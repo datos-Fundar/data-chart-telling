@@ -1,0 +1,31 @@
+{
+	"compilerOptions": {
+		"paths": {
+			"$lib": ["./src/lib"],
+			"$lib/*": ["./src/lib/*"]
+		},
+		"lib": ["esnext", "DOM", "DOM.Iterable"],
+		"moduleResolution": "bundler",
+		"module": "esnext",
+		"noEmit": true,
+		"target": "esnext",
+		"strict": true,
+		"allowJs": true,
+		"checkJs": true,
+		"skipLibCheck": true,
+		"isolatedModules": true,
+		"verbatimModuleSyntax": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"sourceMap": true
+	},
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.svelte",
+		"stories/**/*.ts",
+		"stories/**/*.svelte",
+		"tests/**/*.ts",
+		"tests/**/*.svelte",
+		"vite.config.ts"
+	]
+}
