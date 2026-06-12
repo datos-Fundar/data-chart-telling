@@ -2,28 +2,9 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
 import LinePlotWithCustomMarkers from './LinePlotWithCustomMarkers.svelte';
 import LinePlotWithMarkerStrategies from './LinePlotWithMarkerStrategies.svelte';
-import type { LineSeries, SegmentsMap } from '$lib/types/plots/lines';
+import type { LineSeries, SegmentsMap, DeltaConfig } from '$lib/types/plots/lines';
 import type { Marker } from '$lib/types/plots/markers';
-
-// ── Shared data ───────────────────────────────────────────────────────────────
-
-type YearPoint = { year: number; value: number };
-
-const GDP: YearPoint[] = [
-  { year: 2018, value: 42 },
-  { year: 2019, value: 48 },
-  { year: 2020, value: 31 },
-  { year: 2021, value: 55 },
-  { year: 2022, value: 61 },
-];
-
-const EMPLOYMENT: YearPoint[] = [
-  { year: 2018, value: 72 },
-  { year: 2019, value: 74 },
-  { year: 2020, value: 60 },
-  { year: 2021, value: 68 },
-  { year: 2022, value: 75 },
-];
+import { GDP, EMPLOYMENT, COSTS, MONTHLY, type YearPoint, type MonthPoint } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -47,17 +28,14 @@ const meta = {
     series: {
       description: 'Data series to render. Available series are listed in each story.',
       control: false,
-      table: {
-        type: { summary: 'LineSeries<TData>[]' },
-        category: 'Data',
-      },
+      table: { type: { summary: 'LineSeries<TData>[]' }, category: 'Data' },
     },
     segments: {
-      description: 'Segment styling. Use series names (gdp, employment, etc.) as keys.',
+      description: 'Segment styling. Use series names as keys.',
       control: false,
     },
     markers: {
-      description: 'Marker annotations. Reference series names (gdp, employment, etc.) in the series property.',
+      description: 'Marker annotations.',
       control: false,
     },
   },
@@ -66,13 +44,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// ── Stories ───────────────────────────────────────────────────────────────────
+// ── Basic ─────────────────────────────────────────────────────────────────────
 
 /**
  * Single series with no segments — the whole line is drawn with the CSS
  * default `--plot-line-stroke` variable (falls back to `currentColor`).
- *
- * **Available series:** `gdp`
  */
 export const Default: Story = {
   args: {
@@ -85,8 +61,6 @@ export const Default: Story = {
 /**
  * Two series styled via `segments`. Series carry only data; colours live in
  * `segments` so the same data can be re-styled without touching the series.
- *
- * **Available series:** `gdp`, `employment`
  */
 export const TwoSeries: Story = {
   args: {
@@ -95,8 +69,8 @@ export const TwoSeries: Story = {
       { name: 'employment', x: 'year', y: 'value', data: EMPLOYMENT } satisfies LineSeries<YearPoint>,
     ],
     segments: {
-      gdp:        [{ style: { stroke: '#4f46e5', strokeWidth: 3 } }],
-      employment: [{ style: { stroke: '#e6580d', strokeWidth: 3 } }],
+      gdp:        [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
+      employment: [{ style: { stroke: { stroke: '#e6580d', strokeWidth: 3 } } }],
     } satisfies SegmentsMap,
   },
 };
@@ -105,8 +79,6 @@ export const TwoSeries: Story = {
  * One series split into two ranges: solid up to 2020, dashed from 2020
  * onward (projected values). Both ranges share the 2020 boundary point so
  * the lines connect without a gap.
- *
- * **Available series:** `gdp`
  */
 export const DashedSegment: Story = {
   args: {
@@ -115,8 +87,8 @@ export const DashedSegment: Story = {
     ],
     segments: {
       gdp: [
-        { to:   2020, style: { stroke: '#4f46e5', strokeWidth: 3 } },
-        { from: 2020, style: { stroke: '#4f46e5', strokeWidth: 3, strokeDasharray: '6 4' } },
+        { to:   2020, style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } },
+        { from: 2020, style: { stroke: { stroke: '#4f46e5', strokeWidth: 3, strokeDasharray: '6 4' } } },
       ],
     } satisfies SegmentsMap,
   },
@@ -124,8 +96,6 @@ export const DashedSegment: Story = {
 
 /**
  * Narrow layout — tests that the chart does not overflow its container.
- *
- * **Available series:** `gdp`
  */
 export const Narrow: Story = {
   args: {
@@ -135,17 +105,15 @@ export const Narrow: Story = {
       { name: 'gdp', x: 'year', y: 'value', data: GDP } satisfies LineSeries<YearPoint>,
     ],
     segments: {
-      gdp: [{ style: { stroke: '#4f46e5', strokeWidth: 2 } }],
+      gdp: [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 2 } } }],
     } satisfies SegmentsMap,
   },
 };
 
+// ── Markers ───────────────────────────────────────────────────────────────────
+
 /**
- * Demonstrates vertical rule markers (ruleX) to highlight specific years.
- * Markers can have custom stroke styles.
- *
- * **Available series:** `gdp`
- * **Marker type:** `ruleX` (vertical lines)
+ * Vertical rule markers (ruleX) to highlight specific years.
  */
 export const WithRuleXMarkers: Story = {
   args: {
@@ -153,7 +121,7 @@ export const WithRuleXMarkers: Story = {
       { name: 'gdp', x: 'year', y: 'value', data: GDP } satisfies LineSeries<YearPoint>,
     ],
     segments: {
-      gdp: [{ style: { stroke: '#4f46e5', strokeWidth: 3 } }],
+      gdp: [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
     } satisfies SegmentsMap,
     markers: [
       { type: 'ruleX', x: 2020, style: { stroke: '#dc2626', strokeDasharray: '4 4', strokeOpacity: 0.7 } } satisfies Marker,
@@ -163,10 +131,7 @@ export const WithRuleXMarkers: Story = {
 };
 
 /**
- * Demonstrates horizontal rule markers (ruleY) to highlight threshold values.
- *
- * **Available series:** `employment`
- * **Marker type:** `ruleY` (horizontal lines)
+ * Horizontal rule markers (ruleY) to highlight threshold values.
  */
 export const WithRuleYMarkers: Story = {
   args: {
@@ -174,7 +139,7 @@ export const WithRuleYMarkers: Story = {
       { name: 'employment', x: 'year', y: 'value', data: EMPLOYMENT } satisfies LineSeries<YearPoint>,
     ],
     segments: {
-      employment: [{ style: { stroke: '#e6580d', strokeWidth: 3 } }],
+      employment: [{ style: { stroke: { stroke: '#e6580d', strokeWidth: 3 } } }],
     } satisfies SegmentsMap,
     markers: [
       { type: 'ruleY', y: 60, style: { stroke: '#f97316', strokeDasharray: '6 6', strokeOpacity: 0.5 } } satisfies Marker,
@@ -184,46 +149,431 @@ export const WithRuleYMarkers: Story = {
 };
 
 /**
- * Demonstrates mixing vertical and horizontal markers on the same chart.
+ * Mixing vertical and horizontal markers on the same chart.
  */
 export const WithMixedMarkers: Story = {
   args: {
     series: [
-      { name: 'gdp', x: 'year', y: 'value', data: GDP } satisfies LineSeries<YearPoint>,
+      { name: 'gdp',        x: 'year', y: 'value', data: GDP        } satisfies LineSeries<YearPoint>,
       { name: 'employment', x: 'year', y: 'value', data: EMPLOYMENT } satisfies LineSeries<YearPoint>,
     ],
     segments: {
-      gdp:        [{ style: { stroke: '#4f46e5', strokeWidth: 3 } }],
-      employment: [{ style: { stroke: '#e6580d', strokeWidth: 3 } }],
+      gdp:        [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
+      employment: [{ style: { stroke: { stroke: '#e6580d', strokeWidth: 3 } } }],
     } satisfies SegmentsMap,
     markers: [
       { type: 'ruleX', x: 2020, style: { stroke: '#dc2626', strokeDasharray: '4 4', strokeOpacity: 0.6 } } satisfies Marker,
-      { type: 'ruleY', y: 50, style: { stroke: '#8b5cf6', strokeDasharray: '6 6', strokeOpacity: 0.5 } } satisfies Marker,
+      { type: 'ruleY', y: 50,   style: { stroke: '#8b5cf6', strokeDasharray: '6 6', strokeOpacity: 0.5 } } satisfies Marker,
     ],
   },
 };
 
 /**
- * Demonstrates custom component markers using SVG elements tied to a series.
- * Components can render arbitrary SVG annotations and accept props.
+ * Custom component markers using SVG elements tied to a series.
  */
 export const WithCustomComponentMarker: StoryObj = {
-  render: () => ({
-    Component: LinePlotWithCustomMarkers,
-  }),
+  render: () => ({ Component: LinePlotWithCustomMarkers }),
 };
 
 /**
- * Demonstrates marker strategies: series-level and segment-level peak detection.
- * Shows 4 series with different peak marker configurations:
+ * Marker strategies: series-level and segment-level peak detection.
  * - Series 1: No peak marker
  * - Series 2: Peak marker for entire series
  * - Series 3: Peak marker per segment (strategy: 'segment')
- * - Series 4: Peak marker for entire series (strategy: 'series', despite multiple segments)
+ * - Series 4: Peak marker for entire series despite multiple segments
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const WithMarkerStrategies: any = {
-  render: () => ({
-    Component: LinePlotWithMarkerStrategies,
-  }),
+  render: () => ({ Component: LinePlotWithMarkerStrategies }),
+};
+
+// ── Dots ──────────────────────────────────────────────────────────────────────
+
+/**
+ * Single series with circular dots at each data point.
+ * Dots appear when the `dots` object is present in the segment style —
+ * no explicit `showDots` flag needed.
+ */
+export const WithDots: Story = {
+  args: {
+    series: [
+      { name: 'gdp', x: 'year', y: 'value', data: GDP } satisfies LineSeries<YearPoint>,
+    ],
+    segments: {
+      gdp: [
+        {
+          style: {
+            stroke: { stroke: '#4f46e5', strokeWidth: 3 },
+            dots: { dotRadius: 8, dotSymbol: 'circle' },
+          },
+        },
+      ],
+    } as SegmentsMap,
+  },
+};
+
+/**
+ * Two series with different dot symbols (circle vs square) and coordinated
+ * colors — dots fill matches the line stroke, white dot-stroke for contrast.
+ */
+export const TwoSeriesWithDifferentDots: Story = {
+  args: {
+    series: [
+      { name: 'gdp',  x: 'year', y: 'value', data: GDP  } satisfies LineSeries<YearPoint>,
+      { name: 'costs', x: 'year', y: 'value', data: COSTS } satisfies LineSeries<YearPoint>,
+    ],
+    segments: {
+      gdp: [
+        {
+          style: {
+            stroke: { stroke: '#4f46e5', strokeWidth: 3 },
+            dots: { dotRadius: 8, dotSymbol: 'circle', dotFill: '#4f46e5', dotStroke: '#fff', dotStrokeWidth: 2 },
+          },
+        },
+      ],
+      costs: [
+        {
+          style: {
+            stroke: { stroke: '#e6580d', strokeWidth: 3 },
+            dots: { dotRadius: 8, dotSymbol: 'square', dotFill: '#e6580d', dotStroke: '#fff', dotStrokeWidth: 2 },
+          },
+        },
+      ],
+    } as SegmentsMap,
+  },
+};
+
+/**
+ * One series split into solid (observed) and dashed (projected) segments,
+ * with circle dots before 2020 and triangle dots after.
+ */
+export const DashedSegmentWithDots: Story = {
+  args: {
+    series: [
+      { name: 'gdp', x: 'year', y: 'value', data: GDP } satisfies LineSeries<YearPoint>,
+    ],
+    segments: {
+      gdp: [
+        {
+          to: 2020,
+          style: {
+            stroke: { stroke: '#4f46e5', strokeWidth: 3 },
+            dots: { dotRadius: 8, dotSymbol: 'circle', dotFill: '#4f46e5' },
+          },
+        },
+        {
+          from: 2020,
+          style: {
+            stroke: { stroke: '#4f46e5', strokeWidth: 3, strokeDasharray: '6 4', strokeOpacity: 0.6 },
+            dots: { dotRadius: 8, dotSymbol: 'triangle', dotFill: '#4f46e5' },
+          },
+        },
+      ],
+    } as SegmentsMap,
+  },
+};
+
+/**
+ * Custom dots.
+ */
+export const CustomDotsWithStroke: Story = {
+  args: {
+    series: [
+      { name: 'gdp', x: 'year', y: 'value', data: GDP } satisfies LineSeries<YearPoint>,
+    ],
+    segments: {
+      gdp: [
+        {
+          style: {
+            stroke: { stroke: '#dc2626', strokeWidth: 2 },
+            dots: { dotRadius: 12, dotSymbol: 'circle', dotFill: 'orange', dotStroke: '#222', dotStrokeWidth: 3 },
+          },
+        },
+      ],
+    } as SegmentsMap,
+  },
+};
+
+// ── Styling ───────────────────────────────────────────────────────────────────
+
+/**
+ * Monthly ISO-string X axis with solid and dashed segments that have
+ * different dot symbols — shows string-keyed SegmentsMap in action.
+ * ISO format ("2024-01") ensures alphabetical order matches chronological order.
+ */
+export const MonthlyWithSegmentedDots: Story = {
+  args: {
+    series: [
+      { name: 'metric', x: 'month', y: 'value', data: MONTHLY } satisfies LineSeries<MonthPoint>,
+    ],
+    segments: {
+      metric: [
+        {
+          to: '2024-03',
+          style: {
+            stroke: { stroke: '#4f46e5', strokeWidth: 3 },
+            dots: { dotRadius: 5, dotSymbol: 'circle', dotFill: '#4f46e5' },
+          },
+        },
+        {
+          from: '2024-03',
+          style: {
+            stroke: { stroke: '#4f46e5', strokeWidth: 3, strokeDasharray: '6 4', strokeOpacity: 0.6 },
+            dots: { dotRadius: 5, dotSymbol: 'triangle', dotFill: '#4f46e5' },
+          },
+        },
+      ],
+    } as SegmentsMap,
+  },
+};
+
+// ── Delta ─────────────────────────────────────────────────────────────────────
+
+/**
+ * Vertical delta line between two series at a given X position.
+ * Endpoint dots inherit each series' stroke color automatically.
+ */
+export const XDeltaBetweenTwoSeries: Story = {
+  args: {
+    series: [
+      { name: 'gdp',   x: 'year', y: 'value', data: GDP   } satisfies LineSeries<YearPoint>,
+      { name: 'costs', x: 'year', y: 'value', data: COSTS } satisfies LineSeries<YearPoint>,
+    ],
+    segments: {
+      gdp:   [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
+      costs: [{ style: { stroke: { stroke: '#e6580d', strokeWidth: 3 } } }],
+    } satisfies SegmentsMap,
+    delta: {
+      x: [
+        {
+          at: 2019,
+          from: { type: 'series', series: 'gdp' },
+          to:   { type: 'series', series: 'costs' },
+          stroke: { stroke: '#6b7280', strokeDasharray: '6 6' },
+          formatDiff: (d) => d.toFixed(0),
+          dx: 12,
+          lineAnchor: 'middle',
+        } satisfies DeltaConfig,
+      ],
+    },
+  },
+};
+
+/**
+ * Delta from a series down to the Y=0 baseline (no `to` target).
+ * Useful for labelling the absolute value of a series at a point.
+ */
+export const XDeltaToBaseline: Story = {
+  args: {
+    series: [
+      { name: 'gdp', x: 'year', y: 'value', data: GDP } satisfies LineSeries<YearPoint>,
+    ],
+    segments: {
+      gdp: [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
+    } satisfies SegmentsMap,
+    delta: {
+      x: [
+        {
+          at: 2021,
+          from: { type: 'series', series: 'gdp' },
+          stroke: { stroke: '#4f46e5', strokeDasharray: '4 4', strokeOpacity: 0.6 },
+          formatDiff: (d) => `${d}`,
+          dx: 12,
+          lineAnchor: 'middle',
+        } satisfies DeltaConfig,
+      ],
+    },
+  },
+};
+
+/**
+ * Delta to an explicit axis threshold (e.g. a policy target at y=40).
+ */
+export const XDeltaToAxisValue: Story = {
+  args: {
+    series: [
+      { name: 'gdp', x: 'year', y: 'value', data: GDP } satisfies LineSeries<YearPoint>,
+    ],
+    segments: {
+      gdp: [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
+    } satisfies SegmentsMap,
+    delta: {
+      x: [
+        {
+          at: 2022,
+          from: { type: 'series', series: 'gdp' },
+          to:   { type: 'axis', value: 40 },
+          stroke: { stroke: '#dc2626', strokeDasharray: '6 4' },
+          formatDiff: (d) => `+ ${d.toFixed(0)}`,
+          dx: 20,
+          lineAnchor: 'middle',
+        } satisfies DeltaConfig,
+      ],
+    },
+  },
+};
+
+/**
+ * Multiple X delta annotations on the same chart at different years.
+ */
+export const MultipleXDeltas: Story = {
+  args: {
+    series: [
+      { name: 'gdp',   x: 'year', y: 'value', data: GDP   } satisfies LineSeries<YearPoint>,
+      { name: 'costs', x: 'year', y: 'value', data: COSTS } satisfies LineSeries<YearPoint>,
+    ],
+    segments: {
+      gdp:   [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
+      costs: [{ style: { stroke: { stroke: '#e6580d', strokeWidth: 3 } } }],
+    } satisfies SegmentsMap,
+    delta: {
+      x: [
+        {
+          at: 2019,
+          from: { type: 'series', series: 'gdp' },
+          to:   { type: 'series', series: 'costs' },
+          stroke: { stroke: '#6b7280', strokeDasharray: '4 4', strokeOpacity: 0.7 },
+          formatDiff: (d) => d.toFixed(0),
+          dx: 12,
+          lineAnchor: 'middle',
+        } satisfies DeltaConfig,
+        {
+          at: 2022,
+          from: { type: 'series', series: 'gdp' },
+          to:   { type: 'series', series: 'costs' },
+          stroke: { stroke: '#6b7280', strokeDasharray: '4 4', strokeOpacity: 0.7 },
+          formatDiff: (d) => d.toFixed(0),
+          dx: 12,
+          lineAnchor: 'middle',
+        } satisfies DeltaConfig,
+      ],
+    },
+  },
+};
+
+/**
+ * Horizontal delta between two series at a given Y value.
+ * At y=40, GDP reaches that value around 2018, COSTS reaches it at 2021.
+ * The line spans those two X positions; dots inherit each series' color.
+ */
+export const YDeltaBetweenTwoSeries: Story = {
+  args: {
+    series: [
+      { name: 'gdp',   x: 'year', y: 'value', data: GDP   } satisfies LineSeries<YearPoint>,
+      { name: 'costs', x: 'year', y: 'value', data: COSTS } satisfies LineSeries<YearPoint>,
+    ],
+    segments: {
+      gdp:   [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
+      costs: [{ style: { stroke: { stroke: '#e6580d', strokeWidth: 3 } } }],
+    } satisfies SegmentsMap,
+    delta: {
+      y: [
+        {
+          at: 40,
+          from: { type: 'series', series: 'gdp' },
+          to:   { type: 'series', series: 'costs' },
+          stroke: { stroke: '#6b7280', strokeDasharray: '6 6' },
+          formatDiff: (d) => `${d} yr`,
+          dy: -10,
+          lineAnchor: 'middle',
+        } satisfies DeltaConfig,
+      ],
+    },
+  },
+};
+
+/**
+ * Horizontal delta from a series down to the x=0 baseline (no `to` target).
+ * At y=55, GDP is at x=2021, so the true diff is 2021.
+ * `x.domain` keeps the axis tight around the data; the line is clamped to
+ * the domain edge visually, but the label still shows the true distance from x=0.
+ */
+export const YDeltaToBaseline: Story = {
+  args: {
+    series: [
+      { name: 'gdp', x: 'year', y: 'value', data: GDP } satisfies LineSeries<YearPoint>,
+    ],
+    segments: {
+      gdp: [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
+    } satisfies SegmentsMap,
+    delta: {
+      y: [
+        {
+          at: 55,
+          from: { type: 'series', series: 'gdp' },
+          stroke: { stroke: '#4f46e5', strokeDasharray: '4 4', strokeOpacity: 0.6 },
+          formatDiff: (d) => `${d.toFixed(0)} yr`,
+          dy: -10,
+          lineAnchor: 'middle',
+        } satisfies DeltaConfig,
+      ],
+    },
+    x: { domain: [2018, 2023] },
+  },
+};
+
+/**
+ * Horizontal delta from a series point to an explicit X axis value.
+ * At y=45, COSTS is at 2022 — the line shows the distance to year 2019.
+ */
+export const YDeltaToAxisValue: Story = {
+  args: {
+    series: [
+      { name: 'costs', x: 'year', y: 'value', data: COSTS } satisfies LineSeries<YearPoint>,
+    ],
+    segments: {
+      costs: [{ style: { stroke: { stroke: '#e6580d', strokeWidth: 3 } } }],
+    } satisfies SegmentsMap,
+    delta: {
+      y: [
+        {
+          at: 45,
+          from: { type: 'series', series: 'costs' },
+          to:   { type: 'axis', value: 2019 },
+          stroke: { stroke: '#dc2626', strokeDasharray: '6 4' },
+          formatDiff: (d) => `${d} yr`,
+          dy: -10,
+          lineAnchor: 'middle',
+        } satisfies DeltaConfig,
+      ],
+    },
+  },
+};
+
+/**
+ * Multiple Y delta annotations at different Y values on the same chart.
+ */
+export const MultipleYDeltas: Story = {
+  args: {
+    series: [
+      { name: 'gdp',   x: 'year', y: 'value', data: GDP   } satisfies LineSeries<YearPoint>,
+      { name: 'costs', x: 'year', y: 'value', data: COSTS } satisfies LineSeries<YearPoint>,
+    ],
+    segments: {
+      gdp:   [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
+      costs: [{ style: { stroke: { stroke: '#e6580d', strokeWidth: 3 } } }],
+    } satisfies SegmentsMap,
+    delta: {
+      y: [
+        {
+          at: 32,
+          from: { type: 'series', series: 'gdp' },
+          to:   { type: 'series', series: 'costs' },
+          stroke: { stroke: '#6b7280', strokeDasharray: '4 4', strokeOpacity: 0.7 },
+          formatDiff: (d) => `${d} yr`,
+          dy: -10,
+          lineAnchor: 'middle',
+        } satisfies DeltaConfig,
+        {
+          at: 48,
+          from: { type: 'series', series: 'gdp' },
+          to:   { type: 'series', series: 'costs' },
+          stroke: { stroke: '#6b7280', strokeDasharray: '4 4', strokeOpacity: 0.7 },
+          formatDiff: (d) => `${d} yr`,
+          dy: -10,
+          lineAnchor: 'middle',
+        } satisfies DeltaConfig,
+      ],
+    },
+  },
 };

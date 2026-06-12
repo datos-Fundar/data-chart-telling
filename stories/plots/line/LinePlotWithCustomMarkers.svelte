@@ -34,7 +34,7 @@
   height={400}
   series={[{ name: 'gdp', x: 'year', y: 'value', data: GDP } satisfies LineSeries<YearPoint>]}
   segments={{
-    gdp: [{ style: { stroke: '#4f46e5', strokeWidth: 3 } }],
+    gdp: [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
   } satisfies SegmentsMap}
   {markers}
 />

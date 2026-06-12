@@ -46,15 +46,15 @@
   ];
 
   const segments: SegmentsMap = {
-    series1: [{ style: { stroke: '#ef4444', strokeWidth: 3 } }],
-    series2: [{ style: { stroke: '#f97316', strokeWidth: 3 } }],
+    series1: [{ style: { stroke: { stroke: '#ef4444', strokeWidth: 3 } } }],
+    series2: [{ style: { stroke: { stroke: '#f97316', strokeWidth: 3 } } }],
     series3: [
-      { to: 2020, style: { stroke: '#eab308', strokeWidth: 3 } },
-      { from: 2020, style: { stroke: '#eab308', strokeWidth: 3, strokeDasharray: '6 4' } },
+      { to: 2020, style: { stroke: { stroke: '#eab308', strokeWidth: 3 } } },
+      { from: 2020, style: { stroke: { stroke: '#eab308', strokeWidth: 3, strokeDasharray: '6 4' } } },
     ],
     series4: [
-      { to: 2020, style: { stroke: '#06b6d4', strokeWidth: 3 } },
-      { from: 2020, style: { stroke: '#06b6d4', strokeWidth: 3, strokeDasharray: '6 4' } },
+      { to: 2020, style: { stroke: { stroke: '#06b6d4', strokeWidth: 3 } } },
+      { from: 2020, style: { stroke: { stroke: '#06b6d4', strokeWidth: 3, strokeDasharray: '6 4' } } },
     ],
   };
 
