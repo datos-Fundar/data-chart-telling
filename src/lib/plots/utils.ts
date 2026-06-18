@@ -3,8 +3,8 @@
  * Svelteplot marks expect `(d: T) => value` — this bridges the
  * shorthand key notation used in series definitions.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function resolveAccessor<T extends Record<string, unknown>>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   field: keyof T | ((d: T) => any),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): (d: T) => any {

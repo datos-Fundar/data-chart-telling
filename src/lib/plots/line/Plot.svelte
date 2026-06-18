@@ -3,14 +3,20 @@
   generics="TData extends Record<string, unknown>"
 >
   import { SvelteMap } from 'svelte/reactivity';
-  import { Plot, Line, Dot, AxisX, AxisY, RuleX, RuleY } from 'svelteplot';
+  import { Plot, Line, Dot, AxisX, AxisY, RuleX, RuleY, Pointer } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils';
+  import { getConfiguration } from '$lib/charts/config.svelte';
+  import { getHover, createHover } from '$lib/charts/hover.svelte';
+  import { createHoverController } from '$lib/charts/tooltip/controller.svelte';
+  import HoverMarks from '$lib/charts/tooltip/HoverMarks.svelte';
+  import Tooltip from '$lib/charts/tooltip/Tooltip.svelte';
   import { buildGroupedSeries, validateSegments } from '$lib/plots/line/segments';
   import { resolveXDeltas, resolveYDeltas } from '$lib/plots/line/delta';
   import DeltaAnnotation from '$lib/plots/line/DeltaAnnotation.svelte';
   import type { LineSeries, SegmentsMap, DeltaConfig } from '$lib/types/plots/lines';
   import type { XValue } from '$lib/types/plots/common';
   import type { Marker } from '$lib/types/plots/markers';
+  import type { TooltipRuntime } from '$lib/types/charts/tooltip';
   type AxisScale = { domain?: (number | string | Date)[]; nice?: boolean; reverse?: boolean };
 
   let {
@@ -22,6 +28,7 @@
     delta = {},
     x: xScale = {},
     y: yScale = {},
+    tooltip = undefined,
   }: {
     width: number;
     height: number;
@@ -31,6 +38,7 @@
     delta?: { x?: DeltaConfig[]; y?: DeltaConfig[] };
     x?: AxisScale;
     y?: AxisScale;
+    tooltip?: TooltipRuntime<TData>;
   } = $props();
 
   $effect(() => {
@@ -70,17 +78,51 @@
 
   const resolvedXDeltas = $derived(resolveXDeltas(series, segments, delta.x ?? []));
   const resolvedYDeltas = $derived(resolveYDeltas(series, segments, delta.y ?? []));
+
+  const cfg = $derived(getConfiguration());
+
+  // ── Hover / tooltip ───────────────────────────────────────────────────────
+  const sharedHover = getHover();
+  const localHover = createHover();
+  const hover = $derived(sharedHover ?? localHover);
+  $effect(() => {
+    if (!sharedHover && tooltip) localHover.sync = tooltip.sync;
+  });
+
+  const xAcc = $derived(resolveAccessor(series[0]?.x ?? ((d: TData) => d)));
+  const yAcc = $derived(resolveAccessor(series[0]?.y ?? ((d: TData) => d)));
+  const flat = $derived(series.flatMap((s) => s.data));
+  const hoverPoints = $derived(
+    flat.map((d) => ({ x: xAcc(d) as XValue, y: Number(yAcc(d)), row: d, label: String(yAcc(d)) })),
+  );
+
+  const ctrl = createHoverController<TData>({
+    hover: () => hover,
+    facetId: () => tooltip?.facetId ?? '',
+    points: () => hoverPoints,
+    getX: () => (d) => xAcc(d) as XValue,
+    getY: () => (d) => Number(yAcc(d)),
+    label: () => (r) => String(yAcc(r)),
+    format: () => tooltip?.format ?? ((r) => String(yAcc(r))),
+  });
 </script>
 
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div
+  class="dct-plot"
+  style:color={cfg.axis.color}
+  onpointermove={tooltip ? ctrl.onMove : undefined}
+  onpointerleave={tooltip ? ctrl.onLeave : undefined}
+>
 <Plot
   {width}
   {height}
   x={xScale}
   y={yScale}
-  margin={{ left: 30, right: 20, top: 20, bottom: 20 }}
+  margin={cfg.margins}
 >
-  <AxisX tickSize={5} tickPadding={10} tickFontSize={14} />
-  <AxisY tickSize={0} tickPadding={10} tickFontSize={14} />
+  <AxisX tickSize={cfg.axis.tickSize} tickPadding={cfg.axis.tickPadding} tickFontSize={cfg.axis.fontSize} />
+  <AxisY tickSize={0} tickPadding={cfg.axis.tickPadding} tickFontSize={cfg.axis.fontSize} />
 
   {#each groupedSeries as group (group.series.name)}
     {#each group.visualSegments as seg, i (`${group.series.name}-${i}`)}
@@ -90,7 +132,7 @@
         x={resolveAccessor(group.series.x)}
         y={resolveAccessor(group.series.y)}
         stroke={strokeStyle?.stroke ?? 'var(--plot-line-stroke, currentColor)'}
-        strokeWidth={strokeStyle?.strokeWidth ?? 2}
+        strokeWidth={strokeStyle?.strokeWidth ?? cfg.line.strokeWidth}
         strokeOpacity={strokeStyle?.strokeOpacity ?? 1}
         strokeDasharray={strokeStyle?.strokeDasharray}
         strokeLinejoin="round"
@@ -102,7 +144,7 @@
           data={seg.data}
           x={resolveAccessor(group.series.x)}
           y={resolveAccessor(group.series.y)}
-          r={dotStyle.dotRadius ?? 4}
+          r={dotStyle.dotRadius ?? cfg.line.dotRadius}
           fill={dotStyle.dotFill ?? strokeStyle?.stroke ?? 'var(--plot-line-stroke, currentColor)'}
           symbol={dotStyle.dotSymbol ?? 'circle'}
           stroke={dotStyle.dotStroke ?? strokeStyle?.stroke ?? 'var(--plot-line-stroke, currentColor)'}
@@ -174,4 +216,21 @@
   {#each resolvedYDeltas as d (`ydelta-${d.cfg.at}`)}
     <DeltaAnnotation delta={d} axis="y" xDomain={xScale.domain} yDomain={yScale.domain} />
   {/each}
+
+  {#if tooltip}
+    <Pointer data={flat} x={xAcc} maxDistance={400} onupdate={ctrl.onPointer} />
+    <HoverMarks points={ctrl.points} ruleX={ctrl.ruleX} ruleY={ctrl.ruleY} color={cfg.timeline.activeColor} />
+  {/if}
 </Plot>
+
+{#if tooltip && ctrl.showTooltip && ctrl.cursor}
+  <Tooltip x={ctrl.cursor.x} y={ctrl.cursor.y}>{ctrl.tooltipText}</Tooltip>
+{/if}
+</div>
+
+<style>
+  .dct-plot {
+    position: relative;
+    line-height: 0;
+  }
+</style>
