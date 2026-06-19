@@ -1,19 +1,14 @@
-<script lang="ts">
+<script lang="ts" generics="TData = Record<string, unknown>">
   import { Text } from 'svelteplot';
+  import type { MarkerProps } from '$lib/types/plots/markers';
+  import type { XValue } from '$lib/types/plots/common';
+  import type { FontStyle } from '$lib/types/plots/styles';
 
-  interface Props {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data?: any[];
-    x?: number | (() => number);
-    y?: number | (() => number);
-    text?: string;
-    fill?: string;
-    fontSize?: number;
-    fontWeight?: 'normal' | 'bold';
-    fontStyle?: 'normal' | 'italic';
-    textAnchor?: 'start' | 'middle' | 'end';
-    dx?: number;
-    dy?: number;
+  interface Props extends MarkerProps<TData> {
+    x?: XValue | ((d: TData) => XValue);
+    y?: XValue | ((d: TData) => XValue);
+    text?: string | ((d: TData) => string);
+    style?: FontStyle;
   }
 
   const {
@@ -21,18 +16,22 @@
     x,
     y,
     text = '',
-    fill = 'currentColor',
-    fontSize = 12,
-    fontWeight = 'normal',
-    fontStyle = 'normal',
-    textAnchor = 'middle',
-    dx = 0,
-    dy = 0,
+    style,
   }: Props = $props();
 
   const xAccessor = $derived(typeof x === 'function' ? x : () => x ?? 0);
   const yAccessor = $derived(typeof y === 'function' ? y : () => y ?? 0);
-  const displayData = $derived(data.length > 0 ? data : [{}]);
+  const textAccessor = $derived(typeof text === 'function' ? text : () => text ?? '');
+  const displayData = $derived(data.length > 0 ? data : [{} as TData]);
+
+  const fill = $derived(style?.fill ?? 'currentColor');
+  const fontSize = $derived(style?.fontSize ?? 12);
+  const fontWeight = $derived(style?.fontWeight ?? 'normal');
+  const fontStyleProp = $derived(style?.fontStyle ?? 'normal');
+  const textAnchor = $derived(style?.textAnchor ?? 'middle');
+  const lineAnchor = $derived(style?.lineAnchor ?? 'middle');
+  const dx = $derived(style?.dx ?? 0);
+  const dy = $derived(style?.dy ?? 0);
 </script>
 
 {#if text}
@@ -40,12 +39,16 @@
     data={displayData}
     x={xAccessor}
     y={yAccessor}
-    text={() => text}
+    text={textAccessor}
     {fill}
     {fontSize}
     {fontWeight}
-    {fontStyle}
+    fontStyle={fontStyleProp}
     {textAnchor}
+    {lineAnchor}
+    stroke={style?.stroke}
+    strokeWidth={style?.strokeWidth}
+    paintOrder={style?.paintOrder}
     {dx}
     {dy}
   />

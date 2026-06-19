@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
-import type { BarSeries } from '$lib/types/plots/bars';
+import type { Series } from '$lib/types/plots/common';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -15,8 +15,8 @@ const REGIONS: Region[] = [
   { region: 'Oeste',  value: 71 },
 ];
 
-const SERIES: BarSeries<Region>[] = [
-  { name: 'regions', x: 'region', y: 'value', data: REGIONS, fill: '#4f46e5' },
+const SERIES: Series<Region>[] = [
+  { name: 'regions', x: 'region', y: 'value', data: REGIONS },
 ];
 
 // Waits until at least one <svg> is present in the container.
@@ -62,9 +62,9 @@ describe('BarPlot', () => {
     const GDP: YV[]        = [{ year: '2020', value: 31 }, { year: '2021', value: 55 }];
     const EMPLOYMENT: YV[] = [{ year: '2020', value: 60 }, { year: '2021', value: 68 }];
 
-    const twoSeries: BarSeries<YV>[] = [
-      { name: 'gdp',        x: 'year', y: 'value', data: GDP,        fill: '#4f46e5' },
-      { name: 'employment', x: 'year', y: 'value', data: EMPLOYMENT, fill: '#e6580d' },
+    const twoSeries: Series<YV>[] = [
+      { name: 'gdp', x: 'year', y: 'value', data: GDP },
+      { name: 'employment', x: 'year', y: 'value', data: EMPLOYMENT },
     ];
 
     const { container } = await render(BarPlot, {

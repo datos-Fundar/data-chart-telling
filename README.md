@@ -117,11 +117,9 @@ Omitting `segments` renders the whole series with the CSS custom property `--plo
 import {
   LinePlot,
   BarPlot,
-  type LineSeries,
   type LineRangeSegment,
   type SegmentsMap,
   type LineSegmentStyle,
-  type BarSeries,
   type XValue,
   type YValue,
 } from '@fundar/data-chart-telling';

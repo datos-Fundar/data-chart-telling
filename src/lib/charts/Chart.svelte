@@ -1,12 +1,12 @@
 <script lang="ts" generics="TRow extends Record<string, unknown>">
   import ChartContainer from '$lib/charts/container/ChartContainer.svelte';
-  import TimelineLayout from '$lib/charts/timeline/TimelineLayout.svelte';
-  import FacetGrid from '$lib/charts/facet/FacetGrid.svelte';
-  import Legend from '$lib/charts/legend/Legend.svelte';
-  import { getConfiguration } from '$lib/charts/config.svelte';
-  import { provideHover } from '$lib/charts/hover.svelte';
+  import TimelineLayout from '$lib/layout/timeline/TimelineLayout.svelte';
+  import FacetLayout from '$lib/layout/facet/FacetLayout.svelte';
+  import LegendLayout from '$lib/layout/legend/LegendLayout.svelte';
+  import { getConfiguration } from '$lib/configuration/config.svelte';
+  import { provideHover } from '$lib/layout/tooltip/hover.svelte';
   import type { LegendSection } from '$lib/types/charts/legend';
-  import type { TooltipSync } from '$lib/types/charts/tooltip';
+  import type { TooltipSync } from '$lib/types/layout/tooltip';
   import type {
     ChartPlotSnippet,
     FacetConfig,
@@ -47,14 +47,12 @@
     data: TRow[];
     facet?: FacetConfig<TRow>;
     timeline?: TimelineConfig<TRow>;
-    /** Cross-facet tooltip sync mode; the hover store is shared by all facets. */
     tooltip?: { sync?: TooltipSync };
     plot: ChartPlotSnippet<TRow>;
   } = $props();
 
   const cfg = $derived(getConfiguration());
 
-  // One shared hover store for every facet, so a hover in one syncs to the rest.
   const hoverStore = provideHover();
   $effect(() => {
     hoverStore.sync = tooltip?.sync ?? 'none';
@@ -68,7 +66,7 @@
 -->
 {#snippet body(rows: TRow[], w: number, h: number, selectedValue: TimeValue | undefined)}
   {#if facet}
-    <FacetGrid
+    <FacetLayout
       data={rows}
       by={facet.by}
       columns={facet.columns}
@@ -80,7 +78,7 @@
       {#snippet cell({ facetValue, data: cellData, width: cw, height: ch })}
         {@render plot({ data: cellData, width: cw, height: ch, facetValue, selectedValue })}
       {/snippet}
-    </FacetGrid>
+    </FacetLayout>
   {:else}
     {@render plot({ data: rows, width: w, height: h, selectedValue })}
   {/if}
@@ -88,7 +86,7 @@
 
 {#snippet legendSnippet()}
   {#if legend && legend.length > 0}
-    <Legend sections={legend} />
+    <LegendLayout sections={legend} />
   {/if}
 {/snippet}
 
@@ -109,6 +107,7 @@
         values={timeline.values}
         orientation={timeline.orientation}
         thickness={timeline.thickness ?? cfg.timeline.thickness}
+        filterMode={timeline.filterMode}
         width={w}
         height={h}
       >

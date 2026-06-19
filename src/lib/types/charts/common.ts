@@ -1,13 +1,5 @@
 import type { Snippet } from 'svelte';
-
-/**
- * A field key or accessor function. Mirrors the shorthand used across plots
- * so chart-level encodings (`x`, `y`, `z`, facet, timeline) feel consistent
- * with the plot-level series definitions.
- */
-export type Accessor<TRow extends Record<string, unknown>, V> =
-  | keyof TRow
-  | ((d: TRow) => V);
+import type { Accessor } from '$lib/types/plots/common';
 
 /** Value used to position and step a timeline (typically a year). */
 export type TimeValue = number;
@@ -77,6 +69,13 @@ export type TimelineConfig<TRow extends Record<string, unknown>> = {
   orientation?: Orientation;
   /** Thickness in px of the timeline gutter (width if vertical, height if horizontal). */
   thickness?: number;
+  /**
+   * How the timeline filters `data` for the selected step. `'exact'`
+   * (default) keeps only rows matching the step — a snapshot, right for bar
+   * and heatmap. `'upTo'` keeps every row at or before the step — a
+   * cumulative reveal, right for a line that should grow over time.
+   */
+  filterMode?: 'exact' | 'upTo';
 };
 
 /** Facet configuration passed to {@link Chart}. */

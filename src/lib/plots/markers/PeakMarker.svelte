@@ -1,24 +1,17 @@
 <script lang="ts">
   import DotMarker from './DotMarker.svelte';
   import TextMarker from './TextMarker.svelte';
+  import type { MarkerProps } from '$lib/types/plots/markers';
+  import type { DotStyle, FontStyle } from '$lib/types/plots/styles';
 
-  interface Props {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data?: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  interface Props extends MarkerProps<Record<string, any>> {
     yProp?: string;
     xProp?: string;
     mode?: 'max' | 'min';
     label?: string;
-    dotRadius?: number;
-    dotFill?: string;
-    dotStroke?: string;
-    dotStrokeWidth?: number;
-    textFill?: string;
-    textFontSize?: number;
-    textFontWeight?: 'normal' | 'bold';
-    textDx?: number;
-    textDy?: number;
-    seriesColor?: string;
+    dotStyle?: DotStyle;
+    textStyle?: FontStyle;
   }
 
   const {
@@ -27,21 +20,14 @@
     xProp = 'x',
     mode = 'max',
     label,
-    dotRadius = 5,
-    dotFill,
-    dotStroke,
-    dotStrokeWidth = 2,
-    textFill,
-    textFontSize = 14,
-    textFontWeight = 'bold',
-    textDx = 0,
-    textDy = -15,
+    dotStyle,
+    textStyle,
     seriesColor,
   }: Props = $props();
 
-  const resolvedDotFill = $derived(dotFill ?? seriesColor ?? '#fbbf24');
-  const resolvedDotStroke = $derived(dotStroke ?? seriesColor ?? '#f59e0b');
-  const resolvedTextFill = $derived(textFill ?? seriesColor ?? '#f59e0b');
+  const resolvedDotFill = $derived(dotStyle?.dotFill ?? seriesColor ?? '#fbbf24');
+  const resolvedDotStroke = $derived(dotStyle?.dotStroke ?? seriesColor ?? '#f59e0b');
+  const resolvedTextFill = $derived(textStyle?.fill ?? seriesColor ?? '#f59e0b');
 
   const peakPoint = $derived.by(() => {
     if (data.length === 0) return null;
@@ -60,6 +46,19 @@
 
   const peakX = $derived(peakPoint ? peakPoint[xProp] : null);
   const peakY = $derived(peakPoint ? peakPoint[yProp] : null);
+
+  const resolvedDotStyle = $derived<DotStyle>({
+    ...dotStyle,
+    dotFill: resolvedDotFill,
+    dotStroke: resolvedDotStroke,
+  });
+
+  const resolvedTextStyle = $derived<FontStyle>({
+    ...textStyle,
+    fill: resolvedTextFill,
+    fontWeight: textStyle?.fontWeight ?? 'bold',
+    dy: textStyle?.dy ?? -15,
+  });
 </script>
 
 {#if peakPoint}
@@ -67,10 +66,7 @@
     data={[peakPoint]}
     x={() => peakX}
     y={() => peakY}
-    r={dotRadius}
-    fill={resolvedDotFill}
-    stroke={resolvedDotStroke}
-    strokeWidth={dotStrokeWidth}
+    style={resolvedDotStyle}
   />
   {#if label}
     <TextMarker
@@ -78,11 +74,7 @@
       x={() => peakX}
       y={() => peakY}
       text={label}
-      fill={resolvedTextFill}
-      fontSize={textFontSize}
-      fontWeight={textFontWeight}
-      dx={textDx}
-      dy={textDy}
+      style={resolvedTextStyle}
     />
   {/if}
 {/if}

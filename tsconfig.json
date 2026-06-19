@@ -26,6 +26,7 @@
 		"stories/**/*.svelte",
 		"tests/**/*.ts",
 		"tests/**/*.svelte",
-		"vite.config.ts"
+		"vite.config.ts",
+		".storybook/**/*.ts"
 	]
 }

@@ -20,8 +20,8 @@ const meta = {
     width: 520,
     height: 420,
     series: { data: CELLS, x: 'rooms', y: 'people', value: 'pct' } satisfies HeatmapSeries<Cell>,
-    xLabel: 'Ambientes',
-    yLabel: 'Personas',
+    xScale: { label: 'Ambientes' },
+    yScale: { label: 'Personas' },
     formatValue: (v: number) => `${(v * 100).toFixed(0)}%`,
   },
   argTypes: {

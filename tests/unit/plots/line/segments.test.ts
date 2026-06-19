@@ -1,6 +1,6 @@
 import { describe, test, expect, vi, afterEach } from 'vitest';
-import { buildGroupedSeries, validateSegments } from '$lib/plots/line/segments';
-import type { LineSeries } from '$lib/types/plots/lines';
+import { buildGroupedSeries, validateSegments } from '$lib/plots/utils/segments';
+import type { Series } from '$lib/types/plots/common';
 
 // ── Shared fixtures ───────────────────────────────────────────────────────────
 
@@ -14,9 +14,9 @@ const DATA: P[] = [
   { x: 5, y: 50 },
 ];
 
-const SERIES: LineSeries<P> = { name: 'a', x: 'x', y: 'y', data: DATA };
+const SERIES: Series<P> = { name: 'a', x: 'x', y: 'y', data: DATA };
 
-const xs = (groups: ReturnType<typeof buildGroupedSeries<P>>, groupIdx = 0, segIdx = 0) =>
+const xs = (groups: ReturnType<typeof buildGroupedSeries<Series<P>>>, groupIdx = 0, segIdx = 0) =>
   groups[groupIdx].visualSegments[segIdx].data.map(d => d.x);
 
 afterEach(() => vi.restoreAllMocks());
@@ -119,14 +119,14 @@ describe('buildGroupedSeries – styles', () => {
 
 describe('buildGroupedSeries – multiple series', () => {
   test('returns one group per series in the same order', () => {
-    const b: LineSeries<P> = { name: 'b', x: 'x', y: 'y', data: DATA };
+    const b: Series<P> = { name: 'b', x: 'x', y: 'y', data: DATA };
     const groups = buildGroupedSeries([SERIES, b], {});
     expect(groups[0].series.name).toBe('a');
     expect(groups[1].series.name).toBe('b');
   });
 
   test('segments are applied per series independently', () => {
-    const b: LineSeries<P> = { name: 'b', x: 'x', y: 'y', data: DATA };
+    const b: Series<P> = { name: 'b', x: 'x', y: 'y', data: DATA };
     const groups = buildGroupedSeries([SERIES, b], {
       a: [{ to: 2 }],
       // no entry for 'b' → whole data
@@ -138,7 +138,7 @@ describe('buildGroupedSeries – multiple series', () => {
 
 describe('buildGroupedSeries – function accessor', () => {
   test('works with a function accessor for x', () => {
-    const s: LineSeries<P> = { name: 'fn', x: d => d.x, y: d => d.y, data: DATA };
+    const s: Series<P> = { name: 'fn', x: d => d.x, y: d => d.y, data: DATA };
     const groups = buildGroupedSeries([s], { fn: [{ from: 3 }] });
     expect(xs(groups)).toEqual([3, 4, 5]);
   });

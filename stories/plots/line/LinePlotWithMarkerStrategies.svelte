@@ -1,7 +1,8 @@
 <script lang="ts">
   import LinePlot from '$lib/plots/line/Plot.svelte';
   import PeakMarker from '$lib/plots/markers/PeakMarker.svelte';
-  import type { LineSeries, SegmentsMap } from '$lib/types/plots/lines';
+  import type { Series } from '$lib/types/plots/common';
+  import type { SegmentsMap } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
 
   type YearPoint = { year: number; value: number };
@@ -38,7 +39,7 @@
     { year: 2022, value: 68 },
   ];
 
-  const series: LineSeries<YearPoint>[] = [
+  const series: Series<YearPoint>[] = [
     { name: 'series1', x: 'year', y: 'value', data: SERIES1 },
     { name: 'series2', x: 'year', y: 'value', data: SERIES2 },
     { name: 'series3', x: 'year', y: 'value', data: SERIES3 },

@@ -1,17 +1,94 @@
+import type { XValue, Series } from '$lib/types/plots/common';
+
 export type SymbolType = 'circle' | 'square' | 'triangle' | 'line';
 export type LineStyle = 'solid' | 'dashed' | 'dotted' | 'dashdot';
+export type LineCap = 'butt' | 'round' | 'square';
+export type LineJoin = 'arcs' | 'bevel' | 'miter' | 'miter-clip' | 'round';
 
-export type LineStrokeStyle = {
+/** Stroke styling for any line-ish mark — a line, a rule, a marker's connector. */
+export type StrokeStyle = {
   stroke?: string;
   strokeWidth?: number;
   strokeOpacity?: number;
   strokeDasharray?: string | LineStyle;
+  strokeLinecap?: LineCap;
+  strokeLinejoin?: LineJoin;
 };
 
-export type LineDotStyle = {
+/**
+ * Dot styling for any point mark — a line's endpoint dots, a marker's dot.
+ * Carries its own `dotStroke*` fields rather than nesting a {@link StrokeStyle},
+ * because a dot's outline is a distinct style from the stroke of the line (or
+ * other mark) it sits next to — e.g. a {@link LineSegmentStyle} styles its
+ * line's stroke and its dots' outline independently.
+ */
+export type DotStyle = {
   dotRadius?: number;
   dotFill?: string;
+  dotFillOpacity?: number;
   dotSymbol?: SymbolType;
   dotStroke?: string;
   dotStrokeWidth?: number;
+  dotStrokeOpacity?: number;
+  dotStrokeDasharray?: string | LineStyle;
+};
+
+/** Text/label styling for any text mark — a marker's label, an annotation. */
+export type FontStyle = {
+  fill?: string;
+  fontSize?: number;
+  fontWeight?: 'normal' | 'bold';
+  fontStyle?: 'normal' | 'italic';
+  textAnchor?: 'start' | 'middle' | 'end';
+  lineAnchor?: 'top' | 'middle' | 'bottom';
+  stroke?: string;
+  strokeWidth?: number;
+  paintOrder?: string;
+  dx?: number;
+  dy?: number;
+};
+
+/** Per-segment styling for a line: its stroke and/or its endpoint dots. */
+export type LineSegmentStyle = {
+  stroke?: StrokeStyle;
+  dots?: DotStyle;
+};
+
+/** Per-segment styling for a bar: its fill. */
+export type BarSegmentStyle = {
+  fill?: string;
+  fillOpacity?: number;
+};
+
+/**
+ * A styled interval on the x axis, keyed by series name in a {@link SegmentsMap}.
+ * Works for any mark — `TStyle` is the per-mark style shape (e.g.
+ * {@link LineSegmentStyle} or {@link BarSegmentStyle}).
+ */
+export type RangeSegment<TStyle> = {
+  from?: XValue;
+  to?: XValue;
+  style?: TStyle;
+};
+
+/** Per-series list of styled x-axis intervals. */
+export type SegmentsMap<TStyle = LineSegmentStyle> = Record<string, RangeSegment<TStyle>[]>;
+
+/** One contiguous, styled slice of a series' data — ready to draw as its own mark. */
+export type VisualSegment<T extends Record<string, unknown>, TStyle = LineSegmentStyle> = {
+  data: T[];
+  style: TStyle;
+};
+
+/**
+ * A series split into its styled visual segments. `S` is the full series
+ * type Series<T> — its row type is read off `S['data']`
+ * rather than taken as a separate parameter, since TypeScript can't reliably
+ * infer a type parameter that only appears inside another parameter's
+ * constraint.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type VisualGroup<S extends Series<any>, TStyle = LineSegmentStyle> = {
+  series: S;
+  visualSegments: VisualSegment<S['data'][number], TStyle>[];
 };

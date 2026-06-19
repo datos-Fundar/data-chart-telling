@@ -1,7 +1,8 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { LineSeries, SegmentsMap } from '$lib/types/plots/lines';
+import type { Series } from '$lib/types/plots/common';
+import type { SegmentsMap } from '$lib/types/plots/styles';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -15,7 +16,7 @@ const DATA: P[] = [
   { x: 5, y: 18 },
 ];
 
-const SERIES: LineSeries<P>[] = [
+const SERIES: Series<P>[] = [
   { name: 'series-a', x: 'x', y: 'y', data: DATA },
 ];
 
@@ -187,7 +188,7 @@ describe('LinePlot – dot rendering', () => {
 
 // ── Nested stroke style handling ──────────────────────────────────────────────
 
-describe('LinePlot – nested LineStrokeStyle extraction', () => {
+describe('LinePlot – nested StrokeStyle extraction', () => {
   test('extracts stroke color from nested style.stroke.stroke', async () => {
     const { container } = await render(LinePlot, {
       width: 400,

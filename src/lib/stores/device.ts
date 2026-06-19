@@ -1,7 +1,7 @@
 import { derived, readable } from 'svelte/store';
 import type { Viewport } from '$lib/types/viewport';
 
-const isBrowser = typeof window !== 'undefined';
+export const isBrowser = typeof window !== 'undefined';
 
 const viewport = readable<Viewport>(
   { width: 0, height: 0 },

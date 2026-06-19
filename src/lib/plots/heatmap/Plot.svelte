@@ -1,15 +1,12 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-  import { Plot, Cell, Text, AxisX, AxisY, Pointer } from 'svelteplot';
-  import { resolveAccessor } from '$lib/plots/utils';
-  import { makeColorScale } from '$lib/charts/utils/color';
-  import { getConfiguration } from '$lib/charts/config.svelte';
-  import { getHover, createHover } from '$lib/charts/hover.svelte';
-  import { createHoverController } from '$lib/charts/tooltip/controller.svelte';
-  import HoverMarks from '$lib/charts/tooltip/HoverMarks.svelte';
-  import Tooltip from '$lib/charts/tooltip/Tooltip.svelte';
+  import { Cell, Text, AxisX, AxisY } from 'svelteplot';
+  import { resolveAccessor } from '$lib/plots/utils/accessors';
+  import { makeColorScale } from '$lib/utils/color';
+  import { getConfiguration } from '$lib/configuration/config.svelte';
+  import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import type { HeatmapSeries } from '$lib/types/plots/heatmap';
-  import type { XValue } from '$lib/types/plots/common';
-  import type { TooltipRuntime } from '$lib/types/charts/tooltip';
+  import type { AxisScale, XValue } from '$lib/types/plots/common';
+  import type { TooltipRuntime } from '$lib/types/layout/tooltip';
 
   /**
    * A categorical grid of value-coloured cells. Mirrors the line/bar plot
@@ -23,8 +20,8 @@
     colorMin,
     colorMax,
     domain,
-    xLabel = '',
-    yLabel = '',
+    xScale = {},
+    yScale = {},
     showValues = true,
     formatValue = (v: number) => `${v}`,
     tooltip = undefined,
@@ -32,14 +29,12 @@
     width: number;
     height: number;
     series: HeatmapSeries<TData>;
-    /** Gradient start; defaults to the configured continuous palette. */
     colorMin?: string;
-    /** Gradient end; defaults to the configured continuous palette. */
     colorMax?: string;
-    /** Value range for the colour scale; inferred from the data when omitted. */
+    /** Value (colour) domain — distinct from `xScale`/`yScale`, which place the grid's categories. */
     domain?: [number, number];
-    xLabel?: string;
-    yLabel?: string;
+    xScale?: AxisScale;
+    yScale?: AxisScale;
     showValues?: boolean;
     formatValue?: (v: number) => string;
     tooltip?: TooltipRuntime<TData>;
@@ -53,14 +48,6 @@
   const getY = $derived(resolveAccessor<TData>(series.y));
   const getValue = $derived(resolveAccessor<TData>(series.value));
 
-  // ── Hover / tooltip ───────────────────────────────────────────────────────
-  const sharedHover = getHover();
-  const localHover = createHover();
-  const hover = $derived(sharedHover ?? localHover);
-  $effect(() => {
-    if (!sharedHover && tooltip) localHover.sync = tooltip.sync;
-  });
-
   const hoverPoints = $derived(
     series.data.map((d) => ({
       x: getX(d) as XValue,
@@ -69,16 +56,6 @@
       label: formatValue(Number(getValue(d))),
     })),
   );
-
-  const ctrl = createHoverController<TData>({
-    hover: () => hover,
-    facetId: () => tooltip?.facetId ?? '',
-    points: () => hoverPoints,
-    getX: () => (d) => getX(d) as XValue,
-    getY: () => (d) => getY(d) as XValue,
-    label: () => (r) => formatValue(Number(getValue(r))),
-    format: () => tooltip?.format ?? ((r) => formatValue(Number(getValue(r)))),
-  });
 
   const xDomain = $derived([...new Set(series.data.map((d) => getX(d) as XValue))]);
   const yDomain = $derived([...new Set(series.data.map((d) => getY(d) as XValue))]);
@@ -94,19 +71,19 @@
   );
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<div
-  class="dct-plot"
-  style:color={cfg.axis.color}
-  onpointermove={tooltip ? ctrl.onMove : undefined}
-  onpointerleave={tooltip ? ctrl.onLeave : undefined}
->
-<Plot
+<PlotLayout
   {width}
   {height}
-  margin={cfg.margins}
-  x={{ label: xLabel, domain: xDomain, type: 'band', labelAnchor: 'right' }}
-  y={{ label: yLabel, domain: yDomain, type: 'band' }}
+  x={{ ...xScale, domain: xScale.domain ?? xDomain, type: 'band', labelAnchor: 'right' }}
+  y={{ ...yScale, domain: yScale.domain ?? yDomain, type: 'band' }}
+  data={series.data}
+  {getX}
+  {getY}
+  matchY={getY}
+  {hoverPoints}
+  label={(d) => formatValue(Number(getValue(d)))}
+  {tooltip}
+  showHoverLabels={false}
 >
   <AxisX tickSize={0} tickPadding={4} tickFontSize={cfg.axis.fontSize} titleFontSize={cfg.axis.labelFontSize} />
   <AxisY tickSize={0} tickPadding={4} tickFontSize={cfg.axis.fontSize} titleFontSize={cfg.axis.labelFontSize} />
@@ -131,21 +108,4 @@
       textAnchor="middle"
     />
   {/if}
-
-  {#if tooltip}
-    <Pointer data={series.data} x={getX} y={getY} maxDistance={400} onupdate={ctrl.onPointer} />
-    <HoverMarks points={ctrl.points} ruleX={ctrl.ruleX} ruleY={ctrl.ruleY} color={cfg.timeline.activeColor} showLabels={false} />
-  {/if}
-</Plot>
-
-{#if tooltip && ctrl.showTooltip && ctrl.cursor}
-  <Tooltip x={ctrl.cursor.x} y={ctrl.cursor.y}>{ctrl.tooltipText}</Tooltip>
-{/if}
-</div>
-
-<style>
-  .dct-plot {
-    position: relative;
-    line-height: 0;
-  }
-</style>
+</PlotLayout>

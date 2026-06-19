@@ -1,79 +1,79 @@
 import { describe, test, expect } from 'vitest';
 import type {
-  LineStrokeStyle,
-  LineDotStyle,
+  StrokeStyle,
+  DotStyle,
   SymbolType,
   LineStyle,
+  LineSegmentStyle,
 } from '$lib/types/plots/styles';
-import type { LineSegmentStyle, LineSegment } from '$lib/types/plots/lines';
 
-// ── LineStrokeStyle ──────────────────────────────────────────────────────────
+// ── StrokeStyle ──────────────────────────────────────────────────────────────
 
-describe('LineStrokeStyle', () => {
+describe('StrokeStyle', () => {
   test('accepts stroke color', () => {
-    const style: LineStrokeStyle = { stroke: '#ff0000' };
+    const style: StrokeStyle = { stroke: '#ff0000' };
     expect(style.stroke).toBe('#ff0000');
   });
 
   test('accepts strokeWidth', () => {
-    const style: LineStrokeStyle = { strokeWidth: 3 };
+    const style: StrokeStyle = { strokeWidth: 3 };
     expect(style.strokeWidth).toBe(3);
   });
 
   test('accepts strokeOpacity', () => {
-    const style: LineStrokeStyle = { strokeOpacity: 0.5 };
+    const style: StrokeStyle = { strokeOpacity: 0.5 };
     expect(style.strokeOpacity).toBe(0.5);
   });
 
   test('accepts strokeDasharray as string', () => {
-    const style: LineStrokeStyle = { strokeDasharray: '5 5' };
+    const style: StrokeStyle = { strokeDasharray: '5 5' };
     expect(style.strokeDasharray).toBe('5 5');
   });
 
   test('accepts strokeDasharray as LineStyle enum', () => {
-    const style: LineStrokeStyle = { strokeDasharray: 'dashed' };
+    const style: StrokeStyle = { strokeDasharray: 'dashed' };
     expect(style.strokeDasharray).toBe('dashed');
   });
 
   test('all properties are optional', () => {
-    const style: LineStrokeStyle = {};
+    const style: StrokeStyle = {};
     expect(Object.keys(style)).toHaveLength(0);
   });
 });
 
-// ── LineDotStyle ─────────────────────────────────────────────────────────────
+// ── DotStyle ─────────────────────────────────────────────────────────────────
 
-describe('LineDotStyle', () => {
+describe('DotStyle', () => {
   test('accepts dotRadius', () => {
-    const style: LineDotStyle = { dotRadius: 5 };
+    const style: DotStyle = { dotRadius: 5 };
     expect(style.dotRadius).toBe(5);
   });
 
   test('accepts dotFill color', () => {
-    const style: LineDotStyle = { dotFill: '#0000ff' };
+    const style: DotStyle = { dotFill: '#0000ff' };
     expect(style.dotFill).toBe('#0000ff');
   });
 
   test('accepts dotSymbol', () => {
     const symbols: SymbolType[] = ['circle', 'square', 'triangle', 'line'];
     for (const symbol of symbols) {
-      const style: LineDotStyle = { dotSymbol: symbol };
+      const style: DotStyle = { dotSymbol: symbol };
       expect(style.dotSymbol).toBe(symbol);
     }
   });
 
   test('accepts dotStroke color', () => {
-    const style: LineDotStyle = { dotStroke: '#00ff00' };
+    const style: DotStyle = { dotStroke: '#00ff00' };
     expect(style.dotStroke).toBe('#00ff00');
   });
 
   test('accepts dotStrokeWidth', () => {
-    const style: LineDotStyle = { dotStrokeWidth: 2 };
+    const style: DotStyle = { dotStrokeWidth: 2 };
     expect(style.dotStrokeWidth).toBe(2);
   });
 
   test('all properties are optional', () => {
-    const style: LineDotStyle = {};
+    const style: DotStyle = {};
     expect(Object.keys(style)).toHaveLength(0);
   });
 });
@@ -119,11 +119,11 @@ describe('LineSegmentStyle – nested stroke and dots', () => {
   });
 });
 
-// ── LineSegment (styling only, no data) ───────────────────────────────────────
+// ── LineSegmentStyle (styling only, no data) ───────────────────────────────────
 
-describe('LineSegment', () => {
-  test('is an alias for LineSegmentStyle', () => {
-    const segment: LineSegment = {
+describe('LineSegmentStyle (styling only)', () => {
+  test('holds stroke and dots', () => {
+    const segment: LineSegmentStyle = {
       stroke: { stroke: '#ff0000', strokeWidth: 2 },
       dots: { dotRadius: 4 },
     };
@@ -132,7 +132,7 @@ describe('LineSegment', () => {
   });
 
   test('does NOT contain data (styling only)', () => {
-    const segment: LineSegment = { stroke: { stroke: '#ff0000' } };
+    const segment: LineSegmentStyle = { stroke: { stroke: '#ff0000' } };
     expect('data' in segment).toBe(false);
   });
 });

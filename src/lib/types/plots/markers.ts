@@ -1,22 +1,28 @@
 import type { XValue, YValue } from '$lib/types/plots/common';
+import type { StrokeStyle } from '$lib/types/plots/styles';
 
-export type MarkerStyle = {
-  stroke?: string;
-  strokeWidth?: number;
-  strokeOpacity?: number;
-  strokeDasharray?: string;
-};
+/**
+ * Baseline props every marker component receives when mounted by a plot:
+ * `data` for the points/values it draws, plus `series`/`seriesColor` when
+ * mounted per-series via a `CustomComponentMarker`. Marker components extend
+ * this with whatever else they need (e.g. PeakMarker's `mode`, `label`).
+ */
+export interface MarkerProps<TData = Record<string, unknown>> {
+  data?: TData[];
+  series?: string;
+  seriesColor?: string;
+}
 
 export type RuleXMarker = {
   type: 'ruleX';
   x: XValue;
-  style?: MarkerStyle;
+  style?: StrokeStyle;
 };
 
 export type RuleYMarker = {
   type: 'ruleY';
   y: YValue;
-  style?: MarkerStyle;
+  style?: StrokeStyle;
 };
 
 export type CustomComponentMarker = {

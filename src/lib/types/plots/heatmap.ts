@@ -1,5 +1,4 @@
-import type { XValue } from '$lib/types/plots/common';
-import type { Accessor } from '$lib/types/charts/common';
+import type { XValue, Accessor } from '$lib/types/plots/common';
 
 /**
  * A heatmap is a single grid of cells. `x`/`y` are categorical (band) keys and

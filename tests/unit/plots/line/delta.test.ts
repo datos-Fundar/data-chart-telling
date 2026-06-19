@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import type { DeltaTarget, DeltaConfig } from '$lib/types/plots/lines';
+import type { DeltaTarget, DeltaConfig } from '$lib/types/plots/delta';
 
 // ── DeltaTarget ──────────────────────────────────────────────────────────────
 
@@ -20,29 +20,34 @@ describe('DeltaTarget – series-based', () => {
 });
 
 describe('DeltaTarget – axis-based', () => {
-  test('targets X axis with optional value', () => {
-    const target: DeltaTarget = { type: 'axis', axis: 'x' };
+  test('targets an explicit axis value', () => {
+    const target: DeltaTarget = { type: 'axis', value: 0 };
     expect(target.type).toBe('axis');
-    expect(target.axis).toBe('x');
-  });
-
-  test('targets Y axis with optional value', () => {
-    const target: DeltaTarget = { type: 'axis', axis: 'y' };
-    expect(target.type).toBe('axis');
-    expect(target.axis).toBe('y');
-  });
-
-  test('axis target can include a baseline value', () => {
-    const target: DeltaTarget = { type: 'axis', axis: 'y', value: 0 };
     expect(target.value).toBe(0);
+  });
+
+  test('axis value is optional (defaults to 0 baseline)', () => {
+    const target: DeltaTarget = { type: 'axis' };
+    expect(target.type).toBe('axis');
+    expect(target.value).toBeUndefined();
   });
 });
 
 // ── DeltaConfig ──────────────────────────────────────────────────────────────
 
 describe('DeltaConfig – basic structure', () => {
+  test('has required `axis`', () => {
+    const config: DeltaConfig = {
+      axis: 'x',
+      at: 2020,
+      from: { type: 'series', series: 'revenue' },
+    };
+    expect(config.axis).toBe('x');
+  });
+
   test('has required `at` position', () => {
     const config: DeltaConfig = {
+      axis: 'x',
       at: 2020,
       from: { type: 'series', series: 'revenue' },
     };
@@ -51,6 +56,7 @@ describe('DeltaConfig – basic structure', () => {
 
   test('`at` can be a number (X axis position)', () => {
     const config: DeltaConfig = {
+      axis: 'x',
       at: 2020,
       from: { type: 'series', series: 'a' },
     };
@@ -59,6 +65,7 @@ describe('DeltaConfig – basic structure', () => {
 
   test('`at` can be a string (categorical X axis)', () => {
     const config: DeltaConfig = {
+      axis: 'x',
       at: 'Q1',
       from: { type: 'series', series: 'a' },
     };
@@ -67,6 +74,7 @@ describe('DeltaConfig – basic structure', () => {
 
   test('has required `from` target', () => {
     const config: DeltaConfig = {
+      axis: 'x',
       at: 2020,
       from: { type: 'series', series: 'revenue' },
     };
@@ -75,6 +83,7 @@ describe('DeltaConfig – basic structure', () => {
 
   test('has optional `to` target', () => {
     const config: DeltaConfig = {
+      axis: 'x',
       at: 2020,
       from: { type: 'series', series: 'revenue' },
       to: { type: 'series', series: 'expenses' },
@@ -84,6 +93,7 @@ describe('DeltaConfig – basic structure', () => {
 
   test('without `to` target, defaults to Y=0 baseline', () => {
     const config: DeltaConfig = {
+      axis: 'x',
       at: 2020,
       from: { type: 'series', series: 'profit' },
       // no `to` - implicitly compares to Y axis baseline
@@ -94,28 +104,52 @@ describe('DeltaConfig – basic structure', () => {
 
 // ── DeltaConfig – styling ────────────────────────────────────────────────────
 
-describe('DeltaConfig – styling with LineStrokeStyle', () => {
-  test('accepts stroke style for delta visualization', () => {
+describe('DeltaConfig – styling with StrokeStyle', () => {
+  test('accepts strokeStyle for delta visualization', () => {
     const config: DeltaConfig = {
+      axis: 'x',
       at: 2020,
       from: { type: 'series', series: 'a' },
       to: { type: 'series', series: 'b' },
-      stroke: {
+      strokeStyle: {
         stroke: '#dc2626',
         strokeWidth: 2,
         strokeDasharray: '4 4',
       },
     };
-    expect(config.stroke?.stroke).toBe('#dc2626');
-    expect(config.stroke?.strokeWidth).toBe(2);
+    expect(config.strokeStyle?.stroke).toBe('#dc2626');
+    expect(config.strokeStyle?.strokeWidth).toBe(2);
   });
 
-  test('stroke is optional', () => {
+  test('strokeStyle is optional', () => {
     const config: DeltaConfig = {
+      axis: 'x',
       at: 2020,
       from: { type: 'series', series: 'a' },
     };
-    expect(config.stroke).toBeUndefined();
+    expect(config.strokeStyle).toBeUndefined();
+  });
+});
+
+describe('DeltaConfig – dot styling with DotStyle', () => {
+  test('accepts dotStyle for endpoint dots', () => {
+    const config: DeltaConfig = {
+      axis: 'x',
+      at: 2020,
+      from: { type: 'series', series: 'a' },
+      dotStyle: { dotRadius: 6, dotFill: '#dc2626' },
+    };
+    expect(config.dotStyle?.dotRadius).toBe(6);
+    expect(config.dotStyle?.dotFill).toBe('#dc2626');
+  });
+
+  test('dotStyle is optional', () => {
+    const config: DeltaConfig = {
+      axis: 'x',
+      at: 2020,
+      from: { type: 'series', series: 'a' },
+    };
+    expect(config.dotStyle).toBeUndefined();
   });
 });
 
@@ -124,6 +158,7 @@ describe('DeltaConfig – styling with LineStrokeStyle', () => {
 describe('DeltaConfig – difference formatting', () => {
   test('accepts custom formatDiff function', () => {
     const config: DeltaConfig = {
+      axis: 'x',
       at: 2020,
       from: { type: 'series', series: 'a' },
       formatDiff: (diff) => `${(diff * 100).toFixed(2)}%`,
@@ -133,6 +168,7 @@ describe('DeltaConfig – difference formatting', () => {
 
   test('formatDiff is optional', () => {
     const config: DeltaConfig = {
+      axis: 'x',
       at: 2020,
       from: { type: 'series', series: 'a' },
     };
@@ -142,45 +178,47 @@ describe('DeltaConfig – difference formatting', () => {
 
 // ── DeltaConfig – positioning ────────────────────────────────────────────────
 
-describe('DeltaConfig – text positioning', () => {
+describe('DeltaConfig – text positioning via FontStyle', () => {
   test('accepts dx offset for text', () => {
     const config: DeltaConfig = {
+      axis: 'x',
       at: 2020,
       from: { type: 'series', series: 'a' },
-      dx: 10,
+      fontStyle: { dx: 10 },
     };
-    expect(config.dx).toBe(10);
+    expect(config.fontStyle?.dx).toBe(10);
   });
 
   test('accepts dy offset for text', () => {
     const config: DeltaConfig = {
+      axis: 'y',
       at: 2020,
       from: { type: 'series', series: 'a' },
-      dy: -15,
+      fontStyle: { dy: -15 },
     };
-    expect(config.dy).toBe(-15);
+    expect(config.fontStyle?.dy).toBe(-15);
   });
 
   test('accepts lineAnchor for text position relative to delta line', () => {
     const anchors = ['top', 'middle', 'bottom'] as const;
     for (const anchor of anchors) {
       const config: DeltaConfig = {
+        axis: 'x',
         at: 2020,
         from: { type: 'series', series: 'a' },
-        lineAnchor: anchor,
+        fontStyle: { lineAnchor: anchor },
       };
-      expect(config.lineAnchor).toBe(anchor);
+      expect(config.fontStyle?.lineAnchor).toBe(anchor);
     }
   });
 
-  test('text positioning is optional', () => {
+  test('fontStyle is optional', () => {
     const config: DeltaConfig = {
+      axis: 'x',
       at: 2020,
       from: { type: 'series', series: 'a' },
     };
-    expect(config.dx).toBeUndefined();
-    expect(config.dy).toBeUndefined();
-    expect(config.lineAnchor).toBeUndefined();
+    expect(config.fontStyle).toBeUndefined();
   });
 });
 
@@ -189,17 +227,16 @@ describe('DeltaConfig – text positioning', () => {
 describe('DeltaConfig – realistic use cases', () => {
   test('difference between two series', () => {
     const config: DeltaConfig = {
+      axis: 'x',
       at: 2020,
       from: { type: 'series', series: 'revenue' },
       to: { type: 'series', series: 'expenses' },
-      stroke: {
+      strokeStyle: {
         stroke: '#dc2626',
         strokeDasharray: '6 6',
       },
       formatDiff: (diff) => `$${Math.abs(diff).toFixed(2)}K`,
-      dx: 15,
-      dy: -10,
-      lineAnchor: 'middle',
+      fontStyle: { dx: 15, dy: -10, lineAnchor: 'middle' },
     };
     expect(config.from.type).toBe('series');
     expect(config.to?.type).toBe('series');
@@ -208,9 +245,10 @@ describe('DeltaConfig – realistic use cases', () => {
 
   test('difference from Y=0 baseline (no `to` target)', () => {
     const config: DeltaConfig = {
+      axis: 'y',
       at: 2020,
       from: { type: 'series', series: 'profit' },
-      stroke: { stroke: '#16a34a', strokeWidth: 3 },
+      strokeStyle: { stroke: '#16a34a', strokeWidth: 3 },
       formatDiff: (diff) => diff.toFixed(1),
     };
     expect(config.to).toBeUndefined();
@@ -220,17 +258,21 @@ describe('DeltaConfig – realistic use cases', () => {
 
   test('difference with custom baseline value', () => {
     const config: DeltaConfig = {
+      axis: 'y',
       at: 'Q2',
       from: { type: 'series', series: 'target' },
-      to: { type: 'axis', axis: 'y', value: 100 },
+      to: { type: 'axis', value: 100 },
       formatDiff: (diff) => `${Math.abs(diff).toFixed(0)} units`,
     };
     expect(config.to?.type).toBe('axis');
-    expect(config.to?.value).toBe(100);
+    if (config.to?.type === 'axis') {
+      expect(config.to.value).toBe(100);
+    }
   });
 
   test('minimal config (required fields only)', () => {
     const config: DeltaConfig = {
+      axis: 'x',
       at: 2025,
       from: { type: 'series', series: 'metric' },
     };

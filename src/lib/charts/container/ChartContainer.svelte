@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { ChartBoxSnippet } from '$lib/types/charts/common';
-  import { getConfiguration, configToCssVars, cssVarsStyle } from '$lib/charts/config.svelte';
+  import { getConfiguration, configToCssVars, cssVarsStyle } from '$lib/configuration/config.svelte';
 
   /**
    * The outermost chart frame. It owns the fixed footprint (`width`/`height`),

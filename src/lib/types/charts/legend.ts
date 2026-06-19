@@ -26,8 +26,9 @@ export type ContinuousLegendSection = {
   columns?: number;
   min: number;
   max: number;
-  colorMin: string;
-  colorMax: string;
+  /** Gradient endpoints; default to the configured continuous palette. */
+  colorMin?: string;
+  colorMax?: string;
   ticks?: number[];
   width?: number;
   format?: (v: number) => string;

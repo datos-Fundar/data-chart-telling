@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { LineSeries } from '$lib/types/plots/lines';
+import type { Series } from '$lib/types/plots/common';
 import type { Marker } from '$lib/types/plots/markers';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
@@ -16,7 +16,7 @@ const DATA: P[] = [
   { x: 5, y: 18 },
 ];
 
-const SERIES: LineSeries<P>[] = [
+const SERIES: Series<P>[] = [
   { name: 'a', x: 'x', y: 'y', data: DATA },
 ];
 
@@ -71,7 +71,7 @@ describe('LinePlot', () => {
   });
 
   test('renders one path per series when no segments are provided', async () => {
-    const twoSeries: LineSeries<P>[] = [
+    const twoSeries: Series<P>[] = [
       { name: 'a', x: 'x', y: 'y', data: DATA },
       { name: 'b', x: 'x', y: 'y', data: DATA },
     ];

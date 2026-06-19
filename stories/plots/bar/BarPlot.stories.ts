@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
-import type { BarSeries } from '$lib/types/plots/bars';
+import type { Series } from '$lib/types/plots/common';
 
 type Region = { region: string; value: number };
 type YearValue = { year: string; value: number };
@@ -49,6 +49,7 @@ const meta = {
       control: { type: 'range', min: 200, max: 700, step: 50 },
     },
     series: { control: false },
+    segments: { control: false },
   },
 } satisfies Meta<typeof BarPlot>;
 
@@ -57,18 +58,13 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** Single series with categorical x. */
+/** Single series with categorical x. Fill comes from `segments`, keyed by series name. */
 export const Default: Story = {
   args: {
     series: [
-      {
-        name: 'regions',
-        x: 'region',
-        y: 'value',
-        data: REGIONS,
-        fill: '#4f46e5',
-      } satisfies BarSeries<Region>,
+      { name: 'regions', x: 'region', y: 'value', data: REGIONS } satisfies Series<Region>,
     ],
+    segments: { regions: [{ style: { fill: '#4f46e5' } }] },
   },
 };
 
@@ -76,14 +72,9 @@ export const Default: Story = {
 export const ByYear: Story = {
   args: {
     series: [
-      {
-        name: 'gdp',
-        x: 'year',
-        y: 'value',
-        data: GDP,
-        fill: '#4f46e5',
-      } satisfies BarSeries<YearValue>,
+      { name: 'gdp', x: 'year', y: 'value', data: GDP } satisfies Series<YearValue>,
     ],
+    segments: { gdp: [{ style: { fill: '#4f46e5' } }] },
   },
 };
 
@@ -95,23 +86,13 @@ export const ByYear: Story = {
 export const TwoSeries: Story = {
   args: {
     series: [
-      {
-        name: 'employment',
-        x: 'year',
-        y: 'value',
-        data: EMPLOYMENT,
-        fill: '#e6580d',
-        fillOpacity: 0.85,
-      } satisfies BarSeries<YearValue>,
-      {
-        name: 'gdp',
-        x: 'year',
-        y: 'value',
-        data: GDP,
-        fill: '#4f46e5',
-        fillOpacity: 0.85,
-      } satisfies BarSeries<YearValue>,
+      { name: 'employment', x: 'year', y: 'value', data: EMPLOYMENT } satisfies Series<YearValue>,
+      { name: 'gdp', x: 'year', y: 'value', data: GDP } satisfies Series<YearValue>,
     ],
+    segments: {
+      employment: [{ style: { fill: '#e6580d', fillOpacity: 0.85 } }],
+      gdp: [{ style: { fill: '#4f46e5', fillOpacity: 0.85 } }],
+    },
   },
 };
 
@@ -121,13 +102,8 @@ export const Narrow: Story = {
     width: 320,
     height: 250,
     series: [
-      {
-        name: 'regions',
-        x: 'region',
-        y: 'value',
-        data: REGIONS,
-        fill: '#2daa6e',
-      } satisfies BarSeries<Region>,
+      { name: 'regions', x: 'region', y: 'value', data: REGIONS } satisfies Series<Region>,
     ],
+    segments: { regions: [{ style: { fill: '#2daa6e' } }] },
   },
 };

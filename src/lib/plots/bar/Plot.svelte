@@ -2,97 +2,81 @@
   lang="ts"
   generics="TData extends Record<string, unknown>"
 >
-  import { Plot, BarY, AxisX, AxisY, Pointer } from 'svelteplot';
-  import { resolveAccessor } from '$lib/plots/utils';
-  import { getConfiguration } from '$lib/charts/config.svelte';
-  import { getHover, createHover } from '$lib/charts/hover.svelte';
-  import { createHoverController } from '$lib/charts/tooltip/controller.svelte';
-  import HoverMarks from '$lib/charts/tooltip/HoverMarks.svelte';
-  import Tooltip from '$lib/charts/tooltip/Tooltip.svelte';
-  import type { BarSeries } from '$lib/types/plots/bars';
+  import { BarY, AxisX, AxisY } from 'svelteplot';
+  import { resolveAccessor } from '$lib/plots/utils/accessors';
+  import { getConfiguration } from '$lib/configuration/config.svelte';
+  import { buildSeries } from '$lib/utils/grouping';
+  import { buildGroupedSeries, validateSegments } from '$lib/plots/utils/segments';
+  import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
+  import type { AxisScale, Series, SeriesProps, DataProps } from '$lib/types/plots/common';
+  import type { BarSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
   import type { XValue } from '$lib/types/plots/common';
-  import type { TooltipRuntime } from '$lib/types/charts/tooltip';
+  import type { TooltipRuntime } from '$lib/types/layout/tooltip';
 
   let {
     width,
     height,
     series,
+    data,
+    x,
+    y,
+    z,
+    segments = {},
+    xScale = {},
+    yScale = {},
     tooltip = undefined,
-  }: {
+  }: (SeriesProps<TData> | DataProps<TData>) & {
     width: number;
     height: number;
-    series: BarSeries<TData>[];
+    /** Per-series x-axis ranges with their own fill, keyed by series name. */
+    segments?: SegmentsMap<BarSegmentStyle>;
+    xScale?: AxisScale;
+    yScale?: AxisScale;
     tooltip?: TooltipRuntime<TData>;
   } = $props();
 
-  const cfg = $derived(getConfiguration());
-
-  // ── Hover / tooltip ───────────────────────────────────────────────────────
-  const sharedHover = getHover();
-  const localHover = createHover();
-  const hover = $derived(sharedHover ?? localHover);
   $effect(() => {
-    if (!sharedHover && tooltip) localHover.sync = tooltip.sync;
+    if (Object.keys(segments).length > 0) validateSegments(segments);
   });
 
-  const xAcc = $derived(resolveAccessor(series[0]?.x ?? ((d: TData) => d)));
-  const yAcc = $derived(resolveAccessor(series[0]?.y ?? ((d: TData) => d)));
-  const flat = $derived(series.flatMap((s) => s.data));
+  const cfg = $derived(getConfiguration());
+  const resolvedSeries = $derived(series ?? buildSeries(data!, x!, y!, z));
+  const groupedSeries = $derived(
+    buildGroupedSeries<Series<TData>, BarSegmentStyle>(resolvedSeries, segments),
+  );
+
+  const xAcc = $derived(resolveAccessor(resolvedSeries[0]?.x ?? ((d: TData) => d)));
+  const yAcc = $derived(resolveAccessor(resolvedSeries[0]?.y ?? ((d: TData) => d)));
+  const flat = $derived(resolvedSeries.flatMap((s) => s.data));
   const hoverPoints = $derived(
     flat.map((d) => ({ x: xAcc(d) as XValue, y: Number(yAcc(d)), row: d, label: String(yAcc(d)) })),
   );
-
-  const ctrl = createHoverController<TData>({
-    hover: () => hover,
-    facetId: () => tooltip?.facetId ?? '',
-    points: () => hoverPoints,
-    getX: () => (d) => xAcc(d) as XValue,
-    getY: () => (d) => Number(yAcc(d)),
-    label: () => (r) => String(yAcc(r)),
-    format: () => tooltip?.format ?? ((r) => String(yAcc(r))),
-  });
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<div
-  class="dct-plot"
-  style:color={cfg.axis.color}
-  onpointermove={tooltip ? ctrl.onMove : undefined}
-  onpointerleave={tooltip ? ctrl.onLeave : undefined}
->
-<Plot
+<PlotLayout
   {width}
   {height}
-  margin={cfg.margins}
-  x={{ type: 'band', padding: 0.2 }}
+  x={{ ...xScale, type: 'band', padding: 0.2 }}
+  y={yScale}
+  data={flat}
+  getX={xAcc}
+  getY={(d) => Number(yAcc(d))}
+  {hoverPoints}
+  label={(r) => String(yAcc(r))}
+  {tooltip}
 >
   <AxisX tickSize={cfg.axis.tickSize} tickPadding={cfg.axis.tickPadding} tickFontSize={cfg.axis.fontSize} />
   <AxisY tickSize={0} tickPadding={cfg.axis.tickPadding} tickFontSize={cfg.axis.fontSize} />
 
-  {#each series as s (s.name)}
-    <BarY
-      data={s.data}
-      x={resolveAccessor(s.x)}
-      y={resolveAccessor(s.y)}
-      fill={s.fill}
-      fillOpacity={s.fillOpacity ?? 1}
-    />
+  {#each groupedSeries as group (group.series.name)}
+    {#each group.visualSegments as seg, i (`${group.series.name}-${i}`)}
+      <BarY
+        data={seg.data}
+        x={resolveAccessor(group.series.x)}
+        y={resolveAccessor(group.series.y)}
+        fill={seg.style.fill ?? 'currentColor'}
+        fillOpacity={seg.style.fillOpacity ?? 1}
+      />
+    {/each}
   {/each}
-
-  {#if tooltip}
-    <Pointer data={flat} x={xAcc} maxDistance={400} onupdate={ctrl.onPointer} />
-    <HoverMarks points={ctrl.points} ruleX={ctrl.ruleX} ruleY={ctrl.ruleY} color={cfg.timeline.activeColor} />
-  {/if}
-</Plot>
-
-{#if tooltip && ctrl.showTooltip && ctrl.cursor}
-  <Tooltip x={ctrl.cursor.x} y={ctrl.cursor.y}>{ctrl.tooltipText}</Tooltip>
-{/if}
-</div>
-
-<style>
-  .dct-plot {
-    position: relative;
-    line-height: 0;
-  }
-</style>
+</PlotLayout>
