@@ -59,11 +59,6 @@
   });
 </script>
 
-<!--
-  Leaf renderer: facet when configured, otherwise a single full-box plot.
-  `selectedValue` is threaded through so faceted small-multiples share the
-  timeline's current step.
--->
 {#snippet body(rows: TRow[], w: number, h: number, selectedValue: TimeValue | undefined)}
   {#if facet}
     <FacetLayout
@@ -76,7 +71,13 @@
       height={h}
     >
       {#snippet cell({ facetValue, data: cellData, width: cw, height: ch })}
-        {@render plot({ data: cellData, width: cw, height: ch, facetValue, selectedValue })}
+        {@render plot({
+          data: cellData,
+          width: cw,
+          height: ch,
+          facetValue,
+          selectedValue
+        })}
       {/snippet}
     </FacetLayout>
   {:else}

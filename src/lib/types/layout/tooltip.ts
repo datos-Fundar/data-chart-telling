@@ -32,16 +32,6 @@ export type TooltipRuntime<TRow extends Record<string, unknown>> = {
   sync: TooltipSync;
 };
 
-/** Normalize the author-facing prop into `{ enabled, sync, format? }`. */
-export function resolveTooltip<TRow extends Record<string, unknown>>(
-  tooltip: TooltipProp<TRow> | undefined,
-  defaultSync: TooltipSync,
-): { enabled: boolean; sync: TooltipSync; format?: (row: TRow) => string } {
-  if (!tooltip) return { enabled: false, sync: defaultSync };
-  if (tooltip === true) return { enabled: true, sync: defaultSync };
-  return { enabled: true, sync: tooltip.sync ?? defaultSync, format: tooltip.format };
-}
-
 /**
  * Shared hover state for cross-facet tooltip syncing.
  *

@@ -3,9 +3,10 @@
   import LinePlot from '$lib/plots/line/Plot.svelte';
   import { groupBy } from '$lib/utils/grouping';
   import { colorResolver } from '$lib/layout/legend/utils';
-  import { getConfiguration } from '$lib/configuration/config.svelte';
+  import { resolveTooltip } from '$lib/layout/tooltip/utils';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
-  import { resolveTooltip, type TooltipProp } from '$lib/types/layout/tooltip';
+  import { getConfiguration } from '$lib/configuration/config.svelte';
+  import type { TooltipProp } from '$lib/types/layout/tooltip';
   import type {
     FacetConfig,
     TimelineConfig,

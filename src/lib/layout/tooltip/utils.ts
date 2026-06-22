@@ -1,5 +1,10 @@
 import type { XValue } from '$lib/types/plots/common';
-import type { HoverStore, HoverPoint } from '$lib/types/layout/tooltip';
+import type {
+  HoverStore,
+  HoverPoint,
+  TooltipProp,
+  TooltipSync
+} from '$lib/types/layout/tooltip';
 
 /** Value equality that also handles `Date` (compared by timestamp). */
 export function eq(a: XValue | number, b: XValue | number): boolean {
@@ -36,4 +41,14 @@ export function showsRuleX(sync: HoverStore['sync']): boolean {
 /** Whether the y crosshair rule should be drawn for a given sync mode. */
 export function showsRuleY(sync: HoverStore['sync']): boolean {
   return sync === 'y' || sync === 'xy';
+}
+
+/** Normalize the author-facing prop into `{ enabled, sync, format? }`. */
+export function resolveTooltip<TRow extends Record<string, unknown>>(
+  tooltip: TooltipProp<TRow> | undefined,
+  defaultSync: TooltipSync,
+): { enabled: boolean; sync: TooltipSync; format?: (row: TRow) => string } {
+  if (!tooltip) return { enabled: false, sync: defaultSync };
+  if (tooltip === true) return { enabled: true, sync: defaultSync };
+  return { enabled: true, sync: tooltip.sync ?? defaultSync, format: tooltip.format };
 }

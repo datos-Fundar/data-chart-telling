@@ -1,8 +1,9 @@
 <script lang="ts" generics="TRow extends Record<string, unknown>">
   import Chart from '$lib/charts/Chart.svelte';
   import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
+  import type { TooltipProp } from '$lib/types/layout/tooltip';
+  import { resolveTooltip } from '$lib/layout/tooltip/utils';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
-  import { resolveTooltip, type TooltipProp } from '$lib/types/layout/tooltip';
   import type {
     FacetConfig,
     TimelineConfig,
