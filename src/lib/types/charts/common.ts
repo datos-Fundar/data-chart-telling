@@ -1,5 +1,6 @@
 import type { Snippet } from 'svelte';
 import type { Accessor } from '$lib/types/plots/common';
+import type { EasingName, EasingFn } from '$lib/types/charts/interpolate';
 
 /** Value used to position and step a timeline (typically a year). */
 export type TimeValue = number;
@@ -58,6 +59,38 @@ export type ChartPlotSnippet<TRow extends Record<string, unknown>> = Snippet<
   [ChartPlotContext<TRow>]
 >;
 
+/**
+ * Smoothly tweens a value between the two real steps bracketing the current
+ * scrub position instead of snapping to whichever step is nearest. Rows are
+ * grouped by `key` (e.g. a series or category) and tweened independently
+ * within each group — mirrors a scrolly-telling pattern where a line's
+ * leading edge (or a bar's height) moves continuously between known points.
+ */
+export type TimelineInterpolation<TRow extends Record<string, unknown>> = {
+  /**
+   * Groups rows into independent tween tracks (a series or category key).
+   * Rows only tween against others sharing the same key. Defaults to one
+   * shared track when omitted.
+   */
+  key?: Accessor<TRow, unknown>;
+  /**
+   * Numeric field tweened between the two bracketing rows. `LineChart`/
+   * `BarChart` default this to their own `y` when omitted.
+   */
+  value?: Accessor<TRow, number>;
+  /**
+   * Builds the synthetic in-between row. Defaults to cloning the upper row
+   * with the time field and `value` field overwritten — that default only
+   * works when `accessor` and `value` are plain field names, not function
+   * accessors.
+   */
+  create?: (lower: TRow, upper: TRow, x: TimeValue, value: number) => TRow;
+  /** Eases the overall scrub `progress` across the full step domain. Defaults to linear. */
+  progressEasing?: EasingName | EasingFn;
+  /** Eases the tween within the pair of steps currently bracketing the scrub position. Defaults to linear. */
+  segmentEasing?: EasingName | EasingFn;
+};
+
 /** Timeline configuration passed to {@link Chart}. */
 export type TimelineConfig<TRow extends Record<string, unknown>> = {
   /** How to read the time value (e.g. the year) from a row. */
@@ -76,6 +109,12 @@ export type TimelineConfig<TRow extends Record<string, unknown>> = {
    * cumulative reveal, right for a line that should grow over time.
    */
   filterMode?: 'exact' | 'upTo';
+  /**
+   * Tween between real steps instead of snapping. `true` uses the chart's
+   * own defaults (its `y` as the tweened value, its `z` — or category, for
+   * bars — as the grouping key); pass an object to customise keying/easing.
+   */
+  interpolate?: boolean | TimelineInterpolation<TRow>;
 };
 
 /** Facet configuration passed to {@link Chart}. */

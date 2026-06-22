@@ -109,6 +109,7 @@
         orientation={timeline.orientation}
         thickness={timeline.thickness ?? cfg.timeline.thickness}
         filterMode={timeline.filterMode}
+        interpolate={typeof timeline.interpolate === 'object' ? timeline.interpolate : undefined}
         width={w}
         height={h}
       >

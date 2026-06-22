@@ -3,6 +3,7 @@
   import BarPlot from '$lib/plots/bar/Plot.svelte';
   import { resolveTooltip, resolveHoverSync, hasHoverMarker } from '$lib/layout/tooltip/utils';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
+  import { resolveTimelineInterpolation } from '$lib/utils/interpolate';
   import type { TooltipProp } from '$lib/types/layout/tooltip';
   import type {
     FacetConfig,
@@ -58,7 +59,23 @@
   const resolvedSync = $derived(resolveHoverSync(tip.enabled ? tip.sync : undefined, markers, 'x'));
   const getX = $derived(resolveAccessor<TRow>(x));
   const getY = $derived(resolveAccessor<TRow>(y));
+  const getZ = $derived(z ? resolveAccessor<TRow>(z) : null);
   const defaultFormat = $derived((row: TRow) => `${String(getX(row))}: ${getY(row)}`);
+
+  // A bar timeline snapshots one frame per step; interpolation needs to match
+  // each bar across steps by its category (`x`) — and by `z` too, when the
+  // chart groups categories into series — not by the timeline's own time field.
+  const timelineConfig = $derived(
+    timeline
+      ? {
+          ...timeline,
+          interpolate: resolveTimelineInterpolation(timeline.interpolate, {
+            value: y,
+            key: getZ ? (d: TRow) => `${String(getX(d))}::${String(getZ(d))}` : x,
+          }),
+        }
+      : undefined,
+  );
 </script>
 
 <Chart
@@ -70,7 +87,7 @@
   {legend}
   {data}
   {facet}
-  {timeline}
+  timeline={timelineConfig}
   hover={hoverEnabled ? { sync: resolvedSync } : undefined}
 >
   {#snippet plot({ data: rows, width: w, height: h, facetValue })}

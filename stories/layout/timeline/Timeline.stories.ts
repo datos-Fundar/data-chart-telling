@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import TimelineBox from './TimelineBox.svelte';
 import TimelineLayoutDemo from './TimelineLayoutDemo.svelte';
+import TimelineLayoutInterpolatedDemo from './TimelineLayoutInterpolatedDemo.svelte';
 
 /**
  * `Timeline` is the purely visual scrubber strip: a baseline rule plus the
@@ -39,4 +40,14 @@ export const InteractiveVertical: StoryObj = {
 /** Same coupling, horizontal orientation. */
 export const InteractiveHorizontal: StoryObj = {
   render: () => ({ Component: TimelineLayoutDemo, props: { orientation: 'horizontal' } }),
+};
+
+/**
+ * `interpolate` tweens each category's bar between its real values at the
+ * two years bracketing the scrub position, instead of snapping straight from
+ * one snapshot to the next — the data here skips 2019/2021 on purpose, so
+ * the tween visibly bridges years that don't exist in the dataset.
+ */
+export const Interpolated: StoryObj = {
+  render: () => ({ Component: TimelineLayoutInterpolatedDemo, props: { orientation: 'horizontal' } }),
 };

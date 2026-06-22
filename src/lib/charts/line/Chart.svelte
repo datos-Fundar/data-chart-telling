@@ -3,6 +3,7 @@
   import LinePlot from '$lib/plots/line/Plot.svelte';
   import { resolveTooltip, resolveHoverSync, hasHoverMarker } from '$lib/layout/tooltip/utils';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
+  import { resolveTimelineInterpolation } from '$lib/utils/interpolate';
   import type { TooltipProp } from '$lib/types/layout/tooltip';
   import type {
     FacetConfig,
@@ -61,7 +62,13 @@
   // year's point — so default to a cumulative reveal unless the caller wants
   // the bar/heatmap-style exact-step snapshot instead.
   const timelineConfig = $derived(
-    timeline ? { ...timeline, filterMode: timeline.filterMode ?? 'upTo' } : undefined,
+    timeline
+      ? {
+          ...timeline,
+          filterMode: timeline.filterMode ?? 'upTo',
+          interpolate: resolveTimelineInterpolation(timeline.interpolate, { value: y, key: z }),
+        }
+      : undefined,
   );
 
   const tip = $derived(resolveTooltip(tooltip, 'x'));

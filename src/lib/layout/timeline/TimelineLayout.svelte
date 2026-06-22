@@ -1,10 +1,12 @@
 <script lang="ts" generics="TRow extends Record<string, unknown>">
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import Timeline from '$lib/layout/timeline/Timeline.svelte';
+  import { resolveEasing, interpolateSeries } from '$lib/utils/interpolate';
   import type {
     Orientation,
     TimeValue,
     TimelineChildSnippet,
+    TimelineInterpolation,
   } from '$lib/types/charts/common';
   import type { Accessor } from '$lib/types/plots/common';
 
@@ -22,6 +24,7 @@
     orientation = 'vertical',
     thickness = 60,
     filterMode = 'exact',
+    interpolate,
     width,
     height,
     child,
@@ -33,6 +36,7 @@
     orientation?: Orientation;
     thickness?: number;
     filterMode?: 'exact' | 'upTo';
+    interpolate?: TimelineInterpolation<TRow>;
     width: number;
     height: number;
     child: TimelineChildSnippet<TRow>;
@@ -45,8 +49,24 @@
     return [...new Set(data.map(getTime))].sort((a, b) => a - b);
   });
 
+  const progressEasingFn = $derived(resolveEasing(interpolate?.progressEasing));
+  const segmentEasingFn = $derived(resolveEasing(interpolate?.segmentEasing));
+
+  /** Continuous scrub position across the full step domain — only meaningful when `interpolate` is set. */
+  const currentTime = $derived.by(() => {
+    if (!steps.length) return 0;
+    const t0 = steps[0];
+    const t1 = steps[steps.length - 1];
+    return t0 + (t1 - t0) * progressEasingFn(progress);
+  });
+
   const selectedValue = $derived.by(() => {
     if (!steps.length) return 0;
+    if (interpolate) {
+      return steps.reduce((best, s) =>
+        Math.abs(s - currentTime) < Math.abs(best - currentTime) ? s : best,
+      );
+    }
     const idx = Math.min(
       steps.length - 1,
       Math.max(0, Math.round(progress * (steps.length - 1))),
@@ -54,11 +74,56 @@
     return steps[idx];
   });
 
-  const filtered = $derived(
-    filterMode === 'upTo'
-      ? data.filter((d) => getTime(d) <= selectedValue)
-      : data.filter((d) => getTime(d) === selectedValue),
-  );
+  function defaultCreate(_lower: TRow, upper: TRow, x: TimeValue, value: number): TRow {
+    const valueField = interpolate?.value;
+    if (typeof accessor !== 'string' || typeof valueField !== 'string') {
+      console.warn(
+        'TimelineLayout: cannot auto-build an interpolated row when `accessor` or `interpolate.value` is a function — pass `interpolate.create` explicitly.',
+      );
+      return upper;
+    }
+    return { ...upper, [accessor]: x, [valueField]: value } as TRow;
+  }
+
+  const filtered = $derived.by(() => {
+    const discrete = () =>
+      filterMode === 'upTo'
+        ? data.filter((d) => getTime(d) <= selectedValue)
+        : data.filter((d) => getTime(d) === selectedValue);
+
+    if (!interpolate) return discrete();
+    if (!interpolate.value) {
+      console.warn('TimelineLayout: `interpolate.value` is required to tween — falling back to discrete filtering.');
+      return discrete();
+    }
+
+    const getKey = resolveAccessor<TRow>(interpolate.key ?? (() => '__all__'));
+    const getValue = resolveAccessor<TRow>(interpolate.value) as (d: TRow) => number;
+    const create = interpolate.create ?? defaultCreate;
+
+    const groups = new Map<string, TRow[]>();
+    for (const row of data) {
+      const key = String(getKey(row));
+      const bucket = groups.get(key);
+      if (bucket) bucket.push(row);
+      else groups.set(key, [row]);
+    }
+
+    const result: TRow[] = [];
+    for (const rows of groups.values()) {
+      const tweened = interpolateSeries({
+        rows,
+        x: currentTime,
+        getTime,
+        getValue,
+        create,
+        segmentEasing: segmentEasingFn,
+      });
+      if (filterMode === 'upTo') result.push(...tweened);
+      else if (tweened.length) result.push(tweened[tweened.length - 1]);
+    }
+    return result;
+  });
 
   const isVertical = $derived(orientation === 'vertical');
   const gap = 12;

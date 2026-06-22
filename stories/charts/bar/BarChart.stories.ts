@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarChart from '$lib/charts/bar/Chart.svelte';
 import BarTimeline from './BarTimeline.svelte';
+import BarTimelineInterpolated from './BarTimelineInterpolated.svelte';
 import BarTimelineFacet from './BarTimelineFacet.svelte';
 import { REGION_BARS } from '../../data/region-bars';
 import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
@@ -48,6 +49,16 @@ export const Default: Story = {
  */
 export const WithTimeline: StoryObj = {
   render: () => ({ Component: BarTimeline }),
+};
+
+/**
+ * `interpolate` crossfades each bar's height between its real values at the
+ * two years bracketing the scrub position, instead of cutting straight from
+ * one snapshot to the next — `interpolate: true` reuses the chart's own `y`
+ * (and `x`/`z` as the per-bar key), no extra wiring needed.
+ */
+export const WithInterpolatedTimeline: StoryObj = {
+  render: () => ({ Component: BarTimelineInterpolated }),
 };
 
 /**

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LineChart from '$lib/charts/line/Chart.svelte';
 import LineTimeline from './LineTimeline.svelte';
+import LineTimelineInterpolated from './LineTimelineInterpolated.svelte';
 import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
 
 const meta = {
@@ -87,6 +88,16 @@ export const GroupedWithLegend: Story = {
  */
 export const WithTimeline: StoryObj = {
   render: () => ({ Component: LineTimeline }),
+};
+
+/**
+ * `interpolate` tweens the line's leading edge continuously between real
+ * years instead of jumping straight from one to the next — `interpolate: true`
+ * (or `{ progressEasing: ... }` like here) reuses the chart's own `y`/`z` as
+ * the tweened value and per-series key, no extra wiring needed.
+ */
+export const WithInterpolatedTimeline: StoryObj = {
+  render: () => ({ Component: LineTimelineInterpolated }),
 };
 
 // ── Faceting ────────────────────────────────────────────────────────────────────
