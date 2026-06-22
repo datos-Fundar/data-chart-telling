@@ -2,29 +2,14 @@
   import LineChart from '$lib/charts/line/Chart.svelte';
   import HeatmapChart from '$lib/charts/heatmap/Chart.svelte';
   import type { TooltipSync } from '$lib/types/layout/tooltip';
-  import { TIME_SERIES, METRIC_COLORS, type SeriesPoint } from '../../data/time-series';
+  import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
   import { HEAT_CELLS, type HeatCell } from '../../data/heat-cells';
-  import type { LegendSection } from '$lib/types/charts/legend';
 
   const { kind = 'line' }: { kind?: 'line' | 'heatmap' } = $props();
 
-  // Hover one facet and watch the matching point light up in the others.
   // svelte-ignore state_referenced_locally
   let sync = $state<TooltipSync>(kind === 'heatmap' ? 'xy' : 'x');
-
   const SYNCS: TooltipSync[] = ['none', 'x', 'y', 'xy'];
-
-  const lineLegend: LegendSection[] = [
-    {
-      type: 'discrete',
-      title: 'Indicador',
-      columns: 2,
-      items: [
-        { name: 'PBI', color: METRIC_COLORS.PBI, symbol: 'line' },
-        { name: 'Empleo', color: METRIC_COLORS.Empleo, symbol: 'line' },
-      ],
-    },
-  ];
 
   const heatData = HEAT_CELLS.filter((d) => d.year === 2022);
 </script>
@@ -54,6 +39,7 @@
       formatValue={(v) => `${(v * 100).toFixed(0)}%`}
       facet={{ by: 'scenario' as keyof HeatCell, columns: 2 }}
       tooltip={{ sync }}
+      markers={[{ type: 'hover' }]}
     />
   {:else}
     <LineChart
@@ -65,10 +51,20 @@
       x="year"
       y="value"
       z={'metric' as keyof SeriesPoint}
-      colors={METRIC_COLORS}
-      legend={lineLegend}
+      legend={[
+        {
+          type: 'discrete',
+          title: 'Indicador',
+          columns: 2,
+          items: [
+            { name: 'PBI', symbol: 'line' },
+            { name: 'Empleo', symbol: 'line' },
+          ],
+        },
+      ]}
       facet={{ by: 'region' as keyof SeriesPoint, columns: 2 }}
       tooltip={{ sync }}
+      markers={[{ type: 'hover' }]}
     />
   {/if}
 </div>

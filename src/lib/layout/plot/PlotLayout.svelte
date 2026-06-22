@@ -4,10 +4,11 @@
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { getHover, createHover } from '$lib/layout/tooltip/hover.svelte';
   import { createHoverController } from '$lib/layout/tooltip/controller.svelte';
+  import { hasHoverMarker, findHoverMarker } from '$lib/layout/tooltip/utils';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
   import Tooltip from '$lib/layout/tooltip/Tooltip.svelte';
   import type { XValue } from '$lib/types/plots/common';
-  import type { HoverPoint, TooltipRuntime } from '$lib/types/layout/tooltip';
+  import type { HoverDisplayPoint, HoverPoint, TooltipRuntime } from '$lib/types/layout/tooltip';
   import type { Marker } from '$lib/types/plots/markers';
 
   type PlotProps = ComponentProps<typeof Plot>;
@@ -48,20 +49,37 @@
     hoverPoints: HoverPoint<TData>[];
     label: (row: TData) => string;
     tooltip?: TooltipRuntime<TData>;
-    /** Standalone markers (`ruleX`, `ruleY`, un-scoped `component`); per-series markers stay with the plot kind. */
+    /** Standalone markers (`ruleX`, `ruleY`, un-scoped `component`/`hover`); per-series-scoped markers stay with the plot kind. */
     markers?: Marker[];
     showHoverLabels?: boolean;
-    children: Snippet;
+    /**
+     * `matchedPoints` carries only display info (+ `series`), not `row` — a
+     * per-series-scoped `HoverMarker` never needs the source row, just enough
+     * to filter and place dots/labels, which sidesteps forcing a concrete
+     * `TData` resolution through this snippet's type for every plot kind.
+     */
+    children: Snippet<
+      [{ matchedPoints: HoverDisplayPoint[]; ruleX: XValue | null; ruleY: XValue | number | null }]
+    >;
   } = $props();
 
   const cfg = $derived(getConfiguration());
 
   // ── Hover / tooltip ───────────────────────────────────────────────────────
+  // A hover marker activates pointer tracking just like a tooltip does — the
+  // two are independent, but both ride the same Pointer/controller plumbing.
+  const hoverActive = $derived(tooltip != null || hasHoverMarker(markers));
+
   const sharedHover = getHover();
   const localHover = createHover();
   const hover = $derived(sharedHover ?? localHover);
   $effect(() => {
-    if (!sharedHover && tooltip) localHover.sync = tooltip.sync;
+    if (sharedHover) return;
+    if (tooltip) {
+      localHover.sync = tooltip.sync;
+    } else {
+      localHover.sync = findHoverMarker(markers)?.sync ?? 'none';
+    }
   });
 
   const ctrl = createHoverController<TData>({
@@ -72,6 +90,9 @@
     getY: () => getY,
     label: () => label,
     format: () => tooltip?.format ?? label,
+    seriesFilter: () => tooltip?.series,
+    width: () => width,
+    height: () => height,
   });
 
   const topLevelMarkers = $derived(
@@ -82,17 +103,26 @@
         (marker.type === 'component' && !marker.series),
     ),
   );
+
+  /** The unscoped (no `series`) hover marker, if any — rendered here directly;
+   *  series/segment-scoped ones are rendered by the plot kind itself, which
+   *  has access to its own series grouping. */
+  const unscopedHoverMarker = $derived(
+    markers.find((m) => m.type === 'hover' && !m.series) as
+      | Extract<Marker, { type: 'hover' }>
+      | undefined,
+  );
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   class="dct-plot"
   style:color={cfg.axis.color}
-  onpointermove={tooltip ? ctrl.onMove : undefined}
-  onpointerleave={tooltip ? ctrl.onLeave : undefined}
+  onpointermove={hoverActive ? ctrl.onMove : undefined}
+  onpointerleave={hoverActive ? ctrl.onLeave : undefined}
 >
   <Plot {width} {height} margin={cfg.margins} {x} {y}>
-    {@render children()}
+    {@render children({ matchedPoints: ctrl.points, ruleX: ctrl.ruleX, ruleY: ctrl.ruleY })}
 
     {#each topLevelMarkers as marker, i (marker.type === 'ruleX' ? `${marker.type}-${marker.x}` : marker.type === 'ruleY' ? `${marker.type}-${marker.y}` : `${marker.type}-${i}`)}
       {#if marker.type === 'ruleX'}
@@ -118,20 +148,35 @@
       {/if}
     {/each}
 
-    {#if tooltip}
+    {#if hoverActive}
       <Pointer {data} x={getX} y={matchY} maxDistance={400} onupdate={ctrl.onPointer} />
+    {/if}
+
+    {#if unscopedHoverMarker}
       <HoverMarker
         data={ctrl.points}
-        ruleX={ctrl.ruleX}
-        ruleY={ctrl.ruleY}
-        color={cfg.timeline.activeColor}
-        showLabels={showHoverLabels}
+        ruleX={unscopedHoverMarker.ruleX !== false ? ctrl.ruleX : null}
+        ruleY={unscopedHoverMarker.ruleY !== false ? ctrl.ruleY : null}
+        color={unscopedHoverMarker.color ?? cfg.timeline.activeColor}
+        showLabels={unscopedHoverMarker.showLabels ?? showHoverLabels}
+        ruleStyle={unscopedHoverMarker.ruleStyle}
+        dotStyle={unscopedHoverMarker.dotStyle}
+        fontStyle={unscopedHoverMarker.fontStyle}
       />
     {/if}
   </Plot>
 
-  {#if tooltip && ctrl.showTooltip && ctrl.cursor}
-    <Tooltip x={ctrl.cursor.x} y={ctrl.cursor.y}>{ctrl.tooltipText}</Tooltip>
+  {#if tooltip && ctrl.showTooltip && ctrl.tooltipPosition}
+    <!-- `tooltipPosition` is the real cursor in the facet the mouse is
+         physically over; every other facet broadcasting a synced match
+         reprojects that cursor's relative position onto its own box. -->
+    <Tooltip x={ctrl.tooltipPosition.x} y={ctrl.tooltipPosition.y}>
+      {#if tooltip.content}
+        {@render tooltip.content({ rows: ctrl.matchedRows.map((p) => p.row) })}
+      {:else}
+        {ctrl.tooltipText}
+      {/if}
+    </Tooltip>
   {/if}
 </div>
 

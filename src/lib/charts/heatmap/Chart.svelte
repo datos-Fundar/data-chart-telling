@@ -2,13 +2,14 @@
   import Chart from '$lib/charts/Chart.svelte';
   import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
   import type { TooltipProp } from '$lib/types/layout/tooltip';
-  import { resolveTooltip } from '$lib/layout/tooltip/utils';
+  import { resolveTooltip, resolveHoverSync, hasHoverMarker } from '$lib/layout/tooltip/utils';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import type {
     FacetConfig,
     TimelineConfig,
   } from '$lib/types/charts/common';
   import type { LegendSection } from '$lib/types/charts/legend';
+  import type { Marker } from '$lib/types/plots/markers';
   import type { AxisScale, XValue, Accessor } from '$lib/types/plots/common';
 
   /**
@@ -34,6 +35,7 @@
     yScale = {},
     showValues = true,
     formatValue = (v: number) => `${v}`,
+    markers = [],
     facet,
     timeline,
     tooltip,
@@ -48,17 +50,15 @@
     x: Accessor<TRow, XValue>;
     y: Accessor<TRow, XValue>;
     value: Accessor<TRow, number>;
-    /** Gradient start; defaults to the configured continuous palette. */
     colorMin?: string;
-    /** Gradient end; defaults to the configured continuous palette. */
     colorMax?: string;
     xScale?: AxisScale;
     yScale?: AxisScale;
     showValues?: boolean;
     formatValue?: (v: number) => string;
+    markers?: Marker[];
     facet?: FacetConfig<TRow>;
     timeline?: TimelineConfig<TRow>;
-    /** Enable hover tooltips. `true` for defaults, or `{ sync, format }`. */
     tooltip?: TooltipProp<TRow>;
   } = $props();
 
@@ -72,6 +72,8 @@
 
   // Heatmap hover defaults to `xy` sync — the same single cell across facets.
   const tip = $derived(resolveTooltip(tooltip, 'xy'));
+  const hoverEnabled = $derived(tip.enabled || hasHoverMarker(markers));
+  const resolvedSync = $derived(resolveHoverSync(tip.enabled ? tip.sync : undefined, markers, 'xy'));
   const defaultFormat = $derived((row: TRow) => {
     const xl = xScale.label || 'x';
     const yl = yScale.label || 'y';
@@ -89,7 +91,7 @@
   {data}
   {facet}
   {timeline}
-  tooltip={tip.enabled ? { sync: tip.sync } : undefined}
+  hover={hoverEnabled ? { sync: resolvedSync } : undefined}
 >
   {#snippet plot({ data: rows, width: w, height: h, facetValue })}
     <HeatmapPlot
@@ -103,8 +105,15 @@
       {yScale}
       {showValues}
       {formatValue}
+      {markers}
       tooltip={tip.enabled
-        ? { format: tip.format ?? defaultFormat, facetId: facetValue ?? '', sync: tip.sync }
+        ? {
+            format: tip.format ?? defaultFormat,
+            facetId: facetValue ?? '',
+            sync: tip.sync,
+            series: tip.series,
+            content: tip.content,
+          }
         : undefined}
     />
   {/snippet}

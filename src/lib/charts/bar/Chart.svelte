@@ -1,7 +1,7 @@
 <script lang="ts" generics="TRow extends Record<string, unknown>">
   import Chart from '$lib/charts/Chart.svelte';
   import BarPlot from '$lib/plots/bar/Plot.svelte';
-  import { resolveTooltip } from '$lib/layout/tooltip/utils';
+  import { resolveTooltip, resolveHoverSync, hasHoverMarker } from '$lib/layout/tooltip/utils';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import type { TooltipProp } from '$lib/types/layout/tooltip';
   import type {
@@ -10,6 +10,7 @@
   } from '$lib/types/charts/common';
   import type { LegendSection } from '$lib/types/charts/legend';
   import type { BarSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
+  import type { Marker } from '$lib/types/plots/markers';
   import type { XValue, YValue, Accessor } from '$lib/types/plots/common';
 
   /**
@@ -30,6 +31,7 @@
     y,
     z,
     segments,
+    markers = [],
     facet,
     timeline,
     tooltip,
@@ -43,17 +45,17 @@
     data: TRow[];
     x: Accessor<TRow, XValue>;
     y: Accessor<TRow, YValue>;
-    /** Grouping dimension: one series per distinct value. */
     z?: Accessor<TRow, unknown>;
-    /** Per-group range styling, keyed by the group (`z`) value. */
     segments?: SegmentsMap<BarSegmentStyle>;
+    markers?: Marker[];
     facet?: FacetConfig<TRow>;
     timeline?: TimelineConfig<TRow>;
-    /** Enable hover tooltips. `true` for defaults, or `{ sync, format }`. */
     tooltip?: TooltipProp<TRow>;
   } = $props();
 
   const tip = $derived(resolveTooltip(tooltip, 'x'));
+  const hoverEnabled = $derived(tip.enabled || hasHoverMarker(markers));
+  const resolvedSync = $derived(resolveHoverSync(tip.enabled ? tip.sync : undefined, markers, 'x'));
   const getX = $derived(resolveAccessor<TRow>(x));
   const getY = $derived(resolveAccessor<TRow>(y));
   const defaultFormat = $derived((row: TRow) => `${String(getX(row))}: ${getY(row)}`);
@@ -69,7 +71,7 @@
   {data}
   {facet}
   {timeline}
-  tooltip={tip.enabled ? { sync: tip.sync } : undefined}
+  hover={hoverEnabled ? { sync: resolvedSync } : undefined}
 >
   {#snippet plot({ data: rows, width: w, height: h, facetValue })}
     <BarPlot
@@ -80,8 +82,15 @@
       {y}
       {z}
       {segments}
+      {markers}
       tooltip={tip.enabled
-        ? { format: tip.format ?? defaultFormat, facetId: facetValue ?? '', sync: tip.sync }
+        ? {
+            format: tip.format ?? defaultFormat,
+            facetId: facetValue ?? '',
+            sync: tip.sync,
+            series: tip.series,
+            content: tip.content,
+          }
         : undefined}
     />
   {/snippet}

@@ -60,7 +60,6 @@ export const Faceted: Story = {
     subtitle: 'Facetado por métrica',
     data: TIME_SERIES.filter((d) => d.region === 'Norte'),
     x: 'year',
-    segments: { series: [{ style: { fill: '#4f46e5' } }] },
     facet: { by: 'metric' as keyof SeriesPoint, columns: 2 },
   },
 };

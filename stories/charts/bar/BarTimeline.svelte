@@ -15,7 +15,6 @@
       data={REGION_BARS}
       x="region"
       y="value"
-      segments={{ series: [{ style: { fill: '#2daa6e' } }] }}
       timeline={{ accessor: 'year', progress, orientation: 'horizontal' }}
     />
   {/snippet}

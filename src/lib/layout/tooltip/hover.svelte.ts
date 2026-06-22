@@ -4,7 +4,14 @@ import type { HoverStore } from '$lib/types/layout/tooltip';
 const HOVER_KEY = Symbol('dct-hover');
 
 function blank(): HoverStore {
-  return { activeX: null, activeY: null, source: null, sync: 'none' };
+  return {
+    activeX: null,
+    activeY: null,
+    activeSeries: null,
+    cursorFrac: null,
+    source: null,
+    sync: 'none',
+  };
 }
 
 /** Create + register the shared hover store. Call during component init. */

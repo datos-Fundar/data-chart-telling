@@ -64,7 +64,6 @@ export const Default: Story = {
     series: [
       { name: 'regions', x: 'region', y: 'value', data: REGIONS } satisfies Series<Region>,
     ],
-    segments: { regions: [{ style: { fill: '#4f46e5' } }] },
   },
 };
 
@@ -74,7 +73,6 @@ export const ByYear: Story = {
     series: [
       { name: 'gdp', x: 'year', y: 'value', data: GDP } satisfies Series<YearValue>,
     ],
-    segments: { gdp: [{ style: { fill: '#4f46e5' } }] },
   },
 };
 
@@ -90,8 +88,8 @@ export const TwoSeries: Story = {
       { name: 'gdp', x: 'year', y: 'value', data: GDP } satisfies Series<YearValue>,
     ],
     segments: {
-      employment: [{ style: { fill: '#e6580d', fillOpacity: 0.85 } }],
-      gdp: [{ style: { fill: '#4f46e5', fillOpacity: 0.85 } }],
+      employment: [{ style: { fillOpacity: 0.85 } }],
+      gdp: [{ style: { fillOpacity: 0.85 } }],
     },
   },
 };
@@ -104,6 +102,5 @@ export const Narrow: Story = {
     series: [
       { name: 'regions', x: 'region', y: 'value', data: REGIONS } satisfies Series<Region>,
     ],
-    segments: { regions: [{ style: { fill: '#2daa6e' } }] },
   },
 };

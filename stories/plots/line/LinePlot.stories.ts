@@ -50,8 +50,8 @@ type Story = StoryObj<typeof meta>;
 // ── Basic ─────────────────────────────────────────────────────────────────────
 
 /**
- * Single series with no segments — the whole line is drawn with the CSS
- * default `--plot-line-stroke` variable (falls back to `currentColor`).
+ * Single series with no segments — the whole line is drawn in the configured
+ * palette colour for its series index (first colour, by default).
  */
 export const Default: Story = {
   args: {
@@ -71,10 +71,6 @@ export const TwoSeries: Story = {
       { name: 'gdp',        x: 'year', y: 'value', data: GDP        } satisfies Series<YearPoint>,
       { name: 'employment', x: 'year', y: 'value', data: EMPLOYMENT } satisfies Series<YearPoint>,
     ],
-    segments: {
-      gdp:        [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
-      employment: [{ style: { stroke: { stroke: '#e6580d', strokeWidth: 3 } } }],
-    } satisfies SegmentsMap,
   },
 };
 
@@ -90,8 +86,8 @@ export const DashedSegment: Story = {
     ],
     segments: {
       gdp: [
-        { to:   2020, style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } },
-        { from: 2020, style: { stroke: { stroke: '#4f46e5', strokeWidth: 3, strokeDasharray: '6 4' } } },
+        { to: 2020 },
+        { from: 2020, to: 2022, style: { stroke: { strokeDasharray: '6 4' } } },
       ],
     } satisfies SegmentsMap,
   },
@@ -107,9 +103,6 @@ export const Narrow: Story = {
     series: [
       { name: 'gdp', x: 'year', y: 'value', data: GDP } satisfies Series<YearPoint>,
     ],
-    segments: {
-      gdp: [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 2 } } }],
-    } satisfies SegmentsMap,
   },
 };
 
@@ -123,12 +116,9 @@ export const WithRuleXMarkers: Story = {
     series: [
       { name: 'gdp', x: 'year', y: 'value', data: GDP } satisfies Series<YearPoint>,
     ],
-    segments: {
-      gdp: [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
-    } satisfies SegmentsMap,
     markers: [
-      { type: 'ruleX', x: 2020, style: { stroke: '#dc2626', strokeDasharray: '4 4', strokeOpacity: 0.7 } } satisfies Marker,
-      { type: 'ruleX', x: 2022, style: { stroke: '#16a34a', strokeDasharray: '4 4', strokeOpacity: 0.7 } } satisfies Marker,
+      { type: 'ruleX', x: 2020, style: { strokeDasharray: '4 4', strokeOpacity: 0.7 } } satisfies Marker,
+      { type: 'ruleX', x: 2022, style: { strokeDasharray: '4 4', strokeOpacity: 0.7 } } satisfies Marker,
     ],
   },
 };
@@ -141,12 +131,9 @@ export const WithRuleYMarkers: Story = {
     series: [
       { name: 'employment', x: 'year', y: 'value', data: EMPLOYMENT } satisfies Series<YearPoint>,
     ],
-    segments: {
-      employment: [{ style: { stroke: { stroke: '#e6580d', strokeWidth: 3 } } }],
-    } satisfies SegmentsMap,
     markers: [
-      { type: 'ruleY', y: 60, style: { stroke: '#f97316', strokeDasharray: '6 6', strokeOpacity: 0.5 } } satisfies Marker,
-      { type: 'ruleY', y: 75, style: { stroke: '#16a34a', strokeDasharray: '6 6', strokeOpacity: 0.5 } } satisfies Marker,
+      { type: 'ruleY', y: 60, style: { strokeDasharray: '6 6', strokeOpacity: 0.5 } } satisfies Marker,
+      { type: 'ruleY', y: 75, style: { strokeDasharray: '6 6', strokeOpacity: 0.5 } } satisfies Marker,
     ],
   },
 };
@@ -160,13 +147,9 @@ export const WithMixedMarkers: Story = {
       { name: 'gdp',        x: 'year', y: 'value', data: GDP        } satisfies Series<YearPoint>,
       { name: 'employment', x: 'year', y: 'value', data: EMPLOYMENT } satisfies Series<YearPoint>,
     ],
-    segments: {
-      gdp:        [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
-      employment: [{ style: { stroke: { stroke: '#e6580d', strokeWidth: 3 } } }],
-    } satisfies SegmentsMap,
     markers: [
-      { type: 'ruleX', x: 2020, style: { stroke: '#dc2626', strokeDasharray: '4 4', strokeOpacity: 0.6 } } satisfies Marker,
-      { type: 'ruleY', y: 50,   style: { stroke: '#8b5cf6', strokeDasharray: '6 6', strokeOpacity: 0.5 } } satisfies Marker,
+      { type: 'ruleX', x: 2020, style: { strokeDasharray: '4 4', strokeOpacity: 0.6 } } satisfies Marker,
+      { type: 'ruleY', y: 50,   style: { strokeDasharray: '6 6', strokeOpacity: 0.5 } } satisfies Marker,
     ],
   },
 };
@@ -206,7 +189,6 @@ export const WithDots: Story = {
       gdp: [
         {
           style: {
-            stroke: { stroke: '#4f46e5', strokeWidth: 3 },
             dots: { dotRadius: 8, dotSymbol: 'circle' },
           },
         },
@@ -229,16 +211,14 @@ export const TwoSeriesWithDifferentDots: Story = {
       gdp: [
         {
           style: {
-            stroke: { stroke: '#4f46e5', strokeWidth: 3 },
-            dots: { dotRadius: 8, dotSymbol: 'circle', dotFill: '#4f46e5', dotStroke: '#fff', dotStrokeWidth: 2 },
+            dots: { dotRadius: 8, dotSymbol: 'circle', dotStrokeWidth: 2 },
           },
         },
       ],
       costs: [
         {
           style: {
-            stroke: { stroke: '#e6580d', strokeWidth: 3 },
-            dots: { dotRadius: 8, dotSymbol: 'square', dotFill: '#e6580d', dotStroke: '#fff', dotStrokeWidth: 2 },
+            dots: { dotRadius: 8, dotSymbol: 'square', dotStrokeWidth: 2 },
           },
         },
       ],
@@ -260,15 +240,14 @@ export const DashedSegmentWithDots: Story = {
         {
           to: 2020,
           style: {
-            stroke: { stroke: '#4f46e5', strokeWidth: 3 },
-            dots: { dotRadius: 8, dotSymbol: 'circle', dotFill: '#4f46e5' },
+            dots: { dotRadius: 8, dotSymbol: 'circle' },
           },
         },
         {
           from: 2020,
           style: {
-            stroke: { stroke: '#4f46e5', strokeWidth: 3, strokeDasharray: '6 4', strokeOpacity: 0.6 },
-            dots: { dotRadius: 8, dotSymbol: 'triangle', dotFill: '#4f46e5' },
+            stroke: { strokeDasharray: '6 4', strokeOpacity: 0.6 },
+            dots: { dotRadius: 8, dotSymbol: 'triangle' },
           },
         },
       ],
@@ -288,8 +267,7 @@ export const CustomDotsWithStroke: Story = {
       gdp: [
         {
           style: {
-            stroke: { stroke: '#dc2626', strokeWidth: 2 },
-            dots: { dotRadius: 12, dotSymbol: 'circle', dotFill: 'orange', dotStroke: '#222', dotStrokeWidth: 3 },
+            dots: { dotRadius: 12, dotSymbol: 'circle', dotStrokeWidth: 3 },
           },
         },
       ],
@@ -314,15 +292,14 @@ export const MonthlyWithSegmentedDots: Story = {
         {
           to: '2024-03',
           style: {
-            stroke: { stroke: '#4f46e5', strokeWidth: 3 },
-            dots: { dotRadius: 5, dotSymbol: 'circle', dotFill: '#4f46e5' },
+            dots: { dotRadius: 5, dotSymbol: 'circle' },
           },
         },
         {
           from: '2024-03',
           style: {
-            stroke: { stroke: '#4f46e5', strokeWidth: 3, strokeDasharray: '6 4', strokeOpacity: 0.6 },
-            dots: { dotRadius: 5, dotSymbol: 'triangle', dotFill: '#4f46e5' },
+            stroke: { strokeDasharray: '6 4', strokeOpacity: 0.6 },
+            dots: { dotRadius: 5, dotSymbol: 'triangle' },
           },
         },
       ],
@@ -349,10 +326,6 @@ const GDP_AND_COSTS_SERIES = [...GDP_SERIES, ...COSTS_SERIES];
 export const XDeltaBetweenTwoSeries: Story = {
   args: {
     series: GDP_AND_COSTS_SERIES,
-    segments: {
-      gdp:   [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
-      costs: [{ style: { stroke: { stroke: '#e6580d', strokeWidth: 3 } } }],
-    } satisfies SegmentsMap,
     markers: [
       {
         type: 'component',
@@ -363,7 +336,7 @@ export const XDeltaBetweenTwoSeries: Story = {
           at: 2019,
           from: { type: 'series', series: 'gdp' },
           to:   { type: 'series', series: 'costs' },
-          strokeStyle: { stroke: '#6b7280', strokeDasharray: '6 6' },
+          strokeStyle: { stroke: 'grey', strokeDasharray: '6 6' },
           formatDiff: (d) => d.toFixed(0),
           fontStyle: { dx: 12, lineAnchor: 'middle' },
         } satisfies DeltaConfig,
@@ -379,9 +352,6 @@ export const XDeltaBetweenTwoSeries: Story = {
 export const XDeltaToBaseline: Story = {
   args: {
     series: GDP_SERIES,
-    segments: {
-      gdp: [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
-    } satisfies SegmentsMap,
     markers: [
       {
         type: 'component',
@@ -391,7 +361,7 @@ export const XDeltaToBaseline: Story = {
           axis: 'x',
           at: 2021,
           from: { type: 'series', series: 'gdp' },
-          strokeStyle: { stroke: '#4f46e5', strokeDasharray: '4 4', strokeOpacity: 0.6 },
+          strokeStyle: { strokeDasharray: '4 4', strokeOpacity: 0.6 },
           formatDiff: (d) => `${d}`,
           fontStyle: { dx: 12, lineAnchor: 'middle' },
         } satisfies DeltaConfig,
@@ -406,9 +376,6 @@ export const XDeltaToBaseline: Story = {
 export const XDeltaToAxisValue: Story = {
   args: {
     series: GDP_SERIES,
-    segments: {
-      gdp: [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
-    } satisfies SegmentsMap,
     markers: [
       {
         type: 'component',
@@ -419,7 +386,7 @@ export const XDeltaToAxisValue: Story = {
           at: 2022,
           from: { type: 'series', series: 'gdp' },
           to:   { type: 'axis', value: 40 },
-          strokeStyle: { stroke: '#dc2626', strokeDasharray: '6 4' },
+          strokeStyle: { strokeDasharray: '6 4' },
           formatDiff: (d) => `+ ${d.toFixed(0)}`,
           fontStyle: { dx: 20, lineAnchor: 'middle' },
         } satisfies DeltaConfig,
@@ -434,10 +401,6 @@ export const XDeltaToAxisValue: Story = {
 export const MultipleXDeltas: Story = {
   args: {
     series: GDP_AND_COSTS_SERIES,
-    segments: {
-      gdp:   [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
-      costs: [{ style: { stroke: { stroke: '#e6580d', strokeWidth: 3 } } }],
-    } satisfies SegmentsMap,
     markers: [
       {
         type: 'component',
@@ -448,7 +411,7 @@ export const MultipleXDeltas: Story = {
           at: 2019,
           from: { type: 'series', series: 'gdp' },
           to:   { type: 'series', series: 'costs' },
-          strokeStyle: { stroke: '#6b7280', strokeDasharray: '4 4', strokeOpacity: 0.7 },
+          strokeStyle: { strokeDasharray: '4 4', strokeOpacity: 0.7 },
           formatDiff: (d) => d.toFixed(0),
           fontStyle: { dx: 12, lineAnchor: 'middle' },
         } satisfies DeltaConfig,
@@ -462,7 +425,7 @@ export const MultipleXDeltas: Story = {
           at: 2022,
           from: { type: 'series', series: 'gdp' },
           to:   { type: 'series', series: 'costs' },
-          strokeStyle: { stroke: '#6b7280', strokeDasharray: '4 4', strokeOpacity: 0.7 },
+          strokeStyle: { strokeDasharray: '4 4', strokeOpacity: 0.7 },
           formatDiff: (d) => d.toFixed(0),
           fontStyle: { dx: 12, lineAnchor: 'middle' },
         } satisfies DeltaConfig,
@@ -479,10 +442,6 @@ export const MultipleXDeltas: Story = {
 export const YDeltaBetweenTwoSeries: Story = {
   args: {
     series: GDP_AND_COSTS_SERIES,
-    segments: {
-      gdp:   [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
-      costs: [{ style: { stroke: { stroke: '#e6580d', strokeWidth: 3 } } }],
-    } satisfies SegmentsMap,
     markers: [
       {
         type: 'component',
@@ -493,7 +452,7 @@ export const YDeltaBetweenTwoSeries: Story = {
           at: 40,
           from: { type: 'series', series: 'gdp' },
           to:   { type: 'series', series: 'costs' },
-          strokeStyle: { stroke: '#6b7280', strokeDasharray: '6 6' },
+          strokeStyle: { strokeDasharray: '6 6' },
           formatDiff: (d) => `${d} yr`,
           fontStyle: { dy: -10, lineAnchor: 'middle' },
         } satisfies DeltaConfig,
@@ -511,9 +470,6 @@ export const YDeltaBetweenTwoSeries: Story = {
 export const YDeltaToBaseline: Story = {
   args: {
     series: GDP_SERIES,
-    segments: {
-      gdp: [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
-    } satisfies SegmentsMap,
     markers: [
       {
         type: 'component',
@@ -525,7 +481,7 @@ export const YDeltaToBaseline: Story = {
             axis: 'y',
             at: 55,
             from: { type: 'series', series: 'gdp' },
-            strokeStyle: { stroke: '#4f46e5', strokeDasharray: '4 4', strokeOpacity: 0.6 },
+            strokeStyle: { strokeDasharray: '4 4', strokeOpacity: 0.6 },
             formatDiff: (d) => `${d.toFixed(0)} yr`,
             fontStyle: { dy: -10, lineAnchor: 'middle' },
           } satisfies DeltaConfig),
@@ -543,9 +499,6 @@ export const YDeltaToBaseline: Story = {
 export const YDeltaToAxisValue: Story = {
   args: {
     series: COSTS_SERIES,
-    segments: {
-      costs: [{ style: { stroke: { stroke: '#e6580d', strokeWidth: 3 } } }],
-    } satisfies SegmentsMap,
     markers: [
       {
         type: 'component',
@@ -556,7 +509,7 @@ export const YDeltaToAxisValue: Story = {
           at: 45,
           from: { type: 'series', series: 'costs' },
           to:   { type: 'axis', value: 2019 },
-          strokeStyle: { stroke: '#dc2626', strokeDasharray: '6 4' },
+          strokeStyle: { strokeDasharray: '6 4' },
           formatDiff: (d) => `${d} yr`,
           fontStyle: { dy: -10, lineAnchor: 'middle' },
         } satisfies DeltaConfig,
@@ -571,10 +524,6 @@ export const YDeltaToAxisValue: Story = {
 export const MultipleYDeltas: Story = {
   args: {
     series: GDP_AND_COSTS_SERIES,
-    segments: {
-      gdp:   [{ style: { stroke: { stroke: '#4f46e5', strokeWidth: 3 } } }],
-      costs: [{ style: { stroke: { stroke: '#e6580d', strokeWidth: 3 } } }],
-    } satisfies SegmentsMap,
     markers: [
       {
         type: 'component',
@@ -585,7 +534,7 @@ export const MultipleYDeltas: Story = {
           at: 32,
           from: { type: 'series', series: 'gdp' },
           to:   { type: 'series', series: 'costs' },
-          strokeStyle: { stroke: '#6b7280', strokeDasharray: '4 4', strokeOpacity: 0.7 },
+          strokeStyle: { strokeDasharray: '4 4', strokeOpacity: 0.7 },
           formatDiff: (d) => `${d} yr`,
           fontStyle: { dy: -10, lineAnchor: 'middle' },
         } satisfies DeltaConfig,
@@ -599,7 +548,7 @@ export const MultipleYDeltas: Story = {
           at: 48,
           from: { type: 'series', series: 'gdp' },
           to:   { type: 'series', series: 'costs' },
-          strokeStyle: { stroke: '#6b7280', strokeDasharray: '4 4', strokeOpacity: 0.7 },
+          strokeStyle: { strokeDasharray: '4 4', strokeOpacity: 0.7 },
           formatDiff: (d) => `${d} yr`,
           fontStyle: { dy: -10, lineAnchor: 'middle' },
         } satisfies DeltaConfig,

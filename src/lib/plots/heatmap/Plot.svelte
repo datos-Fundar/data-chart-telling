@@ -6,6 +6,7 @@
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import type { HeatmapSeries } from '$lib/types/plots/heatmap';
   import type { AxisScale, XValue } from '$lib/types/plots/common';
+  import type { Marker } from '$lib/types/plots/markers';
   import type { TooltipRuntime } from '$lib/types/layout/tooltip';
 
   /**
@@ -24,6 +25,7 @@
     yScale = {},
     showValues = true,
     formatValue = (v: number) => `${v}`,
+    markers = [],
     tooltip = undefined,
   }: {
     width: number;
@@ -37,8 +39,21 @@
     yScale?: AxisScale;
     showValues?: boolean;
     formatValue?: (v: number) => string;
+    /** Heatmap has no series concept — only unscoped markers (`ruleX`/`ruleY`/`hover`) apply. */
+    markers?: Marker[];
     tooltip?: TooltipRuntime<TData>;
   } = $props();
+
+  $effect(() => {
+    const scoped = markers.filter(
+      (m) => (m.type === 'hover' || m.type === 'component') && m.series,
+    );
+    if (scoped.length > 0) {
+      console.warn(
+        'HeatmapPlot: markers scoped to a `series` are ignored — heatmaps have no series concept.',
+      );
+    }
+  });
 
   const cfg = $derived(getConfiguration());
   const minColor = $derived(colorMin ?? cfg.continuous.min);
@@ -83,6 +98,7 @@
   {hoverPoints}
   label={(d) => formatValue(Number(getValue(d)))}
   {tooltip}
+  {markers}
   showHoverLabels={false}
 >
   <AxisX tickSize={0} tickPadding={4} tickFontSize={cfg.axis.fontSize} titleFontSize={cfg.axis.labelFontSize} />

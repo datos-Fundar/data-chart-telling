@@ -41,8 +41,8 @@ export const Default: Story = {};
 /** Custom colour ramp and no cell labels. */
 export const WarmRampNoLabels: Story = {
   args: {
-    colorMin: '#fff7ed',
-    colorMax: '#c2410c',
+    colorMin: 'darkblue',
+    colorMax: 'cornflowerblue',
     showValues: false,
   },
 };

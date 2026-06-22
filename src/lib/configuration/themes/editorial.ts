@@ -7,9 +7,9 @@ export const EDITORIAL_THEME: ChartConfigInput = {
   title: { size: '1.9rem', weight: 700, leading: '1.1', spacing: '-0.01em' },
   subtitle: { color: '#8a6d3b', size: '1.05rem' },
   caption: { color: '#8a6d3b' },
-  palette: ['#9b2226', '#bb3e03', '#ca6702', '#ee9b00', '#005f73'],
+  palette: ['#9b2226', '#606c38', '#6a4c93', '#ee9b00', '#005f73'],
   continuous: { min: '#fff3e0', max: '#bb3e03', labelColor: '#2b2118' },
   axis: { color: '#8a6d3b', fontSize: 13, tickSize: 6 },
-  line: { strokeWidth: 4, dotRadius: 5 },
+  line: { strokeWidth: 5, dotRadius: 5 },
   timeline: { activeColor: '#bb3e03', axisColor: '#8a6d3b', thickness: 60 },
 };

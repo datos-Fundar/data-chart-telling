@@ -26,7 +26,6 @@
 
   const CATEGORIES = ['A', 'B', 'C', 'D'];
   const GROUP_NAMES = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
-  const PALETTE = ['#4f46e5', '#e6580d', '#16a34a', '#dc2626', '#0891b2', '#9333ea', '#ca8a04', '#db2777'];
 
   const data = $derived.by((): Row[] => {
     const names = GROUP_NAMES.slice(0, groupCount);
@@ -47,9 +46,6 @@
       width={w}
       height={h}
       series={[{ name, x: 'category', y: 'value', data: cellData }]}
-      segments={{
-        [name]: [{ style: { fill: PALETTE[GROUP_NAMES.indexOf(name.replace('Grupo ', '')) % PALETTE.length] } }],
-      }}
     />
   {/snippet}
 </FacetLayout>

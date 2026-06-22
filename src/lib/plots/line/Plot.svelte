@@ -6,8 +6,10 @@
   import { Line, Dot, AxisX, AxisY } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { getConfiguration } from '$lib/configuration/config.svelte';
+  import { paletteColor } from '$lib/utils/color';
   import { buildSeries } from '$lib/utils/grouping';
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
+  import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
   import { buildGroupedSeries, validateSegments } from '$lib/plots/utils/segments';
   import type { AxisScale, Series, SeriesProps, DataProps } from '$lib/types/plots/common';
   import type { LineSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
@@ -61,7 +63,7 @@
   const seriesMarkers = $derived.by(() => {
     const map = new SvelteMap<string, Marker[]>();
     for (const marker of markers) {
-      if ((marker.type === 'component') && marker.series) {
+      if ((marker.type === 'component' || marker.type === 'hover') && marker.series) {
         if (!map.has(marker.series)) map.set(marker.series, []);
         map.get(marker.series)!.push(marker);
       }
@@ -75,7 +77,17 @@
   const yAcc = $derived(resolveAccessor(resolvedSeries[0]?.y ?? ((d: TData) => d)));
   const flat = $derived(resolvedSeries.flatMap((s) => s.data));
   const hoverPoints = $derived(
-    flat.map((d) => ({ x: xAcc(d) as XValue, y: Number(yAcc(d)), row: d, label: String(yAcc(d)) })),
+    resolvedSeries.flatMap((s) => {
+      const sx = resolveAccessor(s.x);
+      const sy = resolveAccessor(s.y);
+      return s.data.map((d) => ({
+        x: sx(d) as XValue,
+        y: Number(sy(d)),
+        row: d,
+        label: String(sy(d)),
+        series: s.name,
+      }));
+    }),
   );
 </script>
 
@@ -92,17 +104,19 @@
   {tooltip}
   {markers}
 >
+  {#snippet children({ matchedPoints, ruleX, ruleY })}
   <AxisX tickSize={cfg.axis.tickSize} tickPadding={cfg.axis.tickPadding} tickFontSize={cfg.axis.fontSize} />
   <AxisY tickSize={0} tickPadding={cfg.axis.tickPadding} tickFontSize={cfg.axis.fontSize} />
 
-  {#each groupedSeries as group (group.series.name)}
+  {#each groupedSeries as group, seriesIndex (group.series.name)}
+    {@const defaultColor = paletteColor(seriesIndex, cfg.palette)}
     {#each group.visualSegments as seg, i (`${group.series.name}-${i}`)}
       {@const strokeStyle = seg.style.stroke}
       <Line
         data={seg.data}
         x={resolveAccessor(group.series.x)}
         y={resolveAccessor(group.series.y)}
-        stroke={strokeStyle?.stroke ?? 'var(--plot-line-stroke, currentColor)'}
+        stroke={strokeStyle?.stroke ?? defaultColor}
         strokeWidth={strokeStyle?.strokeWidth ?? cfg.line.strokeWidth}
         strokeOpacity={strokeStyle?.strokeOpacity ?? 1}
         strokeDasharray={strokeStyle?.strokeDasharray}
@@ -116,9 +130,9 @@
           x={resolveAccessor(group.series.x)}
           y={resolveAccessor(group.series.y)}
           r={dotStyle.dotRadius ?? cfg.line.dotRadius}
-          fill={dotStyle.dotFill ?? strokeStyle?.stroke ?? 'var(--plot-line-stroke, currentColor)'}
+          fill={dotStyle.dotFill ?? strokeStyle?.stroke ?? defaultColor}
           symbol={dotStyle.dotSymbol ?? 'circle'}
-          stroke={dotStyle.dotStroke ?? strokeStyle?.stroke ?? 'var(--plot-line-stroke, currentColor)'}
+          stroke={dotStyle.dotStroke ?? strokeStyle?.stroke ?? defaultColor}
           strokeWidth={dotStyle.dotStrokeWidth ?? 1}
           fillOpacity={dotStyle.dotFillOpacity ?? strokeStyle?.strokeOpacity ?? 1}
           strokeOpacity={dotStyle.dotStrokeOpacity ?? strokeStyle?.strokeOpacity ?? 1}
@@ -135,7 +149,7 @@
           {@const segmentDataArrays = getSegmentData(group.series.data, xAccessor, segmentRanges)}
           {#each segmentDataArrays as segmentData, segIdx (`${group.series.name}-marker-segment-${segIdx}`)}
             {#if segmentData.length > 0}
-              {@const segmentColor = segmentRanges[segIdx]?.style?.stroke?.stroke}
+              {@const segmentColor = segmentRanges[segIdx]?.style?.stroke?.stroke ?? defaultColor}
               <marker.component
                 {...marker.props}
                 series={group.series.name}
@@ -145,7 +159,7 @@
             {/if}
           {/each}
         {:else}
-          {@const seriesColor = (segments[group.series.name] ?? [])[0]?.style?.stroke?.stroke}
+          {@const seriesColor = (segments[group.series.name] ?? [])[0]?.style?.stroke?.stroke ?? defaultColor}
           <marker.component
             {...marker.props}
             series={group.series.name}
@@ -153,7 +167,41 @@
             seriesColor={seriesColor}
           />
         {/if}
+      {:else if marker.type === 'hover'}
+        {@const seriesPoints = matchedPoints.filter((p) => p.series === group.series.name)}
+        {#if marker.strategy === 'segment'}
+          {@const segmentRanges = segments[group.series.name] ?? []}
+          {#each segmentRanges as range, segIdx (`${group.series.name}-hover-segment-${segIdx}`)}
+            {@const segPoints = seriesPoints.filter(
+              (p) => (range.from === undefined || p.x >= range.from) && (range.to === undefined || p.x <= range.to),
+            )}
+            {#if segPoints.length > 0}
+              <HoverMarker
+                data={segPoints}
+                ruleX={marker.ruleX !== false ? ruleX : null}
+                ruleY={marker.ruleY !== false ? ruleY : null}
+                color={marker.color}
+                showLabels={marker.showLabels}
+                ruleStyle={marker.ruleStyle}
+                dotStyle={marker.dotStyle}
+                fontStyle={marker.fontStyle}
+              />
+            {/if}
+          {/each}
+        {:else}
+          <HoverMarker
+            data={seriesPoints}
+            ruleX={marker.ruleX !== false ? ruleX : null}
+            ruleY={marker.ruleY !== false ? ruleY : null}
+            color={marker.color}
+            showLabels={marker.showLabels}
+            ruleStyle={marker.ruleStyle}
+            dotStyle={marker.dotStyle}
+            fontStyle={marker.fontStyle}
+          />
+        {/if}
       {/if}
     {/each}
   {/each}
+  {/snippet}
 </PlotLayout>

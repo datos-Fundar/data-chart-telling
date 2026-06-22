@@ -25,9 +25,9 @@
     seriesColor,
   }: Props = $props();
 
-  const resolvedDotFill = $derived(dotStyle?.dotFill ?? seriesColor ?? '#fbbf24');
-  const resolvedDotStroke = $derived(dotStyle?.dotStroke ?? seriesColor ?? '#f59e0b');
-  const resolvedTextFill = $derived(textStyle?.fill ?? seriesColor ?? '#f59e0b');
+  const resolvedDotFill = $derived(dotStyle?.dotFill ?? seriesColor ?? 'currentColor');
+  const resolvedDotStroke = $derived(dotStyle?.dotStroke ?? seriesColor ?? 'currentColor');
+  const resolvedTextFill = $derived(textStyle?.fill ?? seriesColor ?? 'currentColor');
 
   const peakPoint = $derived.by(() => {
     if (data.length === 0) return null;

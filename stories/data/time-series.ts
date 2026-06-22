@@ -27,8 +27,3 @@ export const TIME_SERIES: SeriesPoint[] = REGIONS.flatMap((region, ri) =>
     })),
   ),
 );
-
-export const METRIC_COLORS: Record<string, string> = {
-  PBI: '#4f46e5',
-  Empleo: '#e6580d',
-};

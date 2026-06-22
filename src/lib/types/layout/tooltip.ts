@@ -1,3 +1,4 @@
+import type { Snippet } from 'svelte';
 import type { XValue } from '$lib/types/plots/common';
 
 /**
@@ -14,6 +15,11 @@ export type TooltipOptions<TRow extends Record<string, unknown>> = {
   sync?: TooltipSync;
   /** Custom tooltip text for a row (supports `\n`). Defaults per chart kind. */
   format?: (row: TRow) => string;
+  /** Named subset of crossing series to include (sync `x`/`y`/`xy`). Omitted = all matched. */
+  series?: string[];
+  /** Custom tooltip body; when given, replaces `format` entirely. Receives the
+   *  matched, series-filtered rows (length >= 1 whenever the tooltip is shown). */
+  content?: Snippet<[{ rows: TRow[] }]>;
 };
 
 /** Either a bare on/off flag or the full option object. */
@@ -30,6 +36,8 @@ export type TooltipRuntime<TRow extends Record<string, unknown>> = {
   /** Identifies the originating facet (`''` when not faceted). */
   facetId: string;
   sync: TooltipSync;
+  series?: string[];
+  content?: Snippet<[{ rows: TRow[] }]>;
 };
 
 /**
@@ -43,6 +51,15 @@ export type TooltipRuntime<TRow extends Record<string, unknown>> = {
 export type HoverStore = {
   activeX: XValue | null;
   activeY: XValue | null;
+  /** Series of the hovered row, when the plot kind has a series concept (line/bar). */
+  activeSeries: string | null;
+  /**
+   * Mouse position within the source facet's own box, as a fraction of its
+   * width/height (each in `[0, 1]`). Other facets reproject this onto their
+   * own box so a broadcast tooltip lands at the same *relative* spot the
+   * cursor is actually at, rather than a fixed corner.
+   */
+  cursorFrac: { x: number; y: number } | null;
   /** Facet id that currently owns the hover (`''` when not faceted). */
   source: string | null;
   sync: TooltipSync;
@@ -53,6 +70,8 @@ export type HoverDisplayPoint = {
   x: XValue;
   y: XValue | number;
   label: string;
+  /** Owning series name; undefined for plot kinds with no series concept (heatmap). */
+  series?: string;
 };
 
 /** A candidate point for hover matching/highlighting — also carries its source row. */

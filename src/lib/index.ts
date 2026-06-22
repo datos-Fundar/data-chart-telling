@@ -34,8 +34,7 @@ export type { ThemeName } from './configuration/themes';
 
 // ── Utils ─────────────────────────────────────────────────────────────────────
 export { groupBy, buildSeries } from './utils/grouping';
-export { colorResolver, discreteLegendFromColors } from './layout/legend/utils';
-export { makeColorScale, normalize, resolveCssColor } from './utils/color';
+export { makeColorScale, normalize, resolveCssColor, paletteColor } from './utils/color';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export type {

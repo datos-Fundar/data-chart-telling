@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LineChart from '$lib/charts/line/Chart.svelte';
 import LineTimeline from './LineTimeline.svelte';
-import { discreteLegendFromColors } from '$lib/layout/legend/utils';
-import { TIME_SERIES, METRIC_COLORS, type SeriesPoint } from '../../data/time-series';
+import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
 
 const meta = {
   title: 'Charts/LineChart',
@@ -23,7 +22,6 @@ const meta = {
     y: { control: false },
     z: { control: false },
     segments: { control: false },
-    colors: { control: false },
     facet: { control: false },
     timeline: { control: false },
     legend: { control: false },
@@ -46,18 +44,12 @@ export const Default: Story = {
 };
 
 // ── Grouping (z) ────────────────────────────────────────────────────────────────
-
-/**
- * `z` groups the flat rows into one line per metric. Colours come from the
- * `colors` map (group → colour); no manual `segments` needed.
- */
 export const GroupedByZ: Story = {
   args: {
     title: 'PBI vs. Empleo',
     subtitle: 'Agrupado por `z = metric`',
     data: TIME_SERIES.filter((d) => d.region === 'Norte'),
     z: 'metric' as keyof SeriesPoint,
-    colors: METRIC_COLORS,
   },
 };
 
@@ -66,11 +58,23 @@ export const GroupedWithLegend: Story = {
   args: {
     title: 'PBI vs. Empleo',
     subtitle: 'Con leyenda discreta',
-    caption: 'La leyenda se genera desde el mapa de colores.',
+    caption: 'La leyenda y el gráfico utilizan el mapa de colores default.',
     data: TIME_SERIES.filter((d) => d.region === 'Norte'),
     z: 'metric' as keyof SeriesPoint,
-    colors: METRIC_COLORS,
-    legend: [discreteLegendFromColors(METRIC_COLORS, { title: 'Indicador' })],
+    legend: [{
+      type: 'discrete',
+      title: 'Indicador',
+      items: [
+        {
+          name: 'PBI',
+          symbol: 'line',
+        },{
+          name: 'Empleo',
+          symbol: 'line',
+        }
+      ],
+      columns: 2,
+    }],
   },
 };
 
@@ -97,8 +101,20 @@ export const Faceted: Story = {
     subtitle: 'Facetado por región',
     data: TIME_SERIES,
     z: 'metric' as keyof SeriesPoint,
-    colors: METRIC_COLORS,
-    legend: [discreteLegendFromColors(METRIC_COLORS, { title: 'Indicador' })],
+    legend: [{
+      type: 'discrete',
+      title: 'Indicador',
+      items: [
+        {
+          name: 'PBI',
+          symbol: 'line',
+        },{
+          name: 'Empleo',
+          symbol: 'line',
+        }
+      ],
+      columns: 2,
+    }],
     facet: { by: 'region' as keyof SeriesPoint, columns: 2 },
   },
 };
@@ -111,9 +127,15 @@ export const WithMarkers: Story = {
     title: 'Con marcadores',
     data: TIME_SERIES.filter((d) => d.region === 'Norte'),
     z: 'metric' as keyof SeriesPoint,
-    colors: METRIC_COLORS,
     markers: [
-      { type: 'ruleX', x: 2020, style: { stroke: '#dc2626', strokeDasharray: '4 4', strokeOpacity: 0.6 } },
+      {
+        type: 'ruleX',
+        x: 2020,
+        style: {
+          strokeDasharray: '4 4',
+          strokeOpacity: 0.6
+        }
+      },
     ],
   },
 };

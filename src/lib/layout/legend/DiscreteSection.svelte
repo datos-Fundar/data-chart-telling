@@ -1,9 +1,12 @@
 <script lang="ts">
+  import { getConfiguration } from '$lib/configuration/config.svelte';
+  import { paletteColor } from '$lib/utils/color';
   import type { DiscreteLegendSection } from '$lib/types/charts/legend';
   import type { LineStyle } from '$lib/types/plots/styles';
 
   let { section }: { section: DiscreteLegendSection } = $props();
 
+  const cfg = $derived(getConfiguration());
   const columns = $derived(section.columns ?? 1);
 
   function dashArray(style?: LineStyle): string | undefined {
@@ -21,17 +24,18 @@
 </script>
 
 <div class="dct-discrete" style:grid-template-columns="repeat({columns}, max-content)">
-  {#each section.items as item (item.name)}
+  {#each section.items as item, i (item.name)}
+    {@const color = item.color ?? paletteColor(i, cfg.palette)}
     <div class="dct-discrete__item" style:opacity={item.opacity ?? 1}>
       <svg class="dct-discrete__swatch" viewBox="0 0 15 10">
         {#if item.symbol === 'circle'}
-          <circle cx="5" cy="5" r="4" fill={item.color} />
+          <circle cx="5" cy="5" r="4" fill={color} />
         {:else if item.symbol === 'square'}
-          <rect x="1" y="1" width="8" height="8" rx="2" fill={item.color} />
+          <rect x="1" y="1" width="8" height="8" rx="2" fill={color} />
         {:else if item.symbol === 'triangle'}
           <path
             d="M 6 2 L 9 7.5 A 1.5 1.5 0 0 1 7.8 10 L 2.2 10 A 1.5 1.5 0 0 1 1 7.5 L 4 2 A 1.5 1.5 0 0 1 6 2"
-            fill={item.color}
+            fill={color}
             transform="translate(0,-1)"
           />
         {:else if item.symbol === 'line'}
@@ -40,13 +44,13 @@
             y1="5"
             x2="13"
             y2="5"
-            stroke={item.color}
+            stroke={color}
             stroke-width="3"
             stroke-linecap="round"
             stroke-dasharray={dashArray(item.lineStyle)}
           />
         {:else}
-          <rect x="1" y="1" width="8" height="8" fill={item.color} />
+          <rect x="1" y="1" width="8" height="8" fill={color} />
         {/if}
       </svg>
       <span class="dct-discrete__label">{item.label || item.name}</span>

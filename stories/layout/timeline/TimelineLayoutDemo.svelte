@@ -42,7 +42,6 @@
           width={w}
           height={h}
           series={[{ name: 'region', x: 'region', y: 'value', data: rows }]}
-          segments={{ region: [{ style: { fill: '#4f46e5' } }] }}
         />
       {/snippet}
     </TimelineLayout>

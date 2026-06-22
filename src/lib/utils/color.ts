@@ -21,6 +21,12 @@ export function normalize(
   return Math.max(0, Math.min(1, (v - min) / denom));
 }
 
+/** Cycles through a discrete palette by series index — the default colour for an unstyled series. */
+export function paletteColor(index: number, palette: string[]): string {
+  if (palette.length === 0) return 'currentColor';
+  return palette[index % palette.length];
+}
+
 export function makeColorScale(
   min: number,
   max: number,

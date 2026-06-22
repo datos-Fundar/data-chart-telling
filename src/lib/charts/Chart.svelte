@@ -35,7 +35,7 @@
     data,
     facet,
     timeline,
-    tooltip,
+    hover,
     plot,
   }: {
     width: number;
@@ -47,7 +47,7 @@
     data: TRow[];
     facet?: FacetConfig<TRow>;
     timeline?: TimelineConfig<TRow>;
-    tooltip?: { sync?: TooltipSync };
+    hover?: { sync: TooltipSync };
     plot: ChartPlotSnippet<TRow>;
   } = $props();
 
@@ -55,7 +55,7 @@
 
   const hoverStore = provideHover();
   $effect(() => {
-    hoverStore.sync = tooltip?.sync ?? 'none';
+    hoverStore.sync = hover?.sync ?? 'none';
   });
 </script>
 

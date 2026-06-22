@@ -1,8 +1,10 @@
 import type { XValue } from '$lib/types/plots/common';
+import type { Marker, HoverMarkerConfig } from '$lib/types/plots/markers';
 import type {
   HoverStore,
   HoverPoint,
   TooltipProp,
+  TooltipOptions,
   TooltipSync
 } from '$lib/types/layout/tooltip';
 
@@ -18,7 +20,7 @@ export function eq(a: XValue | number, b: XValue | number): boolean {
  * hovered rows); here we resolve the cross-facet `x` / `y` / `xy` cases.
  */
 export function matchPoints<T>(points: HoverPoint<T>[], hover: HoverStore): HoverPoint<T>[] {
-  const { activeX, activeY, sync } = hover;
+  const { activeX, activeY, activeSeries, sync } = hover;
   if (sync === 'x') {
     return activeX == null ? [] : points.filter((p) => eq(p.x, activeX));
   }
@@ -26,9 +28,18 @@ export function matchPoints<T>(points: HoverPoint<T>[], hover: HoverStore): Hove
     return activeY == null ? [] : points.filter((p) => eq(p.y, activeY));
   }
   if (sync === 'xy') {
+    // `xy` means "the same point" — when series identity is available (line/bar),
+    // a coincidental (x,y) collision between two *different* series isn't the same
+    // point, so it must also agree on series. Heatmaps carry no series tag at all,
+    // so this is a no-op there.
     return activeX == null || activeY == null
       ? []
-      : points.filter((p) => eq(p.x, activeX) && eq(p.y, activeY));
+      : points.filter(
+          (p) =>
+            eq(p.x, activeX) &&
+            eq(p.y, activeY) &&
+            (activeSeries == null || p.series == null || p.series === activeSeries),
+        );
   }
   return [];
 }
@@ -43,12 +54,54 @@ export function showsRuleY(sync: HoverStore['sync']): boolean {
   return sync === 'y' || sync === 'xy';
 }
 
-/** Normalize the author-facing prop into `{ enabled, sync, format? }`. */
+/** Normalize the author-facing prop into `{ enabled, sync, format?, series?, content? }`. */
 export function resolveTooltip<TRow extends Record<string, unknown>>(
   tooltip: TooltipProp<TRow> | undefined,
   defaultSync: TooltipSync,
-): { enabled: boolean; sync: TooltipSync; format?: (row: TRow) => string } {
+): {
+  enabled: boolean;
+  sync: TooltipSync;
+  format?: (row: TRow) => string;
+  series?: string[];
+  content?: TooltipOptions<TRow>['content'];
+} {
   if (!tooltip) return { enabled: false, sync: defaultSync };
   if (tooltip === true) return { enabled: true, sync: defaultSync };
-  return { enabled: true, sync: tooltip.sync ?? defaultSync, format: tooltip.format };
+  return {
+    enabled: true,
+    sync: tooltip.sync ?? defaultSync,
+    format: tooltip.format,
+    series: tooltip.series,
+    content: tooltip.content,
+  };
+}
+
+/** Whether any marker in the list is a hover marker (drives Pointer/controller
+ *  activation independent of whether the HTML tooltip text is shown). */
+export function hasHoverMarker(markers: Marker[] | undefined): boolean {
+  return (markers ?? []).some((m) => m.type === 'hover');
+}
+
+/** First hover marker in the list, if any. */
+export function findHoverMarker(markers: Marker[] | undefined): HoverMarkerConfig | undefined {
+  return (markers ?? []).find((m): m is HoverMarkerConfig => m.type === 'hover');
+}
+
+/**
+ * Resolve the sync mode that should drive the shared hover store:
+ * the tooltip's own `sync` wins when tooltip text is enabled, else the first
+ * hover marker's `sync`, else the chart kind's default.
+ */
+export function resolveHoverSync(
+  tooltipSync: TooltipSync | undefined,
+  markers: Marker[] | undefined,
+  defaultSync: TooltipSync,
+): TooltipSync {
+  return tooltipSync ?? findHoverMarker(markers)?.sync ?? defaultSync;
+}
+
+/** Narrow matched points down to a named subset of series (no-op if `series` is empty/undefined). */
+export function filterBySeries<T>(points: HoverPoint<T>[], series?: string[]): HoverPoint<T>[] {
+  if (!series || series.length === 0) return points;
+  return points.filter((p) => p.series != null && series.includes(p.series));
 }

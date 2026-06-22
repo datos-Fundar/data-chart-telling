@@ -107,7 +107,7 @@ Series data is separated from visual styling via the optional `segments` prop â€
 />
 ```
 
-Omitting `segments` renders the whole series with the CSS custom property `--plot-line-stroke` (falls back to `currentColor`).
+Omitting `segments` renders the whole series in the configured `palette` colour for that series' index (see `setConfiguration`).
 
 ---
 

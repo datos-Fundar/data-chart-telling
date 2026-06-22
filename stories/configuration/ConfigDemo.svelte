@@ -5,12 +5,10 @@
   import {
     setConfiguration,
     resetConfiguration,
-    getConfiguration,
   } from '$lib/configuration/config.svelte';
   import { THEMES, type ThemeName } from '$lib/configuration/themes';
   import { TIME_SERIES, type SeriesPoint } from '../data/time-series';
   import { HEAT_CELLS, type HeatCell } from '../data/heat-cells';
-  import type { LegendSection } from '$lib/types/charts/legend';
 
   let active = $state<ThemeName>('Default');
 
@@ -28,36 +26,7 @@
     return () => untrack(() => resetConfiguration());
   });
 
-  const cfg = $derived(getConfiguration());
-
-  // Legends are built from the *live* config so the palette/gradient track theme.
-  const lineLegend = $derived<LegendSection[]>([
-    {
-      type: 'discrete',
-      title: 'Indicador',
-      columns: 2,
-      items: [
-        { name: 'PBI', label: 'PBI', color: cfg.palette[0], symbol: 'line' },
-        { name: 'Empleo', label: 'Empleo', color: cfg.palette[1], symbol: 'line' },
-      ],
-    },
-  ]);
-
   const maxPct = Math.max(...HEAT_CELLS.map((d) => d.pct));
-  const heatLegend = $derived<LegendSection[]>([
-    {
-      type: 'continuous',
-      title: 'Porcentaje',
-      min: 0,
-      max: maxPct,
-      colorMin: cfg.continuous.min,
-      colorMax: cfg.continuous.max,
-      ticks: [Math.round(maxPct * 0.5 * 1000) / 1000],
-      format: (v) => `${(v * 100).toFixed(0)}%`,
-      width: 180,
-    },
-  ]);
-
   const lineData = TIME_SERIES.filter((d) => d.region === 'Norte');
   const heatData = HEAT_CELLS.filter((d) => d.scenario === 'Base' && d.year === 2022);
 </script>
@@ -88,7 +57,17 @@
       x="year"
       y="value"
       z={'metric' as keyof SeriesPoint}
-      legend={lineLegend}
+      legend={[
+        {
+          type: 'discrete',
+          title: 'Indicador',
+          columns: 2,
+          items: [
+            { name: 'PBI', label: 'PBI', symbol: 'line' },
+            { name: 'Empleo', label: 'Empleo', symbol: 'line' },
+          ],
+        },
+      ]}
     />
     <HeatmapChart
       width={460}
@@ -102,7 +81,17 @@
       value={'pct' as keyof HeatCell}
       xScale={{ label: 'Ambientes' }}
       yScale={{ label: 'Personas' }}
-      legend={heatLegend}
+      legend={[
+        {
+          type: 'continuous',
+          title: 'Porcentaje',
+          min: 0,
+          max: maxPct,
+          ticks: [Math.round(maxPct * 0.5 * 1000) / 1000],
+          format: (v) => `${(v * 100).toFixed(0)}%`,
+          width: 180,
+        },
+      ]}
       formatValue={(v) => `${(v * 100).toFixed(0)}%`}
     />
   </div>

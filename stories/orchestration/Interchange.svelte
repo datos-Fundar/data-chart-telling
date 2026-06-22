@@ -5,7 +5,7 @@
   import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
   import Scrubber from '../common/Scrubber.svelte';
   import { buildSeries } from '$lib/utils/grouping';
-  import { TIME_SERIES, METRIC_COLORS, type SeriesPoint } from '../data/time-series';
+  import { TIME_SERIES, type SeriesPoint } from '../data/time-series';
   import { HEAT_CELLS, type HeatCell } from '../data/heat-cells';
   import type { LegendSection } from '$lib/types/charts/legend';
 
@@ -16,14 +16,6 @@
    * around: any plot that accepts `{ data, width, height }` slots in.
    */
   let kind = $state<'line' | 'bar' | 'heatmap'>('line');
-
-  const discreteLegend: LegendSection[] = [
-    { type: 'discrete', title: 'Indicador', columns: 2, items: [
-      { name: 'PBI', color: METRIC_COLORS.PBI, symbol: 'line' },
-      { name: 'Empleo', color: METRIC_COLORS.Empleo, symbol: 'line' },
-    ] },
-  ];
-
   const maxPct = Math.max(...HEAT_CELLS.map((d) => d.pct));
   const continuousLegend: LegendSection[] = [
     { type: 'continuous', title: 'Porcentaje', min: 0, max: maxPct,
@@ -67,7 +59,12 @@
         title="Mismo chrome, plot intercambiable"
         subtitle={`Leaf: ${kind === 'line' ? 'LinePlot' : 'BarPlot'}`}
         data={TIME_SERIES.filter((d) => d.region === 'Norte')}
-        legend={discreteLegend}
+        legend={[
+          { type: 'discrete', title: 'Indicador', columns: 2, items: [
+            { name: 'PBI', symbol: 'line' },
+            { name: 'Empleo', symbol: 'line' },
+          ] },
+        ]}
         facet={{ by: 'metric' as keyof SeriesPoint, columns: 2 }}
       >
         {#snippet plot({ data, width, height })}
@@ -80,7 +77,6 @@
               {data}
               x="year"
               y="value"
-              segments={{ series: [{ style: { fill: '#4f46e5' } }] }}
             />
           {/if}
         {/snippet}

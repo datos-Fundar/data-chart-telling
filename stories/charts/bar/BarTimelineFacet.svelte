@@ -14,7 +14,6 @@
       data={TIME_SERIES}
       x={'metric' as keyof SeriesPoint}
       y="value"
-      segments={{ series: [{ style: { fill: '#9333ea' } }] }}
       facet={{ by: 'region' as keyof SeriesPoint, columns: 2 }}
       timeline={{ accessor: 'year', progress, orientation: 'horizontal' }}
     />
