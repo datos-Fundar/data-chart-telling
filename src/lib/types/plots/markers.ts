@@ -1,4 +1,4 @@
-import type { XValue, YValue } from '$lib/types/plots/common';
+import type { AxisValue } from '$lib/types/plots/common';
 import type { DotStyle, FontStyle, StrokeStyle } from '$lib/types/plots/styles';
 import type { TooltipSync } from '$lib/types/layout/tooltip';
 
@@ -16,13 +16,13 @@ export interface MarkerProps<TData = Record<string, unknown>> {
 
 export type RuleXMarker = {
   type: 'ruleX';
-  x: XValue;
+  x: AxisValue;
   style?: StrokeStyle;
 };
 
 export type RuleYMarker = {
   type: 'ruleY';
-  y: YValue;
+  y: AxisValue;
   style?: StrokeStyle;
 };
 

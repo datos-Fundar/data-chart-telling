@@ -9,7 +9,7 @@
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
   import type { PyramidSeries, PyramidSeriesProps, PyramidDataProps } from '$lib/types/plots/pyramid';
-  import type { ScalesConfig, XValue } from '$lib/types/plots/common';
+  import type { ScalesConfig, AxisValue } from '$lib/types/plots/common';
   import type { BarSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
   import type { TooltipRuntime } from '$lib/types/layout/tooltip';
@@ -91,7 +91,7 @@
   type TaggedRow = TData & {
     __side: string;
     __x: number;
-    __y: XValue;
+    __y: AxisValue;
     __label: string;
     __series: string;
   };
@@ -106,7 +106,7 @@
           ...d,
           __side: s.side,
           __x: s.side === 'left' ? -v : v,
-          __y: getCategory(d) as XValue,
+          __y: getCategory(d) as AxisValue,
           __label: formatValue(v),
           __series: s.name,
         } as TaggedRow;
@@ -132,7 +132,7 @@
     ...new Set(
       resolvedSeries.flatMap((s) => {
         const getCategory = resolveAccessor(s.x);
-        return s.data.map((d) => getCategory(d) as XValue);
+        return s.data.map((d) => getCategory(d) as AxisValue);
       }),
     ),
   ]);
@@ -147,8 +147,8 @@
 
   const getSegmentData = (
     data: TData[],
-    categoryAccessor: (d: TData) => XValue,
-    segmentRanges: { from?: XValue; to?: XValue }[],
+    categoryAccessor: (d: TData) => AxisValue,
+    segmentRanges: { from?: AxisValue; to?: AxisValue }[],
   ) => {
     return segmentRanges.map((range) =>
       data.filter((d) => {

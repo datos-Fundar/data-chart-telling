@@ -1,5 +1,5 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
-import type { Series, XValue, YValue, Accessor } from '$lib/types/plots/common';
+import type { Series, AxisValue, Accessor } from '$lib/types/plots/common';
 
 /**
  * Splits rows into ordered groups keyed by the stringified accessor value.
@@ -29,8 +29,8 @@ export function groupBy<TRow extends Record<string, unknown>>(
  */
 export function buildSeries<TRow extends Record<string, unknown>>(
   data: TRow[],
-  x: Accessor<TRow, XValue>,
-  y: Accessor<TRow, YValue>,
+  x: Accessor<TRow, AxisValue>,
+  y: Accessor<TRow, AxisValue>,
   z: Accessor<TRow, unknown> | undefined,
   defaultName = 'series',
 ): Series<TRow>[] {

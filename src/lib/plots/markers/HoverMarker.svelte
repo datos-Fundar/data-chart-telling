@@ -3,7 +3,7 @@
   import DotMarker from './DotMarker.svelte';
   import TextMarker from './TextMarker.svelte';
   import type { MarkerProps } from '$lib/types/plots/markers';
-  import type { XValue } from '$lib/types/plots/common';
+  import type { AxisValue } from '$lib/types/plots/common';
   import type { DotStyle, FontStyle, StrokeStyle } from '$lib/types/plots/styles';
   import type { HoverDisplayPoint } from '$lib/types/layout/tooltip';
 
@@ -15,8 +15,8 @@
    * for each matched point.
    */
   interface Props extends MarkerProps<HoverDisplayPoint> {
-    ruleX?: XValue | null;
-    ruleY?: XValue | number | null;
+    ruleX?: AxisValue | null;
+    ruleY?: AxisValue | null;
     color?: string;
     showLabels?: boolean;
     ruleStyle?: StrokeStyle;

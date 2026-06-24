@@ -1,6 +1,6 @@
 import type { EasingName, EasingFn } from '$lib/types/charts/interpolate';
 import type { TimeValue, TimelineInterpolation } from '$lib/types/charts/common';
-import type { Accessor } from '$lib/types/plots/common';
+import type { Accessor, AxisValue } from '$lib/types/plots/common';
 
 const EASINGS: Record<EasingName, EasingFn> = {
   linear: (t) => t,
@@ -86,7 +86,7 @@ export function interpolateSeries<TRow>({
  */
 export function resolveTimelineInterpolation<TRow extends Record<string, unknown>>(
   interpolate: boolean | TimelineInterpolation<TRow> | undefined,
-  defaults: { value: Accessor<TRow, number>; key?: Accessor<TRow, unknown> },
+  defaults: { value: Accessor<TRow, AxisValue>; key?: Accessor<TRow, unknown> },
 ): TimelineInterpolation<TRow> | undefined {
   if (!interpolate) return undefined;
   const config = interpolate === true ? {} : interpolate;

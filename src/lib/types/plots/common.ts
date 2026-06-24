@@ -1,5 +1,4 @@
-export type XValue = number | string | Date;
-export type YValue = number;
+export type AxisValue = number | string | Date;
 
 /**
  * Author-facing scale overrides for a plot axis. Mirrors svelteplot's
@@ -47,6 +46,7 @@ export type AxisScale = {
 export type ScalesConfig = {
   x?: AxisScale;
   y?: AxisScale;
+  z?: AxisScale;
 };
 
 /**
@@ -65,8 +65,9 @@ export type Accessor<TRow extends Record<string, unknown>, V> =
  */
 export type Series<T extends Record<string, unknown> = Record<string, unknown>> = {
   name: string;
-  x: Accessor<T, XValue>;
-  y: Accessor<T, YValue>;
+  x: Accessor<T, AxisValue>;
+  y: Accessor<T, AxisValue>;
+  z?: Accessor<T, unknown>;
   data: T[];
 };
 
@@ -88,8 +89,7 @@ export type SeriesProps<T extends Record<string, unknown>> = {
 export type DataProps<T extends Record<string, unknown>> = {
   series?: never;
   data: T[];
-  x: Accessor<T, XValue>;
-  y: Accessor<T, YValue>;
-  /** Grouping dimension: one series per distinct value. */
+  x: Accessor<T, AxisValue>;
+  y: Accessor<T, AxisValue>;
   z?: Accessor<T, unknown>;
 };

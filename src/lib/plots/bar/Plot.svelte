@@ -13,7 +13,7 @@
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
   import type { Series, SeriesProps, DataProps, ScalesConfig } from '$lib/types/plots/common';
   import type { BarSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
-  import type { XValue } from '$lib/types/plots/common';
+  import type { AxisValue } from '$lib/types/plots/common';
   import type { Marker } from '$lib/types/plots/markers';
   import type { TooltipRuntime } from '$lib/types/layout/tooltip';
 
@@ -67,7 +67,7 @@
       const sx = resolveAccessor(s.x);
       const sy = resolveAccessor(s.y);
       return s.data.map((d) => ({
-        x: sx(d) as XValue,
+        x: sx(d) as AxisValue,
         y: Number(sy(d)),
         row: d,
         label: String(sy(d)),
@@ -80,7 +80,7 @@
 <PlotLayout
   {width}
   {height}
-  x={{ type: 'band', padding: 0.2, ...(scales.x ?? {}) }}
+  x={scales.x}
   y={scales.y}
   data={flat}
   getX={xAcc}

@@ -12,7 +12,7 @@
   import type { LegendSection } from '$lib/types/charts/legend';
   import type { BarSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
-  import type { XValue, YValue, Accessor } from '$lib/types/plots/common';
+  import type { AxisValue, Accessor } from '$lib/types/plots/common';
 
   /**
    * High-level bar chart. Groups flat rows by `z` into one series per group
@@ -44,8 +44,8 @@
     caption?: string;
     legend?: LegendSection[];
     data: TRow[];
-    x: Accessor<TRow, XValue>;
-    y: Accessor<TRow, YValue>;
+    x: Accessor<TRow, AxisValue>;
+    y: Accessor<TRow, AxisValue>;
     z?: Accessor<TRow, unknown>;
     segments?: SegmentsMap<BarSegmentStyle>;
     markers?: Marker[];

@@ -12,7 +12,7 @@
   import type { LegendSection } from '$lib/types/charts/legend';
   import type { SegmentsMap } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
-  import type { ScalesConfig, XValue, YValue, Accessor } from '$lib/types/plots/common';
+  import type { ScalesConfig, AxisValue, Accessor } from '$lib/types/plots/common';
 
   /**
    * High-level line chart. It takes flat rows plus `x`/`y`/`z` encodings, groups
@@ -45,8 +45,8 @@
     caption?: string;
     legend?: LegendSection[];
     data: TRow[];
-    x: Accessor<TRow, XValue>;
-    y: Accessor<TRow, YValue>;
+    x: Accessor<TRow, AxisValue>;
+    y: Accessor<TRow, AxisValue>;
     z?: Accessor<TRow, unknown>;
     segments?: SegmentsMap;
     markers?: Marker[];

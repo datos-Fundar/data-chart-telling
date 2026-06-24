@@ -10,13 +10,14 @@
   } from '$lib/types/charts/common';
   import type { LegendSection } from '$lib/types/charts/legend';
   import type { Marker } from '$lib/types/plots/markers';
-  import type { ScalesConfig, XValue, Accessor } from '$lib/types/plots/common';
+  import type { ScalesConfig, AxisValue, Accessor } from '$lib/types/plots/common';
 
   /**
    * High-level heatmap. Proves the chart chrome (container/legend/timeline/facet)
    * is plot-agnostic: it reuses {@link Chart} exactly like {@link LineChart}, only
    * swapping the leaf for {@link HeatmapPlot}. The colour domain is computed once
-   * over the full dataset so cells stay comparable across timeline steps/facets.
+   * over the full dataset so cells stay comparable across timeline steps/facets —
+   * it is passed via `scales.z.domain` and can be overridden by the caller.
    */
   let {
     width,
@@ -28,7 +29,7 @@
     data,
     x,
     y,
-    value,
+    z,
     colorMin,
     colorMax,
     scales = {},
@@ -46,9 +47,9 @@
     caption?: string;
     legend?: LegendSection[];
     data: TRow[];
-    x: Accessor<TRow, XValue>;
-    y: Accessor<TRow, XValue>;
-    value: Accessor<TRow, number>;
+    x: Accessor<TRow, AxisValue>;
+    y: Accessor<TRow, AxisValue>;
+    z: Accessor<TRow, number>;
     colorMin?: string;
     colorMax?: string;
     scales?: ScalesConfig;
@@ -62,10 +63,17 @@
 
   const getX = $derived(resolveAccessor<TRow>(x));
   const getY = $derived(resolveAccessor<TRow>(y));
-  const getValue = $derived(resolveAccessor<TRow>(value));
-  const valueDomain = $derived.by((): [number, number] => {
-    const vals = data.map((d) => Number(getValue(d)));
+  const getZ = $derived(resolveAccessor<TRow>(z));
+
+  // Compute domain over the full dataset so colour is comparable across facets/timeline steps.
+  // Caller-provided `scales.z.domain` always takes precedence.
+  const fullDomain = $derived.by((): [number, number] => {
+    const vals = data.map((d) => Number(getZ(d)));
     return vals.length ? [Math.min(...vals, 0), Math.max(...vals)] : [0, 1];
+  });
+  const mergedScales = $derived<ScalesConfig>({
+    ...scales,
+    z: { domain: fullDomain, ...(scales.z ?? {}) },
   });
 
   // Heatmap hover defaults to `xy` sync — the same single cell across facets.
@@ -75,7 +83,7 @@
   const defaultFormat = $derived((row: TRow) => {
     const xl = scales.x?.label || 'x';
     const yl = scales.y?.label || 'y';
-    return `${xl} ${getX(row)} · ${yl} ${getY(row)}\n${formatValue(Number(getValue(row)))}`;
+    return `${xl} ${getX(row)} · ${yl} ${getY(row)}\n${formatValue(Number(getZ(row)))}`;
   });
 </script>
 
@@ -95,11 +103,13 @@
     <HeatmapPlot
       width={w}
       height={h}
-      series={{ data: rows, x, y, value }}
-      domain={valueDomain}
+      data={rows}
+      {x}
+      {y}
+      {z}
       {colorMin}
       {colorMax}
-      {scales}
+      scales={mergedScales}
       {showValues}
       {formatValue}
       {markers}

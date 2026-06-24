@@ -7,7 +7,7 @@
   import { hasHoverMarker, findHoverMarker } from '$lib/layout/tooltip/utils';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
   import Tooltip from '$lib/layout/tooltip/Tooltip.svelte';
-  import type { XValue } from '$lib/types/plots/common';
+  import type { AxisValue } from '$lib/types/plots/common';
   import type { Marker } from '$lib/types/plots/markers';
   import type { HoverDisplayPoint, HoverPoint, TooltipRuntime } from '$lib/types/layout/tooltip';
 
@@ -42,10 +42,10 @@
     y?: PlotProps['y'];
     /** Flat rows fed to svelteplot's `<Pointer>` for nearest-point matching. */
     data: TData[];
-    getX: (d: TData) => XValue;
-    getY: (d: TData) => XValue | number;
+    getX: (d: TData) => AxisValue;
+    getY: (d: TData) => AxisValue;
     /** Pointer's `y` channel — only needed when matching must be 2D (e.g. a heatmap grid). */
-    matchY?: (d: TData) => XValue;
+    matchY?: (d: TData) => AxisValue;
     hoverPoints: HoverPoint<TData>[];
     label: (row: TData) => string;
     tooltip?: TooltipRuntime<TData>;
@@ -58,7 +58,7 @@
      * `TData` resolution through this snippet's type for every plot kind.
      */
     children: Snippet<
-      [{ matchedPoints: HoverDisplayPoint[]; ruleX: XValue | null; ruleY: XValue | number | null }]
+      [{ matchedPoints: HoverDisplayPoint[]; ruleX: AxisValue | null; ruleY: AxisValue | null }]
     >;
   } = $props();
 

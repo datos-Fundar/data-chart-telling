@@ -38,8 +38,7 @@ export { makeColorScale, normalize, resolveCssColor, paletteColor } from './util
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export type {
-  XValue,
-  YValue,
+  AxisValue,
   Accessor,
   AxisScale,
   ScalesConfig,
@@ -50,7 +49,6 @@ export type {
 export type {
   DeltaConfig,
 } from './types/plots/delta';
-export type { HeatmapSeries } from './types/plots/heatmap';
 export type {
   SymbolType,
   LineStyle,

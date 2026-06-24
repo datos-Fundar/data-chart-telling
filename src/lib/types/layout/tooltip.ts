@@ -1,5 +1,5 @@
 import type { Snippet } from 'svelte';
-import type { XValue } from '$lib/types/plots/common';
+import type { AxisValue } from '$lib/types/plots/common';
 
 /**
  * How a hover in one facet propagates to the others.
@@ -49,8 +49,8 @@ export type TooltipRuntime<TRow extends Record<string, unknown>> = {
  * provider falls back to its own {@link createHover} store.
  */
 export type HoverStore = {
-  activeX: XValue | null;
-  activeY: XValue | null;
+  activeX: AxisValue | null;
+  activeY: AxisValue | null;
   /** Series of the hovered row, when the plot kind has a series concept (line/bar). */
   activeSeries: string | null;
   /**
@@ -67,8 +67,8 @@ export type HoverStore = {
 
 /** A point ready to render: its plotted position plus its label. */
 export type HoverDisplayPoint = {
-  x: XValue;
-  y: XValue | number;
+  x: AxisValue;
+  y: AxisValue;
   label: string;
   /** Owning series name; undefined for plot kinds with no series concept (heatmap). */
   series?: string;

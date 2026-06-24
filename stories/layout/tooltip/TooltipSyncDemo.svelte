@@ -37,7 +37,7 @@
       data={heatData}
       x={'rooms' as keyof HeatCell}
       y={'people' as keyof HeatCell}
-      value={'pct' as keyof HeatCell}
+      z={'pct' as keyof HeatCell}
       scales={{ x: { label: 'Ambientes' }, y: { label: 'Personas' } }}
       showValues={false}
       formatValue={(v) => `${(v * 100).toFixed(0)}%`}

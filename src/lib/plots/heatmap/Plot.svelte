@@ -1,43 +1,46 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
   import { Cell, Text, AxisX, AxisY } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
+  import { buildSeries } from '$lib/utils/grouping';
   import { makeColorScale } from '$lib/utils/color';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
-  import type { HeatmapSeries } from '$lib/types/plots/heatmap';
-  import type { ScalesConfig, XValue } from '$lib/types/plots/common';
+  import type { ScalesConfig, AxisValue, SeriesProps, DataProps } from '$lib/types/plots/common';
   import type { Marker } from '$lib/types/plots/markers';
   import type { TooltipRuntime } from '$lib/types/layout/tooltip';
 
   /**
-   * A categorical grid of value-coloured cells. Mirrors the line/bar plot
-   * contract: it takes a single `series` plus styling and draws into the given
-   * box — so the chart-level container/timeline/facet/legend wrap it unchanged.
+   * A categorical grid of value-coloured cells. Accepts either a pre-built
+   * `series` array (each {@link Series} may carry `z` as the colour accessor) or
+   * flat `data/x/y/z` props — mirrors the line/bar plot contract so the
+   * chart-level container/timeline/facet/legend wrap it unchanged.
+   *
+   * The colour domain is read from `scales.z.domain`; when absent it is derived
+   * from the visible slice of data.
    */
   let {
     width,
     height,
     series,
+    data,
+    x,
+    y,
+    z,
     colorMin,
     colorMax,
-    domain,
     scales = {},
     showValues = true,
     formatValue = (v: number) => `${v}`,
     markers = [],
     tooltip = undefined,
-  }: {
+  }: (SeriesProps<TData> | DataProps<TData>) & {
     width: number;
     height: number;
-    series: HeatmapSeries<TData>;
     colorMin?: string;
     colorMax?: string;
-    /** Value (colour) domain — distinct from `scales.x`/`scales.y`, which place the grid's categories. */
-    domain?: [number, number];
     scales?: ScalesConfig;
     showValues?: boolean;
     formatValue?: (v: number) => string;
-    /** Heatmap has no series concept — only unscoped markers (`ruleX`/`ruleY`/`hover`) apply. */
     markers?: Marker[];
     tooltip?: TooltipRuntime<TData>;
   } = $props();
@@ -57,25 +60,30 @@
   const minColor = $derived(colorMin ?? cfg.continuous.min);
   const maxColor = $derived(colorMax ?? cfg.continuous.max);
 
-  const getX = $derived(resolveAccessor<TData>(series.x));
-  const getY = $derived(resolveAccessor<TData>(series.y));
-  const getValue = $derived(resolveAccessor<TData>(series.value));
+  const resolvedSeries = $derived(series ?? buildSeries(data!, x!, y!, undefined));
+  const flat = $derived(resolvedSeries.flatMap((s) => s.data));
+
+  const getX = $derived(resolveAccessor<TData>(resolvedSeries[0]?.x ?? x!));
+  const getY = $derived(resolveAccessor<TData>(resolvedSeries[0]?.y ?? y!));
+  const getZ = $derived(resolveAccessor<TData>(resolvedSeries[0]?.z ?? z!));
 
   const hoverPoints = $derived(
-    series.data.map((d) => ({
-      x: getX(d) as XValue,
-      y: getY(d) as XValue,
+    flat.map((d) => ({
+      x: getX(d) as AxisValue,
+      y: getY(d) as AxisValue,
       row: d,
-      label: formatValue(Number(getValue(d))),
+      label: formatValue(Number(getZ(d))),
     })),
   );
 
-  const xDomain = $derived([...new Set(series.data.map((d) => getX(d) as XValue))]);
-  const yDomain = $derived([...new Set(series.data.map((d) => getY(d) as XValue))]);
+  const xDomain = $derived([...new Set(flat.map((d) => getX(d) as AxisValue))]);
+  const yDomain = $derived([...new Set(flat.map((d) => getY(d) as AxisValue))]);
 
   const valueDomain = $derived.by((): [number, number] => {
-    if (domain) return domain;
-    const vals = series.data.map((d) => Number(getValue(d)));
+    if (scales.z?.domain && scales.z.domain.length >= 2) {
+      return [Number(scales.z.domain[0]), Number(scales.z.domain[1])];
+    }
+    const vals = flat.map((d) => Number(getZ(d)));
     return vals.length ? [Math.min(...vals, 0), Math.max(...vals)] : [0, 1];
   });
 
@@ -89,12 +97,12 @@
   {height}
   x={{ type: 'band', labelAnchor: 'right', domain: xDomain, ...(scales.x ?? {}) }}
   y={{ type: 'band', domain: yDomain, ...(scales.y ?? {}) }}
-  data={series.data}
+  data={flat}
   {getX}
   {getY}
   matchY={getY}
   {hoverPoints}
-  label={(d) => formatValue(Number(getValue(d)))}
+  label={(d) => formatValue(Number(getZ(d)))}
   {tooltip}
   {markers}
   showHoverLabels={false}
@@ -103,19 +111,19 @@
   <AxisY tickSize={0} tickPadding={4} tickFontSize={cfg.axis.fontSize} titleFontSize={cfg.axis.labelFontSize} />
 
   <Cell
-    data={series.data}
+    data={flat}
     x={getX}
     y={getY}
-    fill={(d) => colorScale(Number(getValue(d)))}
+    fill={(d) => colorScale(Number(getZ(d)))}
     inset={0.5}
   />
 
   {#if showValues}
     <Text
-      data={series.data}
+      data={flat}
       x={getX}
       y={getY}
-      text={(d) => formatValue(Number(getValue(d)))}
+      text={(d) => formatValue(Number(getZ(d)))}
       fill={cfg.continuous.labelColor}
       fontSize={12}
       fontWeight={600}

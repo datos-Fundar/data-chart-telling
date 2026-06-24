@@ -1,4 +1,4 @@
-import type { XValue, Series } from '$lib/types/plots/common';
+import type { AxisValue, Series } from '$lib/types/plots/common';
 
 export type SymbolType = 'circle' | 'square' | 'triangle' | 'line';
 export type LineStyle = 'solid' | 'dashed' | 'dotted' | 'dashdot';
@@ -66,8 +66,8 @@ export type BarSegmentStyle = {
  * {@link LineSegmentStyle} or {@link BarSegmentStyle}).
  */
 export type RangeSegment<TStyle> = {
-  from?: XValue;
-  to?: XValue;
+  from?: AxisValue;
+  to?: AxisValue;
   style?: TStyle;
 };
 

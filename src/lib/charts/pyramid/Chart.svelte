@@ -9,7 +9,7 @@
   import type { LegendSection } from '$lib/types/charts/legend';
   import type { BarSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
-  import type { ScalesConfig, XValue, Accessor } from '$lib/types/plots/common';
+  import type { ScalesConfig, AxisValue, Accessor } from '$lib/types/plots/common';
   import type { PyramidSide } from '$lib/types/plots/pyramid';
 
   /**
@@ -50,7 +50,7 @@
     legend?: LegendSection[];
     data: TRow[];
     /** Category bands, e.g. age group — rendered on the Y axis. */
-    y: Accessor<TRow, XValue>;
+    y: Accessor<TRow, AxisValue>;
     /** Magnitude, always given positive — mirrored left or right by `side`. */
     x: Accessor<TRow, number>;
     /** Maps each `z` group value to the half it is drawn on. */
@@ -77,7 +77,7 @@
   // rows) so the diverging axis and category bands stay comparable across
   // timeline steps/facets — the same reasoning HeatmapChart applies to its
   // colour domain.
-  const categoryDomain = $derived([...new Set(data.map((d) => getY(d) as XValue))]);
+  const categoryDomain = $derived([...new Set(data.map((d) => getY(d) as AxisValue))]);
   const maxMagnitude = $derived.by(() => {
     const vals = data.map((d) => Math.abs(Number(getX(d))));
     return vals.length ? Math.max(...vals) : 1;

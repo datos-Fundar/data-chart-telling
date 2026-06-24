@@ -6,7 +6,7 @@ import {
   filterBySeries,
 } from '$lib/layout/tooltip/utils';
 import type { HoverStore, HoverPoint } from '$lib/types/layout/tooltip';
-import type { XValue } from '$lib/types/plots/common';
+import type { AxisValue } from '$lib/types/plots/common';
 
 /**
  * The plot-agnostic hover state machine shared by every plot. Given reactive
@@ -22,8 +22,8 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
   hover: () => HoverStore;
   facetId: () => string;
   points: () => HoverPoint<T>[];
-  getX: () => (d: T) => XValue;
-  getY: () => (d: T) => XValue | number;
+  getX: () => (d: T) => AxisValue;
+  getY: () => (d: T) => AxisValue;
   /** Short label drawn next to the highlight dot (e.g. the value). */
   label: () => (row: T) => string;
   format: () => (row: T) => string;

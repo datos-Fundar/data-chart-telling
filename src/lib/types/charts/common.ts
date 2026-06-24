@@ -1,5 +1,5 @@
 import type { Snippet } from 'svelte';
-import type { Accessor } from '$lib/types/plots/common';
+import type { Accessor, AxisValue } from '$lib/types/plots/common';
 import type { EasingName, EasingFn } from '$lib/types/charts/interpolate';
 
 export type TimeValue = number;
@@ -42,7 +42,7 @@ export type ChartPlotSnippet<TRow extends Record<string, unknown>> = Snippet<
 
 export type TimelineInterpolation<TRow extends Record<string, unknown>> = {
   key?: Accessor<TRow, unknown>;
-  value?: Accessor<TRow, number>;
+  value?: Accessor<TRow, AxisValue>;
   create?: (lower: TRow, upper: TRow, x: TimeValue, value: number) => TRow;
   progressEasing?: EasingName | EasingFn;
   segmentEasing?: EasingName | EasingFn;

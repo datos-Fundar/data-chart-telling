@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-import type { HeatmapSeries } from '$lib/types/plots/heatmap';
+import type { Series } from '$lib/types/plots/common';
 
 type Cell = { rooms: number; people: number; pct: number };
 
@@ -19,7 +19,7 @@ const meta = {
   args: {
     width: 520,
     height: 420,
-    series: { data: CELLS, x: 'rooms', y: 'people', value: 'pct' } satisfies HeatmapSeries<Cell>,
+    series: [{ name: 'heat', data: CELLS, x: 'rooms', y: 'people', z: 'pct' }] satisfies Series<Cell>[],
     scales: { x: { label: 'Ambientes' }, y: { label: 'Personas' } },
     formatValue: (v: number) => `${(v * 100).toFixed(0)}%`,
   },

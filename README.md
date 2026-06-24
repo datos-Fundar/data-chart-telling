@@ -115,12 +115,6 @@ Omitting `segments` renders the whole series in the configured `palette` colour 
 
 ```ts
 import {
-  LinePlot,
-  BarPlot,
-  type LineRangeSegment,
-  type SegmentsMap,
-  type LineSegmentStyle,
-  type XValue,
-  type YValue,
+  ...
 } from '@fundar/data-chart-telling';
 ```

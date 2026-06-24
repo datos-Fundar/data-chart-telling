@@ -1,4 +1,4 @@
-import type { Accessor, Series, XValue, YValue } from '$lib/types/plots/common';
+import type { Accessor, Series, AxisValue } from '$lib/types/plots/common';
 
 /** Which half of the diverging axis a series is mirrored onto. */
 export type PyramidSide = 'left' | 'right';
@@ -38,9 +38,9 @@ export type PyramidDataProps<T extends Record<string, unknown>> = {
   series?: never;
   data: T[];
   /** Category bands, e.g. age group — rendered on the Y axis. */
-  y: Accessor<T, XValue>;
+  y: Accessor<T, AxisValue>;
   /** Magnitude, always given positive — mirrored left or right by `side`. */
-  x: Accessor<T, YValue>;
+  x: Accessor<T, AxisValue>;
   /** Maps each `z` group value to the half it is drawn on. */
   side: Record<string, PyramidSide>;
   /** Groups rows into one series per value, e.g. by sex. */

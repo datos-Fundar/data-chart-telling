@@ -45,7 +45,7 @@
           <HeatmapPlot
             {width}
             {height}
-            series={{ data, x: 'rooms' as keyof HeatCell, y: 'people' as keyof HeatCell, value: 'pct' as keyof HeatCell }}
+            series={[{ name: '', data, x: 'rooms' as keyof HeatCell, y: 'people' as keyof HeatCell, z: 'pct' as keyof HeatCell }]}
             scales={{ x: { label: 'Ambientes' }, y: { label: 'Personas' } }}
             formatValue={(v) => `${(v * 100).toFixed(0)}%`}
           />

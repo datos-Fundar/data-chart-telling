@@ -1,12 +1,12 @@
 <script lang="ts" generics="TData = Record<string, unknown>">
   import { Text } from 'svelteplot';
   import type { MarkerProps } from '$lib/types/plots/markers';
-  import type { XValue } from '$lib/types/plots/common';
+  import type { AxisValue } from '$lib/types/plots/common';
   import type { FontStyle } from '$lib/types/plots/styles';
 
   interface Props extends MarkerProps<TData> {
-    x?: XValue | ((d: TData) => XValue);
-    y?: XValue | ((d: TData) => XValue);
+    x?: AxisValue | ((d: TData) => AxisValue);
+    y?: AxisValue | ((d: TData) => AxisValue);
     text?: string | ((d: TData) => string);
     style?: FontStyle;
   }

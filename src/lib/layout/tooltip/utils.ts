@@ -1,4 +1,4 @@
-import type { XValue } from '$lib/types/plots/common';
+import type { AxisValue } from '$lib/types/plots/common';
 import type { Marker, HoverMarkerConfig } from '$lib/types/plots/markers';
 import type {
   HoverStore,
@@ -9,7 +9,7 @@ import type {
 } from '$lib/types/layout/tooltip';
 
 /** Value equality that also handles `Date` (compared by timestamp). */
-export function eq(a: XValue | number, b: XValue | number): boolean {
+export function eq(a: AxisValue, b: AxisValue): boolean {
   if (a instanceof Date && b instanceof Date) return +a === +b;
   return a === b;
 }

@@ -1,4 +1,4 @@
-import type { XValue, YValue } from '$lib/types/plots/common';
+import type { AxisValue } from '$lib/types/plots/common';
 import type { StrokeStyle, FontStyle, DotStyle } from '$lib/types/plots/styles';
 
 export type DeltaTarget =
@@ -7,7 +7,7 @@ export type DeltaTarget =
 
 export type DeltaConfig = {
   axis: 'x' | 'y';
-  at: XValue | YValue;
+  at: AxisValue;
   from: DeltaTarget;
   to?: DeltaTarget;
   formatDiff?: (diff: number) => string;

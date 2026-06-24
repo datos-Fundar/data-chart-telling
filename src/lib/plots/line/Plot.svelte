@@ -13,7 +13,7 @@
   import { buildGroupedSeries, validateSegments } from '$lib/plots/utils/segments';
   import type { Series, SeriesProps, DataProps, ScalesConfig } from '$lib/types/plots/common';
   import type { LineSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
-  import type { XValue } from '$lib/types/plots/common';
+  import type { AxisValue } from '$lib/types/plots/common';
   import type { Marker } from '$lib/types/plots/markers';
   import type { TooltipRuntime } from '$lib/types/layout/tooltip';
 
@@ -48,7 +48,7 @@
     buildGroupedSeries<Series<TData>, LineSegmentStyle>(resolvedSeries, segments),
   );
 
-  const getSegmentData = (data: TData[], xAccessor: (d: TData) => XValue, segmentRanges: { from?: XValue; to?: XValue }[]) => {
+  const getSegmentData = (data: TData[], xAccessor: (d: TData) => AxisValue, segmentRanges: { from?: AxisValue; to?: AxisValue }[]) => {
     return segmentRanges.map(range =>
       data.filter(d => {
         const x = xAccessor(d);
@@ -79,7 +79,7 @@
       const sx = resolveAccessor(s.x);
       const sy = resolveAccessor(s.y);
       return s.data.map((d) => ({
-        x: sx(d) as XValue,
+        x: sx(d) as AxisValue,
         y: Number(sy(d)),
         row: d,
         label: String(sy(d)),
