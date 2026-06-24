@@ -26,17 +26,6 @@ export type RuleYMarker = {
   style?: StrokeStyle;
 };
 
-export type CustomComponentMarker = {
-  type: 'component';
-  series?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  component: any;
-  props?: Record<string, unknown>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data?: any[];
-  strategy?: 'series' | 'segment';
-};
-
 /**
  * The in-SVG hover highlight (crosshair + dot + label), opt-in via `markers`
  * so it can be combined freely with — or used entirely without — the HTML
@@ -48,8 +37,6 @@ export type HoverMarkerConfig = {
   type: 'hover';
   series?: string;
   strategy?: 'series' | 'segment';
-  /** Crosshair visibility toggles (default `true`); distinct from the
-   *  computed rule *position*, which always comes from the hover state. */
   ruleX?: boolean;
   ruleY?: boolean;
   color?: string;
@@ -57,12 +44,18 @@ export type HoverMarkerConfig = {
   ruleStyle?: StrokeStyle;
   dotStyle?: DotStyle;
   fontStyle?: FontStyle;
-  /**
-   * Sync mode to seed the (possibly standalone, no-`<Chart>`) hover store
-   * with when no `tooltip` is configured. Ignored once a `tooltip` is
-   * present — its `sync` wins.
-   */
   sync?: TooltipSync;
 };
 
-export type Marker = RuleXMarker | RuleYMarker | CustomComponentMarker | HoverMarkerConfig;
+export type CustomComponentMarker = {
+  type: 'component';
+  series?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  component: any;
+  props?: Record<string, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data?: any[];
+  strategy?: 'series' | 'segment';
+};
+
+export type Marker = RuleXMarker | RuleYMarker | HoverMarkerConfig | CustomComponentMarker;

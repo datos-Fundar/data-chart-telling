@@ -139,7 +139,17 @@ export const FacetSyncLine: StoryObj = {
   render: () => ({ Component: TooltipSyncDemo, props: { kind: 'line' } }),
 };
 
+/** Faceted bar chart — `x` sync highlights the same region across years. */
+export const FacetSyncBar: StoryObj = {
+  render: () => ({ Component: TooltipSyncDemo, props: { kind: 'bar' } }),
+};
+
 /** Faceted heatmap — `xy` sync highlights the same cell in every scenario. */
 export const FacetSyncHeatmap: StoryObj = {
   render: () => ({ Component: TooltipSyncDemo, props: { kind: 'heatmap' } }),
+};
+
+/** Faceted pyramid — `y` sync highlights the same age group across years. */
+export const FacetSyncPyramid: StoryObj = {
+  render: () => ({ Component: TooltipSyncDemo, props: { kind: 'pyramid' } }),
 };

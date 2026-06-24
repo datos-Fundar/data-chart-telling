@@ -1,17 +1,22 @@
 <script lang="ts">
   import LineChart from '$lib/charts/line/Chart.svelte';
+  import BarChart from '$lib/charts/bar/Chart.svelte';
   import HeatmapChart from '$lib/charts/heatmap/Chart.svelte';
+  import PyramidChart from '$lib/charts/pyramid/Chart.svelte';
   import type { TooltipSync } from '$lib/types/layout/tooltip';
   import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
   import { HEAT_CELLS, type HeatCell } from '../../data/heat-cells';
+  import { REGION_BARS, type RegionYear } from '../../data/region-bars';
+  import { AGE_GROUPS, POPULATION_PYRAMID, type PopulationRow } from '../../data/population-pyramid';
 
-  const { kind = 'line' }: { kind?: 'line' | 'heatmap' } = $props();
+  const { kind = 'line' }: { kind?: 'line' | 'heatmap' | 'bar' | 'pyramid' } = $props();
 
   // svelte-ignore state_referenced_locally
-  let sync = $state<TooltipSync>(kind === 'heatmap' ? 'xy' : 'x');
+  let sync = $state<TooltipSync>(kind === 'heatmap' ? 'xy' : kind === 'pyramid' ? 'y' : 'x');
   const SYNCS: TooltipSync[] = ['none', 'x', 'y', 'xy'];
 
   const heatData = HEAT_CELLS.filter((d) => d.year === 2022);
+  const pyramidData = POPULATION_PYRAMID.filter((d) => [1991, 2022, 2030, 2040].includes(d.year));
 </script>
 
 <div class="demo">
@@ -38,6 +43,38 @@
       showValues={false}
       formatValue={(v) => `${(v * 100).toFixed(0)}%`}
       facet={{ by: 'scenario' as keyof HeatCell, columns: 2 }}
+      tooltip={{ sync }}
+      markers={[{ type: 'hover' }]}
+    />
+  {:else if kind === 'bar'}
+    <BarChart
+      width={760}
+      height={420}
+      title="Valor por región y año"
+      subtitle="Tooltip sync: {sync}"
+      data={REGION_BARS}
+      x={'region' as keyof RegionYear}
+      y="value"
+      facet={{ by: 'year' as keyof RegionYear, columns: 3 }}
+      tooltip={{ sync }}
+      markers={[{ type: 'hover' }]}
+    />
+  {:else if kind === 'pyramid'}
+    <PyramidChart
+      width={760}
+      height={520}
+      title="Pirámide poblacional por año"
+      subtitle="Tooltip sync: {sync}"
+      data={pyramidData}
+      y={'ageGroup' as keyof PopulationRow}
+      x={'pct' as keyof PopulationRow}
+      side={{ Mujeres: 'left', Varones: 'right' }}
+      z={'sex' as keyof PopulationRow}
+      colorLeft="#d6336c"
+      colorRight="#1971c2"
+      yScale={{ domain: AGE_GROUPS }}
+      formatValue={(v) => `${v.toFixed(1)}%`}
+      facet={{ by: 'year' as keyof PopulationRow, columns: 2 }}
       tooltip={{ sync }}
       markers={[{ type: 'hover' }]}
     />

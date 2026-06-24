@@ -8,7 +8,7 @@ const preview: Preview = {
     // preset so every story shows an opinionated look out of the box. Runs
     // before each story, so it re-asserts even after a story (e.g. the
     // Configuration demo) resets or switches the global config.
-    setConfiguration(THEMES.Editorial);
+    setConfiguration(THEMES.Default);
   },
   parameters: {
     controls: {
