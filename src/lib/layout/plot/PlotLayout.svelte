@@ -8,8 +8,8 @@
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
   import Tooltip from '$lib/layout/tooltip/Tooltip.svelte';
   import type { XValue } from '$lib/types/plots/common';
-  import type { HoverDisplayPoint, HoverPoint, TooltipRuntime } from '$lib/types/layout/tooltip';
   import type { Marker } from '$lib/types/plots/markers';
+  import type { HoverDisplayPoint, HoverPoint, TooltipRuntime } from '$lib/types/layout/tooltip';
 
   type PlotProps = ComponentProps<typeof Plot>;
 
@@ -49,7 +49,6 @@
     hoverPoints: HoverPoint<TData>[];
     label: (row: TData) => string;
     tooltip?: TooltipRuntime<TData>;
-    /** Standalone markers (`ruleX`, `ruleY`, un-scoped `component`/`hover`); per-series-scoped markers stay with the plot kind. */
     markers?: Marker[];
     showHoverLabels?: boolean;
     /**

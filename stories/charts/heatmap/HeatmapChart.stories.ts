@@ -28,8 +28,7 @@ const meta = {
     x: 'rooms',
     y: 'people',
     value: 'pct',
-    xScale: { label: 'Ambientes' },
-    yScale: { label: 'Personas' },
+    scales: { x: { label: 'Ambientes' }, y: { label: 'Personas' } },
   },
   argTypes: {
     width: { control: { type: 'range', min: 320, max: 1000, step: 20 } },

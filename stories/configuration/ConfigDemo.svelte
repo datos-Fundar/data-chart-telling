@@ -79,8 +79,7 @@
       x={'rooms' as keyof HeatCell}
       y={'people' as keyof HeatCell}
       value={'pct' as keyof HeatCell}
-      xScale={{ label: 'Ambientes' }}
-      yScale={{ label: 'Personas' }}
+      scales={{ x: { label: 'Ambientes' }, y: { label: 'Personas' } }}
       legend={[
         {
           type: 'continuous',

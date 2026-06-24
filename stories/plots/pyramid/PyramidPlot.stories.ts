@@ -23,7 +23,7 @@ const meta = {
     width: 560,
     height: 520,
     series: SERIES,
-    yScale: { label: 'Grupo de edad', domain: AGE_GROUPS },
+    scales: { y: { label: 'Grupo de edad', domain: AGE_GROUPS } },
     formatValue: (v: number) => `${v.toFixed(1)}%`,
   },
   argTypes: {

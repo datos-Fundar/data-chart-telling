@@ -2,16 +2,51 @@ export type XValue = number | string | Date;
 export type YValue = number;
 
 /**
- * Author-facing scale overrides for a plot axis. Shared by every plot kind —
- * `domain`/`reverse` reorder or restrict the axis, `nice` rounds it, and
- * `label` is read by svelteplot's `<Plot>` to title the axis, so a plot kind
- * never needs a separate `xLabel`/`yLabel` prop.
+ * Author-facing scale overrides for a plot axis. Mirrors svelteplot's
+ * `ScaleOptions` + `XScaleOptions` in full — `type`, `padding`, `domain`,
+ * `nice`, `reverse`, `label`, `tickFormat`, `labelAnchor`, etc.
+ *
+ * Used for both `x` and `y` entries in {@link ScalesConfig}. X-specific
+ * fields (`labelAnchor`, `tickRotate`) are accepted on `y` too; svelteplot
+ * silently ignores any inapplicable options.
  */
 export type AxisScale = {
-  domain?: (number | string | Date)[];
-  nice?: boolean;
+  type?: 'auto' | 'linear' | 'pow' | 'sqrt' | 'log' | 'symlog' | 'time' | 'utc' | 'point' | 'ordinal' | 'sequential' | 'band' | 'categorical' | 'cyclical' | 'threshold' | 'quantile-cont' | 'quantile' | 'quantize' | 'diverging' | 'diverging-log' | 'diverging-pow' | 'diverging-sqrt' | 'diverging-symlog';
+  domain?: (number | string | boolean | Date | null)[];
+  range?: (number | string | boolean | Date | null)[];
   reverse?: boolean;
-  label?: string;
+  label?: string | false;
+  interval?: string | number;
+  clamp?: boolean;
+  nice?: boolean;
+  zero?: boolean;
+  round?: boolean;
+  percent?: boolean;
+  padding?: number;
+  align?: number;
+  paddingInner?: number;
+  paddingOuter?: number;
+  insetLeft?: number;
+  insetRight?: number;
+  insetTop?: number;
+  insetBottom?: number;
+  ticks?: (number | string | boolean | Date | null)[];
+  tickSpacing?: number;
+  base?: number;
+  constant?: number;
+  sort?: ((a: unknown, b: unknown) => number) | { channel: string; order: 'ascending' | 'descending' };
+  grid?: boolean;
+  tickRotate?: number;
+  tickFormat?: false | Intl.NumberFormatOptions | Intl.DateTimeFormatOptions | ((d: unknown, index: number, ticks: unknown[]) => string | string[]);
+};
+
+/**
+ * Per-axis scale overrides, passed as a single `scales` prop to every plot
+ * kind.
+ */
+export type ScalesConfig = {
+  x?: AxisScale;
+  y?: AxisScale;
 };
 
 /**

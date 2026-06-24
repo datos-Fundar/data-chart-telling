@@ -9,7 +9,7 @@
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
   import type { PyramidSeries, PyramidSeriesProps, PyramidDataProps } from '$lib/types/plots/pyramid';
-  import type { AxisScale, XValue } from '$lib/types/plots/common';
+  import type { ScalesConfig, XValue } from '$lib/types/plots/common';
   import type { BarSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
   import type { TooltipRuntime } from '$lib/types/layout/tooltip';
@@ -34,8 +34,7 @@
     z,
     colorLeft,
     colorRight,
-    xScale = {},
-    yScale = {},
+    scales = {},
     showValues = false,
     formatValue = (v: number) => `${v}`,
     segments = {},
@@ -46,9 +45,8 @@
     height: number;
     colorLeft?: string;
     colorRight?: string;
-    /** Magnitude (diverging) axis — distinct from `yScale`, which places the category bands. */
-    xScale?: AxisScale;
-    yScale?: AxisScale;
+    /** Magnitude (diverging) axis — distinct from `scales.y`, which places the category bands. */
+    scales?: ScalesConfig;
     showValues?: boolean;
     formatValue?: (v: number) => string;
     /** Per-series fill/opacity over category ranges — e.g. dim every category but a highlighted few. */
@@ -177,11 +175,11 @@
   {width}
   {height}
   x={{
-    ...xScale,
-    domain: xScale.domain ?? [-maxMagnitude, maxMagnitude],
+    domain: [-maxMagnitude, maxMagnitude],
     tickFormat: (v: unknown) => formatValue(Math.abs(Number(v))),
+    ...(scales.x ?? {}),
   }}
-  y={{ ...yScale, domain: yScale.domain ?? yDomain, type: 'band', padding: 0.2 }}
+  y={{ type: 'band', padding: 0.2, domain: yDomain, ...(scales.y ?? {}) }}
   data={flat}
   {getX}
   {getY}

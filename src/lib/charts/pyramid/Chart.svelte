@@ -9,7 +9,7 @@
   import type { LegendSection } from '$lib/types/charts/legend';
   import type { BarSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
-  import type { AxisScale, XValue, Accessor } from '$lib/types/plots/common';
+  import type { ScalesConfig, XValue, Accessor } from '$lib/types/plots/common';
   import type { PyramidSide } from '$lib/types/plots/pyramid';
 
   /**
@@ -33,8 +33,7 @@
     z,
     colorLeft,
     colorRight,
-    xScale = {},
-    yScale = {},
+    scales = {},
     showValues = false,
     formatValue = (v: number) => `${v}`,
     segments,
@@ -60,8 +59,7 @@
     z: Accessor<TRow, unknown>;
     colorLeft?: string;
     colorRight?: string;
-    xScale?: AxisScale;
-    yScale?: AxisScale;
+    scales?: ScalesConfig;
     showValues?: boolean;
     formatValue?: (v: number) => string;
     segments?: SegmentsMap<BarSegmentStyle>;
@@ -84,9 +82,12 @@
     const vals = data.map((d) => Math.abs(Number(getX(d))));
     return vals.length ? Math.max(...vals) : 1;
   });
-  const resolvedXScale = $derived({ ...xScale, domain: xScale.domain ?? [-maxMagnitude, maxMagnitude] });
-  const resolvedYScale = $derived({ ...yScale, domain: yScale.domain ?? categoryDomain });
-
+  // Merge full-dataset domains into scales so each facet/timeline step keeps
+  // the same axis range. User-supplied scales.x/y.domain overrides these.
+  const resolvedScales = $derived({
+    x: { domain: [-maxMagnitude, maxMagnitude], ...(scales.x ?? {}) },
+    y: { domain: categoryDomain, ...(scales.y ?? {}) },
+  });
   // A pyramid timeline snapshots one frame per step; interpolation needs to
   // match each bar across steps by its category and side, not by the
   // timeline's own time field.
@@ -133,8 +134,7 @@
       {z}
       {colorLeft}
       {colorRight}
-      xScale={resolvedXScale}
-      yScale={resolvedYScale}
+      scales={resolvedScales}
       {showValues}
       {formatValue}
       {segments}

@@ -31,7 +31,7 @@
       z={'sex' as keyof PopulationRow}
       colorLeft="#d6336c"
       colorRight="#1971c2"
-      yScale={{ domain: AGE_GROUPS }}
+      scales={{ y: { domain: AGE_GROUPS } }}
       formatValue={(v) => `${v.toFixed(1)}%`}
       {legend}
       timeline={{ accessor: 'year', progress, orientation: 'vertical', interpolate: true }}

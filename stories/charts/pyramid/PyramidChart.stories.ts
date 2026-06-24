@@ -29,7 +29,7 @@ const meta = {
     z: 'sex' as keyof PopulationRow,
     colorLeft: '#d6336c',
     colorRight: '#1971c2',
-    yScale: { domain: AGE_GROUPS },
+    scales: { y: { domain: AGE_GROUPS } },
     formatValue: (v: number) => `${v.toFixed(1)}%`,
   },
   argTypes: {

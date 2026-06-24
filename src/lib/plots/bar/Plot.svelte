@@ -11,7 +11,7 @@
   import { buildGroupedSeries, validateSegments } from '$lib/plots/utils/segments';
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
-  import type { AxisScale, Series, SeriesProps, DataProps } from '$lib/types/plots/common';
+  import type { Series, SeriesProps, DataProps, ScalesConfig } from '$lib/types/plots/common';
   import type { BarSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
   import type { XValue } from '$lib/types/plots/common';
   import type { Marker } from '$lib/types/plots/markers';
@@ -27,18 +27,14 @@
     z,
     segments = {},
     markers = [],
-    xScale = {},
-    yScale = {},
+    scales = {},
     tooltip = undefined,
   }: (SeriesProps<TData> | DataProps<TData>) & {
     width: number;
     height: number;
-    /** Per-series x-axis ranges with their own fill, keyed by series name. */
     segments?: SegmentsMap<BarSegmentStyle>;
-    /** Standalone (`ruleX`/`ruleY`/unscoped `hover`) plus per-series-scoped `hover` markers. */
     markers?: Marker[];
-    xScale?: AxisScale;
-    yScale?: AxisScale;
+    scales?: ScalesConfig;
     tooltip?: TooltipRuntime<TData>;
   } = $props();
 
@@ -84,8 +80,8 @@
 <PlotLayout
   {width}
   {height}
-  x={{ ...xScale, type: 'band', padding: 0.2 }}
-  y={yScale}
+  x={{ type: 'band', padding: 0.2, ...(scales.x ?? {}) }}
+  y={scales.y}
   data={flat}
   getX={xAcc}
   getY={(d) => Number(yAcc(d))}

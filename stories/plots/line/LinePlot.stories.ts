@@ -488,7 +488,7 @@ export const YDeltaToBaseline: Story = {
         },
       } satisfies Marker,
     ],
-    xScale: { domain: [2018, 2023] },
+    scales: { x: { domain: [2018, 2023] } },
   },
 };
 

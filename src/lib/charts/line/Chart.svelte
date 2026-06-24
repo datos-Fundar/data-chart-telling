@@ -12,7 +12,7 @@
   import type { LegendSection } from '$lib/types/charts/legend';
   import type { SegmentsMap } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
-  import type { AxisScale, XValue, YValue, Accessor } from '$lib/types/plots/common';
+  import type { ScalesConfig, XValue, YValue, Accessor } from '$lib/types/plots/common';
 
   /**
    * High-level line chart. It takes flat rows plus `x`/`y`/`z` encodings, groups
@@ -33,8 +33,7 @@
     z,
     segments,
     markers = [],
-    xScale = {},
-    yScale = {},
+    scales = {},
     facet,
     timeline,
     tooltip,
@@ -51,8 +50,7 @@
     z?: Accessor<TRow, unknown>;
     segments?: SegmentsMap;
     markers?: Marker[];
-    xScale?: AxisScale;
-    yScale?: AxisScale;
+    scales?: ScalesConfig;
     facet?: FacetConfig<TRow>;
     timeline?: TimelineConfig<TRow>;
     tooltip?: TooltipProp<TRow>;
@@ -106,8 +104,7 @@
       {z}
       {segments}
       {markers}
-      {xScale}
-      {yScale}
+      {scales}
       tooltip={tip.enabled
         ? {
             format: tip.format ?? defaultFormat,

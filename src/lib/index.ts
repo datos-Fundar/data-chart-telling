@@ -42,6 +42,7 @@ export type {
   YValue,
   Accessor,
   AxisScale,
+  ScalesConfig,
   Series,
   SeriesProps,
   DataProps

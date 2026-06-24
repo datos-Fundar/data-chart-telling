@@ -36,13 +36,13 @@ const meta = {
   component: BarPlot,
   tags: ['autodocs'],
   args: {
-    width: 600,
-    height: 400,
+    width: 950,
+    height: 500,
   },
   argTypes: {
     width: {
       description: 'Plot width in pixels.',
-      control: { type: 'range', min: 300, max: 1000, step: 50 },
+      control: { type: 'range', min: 300, max: 950, step: 50 },
     },
     height: {
       description: 'Plot height in pixels.',
@@ -62,7 +62,12 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     series: [
-      { name: 'regions', x: 'region', y: 'value', data: REGIONS } satisfies Series<Region>,
+      {
+        name: 'regions',
+        x: 'region',
+        y: 'value',
+        data: REGIONS
+      } satisfies Series<Region>,
     ],
   },
 };
@@ -71,7 +76,12 @@ export const Default: Story = {
 export const ByYear: Story = {
   args: {
     series: [
-      { name: 'gdp', x: 'year', y: 'value', data: GDP } satisfies Series<YearValue>,
+      {
+        name: 'gdp',
+        x: 'year',
+        y: 'value',
+        data: GDP
+      } satisfies Series<YearValue>,
     ],
   },
 };

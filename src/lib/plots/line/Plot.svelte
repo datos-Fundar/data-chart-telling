@@ -11,7 +11,7 @@
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
   import { buildGroupedSeries, validateSegments } from '$lib/plots/utils/segments';
-  import type { AxisScale, Series, SeriesProps, DataProps } from '$lib/types/plots/common';
+  import type { Series, SeriesProps, DataProps, ScalesConfig } from '$lib/types/plots/common';
   import type { LineSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
   import type { XValue } from '$lib/types/plots/common';
   import type { Marker } from '$lib/types/plots/markers';
@@ -27,16 +27,14 @@
     z,
     segments = {},
     markers = [],
-    xScale = {},
-    yScale = {},
+    scales = {},
     tooltip = undefined,
   }: (SeriesProps<TData> | DataProps<TData>) & {
     width: number;
     height: number;
     segments?: SegmentsMap;
     markers?: Marker[];
-    xScale?: AxisScale;
-    yScale?: AxisScale;
+    scales?: ScalesConfig;
     tooltip?: TooltipRuntime<TData>;
   } = $props();
 
@@ -94,8 +92,8 @@
 <PlotLayout
   {width}
   {height}
-  x={xScale}
-  y={yScale}
+  x={scales.x}
+  y={scales.y}
   data={flat}
   getX={xAcc}
   getY={(d) => Number(yAcc(d))}

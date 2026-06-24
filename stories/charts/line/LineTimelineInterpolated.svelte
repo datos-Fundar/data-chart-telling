@@ -19,8 +19,7 @@
       x="year"
       y="value"
       z={'metric' as keyof SeriesPoint}
-      xScale={{ domain: [years[0], years[years.length - 1]] }}
-      yScale={{ domain: [20, 80] }}
+      scales={{ x: { domain: [years[0], years[years.length - 1]] }, y: { domain: [20, 80] } }}
       timeline={{
         accessor: 'year',
         progress,

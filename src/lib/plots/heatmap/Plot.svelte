@@ -5,7 +5,7 @@
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import type { HeatmapSeries } from '$lib/types/plots/heatmap';
-  import type { AxisScale, XValue } from '$lib/types/plots/common';
+  import type { ScalesConfig, XValue } from '$lib/types/plots/common';
   import type { Marker } from '$lib/types/plots/markers';
   import type { TooltipRuntime } from '$lib/types/layout/tooltip';
 
@@ -21,8 +21,7 @@
     colorMin,
     colorMax,
     domain,
-    xScale = {},
-    yScale = {},
+    scales = {},
     showValues = true,
     formatValue = (v: number) => `${v}`,
     markers = [],
@@ -33,10 +32,9 @@
     series: HeatmapSeries<TData>;
     colorMin?: string;
     colorMax?: string;
-    /** Value (colour) domain — distinct from `xScale`/`yScale`, which place the grid's categories. */
+    /** Value (colour) domain — distinct from `scales.x`/`scales.y`, which place the grid's categories. */
     domain?: [number, number];
-    xScale?: AxisScale;
-    yScale?: AxisScale;
+    scales?: ScalesConfig;
     showValues?: boolean;
     formatValue?: (v: number) => string;
     /** Heatmap has no series concept — only unscoped markers (`ruleX`/`ruleY`/`hover`) apply. */
@@ -89,8 +87,8 @@
 <PlotLayout
   {width}
   {height}
-  x={{ ...xScale, domain: xScale.domain ?? xDomain, type: 'band', labelAnchor: 'right' }}
-  y={{ ...yScale, domain: yScale.domain ?? yDomain, type: 'band' }}
+  x={{ type: 'band', labelAnchor: 'right', domain: xDomain, ...(scales.x ?? {}) }}
+  y={{ type: 'band', domain: yDomain, ...(scales.y ?? {}) }}
   data={series.data}
   {getX}
   {getY}

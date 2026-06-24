@@ -10,7 +10,7 @@
   } from '$lib/types/charts/common';
   import type { LegendSection } from '$lib/types/charts/legend';
   import type { Marker } from '$lib/types/plots/markers';
-  import type { AxisScale, XValue, Accessor } from '$lib/types/plots/common';
+  import type { ScalesConfig, XValue, Accessor } from '$lib/types/plots/common';
 
   /**
    * High-level heatmap. Proves the chart chrome (container/legend/timeline/facet)
@@ -31,8 +31,7 @@
     value,
     colorMin,
     colorMax,
-    xScale = {},
-    yScale = {},
+    scales = {},
     showValues = true,
     formatValue = (v: number) => `${v}`,
     markers = [],
@@ -52,8 +51,7 @@
     value: Accessor<TRow, number>;
     colorMin?: string;
     colorMax?: string;
-    xScale?: AxisScale;
-    yScale?: AxisScale;
+    scales?: ScalesConfig;
     showValues?: boolean;
     formatValue?: (v: number) => string;
     markers?: Marker[];
@@ -75,8 +73,8 @@
   const hoverEnabled = $derived(tip.enabled || hasHoverMarker(markers));
   const resolvedSync = $derived(resolveHoverSync(tip.enabled ? tip.sync : undefined, markers, 'xy'));
   const defaultFormat = $derived((row: TRow) => {
-    const xl = xScale.label || 'x';
-    const yl = yScale.label || 'y';
+    const xl = scales.x?.label || 'x';
+    const yl = scales.y?.label || 'y';
     return `${xl} ${getX(row)} · ${yl} ${getY(row)}\n${formatValue(Number(getValue(row)))}`;
   });
 </script>
@@ -101,8 +99,7 @@
       domain={valueDomain}
       {colorMin}
       {colorMax}
-      {xScale}
-      {yScale}
+      {scales}
       {showValues}
       {formatValue}
       {markers}

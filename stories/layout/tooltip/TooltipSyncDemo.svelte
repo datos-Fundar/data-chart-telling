@@ -38,8 +38,7 @@
       x={'rooms' as keyof HeatCell}
       y={'people' as keyof HeatCell}
       value={'pct' as keyof HeatCell}
-      xScale={{ label: 'Ambientes' }}
-      yScale={{ label: 'Personas' }}
+      scales={{ x: { label: 'Ambientes' }, y: { label: 'Personas' } }}
       showValues={false}
       formatValue={(v) => `${(v * 100).toFixed(0)}%`}
       facet={{ by: 'scenario' as keyof HeatCell, columns: 2 }}
@@ -72,7 +71,7 @@
       z={'sex' as keyof PopulationRow}
       colorLeft="#d6336c"
       colorRight="#1971c2"
-      yScale={{ domain: AGE_GROUPS }}
+      scales={{ y: { domain: AGE_GROUPS } }}
       formatValue={(v) => `${v.toFixed(1)}%`}
       facet={{ by: 'year' as keyof PopulationRow, columns: 2 }}
       tooltip={{ sync }}
