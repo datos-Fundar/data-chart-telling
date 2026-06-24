@@ -4,7 +4,7 @@ import { THEMES } from '$lib/configuration/themes'
 
 const preview: Preview = {
   beforeEach: () => {
-    // `DEFAULT_CONFIG` is an intentional no-op theme; apply the Editorial
+    // `DEFAULT_CONFIG` is an intentional no-op theme; apply the Default
     // preset so every story shows an opinionated look out of the box. Runs
     // before each story, so it re-asserts even after a story (e.g. the
     // Configuration demo) resets or switches the global config.
