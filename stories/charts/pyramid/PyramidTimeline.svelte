@@ -45,7 +45,6 @@
       data={POPULATION_PYRAMID}
       y={'ageGroup' as keyof PopulationRow}
       x={'pct' as keyof PopulationRow}
-      side={{ Mujeres: 'left', Varones: 'right' }}
       z={'sex' as keyof PopulationRow}
       colorLeft="#d6336c"
       colorRight="#1971c2"

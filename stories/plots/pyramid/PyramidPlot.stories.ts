@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
 import { AGE_GROUPS, POPULATION_PYRAMID } from '../../data/population-pyramid';
-import type { PyramidSeries } from '$lib/types/plots/pyramid';
-
 type Row = { ageGroup: string; pct: number };
 
 const YEAR = 2022;
@@ -10,9 +8,10 @@ const YEAR = 2022;
 const women: Row[] = POPULATION_PYRAMID.filter((d) => d.year === YEAR && d.sex === 'Mujeres');
 const men: Row[] = POPULATION_PYRAMID.filter((d) => d.year === YEAR && d.sex === 'Varones');
 
-const SERIES: PyramidSeries<Row>[] = [
-  { name: 'Mujeres', side: 'left', x: 'ageGroup', y: 'pct', data: women },
-  { name: 'Varones', side: 'right', x: 'ageGroup', y: 'pct', data: men },
+// 'Mujeres' < 'Varones' alphabetically → Mujeres goes left, Varones right.
+const SERIES = [
+  { name: 'Mujeres', x: 'ageGroup', y: 'pct', data: women },
+  { name: 'Varones', x: 'ageGroup', y: 'pct', data: men },
 ];
 
 const meta = {

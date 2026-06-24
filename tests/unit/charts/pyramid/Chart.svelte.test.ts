@@ -15,7 +15,15 @@ const DATA: Row[] = [
   { age: '10-14', pct: 4.9, sex: 'Varones' },
 ];
 
-const SIDE = { Mujeres: 'left' as const, Varones: 'right' as const };
+// y = category (age bands, visual Y axis), x = magnitude (visual X axis), z = grouping (sex).
+const BASE_PROPS = {
+  width: 600,
+  height: 420,
+  data: DATA,
+  y: 'age' as keyof Row,
+  x: 'pct' as keyof Row,
+  z: 'sex' as keyof Row,
+} as const;
 
 // Waits until at least one <svg> is present in the container.
 async function waitForSvg(container: Element): Promise<SVGElement> {
@@ -39,42 +47,21 @@ function barRects(svg: SVGElement): SVGRectElement[] {
 
 describe('PyramidChart', () => {
   test('renders an SVG from flat rows grouped by sex', async () => {
-    const { container } = await render(PyramidChart, {
-      width: 600,
-      height: 420,
-      data: DATA,
-      y: 'age',
-      x: 'pct',
-      side: SIDE,
-      z: 'sex',
-    });
+    const { container } = await render(PyramidChart, BASE_PROPS);
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
   });
 
   test('renders one bar per row', async () => {
-    const { container } = await render(PyramidChart, {
-      width: 600,
-      height: 420,
-      data: DATA,
-      y: 'age',
-      x: 'pct',
-      side: SIDE,
-      z: 'sex',
-    });
+    const { container } = await render(PyramidChart, BASE_PROPS);
     const svg = await waitForSvg(container);
     expect(barRects(svg).length).toBe(DATA.length);
   });
 
   test('does not crash with an empty dataset', async () => {
     const { container } = await render(PyramidChart, {
-      width: 600,
-      height: 420,
+      ...BASE_PROPS,
       data: [] as Row[],
-      y: 'age',
-      x: 'pct',
-      side: SIDE,
-      z: 'sex',
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
@@ -82,13 +69,7 @@ describe('PyramidChart', () => {
 
   test('renders the title when provided', async () => {
     const { container } = await render(PyramidChart, {
-      width: 600,
-      height: 420,
-      data: DATA,
-      y: 'age',
-      x: 'pct',
-      side: SIDE,
-      z: 'sex',
+      ...BASE_PROPS,
       title: 'Pirámide poblacional',
     });
     await waitForSvg(container);

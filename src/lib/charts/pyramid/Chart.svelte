@@ -10,14 +10,14 @@
   import type { BarSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
   import type { ScalesConfig, AxisValue, Accessor } from '$lib/types/plots/common';
-  import type { PyramidSide } from '$lib/types/plots/pyramid';
 
   /**
    * High-level population-pyramid-style chart. Forwards flat rows and the
-   * `y`/`x`/`side`/`z` accessors straight to {@link PyramidPlot}, which groups
-   * them into series itself, and delegates all chrome (title, legend, timeline,
-   * facets) to {@link Chart} — mirroring how {@link BarChart}/{@link LineChart}
-   * adapt flat rows for their plot.
+   * `x`/`y`/`z` accessors straight to {@link PyramidPlot}, which groups them
+   * into series and assigns left/right sides automatically from the
+   * alphabetical order of `z` values. Pass `scales.z.reverse: true` to flip
+   * which side goes first. Delegates all chrome (title, legend, timeline,
+   * facets) to {@link Chart}.
    */
   let {
     width,
@@ -27,10 +27,9 @@
     caption,
     legend,
     data,
-    y,
-    x,
-    side,
-    z,
+    x: magnitude,
+    y: category,
+    z: sides,
     colorLeft,
     colorRight,
     scales = {},
@@ -49,13 +48,8 @@
     caption?: string;
     legend?: LegendSection[];
     data: TRow[];
-    /** Category bands, e.g. age group — rendered on the Y axis. */
-    y: Accessor<TRow, AxisValue>;
-    /** Magnitude, always given positive — mirrored left or right by `side`. */
     x: Accessor<TRow, number>;
-    /** Maps each `z` group value to the half it is drawn on. */
-    side: Record<string, PyramidSide>;
-    /** Groups rows into one series per value, e.g. by sex. */
+    y: Accessor<TRow, AxisValue>;
     z: Accessor<TRow, unknown>;
     colorLeft?: string;
     colorRight?: string;
@@ -69,35 +63,36 @@
     tooltip?: TooltipProp<TRow>;
   } = $props();
 
-  const getY = $derived(resolveAccessor<TRow>(y));
-  const getX = $derived(resolveAccessor<TRow>(x));
-  const getZ = $derived(resolveAccessor<TRow>(z));
+  const getMagnitude = $derived(resolveAccessor<TRow>(magnitude));
+  const getCategory = $derived(resolveAccessor<TRow>(category));
+  const getSides = $derived(resolveAccessor<TRow>(sides));
 
   // Computed once over the full dataset (not the per-facet/timeline-filtered
   // rows) so the diverging axis and category bands stay comparable across
   // timeline steps/facets — the same reasoning HeatmapChart applies to its
   // colour domain.
-  const categoryDomain = $derived([...new Set(data.map((d) => getY(d) as AxisValue))]);
+  const categoryDomain = $derived([...new Set(data.map((d) => getCategory(d) as AxisValue))]);
   const maxMagnitude = $derived.by(() => {
-    const vals = data.map((d) => Math.abs(Number(getX(d))));
+    const vals = data.map((d) => Math.abs(Number(getMagnitude(d))));
     return vals.length ? Math.max(...vals) : 1;
   });
-  // Merge full-dataset domains into scales so each facet/timeline step keeps
-  // the same axis range. User-supplied scales.x/y.domain overrides these.
+  // Spread all caller scales first so scales.z (used by PyramidPlot for side
+  // assignment) is preserved, then override x/y with the computed domains.
   const resolvedScales = $derived({
+    ...scales,
     x: { domain: [-maxMagnitude, maxMagnitude], ...(scales.x ?? {}) },
     y: { domain: categoryDomain, ...(scales.y ?? {}) },
   });
   // A pyramid timeline snapshots one frame per step; interpolation needs to
-  // match each bar across steps by its category and side, not by the
+  // match each bar across steps by its category and z-group, not by the
   // timeline's own time field.
   const timelineConfig = $derived(
     timeline
       ? {
           ...timeline,
           interpolate: resolveTimelineInterpolation(timeline.interpolate, {
-            value: x,
-            key: (d: TRow) => `${String(getY(d))}::${String(getZ(d))}`,
+            value: magnitude,
+            key: (d: TRow) => `${String(getCategory(d))}::${String(getSides(d))}`,
           }),
         }
       : undefined,
@@ -107,7 +102,7 @@
   const hoverEnabled = $derived(tip.enabled || hasHoverMarker(markers));
   const resolvedSync = $derived(resolveHoverSync(tip.enabled ? tip.sync : undefined, markers, 'y'));
   const defaultFormat = $derived(
-    (row: TRow) => `${String(getZ(row))}\n${String(getY(row))}: ${formatValue(Number(getX(row)))}`,
+    (row: TRow) => `${String(getSides(row))}\n${String(getCategory(row))}: ${formatValue(Number(getMagnitude(row)))}`,
   );
 </script>
 
@@ -128,10 +123,9 @@
       width={w}
       height={h}
       data={rows}
-      {y}
-      {x}
-      {side}
-      {z}
+      x={magnitude}
+      y={category}
+      z={sides}
       {colorLeft}
       {colorRight}
       scales={resolvedScales}

@@ -79,20 +79,94 @@ pnpm build-storybook
 
 ## Chart types
 
-> **Vocabulary**: a _plot_ is a single graph (axes + marks). A _chart_ is a plot composition that adds a title, caption, legend, facets, and/or a timeline. Charts are not yet implemented.
+> **Vocabulary**: a _plot_ is a single graph (axes + marks). A _chart_ wraps a plot with a title, caption, legend, facets, and/or a timeline.
+
+### Charts
+
+| Component | Import path | Description |
+| --- | --- | --- |
+| `BarChart` | `$lib/charts/bar/Chart.svelte` | Vertical bar chart with title/caption/legend/facet/timeline chrome. |
+| `HeatmapChart` | `$lib/charts/heatmap/Chart.svelte` | Grid of colour-coded cells. Colour domain is computed over the full dataset for cross-facet comparability. |
+| `LineChart` | `$lib/charts/line/Chart.svelte` | Line chart. Default timeline mode is `upTo` (cumulative reveal). |
+| `PyramidChart` | `$lib/charts/pyramid/Chart.svelte` | Population-pyramid-style diverging bar chart with a shared zero baseline. |
 
 ### Plots
 
 | Component | Import path | Description |
-|---|---|---|
-| `LinePlot` | `$lib/plots/line/Plot.svelte` | Line chart. Supports multiple series and optional per-series range segments with independent styles (solid/dashed). |
-| `BarPlot` | `$lib/plots/bar/Plot.svelte` | Vertical bar chart. Uses a band scale on X by default. Supports multiple series. |
+| --- | --- | --- |
+| `BarPlot` | `$lib/plots/bar/Plot.svelte` | Vertical bar chart. Supports multiple series and per-series range segments. |
+| `HeatmapPlot` | `$lib/plots/heatmap/Plot.svelte` | Grid of colour-coded cells. |
+| `LinePlot` | `$lib/plots/line/Plot.svelte` | Line chart. Supports multiple series and per-series range segments with independent stroke styles. |
+| `PyramidPlot` | `$lib/plots/pyramid/Plot.svelte` | Diverging horizontal bar chart; each series is mirrored left or right of a shared zero baseline. |
 
-Both components accept explicit `width` and `height` in pixels (svelteplot does not auto-size).
+All components accept explicit `width` and `height` in pixels (svelteplot does not auto-size).
 
-### LinePlot — segments
+---
 
-Series data is separated from visual styling via the optional `segments` prop — a record keyed by series name:
+### Plot props
+
+Plots accept either `series` (pre-built `Series[]`) or the `data` + `x`/`y`/`z` flat-rows path — these are mutually exclusive.
+
+| Prop | Type | Default | BarPlot | HeatmapPlot | LinePlot | PyramidPlot |
+| ---- | ---- | ------- | ------- | ----------- | -------- | ----------- |
+| `width` | `number` | — | ✅ | ✅ | ✅ | ✅ |
+| `height` | `number` | — | ✅ | ✅ | ✅ | ✅ |
+| `series` | `Series[]` | — | ✅ | ✅ | ✅ | ✅ |
+| `data` | `TData[]` | — | ✅ | ✅ | ✅ | ✅ |
+| `x` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
+| `y` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
+| `z` | `Accessor` | | ✅ | ⚠️ | ✅ | ✅ |
+| `segments` | `SegmentsMap` | `{}` | ✅ | ❌ | ✅ | ✅ |
+| `markers` | `Marker[]` | `[]` | ✅ | ✅ | ✅ | ✅ |
+| `scales` | `ScalesConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
+| `tooltip` | `TooltipRuntime` | | ✅ | ✅ | ✅ | ✅ |
+| `showValues` | `boolean` | | ❌ | ✅ `true` | ❌ | ✅ `false` |
+| `formatValue` | `(v: number) => string` | `v => String(v)` | ❌ | ✅ | ❌ | ✅ |
+| `colorMin` | `string` | | ❌ | ✅ | ❌ | ❌ |
+| `colorMax` | `string` | | ❌ | ✅ | ❌ | ❌ |
+| `colorLeft` | `string` | | ❌ | ❌ | ❌ | ✅ |
+| `colorRight` | `string` | | ❌ | ❌ | ❌ | ✅ |
+
+> ⚠️ `z` in **HeatmapPlot**: encodes the cell colour value (not series grouping). Optional in type but required in practice on the `data` path.
+
+---
+
+### Chart props
+
+| Prop | Type | Default | BarChart | HeatmapChart | LineChart | PyramidChart |
+| ---- | ---- | ------- | -------- | ------------ | --------- | ------------ |
+| `width` | `number` | — | ✅ | ✅ | ✅ | ✅ |
+| `height` | `number` | — | ✅ | ✅ | ✅ | ✅ |
+| `data` | `TRow[]` | — | ✅ | ✅ | ✅ | ✅ |
+| `x` | `Accessor` | — | ✅ | ✅ | ✅ | ⚠️ |
+| `y` | `Accessor` | — | ✅ | ✅ | ✅ | ⚠️ |
+| `z` | `Accessor` | | ✅ | ⚠️ | ✅ | ⚠️ |
+| `title` | `string` | | ✅ | ✅ | ✅ | ✅ |
+| `subtitle` | `string` | | ✅ | ✅ | ✅ | ✅ |
+| `caption` | `string` | | ✅ | ✅ | ✅ | ✅ |
+| `legend` | `LegendSection[]` | | ✅ | ✅ | ✅ | ✅ |
+| `segments` | `SegmentsMap` | `{}` | ✅ | ❌ | ✅ | ✅ |
+| `markers` | `Marker[]` | `[]` | ✅ | ✅ | ✅ | ✅ |
+| `scales` | `ScalesConfig` | `{}` | ❌ | ✅ | ✅ | ✅ |
+| `facet` | `FacetConfig` | | ✅ | ✅ | ✅ | ✅ |
+| `timeline` | `TimelineConfig` | | ✅ | ✅ | ✅ | ✅ |
+| `tooltip` | `TooltipProp` | | ✅ | ✅ | ✅ | ✅ |
+| `showValues` | `boolean` | | ❌ | ✅ `true` | ❌ | ✅ `false` |
+| `formatValue` | `(v: number) => string` | `v => String(v)` | ❌ | ✅ | ❌ | ✅ |
+| `colorMin` | `string` | | ❌ | ✅ | ❌ | ❌ |
+| `colorMax` | `string` | | ❌ | ✅ | ❌ | ❌ |
+| `colorLeft` | `string` | | ❌ | ❌ | ❌ | ✅ |
+| `colorRight` | `string` | | ❌ | ❌ | ❌ | ✅ |
+
+> ⚠️ `x` / `y` in **PyramidChart**: props match the visual axes — `y` is the category bands (shown on the Y axis, e.g. age groups) and `x` is the magnitude (shown on the X axis). Unlike Bar/Line where `x` = category, Pyramid flips this to match what you see.  
+> ⚠️ `z` in **HeatmapChart**: required and typed `Accessor<TRow, number>` — encodes the cell colour value, not series grouping.  
+> ⚠️ `z` in **PyramidChart**: required — groups rows into series (e.g. by sex). Series are sorted alphabetically; the first goes left, the second right. `scales.z.reverse: true` flips the order.
+
+---
+
+### Segments
+
+Series data is separated from visual styling via the optional `segments` prop — a record keyed by series name (supported by `BarChart`, `LineChart`, `PyramidChart` and their corresponding plots):
 
 ```svelte
 <LinePlot

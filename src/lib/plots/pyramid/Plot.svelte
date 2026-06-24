@@ -8,8 +8,7 @@
   import { buildGroupedSeries, validateSegments } from '$lib/plots/utils/segments';
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
-  import type { PyramidSeries, PyramidSeriesProps, PyramidDataProps } from '$lib/types/plots/pyramid';
-  import type { ScalesConfig, AxisValue } from '$lib/types/plots/common';
+  import type { Series, SeriesProps, DataProps, ScalesConfig, AxisValue } from '$lib/types/plots/common';
   import type { BarSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
   import type { TooltipRuntime } from '$lib/types/layout/tooltip';
@@ -20,18 +19,24 @@
    * Mirrors the bar/line plot contract — series in, marks out — so the
    * chart-level container/timeline/facet/legend wrap it unchanged. Like
    * `LinePlot`/`BarPlot`, accepts either pre-built `series` or flat `data` +
-   * `y`/`x`/`side`/`z` accessors, so the plot is usable standalone without
-   * going through `PyramidChart`.
+   * `x`/`y`/`z` accessors.
+   *
+   * Side assignment is automatic: series names are sorted alphabetically and
+   * the first goes left, the second right. Pass `scales.z.reverse: true` to
+   * flip the order.
    */
+
+  type PyramidSide = 'left' | 'right';
+  type InternalSeries = Series<TData> & { side: PyramidSide };
+
   let {
     width,
     height,
     series,
     data,
-    y,
-    x,
-    side,
-    z,
+    x: magnitude,
+    y: category,
+    z: sides,
     colorLeft,
     colorRight,
     scales = {},
@@ -40,18 +45,15 @@
     segments = {},
     markers = [],
     tooltip = undefined,
-  }: (PyramidSeriesProps<TData> | PyramidDataProps<TData>) & {
+  }: (SeriesProps<TData> | DataProps<TData>) & {
     width: number;
     height: number;
     colorLeft?: string;
     colorRight?: string;
-    /** Magnitude (diverging) axis — distinct from `scales.y`, which places the category bands. */
     scales?: ScalesConfig;
     showValues?: boolean;
     formatValue?: (v: number) => string;
-    /** Per-series fill/opacity over category ranges — e.g. dim every category but a highlighted few. */
     segments?: SegmentsMap<BarSegmentStyle>;
-    /** Standalone (`ruleX`/`ruleY`/unscoped `hover`) plus per-series-scoped markers. */
     markers?: Marker[];
     tooltip?: TooltipRuntime<TData>;
   } = $props();
@@ -64,21 +66,24 @@
   const leftColor = $derived(colorLeft ?? paletteColor(0, cfg.palette));
   const rightColor = $derived(colorRight ?? paletteColor(1, cfg.palette));
 
-  // Groups flat rows into one series per z-value, then looks up each group's
-  // side from the `side` mapping using the series name (= string z-value).
-  const resolvedSeries = $derived.by(() => {
-    if (series) return series;
-    return buildSeries(data!, y!, x!, z!).map((s) => ({
-      ...s,
-      side: side![s.name] ?? 'left',
-    }));
+  // Sort series names alphabetically; even index → left, odd → right.
+  // scales.z.reverse flips the assignment so the second name goes left.
+  const zReversed = $derived(scales.z?.reverse ?? false);
+  const resolvedSeries = $derived.by((): InternalSeries[] => {
+    const base: Series<TData>[] = series ?? buildSeries(data!, category!, magnitude!, sides);
+    const sortedNames = [...base.map((s) => s.name)].sort((a, b) => a.localeCompare(b));
+    return base.map((s) => {
+      const idx = sortedNames.indexOf(s.name);
+      const side: PyramidSide = (idx % 2 === 0) !== zReversed ? 'left' : 'right';
+      return { ...s, side };
+    });
   });
 
   const groupedSeries = $derived(
-    buildGroupedSeries<PyramidSeries<TData>, BarSegmentStyle>(resolvedSeries, segments),
+    buildGroupedSeries<InternalSeries, BarSegmentStyle>(resolvedSeries, segments),
   );
 
-  function signedValue(s: PyramidSeries<TData>, d: TData): number {
+  function signedValue(s: InternalSeries, d: TData): number {
     const v = Math.abs(Number(resolveAccessor(s.y)(d)));
     return s.side === 'left' ? -v : v;
   }
