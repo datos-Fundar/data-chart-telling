@@ -26,10 +26,8 @@ const meta = {
     y: 'ageGroup' as keyof PopulationRow,
     x: 'pct' as keyof PopulationRow,
     z: 'sex' as keyof PopulationRow,
-    colorLeft: '#d6336c',
-    colorRight: '#1971c2',
     scales: { y: { domain: AGE_GROUPS } },
-    formatValue: (v: number) => `${v.toFixed(1)}%`,
+    styles: { colors: { left: '#d6336c', right: '#1971c2' }, values: { format: (v: number) => `${v.toFixed(1)}%` } },
   },
   argTypes: {
     width: { control: { type: 'range', min: 320, max: 1000, step: 20 } },
@@ -63,7 +61,7 @@ export const WithValueLabels: Story = {
     subtitle: 'Censo 2022',
     data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
     legend,
-    showValues: true,
+    styles: { values: { show: true } },
   },
 };
 

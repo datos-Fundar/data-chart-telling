@@ -73,8 +73,7 @@ describe('PyramidPlot', () => {
   test('left and right series get different colours', async () => {
     const { container } = await render(PyramidPlot, {
       ...BASE_PROPS,
-      colorLeft: '#ff0000',
-      colorRight: '#0000ff',
+      styles: { colors: { left: '#ff0000', right: '#0000ff' } },
     });
     const svg = await waitForSvg(container);
     const fills = new Set(barRects(svg).map((r) => getComputedStyle(r).fill));
@@ -100,8 +99,7 @@ describe('PyramidPlot', () => {
   test('showValues renders a formatted label next to each bar', async () => {
     const { container } = await render(PyramidPlot, {
       ...BASE_PROPS,
-      showValues: true,
-      formatValue: (v: number) => `${v.toFixed(1)}%`,
+      styles: { values: { show: true, format: (v: number) => `${v.toFixed(1)}%` } },
     });
     const svg = await waitForSvg(container);
     const texts = Array.from(svg.querySelectorAll('text')).map((t) => t.textContent);
@@ -110,7 +108,7 @@ describe('PyramidPlot', () => {
   });
 
   test('showValues defaults to false (no per-bar value labels)', async () => {
-    const withLabels = await render(PyramidPlot, { ...BASE_PROPS, showValues: true });
+    const withLabels = await render(PyramidPlot, { ...BASE_PROPS, styles: { values: { show: true } } });
     const withoutLabels = await render(PyramidPlot, BASE_PROPS);
     const svgWith = await waitForSvg(withLabels.container);
     const svgWithout = await waitForSvg(withoutLabels.container);
@@ -123,13 +121,11 @@ describe('PyramidPlot', () => {
   test('scales.z.reverse swaps which side each group appears on', async () => {
     const normal = await render(PyramidPlot, {
       ...BASE_PROPS,
-      colorLeft: '#ff0000',
-      colorRight: '#0000ff',
+      styles: { colors: { left: '#ff0000', right: '#0000ff' } },
     });
     const reversed = await render(PyramidPlot, {
       ...BASE_PROPS,
-      colorLeft: '#ff0000',
-      colorRight: '#0000ff',
+      styles: { colors: { left: '#ff0000', right: '#0000ff' } },
       scales: { z: { reverse: true } },
     });
     const svgNormal = await waitForSvg(normal.container);

@@ -115,19 +115,31 @@ Plots accept either `series` (pre-built `Series[]`) or the `data` + `x`/`y`/`z` 
 | `data` | `TData[]` | — | ✅ | ✅ | ✅ | ✅ |
 | `x` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
 | `y` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
-| `z` | `Accessor` | | ✅ | ⚠️ | ✅ | ✅ |
+| `z` | `Accessor` | | ✅ | ✅ | ✅ | ✅ |
 | `segments` | `SegmentsMap` | `{}` | ✅ | ❌ | ✅ | ✅ |
 | `markers` | `Marker[]` | `[]` | ✅ | ✅ | ✅ | ✅ |
 | `scales` | `ScalesConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
 | `tooltip` | `TooltipRuntime` | | ✅ | ✅ | ✅ | ✅ |
-| `showValues` | `boolean` | | ❌ | ✅ `true` | ❌ | ✅ `false` |
-| `formatValue` | `(v: number) => string` | `v => String(v)` | ❌ | ✅ | ❌ | ✅ |
-| `colorMin` | `string` | | ❌ | ✅ | ❌ | ❌ |
-| `colorMax` | `string` | | ❌ | ✅ | ❌ | ❌ |
-| `colorLeft` | `string` | | ❌ | ❌ | ❌ | ✅ |
-| `colorRight` | `string` | | ❌ | ❌ | ❌ | ✅ |
+| `styles` | `PlotStyles` | | ✅ | ✅ | ✅ | ✅ |
 
-> ⚠️ `z` in **HeatmapPlot**: encodes the cell colour value (not series grouping). Optional in type but required in practice on the `data` path.
+#### `PlotStyles` sub-properties (plots)
+
+| Sub-prop | Type | BarPlot default | HeatmapPlot default | LinePlot default | PyramidPlot default |
+| -------- | ---- | --------------- | ------------------- | ---------------- | ------------------- |
+| `styles.values.show` | `boolean` | `false` | `true` | `false` (last point) | `false` |
+| `styles.values.format` | `(v: number, seriesName: string) => string` | `v => \`${v}\`` | `v => \`${v}\`` | `(v, name) => \`${name} - ${v}\`` | `v => \`${v}\`` |
+| `styles.values.anchor` | `'outside' \| 'start' \| 'middle' \| 'end'` | `'outside'` | — | `'start'` | `'outside'` |
+| `styles.values.dx` | `number` | | | | |
+| `styles.values.dy` | `number` | | | | |
+| `styles.values.textAnchor` | `'start' \| 'end' \| 'middle'` | | `'middle'` | | |
+| `styles.values.lineAnchor` | `'top' \| 'bottom' \| 'middle'` | | `'middle'` | | |
+| `styles.values.rotate` | `number` | | | | |
+| `styles.values.class` | `string` | | | | |
+| `styles.values.textClass` | `string` | | | | |
+| `styles.colors.min` | `string` | — | cfg `continuous.min` | — | — |
+| `styles.colors.max` | `string` | — | cfg `continuous.max` | — | — |
+| `styles.colors.left` | `string` | — | — | — | palette index 0 |
+| `styles.colors.right` | `string` | — | — | — | palette index 1 |
 
 ---
 
@@ -138,9 +150,9 @@ Plots accept either `series` (pre-built `Series[]`) or the `data` + `x`/`y`/`z` 
 | `width` | `number` | — | ✅ | ✅ | ✅ | ✅ |
 | `height` | `number` | — | ✅ | ✅ | ✅ | ✅ |
 | `data` | `TRow[]` | — | ✅ | ✅ | ✅ | ✅ |
-| `x` | `Accessor` | — | ✅ | ✅ | ✅ | ⚠️ |
-| `y` | `Accessor` | — | ✅ | ✅ | ✅ | ⚠️ |
-| `z` | `Accessor` | | ✅ | ⚠️ | ✅ | ⚠️ |
+| `x` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
+| `y` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
+| `z` | `Accessor` | | ✅ | ✅ | ✅ | ✅ |
 | `title` | `string` | | ✅ | ✅ | ✅ | ✅ |
 | `subtitle` | `string` | | ✅ | ✅ | ✅ | ✅ |
 | `caption` | `string` | | ✅ | ✅ | ✅ | ✅ |
@@ -151,16 +163,9 @@ Plots accept either `series` (pre-built `Series[]`) or the `data` + `x`/`y`/`z` 
 | `facet` | `FacetConfig` | | ✅ | ✅ | ✅ | ✅ |
 | `timeline` | `TimelineConfig` | | ✅ | ✅ | ✅ | ✅ |
 | `tooltip` | `TooltipProp` | | ✅ | ✅ | ✅ | ✅ |
-| `showValues` | `boolean` | | ❌ | ✅ `true` | ❌ | ✅ `false` |
-| `formatValue` | `(v: number) => string` | `v => String(v)` | ❌ | ✅ | ❌ | ✅ |
-| `colorMin` | `string` | | ❌ | ✅ | ❌ | ❌ |
-| `colorMax` | `string` | | ❌ | ✅ | ❌ | ❌ |
-| `colorLeft` | `string` | | ❌ | ❌ | ❌ | ✅ |
-| `colorRight` | `string` | | ❌ | ❌ | ❌ | ✅ |
+| `styles` | `PlotStyles` | | ✅ | ✅ | ✅ | ✅ |
 
-> ⚠️ `x` / `y` in **PyramidChart**: props match the visual axes — `y` is the category bands (shown on the Y axis, e.g. age groups) and `x` is the magnitude (shown on the X axis). Unlike Bar/Line where `x` = category, Pyramid flips this to match what you see.  
-> ⚠️ `z` in **HeatmapChart**: required and typed `Accessor<TRow, number>` — encodes the cell colour value, not series grouping.  
-> ⚠️ `z` in **PyramidChart**: required — groups rows into series (e.g. by sex). Series are sorted alphabetically; the first goes left, the second right. `scales.z.reverse: true` flips the order.
+See the [PlotStyles sub-properties table](#plotstyles-sub-properties-plots) above — charts accept the same `styles` shape and pass it through to their underlying plot.  
 
 ---
 

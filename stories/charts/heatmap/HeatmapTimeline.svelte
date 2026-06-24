@@ -36,7 +36,7 @@
       z={'pct' as keyof HeatCell}
       scales={{ x: { label: 'Ambientes' }, y: { label: 'Personas' } }}
       {legend}
-      formatValue={(v) => `${(v * 100).toFixed(0)}%`}
+      styles={{ values: { format: (v) => `${(v * 100).toFixed(0)}%` } }}
       facet={faceted ? { by: 'scenario' as keyof HeatCell, columns: 2 } : undefined}
       timeline={{ accessor: 'year', progress, orientation: 'vertical' }}
     />

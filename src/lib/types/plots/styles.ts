@@ -1,5 +1,63 @@
 import type { AxisValue, Series } from '$lib/types/plots/common';
 
+/**
+ * Unified positional anchor for value labels across all plot kinds.
+ *
+ * - `'outside'` — beyond the tip of the mark (above a vertical bar, to the
+ *   far end of a horizontal bar or line). This is the only value with no
+ *   direct svelteplot equivalent; the plot computes dx/dy internally.
+ * - `'start'` — at the tip of the mark, just inside (top of a bar, far end
+ *   of a pyramid bar from zero, right of a line's last point).
+ * - `'middle'` — centred on the mark.
+ * - `'end'` — at the baseline/zero end of the mark.
+ */
+export type ValueAnchor = 'outside' | 'start' | 'middle' | 'end';
+
+/**
+ * Controls if and how value labels are rendered on a plot. The high-level
+ * `anchor` sets sensible defaults for placement; the low-level svelteplot
+ * Text-mark fields (`dx`, `dy`, `textAnchor`, `lineAnchor`, `lineHeight`,
+ * `rotate`, `class`, `textClass`) override those defaults when provided.
+ */
+export type ValuesStyle = {
+  show?: boolean;
+  anchor?: ValueAnchor;
+  /** Called with the numeric value and the series name. Return a string to render. */
+  format?: (value: number, seriesName: string) => string;
+  dx?: number;
+  dy?: number;
+  textAnchor?: 'start' | 'end' | 'middle';
+  lineAnchor?: 'top' | 'bottom' | 'middle';
+  lineHeight?: number;
+  rotate?: number;
+  class?: string;
+  textClass?: string;
+};
+
+/**
+ * Color overrides for plots that derive their palette from data.
+ * Each plot uses only the fields relevant to its kind; unused fields are
+ * silently ignored.
+ *
+ * - `min` / `max` — sequential colour ramp endpoints (heatmap).
+ * - `left` / `right` — diverging bar sides (pyramid).
+ */
+export type ColorsStyle = {
+  min?: string;
+  max?: string;
+  left?: string;
+  right?: string;
+};
+
+/**
+ * Top-level rendering style overrides shared by all plot kinds. Passed as the
+ * `styles` prop. Each plot reads only the fields it cares about.
+ */
+export type PlotStyles = {
+  values?: ValuesStyle;
+  colors?: ColorsStyle;
+};
+
 export type SymbolType = 'circle' | 'square' | 'triangle' | 'line';
 export type LineStyle = 'solid' | 'dashed' | 'dotted' | 'dashdot';
 export type LineCap = 'butt' | 'round' | 'square';

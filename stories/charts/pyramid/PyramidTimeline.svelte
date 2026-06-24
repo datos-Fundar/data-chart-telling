@@ -46,10 +46,8 @@
       y={'ageGroup' as keyof PopulationRow}
       x={'pct' as keyof PopulationRow}
       z={'sex' as keyof PopulationRow}
-      colorLeft="#d6336c"
-      colorRight="#1971c2"
       scales={{ y: { domain: AGE_GROUPS } }}
-      formatValue={(v) => `${v.toFixed(1)}%`}
+      styles={{ colors: { left: '#d6336c', right: '#1971c2' }, values: { format: (v) => `${v.toFixed(1)}%` } }}
       {segments}
       {legend}
       timeline={{ accessor: 'year', progress, orientation: 'vertical' }}

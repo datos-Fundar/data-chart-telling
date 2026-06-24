@@ -57,7 +57,7 @@ export const Default: Story = {
     data: HEAT_CELLS.filter((d) => d.scenario === 'Base' && d.year === 2022),
     z: 'pct',
     legend: continuousLegend,
-    formatValue: (v: number) => `${(v * 100).toFixed(0)}%`,
+    styles: { values: { format: (v: number) => `${(v * 100).toFixed(0)}%` } },
   },
 };
 
@@ -79,7 +79,7 @@ export const Faceted: Story = {
     data: HEAT_CELLS.filter((d) => d.year === 2022),
     z: 'pct',
     legend: continuousLegend,
-    formatValue: (v: number) => `${(v * 100).toFixed(0)}%`,
+    styles: { values: { format: (v: number) => `${(v * 100).toFixed(0)}%` } },
     facet: { by: 'scenario' as keyof HeatCell, columns: 2 },
   },
 };

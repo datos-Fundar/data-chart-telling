@@ -6,6 +6,7 @@
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import type { ScalesConfig, AxisValue, SeriesProps, DataProps } from '$lib/types/plots/common';
+  import type { PlotStyles } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
   import type { TooltipRuntime } from '$lib/types/layout/tooltip';
 
@@ -26,21 +27,15 @@
     x,
     y,
     z,
-    colorMin,
-    colorMax,
+    styles = {},
     scales = {},
-    showValues = true,
-    formatValue = (v: number) => `${v}`,
     markers = [],
     tooltip = undefined,
   }: (SeriesProps<TData> | DataProps<TData>) & {
     width: number;
     height: number;
-    colorMin?: string;
-    colorMax?: string;
+    styles?: PlotStyles;
     scales?: ScalesConfig;
-    showValues?: boolean;
-    formatValue?: (v: number) => string;
     markers?: Marker[];
     tooltip?: TooltipRuntime<TData>;
   } = $props();
@@ -57,8 +52,10 @@
   });
 
   const cfg = $derived(getConfiguration());
-  const minColor = $derived(colorMin ?? cfg.continuous.min);
-  const maxColor = $derived(colorMax ?? cfg.continuous.max);
+  const minColor = $derived(styles.colors?.min ?? cfg.continuous.min);
+  const maxColor = $derived(styles.colors?.max ?? cfg.continuous.max);
+  const showVals = $derived(styles.values?.show ?? true);
+  const fmtVal = $derived(styles.values?.format ?? ((v: number) => `${v}`));
 
   const resolvedSeries = $derived(series ?? buildSeries(data!, x!, y!, undefined));
   const flat = $derived(resolvedSeries.flatMap((s) => s.data));
@@ -72,7 +69,7 @@
       x: getX(d) as AxisValue,
       y: getY(d) as AxisValue,
       row: d,
-      label: formatValue(Number(getZ(d))),
+      label: fmtVal(Number(getZ(d)), ''),
     })),
   );
 
@@ -102,7 +99,7 @@
   {getY}
   matchY={getY}
   {hoverPoints}
-  label={(d) => formatValue(Number(getZ(d)))}
+  label={(d) => fmtVal(Number(getZ(d)), '')}
   {tooltip}
   {markers}
   showHoverLabels={false}
@@ -111,23 +108,30 @@
   <AxisY tickSize={0} tickPadding={4} tickFontSize={cfg.axis.fontSize} titleFontSize={cfg.axis.labelFontSize} />
 
   <Cell
-    data={flat}
+    data={flat as unknown as Record<string | symbol, never>[]}
     x={getX}
     y={getY}
-    fill={(d) => colorScale(Number(getZ(d)))}
+    fill={(d) => colorScale(Number(getZ(d as TData)))}
     inset={0.5}
   />
 
-  {#if showValues}
+  {#if showVals}
     <Text
       data={flat}
       x={getX}
       y={getY}
-      text={(d) => formatValue(Number(getZ(d)))}
+      text={(d) => fmtVal(Number(getZ(d)), '')}
       fill={cfg.continuous.labelColor}
       fontSize={12}
       fontWeight={600}
-      textAnchor="middle"
+      textAnchor={styles.values?.textAnchor ?? 'middle'}
+      lineAnchor={styles.values?.lineAnchor ?? 'middle'}
+      dx={styles.values?.dx ?? 0}
+      dy={styles.values?.dy ?? 0}
+      lineHeight={styles.values?.lineHeight}
+      rotate={styles.values?.rotate}
+      class={styles.values?.class}
+      textClass={styles.values?.textClass}
     />
   {/if}
 </PlotLayout>

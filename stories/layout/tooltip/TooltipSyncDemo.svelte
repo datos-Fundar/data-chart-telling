@@ -39,8 +39,7 @@
       y={'people' as keyof HeatCell}
       z={'pct' as keyof HeatCell}
       scales={{ x: { label: 'Ambientes' }, y: { label: 'Personas' } }}
-      showValues={false}
-      formatValue={(v) => `${(v * 100).toFixed(0)}%`}
+      styles={{ values: { show: false, format: (v) => `${(v * 100).toFixed(0)}%` } }}
       facet={{ by: 'scenario' as keyof HeatCell, columns: 2 }}
       tooltip={{ sync }}
       markers={[{ type: 'hover' }]}
@@ -67,12 +66,9 @@
       data={pyramidData}
       y={'ageGroup' as keyof PopulationRow}
       x={'pct' as keyof PopulationRow}
-      side={{ Mujeres: 'left', Varones: 'right' }}
       z={'sex' as keyof PopulationRow}
-      colorLeft="#d6336c"
-      colorRight="#1971c2"
       scales={{ y: { domain: AGE_GROUPS } }}
-      formatValue={(v) => `${v.toFixed(1)}%`}
+      styles={{ colors: { left: '#d6336c', right: '#1971c2' }, values: { format: (v) => `${v.toFixed(1)}%` } }}
       facet={{ by: 'year' as keyof PopulationRow, columns: 2 }}
       tooltip={{ sync }}
       markers={[{ type: 'hover' }]}

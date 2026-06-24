@@ -7,7 +7,7 @@
   import type { TooltipProp } from '$lib/types/layout/tooltip';
   import type { FacetConfig, TimelineConfig } from '$lib/types/charts/common';
   import type { LegendSection } from '$lib/types/charts/legend';
-  import type { BarSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
+  import type { BarSegmentStyle, SegmentsMap, PlotStyles } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
   import type { ScalesConfig, AxisValue, Accessor } from '$lib/types/plots/common';
 
@@ -30,11 +30,8 @@
     x: magnitude,
     y: category,
     z: sides,
-    colorLeft,
-    colorRight,
+    styles = {},
     scales = {},
-    showValues = false,
-    formatValue = (v: number) => `${v}`,
     segments,
     markers = [],
     facet,
@@ -51,11 +48,8 @@
     x: Accessor<TRow, number>;
     y: Accessor<TRow, AxisValue>;
     z: Accessor<TRow, unknown>;
-    colorLeft?: string;
-    colorRight?: string;
+    styles?: PlotStyles;
     scales?: ScalesConfig;
-    showValues?: boolean;
-    formatValue?: (v: number) => string;
     segments?: SegmentsMap<BarSegmentStyle>;
     markers?: Marker[];
     facet?: FacetConfig<TRow>;
@@ -66,6 +60,7 @@
   const getMagnitude = $derived(resolveAccessor<TRow>(magnitude));
   const getCategory = $derived(resolveAccessor<TRow>(category));
   const getSides = $derived(resolveAccessor<TRow>(sides));
+  const fmtVal = $derived(styles.values?.format ?? ((v: number) => `${v}`));
 
   // Computed once over the full dataset (not the per-facet/timeline-filtered
   // rows) so the diverging axis and category bands stay comparable across
@@ -102,7 +97,7 @@
   const hoverEnabled = $derived(tip.enabled || hasHoverMarker(markers));
   const resolvedSync = $derived(resolveHoverSync(tip.enabled ? tip.sync : undefined, markers, 'y'));
   const defaultFormat = $derived(
-    (row: TRow) => `${String(getSides(row))}\n${String(getCategory(row))}: ${formatValue(Number(getMagnitude(row)))}`,
+    (row: TRow) => `${String(getSides(row))}\n${String(getCategory(row))}: ${fmtVal(Number(getMagnitude(row)), String(getSides(row)))}`,
   );
 </script>
 
@@ -126,11 +121,8 @@
       x={magnitude}
       y={category}
       z={sides}
-      {colorLeft}
-      {colorRight}
+      {styles}
       scales={resolvedScales}
-      {showValues}
-      {formatValue}
       {segments}
       {markers}
       tooltip={tip.enabled

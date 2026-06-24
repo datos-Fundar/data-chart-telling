@@ -10,7 +10,7 @@
     TimelineConfig,
   } from '$lib/types/charts/common';
   import type { LegendSection } from '$lib/types/charts/legend';
-  import type { BarSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
+  import type { BarSegmentStyle, SegmentsMap, PlotStyles } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
   import type { AxisValue, Accessor } from '$lib/types/plots/common';
 
@@ -31,6 +31,7 @@
     x,
     y,
     z,
+    styles = {},
     segments,
     markers = [],
     facet,
@@ -47,6 +48,7 @@
     x: Accessor<TRow, AxisValue>;
     y: Accessor<TRow, AxisValue>;
     z?: Accessor<TRow, unknown>;
+    styles?: PlotStyles;
     segments?: SegmentsMap<BarSegmentStyle>;
     markers?: Marker[];
     facet?: FacetConfig<TRow>;
@@ -98,6 +100,7 @@
       {x}
       {y}
       {z}
+      {styles}
       {segments}
       {markers}
       tooltip={tip.enabled

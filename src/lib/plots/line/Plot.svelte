@@ -3,7 +3,7 @@
   generics="TData extends Record<string, unknown>"
 >
   import { SvelteMap } from 'svelte/reactivity';
-  import { Line, Dot, AxisX, AxisY } from 'svelteplot';
+  import { Line, Dot, Text, AxisX, AxisY } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { paletteColor } from '$lib/utils/color';
@@ -12,7 +12,7 @@
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
   import { buildGroupedSeries, validateSegments } from '$lib/plots/utils/segments';
   import type { Series, SeriesProps, DataProps, ScalesConfig } from '$lib/types/plots/common';
-  import type { LineSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
+  import type { LineSegmentStyle, SegmentsMap, PlotStyles, ValueAnchor } from '$lib/types/plots/styles';
   import type { AxisValue } from '$lib/types/plots/common';
   import type { Marker } from '$lib/types/plots/markers';
   import type { TooltipRuntime } from '$lib/types/layout/tooltip';
@@ -25,6 +25,7 @@
     x,
     y,
     z,
+    styles = {},
     segments = {},
     markers = [],
     scales = {},
@@ -32,6 +33,7 @@
   }: (SeriesProps<TData> | DataProps<TData>) & {
     width: number;
     height: number;
+    styles?: PlotStyles;
     segments?: SegmentsMap;
     markers?: Marker[];
     scales?: ScalesConfig;
@@ -51,8 +53,8 @@
   const getSegmentData = (data: TData[], xAccessor: (d: TData) => AxisValue, segmentRanges: { from?: AxisValue; to?: AxisValue }[]) => {
     return segmentRanges.map(range =>
       data.filter(d => {
-        const x = xAccessor(d);
-        const inRange = (!range.from || x >= range.from) && (!range.to || x <= range.to);
+        const xVal = xAccessor(d);
+        const inRange = (!range.from || xVal >= range.from) && (!range.to || xVal <= range.to);
         return inRange;
       })
     );
@@ -70,6 +72,11 @@
   });
 
   const cfg = $derived(getConfiguration());
+  const showVals = $derived(styles.values?.show ?? false);
+  const fmtVal = $derived(
+    styles.values?.format ?? ((v: number, name: string) => `${name} - ${v}`),
+  );
+  const valAnchor = $derived<ValueAnchor>(styles.values?.anchor ?? 'start');
 
   const xAcc = $derived(resolveAccessor(resolvedSeries[0]?.x ?? ((d: TData) => d)));
   const yAcc = $derived(resolveAccessor(resolvedSeries[0]?.y ?? ((d: TData) => d)));
@@ -86,6 +93,13 @@
         series: s.name,
       }));
     }),
+  );
+
+  // Last data point per series, with its palette index for colour.
+  const lastPoints = $derived(
+    resolvedSeries
+      .map((s, idx) => ({ series: s, lastRow: s.data[s.data.length - 1], seriesIndex: idx }))
+      .filter(({ lastRow }) => lastRow !== undefined),
   );
 </script>
 
@@ -110,8 +124,9 @@
     {@const defaultColor = paletteColor(seriesIndex, cfg.palette)}
     {#each group.visualSegments as seg, i (`${group.series.name}-${i}`)}
       {@const strokeStyle = seg.style.stroke}
+      {@const lineData = seg.data as unknown as Record<string | symbol, never>[]}
       <Line
-        data={seg.data}
+        data={lineData}
         x={resolveAccessor(group.series.x)}
         y={resolveAccessor(group.series.y)}
         stroke={strokeStyle?.stroke ?? defaultColor}
@@ -201,5 +216,39 @@
       {/if}
     {/each}
   {/each}
+
+  {#if showVals}
+    {@const defaultDx = valAnchor === 'start' ? 6 : valAnchor === 'end' ? -6 : 0}
+    {@const defaultDy = valAnchor === 'outside' ? -8 : 0}
+    {@const defaultTA = valAnchor === 'start'
+      ? ('start' as const)
+      : valAnchor === 'end'
+      ? ('end' as const)
+      : ('middle' as const)}
+    {@const defaultLA = valAnchor === 'outside'
+      ? ('bottom' as const)
+      : ('middle' as const)}
+    {#each lastPoints as { series: s, lastRow, seriesIndex } (s.name)}
+      {@const xFn = resolveAccessor(s.x)}
+      {@const yFn = resolveAccessor(s.y)}
+      {@const seriesColor = paletteColor(seriesIndex, cfg.palette)}
+      <Text
+        data={[lastRow]}
+        x={xFn}
+        y={yFn}
+        text={() => fmtVal(Number(yFn(lastRow)), s.name)}
+        dx={styles.values?.dx ?? defaultDx}
+        dy={styles.values?.dy ?? defaultDy}
+        textAnchor={styles.values?.textAnchor ?? defaultTA}
+        lineAnchor={styles.values?.lineAnchor ?? defaultLA}
+        lineHeight={styles.values?.lineHeight}
+        rotate={styles.values?.rotate}
+        class={styles.values?.class}
+        textClass={styles.values?.textClass}
+        fill={seriesColor}
+        fontSize={12}
+      />
+    {/each}
+  {/if}
   {/snippet}
 </PlotLayout>

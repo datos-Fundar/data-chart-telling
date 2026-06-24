@@ -3,7 +3,7 @@
   generics="TData extends Record<string, unknown>"
 >
   import { SvelteMap } from 'svelte/reactivity';
-  import { BarY, AxisX, AxisY } from 'svelteplot';
+  import { BarY, Text, AxisX, AxisY } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { paletteColor } from '$lib/utils/color';
@@ -12,7 +12,7 @@
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
   import type { Series, SeriesProps, DataProps, ScalesConfig } from '$lib/types/plots/common';
-  import type { BarSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
+  import type { BarSegmentStyle, SegmentsMap, PlotStyles, ValueAnchor } from '$lib/types/plots/styles';
   import type { AxisValue } from '$lib/types/plots/common';
   import type { Marker } from '$lib/types/plots/markers';
   import type { TooltipRuntime } from '$lib/types/layout/tooltip';
@@ -25,6 +25,7 @@
     x,
     y,
     z,
+    styles = {},
     segments = {},
     markers = [],
     scales = {},
@@ -32,6 +33,7 @@
   }: (SeriesProps<TData> | DataProps<TData>) & {
     width: number;
     height: number;
+    styles?: PlotStyles;
     segments?: SegmentsMap<BarSegmentStyle>;
     markers?: Marker[];
     scales?: ScalesConfig;
@@ -47,6 +49,9 @@
   const groupedSeries = $derived(
     buildGroupedSeries<Series<TData>, BarSegmentStyle>(resolvedSeries, segments),
   );
+  const showVals = $derived(styles.values?.show ?? false);
+  const fmtVal = $derived(styles.values?.format ?? ((v: number) => `${v}`));
+  const valAnchor = $derived<ValueAnchor>(styles.values?.anchor ?? 'outside');
 
   const seriesMarkers = $derived.by(() => {
     const map = new SvelteMap<string, Marker[]>();
@@ -96,15 +101,47 @@
 
   {#each groupedSeries as group, seriesIndex (group.series.name)}
     {@const defaultColor = paletteColor(seriesIndex, cfg.palette)}
+    {@const xFn = resolveAccessor(group.series.x)}
+    {@const yFn = resolveAccessor(group.series.y)}
     {#each group.visualSegments as seg, i (`${group.series.name}-${i}`)}
       <BarY
         data={seg.data}
-        x={resolveAccessor(group.series.x)}
-        y={resolveAccessor(group.series.y)}
+        x={xFn}
+        y={yFn}
         fill={seg.style.fill ?? defaultColor}
         fillOpacity={seg.style.fillOpacity ?? 1}
       />
     {/each}
+
+    {#if showVals}
+      {@const yTextFn = valAnchor === 'middle'
+        ? (d: TData) => Number(yFn(d)) / 2
+        : valAnchor === 'end'
+        ? () => 0
+        : (d: TData) => Number(yFn(d))}
+      {@const defaultDy = valAnchor === 'outside' ? -6 : valAnchor === 'start' ? 4 : valAnchor === 'end' ? -4 : 0}
+      {@const defaultLA = valAnchor === 'outside' || valAnchor === 'end'
+        ? ('bottom' as const)
+        : valAnchor === 'start'
+        ? ('top' as const)
+        : ('middle' as const)}
+      <Text
+        data={group.series.data}
+        x={xFn}
+        y={yTextFn}
+        text={(d: TData) => fmtVal(Number(yFn(d)), group.series.name)}
+        dx={styles.values?.dx ?? 0}
+        dy={styles.values?.dy ?? defaultDy}
+        textAnchor={styles.values?.textAnchor ?? 'middle'}
+        lineAnchor={styles.values?.lineAnchor ?? defaultLA}
+        lineHeight={styles.values?.lineHeight}
+        rotate={styles.values?.rotate}
+        class={styles.values?.class}
+        textClass={styles.values?.textClass}
+        fill={cfg.axis.color}
+        fontSize={12}
+      />
+    {/if}
 
     {#each seriesMarkers.get(group.series.name) ?? [] as marker, i (`series-${group.series.name}-hover-${i}`)}
       {#if marker.type === 'hover'}

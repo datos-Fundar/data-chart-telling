@@ -47,7 +47,7 @@
             {height}
             series={[{ name: '', data, x: 'rooms' as keyof HeatCell, y: 'people' as keyof HeatCell, z: 'pct' as keyof HeatCell }]}
             scales={{ x: { label: 'Ambientes' }, y: { label: 'Personas' } }}
-            formatValue={(v) => `${(v * 100).toFixed(0)}%`}
+            styles={{ values: { format: (v) => `${(v * 100).toFixed(0)}%` } }}
           />
         {/snippet}
       </Chart>

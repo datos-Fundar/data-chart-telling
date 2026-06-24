@@ -9,7 +9,7 @@
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
   import type { Series, SeriesProps, DataProps, ScalesConfig, AxisValue } from '$lib/types/plots/common';
-  import type { BarSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
+  import type { BarSegmentStyle, SegmentsMap, PlotStyles, ValueAnchor } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
   import type { TooltipRuntime } from '$lib/types/layout/tooltip';
 
@@ -37,22 +37,16 @@
     x: magnitude,
     y: category,
     z: sides,
-    colorLeft,
-    colorRight,
+    styles = {},
     scales = {},
-    showValues = false,
-    formatValue = (v: number) => `${v}`,
     segments = {},
     markers = [],
     tooltip = undefined,
   }: (SeriesProps<TData> | DataProps<TData>) & {
     width: number;
     height: number;
-    colorLeft?: string;
-    colorRight?: string;
+    styles?: PlotStyles;
     scales?: ScalesConfig;
-    showValues?: boolean;
-    formatValue?: (v: number) => string;
     segments?: SegmentsMap<BarSegmentStyle>;
     markers?: Marker[];
     tooltip?: TooltipRuntime<TData>;
@@ -63,8 +57,11 @@
   });
 
   const cfg = $derived(getConfiguration());
-  const leftColor = $derived(colorLeft ?? paletteColor(0, cfg.palette));
-  const rightColor = $derived(colorRight ?? paletteColor(1, cfg.palette));
+  const leftColor = $derived(styles.colors?.left ?? paletteColor(0, cfg.palette));
+  const rightColor = $derived(styles.colors?.right ?? paletteColor(1, cfg.palette));
+  const showVals = $derived(styles.values?.show ?? false);
+  const fmtVal = $derived(styles.values?.format ?? ((v: number) => `${v}`));
+  const valAnchor = $derived<ValueAnchor>(styles.values?.anchor ?? 'outside');
 
   // Sort series names alphabetically; even index → left, odd → right.
   // scales.z.reverse flips the assignment so the second name goes left.
@@ -112,7 +109,7 @@
           __side: s.side,
           __x: s.side === 'left' ? -v : v,
           __y: getCategory(d) as AxisValue,
-          __label: formatValue(v),
+          __label: fmtVal(v, s.name),
           __series: s.name,
         } as TaggedRow;
       });
@@ -181,7 +178,7 @@
   {height}
   x={{
     domain: [-maxMagnitude, maxMagnitude],
-    tickFormat: (v: unknown) => formatValue(Math.abs(Number(v))),
+    tickFormat: (v: unknown) => fmtVal(Math.abs(Number(v)), ''),
     ...(scales.x ?? {}),
   }}
   y={{ type: 'band', padding: 0.2, domain: yDomain, ...(scales.y ?? {}) }}
@@ -195,96 +192,116 @@
   {markers}
 >
   {#snippet children({ matchedPoints, ruleX, ruleY })}
-  <AxisX tickSize={cfg.axis.tickSize} tickPadding={cfg.axis.tickPadding} tickFontSize={cfg.axis.fontSize} />
-  <AxisY tickSize={0} tickPadding={cfg.axis.tickPadding} tickFontSize={cfg.axis.fontSize} titleFontSize={cfg.axis.labelFontSize} />
+    <AxisX tickSize={cfg.axis.tickSize} tickPadding={cfg.axis.tickPadding} tickFontSize={cfg.axis.fontSize} />
+    <AxisY tickSize={0} tickPadding={cfg.axis.tickPadding} tickFontSize={cfg.axis.fontSize} titleFontSize={cfg.axis.labelFontSize} />
 
-  {#each groupedSeries as group (group.series.name)}
-    {@const defaultColor = group.series.side === 'left' ? leftColor : rightColor}
-    {@const getCategory = resolveAccessor(group.series.x)}
-    {#each group.visualSegments as seg, i (`${group.series.name}-${i}`)}
-      <BarX
-        data={seg.data}
-        x1={0}
-        x2={(d: TData) => signedValue(group.series, d)}
-        y={getCategory}
-        fill={seg.style.fill ?? defaultColor}
-        fillOpacity={seg.style.fillOpacity ?? 1}
-      />
-    {/each}
+    {#each groupedSeries as group (group.series.name)}
+      {@const defaultColor = group.series.side === 'left' ? leftColor : rightColor}
+      {@const getCategory = resolveAccessor(group.series.x)}
+      {#each group.visualSegments as seg, i (`${group.series.name}-${i}`)}
+        <BarX
+          data={seg.data}
+          x1={0}
+          x2={(d: TData) => signedValue(group.series, d)}
+          y={getCategory}
+          fill={seg.style.fill ?? defaultColor}
+          fillOpacity={seg.style.fillOpacity ?? 1}
+        />
+      {/each}
 
-    {#if showValues}
-      <Text
-        data={group.series.data}
-        x={(d: TData) => signedValue(group.series, d)}
-        y={getCategory}
-        text={(d: TData) => formatValue(Math.abs(Number(resolveAccessor(group.series.y)(d))))}
-        dx={group.series.side === 'left' ? -6 : 6}
-        textAnchor={group.series.side === 'left' ? 'end' : 'start'}
-        fill={cfg.axis.color}
-        fontSize={12}
-      />
-    {/if}
-
-    {#each seriesMarkers.get(group.series.name) ?? [] as marker, i (`series-${group.series.name}-${marker.type}-${i}`)}
-      {#if marker.type === 'component'}
-        {#if marker.strategy === 'segment'}
-          {@const segmentRanges = segments[group.series.name] ?? []}
-          {@const segmentDataArrays = getSegmentData(group.series.data, getCategory, segmentRanges)}
-          {#each segmentDataArrays as segmentData, segIdx (`${group.series.name}-marker-segment-${segIdx}`)}
-            {#if segmentData.length > 0}
-              {@const segmentColor = segmentRanges[segIdx]?.style?.fill ?? defaultColor}
-              <marker.component
-                {...marker.props}
-                series={group.series.name}
-                data={segmentData}
-                seriesColor={segmentColor}
-              />
-            {/if}
-          {/each}
-        {:else}
-          {@const seriesColor = (segments[group.series.name] ?? [])[0]?.style?.fill ?? defaultColor}
-          <marker.component
-            {...marker.props}
-            series={group.series.name}
-            data={group.series.data}
-            seriesColor={seriesColor}
-          />
-        {/if}
-      {:else if marker.type === 'hover'}
-        {@const seriesPoints = matchedPoints.filter((p) => p.series === group.series.name)}
-        {#if marker.strategy === 'segment'}
-          {@const segmentRanges = segments[group.series.name] ?? []}
-          {#each segmentRanges as range, segIdx (`${group.series.name}-hover-segment-${segIdx}`)}
-            {@const segPoints = seriesPoints.filter(
-              (p) => (range.from === undefined || p.x >= range.from) && (range.to === undefined || p.x <= range.to),
-            )}
-            {#if segPoints.length > 0}
-              <HoverMarker
-                data={segPoints}
-                ruleX={marker.ruleX !== false ? ruleX : null}
-                ruleY={marker.ruleY !== false ? ruleY : null}
-                color={marker.color}
-                showLabels={marker.showLabels}
-                ruleStyle={marker.ruleStyle}
-                dotStyle={marker.dotStyle}
-                fontStyle={marker.fontStyle}
-              />
-            {/if}
-          {/each}
-        {:else}
-          <HoverMarker
-            data={seriesPoints}
-            ruleX={marker.ruleX !== false ? ruleX : null}
-            ruleY={marker.ruleY !== false ? ruleY : null}
-            color={marker.color}
-            showLabels={marker.showLabels}
-            ruleStyle={marker.ruleStyle}
-            dotStyle={marker.dotStyle}
-            fontStyle={marker.fontStyle}
-          />
-        {/if}
+      {#if showVals}
+        {@const isLeft = group.series.side === 'left'}
+        {@const xFn = valAnchor === 'middle'
+          ? (d: TData) => signedValue(group.series, d) / 2
+          : valAnchor === 'end'
+          ? () => 0
+          : (d: TData) => signedValue(group.series, d)}
+        {@const defaultDx = valAnchor === 'middle' ? 0
+          : valAnchor === 'end' ? (isLeft ? -4 : 4)
+          : (isLeft ? -6 : 6)}
+        {@const defaultTextAnchor = valAnchor === 'middle'
+          ? ('middle' as const)
+          : isLeft
+          ? ('end' as const)
+          : ('start' as const)}
+        <Text
+          data={group.series.data}
+          x={xFn}
+          y={getCategory}
+          text={(d: TData) => fmtVal(Math.abs(Number(resolveAccessor(group.series.y)(d))), group.series.name)}
+          dx={styles.values?.dx ?? defaultDx}
+          dy={styles.values?.dy ?? 0}
+          textAnchor={styles.values?.textAnchor ?? defaultTextAnchor}
+          lineAnchor={styles.values?.lineAnchor ?? 'middle'}
+          lineHeight={styles.values?.lineHeight}
+          rotate={styles.values?.rotate}
+          class={styles.values?.class}
+          textClass={styles.values?.textClass}
+          fill={cfg.axis.color}
+          fontSize={12}
+        />
       {/if}
+
+      {#each seriesMarkers.get(group.series.name) ?? [] as marker, i (`series-${group.series.name}-${marker.type}-${i}`)}
+        {#if marker.type === 'component'}
+          {#if marker.strategy === 'segment'}
+            {@const segmentRanges = segments[group.series.name] ?? []}
+            {@const segmentDataArrays = getSegmentData(group.series.data, getCategory, segmentRanges)}
+            {#each segmentDataArrays as segmentData, segIdx (`${group.series.name}-marker-segment-${segIdx}`)}
+              {#if segmentData.length > 0}
+                {@const segmentColor = segmentRanges[segIdx]?.style?.fill ?? defaultColor}
+                <marker.component
+                  {...marker.props}
+                  series={group.series.name}
+                  data={segmentData}
+                  seriesColor={segmentColor}
+                />
+              {/if}
+            {/each}
+          {:else}
+            {@const seriesColor = (segments[group.series.name] ?? [])[0]?.style?.fill ?? defaultColor}
+            <marker.component
+              {...marker.props}
+              series={group.series.name}
+              data={group.series.data}
+              seriesColor={seriesColor}
+            />
+          {/if}
+        {:else if marker.type === 'hover'}
+          {@const seriesPoints = matchedPoints.filter((p) => p.series === group.series.name)}
+          {#if marker.strategy === 'segment'}
+            {@const segmentRanges = segments[group.series.name] ?? []}
+            {#each segmentRanges as range, segIdx (`${group.series.name}-hover-segment-${segIdx}`)}
+              {@const segPoints = seriesPoints.filter(
+                (p) => (range.from === undefined || p.x >= range.from) && (range.to === undefined || p.x <= range.to),
+              )}
+              {#if segPoints.length > 0}
+                <HoverMarker
+                  data={segPoints}
+                  ruleX={marker.ruleX !== false ? ruleX : null}
+                  ruleY={marker.ruleY !== false ? ruleY : null}
+                  color={marker.color}
+                  showLabels={marker.showLabels}
+                  ruleStyle={marker.ruleStyle}
+                  dotStyle={marker.dotStyle}
+                  fontStyle={marker.fontStyle}
+                />
+              {/if}
+            {/each}
+          {:else}
+            <HoverMarker
+              data={seriesPoints}
+              ruleX={marker.ruleX !== false ? ruleX : null}
+              ruleY={marker.ruleY !== false ? ruleY : null}
+              color={marker.color}
+              showLabels={marker.showLabels}
+              ruleStyle={marker.ruleStyle}
+              dotStyle={marker.dotStyle}
+              fontStyle={marker.fontStyle}
+            />
+          {/if}
+        {/if}
+      {/each}
     {/each}
-  {/each}
   {/snippet}
 </PlotLayout>

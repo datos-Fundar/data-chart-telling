@@ -23,14 +23,13 @@ const meta = {
     height: 520,
     series: SERIES,
     scales: { y: { label: 'Grupo de edad', domain: AGE_GROUPS } },
-    formatValue: (v: number) => `${v.toFixed(1)}%`,
+    styles: { values: { format: (v: number) => `${v.toFixed(1)}%` } },
   },
   argTypes: {
     width: { control: { type: 'range', min: 320, max: 900, step: 20 } },
     height: { control: { type: 'range', min: 320, max: 800, step: 20 } },
     series: { control: false },
     segments: { control: false },
-    showValues: { control: 'boolean' },
   },
 } satisfies Meta<typeof PyramidPlot>;
 
@@ -43,15 +42,14 @@ export const Default: Story = {};
 /** Custom left/right colours instead of the default palette. */
 export const CustomColors: Story = {
   args: {
-    colorLeft: '#d6336c',
-    colorRight: '#1971c2',
+    styles: { colors: { left: '#d6336c', right: '#1971c2' } },
   },
 };
 
 /** Each bar's magnitude printed beside it. */
 export const WithValueLabels: Story = {
   args: {
-    showValues: true,
+    styles: { values: { show: true } },
   },
 };
 

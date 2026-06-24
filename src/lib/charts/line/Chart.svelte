@@ -10,7 +10,7 @@
     TimelineConfig,
   } from '$lib/types/charts/common';
   import type { LegendSection } from '$lib/types/charts/legend';
-  import type { SegmentsMap } from '$lib/types/plots/styles';
+  import type { SegmentsMap, PlotStyles } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
   import type { ScalesConfig, AxisValue, Accessor } from '$lib/types/plots/common';
 
@@ -31,6 +31,7 @@
     x,
     y,
     z,
+    styles = {},
     segments,
     markers = [],
     scales = {},
@@ -48,6 +49,7 @@
     x: Accessor<TRow, AxisValue>;
     y: Accessor<TRow, AxisValue>;
     z?: Accessor<TRow, unknown>;
+    styles?: PlotStyles;
     segments?: SegmentsMap;
     markers?: Marker[];
     scales?: ScalesConfig;
@@ -102,6 +104,7 @@
       {x}
       {y}
       {z}
+      {styles}
       {segments}
       {markers}
       {scales}

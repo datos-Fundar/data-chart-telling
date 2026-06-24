@@ -21,13 +21,12 @@ const meta = {
     height: 420,
     series: [{ name: 'heat', data: CELLS, x: 'rooms', y: 'people', z: 'pct' }] satisfies Series<Cell>[],
     scales: { x: { label: 'Ambientes' }, y: { label: 'Personas' } },
-    formatValue: (v: number) => `${(v * 100).toFixed(0)}%`,
+    styles: { values: { format: (v: number) => `${(v * 100).toFixed(0)}%` } },
   },
   argTypes: {
     width: { control: { type: 'range', min: 320, max: 900, step: 20 } },
     height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
     series: { control: false },
-    showValues: { control: 'boolean' },
   },
 } satisfies Meta<typeof HeatmapPlot>;
 
@@ -40,8 +39,6 @@ export const Default: Story = {};
 /** Custom colour ramp and no cell labels. */
 export const WarmRampNoLabels: Story = {
   args: {
-    colorMin: 'darkblue',
-    colorMax: 'cornflowerblue',
-    showValues: false,
+    styles: { colors: { min: 'darkblue', max: 'cornflowerblue' }, values: { show: false } },
   },
 };

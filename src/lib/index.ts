@@ -1,15 +1,17 @@
 // ── Plots ───────────────────────────────────────────────────────────────────
 // Low-level graphics: one specific mark family each, drawn into a given box.
-export { default as LinePlot } from './plots/line/Plot.svelte';
 export { default as BarPlot } from './plots/bar/Plot.svelte';
 export { default as HeatmapPlot } from './plots/heatmap/Plot.svelte';
+export { default as LinePlot } from './plots/line/Plot.svelte';
+export { default as PyramidPlot } from './plots/pyramid/Plot.svelte';
 
 // ── Charts ──────────────────────────────────────────────────────────────────
 // High-level, plot-agnostic chrome plus ready-made chart kinds.
 export { default as Chart } from './charts/Chart.svelte';
-export { default as LineChart } from './charts/line/Chart.svelte';
 export { default as BarChart } from './charts/bar/Chart.svelte';
 export { default as HeatmapChart } from './charts/heatmap/Chart.svelte';
+export { default as LineChart } from './charts/line/Chart.svelte';
+export { default as PyramidChart } from './charts/pyramid/Chart.svelte';
 
 // Interchangeable layout primitives (compose your own chart kinds with these).
 export { default as ChartContainer } from './charts/container/ChartContainer.svelte';
@@ -34,7 +36,12 @@ export type { ThemeName } from './configuration/themes';
 
 // ── Utils ─────────────────────────────────────────────────────────────────────
 export { groupBy, buildSeries } from './utils/grouping';
-export { makeColorScale, normalize, resolveCssColor, paletteColor } from './utils/color';
+export {
+  makeColorScale,
+  normalize,
+  resolveCssColor,
+  paletteColor
+} from './utils/color';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export type {
@@ -59,6 +66,10 @@ export type {
   BarSegmentStyle,
   RangeSegment,
   SegmentsMap,
+  ValueAnchor,
+  ValuesStyle,
+  ColorsStyle,
+  PlotStyles,
 } from './types/plots/styles';
 export type { Marker, MarkerProps } from './types/plots/markers';
 export type {

@@ -11,6 +11,7 @@
   import type { LegendSection } from '$lib/types/charts/legend';
   import type { Marker } from '$lib/types/plots/markers';
   import type { ScalesConfig, AxisValue, Accessor } from '$lib/types/plots/common';
+  import type { PlotStyles } from '$lib/types/plots/styles';
 
   /**
    * High-level heatmap. Proves the chart chrome (container/legend/timeline/facet)
@@ -30,11 +31,8 @@
     x,
     y,
     z,
-    colorMin,
-    colorMax,
+    styles = {},
     scales = {},
-    showValues = true,
-    formatValue = (v: number) => `${v}`,
     markers = [],
     facet,
     timeline,
@@ -50,11 +48,8 @@
     x: Accessor<TRow, AxisValue>;
     y: Accessor<TRow, AxisValue>;
     z: Accessor<TRow, number>;
-    colorMin?: string;
-    colorMax?: string;
+    styles?: PlotStyles;
     scales?: ScalesConfig;
-    showValues?: boolean;
-    formatValue?: (v: number) => string;
     markers?: Marker[];
     facet?: FacetConfig<TRow>;
     timeline?: TimelineConfig<TRow>;
@@ -64,6 +59,7 @@
   const getX = $derived(resolveAccessor<TRow>(x));
   const getY = $derived(resolveAccessor<TRow>(y));
   const getZ = $derived(resolveAccessor<TRow>(z));
+  const fmtVal = $derived(styles.values?.format ?? ((v: number) => `${v}`));
 
   // Compute domain over the full dataset so colour is comparable across facets/timeline steps.
   // Caller-provided `scales.z.domain` always takes precedence.
@@ -83,7 +79,7 @@
   const defaultFormat = $derived((row: TRow) => {
     const xl = scales.x?.label || 'x';
     const yl = scales.y?.label || 'y';
-    return `${xl} ${getX(row)} · ${yl} ${getY(row)}\n${formatValue(Number(getZ(row)))}`;
+    return `${xl} ${getX(row)} · ${yl} ${getY(row)}\n${fmtVal(Number(getZ(row)), '')}`;
   });
 </script>
 
@@ -107,11 +103,8 @@
       {x}
       {y}
       {z}
-      {colorMin}
-      {colorMax}
+      {styles}
       scales={mergedScales}
-      {showValues}
-      {formatValue}
       {markers}
       tooltip={tip.enabled
         ? {

@@ -91,7 +91,7 @@
           width: 180,
         },
       ]}
-      formatValue={(v) => `${(v * 100).toFixed(0)}%`}
+      styles={{ values: { format: (v) => `${(v * 100).toFixed(0)}%` } }}
     />
   </div>
 </div>
