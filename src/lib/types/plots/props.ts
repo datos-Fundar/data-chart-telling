@@ -1,7 +1,7 @@
 import type { Marker } from '$lib/types/plots/markers';
 import type { TooltipRuntime } from '$lib/types/layout/tooltip';
 import type { PlotStyles, SegmentsMap } from '$lib/types/plots/styles';
-import type { SeriesProps, DataProps, ScalesConfig } from '$lib/types/plots/common';
+import type { SeriesProps, DataProps, ScalesConfig, MarginConfig } from '$lib/types/plots/common';
 
 /**
  * Common props accepted by every plot component (bar, line, heatmap, pyramid,
@@ -22,5 +22,6 @@ export type PlotProps<
   segments?: SegmentsMap<TSegmentStyle>;
   markers?: Marker[];
   scales?: ScalesConfig;
+  margins?: MarginConfig;
   tooltip?: TooltipRuntime<TData>;
 };

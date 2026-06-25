@@ -30,6 +30,7 @@
     z,
     styles = {},
     scales = {},
+    margins,
     segments,
     markers = [],
     facet,
@@ -83,6 +84,7 @@
       {z}
       {styles}
       {scales}
+      {margins}
       {segments}
       {markers}
       tooltip={tip.enabled

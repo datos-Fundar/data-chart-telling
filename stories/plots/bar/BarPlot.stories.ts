@@ -51,6 +51,9 @@ const meta = {
     series: { control: false },
     segments: { control: false },
   },
+  parameters: {
+    docs: { source: { name: 'BarPlot' } },
+  },
 } satisfies Meta<typeof BarPlot>;
 
 export default meta;

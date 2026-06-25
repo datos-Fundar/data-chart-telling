@@ -17,19 +17,36 @@ export const EMPLOYMENT: YearPoint[] = [
   { year: 2022, value: 75 },
 ];
 
-export const COSTS: YearPoint[] = [
-  { year: 2018, value: 30 },
-  { year: 2019, value: 35 },
-  { year: 2020, value: 28 },
-  { year: 2021, value: 40 },
-  { year: 2022, value: 45 },
+export type LifeExpectancyPoint = {
+  year: number;
+  value: number;
+  sex: 'male' | 'female';
+  region: string
+};
+
+export const LIFE_EXPECTANCY: LifeExpectancyPoint[] = [
+  { year: 2008, value: 74.5, sex: 'male', region: 'Argentina' },
+  { year: 2008, value: 77.9, sex: 'female', region: 'Argentina' },
+  { year: 2009, value: 75.5, sex: 'male', region: 'Argentina' },
+  { year: 2009, value: 79.9, sex: 'female', region: 'Argentina' },
+  { year: 2010, value: 76.4, sex: 'male', region: 'Argentina' },
+  { year: 2010, value: 81.0, sex: 'female', region: 'Argentina' },
+  { year: 2012, value: 77.1, sex: 'male', region: 'Argentina' },
+  { year: 2012, value: 82.4, sex: 'female', region: 'Argentina' },
+  { year: 2014, value: 77.8, sex: 'male', region: 'Argentina' },
+  { year: 2014, value: 83.0, sex: 'female', region: 'Argentina' },
+  { year: 2016, value: 78.3, sex: 'male', region: 'Argentina' },
+  { year: 2016, value: 83.4, sex: 'female', region: 'Argentina' },
+  { year: 2018, value: 78.7, sex: 'male', region: 'Argentina' },
+  { year: 2018, value: 83.7, sex: 'female', region: 'Argentina' },
+  { year: 2020, value: 79.1, sex: 'male', region: 'Argentina' },
+  { year: 2020, value: 84.0, sex: 'female', region: 'Argentina' },
 ];
 
-export const MONTHLY: MonthPoint[] = [
-  { month: '2024-01', value: 25 },
-  { month: '2024-02', value: 30 },
-  { month: '2024-03', value: 35 },
-  { month: '2024-04', value: 28 },
-  { month: '2024-05', value: 42 },
-  { month: '2024-06', value: 38 },
-];
+export const FEMALE_LIFE_EXPECTANCY: YearPoint[] = LIFE_EXPECTANCY
+  .filter((d) => d.sex === 'female')
+  .map((d) => ({ year: d.year, value: d.value }));
+
+export const MALE_LIFE_EXPECTANCY: YearPoint[] = LIFE_EXPECTANCY
+  .filter((d) => d.sex === 'male')
+  .map((d) => ({ year: d.year, value: d.value }));

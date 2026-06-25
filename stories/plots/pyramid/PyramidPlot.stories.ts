@@ -31,6 +31,9 @@ const meta = {
     series: { control: false },
     segments: { control: false },
   },
+  parameters: {
+    docs: { source: { name: 'PyramidPlot' } },
+  },
 } satisfies Meta<typeof PyramidPlot>;
 
 export default meta;

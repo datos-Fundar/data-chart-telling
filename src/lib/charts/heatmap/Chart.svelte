@@ -32,6 +32,7 @@
     styles = {},
     segments = [],
     scales = {},
+    margins,
     markers = [],
     facet,
     timeline,
@@ -88,6 +89,7 @@
       {styles}
       {segments}
       scales={mergedScales}
+      {margins}
       {markers}
       tooltip={tip.enabled
         ? {

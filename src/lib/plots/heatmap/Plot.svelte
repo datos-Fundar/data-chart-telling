@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-  import { Cell, Text, AxisX, AxisY } from 'svelteplot';
+  import { Cell, Text } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { buildSeries } from '$lib/utils/grouping';
   import { makeColorScale } from '$lib/utils/color';
@@ -29,6 +29,7 @@
     styles = {},
     segments = [],
     scales = {},
+    margins,
     markers = [],
     tooltip = undefined,
   }: PlotProps<TData, CellSegmentStyle> = $props();
@@ -135,11 +136,11 @@
   label={(d) => fmtVal(Number(getZ(d)), '')}
   {tooltip}
   {markers}
+  seriesData={resolvedSeries}
+  scales={scales}
+  {margins}
   showHoverLabels={false}
 >
-  <AxisX tickSize={0} tickPadding={4} tickFontSize={cfg.axis.fontSize} titleFontSize={cfg.axis.labelFontSize} />
-  <AxisY tickSize={0} tickPadding={4} tickFontSize={cfg.axis.fontSize} titleFontSize={cfg.axis.labelFontSize} />
-
   <Cell
     data={flat as unknown as Record<string | symbol, never>[]}
     x={getX}

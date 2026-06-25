@@ -10,6 +10,15 @@ function serialize(v: unknown, depth = 0): string {
   const pad = '  '.repeat(depth);
   const inner = '  '.repeat(depth + 1);
 
+  // Functions: short arrow functions show their source; multi-line functions
+  // (e.g. Svelte components) show just the name.
+  if (typeof v === 'function') {
+    const fn = v as Function & { displayName?: string; __name?: string };
+    const src = fn.toString().trim();
+    if (src.includes('\n')) return fn.displayName || fn.__name || fn.name || 'Component';
+    return src;
+  }
+
   if (typeof v === 'string') return `'${v}'`;
   if (typeof v === 'number' || typeof v === 'boolean') return String(v);
 
@@ -54,7 +63,13 @@ const preview: Preview = {
       source: {
         type: 'dynamic',
         transform: (_src: string, ctx: any) => {
-          const name = ctx.title?.split('/').pop() ?? 'Component';
+          const c = ctx.component as any;
+          const name = (
+            ctx.parameters?.docs?.source?.name
+            || c?.displayName || c?.__name || c?.name
+            || ctx.title?.split('/').pop()
+            || 'Component'
+          );
           const lines = Object.entries(ctx.args ?? {}).map(([k, v]) => `  ${k}={${serialize(v, 1)}}`);
           return lines.length ? `<${name}\n${lines.join('\n')}\n/>` : `<${name} />`;
         },
@@ -75,7 +90,32 @@ const preview: Preview = {
       // which shows them all composed together. Unlisted stories fall back
       // to alphabetical order.
       storySort: {
-        order: ['Plots', 'Layout', 'Configuration', 'Charts', 'Orchestration'],
+        order: [
+          'Plots',
+          [
+            'LinePlot',
+            [
+              'Series',
+              'Scales',
+              'Styles',
+              'Segments',
+              'Markers',
+              [
+                'Rules',
+                'Deltas',
+                'Custom',
+              ],
+              'Tooltip',
+            ],
+            'BarPlot',
+            'HeatmapPlot',
+            'PyramidPlot'
+          ],
+          'Layout',
+          'Configuration',
+          'Charts',
+          'Orchestration'
+        ],
       },
     },
   },

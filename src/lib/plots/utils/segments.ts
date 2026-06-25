@@ -109,18 +109,69 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
   const getX = resolveAccessor(series.x);
   const getY = resolveAccessor(series.y);
 
-  return segs.map((seg) => {
-    const areas = seg.areas;
-    const data =
-      !areas || areas.length === 0
-        ? series.data
-        : series.data.filter((d) => {
-            const xVal = getX(d) as AxisValue;
-            const yVal = getY(d) as AxisValue;
-            return areas.some((area) => areaMatchesXY(xVal, yVal, area));
-          });
-    return { data, style: seg.style ?? ({} as TStyle) };
+  type DataPoint = S['data'][number];
+
+  // For each data point, find the first matching segment index (-1 = unmatched).
+  const matchIdx = series.data.map((d) => {
+    const xVal = getX(d) as AxisValue;
+    const yVal = getY(d) as AxisValue;
+    return segs.findIndex((seg) => {
+      const areas = seg.areas;
+      if (!areas || areas.length === 0) return true;
+      return areas.some((area) => areaMatchesXY(xVal, yVal, area));
+    });
   });
+
+  // Group consecutive data points into runs by their matched segment index.
+  // Each run becomes its own visual segment (mark), preventing Observable Plot
+  // from drawing lines across non-contiguous areas of the same Segment.
+  type Run = { data: DataPoint[]; segIdx: number };
+  const runs: Run[] = [];
+  for (let i = 0; i < series.data.length; i++) {
+    const idx = matchIdx[i];
+    const last = runs[runs.length - 1];
+    if (last && last.segIdx === idx) {
+      last.data.push(series.data[i]);
+    } else {
+      runs.push({ data: [series.data[i]], segIdx: idx });
+    }
+  }
+
+  const defaultVisual: VisualSegment<DataPoint, TStyle>[] = [];
+  const connectors: VisualSegment<DataPoint, TStyle>[] = [];
+  const userVisual: VisualSegment<DataPoint, TStyle>[] = [];
+
+  for (let r = 0; r < runs.length; r++) {
+    const run = runs[r];
+    if (run.segIdx === -1) {
+      // Unmatched run: insert bridge points so the line connects to adjacent
+      // user segments without a gap.
+      const bridged: DataPoint[] = [];
+      if (r > 0) bridged.push(runs[r - 1].data[runs[r - 1].data.length - 1]);
+      bridged.push(...run.data);
+      if (r < runs.length - 1) bridged.push(runs[r + 1].data[0]);
+      defaultVisual.push({ data: bridged, style: {} as TStyle });
+    } else {
+      userVisual.push({ data: run.data, style: segs[run.segIdx].style ?? ({} as TStyle) });
+      // When the next run is also a user segment (no unmatched data between them),
+      // insert a line-only connector so the lines join without a gap. Using a
+      // separate mark (rather than appending a bridge point to the current run)
+      // avoids rendering an extra dot at the shared boundary point.
+      const nextRun = runs[r + 1];
+      if (nextRun && nextRun.segIdx !== -1) {
+        connectors.push({
+          data: [run.data[run.data.length - 1], nextRun.data[0]],
+          style: {} as TStyle,
+        });
+      }
+    }
+  }
+
+  if (defaultVisual.length === 0 && connectors.length === 0) return userVisual;
+
+  // Defaults and connectors render first so user segments paint on top at
+  // their endpoints, ensuring the correct dot style at boundary points.
+  return [...defaultVisual, ...connectors, ...userVisual];
 }
 
 /**

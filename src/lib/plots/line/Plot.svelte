@@ -3,7 +3,7 @@
   generics="TData extends Record<string, unknown>"
 >
   import { SvelteMap } from 'svelte/reactivity';
-  import { Line, Dot, Text, AxisX, AxisY } from 'svelteplot';
+  import { Line, Dot, Text } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { paletteColor } from '$lib/utils/color';
@@ -28,6 +28,7 @@
     segments = {},
     markers = [],
     scales = {},
+    margins,
     tooltip = undefined,
   }: PlotProps<TData, LineSegmentStyle> = $props();
 
@@ -94,11 +95,11 @@
   label={(r) => String(yAcc(r))}
   {tooltip}
   {markers}
+  seriesData={resolvedSeries}
+  {scales}
+  {margins}
 >
   {#snippet children({ matchedPoints, ruleX, ruleY })}
-  <AxisX tickSize={cfg.axis.tickSize} tickPadding={cfg.axis.tickPadding} tickFontSize={cfg.axis.fontSize} />
-  <AxisY tickSize={0} tickPadding={cfg.axis.tickPadding} tickFontSize={cfg.axis.fontSize} />
-
   {#each groupedSeries as group, seriesIndex (group.series.name)}
     {@const defaultColor = paletteColor(seriesIndex, cfg.palette)}
     {#each group.visualSegments as seg, i (`${group.series.name}-${i}`)}

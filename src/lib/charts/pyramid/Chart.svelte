@@ -33,6 +33,7 @@
     z: sides,
     styles = {},
     scales = {},
+    margins,
     segments,
     markers = [],
     facet,
@@ -106,6 +107,7 @@
       z={sides}
       {styles}
       scales={resolvedScales}
+      {margins}
       {segments}
       {markers}
       tooltip={tip.enabled

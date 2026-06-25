@@ -1,6 +1,6 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
   import { SvelteMap } from 'svelte/reactivity';
-  import { BarX, Text, AxisX, AxisY } from 'svelteplot';
+  import { BarX, Text } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { paletteColor } from '$lib/utils/color';
@@ -39,6 +39,7 @@
     z: sides,
     styles = {},
     scales = {},
+    margins,
     segments = {},
     markers = [],
     tooltip = undefined,
@@ -166,11 +167,11 @@
   label={labelFor}
   {tooltip}
   {markers}
+  seriesData={resolvedSeries}
+  {scales}
+  {margins}
 >
   {#snippet children({ matchedPoints, ruleX, ruleY })}
-    <AxisX tickSize={cfg.axis.tickSize} tickPadding={cfg.axis.tickPadding} tickFontSize={cfg.axis.fontSize} />
-    <AxisY tickSize={0} tickPadding={cfg.axis.tickPadding} tickFontSize={cfg.axis.fontSize} titleFontSize={cfg.axis.labelFontSize} />
-
     {#each groupedSeries as group (group.series.name)}
       {@const defaultColor = group.series.side === 'left' ? leftColor : rightColor}
       {@const getCategory = resolveAccessor(group.series.x)}

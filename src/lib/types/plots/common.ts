@@ -1,5 +1,8 @@
 export type AxisValue = number | string | Date;
 
+/** Partial margin override — only the sides you specify are overridden; the rest come from the theme. */
+export type MarginConfig = Partial<{ top: number; right: number; bottom: number; left: number }>;
+
 /**
  * Author-facing scale overrides for a plot axis. Mirrors svelteplot's
  * `ScaleOptions` + `XScaleOptions` in full — `type`, `padding`, `domain`,
@@ -31,6 +34,9 @@ export type AxisScale = {
   insetBottom?: number;
   ticks?: (number | string | boolean | Date | null)[];
   tickSpacing?: number;
+  tickSize?: number;
+  tickPadding?: number;
+  titleFontSize?: number;
   base?: number;
   constant?: number;
   sort?: ((a: unknown, b: unknown) => number) | { channel: string; order: 'ascending' | 'descending' };

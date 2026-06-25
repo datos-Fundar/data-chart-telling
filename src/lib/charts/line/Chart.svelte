@@ -32,6 +32,7 @@
     segments,
     markers = [],
     scales = {},
+    margins,
     facet,
     timeline,
     tooltip,
@@ -87,6 +88,7 @@
       {segments}
       {markers}
       {scales}
+      {margins}
       tooltip={tip.enabled
         ? {
             format: tip.format ?? defaultFormat,

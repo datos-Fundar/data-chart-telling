@@ -1,4 +1,4 @@
-import type { Accessor, AxisValue, ScalesConfig } from '$lib/types/plots/common';
+import type { Accessor, AxisValue, ScalesConfig, MarginConfig } from '$lib/types/plots/common';
 import type { PlotStyles, SegmentsMap } from '$lib/types/plots/styles';
 import type { Marker } from '$lib/types/plots/markers';
 import type { TooltipProp } from '$lib/types/layout/tooltip';
@@ -32,6 +32,7 @@ export type ChartProps<
   segments?: SegmentsMap<TSegmentStyle>;
   markers?: Marker[];
   scales?: ScalesConfig;
+  margins?: MarginConfig;
   facet?: FacetConfig<TRow>;
   timeline?: TimelineConfig<TRow>;
   tooltip?: TooltipProp<TRow>;

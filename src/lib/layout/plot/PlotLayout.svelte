@@ -1,13 +1,13 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
   import type { ComponentProps, Snippet } from 'svelte';
-  import { Plot, Pointer, RuleX, RuleY } from 'svelteplot';
+  import { Plot, Pointer, RuleX, RuleY, AxisX, AxisY } from 'svelteplot';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { getHover, createHover } from '$lib/layout/tooltip/hover.svelte';
   import { createHoverController } from '$lib/layout/tooltip/controller.svelte';
   import { hasHoverMarker, findHoverMarker } from '$lib/layout/tooltip/utils';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
   import Tooltip from '$lib/layout/tooltip/Tooltip.svelte';
-  import type { AxisValue } from '$lib/types/plots/common';
+  import type { AxisValue, Series, ScalesConfig, MarginConfig } from '$lib/types/plots/common';
   import type { Marker } from '$lib/types/plots/markers';
   import type { HoverDisplayPoint, HoverPoint, TooltipRuntime } from '$lib/types/layout/tooltip';
 
@@ -17,8 +17,8 @@
    * Shared chrome around every plot kind's svelteplot markup: the pointer-event
    * wrapper, the hover/tooltip state machine, the `<Plot>` element itself plus
    * standalone markers (`ruleX`/`ruleY`/un-scoped `component`) and the floating
-   * tooltip. A plot kind only supplies its data/accessors and its marks (axes,
-   * `<Line>`/`<BarY>`/`<Cell>`, …) through `children`.
+   * tooltip. A plot kind only supplies its data/accessors and its marks
+   * (`<Line>`/`<BarY>`/`<Cell>`, …) through `children`.
    */
   let {
     width,
@@ -33,7 +33,10 @@
     label,
     tooltip = undefined,
     markers = [],
+    seriesData = [],
     showHoverLabels = true,
+    scales,
+    margins,
     children,
   }: {
     width: number;
@@ -50,6 +53,12 @@
     label: (row: TData) => string;
     tooltip?: TooltipRuntime<TData>;
     markers?: Marker[];
+    /** All resolved series, forwarded to unscoped component markers (e.g. DeltaMarker). */
+    seriesData?: Series<TData>[];
+    /** Scale config forwarded from the plot — axis visual fields (tickSize, tickPadding, titleFontSize) are read here; the rest flows to `<Plot>` via `x`/`y`. */
+    scales?: ScalesConfig;
+    /** Partial margin override — merged on top of the theme before tickRotate adjustment. */
+    margins?: MarginConfig;
     showHoverLabels?: boolean;
     /**
      * `matchedPoints` carries only display info (+ `series`), not `row` — a
@@ -63,6 +72,21 @@
   } = $props();
 
   const cfg = $derived(getConfiguration());
+
+  // When x ticks are rotated the labels spill below and to the right of the
+  // SVG viewBox, which clips them. Add proportional extra margin so the
+  // rotated text stays within bounds. 80 and 40 are conservative estimates of
+  // a typical tick-label length in px; override cfg.margins to tighten/loosen.
+  const computedMargins = $derived.by(() => {
+    const base = { ...cfg.margins, ...margins };
+    const xRotate = scales?.x?.tickRotate;
+    if (!xRotate) return base;
+    const rad = Math.abs(xRotate) * Math.PI / 180;
+    return {
+      ...base,
+      bottom: base.bottom + Math.ceil(Math.sin(rad) * 20),
+    };
+  });
 
   // ── Hover / tooltip ───────────────────────────────────────────────────────
   // A hover marker activates pointer tracking just like a tooltip does — the
@@ -120,7 +144,9 @@
   onpointermove={hoverActive ? ctrl.onMove : undefined}
   onpointerleave={hoverActive ? ctrl.onLeave : undefined}
 >
-  <Plot {width} {height} margin={cfg.margins} {x} {y}>
+  <Plot {width} {height} margin={computedMargins} {x} {y}>
+    <AxisX tickSize={scales?.x?.tickSize ?? cfg.axis.xTickSize} tickPadding={scales?.x?.tickPadding ?? cfg.axis.xTickPadding} tickFontSize={cfg.axis.fontSize} titleFontSize={scales?.x?.titleFontSize ?? cfg.axis.titleFontSize} />
+    <AxisY tickSize={scales?.y?.tickSize ?? cfg.axis.yTickSize} tickPadding={scales?.y?.tickPadding ?? cfg.axis.yTickPadding} tickFontSize={cfg.axis.fontSize} titleFontSize={scales?.y?.titleFontSize ?? cfg.axis.titleFontSize} />
     {@render children({ matchedPoints: ctrl.points, ruleX: ctrl.ruleX, ruleY: ctrl.ruleY })}
 
     {#each topLevelMarkers as marker, i (marker.type === 'ruleX' ? `${marker.type}-${marker.x}` : marker.type === 'ruleY' ? `${marker.type}-${marker.y}` : `${marker.type}-${i}`)}
@@ -143,7 +169,7 @@
           strokeDasharray={marker.style?.strokeDasharray}
         />
       {:else if marker.type === 'component'}
-        <marker.component {...marker.props} data={marker.data} />
+        <marker.component {...marker.props} data={marker.data ?? seriesData} />
       {/if}
     {/each}
 

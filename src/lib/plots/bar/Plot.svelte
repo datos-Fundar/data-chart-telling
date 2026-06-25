@@ -5,7 +5,7 @@
   import { SvelteMap } from 'svelte/reactivity';
   import { paletteColor } from '$lib/utils/color';
   import { buildSeries } from '$lib/utils/grouping';
-  import { BarY, Text, AxisX, AxisY } from 'svelteplot';
+  import { BarY, Text } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { buildGroupedSeries, validateSegments, resolveSegmentsForSeries, matchesSegmentX } from '$lib/plots/utils/segments';
@@ -33,6 +33,7 @@
     segments = {},
     markers = [],
     scales = {},
+    margins,
     tooltip = undefined,
   }: PlotProps<TData, BarSegmentStyle> = $props();
 
@@ -88,11 +89,11 @@
   label={(r) => String(yAcc(r))}
   {tooltip}
   {markers}
+  seriesData={resolvedSeries}
+  {scales}
+  {margins}
 >
   {#snippet children({ matchedPoints, ruleX, ruleY })}
-  <AxisX tickSize={cfg.axis.tickSize} tickPadding={cfg.axis.tickPadding} tickFontSize={cfg.axis.fontSize} />
-  <AxisY tickSize={0} tickPadding={cfg.axis.tickPadding} tickFontSize={cfg.axis.fontSize} />
-
   {#each groupedSeries as group, seriesIndex (group.series.name)}
     {@const defaultColor = paletteColor(seriesIndex, cfg.palette)}
     {@const xFn = resolveAccessor(group.series.x)}

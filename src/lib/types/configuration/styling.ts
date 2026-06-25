@@ -51,8 +51,11 @@ export type ChartConfig = {
     color: string;
     fontSize: number;
     labelFontSize: number;
-    tickSize: number;
-    tickPadding: number;
+    titleFontSize: number;
+    xTickSize: number;
+    yTickSize: number;
+    xTickPadding: number;
+    yTickPadding: number;
     grid: boolean;
   };
 

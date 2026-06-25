@@ -28,6 +28,9 @@ const meta = {
     height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
     series: { control: false },
   },
+  parameters: {
+    docs: { source: { name: 'HeatmapPlot' } },
+  },
 } satisfies Meta<typeof HeatmapPlot>;
 
 export default meta;
