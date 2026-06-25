@@ -115,8 +115,8 @@ Plots accept either `series` (pre-built `Series[]`) or the `data` + `x`/`y`/`z` 
 | `data` | `TData[]` | — | ✅ | ✅ | ✅ | ✅ |
 | `x` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
 | `y` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
-| `z` | `Accessor` | | ✅ | ✅ | ✅ | ✅ |
-| `segments` | `SegmentsMap` | `{}` | ✅ | ❌ | ✅ | ✅ |
+| `z` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
+| `segments` | `SegmentsMap<TStyle>` | `{}` / `[]` | ✅ | ✅ | ✅ | ✅ |
 | `markers` | `Marker[]` | `[]` | ✅ | ✅ | ✅ | ✅ |
 | `scales` | `ScalesConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
 | `tooltip` | `TooltipRuntime` | | ✅ | ✅ | ✅ | ✅ |
@@ -152,12 +152,12 @@ Plots accept either `series` (pre-built `Series[]`) or the `data` + `x`/`y`/`z` 
 | `data` | `TRow[]` | — | ✅ | ✅ | ✅ | ✅ |
 | `x` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
 | `y` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
-| `z` | `Accessor` | | ✅ | ✅ | ✅ | ✅ |
+| `z` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
 | `title` | `string` | | ✅ | ✅ | ✅ | ✅ |
 | `subtitle` | `string` | | ✅ | ✅ | ✅ | ✅ |
 | `caption` | `string` | | ✅ | ✅ | ✅ | ✅ |
 | `legend` | `LegendSection[]` | | ✅ | ✅ | ✅ | ✅ |
-| `segments` | `SegmentsMap` | `{}` | ✅ | ❌ | ✅ | ✅ |
+| `segments` | `SegmentsMap<TStyle>` | `{}` / `[]` | ✅ | ✅ | ✅ | ✅ |
 | `markers` | `Marker[]` | `[]` | ✅ | ✅ | ✅ | ✅ |
 | `scales` | `ScalesConfig` | `{}` | ❌ | ✅ | ✅ | ✅ |
 | `facet` | `FacetConfig` | | ✅ | ✅ | ✅ | ✅ |
@@ -171,7 +171,41 @@ See the [PlotStyles sub-properties table](#plotstyles-sub-properties-plots) abov
 
 ### Segments
 
-Series data is separated from visual styling via the optional `segments` prop — a record keyed by series name (supported by `BarChart`, `LineChart`, `PyramidChart` and their corresponding plots):
+The `segments` prop separates data ranges from visual styling. Every plot kind shares the same underlying types; the style shape (`TStyle`) differs per mark.
+
+| Plot | `segments` type |
+| ---- | --------------- |
+| `LinePlot` / `LineChart` | `SegmentsMap<LineSegmentStyle>` |
+| `BarPlot` / `BarChart` | `SegmentsMap<BarSegmentStyle>` |
+| `PyramidPlot` / `PyramidChart` | `SegmentsMap<BarSegmentStyle>` |
+| `HeatmapPlot` / `HeatmapChart` | `SegmentsMap<CellSegmentStyle>` (array form only) |
+
+#### Core types
+
+```ts
+type Range   = { from?: AxisValue; to?: AxisValue };   // half-open on either side
+type Area    = { x?: Range; y?: Range };               // 2-D rectangular region
+type Segment<TStyle> = { areas?: Area[]; style?: TStyle };
+```
+
+A **`Segment`** matches a data point (or heatmap cell) when the point falls inside **any** of its `areas`. Omitting `areas` (or providing an empty array) makes the segment match **all** data — useful as a baseline style. Segments are rendered in order; later ones appear on top.
+
+An **`Area`** restricts by x, y, or both. Both bounds of a `Range` are **inclusive**. Omitting `x` or `y` leaves that axis unrestricted.
+
+#### `SegmentsMap` forms
+
+```ts
+// Array form — same segments apply to every series (required for heatmaps)
+type SegmentsMap<TStyle> = Segment<TStyle>[];
+
+// Record form — segments keyed by series name (line / bar / pyramid)
+type SegmentsMap<TStyle> = SeriesAwareSegmentsMap<TStyle>;
+                         = Record<string, Segment<TStyle>[]>;
+```
+
+#### Examples
+
+**Line chart — colour a period and leave the rest as the palette default:**
 
 ```svelte
 <LinePlot
@@ -179,14 +213,29 @@ Series data is separated from visual styling via the optional `segments` prop �
   series={[{ name: 'gdp', x: 'year', y: 'value', data: GDP }]}
   segments={{
     gdp: [
-      { to:   2020, style: { stroke: '#4f46e5', strokeWidth: 3 } },
-      { from: 2020, style: { stroke: '#4f46e5', strokeDasharray: '6 4' } },
+      { style: { stroke: { stroke: '#94a3b8', strokeWidth: 1 } } },
+      { areas: [{ x: { from: 2008, to: 2010 } }],
+        style: { stroke: { stroke: '#ef4444', strokeWidth: 3 } } },
     ],
   }}
 />
 ```
 
-Omitting `segments` renders the whole series in the configured `palette` colour for that series' index (see `setConfiguration`).
+**Heatmap — highlight specific columns, rows, and individual cells:**
+
+```svelte
+<HeatmapChart
+  {width} {height} {data} {x} {y} {z}
+  segments={[
+    { areas: [{ x: { from: 'Q1', to: 'Q1' } }, { x: { from: 'Q3', to: 'Q3' } }],
+      style: { stroke: '#f59e0b', strokeWidth: 2 } },
+    { areas: [{ x: { from: 'Q2', to: 'Q2' }, y: { from: 1, to: 2 } }],
+      style: { fill: '#ef4444', fillOpacity: 0.8 } },
+  ]}
+/>
+```
+
+Omitting `segments` renders every mark in its default palette colour.
 
 ---
 

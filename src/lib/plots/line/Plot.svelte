@@ -10,7 +10,7 @@
   import { buildSeries } from '$lib/utils/grouping';
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
-  import { buildGroupedSeries, validateSegments } from '$lib/plots/utils/segments';
+  import { buildGroupedSeries, validateSegments, resolveSegmentsForSeries, matchesSegmentX, getDataForSegments } from '$lib/plots/utils/segments';
   import type { Series, SeriesProps, DataProps, ScalesConfig } from '$lib/types/plots/common';
   import type { LineSegmentStyle, SegmentsMap, PlotStyles, ValueAnchor } from '$lib/types/plots/styles';
   import type { AxisValue } from '$lib/types/plots/common';
@@ -34,7 +34,7 @@
     width: number;
     height: number;
     styles?: PlotStyles;
-    segments?: SegmentsMap;
+    segments?: SegmentsMap<LineSegmentStyle>;
     markers?: Marker[];
     scales?: ScalesConfig;
     tooltip?: TooltipRuntime<TData>;
@@ -42,23 +42,11 @@
 
   const resolvedSeries = $derived(series ?? buildSeries(data!, x!, y!, z));
 
-  $effect(() => {
-    if (Object.keys(segments).length > 0) validateSegments(segments);
-  });
+  $effect(() => { validateSegments(segments); });
 
   const groupedSeries = $derived(
     buildGroupedSeries<Series<TData>, LineSegmentStyle>(resolvedSeries, segments),
   );
-
-  const getSegmentData = (data: TData[], xAccessor: (d: TData) => AxisValue, segmentRanges: { from?: AxisValue; to?: AxisValue }[]) => {
-    return segmentRanges.map(range =>
-      data.filter(d => {
-        const xVal = xAccessor(d);
-        const inRange = (!range.from || xVal >= range.from) && (!range.to || xVal <= range.to);
-        return inRange;
-      })
-    );
-  };
 
   const seriesMarkers = $derived.by(() => {
     const map = new SvelteMap<string, Marker[]>();
@@ -157,12 +145,12 @@
     {#each seriesMarkers.get(group.series.name) ?? [] as marker, i (`series-${group.series.name}-${marker.type}-${i}`)}
       {#if marker.type === 'component'}
         {#if marker.strategy === 'segment'}
-          {@const segmentRanges = segments[group.series.name] ?? []}
+          {@const segs = resolveSegmentsForSeries(segments, group.series.name)}
           {@const xAccessor = resolveAccessor(group.series.x)}
-          {@const segmentDataArrays = getSegmentData(group.series.data, xAccessor, segmentRanges)}
+          {@const segmentDataArrays = getDataForSegments(group.series.data, xAccessor, segs)}
           {#each segmentDataArrays as segmentData, segIdx (`${group.series.name}-marker-segment-${segIdx}`)}
             {#if segmentData.length > 0}
-              {@const segmentColor = segmentRanges[segIdx]?.style?.stroke?.stroke ?? defaultColor}
+              {@const segmentColor = segs[segIdx]?.style?.stroke?.stroke ?? defaultColor}
               <marker.component
                 {...marker.props}
                 series={group.series.name}
@@ -172,7 +160,8 @@
             {/if}
           {/each}
         {:else}
-          {@const seriesColor = (segments[group.series.name] ?? [])[0]?.style?.stroke?.stroke ?? defaultColor}
+          {@const segs = resolveSegmentsForSeries(segments, group.series.name)}
+          {@const seriesColor = segs[0]?.style?.stroke?.stroke ?? defaultColor}
           <marker.component
             {...marker.props}
             series={group.series.name}
@@ -183,11 +172,9 @@
       {:else if marker.type === 'hover'}
         {@const seriesPoints = matchedPoints.filter((p) => p.series === group.series.name)}
         {#if marker.strategy === 'segment'}
-          {@const segmentRanges = segments[group.series.name] ?? []}
-          {#each segmentRanges as range, segIdx (`${group.series.name}-hover-segment-${segIdx}`)}
-            {@const segPoints = seriesPoints.filter(
-              (p) => (range.from === undefined || p.x >= range.from) && (range.to === undefined || p.x <= range.to),
-            )}
+          {@const segs = resolveSegmentsForSeries(segments, group.series.name)}
+          {#each segs as seg, segIdx (`${group.series.name}-hover-segment-${segIdx}`)}
+            {@const segPoints = seriesPoints.filter((p) => matchesSegmentX(p.x, seg))}
             {#if segPoints.length > 0}
               <HoverMarker
                 data={segPoints}

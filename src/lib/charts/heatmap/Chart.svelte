@@ -11,7 +11,7 @@
   import type { LegendSection } from '$lib/types/charts/legend';
   import type { Marker } from '$lib/types/plots/markers';
   import type { ScalesConfig, AxisValue, Accessor } from '$lib/types/plots/common';
-  import type { PlotStyles } from '$lib/types/plots/styles';
+  import type { PlotStyles, CellSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
 
   /**
    * High-level heatmap. Proves the chart chrome (container/legend/timeline/facet)
@@ -32,6 +32,7 @@
     y,
     z,
     styles = {},
+    segments = [],
     scales = {},
     markers = [],
     facet,
@@ -49,6 +50,7 @@
     y: Accessor<TRow, AxisValue>;
     z: Accessor<TRow, number>;
     styles?: PlotStyles;
+    segments?: SegmentsMap<CellSegmentStyle>;
     scales?: ScalesConfig;
     markers?: Marker[];
     facet?: FacetConfig<TRow>;
@@ -104,6 +106,7 @@
       {y}
       {z}
       {styles}
+      {segments}
       scales={mergedScales}
       {markers}
       tooltip={tip.enabled

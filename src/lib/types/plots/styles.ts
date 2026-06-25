@@ -118,19 +118,62 @@ export type BarSegmentStyle = {
   fillOpacity?: number;
 };
 
-/**
- * A styled interval on the x axis, keyed by series name in a {@link SegmentsMap}.
- * Works for any mark — `TStyle` is the per-mark style shape (e.g.
- * {@link LineSegmentStyle} or {@link BarSegmentStyle}).
- */
-export type RangeSegment<TStyle> = {
+/** Per-cell styling override for a heatmap cell. */
+export type CellSegmentStyle = {
+  fill?: string;
+  fillOpacity?: number;
+  stroke?: string;
+  strokeWidth?: number;
+};
+
+/** A half-open interval on one axis. Both bounds are inclusive; omit either to leave that end open. */
+export type Range = {
   from?: AxisValue;
   to?: AxisValue;
+};
+
+/**
+ * A 2-D rectangular area on the plot, addressed by optional x and y intervals.
+ * Omitting an interval leaves that axis unrestricted (matches all values).
+ *
+ * - For line/bar/pyramid plots only the `x` interval is used (the series' primary
+ *   axis); `y` is evaluated but filters by the series' value axis.
+ * - For heatmaps both `x` (column) and `y` (row) are used to address cells.
+ */
+export type Area = {
+  x?: Range;
+  y?: Range;
+};
+
+/**
+ * One styled rule for a plot. A data point (or cell) is styled when it falls
+ * inside **any** of the listed `areas`. Omitting `areas` (or passing an empty
+ * array) makes the segment match **all** data — useful as a baseline style.
+ * `TStyle` is the per-mark shape ({@link LineSegmentStyle}, {@link BarSegmentStyle},
+ * {@link CellSegmentStyle}, …).
+ *
+ * Segments are applied in order; later ones are rendered on top of earlier ones.
+ */
+export type Segment<TStyle> = {
+  areas?: Area[];
   style?: TStyle;
 };
 
-/** Per-series list of styled x-axis intervals. */
-export type SegmentsMap<TStyle = LineSegmentStyle> = Record<string, RangeSegment<TStyle>[]>;
+/** Per-series list of {@link Segment}s, keyed by series name. */
+export type SeriesAwareSegmentsMap<TStyle> = Record<string, Segment<TStyle>[]>;
+
+/**
+ * Unified segments prop accepted by every plot kind.
+ *
+ * - **Array form** (`Segment<TStyle>[]`): segments are applied to **all** series
+ *   (or to the implicit single dataset of a heatmap). Only form supported by
+ *   `HeatmapPlot` / `HeatmapChart`.
+ * - **Record form** (`SeriesAwareSegmentsMap<TStyle>`): each key is a series
+ *   name; segments apply only to that series. Supported by line, bar, and
+ *   pyramid plots; when an array is passed to those plots the same segments
+ *   apply to every series.
+ */
+export type SegmentsMap<TStyle> = Segment<TStyle>[] | SeriesAwareSegmentsMap<TStyle>;
 
 /** One contiguous, styled slice of a series' data — ready to draw as its own mark. */
 export type VisualSegment<T extends Record<string, unknown>, TStyle = LineSegmentStyle> = {

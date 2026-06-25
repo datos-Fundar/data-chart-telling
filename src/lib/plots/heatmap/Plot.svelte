@@ -6,7 +6,7 @@
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import type { ScalesConfig, AxisValue, SeriesProps, DataProps } from '$lib/types/plots/common';
-  import type { PlotStyles } from '$lib/types/plots/styles';
+  import type { PlotStyles, CellSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
   import type { TooltipRuntime } from '$lib/types/layout/tooltip';
 
@@ -28,6 +28,7 @@
     y,
     z,
     styles = {},
+    segments = [],
     scales = {},
     markers = [],
     tooltip = undefined,
@@ -35,6 +36,7 @@
     width: number;
     height: number;
     styles?: PlotStyles;
+    segments?: SegmentsMap<CellSegmentStyle>;
     scales?: ScalesConfig;
     markers?: Marker[];
     tooltip?: TooltipRuntime<TData>;
@@ -47,6 +49,11 @@
     if (scoped.length > 0) {
       console.warn(
         'HeatmapPlot: markers scoped to a `series` are ignored — heatmaps have no series concept.',
+      );
+    }
+    if (!Array.isArray(segments) && Object.keys(segments).length > 0) {
+      console.warn(
+        'HeatmapPlot: `segments` was passed as a record (SeriesAwareSegmentsMap) but heatmaps have no named series — use the array form (Segment[]) instead.',
       );
     }
   });
@@ -87,6 +94,41 @@
   const colorScale = $derived(
     makeColorScale(valueDomain[0], valueDomain[1], minColor, maxColor),
   );
+
+  const segList = $derived(Array.isArray(segments) ? segments : []);
+
+  const segStyleMap = $derived.by(() => {
+    const map = new Map<string, CellSegmentStyle>();
+    if (!segList.length) return map;
+    for (const d of flat) {
+      const cx = getX(d) as AxisValue;
+      const cy = getY(d) as AxisValue;
+      const key = `${String(cx)}::${String(cy)}`;
+      if (!map.has(key)) {
+        let style: CellSegmentStyle = {};
+        for (const seg of segList) {
+          const areas = seg.areas;
+          const matches =
+            !areas || areas.length === 0
+              ? true
+              : areas.some((area) => {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const xOk = !area.x || ((area.x.from === undefined || (cx as any) >= area.x.from) && (area.x.to === undefined || (cx as any) <= area.x.to));
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const yOk = !area.y || ((area.y.from === undefined || (cy as any) >= area.y.from) && (area.y.to === undefined || (cy as any) <= area.y.to));
+                  return xOk && yOk;
+                });
+          if (matches) style = { ...style, ...seg.style };
+        }
+        map.set(key, style);
+      }
+    }
+    return map;
+  });
+
+  const getCellStyle = $derived(
+    (d: TData) => segStyleMap.get(`${String(getX(d))}::${String(getY(d))}`) ?? {},
+  );
 </script>
 
 <PlotLayout
@@ -111,7 +153,10 @@
     data={flat as unknown as Record<string | symbol, never>[]}
     x={getX}
     y={getY}
-    fill={(d) => colorScale(Number(getZ(d as TData)))}
+    fill={(d) => getCellStyle(d as TData).fill ?? colorScale(Number(getZ(d as TData)))}
+    fillOpacity={(d) => getCellStyle(d as TData).fillOpacity ?? 1}
+    stroke={(d) => getCellStyle(d as TData).stroke}
+    strokeWidth={(d) => getCellStyle(d as TData).strokeWidth ?? 0}
     inset={0.5}
   />
 

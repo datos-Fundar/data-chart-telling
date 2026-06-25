@@ -8,7 +8,7 @@
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { paletteColor } from '$lib/utils/color';
   import { buildSeries } from '$lib/utils/grouping';
-  import { buildGroupedSeries, validateSegments } from '$lib/plots/utils/segments';
+  import { buildGroupedSeries, validateSegments, resolveSegmentsForSeries, matchesSegmentX } from '$lib/plots/utils/segments';
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
   import type { Series, SeriesProps, DataProps, ScalesConfig } from '$lib/types/plots/common';
@@ -40,9 +40,7 @@
     tooltip?: TooltipRuntime<TData>;
   } = $props();
 
-  $effect(() => {
-    if (Object.keys(segments).length > 0) validateSegments(segments);
-  });
+  $effect(() => { validateSegments(segments); });
 
   const cfg = $derived(getConfiguration());
   const resolvedSeries = $derived(series ?? buildSeries(data!, x!, y!, z));
@@ -147,11 +145,9 @@
       {#if marker.type === 'hover'}
         {@const seriesPoints = matchedPoints.filter((p) => p.series === group.series.name)}
         {#if marker.strategy === 'segment'}
-          {@const segmentRanges = segments[group.series.name] ?? []}
-          {#each segmentRanges as range, segIdx (`${group.series.name}-hover-segment-${segIdx}`)}
-            {@const segPoints = seriesPoints.filter(
-              (p) => (range.from === undefined || p.x >= range.from) && (range.to === undefined || p.x <= range.to),
-            )}
+          {@const segs = resolveSegmentsForSeries(segments, group.series.name)}
+          {#each segs as seg, segIdx (`${group.series.name}-hover-segment-${segIdx}`)}
+            {@const segPoints = seriesPoints.filter((p) => matchesSegmentX(p.x, seg))}
             {#if segPoints.length > 0}
               <HoverMarker
                 data={segPoints}
