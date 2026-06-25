@@ -1,18 +1,15 @@
 <script lang="ts" generics="TRow extends Record<string, unknown>">
   import Chart from '$lib/charts/Chart.svelte';
   import LinePlot from '$lib/plots/line/Plot.svelte';
-  import { resolveTooltip, resolveHoverSync, hasHoverMarker } from '$lib/layout/tooltip/utils';
+  import {
+    resolveTooltip,
+    resolveHoverSync,
+    hasHoverMarker
+  } from '$lib/layout/tooltip/utils';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { resolveTimelineInterpolation } from '$lib/utils/interpolate';
-  import type { TooltipProp } from '$lib/types/layout/tooltip';
-  import type {
-    FacetConfig,
-    TimelineConfig,
-  } from '$lib/types/charts/common';
-  import type { LegendSection } from '$lib/types/charts/legend';
-  import type { LineSegmentStyle, SegmentsMap, PlotStyles } from '$lib/types/plots/styles';
-  import type { Marker } from '$lib/types/plots/markers';
-  import type { ScalesConfig, AxisValue, Accessor } from '$lib/types/plots/common';
+  import type { LineSegmentStyle } from '$lib/types/plots/styles';
+  import type { ChartProps } from '$lib/types/charts/props';
 
   /**
    * High-level line chart. It takes flat rows plus `x`/`y`/`z` encodings, groups
@@ -38,25 +35,7 @@
     facet,
     timeline,
     tooltip,
-  }: {
-    width: number;
-    height: number;
-    title?: string;
-    subtitle?: string;
-    caption?: string;
-    legend?: LegendSection[];
-    data: TRow[];
-    x: Accessor<TRow, AxisValue>;
-    y: Accessor<TRow, AxisValue>;
-    z?: Accessor<TRow, unknown>;
-    styles?: PlotStyles;
-    segments?: SegmentsMap<LineSegmentStyle>;
-    markers?: Marker[];
-    scales?: ScalesConfig;
-    facet?: FacetConfig<TRow>;
-    timeline?: TimelineConfig<TRow>;
-    tooltip?: TooltipProp<TRow>;
-  } = $props();
+  }: ChartProps<TRow, LineSegmentStyle> = $props();
 
   // A line should grow into its full extent over time, not snap to a single
   // year's point — so default to a cumulative reveal unless the caller wants

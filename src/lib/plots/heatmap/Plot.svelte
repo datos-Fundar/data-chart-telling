@@ -5,10 +5,9 @@
   import { makeColorScale } from '$lib/utils/color';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
-  import type { ScalesConfig, AxisValue, SeriesProps, DataProps } from '$lib/types/plots/common';
-  import type { PlotStyles, CellSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
-  import type { Marker } from '$lib/types/plots/markers';
-  import type { TooltipRuntime } from '$lib/types/layout/tooltip';
+  import type { PlotProps } from '$lib/types/plots/props';
+  import type { AxisValue } from '$lib/types/plots/common';
+  import type { CellSegmentStyle } from '$lib/types/plots/styles';
 
   /**
    * A categorical grid of value-coloured cells. Accepts either a pre-built
@@ -32,15 +31,7 @@
     scales = {},
     markers = [],
     tooltip = undefined,
-  }: (SeriesProps<TData> | DataProps<TData>) & {
-    width: number;
-    height: number;
-    styles?: PlotStyles;
-    segments?: SegmentsMap<CellSegmentStyle>;
-    scales?: ScalesConfig;
-    markers?: Marker[];
-    tooltip?: TooltipRuntime<TData>;
-  } = $props();
+  }: PlotProps<TData, CellSegmentStyle> = $props();
 
   $effect(() => {
     const scoped = markers.filter(

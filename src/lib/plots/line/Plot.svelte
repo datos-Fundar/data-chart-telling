@@ -11,11 +11,10 @@
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
   import { buildGroupedSeries, validateSegments, resolveSegmentsForSeries, matchesSegmentX, getDataForSegments } from '$lib/plots/utils/segments';
-  import type { Series, SeriesProps, DataProps, ScalesConfig } from '$lib/types/plots/common';
-  import type { LineSegmentStyle, SegmentsMap, PlotStyles, ValueAnchor } from '$lib/types/plots/styles';
-  import type { AxisValue } from '$lib/types/plots/common';
+  import type { PlotProps } from '$lib/types/plots/props';
+  import type { Series, AxisValue } from '$lib/types/plots/common';
+  import type { LineSegmentStyle, ValueAnchor } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
-  import type { TooltipRuntime } from '$lib/types/layout/tooltip';
 
   let {
     width,
@@ -30,15 +29,7 @@
     markers = [],
     scales = {},
     tooltip = undefined,
-  }: (SeriesProps<TData> | DataProps<TData>) & {
-    width: number;
-    height: number;
-    styles?: PlotStyles;
-    segments?: SegmentsMap<LineSegmentStyle>;
-    markers?: Marker[];
-    scales?: ScalesConfig;
-    tooltip?: TooltipRuntime<TData>;
-  } = $props();
+  }: PlotProps<TData, LineSegmentStyle> = $props();
 
   const resolvedSeries = $derived(series ?? buildSeries(data!, x!, y!, z));
 

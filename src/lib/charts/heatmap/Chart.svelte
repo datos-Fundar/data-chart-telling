@@ -1,17 +1,15 @@
 <script lang="ts" generics="TRow extends Record<string, unknown>">
   import Chart from '$lib/charts/Chart.svelte';
   import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-  import type { TooltipProp } from '$lib/types/layout/tooltip';
-  import { resolveTooltip, resolveHoverSync, hasHoverMarker } from '$lib/layout/tooltip/utils';
+  import {
+    resolveTooltip,
+    resolveHoverSync,
+    hasHoverMarker
+  } from '$lib/layout/tooltip/utils';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
-  import type {
-    FacetConfig,
-    TimelineConfig,
-  } from '$lib/types/charts/common';
-  import type { LegendSection } from '$lib/types/charts/legend';
-  import type { Marker } from '$lib/types/plots/markers';
-  import type { ScalesConfig, AxisValue, Accessor } from '$lib/types/plots/common';
-  import type { PlotStyles, CellSegmentStyle, SegmentsMap } from '$lib/types/plots/styles';
+  import type { Accessor, ScalesConfig } from '$lib/types/plots/common';
+  import type { CellSegmentStyle } from '$lib/types/plots/styles';
+  import type { ChartProps } from '$lib/types/charts/props';
 
   /**
    * High-level heatmap. Proves the chart chrome (container/legend/timeline/facet)
@@ -38,25 +36,7 @@
     facet,
     timeline,
     tooltip,
-  }: {
-    width: number;
-    height: number;
-    title?: string;
-    subtitle?: string;
-    caption?: string;
-    legend?: LegendSection[];
-    data: TRow[];
-    x: Accessor<TRow, AxisValue>;
-    y: Accessor<TRow, AxisValue>;
-    z: Accessor<TRow, number>;
-    styles?: PlotStyles;
-    segments?: SegmentsMap<CellSegmentStyle>;
-    scales?: ScalesConfig;
-    markers?: Marker[];
-    facet?: FacetConfig<TRow>;
-    timeline?: TimelineConfig<TRow>;
-    tooltip?: TooltipProp<TRow>;
-  } = $props();
+  }: ChartProps<TRow, CellSegmentStyle> & { z: Accessor<TRow, number> } = $props();
 
   const getX = $derived(resolveAccessor<TRow>(x));
   const getY = $derived(resolveAccessor<TRow>(y));

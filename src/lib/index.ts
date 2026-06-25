@@ -76,6 +76,7 @@ export type {
   PlotStyles,
 } from './types/plots/styles';
 export type { Marker, MarkerProps } from './types/plots/markers';
+export type { PlotProps } from './types/plots/props';
 export type {
   TimeValue,
   Orientation,
@@ -98,3 +99,4 @@ export type {
   TooltipRuntime,
 } from './types/layout/tooltip';
 export type { ChartConfig, ChartConfigInput, TextStyle } from './types/configuration/styling';
+export type { ChartProps } from './types/charts/props';

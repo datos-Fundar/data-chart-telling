@@ -11,7 +11,7 @@
   import type { Marker } from '$lib/types/plots/markers';
   import type { HoverDisplayPoint, HoverPoint, TooltipRuntime } from '$lib/types/layout/tooltip';
 
-  type PlotProps = ComponentProps<typeof Plot>;
+  type SveltePlotProps = ComponentProps<typeof Plot>;
 
   /**
    * Shared chrome around every plot kind's svelteplot markup: the pointer-event
@@ -38,8 +38,8 @@
   }: {
     width: number;
     height: number;
-    x?: PlotProps['x'];
-    y?: PlotProps['y'];
+    x?: SveltePlotProps['x'];
+    y?: SveltePlotProps['y'];
     /** Flat rows fed to svelteplot's `<Pointer>` for nearest-point matching. */
     data: TData[];
     getX: (d: TData) => AxisValue;

@@ -8,10 +8,10 @@
   import { buildGroupedSeries, validateSegments, resolveSegmentsForSeries, matchesSegmentX, getDataForSegments } from '$lib/plots/utils/segments';
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
-  import type { Series, SeriesProps, DataProps, ScalesConfig, AxisValue } from '$lib/types/plots/common';
-  import type { BarSegmentStyle, SegmentsMap, PlotStyles, ValueAnchor } from '$lib/types/plots/styles';
+  import type { PlotProps } from '$lib/types/plots/props';
+  import type { Series, AxisValue } from '$lib/types/plots/common';
+  import type { BarSegmentStyle, ValueAnchor } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
-  import type { TooltipRuntime } from '$lib/types/layout/tooltip';
 
   /**
    * A population-pyramid-style diverging bar chart: each series is mirrored
@@ -42,15 +42,7 @@
     segments = {},
     markers = [],
     tooltip = undefined,
-  }: (SeriesProps<TData> | DataProps<TData>) & {
-    width: number;
-    height: number;
-    styles?: PlotStyles;
-    scales?: ScalesConfig;
-    segments?: SegmentsMap<BarSegmentStyle>;
-    markers?: Marker[];
-    tooltip?: TooltipRuntime<TData>;
-  } = $props();
+  }: PlotProps<TData, BarSegmentStyle> = $props();
 
   $effect(() => { validateSegments(segments); });
 

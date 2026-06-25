@@ -1,15 +1,16 @@
 <script lang="ts" generics="TRow extends Record<string, unknown>">
   import Chart from '$lib/charts/Chart.svelte';
   import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-  import { resolveTooltip, resolveHoverSync, hasHoverMarker } from '$lib/layout/tooltip/utils';
+  import {
+    resolveTooltip,
+    resolveHoverSync,
+    hasHoverMarker
+  } from '$lib/layout/tooltip/utils';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { resolveTimelineInterpolation } from '$lib/utils/interpolate';
-  import type { TooltipProp } from '$lib/types/layout/tooltip';
-  import type { FacetConfig, TimelineConfig } from '$lib/types/charts/common';
-  import type { LegendSection } from '$lib/types/charts/legend';
-  import type { BarSegmentStyle, SegmentsMap, PlotStyles } from '$lib/types/plots/styles';
-  import type { Marker } from '$lib/types/plots/markers';
-  import type { ScalesConfig, AxisValue, Accessor } from '$lib/types/plots/common';
+  import type { Accessor, AxisValue } from '$lib/types/plots/common';
+  import type { BarSegmentStyle } from '$lib/types/plots/styles';
+  import type { ChartProps } from '$lib/types/charts/props';
 
   /**
    * High-level population-pyramid-style chart. Forwards flat rows and the
@@ -37,25 +38,7 @@
     facet,
     timeline,
     tooltip,
-  }: {
-    width: number;
-    height: number;
-    title?: string;
-    subtitle?: string;
-    caption?: string;
-    legend?: LegendSection[];
-    data: TRow[];
-    x: Accessor<TRow, number>;
-    y: Accessor<TRow, AxisValue>;
-    z: Accessor<TRow, unknown>;
-    styles?: PlotStyles;
-    scales?: ScalesConfig;
-    segments?: SegmentsMap<BarSegmentStyle>;
-    markers?: Marker[];
-    facet?: FacetConfig<TRow>;
-    timeline?: TimelineConfig<TRow>;
-    tooltip?: TooltipProp<TRow>;
-  } = $props();
+  }: ChartProps<TRow, BarSegmentStyle> & { x: Accessor<TRow, number>; z: Accessor<TRow, unknown> } = $props();
 
   const getMagnitude = $derived(resolveAccessor<TRow>(magnitude));
   const getCategory = $derived(resolveAccessor<TRow>(category));

@@ -3,20 +3,24 @@
   generics="TData extends Record<string, unknown>"
 >
   import { SvelteMap } from 'svelte/reactivity';
+  import { paletteColor } from '$lib/utils/color';
+  import { buildSeries } from '$lib/utils/grouping';
   import { BarY, Text, AxisX, AxisY } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { getConfiguration } from '$lib/configuration/config.svelte';
-  import { paletteColor } from '$lib/utils/color';
-  import { buildSeries } from '$lib/utils/grouping';
   import { buildGroupedSeries, validateSegments, resolveSegmentsForSeries, matchesSegmentX } from '$lib/plots/utils/segments';
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
-  import type { Series, SeriesProps, DataProps, ScalesConfig } from '$lib/types/plots/common';
-  import type { BarSegmentStyle, SegmentsMap, PlotStyles, ValueAnchor } from '$lib/types/plots/styles';
-  import type { AxisValue } from '$lib/types/plots/common';
   import type { Marker } from '$lib/types/plots/markers';
-  import type { TooltipRuntime } from '$lib/types/layout/tooltip';
+  import type { PlotProps } from '$lib/types/plots/props';
+  import type { Series, AxisValue } from '$lib/types/plots/common';
+  import type { BarSegmentStyle, ValueAnchor } from '$lib/types/plots/styles';
 
+  /**
+   * A vertical bar chart. Accepts either a pre-built `series` array or flat
+   * `data/x/y/z` props — mirrors the line/heatmap plot contract so the
+   * chart-level container/timeline/facet/legend wrap it unchanged.
+   */
   let {
     width,
     height,
@@ -30,15 +34,7 @@
     markers = [],
     scales = {},
     tooltip = undefined,
-  }: (SeriesProps<TData> | DataProps<TData>) & {
-    width: number;
-    height: number;
-    styles?: PlotStyles;
-    segments?: SegmentsMap<BarSegmentStyle>;
-    markers?: Marker[];
-    scales?: ScalesConfig;
-    tooltip?: TooltipRuntime<TData>;
-  } = $props();
+  }: PlotProps<TData, BarSegmentStyle> = $props();
 
   $effect(() => { validateSegments(segments); });
 
