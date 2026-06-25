@@ -119,6 +119,7 @@ Plots accept either `series` (pre-built `Series[]`) or the `data` + `x`/`y`/`z` 
 | `segments` | `SegmentsMap<TStyle>` | `{}` / `[]` | ✅ | ✅ | ✅ | ✅ |
 | `markers` | `Marker[]` | `[]` | ✅ | ✅ | ✅ | ✅ |
 | `scales` | `ScalesConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
+| `margins` | `MarginConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
 | `tooltip` | `TooltipRuntime` | | ✅ | ✅ | ✅ | ✅ |
 | `styles` | `PlotStyles` | | ✅ | ✅ | ✅ | ✅ |
 
@@ -160,6 +161,7 @@ Plots accept either `series` (pre-built `Series[]`) or the `data` + `x`/`y`/`z` 
 | `segments` | `SegmentsMap<TStyle>` | `{}` / `[]` | ✅ | ✅ | ✅ | ✅ |
 | `markers` | `Marker[]` | `[]` | ✅ | ✅ | ✅ | ✅ |
 | `scales` | `ScalesConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
+| `margins` | `MarginConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
 | `facet` | `FacetConfig` | | ✅ | ✅ | ✅ | ✅ |
 | `timeline` | `TimelineConfig` | | ✅ | ✅ | ✅ | ✅ |
 | `tooltip` | `TooltipProp` | | ✅ | ✅ | ✅ | ✅ |
