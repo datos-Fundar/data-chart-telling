@@ -6,7 +6,7 @@
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { provideHover } from '$lib/layout/tooltip/hover.svelte';
   import type { LegendSection } from '$lib/types/charts/legend';
-  import type { TooltipSync } from '$lib/types/layout/tooltip';
+  import type { HoverStrategy } from '$lib/types/layout/tooltip';
   import type {
     ChartPlotSnippet,
     FacetConfig,
@@ -47,7 +47,7 @@
     data: TRow[];
     facet?: FacetConfig<TRow>;
     timeline?: TimelineConfig<TRow>;
-    hover?: { sync: TooltipSync };
+    hover?: { strategy: HoverStrategy; sync: boolean };
     plot: ChartPlotSnippet<TRow>;
   } = $props();
 
@@ -55,7 +55,8 @@
 
   const hoverStore = provideHover();
   $effect(() => {
-    hoverStore.sync = hover?.sync ?? 'none';
+    hoverStore.strategy = hover?.strategy ?? 'x';
+    hoverStore.sync = hover?.sync ?? false;
   });
 </script>
 

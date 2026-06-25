@@ -93,7 +93,7 @@ export type {
   LegendItem,
 } from './types/charts/legend';
 export type {
-  TooltipSync,
+  HoverStrategy,
   TooltipOptions,
   TooltipProp,
   TooltipRuntime,

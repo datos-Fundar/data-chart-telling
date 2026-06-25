@@ -12,4 +12,5 @@ export const EDITORIAL_THEME: ChartConfigInput = {
   axis: { color: '#8a6d3b', fontSize: 13, xTickSize: 6, yTickSize: 6 },
   line: { strokeWidth: 5, dotRadius: 5 },
   timeline: { activeColor: '#bb3e03', axisColor: '#8a6d3b', thickness: 60 },
+  hover: { rule: { stroke: '#bb3e03' } },
 };

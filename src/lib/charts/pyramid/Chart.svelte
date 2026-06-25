@@ -3,6 +3,7 @@
   import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
   import {
     resolveTooltip,
+    resolveHoverStrategy,
     resolveHoverSync,
     hasHoverMarker
   } from '$lib/layout/tooltip/utils';
@@ -79,7 +80,8 @@
 
   const tip = $derived(resolveTooltip(tooltip, 'y'));
   const hoverEnabled = $derived(tip.enabled || hasHoverMarker(markers));
-  const resolvedSync = $derived(resolveHoverSync(tip.enabled ? tip.sync : undefined, markers, 'y'));
+  const resolvedStrategy = $derived(resolveHoverStrategy(tip.enabled ? tip.strategy : undefined, markers, 'y'));
+  const resolvedSync = $derived(resolveHoverSync(tip.enabled ? tip.sync : undefined, markers));
   const defaultFormat = $derived(
     (row: TRow) => `${String(getSides(row))}\n${String(getCategory(row))}: ${fmtVal(Number(getMagnitude(row)), String(getSides(row)))}`,
   );
@@ -95,7 +97,7 @@
   {data}
   {facet}
   timeline={timelineConfig}
-  hover={hoverEnabled ? { sync: resolvedSync } : undefined}
+  hover={hoverEnabled ? { strategy: resolvedStrategy, sync: resolvedSync } : undefined}
 >
   {#snippet plot({ data: rows, width: w, height: h, facetValue })}
     <PyramidPlot
@@ -114,6 +116,7 @@
         ? {
             format: tip.format ?? defaultFormat,
             facetId: facetValue ?? '',
+            strategy: tip.strategy,
             sync: tip.sync,
             series: tip.series,
             content: tip.content,

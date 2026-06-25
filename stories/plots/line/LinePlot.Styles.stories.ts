@@ -1,11 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { Series } from '$lib/types/plots/common';
 import type { PlotStyles } from '$lib/types/plots/styles';
 import {
   FEMALE_LIFE_EXPECTANCY,
   MALE_LIFE_EXPECTANCY,
-  type YearPoint,
 } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -44,27 +42,22 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const FEMALE = {
-  name: 'female',
-  x: 'year',
-  y: 'value',
-  data: FEMALE_LIFE_EXPECTANCY,
-} satisfies Series<YearPoint>;
-
-const MALE = {
-  name: 'male',
-  x: 'year',
-  y: 'value',
-  data: MALE_LIFE_EXPECTANCY,
-} satisfies Series<YearPoint>;
-
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
  * No style overrides — the plot uses the configured theme defaults.
  */
 export const Default: Story = {
-  args: { series: [FEMALE] },
+  args: { 
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY,
+      }
+    ],
+  },
 };
 
 /**
@@ -76,81 +69,18 @@ export const Default: Story = {
  */
 export const ShowValues: Story = {
   args: {
-    series: [FEMALE],
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY,
+      }
+    ],
     styles: {
       values: { show: true },
     } satisfies PlotStyles,
-  },
-};
-
-/**
- * Anchor `'start'` (explicit) — text appears to the right of the last data
- * point, aligned with the series line. This is the default when `anchor` is
- * omitted.
- */
-export const AnchorStart: Story = {
-  args: {
-    series: [FEMALE],
-    styles: {
-      values: {
-        show: true,
-        anchor: 'start',
-        format: (v: number) => `${v.toFixed(1)} yr`,
-      },
-    } satisfies PlotStyles,
-  },
-};
-
-/**
- * Anchor `'outside'` — the label appears **above** the last data point,
- * centered on it. Useful when the label would otherwise overlap the line or
- * clip outside the right edge of the plot.
- */
-export const AnchorOutside: Story = {
-  args: {
-    series: [FEMALE],
-    styles: {
-      values: {
-        show: true,
-        anchor: 'outside',
-        format: (v: number) => `${v.toFixed(1)} yr`,
-      },
-    } satisfies PlotStyles,
-  },
-};
-
-/**
- * Anchor `'middle'` — the label is centered directly on the last data point
- * with no offset. Works best when there are no dots at the endpoint, or
- * combined with `dy` to shift the text slightly.
- */
-export const AnchorMiddle: Story = {
-  args: {
-    series: [FEMALE],
-    styles: {
-      values: {
-        show: true,
-        anchor: 'middle',
-        format: (v: number) => `${v.toFixed(1)} yr`,
-      },
-    } satisfies PlotStyles,
-  },
-};
-
-/**
- * Anchor `'end'` — text appears to the **left** of the last data point,
- * toward the chart's zero side. Mirror image of the default `'start'`.
- */
-export const AnchorEnd: Story = {
-  args: {
-    series: [FEMALE],
-    styles: {
-      values: {
-        show: true,
-        anchor: 'end',
-        format: (v: number) => `${v.toFixed(1)} yr`,
-      },
-    } satisfies PlotStyles,
+    margins: { right: 80 },
   },
 };
 
@@ -161,13 +91,138 @@ export const AnchorEnd: Story = {
  */
 export const CustomFormat: Story = {
   args: {
-    series: [FEMALE],
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY,
+      }
+    ],
     styles: {
       values: {
         show: true,
         format: (v: number, name: string) => `${name} → ${v.toFixed(1)} yr`,
       },
     } satisfies PlotStyles,
+    margins: { right: 120 },
+  },
+};
+
+/**
+ * Two series with default end-point labels — each series gets its own label
+ * at its last data point, filled with the palette colour for that series.
+ * The default `anchor: 'start'` places both labels to the right of their
+ * respective endpoints.
+ */
+export const TwoSeriesWithLabels: Story = {
+  args: {
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY,
+      },
+      {
+        name: 'male',
+        x: 'year',
+        y: 'value',
+        data: MALE_LIFE_EXPECTANCY,
+      }
+    ],
+    styles: {
+      values: {
+        show: true,
+        format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
+      },
+    } satisfies PlotStyles,
+    margins: { right: 80 },
+  },
+};
+
+/**
+ * Anchor `'start'` (explicit) — text appears to the right of the last data
+ * point, aligned with the series line. This is the default when `anchor` is
+ * omitted.
+ */
+export const AnchorStart: Story = {
+  args: {
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY,
+      }
+    ],
+    styles: {
+      values: {
+        show: true,
+        anchor: 'start',
+        format: (v: number) => `${v.toFixed(1)} yr`,
+      },
+    } satisfies PlotStyles,
+    margins: { right: 80 },
+  },
+};
+
+/**
+ * Anchor `'outside'` — the label appears **above** the last data point,
+ * centered on it. Useful when the label would otherwise overlap the line or
+ * clip outside the right edge of the plot.
+ */
+export const AnchorOutside: Story = {
+  args: {
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY,
+      }
+    ],
+    styles: {
+      values: {
+        show: true,
+        anchor: 'outside',
+        format: (v: number) => `${v.toFixed(1)} yr`,
+      },
+    } satisfies PlotStyles,
+    margins: { right: 80 },
+  },
+};
+
+/**
+ * Two series with `anchor: 'outside'` labels — both labels appear above
+ * their respective last points. Because both series share the same last
+ * x value (2020), the labels are stacked vertically, separated naturally
+ * by the difference in y values (~5 years here).
+ */
+export const TwoSeriesLabelsOutside: Story = {
+  args: {
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY,
+      },
+      {
+        name: 'male',
+        x: 'year',
+        y: 'value',
+        data: MALE_LIFE_EXPECTANCY,
+      }
+    ],
+    styles: {
+      values: {
+        show: true,
+        anchor: 'outside',
+        format: (v: number, name: string) => `${name}: ${v.toFixed(1)} yr`,
+      },
+    } satisfies PlotStyles,
+    margins: { right: 80 },
   },
 };
 
@@ -181,7 +236,14 @@ export const CustomFormat: Story = {
  */
 export const CustomOffsets: Story = {
   args: {
-    series: [FEMALE],
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY,
+      }
+    ],
     styles: {
       values: {
         show: true,
@@ -190,43 +252,60 @@ export const CustomOffsets: Story = {
         dy: -18,
       },
     } satisfies PlotStyles,
+    margins: { right: 80 },
   },
 };
 
 /**
- * Two series with default end-point labels — each series gets its own label
- * at its last data point, filled with the palette colour for that series.
- * The default `anchor: 'start'` places both labels to the right of their
- * respective endpoints.
+ * Anchor `'middle'` — the label is centered directly on the last data point
+ * with no offset. Works best when there are no dots at the endpoint, or
+ * combined with `dy` to shift the text slightly.
  */
-export const TwoSeriesWithLabels: Story = {
+export const AnchorMiddle: Story = {
   args: {
-    series: [FEMALE, MALE],
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY,
+      }
+    ],
     styles: {
       values: {
         show: true,
-        format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
+        anchor: 'middle',
+        format: (v: number) => `${v.toFixed(1)} yr`,
+        dy: 18,
       },
     } satisfies PlotStyles,
+    margins: { right: 80 },
   },
 };
 
 /**
- * Two series with `anchor: 'outside'` labels — both labels appear above
- * their respective last points. Because both series share the same last
- * x value (2020), the labels are stacked vertically, separated naturally
- * by the difference in y values (~5 years here).
+ * Anchor `'end'` — text appears to the **left** of the last data point,
+ * toward the chart's zero side. Mirror image of the default `'start'`.
  */
-export const TwoSeriesLabelsOutside: Story = {
+export const AnchorEnd: Story = {
   args: {
-    series: [FEMALE, MALE],
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY,
+      }
+    ],
     styles: {
       values: {
         show: true,
-        anchor: 'outside',
-        format: (v: number, name: string) => `${name}: ${v.toFixed(1)} yr`,
+        anchor: 'end',
+        dy: -18,
+        format: (v: number) => `${v.toFixed(1)} yr`,
       },
     } satisfies PlotStyles,
+    margins: { right: 80 },
   },
 };
 
@@ -238,7 +317,14 @@ export const TwoSeriesLabelsOutside: Story = {
  */
 export const LowLevelTextPlacement: Story = {
   args: {
-    series: [FEMALE],
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY,
+      }
+    ],
     styles: {
       values: {
         show: true,
@@ -249,5 +335,6 @@ export const LowLevelTextPlacement: Story = {
         dx: 0,
       },
     } satisfies PlotStyles,
+    margins: { right: 80 },
   },
 };

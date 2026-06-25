@@ -3,7 +3,7 @@
   import BarChart from '$lib/charts/bar/Chart.svelte';
   import HeatmapChart from '$lib/charts/heatmap/Chart.svelte';
   import PyramidChart from '$lib/charts/pyramid/Chart.svelte';
-  import type { TooltipSync } from '$lib/types/layout/tooltip';
+  import type { HoverStrategy } from '$lib/types/layout/tooltip';
   import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
   import { HEAT_CELLS, type HeatCell } from '../../data/heat-cells';
   import { REGION_BARS, type RegionYear } from '../../data/region-bars';
@@ -11,9 +11,14 @@
 
   const { kind = 'line' }: { kind?: 'line' | 'heatmap' | 'bar' | 'pyramid' } = $props();
 
+  const defaultStrategy: HoverStrategy =
+    kind === 'heatmap' ? 'punctual' : kind === 'pyramid' ? 'y' : 'x';
+
   // svelte-ignore state_referenced_locally
-  let sync = $state<TooltipSync>(kind === 'heatmap' ? 'xy' : kind === 'pyramid' ? 'y' : 'x');
-  const SYNCS: TooltipSync[] = ['none', 'x', 'y', 'xy'];
+  let strategy = $state<HoverStrategy>(defaultStrategy);
+  let sync = $state(true);
+
+  const STRATEGIES: HoverStrategy[] = ['x', 'y', 'punctual'];
 
   const heatData = HEAT_CELLS.filter((d) => d.year === 2022);
   const pyramidData = POPULATION_PYRAMID.filter((d) => [1991, 2022, 2030, 2040].includes(d.year));
@@ -21,10 +26,13 @@
 
 <div class="demo">
   <div class="demo__controls">
-    <span class="demo__label">tooltip sync:</span>
-    {#each SYNCS as s (s)}
-      <button class:active={sync === s} onclick={() => (sync = s)}>{s}</button>
+    <span class="demo__label">strategy:</span>
+    {#each STRATEGIES as s (s)}
+      <button class:active={strategy === s} onclick={() => (strategy = s)}>{s}</button>
     {/each}
+    <span class="demo__sep">|</span>
+    <span class="demo__label">sync:</span>
+    <button class:active={sync} onclick={() => (sync = !sync)}>{sync ? 'on' : 'off'}</button>
     <span class="demo__hint">hover a facet — the match is mirrored in the others</span>
   </div>
 
@@ -33,7 +41,7 @@
       width={760}
       height={460}
       title="Hogares por ambientes (2022)"
-      subtitle="Tooltip sync: {sync}"
+      subtitle="Strategy: {strategy} · Sync: {sync ? 'on' : 'off'}"
       data={heatData}
       x={'rooms' as keyof HeatCell}
       y={'people' as keyof HeatCell}
@@ -41,7 +49,7 @@
       scales={{ x: { label: 'Ambientes' }, y: { label: 'Personas' } }}
       styles={{ values: { show: false, format: (v) => `${(v * 100).toFixed(0)}%` } }}
       facet={{ by: 'scenario' as keyof HeatCell, columns: 2 }}
-      tooltip={{ sync }}
+      tooltip={{ strategy, sync }}
       markers={[{ type: 'hover' }]}
     />
   {:else if kind === 'bar'}
@@ -49,12 +57,12 @@
       width={760}
       height={420}
       title="Valor por región y año"
-      subtitle="Tooltip sync: {sync}"
+      subtitle="Strategy: {strategy} · Sync: {sync ? 'on' : 'off'}"
       data={REGION_BARS}
       x={'region' as keyof RegionYear}
       y="value"
       facet={{ by: 'year' as keyof RegionYear, columns: 3 }}
-      tooltip={{ sync }}
+      tooltip={{ strategy, sync }}
       markers={[{ type: 'hover' }]}
     />
   {:else if kind === 'pyramid'}
@@ -62,7 +70,7 @@
       width={760}
       height={520}
       title="Pirámide poblacional por año"
-      subtitle="Tooltip sync: {sync}"
+      subtitle="Strategy: {strategy} · Sync: {sync ? 'on' : 'off'}"
       data={pyramidData}
       y={'ageGroup' as keyof PopulationRow}
       x={'pct' as keyof PopulationRow}
@@ -70,7 +78,7 @@
       scales={{ y: { domain: AGE_GROUPS } }}
       styles={{ colors: { left: '#d6336c', right: '#1971c2' }, values: { format: (v) => `${v.toFixed(1)}%` } }}
       facet={{ by: 'year' as keyof PopulationRow, columns: 2 }}
-      tooltip={{ sync }}
+      tooltip={{ strategy, sync }}
       markers={[{ type: 'hover' }]}
     />
   {:else}
@@ -78,7 +86,7 @@
       width={760}
       height={440}
       title="PBI vs. Empleo por región"
-      subtitle="Tooltip sync: {sync}"
+      subtitle="Strategy: {strategy} · Sync: {sync ? 'on' : 'off'}"
       data={TIME_SERIES}
       x="year"
       y="value"
@@ -95,7 +103,7 @@
         },
       ]}
       facet={{ by: 'region' as keyof SeriesPoint, columns: 2 }}
-      tooltip={{ sync }}
+      tooltip={{ strategy, sync }}
       markers={[{ type: 'hover' }]}
     />
   {/if}
@@ -118,6 +126,10 @@
     font-family: ui-monospace, monospace;
     font-size: 0.8rem;
     opacity: 0.7;
+  }
+  .demo__sep {
+    opacity: 0.3;
+    margin: 0 0.25rem;
   }
   .demo__controls button {
     padding: 0.3rem 0.8rem;

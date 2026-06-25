@@ -3,6 +3,7 @@
   import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
   import {
     resolveTooltip,
+    resolveHoverStrategy,
     resolveHoverSync,
     hasHoverMarker
   } from '$lib/layout/tooltip/utils';
@@ -55,10 +56,10 @@
     z: { domain: fullDomain, ...(scales.z ?? {}) },
   });
 
-  // Heatmap hover defaults to `xy` sync — the same single cell across facets.
-  const tip = $derived(resolveTooltip(tooltip, 'xy'));
+  const tip = $derived(resolveTooltip(tooltip, 'punctual'));
   const hoverEnabled = $derived(tip.enabled || hasHoverMarker(markers));
-  const resolvedSync = $derived(resolveHoverSync(tip.enabled ? tip.sync : undefined, markers, 'xy'));
+  const resolvedStrategy = $derived(resolveHoverStrategy(tip.enabled ? tip.strategy : undefined, markers, 'punctual'));
+  const resolvedSync = $derived(resolveHoverSync(tip.enabled ? tip.sync : undefined, markers));
   const defaultFormat = $derived((row: TRow) => {
     const xl = scales.x?.label || 'x';
     const yl = scales.y?.label || 'y';
@@ -76,7 +77,7 @@
   {data}
   {facet}
   {timeline}
-  hover={hoverEnabled ? { sync: resolvedSync } : undefined}
+  hover={hoverEnabled ? { strategy: resolvedStrategy, sync: resolvedSync } : undefined}
 >
   {#snippet plot({ data: rows, width: w, height: h, facetValue })}
     <HeatmapPlot
@@ -95,6 +96,7 @@
         ? {
             format: tip.format ?? defaultFormat,
             facetId: facetValue ?? '',
+            strategy: tip.strategy,
             sync: tip.sync,
             series: tip.series,
             content: tip.content,

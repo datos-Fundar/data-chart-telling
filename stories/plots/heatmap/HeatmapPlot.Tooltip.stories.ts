@@ -52,14 +52,14 @@ export const NoTooltip: Story = {
  * returns the string shown in the floating box.
  *
  * Hover over any cell to activate. A standalone `HeatmapPlot` uses
- * `facetId: ''` and `sync: 'none'`.
+ * `facetId: ''` and `sync: false`.
  */
 export const BasicTooltip: Story = {
   args: {
     series: SERIES,
     tooltip: {
       facetId: '',
-      sync: 'none',
+      sync: false,
       format: (row) => {
         const { ageGroup, province, pct } = row as AgeProvinceCell;
         return `${ageGroup} - ${province}: ${(pct * 100).toFixed(1)}%`;
@@ -77,7 +77,7 @@ export const RichFormat: Story = {
     series: SERIES,
     tooltip: {
       facetId: '',
-      sync: 'none',
+      sync: false,
       format: (row) => {
         const { ageGroup, province, pct } = row as AgeProvinceCell;
         return `Age: ${ageGroup}\nProvince: ${province}\nEmployment rate: ${(pct * 100).toFixed(1)}%`;
@@ -95,7 +95,7 @@ export const ComputedFormat: Story = {
     series: SERIES,
     tooltip: {
       facetId: '',
-      sync: 'none',
+      sync: false,
       format: (row) => {
         const { ageGroup, province, pct } = row as AgeProvinceCell;
         const threshold = 0.75;
@@ -116,7 +116,7 @@ export const RoundedPercentage: Story = {
     series: SERIES,
     tooltip: {
       facetId: '',
-      sync: 'none',
+      sync: false,
       format: (row) => {
         const { ageGroup, province, pct } = row as AgeProvinceCell;
         return `${ageGroup} - ${province}\n${Math.round(pct * 100)}%`;

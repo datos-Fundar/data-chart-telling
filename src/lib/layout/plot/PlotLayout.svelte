@@ -9,7 +9,7 @@
   import Tooltip from '$lib/layout/tooltip/Tooltip.svelte';
   import type { AxisValue, Series, ScalesConfig, MarginConfig } from '$lib/types/plots/common';
   import type { Marker } from '$lib/types/plots/markers';
-  import type { HoverDisplayPoint, HoverPoint, TooltipRuntime } from '$lib/types/layout/tooltip';
+  import type { HoverStrategy, HoverDisplayPoint, HoverPoint, TooltipRuntime } from '$lib/types/layout/tooltip';
 
   type SveltePlotProps = ComponentProps<typeof Plot>;
 
@@ -37,6 +37,7 @@
     showHoverLabels = true,
     scales,
     margins,
+    defaultStrategy = 'x',
     children,
   }: {
     width: number;
@@ -55,28 +56,37 @@
     markers?: Marker[];
     /** All resolved series, forwarded to unscoped component markers (e.g. DeltaMarker). */
     seriesData?: Series<TData>[];
-    /** Scale config forwarded from the plot — axis visual fields (tickSize, tickPadding, titleFontSize) are read here; the rest flows to `<Plot>` via `x`/`y`. */
+    /** Scale config forwarded from the plot. */
     scales?: ScalesConfig;
     /** Partial margin override — merged on top of the theme before tickRotate adjustment. */
     margins?: MarginConfig;
     showHoverLabels?: boolean;
     /**
+     * The plot kind's default hover strategy when none is set on the tooltip or
+     * hover marker. Line/bar → `'x'`, pyramid → `'y'`, heatmap → `'punctual'`.
+     */
+    defaultStrategy?: HoverStrategy;
+    /**
      * `matchedPoints` carries only display info (+ `series`), not `row` — a
      * per-series-scoped `HoverMarker` never needs the source row, just enough
      * to filter and place dots/labels, which sidesteps forcing a concrete
      * `TData` resolution through this snippet's type for every plot kind.
+     * `impliesRuleX`/`impliesRuleY` tell the plot kind whether the active
+     * strategy implies a crosshair rule on each axis by default.
      */
     children: Snippet<
-      [{ matchedPoints: HoverDisplayPoint[]; ruleX: AxisValue | null; ruleY: AxisValue | null }]
+      [{
+        matchedPoints: HoverDisplayPoint[];
+        ruleX: AxisValue | null;
+        ruleY: AxisValue | null;
+        impliesRuleX: boolean;
+        impliesRuleY: boolean;
+      }]
     >;
   } = $props();
 
   const cfg = $derived(getConfiguration());
 
-  // When x ticks are rotated the labels spill below and to the right of the
-  // SVG viewBox, which clips them. Add proportional extra margin so the
-  // rotated text stays within bounds. 80 and 40 are conservative estimates of
-  // a typical tick-label length in px; override cfg.margins to tighten/loosen.
   const computedMargins = $derived.by(() => {
     const base = { ...cfg.margins, ...margins };
     const xRotate = scales?.x?.tickRotate;
@@ -89,20 +99,17 @@
   });
 
   // ── Hover / tooltip ───────────────────────────────────────────────────────
-  // A hover marker activates pointer tracking just like a tooltip does — the
-  // two are independent, but both ride the same Pointer/controller plumbing.
   const hoverActive = $derived(tooltip != null || hasHoverMarker(markers));
 
   const sharedHover = getHover();
   const localHover = createHover();
   const hover = $derived(sharedHover ?? localHover);
+
   $effect(() => {
     if (sharedHover) return;
-    if (tooltip) {
-      localHover.sync = tooltip.sync;
-    } else {
-      localHover.sync = findHoverMarker(markers)?.sync ?? 'none';
-    }
+    const hoverMarker = findHoverMarker(markers);
+    localHover.strategy = tooltip?.strategy ?? hoverMarker?.strategy ?? defaultStrategy;
+    localHover.sync = tooltip?.sync ?? hoverMarker?.sync ?? false;
   });
 
   const ctrl = createHoverController<TData>({
@@ -127,13 +134,27 @@
     ),
   );
 
-  /** The unscoped (no `series`) hover marker, if any — rendered here directly;
-   *  series/segment-scoped ones are rendered by the plot kind itself, which
-   *  has access to its own series grouping. */
+  /** The unscoped (no `series`) hover marker, if any. */
   const unscopedHoverMarker = $derived(
     markers.find((m) => m.type === 'hover' && !m.series) as
       | Extract<Marker, { type: 'hover' }>
       | undefined,
+  );
+
+  /**
+   * Gate ruleX display: shows when the strategy implies it (default) or the
+   * marker explicitly requests it (`ruleX: true`), and is never suppressed
+   * unless the marker explicitly disables it (`ruleX: false`).
+   */
+  const showRuleX = $derived(
+    unscopedHoverMarker != null &&
+    unscopedHoverMarker.ruleX !== false &&
+    (ctrl.impliesRuleX || unscopedHoverMarker.ruleX === true),
+  );
+  const showRuleY = $derived(
+    unscopedHoverMarker != null &&
+    unscopedHoverMarker.ruleY !== false &&
+    (ctrl.impliesRuleY || unscopedHoverMarker.ruleY === true),
   );
 </script>
 
@@ -147,7 +168,13 @@
   <Plot {width} {height} margin={computedMargins} {x} {y}>
     <AxisX tickSize={scales?.x?.tickSize ?? cfg.axis.xTickSize} tickPadding={scales?.x?.tickPadding ?? cfg.axis.xTickPadding} tickFontSize={cfg.axis.fontSize} titleFontSize={scales?.x?.titleFontSize ?? cfg.axis.titleFontSize} />
     <AxisY tickSize={scales?.y?.tickSize ?? cfg.axis.yTickSize} tickPadding={scales?.y?.tickPadding ?? cfg.axis.yTickPadding} tickFontSize={cfg.axis.fontSize} titleFontSize={scales?.y?.titleFontSize ?? cfg.axis.titleFontSize} />
-    {@render children({ matchedPoints: ctrl.points, ruleX: ctrl.ruleX, ruleY: ctrl.ruleY })}
+    {@render children({
+      matchedPoints: ctrl.points,
+      ruleX: ctrl.ruleX,
+      ruleY: ctrl.ruleY,
+      impliesRuleX: ctrl.impliesRuleX,
+      impliesRuleY: ctrl.impliesRuleY,
+    })}
 
     {#each topLevelMarkers as marker, i (marker.type === 'ruleX' ? `${marker.type}-${marker.x}` : marker.type === 'ruleY' ? `${marker.type}-${marker.y}` : `${marker.type}-${i}`)}
       {#if marker.type === 'ruleX'}
@@ -180,9 +207,8 @@
     {#if unscopedHoverMarker}
       <HoverMarker
         data={ctrl.points}
-        ruleX={unscopedHoverMarker.ruleX !== false ? ctrl.ruleX : null}
-        ruleY={unscopedHoverMarker.ruleY !== false ? ctrl.ruleY : null}
-        color={unscopedHoverMarker.color ?? cfg.timeline.activeColor}
+        ruleX={showRuleX ? ctrl.ruleX : null}
+        ruleY={showRuleY ? ctrl.ruleY : null}
         showLabels={unscopedHoverMarker.showLabels ?? showHoverLabels}
         ruleStyle={unscopedHoverMarker.ruleStyle}
         dotStyle={unscopedHoverMarker.dotStyle}
@@ -192,9 +218,6 @@
   </Plot>
 
   {#if tooltip && ctrl.showTooltip && ctrl.tooltipPosition}
-    <!-- `tooltipPosition` is the real cursor in the facet the mouse is
-         physically over; every other facet broadcasting a synced match
-         reprojects that cursor's relative position onto its own box. -->
     <Tooltip x={ctrl.tooltipPosition.x} y={ctrl.tooltipPosition.y}>
       {#if tooltip.content}
         {@render tooltip.content({ rows: ctrl.matchedRows.map((p) => p.row) })}

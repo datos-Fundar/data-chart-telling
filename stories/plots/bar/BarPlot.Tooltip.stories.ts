@@ -76,7 +76,7 @@ export const NoTooltip: Story = {
  * returns the string shown in the floating box.
  *
  * Hover over any bar to activate. A standalone `BarPlot` (not inside a
- * `<Chart>`) uses `facetId: ''` and `sync: 'none'` — no cross-facet
+ * `<Chart>`) uses `facetId: ''` and `sync: false` — no cross-facet
  * broadcasting applies.
  */
 export const BasicTooltip: Story = {
@@ -84,7 +84,7 @@ export const BasicTooltip: Story = {
     series: [FEMALE],
     tooltip: {
       facetId: '',
-      sync: 'none',
+      sync: false,
       format: (row) => {
         const { province, value } = row as ProvincePoint;
         return `${province}: ${value} yr`;
@@ -103,7 +103,7 @@ export const RichFormat: Story = {
     series: [FEMALE],
     tooltip: {
       facetId: '',
-      sync: 'none',
+      sync: false,
       format: (row) => {
         const { province, value } = row as ProvincePoint;
         return `Province: ${province}\nLife expectancy: ${value.toFixed(1)} yr`;
@@ -121,7 +121,7 @@ export const ComputedFormat: Story = {
     series: [FEMALE],
     tooltip: {
       facetId: '',
-      sync: 'none',
+      sync: false,
       format: (row) => {
         const { province, value } = row as ProvincePoint;
         const delta = (value - 82).toFixed(1);
@@ -142,7 +142,7 @@ export const TwoSeries: Story = {
     series: [FEMALE, MALE],
     tooltip: {
       facetId: '',
-      sync: 'none',
+      sync: false,
       format: (row) => {
         const { province, value } = row as ProvincePoint;
         return `${province}: ${value.toFixed(1)} yr`;
@@ -163,7 +163,7 @@ export const SeriesFiltered: Story = {
     series: [FEMALE, MALE],
     tooltip: {
       facetId: '',
-      sync: 'none',
+      sync: false,
       series: ['female'],
       format: (row) => {
         const { province, value } = row as ProvincePoint;
@@ -186,7 +186,7 @@ export const TwoSeriesFromGroupedData: Story = {
     z: 'sex',
     tooltip: {
       facetId: '',
-      sync: 'none',
+      sync: false,
       format: (row) => {
         const { sex, province, value } = row as ProvinceLifeExpectancy;
         return `${sex} (${province}): ${value.toFixed(1)} yr`;
@@ -207,7 +207,7 @@ export const GroupedDataSeriesFiltered: Story = {
     z: 'sex',
     tooltip: {
       facetId: '',
-      sync: 'none',
+      sync: false,
       series: ['female'],
       format: (row) => {
         const { province, value } = row as ProvinceLifeExpectancy;

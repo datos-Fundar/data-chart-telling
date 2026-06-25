@@ -82,6 +82,11 @@ export const DEFAULT_CONFIG: ChartConfig = {
   continuous: { min: '#e0e7ff', max: '#4f46e5', labelColor: '#111827' },
   line: { strokeWidth: 3, dotRadius: 4 },
   timeline: { axisColor: 'currentColor', activeColor: '#e6580d', thickness: 60 },
+  hover: {
+    rule: { stroke: '#e6580d', strokeOpacity: 0.35, strokeWidth: 1.5, strokeDasharray: '4 4' },
+    dot: { dotRadius: 5, dotFill: 'currentColor' },
+    font: { fill: 'currentColor', fontSize: 12, dy: -18 },
+  },
 };
 
 // ── Merge ─────────────────────────────────────────────────────────────────────

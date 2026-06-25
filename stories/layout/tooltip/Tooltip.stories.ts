@@ -9,15 +9,17 @@ import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
  * the two are independent, so you can have either, both, or neither:
  *
  * ```svelte
- * <LineChart … tooltip markers={[{ type: 'hover' }]} />   <!-- both, defaults -->
- * <LineChart … tooltip={{ sync: 'x' }} />                  <!-- text only -->
- * <LineChart … markers={[{ type: 'hover' }]} />            <!-- crosshair only -->
- * <HeatmapChart … tooltip={{ sync: 'xy', format }} markers={[{ type: 'hover' }]} />
+ * <LineChart … tooltip markers={[{ type: 'hover' }]} />              <!-- both, defaults -->
+ * <LineChart … tooltip={{ strategy: 'x', sync: true }} />            <!-- text only -->
+ * <LineChart … markers={[{ type: 'hover' }]} />                      <!-- crosshair only -->
+ * <HeatmapChart … tooltip={{ strategy: 'punctual', sync: true, format }} markers={[{ type: 'hover' }]} />
  * ```
  *
- * When faceted, hovering one panel highlights the matching point in the others.
- * `tooltip.sync` (or, with no tooltip, the hover marker's own `sync`) chooses
- * what "matching" means: `none` (independent), `x`, `y`, or `xy`.
+ * When faceted, set `sync: true` to broadcast the hover to other panels.
+ * `strategy` controls how related points are found:
+ * - `'x'`        all points sharing the hovered x (default for line/bar).
+ * - `'y'`        all points sharing the hovered y (default for pyramid).
+ * - `'punctual'` exact XY match — one cell at a time (default for heatmap).
  */
 const meta = {
   title: 'Layout/Tooltip',
@@ -60,7 +62,7 @@ export const CustomFormat: Story = {
     data: TIME_SERIES.filter((d) => d.region === 'Norte'),
     z: 'metric' as keyof SeriesPoint,
     tooltip: {
-      sync: 'x',
+      strategy: 'x',
       format: (row) => {
         const r = row as unknown as SeriesPoint;
         return `${r.metric} · ${r.year}\n$ ${r.value} M`;
@@ -86,7 +88,7 @@ export const MarkerOnly: Story = {
     title: 'Solo marcador (sin tooltip)',
     data: TIME_SERIES.filter((d) => d.region === 'Norte'),
     z: 'metric' as keyof SeriesPoint,
-    markers: [{ type: 'hover', sync: 'x' }],
+    markers: [{ type: 'hover' }],
   },
 };
 
@@ -96,7 +98,7 @@ export const MultiSeriesCrossing: Story = {
     title: 'Todas las series cruzando el x',
     data: TIME_SERIES.filter((d) => d.region === 'Norte'),
     z: 'metric' as keyof SeriesPoint,
-    tooltip: { sync: 'x' },
+    tooltip: { strategy: 'x' },
     markers: [{ type: 'hover' }],
   },
 };
@@ -112,16 +114,16 @@ export const SeriesSubset: Story = {
     title: 'Tooltip acotado a una serie',
     data: TIME_SERIES.filter((d) => d.region === 'Norte'),
     z: 'metric' as keyof SeriesPoint,
-    tooltip: { sync: 'x', series: ['PBI'] },
+    tooltip: { strategy: 'x', series: ['PBI'] },
     markers: [{ type: 'hover', series: 'PBI' }],
   },
 };
 
 /**
- * Once sync isn't `none`, the floating tooltip shows in *every* synced facet
- * with a match, not just the one the mouse is over — hover either panel and
- * both bubbles appear. The non-cursor facet reprojects the cursor's relative
- * position onto its own box, since it has no mouse position of its own.
+ * Once `sync: true`, the floating tooltip shows in *every* synced facet with a
+ * match, not just the one the mouse is over — hover either panel and both
+ * bubbles appear. The non-cursor facet reprojects the cursor's relative position
+ * onto its own box.
  */
 export const MultiFacetBroadcast: Story = {
   args: {
@@ -129,27 +131,27 @@ export const MultiFacetBroadcast: Story = {
     subtitle: 'Pasá el cursor por una región — la otra también muestra su tooltip',
     z: 'metric' as keyof SeriesPoint,
     facet: { by: 'region' as keyof SeriesPoint, columns: 2 },
-    tooltip: { sync: 'x' },
+    tooltip: { strategy: 'x', sync: true },
     markers: [{ type: 'hover' }],
   },
 };
 
-/** Faceted line chart — switch the sync mode and hover across panels. */
+/** Faceted line chart — switch strategy and sync, hover across panels. */
 export const FacetSyncLine: StoryObj = {
   render: () => ({ Component: TooltipSyncDemo, props: { kind: 'line' } }),
 };
 
-/** Faceted bar chart — `x` sync highlights the same region across years. */
+/** Faceted bar chart — `x` strategy highlights the same region across years. */
 export const FacetSyncBar: StoryObj = {
   render: () => ({ Component: TooltipSyncDemo, props: { kind: 'bar' } }),
 };
 
-/** Faceted heatmap — `xy` sync highlights the same cell in every scenario. */
+/** Faceted heatmap — `punctual` strategy highlights the same cell in every scenario. */
 export const FacetSyncHeatmap: StoryObj = {
   render: () => ({ Component: TooltipSyncDemo, props: { kind: 'heatmap' } }),
 };
 
-/** Faceted pyramid — `y` sync highlights the same age group across years. */
+/** Faceted pyramid — `y` strategy highlights the same age group across years. */
 export const FacetSyncPyramid: StoryObj = {
   render: () => ({ Component: TooltipSyncDemo, props: { kind: 'pyramid' } }),
 };

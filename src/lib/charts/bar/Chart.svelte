@@ -3,6 +3,7 @@
   import BarPlot from '$lib/plots/bar/Plot.svelte';
   import {
     resolveTooltip,
+    resolveHoverStrategy,
     resolveHoverSync,
     hasHoverMarker
   } from '$lib/layout/tooltip/utils';
@@ -40,7 +41,8 @@
 
   const tip = $derived(resolveTooltip(tooltip, 'x'));
   const hoverEnabled = $derived(tip.enabled || hasHoverMarker(markers));
-  const resolvedSync = $derived(resolveHoverSync(tip.enabled ? tip.sync : undefined, markers, 'x'));
+  const resolvedStrategy = $derived(resolveHoverStrategy(tip.enabled ? tip.strategy : undefined, markers, 'x'));
+  const resolvedSync = $derived(resolveHoverSync(tip.enabled ? tip.sync : undefined, markers));
   const getX = $derived(resolveAccessor<TRow>(x));
   const getY = $derived(resolveAccessor<TRow>(y));
   const getZ = $derived(z ? resolveAccessor<TRow>(z) : null);
@@ -72,7 +74,7 @@
   {data}
   {facet}
   timeline={timelineConfig}
-  hover={hoverEnabled ? { sync: resolvedSync } : undefined}
+  hover={hoverEnabled ? { strategy: resolvedStrategy, sync: resolvedSync } : undefined}
 >
   {#snippet plot({ data: rows, width: w, height: h, facetValue })}
     <BarPlot
@@ -91,6 +93,7 @@
         ? {
             format: tip.format ?? defaultFormat,
             facetId: facetValue ?? '',
+            strategy: tip.strategy,
             sync: tip.sync,
             series: tip.series,
             content: tip.content,

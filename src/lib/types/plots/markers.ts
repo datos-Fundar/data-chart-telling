@@ -1,6 +1,6 @@
 import type { AxisValue } from '$lib/types/plots/common';
 import type { DotStyle, FontStyle, StrokeStyle } from '$lib/types/plots/styles';
-import type { TooltipSync } from '$lib/types/layout/tooltip';
+import type { HoverStrategy } from '$lib/types/layout/tooltip';
 
 /**
  * Baseline props every marker component receives when mounted by a plot:
@@ -30,21 +30,23 @@ export type RuleYMarker = {
  * The in-SVG hover highlight (crosshair + dot + label), opt-in via `markers`
  * so it can be combined freely with — or used entirely without — the HTML
  * tooltip. Omitting `series` mounts it unscoped (all series); scoping it to
- * one series, optionally further split by `strategy: 'segment'`, follows the
- * same targeting fields as {@link CustomComponentMarker}.
+ * one series follows the same targeting fields as {@link CustomComponentMarker}.
  */
 export type HoverMarkerConfig = {
   type: 'hover';
   series?: string;
-  strategy?: 'series' | 'segment';
+  /** Whether to render per segment or for the full series. Defaults to `'series'`. */
+  scope?: 'series' | 'segment';
+  /** Matching strategy — how related points are found. Defaults to the plot kind's own default. */
+  strategy?: HoverStrategy;
+  /** Broadcast the hover to other facets. Defaults to `false`. */
+  sync?: boolean;
   ruleX?: boolean;
   ruleY?: boolean;
-  color?: string;
   showLabels?: boolean;
   ruleStyle?: StrokeStyle;
   dotStyle?: DotStyle;
   fontStyle?: FontStyle;
-  sync?: TooltipSync;
 };
 
 export type CustomComponentMarker = {
@@ -55,7 +57,8 @@ export type CustomComponentMarker = {
   props?: Record<string, unknown>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data?: any[];
-  strategy?: 'series' | 'segment';
+  /** Whether to render per segment or for the full series. Defaults to `'series'`. */
+  scope?: 'series' | 'segment';
 };
 
 export type Marker = RuleXMarker | RuleYMarker | HoverMarkerConfig | CustomComponentMarker;

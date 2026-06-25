@@ -127,6 +127,7 @@ export const WithAxisLabels: Story = {
       x: { label: 'Year' },
       y: { label: 'Life expectancy (years)' },
     } satisfies ScalesConfig,
+    margins: { bottom: 50 },
   },
 };
 

@@ -2,6 +2,7 @@
   import { RuleX, RuleY } from 'svelteplot';
   import DotMarker from './DotMarker.svelte';
   import TextMarker from './TextMarker.svelte';
+  import { getConfiguration } from '$lib/configuration/config.svelte';
   import type { MarkerProps } from '$lib/types/plots/markers';
   import type { AxisValue } from '$lib/types/plots/common';
   import type { DotStyle, FontStyle, StrokeStyle } from '$lib/types/plots/styles';
@@ -17,7 +18,6 @@
   interface Props extends MarkerProps<HoverDisplayPoint> {
     ruleX?: AxisValue | null;
     ruleY?: AxisValue | null;
-    color?: string;
     showLabels?: boolean;
     ruleStyle?: StrokeStyle;
     dotStyle?: DotStyle;
@@ -28,22 +28,23 @@
     data = [],
     ruleX = null,
     ruleY = null,
-    color = 'currentColor',
     showLabels = true,
     ruleStyle,
     dotStyle,
     fontStyle,
   }: Props = $props();
+
+  const cfg = $derived(getConfiguration());
 </script>
 
 {#if ruleX != null}
   <RuleX
     data={[{ v: ruleX }]}
     x={(d) => d.v}
-    stroke={ruleStyle?.stroke ?? color}
-    strokeOpacity={ruleStyle?.strokeOpacity ?? 0.35}
-    strokeWidth={ruleStyle?.strokeWidth ?? 1.5}
-    strokeDasharray={ruleStyle?.strokeDasharray ?? '4 4'}
+    stroke={ruleStyle?.stroke ?? cfg.hover.rule.stroke}
+    strokeOpacity={ruleStyle?.strokeOpacity ?? cfg.hover.rule.strokeOpacity}
+    strokeWidth={ruleStyle?.strokeWidth ?? cfg.hover.rule.strokeWidth}
+    strokeDasharray={ruleStyle?.strokeDasharray ?? cfg.hover.rule.strokeDasharray}
   />
 {/if}
 
@@ -51,10 +52,10 @@
   <RuleY
     data={[{ v: ruleY }]}
     y={(d) => d.v}
-    stroke={ruleStyle?.stroke ?? color}
-    strokeOpacity={ruleStyle?.strokeOpacity ?? 0.35}
-    strokeWidth={ruleStyle?.strokeWidth ?? 1.5}
-    strokeDasharray={ruleStyle?.strokeDasharray ?? '4 4'}
+    stroke={ruleStyle?.stroke ?? cfg.hover.rule.stroke}
+    strokeOpacity={ruleStyle?.strokeOpacity ?? cfg.hover.rule.strokeOpacity}
+    strokeWidth={ruleStyle?.strokeWidth ?? cfg.hover.rule.strokeWidth}
+    strokeDasharray={ruleStyle?.strokeDasharray ?? cfg.hover.rule.strokeDasharray}
   />
 {/if}
 
@@ -63,7 +64,7 @@
     {data}
     x={(d) => d.x}
     y={(d) => d.y}
-    style={dotStyle}
+    style={{ ...cfg.hover.dot, ...dotStyle }}
   />
   {#if showLabels}
     <TextMarker
@@ -71,7 +72,7 @@
       x={(d) => d.x}
       y={(d) => d.y}
       text={(d) => d.label ?? ''}
-      style={fontStyle}
+      style={{ ...cfg.hover.font, ...fontStyle }}
     />
   {/if}
 {/if}

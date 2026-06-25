@@ -1,8 +1,8 @@
 import {
   eq,
-  matchPoints,
-  showsRuleX,
-  showsRuleY,
+  matchByStrategy,
+  impliesRuleX,
+  impliesRuleY,
   filterBySeries,
 } from '$lib/layout/tooltip/utils';
 import type { HoverStore, HoverPoint } from '$lib/types/layout/tooltip';
@@ -33,7 +33,6 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
   width: () => number;
   height: () => number;
 }) {
-  let hoveredRows = $state<T[]>([]);
   let cursor = $state<{ x: number; y: number } | null>(null);
 
   // svelteplot's `Pointer` hands back cloned rows (not the original
@@ -45,51 +44,41 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
     return args.points().find((p) => eq(p.x, x) && eq(p.y, y))?.series;
   };
 
-  const toPoint = (row: T) => ({
-    x: args.getX()(row),
-    y: args.getY()(row),
-    label: args.label()(row),
-    series: seriesForRow(row),
-  });
-
-  // Points matched in THIS facet, with `row` kept. `none` mirrors only the
-  // locally hovered rows; the synced modes resolve matches against the
-  // shared active value. Shared by the marker's `highlight` (below) and the
-  // tooltip text/content, which additionally apply a series allow-list.
+  // Points matched in THIS facet. Non-source facets only react when sync is
+  // enabled. The strategy in the shared store determines how points are found.
   const matched = $derived.by((): HoverPoint<T>[] => {
     const h = args.hover();
-    if (h.sync === 'none') {
-      return h.source === args.facetId() ? hoveredRows.map((r) => ({ ...toPoint(r), row: r })) : [];
-    }
-    return matchPoints(args.points(), h);
+    const isSource = h.source === args.facetId();
+    if (!isSource && !h.sync) return [];
+    return matchByStrategy(args.points(), h);
   });
 
   const matchedRows = $derived(filterBySeries(matched, args.seriesFilter?.()));
 
-  // Points highlighted in THIS facet for the (unscoped) in-SVG marker — no
-  // series filtering, since that's the tooltip text's concern, not the
-  // marker's.
+  // Points highlighted in THIS facet for the in-SVG marker — no series
+  // filtering, since that's the tooltip text's concern, not the marker's.
   const highlight = $derived(matched.map(({ x, y, label, series }) => ({ x, y, label, series })));
 
-  const ruleX = $derived.by(() => (showsRuleX(args.hover().sync) ? args.hover().activeX : null));
-  const ruleY = $derived.by(() => (showsRuleY(args.hover().sync) ? args.hover().activeY : null));
+  // Raw hover position — available whenever there are matched points.
+  // PlotLayout gates actual display with impliesRuleX/Y + the marker's ruleX/Y props.
+  const ruleX = $derived(matched.length > 0 ? args.hover().activeX : null);
+  const ruleY = $derived(matched.length > 0 ? args.hover().activeY : null);
 
-  // The facet owning the cursor shows its tooltip at the mouse position; once
-  // sync is active, every *other* facet with a match shows its own tooltip
-  // too (anchored elsewhere — see `cursor` usage at the call site), so a
-  // synced hover isn't only visible in the facet you're physically over.
+  // Whether the current strategy implies a crosshair rule on each axis by default.
+  const _impliesRuleX = $derived(impliesRuleX(args.hover().strategy));
+  const _impliesRuleY = $derived(impliesRuleY(args.hover().strategy));
+
   const showTooltip = $derived.by(() => {
     if (matchedRows.length === 0) return false;
     const h = args.hover();
     if (h.source === args.facetId()) return cursor != null;
-    return h.sync !== 'none';
+    return h.sync;
   });
   const tooltipText = $derived(
     matchedRows.length ? matchedRows.map((p) => args.format()(p.row)).join('\n\n') : '',
   );
 
   function onPointer(data: T[]) {
-    hoveredRows = data;
     const h = args.hover();
     if (data.length) {
       h.activeX = args.getX()(data[0]);
@@ -105,7 +94,6 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
   }
 
   function onMove(e: PointerEvent) {
-    // Relative to the wrapper (currentTarget), not whatever SVG node was hit.
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -117,7 +105,6 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
 
   function onLeave() {
     cursor = null;
-    hoveredRows = [];
     const h = args.hover();
     if (h.source === args.facetId()) {
       h.activeX = null;
@@ -128,10 +115,6 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
     }
   }
 
-  // Where THIS facet's tooltip should render: the real cursor if this facet
-  // owns the hover, else the source facet's cursor fraction reprojected onto
-  // this facet's own box, so a broadcast tooltip lands at the same relative
-  // spot rather than a fixed corner.
   const tooltipPosition = $derived.by((): { x: number; y: number } | null => {
     if (cursor) return cursor;
     const frac = args.hover().cursorFrac;
@@ -153,6 +136,12 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
     },
     get ruleY() {
       return ruleY;
+    },
+    get impliesRuleX() {
+      return _impliesRuleX;
+    },
+    get impliesRuleY() {
+      return _impliesRuleY;
     },
     get showTooltip() {
       return showTooltip;

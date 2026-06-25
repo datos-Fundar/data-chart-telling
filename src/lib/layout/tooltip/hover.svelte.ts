@@ -10,7 +10,8 @@ function blank(): HoverStore {
     activeSeries: null,
     cursorFrac: null,
     source: null,
-    sync: 'none',
+    strategy: 'x',
+    sync: false,
   };
 }
 

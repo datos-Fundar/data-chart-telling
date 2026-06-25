@@ -140,6 +140,7 @@
   scales={scales}
   {margins}
   showHoverLabels={false}
+  defaultStrategy="punctual"
 >
   <Cell
     data={flat as unknown as Record<string | symbol, never>[]}

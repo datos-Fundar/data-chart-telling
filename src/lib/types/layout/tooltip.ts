@@ -2,23 +2,27 @@ import type { Snippet } from 'svelte';
 import type { AxisValue } from '$lib/types/plots/common';
 
 /**
- * How a hover in one facet propagates to the others.
- * - `none` — only the hovered facet reacts.
- * - `x`    — every facet highlights the point(s) sharing the hovered x.
- * - `y`    — …sharing the hovered y.
- * - `xy`   — …sharing both (a single matching point, e.g. one heatmap cell).
+ * How the hover highlight finds related points within a facet.
+ * - `'x'`        all points sharing the hovered x (default for line / bar).
+ * - `'y'`        all points sharing the hovered y (default for pyramid).
+ * - `'punctual'` exact XY match — one cell at a time (default for heatmap).
  */
-export type TooltipSync = 'none' | 'x' | 'y' | 'xy';
+export type HoverStrategy = 'x' | 'y' | 'punctual';
 
 /** Author-facing tooltip option on the chart kinds. `true` = enable with defaults. */
 export type TooltipOptions<TRow extends Record<string, unknown>> = {
-  sync?: TooltipSync;
+  /** Matching strategy. Defaults to the chart kind's own default. */
+  strategy?: HoverStrategy;
+  /**
+   * Broadcast the hover to other facets. When `true` every facet with a
+   * matching point highlights it using the same strategy. Defaults to `false`.
+   */
+  sync?: boolean;
   /** Custom tooltip text for a row (supports `\n`). Defaults per chart kind. */
   format?: (row: TRow) => string;
-  /** Named subset of crossing series to include (sync `x`/`y`/`xy`). Omitted = all matched. */
+  /** Named subset of crossing series to include. Omitted = all matched. */
   series?: string[];
-  /** Custom tooltip body; when given, replaces `format` entirely. Receives the
-   *  matched, series-filtered rows (length >= 1 whenever the tooltip is shown). */
+  /** Custom tooltip body; replaces `format` when given. */
   content?: Snippet<[{ rows: TRow[] }]>;
 };
 
@@ -35,7 +39,10 @@ export type TooltipRuntime<TRow extends Record<string, unknown>> = {
   format: (row: TRow) => string;
   /** Identifies the originating facet (`''` when not faceted). */
   facetId: string;
-  sync: TooltipSync;
+  /** Strategy resolved by the chart; omitted → PlotLayout falls back to its own default. */
+  strategy?: HoverStrategy;
+  /** Whether to broadcast to other facets. */
+  sync: boolean;
   series?: string[];
   content?: Snippet<[{ rows: TRow[] }]>;
 };
@@ -62,7 +69,10 @@ export type HoverStore = {
   cursorFrac: { x: number; y: number } | null;
   /** Facet id that currently owns the hover (`''` when not faceted). */
   source: string | null;
-  sync: TooltipSync;
+  /** How related points are found within a facet. */
+  strategy: HoverStrategy;
+  /** Whether the hover is broadcast to other facets. */
+  sync: boolean;
 };
 
 /** A point ready to render: its plotted position plus its label. */

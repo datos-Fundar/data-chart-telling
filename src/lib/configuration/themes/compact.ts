@@ -7,4 +7,5 @@ export const COMPACT_THEME: ChartConfigInput = {
   axis: { fontSize: 11, xTickSize: 3, yTickSize: 3, xTickPadding: 6, yTickPadding: 6 },
   margins: { top: 18, right: 30, bottom: 22, left: 30 },
   line: { strokeWidth: 2, dotRadius: 3 },
+  hover: { rule: { strokeWidth: 1, strokeDasharray: '3 3' }, dot: { dotRadius: 3 } },
 };

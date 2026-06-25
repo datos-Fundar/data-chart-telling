@@ -170,8 +170,9 @@
   seriesData={resolvedSeries}
   {scales}
   {margins}
+  defaultStrategy="y"
 >
-  {#snippet children({ matchedPoints, ruleX, ruleY })}
+  {#snippet children({ matchedPoints, ruleX, ruleY, impliesRuleX, impliesRuleY })}
     {#each groupedSeries as group (group.series.name)}
       {@const defaultColor = group.series.side === 'left' ? leftColor : rightColor}
       {@const getCategory = resolveAccessor(group.series.x)}
@@ -221,7 +222,7 @@
 
       {#each seriesMarkers.get(group.series.name) ?? [] as marker, i (`series-${group.series.name}-${marker.type}-${i}`)}
         {#if marker.type === 'component'}
-          {#if marker.strategy === 'segment'}
+          {#if marker.scope === 'segment'}
             {@const segs = resolveSegmentsForSeries(segments, group.series.name)}
             {@const segmentDataArrays = getDataForSegments(group.series.data, getCategory, segs)}
             {#each segmentDataArrays as segmentData, segIdx (`${group.series.name}-marker-segment-${segIdx}`)}
@@ -247,16 +248,15 @@
           {/if}
         {:else if marker.type === 'hover'}
           {@const seriesPoints = matchedPoints.filter((p) => p.series === group.series.name)}
-          {#if marker.strategy === 'segment'}
+          {#if marker.scope === 'segment'}
             {@const segs = resolveSegmentsForSeries(segments, group.series.name)}
             {#each segs as seg, segIdx (`${group.series.name}-hover-segment-${segIdx}`)}
               {@const segPoints = seriesPoints.filter((p) => matchesSegmentX(p.x, seg))}
               {#if segPoints.length > 0}
                 <HoverMarker
                   data={segPoints}
-                  ruleX={marker.ruleX !== false ? ruleX : null}
-                  ruleY={marker.ruleY !== false ? ruleY : null}
-                  color={marker.color}
+                  ruleX={marker.ruleX !== false && (impliesRuleX || marker.ruleX === true) ? ruleX : null}
+                  ruleY={marker.ruleY !== false && (impliesRuleY || marker.ruleY === true) ? ruleY : null}
                   showLabels={marker.showLabels}
                   ruleStyle={marker.ruleStyle}
                   dotStyle={marker.dotStyle}
@@ -267,9 +267,8 @@
           {:else}
             <HoverMarker
               data={seriesPoints}
-              ruleX={marker.ruleX !== false ? ruleX : null}
-              ruleY={marker.ruleY !== false ? ruleY : null}
-              color={marker.color}
+              ruleX={marker.ruleX !== false && (impliesRuleX || marker.ruleX === true) ? ruleX : null}
+              ruleY={marker.ruleY !== false && (impliesRuleY || marker.ruleY === true) ? ruleY : null}
               showLabels={marker.showLabels}
               ruleStyle={marker.ruleStyle}
               dotStyle={marker.dotStyle}

@@ -49,14 +49,14 @@ export const NoTooltip: Story = {
  * returns the string shown in the floating box.
  *
  * Hover over any bar to activate. A standalone `PyramidPlot` uses
- * `facetId: ''` and `sync: 'none'`.
+ * `facetId: ''` and `sync: false`.
  */
 export const BasicTooltip: Story = {
   args: {
     ...BASE_ARGS,
     tooltip: {
       facetId: '',
-      sync: 'none',
+      sync: false,
       format: (row) => {
         const { ageGroup, sex, pct } = row as PopulationRow;
         return `${sex} - ${ageGroup}: ${pct}%`;
@@ -74,7 +74,7 @@ export const RichFormat: Story = {
     ...BASE_ARGS,
     tooltip: {
       facetId: '',
-      sync: 'none',
+      sync: false,
       format: (row) => {
         const { ageGroup, sex, pct } = row as PopulationRow;
         return `${sex}\nAge Group: ${ageGroup}\nPopulation: ${pct.toFixed(2)}%`;
@@ -92,7 +92,7 @@ export const ComputedFormat: Story = {
     ...BASE_ARGS,
     tooltip: {
       facetId: '',
-      sync: 'none',
+      sync: false,
       format: (row) => {
         const { ageGroup, sex, pct } = row as PopulationRow;
         const baselinePct = 3.0;
@@ -113,7 +113,7 @@ export const FemaleOnly: Story = {
     ...BASE_ARGS,
     tooltip: {
       facetId: '',
-      sync: 'none',
+      sync: false,
       series: ['Mujeres'],
       format: (row) => {
         const { ageGroup, pct } = row as PopulationRow;
@@ -131,7 +131,7 @@ export const MaleOnly: Story = {
     ...BASE_ARGS,
     tooltip: {
       facetId: '',
-      sync: 'none',
+      sync: false,
       series: ['Varones'],
       format: (row) => {
         const { ageGroup, pct } = row as PopulationRow;
@@ -150,7 +150,7 @@ export const BothSidesFormatted: Story = {
     ...BASE_ARGS,
     tooltip: {
       facetId: '',
-      sync: 'none',
+      sync: false,
       format: (row) => {
         const { sex, ageGroup, pct } = row as PopulationRow;
         const sexEmoji = sex === 'Mujeres' ? '♀' : '♂';
@@ -169,7 +169,7 @@ export const CohortPercentage: Story = {
     ...BASE_ARGS,
     tooltip: {
       facetId: '',
-      sync: 'none',
+      sync: false,
       format: (row) => {
         const { sex, ageGroup, pct } = row as PopulationRow;
         return `${sex} (${ageGroup})\n${pct.toFixed(2)}% of population`;

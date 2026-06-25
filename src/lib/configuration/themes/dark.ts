@@ -15,4 +15,5 @@ export const DARK_THEME: ChartConfigInput = {
   tooltip: { background: '#e5e7eb', color: '#0f172a' },
   line: { strokeWidth: 3, dotRadius: 4 },
   timeline: { activeColor: '#38bdf8', axisColor: '#94a3b8', thickness: 60 },
+  hover: { rule: { stroke: '#38bdf8' } },
 };

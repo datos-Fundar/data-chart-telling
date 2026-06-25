@@ -231,7 +231,7 @@ export const WithMarkerStrategies: Story = {
         type: 'component',
         series: 'series3',
         component: PeakMarker,
-        strategy: 'segment',
+        scope: 'segment',
         props: {
           yProp: 'value',
           xProp: 'year',
@@ -243,7 +243,7 @@ export const WithMarkerStrategies: Story = {
         type: 'component',
         series: 'series4',
         component: PeakMarker,
-        strategy: 'series',
+        scope: 'series',
         props: {
           yProp: 'value',
           xProp: 'year',
