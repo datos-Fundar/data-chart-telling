@@ -1,0 +1,247 @@
+import type { Meta, StoryObj } from '@storybook/svelte-vite';
+import BarPlot from '$lib/plots/bar/Plot.svelte';
+import type { Series } from '$lib/types/plots/common';
+import type { PlotStyles } from '$lib/types/plots/styles';
+import {
+  FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+  MALE_LIFE_EXPECTANCY_BY_PROVINCE,
+  type ProvincePoint,
+} from './data';
+
+// ── Meta ──────────────────────────────────────────────────────────────────────
+
+const meta = {
+  title: 'Plots/BarPlot/Styles',
+  component: BarPlot,
+  tags: ['autodocs'],
+  args: {
+    width: 950,
+    height: 500,
+  },
+  argTypes: {
+    width: {
+      description: 'Plot width in pixels.',
+      control: { type: 'range', min: 300, max: 950, step: 50 },
+    },
+    height: {
+      description: 'Plot height in pixels.',
+      control: { type: 'range', min: 200, max: 700, step: 50 },
+    },
+    series: {
+      description: 'Data series to render.',
+      control: false,
+    },
+    styles: {
+      description: 'Rendering style overrides.',
+      control: false,
+    },
+  },
+  parameters: {
+    docs: { source: { name: 'BarPlot' } },
+  },
+} satisfies Meta<typeof BarPlot>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+const FEMALE = {
+  name: 'female',
+  x: 'province',
+  y: 'value',
+  data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+} satisfies Series<ProvincePoint>;
+
+const MALE = {
+  name: 'male',
+  x: 'province',
+  y: 'value',
+  data: MALE_LIFE_EXPECTANCY_BY_PROVINCE,
+} satisfies Series<ProvincePoint>;
+
+// ── Stories ───────────────────────────────────────────────────────────────────
+
+/**
+ * No style overrides — the plot uses the configured theme defaults.
+ */
+export const Default: Story = {
+  args: { series: [FEMALE] },
+};
+
+/**
+ * Value labels enabled with default settings — `styles.values.show: true`
+ * renders the numeric Y value above (or anchored to) the top of each bar.
+ *
+ * The default format is `"${seriesName} - ${value}"` and the default anchor
+ * is `'outside'`, which places the text above the bar.
+ */
+export const ShowValues: Story = {
+  args: {
+    series: [FEMALE],
+    styles: {
+      values: { show: true },
+    } satisfies PlotStyles,
+  },
+};
+
+/**
+ * Anchor `'outside'` (explicit) — text appears above the bar, centered on it.
+ * This is the default when `anchor` is omitted for bar charts.
+ */
+export const AnchorOutside: Story = {
+  args: {
+    series: [FEMALE],
+    styles: {
+      values: {
+        show: true,
+        anchor: 'outside',
+        format: (v: number) => `${v.toFixed(1)} yr`,
+      },
+    } satisfies PlotStyles,
+  },
+};
+
+/**
+ * Anchor `'end'` — the label appears at the end of the bar (top),
+ * useful when labels need to be directly on the bar.
+ */
+export const AnchorEnd: Story = {
+  args: {
+    series: [FEMALE],
+    styles: {
+      values: {
+        show: true,
+        anchor: 'end',
+        format: (v: number) => `${v.toFixed(1)} yr`,
+      },
+    } satisfies PlotStyles,
+  },
+};
+
+/**
+ * Anchor `'middle'` — the label is placed in the middle of the bar.
+ * Works best for taller bars with good contrast.
+ */
+export const AnchorMiddle: Story = {
+  args: {
+    series: [FEMALE],
+    styles: {
+      values: {
+        show: true,
+        anchor: 'middle',
+        format: (v: number) => `${v.toFixed(1)} yr`,
+      },
+    } satisfies PlotStyles,
+  },
+};
+
+/**
+ * Anchor `'start'` — text appears at the start of the bar (bottom),
+ * useful for showing baseline values.
+ */
+export const AnchorStart: Story = {
+  args: {
+    series: [FEMALE],
+    styles: {
+      values: {
+        show: true,
+        anchor: 'start',
+        format: (v: number) => `${v.toFixed(1)} yr`,
+      },
+    } satisfies PlotStyles,
+  },
+};
+
+/**
+ * Custom format — the `format(value, seriesName)` callback receives the
+ * numeric Y value and the series name. Return any string to override the
+ * default `"${seriesName} - ${value}"` label.
+ */
+export const CustomFormat: Story = {
+  args: {
+    series: [FEMALE],
+    styles: {
+      values: {
+        show: true,
+        format: (v: number, name: string) => `${name} → ${v.toFixed(1)} yr`,
+      },
+    } satisfies PlotStyles,
+  },
+};
+
+/**
+ * Custom offsets — `dx` and `dy` fine-tune the label position in pixels,
+ * overriding the defaults computed from `anchor`. Useful for nudging a label
+ * away from another bar or legend.
+ *
+ * Here `anchor: 'outside'` is combined with `dy` to push the label further
+ * above the bar.
+ */
+export const CustomOffsets: Story = {
+  args: {
+    series: [FEMALE],
+    styles: {
+      values: {
+        show: true,
+        anchor: 'outside',
+        format: (v: number) => `${v.toFixed(1)} yr`,
+        dy: -12,
+      },
+    } satisfies PlotStyles,
+  },
+};
+
+/**
+ * Two series with default labels — each series' bars get their own labels,
+ * filled with the palette colour for that series. The default `anchor: 'outside'`
+ * places both label sets above their respective bars.
+ */
+export const TwoSeriesWithLabels: Story = {
+  args: {
+    series: [FEMALE, MALE],
+    styles: {
+      values: {
+        show: true,
+        format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
+      },
+    } satisfies PlotStyles,
+  },
+};
+
+/**
+ * Two series with `anchor: 'inside'` labels — labels appear inside the bars.
+ * Works best when bars are tall enough to accommodate text.
+ */
+export const TwoSeriesLabelsInside: Story = {
+  args: {
+    series: [FEMALE, MALE],
+    styles: {
+      values: {
+        show: true,
+        anchor: 'middle',
+        format: (v: number, name: string) => `${name}: ${v.toFixed(1)} yr`,
+      },
+    } satisfies PlotStyles,
+  },
+};
+
+/**
+ * Custom text anchor and line anchor — bypasses the `anchor` shorthand and
+ * sets svelteplot's low-level `textAnchor` / `lineAnchor` directly. The label
+ * is right-aligned (`textAnchor: 'end'`) and sits above the bar
+ * (`lineAnchor: 'bottom'`), with a nudge via `dy`.
+ */
+export const LowLevelTextPlacement: Story = {
+  args: {
+    series: [FEMALE],
+    styles: {
+      values: {
+        show: true,
+        format: (v: number) => `${v.toFixed(1)} yr`,
+        textAnchor: 'end',
+        lineAnchor: 'bottom',
+        dy: -8,
+        dx: 0,
+      },
+    } satisfies PlotStyles,
+  },
+};
