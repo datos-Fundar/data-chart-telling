@@ -159,7 +159,7 @@ Plots accept either `series` (pre-built `Series[]`) or the `data` + `x`/`y`/`z` 
 | `legend` | `LegendSection[]` | | ✅ | ✅ | ✅ | ✅ |
 | `segments` | `SegmentsMap<TStyle>` | `{}` / `[]` | ✅ | ✅ | ✅ | ✅ |
 | `markers` | `Marker[]` | `[]` | ✅ | ✅ | ✅ | ✅ |
-| `scales` | `ScalesConfig` | `{}` | ❌ | ✅ | ✅ | ✅ |
+| `scales` | `ScalesConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
 | `facet` | `FacetConfig` | | ✅ | ✅ | ✅ | ✅ |
 | `timeline` | `TimelineConfig` | | ✅ | ✅ | ✅ | ✅ |
 | `tooltip` | `TooltipProp` | | ✅ | ✅ | ✅ | ✅ |
