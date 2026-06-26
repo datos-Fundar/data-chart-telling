@@ -210,6 +210,7 @@
         ruleX={showRuleX ? ctrl.ruleX : null}
         ruleY={showRuleY ? ctrl.ruleY : null}
         showLabels={unscopedHoverMarker.showLabels ?? showHoverLabels}
+        format={unscopedHoverMarker.format}
         ruleStyle={unscopedHoverMarker.ruleStyle}
         dotStyle={unscopedHoverMarker.dotStyle}
         fontStyle={unscopedHoverMarker.fontStyle}

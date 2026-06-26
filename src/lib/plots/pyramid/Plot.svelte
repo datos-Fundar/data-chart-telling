@@ -118,6 +118,7 @@
       row: d,
       label: d.__label,
       series: d.__series,
+      color: d.__side === 'left' ? leftColor : rightColor,
     })),
   );
 

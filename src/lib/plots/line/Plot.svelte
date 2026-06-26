@@ -62,7 +62,7 @@
   const yAcc = $derived(resolveAccessor(resolvedSeries[0]?.y ?? ((d: TData) => d)));
   const flat = $derived(resolvedSeries.flatMap((s) => s.data));
   const hoverPoints = $derived(
-    resolvedSeries.flatMap((s) => {
+    resolvedSeries.flatMap((s, idx) => {
       const sx = resolveAccessor(s.x);
       const sy = resolveAccessor(s.y);
       return s.data.map((d) => ({
@@ -71,6 +71,7 @@
         row: d,
         label: String(sy(d)),
         series: s.name,
+        color: paletteColor(idx, cfg.palette),
       }));
     }),
   );

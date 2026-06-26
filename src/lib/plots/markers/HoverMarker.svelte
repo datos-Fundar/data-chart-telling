@@ -19,6 +19,7 @@
     ruleX?: AxisValue | null;
     ruleY?: AxisValue | null;
     showLabels?: boolean;
+    format?: (point: HoverDisplayPoint) => string;
     ruleStyle?: StrokeStyle;
     dotStyle?: DotStyle;
     fontStyle?: FontStyle;
@@ -29,6 +30,7 @@
     ruleX = null,
     ruleY = null,
     showLabels = true,
+    format,
     ruleStyle,
     dotStyle,
     fontStyle,
@@ -60,19 +62,32 @@
 {/if}
 
 {#if data.length > 0}
-  <DotMarker
-    {data}
-    x={(d) => d.x}
-    y={(d) => d.y}
-    style={{ ...cfg.hover.dot, ...dotStyle }}
-  />
-  {#if showLabels}
-    <TextMarker
-      {data}
+  {#each data as point (point.series ?? `${point.x}_${point.y}`)}
+    <DotMarker
+      data={[point]}
       x={(d) => d.x}
       y={(d) => d.y}
-      text={(d) => d.label ?? ''}
-      style={{ ...cfg.hover.font, ...fontStyle }}
+      style={{
+        ...cfg.hover.dot,
+        ...dotStyle,
+        ...(dotStyle?.dotFill === 'currentColor' && point.color ? { dotFill: point.color } : {}),
+        ...(dotStyle?.dotStroke === 'currentColor' && point.color ? { dotStroke: point.color } : {}),
+      }}
     />
+  {/each}
+  {#if showLabels}
+    {#each data as point (point.series ?? `${point.x}_${point.y}`)}
+      <TextMarker
+        data={[point]}
+        x={(d) => d.x}
+        y={(d) => d.y}
+        text={(d) => format ? format(d) : (d.label ?? '')}
+        style={{
+          ...cfg.hover.font,
+          ...fontStyle,
+          ...(fontStyle?.fill === 'currentColor' && point.color ? { fill: point.color } : {}),
+        }}
+      />
+    {/each}
   {/if}
 {/if}

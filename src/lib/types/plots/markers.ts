@@ -1,6 +1,6 @@
 import type { AxisValue } from '$lib/types/plots/common';
 import type { DotStyle, FontStyle, StrokeStyle } from '$lib/types/plots/styles';
-import type { HoverStrategy } from '$lib/types/layout/tooltip';
+import type { HoverStrategy, HoverDisplayPoint } from '$lib/types/layout/tooltip';
 
 /**
  * Baseline props every marker component receives when mounted by a plot:
@@ -44,6 +44,8 @@ export type HoverMarkerConfig = {
   ruleX?: boolean;
   ruleY?: boolean;
   showLabels?: boolean;
+  /** Custom label formatter. Receives the matched point; return the string to display. */
+  format?: (point: HoverDisplayPoint) => string;
   ruleStyle?: StrokeStyle;
   dotStyle?: DotStyle;
   fontStyle?: FontStyle;

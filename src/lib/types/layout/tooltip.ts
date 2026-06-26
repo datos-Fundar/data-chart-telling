@@ -82,6 +82,8 @@ export type HoverDisplayPoint = {
   label: string;
   /** Owning series name; undefined for plot kinds with no series concept (heatmap). */
   series?: string;
+  /** Resolved series color — used by HoverMarker when dotFill/fill is `'currentColor'`. */
+  color?: string;
 };
 
 /** A candidate point for hover matching/highlighting — also carries its source row. */
