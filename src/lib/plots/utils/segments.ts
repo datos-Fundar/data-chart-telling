@@ -12,22 +12,17 @@ import type {
 const DEFAULT_KEY = 'default';
 
 /**
- * Returns the flat {@link Segment} list for one series by merging all groups.
- * Within each group, series-specific segments are added before `'default'`
- * segments, so series-specific rules win on tie-breaks.
+ * Returns the flat {@link Segment} list for one series.
+ * Series-specific segments are added before `'default'` segments so that
+ * series-specific catch-alls win over default catch-alls on tie-breaks.
  */
 export function resolveSegmentsForSeries<TStyle>(
   segments: Segments<TStyle>,
   seriesName: string,
 ): Segment<TStyle>[] {
-  const result: Segment<TStyle>[] = [];
-  for (const group of segments) {
-    const specific = (group as Record<string, Segment<TStyle>[]>)[seriesName];
-    const defaults = (group as Record<string, Segment<TStyle>[]>)[DEFAULT_KEY];
-    if (specific) result.push(...specific);
-    if (defaults) result.push(...defaults);
-  }
-  return result;
+  const specific = segments[seriesName] ?? [];
+  const defaults = segments[DEFAULT_KEY] ?? [];
+  return [...specific, ...defaults];
 }
 
 /** Returns true when `xVal` falls inside any of a segment's x ranges. */
@@ -89,10 +84,8 @@ export function validateSegments<TStyle>(segments: Segments<TStyle>): void {
       );
     }
   };
-  for (const group of segments) {
-    for (const [key, segs] of Object.entries(group as Record<string, Segment<TStyle>[]>)) {
-      check(key === DEFAULT_KEY ? '(default)' : `"${key}"`, segs);
-    }
+  for (const [key, segs] of Object.entries(segments)) {
+    check(key === DEFAULT_KEY ? '(default)' : `"${key}"`, segs);
   }
 }
 
@@ -174,7 +167,16 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
       if (r < runs.length - 1) bridged.push(runs[r + 1].data[0]);
       defaultVisual.push({ data: bridged, style: {} as TStyle });
     } else {
-      userVisual.push({ data: run.data, style: segs[run.segIdx].style ?? ({} as TStyle) });
+      const seg = segs[run.segIdx];
+      const segStyle = seg.style ?? ({} as TStyle);
+      // Area-specific segments merge the catch-all as a baseline: catch-all
+      // keys fill in whatever the area segment omits; the area wins on conflict.
+      const isAreaSpecific = seg.areas != null && seg.areas.length > 0;
+      const resolvedStyle: TStyle =
+        isAreaSpecific && catchAll?.style
+          ? { ...(catchAll.style as object), ...(segStyle as object) } as TStyle
+          : segStyle;
+      userVisual.push({ data: run.data, style: resolvedStyle });
       // When the next run is also a user segment (no unmatched data between them),
       // insert a line-only connector so the lines join without a gap. Using a
       // separate mark (rather than appending a bridge point to the current run)

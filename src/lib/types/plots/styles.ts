@@ -161,51 +161,29 @@ export type Segment<TStyle> = {
   style?: TStyle;
 };
 
-/** Per-series list of {@link Segment}s, keyed by series name. */
-export type SeriesAwareSegmentsMap<TStyle> = Record<string, Segment<TStyle>[]>;
-
-/**
- * A segment group that applies its segments to **every** series. Use the
- * `'default'` key to target all series at once.
- *
- * @example
- * ```ts
- * const group: DefaultSegmentsMap<LineSegmentStyle> = {
- *   default: [{ areas: [{ x: { from: 2012, to: 2014 } }], style: { dots: { dotSymbol: 'circle' } } }],
- * };
- * ```
- */
-export type DefaultSegmentsMap<TStyle> = { default: Segment<TStyle>[] };
-
-/**
- * One element of a {@link Segments} array. Either a {@link DefaultSegmentsMap}
- * (applies its segments to every series via the `'default'` key) or a
- * {@link SeriesAwareSegmentsMap} (applies segments only to the named series).
- * Both forms can be mixed in the same array.
- */
-export type SegmentsStyle<TStyle> = DefaultSegmentsMap<TStyle> | SeriesAwareSegmentsMap<TStyle>;
-
 /**
  * The `segments` prop accepted by every plot kind.
  *
- * An array of {@link SegmentsStyle} groups processed in order. Each group maps
- * either `'default'` (all series) or specific series names to lists of
- * {@link Segment}s. Multiple groups let you organise segments by concern:
+ * A record mapping series names (or `'default'` for all series) to lists of
+ * {@link Segment}s. Segments in a named key apply only to that series;
+ * segments under `'default'` apply to every series.
  *
  * ```ts
- * segments: [
- *   // Group 1 – per-series stroke colours (catch-all baseline)
- *   { female: [{ style: { stroke: { stroke: 'steelblue' } } }],
- *     male:   [{ style: { stroke: { stroke: 'tomato'    } } }] },
- *   // Group 2 – shared dot symbols for every series
- *   { default: [{ areas: [{ x: { from: 2012, to: 2014 } }], style: { dots: { dotSymbol: 'circle' } } }] },
- * ]
+ * segments: {
+ *   female:  [{ style: { stroke: { stroke: 'tomato' } } }],   // catch-all for female
+ *   male:    [{ style: { stroke: { stroke: 'steelblue' } } }], // catch-all for male
+ *   default: [{ areas: [{ x: { from: 2012, to: 2014 } }], style: { dots: { dotSymbol: 'circle' } } }],
+ * }
  * ```
  *
  * Within each resolved series list, catch-alls (no `areas`) are evaluated last
  * so that area-specific segments always override them, regardless of position.
+ * Area-specific segments also inherit any style key absent from their own style
+ * by merging the catch-all as a baseline — the area's own style wins on conflict.
+ * This lets you set a series colour once in a catch-all and add per-range dots
+ * or dash patterns without repeating the colour on every area segment.
  */
-export type Segments<TStyle> = SegmentsStyle<TStyle>[];
+export type Segments<TStyle> = Record<string, Segment<TStyle>[]>;
 
 /** One contiguous, styled slice of a series' data — ready to draw as its own mark. */
 export type VisualSegment<T extends Record<string, unknown>, TStyle = LineSegmentStyle> = {

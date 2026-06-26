@@ -186,20 +186,18 @@ const SERIES4: YearPoint[] = [
   { year: 2022, value: 68 },
 ];
 
-const STRATEGIES_SEGMENTS: Segments<LineSegmentStyle> = [
-  {
-    series1: [{ style: {} }],
-    series2: [{ style: {} }],
-    series3: [
-      { areas: [{ x: { to: 2020 } }], style: {} },
-      { areas: [{ x: { from: 2020 } }], style: { stroke: { strokeDasharray: '6 4' } } },
-    ],
-    series4: [
-      { areas: [{ x: { to: 2020 } }], style: {} },
-      { areas: [{ x: { from: 2020 } }], style: { stroke: { strokeDasharray: '6 4' } } },
-    ],
-  },
-];
+const STRATEGIES_SEGMENTS: Segments<LineSegmentStyle> = {
+  series1: [{ style: {} }],
+  series2: [{ style: {} }],
+  series3: [
+    { areas: [{ x: { to: 2020 } }], style: {} },
+    { areas: [{ x: { from: 2020 } }], style: { stroke: { strokeDasharray: '6 4' } } },
+  ],
+  series4: [
+    { areas: [{ x: { to: 2020 } }], style: {} },
+    { areas: [{ x: { from: 2020 } }], style: { stroke: { strokeDasharray: '6 4' } } },
+  ],
+};
 
 /**
  * Marker strategies: series-level and segment-level peak detection.

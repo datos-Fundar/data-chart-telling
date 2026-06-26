@@ -48,24 +48,22 @@ const SERIES = [
 export const HighlightRegion: Story = {
   args: {
     series: SERIES,
-    segments: [
-      {
-        default: [
-          {
-            areas: [
-              {
-                x: { from: '25-34', to: '45-54' },
-                y: { from: 'Buenos Aires', to: 'Mendoza' },
-              },
-            ],
-            style: { fillOpacity: 1 },
-          },
-          {
-            style: { fillOpacity: 0.3 },
-          },
-        ],
-      },
-    ] satisfies Segments<CellSegmentStyle>,
+    segments: {
+      default: [
+        {
+          areas: [
+            {
+              x: { from: '25-34', to: '45-54' },
+              y: { from: 'Buenos Aires', to: 'Mendoza' },
+            },
+          ],
+          style: { fillOpacity: 1 },
+        },
+        {
+          style: { fillOpacity: 0.3 },
+        },
+      ],
+    } satisfies Segments<CellSegmentStyle>,
   },
 };
 
@@ -76,22 +74,20 @@ export const HighlightRegion: Story = {
 export const HighlightRows: Story = {
   args: {
     series: SERIES,
-    segments: [
-      {
-        default: [
-          {
-            areas: [
-              { x: { from: '35-44', to: '35-44' } },
-              { x: { from: '45-54', to: '45-54' } },
-            ],
-            style: { fillOpacity: 0.95 },
-          },
-          {
-            style: { fillOpacity: 0.25 },
-          },
-        ],
-      },
-    ] satisfies Segments<CellSegmentStyle>,
+    segments: {
+      default: [
+        {
+          areas: [
+            { x: { from: '35-44', to: '35-44' } },
+            { x: { from: '45-54', to: '45-54' } },
+          ],
+          style: { fillOpacity: 0.95 },
+        },
+        {
+          style: { fillOpacity: 0.25 },
+        },
+      ],
+    } satisfies Segments<CellSegmentStyle>,
   },
 };
 
@@ -102,22 +98,20 @@ export const HighlightRows: Story = {
 export const HighlightColumns: Story = {
   args: {
     series: SERIES,
-    segments: [
-      {
-        default: [
-          {
-            areas: [
-              { y: { from: 'Buenos Aires', to: 'Santa Fe' } },
-              { y: { from: 'Tucumán', to: 'Tucumán' } },
-            ],
-            style: { fillOpacity: 1 },
-          },
-          {
-            style: { fillOpacity: 0.3 },
-          },
-        ],
-      },
-    ] satisfies Segments<CellSegmentStyle>,
+    segments: {
+      default: [
+        {
+          areas: [
+            { y: { from: 'Buenos Aires', to: 'Santa Fe' } },
+            { y: { from: 'Tucumán', to: 'Tucumán' } },
+          ],
+          style: { fillOpacity: 1 },
+        },
+        {
+          style: { fillOpacity: 0.3 },
+        },
+      ],
+    } satisfies Segments<CellSegmentStyle>,
   },
 };
 
@@ -128,33 +122,31 @@ export const HighlightColumns: Story = {
 export const LayeredOpacity: Story = {
   args: {
     series: SERIES,
-    segments: [
-      {
-        default: [
-          {
-            areas: [
-              {
-                x: { from: '25-34', to: '35-44' },
-                y: { from: 'Buenos Aires', to: 'Santa Fe' },
-              },
-            ],
-            style: { fillOpacity: 1 },
-          },
-          {
-            areas: [
-              {
-                x: { from: '45-54', to: '55-64' },
-                y: { from: 'Mendoza', to: 'Tucumán' },
-              },
-            ],
-            style: { fillOpacity: 0.6 },
-          },
-          {
-            style: { fillOpacity: 0.25 },
-          },
-        ],
-      },
-    ] satisfies Segments<CellSegmentStyle>,
+    segments: {
+      default: [
+        {
+          areas: [
+            {
+              x: { from: '25-34', to: '35-44' },
+              y: { from: 'Buenos Aires', to: 'Santa Fe' },
+            },
+          ],
+          style: { fillOpacity: 1 },
+        },
+        {
+          areas: [
+            {
+              x: { from: '45-54', to: '55-64' },
+              y: { from: 'Mendoza', to: 'Tucumán' },
+            },
+          ],
+          style: { fillOpacity: 0.6 },
+        },
+        {
+          style: { fillOpacity: 0.25 },
+        },
+      ],
+    } satisfies Segments<CellSegmentStyle>,
   },
 };
 
@@ -165,27 +157,25 @@ export const LayeredOpacity: Story = {
 export const HighlightWithStroke: Story = {
   args: {
     series: SERIES,
-    segments: [
-      {
-        default: [
-          {
-            areas: [
-              {
-                x: { from: '18-24', to: '34-34' },
-                y: { from: 'Buenos Aires', to: 'Córdoba' },
-              },
-            ],
-            style: {
-              fillOpacity: 0.9,
-              stroke: '#f59f00',
-              strokeWidth: 2,
+    segments: {
+      default: [
+        {
+          areas: [
+            {
+              x: { from: '18-24', to: '34-34' },
+              y: { from: 'Buenos Aires', to: 'Córdoba' },
             },
+          ],
+          style: {
+            fillOpacity: 0.9,
+            stroke: '#f59f00',
+            strokeWidth: 2,
           },
-          {
-            style: { fillOpacity: 0.3 },
-          },
-        ],
-      },
-    ] satisfies Segments<CellSegmentStyle>,
+        },
+        {
+          style: { fillOpacity: 0.3 },
+        },
+      ],
+    } satisfies Segments<CellSegmentStyle>,
   },
 };

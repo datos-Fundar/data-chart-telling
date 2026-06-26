@@ -49,7 +49,7 @@ type Story = StoryObj<typeof meta>;
 // ── Default key: segments that apply to every series ──────────────────────────
 
 /**
- * Simplest `default` group: one Segment with one Area.
+ * Simplest `default` key: one Segment with one Area.
  *
  * The area covers x ∈ ['Buenos Aires', 'Santa Fe']. Bars outside the area are
  * rendered with the default palette style — no explicit catch-all needed.
@@ -89,30 +89,28 @@ export const HighlightedProvincesSegment: any = {
       series: args.series,
       width: args.width,
       height: args.height,
-      segments: [
-        {
-          default: [
-            {
-              areas: [
-                {
-                  x: {
-                    from: 'Buenos Aires',
-                    to: 'Santa Fe',
-                  },
+      segments: {
+        default: [
+          {
+            areas: [
+              {
+                x: {
+                  from: 'Buenos Aires',
+                  to: 'Santa Fe',
                 },
-              ],
-              style: {
-                fillOpacity: args.fillOpacity,
               },
+            ],
+            style: {
+              fillOpacity: args.fillOpacity,
             },
-            {
-              style: {
-                fillOpacity: args.dimmedOpacity,
-              },
+          },
+          {
+            style: {
+              fillOpacity: args.dimmedOpacity,
             },
-          ],
-        },
-      ] satisfies Segments<BarSegmentStyle>,
+          },
+        ],
+      } satisfies Segments<BarSegmentStyle>,
     },
   }),
 };
@@ -131,22 +129,20 @@ export const MultipleAreasOneSegment: Story = {
         data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
       },
     ],
-    segments: [
-      {
-        default: [
-          {
-            areas: [
-              { x: { from: 'Buenos Aires', to: 'La Pampa' } },
-              { x: { from: 'Catamarca', to: 'Catamarca' } },
-            ],
-            style: { fillOpacity: 0.9 },
-          },
-          {
-            style: { fillOpacity: 0.3 },
-          },
-        ],
-      },
-    ] satisfies Segments<BarSegmentStyle>,
+    segments: {
+      default: [
+        {
+          areas: [
+            { x: { from: 'Buenos Aires', to: 'La Pampa' } },
+            { x: { from: 'Catamarca', to: 'Catamarca' } },
+          ],
+          style: { fillOpacity: 0.9 },
+        },
+        {
+          style: { fillOpacity: 0.3 },
+        },
+      ],
+    } satisfies Segments<BarSegmentStyle>,
   },
 };
 
@@ -166,19 +162,17 @@ export const TwoSegmentsDifferentStyles: Story = {
         data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
       },
     ],
-    segments: [
-      {
-        default: [
-          {
-            areas: [{ x: { from: 'Buenos Aires', to: 'Santa Fe' } }],
-            style: { fill: 'tomato', fillOpacity: 0.85 },
-          },
-          {
-            style: { fillOpacity: 0.4 },
-          },
-        ],
-      },
-    ] satisfies Segments<BarSegmentStyle>,
+    segments: {
+      default: [
+        {
+          areas: [{ x: { from: 'Buenos Aires', to: 'Santa Fe' } }],
+          style: { fill: 'tomato', fillOpacity: 0.85 },
+        },
+        {
+          style: { fillOpacity: 0.4 },
+        },
+      ],
+    } satisfies Segments<BarSegmentStyle>,
   },
 };
 
@@ -193,19 +187,17 @@ export const TwoSegmentsOnAllSeries: Story = {
     x: 'province',
     y: 'value',
     z: 'sex',
-    segments: [
-      {
-        default: [
-          {
-            areas: [{ x: { from: 'Buenos Aires', to: 'Santa Fe' } }],
-            style: { fillOpacity: 0.85 },
-          },
-          {
-            style: { fillOpacity: 0.4 },
-          },
-        ],
-      },
-    ] satisfies Segments<BarSegmentStyle>,
+    segments: {
+      default: [
+        {
+          areas: [{ x: { from: 'Buenos Aires', to: 'Santa Fe' } }],
+          style: { fillOpacity: 0.85 },
+        },
+        {
+          style: { fillOpacity: 0.4 },
+        },
+      ],
+    } satisfies Segments<BarSegmentStyle>,
   },
 };
 
@@ -223,19 +215,17 @@ export const SegmentsOnOneSeriesOnly: Story = {
     x: 'province',
     y: 'value',
     z: 'sex',
-    segments: [
-      {
-        female: [
-          {
-            areas: [{ x: { from: 'Buenos Aires', to: 'Santa Fe' } }],
-            style: { fillOpacity: 0.9 },
-          },
-          {
-            style: { fillOpacity: 0.3 },
-          },
-        ],
-      },
-    ] satisfies Segments<BarSegmentStyle>,
+    segments: {
+      female: [
+        {
+          areas: [{ x: { from: 'Buenos Aires', to: 'Santa Fe' } }],
+          style: { fillOpacity: 0.9 },
+        },
+        {
+          style: { fillOpacity: 0.3 },
+        },
+      ],
+    } satisfies Segments<BarSegmentStyle>,
   },
 };
 
@@ -249,21 +239,19 @@ export const CustomFillsPerSeries: Story = {
     x: 'province',
     y: 'value',
     z: 'sex',
-    segments: [
-      {
-        female: [
-          {
-            areas: [{ x: { from: 'Buenos Aires', to: 'La Pampa' } }],
-            style: { fillOpacity: 0.8 },
-          },
-        ],
-        male: [
-          {
-            areas: [{ x: { from: 'Buenos Aires', to: 'La Pampa' } }],
-            style: { fill: '#1971c2', fillOpacity: 0.85 },
-          },
-        ],
-      },
-    ] satisfies Segments<BarSegmentStyle>,
+    segments: {
+      female: [
+        {
+          areas: [{ x: { from: 'Buenos Aires', to: 'La Pampa' } }],
+          style: { fillOpacity: 0.8 },
+        },
+      ],
+      male: [
+        {
+          areas: [{ x: { from: 'Buenos Aires', to: 'La Pampa' } }],
+          style: { fill: '#1971c2', fillOpacity: 0.85 },
+        },
+      ],
+    } satisfies Segments<BarSegmentStyle>,
   },
 };

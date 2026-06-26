@@ -47,10 +47,10 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 // ── Default key: segments that apply to every series ──────────────────────────
-// Use `{ default: Segment[] }` in a group to apply the same rules to all series.
+// Use `{ default: Segment[] }` to apply the same rules to all series.
 
 /**
- * Simplest `default` group: one Segment with one Area.
+ * Simplest `default` key: one Segment with one Area.
  *
  * The area covers x ∈ [2016, 2020]. Data points outside the area (2008–2014)
  * are rendered with the default palette style — no explicit catch-all needed.
@@ -112,24 +112,22 @@ export const DashedSegmentInRange: any = {
       series: args.series,
       width: args.width,
       height: args.height,
-      segments: [
-        {
-          default: [
-            {
-              areas: [{ x: { from: 2016, to: 2020 } }],
-              style: {
-                stroke: {
-                  stroke: args.stroke,
-                  strokeWidth: args.strokeWidth,
-                  strokeOpacity: args.strokeOpacity,
-                  strokeDasharray: args.strokeDasharray,
-                  strokeLinecap: args.strokeLinecap,
-                },
+      segments: {
+        default: [
+          {
+            areas: [{ x: { from: 2016, to: 2020 } }],
+            style: {
+              stroke: {
+                stroke: args.stroke,
+                strokeWidth: args.strokeWidth,
+                strokeOpacity: args.strokeOpacity,
+                strokeDasharray: args.strokeDasharray,
+                strokeLinecap: args.strokeLinecap,
               },
             },
-          ],
-        },
-      ] satisfies Segments<LineSegmentStyle>,
+          },
+        ],
+      } satisfies Segments<LineSegmentStyle>,
     },
   }),
 };
@@ -150,19 +148,17 @@ export const MultipleAreasOneSegment: Story = {
         data: FEMALE_LIFE_EXPECTANCY
       },
     ],
-    segments: [
-      {
-        default: [
-          {
-            areas: [
-              { x: { from: 2010, to: 2012 } },
-              { x: { from: 2016, to: 2020 } },
-            ],
-            style: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.7 } },
-          },
-        ],
-      },
-    ] satisfies Segments<LineSegmentStyle>,
+    segments: {
+      default: [
+        {
+          areas: [
+            { x: { from: 2010, to: 2012 } },
+            { x: { from: 2016, to: 2020 } },
+          ],
+          style: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.7 } },
+        },
+      ],
+    } satisfies Segments<LineSegmentStyle>,
   },
 };
 
@@ -185,19 +181,17 @@ export const MultipleAreasWithYConstraint: Story = {
         data: FEMALE_LIFE_EXPECTANCY
       },
     ],
-    segments: [
-      {
-        default: [
-          {
-            areas: [
-              { x: { from: 2010, to: 2012 } },
-              { x: { from: 2015, to: 2020 }, y: { from: 83.5, to: 84 } },
-            ],
-            style: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.7 } },
-          },
-        ],
-      },
-    ] satisfies Segments<LineSegmentStyle>,
+    segments: {
+      default: [
+        {
+          areas: [
+            { x: { from: 2010, to: 2012 } },
+            { x: { from: 2015, to: 2020 }, y: { from: 83.5, to: 84 } },
+          ],
+          style: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.7 } },
+        },
+      ],
+    } satisfies Segments<LineSegmentStyle>,
   },
 };
 
@@ -219,20 +213,18 @@ export const TwoSegmentsDifferentStyles: Story = {
         data: FEMALE_LIFE_EXPECTANCY
       },
     ],
-    segments: [
-      {
-        default: [
-          {
-            areas: [{ x: { from: 2010, to: 2012 } }],
-            style: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.5 } },
-          },
-          {
-            areas: [{ x: { from: 2015, to: 2020 }, y: { from: 83.5, to: 84 } }],
-            style: { stroke: { stroke: 'tomato', strokeDasharray: '3 3', strokeWidth: 2.5 } },
-          },
-        ],
-      },
-    ] satisfies Segments<LineSegmentStyle>,
+    segments: {
+      default: [
+        {
+          areas: [{ x: { from: 2010, to: 2012 } }],
+          style: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.5 } },
+        },
+        {
+          areas: [{ x: { from: 2015, to: 2020 }, y: { from: 83.5, to: 84 } }],
+          style: { stroke: { stroke: 'tomato', strokeDasharray: '3 3', strokeWidth: 2.5 } },
+        },
+      ],
+    } satisfies Segments<LineSegmentStyle>,
   },
 };
 
@@ -252,25 +244,23 @@ export const TwoSegmentsOnAllSeries: Story = {
     x: 'year',
     y: 'value',
     z: 'sex',
-    segments: [
-      {
-        default: [
-          {
-            areas: [{ x: { from: 2010, to: 2012 } }],
-            style: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.5 } },
-          },
-          {
-            areas: [{ x: { from: 2015, to: 2020 }, y: { from: 83.5, to: 84 } }],
-            style: { stroke: { stroke: 'tomato', strokeDasharray: '3 3', strokeWidth: 2.5 } },
-          },
-        ],
-      },
-    ] satisfies Segments<LineSegmentStyle>,
+    segments: {
+      default: [
+        {
+          areas: [{ x: { from: 2010, to: 2012 } }],
+          style: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.5 } },
+        },
+        {
+          areas: [{ x: { from: 2015, to: 2020 }, y: { from: 83.5, to: 84 } }],
+          style: { stroke: { stroke: 'tomato', strokeDasharray: '3 3', strokeWidth: 2.5 } },
+        },
+      ],
+    } satisfies Segments<LineSegmentStyle>,
   },
 };
 
 // ── Series-aware form ─────────────────────────────────────────────────────────
-// Keys in a group target exactly one series; series with no entry use the default palette.
+// Keys in the record target exactly one series; series with no entry use the default palette.
 
 /**
  * Segments keyed by series name apply only to the named series.
@@ -285,20 +275,18 @@ export const SegmentsOnOneSeriesOnly: Story = {
     x: 'year',
     y: 'value',
     z: 'sex',
-    segments: [
-      {
-        female: [
-          {
-            areas: [{ x: { from: 2010, to: 2012 } }],
-            style: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.5 } },
-          },
-          {
-            areas: [{ x: { from: 2015, to: 2020 }, y: { from: 83.5, to: 84 } }],
-            style: { stroke: { stroke: 'tomato', strokeDasharray: '3 3', strokeWidth: 2.5 } },
-          },
-        ],
-      },
-    ] satisfies Segments<LineSegmentStyle>,
+    segments: {
+      female: [
+        {
+          areas: [{ x: { from: 2010, to: 2012 } }],
+          style: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.5 } },
+        },
+        {
+          areas: [{ x: { from: 2015, to: 2020 }, y: { from: 83.5, to: 84 } }],
+          style: { stroke: { stroke: 'tomato', strokeDasharray: '3 3', strokeWidth: 2.5 } },
+        },
+      ],
+    } satisfies Segments<LineSegmentStyle>,
   },
 };
 
@@ -318,17 +306,15 @@ export const WithDots: Story = {
         data: FEMALE_LIFE_EXPECTANCY
       },
     ],
-    segments: [
-      {
-        female: [
-          {
-            style: {
-              dots: { dotRadius: 8, dotSymbol: 'circle' },
-            },
+    segments: {
+      female: [
+        {
+          style: {
+            dots: { dotRadius: 8, dotSymbol: 'circle' },
           },
-        ],
-      },
-    ] satisfies Segments<LineSegmentStyle>,
+        },
+      ],
+    } satisfies Segments<LineSegmentStyle>,
   },
 };
 
@@ -342,24 +328,22 @@ export const TwoSeriesWithDifferentDots: Story = {
     x: 'year',
     y: 'value',
     z: 'sex',
-    segments: [
-      {
-        female: [
-          {
-            style: {
-              dots: { dotRadius: 8, dotSymbol: 'circle', dotStrokeWidth: 2 },
-            },
+    segments: {
+      female: [
+        {
+          style: {
+            dots: { dotRadius: 8, dotSymbol: 'circle', dotStrokeWidth: 2 },
           },
-        ],
-        male: [
-          {
-            style: {
-              dots: { dotRadius: 8, dotSymbol: 'square', dotStrokeWidth: 2 },
-            },
+        },
+      ],
+      male: [
+        {
+          style: {
+            dots: { dotRadius: 8, dotSymbol: 'square', dotStrokeWidth: 2 },
           },
-        ],
-      },
-    ] satisfies Segments<LineSegmentStyle>,
+        },
+      ],
+    } satisfies Segments<LineSegmentStyle>,
   },
 };
 
@@ -377,23 +361,21 @@ export const DashedSegmentWithDots: Story = {
         data: FEMALE_LIFE_EXPECTANCY
       },
     ],
-    segments: [
-      {
-        female: [
-          {
-            areas: [{ x: { to: 2015 } }],
-            style: { dots: { dotRadius: 8, dotSymbol: 'circle' } },
+    segments: {
+      female: [
+        {
+          areas: [{ x: { to: 2015 } }],
+          style: { dots: { dotRadius: 8, dotSymbol: 'circle' } },
+        },
+        {
+          areas: [{ x: { from: 2015 } }],
+          style: {
+            stroke: { strokeDasharray: '6 4', strokeOpacity: 0.6 },
+            dots: { dotRadius: 8, dotSymbol: 'triangle' },
           },
-          {
-            areas: [{ x: { from: 2015 } }],
-            style: {
-              stroke: { strokeDasharray: '6 4', strokeOpacity: 0.6 },
-              dots: { dotRadius: 8, dotSymbol: 'triangle' },
-            },
-          },
-        ],
-      },
-    ] satisfies Segments<LineSegmentStyle>,
+        },
+      ],
+    } satisfies Segments<LineSegmentStyle>,
   },
 };
 
@@ -410,32 +392,28 @@ export const CustomDotsWithStroke: Story = {
         data: FEMALE_LIFE_EXPECTANCY
       },
     ],
-    segments: [
-      {
-        female: [
-          {
-            style: {
-              dots: {
-                dotRadius: 12,
-                dotSymbol: 'circle',
-                dotFill: 'yellow',
-                dotFillOpacity: 0.8,
-                dotStroke: 'red',
-                dotStrokeWidth: 3
-              },
+    segments: {
+      female: [
+        {
+          style: {
+            dots: {
+              dotRadius: 12,
+              dotSymbol: 'circle',
+              dotFill: 'yellow',
+              dotFillOpacity: 0.8,
+              dotStroke: 'red',
+              dotStrokeWidth: 3
             },
           },
-        ],
-      },
-    ] satisfies Segments<LineSegmentStyle>,
+        },
+      ],
+    } satisfies Segments<LineSegmentStyle>,
   },
 };
 
 // ── Catch-all as default baseline ─────────────────────────────────────────────
 // A catch-all segment (no `areas`) placed anywhere in the list is evaluated
 // last — area-specific segments always win, regardless of their position.
-// The stories below also explore how multi-group and mixed-key layouts
-// interact with catch-alls and the `default` key.
 
 /**
  * Catch-all as a baseline that area-specific segments fully override.
@@ -449,8 +427,8 @@ export const CustomDotsWithStroke: Story = {
  *
  * Because each area segment explicitly carries a `stroke` override, the line
  * color changes in the highlighted ranges. Compare with
- * {@link MultiGroupSeparationOfConcerns} where the dots segments carry no
- * stroke and the line color instead stays as the palette default there.
+ * {@link OneGroupWithSeparationOfConcerns} where the dots segments carry no
+ * stroke and the line color stays consistent throughout.
  */
 export const CatchAllAsDefaultStyle: Story = {
   args: {
@@ -458,93 +436,94 @@ export const CatchAllAsDefaultStyle: Story = {
     x: 'year',
     y: 'value',
     z: 'sex',
-    segments: [
-      {
-        female: [
-          { style: { stroke: { stroke: 'yellow' } } },
-          { areas: [{ x: { from: 2010, to: 2012 } }], style: { stroke: { stroke: 'tomato' }, dots: { dotRadius: 5, dotSymbol: 'circle' } } },
-          { areas: [{ x: { from: 2016, to: 2018 } }], style: { stroke: { stroke: 'tomato' }, dots: { dotRadius: 5, dotSymbol: 'triangle' } } },
-        ],
-        male: [
-          { style: { stroke: { stroke: 'lightblue' } } },
-          { areas: [{ x: { from: 2010, to: 2012 } }], style: { stroke: { stroke: 'blue' }, dots: { dotRadius: 5, dotSymbol: 'circle' } } },
-          { areas: [{ x: { from: 2016, to: 2018 } }], style: { stroke: { stroke: 'blue' }, dots: { dotRadius: 5, dotSymbol: 'triangle' } } },
-        ],
-      },
-    ] satisfies Segments<LineSegmentStyle>,
+    segments: {
+      female: [
+        { style: { stroke: { stroke: 'lightpink' } } },
+        { areas: [{ x: { from: 2010, to: 2012 } }], style: { stroke: { stroke: 'red' }, dots: { dotRadius: 5, dotSymbol: 'circle' } } },
+        { areas: [{ x: { from: 2016, to: 2018 } }], style: { stroke: { stroke: 'red' }, dots: { dotRadius: 5, dotSymbol: 'triangle' } } },
+      ],
+      male: [
+        { style: { stroke: { stroke: 'lightblue' } } },
+        { areas: [{ x: { from: 2010, to: 2012 } }], style: { stroke: { stroke: 'blue' }, dots: { dotRadius: 5, dotSymbol: 'circle' } } },
+        { areas: [{ x: { from: 2016, to: 2018 } }], style: { stroke: { stroke: 'blue' }, dots: { dotRadius: 5, dotSymbol: 'triangle' } } },
+      ],
+    } satisfies Segments<LineSegmentStyle>,
   },
 };
 
-// ── Multi-group format ────────────────────────────────────────────────────────
-// Split segments across multiple groups to separate concerns.
+// ── Separation of concerns ────────────────────────────────────────────────────
+// Use named keys for series colours and `default` for shared period dots.
 
 /**
- * Two groups separating line color from dot placement.
+ * Series colour with shared dot placement — separation of concerns in one record.
  *
- * - Group 1: per-series catch-alls set the baseline stroke color for each line
- *   (yellow for female, lightblue for male).
- * - Group 2: a single `default` entry adds dots for **all** series in two
- *   specific time ranges, without repeating the stroke color.
+ * - Per-series catch-alls (`female`, `male`) set the baseline stroke colour.
+ * - The `default` key adds dots for **all** series in two specific time ranges,
+ *   without repeating the stroke colour.
  *
- * Because the `default` segments in group 2 only carry a `dots` style (no
- * `stroke`), the line portion of highlighted points uses the palette default
- * color rather than inheriting the catch-all's stroke. Segments are
- * self-contained — they do not merge or inherit from other segments. To keep
- * the line color consistent across the whole series, either repeat the stroke
- * in every area segment (as in {@link CatchAllAsDefaultStyle}) or collapse
- * everything into a single group with explicit strokes.
+ * Area-specific segments automatically merge the catch-all as a baseline:
+ * any style key absent from the area segment's own style is filled in from
+ * the catch-all. Here the `default` dot segments carry no `stroke`, so they
+ * inherit the per-series catch-all stroke (yellow / lightblue). The line
+ * stays the series colour throughout — no need to repeat the stroke on every
+ * area segment.
  */
-export const MultiGroupSeparationOfConcerns: Story = {
+export const SeparationOfConcerns: Story = {
   args: {
     data: LIFE_EXPECTANCY,
     x: 'year',
     y: 'value',
     z: 'sex',
-    segments: [
-      {
-        female: [{ style: { stroke: { stroke: 'yellow' } } }],
-        male:   [{ style: { stroke: { stroke: 'lightblue' } } }],
-      },
-      {
-        default: [
-          { areas: [{ x: { from: 2010, to: 2012 } }], style: { dots: { dotRadius: 5, dotSymbol: 'circle' } } },
-          { areas: [{ x: { from: 2016, to: 2018 } }], style: { dots: { dotRadius: 5, dotSymbol: 'triangle' } } },
-        ],
-      },
-    ] satisfies Segments<LineSegmentStyle>,
+    segments: {
+      female: [{ style: { stroke: { stroke: 'lightpink' } } }],
+      male:   [{ style: { stroke: { stroke: 'lightblue' } } }],
+      default: [
+        { areas: [{ x: { from: 2010, to: 2012 } }], style: { dots: { dotRadius: 5, dotSymbol: 'circle' } } },
+        { areas: [{ x: { from: 2016, to: 2018 } }], style: { dots: { dotRadius: 5, dotSymbol: 'triangle' } } },
+      ],
+    } satisfies Segments<LineSegmentStyle>,
   },
 };
 
+// ── Per-series colour + shared period dots ─────────────────────────────────────
+// The canonical pattern: one catch-all per series sets the line colour; a
+// `default` key adds dot symbols that vary by time period across all series.
+
 /**
- * Same structure as {@link MultiGroupSeparationOfConcerns} collapsed into a
- * single group.
+ * Per-series line colour with dot symbols that vary by time period.
  *
- * Series-specific keys (`female`, `male`) supply the catch-all baseline
- * strokes; the `default` key in the same group provides area-specific dots
- * for all series. Within each group `resolveSegmentsForSeries` appends
- * series-specific segments before `default` segments, so the evaluation order
- * is identical to the two-group version: `default` area segments win for
- * matched ranges, series catch-alls fire as a fallback for everything else.
+ * One record holds everything: per-series catch-alls supply each line's colour,
+ * and a `default` key maps three successive time ranges to different dot
+ * symbols — all without repeating the stroke colour on any area segment.
  *
- * The visual result is the same as {@link MultiGroupSeparationOfConcerns}.
- * Use multiple groups when the two concerns grow large enough that keeping
- * them separate aids readability; a single group is fine when they are small.
+ * The catch-all merge fills in the missing stroke on each `default` area
+ * segment, so every dot inherits the correct series colour automatically.
+ * This is the intended pattern when colour belongs to the series and dot shape
+ * belongs to the time period.
  */
-export const OneGroupWithSeparationOfConcerns: Story = {
+export const SharedDotsByTimePeriod: Story = {
   args: {
     data: LIFE_EXPECTANCY,
     x: 'year',
     y: 'value',
     z: 'sex',
-    segments: [
-      {
-        female: [{ style: { stroke: { stroke: 'yellow' } } }],
-        male:   [{ style: { stroke: { stroke: 'lightblue' } } }],
-        default: [
-          { areas: [{ x: { from: 2010, to: 2012 } }], style: { dots: { dotRadius: 5, dotSymbol: 'circle' } } },
-          { areas: [{ x: { from: 2016, to: 2018 } }], style: { dots: { dotRadius: 5, dotSymbol: 'triangle' } } },
-        ],
-      },
-    ] satisfies Segments<LineSegmentStyle>,
+    segments: {
+      female: [{ style: { stroke: { stroke: 'tomato' } } }],
+      male:   [{ style: { stroke: { stroke: 'steelblue' } } }],
+      default: [
+        {
+          areas: [{ x: { to: 2012 } }],
+          style: { dots: { dotRadius: 5, dotSymbol: 'circle' } },
+        },
+        {
+          areas: [{ x: { from: 2012, to: 2015 } }],
+          style: { dots: { dotRadius: 5, dotSymbol: 'triangle' } },
+        },
+        {
+          areas: [{ x: { from: 2015 } }],
+          style: { dots: { dotRadius: 5, dotSymbol: 'square' } },
+        },
+      ],
+    } satisfies Segments<LineSegmentStyle>,
   },
 };

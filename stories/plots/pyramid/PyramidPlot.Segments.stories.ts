@@ -44,18 +44,16 @@ const BASE_ARGS = {
 export const HighlightedSegments: Story = {
   args: {
     ...BASE_ARGS,
-    segments: [
-      Object.fromEntries(
-        (['Mujeres', 'Varones'] as const).map((name) => [
-          name,
-          AGE_GROUPS.map((ageGroup) => ({
-            from: ageGroup,
-            to: ageGroup,
-            style: { fillOpacity: ['80-84', '85+'].includes(ageGroup) ? 1 : 0.25 },
-          })),
-        ]),
-      ),
-    ] satisfies Segments<BarSegmentStyle>,
+    segments: Object.fromEntries(
+      (['Mujeres', 'Varones'] as const).map((name) => [
+        name,
+        AGE_GROUPS.map((ageGroup) => ({
+          from: ageGroup,
+          to: ageGroup,
+          style: { fillOpacity: ['80-84', '85+'].includes(ageGroup) ? 1 : 0.25 },
+        })),
+      ]),
+    ) satisfies Segments<BarSegmentStyle>,
   },
 };
 
@@ -66,22 +64,20 @@ export const HighlightedSegments: Story = {
 export const WorkingAgeHighlight: Story = {
   args: {
     ...BASE_ARGS,
-    segments: [
-      Object.fromEntries(
-        (['Mujeres', 'Varones'] as const).map((name) => [
-          name,
-          AGE_GROUPS.map((ageGroup) => {
-            const ageStart = parseInt(ageGroup.split('-')[0]);
-            const isWorkingAge = ageStart >= 18 && ageStart < 65;
-            return {
-              from: ageGroup,
-              to: ageGroup,
-              style: { fillOpacity: isWorkingAge ? 1 : 0.2 },
-            };
-          }),
-        ]),
-      ),
-    ] satisfies Segments<BarSegmentStyle>,
+    segments: Object.fromEntries(
+      (['Mujeres', 'Varones'] as const).map((name) => [
+        name,
+        AGE_GROUPS.map((ageGroup) => {
+          const ageStart = parseInt(ageGroup.split('-')[0]);
+          const isWorkingAge = ageStart >= 18 && ageStart < 65;
+          return {
+            from: ageGroup,
+            to: ageGroup,
+            style: { fillOpacity: isWorkingAge ? 1 : 0.2 },
+          };
+        }),
+      ]),
+    ) satisfies Segments<BarSegmentStyle>,
   },
 };
 
@@ -92,22 +88,20 @@ export const WorkingAgeHighlight: Story = {
 export const YouthAndElderlyHighlight: Story = {
   args: {
     ...BASE_ARGS,
-    segments: [
-      Object.fromEntries(
-        (['Mujeres', 'Varones'] as const).map((name) => [
-          name,
-          AGE_GROUPS.map((ageGroup) => {
-            const ageStart = parseInt(ageGroup.split('-')[0]);
-            const isYouthOrElderly = ageStart < 25 || ageStart >= 65;
-            return {
-              from: ageGroup,
-              to: ageGroup,
-              style: { fillOpacity: isYouthOrElderly ? 0.95 : 0.2 },
-            };
-          }),
-        ]),
-      ),
-    ] satisfies Segments<BarSegmentStyle>,
+    segments: Object.fromEntries(
+      (['Mujeres', 'Varones'] as const).map((name) => [
+        name,
+        AGE_GROUPS.map((ageGroup) => {
+          const ageStart = parseInt(ageGroup.split('-')[0]);
+          const isYouthOrElderly = ageStart < 25 || ageStart >= 65;
+          return {
+            from: ageGroup,
+            to: ageGroup,
+            style: { fillOpacity: isYouthOrElderly ? 0.95 : 0.2 },
+          };
+        }),
+      ]),
+    ) satisfies Segments<BarSegmentStyle>,
   },
 };
 
@@ -118,23 +112,21 @@ export const YouthAndElderlyHighlight: Story = {
 export const ByDecadePattern: Story = {
   args: {
     ...BASE_ARGS,
-    segments: [
-      Object.fromEntries(
-        (['Mujeres', 'Varones'] as const).map((name) => [
-          name,
-          AGE_GROUPS.map((ageGroup) => {
-            const ageStart = parseInt(ageGroup.split('-')[0]);
-            const decade = Math.floor(ageStart / 10);
-            const opacity = decade % 2 === 0 ? 0.9 : 0.3;
-            return {
-              from: ageGroup,
-              to: ageGroup,
-              style: { fillOpacity: opacity },
-            };
-          }),
-        ]),
-      ),
-    ] satisfies Segments<BarSegmentStyle>,
+    segments: Object.fromEntries(
+      (['Mujeres', 'Varones'] as const).map((name) => [
+        name,
+        AGE_GROUPS.map((ageGroup) => {
+          const ageStart = parseInt(ageGroup.split('-')[0]);
+          const decade = Math.floor(ageStart / 10);
+          const opacity = decade % 2 === 0 ? 0.9 : 0.3;
+          return {
+            from: ageGroup,
+            to: ageGroup,
+            style: { fillOpacity: opacity },
+          };
+        }),
+      ]),
+    ) satisfies Segments<BarSegmentStyle>,
   },
 };
 
@@ -145,23 +137,21 @@ export const ByDecadePattern: Story = {
 export const AsymmetricHighlight: Story = {
   args: {
     ...BASE_ARGS,
-    segments: [
-      {
-        Mujeres: AGE_GROUPS.map((ageGroup) => ({
+    segments: {
+      Mujeres: AGE_GROUPS.map((ageGroup) => ({
+        from: ageGroup,
+        to: ageGroup,
+        style: { fillOpacity: ageGroup === '80-84' || ageGroup === '85+' ? 1 : 0.25 },
+      })),
+      Varones: AGE_GROUPS.map((ageGroup) => {
+        const ageStart = parseInt(ageGroup.split('-')[0]);
+        const isWorkingAge = ageStart >= 25 && ageStart < 55;
+        return {
           from: ageGroup,
           to: ageGroup,
-          style: { fillOpacity: ageGroup === '80-84' || ageGroup === '85+' ? 1 : 0.25 },
-        })),
-        Varones: AGE_GROUPS.map((ageGroup) => {
-          const ageStart = parseInt(ageGroup.split('-')[0]);
-          const isWorkingAge = ageStart >= 25 && ageStart < 55;
-          return {
-            from: ageGroup,
-            to: ageGroup,
-            style: { fillOpacity: isWorkingAge ? 1 : 0.25 },
-          };
-        }),
-      },
-    ] satisfies Segments<BarSegmentStyle>,
+          style: { fillOpacity: isWorkingAge ? 1 : 0.25 },
+        };
+      }),
+    } satisfies Segments<BarSegmentStyle>,
   },
 };
