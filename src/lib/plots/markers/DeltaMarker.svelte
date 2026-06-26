@@ -59,15 +59,27 @@
       ? Math.min(fromVis, toVis)
       : (fromVis + toVis) / 2;
   }
+
+  // Pre-derive all coordinates as script-level signals so prop getters read safe
+  // values during Svelte 5 teardown, before the {#if} guard finishes unmounting.
+  const coords = $derived.by(() => {
+    if (!resolved) return null;
+    const fromVis = clamp(resolved.from ?? 0);
+    const toVis = clamp(resolved.to ?? 0);
+    const at = resolved.at ?? 0;
+    return {
+      fromPt: pt(at, fromVis),
+      toPt: pt(at, toVis),
+      textPt: pt(at, textVaryCoord(fromVis, toVis)),
+      lineData: [pt(at, fromVis), pt(at, toVis)],
+      diff: resolved.diff ?? 0,
+    };
+  });
 </script>
 
-{#if resolved}
-  {@const fromVis = clamp(resolved?.from ?? 0)}
-  {@const toVis = clamp(resolved?.to ?? 0)}
-  {@const textPt = pt(resolved?.at ?? 0, textVaryCoord(fromVis, toVis))}
-
+{#if coords}
   <Line
-    data={[pt(resolved?.at ?? 0, fromVis), pt(resolved?.at ?? 0, toVis)]}
+    data={coords.lineData}
     x={(p) => p.x}
     y={(p) => p.y}
     stroke={strokeStyle?.stroke ?? 'currentColor'}
@@ -77,19 +89,19 @@
     strokeLinecap={strokeStyle?.strokeLinecap ?? 'round'}
   />
   <DotMarker
-    x={pt(resolved?.at ?? 0, fromVis).x}
-    y={pt(resolved?.at ?? 0, fromVis).y}
+    x={coords?.fromPt?.x ?? 0}
+    y={coords?.fromPt?.y ?? 0}
     style={{ dotRadius: 4, dotFill: strokeStyle?.stroke, dotStroke: strokeStyle?.stroke, dotStrokeWidth: 2, ...dotStyle }}
   />
   <DotMarker
-    x={pt(resolved?.at ?? 0, toVis).x}
-    y={pt(resolved?.at ?? 0, toVis).y}
+    x={coords?.toPt?.x ?? 0}
+    y={coords?.toPt?.y ?? 0}
     style={{ dotRadius: 4, dotFill: strokeStyle?.stroke, dotStroke: strokeStyle?.stroke, dotStrokeWidth: 2, ...dotStyle }}
   />
   <TextMarker
-    x={textPt.x}
-    y={textPt.y}
-    text={(formatDiff ?? ((v: number) => v.toFixed(1)))(resolved?.diff ?? 0)}
+    x={coords?.textPt?.x ?? 0}
+    y={coords?.textPt?.y ?? 0}
+    text={(formatDiff ?? ((v: number) => v.toFixed(1)))(coords?.diff ?? 0)}
     style={{
       fontWeight: 'bold',
       fontSize: 14,

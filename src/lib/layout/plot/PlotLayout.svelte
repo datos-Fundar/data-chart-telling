@@ -218,7 +218,7 @@
   </Plot>
 
   {#if tooltip && ctrl.showTooltip && ctrl.tooltipPosition}
-    <Tooltip x={ctrl.tooltipPosition.x} y={ctrl.tooltipPosition.y}>
+    <Tooltip x={ctrl.tooltipPosition?.x ?? 0} y={ctrl.tooltipPosition?.y ?? 0}>
       {#if tooltip.content}
         {@render tooltip.content({ rows: ctrl.matchedRows.map((p) => p.row) })}
       {:else}
