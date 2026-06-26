@@ -3,30 +3,31 @@ import type { AxisValue, Series } from '$lib/types/plots/common';
 import type {
   Area,
   Segment,
-  SegmentsMap,
-  SeriesAwareSegmentsMap,
+  Segments,
   LineSegmentStyle,
   VisualGroup,
   VisualSegment,
 } from '$lib/types/plots/styles';
 
-/** Narrows a {@link SegmentsMap} to its per-series record form. */
-export function isSeriesAware<TStyle>(
-  segments: SegmentsMap<TStyle>,
-): segments is SeriesAwareSegmentsMap<TStyle> {
-  return !Array.isArray(segments);
-}
+const DEFAULT_KEY = 'default';
 
 /**
- * Returns the {@link Segment} list relevant for one series. If `segments` is
- * the global array form every series gets the same list; if it is the record
- * form only the entry keyed by `seriesName` is used (falling back to `[]`).
+ * Returns the flat {@link Segment} list for one series by merging all groups.
+ * Within each group, series-specific segments are added before `'default'`
+ * segments, so series-specific rules win on tie-breaks.
  */
 export function resolveSegmentsForSeries<TStyle>(
-  segments: SegmentsMap<TStyle>,
+  segments: Segments<TStyle>,
   seriesName: string,
 ): Segment<TStyle>[] {
-  return Array.isArray(segments) ? segments : (segments[seriesName] ?? []);
+  const result: Segment<TStyle>[] = [];
+  for (const group of segments) {
+    const specific = (group as Record<string, Segment<TStyle>[]>)[seriesName];
+    const defaults = (group as Record<string, Segment<TStyle>[]>)[DEFAULT_KEY];
+    if (specific) result.push(...specific);
+    if (defaults) result.push(...defaults);
+  }
+  return result;
 }
 
 /** Returns true when `xVal` falls inside any of a segment's x ranges. */
@@ -74,25 +75,23 @@ export function getDataForSegments<TData, TStyle>(
 }
 
 /**
- * Warns about obvious configuration mistakes:
- * - Multiple segments with no `areas` in the same series (they all match
- *   everything; only the last style will be visible).
+ * Warns about obvious configuration mistakes: multiple catch-all segments
+ * (no `areas`) in the same series list. Since catch-alls are evaluated last
+ * and in order, only the first one can ever match; later ones are dead code.
  */
-export function validateSegments<TStyle>(segments: SegmentsMap<TStyle>): void {
+export function validateSegments<TStyle>(segments: Segments<TStyle>): void {
   const check = (label: string, segs: Segment<TStyle>[]) => {
     const catchAlls = segs.filter((s) => !s.areas || s.areas.length === 0).length;
     if (catchAlls > 1) {
       console.warn(
         `segments ${label}: ${catchAlls} entries have no areas — ` +
-          `they each match every data point; only the last one's style will be visible.`,
+          `only the first catch-all's style will be used.`,
       );
     }
   };
-  if (Array.isArray(segments)) {
-    check('(global)', segments);
-  } else {
-    for (const [name, segs] of Object.entries(segments)) {
-      check(`"${name}"`, segs);
+  for (const group of segments) {
+    for (const [key, segs] of Object.entries(group as Record<string, Segment<TStyle>[]>)) {
+      check(key === DEFAULT_KEY ? '(default)' : `"${key}"`, segs);
     }
   }
 }
@@ -111,15 +110,28 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
 
   type DataPoint = S['data'][number];
 
+  // Evaluate area-specific segments before catch-alls (no areas), preserving
+  // relative order within each group. This lets a catch-all placed first in
+  // the list act as a fallback baseline rather than matching everything.
+  const evalOrder = segs
+    .map((seg, i) => ({ seg, i }))
+    .sort((a, b) => {
+      const aSpecific = a.seg.areas != null && a.seg.areas.length > 0;
+      const bSpecific = b.seg.areas != null && b.seg.areas.length > 0;
+      if (aSpecific === bSpecific) return a.i - b.i;
+      return aSpecific ? -1 : 1;
+    });
+
   // For each data point, find the first matching segment index (-1 = unmatched).
   const matchIdx = series.data.map((d) => {
     const xVal = getX(d) as AxisValue;
     const yVal = getY(d) as AxisValue;
-    return segs.findIndex((seg) => {
+    const found = evalOrder.find(({ seg }) => {
       const areas = seg.areas;
       if (!areas || areas.length === 0) return true;
       return areas.some((area) => areaMatchesXY(xVal, yVal, area));
     });
+    return found !== undefined ? found.i : -1;
   });
 
   // Group consecutive data points into runs by their matched segment index.
@@ -136,6 +148,16 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
       runs.push({ data: [series.data[i]], segIdx: idx });
     }
   }
+
+  // Connector lines need to match the catch-all's stroke so they don't reveal
+  // the default palette color when the user has set a baseline via catch-all.
+  // Dots are excluded to avoid duplicate marks at the shared boundary points.
+  const catchAll = segs.find((s) => !s.areas || s.areas.length === 0);
+  const connectorStyle: TStyle = (() => {
+    if (!catchAll?.style) return {} as TStyle;
+    const { dots: _, ...rest } = catchAll.style as Record<string, unknown>;
+    return rest as TStyle;
+  })();
 
   const defaultVisual: VisualSegment<DataPoint, TStyle>[] = [];
   const connectors: VisualSegment<DataPoint, TStyle>[] = [];
@@ -161,7 +183,7 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
       if (nextRun && nextRun.segIdx !== -1) {
         connectors.push({
           data: [run.data[run.data.length - 1], nextRun.data[0]],
-          style: {} as TStyle,
+          style: connectorStyle,
         });
       }
     }
@@ -176,14 +198,14 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
 
 /**
  * Builds the full list of visual groups — one per series — ready to render.
- * Each group's `visualSegments` is derived from the series' entry in
- * `segments` (or the global array when `segments` is in array form).
+ * Each group's `visualSegments` is derived by resolving the flat segment list
+ * for that series from all groups in `segments`.
  */
 export function buildGroupedSeries<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   S extends Series<any>,
   TStyle = LineSegmentStyle,
->(seriesList: S[], segments: SegmentsMap<TStyle>): VisualGroup<S, TStyle>[] {
+>(seriesList: S[], segments: Segments<TStyle>): VisualGroup<S, TStyle>[] {
   return seriesList.map((s) => ({
     series: s,
     visualSegments: resolveSeriesSegments<S, TStyle>(

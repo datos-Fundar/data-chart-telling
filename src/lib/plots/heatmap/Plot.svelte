@@ -43,9 +43,12 @@
         'HeatmapPlot: markers scoped to a `series` are ignored — heatmaps have no series concept.',
       );
     }
-    if (!Array.isArray(segments) && Object.keys(segments).length > 0) {
+    const seriesKeys = segments.flatMap((g) =>
+      Object.keys(g as Record<string, unknown>).filter((k) => k !== 'default'),
+    );
+    if (seriesKeys.length > 0) {
       console.warn(
-        'HeatmapPlot: `segments` was passed as a record (SeriesAwareSegmentsMap) but heatmaps have no named series — use the array form (Segment[]) instead.',
+        `HeatmapPlot: segment groups have series-specific keys (${[...new Set(seriesKeys)].join(', ')}) — heatmaps have no named series. Use the 'default' key instead.`,
       );
     }
   });
@@ -87,7 +90,7 @@
     makeColorScale(valueDomain[0], valueDomain[1], minColor, maxColor),
   );
 
-  const segList = $derived(Array.isArray(segments) ? segments : []);
+  const segList = $derived(segments.flatMap((g) => (g as Record<string, CellSegmentStyle[]>)['default'] ?? []));
 
   const segStyleMap = $derived.by(() => {
     const map = new Map<string, CellSegmentStyle>();

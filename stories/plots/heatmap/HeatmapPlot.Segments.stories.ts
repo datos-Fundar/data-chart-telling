@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
 import type { Series } from '$lib/types/plots/common';
-import type { SegmentsMap, HeatmapSegmentStyle } from '$lib/types/plots/styles';
-import { EMPLOYMENT_BY_AGE_PROVINCE, AGE_GROUPS, PROVINCES, type AgeProvinceCell } from './data';
+import type { Segments, CellSegmentStyle } from '$lib/types/plots/styles';
+import { EMPLOYMENT_BY_AGE_PROVINCE, type AgeProvinceCell } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -39,6 +39,7 @@ const SERIES = [
 ];
 
 // ── Stories ───────────────────────────────────────────────────────────────────
+// Heatmap segments use the `'default'` key — heatmaps have no named series.
 
 /**
  * Highlight a region — dims all cells except those in a specific age group
@@ -49,18 +50,22 @@ export const HighlightRegion: Story = {
     series: SERIES,
     segments: [
       {
-        areas: [
+        default: [
           {
-            x: { from: '25-34', to: '45-54' },
-            y: { from: 'Buenos Aires', to: 'Mendoza' },
+            areas: [
+              {
+                x: { from: '25-34', to: '45-54' },
+                y: { from: 'Buenos Aires', to: 'Mendoza' },
+              },
+            ],
+            style: { fillOpacity: 1 },
+          },
+          {
+            style: { fillOpacity: 0.3 },
           },
         ],
-        style: { fillOpacity: 1 },
       },
-      {
-        style: { fillOpacity: 0.3 },
-      },
-    ] satisfies SegmentsMap<HeatmapSegmentStyle>,
+    ] satisfies Segments<CellSegmentStyle>,
   },
 };
 
@@ -73,16 +78,20 @@ export const HighlightRows: Story = {
     series: SERIES,
     segments: [
       {
-        areas: [
-          { x: { from: '35-44', to: '35-44' } },
-          { x: { from: '45-54', to: '45-54' } },
+        default: [
+          {
+            areas: [
+              { x: { from: '35-44', to: '35-44' } },
+              { x: { from: '45-54', to: '45-54' } },
+            ],
+            style: { fillOpacity: 0.95 },
+          },
+          {
+            style: { fillOpacity: 0.25 },
+          },
         ],
-        style: { fillOpacity: 0.95 },
       },
-      {
-        style: { fillOpacity: 0.25 },
-      },
-    ] satisfies SegmentsMap<HeatmapSegmentStyle>,
+    ] satisfies Segments<CellSegmentStyle>,
   },
 };
 
@@ -95,50 +104,57 @@ export const HighlightColumns: Story = {
     series: SERIES,
     segments: [
       {
-        areas: [
-          { y: { from: 'Buenos Aires', to: 'Santa Fe' } },
-          { y: { from: 'Tucumán', to: 'Tucumán' } },
+        default: [
+          {
+            areas: [
+              { y: { from: 'Buenos Aires', to: 'Santa Fe' } },
+              { y: { from: 'Tucumán', to: 'Tucumán' } },
+            ],
+            style: { fillOpacity: 1 },
+          },
+          {
+            style: { fillOpacity: 0.3 },
+          },
         ],
-        style: { fillOpacity: 1 },
       },
-      {
-        style: { fillOpacity: 0.3 },
-      },
-    ] satisfies SegmentsMap<HeatmapSegmentStyle>,
+    ] satisfies Segments<CellSegmentStyle>,
   },
 };
 
 /**
  * Multiple highlight areas with different opacities — creates a visual
- * hierarchy by dimming some regions more than others. First segment (hottest)
- * is fully opaque, second (warm) is half-bright, rest are dimmed.
+ * hierarchy by dimming some regions more than others.
  */
 export const LayeredOpacity: Story = {
   args: {
     series: SERIES,
     segments: [
       {
-        areas: [
+        default: [
           {
-            x: { from: '25-34', to: '35-44' },
-            y: { from: 'Buenos Aires', to: 'Santa Fe' },
+            areas: [
+              {
+                x: { from: '25-34', to: '35-44' },
+                y: { from: 'Buenos Aires', to: 'Santa Fe' },
+              },
+            ],
+            style: { fillOpacity: 1 },
+          },
+          {
+            areas: [
+              {
+                x: { from: '45-54', to: '55-64' },
+                y: { from: 'Mendoza', to: 'Tucumán' },
+              },
+            ],
+            style: { fillOpacity: 0.6 },
+          },
+          {
+            style: { fillOpacity: 0.25 },
           },
         ],
-        style: { fillOpacity: 1 },
       },
-      {
-        areas: [
-          {
-            x: { from: '45-54', to: '55-64' },
-            y: { from: 'Mendoza', to: 'Tucumán' },
-          },
-        ],
-        style: { fillOpacity: 0.6 },
-      },
-      {
-        style: { fillOpacity: 0.25 },
-      },
-    ] satisfies SegmentsMap<HeatmapSegmentStyle>,
+    ] satisfies Segments<CellSegmentStyle>,
   },
 };
 
@@ -151,21 +167,25 @@ export const HighlightWithStroke: Story = {
     series: SERIES,
     segments: [
       {
-        areas: [
+        default: [
           {
-            x: { from: '18-24', to: '34-34' },
-            y: { from: 'Buenos Aires', to: 'Córdoba' },
+            areas: [
+              {
+                x: { from: '18-24', to: '34-34' },
+                y: { from: 'Buenos Aires', to: 'Córdoba' },
+              },
+            ],
+            style: {
+              fillOpacity: 0.9,
+              stroke: '#f59f00',
+              strokeWidth: 2,
+            },
+          },
+          {
+            style: { fillOpacity: 0.3 },
           },
         ],
-        style: {
-          fillOpacity: 0.9,
-          stroke: '#f59f00',
-          strokeWidth: 2,
-        },
       },
-      {
-        style: { fillOpacity: 0.3 },
-      },
-    ] satisfies SegmentsMap<HeatmapSegmentStyle>,
+    ] satisfies Segments<CellSegmentStyle>,
   },
 };

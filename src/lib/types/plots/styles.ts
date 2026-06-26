@@ -148,11 +148,13 @@ export type Area = {
 /**
  * One styled rule for a plot. A data point (or cell) is styled when it falls
  * inside **any** of the listed `areas`. Omitting `areas` (or passing an empty
- * array) makes the segment match **all** data — useful as a baseline style.
- * `TStyle` is the per-mark shape ({@link LineSegmentStyle}, {@link BarSegmentStyle},
- * {@link CellSegmentStyle}, …).
+ * array) makes the segment a catch-all that matches every data point — useful
+ * as a baseline style. `TStyle` is the per-mark shape ({@link LineSegmentStyle},
+ * {@link BarSegmentStyle}, {@link CellSegmentStyle}, …).
  *
- * Segments are applied in order; later ones are rendered on top of earlier ones.
+ * Catch-alls are evaluated last so that area-specific segments always take
+ * priority, regardless of their position in the list. A catch-all placed first
+ * therefore acts as a fallback baseline that area-specific segments override.
  */
 export type Segment<TStyle> = {
   areas?: Area[];
@@ -163,17 +165,47 @@ export type Segment<TStyle> = {
 export type SeriesAwareSegmentsMap<TStyle> = Record<string, Segment<TStyle>[]>;
 
 /**
- * Unified segments prop accepted by every plot kind.
+ * A segment group that applies its segments to **every** series. Use the
+ * `'default'` key to target all series at once.
  *
- * - **Array form** (`Segment<TStyle>[]`): segments are applied to **all** series
- *   (or to the implicit single dataset of a heatmap). Only form supported by
- *   `HeatmapPlot` / `HeatmapChart`.
- * - **Record form** (`SeriesAwareSegmentsMap<TStyle>`): each key is a series
- *   name; segments apply only to that series. Supported by line, bar, and
- *   pyramid plots; when an array is passed to those plots the same segments
- *   apply to every series.
+ * @example
+ * ```ts
+ * const group: DefaultSegmentsMap<LineSegmentStyle> = {
+ *   default: [{ areas: [{ x: { from: 2012, to: 2014 } }], style: { dots: { dotSymbol: 'circle' } } }],
+ * };
+ * ```
  */
-export type SegmentsMap<TStyle> = Segment<TStyle>[] | SeriesAwareSegmentsMap<TStyle>;
+export type DefaultSegmentsMap<TStyle> = { default: Segment<TStyle>[] };
+
+/**
+ * One element of a {@link Segments} array. Either a {@link DefaultSegmentsMap}
+ * (applies its segments to every series via the `'default'` key) or a
+ * {@link SeriesAwareSegmentsMap} (applies segments only to the named series).
+ * Both forms can be mixed in the same array.
+ */
+export type SegmentsStyle<TStyle> = DefaultSegmentsMap<TStyle> | SeriesAwareSegmentsMap<TStyle>;
+
+/**
+ * The `segments` prop accepted by every plot kind.
+ *
+ * An array of {@link SegmentsStyle} groups processed in order. Each group maps
+ * either `'default'` (all series) or specific series names to lists of
+ * {@link Segment}s. Multiple groups let you organise segments by concern:
+ *
+ * ```ts
+ * segments: [
+ *   // Group 1 – per-series stroke colours (catch-all baseline)
+ *   { female: [{ style: { stroke: { stroke: 'steelblue' } } }],
+ *     male:   [{ style: { stroke: { stroke: 'tomato'    } } }] },
+ *   // Group 2 – shared dot symbols for every series
+ *   { default: [{ areas: [{ x: { from: 2012, to: 2014 } }], style: { dots: { dotSymbol: 'circle' } } }] },
+ * ]
+ * ```
+ *
+ * Within each resolved series list, catch-alls (no `areas`) are evaluated last
+ * so that area-specific segments always override them, regardless of position.
+ */
+export type Segments<TStyle> = SegmentsStyle<TStyle>[];
 
 /** One contiguous, styled slice of a series' data — ready to draw as its own mark. */
 export type VisualSegment<T extends Record<string, unknown>, TStyle = LineSegmentStyle> = {

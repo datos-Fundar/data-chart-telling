@@ -40,7 +40,7 @@
     styles = {},
     scales = {},
     margins,
-    segments = {},
+    segments = [],
     markers = [],
     tooltip = undefined,
   }: PlotProps<TData, BarSegmentStyle> = $props();

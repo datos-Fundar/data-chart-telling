@@ -3,7 +3,7 @@ import LinePlot from '$lib/plots/line/Plot.svelte';
 import PeakMarker from '$lib/plots/markers/PeakMarker.svelte';
 import DotMarker from '$lib/plots/markers/DotMarker.svelte';
 import TextMarker from '$lib/plots/markers/TextMarker.svelte';
-import type { SegmentsMap, LineSegmentStyle } from '$lib/types/plots/styles';
+import type { Segments, LineSegmentStyle } from '$lib/types/plots/styles';
 import type { Marker } from '$lib/types/plots/markers';
 import { FEMALE_LIFE_EXPECTANCY, type YearPoint } from '../data';
 
@@ -186,18 +186,20 @@ const SERIES4: YearPoint[] = [
   { year: 2022, value: 68 },
 ];
 
-const STRATEGIES_SEGMENTS: SegmentsMap<LineSegmentStyle> = {
-  series1: [{ style: {} }],
-  series2: [{ style: {} }],
-  series3: [
-    { areas: [{ x: { to: 2020 } }], style: {} },
-    { areas: [{ x: { from: 2020 } }], style: { stroke: { strokeDasharray: '6 4' } } },
-  ],
-  series4: [
-    { areas: [{ x: { to: 2020 } }], style: {} },
-    { areas: [{ x: { from: 2020 } }], style: { stroke: { strokeDasharray: '6 4' } } },
-  ],
-};
+const STRATEGIES_SEGMENTS: Segments<LineSegmentStyle> = [
+  {
+    series1: [{ style: {} }],
+    series2: [{ style: {} }],
+    series3: [
+      { areas: [{ x: { to: 2020 } }], style: {} },
+      { areas: [{ x: { from: 2020 } }], style: { stroke: { strokeDasharray: '6 4' } } },
+    ],
+    series4: [
+      { areas: [{ x: { to: 2020 } }], style: {} },
+      { areas: [{ x: { from: 2020 } }], style: { stroke: { strokeDasharray: '6 4' } } },
+    ],
+  },
+];
 
 /**
  * Marker strategies: series-level and segment-level peak detection.

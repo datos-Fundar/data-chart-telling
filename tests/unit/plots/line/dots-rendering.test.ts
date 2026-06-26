@@ -2,7 +2,7 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import LinePlot from '$lib/plots/line/Plot.svelte';
 import type { Series } from '$lib/types/plots/common';
-import type { SegmentsMap } from '$lib/types/plots/styles';
+import type { Segments, LineSegmentStyle } from '$lib/types/plots/styles';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -48,16 +48,18 @@ describe('LinePlot – dot rendering', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      segments: {
-        'series-a': [
-          {
-            style: {
-              stroke: { stroke: '#4f46e5', strokeWidth: 2 },
-              // no dots
+      segments: [
+        {
+          'series-a': [
+            {
+              style: {
+                stroke: { stroke: '#4f46e5', strokeWidth: 2 },
+                // no dots
+              },
             },
-          },
-        ],
-      } as SegmentsMap,
+          ],
+        },
+      ] as Segments<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     const dotCount = countDotCircles(svg);
@@ -69,16 +71,18 @@ describe('LinePlot – dot rendering', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      segments: {
-        'series-a': [
-          {
-            style: {
-              stroke: { stroke: '#4f46e5', strokeWidth: 2 },
-              dots: { dotRadius: 4 },
+      segments: [
+        {
+          'series-a': [
+            {
+              style: {
+                stroke: { stroke: '#4f46e5', strokeWidth: 2 },
+                dots: { dotRadius: 4 },
+              },
             },
-          },
-        ],
-      } as SegmentsMap,
+          ],
+        },
+      ] as Segments<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     const dotCount = countDotCircles(svg);
@@ -91,24 +95,26 @@ describe('LinePlot – dot rendering', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      segments: {
-        'series-a': [
-          {
-            to: 3,
-            style: {
-              stroke: { stroke: '#4f46e5', strokeWidth: 2 },
-              dots: { dotRadius: 4 },
+      segments: [
+        {
+          'series-a': [
+            {
+              to: 3,
+              style: {
+                stroke: { stroke: '#4f46e5', strokeWidth: 2 },
+                dots: { dotRadius: 4 },
+              },
             },
-          },
-          {
-            from: 3,
-            style: {
-              stroke: { stroke: '#4f46e5', strokeWidth: 2, strokeDasharray: '5 5' },
-              dots: { dotRadius: 4 },
+            {
+              from: 3,
+              style: {
+                stroke: { stroke: '#4f46e5', strokeWidth: 2, strokeDasharray: '5 5' },
+                dots: { dotRadius: 4 },
+              },
             },
-          },
-        ],
-      } as SegmentsMap,
+          ],
+        },
+      ] as Segments<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     const pathCount = countLinePaths(svg);
@@ -122,15 +128,17 @@ describe('LinePlot – dot rendering', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      segments: {
-        'series-a': [
-          {
-            style: {
-              dots: { dotRadius: 6 },
+      segments: [
+        {
+          'series-a': [
+            {
+              style: {
+                dots: { dotRadius: 6 },
+              },
             },
-          },
-        ],
-      } as SegmentsMap,
+          ],
+        },
+      ] as Segments<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     const circles = svg.querySelectorAll('g:not(.axis-x):not(.axis-y) circle');
@@ -149,16 +157,18 @@ describe('LinePlot – dot rendering', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      segments: {
-        'series-a': [
-          {
-            style: {
-              stroke: { stroke: '#4f46e5' },
-              dots: { dotRadius: 4, dotFill: '#ff0000' },
+      segments: [
+        {
+          'series-a': [
+            {
+              style: {
+                stroke: { stroke: '#4f46e5' },
+                dots: { dotRadius: 4, dotFill: '#ff0000' },
+              },
             },
-          },
-        ],
-      } as SegmentsMap,
+          ],
+        },
+      ] as Segments<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
@@ -170,15 +180,17 @@ describe('LinePlot – dot rendering', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      segments: {
-        'series-a': [
-          {
-            style: {
-              dots: { dotRadius: 4, dotSymbol: 'square' },
+      segments: [
+        {
+          'series-a': [
+            {
+              style: {
+                dots: { dotRadius: 4, dotSymbol: 'square' },
+              },
             },
-          },
-        ],
-      } as SegmentsMap,
+          ],
+        },
+      ] as Segments<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     // Component should render without error with square symbols
@@ -194,15 +206,17 @@ describe('LinePlot – nested StrokeStyle extraction', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      segments: {
-        'series-a': [
-          {
-            style: {
-              stroke: { stroke: '#dc2626', strokeWidth: 3 },
+      segments: [
+        {
+          'series-a': [
+            {
+              style: {
+                stroke: { stroke: '#dc2626', strokeWidth: 3 },
+              },
             },
-          },
-        ],
-      } as SegmentsMap,
+          ],
+        },
+      ] as Segments<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
@@ -214,15 +228,17 @@ describe('LinePlot – nested StrokeStyle extraction', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      segments: {
-        'series-a': [
-          {
-            style: {
-              stroke: { stroke: '#4f46e5', strokeWidth: 5 },
+      segments: [
+        {
+          'series-a': [
+            {
+              style: {
+                stroke: { stroke: '#4f46e5', strokeWidth: 5 },
+              },
             },
-          },
-        ],
-      } as SegmentsMap,
+          ],
+        },
+      ] as Segments<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
@@ -233,15 +249,17 @@ describe('LinePlot – nested StrokeStyle extraction', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      segments: {
-        'series-a': [
-          {
-            style: {
-              stroke: { stroke: '#4f46e5', strokeDasharray: '6 4' },
+      segments: [
+        {
+          'series-a': [
+            {
+              style: {
+                stroke: { stroke: '#4f46e5', strokeDasharray: '6 4' },
+              },
             },
-          },
-        ],
-      } as SegmentsMap,
+          ],
+        },
+      ] as Segments<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     const paths = svg.querySelectorAll('g:not(.axis-x):not(.axis-y) path');
@@ -253,15 +271,17 @@ describe('LinePlot – nested StrokeStyle extraction', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      segments: {
-        'series-a': [
-          {
-            style: {
-              stroke: { stroke: '#4f46e5', strokeOpacity: 0.5 },
+      segments: [
+        {
+          'series-a': [
+            {
+              style: {
+                stroke: { stroke: '#4f46e5', strokeOpacity: 0.5 },
+              },
             },
-          },
-        ],
-      } as SegmentsMap,
+          ],
+        },
+      ] as Segments<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
@@ -272,16 +292,18 @@ describe('LinePlot – nested StrokeStyle extraction', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      segments: {
-        'series-a': [
-          {
-            style: {
-              // no stroke, should use default
-              dots: { dotRadius: 4 },
+      segments: [
+        {
+          'series-a': [
+            {
+              style: {
+                // no stroke, should use default
+                dots: { dotRadius: 4 },
+              },
             },
-          },
-        ],
-      } as SegmentsMap,
+          ],
+        },
+      ] as Segments<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
@@ -297,25 +319,27 @@ describe('LinePlot – combined stroke and dots styling', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      segments: {
-        'series-a': [
-          {
-            style: {
-              stroke: {
-                stroke: '#4f46e5',
-                strokeWidth: 3,
-                strokeOpacity: 0.8,
-              },
-              dots: {
-                dotRadius: 5,
-                dotFill: '#4f46e5',
-                dotStroke: '#fff',
-                dotSymbol: 'circle',
+      segments: [
+        {
+          'series-a': [
+            {
+              style: {
+                stroke: {
+                  stroke: '#4f46e5',
+                  strokeWidth: 3,
+                  strokeOpacity: 0.8,
+                },
+                dots: {
+                  dotRadius: 5,
+                  dotFill: '#4f46e5',
+                  dotStroke: '#fff',
+                  dotSymbol: 'circle',
+                },
               },
             },
-          },
-        ],
-      } as SegmentsMap,
+          ],
+        },
+      ] as Segments<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     const pathCount = countLinePaths(svg);
@@ -329,16 +353,18 @@ describe('LinePlot – combined stroke and dots styling', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      segments: {
-        'series-a': [
-          {
-            style: {
-              stroke: { stroke: '#dc2626' },
-              dots: { dotRadius: 4 }, // no dotFill, should use stroke color
+      segments: [
+        {
+          'series-a': [
+            {
+              style: {
+                stroke: { stroke: '#dc2626' },
+                dots: { dotRadius: 4 }, // no dotFill, should use stroke color
+              },
             },
-          },
-        ],
-      } as SegmentsMap,
+          ],
+        },
+      ] as Segments<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
@@ -349,27 +375,29 @@ describe('LinePlot – combined stroke and dots styling', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      segments: {
-        'series-a': [
-          {
-            style: {
-              stroke: {
-                stroke: '#4f46e5',
-                strokeWidth: 2,
-                strokeOpacity: 0.9,
-                strokeDasharray: '5 5',
-              },
-              dots: {
-                dotRadius: 5,
-                dotFill: '#fff',
-                dotStroke: '#4f46e5',
-                dotStrokeWidth: 2,
-                dotSymbol: 'circle',
+      segments: [
+        {
+          'series-a': [
+            {
+              style: {
+                stroke: {
+                  stroke: '#4f46e5',
+                  strokeWidth: 2,
+                  strokeOpacity: 0.9,
+                  strokeDasharray: '5 5',
+                },
+                dots: {
+                  dotRadius: 5,
+                  dotFill: '#fff',
+                  dotStroke: '#4f46e5',
+                  dotStrokeWidth: 2,
+                  dotSymbol: 'circle',
+                },
               },
             },
-          },
-        ],
-      } as SegmentsMap,
+          ],
+        },
+      ] as Segments<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();

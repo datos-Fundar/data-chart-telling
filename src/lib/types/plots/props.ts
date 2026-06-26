@@ -1,6 +1,6 @@
 import type { Marker } from '$lib/types/plots/markers';
 import type { TooltipRuntime } from '$lib/types/layout/tooltip';
-import type { PlotStyles, SegmentsMap } from '$lib/types/plots/styles';
+import type { PlotStyles, Segments } from '$lib/types/plots/styles';
 import type { SeriesProps, DataProps, ScalesConfig, MarginConfig } from '$lib/types/plots/common';
 
 /**
@@ -19,7 +19,7 @@ export type PlotProps<
   width: number;
   height: number;
   styles?: PlotStyles;
-  segments?: SegmentsMap<TSegmentStyle>;
+  segments?: Segments<TSegmentStyle>;
   markers?: Marker[];
   scales?: ScalesConfig;
   margins?: MarginConfig;

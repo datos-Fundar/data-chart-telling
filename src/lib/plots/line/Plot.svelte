@@ -25,7 +25,7 @@
     y,
     z,
     styles = {},
-    segments = {},
+    segments = [],
     markers = [],
     scales = {},
     margins,

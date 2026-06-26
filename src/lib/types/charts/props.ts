@@ -1,5 +1,5 @@
 import type { Accessor, AxisValue, ScalesConfig, MarginConfig } from '$lib/types/plots/common';
-import type { PlotStyles, SegmentsMap } from '$lib/types/plots/styles';
+import type { PlotStyles, Segments } from '$lib/types/plots/styles';
 import type { Marker } from '$lib/types/plots/markers';
 import type { TooltipProp } from '$lib/types/layout/tooltip';
 import type { LegendSection } from '$lib/types/charts/legend';
@@ -29,7 +29,7 @@ export type ChartProps<
   y: Accessor<TRow, AxisValue>;
   z?: Accessor<TRow, unknown>;
   styles?: PlotStyles;
-  segments?: SegmentsMap<TSegmentStyle>;
+  segments?: Segments<TSegmentStyle>;
   markers?: Marker[];
   scales?: ScalesConfig;
   margins?: MarginConfig;

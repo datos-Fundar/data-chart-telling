@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
 import type {
-  SegmentsMap,
-  SeriesAwareSegmentsMap,
+  Segments,
   BarSegmentStyle,
 } from '$lib/types/plots/styles';
 import {
@@ -47,18 +46,15 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// ── SegmentsMap: array form ───────────────────────────────────────────────────
-// When `segments` is Segment<TStyle>[], the same rules apply to every series.
+// ── Default key: segments that apply to every series ──────────────────────────
 
 /**
- * Simplest SegmentsMap: a list with one Segment containing one Area.
+ * Simplest `default` group: one Segment with one Area.
  *
- * The area covers x ∈ ['Buenos Aires', 'Córdoba', 'Santa Fe'], which matches
- * the first three provinces. Bars outside the area are rendered automatically
- * with the default palette style — no need to declare an explicit catch-all segment.
+ * The area covers x ∈ ['Buenos Aires', 'Santa Fe']. Bars outside the area are
+ * rendered with the default palette style — no explicit catch-all needed.
  *
- * Use the **Fill** controls in the panel to explore fillOpacity live without
- * editing code.
+ * Use the **Fill** controls in the panel to explore fillOpacity live.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const HighlightedProvincesSegment: any = {
@@ -95,24 +91,28 @@ export const HighlightedProvincesSegment: any = {
       height: args.height,
       segments: [
         {
-          areas: [
+          default: [
             {
-              x: {
-                from: 'Buenos Aires',
-                to: 'Santa Fe',
+              areas: [
+                {
+                  x: {
+                    from: 'Buenos Aires',
+                    to: 'Santa Fe',
+                  },
+                },
+              ],
+              style: {
+                fillOpacity: args.fillOpacity,
+              },
+            },
+            {
+              style: {
+                fillOpacity: args.dimmedOpacity,
               },
             },
           ],
-          style: {
-            fillOpacity: args.fillOpacity,
-          },
         },
-        {
-          style: {
-            fillOpacity: args.dimmedOpacity,
-          },
-        },
-      ] satisfies SegmentsMap<BarSegmentStyle>,
+      ] satisfies Segments<BarSegmentStyle>,
     },
   }),
 };
@@ -133,16 +133,20 @@ export const MultipleAreasOneSegment: Story = {
     ],
     segments: [
       {
-        areas: [
-          { x: { from: 'Buenos Aires', to: 'La Pampa' } },
-          { x: { from: 'Catamarca', to: 'Catamarca' } },
+        default: [
+          {
+            areas: [
+              { x: { from: 'Buenos Aires', to: 'La Pampa' } },
+              { x: { from: 'Catamarca', to: 'Catamarca' } },
+            ],
+            style: { fillOpacity: 0.9 },
+          },
+          {
+            style: { fillOpacity: 0.3 },
+          },
         ],
-        style: { fillOpacity: 0.9 },
       },
-      {
-        style: { fillOpacity: 0.3 },
-      },
-    ] satisfies SegmentsMap<BarSegmentStyle>,
+    ] satisfies Segments<BarSegmentStyle>,
   },
 };
 
@@ -151,8 +155,6 @@ export const MultipleAreasOneSegment: Story = {
  *
  * - Segment 1: Buenos Aires to Santa Fe — high opacity.
  * - Segment 2: Rest — reduced opacity.
- *
- * Segments are drawn in list order; later ones render on top of earlier ones.
  */
 export const TwoSegmentsDifferentStyles: Story = {
   args: {
@@ -166,22 +168,24 @@ export const TwoSegmentsDifferentStyles: Story = {
     ],
     segments: [
       {
-        areas: [{ x: { from: 'Buenos Aires', to: 'Santa Fe' } }],
-        style: { fill: 'tomato', fillOpacity: 0.85 },
+        default: [
+          {
+            areas: [{ x: { from: 'Buenos Aires', to: 'Santa Fe' } }],
+            style: { fill: 'tomato', fillOpacity: 0.85 },
+          },
+          {
+            style: { fillOpacity: 0.4 },
+          },
+        ],
       },
-      {
-        style: { fillOpacity: 0.4 },
-      },
-    ] satisfies SegmentsMap<BarSegmentStyle>,
+    ] satisfies Segments<BarSegmentStyle>,
   },
 };
 
 /**
  * Same two-segment structure on two series (female and male).
  *
- * Array-form `segments` apply identically to every series in the plot.
- * The styling naturally appears on all series, though each uses its own
- * palette colour combined with the segment opacity.
+ * `default` segments apply identically to every series in the plot.
  */
 export const TwoSegmentsOnAllSeries: Story = {
   args: {
@@ -191,23 +195,24 @@ export const TwoSegmentsOnAllSeries: Story = {
     z: 'sex',
     segments: [
       {
-        areas: [{ x: { from: 'Buenos Aires', to: 'Santa Fe' } }],
-        style: { fillOpacity: 0.85 },
+        default: [
+          {
+            areas: [{ x: { from: 'Buenos Aires', to: 'Santa Fe' } }],
+            style: { fillOpacity: 0.85 },
+          },
+          {
+            style: { fillOpacity: 0.4 },
+          },
+        ],
       },
-      {
-        style: { fillOpacity: 0.4 },
-      },
-    ] satisfies SegmentsMap<BarSegmentStyle>,
+    ] satisfies Segments<BarSegmentStyle>,
   },
 };
 
-// ── SeriesAwareSegmentsMap: record form ───────────────────────────────────────
-// When `segments` is a Record<seriesName, Segment<TStyle>[]>, each key targets
-// exactly one series. Series with no entry are drawn with the default palette.
+// ── Series-aware form ─────────────────────────────────────────────────────────
 
 /**
- * `SeriesAwareSegmentsMap` form: segments are keyed by series name so they
- * apply only to the named series.
+ * Segments keyed by series name apply only to the named series.
  *
  * Here, highlighting is scoped explicitly to `'female'`. The male bars are
  * unaffected — the record key is the deciding factor.
@@ -218,23 +223,25 @@ export const SegmentsOnOneSeriesOnly: Story = {
     x: 'province',
     y: 'value',
     z: 'sex',
-    segments: {
-      female: [
-        {
-          areas: [{ x: { from: 'Buenos Aires', to: 'Santa Fe' } }],
-          style: { fillOpacity: 0.9 },
-        },
-        {
-          style: { fillOpacity: 0.3 },
-        },
-      ],
-    } satisfies SeriesAwareSegmentsMap<BarSegmentStyle>,
+    segments: [
+      {
+        female: [
+          {
+            areas: [{ x: { from: 'Buenos Aires', to: 'Santa Fe' } }],
+            style: { fillOpacity: 0.9 },
+          },
+          {
+            style: { fillOpacity: 0.3 },
+          },
+        ],
+      },
+    ] satisfies Segments<BarSegmentStyle>,
   },
 };
 
 /**
- * Custom fills for different series — female bars are blue, male bars are
- * highlighted with a custom color. Each series can have its own segment rules.
+ * Custom fills for different series — female bars are highlighted with a
+ * range-specific opacity, male bars get a custom color.
  */
 export const CustomFillsPerSeries: Story = {
   args: {
@@ -242,19 +249,21 @@ export const CustomFillsPerSeries: Story = {
     x: 'province',
     y: 'value',
     z: 'sex',
-    segments: {
-      female: [
-        {
-          areas: [{ x: { from: 'Buenos Aires', to: 'La Pampa' } }],
-          style: { fillOpacity: 0.8 },
-        },
-      ],
-      male: [
-        {
-          areas: [{ x: { from: 'Buenos Aires', to: 'La Pampa' } }],
-          style: { fill: '#1971c2', fillOpacity: 0.85 },
-        },
-      ],
-    } satisfies SeriesAwareSegmentsMap<BarSegmentStyle>,
+    segments: [
+      {
+        female: [
+          {
+            areas: [{ x: { from: 'Buenos Aires', to: 'La Pampa' } }],
+            style: { fillOpacity: 0.8 },
+          },
+        ],
+        male: [
+          {
+            areas: [{ x: { from: 'Buenos Aires', to: 'La Pampa' } }],
+            style: { fill: '#1971c2', fillOpacity: 0.85 },
+          },
+        ],
+      },
+    ] satisfies Segments<BarSegmentStyle>,
   },
 };

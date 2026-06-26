@@ -116,7 +116,7 @@ Plots accept either `series` (pre-built `Series[]`) or the `data` + `x`/`y`/`z` 
 | `x` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
 | `y` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
 | `z` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
-| `segments` | `SegmentsMap<TStyle>` | `{}` / `[]` | ✅ | ✅ | ✅ | ✅ |
+| `segments` | `Segments<TStyle>` | `[]` | ✅ | ✅ | ✅ | ✅ |
 | `markers` | `Marker[]` | `[]` | ✅ | ✅ | ✅ | ✅ |
 | `scales` | `ScalesConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
 | `margins` | `MarginConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
@@ -158,7 +158,7 @@ Plots accept either `series` (pre-built `Series[]`) or the `data` + `x`/`y`/`z` 
 | `subtitle` | `string` | | ✅ | ✅ | ✅ | ✅ |
 | `caption` | `string` | | ✅ | ✅ | ✅ | ✅ |
 | `legend` | `LegendSection[]` | | ✅ | ✅ | ✅ | ✅ |
-| `segments` | `SegmentsMap<TStyle>` | `{}` / `[]` | ✅ | ✅ | ✅ | ✅ |
+| `segments` | `Segments<TStyle>` | `[]` | ✅ | ✅ | ✅ | ✅ |
 | `markers` | `Marker[]` | `[]` | ✅ | ✅ | ✅ | ✅ |
 | `scales` | `ScalesConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
 | `margins` | `MarginConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
@@ -177,49 +177,80 @@ The `segments` prop separates data ranges from visual styling. Every plot kind s
 
 | Plot | `segments` type |
 | ---- | --------------- |
-| `LinePlot` / `LineChart` | `SegmentsMap<LineSegmentStyle>` |
-| `BarPlot` / `BarChart` | `SegmentsMap<BarSegmentStyle>` |
-| `PyramidPlot` / `PyramidChart` | `SegmentsMap<BarSegmentStyle>` |
-| `HeatmapPlot` / `HeatmapChart` | `SegmentsMap<CellSegmentStyle>` (array form only) |
+| `LinePlot` / `LineChart` | `Segments<LineSegmentStyle>` |
+| `BarPlot` / `BarChart` | `Segments<BarSegmentStyle>` |
+| `PyramidPlot` / `PyramidChart` | `Segments<BarSegmentStyle>` |
+| `HeatmapPlot` / `HeatmapChart` | `Segments<CellSegmentStyle>` (`'default'` key only) |
 
 #### Core types
 
 ```ts
-type Range   = { from?: AxisValue; to?: AxisValue };   // half-open on either side
-type Area    = { x?: Range; y?: Range };               // 2-D rectangular region
+type Range           = { from?: AxisValue; to?: AxisValue };  // inclusive on both sides
+type Area            = { x?: Range; y?: Range };              // 2-D rectangular region
 type Segment<TStyle> = { areas?: Area[]; style?: TStyle };
 ```
 
-A **`Segment`** matches a data point (or heatmap cell) when the point falls inside **any** of its `areas`. Omitting `areas` (or providing an empty array) makes the segment match **all** data — useful as a baseline style. Segments are rendered in order; later ones appear on top.
+A **`Segment`** matches a data point (or heatmap cell) when the point falls inside **any** of its `areas`. Omitting `areas` creates a **catch-all** that matches every data point — but catch-alls are always evaluated **last**, regardless of their position in the list, so area-specific segments always win. This lets a catch-all placed first act as a fallback baseline that highlighted ranges override.
 
 An **`Area`** restricts by x, y, or both. Both bounds of a `Range` are **inclusive**. Omitting `x` or `y` leaves that axis unrestricted.
 
-#### `SegmentsMap` forms
+#### `Segments` structure
+
+`segments` is always an **array of groups**. Each group is a plain object whose keys map to `Segment[]` lists:
 
 ```ts
-// Array form — same segments apply to every series (required for heatmaps)
-type SegmentsMap<TStyle> = Segment<TStyle>[];
+// 'default' key — applies its segments to every series
+type DefaultSegmentsMap<TStyle>     = { default: Segment<TStyle>[] };
 
-// Record form — segments keyed by series name (line / bar / pyramid)
-type SegmentsMap<TStyle> = SeriesAwareSegmentsMap<TStyle>;
-                         = Record<string, Segment<TStyle>[]>;
+// named keys — applies segments only to the named series
+type SeriesAwareSegmentsMap<TStyle> = Record<string, Segment<TStyle>[]>;
+
+// one element of the array — either form, or a mix of both key types
+type SegmentsStyle<TStyle> = DefaultSegmentsMap<TStyle> | SeriesAwareSegmentsMap<TStyle>;
+
+// the prop type: an ordered list of groups
+type Segments<TStyle> = SegmentsStyle<TStyle>[];
 ```
+
+Having multiple groups lets you organise segments by concern — for example one group for per-series stroke colours and a second for shared dot markers applied via `'default'`. Groups are processed in order and their resolved segments are concatenated per series before evaluation.
 
 #### Examples
 
-**Line chart — colour a period and leave the rest as the palette default:**
+**Line chart — baseline colour with a highlighted range (catch-all as fallback):**
 
 ```svelte
 <LinePlot
   {width} {height}
   series={[{ name: 'gdp', x: 'year', y: 'value', data: GDP }]}
-  segments={{
-    gdp: [
-      { style: { stroke: { stroke: '#94a3b8', strokeWidth: 1 } } },
-      { areas: [{ x: { from: 2008, to: 2010 } }],
-        style: { stroke: { stroke: '#ef4444', strokeWidth: 3 } } },
-    ],
-  }}
+  segments={[
+    {
+      gdp: [
+        { style: { stroke: { stroke: '#94a3b8', strokeWidth: 1 } } },
+        { areas: [{ x: { from: 2008, to: 2010 } }],
+          style: { stroke: { stroke: '#ef4444', strokeWidth: 3 } } },
+      ],
+    },
+  ]}
+/>
+```
+
+**Line chart — per-series baseline colours + shared dot markers (two-group approach):**
+
+```svelte
+<LinePlot
+  {width} {height}
+  data={LIFE_EXPECTANCY} x="year" y="value" z="sex"
+  segments={[
+    // Group 1: per-series catch-all stroke colours
+    { female: [{ style: { stroke: { stroke: 'steelblue' } } }],
+      male:   [{ style: { stroke: { stroke: 'tomato'    } } }] },
+    // Group 2: dots for all series in a specific range
+    { default: [
+        { areas: [{ x: { from: 2010, to: 2012 } }],
+          style: { dots: { dotRadius: 5, dotSymbol: 'circle' } } },
+      ],
+    },
+  ]}
 />
 ```
 
@@ -229,15 +260,19 @@ type SegmentsMap<TStyle> = SeriesAwareSegmentsMap<TStyle>;
 <HeatmapChart
   {width} {height} {data} {x} {y} {z}
   segments={[
-    { areas: [{ x: { from: 'Q1', to: 'Q1' } }, { x: { from: 'Q3', to: 'Q3' } }],
-      style: { stroke: '#f59e0b', strokeWidth: 2 } },
-    { areas: [{ x: { from: 'Q2', to: 'Q2' }, y: { from: 1, to: 2 } }],
-      style: { fill: '#ef4444', fillOpacity: 0.8 } },
+    {
+      default: [
+        { areas: [{ x: { from: 'Q1', to: 'Q1' } }, { x: { from: 'Q3', to: 'Q3' } }],
+          style: { stroke: '#f59e0b', strokeWidth: 2 } },
+        { areas: [{ x: { from: 'Q2', to: 'Q2' }, y: { from: 1, to: 2 } }],
+          style: { fill: '#ef4444', fillOpacity: 0.8 } },
+      ],
+    },
   ]}
 />
 ```
 
-Omitting `segments` renders every mark in its default palette colour.
+Omitting `segments` (or passing `[]`) renders every mark in its default palette colour.
 
 ---
 
