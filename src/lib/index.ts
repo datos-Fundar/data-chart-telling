@@ -21,7 +21,13 @@ export { default as TimelineLayout } from './layout/timeline/TimelineLayout.svel
 export { default as FacetLayout } from './layout/facet/FacetLayout.svelte';
 export { default as LegendLayout } from './layout/legend/LegendLayout.svelte';
 export { default as Tooltip } from './layout/tooltip/Tooltip.svelte';
+
+// Markers
+export { default as DeltaMarker } from './plots/markers/DeltaMarker.svelte';
+export { default as DotMarker } from './plots/markers/DotMarker.svelte';
 export { default as HoverMarker } from './plots/markers/HoverMarker.svelte';
+export { default as PeakMarker } from './plots/markers/PeakMarker.svelte';
+export { default as TextMarker } from './plots/markers/TextMarker.svelte';
 
 export {
   setConfiguration,
