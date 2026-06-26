@@ -22,6 +22,7 @@
     progress,
     values,
     orientation = 'vertical',
+    show = true,
     thickness = 60,
     filterMode = 'exact',
     interpolate,
@@ -34,6 +35,7 @@
     progress: number;
     values?: TimeValue[];
     orientation?: Orientation;
+    show?: boolean;
     thickness?: number;
     filterMode?: 'exact' | 'upTo';
     interpolate?: TimelineInterpolation<TRow>;
@@ -126,32 +128,37 @@
   });
 
   const isVertical = $derived(orientation === 'vertical');
-  const gap = 12;
+  const gap = $derived(show ? 12 : 0);
+  const effectiveThickness = $derived(show ? thickness : 0);
   const innerWidth = $derived(
-    Math.max(0, isVertical ? width - thickness - gap : width),
+    Math.max(0, isVertical ? width - effectiveThickness - gap : width),
   );
   const innerHeight = $derived(
-    Math.max(0, isVertical ? height : height - thickness - gap),
+    Math.max(0, isVertical ? height : height - effectiveThickness - gap),
   );
 </script>
 
 {#if isVertical}
-  <div class="dct-timeline dct-timeline--vertical" style:width="{width}px" style:height="{height}px">
+  <div class="dct-timeline dct-timeline--vertical" style:width="{width}px" style:height="{height}px" style:gap="{gap}px">
     <div class="dct-timeline__plot">
       {@render child({ selectedValue, data: filtered, width: innerWidth, height: innerHeight })}
     </div>
-    <div class="dct-timeline__gutter" style:width="{thickness}px">
-      <Timeline currentValue={selectedValue} values={steps} orientation="vertical" width={thickness} height={innerHeight} />
-    </div>
+    {#if show}
+      <div class="dct-timeline__gutter" style:width="{thickness}px">
+        <Timeline currentValue={selectedValue} values={steps} orientation="vertical" width={thickness} height={innerHeight} />
+      </div>
+    {/if}
   </div>
 {:else}
-  <div class="dct-timeline dct-timeline--horizontal" style:width="{width}px" style:height="{height}px">
+  <div class="dct-timeline dct-timeline--horizontal" style:width="{width}px" style:height="{height}px" style:gap="{gap}px">
     <div class="dct-timeline__plot">
       {@render child({ selectedValue, data: filtered, width: innerWidth, height: innerHeight })}
     </div>
-    <div class="dct-timeline__gutter" style:height="{thickness}px">
-      <Timeline currentValue={selectedValue} values={steps} orientation="horizontal" width={innerWidth} height={thickness} />
-    </div>
+    {#if show}
+      <div class="dct-timeline__gutter" style:height="{thickness}px">
+        <Timeline currentValue={selectedValue} values={steps} orientation="horizontal" width={innerWidth} height={thickness} />
+      </div>
+    {/if}
   </div>
 {/if}
 
@@ -161,11 +168,9 @@
   }
   .dct-timeline--vertical {
     flex-direction: row;
-    gap: 12px;
   }
   .dct-timeline--horizontal {
     flex-direction: column;
-    gap: 12px;
   }
   .dct-timeline__plot {
     flex: 1 1 auto;

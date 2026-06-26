@@ -108,6 +108,7 @@
         progress={timeline.progress}
         values={timeline.values}
         orientation={timeline.orientation}
+        show={timeline.show}
         thickness={timeline.thickness ?? cfg.timeline.thickness}
         filterMode={timeline.filterMode}
         interpolate={typeof timeline.interpolate === 'object' ? timeline.interpolate : undefined}

@@ -53,6 +53,7 @@ export type TimelineConfig<TRow extends Record<string, unknown>> = {
   progress: number;
   values?: TimeValue[];
   orientation?: Orientation;
+  show?: boolean;
   thickness?: number;
   filterMode?: 'exact' | 'upTo';
   interpolate?: boolean | TimelineInterpolation<TRow>;
