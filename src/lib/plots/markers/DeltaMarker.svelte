@@ -62,12 +62,12 @@
 </script>
 
 {#if resolved}
-  {@const fromVis = clamp(resolved.from)}
-  {@const toVis = clamp(resolved.to)}
-  {@const textPt = pt(resolved.at, textVaryCoord(fromVis, toVis))}
+  {@const fromVis = clamp(resolved?.from ?? 0)}
+  {@const toVis = clamp(resolved?.to ?? 0)}
+  {@const textPt = pt(resolved?.at ?? 0, textVaryCoord(fromVis, toVis))}
 
   <Line
-    data={[pt(resolved.at, fromVis), pt(resolved.at, toVis)]}
+    data={[pt(resolved?.at ?? 0, fromVis), pt(resolved?.at ?? 0, toVis)]}
     x={(p) => p.x}
     y={(p) => p.y}
     stroke={strokeStyle?.stroke ?? 'currentColor'}
@@ -77,19 +77,19 @@
     strokeLinecap={strokeStyle?.strokeLinecap ?? 'round'}
   />
   <DotMarker
-    x={pt(resolved.at, fromVis).x}
-    y={pt(resolved.at, fromVis).y}
+    x={pt(resolved?.at ?? 0, fromVis).x}
+    y={pt(resolved?.at ?? 0, fromVis).y}
     style={{ dotRadius: 4, dotFill: strokeStyle?.stroke, dotStroke: strokeStyle?.stroke, dotStrokeWidth: 2, ...dotStyle }}
   />
   <DotMarker
-    x={pt(resolved.at, toVis).x}
-    y={pt(resolved.at, toVis).y}
+    x={pt(resolved?.at ?? 0, toVis).x}
+    y={pt(resolved?.at ?? 0, toVis).y}
     style={{ dotRadius: 4, dotFill: strokeStyle?.stroke, dotStroke: strokeStyle?.stroke, dotStrokeWidth: 2, ...dotStyle }}
   />
   <TextMarker
     x={textPt.x}
     y={textPt.y}
-    text={(formatDiff ?? ((v: number) => v.toFixed(1)))(resolved.diff)}
+    text={(formatDiff ?? ((v: number) => v.toFixed(1)))(resolved?.diff ?? 0)}
     style={{
       fontWeight: 'bold',
       fontSize: 14,
