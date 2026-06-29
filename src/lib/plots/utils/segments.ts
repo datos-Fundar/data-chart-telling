@@ -89,6 +89,28 @@ export function validateSegments<TStyle>(segments: Segments<TStyle>): void {
   }
 }
 
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+  return v !== null && typeof v === 'object' && !Array.isArray(v);
+}
+
+/**
+ * Merges two style objects one level deep: for any key where both base and
+ * override hold plain objects (e.g. `stroke`, `dots`), their fields are
+ * merged — override wins on conflict. Primitive fields are overridden directly.
+ */
+function mergeStyles<TStyle>(base: TStyle, override: TStyle): TStyle {
+  const result: Record<string, unknown> = { ...(base as Record<string, unknown>) };
+  for (const [key, val] of Object.entries(override as Record<string, unknown>)) {
+    const baseVal = result[key];
+    if (isPlainObject(val) && isPlainObject(baseVal)) {
+      result[key] = { ...baseVal, ...val };
+    } else {
+      result[key] = val;
+    }
+  }
+  return result as TStyle;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function resolveSeriesSegments<S extends Series<any>, TStyle>(
   series: S,
@@ -174,7 +196,7 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
       const isAreaSpecific = seg.areas != null && seg.areas.length > 0;
       const resolvedStyle: TStyle =
         isAreaSpecific && catchAll?.style
-          ? { ...(catchAll.style as object), ...(segStyle as object) } as TStyle
+          ? mergeStyles(catchAll.style as TStyle, segStyle)
           : segStyle;
       userVisual.push({ data: run.data, style: resolvedStyle });
       // When the next run is also a user segment (no unmatched data between them),
