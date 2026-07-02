@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LineChart from '$lib/charts/line/Chart.svelte';
 import LineTimeline from './LineTimeline.svelte';
 import LineTimelineInterpolated from './LineTimelineInterpolated.svelte';
+import LineCustomHeader from './LineCustomHeader.svelte';
 import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
 
 const meta = {
@@ -128,6 +129,18 @@ export const Faceted: Story = {
     }],
     facet: { by: 'region' as keyof SeriesPoint, columns: 2 },
   },
+};
+
+// ── Custom header & footer ──────────────────────────────────────────────────────
+
+/**
+ * `header` and `footer` snippets replace the string `title`/`subtitle`/`caption`
+ * props with arbitrary markup. Here: a two-column header (title + subtitle on
+ * the left, a logo mark on the right) and a footer with a source note and an
+ * update timestamp.
+ */
+export const WithCustomHeaderAndFooter: StoryObj = {
+  render: () => ({ Component: LineCustomHeader }),
 };
 
 // ── Markers ─────────────────────────────────────────────────────────────────────

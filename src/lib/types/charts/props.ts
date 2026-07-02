@@ -1,3 +1,4 @@
+import type { Snippet } from 'svelte';
 import type { Accessor, AxisValue, ScalesConfig, MarginConfig } from '$lib/types/plots/common';
 import type { PlotStyles, Segments } from '$lib/types/plots/styles';
 import type { Marker } from '$lib/types/plots/markers';
@@ -23,6 +24,8 @@ export type ChartProps<
   title?: string;
   subtitle?: string;
   caption?: string;
+  header?: Snippet;
+  footer?: Snippet;
   legend?: LegendSection[];
   data: TRow[];
   x: Accessor<TRow, AxisValue>;

@@ -5,6 +5,7 @@
   import LegendLayout from '$lib/layout/legend/LegendLayout.svelte';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { provideHover } from '$lib/layout/tooltip/hover.svelte';
+  import type { Snippet } from 'svelte';
   import type { LegendSection } from '$lib/types/charts/legend';
   import type { HoverStrategy } from '$lib/types/layout/tooltip';
   import type {
@@ -32,6 +33,8 @@
     subtitle,
     caption,
     legend,
+    header,
+    footer,
     data,
     facet,
     timeline,
@@ -44,6 +47,8 @@
     subtitle?: string;
     caption?: string;
     legend?: LegendSection[];
+    header?: Snippet;
+    footer?: Snippet;
     data: TRow[];
     facet?: FacetConfig<TRow>;
     timeline?: TimelineConfig<TRow>;
@@ -98,6 +103,8 @@
   {title}
   {subtitle}
   {caption}
+  {header}
+  {footer}
   legend={legend && legend.length > 0 ? legendSnippet : undefined}
 >
   {#snippet plot({ width: w, height: h })}

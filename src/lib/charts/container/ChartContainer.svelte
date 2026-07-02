@@ -17,6 +17,8 @@
     subtitle,
     caption,
     legend,
+    header,
+    footer,
     plot,
   }: {
     width: number;
@@ -25,6 +27,8 @@
     subtitle?: string;
     caption?: string;
     legend?: Snippet;
+    header?: Snippet;
+    footer?: Snippet;
     plot: ChartBoxSnippet;
   } = $props();
 
@@ -37,7 +41,9 @@
 </script>
 
 <div class="dct-chart" style={themeStyle} style:width="{width}px" style:height="{height}px">
-  {#if title || subtitle}
+  {#if header}
+    <div class="dct-chart__header">{@render header()}</div>
+  {:else if title || subtitle}
     <div class="dct-chart__header">
       {#if title}<h3 class="dct-chart__title">{title}</h3>{/if}
       {#if subtitle}<span class="dct-chart__subtitle">{subtitle}</span>{/if}
@@ -58,7 +64,9 @@
     {/if}
   </div>
 
-  {#if caption}
+  {#if footer}
+    <div class="dct-chart__caption">{@render footer()}</div>
+  {:else if caption}
     <div class="dct-chart__caption">
       <span>{caption}</span>
     </div>

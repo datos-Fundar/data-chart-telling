@@ -157,6 +157,8 @@ Plots accept either `series` (pre-built `Series[]`) or the `data` + `x`/`y`/`z` 
 | `title` | `string` | | ✅ | ✅ | ✅ | ✅ |
 | `subtitle` | `string` | | ✅ | ✅ | ✅ | ✅ |
 | `caption` | `string` | | ✅ | ✅ | ✅ | ✅ |
+| `header` | `Snippet` | | ✅ | ✅ | ✅ | ✅ |
+| `footer` | `Snippet` | | ✅ | ✅ | ✅ | ✅ |
 | `legend` | `LegendSection[]` | | ✅ | ✅ | ✅ | ✅ |
 | `segments` | `Segments<TStyle>` | `[]` | ✅ | ✅ | ✅ | ✅ |
 | `markers` | `Marker[]` | `[]` | ✅ | ✅ | ✅ | ✅ |
@@ -166,6 +168,23 @@ Plots accept either `series` (pre-built `Series[]`) or the `data` + `x`/`y`/`z` 
 | `timeline` | `TimelineConfig` | | ✅ | ✅ | ✅ | ✅ |
 | `tooltip` | `TooltipProp` | | ✅ | ✅ | ✅ | ✅ |
 | `styles` | `PlotStyles` | | ✅ | ✅ | ✅ | ✅ |
+
+`header` and `footer` are Svelte 5 snippets that replace the string props when richer markup is needed (custom styles, logos, links, etc.). When `header` is provided it takes full precedence over `title`/`subtitle`; when `footer` is provided it takes full precedence over `caption`. Use the natural snippet syntax:
+
+```svelte
+<LineChart ...>
+  {#snippet header()}
+    <div style="display:flex; justify-content:space-between">
+      <h3 style="color:#2563eb">My Chart</h3>
+      <img src="/logo.svg" alt="Logo" />
+    </div>
+  {/snippet}
+
+  {#snippet footer()}
+    <small>Source: <a href="...">Dataset</a> · Updated Q3 2024</small>
+  {/snippet}
+</LineChart>
+```
 
 See the [PlotStyles sub-properties table](#plotstyles-sub-properties-plots) above — charts accept the same `styles` shape and pass it through to their underlying plot.  
 

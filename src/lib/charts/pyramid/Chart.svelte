@@ -28,6 +28,8 @@
     subtitle,
     caption,
     legend,
+    header,
+    footer,
     data,
     x: magnitude,
     y: category,
@@ -94,6 +96,8 @@
   {subtitle}
   {caption}
   {legend}
+  {header}
+  {footer}
   {data}
   {facet}
   timeline={timelineConfig}

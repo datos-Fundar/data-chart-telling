@@ -26,6 +26,8 @@
     subtitle,
     caption,
     legend,
+    header,
+    footer,
     data,
     x,
     y,
@@ -74,6 +76,8 @@
   {subtitle}
   {caption}
   {legend}
+  {header}
+  {footer}
   {data}
   {facet}
   {timeline}
