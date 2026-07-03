@@ -178,10 +178,12 @@
                 ruleStyle={marker.ruleStyle}
                 dotStyle={marker.dotStyle}
                 fontStyle={marker.fontStyle}
+                seriesColor={seg.style?.stroke?.stroke ?? defaultColor}
               />
             {/if}
           {/each}
         {:else}
+          {@const segs = resolveSegmentsForSeries(segments, group.series.name)}
           <HoverMarker
             data={seriesPoints}
             ruleX={marker.ruleX !== false && (impliesRuleX || marker.ruleX === true) ? ruleX : null}
@@ -190,6 +192,7 @@
             ruleStyle={marker.ruleStyle}
             dotStyle={marker.dotStyle}
             fontStyle={marker.fontStyle}
+            seriesColor={segs[0]?.style?.stroke?.stroke ?? defaultColor}
           />
         {/if}
       {/if}

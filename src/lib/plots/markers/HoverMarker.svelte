@@ -34,9 +34,14 @@
     ruleStyle,
     dotStyle,
     fontStyle,
+    seriesColor,
   }: Props = $props();
 
   const cfg = $derived(getConfiguration());
+
+  /** Explicit style wins; otherwise fall back to the series color, then the point's own resolved color. */
+  const resolveColor = (explicit: string | undefined, point: HoverDisplayPoint) =>
+    explicit ?? seriesColor ?? point.color;
 </script>
 
 {#if ruleX != null}
@@ -70,8 +75,8 @@
       style={{
         ...cfg.hover.dot,
         ...dotStyle,
-        ...(dotStyle?.dotFill === 'currentColor' && point.color ? { dotFill: point.color } : {}),
-        ...(dotStyle?.dotStroke === 'currentColor' && point.color ? { dotStroke: point.color } : {}),
+        dotFill: resolveColor(dotStyle?.dotFill, point),
+        dotStroke: resolveColor(dotStyle?.dotStroke, point),
       }}
     />
   {/each}
@@ -85,7 +90,7 @@
         style={{
           ...cfg.hover.font,
           ...fontStyle,
-          ...(fontStyle?.fill === 'currentColor' && point.color ? { fill: point.color } : {}),
+          fill: resolveColor(fontStyle?.fill, point),
         }}
       />
     {/each}
