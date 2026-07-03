@@ -1,7 +1,12 @@
 export type AxisValue = number | string | Date;
 
-/** Partial margin override — only the sides you specify are overridden; the rest come from the theme. */
-export type MarginConfig = Partial<{ top: number; right: number; bottom: number; left: number }>;
+/**
+ * Partial margin override — only the sides you specify are overridden; the
+ * rest come from the theme (which itself defaults every side to `'auto'`).
+ * `'auto'` sizes that side to fit its rendered content (tick labels, axis
+ * title, rotated ticks); a number pins it exactly.
+ */
+export type MarginConfig = Partial<{ top: number | 'auto'; right: number | 'auto'; bottom: number | 'auto'; left: number | 'auto' }>;
 
 /**
  * Author-facing scale overrides for a plot axis. Mirrors svelteplot's
@@ -18,6 +23,7 @@ export type AxisScale = {
   range?: (number | string | boolean | Date | null)[];
   reverse?: boolean;
   label?: string | false;
+  labelAnchor?: 'auto' | 'left' | 'center' | 'right' | 'bottom' | 'middle' | 'top';
   interval?: string | number;
   clamp?: boolean;
   nice?: boolean;
@@ -40,9 +46,11 @@ export type AxisScale = {
   base?: number;
   constant?: number;
   sort?: (a: AxisValue, b: AxisValue) => number;
-  grid?: boolean;
+  grid?: boolean | { stroke?: string; strokeWidth?: number; strokeOpacity?: number; strokeDasharray?: string };
   tickRotate?: number;
   tickFormat?: false | Intl.NumberFormatOptions | Intl.DateTimeFormatOptions | ((d: unknown, index: number, ticks: unknown[]) => string | string[]);
+  labelOrientation?: 'horizontal' | 'vertical';
+  labelPosition?: 'top' | 'middle';
 };
 
 /**

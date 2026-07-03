@@ -72,7 +72,13 @@ export type ChartConfig = {
   };
 
   // ── Plot geometry / colour ──────────────────────────────────────────────────
-  margins: { top: number; right: number; bottom: number; left: number };
+  /**
+   * Per-side plot margin. `'auto'` (the default) lets svelteplot size that
+   * side to fit whatever it actually renders there — tick labels, an axis
+   * title, rotated ticks — instead of clipping content or leaving unused
+   * space. A number pins that side exactly, opting out of auto-sizing.
+   */
+  margins: { top: number | 'auto'; right: number | 'auto'; bottom: number | 'auto'; left: number | 'auto' };
   /** Discrete categorical palette (grouped series). */
   palette: string[];
   /** Continuous gradient endpoints + on-cell label colour. */

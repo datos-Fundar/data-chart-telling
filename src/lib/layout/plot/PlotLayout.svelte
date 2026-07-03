@@ -1,6 +1,6 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
   import type { ComponentProps, Snippet } from 'svelte';
-  import { Plot, Pointer, RuleX, RuleY, AxisX, AxisY } from 'svelteplot';
+  import { Plot, Pointer, RuleX, RuleY, AxisX, AxisY, GridX, GridY } from 'svelteplot';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { getHover, createHover } from '$lib/layout/tooltip/hover.svelte';
   import { createHoverController } from '$lib/layout/tooltip/controller.svelte';
@@ -42,8 +42,14 @@
   }: {
     width: number;
     height: number;
-    x?: SveltePlotProps['x'];
-    y?: SveltePlotProps['y'];
+    /**
+     * Typed as {@link AxisScale} (what every plot kind actually passes,
+     * `scales.x`/`scales.y`) rather than svelteplot's own narrower scale
+     * option type — `grid` and the vertical-label fields are ours, resolved
+     * by {@link finalizeScale} before reaching the real `<Plot>` below.
+     */
+    x?: AxisScale;
+    y?: AxisScale;
     /** Flat rows fed to svelteplot's `<Pointer>` for nearest-point matching. */
     data: TData[];
     getX: (d: TData) => AxisValue;
@@ -87,15 +93,44 @@
 
   const cfg = $derived(getConfiguration());
 
+  /**
+   * Margins passed straight to `<Plot margin={…}>`. Each side defaults to
+   * `'auto'` (from the theme), which lets svelteplot size it to whatever it
+   * actually renders there — tick labels, an axis title, rotated ticks —
+   * rather than a fixed guess that either clips content or wastes space.
+   * `margins`/`cfg.margins` can still pin a side to an exact number.
+   */
   const computedMargins = $derived.by(() => {
     const base = { ...cfg.margins, ...margins };
     const xRotate = scales?.x?.tickRotate;
-    if (!xRotate) return base;
+    // Auto margins already measure the real (rotated) label bounding box, so
+    // this manual boost is only needed when the caller pinned bottom to a
+    // fixed number, which bypasses that measurement.
+    if (!xRotate || typeof base.bottom !== 'number') return base;
     const rad = Math.abs(xRotate) * Math.PI / 180;
     return {
       ...base,
       bottom: base.bottom + Math.ceil(Math.sin(rad) * 20),
     };
+  });
+
+  const AUTO_MARGIN_ESTIMATE = { top: 20, right: 20, bottom: 30, left: 40 };
+
+  /**
+   * Best-effort numeric fallback for margins that resolved to `'auto'` —
+   * used only for our own layout heuristics below (tick-count capping,
+   * vertical label placement), which need *a* number, not svelteplot's
+   * exact post-measurement value.
+   */
+  function numericMargin(side: keyof typeof AUTO_MARGIN_ESTIMATE, value: number | 'auto' | undefined): number {
+    return typeof value === 'number' ? value : AUTO_MARGIN_ESTIMATE[side];
+  }
+
+  const numericMargins = $derived({
+    top: numericMargin('top', computedMargins.top),
+    right: numericMargin('right', computedMargins.right),
+    bottom: numericMargin('bottom', computedMargins.bottom),
+    left: numericMargin('left', computedMargins.left),
   });
 
   // ── Axis ticks / domain ──────────────────────────────────────────────────
@@ -118,10 +153,10 @@
   }
 
   const xTickCount = $derived(
-    autoTickCount(scales?.x, xValues, Math.max(0, width - computedMargins.left - computedMargins.right), 80, 3),
+    autoTickCount(scales?.x, xValues, Math.max(0, width - numericMargins.left - numericMargins.right), 80, 3),
   );
   const yTickCount = $derived(
-    autoTickCount(scales?.y, yValues, Math.max(0, height - computedMargins.top - computedMargins.bottom), 50, 2),
+    autoTickCount(scales?.y, yValues, Math.max(0, height - numericMargins.top - numericMargins.bottom), 50, 2),
   );
 
   /**
@@ -140,8 +175,37 @@
     return { ...(scale as object), domain } as T;
   }
 
-  const resolvedX = $derived(sortedScale(x, scales?.x, xValues));
-  const resolvedY = $derived(sortedScale(y, scales?.y, yValues));
+  /**
+   * `grid` and a vertical `label` are rendered ourselves below rather than
+   * passed through to svelteplot (which only draws a fixed-style implicit
+   * grid, and never rotates the axis title) — stripped here so they don't
+   * also trigger svelteplot's own (duplicate, unstyled) rendering of them.
+   */
+  function finalizeScale<T>(scale: T, scaleConfig: AxisScale | undefined, values: AxisValue[]): T {
+    const sorted = sortedScale(scale, scaleConfig, values);
+    if (typeof sorted !== 'object' || sorted === null || Array.isArray(sorted)) return sorted;
+    const out = { ...(sorted as Record<string, unknown>) };
+    delete out.grid;
+    if (scaleConfig?.labelOrientation === 'vertical') delete out.label;
+    return out as T;
+  }
+
+  // Cast to svelteplot's own (narrower) scale option type: finalizeScale has
+  // already stripped the fields that don't exist there (grid, the vertical
+  // label config) by this point.
+  const resolvedX = $derived(finalizeScale(x, scales?.x, xValues) as SveltePlotProps['x']);
+  const resolvedY = $derived(finalizeScale(y, scales?.y, yValues) as SveltePlotProps['y']);
+
+  /** Vertical Y-axis title placement, when `scales.y.labelOrientation === 'vertical'`. */
+  const verticalYLabel = $derived.by(() => {
+    if (!scales?.y?.label || scales.y.labelOrientation !== 'vertical') return null;
+    const position = scales.y.labelPosition ?? 'middle';
+    const x = 14;
+    const top = numericMargins.top;
+    const bottom = height - numericMargins.bottom;
+    const y = position === 'top' ? top : (top + bottom) / 2;
+    return { text: scales.y.label, x, y, anchor: position === 'top' ? ('end' as const) : ('middle' as const) };
+  });
 
   // ── Hover / tooltip ───────────────────────────────────────────────────────
   const hoverActive = $derived(tooltip != null || hasHoverMarker(markers));
@@ -225,6 +289,33 @@
       tickFontSize={cfg.axis.fontSize}
       titleFontSize={scales?.y?.titleFontSize ?? cfg.axis.titleFontSize}
     />
+    {#if scales?.x?.grid}
+      <GridX
+        stroke={typeof scales.x.grid === 'object' ? scales.x.grid.stroke : undefined}
+        strokeWidth={typeof scales.x.grid === 'object' ? scales.x.grid.strokeWidth : undefined}
+        strokeOpacity={typeof scales.x.grid === 'object' ? scales.x.grid.strokeOpacity : undefined}
+        strokeDasharray={typeof scales.x.grid === 'object' ? scales.x.grid.strokeDasharray : undefined}
+      />
+    {/if}
+    {#if scales?.y?.grid}
+      <GridY
+        stroke={typeof scales.y.grid === 'object' ? scales.y.grid.stroke : undefined}
+        strokeWidth={typeof scales.y.grid === 'object' ? scales.y.grid.strokeWidth : undefined}
+        strokeOpacity={typeof scales.y.grid === 'object' ? scales.y.grid.strokeOpacity : undefined}
+        strokeDasharray={typeof scales.y.grid === 'object' ? scales.y.grid.strokeDasharray : undefined}
+      />
+    {/if}
+    {#if verticalYLabel}
+      <text
+        x={verticalYLabel.x}
+        y={verticalYLabel.y}
+        transform="rotate(-90, {verticalYLabel.x}, {verticalYLabel.y})"
+        text-anchor={verticalYLabel.anchor}
+        font-size={scales?.y?.titleFontSize ?? cfg.axis.titleFontSize}
+        fill={cfg.axis.color}
+        opacity="0.8"
+      >{verticalYLabel.text}</text>
+    {/if}
     {@render children({
       matchedPoints: ctrl.points,
       ruleX: ctrl.ruleX,

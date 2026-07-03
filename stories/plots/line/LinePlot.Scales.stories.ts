@@ -425,3 +425,98 @@ export const MonthYearAcrossYears: Story = {
     } satisfies ScalesConfig,
   },
 };
+
+// ── Custom axis chrome ───────────────────────────────────────────────────────
+
+/**
+ * Vertical Y-axis title, anchored at the top — `labelOrientation: 'vertical'`
+ * rotates the title 90° and draws it beside the ticks instead of
+ * svelteplot's default horizontal title above the plot; `labelPosition: 'top'`
+ * anchors it near the axis's highest tick, reading downward.
+ *
+ * svelteplot can't auto-measure this custom label, so it needs an explicit
+ * `margins.left` wide enough for both the label and the tick digits.
+ */
+export const VerticalYLabelTop: Story = {
+  args: {
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY,
+      } satisfies Series<YearPoint>,
+    ],
+    scales: {
+      y: { label: 'Life expectancy (years)', labelOrientation: 'vertical', labelPosition: 'top' },
+    } satisfies ScalesConfig,
+    margins: { left: 60 },
+  },
+};
+
+/**
+ * Vertical Y-axis title, centered — `labelPosition` defaults to `'middle'`,
+ * spanning the full axis height instead of sitting at the top.
+ *
+ * Compare with `VerticalYLabelTop`.
+ */
+export const VerticalYLabelMiddle: Story = {
+  args: {
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY,
+      } satisfies Series<YearPoint>,
+    ],
+    scales: {
+      y: { label: 'Life expectancy (years)', labelOrientation: 'vertical' },
+    } satisfies ScalesConfig,
+    margins: { left: 60 },
+  },
+};
+
+/**
+ * Grid without an axis line — svelteplot doesn't draw a continuous axis
+ * spine at all; the only line an axis draws is the small perpendicular tick
+ * mark at each value, controlled by `tickSize`. Setting it to `0` hides
+ * those marks while `grid: true` keeps the horizontal reference lines,
+ * leaving just floating tick labels plus the grid.
+ */
+export const GridOnlyNoTickMarks: Story = {
+  args: {
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY,
+      } satisfies Series<YearPoint>,
+    ],
+    scales: {
+      y: { grid: true, tickSize: 0 },
+    } satisfies ScalesConfig,
+  },
+};
+
+/**
+ * Styled grid — `grid` accepts a style object (`stroke`, `strokeWidth`,
+ * `strokeOpacity`, `strokeDasharray`) instead of just `true`, here producing
+ * a light dotted grid rather than solid lines.
+ */
+export const DottedGrid: Story = {
+  args: {
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY,
+      } satisfies Series<YearPoint>,
+    ],
+    scales: {
+      y: { grid: { strokeDasharray: '2 3', strokeOpacity: 0.5 } },
+    } satisfies ScalesConfig,
+  },
+};
