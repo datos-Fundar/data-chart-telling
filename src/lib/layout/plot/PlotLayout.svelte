@@ -7,7 +7,7 @@
   import { hasHoverMarker, findHoverMarker } from '$lib/layout/tooltip/utils';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
   import Tooltip from '$lib/layout/tooltip/Tooltip.svelte';
-  import type { AxisValue, Series, ScalesConfig, MarginConfig } from '$lib/types/plots/common';
+  import type { AxisValue, AxisScale, Series, ScalesConfig, MarginConfig } from '$lib/types/plots/common';
   import type { Marker } from '$lib/types/plots/markers';
   import type { HoverStrategy, HoverDisplayPoint, HoverPoint, TooltipRuntime } from '$lib/types/layout/tooltip';
 
@@ -98,6 +98,51 @@
     };
   });
 
+  // ── Axis ticks / domain ──────────────────────────────────────────────────
+
+  const xValues = $derived(data.map(getX));
+  const yValues = $derived(data.map(getY));
+
+  /**
+   * Caps the requested tick count to the axis's own number of distinct
+   * values, but never above what the pixel width would naturally request —
+   * so a narrow domain (e.g. 5 whole years) never gets subdivided into
+   * fractional ticks (2020, 2020.5, 2021, …) just to fill the space. Skipped
+   * whenever the caller already controls tick density directly.
+   */
+  function autoTickCount(scale: AxisScale | undefined, values: AxisValue[], span: number, spacing: number, min: number): number | undefined {
+    if (scale?.ticks != null || scale?.tickSpacing != null || scale?.interval != null) return undefined;
+    const uniqueCount = new Set(values.map(String)).size;
+    const natural = Math.max(min, Math.round(span / spacing));
+    return uniqueCount >= 2 && uniqueCount < natural ? uniqueCount : undefined;
+  }
+
+  const xTickCount = $derived(
+    autoTickCount(scales?.x, xValues, Math.max(0, width - computedMargins.left - computedMargins.right), 80, 3),
+  );
+  const yTickCount = $derived(
+    autoTickCount(scales?.y, yValues, Math.max(0, height - computedMargins.top - computedMargins.bottom), 50, 2),
+  );
+
+  /**
+   * svelteplot's own `sort` scale option only toggles a fixed ascending sort
+   * (lexicographic for strings) — it can't take a custom comparator. When the
+   * caller supplies one via `scales.x.sort`/`scales.y.sort` for a string-valued
+   * axis (e.g. dates formatted as text), compute the ordered domain ourselves
+   * and hand it to the scale as an explicit `domain`, which svelteplot does
+   * respect as-is for ordinal scales.
+   */
+  function sortedScale<T>(scale: T, scaleConfig: AxisScale | undefined, values: AxisValue[]): T {
+    const sort = scaleConfig?.sort;
+    if (!sort || scaleConfig?.domain || values.length === 0) return scale;
+    if (!values.every((v) => typeof v === 'string')) return scale;
+    const domain = [...new Set(values)].sort(sort);
+    return { ...(scale as object), domain } as T;
+  }
+
+  const resolvedX = $derived(sortedScale(x, scales?.x, xValues));
+  const resolvedY = $derived(sortedScale(y, scales?.y, yValues));
+
   // ── Hover / tooltip ───────────────────────────────────────────────────────
   const hoverActive = $derived(tooltip != null || hasHoverMarker(markers));
 
@@ -165,9 +210,21 @@
   onpointermove={hoverActive ? ctrl.onMove : undefined}
   onpointerleave={hoverActive ? ctrl.onLeave : undefined}
 >
-  <Plot {width} {height} margin={computedMargins} {x} {y}>
-    <AxisX tickSize={scales?.x?.tickSize ?? cfg.axis.xTickSize} tickPadding={scales?.x?.tickPadding ?? cfg.axis.xTickPadding} tickFontSize={cfg.axis.fontSize} titleFontSize={scales?.x?.titleFontSize ?? cfg.axis.titleFontSize} />
-    <AxisY tickSize={scales?.y?.tickSize ?? cfg.axis.yTickSize} tickPadding={scales?.y?.tickPadding ?? cfg.axis.yTickPadding} tickFontSize={cfg.axis.fontSize} titleFontSize={scales?.y?.titleFontSize ?? cfg.axis.titleFontSize} />
+  <Plot {width} {height} margin={computedMargins} x={resolvedX} y={resolvedY}>
+    <AxisX
+      tickCount={xTickCount}
+      tickSize={scales?.x?.tickSize ?? cfg.axis.xTickSize}
+      tickPadding={scales?.x?.tickPadding ?? cfg.axis.xTickPadding}
+      tickFontSize={cfg.axis.fontSize}
+      titleFontSize={scales?.x?.titleFontSize ?? cfg.axis.titleFontSize}
+    />
+    <AxisY
+      tickCount={yTickCount}
+      tickSize={scales?.y?.tickSize ?? cfg.axis.yTickSize}
+      tickPadding={scales?.y?.tickPadding ?? cfg.axis.yTickPadding}
+      tickFontSize={cfg.axis.fontSize}
+      titleFontSize={scales?.y?.titleFontSize ?? cfg.axis.titleFontSize}
+    />
     {@render children({
       matchedPoints: ctrl.points,
       ruleX: ctrl.ruleX,

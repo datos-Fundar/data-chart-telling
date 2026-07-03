@@ -39,7 +39,7 @@ export type AxisScale = {
   titleFontSize?: number;
   base?: number;
   constant?: number;
-  sort?: ((a: unknown, b: unknown) => number) | { channel: string; order: 'ascending' | 'descending' };
+  sort?: (a: AxisValue, b: AxisValue) => number;
   grid?: boolean;
   tickRotate?: number;
   tickFormat?: false | Intl.NumberFormatOptions | Intl.DateTimeFormatOptions | ((d: unknown, index: number, ticks: unknown[]) => string | string[]);

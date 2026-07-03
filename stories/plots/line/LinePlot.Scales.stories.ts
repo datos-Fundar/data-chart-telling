@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { Series, ScalesConfig } from '$lib/types/plots/common';
+import type { Series, ScalesConfig, AxisValue } from '$lib/types/plots/common';
 import {
   FEMALE_LIFE_EXPECTANCY,
   LIFE_EXPECTANCY,
@@ -273,5 +273,155 @@ export const CombinedOverrides: Story = {
       y: { label: 'Life expectancy (years)', domain: [60, 90], grid: true },
     } satisfies ScalesConfig,
     margins: { bottom: 50 },
+  },
+};
+
+// ── Time-like X axes ─────────────────────────────────────────────────────────
+
+type DatePoint = { date: Date; value: number };
+type IsoDatePoint = { date: string; value: number };
+type MonthPoint = { month: string; value: number };
+type MonthYearPoint = { period: string; value: number };
+
+const MONTHS_ES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+const DATE_OBJECT_DATA: DatePoint[] = [
+  { date: new Date(2016, 0, 1), value: 12 },
+  { date: new Date(2017, 0, 1), value: 18 },
+  { date: new Date(2018, 0, 1), value: 22 },
+  { date: new Date(2019, 0, 1), value: 27 },
+  { date: new Date(2020, 0, 1), value: 24 },
+  { date: new Date(2021, 0, 1), value: 33 },
+  { date: new Date(2022, 0, 1), value: 41 },
+  { date: new Date(2023, 0, 1), value: 47 },
+  { date: new Date(2024, 0, 1), value: 52 },
+];
+
+/**
+ * `Date` objects on the X axis — svelteplot infers a `time` scale, which
+ * sorts and ticks chronologically by construction. Nine yearly points spread
+ * across a wide plot also exercise the tick-count fix: without it, a
+ * pixel-width-based tick request on such a narrow domain could ask for more
+ * ticks than there are distinct years.
+ */
+export const DateObjectXAxis: Story = {
+  args: {
+    series: [
+      {
+        name: 'adoption',
+        x: 'date',
+        y: 'value',
+        data: DATE_OBJECT_DATA,
+      } satisfies Series<DatePoint>,
+    ],
+  },
+};
+
+const ISO_DATE_DATA: IsoDatePoint[] = [
+  { date: '2023-01-01', value: 14 },
+  { date: '2023-04-01', value: 19 },
+  { date: '2023-07-01', value: 25 },
+  { date: '2023-10-01', value: 21 },
+  { date: '2024-01-01', value: 28 },
+  { date: '2024-04-01', value: 33 },
+  { date: '2024-07-01', value: 30 },
+  { date: '2024-10-01', value: 38 },
+];
+
+/**
+ * Dates as `'YYYY-MM-DD'` strings — svelteplot infers a `point` (ordinal)
+ * scale for string X values, no `scales.x.sort` needed here: the default
+ * ascending sort is lexicographic, and ISO dates happen to sort
+ * lexicographically in chronological order too.
+ */
+export const IsoDateStringXAxis: Story = {
+  args: {
+    series: [
+      {
+        name: 'signups',
+        x: 'date',
+        y: 'value',
+        data: ISO_DATE_DATA,
+      } satisfies Series<IsoDatePoint>,
+    ],
+  },
+};
+
+const MONTH_DATA: MonthPoint[] = [
+  { month: 'Ene', value: 20 },
+  { month: 'Feb', value: 18 },
+  { month: 'Mar', value: 24 },
+  { month: 'Abr', value: 30 },
+  { month: 'May', value: 38 },
+  { month: 'Jun', value: 45 },
+  { month: 'Jul', value: 48 },
+  { month: 'Ago', value: 44 },
+  { month: 'Sep', value: 36 },
+  { month: 'Oct', value: 29 },
+  { month: 'Nov', value: 22 },
+  { month: 'Dic', value: 25 },
+];
+
+/** Orders month-abbreviation strings by calendar position, not alphabetically. */
+function byMonth(a: AxisValue, b: AxisValue): number {
+  return MONTHS_ES.indexOf(String(a)) - MONTHS_ES.indexOf(String(b));
+}
+
+/**
+ * Month-name strings within a single year — a plain ordinal scale would sort
+ * these alphabetically (Abr, Ago, Dic, Ene, …), scrambling the seasonal
+ * shape entirely. `scales.x.sort` supplies calendar order instead.
+ */
+export const MonthNamesSameYear: Story = {
+  args: {
+    series: [
+      {
+        name: 'seasonal',
+        x: 'month',
+        y: 'value',
+        data: MONTH_DATA,
+      } satisfies Series<MonthPoint>,
+    ],
+    scales: {
+      x: { sort: byMonth },
+    } satisfies ScalesConfig,
+  },
+};
+
+const MONTH_YEAR_DATA: MonthYearPoint[] = [
+  { period: 'Nov-2025', value: 40 },
+  { period: 'Dic-2025', value: 46 },
+  { period: 'Ene-2026', value: 39 },
+  { period: 'Feb-2026', value: 43 },
+  { period: 'Mar-2026', value: 50 },
+  { period: 'Abr-2026', value: 55 },
+];
+
+function byMonthYear(a: AxisValue, b: AxisValue): number {
+  const rank = (v: AxisValue) => {
+    const [month, year] = String(v).split('-');
+    return Number(year) * 12 + MONTHS_ES.indexOf(month);
+  };
+  return rank(a) - rank(b);
+}
+
+/**
+ * `'Mmm-YYYY'` strings crossing a year boundary — alphabetical order would
+ * place `Abr-2026` before `Dic-2025`. `scales.x.sort` parses month + year
+ * out of each label so the axis (and the line) stay chronological.
+ */
+export const MonthYearAcrossYears: Story = {
+  args: {
+    series: [
+      {
+        name: 'trend',
+        x: 'period',
+        y: 'value',
+        data: MONTH_YEAR_DATA,
+      } satisfies Series<MonthYearPoint>,
+    ],
+    scales: {
+      x: { sort: byMonthYear },
+    } satisfies ScalesConfig,
   },
 };
