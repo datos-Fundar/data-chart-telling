@@ -75,7 +75,7 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
     return h.sync;
   });
   const tooltipText = $derived(
-    matchedRows.length ? matchedRows.map((p) => args.format()(p.row)).join('\n\n') : '',
+    matchedRows.length ? matchedRows.map((p) => args.format()(p.row)).join('\n') : '',
   );
 
   function onPointer(data: T[]) {

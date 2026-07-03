@@ -6,6 +6,11 @@
    * parent. It is styled entirely from the `--dct-tooltip-*` variables that
    * {@link ChartContainer} stamps from the config, so it themes for free. Plots
    * that implement hovering can render this with their own content snippet.
+   *
+   * Placement is boundary-aware: it prefers sitting centered above the point,
+   * but flips below when it would overflow the top and shifts horizontally
+   * when it would overflow the left/right, so it always stays clear of the
+   * `bounds` box (typically the plot's own width/height).
    */
   let {
     x,
@@ -13,6 +18,7 @@
     visible = true,
     background,
     color,
+    bounds,
     children,
   }: {
     x: number;
@@ -20,15 +26,39 @@
     visible?: boolean;
     background?: string;
     color?: string;
+    /** Box the tooltip must stay within — usually the hosting plot's width/height. */
+    bounds?: { width: number; height: number };
     children: Snippet;
   } = $props();
+
+  const GAP = 10;
+  const EDGE_MARGIN = 6;
+
+  let boxWidth = $state(0);
+  let boxHeight = $state(0);
+
+  const placement = $derived.by(() => {
+    const boundsWidth = bounds?.width ?? Infinity;
+    const boundsHeight = bounds?.height ?? Infinity;
+
+    let top = y - GAP - boxHeight;
+    if (top < EDGE_MARGIN) top = y + GAP;
+    top = Math.min(Math.max(top, EDGE_MARGIN), Math.max(EDGE_MARGIN, boundsHeight - boxHeight - EDGE_MARGIN));
+
+    let left = x - boxWidth / 2;
+    left = Math.min(Math.max(left, EDGE_MARGIN), Math.max(EDGE_MARGIN, boundsWidth - boxWidth - EDGE_MARGIN));
+
+    return { left, top };
+  });
 </script>
 
 {#if visible}
   <div
     class="dct-tooltip"
-    style:left="{x}px"
-    style:top="{y}px"
+    bind:clientWidth={boxWidth}
+    bind:clientHeight={boxHeight}
+    style:left="{placement.left}px"
+    style:top="{placement.top}px"
     style:background={background}
     style:color={color}
   >
@@ -40,7 +70,6 @@
   .dct-tooltip {
     position: absolute;
     z-index: 10;
-    transform: translate(-50%, -110%);
     pointer-events: none;
     background: var(--dct-tooltip-bg, #111827);
     color: var(--dct-tooltip-color, #fff);
