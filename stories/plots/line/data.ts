@@ -1,22 +1,6 @@
 export type YearPoint = { year: number; value: number };
 export type MonthPoint = { month: string; value: number };
 
-export const GDP: YearPoint[] = [
-  { year: 2018, value: 42 },
-  { year: 2019, value: 48 },
-  { year: 2020, value: 31 },
-  { year: 2021, value: 55 },
-  { year: 2022, value: 61 },
-];
-
-export const EMPLOYMENT: YearPoint[] = [
-  { year: 2018, value: 72 },
-  { year: 2019, value: 74 },
-  { year: 2020, value: 60 },
-  { year: 2021, value: 68 },
-  { year: 2022, value: 75 },
-];
-
 export type LifeExpectancyPoint = {
   year: number;
   value: number;
