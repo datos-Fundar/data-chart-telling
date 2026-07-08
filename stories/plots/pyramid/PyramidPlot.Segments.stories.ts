@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-import type { Segments, BarSegmentStyle } from '$lib/types/plots/styles';
+import type { Segments, BarSegmentStyle, Area } from '$lib/types/plots/styles';
 import { AGE_GROUPS, POPULATION_PYRAMID } from '../../data/population-pyramid';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -35,25 +35,34 @@ const BASE_ARGS = {
   scales: { y: { domain: AGE_GROUPS } },
 };
 
+// Age group labels are 5-year bins ('0-4', '5-9', … '85+') whose bucket-start
+// numbers don't sort correctly as plain strings (e.g. '5-9' > '20-24'
+// lexicographically). A `from`/`to` *range* area would silently mismatch, so
+// each matching bucket is listed as its own single-point area instead —
+// equality-only matching, immune to that ordering quirk.
+function areasFor(ageGroups: string[]): Area[] {
+  return ageGroups.map((ageGroup) => ({ x: { from: ageGroup, to: ageGroup } }));
+}
+
+function bucketStart(ageGroup: string): number {
+  return parseInt(ageGroup.split('-')[0]);
+}
+
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * `segments` dims every age group except a few highlighted ones.
- * Useful for drawing attention to specific demographic cohorts (e.g., working age, retired).
+ * `segments` dims every age group except a few highlighted ones. Applied via
+ * the `default` key, so the same rule affects both series (Mujeres, Varones).
  */
 export const HighlightedSegments: Story = {
   args: {
     ...BASE_ARGS,
-    segments: Object.fromEntries(
-      (['Mujeres', 'Varones'] as const).map((name) => [
-        name,
-        AGE_GROUPS.map((ageGroup) => ({
-          from: ageGroup,
-          to: ageGroup,
-          style: { fillOpacity: ['80-84', '85+'].includes(ageGroup) ? 1 : 0.25 },
-        })),
-      ]),
-    ) satisfies Segments<BarSegmentStyle>,
+    segments: {
+      default: [
+        { areas: areasFor(['80-84', '85+']), style: { fillOpacity: 1 } },
+        { style: { fillOpacity: 0.25 } },
+      ],
+    } satisfies Segments<BarSegmentStyle>,
   },
 };
 
@@ -64,20 +73,17 @@ export const HighlightedSegments: Story = {
 export const WorkingAgeHighlight: Story = {
   args: {
     ...BASE_ARGS,
-    segments: Object.fromEntries(
-      (['Mujeres', 'Varones'] as const).map((name) => [
-        name,
-        AGE_GROUPS.map((ageGroup) => {
-          const ageStart = parseInt(ageGroup.split('-')[0]);
-          const isWorkingAge = ageStart >= 18 && ageStart < 65;
-          return {
-            from: ageGroup,
-            to: ageGroup,
-            style: { fillOpacity: isWorkingAge ? 1 : 0.2 },
-          };
-        }),
-      ]),
-    ) satisfies Segments<BarSegmentStyle>,
+    segments: {
+      default: [
+        {
+          areas: areasFor(
+            AGE_GROUPS.filter((ag) => bucketStart(ag) >= 18 && bucketStart(ag) < 65),
+          ),
+          style: { fillOpacity: 1 },
+        },
+        { style: { fillOpacity: 0.2 } },
+      ],
+    } satisfies Segments<BarSegmentStyle>,
   },
 };
 
@@ -88,70 +94,81 @@ export const WorkingAgeHighlight: Story = {
 export const YouthAndElderlyHighlight: Story = {
   args: {
     ...BASE_ARGS,
-    segments: Object.fromEntries(
-      (['Mujeres', 'Varones'] as const).map((name) => [
-        name,
-        AGE_GROUPS.map((ageGroup) => {
-          const ageStart = parseInt(ageGroup.split('-')[0]);
-          const isYouthOrElderly = ageStart < 25 || ageStart >= 65;
-          return {
-            from: ageGroup,
-            to: ageGroup,
-            style: { fillOpacity: isYouthOrElderly ? 0.95 : 0.2 },
-          };
-        }),
-      ]),
-    ) satisfies Segments<BarSegmentStyle>,
+    segments: {
+      default: [
+        {
+          areas: areasFor(
+            AGE_GROUPS.filter((ag) => bucketStart(ag) < 25 || bucketStart(ag) >= 65),
+          ),
+          style: { fillOpacity: 0.95 },
+        },
+        { style: { fillOpacity: 0.2 } },
+      ],
+    } satisfies Segments<BarSegmentStyle>,
   },
 };
 
 /**
- * Highlight by decade — groups and highlights every other decade (0s, 20s, 40s, 60s+)
- * with alternating opacity levels, creating a visual pattern.
+ * Highlight by decade — every other decade (0s, 20s, 40s, 60s+) gets a
+ * higher opacity than the rest, creating a visual pattern. Every age group
+ * falls into exactly one of the two segments, so no catch-all is needed.
  */
 export const ByDecadePattern: Story = {
   args: {
     ...BASE_ARGS,
-    segments: Object.fromEntries(
-      (['Mujeres', 'Varones'] as const).map((name) => [
-        name,
-        AGE_GROUPS.map((ageGroup) => {
-          const ageStart = parseInt(ageGroup.split('-')[0]);
-          const decade = Math.floor(ageStart / 10);
-          const opacity = decade % 2 === 0 ? 0.9 : 0.3;
-          return {
-            from: ageGroup,
-            to: ageGroup,
-            style: { fillOpacity: opacity },
-          };
-        }),
-      ]),
-    ) satisfies Segments<BarSegmentStyle>,
+    segments: {
+      default: [
+        {
+          areas: areasFor(AGE_GROUPS.filter((ag) => Math.floor(bucketStart(ag) / 10) % 2 === 0)),
+          style: { fillOpacity: 0.9 },
+        },
+        {
+          areas: areasFor(AGE_GROUPS.filter((ag) => Math.floor(bucketStart(ag) / 10) % 2 === 1)),
+          style: { fillOpacity: 0.3 },
+        },
+      ],
+    } satisfies Segments<BarSegmentStyle>,
   },
 };
 
 /**
  * Asymmetric highlighting — female side highlights elderly (80+), male side
  * highlights working age (25-54), showing two different demographic interests.
+ * Segments keyed by series name apply only to that series.
  */
 export const AsymmetricHighlight: Story = {
   args: {
     ...BASE_ARGS,
     segments: {
-      Mujeres: AGE_GROUPS.map((ageGroup) => ({
-        from: ageGroup,
-        to: ageGroup,
-        style: { fillOpacity: ageGroup === '80-84' || ageGroup === '85+' ? 1 : 0.25 },
-      })),
-      Varones: AGE_GROUPS.map((ageGroup) => {
-        const ageStart = parseInt(ageGroup.split('-')[0]);
-        const isWorkingAge = ageStart >= 25 && ageStart < 55;
-        return {
-          from: ageGroup,
-          to: ageGroup,
-          style: { fillOpacity: isWorkingAge ? 1 : 0.25 },
-        };
-      }),
+      Mujeres: [
+        { areas: areasFor(['80-84', '85+']), style: { fillOpacity: 1 } },
+        { style: { fillOpacity: 0.25 } },
+      ],
+      Varones: [
+        {
+          areas: areasFor(
+            AGE_GROUPS.filter((ag) => bucketStart(ag) >= 25 && bucketStart(ag) < 55),
+          ),
+          style: { fillOpacity: 1 },
+        },
+        { style: { fillOpacity: 0.25 } },
+      ],
+    } satisfies Segments<BarSegmentStyle>,
+  },
+};
+
+/**
+ * Custom fill color on the highlighted area — combines a distinct color
+ * with a dimmed catch-all for the rest, on the `default` key.
+ */
+export const CustomColorHighlight: Story = {
+  args: {
+    ...BASE_ARGS,
+    segments: {
+      default: [
+        { areas: areasFor(['80-84', '85+']), style: { fill: '#d6336c', fillOpacity: 0.9 } },
+        { style: { fillOpacity: 0.2 } },
+      ],
     } satisfies Segments<BarSegmentStyle>,
   },
 };

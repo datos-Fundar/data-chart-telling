@@ -51,20 +51,23 @@ export const Default: Story = {
  * Both series share the same y axis (age groups) and plot as a diverging bar chart.
  *
  * The series order determines visual placement: first series goes left, second goes right.
+ * A series' `x` is the category accessor (age group) and `y` is the magnitude
+ * (population %) — the same convention `buildSeries` uses internally for the
+ * `data`/`x`/`y`/`z` shorthand above.
  */
 export const ExplicitSeries: Story = {
   args: {
     series: [
       {
         name: 'Mujeres',
-        x: 'pct',
-        y: 'ageGroup',
+        x: 'ageGroup',
+        y: 'pct',
         data: POPULATION_PYRAMID.filter((d) => d.year === 2022 && d.sex === 'Mujeres'),
       } satisfies Series<PopulationRow>,
       {
         name: 'Varones',
-        x: 'pct',
-        y: 'ageGroup',
+        x: 'ageGroup',
+        y: 'pct',
         data: POPULATION_PYRAMID.filter((d) => d.year === 2022 && d.sex === 'Varones'),
       } satisfies Series<PopulationRow>,
     ],
