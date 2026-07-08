@@ -87,8 +87,6 @@
 <PlotLayout
   {width}
   {height}
-  x={scales.x}
-  y={scales.y}
   data={flat}
   getX={xAcc}
   getY={(d) => Number(yAcc(d))}

@@ -77,7 +77,7 @@ export const CustomYDomain: Story = {
       } satisfies Series<ProvincePoint>,
     ],
     scales: {
-      y: { domain: [75, 85] },
+      y: { domain: [70, 85] },
     } satisfies ScalesConfig,
   },
 };
@@ -185,6 +185,7 @@ export const RotatedXTicks: Story = {
         tickRotate: -45,
       },
     } satisfies ScalesConfig,
+    margins: { bottom: 80 },
   },
 };
 
@@ -210,6 +211,30 @@ export const ZeroAnchoredY: Story = {
 };
 
 /**
+ * Bars ordered by their own Y value (descending) instead of the default
+ * alphabetical order of the X category. `scales.x.sort` receives the full
+ * row on each side — not just the X value — so the comparator can read
+ * `value` (or any other field) to decide the order.
+ */
+export const SortXByYDescending: Story = {
+  args: {
+    series: [
+      {
+        name: 'female_life_expectancy',
+        x: 'province',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+      } satisfies Series<ProvincePoint>,
+    ],
+    scales: {
+      x: {
+        sort: (a, b) => (b as ProvincePoint).value - (a as ProvincePoint).value,
+      },
+    } satisfies ScalesConfig,
+  },
+};
+
+/**
  * All overrides combined on a two-series chart: labelled axes, a tighter
  * Y domain, rotated X tick labels, and a Y grid.
  */
@@ -224,5 +249,146 @@ export const CombinedOverrides: Story = {
       y: { label: 'Life expectancy (years)', domain: [70, 85], grid: true },
     } satisfies ScalesConfig,
     margins: { bottom: 80, left: 60 },
+  },
+};
+
+// ── Series layout (multiple series sharing a category) ────────────────────────
+// `scales.z.seriesLayout` controls how series that share the same X category
+// are arranged — `z` because it's the grouping axis, not the category (`x`)
+// axis itself.
+
+/**
+ * Default layout when omitted — every series draws at the same X position,
+ * full band width. The taller bar is fully covered by the shorter one drawn
+ * after it, so only its top sliver peeks out above. Compare with `Grouped`
+ * and `Stacked` below.
+ */
+export const OverlappingSeries: Story = {
+  args: {
+    data: LIFE_EXPECTANCY_BY_PROVINCE,
+    x: 'province',
+    y: 'value',
+    z: 'sex',
+  },
+};
+
+/**
+ * `seriesLayout: 'grouped'` gives each series its own slice of the category
+ * band, side by side — the classic grouped-bar-chart look. The slice width
+ * is only an estimate (derived from this plot's own width/margins, not
+ * svelteplot's actual measured scale), so it can be slightly off when an
+ * `'auto'` margin ends up wider than expected.
+ */
+export const GroupedSeries: Story = {
+  args: {
+    data: LIFE_EXPECTANCY_BY_PROVINCE,
+    x: 'province',
+    y: 'value',
+    z: 'sex',
+    scales: {
+      z: { seriesLayout: 'grouped' },
+    } satisfies ScalesConfig,
+  },
+};
+
+/**
+ * `seriesLayout: 'stacked'` stacks series cumulatively within each category's
+ * band instead of placing them side by side. Each series keeps its single
+ * resolved colour; per-area `segments` style overrides aren't applied in
+ * stacked mode.
+ */
+export const StackedSeries: Story = {
+  args: {
+    data: LIFE_EXPECTANCY_BY_PROVINCE,
+    x: 'province',
+    y: 'value',
+    z: 'sex',
+    scales: {
+      z: { seriesLayout: 'stacked' },
+    } satisfies ScalesConfig,
+  },
+};
+
+/**
+ * `scales.z.seriesPadding` (0–1) reserves a fraction of each series' own
+ * slice as a gap on either side, separating bars within the same group.
+ * Space *between* groups is controlled separately, by the category axis's
+ * own `paddingInner`/`paddingOuter` (see `WideGroupSpacing` below).
+ */
+export const GroupedWithSeriesPadding: Story = {
+  args: {
+    data: LIFE_EXPECTANCY_BY_PROVINCE,
+    x: 'province',
+    y: 'value',
+    z: 'sex',
+    scales: {
+      z: { seriesLayout: 'grouped', seriesPadding: 0.3 },
+    } satisfies ScalesConfig,
+  },
+};
+
+/**
+ * `scales.x.paddingInner` widens the gap *between* categories (provinces),
+ * which — since 'grouped' estimates its slice width off the same band-scale
+ * formula — also narrows every series' own bars accordingly.
+ */
+export const WideGroupSpacing: Story = {
+  args: {
+    data: LIFE_EXPECTANCY_BY_PROVINCE,
+    x: 'province',
+    y: 'value',
+    z: 'sex',
+    scales: {
+      x: { paddingInner: 0.5 },
+      z: { seriesLayout: 'grouped' },
+    } satisfies ScalesConfig,
+  },
+};
+
+// ── Orientation (horizontal bars) ──────────────────────────────────────────────
+// `scales.x`/`scales.y` always describe *that visual axis*, regardless of
+// which data field ends up there — marking `scales.y.type: 'categorical'`
+// says "the category is drawn on Y this time", swapping BarPlot from its
+// default `BarY` (vertical) to `BarX` (horizontal). `x` is categorical by
+// default; marking both (or presumably relying on neither) is ambiguous —
+// BarPlot warns and falls back to vertical.
+
+/**
+ * Horizontal bars — `scales.y.type: 'categorical'` puts the province names
+ * on the Y axis and life expectancy (the value) on X.
+ */
+export const HorizontalBars: Story = {
+  args: {
+    series: [
+      {
+        name: 'female_life_expectancy',
+        x: 'province',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+      } satisfies Series<ProvincePoint>,
+    ],
+    scales: {
+      y: { type: 'categorical' },
+    } satisfies ScalesConfig,
+    margins: { left: 90 },
+  },
+};
+
+/**
+ * Horizontal bars combined with 'grouped' series layout — the two series
+ * sit side by side within each category's row instead of one on top of the
+ * other.
+ */
+export const HorizontalGroupedSeries: Story = {
+  args: {
+    data: LIFE_EXPECTANCY_BY_PROVINCE,
+    x: 'province',
+    y: 'value',
+    z: 'sex',
+    scales: {
+      y: { type: 'categorical' },
+      z: { seriesLayout: 'grouped' },
+    } satisfies ScalesConfig,
+    margins: { left: 90 },
   },
 };

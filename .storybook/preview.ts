@@ -108,6 +108,17 @@ const preview: Preview = {
               'Tooltip',
             ],
             'BarPlot',
+            [
+              'Series',
+              'Scales',
+              'Styles',
+              'Segments',
+              'Markers',
+              [
+                'Rules',
+              ],
+              'Tooltip',
+            ],
             'HeatmapPlot',
             'PyramidPlot'
           ],

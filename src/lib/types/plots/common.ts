@@ -16,8 +16,11 @@ export type MarginConfig = Partial<{ top: number | 'auto'; right: number | 'auto
  * Used for both `x` and `y` entries in {@link ScalesConfig}. X-specific
  * fields (`labelAnchor`, `tickRotate`) are accepted on `y` too; svelteplot
  * silently ignores any inapplicable options.
+ *
+ * `TData` is the plot's own row type — it's what {@link AxisScale.sort}
+ * receives, so ordering isn't limited to comparing this axis's own value.
  */
-export type AxisScale = {
+export type AxisScale<TData = Record<string, unknown>> = {
   type?: 'auto' | 'linear' | 'pow' | 'sqrt' | 'log' | 'symlog' | 'time' | 'utc' | 'point' | 'ordinal' | 'sequential' | 'band' | 'categorical' | 'cyclical' | 'threshold' | 'quantile-cont' | 'quantile' | 'quantize' | 'diverging' | 'diverging-log' | 'diverging-pow' | 'diverging-sqrt' | 'diverging-symlog';
   domain?: (number | string | boolean | Date | null)[];
   range?: (number | string | boolean | Date | null)[];
@@ -45,22 +48,24 @@ export type AxisScale = {
   titleFontSize?: number;
   base?: number;
   constant?: number;
-  sort?: (a: AxisValue, b: AxisValue) => number;
+  sort?: (a: TData, b: TData) => number;
   grid?: boolean | { stroke?: string; strokeWidth?: number; strokeOpacity?: number; strokeDasharray?: string };
   tickRotate?: number;
   tickFormat?: false | Intl.NumberFormatOptions | Intl.DateTimeFormatOptions | ((d: unknown, index: number, ticks: unknown[]) => string | string[]);
   labelOrientation?: 'horizontal' | 'vertical';
   labelPosition?: 'top' | 'middle';
+  seriesLayout?: 'overlap' | 'grouped' | 'stacked';
+  seriesPadding?: number;
 };
 
 /**
  * Per-axis scale overrides, passed as a single `scales` prop to every plot
- * kind.
+ * kind. `TData` threads through to {@link AxisScale.sort} on each axis.
  */
-export type ScalesConfig = {
-  x?: AxisScale;
-  y?: AxisScale;
-  z?: AxisScale;
+export type ScalesConfig<TData = Record<string, unknown>> = {
+  x?: AxisScale<TData>;
+  y?: AxisScale<TData>;
+  z?: AxisScale<TData>;
 };
 
 /**

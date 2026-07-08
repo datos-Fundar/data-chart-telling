@@ -34,7 +34,7 @@ export type ChartProps<
   styles?: PlotStyles;
   segments?: Segments<TSegmentStyle>;
   markers?: Marker[];
-  scales?: ScalesConfig;
+  scales?: ScalesConfig<TRow>;
   margins?: MarginConfig;
   facet?: FacetConfig<TRow>;
   timeline?: TimelineConfig<TRow>;

@@ -53,7 +53,7 @@
     const vals = data.map((d) => Number(getZ(d)));
     return vals.length ? [Math.min(...vals, 0), Math.max(...vals)] : [0, 1];
   });
-  const mergedScales = $derived<ScalesConfig>({
+  const mergedScales = $derived<ScalesConfig<TRow>>({
     ...scales,
     z: { domain: fullDomain, ...(scales.z ?? {}) },
   });

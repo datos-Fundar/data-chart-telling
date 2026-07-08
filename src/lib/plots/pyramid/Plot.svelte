@@ -9,7 +9,7 @@
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
   import type { PlotProps } from '$lib/types/plots/props';
-  import type { Series, AxisValue } from '$lib/types/plots/common';
+  import type { Series, AxisValue, ScalesConfig } from '$lib/types/plots/common';
   import type { BarSegmentStyle, ValueAnchor } from '$lib/types/plots/styles';
   import type { Marker } from '$lib/types/plots/markers';
 
@@ -68,7 +68,9 @@
   });
 
   const groupedSeries = $derived(
-    buildGroupedSeries<InternalSeries, BarSegmentStyle>(resolvedSeries, segments),
+    // connect: false — bars are discrete; there's no visual gap between
+    // adjacent categories to bridge (see buildGroupedSeries's own doc).
+    buildGroupedSeries<InternalSeries, BarSegmentStyle>(resolvedSeries, segments, false),
   );
 
   function signedValue(s: InternalSeries, d: TData): number {
@@ -149,27 +151,35 @@
     }
     return map;
   });
+
+  // The single, fully-resolved scales object PlotLayout reads for
+  // everything (ticks, grid, sort, and the real svelteplot scale) — avoids
+  // keeping a second, separately-defaulted copy of `scales.x`/`scales.y`
+  // (our own diverging-domain + band-scale defaults) out of sync with the
+  // one actually forwarded.
+  const resolvedScales = $derived<ScalesConfig<TData>>({
+    ...scales,
+    x: {
+      domain: [-maxMagnitude, maxMagnitude],
+      tickFormat: (v: unknown) => fmtVal(Math.abs(Number(v)), ''),
+      ...(scales.x ?? {}),
+    },
+    y: { type: 'band', padding: 0.2, domain: yDomain, ...(scales.y ?? {}) },
+  });
 </script>
 
 <PlotLayout
   {width}
   {height}
-  x={{
-    domain: [-maxMagnitude, maxMagnitude],
-    tickFormat: (v: unknown) => fmtVal(Math.abs(Number(v)), ''),
-    ...(scales.x ?? {}),
-  }}
-  y={{ type: 'band', padding: 0.2, domain: yDomain, ...(scales.y ?? {}) }}
   data={flat}
   {getX}
   {getY}
-  matchY={getY}
   {hoverPoints}
   label={labelFor}
   {tooltip}
   {markers}
   seriesData={resolvedSeries}
-  {scales}
+  scales={resolvedScales}
   {margins}
   defaultStrategy="y"
 >

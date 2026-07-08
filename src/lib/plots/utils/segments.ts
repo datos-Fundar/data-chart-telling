@@ -115,6 +115,7 @@ function mergeStyles<TStyle>(base: TStyle, override: TStyle): TStyle {
 function resolveSeriesSegments<S extends Series<any>, TStyle>(
   series: S,
   segs: Segment<TStyle>[],
+  connect: boolean,
 ): VisualSegment<S['data'][number], TStyle>[] {
   if (!segs.length) {
     return [{ data: series.data, style: {} as TStyle }];
@@ -181,12 +182,16 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
   for (let r = 0; r < runs.length; r++) {
     const run = runs[r];
     if (run.segIdx === -1) {
-      // Unmatched run: insert bridge points so the line connects to adjacent
-      // user segments without a gap.
-      const bridged: DataPoint[] = [];
-      if (r > 0) bridged.push(runs[r - 1].data[runs[r - 1].data.length - 1]);
-      bridged.push(...run.data);
-      if (r < runs.length - 1) bridged.push(runs[r + 1].data[0]);
+      // Unmatched run: for a continuous mark (line), insert bridge points so
+      // it connects to adjacent user segments without a visual gap. Discrete
+      // marks (bar, pyramid) have no such gap to bridge — bridging would just
+      // duplicate the neighboring runs' boundary rows as an extra, wrongly
+      // styled mark at that same category.
+      const bridged: DataPoint[] = [...run.data];
+      if (connect) {
+        if (r > 0) bridged.unshift(runs[r - 1].data[runs[r - 1].data.length - 1]);
+        if (r < runs.length - 1) bridged.push(runs[r + 1].data[0]);
+      }
       defaultVisual.push({ data: bridged, style: {} as TStyle });
     } else {
       const seg = segs[run.segIdx];
@@ -202,9 +207,11 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
       // When the next run is also a user segment (no unmatched data between them),
       // insert a line-only connector so the lines join without a gap. Using a
       // separate mark (rather than appending a bridge point to the current run)
-      // avoids rendering an extra dot at the shared boundary point.
+      // avoids rendering an extra dot at the shared boundary point. Skipped
+      // entirely for discrete marks (see above) — it would duplicate both
+      // runs' boundary rows as an extra mark.
       const nextRun = runs[r + 1];
-      if (nextRun && nextRun.segIdx !== -1) {
+      if (connect && nextRun && nextRun.segIdx !== -1) {
         connectors.push({
           data: [run.data[run.data.length - 1], nextRun.data[0]],
           style: connectorStyle,
@@ -224,17 +231,24 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
  * Builds the full list of visual groups — one per series — ready to render.
  * Each group's `visualSegments` is derived by resolving the flat segment list
  * for that series from all groups in `segments`.
+ *
+ * `connect` bridges adjacent visual segments so a *continuous* mark (line)
+ * has no visual gap at their boundary — the default, since `buildGroupedSeries`
+ * itself defaults `TStyle` to {@link LineSegmentStyle}. Discrete marks (bar,
+ * pyramid) have no gap to bridge; pass `connect: false` so boundary rows
+ * aren't duplicated as an extra, separately-styled mark.
  */
 export function buildGroupedSeries<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   S extends Series<any>,
   TStyle = LineSegmentStyle,
->(seriesList: S[], segments: Segments<TStyle>): VisualGroup<S, TStyle>[] {
+>(seriesList: S[], segments: Segments<TStyle>, connect = true): VisualGroup<S, TStyle>[] {
   return seriesList.map((s) => ({
     series: s,
     visualSegments: resolveSeriesSegments<S, TStyle>(
       s,
       resolveSegmentsForSeries(segments, s.name),
+      connect,
     ),
   }));
 }

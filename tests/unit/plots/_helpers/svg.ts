@@ -28,3 +28,9 @@ export function countDotMarks(svg: SVGElement): number {
 export function countTextLabels(svg: SVGElement): number {
   return svg.querySelectorAll('g.text text').length;
 }
+
+// BarPlot renders vertical bars as <BarY> (g.bar-y) or, in horizontal
+// orientation, as <BarX> (g.bar-x) — either way each bar is a <rect>.
+export function countBarRects(svg: SVGElement): number {
+  return svg.querySelectorAll('g.bar-y rect, g.bar-x rect').length;
+}

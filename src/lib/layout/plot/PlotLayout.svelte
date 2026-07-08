@@ -1,7 +1,9 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
   import type { ComponentProps, Snippet } from 'svelte';
+  import { SvelteSet } from 'svelte/reactivity';
   import { Plot, Pointer, RuleX, RuleY, AxisX, AxisY, GridX, GridY } from 'svelteplot';
   import { getConfiguration } from '$lib/configuration/config.svelte';
+  import { numericMargin } from '$lib/layout/plot/margins';
   import { getHover, createHover } from '$lib/layout/tooltip/hover.svelte';
   import { createHoverController } from '$lib/layout/tooltip/controller.svelte';
   import { hasHoverMarker, findHoverMarker } from '$lib/layout/tooltip/utils';
@@ -9,7 +11,7 @@
   import Tooltip from '$lib/layout/tooltip/Tooltip.svelte';
   import type { AxisValue, AxisScale, Series, ScalesConfig, MarginConfig } from '$lib/types/plots/common';
   import type { Marker } from '$lib/types/plots/markers';
-  import type { HoverStrategy, HoverDisplayPoint, HoverPoint, TooltipRuntime } from '$lib/types/layout/tooltip';
+  import type { HoverStrategy, HoverPoint, TooltipRuntime } from '$lib/types/layout/tooltip';
 
   type SveltePlotProps = ComponentProps<typeof Plot>;
 
@@ -23,12 +25,9 @@
   let {
     width,
     height,
-    x,
-    y,
     data,
     getX,
     getY,
-    matchY,
     hoverPoints,
     label,
     tooltip = undefined,
@@ -42,20 +41,10 @@
   }: {
     width: number;
     height: number;
-    /**
-     * Typed as {@link AxisScale} (what every plot kind actually passes,
-     * `scales.x`/`scales.y`) rather than svelteplot's own narrower scale
-     * option type — `grid` and the vertical-label fields are ours, resolved
-     * by {@link finalizeScale} before reaching the real `<Plot>` below.
-     */
-    x?: AxisScale;
-    y?: AxisScale;
     /** Flat rows fed to svelteplot's `<Pointer>` for nearest-point matching. */
     data: TData[];
     getX: (d: TData) => AxisValue;
     getY: (d: TData) => AxisValue;
-    /** Pointer's `y` channel — only needed when matching must be 2D (e.g. a heatmap grid). */
-    matchY?: (d: TData) => AxisValue;
     hoverPoints: HoverPoint<TData>[];
     label: (row: TData) => string;
     tooltip?: TooltipRuntime<TData>;
@@ -63,7 +52,7 @@
     /** All resolved series, forwarded to unscoped component markers (e.g. DeltaMarker). */
     seriesData?: Series<TData>[];
     /** Scale config forwarded from the plot. */
-    scales?: ScalesConfig;
+    scales?: ScalesConfig<TData>;
     /** Partial margin override — merged on top of the theme before tickRotate adjustment. */
     margins?: MarginConfig;
     showHoverLabels?: boolean;
@@ -73,16 +62,17 @@
      */
     defaultStrategy?: HoverStrategy;
     /**
-     * `matchedPoints` carries only display info (+ `series`), not `row` — a
-     * per-series-scoped `HoverMarker` never needs the source row, just enough
-     * to filter and place dots/labels, which sidesteps forcing a concrete
-     * `TData` resolution through this snippet's type for every plot kind.
+     * `matchedPoints` carries the source `row` alongside the display fields
+     * — needed by plot kinds whose semantic value isn't tied to a fixed
+     * visual axis (e.g. `BarPlot`'s category, which can be drawn on either
+     * axis depending on orientation), so a template can resolve it straight
+     * off `row` instead of assuming which of `.x`/`.y` it landed on.
      * `impliesRuleX`/`impliesRuleY` tell the plot kind whether the active
      * strategy implies a crosshair rule on each axis by default.
      */
     children: Snippet<
       [{
-        matchedPoints: HoverDisplayPoint[];
+        matchedPoints: HoverPoint<TData>[];
         ruleX: AxisValue | null;
         ruleY: AxisValue | null;
         impliesRuleX: boolean;
@@ -114,18 +104,6 @@
     };
   });
 
-  const AUTO_MARGIN_ESTIMATE = { top: 20, right: 20, bottom: 30, left: 40 };
-
-  /**
-   * Best-effort numeric fallback for margins that resolved to `'auto'` —
-   * used only for our own layout heuristics below (tick-count capping,
-   * vertical label placement), which need *a* number, not svelteplot's
-   * exact post-measurement value.
-   */
-  function numericMargin(side: keyof typeof AUTO_MARGIN_ESTIMATE, value: number | 'auto' | undefined): number {
-    return typeof value === 'number' ? value : AUTO_MARGIN_ESTIMATE[side];
-  }
-
   const numericMargins = $derived({
     top: numericMargin('top', computedMargins.top),
     right: numericMargin('right', computedMargins.right),
@@ -145,7 +123,7 @@
    * fractional ticks (2020, 2020.5, 2021, …) just to fill the space. Skipped
    * whenever the caller already controls tick density directly.
    */
-  function autoTickCount(scale: AxisScale | undefined, values: AxisValue[], span: number, spacing: number, min: number): number | undefined {
+  function autoTickCount(scale: AxisScale<TData> | undefined, values: AxisValue[], span: number, spacing: number, min: number): number | undefined {
     if (scale?.ticks != null || scale?.tickSpacing != null || scale?.interval != null) return undefined;
     const uniqueCount = new Set(values.map(String)).size;
     const natural = Math.max(min, Math.round(span / spacing));
@@ -159,20 +137,37 @@
     autoTickCount(scales?.y, yValues, Math.max(0, height - numericMargins.top - numericMargins.bottom), 50, 2),
   );
 
+  /** One representative row per unique axis value (first occurrence in `data`). */
+  function uniqueRows(rows: TData[], getAxisValue: (d: TData) => AxisValue): TData[] {
+    const seen = new SvelteSet<AxisValue>();
+    const out: TData[] = [];
+    for (const row of rows) {
+      const v = getAxisValue(row);
+      if (seen.has(v)) continue;
+      seen.add(v);
+      out.push(row);
+    }
+    return out;
+  }
+
   /**
    * svelteplot's own `sort` scale option only toggles a fixed ascending sort
    * (lexicographic for strings) — it can't take a custom comparator. When the
    * caller supplies one via `scales.x.sort`/`scales.y.sort` for a string-valued
-   * axis (e.g. dates formatted as text), compute the ordered domain ourselves
-   * and hand it to the scale as an explicit `domain`, which svelteplot does
-   * respect as-is for ordinal scales.
+   * axis (e.g. dates formatted as text, or categories ordered by another
+   * field), compute the ordered domain ourselves and hand it to the scale as
+   * an explicit `domain`, which svelteplot does respect as-is for ordinal
+   * scales. The comparator receives one representative row per unique axis
+   * value, not just the axis value itself, so it can sort by this axis's own
+   * value or by any other field on the row.
    */
-  function sortedScale<T>(scale: T, scaleConfig: AxisScale | undefined, values: AxisValue[]): T {
-    const sort = scaleConfig?.sort;
-    if (!sort || scaleConfig?.domain || values.length === 0) return scale;
-    if (!values.every((v) => typeof v === 'string')) return scale;
-    const domain = [...new Set(values)].sort(sort);
-    return { ...(scale as object), domain } as T;
+  function sortedScale(scale: AxisScale<TData> | undefined, rows: TData[], getAxisValue: (d: TData) => AxisValue): AxisScale<TData> | undefined {
+    const sort = scale?.sort;
+    if (!sort || scale?.domain) return scale;
+    const reps = uniqueRows(rows, getAxisValue);
+    if (reps.length === 0 || !reps.every((r) => typeof getAxisValue(r) === 'string')) return scale;
+    const domain = [...reps].sort(sort).map(getAxisValue);
+    return { ...scale, domain };
   }
 
   /**
@@ -180,21 +175,26 @@
    * passed through to svelteplot (which only draws a fixed-style implicit
    * grid, and never rotates the axis title) — stripped here so they don't
    * also trigger svelteplot's own (duplicate, unstyled) rendering of them.
+   * Also the single place a plot kind's fully-resolved `scales.x`/`scales.y`
+   * (defaults already merged in by the plot itself) turns into what
+   * svelteplot's own, narrower scale option type actually accepts.
    */
-  function finalizeScale<T>(scale: T, scaleConfig: AxisScale | undefined, values: AxisValue[]): T {
-    const sorted = sortedScale(scale, scaleConfig, values);
-    if (typeof sorted !== 'object' || sorted === null || Array.isArray(sorted)) return sorted;
-    const out = { ...(sorted as Record<string, unknown>) };
+  function finalizeScale(scale: AxisScale<TData> | undefined, rows: TData[], getAxisValue: (d: TData) => AxisValue): AxisScale<TData> | undefined {
+    const sorted = sortedScale(scale, rows, getAxisValue);
+    if (!sorted) return sorted;
+    const out = { ...sorted };
     delete out.grid;
-    if (scaleConfig?.labelOrientation === 'vertical') delete out.label;
-    return out as T;
+    delete out.seriesLayout;
+    delete out.seriesPadding;
+    if (scale?.labelOrientation === 'vertical') delete out.label;
+    return out;
   }
 
-  // Cast to svelteplot's own (narrower) scale option type: finalizeScale has
-  // already stripped the fields that don't exist there (grid, the vertical
-  // label config) by this point.
-  const resolvedX = $derived(finalizeScale(x, scales?.x, xValues) as SveltePlotProps['x']);
-  const resolvedY = $derived(finalizeScale(y, scales?.y, yValues) as SveltePlotProps['y']);
+  // Cast to svelteplot's own (narrower, axis-specific) scale option type:
+  // finalizeScale has already stripped the fields that don't exist there
+  // (grid, the vertical label config, BarPlot's series-layout knobs).
+  const resolvedX = $derived(finalizeScale(scales?.x, data, getX) as SveltePlotProps['x']);
+  const resolvedY = $derived(finalizeScale(scales?.y, data, getY) as SveltePlotProps['y']);
 
   /** Vertical Y-axis title placement, when `scales.y.labelOrientation === 'vertical'`. */
   const verticalYLabel = $derived.by(() => {
@@ -213,6 +213,17 @@
   const sharedHover = getHover();
   const localHover = createHover();
   const hover = $derived(sharedHover ?? localHover);
+
+  /**
+   * Whether svelteplot's `<Pointer>` needs to search 2D (both x and y) or
+   * just along x — derived from the *active* strategy rather than taken as
+   * a separate prop, since it's always exactly `getY` (already passed in)
+   * or nothing: line/bar only ever search by x, pyramid (category on y) and
+   * heatmap (a 2D grid) need y too. Reactive to `hover.strategy`, so a
+   * caller overriding `tooltip.strategy`/a hover marker's `strategy` away
+   * from the plot kind's default gets correctly-dimensioned matching too.
+   */
+  const pointerMatchY = $derived(hover.strategy === 'x' ? undefined : getY);
 
   $effect(() => {
     if (sharedHover) return;
@@ -349,7 +360,7 @@
     {/each}
 
     {#if hoverActive}
-      <Pointer {data} x={getX} y={matchY} maxDistance={400} onupdate={ctrl.onPointer} />
+      <Pointer {data} x={getX} y={pointerMatchY} maxDistance={400} onupdate={ctrl.onPointer} />
     {/if}
 
     {#if unscopedHoverMarker}

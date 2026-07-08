@@ -46,8 +46,43 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Horizontal rule markers (ruleY) to highlight threshold values on the Y axis.
- * Useful for showing policy thresholds, targets, or average lines.
+ * Vertical rule markers (ruleX) to highlight specific provinces on the
+ * categorical x axis.
+ */
+export const WithRuleXMarkers: Story = {
+  args: {
+    series: [
+      {
+        name: 'female',
+        x: 'province',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+      },
+    ],
+    markers: [
+      {
+        type: 'ruleX',
+        x: 'Córdoba',
+        style: {
+          strokeDasharray: '4 4',
+          strokeOpacity: 0.7,
+        },
+      } satisfies Marker,
+      {
+        type: 'ruleX',
+        x: 'Tucumán',
+        style: {
+          strokeDasharray: '4 4',
+          strokeOpacity: 0.7,
+        },
+      } satisfies Marker,
+    ],
+  },
+};
+
+/**
+ * Horizontal rule markers (ruleY) to highlight threshold values, such as a
+ * national average or a policy target.
  */
 export const WithRuleYMarkers: Story = {
   args: {
@@ -64,16 +99,16 @@ export const WithRuleYMarkers: Story = {
         type: 'ruleY',
         y: 82.0,
         style: {
-          strokeDasharray: '4 4',
-          strokeOpacity: 0.7,
+          strokeDasharray: '6 6',
+          strokeOpacity: 0.5,
         },
       } satisfies Marker,
       {
         type: 'ruleY',
         y: 84.0,
         style: {
-          strokeDasharray: '4 4',
-          strokeOpacity: 0.7,
+          strokeDasharray: '6 6',
+          strokeOpacity: 0.5,
         },
       } satisfies Marker,
     ],
@@ -81,76 +116,10 @@ export const WithRuleYMarkers: Story = {
 };
 
 /**
- * Single threshold marker — highlights a single policy target or average.
- * Helpful for comparing all provinces against a national standard.
+ * Mixing a vertical and a horizontal marker on the same chart, on grouped
+ * data with both sexes.
  */
-export const SingleThresholdMarker: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      },
-    ],
-    markers: [
-      {
-        type: 'ruleY',
-        y: 82.5,
-        style: {
-          stroke: '#f59f00',
-          strokeWidth: 2,
-          strokeDasharray: '6 4',
-          strokeOpacity: 0.8,
-        },
-      } satisfies Marker,
-    ],
-  },
-};
-
-/**
- * Mixing two threshold markers with different styles — one dashed (target)
- * and one solid (warning level).
- */
-export const MultipleThresholdsWithStyles: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      },
-    ],
-    markers: [
-      {
-        type: 'ruleY',
-        y: 82.0,
-        style: {
-          stroke: '#51cf66',
-          strokeDasharray: '6 4',
-          strokeOpacity: 0.7,
-        },
-      } satisfies Marker,
-      {
-        type: 'ruleY',
-        y: 80.0,
-        style: {
-          stroke: '#ff6b6b',
-          strokeWidth: 2,
-          strokeOpacity: 0.6,
-        },
-      } satisfies Marker,
-    ],
-  },
-};
-
-/**
- * Two series with shared threshold markers. The markers apply to both series,
- * helping compare their relationship to the threshold.
- */
-export const TwoSeriesWithThresholdMarkers: Story = {
+export const WithMixedMarkers: Story = {
   args: {
     data: LIFE_EXPECTANCY_BY_PROVINCE,
     x: 'province',
@@ -158,8 +127,8 @@ export const TwoSeriesWithThresholdMarkers: Story = {
     z: 'sex',
     markers: [
       {
-        type: 'ruleY',
-        y: 80.0,
+        type: 'ruleX',
+        x: 'Buenos Aires',
         style: {
           strokeDasharray: '4 4',
           strokeOpacity: 0.6,
@@ -167,10 +136,10 @@ export const TwoSeriesWithThresholdMarkers: Story = {
       } satisfies Marker,
       {
         type: 'ruleY',
-        y: 82.0,
+        y: 78.7,
         style: {
-          strokeDasharray: '4 4',
-          strokeOpacity: 0.6,
+          strokeDasharray: '6 6',
+          strokeOpacity: 0.5,
         },
       } satisfies Marker,
     ],

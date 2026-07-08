@@ -116,8 +116,8 @@ export const HighlightedProvincesSegment: any = {
 };
 
 /**
- * Multiple bars with different opacity — highlights the top 3 provinces
- * with higher opacity while dimming the rest.
+ * Multiple bars with different opacity — highlights the highest and lowest
+ * provinces with higher opacity while dimming the rest.
  */
 export const MultipleAreasOneSegment: Story = {
   args: {
@@ -133,8 +133,8 @@ export const MultipleAreasOneSegment: Story = {
       default: [
         {
           areas: [
-            { x: { from: 'Buenos Aires', to: 'La Pampa' } },
-            { x: { from: 'Catamarca', to: 'Catamarca' } },
+            { x: { from: 'Buenos Aires', to: 'Buenos Aires' } },
+            { x: { from: 'Tucumán', to: 'Tucumán' } },
           ],
           style: { fillOpacity: 0.9 },
         },
@@ -242,13 +242,13 @@ export const CustomFillsPerSeries: Story = {
     segments: {
       female: [
         {
-          areas: [{ x: { from: 'Buenos Aires', to: 'La Pampa' } }],
+          areas: [{ x: { from: 'Buenos Aires', to: 'Formosa' } }],
           style: { fillOpacity: 0.8 },
         },
       ],
       male: [
         {
-          areas: [{ x: { from: 'Buenos Aires', to: 'La Pampa' } }],
+          areas: [{ x: { from: 'Buenos Aires', to: 'Formosa' } }],
           style: { fill: '#1971c2', fillOpacity: 0.85 },
         },
       ],

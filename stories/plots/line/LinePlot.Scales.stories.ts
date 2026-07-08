@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { Series, ScalesConfig, AxisValue } from '$lib/types/plots/common';
+import type { Series, ScalesConfig } from '$lib/types/plots/common';
 import {
   FEMALE_LIFE_EXPECTANCY,
   LIFE_EXPECTANCY,
@@ -362,15 +362,20 @@ const MONTH_DATA: MonthPoint[] = [
   { month: 'Dic', value: 25 },
 ];
 
-/** Orders month-abbreviation strings by calendar position, not alphabetically. */
-function byMonth(a: AxisValue, b: AxisValue): number {
-  return MONTHS_ES.indexOf(String(a)) - MONTHS_ES.indexOf(String(b));
+/** Orders month-abbreviation rows by calendar position, not alphabetically. */
+function byMonth(a: Record<string, unknown>, b: Record<string, unknown>): number {
+  const { month: am } = a as MonthPoint;
+  const { month: bm } = b as MonthPoint;
+  return MONTHS_ES.indexOf(am) - MONTHS_ES.indexOf(bm);
 }
 
 /**
  * Month-name strings within a single year — a plain ordinal scale would sort
  * these alphabetically (Abr, Ago, Dic, Ene, …), scrambling the seasonal
- * shape entirely. `scales.x.sort` supplies calendar order instead.
+ * shape entirely. `scales.x.sort` supplies calendar order instead. The
+ * comparator receives the full row (not just the X value), which is what
+ * makes it possible to sort by any field on the row — see `SortXByYDesc`
+ * below for sorting by Y instead of X.
  */
 export const MonthNamesSameYear: Story = {
   args: {
@@ -397,9 +402,10 @@ const MONTH_YEAR_DATA: MonthYearPoint[] = [
   { period: 'Abr-2026', value: 55 },
 ];
 
-function byMonthYear(a: AxisValue, b: AxisValue): number {
-  const rank = (v: AxisValue) => {
-    const [month, year] = String(v).split('-');
+function byMonthYear(a: Record<string, unknown>, b: Record<string, unknown>): number {
+  const rank = (row: Record<string, unknown>) => {
+    const { period } = row as MonthYearPoint;
+    const [month, year] = period.split('-');
     return Number(year) * 12 + MONTHS_ES.indexOf(month);
   };
   return rank(a) - rank(b);

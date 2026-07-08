@@ -57,7 +57,10 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
 
   // Points highlighted in THIS facet for the in-SVG marker — no series
   // filtering, since that's the tooltip text's concern, not the marker's.
-  const highlight = $derived(matched.map(({ x, y, label, series, color }) => ({ x, y, label, series, color })));
+  // Keeps `row` (not just the display fields) so plot-kind templates can
+  // resolve a semantic value off the source row directly — e.g. a bar
+  // plot's category, regardless of which visual axis it's drawn on.
+  const highlight = $derived(matched.map(({ x, y, label, series, color, row }) => ({ x, y, label, series, color, row })));
 
   // Raw hover position — available whenever there are matched points.
   // PlotLayout gates actual display with impliesRuleX/Y + the marker's ruleX/Y props.

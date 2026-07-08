@@ -21,7 +21,7 @@ export type PlotProps<
   styles?: PlotStyles;
   segments?: Segments<TSegmentStyle>;
   markers?: Marker[];
-  scales?: ScalesConfig;
+  scales?: ScalesConfig<TData>;
   margins?: MarginConfig;
   tooltip?: TooltipRuntime<TData>;
 };

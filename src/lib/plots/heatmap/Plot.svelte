@@ -6,7 +6,7 @@
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import type { PlotProps } from '$lib/types/plots/props';
-  import type { AxisValue } from '$lib/types/plots/common';
+  import type { AxisValue, ScalesConfig } from '$lib/types/plots/common';
   import type { CellSegmentStyle } from '$lib/types/plots/styles';
 
   /**
@@ -43,12 +43,10 @@
         'HeatmapPlot: markers scoped to a `series` are ignored — heatmaps have no series concept.',
       );
     }
-    const seriesKeys = segments.flatMap((g) =>
-      Object.keys(g as Record<string, unknown>).filter((k) => k !== 'default'),
-    );
+    const seriesKeys = Object.keys(segments).filter((k) => k !== 'default');
     if (seriesKeys.length > 0) {
       console.warn(
-        `HeatmapPlot: segment groups have series-specific keys (${[...new Set(seriesKeys)].join(', ')}) — heatmaps have no named series. Use the 'default' key instead.`,
+        `HeatmapPlot: segment groups have series-specific keys (${seriesKeys.join(', ')}) — heatmaps have no named series. Use the 'default' key instead.`,
       );
     }
   });
@@ -90,7 +88,7 @@
     makeColorScale(valueDomain[0], valueDomain[1], minColor, maxColor),
   );
 
-  const segList = $derived(segments.flatMap((g) => (g as Record<string, CellSegmentStyle[]>)['default'] ?? []));
+  const segList = $derived(segments.default ?? []);
 
   const segStyleMap = $derived.by(() => {
     const map = new Map<string, CellSegmentStyle>();
@@ -124,23 +122,31 @@
   const getCellStyle = $derived(
     (d: TData) => segStyleMap.get(`${String(getX(d))}::${String(getY(d))}`) ?? {},
   );
+
+  // The single, fully-resolved scales object PlotLayout reads for
+  // everything (ticks, grid, sort, and the real svelteplot scale) — avoids
+  // keeping a second, separately-defaulted copy of `scales.x`/`scales.y`
+  // (our own band-scale + domain defaults) out of sync with the one
+  // actually forwarded.
+  const resolvedScales = $derived<ScalesConfig<TData>>({
+    ...scales,
+    x: { type: 'band', labelAnchor: 'right', domain: xDomain, ...(scales.x ?? {}) },
+    y: { type: 'band', domain: yDomain, ...(scales.y ?? {}) },
+  });
 </script>
 
 <PlotLayout
   {width}
   {height}
-  x={{ type: 'band', labelAnchor: 'right', domain: xDomain, ...(scales.x ?? {}) }}
-  y={{ type: 'band', domain: yDomain, ...(scales.y ?? {}) }}
   data={flat}
   {getX}
   {getY}
-  matchY={getY}
   {hoverPoints}
   label={(d) => fmtVal(Number(getZ(d)), '')}
   {tooltip}
   {markers}
   seriesData={resolvedSeries}
-  scales={scales}
+  scales={resolvedScales}
   {margins}
   showHoverLabels={false}
   defaultStrategy="punctual"
