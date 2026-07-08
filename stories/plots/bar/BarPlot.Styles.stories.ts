@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
-import type { Series } from '$lib/types/plots/common';
+import type { Series, ScalesConfig } from '$lib/types/plots/common';
 import type { PlotStyles } from '$lib/types/plots/styles';
 import {
   FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
@@ -33,6 +33,10 @@ const meta = {
     },
     styles: {
       description: 'Rendering style overrides.',
+      control: false,
+    },
+    scales: {
+      description: 'Per-axis scale configuration.',
       control: false,
     },
   },
@@ -111,6 +115,7 @@ export const AnchorEnd: Story = {
       values: {
         show: true,
         anchor: 'end',
+        dy: -10,
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
     } satisfies PlotStyles,
@@ -145,6 +150,7 @@ export const AnchorStart: Story = {
       values: {
         show: true,
         anchor: 'start',
+        dy: 10,
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
     } satisfies PlotStyles,
@@ -208,10 +214,10 @@ export const TwoSeriesWithLabels: Story = {
 };
 
 /**
- * Two series with `anchor: 'inside'` labels — labels appear inside the bars.
+ * Two series with `anchor: 'middle'` labels — labels appear inside the bars.
  * Works best when bars are tall enough to accommodate text.
  */
-export const TwoSeriesLabelsInside: Story = {
+export const TwoSeriesLabelsMiddle: Story = {
   args: {
     series: [FEMALE, MALE],
     styles: {
@@ -221,6 +227,46 @@ export const TwoSeriesLabelsInside: Story = {
         format: (v: number, name: string) => `${name}: ${v.toFixed(1)} yr`,
       },
     } satisfies PlotStyles,
+  },
+};
+
+/**
+ * Grouped series with labels anchored to the middle. The `\n` in the format
+ * function creates a multi-line label.
+ */
+export const TwoSeriesGroupedLabelsMiddle: Story = {
+  args: {
+    series: [FEMALE, MALE],
+    styles: {
+      values: {
+        show: true,
+        anchor: 'middle',
+        format: (v: number, name: string) => `${name}\n(${v.toFixed(1)} yr)`,
+      },
+    } satisfies PlotStyles,
+    scales: {
+      z: { seriesLayout: 'grouped', seriesPadding: 0.2 },
+    } satisfies ScalesConfig,
+  },
+};
+
+/**
+ * Stacked series with labels anchored to the middle. The labels are centered
+ * within each bar's segment of the stack.
+ */
+export const TwoSeriesStackedLabelsMiddle: Story = {
+  args: {
+    series: [FEMALE, MALE],
+    styles: {
+      values: {
+        show: true,
+        anchor: 'middle',
+        format: (v: number, name: string) => `${name}\n(${v.toFixed(1)} yr)`,
+      },
+    } satisfies PlotStyles,
+    scales: {
+      z: { seriesLayout: 'stacked' },
+    } satisfies ScalesConfig,
   },
 };
 

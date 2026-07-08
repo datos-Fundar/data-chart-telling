@@ -101,6 +101,7 @@ export const WithAxisLabels: Story = {
       x: { label: 'Province' },
       y: { label: 'Life expectancy (years)' },
     } satisfies ScalesConfig,
+    margins: { bottom: 50 },
   },
 };
 
@@ -163,6 +164,7 @@ export const CustomTickFormat: Story = {
         tickFormat: (d: unknown) => `${d} yr`,
       },
     } satisfies ScalesConfig,
+    margins: { left: 40 },
   },
 };
 
@@ -339,8 +341,8 @@ export const WideGroupSpacing: Story = {
     y: 'value',
     z: 'sex',
     scales: {
-      x: { paddingInner: 0.5 },
-      z: { seriesLayout: 'grouped' },
+      x: { paddingInner: 0.4 },
+      z: { seriesLayout: 'grouped', seriesPadding: 0.3 },
     } satisfies ScalesConfig,
   },
 };

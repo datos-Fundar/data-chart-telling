@@ -17,9 +17,6 @@
   import type { Series, AxisValue, AxisScale } from '$lib/types/plots/common';
   import type { BarSegmentStyle, ValueAnchor } from '$lib/types/plots/styles';
 
-  /** One flattened row for the combined 'stacked'-layout bar call. */
-  type StackedRow = { __x: AxisValue; __y: number; __fill: string };
-
   /**
    * A bar chart, vertical by default. Accepts either a pre-built `series`
    * array or flat `data/x/y/z` props — mirrors the line/heatmap plot contract
@@ -189,32 +186,33 @@
   const seriesGap = $derived(Math.max(0, Math.min(1, scales.z?.seriesPadding ?? 0)) * seriesStep);
 
   /**
-   * Combined dataset for 'stacked' layout — svelteplot's `stack` transform
-   * needs every series' rows in one call to compute cumulative offsets per
-   * category. Neither `BarY` nor `BarX` has a `z`/group prop of their own,
-   * so `fill` doubles as the grouping key (svelteplot's stack transform
-   * falls back to grouping by `fill` when no `z` channel is given) — this
-   * only works because each series' resolved color is distinct by default;
-   * two series that are explicitly styled with the exact same color would
-   * incorrectly merge into one stack. Each row carries its series' single
-   * resolved color; the segments feature's per-area style overrides aren't
-   * supported in stacked mode.
+   * Per-category cumulative sums for 'stacked' layout — `stackedPrefixSums.get(category)[i]`
+   * is the sum of series `0..i-1`'s value at that category, i.e. series `i`'s
+   * own segment spans `[prefix, prefix + value]`. Computed by hand (rather
+   * than svelteplot's `stackY`/`stackX` transform, which needs every series'
+   * rows in one call to line up cumulative offsets) so the same numbers can
+   * position both the bar segment and its middle-anchored label.
    */
-  const stackedRows = $derived.by((): StackedRow[] => {
-    if (layout !== 'stacked') return [];
-    return groupedSeries.flatMap((group, seriesIndex) => {
-      const defaultColor = paletteColor(seriesIndex, cfg.palette);
-      const segs = resolveSegmentsForSeries(segments, group.series.name);
-      const fill = segs[0]?.style?.fill ?? defaultColor;
-      const seriesXFn = resolveAccessor(group.series.x);
-      const seriesYFn = resolveAccessor(group.series.y);
-      return group.series.data.map((d) => ({
-        __x: seriesXFn(d),
-        __y: Number(seriesYFn(d)),
-        __fill: fill,
-      }));
-    });
+  const stackedPrefixSums = $derived.by(() => {
+    const sums = new SvelteMap<AxisValue, number[]>();
+    if (layout !== 'stacked') return sums;
+    for (const category of new Set(flat.map((d) => xAcc(d)))) {
+      let running = 0;
+      const prefix: number[] = [];
+      for (const group of groupedSeries) {
+        prefix.push(running);
+        const seriesXFn = resolveAccessor(group.series.x);
+        const seriesYFn = resolveAccessor(group.series.y);
+        const row = group.series.data.find((d) => seriesXFn(d) === category);
+        running += row ? Number(seriesYFn(row)) : 0;
+      }
+      sums.set(category, prefix);
+    }
+    return sums;
   });
+  function stackedBaseline(category: AxisValue, seriesIndex: number): number {
+    return stackedPrefixSums.get(category)?.[seriesIndex] ?? 0;
+  }
 
   // `x`/`y` here are visual (matched against PlotLayout's own getX/getY,
   // which drive tick/domain computation and the Pointer's hit-testing) —
@@ -256,20 +254,21 @@
   defaultStrategy={categoricalAxis}
 >
   {#snippet children({ matchedPoints, ruleX, ruleY, impliesRuleX, impliesRuleY })}
-  {#if layout === 'stacked'}
-    <BarMark
-      data={stackedRows}
-      {...isHorizontal
-        ? { y: (d: StackedRow) => d.__x, x: (d: StackedRow) => d.__y }
-        : { x: (d: StackedRow) => d.__x, y: (d: StackedRow) => d.__y }}
-      fill={(d: StackedRow) => d.__fill}
-    />
-  {/if}
   {#each groupedSeries as group, seriesIndex (group.series.name)}
     {@const defaultColor = paletteColor(seriesIndex, cfg.palette)}
     {@const xFn = resolveAccessor(group.series.x)}
     {@const yFn = resolveAccessor(group.series.y)}
-    {#if layout !== 'stacked'}
+    {#if layout === 'stacked'}
+      {@const stackedBaselineFn = (d: TData) => stackedBaseline(xFn(d), seriesIndex)}
+      {@const stackedTopFn = (d: TData) => stackedBaseline(xFn(d), seriesIndex) + Number(yFn(d))}
+      <BarMark
+        data={group.series.data}
+        {...isHorizontal
+          ? { y: xFn, x1: stackedBaselineFn, x2: stackedTopFn }
+          : { x: xFn, y1: stackedBaselineFn, y2: stackedTopFn }}
+        fill={defaultColor}
+      />
+    {:else}
       {#each group.visualSegments as seg, i (`${group.series.name}-${i}`)}
         <BarMark
           data={seg.data}
@@ -294,23 +293,31 @@
     {/if}
 
     {#if showVals}
-      {@const valueTextFn = valAnchor === 'middle'
-        ? (d: TData) => Number(yFn(d)) / 2
-        : valAnchor === 'end'
-        ? () => 0
-        : (d: TData) => Number(yFn(d))}
+      {@const valueTextFn = layout === 'stacked'
+          ? (d: TData) => stackedBaseline(xFn(d), seriesIndex) + Number(yFn(d)) / 2
+          : valAnchor === 'middle' && !isHorizontal
+          ? (d: TData) => Number(yFn(d)) / 2
+          : valAnchor === 'end'
+          ? () => 0
+          : (d: TData) => Number(yFn(d))}
       {@const defaultOffset = valAnchor === 'outside' ? (isHorizontal ? 6 : -6) : valAnchor === 'start' ? (isHorizontal ? -4 : 4) : valAnchor === 'end' ? (isHorizontal ? 4 : -4) : 0}
       {@const defaultLA = valAnchor === 'outside' || valAnchor === 'end'
         ? ('bottom' as const)
         : valAnchor === 'start'
         ? ('top' as const)
         : ('middle' as const)}
+      {@const groupDx = layout === 'grouped' && !isHorizontal
+          ? -(estimatedBandwidth / 2) + seriesIndex * seriesStep + seriesStep / 2
+          : 0}
+      {@const groupDy = layout === 'grouped' && isHorizontal
+          ? -(estimatedBandwidth / 2) + seriesIndex * seriesStep + seriesStep / 2
+          : 0}
       <Text
         data={group.series.data}
         {...isHorizontal ? { y: xFn, x: valueTextFn } : { x: xFn, y: valueTextFn }}
         text={(d: TData) => fmtVal(Number(yFn(d)), group.series.name)}
-        dx={styles.values?.dx ?? (isHorizontal ? defaultOffset : 0)}
-        dy={styles.values?.dy ?? (isHorizontal ? 0 : defaultOffset)}
+        dx={styles.values?.dx ?? (isHorizontal ? defaultOffset : groupDx)}
+        dy={styles.values?.dy ?? (isHorizontal ? groupDy : defaultOffset)}
         textAnchor={styles.values?.textAnchor ?? (isHorizontal ? (valAnchor === 'outside' || valAnchor === 'end' ? 'start' : valAnchor === 'start' ? 'end' : 'middle') : 'middle')}
         lineAnchor={styles.values?.lineAnchor ?? (isHorizontal ? 'middle' : defaultLA)}
         lineHeight={styles.values?.lineHeight}
