@@ -191,6 +191,9 @@ export const TwoSeries: Story = {
     markers: [
       {
         type: 'hover',
+        fontStyle: {
+          dy: -10,
+        }
       } satisfies Marker,
     ],
   },
@@ -241,16 +244,19 @@ export const FromGroupedData: Story = {
     markers: [
       {
         type: 'hover',
+        fontStyle: {
+          dy: -10,
+        }
       } satisfies Marker,
     ],
   },
 };
 
 /**
- * Grouped-data series-scoped — even though both series are rendered, the
+ * Overlaped-data series-scoped — even though both series are rendered, the
  * hover marker only responds to female data points.
  */
-export const GroupedSeriesScoped: Story = {
+export const OverlapedSeriesScoped: Story = {
   args: {
     data: LIFE_EXPECTANCY_BY_PROVINCE,
     x: 'province',
@@ -260,6 +266,50 @@ export const GroupedSeriesScoped: Story = {
       {
         type: 'hover',
         series: 'female',
+      } satisfies Marker,
+    ],
+  },
+};
+
+/**
+ * Hover marker on `'grouped'` series — the dot and label land on each
+ * series' own bar slice (offset sideways from the category center), not
+ * stacked on top of each other at the shared category position.
+ */
+export const GroupedSeries: Story = {
+  args: {
+    data: LIFE_EXPECTANCY_BY_PROVINCE,
+    x: 'province',
+    y: 'value',
+    z: 'sex',
+    scales: {
+      z: { seriesLayout: 'grouped', seriesPadding: 0.2 },
+    },
+    markers: [
+      {
+        type: 'hover',
+      } satisfies Marker,
+    ],
+  },
+};
+
+/**
+ * Hover marker on `'stacked'` series — the dot and label land at each
+ * series' cumulative height (its own segment's top), not at its raw value
+ * from a zero baseline, so they sit on the correct segment of the stack.
+ */
+export const StackedSeries: Story = {
+  args: {
+    data: LIFE_EXPECTANCY_BY_PROVINCE,
+    x: 'province',
+    y: 'value',
+    z: 'sex',
+    scales: {
+      z: { seriesLayout: 'stacked' },
+    },
+    markers: [
+      {
+        type: 'hover',
       } satisfies Marker,
     ],
   },

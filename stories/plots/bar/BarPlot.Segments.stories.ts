@@ -49,15 +49,15 @@ type Story = StoryObj<typeof meta>;
 // ── Default key: segments that apply to every series ──────────────────────────
 
 /**
- * Simplest `default` key: one Segment with one Area.
+ * Simplest form: one series-keyed Segment highlights a single area, and a
+ * `default` catch-all styles everything else.
  *
- * The area covers x ∈ ['Buenos Aires', 'Santa Fe']. Bars outside the area are
- * rendered with the default palette style — no explicit catch-all needed.
- *
- * Use the **Fill** controls in the panel to explore fillOpacity live.
+ * The series key (`'female_life_expectancy'`) highlights Tucumán only; every
+ * other province — including the Buenos Aires–Santa Fe range — isn't matched
+ * by anything series-specific, so it falls through to the `default` catch-all's
+ * dimmed style.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const HighlightedProvincesSegment: any = {
+export const HighlightedProvincesSegment: Story = {
   args: {
     series: [
       {
@@ -67,52 +67,31 @@ export const HighlightedProvincesSegment: any = {
         data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
       },
     ],
-    fillOpacity: 1.0,
-    dimmedOpacity: 0.3,
-  },
-  argTypes: {
-    fillOpacity: {
-      control: { type: 'range', min: 0, max: 1, step: 0.05 },
-      description: 'Fill opacity of highlighted segment.',
-      table: { category: 'Fill' },
-    },
-    dimmedOpacity: {
-      control: { type: 'range', min: 0, max: 1, step: 0.05 },
-      description: 'Fill opacity of non-highlighted bars.',
-      table: { category: 'Fill' },
-    },
-  },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  render: (args: any) => ({
-    Component: BarPlot,
-    props: {
-      series: args.series,
-      width: args.width,
-      height: args.height,
-      segments: {
-        default: [
-          {
-            areas: [
-              {
-                x: {
-                  from: 'Buenos Aires',
-                  to: 'Santa Fe',
-                },
+    segments: {
+      female_life_expectancy: [
+        {
+          areas: [
+            {
+              x: {
+                from: 'Tucumán',
+                to: 'Tucumán',
               },
-            ],
-            style: {
-              fillOpacity: args.fillOpacity,
             },
+          ],
+          style: {
+            fillOpacity: 1.0,
           },
-          {
-            style: {
-              fillOpacity: args.dimmedOpacity,
-            },
+        },
+      ],
+      default: [
+        {
+          style: {
+            fillOpacity: 0.3,
           },
-        ],
-      } satisfies Segments<BarSegmentStyle>,
-    },
-  }),
+        },
+      ],
+    } satisfies Segments<BarSegmentStyle>,
+  },
 };
 
 /**

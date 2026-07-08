@@ -210,8 +210,8 @@ export const GroupedDataSeriesFiltered: Story = {
       sync: false,
       series: ['female'],
       format: (row) => {
-        const { province, value } = row as ProvinceLifeExpectancy;
-        return `Female (${province}): ${value.toFixed(1)} yr`;
+        const { sex, province, value } = row as ProvinceLifeExpectancy;
+        return `${sex} (${province}): ${value.toFixed(1)} yr`;
       },
     },
   },

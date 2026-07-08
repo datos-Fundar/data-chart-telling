@@ -5,16 +5,19 @@
   import { SvelteMap } from 'svelte/reactivity';
   import { paletteColor } from '$lib/utils/color';
   import { buildSeries } from '$lib/utils/grouping';
-  import { BarX, BarY, Text } from 'svelteplot';
+  import { BarX, BarY } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { buildGroupedSeries, validateSegments, resolveSegmentsForSeries, matchesSegmentX } from '$lib/plots/utils/segments';
-  import { numericMargin } from '$lib/layout/plot/margins';
+  import { createBarLayout } from '$lib/plots/bar/layout.svelte';
+  import { buildHoverPoints } from '$lib/plots/bar/hoverPoints';
+  import BarSegments from '$lib/plots/bar/BarSegments.svelte';
+  import ValueLabels from '$lib/plots/bar/ValueLabels.svelte';
   import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
   import type { Marker } from '$lib/types/plots/markers';
   import type { PlotProps } from '$lib/types/plots/props';
-  import type { Series, AxisValue, AxisScale } from '$lib/types/plots/common';
+  import type { Series, AxisScale } from '$lib/types/plots/common';
   import type { BarSegmentStyle, ValueAnchor } from '$lib/types/plots/styles';
 
   /**
@@ -121,121 +124,26 @@
   const plotGetY = $derived(isHorizontal ? xAcc : (d: TData) => Number(yAcc(d)));
 
   /**
-   * Bars default to a 0 baseline. When the value axis's domain is set and
-   * excludes 0 (e.g. `[75, 85]`, to zoom in on a tight range), a literal 0
-   * baseline sits way outside the visible domain — the scale still maps it
-   * linearly, so the bar's "start" lands far past the plot's own edge and
-   * the bar overflows into the margin instead of appearing to end at the
-   * frame. Clamping the baseline to whichever domain bound is closest to 0
-   * makes bars cut off exactly at the visible edge instead, which is the
-   * point of setting a truncated domain in the first place. Left as 0 (no
-   * clamp) when the domain isn't set or already straddles 0 naturally.
+   * Series-layout geometry (grouped/stacked offsets, band-width estimate,
+   * value baseline) — the single source of truth shared by bar-segment
+   * rendering, value labels, and hover markers below. See `layout.svelte.ts`.
    */
-  const valueScale = $derived(isHorizontal ? scales.x : scales.y);
-  const valueBaseline = $derived.by(() => {
-    const domain = valueScale?.domain;
-    if (!domain || domain.length < 2) return 0;
-    const lo = Number(domain[0]);
-    const hi = Number(domain[domain.length - 1]);
-    if (Number.isNaN(lo) || Number.isNaN(hi)) return 0;
-    const min = Math.min(lo, hi);
-    const max = Math.max(lo, hi);
-    if (min > 0) return min;
-    if (max < 0) return max;
-    return 0;
+  const barLayout = createBarLayout<TData>({
+    scales: () => scales,
+    isHorizontal: () => isHorizontal,
+    width: () => width,
+    height: () => height,
+    margins: () => margins,
+    flat: () => flat,
+    xAcc: () => xAcc,
+    groupedSeries: () => groupedSeries,
   });
-
-  /**
-   * How series sharing the same category are arranged — see
-   * {@link AxisScale.seriesLayout}. Read off `scales.z` since it's the
-   * grouping axis, not the category axis itself.
-   */
-  const layout = $derived(scales.z?.seriesLayout ?? 'overlap');
-
-  /**
-   * Approximate per-category band size in pixels (width for vertical bars,
-   * height for horizontal ones), used only to size each series' slice in
-   * 'grouped' layout via inset props. Derived from this plot's own
-   * `width`/`height`/`margins` rather than svelteplot's actual measured
-   * scale (not part of its public API) — close enough for a grouped look,
-   * though it can be slightly off when an 'auto' margin ends up wider than
-   * the estimate (e.g. unusually long tick labels). Follows the same
-   * band-scale formula (and 0.15 default padding) svelteplot itself uses,
-   * so the category axis's own `paddingInner`/`paddingOuter` — the space
-   * *between* categories — is reflected here too, not just svelteplot's
-   * real render.
-   */
-  const categoricalScale = $derived(isHorizontal ? scales.y : scales.x);
-  const seriesCount = $derived(groupedSeries.length);
-  const estimatedBandwidth = $derived.by(() => {
-    const categoryCount = new Set(flat.map((d) => xAcc(d))).size;
-    if (categoryCount === 0) return 0;
-    const baseMargins = { ...cfg.margins, ...margins };
-    const innerSize = isHorizontal
-      ? Math.max(0, height - numericMargin('top', baseMargins.top) - numericMargin('bottom', baseMargins.bottom))
-      : Math.max(0, width - numericMargin('left', baseMargins.left) - numericMargin('right', baseMargins.right));
-    const paddingInner = categoricalScale?.paddingInner ?? categoricalScale?.padding ?? 0.15;
-    const paddingOuter = categoricalScale?.paddingOuter ?? categoricalScale?.padding ?? 0.15;
-    const step = innerSize / (categoryCount - paddingInner + 2 * paddingOuter);
-    return step * (1 - paddingInner);
-  });
-  // Each series gets an equal slice of the band; `seriesPadding` (0–1, space
-  // *within* a group, between its series) reserves a fraction of that slice
-  // as a gap split evenly on either side of the bar.
-  const seriesStep = $derived(seriesCount > 0 ? estimatedBandwidth / seriesCount : 0);
-  const seriesGap = $derived(Math.max(0, Math.min(1, scales.z?.seriesPadding ?? 0)) * seriesStep);
-
-  /**
-   * Per-category cumulative sums for 'stacked' layout — `stackedPrefixSums.get(category)[i]`
-   * is the sum of series `0..i-1`'s value at that category, i.e. series `i`'s
-   * own segment spans `[prefix, prefix + value]`. Computed by hand (rather
-   * than svelteplot's `stackY`/`stackX` transform, which needs every series'
-   * rows in one call to line up cumulative offsets) so the same numbers can
-   * position both the bar segment and its middle-anchored label.
-   */
-  const stackedPrefixSums = $derived.by(() => {
-    const sums = new SvelteMap<AxisValue, number[]>();
-    if (layout !== 'stacked') return sums;
-    for (const category of new Set(flat.map((d) => xAcc(d)))) {
-      let running = 0;
-      const prefix: number[] = [];
-      for (const group of groupedSeries) {
-        prefix.push(running);
-        const seriesXFn = resolveAccessor(group.series.x);
-        const seriesYFn = resolveAccessor(group.series.y);
-        const row = group.series.data.find((d) => seriesXFn(d) === category);
-        running += row ? Number(seriesYFn(row)) : 0;
-      }
-      sums.set(category, prefix);
-    }
-    return sums;
-  });
-  function stackedBaseline(category: AxisValue, seriesIndex: number): number {
-    return stackedPrefixSums.get(category)?.[seriesIndex] ?? 0;
-  }
 
   // `x`/`y` here are visual (matched against PlotLayout's own getX/getY,
   // which drive tick/domain computation and the Pointer's hit-testing) —
   // `row` (see PlotLayout/HoverPoint) is what lets the template recover the
   // semantic category regardless of which axis it landed on.
-  const hoverPoints = $derived(
-    resolvedSeries.flatMap((s, idx) => {
-      const sx = resolveAccessor(s.x);
-      const sy = resolveAccessor(s.y);
-      return s.data.map((d) => {
-        const category = sx(d) as AxisValue;
-        const value = Number(sy(d));
-        return {
-          x: isHorizontal ? value : category,
-          y: isHorizontal ? category : value,
-          row: d,
-          label: String(sy(d)),
-          series: s.name,
-          color: paletteColor(idx, cfg.palette),
-        };
-      });
-    }),
-  );
+  const hoverPoints = $derived(buildHoverPoints(resolvedSeries, isHorizontal, barLayout, cfg.palette));
 </script>
 
 <PlotLayout
@@ -256,77 +164,10 @@
   {#snippet children({ matchedPoints, ruleX, ruleY, impliesRuleX, impliesRuleY })}
   {#each groupedSeries as group, seriesIndex (group.series.name)}
     {@const defaultColor = paletteColor(seriesIndex, cfg.palette)}
-    {@const xFn = resolveAccessor(group.series.x)}
-    {@const yFn = resolveAccessor(group.series.y)}
-    {#if layout === 'stacked'}
-      {@const stackedBaselineFn = (d: TData) => stackedBaseline(xFn(d), seriesIndex)}
-      {@const stackedTopFn = (d: TData) => stackedBaseline(xFn(d), seriesIndex) + Number(yFn(d))}
-      <BarMark
-        data={group.series.data}
-        {...isHorizontal
-          ? { y: xFn, x1: stackedBaselineFn, x2: stackedTopFn }
-          : { x: xFn, y1: stackedBaselineFn, y2: stackedTopFn }}
-        fill={defaultColor}
-      />
-    {:else}
-      {#each group.visualSegments as seg, i (`${group.series.name}-${i}`)}
-        <BarMark
-          data={seg.data}
-          {...isHorizontal
-            ? { y: xFn, x1: valueBaseline, x2: yFn }
-            : { x: xFn, y1: valueBaseline, y2: yFn }}
-          fill={seg.style.fill ?? defaultColor}
-          fillOpacity={seg.style.fillOpacity ?? 1}
-          {...layout === 'grouped'
-            ? isHorizontal
-              ? {
-                  insetTop: seriesIndex * seriesStep + seriesGap / 2,
-                  insetBottom: (seriesCount - 1 - seriesIndex) * seriesStep + seriesGap / 2,
-                }
-              : {
-                  insetLeft: seriesIndex * seriesStep + seriesGap / 2,
-                  insetRight: (seriesCount - 1 - seriesIndex) * seriesStep + seriesGap / 2,
-                }
-            : {}}
-        />
-      {/each}
-    {/if}
+    <BarSegments {group} {seriesIndex} {barLayout} {isHorizontal} {BarMark} {defaultColor} />
 
     {#if showVals}
-      {@const valueTextFn = layout === 'stacked'
-          ? (d: TData) => stackedBaseline(xFn(d), seriesIndex) + Number(yFn(d)) / 2
-          : valAnchor === 'middle' && !isHorizontal
-          ? (d: TData) => Number(yFn(d)) / 2
-          : valAnchor === 'end'
-          ? () => 0
-          : (d: TData) => Number(yFn(d))}
-      {@const defaultOffset = valAnchor === 'outside' ? (isHorizontal ? 6 : -6) : valAnchor === 'start' ? (isHorizontal ? -4 : 4) : valAnchor === 'end' ? (isHorizontal ? 4 : -4) : 0}
-      {@const defaultLA = valAnchor === 'outside' || valAnchor === 'end'
-        ? ('bottom' as const)
-        : valAnchor === 'start'
-        ? ('top' as const)
-        : ('middle' as const)}
-      {@const groupDx = layout === 'grouped' && !isHorizontal
-          ? -(estimatedBandwidth / 2) + seriesIndex * seriesStep + seriesStep / 2
-          : 0}
-      {@const groupDy = layout === 'grouped' && isHorizontal
-          ? -(estimatedBandwidth / 2) + seriesIndex * seriesStep + seriesStep / 2
-          : 0}
-      <Text
-        data={group.series.data}
-        {...isHorizontal ? { y: xFn, x: valueTextFn } : { x: xFn, y: valueTextFn }}
-        text={(d: TData) => fmtVal(Number(yFn(d)), group.series.name)}
-        dx={styles.values?.dx ?? (isHorizontal ? defaultOffset : groupDx)}
-        dy={styles.values?.dy ?? (isHorizontal ? groupDy : defaultOffset)}
-        textAnchor={styles.values?.textAnchor ?? (isHorizontal ? (valAnchor === 'outside' || valAnchor === 'end' ? 'start' : valAnchor === 'start' ? 'end' : 'middle') : 'middle')}
-        lineAnchor={styles.values?.lineAnchor ?? (isHorizontal ? 'middle' : defaultLA)}
-        lineHeight={styles.values?.lineHeight}
-        rotate={styles.values?.rotate}
-        class={styles.values?.class}
-        textClass={styles.values?.textClass}
-        fill={cfg.axis.color}
-        fontSize={12}
-      />
+      <ValueLabels {group} {seriesIndex} {barLayout} {isHorizontal} {valAnchor} {fmtVal} values={styles.values} axisColor={cfg.axis.color} />
     {/if}
 
     {#each seriesMarkers.get(group.series.name) ?? [] as marker, i (`series-${group.series.name}-hover-${i}`)}

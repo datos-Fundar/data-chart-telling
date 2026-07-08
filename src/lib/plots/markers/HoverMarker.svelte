@@ -68,31 +68,37 @@
 
 {#if data.length > 0}
   {#each data as point (point.series ?? `${point.x}_${point.y}`)}
-    <DotMarker
-      data={[point]}
-      x={(d) => d.x}
-      y={(d) => d.y}
-      style={{
-        ...cfg.hover.dot,
-        ...dotStyle,
-        dotFill: resolveColor(dotStyle?.dotFill, point),
-        dotStroke: resolveColor(dotStyle?.dotStroke, point),
-      }}
-    />
-  {/each}
-  {#if showLabels}
-    {#each data as point (point.series ?? `${point.x}_${point.y}`)}
-      <TextMarker
+    <!-- Pixel nudge for plot kinds whose series position isn't fully captured
+         by x/y alone (e.g. BarPlot's 'grouped' layout) — see HoverDisplayPoint.dx/dy. -->
+    <g transform="translate({point.dx ?? 0}, {point.dy ?? 0})">
+      <DotMarker
         data={[point]}
         x={(d) => d.x}
         y={(d) => d.y}
-        text={(d) => format ? format(d) : (d.label ?? '')}
         style={{
-          ...cfg.hover.font,
-          ...fontStyle,
-          fill: resolveColor(fontStyle?.fill, point),
+          ...cfg.hover.dot,
+          ...dotStyle,
+          dotFill: resolveColor(dotStyle?.dotFill, point),
+          dotStroke: resolveColor(dotStyle?.dotStroke, point),
         }}
       />
+    </g>
+  {/each}
+  {#if showLabels}
+    {#each data as point (point.series ?? `${point.x}_${point.y}`)}
+      <g transform="translate({point.dx ?? 0}, {point.dy ?? 0})">
+        <TextMarker
+          data={[point]}
+          x={(d) => d.x}
+          y={(d) => d.y}
+          text={(d) => format ? format(d) : (d.label ?? '')}
+          style={{
+            ...cfg.hover.font,
+            ...fontStyle,
+            fill: resolveColor(fontStyle?.fill, point),
+          }}
+        />
+      </g>
     {/each}
   {/if}
 {/if}

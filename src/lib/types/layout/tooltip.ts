@@ -84,6 +84,16 @@ export type HoverDisplayPoint = {
   series?: string;
   /** Resolved series color — used by HoverMarker when dotFill/fill is `'currentColor'`. */
   color?: string;
+  /**
+   * Pixel nudge applied on top of the scaled `x`/`y` position — for plot kinds
+   * where a series' visual position isn't fully captured by its data value
+   * (e.g. BarPlot's 'grouped' layout, where every series shares the same `x`
+   * category but is drawn at its own pixel slice within that category's band).
+   * Matching (`matchByStrategy`) still compares raw `x`/`y`, so this is
+   * display-only and never affects which points highlight together.
+   */
+  dx?: number;
+  dy?: number;
 };
 
 /** A candidate point for hover matching/highlighting — also carries its source row. */
