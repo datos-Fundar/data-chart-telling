@@ -75,22 +75,6 @@ export const CustomValueFormat: Story = {
 };
 
 /**
- * Custom value format with larger font — combines custom formatting with
- * text size adjustment for readability.
- */
-export const LargerValueLabels: Story = {
-  args: {
-    series: SERIES,
-    styles: {
-      values: {
-        format: (v: number) => `${(v * 100).toFixed(0)}%`,
-        fontSize: 14,
-      },
-    } satisfies PlotStyles,
-  },
-};
-
-/**
  * Warm color ramp — overrides the default colour scheme to a warm palette
  * (dark blue to light blue) instead of the default viridis-like ramp.
  */

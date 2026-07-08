@@ -1,6 +1,7 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
   import { Cell, Text } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
+  import { validateSegments } from '$lib/plots/utils/segments';
   import { buildSeries } from '$lib/utils/grouping';
   import { makeColorScale } from '$lib/utils/color';
   import { getConfiguration } from '$lib/configuration/config.svelte';
@@ -35,6 +36,7 @@
   }: PlotProps<TData, CellSegmentStyle> = $props();
 
   $effect(() => {
+    validateSegments(segments);
     const scoped = markers.filter(
       (m) => (m.type === 'hover' || m.type === 'component') && m.series,
     );
@@ -90,27 +92,37 @@
 
   const segList = $derived(segments.default ?? []);
 
+  /**
+   * A catch-all (no `areas`) always matches, so evaluating segments in plain
+   * array order and merging every match — as this used to do — makes a
+   * catch-all listed *after* an area-specific one (the documented, and only
+   * demonstrated, convention: baseline first, highlight second) overwrite it
+   * on every cell, since it's applied last unconditionally. Area-specific
+   * segments must always win over the catch-all regardless of list order —
+   * so the catch-all is applied once as the baseline, and only
+   * area-specific segments can override it on top, mirroring the same
+   * catch-all/area-specific priority every other plot kind's segments
+   * already follow (see `resolveSeriesSegments` in `utils/segments.ts`).
+   */
   const segStyleMap = $derived.by(() => {
     const map = new Map<string, CellSegmentStyle>();
     if (!segList.length) return map;
+    const catchAll = segList.find((s) => !s.areas || s.areas.length === 0);
+    const areaSegs = segList.filter((s) => s.areas && s.areas.length > 0);
     for (const d of flat) {
       const cx = getX(d) as AxisValue;
       const cy = getY(d) as AxisValue;
       const key = `${String(cx)}::${String(cy)}`;
       if (!map.has(key)) {
-        let style: CellSegmentStyle = {};
-        for (const seg of segList) {
-          const areas = seg.areas;
-          const matches =
-            !areas || areas.length === 0
-              ? true
-              : areas.some((area) => {
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  const xOk = !area.x || ((area.x.from === undefined || (cx as any) >= area.x.from) && (area.x.to === undefined || (cx as any) <= area.x.to));
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  const yOk = !area.y || ((area.y.from === undefined || (cy as any) >= area.y.from) && (area.y.to === undefined || (cy as any) <= area.y.to));
-                  return xOk && yOk;
-                });
+        let style: CellSegmentStyle = catchAll?.style ? { ...catchAll.style } : {};
+        for (const seg of areaSegs) {
+          const matches = seg.areas!.some((area) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const xOk = !area.x || ((area.x.from === undefined || (cx as any) >= area.x.from) && (area.x.to === undefined || (cx as any) <= area.x.to));
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const yOk = !area.y || ((area.y.from === undefined || (cy as any) >= area.y.from) && (area.y.to === undefined || (cy as any) <= area.y.to));
+            return xOk && yOk;
+          });
           if (matches) style = { ...style, ...seg.style };
         }
         map.set(key, style);
@@ -122,6 +134,35 @@
   const getCellStyle = $derived(
     (d: TData) => segStyleMap.get(`${String(getX(d))}::${String(getY(d))}`) ?? {},
   );
+
+  /**
+   * One `<Cell>` call per *distinct resolved style*, not one call for the
+   * whole dataset. svelteplot registers `fillOpacity`/`strokeWidth` under
+   * its shared "opacity"/numeric scale machinery — passed as a per-row
+   * accessor that genuinely varies within a single mark instance, that
+   * scale collapses every row to the same (wrong) value instead of the
+   * literal numbers set on each segment. A literal, per-call constant (one
+   * call per style bucket) bypasses that entirely, which is exactly how
+   * bar/line avoid the same trap (one mark per visual segment). `fill`
+   * stays a per-cell accessor within each group — unlike fillOpacity, it
+   * must keep varying continuously with the underlying value wherever a
+   * segment doesn't explicitly override it.
+   */
+  type StyleGroup = { style: CellSegmentStyle; data: TData[] };
+  const styleGroups = $derived.by((): StyleGroup[] => {
+    const groups = new Map<string, StyleGroup>();
+    for (const d of flat) {
+      const style = getCellStyle(d);
+      const key = JSON.stringify(style);
+      let group = groups.get(key);
+      if (!group) {
+        group = { style, data: [] };
+        groups.set(key, group);
+      }
+      group.data.push(d);
+    }
+    return [...groups.values()];
+  });
 
   // The single, fully-resolved scales object PlotLayout reads for
   // everything (ticks, grid, sort, and the real svelteplot scale) — avoids
@@ -151,16 +192,18 @@
   showHoverLabels={false}
   defaultStrategy="punctual"
 >
-  <Cell
-    data={flat as unknown as Record<string | symbol, never>[]}
-    x={getX}
-    y={getY}
-    fill={(d) => getCellStyle(d as TData).fill ?? colorScale(Number(getZ(d as TData)))}
-    fillOpacity={(d) => getCellStyle(d as TData).fillOpacity ?? 1}
-    stroke={(d) => getCellStyle(d as TData).stroke}
-    strokeWidth={(d) => getCellStyle(d as TData).strokeWidth ?? 0}
-    inset={0.5}
-  />
+  {#each styleGroups as group, i (i)}
+    <Cell
+      data={group.data as unknown as Record<string | symbol, never>[]}
+      x={getX}
+      y={getY}
+      fill={(d) => group.style.fill ?? colorScale(Number(getZ(d as TData)))}
+      fillOpacity={group.style.fillOpacity ?? 1}
+      stroke={group.style.stroke}
+      strokeWidth={group.style.strokeWidth ?? 0}
+      inset={0.5}
+    />
+  {/each}
 
   {#if showVals}
     <Text

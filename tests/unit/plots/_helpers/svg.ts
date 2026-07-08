@@ -34,3 +34,7 @@ export function countTextLabels(svg: SVGElement): number {
 export function countBarRects(svg: SVGElement): number {
   return svg.querySelectorAll('g.bar-y rect, g.bar-x rect').length;
 }
+
+export function countCells(svg: SVGElement): number {
+  return svg.querySelectorAll('g.cell rect').length;
+}

@@ -162,7 +162,7 @@ export const HighlightWithStroke: Story = {
         {
           areas: [
             {
-              x: { from: '18-24', to: '34-34' },
+              x: { from: '18-24', to: '25-34' },
               y: { from: 'Buenos Aires', to: 'Córdoba' },
             },
           ],
