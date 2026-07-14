@@ -19,6 +19,7 @@
     background,
     color,
     bounds,
+    plain = false,
     children,
   }: {
     x: number;
@@ -28,6 +29,13 @@
     color?: string;
     /** Box the tooltip must stay within — usually the hosting plot's width/height. */
     bounds?: { width: number; height: number };
+    /**
+     * Drops the default dark box (background/padding/border) so a custom
+     * `content` snippet fully owns its own look. Set whenever the caller
+     * supplies `content` — the drop shadow and border radius still apply,
+     * so a custom card can match its own corners via `--dct-tooltip-radius`.
+     */
+    plain?: boolean;
     children: Snippet;
   } = $props();
 
@@ -55,6 +63,7 @@
 {#if visible}
   <div
     class="dct-tooltip"
+    class:dct-tooltip--plain={plain}
     bind:clientWidth={boxWidth}
     bind:clientHeight={boxHeight}
     style:left="{placement.left}px"
@@ -80,5 +89,11 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
     white-space: pre-line;
     line-height: 1.35;
+  }
+
+  .dct-tooltip--plain {
+    background: transparent;
+    padding: 0;
+    border: none;
   }
 </style>

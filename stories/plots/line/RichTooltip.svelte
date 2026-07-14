@@ -56,16 +56,6 @@
 </div>
 
 <style>
-  /* The library's default tooltip chrome (dark box + padding) is switched off
-     via its CSS vars so `content` fully owns the look — only the drop shadow
-     and radius are kept, matched to the card below. */
-  .rich-tooltip-demo {
-    --dct-tooltip-bg: transparent;
-    --dct-tooltip-pad: 0;
-    --dct-tooltip-radius: 0.75rem;
-    --dct-tooltip-border: none;
-  }
-
   .rich-tooltip {
     min-width: 200px;
     background: #fff;

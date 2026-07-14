@@ -263,9 +263,9 @@ export const GroupedDataSeriesFiltered: Story = {
  * per-series list sorted by value, and a footnote. `format` is still required
  * by the type but is ignored once `content` is set.
  *
- * See `RichTooltip.svelte` for the markup — it also switches off the
- * library's default dark tooltip box (via the `--dct-tooltip-*` CSS vars) so
- * the custom card fully owns the look.
+ * See `RichTooltip.svelte` for the markup — the library automatically drops
+ * its default dark tooltip box (background/padding/border) whenever
+ * `content` is set, so the custom card fully owns the look.
  */
 export const CustomContent: StoryObj = {
   render: () => ({ Component: RichTooltip }),

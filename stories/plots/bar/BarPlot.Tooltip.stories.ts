@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
 import type { Series } from '$lib/types/plots/common';
+import RichTooltip from './RichTooltip.svelte';
 import {
   FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
   MALE_LIFE_EXPECTANCY_BY_PROVINCE,
@@ -215,4 +216,18 @@ export const GroupedDataSeriesFiltered: Story = {
       },
     },
   },
+};
+
+/**
+ * Fully custom tooltip markup via `content` — replaces the default floating
+ * label entirely with an arbitrary snippet: a bold header, a colour-coded
+ * per-series list sorted by value, and a footnote. `format` is still required
+ * by the type but is ignored once `content` is set.
+ *
+ * See `RichTooltip.svelte` for the markup — the library automatically drops
+ * its default dark tooltip box (background/padding/border) whenever
+ * `content` is set, so the custom card fully owns the look.
+ */
+export const CustomContent: StoryObj = {
+  render: () => ({ Component: RichTooltip }),
 };
