@@ -1,7 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
 import type { Series } from '$lib/types/plots/common';
-import { EMPLOYMENT_BY_AGE_PROVINCE, ROOMS_PEOPLE_DENSITY, type AgeProvinceCell, type RoomsPeopleCell } from './data';
+import {
+  LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+  FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+  MALE_LIFE_EXPECTANCY_BY_PROVINCE,
+  type ProvinceSexCell,
+} from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -10,11 +15,11 @@ const meta = {
   component: HeatmapPlot,
   tags: ['autodocs'],
   args: {
-    width: 520,
+    width: 950,
     height: 420,
   },
   argTypes: {
-    width: { control: { type: 'range', min: 320, max: 900, step: 20 } },
+    width: { control: { type: 'range', min: 320, max: 950, step: 20 } },
     height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
     series: { control: false },
     data: { control: false },
@@ -31,38 +36,47 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * Single series with explicit series object — data is grouped into one series
- * with x, y, z dimensions mapping to 'ageGroup', 'province', and 'pct' fields.
+ * with x, y, z dimensions mapping to 'province', 'sex', and 'value' fields.
  *
- * The heatmap displays employment rates across age groups and provinces.
+ * The heatmap displays life expectancy across provinces and sex.
  */
 export const Default: Story = {
   args: {
     series: [
       {
-        name: 'employment_rate',
-        x: 'ageGroup',
-        y: 'province',
-        z: 'pct',
-        data: EMPLOYMENT_BY_AGE_PROVINCE,
-      } satisfies Series<AgeProvinceCell>,
+        name: 'life_expectancy',
+        x: 'province',
+        y: 'sex',
+        z: 'value',
+        data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+      } satisfies Series<ProvinceSexCell>,
     ],
   },
 };
 
 /**
- * Alternative data structure — rooms × people density matrix.
- * Shows the distribution of household density by number of rooms and occupants.
+ * Alternative data structure — the same grid built from two separate
+ * per-sex series instead of one combined array. Each series only carries
+ * its own row of cells; `HeatmapPlot` merges every series' data onto the
+ * same x/y/z accessors before drawing.
  */
-export const RoomsPeopleDensity: Story = {
+export const TwoSeriesBySex: Story = {
   args: {
     series: [
       {
-        name: 'household_density',
-        x: 'rooms',
-        y: 'people',
-        z: 'pct',
-        data: ROOMS_PEOPLE_DENSITY,
-      } satisfies Series<RoomsPeopleCell>,
+        name: 'female',
+        x: 'province',
+        y: 'sex',
+        z: 'value',
+        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+      } satisfies Series<ProvinceSexCell>,
+      {
+        name: 'male',
+        x: 'province',
+        y: 'sex',
+        z: 'value',
+        data: MALE_LIFE_EXPECTANCY_BY_PROVINCE,
+      } satisfies Series<ProvinceSexCell>,
     ],
   },
 };
@@ -73,9 +87,9 @@ export const RoomsPeopleDensity: Story = {
  */
 export const UsingDataShorthand: Story = {
   args: {
-    data: EMPLOYMENT_BY_AGE_PROVINCE,
-    x: 'ageGroup',
-    y: 'province',
-    z: 'pct',
+    data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+    x: 'province',
+    y: 'sex',
+    z: 'value',
   },
 };

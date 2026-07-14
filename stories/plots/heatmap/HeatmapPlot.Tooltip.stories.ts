@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
 import type { Series } from '$lib/types/plots/common';
-import { EMPLOYMENT_BY_AGE_PROVINCE, type AgeProvinceCell } from './data';
+import RichTooltip from './RichTooltip.svelte';
+import { LIFE_EXPECTANCY_BY_PROVINCE_SEX, type ProvinceSexCell } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -10,11 +11,11 @@ const meta = {
   component: HeatmapPlot,
   tags: ['autodocs'],
   args: {
-    width: 520,
+    width: 950,
     height: 420,
   },
   argTypes: {
-    width: { control: { type: 'range', min: 320, max: 900, step: 20 } },
+    width: { control: { type: 'range', min: 320, max: 950, step: 20 } },
     height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
     series: { control: false },
     tooltip: { control: false },
@@ -29,12 +30,12 @@ type Story = StoryObj<typeof meta>;
 
 const SERIES = [
   {
-    name: 'employment_rate',
-    x: 'ageGroup',
-    y: 'province',
-    z: 'pct',
-    data: EMPLOYMENT_BY_AGE_PROVINCE,
-  } satisfies Series<AgeProvinceCell>,
+    name: 'life_expectancy',
+    x: 'province',
+    y: 'sex',
+    z: 'value',
+    data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+  } satisfies Series<ProvinceSexCell>,
 ];
 
 // ── Stories ───────────────────────────────────────────────────────────────────
@@ -61,8 +62,8 @@ export const BasicTooltip: Story = {
       facetId: '',
       sync: false,
       format: (row) => {
-        const { ageGroup, province, pct } = row as AgeProvinceCell;
-        return `${ageGroup} - ${province}: ${(pct * 100).toFixed(1)}%`;
+        const { province, sex, value } = row as ProvinceSexCell;
+        return `${province} - ${sex}: ${value.toFixed(1)} yr`;
       },
     },
   },
@@ -79,8 +80,8 @@ export const RichFormat: Story = {
       facetId: '',
       sync: false,
       format: (row) => {
-        const { ageGroup, province, pct } = row as AgeProvinceCell;
-        return `Age: ${ageGroup}\nProvince: ${province}\nEmployment rate: ${(pct * 100).toFixed(1)}%`;
+        const { province, sex, value } = row as ProvinceSexCell;
+        return `Province: ${province}\nSex: ${sex}\nLife expectancy: ${value.toFixed(1)} yr`;
       },
     },
   },
@@ -88,7 +89,7 @@ export const RichFormat: Story = {
 
 /**
  * Computed tooltip — the format function can derive any string from the row.
- * Here it shows the employment rate relative to a 75% threshold.
+ * Here it shows the life expectancy relative to an 80-year threshold.
  */
 export const ComputedFormat: Story = {
   args: {
@@ -97,30 +98,43 @@ export const ComputedFormat: Story = {
       facetId: '',
       sync: false,
       format: (row) => {
-        const { ageGroup, province, pct } = row as AgeProvinceCell;
-        const threshold = 0.75;
-        const delta = ((pct - threshold) * 100).toFixed(1);
-        const sign = pct >= threshold ? '+' : '';
-        return `${ageGroup} - ${province}: ${(pct * 100).toFixed(1)}% (${sign}${delta} vs 75%)`;
+        const { province, sex, value } = row as ProvinceSexCell;
+        const delta = (value - 80).toFixed(1);
+        const sign = value >= 80 ? '+' : '';
+        return `${province} - ${sex}: ${value.toFixed(1)} yr (${sign}${delta} vs 80)`;
       },
     },
   },
 };
 
 /**
- * Rounded percentage format — displays values as clean rounded percentages
- * for easier interpretation at a glance.
+ * Rounded value format — displays life expectancy as a clean rounded number
+ * of years for easier interpretation at a glance.
  */
-export const RoundedPercentage: Story = {
+export const RoundedValue: Story = {
   args: {
     series: SERIES,
     tooltip: {
       facetId: '',
       sync: false,
       format: (row) => {
-        const { ageGroup, province, pct } = row as AgeProvinceCell;
-        return `${ageGroup} - ${province}\n${Math.round(pct * 100)}%`;
+        const { province, sex, value } = row as ProvinceSexCell;
+        return `${province} - ${sex}\n${Math.round(value)} yr`;
       },
     },
   },
+};
+
+/**
+ * Fully custom tooltip markup via `content` — replaces the default floating
+ * label entirely with an arbitrary snippet: a bold header, a colour swatch
+ * matching the hovered cell's own fill, and a footnote. `format` is still
+ * required by the type but is ignored once `content` is set.
+ *
+ * See `RichTooltip.svelte` for the markup — the library automatically drops
+ * its default dark tooltip box (background/padding/border) whenever
+ * `content` is set, so the custom card fully owns the look.
+ */
+export const CustomContent: StoryObj = {
+  render: () => ({ Component: RichTooltip }),
 };

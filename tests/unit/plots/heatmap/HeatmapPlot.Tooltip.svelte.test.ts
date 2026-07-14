@@ -2,10 +2,10 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
 import type { Series } from '$lib/types/plots/common';
-import { EMPLOYMENT_BY_AGE_PROVINCE, type AgeProvinceCell } from '../../../../stories/plots/heatmap/data';
+import { LIFE_EXPECTANCY_BY_PROVINCE_SEX, type ProvinceSexCell } from '../../../../stories/plots/heatmap/data';
 import { waitForSvg } from '../_helpers/svg';
 
-const DATA_PROPS = { data: EMPLOYMENT_BY_AGE_PROVINCE, x: 'ageGroup' as const, y: 'province' as const, z: 'pct' as const };
+const DATA_PROPS = { data: LIFE_EXPECTANCY_BY_PROVINCE_SEX, x: 'province' as const, y: 'sex' as const, z: 'value' as const };
 
 function noTooltipDom(container: Element) {
   return container.querySelector('.dct-tooltip, [class*="tooltip"]');
@@ -27,8 +27,8 @@ describe('HeatmapPlot – tooltip', () => {
         facetId: '',
         sync: false,
         format: (row) => {
-          const { ageGroup, province, pct } = row as AgeProvinceCell;
-          return `${ageGroup} - ${province}: ${(pct * 100).toFixed(1)}%`;
+          const { province, sex, value } = row as ProvinceSexCell;
+          return `${province} - ${sex}: ${value.toFixed(1)} yr`;
         },
       },
     });
@@ -45,8 +45,8 @@ describe('HeatmapPlot – tooltip', () => {
         facetId: '',
         sync: false,
         format: (row) => {
-          const { ageGroup, province, pct } = row as AgeProvinceCell;
-          return `${ageGroup} - ${province}: ${(pct * 100).toFixed(1)}%`;
+          const { province, sex, value } = row as ProvinceSexCell;
+          return `${province} - ${sex}: ${value.toFixed(1)} yr`;
         },
       },
     });
@@ -59,14 +59,14 @@ describe('HeatmapPlot – tooltip', () => {
       width: 400,
       height: 300,
       series: [
-        { name: 'employment_rate', x: 'ageGroup', y: 'province', z: 'pct', data: EMPLOYMENT_BY_AGE_PROVINCE } satisfies Series<AgeProvinceCell>,
+        { name: 'life_expectancy', x: 'province', y: 'sex', z: 'value', data: LIFE_EXPECTANCY_BY_PROVINCE_SEX } satisfies Series<ProvinceSexCell>,
       ],
       tooltip: {
         facetId: '',
         sync: false,
         format: (row) => {
-          const { ageGroup, pct } = row as AgeProvinceCell;
-          return `${ageGroup}: ${Math.round(pct * 100)}%`;
+          const { province, value } = row as ProvinceSexCell;
+          return `${province}: ${Math.round(value)} yr`;
         },
       },
     });

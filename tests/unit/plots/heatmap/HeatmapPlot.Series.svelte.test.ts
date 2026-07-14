@@ -2,7 +2,7 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
 import type { Series } from '$lib/types/plots/common';
-import { EMPLOYMENT_BY_AGE_PROVINCE, type AgeProvinceCell } from '../../../../stories/plots/heatmap/data';
+import { LIFE_EXPECTANCY_BY_PROVINCE_SEX, type ProvinceSexCell } from '../../../../stories/plots/heatmap/data';
 import { waitForSvg, countCells } from '../_helpers/svg';
 
 describe('HeatmapPlot – series prop', () => {
@@ -11,7 +11,7 @@ describe('HeatmapPlot – series prop', () => {
       width: 400,
       height: 300,
       series: [
-        { name: 'employment_rate', x: 'ageGroup', y: 'province', z: 'pct', data: EMPLOYMENT_BY_AGE_PROVINCE } satisfies Series<AgeProvinceCell>,
+        { name: 'life_expectancy', x: 'province', y: 'sex', z: 'value', data: LIFE_EXPECTANCY_BY_PROVINCE_SEX } satisfies Series<ProvinceSexCell>,
       ],
     });
     const svg = await waitForSvg(container);
@@ -23,21 +23,21 @@ describe('HeatmapPlot – series prop', () => {
       width: 400,
       height: 300,
       series: [
-        { name: 'employment_rate', x: 'ageGroup', y: 'province', z: 'pct', data: EMPLOYMENT_BY_AGE_PROVINCE } satisfies Series<AgeProvinceCell>,
+        { name: 'life_expectancy', x: 'province', y: 'sex', z: 'value', data: LIFE_EXPECTANCY_BY_PROVINCE_SEX } satisfies Series<ProvinceSexCell>,
       ],
     });
     const svg = await waitForSvg(container);
-    expect(countCells(svg)).toBe(EMPLOYMENT_BY_AGE_PROVINCE.length);
+    expect(countCells(svg)).toBe(LIFE_EXPECTANCY_BY_PROVINCE_SEX.length);
   });
 
   test('does not crash with an empty data array', async () => {
     const { container } = await render(HeatmapPlot, {
       width: 400,
       height: 300,
-      data: [] as AgeProvinceCell[],
-      x: 'ageGroup',
-      y: 'province',
-      z: 'pct',
+      data: [] as ProvinceSexCell[],
+      x: 'province',
+      y: 'sex',
+      z: 'value',
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
@@ -49,12 +49,12 @@ describe('HeatmapPlot – data/x/y/z shorthand', () => {
     const { container } = await render(HeatmapPlot, {
       width: 400,
       height: 300,
-      data: EMPLOYMENT_BY_AGE_PROVINCE,
-      x: 'ageGroup',
-      y: 'province',
-      z: 'pct',
+      data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+      x: 'province',
+      y: 'sex',
+      z: 'value',
     });
     const svg = await waitForSvg(container);
-    expect(countCells(svg)).toBe(EMPLOYMENT_BY_AGE_PROVINCE.length);
+    expect(countCells(svg)).toBe(LIFE_EXPECTANCY_BY_PROVINCE_SEX.length);
   });
 });

@@ -120,7 +120,21 @@ const preview: Preview = {
               'Tooltip',
             ],
             'HeatmapPlot',
-            'PyramidPlot'
+            [
+              'Series',
+              'Scales',
+              'Styles',
+              'Segments',
+              'Tooltip',
+            ],
+            'PyramidPlot',
+            [
+              'Series',
+              'Scales',
+              'Styles',
+              'Segments',
+              'Tooltip',
+            ],
           ],
           'Layout',
           'Configuration',

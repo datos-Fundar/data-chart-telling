@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
 import type { Series } from '$lib/types/plots/common';
 import type { Segments, CellSegmentStyle } from '$lib/types/plots/styles';
-import { EMPLOYMENT_BY_AGE_PROVINCE, type AgeProvinceCell } from './data';
+import { LIFE_EXPECTANCY_BY_PROVINCE_SEX, type ProvinceSexCell } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -11,11 +11,11 @@ const meta = {
   component: HeatmapPlot,
   tags: ['autodocs'],
   args: {
-    width: 520,
+    width: 950,
     height: 420,
   },
   argTypes: {
-    width: { control: { type: 'range', min: 320, max: 900, step: 20 } },
+    width: { control: { type: 'range', min: 320, max: 950, step: 20 } },
     height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
     series: { control: false },
     segments: { control: false },
@@ -30,20 +30,22 @@ type Story = StoryObj<typeof meta>;
 
 const SERIES = [
   {
-    name: 'employment_rate',
-    x: 'ageGroup',
-    y: 'province',
-    z: 'pct',
-    data: EMPLOYMENT_BY_AGE_PROVINCE,
-  } satisfies Series<AgeProvinceCell>,
+    name: 'life_expectancy',
+    x: 'province',
+    y: 'sex',
+    z: 'value',
+    data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+  } satisfies Series<ProvinceSexCell>,
 ];
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 // Heatmap segments use the `'default'` key — heatmaps have no named series.
+// `from`/`to` compare category values lexicographically, so provinces fall in
+// alphabetical order: Buenos Aires, Córdoba, Formosa, La Rioja, Santa Fe, Tucumán.
 
 /**
- * Highlight a region — dims all cells except those in a specific age group
- * and province range. Useful for focusing on a particular demographic slice.
+ * Highlight a region — dims all cells except the female row for a range of
+ * provinces. Useful for focusing on a particular demographic slice.
  */
 export const HighlightRegion: Story = {
   args: {
@@ -53,8 +55,8 @@ export const HighlightRegion: Story = {
         {
           areas: [
             {
-              x: { from: '25-34', to: '45-54' },
-              y: { from: 'Buenos Aires', to: 'Mendoza' },
+              x: { from: 'Buenos Aires', to: 'Formosa' },
+              y: { from: 'Female', to: 'Female' },
             },
           ],
           style: { fillOpacity: 1 },
@@ -68,19 +70,16 @@ export const HighlightRegion: Story = {
 };
 
 /**
- * Highlight rows (age groups) — all cells in the 35-44 and 45-54 age groups
- * are highlighted with full opacity; others are dimmed.
+ * Highlight a row (sex) — every female cell is highlighted with full opacity;
+ * the male row is dimmed.
  */
-export const HighlightRows: Story = {
+export const HighlightSex: Story = {
   args: {
     series: SERIES,
     segments: {
       default: [
         {
-          areas: [
-            { x: { from: '35-44', to: '35-44' } },
-            { x: { from: '45-54', to: '45-54' } },
-          ],
+          areas: [{ y: { from: 'Female', to: 'Female' } }],
           style: { fillOpacity: 0.95 },
         },
         {
@@ -95,15 +94,15 @@ export const HighlightRows: Story = {
  * Highlight columns (provinces) — all cells in specific provinces are shown
  * at full brightness; others are faded.
  */
-export const HighlightColumns: Story = {
+export const HighlightProvinces: Story = {
   args: {
     series: SERIES,
     segments: {
       default: [
         {
           areas: [
-            { y: { from: 'Buenos Aires', to: 'Santa Fe' } },
-            { y: { from: 'Tucumán', to: 'Tucumán' } },
+            { x: { from: 'Buenos Aires', to: 'Córdoba' } },
+            { x: { from: 'Tucumán', to: 'Tucumán' } },
           ],
           style: { fillOpacity: 1 },
         },
@@ -127,8 +126,8 @@ export const LayeredOpacity: Story = {
         {
           areas: [
             {
-              x: { from: '25-34', to: '35-44' },
-              y: { from: 'Buenos Aires', to: 'Santa Fe' },
+              x: { from: 'Buenos Aires', to: 'Formosa' },
+              y: { from: 'Female', to: 'Female' },
             },
           ],
           style: { fillOpacity: 1 },
@@ -136,8 +135,8 @@ export const LayeredOpacity: Story = {
         {
           areas: [
             {
-              x: { from: '45-54', to: '55-64' },
-              y: { from: 'Mendoza', to: 'Tucumán' },
+              x: { from: 'La Rioja', to: 'Tucumán' },
+              y: { from: 'Male', to: 'Male' },
             },
           ],
           style: { fillOpacity: 0.6 },
@@ -162,8 +161,8 @@ export const HighlightWithStroke: Story = {
         {
           areas: [
             {
-              x: { from: '18-24', to: '25-34' },
-              y: { from: 'Buenos Aires', to: 'Córdoba' },
+              x: { from: 'Buenos Aires', to: 'Córdoba' },
+              y: { from: 'Female', to: 'Female' },
             },
           ],
           style: {

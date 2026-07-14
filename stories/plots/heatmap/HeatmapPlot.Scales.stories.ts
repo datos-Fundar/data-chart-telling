@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
 import type { Series, ScalesConfig } from '$lib/types/plots/common';
-import { EMPLOYMENT_BY_AGE_PROVINCE, AGE_GROUPS, PROVINCES, type AgeProvinceCell } from './data';
+import { LIFE_EXPECTANCY_BY_PROVINCE_SEX, PROVINCES, SEXES, type ProvinceSexCell } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -10,11 +10,11 @@ const meta = {
   component: HeatmapPlot,
   tags: ['autodocs'],
   args: {
-    width: 520,
+    width: 950,
     height: 420,
   },
   argTypes: {
-    width: { control: { type: 'range', min: 320, max: 900, step: 20 } },
+    width: { control: { type: 'range', min: 320, max: 950, step: 20 } },
     height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
     series: { control: false },
     scales: { control: false },
@@ -36,12 +36,12 @@ export const Default: Story = {
   args: {
     series: [
       {
-        name: 'employment_rate',
-        x: 'ageGroup',
-        y: 'province',
-        z: 'pct',
-        data: EMPLOYMENT_BY_AGE_PROVINCE,
-      } satisfies Series<AgeProvinceCell>,
+        name: 'life_expectancy',
+        x: 'province',
+        y: 'sex',
+        z: 'value',
+        data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+      } satisfies Series<ProvinceSexCell>,
     ],
   },
 };
@@ -54,22 +54,22 @@ export const WithAxisLabels: Story = {
   args: {
     series: [
       {
-        name: 'employment_rate',
-        x: 'ageGroup',
-        y: 'province',
-        z: 'pct',
-        data: EMPLOYMENT_BY_AGE_PROVINCE,
-      } satisfies Series<AgeProvinceCell>,
+        name: 'life_expectancy',
+        x: 'province',
+        y: 'sex',
+        z: 'value',
+        data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+      } satisfies Series<ProvinceSexCell>,
     ],
     scales: {
-      x: { label: 'Age Group' },
-      y: { label: 'Province' },
+      x: { label: 'Province' },
+      y: { label: 'Sex' },
     } satisfies ScalesConfig,
   },
 };
 
 /**
- * Explicit domain ordering for X axis — ensures age groups appear in the
+ * Explicit domain ordering for X axis — ensures provinces appear in the
  * desired order rather than alphabetically. The `domain` array pins the
  * exact order and set of values shown.
  */
@@ -77,58 +77,84 @@ export const ExplicitXDomain: Story = {
   args: {
     series: [
       {
-        name: 'employment_rate',
-        x: 'ageGroup',
-        y: 'province',
-        z: 'pct',
-        data: EMPLOYMENT_BY_AGE_PROVINCE,
-      } satisfies Series<AgeProvinceCell>,
+        name: 'life_expectancy',
+        x: 'province',
+        y: 'sex',
+        z: 'value',
+        data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+      } satisfies Series<ProvinceSexCell>,
     ],
     scales: {
-      x: { domain: AGE_GROUPS, label: 'Age Group' },
-      y: { domain: PROVINCES, label: 'Province' },
+      x: { domain: PROVINCES, label: 'Province' },
+      y: { domain: SEXES, label: 'Sex' },
     } satisfies ScalesConfig,
   },
 };
 
 /**
- * Reversed Y axis — provinces appear bottom-to-top instead of top-to-bottom.
+ * Explicit Z domain — pins the colour scale to a fixed `[70, 85]` range
+ * instead of auto-fitting to the visible data's min/max. Spreads the colour
+ * ramp across the full plausible life-expectancy range, making it easier to
+ * read the gradient at a glance rather than always stretching to whichever
+ * values happen to be shown.
+ */
+export const ExplicitZDomain: Story = {
+  args: {
+    series: [
+      {
+        name: 'life_expectancy',
+        x: 'province',
+        y: 'sex',
+        z: 'value',
+        data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+      } satisfies Series<ProvinceSexCell>,
+    ],
+    scales: {
+      z: { domain: [70, 85] },
+    } satisfies ScalesConfig,
+  },
+};
+
+/**
+ * Reversed Y axis — sexes appear bottom-to-top instead of top-to-bottom.
  * Useful for matching reading direction or presentation conventions.
  */
 export const ReversedY: Story = {
   args: {
     series: [
       {
-        name: 'employment_rate',
-        x: 'ageGroup',
-        y: 'province',
-        z: 'pct',
-        data: EMPLOYMENT_BY_AGE_PROVINCE,
-      } satisfies Series<AgeProvinceCell>,
+        name: 'life_expectancy',
+        x: 'province',
+        y: 'sex',
+        z: 'value',
+        data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+      } satisfies Series<ProvinceSexCell>,
     ],
     scales: {
       y: { reverse: true },
+      z: { domain: [70, 85] },
     } satisfies ScalesConfig,
   },
 };
 
 /**
- * Rotated X tick labels — makes long age group labels more readable when
- * they might otherwise overlap on narrow charts.
+ * Rotated X tick labels — makes province labels more readable when they
+ * might otherwise overlap on narrow charts.
  */
 export const RotatedXTicks: Story = {
   args: {
     series: [
       {
-        name: 'employment_rate',
-        x: 'ageGroup',
-        y: 'province',
-        z: 'pct',
-        data: EMPLOYMENT_BY_AGE_PROVINCE,
-      } satisfies Series<AgeProvinceCell>,
+        name: 'life_expectancy',
+        x: 'province',
+        y: 'sex',
+        z: 'value',
+        data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+      } satisfies Series<ProvinceSexCell>,
     ],
     scales: {
       x: { tickRotate: -45 },
+      z: { domain: [70, 85] },
     } satisfies ScalesConfig,
   },
 };
@@ -141,16 +167,17 @@ export const CombinedOverrides: Story = {
   args: {
     series: [
       {
-        name: 'employment_rate',
-        x: 'ageGroup',
-        y: 'province',
-        z: 'pct',
-        data: EMPLOYMENT_BY_AGE_PROVINCE,
-      } satisfies Series<AgeProvinceCell>,
+        name: 'life_expectancy',
+        x: 'province',
+        y: 'sex',
+        z: 'value',
+        data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+      } satisfies Series<ProvinceSexCell>,
     ],
     scales: {
-      x: { domain: AGE_GROUPS, label: 'Age Group', tickRotate: -45 },
-      y: { domain: PROVINCES, label: 'Province' },
+      x: { domain: PROVINCES, label: 'Province', tickRotate: -45 },
+      y: { domain: SEXES, label: 'Sex' },
+      z: { domain: [70, 85] },
     } satisfies ScalesConfig,
     margins: { bottom: 50, left: 100 },
   },

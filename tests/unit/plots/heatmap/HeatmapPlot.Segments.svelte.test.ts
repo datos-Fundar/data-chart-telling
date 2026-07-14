@@ -2,10 +2,10 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
 import type { Segments, CellSegmentStyle } from '$lib/types/plots/styles';
-import { EMPLOYMENT_BY_AGE_PROVINCE } from '../../../../stories/plots/heatmap/data';
+import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from '../../../../stories/plots/heatmap/data';
 import { waitForSvg, countCells } from '../_helpers/svg';
 
-const DATA_PROPS = { data: EMPLOYMENT_BY_AGE_PROVINCE, x: 'ageGroup' as const, y: 'province' as const, z: 'pct' as const };
+const DATA_PROPS = { data: LIFE_EXPECTANCY_BY_PROVINCE_SEX, x: 'province' as const, y: 'sex' as const, z: 'value' as const };
 
 function styleAttrs(svg: SVGElement): string[] {
   return Array.from(svg.querySelectorAll('g.cell rect')).map((r) => r.getAttribute('style') ?? '');
@@ -13,10 +13,10 @@ function styleAttrs(svg: SVGElement): string[] {
 
 describe('HeatmapPlot – segments (areas, "default" key)', () => {
   test('an area segment and the catch-all each apply their own fillOpacity', async () => {
-    const xFrom = '25-34';
-    const xTo = '45-54';
-    const yFrom = 'Buenos Aires';
-    const yTo = 'Mendoza';
+    const xFrom = 'Buenos Aires';
+    const xTo = 'Formosa';
+    const yFrom = 'Female';
+    const yTo = 'Female';
     const { container } = await render(HeatmapPlot, {
       width: 400,
       height: 300,
@@ -29,14 +29,14 @@ describe('HeatmapPlot – segments (areas, "default" key)', () => {
       } satisfies Segments<CellSegmentStyle>,
     });
     const svg = await waitForSvg(container);
-    expect(countCells(svg)).toBe(EMPLOYMENT_BY_AGE_PROVINCE.length);
-    const matchedCount = EMPLOYMENT_BY_AGE_PROVINCE.filter(
-      (d) => d.ageGroup >= xFrom && d.ageGroup <= xTo && d.province >= yFrom && d.province <= yTo,
+    expect(countCells(svg)).toBe(LIFE_EXPECTANCY_BY_PROVINCE_SEX.length);
+    const matchedCount = LIFE_EXPECTANCY_BY_PROVINCE_SEX.filter(
+      (d) => d.province >= xFrom && d.province <= xTo && d.sex >= yFrom && d.sex <= yTo,
     ).length;
     const styles = styleAttrs(svg);
     expect(styles.filter((s) => s.includes('fill-opacity: 1;')).length).toBe(matchedCount);
     expect(styles.filter((s) => s.includes('fill-opacity: 0.3')).length).toBe(
-      EMPLOYMENT_BY_AGE_PROVINCE.length - matchedCount,
+      LIFE_EXPECTANCY_BY_PROVINCE_SEX.length - matchedCount,
     );
   });
 
@@ -62,10 +62,10 @@ describe('HeatmapPlot – segments (areas, "default" key)', () => {
       width: 400,
       height: 300,
       ...DATA_PROPS,
-      segments: { employment_rate: [{ style: {} }] } satisfies Segments<CellSegmentStyle>,
+      segments: { life_expectancy: [{ style: {} }] } satisfies Segments<CellSegmentStyle>,
     });
     await vi.waitFor(() => {
-      expect(warn).toHaveBeenCalledWith(expect.stringContaining('employment_rate'));
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('life_expectancy'));
     }, { timeout: 1000 });
     warn.mockRestore();
   });
@@ -80,13 +80,13 @@ describe('HeatmapPlot – segments (catch-all + area merging)', () => {
       segments: {
         default: [
           { style: { fill: '#e11d48' } },
-          { areas: [{ x: { from: '25-34', to: '45-54' } }], style: { fillOpacity: 0.5 } },
+          { areas: [{ x: { from: 'Buenos Aires', to: 'Formosa' } }], style: { fillOpacity: 0.5 } },
         ],
       } satisfies Segments<CellSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     const styles = styleAttrs(svg);
-    expect(styles.length).toBe(EMPLOYMENT_BY_AGE_PROVINCE.length);
+    expect(styles.length).toBe(LIFE_EXPECTANCY_BY_PROVINCE_SEX.length);
     styles.forEach((s) => expect(s).toContain('fill: rgb(225, 29, 72)'));
   });
 });
