@@ -28,7 +28,10 @@
   const fontSize = $derived(style?.fontSize ?? 12);
   const fontWeight = $derived(style?.fontWeight ?? 'normal');
   const fontStyleProp = $derived(style?.fontStyle ?? 'normal');
-  const textAnchor = $derived(style?.textAnchor ?? 'middle');
+  // 'outside' is meant to be resolved per-point by the caller (see
+  // HoverMarker, which knows each point's signed x); a caller that passes it
+  // through unresolved falls back to 'start' rather than an invalid svelteplot value.
+  const textAnchor = $derived(style?.textAnchor === 'outside' ? 'start' : (style?.textAnchor ?? 'middle'));
   const lineAnchor = $derived(style?.lineAnchor ?? 'middle');
   const dx = $derived(style?.dx ?? 0);
   const dy = $derived(style?.dy ?? 0);
@@ -46,10 +49,14 @@
     fontStyle={fontStyleProp}
     {textAnchor}
     {lineAnchor}
+    lineHeight={style?.lineHeight}
+    rotate={style?.rotate}
     stroke={style?.stroke}
     strokeWidth={style?.strokeWidth}
     paintOrder={style?.paintOrder}
     {dx}
     {dy}
+    class={style?.class}
+    textClass={style?.textClass}
   />
 {/if}

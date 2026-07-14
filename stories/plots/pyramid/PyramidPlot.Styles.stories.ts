@@ -10,11 +10,11 @@ const meta = {
   component: PyramidPlot,
   tags: ['autodocs'],
   args: {
-    width: 560,
+    width: 950,
     height: 520,
   },
   argTypes: {
-    width: { control: { type: 'range', min: 320, max: 900, step: 20 } },
+    width: { control: { type: 'range', min: 320, max: 950, step: 20 } },
     height: { control: { type: 'range', min: 320, max: 800, step: 20 } },
     styles: { control: false },
   },
@@ -27,13 +27,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
-const BASE_ARGS = {
-  data: DATA,
-  x: 'pct',
-  y: 'ageGroup',
-  z: 'sex',
-  scales: { y: { domain: AGE_GROUPS } },
-};
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
@@ -42,7 +35,13 @@ const BASE_ARGS = {
  * The palette chooses colors for left/right (female/male) automatically.
  */
 export const Default: Story = {
-  args: BASE_ARGS,
+  args: {
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: { y: { domain: AGE_GROUPS } },
+  },
 };
 
 /**
@@ -51,19 +50,13 @@ export const Default: Story = {
  */
 export const CustomColors: Story = {
   args: {
-    ...BASE_ARGS,
-    styles: {
-      colors: { left: '#d6336c', right: '#1971c2' },
-    } satisfies PlotStyles,
-  },
-};
-
-/**
- * Alternative color scheme — pink and teal for a modern look.
- */
-export const PinkTeal: Story = {
-  args: {
-    ...BASE_ARGS,
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: {
+      y: { domain: AGE_GROUPS }
+    },
     styles: {
       colors: { left: '#ff6b9d', right: '#4ecdc4' },
     } satisfies PlotStyles,
@@ -76,7 +69,14 @@ export const PinkTeal: Story = {
  */
 export const WithValueLabels: Story = {
   args: {
-    ...BASE_ARGS,
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: {
+      x: { domain: [-6, 6] },
+      y: { domain: AGE_GROUPS }
+    },
     styles: {
       values: { show: true },
     } satisfies PlotStyles,
@@ -89,7 +89,14 @@ export const WithValueLabels: Story = {
  */
 export const CustomValueFormat: Story = {
   args: {
-    ...BASE_ARGS,
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: {
+      x: { domain: [-6, 6] },
+      y: { domain: AGE_GROUPS }
+    },
     styles: {
       values: { show: true, format: (v: number) => `${v.toFixed(1)}%` },
     } satisfies PlotStyles,
@@ -102,12 +109,18 @@ export const CustomValueFormat: Story = {
  */
 export const LabelsInside: Story = {
   args: {
-    ...BASE_ARGS,
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: { y: { domain: AGE_GROUPS } },
     styles: {
       values: {
         show: true,
         anchor: 'end',
         format: (v: number) => `${v.toFixed(1)}%`,
+        fill: '#ffffff',
+        fontWeight: 'bold',
       },
     } satisfies PlotStyles,
   },
@@ -119,7 +132,14 @@ export const LabelsInside: Story = {
  */
 export const LabelsWithOffset: Story = {
   args: {
-    ...BASE_ARGS,
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: {
+      x: { domain: [-6, 6] },
+      y: { domain: AGE_GROUPS }
+    },
     styles: {
       values: {
         show: true,
@@ -136,35 +156,16 @@ export const LabelsWithOffset: Story = {
  */
 export const CustomColorsAndLabels: Story = {
   args: {
-    ...BASE_ARGS,
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: {
+      x: { domain: [-6, 6] },
+      y: { domain: AGE_GROUPS }
+    },
     styles: {
       colors: { left: '#9c27b0', right: '#ff9800' },
-      values: { show: true, format: (v: number) => `${v.toFixed(1)}%` },
-    } satisfies PlotStyles,
-  },
-};
-
-/**
- * Desaturated colors — uses muted, pastel-like colors for a softer aesthetic.
- */
-export const DesaturatedColors: Story = {
-  args: {
-    ...BASE_ARGS,
-    styles: {
-      colors: { left: '#b19cd9', right: '#a8d8ea' },
-    } satisfies PlotStyles,
-  },
-};
-
-/**
- * High contrast colors — uses maximally contrasting colors (dark navy and
- * bright yellow) for maximum visibility in presentations or accessibility.
- */
-export const HighContrast: Story = {
-  args: {
-    ...BASE_ARGS,
-    styles: {
-      colors: { left: '#001f3f', right: '#ffeb3b' },
       values: { show: true, format: (v: number) => `${v.toFixed(1)}%` },
     } satisfies PlotStyles,
   },

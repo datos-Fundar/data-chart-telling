@@ -53,6 +53,10 @@
   const showVals = $derived(styles.values?.show ?? false);
   const fmtVal = $derived(styles.values?.format ?? ((v: number) => `${v}`));
   const valAnchor = $derived<ValueAnchor>(styles.values?.anchor ?? 'outside');
+  // 'outside' is a per-point escape hatch resolved by HoverMarker; pyramid's
+  // own value labels already have their own `anchor: 'outside'` concept
+  // above, so treat it as unset here.
+  const resolvedTextAnchor = $derived(styles.values?.textAnchor === 'outside' ? undefined : styles.values?.textAnchor);
 
   // Sort series names alphabetically; even index → left, odd → right.
   // scales.z.reverse flips the assignment so the second name goes left.
@@ -220,14 +224,19 @@
           text={(d: TData) => fmtVal(Math.abs(Number(resolveAccessor(group.series.y)(d))), group.series.name)}
           dx={styles.values?.dx ?? defaultDx}
           dy={styles.values?.dy ?? 0}
-          textAnchor={styles.values?.textAnchor ?? defaultTextAnchor}
+          textAnchor={resolvedTextAnchor ?? defaultTextAnchor}
           lineAnchor={styles.values?.lineAnchor ?? 'middle'}
           lineHeight={styles.values?.lineHeight}
           rotate={styles.values?.rotate}
           class={styles.values?.class}
           textClass={styles.values?.textClass}
-          fill={cfg.axis.color}
-          fontSize={12}
+          fill={styles.values?.fill ?? cfg.axis.color}
+          fontSize={styles.values?.fontSize ?? 12}
+          fontWeight={styles.values?.fontWeight}
+          fontStyle={styles.values?.fontStyle}
+          stroke={styles.values?.stroke}
+          strokeWidth={styles.values?.strokeWidth}
+          paintOrder={styles.values?.paintOrder}
         />
       {/if}
 

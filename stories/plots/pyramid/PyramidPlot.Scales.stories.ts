@@ -10,11 +10,11 @@ const meta = {
   component: PyramidPlot,
   tags: ['autodocs'],
   args: {
-    width: 560,
+    width: 950,
     height: 520,
   },
   argTypes: {
-    width: { control: { type: 'range', min: 320, max: 900, step: 20 } },
+    width: { control: { type: 'range', min: 320, max: 950, step: 20 } },
     height: { control: { type: 'range', min: 320, max: 800, step: 20 } },
     scales: { control: false },
   },
@@ -85,21 +85,6 @@ export const CustomXDomain: Story = {
     scales: {
       x: { domain: [0, 6] },
       y: { domain: AGE_GROUPS },
-    } satisfies ScalesConfig,
-  },
-};
-
-/**
- * Rotated Y tick labels — makes long age group labels more readable at an angle.
- */
-export const RotatedYTicks: Story = {
-  args: {
-    data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: {
-      y: { domain: AGE_GROUPS, tickRotate: -45 },
     } satisfies ScalesConfig,
   },
 };

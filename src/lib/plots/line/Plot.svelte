@@ -57,6 +57,10 @@
     styles.values?.format ?? ((v: number, name: string) => `${name} - ${v}`),
   );
   const valAnchor = $derived<ValueAnchor>(styles.values?.anchor ?? 'start');
+  // 'outside' is a per-point escape hatch resolved by HoverMarker; line's own
+  // value labels already have their own `anchor: 'outside'` concept above,
+  // so treat it as unset here.
+  const resolvedTextAnchor = $derived(styles.values?.textAnchor === 'outside' ? undefined : styles.values?.textAnchor);
 
   const xAcc = $derived(resolveAccessor(resolvedSeries[0]?.x ?? ((d: TData) => d)));
   const yAcc = $derived(resolveAccessor(resolvedSeries[0]?.y ?? ((d: TData) => d)));
@@ -219,7 +223,7 @@
         text={() => fmtVal(Number(yFn(lastRow)), s.name)}
         dx={styles.values?.dx ?? defaultDx}
         dy={styles.values?.dy ?? defaultDy}
-        textAnchor={styles.values?.textAnchor ?? defaultTA}
+        textAnchor={resolvedTextAnchor ?? defaultTA}
         lineAnchor={styles.values?.lineAnchor ?? defaultLA}
         lineHeight={styles.values?.lineHeight}
         rotate={styles.values?.rotate}

@@ -13,25 +13,63 @@ import type { AxisValue, Series } from '$lib/types/plots/common';
  */
 export type ValueAnchor = 'outside' | 'start' | 'middle' | 'end';
 
+/** Per-segment styling for a line: its stroke and/or its endpoint dots. */
+export type LineSegmentStyle = {
+  stroke?: StrokeStyle;
+  dots?: DotStyle;
+};
+
+/** Per-segment styling for a bar: its fill. */
+export type BarSegmentStyle = {
+  fill?: string;
+  fillOpacity?: number;
+};
+
+/** Per-cell styling override for a heatmap cell. */
+export type CellSegmentStyle = {
+  fill?: string;
+  fillOpacity?: number;
+  stroke?: string;
+  strokeWidth?: number;
+};
+
+/** Text/label styling for any text mark — a marker's label, an annotation, a value label. */
+export type FontStyle = {
+  fill?: string;
+  fontSize?: number;
+  fontWeight?: 'normal' | 'bold';
+  fontStyle?: 'normal' | 'italic';
+  /**
+   * `'outside'` is only meaningful where the consuming mark resolves it
+   * per-point from a signed x value (currently {@link HoverMarker} only) —
+   * it anchors the label away from zero: `'start'` (extending right) for a
+   * positive x, `'end'` (extending left) for negative. Elsewhere it's
+   * treated the same as `'start'`.
+   */
+  textAnchor?: 'start' | 'middle' | 'end' | 'outside';
+  lineAnchor?: 'top' | 'middle' | 'bottom';
+  lineHeight?: number;
+  rotate?: number;
+  stroke?: string;
+  strokeWidth?: number;
+  paintOrder?: string;
+  dx?: number;
+  dy?: number;
+  class?: string;
+  textClass?: string;
+};
+
 /**
  * Controls if and how value labels are rendered on a plot. The high-level
- * `anchor` sets sensible defaults for placement; the low-level svelteplot
- * Text-mark fields (`dx`, `dy`, `textAnchor`, `lineAnchor`, `lineHeight`,
- * `rotate`, `class`, `textClass`) override those defaults when provided.
+ * `anchor` sets sensible defaults for placement; the inherited {@link FontStyle}
+ * fields (`dx`, `dy`, `textAnchor`, `lineAnchor`, `lineHeight`, `rotate`,
+ * `class`, `textClass`, `fill`, …) override those defaults when provided.
  */
-export type ValuesStyle = {
+export type ValuesStyle = FontStyle & {
   show?: boolean;
   anchor?: ValueAnchor;
   /** Called with the numeric value and the series name. Return a string to render. */
   format?: (value: number, seriesName: string) => string;
-  dx?: number;
-  dy?: number;
-  textAnchor?: 'start' | 'end' | 'middle';
-  lineAnchor?: 'top' | 'bottom' | 'middle';
-  lineHeight?: number;
-  rotate?: number;
-  class?: string;
-  textClass?: string;
 };
 
 /**
@@ -89,41 +127,6 @@ export type DotStyle = {
   dotStrokeWidth?: number;
   dotStrokeOpacity?: number;
   dotStrokeDasharray?: string | LineStyle;
-};
-
-/** Text/label styling for any text mark — a marker's label, an annotation. */
-export type FontStyle = {
-  fill?: string;
-  fontSize?: number;
-  fontWeight?: 'normal' | 'bold';
-  fontStyle?: 'normal' | 'italic';
-  textAnchor?: 'start' | 'middle' | 'end';
-  lineAnchor?: 'top' | 'middle' | 'bottom';
-  stroke?: string;
-  strokeWidth?: number;
-  paintOrder?: string;
-  dx?: number;
-  dy?: number;
-};
-
-/** Per-segment styling for a line: its stroke and/or its endpoint dots. */
-export type LineSegmentStyle = {
-  stroke?: StrokeStyle;
-  dots?: DotStyle;
-};
-
-/** Per-segment styling for a bar: its fill. */
-export type BarSegmentStyle = {
-  fill?: string;
-  fillOpacity?: number;
-};
-
-/** Per-cell styling override for a heatmap cell. */
-export type CellSegmentStyle = {
-  fill?: string;
-  fillOpacity?: number;
-  stroke?: string;
-  strokeWidth?: number;
 };
 
 /** A half-open interval on one axis. Both bounds are inclusive; omit either to leave that end open. */

@@ -56,6 +56,12 @@
     : ('middle' as const),
   );
   const groupOffset = $derived(barLayout.groupOffset(seriesIndex));
+
+  // `textAnchor: 'outside'` is a per-point escape hatch resolved by
+  // HoverMarker (which knows each point's signed x) — value labels already
+  // have their own `anchor: 'outside'` concept (computed above), so if it
+  // leaks through here just fall back to the anchor-derived default.
+  const resolvedTextAnchor = $derived(values?.textAnchor === 'outside' ? undefined : values?.textAnchor);
 </script>
 
 <Text
@@ -64,12 +70,17 @@
   text={(d: TData) => fmtVal(Number(yFn(d)), group.series.name)}
   dx={values?.dx ?? (isHorizontal ? defaultOffset : groupOffset.dx)}
   dy={values?.dy ?? (isHorizontal ? groupOffset.dy : defaultOffset)}
-  textAnchor={values?.textAnchor ?? (isHorizontal ? (valAnchor === 'outside' || valAnchor === 'end' ? 'start' : valAnchor === 'start' ? 'end' : 'middle') : 'middle')}
+  textAnchor={resolvedTextAnchor ?? (isHorizontal ? (valAnchor === 'outside' || valAnchor === 'end' ? 'start' : valAnchor === 'start' ? 'end' : 'middle') : 'middle')}
   lineAnchor={values?.lineAnchor ?? (isHorizontal ? 'middle' : defaultLA)}
   lineHeight={values?.lineHeight}
   rotate={values?.rotate}
   class={values?.class}
   textClass={values?.textClass}
-  fill={axisColor}
-  fontSize={12}
+  fill={values?.fill ?? axisColor}
+  fontSize={values?.fontSize ?? 12}
+  fontWeight={values?.fontWeight}
+  fontStyle={values?.fontStyle}
+  stroke={values?.stroke}
+  strokeWidth={values?.strokeWidth}
+  paintOrder={values?.paintOrder}
 />

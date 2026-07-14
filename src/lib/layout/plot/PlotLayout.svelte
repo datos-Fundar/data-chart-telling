@@ -215,14 +215,19 @@
   const hover = $derived(sharedHover ?? localHover);
 
   /**
-   * Whether svelteplot's `<Pointer>` needs to search 2D (both x and y) or
-   * just along x — derived from the *active* strategy rather than taken as
-   * a separate prop, since it's always exactly `getY` (already passed in)
-   * or nothing: line/bar only ever search by x, pyramid (category on y) and
-   * heatmap (a 2D grid) need y too. Reactive to `hover.strategy`, so a
-   * caller overriding `tooltip.strategy`/a hover marker's `strategy` away
-   * from the plot kind's default gets correctly-dimensioned matching too.
+   * Which axes svelteplot's `<Pointer>` should search along — derived from
+   * the *active* strategy rather than taken as separate props. Passing
+   * `undefined` for an axis collapses every point to the same coordinate on
+   * that axis in the search quadtree, making the nearest-neighbor match
+   * ignore it entirely: `'x'` (line/bar) searches x only, `'y'` (pyramid —
+   * its category sits on y, and a bar's own magnitude on x shouldn't pull in
+   * a *different* row just because that row's bar tip is nearer in x)
+   * searches y only, and `'punctual'` (heatmap's 2D grid) needs both. Reactive
+   * to `hover.strategy`, so a caller overriding `tooltip.strategy`/a hover
+   * marker's `strategy` away from the plot kind's default gets
+   * correctly-dimensioned matching too.
    */
+  const pointerMatchX = $derived(hover.strategy === 'y' ? undefined : getX);
   const pointerMatchY = $derived(hover.strategy === 'x' ? undefined : getY);
 
   $effect(() => {
@@ -360,7 +365,7 @@
     {/each}
 
     {#if hoverActive}
-      <Pointer {data} x={getX} y={pointerMatchY} maxDistance={400} onupdate={ctrl.onPointer} />
+      <Pointer {data} x={pointerMatchX} y={pointerMatchY} maxDistance={400} onupdate={ctrl.onPointer} />
     {/if}
 
     {#if unscopedHoverMarker}

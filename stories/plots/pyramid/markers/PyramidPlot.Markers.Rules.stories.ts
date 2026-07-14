@@ -10,11 +10,11 @@ const meta = {
   component: PyramidPlot,
   tags: ['autodocs'],
   args: {
-    width: 560,
+    width: 950,
     height: 520,
   },
   argTypes: {
-    width: { control: { type: 'range', min: 320, max: 900, step: 20 } },
+    width: { control: { type: 'range', min: 320, max: 950, step: 20 } },
     height: { control: { type: 'range', min: 320, max: 800, step: 20 } },
     markers: { control: false },
   },
@@ -27,13 +27,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
-const BASE_ARGS = {
-  data: DATA,
-  x: 'pct',
-  y: 'ageGroup',
-  z: 'sex',
-  scales: { y: { domain: AGE_GROUPS } },
-};
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
@@ -44,7 +37,11 @@ const BASE_ARGS = {
  */
 export const WithRuleXMarker: Story = {
   args: {
-    ...BASE_ARGS,
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: { y: { domain: AGE_GROUPS } },
     markers: [
       {
         type: 'ruleX',
@@ -65,7 +62,11 @@ export const WithRuleXMarker: Story = {
  */
 export const MultipleThresholdMarkers: Story = {
   args: {
-    ...BASE_ARGS,
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: { y: { domain: AGE_GROUPS } },
     markers: [
       {
         type: 'ruleX',
@@ -96,7 +97,11 @@ export const MultipleThresholdMarkers: Story = {
  */
 export const SymmetricMarkers: Story = {
   args: {
-    ...BASE_ARGS,
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: { y: { domain: AGE_GROUPS } },
     markers: [
       {
         type: 'ruleX',
@@ -126,7 +131,11 @@ export const SymmetricMarkers: Story = {
  */
 export const AverageMarker: Story = {
   args: {
-    ...BASE_ARGS,
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: { y: { domain: AGE_GROUPS } },
     markers: [
       {
         type: 'ruleX',
@@ -148,7 +157,11 @@ export const AverageMarker: Story = {
  */
 export const PolicyThresholdMarker: Story = {
   args: {
-    ...BASE_ARGS,
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: { y: { domain: AGE_GROUPS } },
     markers: [
       {
         type: 'ruleX',

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
+import RichTooltip from './RichTooltip.svelte';
 import { AGE_GROUPS, POPULATION_PYRAMID, type PopulationRow } from '../../data/population-pyramid';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -9,11 +10,11 @@ const meta = {
   component: PyramidPlot,
   tags: ['autodocs'],
   args: {
-    width: 560,
+    width: 950,
     height: 520,
   },
   argTypes: {
-    width: { control: { type: 'range', min: 320, max: 900, step: 20 } },
+    width: { control: { type: 'range', min: 320, max: 950, step: 20 } },
     height: { control: { type: 'range', min: 320, max: 800, step: 20 } },
     tooltip: { control: false },
   },
@@ -26,13 +27,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
-const BASE_ARGS = {
-  data: DATA,
-  x: 'pct',
-  y: 'ageGroup',
-  z: 'sex',
-  scales: { y: { domain: AGE_GROUPS } },
-};
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
@@ -41,7 +35,13 @@ const BASE_ARGS = {
  * This is the default behaviour when `tooltip` is omitted.
  */
 export const NoTooltip: Story = {
-  args: BASE_ARGS,
+  args: {
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: { y: { domain: AGE_GROUPS } },
+  },
 };
 
 /**
@@ -53,7 +53,11 @@ export const NoTooltip: Story = {
  */
 export const BasicTooltip: Story = {
   args: {
-    ...BASE_ARGS,
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: { y: { domain: AGE_GROUPS } },
     tooltip: {
       facetId: '',
       sync: false,
@@ -71,7 +75,11 @@ export const BasicTooltip: Story = {
  */
 export const RichFormat: Story = {
   args: {
-    ...BASE_ARGS,
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: { y: { domain: AGE_GROUPS } },
     tooltip: {
       facetId: '',
       sync: false,
@@ -89,7 +97,11 @@ export const RichFormat: Story = {
  */
 export const ComputedFormat: Story = {
   args: {
-    ...BASE_ARGS,
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: { y: { domain: AGE_GROUPS } },
     tooltip: {
       facetId: '',
       sync: false,
@@ -110,7 +122,11 @@ export const ComputedFormat: Story = {
  */
 export const FemaleOnly: Story = {
   args: {
-    ...BASE_ARGS,
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: { y: { domain: AGE_GROUPS } },
     tooltip: {
       facetId: '',
       sync: false,
@@ -128,7 +144,11 @@ export const FemaleOnly: Story = {
  */
 export const MaleOnly: Story = {
   args: {
-    ...BASE_ARGS,
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: { y: { domain: AGE_GROUPS } },
     tooltip: {
       facetId: '',
       sync: false,
@@ -147,7 +167,11 @@ export const MaleOnly: Story = {
  */
 export const BothSidesFormatted: Story = {
   args: {
-    ...BASE_ARGS,
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: { y: { domain: AGE_GROUPS } },
     tooltip: {
       facetId: '',
       sync: false,
@@ -166,7 +190,11 @@ export const BothSidesFormatted: Story = {
  */
 export const CohortPercentage: Story = {
   args: {
-    ...BASE_ARGS,
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: { y: { domain: AGE_GROUPS } },
     tooltip: {
       facetId: '',
       sync: false,
@@ -176,4 +204,21 @@ export const CohortPercentage: Story = {
       },
     },
   },
+};
+
+/**
+ * Fully custom tooltip markup via `content` — replaces the default floating
+ * label entirely with an arbitrary snippet: a bold header (the hovered age
+ * group), a colour-coded list of both sexes' shares sorted by value, and a
+ * footnote. `format` is still required by the type but is ignored once
+ * `content` is set.
+ *
+ * Because pyramid's default hover strategy matches by row (`'y'`), `content`
+ * receives both the female and male rows for the hovered age group at once —
+ * see `RichTooltip.svelte` for the markup. The library automatically drops
+ * its default dark tooltip box (background/padding/border) whenever
+ * `content` is set, so the custom card fully owns the look.
+ */
+export const CustomContent: StoryObj = {
+  render: () => ({ Component: RichTooltip }),
 };

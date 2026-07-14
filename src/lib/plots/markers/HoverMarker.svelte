@@ -42,6 +42,42 @@
   /** Explicit style wins; otherwise fall back to the series color, then the point's own resolved color. */
   const resolveColor = (explicit: string | undefined, point: HoverDisplayPoint) =>
     explicit ?? seriesColor ?? point.color;
+
+  // Horizontal gap between the dot's edge and an 'outside'-anchored label —
+  // scales with the dot's own resolved radius so the label clears it.
+  const dotRadius = $derived(dotStyle?.dotRadius ?? cfg.hover.dot.dotRadius ?? 5);
+
+  /**
+   * Resolves `fontStyle.textAnchor: 'outside'` into a per-point anchor +
+   * offset, mirroring the value-label `'outside'` anchor's own left/right
+   * split (see pyramid/bar's own `ValueAnchor` handling): a positive `x`
+   * anchors `'start'` and nudges right, a negative `x` anchors `'end'` and
+   * nudges left — so a diverging mark's label sits on the side of the dot
+   * away from zero, on whichever side that dot itself landed. Only
+   * meaningful when the point's `x` is numeric (e.g. pyramid's magnitude
+   * axis); anything else falls through to the plain `fontStyle` unchanged.
+   *
+   * Also overrides `cfg.hover.font`'s default `dy: -18` (meant for a label
+   * floating *above* the dot) back to vertically centered, and clears the
+   * dot's own radius horizontally instead of the flat default nudge, so the
+   * label doesn't collide with the dot it's labeling.
+   */
+  function resolveFontStyle(point: HoverDisplayPoint) {
+    if (fontStyle?.textAnchor !== 'outside' || typeof point.x !== 'number') {
+      return { ...cfg.hover.font, ...fontStyle, fill: resolveColor(fontStyle?.fill, point) };
+    }
+    const outward = point.x >= 0;
+    const gap = dotRadius + 5;
+    return {
+      ...cfg.hover.font,
+      ...fontStyle,
+      fill: resolveColor(fontStyle?.fill, point),
+      textAnchor: outward ? ('start' as const) : ('end' as const),
+      lineAnchor: fontStyle?.lineAnchor ?? ('middle' as const),
+      dx: fontStyle?.dx ?? (outward ? gap : -gap),
+      dy: fontStyle?.dy ?? 0,
+    };
+  }
 </script>
 
 {#if ruleX != null}
@@ -92,11 +128,7 @@
           x={(d) => d.x}
           y={(d) => d.y}
           text={(d) => format ? format(d) : (d.label ?? '')}
-          style={{
-            ...cfg.hover.font,
-            ...fontStyle,
-            fill: resolveColor(fontStyle?.fill, point),
-          }}
+          style={resolveFontStyle(point)}
         />
       </g>
     {/each}
