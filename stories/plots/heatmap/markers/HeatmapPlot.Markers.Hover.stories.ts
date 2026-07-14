@@ -1,0 +1,193 @@
+import type { Meta, StoryObj } from '@storybook/svelte-vite';
+import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
+import type { Marker } from '$lib/types/plots/markers';
+import {
+  LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+  FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+  MALE_LIFE_EXPECTANCY_BY_PROVINCE,
+} from '../data';
+
+// ── Meta ──────────────────────────────────────────────────────────────────────
+
+const meta = {
+  title: 'Plots/HeatmapPlot/Markers/Hover',
+  component: HeatmapPlot,
+  tags: ['autodocs'],
+  args: {
+    width: 950,
+    height: 420,
+  },
+  argTypes: {
+    width: { control: { type: 'range', min: 320, max: 950, step: 20 } },
+    height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
+    series: { control: false },
+    markers: { control: false },
+  },
+  parameters: {
+    docs: { source: { name: 'HeatmapPlot' } },
+  },
+} satisfies Meta<typeof HeatmapPlot>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+const SERIES = [
+  {
+    name: 'life_expectancy',
+    x: 'province',
+    y: 'sex',
+    z: 'value',
+    data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+  },
+];
+
+// ── Stories ───────────────────────────────────────────────────────────────────
+
+/**
+ * Basic hover marker — a dot appears on the hovered cell as the cursor moves
+ * over the plot, along with a full crosshair (both `ruleX` and `ruleY` are
+ * implied by the heatmap's `'punctual'` hover strategy). No value label by
+ * default — heatmap cells already show their value permanently, so the
+ * marker's own label defaults off. No floating HTML tooltip is involved.
+ */
+export const Basic: Story = {
+  args: {
+    series: SERIES,
+    markers: [
+      {
+        type: 'hover',
+      } satisfies Marker,
+    ],
+  },
+};
+
+/**
+ * With labels — `showLabels: true` overrides the heatmap's default-off value
+ * label, drawing it next to the hover dot in addition to each cell's own
+ * permanent text.
+ */
+export const WithLabels: Story = {
+  args: {
+    series: SERIES,
+    markers: [
+      {
+        type: 'hover',
+        showLabels: true,
+      } satisfies Marker,
+    ],
+    styles: {
+      values: { show: false },
+    }
+  },
+};
+
+/**
+ * No crosshair — `ruleX: false` and `ruleY: false` suppress both rules the
+ * `'punctual'` strategy implies by default, leaving just the hover dot.
+ */
+export const WithoutRules: Story = {
+  args: {
+    series: SERIES,
+    markers: [
+      {
+        type: 'hover',
+        ruleX: false,
+        ruleY: false,
+      } satisfies Marker,
+    ],
+  },
+};
+
+/**
+ * Row rule only — `ruleX: false` keeps just the horizontal (`ruleY`) rule,
+ * highlighting the hovered cell's sex row without the vertical province rule.
+ */
+export const RowRuleOnly: Story = {
+  args: {
+    series: SERIES,
+    markers: [
+      {
+        type: 'hover',
+        ruleX: false,
+        ruleY: true,
+      } satisfies Marker,
+    ],
+  },
+};
+
+/**
+ * Custom rule style — `ruleStyle` overrides the crosshair stroke. Here the
+ * rules render in red with a solid line and higher opacity.
+ */
+export const WithCustomRuleStyle: Story = {
+  args: {
+    series: SERIES,
+    markers: [
+      {
+        type: 'hover',
+        ruleStyle: {
+          stroke: '#e63946',
+          strokeOpacity: 0.3,
+          strokeWidth: 2,
+          strokeDasharray: '6 3',
+        },
+        dotStyle: {
+          dotFill: '#e63946',
+          dotFillOpacity: 0.2,
+          dotStrokeOpacity: 1,
+          dotRadius: 20,
+        }
+      } satisfies Marker,
+    ],
+  },
+};
+
+/**
+ * Two series from separate per-sex arrays — the unscoped hover marker
+ * responds identically whether the grid comes from one combined series or,
+ * as here, two merged per-sex series (see `TwoSeriesBySex` in the Series
+ * stories).
+ */
+export const TwoSeriesBySex: Story = {
+  args: {
+    series: [
+      {
+        name: 'female',
+        x: 'province',
+        y: 'sex',
+        z: 'value',
+        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+      },
+      {
+        name: 'male',
+        x: 'province',
+        y: 'sex',
+        z: 'value',
+        data: MALE_LIFE_EXPECTANCY_BY_PROVINCE,
+      },
+    ],
+    markers: [
+      {
+        type: 'hover',
+      } satisfies Marker,
+    ],
+  },
+};
+
+/**
+ * Using the data/x/y/z shorthand — equivalent to `Basic`, built without an
+ * explicit series array.
+ */
+export const FromGroupedData: Story = {
+  args: {
+    data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+    x: 'province',
+    y: 'sex',
+    z: 'value',
+    markers: [
+      {
+        type: 'hover',
+      } satisfies Marker,
+    ],
+  },
+};

@@ -116,6 +116,7 @@ const preview: Preview = {
               'Markers',
               [
                 'Rules',
+                'Hover',
               ],
               'Tooltip',
             ],
@@ -125,6 +126,11 @@ const preview: Preview = {
               'Scales',
               'Styles',
               'Segments',
+              'Markers',
+              [
+                'Rules',
+                'Hover',
+              ],
               'Tooltip',
             ],
             'PyramidPlot',
@@ -133,6 +139,10 @@ const preview: Preview = {
               'Scales',
               'Styles',
               'Segments',
+              'Markers',
+              [
+                'Rules',
+              ],
               'Tooltip',
             ],
           ],
