@@ -6,6 +6,16 @@ function isPrimitive(v: unknown): boolean {
   return v === null || typeof v !== 'object';
 }
 
+// Arrays longer than this (e.g. GeoPlot's `data` — dozens to hundreds of
+// GeoJSON features, each with a coordinate ring of its own that can run into
+// the thousands of points) get previewed as their first few items + an
+// ellipsis marker instead of being fully stringified. Applied recursively,
+// so it also catches large nested arrays (like a feature's own
+// `geometry.coordinates` ring), not just the top-level `data` array — this
+// is what actually made the "show code" panel hang before.
+const MAX_ARRAY_PREVIEW = 3;
+const ARRAY_PREVIEW_COUNT = 1;
+
 function serialize(v: unknown, depth = 0): string {
   const pad = '  '.repeat(depth);
   const inner = '  '.repeat(depth + 1);
@@ -24,10 +34,17 @@ function serialize(v: unknown, depth = 0): string {
 
   if (Array.isArray(v)) {
     if (v.length === 0) return '[]';
-    if (v.every(isPrimitive))
-      return `[${v.map(i => serialize(i, depth)).join(', ')}]`;
-    const items = v.map(i => `${inner}${serialize(i, depth + 1)}`).join(',\n');
-    return `[\n${items}\n${pad}]`;
+    const truncated = v.length > MAX_ARRAY_PREVIEW;
+    const shown = truncated ? v.slice(0, ARRAY_PREVIEW_COUNT) : v;
+    const remaining = v.length - shown.length;
+    if (v.every(isPrimitive)) {
+      const rendered = shown.map(i => serialize(i, depth));
+      if (truncated) rendered.push(`/* …${remaining} more */`);
+      return `[${rendered.join(', ')}]`;
+    }
+    const items = shown.map(i => `${inner}${serialize(i, depth + 1)}`);
+    if (truncated) items.push(`${inner}/* …${remaining} more */`);
+    return `[\n${items.join(',\n')}\n${pad}]`;
   }
 
   if (v !== null && typeof v === 'object') {
@@ -142,6 +159,25 @@ const preview: Preview = {
               'Markers',
               [
                 'Rules',
+              ],
+              'Tooltip',
+            ],
+            'GeoPlot',
+            [
+              'Series',
+              'Scales',
+              'Styles',
+              'Segments',
+              'Markers',
+              [
+                'Graticule',
+                'Dot',
+                'Vector',
+                'Link',
+                'Contour',
+                'Inset',
+                'Hover',
+                'Custom',
               ],
               'Tooltip',
             ],

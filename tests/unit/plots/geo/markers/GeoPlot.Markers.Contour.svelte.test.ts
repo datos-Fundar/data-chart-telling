@@ -1,0 +1,73 @@
+import { render } from 'vitest-browser-svelte';
+import { describe, test, expect } from 'vitest';
+import GeoPlot from '$lib/plots/geo/Plot.svelte';
+import type { GeoMarker } from '$lib/types/plots/geo/markers';
+import { WORLD_COUNTRIES, WEATHER_STATIONS } from '../../../../../stories/plots/geo/data';
+import { waitForSvg, countContourPaths } from '../../_helpers/svg';
+
+describe('GeoPlot – contour marker', () => {
+  test('scatter-interpolation mode renders contour paths without crashing', async () => {
+    const { container } = render(GeoPlot, {
+      width: 400,
+      height: 300,
+      data: WORLD_COUNTRIES,
+      scales: { projection: 'mercator' },
+      markers: [
+        {
+          type: 'contour',
+          data: WEATHER_STATIONS,
+          x: 'lon',
+          y: 'lat',
+          value: 'tempC',
+          thresholds: 6,
+        } satisfies GeoMarker,
+      ],
+    });
+    const svg = await waitForSvg(container);
+    expect(countContourPaths(svg)).toBeGreaterThan(0);
+  });
+
+  test('explicit thresholds array renders without crashing', async () => {
+    const { container } = render(GeoPlot, {
+      width: 400,
+      height: 300,
+      data: WORLD_COUNTRIES,
+      scales: { projection: 'mercator' },
+      markers: [
+        {
+          type: 'contour',
+          data: WEATHER_STATIONS,
+          x: 'lon',
+          y: 'lat',
+          value: 'tempC',
+          thresholds: [15, 20, 25, 30],
+        } satisfies GeoMarker,
+      ],
+    });
+    const svg = await waitForSvg(container);
+    expect(countContourPaths(svg)).toBeGreaterThan(0);
+  });
+
+  test('fill: "value" renders without crashing', async () => {
+    const { container } = render(GeoPlot, {
+      width: 400,
+      height: 300,
+      data: WORLD_COUNTRIES,
+      scales: { projection: 'mercator' },
+      markers: [
+        {
+          type: 'contour',
+          data: WEATHER_STATIONS,
+          x: 'lon',
+          y: 'lat',
+          value: 'tempC',
+          thresholds: 6,
+          fill: 'value',
+          blur: 2,
+        } satisfies GeoMarker,
+      ],
+    });
+    const svg = await waitForSvg(container);
+    expect(svg).toBeTruthy();
+  });
+});

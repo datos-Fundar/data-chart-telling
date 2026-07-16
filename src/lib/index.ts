@@ -4,6 +4,7 @@ export { default as BarPlot } from './plots/bar/Plot.svelte';
 export { default as HeatmapPlot } from './plots/heatmap/Plot.svelte';
 export { default as LinePlot } from './plots/line/Plot.svelte';
 export { default as PyramidPlot } from './plots/pyramid/Plot.svelte';
+export { default as GeoPlot } from './plots/geo/Plot.svelte';
 
 // ── Charts ──────────────────────────────────────────────────────────────────
 // High-level, plot-agnostic chrome plus ready-made chart kinds.
@@ -16,6 +17,11 @@ export { default as PyramidChart } from './charts/pyramid/Chart.svelte';
 // Interchangeable layout primitives (compose your own chart kinds with these).
 export { default as ChartContainer } from './charts/container/ChartContainer.svelte';
 export { default as PlotLayout } from './layout/plot/PlotLayout.svelte';
+export { default as GeoPlotLayout } from './layout/geo/GeoPlotLayout.svelte';
+export { default as TileLayer } from './plots/geo/TileLayer.svelte';
+
+// Custom geo projections — usable as `scales.projection.type`.
+export { argentinaBicontinental } from './plots/geo/projections/argentina';
 export { default as Timeline } from './layout/timeline/Timeline.svelte';
 export { default as TimelineLayout } from './layout/timeline/TimelineLayout.svelte';
 export { default as FacetLayout } from './layout/facet/FacetLayout.svelte';
@@ -85,6 +91,23 @@ export type {
 } from './types/plots/styles';
 export type { Marker, MarkerProps } from './types/plots/markers';
 export type { PlotProps } from './types/plots/props';
+export type { GeoPlotProps } from './types/plots/geo/props';
+export type { GeoFeature, GeoJsonInput, GeoDataProps, Topology } from './types/plots/geo/common';
+export type {
+  GeoScalesConfig,
+  GeoProjectionName,
+  GeoProjectionConfig,
+  GeoCustomProjection,
+  GeoCustomProjectionFactory,
+} from './types/plots/geo/scales';
+export type { GeoSegmentStyle, GeoStyles, GeoTileLayerConfig, GeoZoomConfig } from './types/plots/geo/styles';
+export type {
+  GeoMarker,
+  GeoInsetMarker,
+  GeoInsetLocation,
+  GeoInsetProjectionName,
+  GeoInsetProjectionConfig,
+} from './types/plots/geo/markers';
 export type {
   TimeValue,
   Orientation,

@@ -15,10 +15,11 @@ import type { SeriesProps, DataProps, ScalesConfig, MarginConfig } from '$lib/ty
 export type PlotProps<
   TData extends Record<string, unknown>,
   TSegmentStyle extends object = object,
+  TStyles extends object = PlotStyles,
 > = (SeriesProps<TData> | DataProps<TData>) & {
   width: number;
   height: number;
-  styles?: PlotStyles;
+  styles?: TStyles;
   segments?: Segments<TSegmentStyle>;
   markers?: Marker[];
   scales?: ScalesConfig<TData>;
