@@ -19,6 +19,7 @@ const meta = {
     width: 950,
     height: 500,
     data: ARGENTINA_PROVINCES,
+    featureId: (f) => (f.properties as ArgentinaProvinceProps).nombre,
     scales: { projection: { type: argentinaBicontinental } },
   },
   argTypes: {
@@ -38,34 +39,20 @@ type Story = StoryObj<typeof meta>;
 
 const POPULATION_DOMAIN: [number, number] = [190_000, 17_600_000];
 
-// Argentina's mainland alone (no Antarctic sector/islands) — used as the
-// tile-layer stories' own `scales.projection.domain` instead of the full
-// `ARGENTINA_PROVINCES` dataset's extent. Mercator can't sensibly represent
-// latitudes anywhere near ±90°, and the "Tierra del Fuego, Antártida e Islas
-// del Atlántico Sur" province's `MultiPolygon` reaches the South Pole — left
-// in the fit, that single feature would dominate the bounding box and zoom
-// the whole map out to near-nothing. The wedge itself is still *drawn* (it's
-// still in `data`), just excluded from the fit and then trimmed back to the
-// frame by `clip: 'frame'`.
-const ARGENTINA_MAINLAND_DOMAIN: GeoJSON.Feature = {
-  type: 'Feature',
-  properties: null,
-  geometry: {
-    type: 'Polygon',
-    // Clockwise winding (RFC 7946's right-hand rule for exterior rings) —
-    // reversed, d3-geo reads this as covering the ring's *complement*
-    // (nearly the whole sphere) instead of this small rectangle.
-    coordinates: [
-      [
-        [-74, -56],
-        [-74, -21],
-        [-53, -21],
-        [-53, -56],
-        [-74, -56],
-      ],
-    ],
-  },
-};
+// "Tierra del Fuego, Antártida e Islas del Atlántico Sur"'s `MultiPolygon`
+// includes a pie-slice reaching the South Pole plus the far-flung South
+// Georgia/South Sandwich Islands — Mercator can't represent latitudes near
+// ±90° (it projects them to +/-Infinity), so feeding that wedge through a
+// mercator projection degenerates into a giant filled rectangle covering the
+// whole frame instead of clipping away cleanly. `excludeParts` drops those
+// parts from what's *drawn* here (same predicate the `Markers/Inset`
+// stories' `AntarcticSector`/`CombinedInsets` use to show that wedge
+// separately, under a pole-safe azimuthal projection); Tierra del Fuego's
+// mainland island is untouched. `domain: 'data'` then auto-fits the
+// projection to whatever's left, without needing a hand-authored bbox.
+const TIERRA_DEL_FUEGO = 'Tierra del Fuego, Antártida e Islas del Atlántico Sur';
+const isAntarcticPart = (part: { centroid: [number, number] }, feature: { __id: string }) =>
+  feature.__id === TIERRA_DEL_FUEGO && (part.centroid[1] < -60 || part.centroid[0] > -50);
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
@@ -95,7 +82,11 @@ export const CustomFillStroke: Story = {
 export const ChoroplethColorRamp: Story = {
   args: {
     value: (f) => (f.properties as ArgentinaProvinceProps).population,
-    scales: { color: { domain: POPULATION_DOMAIN } },
+    // `scales` is set here too, not just `color` — Storybook merges `args`
+    // shallowly, so a story-level `scales` object replaces the meta's
+    // `scales: { projection: … }` entirely rather than merging into it;
+    // omitting `projection` here would silently fall back to `equal-earth`.
+    scales: { projection: { type: argentinaBicontinental }, color: { domain: POPULATION_DOMAIN } },
     styles: {
       colors: { min: '#e0e7ff', max: '#4f46e5' },
       stroke: '#ffffff',
@@ -108,7 +99,11 @@ export const ChoroplethColorRamp: Story = {
 export const InvertedColorRamp: Story = {
   args: {
     value: (f) => (f.properties as ArgentinaProvinceProps).population,
-    scales: { color: { domain: POPULATION_DOMAIN } },
+    // `scales` is set here too, not just `color` — Storybook merges `args`
+    // shallowly, so a story-level `scales` object replaces the meta's
+    // `scales: { projection: … }` entirely rather than merging into it;
+    // omitting `projection` here would silently fall back to `equal-earth`.
+    scales: { projection: { type: argentinaBicontinental }, color: { domain: POPULATION_DOMAIN } },
     styles: {
       colors: { min: '#4f46e5', max: '#e0e7ff' },
     } satisfies GeoStyles<ArgentinaProvinceProps>,
@@ -147,7 +142,8 @@ export const ZoomWithLimits: Story = {
  */
 export const TileLayerBasemap: Story = {
   args: {
-    scales: { projection: { type: 'mercator', clip: 'frame', domain: ARGENTINA_MAINLAND_DOMAIN } },
+    scales: { projection: { type: 'mercator', domain: 'data' } },
+    excludeParts: isAntarcticPart,
     styles: {
       fillOpacity: 0.35,
       stroke: '#4f46e5',
@@ -173,7 +169,8 @@ const IGN_ATTRIBUTION = '© Instituto Geográfico Nacional (IGN)';
 /** IGN's default "Argenmap" basemap — the standard full-color street map. */
 export const TileLayerIgnArgenmap: Story = {
   args: {
-    scales: { projection: { type: 'mercator', clip: 'frame', domain: ARGENTINA_MAINLAND_DOMAIN } },
+    scales: { projection: { type: 'mercator', domain: 'data' } },
+    excludeParts: isAntarcticPart,
     styles: {
       fillOpacity: 0.35,
       stroke: '#4f46e5',
@@ -190,7 +187,8 @@ export const TileLayerIgnArgenmap: Story = {
 /** IGN's "Argenmap gris" basemap — a muted grayscale variant, useful under a strong choropleth. */
 export const TileLayerIgnArgenmapGris: Story = {
   args: {
-    scales: { projection: { type: 'mercator', clip: 'frame', domain: ARGENTINA_MAINLAND_DOMAIN } },
+    scales: { projection: { type: 'mercator', domain: 'data' } },
+    excludeParts: isAntarcticPart,
     styles: {
       fillOpacity: 0.35,
       stroke: '#4f46e5',
@@ -207,7 +205,8 @@ export const TileLayerIgnArgenmapGris: Story = {
 /** IGN's "Argenmap topográfico" basemap — shows terrain/elevation shading and contour detail. */
 export const TileLayerIgnArgenmapTopografico: Story = {
   args: {
-    scales: { projection: { type: 'mercator', clip: 'frame', domain: ARGENTINA_MAINLAND_DOMAIN } },
+    scales: { projection: { type: 'mercator', domain: 'data' } },
+    excludeParts: isAntarcticPart,
     styles: {
       fillOpacity: 0.35,
       stroke: '#4f46e5',
@@ -224,7 +223,8 @@ export const TileLayerIgnArgenmapTopografico: Story = {
 /** IGN's "Argenmap oscuro" basemap — a dark-themed variant, pairs well with a light-colored choropleth ramp. */
 export const TileLayerIgnArgenmapOscuro: Story = {
   args: {
-    scales: { projection: { type: 'mercator', clip: 'frame', domain: ARGENTINA_MAINLAND_DOMAIN } },
+    scales: { projection: { type: 'mercator', domain: 'data' } },
+    excludeParts: isAntarcticPart,
     styles: {
       fillOpacity: 0.35,
       stroke: '#a5b4fc',
@@ -241,7 +241,8 @@ export const TileLayerIgnArgenmapOscuro: Story = {
 /** IGN's "Argenmap híbrido" basemap — satellite imagery with street/label overlays. */
 export const TileLayerIgnArgenmapHibrido: Story = {
   args: {
-    scales: { projection: { type: 'mercator', clip: 'frame', domain: ARGENTINA_MAINLAND_DOMAIN } },
+    scales: { projection: { type: 'mercator', domain: 'data' } },
+    excludeParts: isAntarcticPart,
     styles: {
       fillOpacity: 0.25,
       stroke: '#ffffff',

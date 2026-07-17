@@ -20,6 +20,13 @@ export function createGeoZoom(args: {
   enabled: () => boolean;
   config: () => GeoZoomConfig | undefined;
   node: () => HTMLElement | null;
+  /**
+   * When true, drag/touch gestures are left for something else to handle
+   * (see `createGeoRotate`) — only wheel/pinch scaling stays wired to this
+   * behavior. Checked per-event, so toggling it doesn't need to tear down
+   * and recreate the underlying d3-zoom behavior.
+   */
+  disableDrag?: () => boolean;
 }) {
   let transform = $state<GeoZoomTransform>({ x: 0, y: 0, k: 1 });
 
@@ -30,6 +37,11 @@ export function createGeoZoom(args: {
 
     const behavior = d3zoom<HTMLElement, unknown>()
       .scaleExtent([cfg?.min ?? 1, cfg?.max ?? 8])
+      .filter((event: Event) => {
+        if (args.disableDrag?.() && event.type !== 'wheel') return false;
+        // d3-zoom's own default filter, minus the part this replaces.
+        return (!(event as MouseEvent).ctrlKey || event.type === 'wheel') && !(event as MouseEvent).button;
+      })
       .on('zoom', (event: D3ZoomEvent<HTMLElement, unknown>) => {
         transform = { x: event.transform.x, y: event.transform.y, k: event.transform.k };
       });

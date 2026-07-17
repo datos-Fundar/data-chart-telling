@@ -12,12 +12,29 @@ export type GeoGraticuleMarker = {
   stepX?: number;
   stepY?: number;
   style?: StrokeStyle;
+  /**
+   * Renders behind the base map's own fill/stroke instead of on top of it
+   * (markers otherwise always draw over the base map, regardless of their
+   * position in the `markers` array). Useful for a graticule meant to read
+   * as a faint background reference frame rather than an overlay obscuring
+   * the geometry above it.
+   */
+  behind?: boolean;
 };
 
 /** The outer globe outline (for orthographic-type projections) — svelteplot's `Sphere`. */
 export type GeoSphereMarker = {
   type: 'sphere';
   style?: StrokeStyle & { fill?: string; fillOpacity?: number };
+  /**
+   * Renders behind the base map's own fill/stroke instead of on top of it —
+   * needed any time `style.fill` is set, since a filled sphere otherwise
+   * covers every feature drawn under it (the sphere is the full globe
+   * outline, larger than any geometry on it). Off by default so an
+   * unfilled/stroke-only sphere (the common case, tracing just the globe's
+   * edge) keeps drawing on top where it stays visible over ocean fills.
+   */
+  behind?: boolean;
 };
 
 /**
@@ -87,6 +104,19 @@ export type GeoContourMarker<TRow extends Record<string, unknown> = Record<strin
   blur?: number;
   interpolate?: 'none' | 'nearest' | 'barycentric' | 'random-walk';
   style?: { strokeWidth?: number; fillOpacity?: number; strokeOpacity?: number };
+  /**
+   * Masks the contour to just the base map's landmass (`'land'`) or just
+   * its water (`'ocean'`) — e.g. a temperature contour that should only
+   * shade land, leaving the ocean bare (or the reverse).
+   */
+  clip?: 'land' | 'ocean';
+  /**
+   * Renders behind the base map's own fill/stroke instead of on top of it —
+   * lets a filled contour read as background shading with the base map's
+   * feature borders drawn crisply over it, rather than the contour
+   * obscuring them.
+   */
+  behind?: boolean;
 };
 
 /**

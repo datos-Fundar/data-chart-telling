@@ -59,15 +59,6 @@ function latToTileY(lat: number, z: number): number {
   return ((1 - Math.log(Math.tan(rad) + 1 / Math.cos(rad)) / Math.PI) / 2) * 2 ** z;
 }
 
-function tileXToLon(x: number, z: number): number {
-  return (x / 2 ** z) * 360 - 180;
-}
-
-function tileYToLat(y: number, z: number): number {
-  const n = Math.PI - (2 * Math.PI * y) / 2 ** z;
-  return (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
-}
-
 /**
  * Picks an integer XYZ zoom level whose tile pixel density roughly matches
  * the projection's *current* pixels-per-degree at the map center — so tiles
@@ -139,20 +130,70 @@ export function visibleTiles(
   return tiles;
 }
 
-/** Projects a tile's four corners back through the same projection to place it on screen. */
-export function tileScreenBounds(projection: ProjectionLike, tile: TileCoord): ScreenBounds | null {
-  const lon1 = tileXToLon(tile.x, tile.z);
-  const lon2 = tileXToLon(tile.x + 1, tile.z);
-  const lat1 = tileYToLat(tile.y, tile.z);
-  const lat2 = tileYToLat(tile.y + 1, tile.z);
+/** An affine tile-space → screen-space mapping (see `buildMercatorFit`), reused across every tile in a grid instead of forward-projecting each one individually. */
+export type MercatorFit = {
+  z: number;
+  screenLeft: number;
+  screenTop: number;
+  tileXAtLeft: number;
+  tileYAtTop: number;
+  pxPerTileX: number;
+  pxPerTileY: number;
+};
 
-  const corners = [projection([lon1, lat1]), projection([lon2, lat2])];
-  if (corners.some((c) => c == null)) return null;
-  const [p1, p2] = corners as [number, number][];
+/**
+ * Builds an affine tile-space → screen-space mapping from two reliable
+ * anchor points — `bounds`' own top-left/bottom-right corners, inverted
+ * back to lon/lat — rather than forward-projecting each tile's own corners
+ * individually (what this replaced). That per-tile approach broke under a
+ * projection whose scale/translate were fit to a *custom* domain rather
+ * than set via its own `.scale()`/`.translate()`: `d3-geo`'s cylindrical
+ * projections (mercator included) auto-install an internal `clipExtent`
+ * sized to whatever scale/translate they were constructed or last
+ * `.scale()`/`.translate()`-called with (guarding against the y → ±Infinity
+ * blowup near the poles); svelteplot's own domain-fitting wraps the
+ * *unmodified* projection instance in an external transform instead of
+ * calling those setters, so that internal clip keeps silently rejecting
+ * forward-projected points outside its stale bounds — nulling out most of
+ * a tile grid even for tiles nowhere near a pole. `.invert()` isn't routed
+ * through that clip, so anchoring to two known-good inverted corners
+ * sidesteps it entirely — sound because Mercator's tile space (longitude,
+ * and the standard log-tan latitude transform used by `latToTileY`) is
+ * affine in screen space by construction, so one linear fit applies
+ * uniformly to every tile in the grid.
+ */
+export function buildMercatorFit(projection: ProjectionLike, bounds: ScreenBounds, z: number): MercatorFit | null {
+  if (!projection.invert) return null;
+  const topLeft = projection.invert([bounds.left, bounds.top]);
+  const bottomRight = projection.invert([bounds.left + bounds.width, bounds.top + bounds.height]);
+  if (!topLeft || !bottomRight) return null;
 
-  const left = Math.min(p1[0], p2[0]);
-  const top = Math.min(p1[1], p2[1]);
-  return { left, top, width: Math.abs(p2[0] - p1[0]), height: Math.abs(p2[1] - p1[1]) };
+  const tileXAtLeft = lonToTileX(topLeft[0], z);
+  const tileXAtRight = lonToTileX(bottomRight[0], z);
+  const tileYAtTop = latToTileY(topLeft[1], z);
+  const tileYAtBottom = latToTileY(bottomRight[1], z);
+  if (tileXAtRight === tileXAtLeft || tileYAtBottom === tileYAtTop) return null;
+
+  return {
+    z,
+    screenLeft: bounds.left,
+    screenTop: bounds.top,
+    tileXAtLeft,
+    tileYAtTop,
+    pxPerTileX: bounds.width / (tileXAtRight - tileXAtLeft),
+    pxPerTileY: bounds.height / (tileYAtBottom - tileYAtTop),
+  };
+}
+
+/** Places a tile on screen via a `MercatorFit` — `null` only if `tile` is from a different zoom level than the fit was built for. */
+export function tileScreenBounds(fit: MercatorFit, tile: TileCoord): ScreenBounds | null {
+  if (tile.z !== fit.z) return null;
+  return {
+    left: fit.screenLeft + (tile.x - fit.tileXAtLeft) * fit.pxPerTileX,
+    top: fit.screenTop + (tile.y - fit.tileYAtTop) * fit.pxPerTileY,
+    width: fit.pxPerTileX,
+    height: fit.pxPerTileY,
+  };
 }
 
 /**

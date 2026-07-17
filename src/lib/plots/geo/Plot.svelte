@@ -13,13 +13,14 @@
   import { isTopology, topologyToGeoJson } from '$lib/plots/utils/topojson';
   import { makeColorScale } from '$lib/utils/color';
   import { getConfiguration } from '$lib/configuration/config.svelte';
-  import { numericMargin } from '$lib/layout/plot/margins';
+  import { numericMargin, GEO_MARGIN_ESTIMATE } from '$lib/layout/plot/margins';
   import GeoPlotLayout from '$lib/layout/geo/GeoPlotLayout.svelte';
   import InsetMarker from './InsetMarker.svelte';
+  import ContourClip from './ContourClip.svelte';
   import type { GeoPlotProps } from '$lib/types/plots/geo/props';
   import type { GeoFeature } from '$lib/types/plots/geo/common';
   import type { GeoSegmentStyle } from '$lib/types/plots/geo/styles';
-  import type { GeoHoverMarkerConfig, GeoDotMarker, GeoInsetMarker } from '$lib/types/plots/geo/markers';
+  import type { GeoMarker, GeoHoverMarkerConfig, GeoDotMarker, GeoInsetMarker } from '$lib/types/plots/geo/markers';
 
   /**
    * A map, rendered from GeoJSON (or, optionally, TopoJSON — see
@@ -153,10 +154,10 @@
    * that frame tightly (as an auto-fitting projection does).
    */
   const insetContentBox = $derived.by(() => {
-    const top = numericMargin('top', margins?.top ?? cfg.margins.top);
-    const right = numericMargin('right', margins?.right ?? cfg.margins.right);
-    const bottom = numericMargin('bottom', margins?.bottom ?? cfg.margins.bottom);
-    const left = numericMargin('left', margins?.left ?? cfg.margins.left);
+    const top = numericMargin('top', margins?.top, GEO_MARGIN_ESTIMATE);
+    const right = numericMargin('right', margins?.right, GEO_MARGIN_ESTIMATE);
+    const bottom = numericMargin('bottom', margins?.bottom, GEO_MARGIN_ESTIMATE);
+    const left = numericMargin('left', margins?.left, GEO_MARGIN_ESTIMATE);
     return { left, top, width: Math.max(0, width - left - right), height: Math.max(0, height - top - bottom) };
   });
 
@@ -248,38 +249,22 @@
   const hoverPoints = $derived(hoverCandidates.map((f) => ({ x: f.__cx, y: f.__cy, row: f, label: f.__id })));
   const hoverGetX = (f: TaggedFeature) => f.__cx;
   const hoverGetY = (f: TaggedFeature) => f.__cy;
+
+  /**
+   * `markers` otherwise always render after (on top of) the base map's own
+   * `styleGroups`, regardless of array order — a marker opts into drawing
+   * underneath it instead by setting `behind: true` (see e.g.
+   * `GeoSphereMarker.behind`).
+   */
+  function isBehindMarker(marker: GeoMarker): boolean {
+    return (
+      (marker.type === 'graticule' || marker.type === 'sphere' || marker.type === 'contour') &&
+      marker.behind === true
+    );
+  }
 </script>
 
-<GeoPlotLayout
-  {width}
-  {height}
-  {margins}
-  projection={resolvedProjection}
-  data={hoverCandidates}
-  getX={hoverGetX}
-  getY={hoverGetY}
-  {hoverPoints}
-  label={(f) => f.__id}
-  {tooltip}
-  hoverMarker={hoverMarkerConfig}
-  zoom={styles.zoom ?? false}
-  tileLayer={styles.tileLayer}
->
-    {#each styleGroups as group (JSON.stringify(group.style))}
-      <Geo
-        data={group.data}
-        fill={(d: TaggedFeature) => group.style.fill ?? resolveBaseFill(d)}
-        fillOpacity={group.style.fillOpacity ?? styles.fillOpacity ?? 1}
-        stroke={group.style.stroke ?? styles.stroke ?? cfg.axis.color}
-        strokeWidth={group.style.strokeWidth ?? styles.strokeWidth ?? 0.5}
-        style="vector-effect: non-scaling-stroke"
-        onclick={styles.onFeatureClick
-          ? (e: Event, d: TaggedFeature) => styles.onFeatureClick?.(d, e)
-          : undefined}
-      />
-    {/each}
-
-    {#each markers as marker, i (marker.type + '-' + i)}
+{#snippet marker_(marker: GeoMarker)}
       {#if marker.type === 'graticule'}
         <Graticule
           step={marker.step}
@@ -346,10 +331,21 @@
                 : greatCircleInterpolate(Number(getX1(d)), Number(getY1(d)), Number(getX2(d)), Number(getY2(d))),
           },
         }))}
+        <!--
+          No `fill` prop here, deliberately: svelteplot's channel resolution
+          (`toChannelOption`) treats *any* string value — including the
+          literal `'none'` this used to pass — as scale-worthy unless it
+          parses as a real CSS color, so `fill="none"` was getting run
+          through the plot's color scale and painted an arbitrary category
+          color instead of staying unfilled (confirmed by inspecting the
+          rendered DOM). Omitting the prop entirely leaves svelteplot's own
+          per-mark default in place, which is `fill: none` for an unfilled
+          channel — the outcome this mark actually wants, without the buggy
+          detour through the color scale.
+        -->
         <Geo
           class="link"
           data={linkFeatures}
-          fill="none"
           stroke={marker.style?.stroke ?? 'currentColor'}
           strokeWidth={marker.style?.strokeWidth ?? 1}
           strokeOpacity={marker.style?.strokeOpacity}
@@ -357,21 +353,32 @@
           style="vector-effect: non-scaling-stroke"
         />
       {:else if marker.type === 'contour'}
-        <Contour
-          class="contour"
-          data={marker.data}
-          x={marker.x}
-          y={marker.y}
-          value={marker.value}
-          thresholds={marker.thresholds}
-          fill={marker.fill ?? 'none'}
-          stroke={marker.stroke ?? 'currentColor'}
-          strokeWidth={marker.style?.strokeWidth}
-          fillOpacity={marker.style?.fillOpacity}
-          strokeOpacity={marker.style?.strokeOpacity}
-          blur={marker.blur}
-          interpolate={marker.interpolate}
-        />
+        <!--
+          `fill`/`stroke`: no `?? 'none'` fallback here, deliberately — same
+          bug as the `link` marker above. Omitting the prop when
+          `marker.fill` is unset leaves svelteplot's own per-mark default in
+          place (`fill="none"`, per Contour's own doc comment), instead of
+          running the literal string `'none'` through the plot's color scale
+          (`'none'` isn't a recognized CSS color, so svelteplot doesn't treat
+          it as a literal output value the way it does e.g. `'currentColor'`).
+        -->
+        <ContourClip mode={marker.clip} {features}>
+          <Contour
+            class="contour"
+            data={marker.data}
+            x={marker.x}
+            y={marker.y}
+            value={marker.value}
+            thresholds={marker.thresholds}
+            fill={marker.fill}
+            stroke={marker.stroke ?? 'currentColor'}
+            strokeWidth={marker.style?.strokeWidth}
+            fillOpacity={marker.style?.fillOpacity}
+            strokeOpacity={marker.style?.strokeOpacity}
+            blur={marker.blur}
+            interpolate={marker.interpolate}
+          />
+        </ContourClip>
       {:else if marker.type === 'component'}
         <marker.component {...marker.props} data={marker.data ?? features} />
       {:else if marker.type === 'inset'}
@@ -385,5 +392,47 @@
           defaultFill={cfg.palette[0]}
         />
       {/if}
+{/snippet}
+
+<GeoPlotLayout
+  {width}
+  {height}
+  {margins}
+  projection={resolvedProjection}
+  data={hoverCandidates}
+  getX={hoverGetX}
+  getY={hoverGetY}
+  {hoverPoints}
+  label={(f) => f.__id}
+  {tooltip}
+  hoverMarker={hoverMarkerConfig}
+  zoom={styles.zoom ?? false}
+  tileLayer={styles.tileLayer}
+>
+    {#each markers as marker, i (marker.type + '-' + i)}
+      {#if isBehindMarker(marker)}
+        {@render marker_(marker)}
+      {/if}
     {/each}
+
+    {#each styleGroups as group (JSON.stringify(group.style))}
+      <Geo
+        data={group.data}
+        fill={(d: TaggedFeature) => group.style.fill ?? resolveBaseFill(d)}
+        fillOpacity={group.style.fillOpacity ?? styles.fillOpacity ?? 1}
+        stroke={group.style.stroke ?? styles.stroke ?? cfg.axis.color}
+        strokeWidth={group.style.strokeWidth ?? styles.strokeWidth ?? 0.5}
+        style="vector-effect: non-scaling-stroke"
+        onclick={styles.onFeatureClick
+          ? (e: Event, d: TaggedFeature) => styles.onFeatureClick?.(d, e)
+          : undefined}
+      />
+    {/each}
+
+    {#each markers as marker, i (marker.type + '-' + i)}
+      {#if !isBehindMarker(marker)}
+        {@render marker_(marker)}
+      {/if}
+    {/each}
+
 </GeoPlotLayout>

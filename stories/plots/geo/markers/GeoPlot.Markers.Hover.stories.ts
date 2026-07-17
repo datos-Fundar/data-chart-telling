@@ -1,9 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import type { GeoMarker } from '$lib/types/plots/geo/markers';
+import { argentinaBicontinental } from '$lib/plots/geo/projections/argentina';
 import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
+// Defaults to `argentinaBicontinental` (see the `Scales`/`Styles` stories)
+// like every other `ARGENTINA_PROVINCES`-based story file, instead of the
+// bare `equal-earth` default a plot gets with no `scales.projection` at
+// all — `equal-earth`'s whole-world extent leaves far more empty frame
+// around the mainland than the bicontinental projection's tight fit.
 
 const meta = {
   title: 'Plots/GeoPlot/Markers/Hover',
@@ -14,6 +20,7 @@ const meta = {
     height: 500,
     data: ARGENTINA_PROVINCES,
     featureId: (f) => (f.properties as ArgentinaProvinceProps).nombre,
+    scales: { projection: { type: argentinaBicontinental } },
   },
   argTypes: {
     width: { control: { type: 'range', min: 320, max: 950, step: 20 } },

@@ -1,6 +1,13 @@
 <script lang="ts">
   import { usePlot } from 'svelteplot';
-  import { visibleTiles, tileScreenBounds, tileUrl, toProjectionLike, type StreamingProjection } from '$lib/plots/utils/tiles';
+  import {
+    visibleTiles,
+    buildMercatorFit,
+    tileScreenBounds,
+    tileUrl,
+    toProjectionLike,
+    type StreamingProjection,
+  } from '$lib/plots/utils/tiles';
   import type { GeoTileLayerConfig } from '$lib/types/plots/geo/styles';
 
   /**
@@ -41,12 +48,20 @@
     if (!projection) return [];
     return visibleTiles(projection, { left, top, width, height }, tileSize, config.minZoom ?? 0, config.maxZoom ?? 19);
   });
+
+  // One affine fit per zoom level, shared across every tile in `tiles` — see
+  // `buildMercatorFit`'s doc comment for why this replaces forward-projecting
+  // each tile's own corners individually.
+  const fit = $derived.by(() => {
+    if (!projection || tiles.length === 0) return null;
+    return buildMercatorFit(projection, { left, top, width, height }, tiles[0].z);
+  });
 </script>
 
-{#if projection}
+{#if projection && fit}
   <g class="dct-geo-tiles" opacity={config.opacity ?? 1}>
     {#each tiles as tile (`${tile.z}/${tile.x}/${tile.y}`)}
-      {@const bounds = tileScreenBounds(projection, tile)}
+      {@const bounds = tileScreenBounds(fit, tile)}
       {#if bounds}
         <image
           href={tileUrl(config.url, tile)}

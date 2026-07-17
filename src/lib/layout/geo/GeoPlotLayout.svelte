@@ -2,13 +2,14 @@
   import type { ComponentProps, Snippet } from 'svelte';
   import { Plot, Pointer } from 'svelteplot';
   import { getConfiguration } from '$lib/configuration/config.svelte';
-  import { numericMargin } from '$lib/layout/plot/margins';
+  import { numericMargin, GEO_MARGIN_ESTIMATE } from '$lib/layout/plot/margins';
   import { getHover, createHover } from '$lib/layout/tooltip/hover.svelte';
   import { createHoverController } from '$lib/layout/tooltip/controller.svelte';
   import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
   import Tooltip from '$lib/layout/tooltip/Tooltip.svelte';
   import TileLayer from '$lib/plots/geo/TileLayer.svelte';
   import { createGeoZoom } from '$lib/plots/geo/zoom.svelte';
+  import { createGeoRotate, type GeoRotate } from '$lib/plots/geo/rotate.svelte';
   import { resolveProjection } from './resolveProjection';
   import type { MarginConfig } from '$lib/types/plots/common';
   import type { GeoProjectionConfig } from '$lib/types/plots/geo/scales';
@@ -60,10 +61,10 @@
   const cfg = $derived(getConfiguration());
 
   const numericMargins = $derived({
-    top: numericMargin('top', margins?.top ?? cfg.margins.top),
-    right: numericMargin('right', margins?.right ?? cfg.margins.right),
-    bottom: numericMargin('bottom', margins?.bottom ?? cfg.margins.bottom),
-    left: numericMargin('left', margins?.left ?? cfg.margins.left),
+    top: numericMargin('top', margins?.top, GEO_MARGIN_ESTIMATE),
+    right: numericMargin('right', margins?.right, GEO_MARGIN_ESTIMATE),
+    bottom: numericMargin('bottom', margins?.bottom, GEO_MARGIN_ESTIMATE),
+    left: numericMargin('left', margins?.left, GEO_MARGIN_ESTIMATE),
   });
 
   const resolvedProjection = $derived(resolveProjection(projection, data));
@@ -99,10 +100,44 @@
   let containerEl: HTMLDivElement | undefined = $state();
   const zoomEnabled = $derived(zoom !== false && zoom != null);
   const zoomConfig = $derived(typeof zoom === 'object' ? zoom : undefined);
+
+  /**
+   * Orthographic (and other azimuthal, hemisphere-style) projections don't
+   * gain anything from drag-to-*pan* — panning just slides the same globe a
+   * few pixels within the frame — so when `zoom` is enabled on one, drag
+   * instead rotates the globe (`createGeoRotate`) and wheel/pinch keeps
+   * scaling it (`createGeoZoom`, with its own drag disabled below so the two
+   * gestures don't fight over the same pointer events).
+   */
+  const projectionType = $derived(
+    typeof resolvedProjection === 'string' ? resolvedProjection : resolvedProjection?.type,
+  );
+  const rotateEnabled = $derived(zoomEnabled && projectionType === 'orthographic');
+  const baseRotate = $derived.by((): GeoRotate => {
+    const configured = typeof resolvedProjection === 'object' ? resolvedProjection?.rotate : undefined;
+    return [configured?.[0] ?? 0, configured?.[1] ?? 0, configured?.[2] ?? 0];
+  });
+
   const geoZoom = createGeoZoom({
     enabled: () => zoomEnabled,
     config: () => zoomConfig,
     node: () => containerEl ?? null,
+    disableDrag: () => rotateEnabled,
+  });
+
+  const geoRotate = createGeoRotate({
+    enabled: () => rotateEnabled,
+    baseRotate: () => baseRotate,
+    scale: () => geoZoom.transform.k,
+    node: () => containerEl ?? null,
+  });
+
+  const finalProjection = $derived.by(() => {
+    if (!rotateEnabled) return resolvedProjection;
+    return {
+      ...(typeof resolvedProjection === 'string' ? { type: resolvedProjection } : resolvedProjection),
+      rotate: geoRotate.rotate,
+    };
   });
 </script>
 
@@ -115,11 +150,27 @@
   onpointermove={hoverActive ? ctrl.onMove : undefined}
   onpointerleave={hoverActive ? ctrl.onLeave : undefined}
 >
+  <!--
+    Pins the plot's generic linear x/y scales to the full lon/lat range.
+    Every geo-aware mark (Geo, Dot, Vector, Link, …) bypasses these entirely
+    when a projection is active, routing through it instead — except
+    svelteplot's own `Contour` mark, whose scatter/sampler-mode grid is
+    hardcoded to read `plot.scales.x`/`y` (see `Contour.svelte`) regardless
+    of any active projection. Left unset, that scale would auto-fit to just
+    the contour data's own point extent — a different frame than the
+    projection's own (typically whole-world) fit, so the contour would sit
+    at the wrong scale/position relative to the map under it. Pinning both
+    to the world range only helps `contour` markers align (best exactly
+    under an `equirectangular` projection, whose x/y truly are linear in
+    lon/lat) and is a no-op for every other mark type.
+  -->
   <Plot
     {width}
     {height}
     margin={numericMargins}
-    projection={resolvedProjection as ComponentProps<typeof Plot>['projection']}
+    projection={finalProjection as ComponentProps<typeof Plot>['projection']}
+    x={{ domain: [-180, 180] }}
+    y={{ domain: [90, -90] }}
   >
     <g transform="translate({geoZoom.transform.x}, {geoZoom.transform.y}) scale({geoZoom.transform.k})">
       {#if tileLayer}

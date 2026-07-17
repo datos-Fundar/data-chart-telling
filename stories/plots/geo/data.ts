@@ -200,6 +200,32 @@ export const WEATHER_STATIONS: WeatherStation[] = [
   { city: 'Lima', lon: -77.0, lat: -12.0, tempC: 21 },
 ];
 
+export type WorldTemperaturePoint = { lon: number; lat: number; tempC: number };
+
+/**
+ * A simulated global temperature field — a coarse lon/lat grid (not real
+ * station readings) run through a deterministic model: colder toward the
+ * poles, a longitudinal wave standing in for continental/oceanic banding,
+ * so the field has enough texture for marching squares to trace something
+ * more legible than a flat gradient. Deterministic (no `Math.random()`) so
+ * Storybook snapshots stay stable. Mirrors svelteplot's `contour/weather`
+ * example in spirit — interpolating a scatter of readings — scaled up to
+ * the whole world instead of a single country's real weather stations (see
+ * `WEATHER_STATIONS`, whose small South-America-only cluster reads as an
+ * unlabeled blob at world scale).
+ */
+export const WORLD_TEMPERATURE: WorldTemperaturePoint[] = (() => {
+  const points: WorldTemperaturePoint[] = [];
+  for (let lat = -80; lat <= 80; lat += 10) {
+    for (let lon = -170; lon <= 170; lon += 15) {
+      const latBand = 30 - 0.62 * Math.abs(lat);
+      const wave = 6 * Math.sin((lon * Math.PI) / 90 + (lat * Math.PI) / 180) * Math.cos((lat * Math.PI) / 180);
+      points.push({ lon, lat, tempC: Math.round((latBand + wave) * 10) / 10 });
+    }
+  }
+  return points;
+})();
+
 export type ShiftVector = {
   city: string;
   lon: number;

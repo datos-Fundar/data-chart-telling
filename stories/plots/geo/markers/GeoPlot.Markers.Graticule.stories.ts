@@ -58,14 +58,24 @@ export const CustomStepAndStyle: Story = {
 /**
  * Sphere + graticule on an orthographic globe — the `sphere` marker draws
  * the outer outline of the whole earth, which only reads clearly on a
- * hemisphere-style projection like `orthographic`.
+ * hemisphere-style projection like `orthographic`. `behind: true` is what
+ * makes the fill work as ocean-colored background here rather than an
+ * opaque layer painted over every country on top of it — markers otherwise
+ * always draw over the base map regardless of their position in `markers`.
+ * `styles.zoom: true` also enables drag-to-rotate on an orthographic
+ * projection — drag the globe below to spin it.
  */
 export const SphereOutline: Story = {
   args: {
     data: WORLD_COUNTRIES,
     scales: { projection: { type: 'orthographic', rotate: [60, 20] } },
+    styles: { zoom: true },
     markers: [
-      { type: 'sphere', style: { fill: '#eff6ff', stroke: 'currentColor', strokeWidth: 1 } } satisfies GeoMarker,
+      {
+        type: 'sphere',
+        behind: true,
+        style: { fill: '#eff6ff', stroke: 'currentColor', strokeWidth: 1 },
+      } satisfies GeoMarker,
       { type: 'graticule', style: { stroke: '#cbd5e1', strokeOpacity: 0.6 } } satisfies GeoMarker,
     ],
   },
@@ -80,8 +90,9 @@ export const WithEarthquakeDots: Story = {
   args: {
     data: WORLD_COUNTRIES,
     scales: { projection: { type: 'orthographic', rotate: [65, 15] } },
+    styles: { zoom: true },
     markers: [
-      { type: 'sphere', style: { fill: '#f8fafc', stroke: 'currentColor' } } satisfies GeoMarker,
+      { type: 'sphere', behind: true, style: { fill: '#f8fafc', stroke: 'currentColor' } } satisfies GeoMarker,
       { type: 'graticule', style: { stroke: '#e2e8f0' } } satisfies GeoMarker,
       {
         type: 'dot',
