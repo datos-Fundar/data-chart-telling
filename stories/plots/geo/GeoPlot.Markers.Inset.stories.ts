@@ -53,7 +53,7 @@ const TIERRA_DEL_FUEGO = 'Tierra del Fuego, Antártida e Islas del Atlántico Su
  * Latitude alone (`< -60`) catches the Antarctic continent/peninsula, but
  * misses South Georgia and the South Sandwich Islands — real sub-parts of
  * this same province, sitting further north (down to about -53.5°) but far
- * east (longitude -49 to -26, vs. the mainland/Falklands cluster's -68 to
+ * east (longitude -49 to -26, vs. the mainland/Malvinas cluster's -68 to
  * -58) — hence the longitude half of this predicate, found by inspecting
  * `ARGENTINA_PROVINCES`' actual part centroids rather than guessed.
  */
