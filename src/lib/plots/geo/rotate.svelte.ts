@@ -4,7 +4,7 @@ export type GeoRotate = [number, number, number];
  * Wires drag-to-rotate onto a DOM node for orthographic-style projections,
  * exposing the resulting `[lambda, phi, gamma]` as reactive Svelte state —
  * the caller feeds it back into the projection's own `rotate` config (see
- * `GeoPlotLayout.svelte`). Plain pointer events rather than d3-drag: a
+ * `GeoPlot`'s own `Plot.svelte`). Plain pointer events rather than d3-drag: a
  * single-pointer drag-delta-to-rotation-delta conversion doesn't need
  * d3-drag's multi-touch gesture machinery, and this package doesn't
  * otherwise depend on it.

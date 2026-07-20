@@ -6,8 +6,8 @@
   import DotMarker from './DotMarker.svelte';
   import TextMarker from './TextMarker.svelte';
   import { resolveXDeltas, resolveYDeltas } from '$lib/plots/utils/delta';
-  import type { MarkerProps } from '$lib/types/plots/markers';
-  import type { Series } from '$lib/types/plots/common';
+  import type { MarkerProps } from '$lib/types/markers/props';
+  import type { Series } from '$lib/types/plots/data/common';
   import type { DeltaConfig } from '$lib/types/plots/delta';
 
   interface Props extends MarkerProps<Series<TData>>, DeltaConfig {

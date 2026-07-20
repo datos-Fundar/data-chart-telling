@@ -1,9 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type {
-  Segments,
-  LineSegmentStyle
-} from '$lib/types/plots/styles';
+import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
+import type { SegmentsConfig } from '$lib/types/plots/props';
 import {
   FEMALE_LIFE_EXPECTANCY,
   LIFE_EXPECTANCY,
@@ -127,7 +125,7 @@ export const DashedSegmentInRange: any = {
             },
           },
         ],
-      } satisfies Segments<LineSegmentStyle>,
+      } satisfies SegmentsConfig<LineSegmentStyle>,
     },
   }),
 };
@@ -158,7 +156,7 @@ export const MultipleAreasOneSegment: Story = {
           style: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.7 } },
         },
       ],
-    } satisfies Segments<LineSegmentStyle>,
+    } satisfies SegmentsConfig<LineSegmentStyle>,
   },
 };
 
@@ -191,7 +189,7 @@ export const MultipleAreasWithYConstraint: Story = {
           style: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.7 } },
         },
       ],
-    } satisfies Segments<LineSegmentStyle>,
+    } satisfies SegmentsConfig<LineSegmentStyle>,
   },
 };
 
@@ -224,7 +222,7 @@ export const TwoSegmentsDifferentStyles: Story = {
           style: { stroke: { stroke: 'tomato', strokeDasharray: '3 3', strokeWidth: 2.5 } },
         },
       ],
-    } satisfies Segments<LineSegmentStyle>,
+    } satisfies SegmentsConfig<LineSegmentStyle>,
   },
 };
 
@@ -255,7 +253,7 @@ export const TwoSegmentsOnAllSeries: Story = {
           style: { stroke: { stroke: 'tomato', strokeDasharray: '3 3', strokeWidth: 2.5 } },
         },
       ],
-    } satisfies Segments<LineSegmentStyle>,
+    } satisfies SegmentsConfig<LineSegmentStyle>,
   },
 };
 
@@ -286,7 +284,7 @@ export const SegmentsOnOneSeriesOnly: Story = {
           style: { stroke: { stroke: 'tomato', strokeDasharray: '3 3', strokeWidth: 2.5 } },
         },
       ],
-    } satisfies Segments<LineSegmentStyle>,
+    } satisfies SegmentsConfig<LineSegmentStyle>,
   },
 };
 
@@ -314,7 +312,7 @@ export const WithDots: Story = {
           },
         },
       ],
-    } satisfies Segments<LineSegmentStyle>,
+    } satisfies SegmentsConfig<LineSegmentStyle>,
   },
 };
 
@@ -343,7 +341,7 @@ export const TwoSeriesWithDifferentDots: Story = {
           },
         },
       ],
-    } satisfies Segments<LineSegmentStyle>,
+    } satisfies SegmentsConfig<LineSegmentStyle>,
   },
 };
 
@@ -375,7 +373,7 @@ export const DashedSegmentWithDots: Story = {
           },
         },
       ],
-    } satisfies Segments<LineSegmentStyle>,
+    } satisfies SegmentsConfig<LineSegmentStyle>,
   },
 };
 
@@ -407,7 +405,7 @@ export const CustomDotsWithStroke: Story = {
           },
         },
       ],
-    } satisfies Segments<LineSegmentStyle>,
+    } satisfies SegmentsConfig<LineSegmentStyle>,
   },
 };
 
@@ -447,7 +445,7 @@ export const CatchAllAsDefaultStyle: Story = {
         { areas: [{ x: { from: 2010, to: 2012 } }], style: { stroke: { stroke: 'blue' }, dots: { dotRadius: 5, dotSymbol: 'circle' } } },
         { areas: [{ x: { from: 2016, to: 2018 } }], style: { stroke: { stroke: 'blue' }, dots: { dotRadius: 5, dotSymbol: 'triangle' } } },
       ],
-    } satisfies Segments<LineSegmentStyle>,
+    } satisfies SegmentsConfig<LineSegmentStyle>,
   },
 };
 
@@ -481,7 +479,7 @@ export const SeparationOfConcerns: Story = {
         { areas: [{ x: { from: 2010, to: 2012 } }], style: { dots: { dotRadius: 5, dotSymbol: 'circle' } } },
         { areas: [{ x: { from: 2016, to: 2018 } }], style: { dots: { dotRadius: 5, dotSymbol: 'triangle' } } },
       ],
-    } satisfies Segments<LineSegmentStyle>,
+    } satisfies SegmentsConfig<LineSegmentStyle>,
   },
 };
 
@@ -524,6 +522,6 @@ export const SharedDotsByTimePeriod: Story = {
           style: { dots: { dotRadius: 5, dotSymbol: 'square' } },
         },
       ],
-    } satisfies Segments<LineSegmentStyle>,
+    } satisfies SegmentsConfig<LineSegmentStyle>,
   },
 };

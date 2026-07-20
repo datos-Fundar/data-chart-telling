@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoProjectionName } from '$lib/types/plots/geo/scales';
+import type { GeoProjectionName } from '$lib/types/plots/scales/geo';
 import { WORLD_COUNTRIES } from '../../../../stories/plots/geo/data';
 import { waitForSvg, countGeoPaths } from '../_helpers/svg';
 

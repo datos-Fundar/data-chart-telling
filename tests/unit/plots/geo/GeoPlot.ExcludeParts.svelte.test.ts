@@ -1,8 +1,8 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoFeature } from '$lib/types/plots/geo/common';
-import type { GeoMarker } from '$lib/types/plots/geo/markers';
+import type { GeoFeature } from '$lib/types/plots/data/geo';
+import type { GeoMarker } from '$lib/types/markers/geo';
 import { ARGENTINA_PROVINCES } from '../../../../stories/plots/geo/data';
 import { waitForSvg, countGeoPaths } from '../_helpers/svg';
 
@@ -65,6 +65,6 @@ describe('GeoPlot – excludeParts', () => {
     // Every province still renders on the main map (Tierra del Fuego just
     // has fewer parts) — and the inset draws a path for the excluded parts.
     expect(countGeoPaths(svg)).toBe(ARGENTINA_PROVINCES.length);
-    expect(svg.querySelectorAll('g.inset path').length).toBe(1);
+    expect(svg.querySelectorAll('g.dct-geo-inset path').length).toBe(1);
   });
 });

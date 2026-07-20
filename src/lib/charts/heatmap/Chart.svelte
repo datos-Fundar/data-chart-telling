@@ -1,5 +1,5 @@
 <script lang="ts" generics="TRow extends Record<string, unknown>">
-  import Chart from '$lib/charts/Chart.svelte';
+  import BaseChart from '$lib/charts/BaseChart.svelte';
   import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
   import {
     resolveTooltip,
@@ -8,13 +8,14 @@
     hasHoverMarker
   } from '$lib/layout/tooltip/utils';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
-  import type { Accessor, ScalesConfig } from '$lib/types/plots/common';
-  import type { CellSegmentStyle } from '$lib/types/plots/styles';
+  import type { Accessor } from '$lib/types/plots/data/common';
+  import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
+  import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
   import type { ChartProps } from '$lib/types/charts/props';
 
   /**
    * High-level heatmap. Proves the chart chrome (container/legend/timeline/facet)
-   * is plot-agnostic: it reuses {@link Chart} exactly like {@link LineChart}, only
+   * is plot-agnostic: it reuses {@link BaseChart} exactly like {@link LineChart}, only
    * swapping the leaf for {@link HeatmapPlot}. The colour domain is computed once
    * over the full dataset so cells stay comparable across timeline steps/facets —
    * it is passed via `scales.z.domain` and can be overridden by the caller.
@@ -53,7 +54,7 @@
     const vals = data.map((d) => Number(getZ(d)));
     return vals.length ? [Math.min(...vals, 0), Math.max(...vals)] : [0, 1];
   });
-  const mergedScales = $derived<ScalesConfig<TRow>>({
+  const mergedScales = $derived<AxisBasedScalesConfig<TRow>>({
     ...scales,
     z: { domain: fullDomain, ...(scales.z ?? {}) },
   });
@@ -69,7 +70,7 @@
   });
 </script>
 
-<Chart
+<BaseChart
   {width}
   {height}
   {title}
@@ -108,4 +109,4 @@
         : undefined}
     />
   {/snippet}
-</Chart>
+</BaseChart>

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { buildInsetProjection } from '$lib/plots/geo/insetProjection';
+import { buildInsetProjection } from '$lib/markers/inset/insetProjection';
 
 describe('buildInsetProjection', () => {
   test('defaults to mercator when no config is given', () => {

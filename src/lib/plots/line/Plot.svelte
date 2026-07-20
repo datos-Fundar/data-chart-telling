@@ -8,13 +8,30 @@
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { paletteColor } from '$lib/utils/color';
   import { buildSeries } from '$lib/utils/grouping';
-  import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
-  import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
+  import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
+  import AxisLayout from '$lib/layout/plot/AxisLayout.svelte';
+  import GridLayout from '$lib/layout/plot/GridLayout.svelte';
+  import RuleLayout from '$lib/layout/plot/RuleLayout.svelte';
+  import HoverMarker from '$lib/markers/HoverMarker.svelte';
+  import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
   import { buildGroupedSeries, validateSegments, resolveSegmentsForSeries, matchesSegmentX, getDataForSegments } from '$lib/plots/utils/segments';
-  import type { PlotProps } from '$lib/types/plots/props';
-  import type { Series, AxisValue } from '$lib/types/plots/common';
-  import type { LineSegmentStyle, ValueAnchor } from '$lib/types/plots/styles';
-  import type { Marker } from '$lib/types/plots/markers';
+  import type { BasePlotProps } from '$lib/types/plots/props';
+  import type { AxisValue } from '$lib/types/plots/axis';
+  import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
+  import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
+  import type { BasePlotStyles } from '$lib/types/plots/styles/common';
+  import type { ValueAnchor } from '$lib/types/plots/constants';
+  import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
+  import type { Marker } from '$lib/types/markers/common';
+
+  type Props = BasePlotProps<
+    SeriesProps<TData> | DataProps<TData>,
+    TData,
+    BasePlotStyles,
+    LineSegmentStyle,
+    Marker,
+    AxisBasedScalesConfig<TData>
+  >;
 
   let {
     width,
@@ -30,7 +47,7 @@
     scales = {},
     margins,
     tooltip = undefined,
-  }: PlotProps<TData, LineSegmentStyle> = $props();
+  }: Props = $props();
 
   const resolvedSeries = $derived(series ?? buildSeries(data!, x!, y!, z));
 
@@ -86,9 +103,13 @@
       .map((s, idx) => ({ series: s, lastRow: s.data[s.data.length - 1], seriesIndex: idx }))
       .filter(({ lastRow }) => lastRow !== undefined),
   );
+
+  const hoverActive = $derived(tooltip != null || hasHoverMarker(markers));
+  const hoverStrategy = $derived(resolveHoverStrategy(tooltip?.strategy, markers, 'x'));
+  const hoverSync = $derived(resolveHoverSync(tooltip?.sync, markers));
 </script>
 
-<PlotLayout
+<BasePlotLayout
   {width}
   {height}
   data={flat}
@@ -97,13 +118,17 @@
   {hoverPoints}
   label={(r) => String(yAcc(r))}
   {tooltip}
-  {markers}
-  seriesData={resolvedSeries}
+  {hoverActive}
+  {hoverStrategy}
+  {hoverSync}
   {scales}
   {margins}
-  defaultStrategy="x"
+  xTickRotate={scales?.x?.tickRotate}
 >
-  {#snippet children({ matchedPoints, ruleX, ruleY, impliesRuleX, impliesRuleY })}
+  {#snippet children({ matchedPoints, ruleX, ruleY, impliesRuleX, impliesRuleY, numericMargins })}
+  <AxisLayout data={flat} getX={xAcc} getY={(d) => Number(yAcc(d))} {width} {height} {numericMargins} {scales} />
+  <GridLayout {scales} />
+  <RuleLayout {markers} seriesData={resolvedSeries} {matchedPoints} {ruleX} {ruleY} {impliesRuleX} {impliesRuleY}>
   {#each groupedSeries as group, seriesIndex (group.series.name)}
     {@const defaultColor = paletteColor(seriesIndex, cfg.palette)}
     {#each group.visualSegments as seg, i (`${group.series.name}-${i}`)}
@@ -234,5 +259,6 @@
       />
     {/each}
   {/if}
+  </RuleLayout>
   {/snippet}
-</PlotLayout>
+</BasePlotLayout>

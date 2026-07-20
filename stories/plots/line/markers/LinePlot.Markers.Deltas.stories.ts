@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import DeltaMarker from '$lib/plots/markers/DeltaMarker.svelte';
-import type { Marker } from '$lib/types/plots/markers';
+import DeltaMarker from '$lib/markers/DeltaMarker.svelte';
+import type { Marker } from '$lib/types/markers/common';
 import type { DeltaConfig } from '$lib/types/plots/delta';
 import { FEMALE_LIFE_EXPECTANCY, LIFE_EXPECTANCY } from '../data';
 

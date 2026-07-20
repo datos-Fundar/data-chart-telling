@@ -1,10 +1,10 @@
 import type { Snippet } from 'svelte';
-import type { AxisValue } from '$lib/types/plots/common';
+import type { AxisValue } from '$lib/types/plots/axis';
 
 /**
  * How the hover highlight finds related points within a facet.
- * - `'x'`        all points sharing the hovered x (default for line / bar).
- * - `'y'`        all points sharing the hovered y (default for pyramid).
+ * - `'x'` all points sharing the hovered x (default for line / bar).
+ * - `'y'` all points sharing the hovered y (default for pyramid).
  * - `'punctual'` exact XY match — one cell at a time (default for heatmap).
  */
 export type HoverStrategy = 'x' | 'y' | 'punctual';
@@ -32,25 +32,9 @@ export type TooltipProp<TRow extends Record<string, unknown>> =
   | TooltipOptions<TRow>;
 
 /**
- * Resolved tooltip config handed from a chart kind down to a plot. Presence of
- * this object on a plot is what turns hovering on.
- */
-export type TooltipRuntime<TRow extends Record<string, unknown>> = {
-  format: (row: TRow) => string;
-  /** Identifies the originating facet (`''` when not faceted). */
-  facetId: string;
-  /** Strategy resolved by the chart; omitted → PlotLayout falls back to its own default. */
-  strategy?: HoverStrategy;
-  /** Whether to broadcast to other facets. */
-  sync: boolean;
-  series?: string[];
-  content?: Snippet<[{ rows: TRow[] }]>;
-};
-
-/**
  * Shared hover state for cross-facet tooltip syncing.
  *
- * {@link Chart} provides one store via context; every faceted plot reads the
+ * {@link BaseChart} provides one store via context; every faceted plot reads the
  * same instance, so a hover detected in one facet (which writes `activeX/Y` and
  * stamps itself as `source`) is visible to the others. A standalone plot with no
  * provider falls back to its own {@link createHover} store.

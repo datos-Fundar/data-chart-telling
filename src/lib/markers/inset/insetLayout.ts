@@ -1,4 +1,4 @@
-import type { GeoInsetLocation } from '$lib/types/plots/geo/markers';
+import type { GeoInsetLocation } from '$lib/types/markers/geo';
 
 type Horizontal = 'left' | 'middle' | 'right';
 type Vertical = 'top' | 'middle' | 'bottom';

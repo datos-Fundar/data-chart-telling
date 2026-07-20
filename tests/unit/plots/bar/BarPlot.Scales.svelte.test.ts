@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
-import type { ScalesConfig } from '$lib/types/plots/common';
+import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
 import {
   FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
   LIFE_EXPECTANCY_BY_PROVINCE,
@@ -23,7 +23,7 @@ describe('BarPlot – scales', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      scales: { y: { domain: [75, 85] } } satisfies ScalesConfig,
+      scales: { y: { domain: [75, 85] } } satisfies AxisBasedScalesConfig,
     });
     const svg = await waitForSvg(container);
     const heights = Array.from(svg.querySelectorAll('g.bar-y rect')).map((r) => Number(r.getAttribute('height')));
@@ -40,7 +40,7 @@ describe('BarPlot – scales', () => {
         width: 400,
         height: 300,
         series: SERIES,
-        scales: { y: { reverse } } satisfies ScalesConfig,
+        scales: { y: { reverse } } satisfies AxisBasedScalesConfig,
       });
       const svg = await waitForSvg(container);
       const label = Array.from(svg.querySelectorAll('g.axis-y text')).find((t) => t.textContent === tick);
@@ -58,7 +58,7 @@ describe('BarPlot – scales', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      scales: { y: { ticks: [80], tickFormat: () => 'custom' } } satisfies ScalesConfig,
+      scales: { y: { ticks: [80], tickFormat: () => 'custom' } } satisfies AxisBasedScalesConfig,
     });
     const svg = await waitForSvg(container);
     const ticks = Array.from(svg.querySelectorAll('g.axis-y text')).map((t) => t.textContent);
@@ -70,7 +70,7 @@ describe('BarPlot – scales', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      scales: { y: { grid: true } } satisfies ScalesConfig,
+      scales: { y: { grid: true } } satisfies AxisBasedScalesConfig,
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.grid-y line').length).toBeGreaterThan(0);
@@ -89,7 +89,7 @@ describe('BarPlot – scales', () => {
       series: SERIES,
       scales: {
         x: { sort: (a, b) => (b as ProvincePoint).value - (a as ProvincePoint).value },
-      } satisfies ScalesConfig,
+      } satisfies AxisBasedScalesConfig,
     });
     const svg = await waitForSvg(container);
     const ticks = Array.from(svg.querySelectorAll('g.axis-x text')).map((t) => t.textContent);
@@ -109,7 +109,7 @@ describe('BarPlot – scales.z.seriesLayout', () => {
       x: 'province',
       y: 'value',
       z: 'sex',
-      scales: { z: { seriesLayout: 'grouped' } } satisfies ScalesConfig,
+      scales: { z: { seriesLayout: 'grouped' } } satisfies AxisBasedScalesConfig,
     });
     const svg = await waitForSvg(container);
     const xs = Array.from(svg.querySelectorAll('g.bar-y rect')).map(
@@ -126,7 +126,7 @@ describe('BarPlot – scales.z.seriesLayout', () => {
       x: 'province',
       y: 'value',
       z: 'sex',
-      scales: { z: { seriesLayout: 'stacked' } } satisfies ScalesConfig,
+      scales: { z: { seriesLayout: 'stacked' } } satisfies AxisBasedScalesConfig,
     });
     const svg = await waitForSvg(container);
     const rects = Array.from(svg.querySelectorAll('g.bar-y rect'));
@@ -146,7 +146,7 @@ describe('BarPlot – scales.z.seriesLayout', () => {
         x: 'province',
         y: 'value',
         z: 'sex',
-        scales: { z: { seriesLayout: 'grouped', seriesPadding } } satisfies ScalesConfig,
+        scales: { z: { seriesLayout: 'grouped', seriesPadding } } satisfies AxisBasedScalesConfig,
       });
       const svg = await waitForSvg(container);
       return Number(svg.querySelector('g.bar-y rect')?.getAttribute('width'));
@@ -163,7 +163,7 @@ describe('BarPlot – orientation (scales.x/y.type: "categorical")', () => {
       width: 600,
       height: 400,
       series: SERIES,
-      scales: { y: { type: 'categorical' } } satisfies ScalesConfig,
+      scales: { y: { type: 'categorical' } } satisfies AxisBasedScalesConfig,
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.bar-x rect').length).toBe(FEMALE_LIFE_EXPECTANCY_BY_PROVINCE.length);
@@ -181,7 +181,7 @@ describe('BarPlot – orientation (scales.x/y.type: "categorical")', () => {
       scales: {
         x: { type: 'categorical' },
         y: { type: 'categorical' },
-      } satisfies ScalesConfig,
+      } satisfies AxisBasedScalesConfig,
     });
     const svg = await waitForSvg(container);
     expect(warn).toHaveBeenCalledWith(expect.stringContaining("both"));

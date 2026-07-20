@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
-import type { Marker } from '$lib/types/plots/markers';
+import type { Marker } from '$lib/types/markers/common';
 import { FEMALE_LIFE_EXPECTANCY_BY_PROVINCE } from '../../../../../stories/plots/bar/data';
 import { waitForSvg } from '../../_helpers/svg';
 

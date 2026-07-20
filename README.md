@@ -117,12 +117,12 @@ Plots accept either `series` (pre-built `Series[]`) or the `data` + `x`/`y`/`z` 
 | `x` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
 | `y` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
 | `z` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
-| `segments` | `Segments<TStyle>` | `[]` | ✅ | ✅ | ✅ | ✅ |
+| `segments` | `SegmentsConfig<TStyle>` | `[]` | ✅ | ✅ | ✅ | ✅ |
 | `markers` | `Marker[]` | `[]` | ✅ | ✅ | ✅ | ✅ |
-| `scales` | `ScalesConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
+| `scales` | `AxisBasedScalesConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
 | `margins` | `MarginConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
-| `tooltip` | `TooltipRuntime` | | ✅ | ✅ | ✅ | ✅ |
-| `styles` | `PlotStyles` | | ✅ | ✅ | ✅ | ✅ |
+| `tooltip` | `TooltipConfig` | | ✅ | ✅ | ✅ | ✅ |
+| `styles` | `BasePlotStyles` | | ✅ | ✅ | ✅ | ✅ |
 
 #### GeoPlot props
 
@@ -137,14 +137,14 @@ Unlike x/y plots, `GeoPlot` uses GeoJSON/TopoJSON as its data source (no x/y/z a
 | `featureId` | `Accessor<GeoFeature, string>` | `feature.id ?? feature.properties?.id ?? feature.properties?.name` | Resolver for each feature's stable id (used for `segments` lookup and hover identification). |
 | `value` | `(feature: GeoFeature) => number \| undefined` | — | Optional continuous accessor for choropleth colouring (mirrors heatmap's `z`). |
 | `excludeParts` | `(part: GeoGeometry, feature: GeoFeature) => boolean` | — | Excludes matching geometry parts from rendering/hover (e.g. for inset markers). Return `true` to exclude. |
-| `segments` | `Segments<GeoSegmentStyle>` | `[]` | Per-feature styling (keyed by `featureId`). |
+| `segments` | `SegmentsConfig<GeoSegmentStyle>` | `[]` | Per-feature styling (keyed by `featureId`). |
 | `markers` | `GeoMarker[]` | `[]` | Array of markers: `graticule`, `sphere`, `dot`, `vector`, `link`, `contour`, `inset`, or custom `component`. |
 | `scales` | `GeoScalesConfig` | `{}` | Projection and colour scale config. |
 | `margins` | `MarginConfig` | `{}` | Top/right/bottom/left margin overrides. |
-| `tooltip` | `TooltipRuntime<GeoFeature>` | — | Hover/click tooltip configuration. |
+| `tooltip` | `TooltipConfig<GeoFeature>` | — | Hover/click tooltip configuration. |
 | `styles` | `GeoStyles<TProps>` | — | Base map fill, choropleth ramp, tile layer, zoom, and click handlers. |
 
-#### `PlotStyles` sub-properties (BarPlot, LinePlot, HeatmapPlot, PyramidPlot)
+#### `BasePlotStyles` sub-properties (BarPlot, LinePlot, HeatmapPlot, PyramidPlot)
 
 | Sub-prop | Type | BarPlot default | HeatmapPlot default | LinePlot default | PyramidPlot default |
 | -------- | ---- | --------------- | ------------------- | ---------------- | ------------------- |
@@ -177,11 +177,11 @@ Unlike x/y plots, `GeoPlot` uses GeoJSON/TopoJSON as its data source (no x/y/z a
 | `styles.zoom` | `boolean \| GeoZoomConfig` | `false` | Enable/configure drag-pan + scroll-zoom (`false` = static map). |
 | `styles.onFeatureClick` | `(feature: GeoFeature, event: Event) => void` | — | Click handler for base-map features. |
 
-#### Scales: `ScalesConfig` (x/y plots) vs `GeoScalesConfig` (GeoPlot)
+#### Scales: `AxisBasedScalesConfig` (x/y plots) vs `GeoScalesConfig` (GeoPlot)
 
-X/Y plots use `ScalesConfig` with `x`, `y`, `z` axis configurations. GeoPlot uses `GeoScalesConfig` with projection and colour settings instead:
+X/Y plots use `AxisBasedScalesConfig` with `x`, `y`, `z` axis configurations. GeoPlot uses `GeoScalesConfig` with projection and colour settings instead. `ScalesConfig` is the union of both (`AxisBasedScalesConfig | GeoScalesConfig`) — each plot kind's own `scales` prop narrows to whichever one applies to it.
 
-| Prop | ScalesConfig (BarPlot, LinePlot, HeatmapPlot, PyramidPlot) | GeoScalesConfig (GeoPlot) |
+| Prop | AxisBasedScalesConfig (BarPlot, LinePlot, HeatmapPlot, PyramidPlot) | GeoScalesConfig (GeoPlot) |
 | ---- | ------- | ------- |
 | `x` | ✅ (AxisScale) | ❌ |
 | `y` | ✅ (AxisScale) | ❌ |
@@ -195,12 +195,12 @@ X/Y plots use `ScalesConfig` with `x`, `y`, `z` axis configurations. GeoPlot use
 | ---- | ------- | ----------- | -------- | ----------- | ------- | ----- |
 | `width` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots. |
 | `height` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots. |
-| `segments` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots; GeoPlot uses `Segments<GeoSegmentStyle>`, others use their own `SegmentStyle` type. |
+| `segments` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots; GeoPlot uses `SegmentsConfig<GeoSegmentStyle>`, others use their own `SegmentStyle` type. |
 | `markers` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots; GeoPlot uses `GeoMarker[]`, others use `Marker[]`. |
 | `margins` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots. |
 | `tooltip` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots; row type varies per plot. |
-| `styles` | ✅ | ✅ | ✅ | ✅ | ✅ | Common; type is `PlotStyles` for x/y plots, `GeoStyles<TProps>` for GeoPlot. |
-| `scales` | ✅ | ✅ | ✅ | ✅ | ✅ | Common; type is `ScalesConfig<TData>` for x/y plots, `GeoScalesConfig` for GeoPlot. |
+| `styles` | ✅ | ✅ | ✅ | ✅ | ✅ | Common; type is `BasePlotStyles` for x/y plots, `GeoStyles<TProps>` for GeoPlot. |
+| `scales` | ✅ | ✅ | ✅ | ✅ | ✅ | Common; type is `AxisBasedScalesConfig<TData>` for x/y plots, `GeoScalesConfig` for GeoPlot. |
 | `series` | ✅ | ✅ | ✅ | ✅ | ❌ | X/Y plots only (mutually exclusive with `data`/`x`/`y`/`z`). |
 | `data` | ✅ (TData[]) | ✅ (TData[]) | ✅ (TData[]) | ✅ (TData[]) | ✅ (FeatureCollection \| Feature[] \| Topology) | Common; data shape differs — x/y plots use flat rows, GeoPlot uses geo features. |
 | `x` | ✅ | ✅ | ✅ | ✅ | ❌ | X/Y plots only. |
@@ -229,14 +229,14 @@ X/Y plots use `ScalesConfig` with `x`, `y`, `z` axis configurations. GeoPlot use
 | `header` | `Snippet` | | ✅ | ✅ | ✅ | ✅ |
 | `footer` | `Snippet` | | ✅ | ✅ | ✅ | ✅ |
 | `legend` | `LegendSection[]` | | ✅ | ✅ | ✅ | ✅ |
-| `segments` | `Segments<TStyle>` | `[]` | ✅ | ✅ | ✅ | ✅ |
+| `segments` | `SegmentsConfig<TStyle>` | `[]` | ✅ | ✅ | ✅ | ✅ |
 | `markers` | `Marker[]` | `[]` | ✅ | ✅ | ✅ | ✅ |
-| `scales` | `ScalesConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
+| `scales` | `AxisBasedScalesConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
 | `margins` | `MarginConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
 | `facet` | `FacetConfig` | | ✅ | ✅ | ✅ | ✅ |
 | `timeline` | `TimelineConfig` | | ✅ | ✅ | ✅ | ✅ |
 | `tooltip` | `TooltipProp` | | ✅ | ✅ | ✅ | ✅ |
-| `styles` | `PlotStyles` | | ✅ | ✅ | ✅ | ✅ |
+| `styles` | `BasePlotStyles` | | ✅ | ✅ | ✅ | ✅ |
 
 `header` and `footer` are Svelte 5 snippets that replace the string props when richer markup is needed (custom styles, logos, links, etc.). When `header` is provided it takes full precedence over `title`/`subtitle`; when `footer` is provided it takes full precedence over `caption`. Use the natural snippet syntax:
 
@@ -255,7 +255,7 @@ X/Y plots use `ScalesConfig` with `x`, `y`, `z` axis configurations. GeoPlot use
 </LineChart>
 ```
 
-See the [PlotStyles sub-properties table](#plotstyles-sub-properties-plots) above — charts accept the same `styles` shape and pass it through to their underlying plot.  
+See the [BasePlotStyles sub-properties table](#baseplotstyles-sub-properties-barplot-lineplot-heatmapplot-pyramidplot) above — charts accept the same `styles` shape and pass it through to their underlying plot.  
 
 ---
 
@@ -265,11 +265,11 @@ The `segments` prop separates data ranges from visual styling. Every plot kind s
 
 | Plot | `segments` type | Key structure | Lookup |
 | ---- | --------------- | ------------- | ------ |
-| `LinePlot` / `LineChart` | `Segments<LineSegmentStyle>` | Named keys (series names) or `'default'` | By series name (`z` accessor or series index). |
-| `BarPlot` / `BarChart` | `Segments<BarSegmentStyle>` | Named keys (series names) or `'default'` | By series name (`z` accessor or series index). |
-| `PyramidPlot` / `PyramidChart` | `Segments<BarSegmentStyle>` | Named keys (series names) or `'default'` | By series name (`z` accessor or series index). |
-| `HeatmapPlot` / `HeatmapChart` | `Segments<CellSegmentStyle>` | `'default'` key only | All cells (can be restricted by `areas` coordinates). |
-| `GeoPlot` | `Segments<GeoSegmentStyle>` | Named keys (feature ids) or `'default'` | By feature id (`featureId` accessor or derived from properties). |
+| `LinePlot` / `LineChart` | `SegmentsConfig<LineSegmentStyle>` | Named keys (series names) or `'default'` | By series name (`z` accessor or series index). |
+| `BarPlot` / `BarChart` | `SegmentsConfig<BarSegmentStyle>` | Named keys (series names) or `'default'` | By series name (`z` accessor or series index). |
+| `PyramidPlot` / `PyramidChart` | `SegmentsConfig<BarSegmentStyle>` | Named keys (series names) or `'default'` | By series name (`z` accessor or series index). |
+| `HeatmapPlot` / `HeatmapChart` | `SegmentsConfig<CellSegmentStyle>` | `'default'` key only | All cells (can be restricted by `areas` coordinates). |
+| `GeoPlot` | `SegmentsConfig<GeoSegmentStyle>` | Named keys (feature ids) or `'default'` | By feature id (`featureId` accessor or derived from properties). |
 
 **Segment styles by plot:**
 

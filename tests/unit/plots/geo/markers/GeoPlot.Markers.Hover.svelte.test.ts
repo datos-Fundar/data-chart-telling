@@ -1,8 +1,8 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/plots/geo/markers';
-import type { GeoFeature } from '$lib/types/plots/geo/common';
+import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoFeature } from '$lib/types/plots/data/geo';
 import { ARGENTINA_PROVINCES } from '../../../../../stories/plots/geo/data';
 import { waitForSvg, countDotMarks, countTextLabels } from '../../_helpers/svg';
 

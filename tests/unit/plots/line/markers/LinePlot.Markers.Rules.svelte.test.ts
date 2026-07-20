@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { Marker } from '$lib/types/plots/markers';
+import type { Marker } from '$lib/types/markers/common';
 import { FEMALE_LIFE_EXPECTANCY } from '../../../../../stories/plots/line/data';
 import { waitForSvg } from '../../_helpers/svg';
 

@@ -8,7 +8,7 @@
     toProjectionLike,
     type StreamingProjection,
   } from '$lib/plots/utils/tiles';
-  import type { GeoTileLayerConfig } from '$lib/types/plots/geo/styles';
+  import type { GeoTileLayerConfig } from '$lib/types/plots/styles/geo';
 
   /**
    * Renders an XYZ raster tile basemap under the vector geometry. Mounted as

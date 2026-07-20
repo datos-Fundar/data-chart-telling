@@ -3,9 +3,9 @@
   import DotMarker from './DotMarker.svelte';
   import TextMarker from './TextMarker.svelte';
   import { getConfiguration } from '$lib/configuration/config.svelte';
-  import type { MarkerProps } from '$lib/types/plots/markers';
-  import type { AxisValue } from '$lib/types/plots/common';
-  import type { DotStyle, FontStyle, StrokeStyle } from '$lib/types/plots/styles';
+  import type { MarkerProps } from '$lib/types/markers/props';
+  import type { AxisValue } from '$lib/types/plots/axis';
+  import type { DotStyle, FontStyle, StrokeStyle } from '$lib/types/plots/styling';
   import type { HoverDisplayPoint } from '$lib/types/layout/tooltip';
 
   /**

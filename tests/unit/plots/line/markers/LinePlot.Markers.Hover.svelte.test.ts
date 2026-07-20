@@ -1,8 +1,9 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { Marker } from '$lib/types/plots/markers';
-import type { Segments, LineSegmentStyle } from '$lib/types/plots/styles';
+import type { Marker } from '$lib/types/markers/common';
+import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
+import type { SegmentsConfig } from '$lib/types/plots/props';
 import { FEMALE_LIFE_EXPECTANCY, LIFE_EXPECTANCY } from '../../../../../stories/plots/line/data';
 import { waitForSvg, countDotMarks, countTextLabels } from '../../_helpers/svg';
 
@@ -40,7 +41,7 @@ describe('LinePlot – markers.hover', () => {
   });
 
   test('does not crash with scope "segment" over a segmented series', async () => {
-    const segments: Segments<LineSegmentStyle> = {
+    const segments: SegmentsConfig<LineSegmentStyle> = {
       female: [
         { areas: [{ x: { to: 2014 } }], style: {} },
         { areas: [{ x: { from: 2014 } }], style: { stroke: { strokeDasharray: '6 4' } } },

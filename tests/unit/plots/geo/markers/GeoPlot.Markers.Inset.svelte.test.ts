@@ -1,12 +1,12 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/plots/geo/markers';
+import type { GeoMarker } from '$lib/types/markers/geo';
 import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '../../../../../stories/plots/geo/data';
 import { waitForSvg } from '../../_helpers/svg';
 
 function countInsetPaths(svg: SVGElement): number {
-  return svg.querySelectorAll('g.inset path').length;
+  return svg.querySelectorAll('g.dct-geo-inset path').length;
 }
 
 const featureId = (f: { properties: unknown }) => (f.properties as ArgentinaProvinceProps).nombre;
@@ -149,8 +149,8 @@ describe('GeoPlot – inset marker', () => {
     // differ from the unfiltered one, so the rendered `d` attribute changes.
     expect(unfilteredCount).toBe(1);
     expect(filteredCount).toBe(1);
-    const unfilteredD = unfilteredSvg.querySelector('g.inset path')?.getAttribute('d');
-    const filteredD = filteredSvg.querySelector('g.inset path')?.getAttribute('d');
+    const unfilteredD = unfilteredSvg.querySelector('g.dct-geo-inset path')?.getAttribute('d');
+    const filteredD = filteredSvg.querySelector('g.dct-geo-inset path')?.getAttribute('d');
     expect(filteredD).not.toBe(unfilteredD);
   });
 

@@ -1,5 +1,5 @@
 <script lang="ts" generics="TRow extends Record<string, unknown>">
-  import Chart from '$lib/charts/Chart.svelte';
+  import BaseChart from '$lib/charts/BaseChart.svelte';
   import BarPlot from '$lib/plots/bar/Plot.svelte';
   import {
     resolveTooltip,
@@ -9,12 +9,12 @@
   } from '$lib/layout/tooltip/utils';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { resolveTimelineInterpolation } from '$lib/utils/interpolate';
-  import type { BarSegmentStyle } from '$lib/types/plots/styles';
+  import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
   import type { ChartProps } from '$lib/types/charts/props';
 
   /**
    * High-level bar chart. Groups flat rows by `z` into one series per group
-   * and delegates all chrome to {@link Chart}. Styling lives entirely in
+   * and delegates all chrome to {@link BaseChart}. Styling lives entirely in
    * `segments` — there's no separate colour shorthand, so a series' look is
    * always defined in one place.
    */
@@ -66,7 +66,7 @@
   );
 </script>
 
-<Chart
+<BaseChart
   {width}
   {height}
   {title}
@@ -105,4 +105,4 @@
         : undefined}
     />
   {/snippet}
-</Chart>
+</BaseChart>

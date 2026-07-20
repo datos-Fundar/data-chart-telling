@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { PlotStyles } from '$lib/types/plots/styles';
+import type { BasePlotStyles } from '$lib/types/plots/styles/common';
 import { FEMALE_LIFE_EXPECTANCY, MALE_LIFE_EXPECTANCY } from '../../../../stories/plots/line/data';
 import { waitForSvg, countTextLabels } from '../_helpers/svg';
 
@@ -20,7 +20,7 @@ describe('LinePlot – styles.values', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      styles: { values: { show: true } } satisfies PlotStyles,
+      styles: { values: { show: true } } satisfies BasePlotStyles,
       margins: { right: 80 },
     });
     const svg = await waitForSvg(container);
@@ -36,7 +36,7 @@ describe('LinePlot – styles.values', () => {
       series: [FEMALE],
       styles: {
         values: { show: true, format: (v, name) => `${name} → ${v.toFixed(1)} yr` },
-      } satisfies PlotStyles,
+      } satisfies BasePlotStyles,
       margins: { right: 120 },
     });
     const svg = await waitForSvg(container);
@@ -51,7 +51,7 @@ describe('LinePlot – styles.values', () => {
       series: [FEMALE, MALE],
       styles: {
         values: { show: true, format: (v, name) => `${name} (${v})` },
-      } satisfies PlotStyles,
+      } satisfies BasePlotStyles,
       margins: { right: 80 },
     });
     const svg = await waitForSvg(container);

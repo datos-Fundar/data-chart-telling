@@ -27,7 +27,7 @@ export function getHover(): HoverStore | null {
   return getContext<HoverStore | undefined>(HOVER_KEY) ?? null;
 }
 
-/** A private hover store for a plot used outside of a {@link Chart}. */
+/** A private hover store for a plot used outside of a {@link BaseChart}. */
 export function createHover(): HoverStore {
   const store = $state<HoverStore>(blank());
   return store;

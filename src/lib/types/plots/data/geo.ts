@@ -1,10 +1,10 @@
 /// <reference types="geojson" />
-import type { Accessor } from '$lib/types/plots/common';
+import type { Accessor } from '$lib/types/plots/data/common';
 
 /**
  * One GeoJSON feature, generically typed over its `properties`. Intersected
  * with `Record<string, unknown>` so it satisfies the same generic bound
- * every other row type in this package does (e.g. `TooltipRuntime<TRow
+ * every other row type in this package does (e.g. `TooltipConfig<TRow
  * extends Record<string, unknown>>`) — GeoJSON's own `Feature` type has no
  * index signature on its own.
  */
@@ -34,7 +34,7 @@ export type Topology = {
 
 /**
  * Data contract for GeoPlot — the geo analog of {@link DataProps}/{@link SeriesProps}
- * (`$lib/types/plots/common`). There's no x/y/z axis pair for geographic data:
+ * (`$lib/types/plots/data/common`). There's no x/y/z axis pair for geographic data:
  * `data` IS the map.
  */
 export type GeoDataProps<TProps extends Record<string, unknown> = Record<string, unknown>> = {

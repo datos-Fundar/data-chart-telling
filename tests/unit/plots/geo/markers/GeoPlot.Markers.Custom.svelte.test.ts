@@ -1,9 +1,9 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import DotMarker from '$lib/plots/markers/DotMarker.svelte';
-import TextMarker from '$lib/plots/markers/TextMarker.svelte';
-import type { GeoMarker } from '$lib/types/plots/geo/markers';
+import DotMarker from '$lib/markers/DotMarker.svelte';
+import TextMarker from '$lib/markers/TextMarker.svelte';
+import type { GeoMarker } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, WEATHER_STATIONS, type WeatherStation } from '../../../../../stories/plots/geo/data';
 import { waitForSvg, countDotMarks, countTextLabels } from '../../_helpers/svg';
 

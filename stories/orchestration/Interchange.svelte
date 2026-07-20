@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Chart from '$lib/charts/Chart.svelte';
+  import BaseChart from '$lib/charts/BaseChart.svelte';
   import LinePlot from '$lib/plots/line/Plot.svelte';
   import BarPlot from '$lib/plots/bar/Plot.svelte';
   import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
@@ -10,7 +10,7 @@
   import type { LegendSection } from '$lib/types/charts/legend';
 
   /**
-   * One generic <Chart> orchestrator, three different leaf plots. The container,
+   * One generic <BaseChart> orchestrator, three different leaf plots. The container,
    * timeline, facet and legend chrome is *identical* across all three — only the
    * `plot` snippet changes. This is the interchangeability the package is built
    * around: any plot that accepts `{ data, width, height }` slots in.
@@ -32,7 +32,7 @@
 <Scrubber>
   {#snippet children({ progress })}
     {#if kind === 'heatmap'}
-      <Chart
+      <BaseChart
         width={720}
         height={520}
         title="Mismo chrome, plot intercambiable"
@@ -50,9 +50,9 @@
             styles={{ values: { format: (v) => `${(v * 100).toFixed(0)}%` } }}
           />
         {/snippet}
-      </Chart>
+      </BaseChart>
     {:else}
-      <Chart
+      <BaseChart
         width={720}
         height={460}
         title="Mismo chrome, plot intercambiable"
@@ -79,7 +79,7 @@
             />
           {/if}
         {/snippet}
-      </Chart>
+      </BaseChart>
     {/if}
   {/snippet}
 </Scrubber>

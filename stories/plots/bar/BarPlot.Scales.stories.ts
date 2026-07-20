@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
-import type { Series, ScalesConfig } from '$lib/types/plots/common';
+import type { Series } from '$lib/types/plots/data/common';
+import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
 import {
   FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
   LIFE_EXPECTANCY_BY_PROVINCE,
@@ -78,7 +79,7 @@ export const CustomYDomain: Story = {
     ],
     scales: {
       y: { domain: [70, 85] },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -100,7 +101,7 @@ export const WithAxisLabels: Story = {
     scales: {
       x: { label: 'Province' },
       y: { label: 'Life expectancy (years)' },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
     margins: { bottom: 50 },
   },
 };
@@ -121,7 +122,7 @@ export const ReversedY: Story = {
     ],
     scales: {
       y: { reverse: true },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -141,7 +142,7 @@ export const WithGrid: Story = {
     ],
     scales: {
       y: { grid: true },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -163,7 +164,7 @@ export const CustomTickFormat: Story = {
       y: {
         tickFormat: (d: unknown) => `${d} yr`,
       },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
     margins: { left: 40 },
   },
 };
@@ -186,7 +187,7 @@ export const RotatedXTicks: Story = {
       x: {
         tickRotate: -45,
       },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
     margins: { bottom: 80 },
   },
 };
@@ -208,7 +209,7 @@ export const ZeroAnchoredY: Story = {
     ],
     scales: {
       y: { zero: true },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -232,7 +233,7 @@ export const SortXByYDescending: Story = {
       x: {
         sort: (a, b) => (b as ProvincePoint).value - (a as ProvincePoint).value,
       },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -249,7 +250,7 @@ export const CombinedOverrides: Story = {
     scales: {
       x: { label: 'Province', tickRotate: -45 },
       y: { label: 'Life expectancy (years)', domain: [70, 85], grid: true },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
     margins: { bottom: 80, left: 60 },
   },
 };
@@ -289,7 +290,7 @@ export const GroupedSeries: Story = {
     z: 'sex',
     scales: {
       z: { seriesLayout: 'grouped' },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -307,7 +308,7 @@ export const StackedSeries: Story = {
     z: 'sex',
     scales: {
       z: { seriesLayout: 'stacked' },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -325,7 +326,7 @@ export const GroupedWithSeriesPadding: Story = {
     z: 'sex',
     scales: {
       z: { seriesLayout: 'grouped', seriesPadding: 0.3 },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -343,7 +344,7 @@ export const WideGroupSpacing: Story = {
     scales: {
       x: { paddingInner: 0.4 },
       z: { seriesLayout: 'grouped', seriesPadding: 0.3 },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -371,7 +372,7 @@ export const HorizontalBars: Story = {
     ],
     scales: {
       y: { type: 'categorical' },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
     margins: { left: 90 },
   },
 };
@@ -390,7 +391,7 @@ export const HorizontalGroupedSeries: Story = {
     scales: {
       y: { type: 'categorical' },
       z: { seriesLayout: 'grouped' },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
     margins: { left: 90 },
   },
 };

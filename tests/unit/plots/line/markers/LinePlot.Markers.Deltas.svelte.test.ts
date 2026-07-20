@@ -1,8 +1,8 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import DeltaMarker from '$lib/plots/markers/DeltaMarker.svelte';
-import type { Marker } from '$lib/types/plots/markers';
+import DeltaMarker from '$lib/markers/DeltaMarker.svelte';
+import type { Marker } from '$lib/types/markers/common';
 import type { DeltaConfig } from '$lib/types/plots/delta';
 import { FEMALE_LIFE_EXPECTANCY, MALE_LIFE_EXPECTANCY } from '../../../../../stories/plots/line/data';
 import { waitForSvg, countLinePaths, countDotMarks, countTextLabels } from '../../_helpers/svg';

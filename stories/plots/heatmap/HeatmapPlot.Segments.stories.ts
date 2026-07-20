@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-import type { Series } from '$lib/types/plots/common';
-import type { Segments, CellSegmentStyle } from '$lib/types/plots/styles';
+import type { Series } from '$lib/types/plots/data/common';
+import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
+import type { SegmentsConfig } from '$lib/types/plots/props';
 import { LIFE_EXPECTANCY_BY_PROVINCE_SEX, type ProvinceSexCell } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -65,7 +66,7 @@ export const HighlightRegion: Story = {
           style: { fillOpacity: 0.3 },
         },
       ],
-    } satisfies Segments<CellSegmentStyle>,
+    } satisfies SegmentsConfig<CellSegmentStyle>,
   },
 };
 
@@ -86,7 +87,7 @@ export const HighlightSex: Story = {
           style: { fillOpacity: 0.25 },
         },
       ],
-    } satisfies Segments<CellSegmentStyle>,
+    } satisfies SegmentsConfig<CellSegmentStyle>,
   },
 };
 
@@ -110,7 +111,7 @@ export const HighlightProvinces: Story = {
           style: { fillOpacity: 0.3 },
         },
       ],
-    } satisfies Segments<CellSegmentStyle>,
+    } satisfies SegmentsConfig<CellSegmentStyle>,
   },
 };
 
@@ -145,7 +146,7 @@ export const LayeredOpacity: Story = {
           style: { fillOpacity: 0.25 },
         },
       ],
-    } satisfies Segments<CellSegmentStyle>,
+    } satisfies SegmentsConfig<CellSegmentStyle>,
   },
 };
 
@@ -175,6 +176,6 @@ export const HighlightWithStroke: Story = {
           style: { fillOpacity: 0.3 },
         },
       ],
-    } satisfies Segments<CellSegmentStyle>,
+    } satisfies SegmentsConfig<CellSegmentStyle>,
   },
 };

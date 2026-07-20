@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import DotMarker from '$lib/plots/markers/DotMarker.svelte';
-import TextMarker from '$lib/plots/markers/TextMarker.svelte';
-import type { GeoMarker } from '$lib/types/plots/geo/markers';
+import DotMarker from '$lib/markers/DotMarker.svelte';
+import TextMarker from '$lib/markers/TextMarker.svelte';
+import type { GeoMarker } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, WEATHER_STATIONS, type WeatherStation } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────

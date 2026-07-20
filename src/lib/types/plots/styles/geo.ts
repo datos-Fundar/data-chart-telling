@@ -1,13 +1,5 @@
-import type { ColorsStyle } from '$lib/types/plots/styles';
-import type { GeoFeature } from '$lib/types/plots/geo/common';
-
-/** Per-feature styling override — the geo analog of `CellSegmentStyle`. */
-export type GeoSegmentStyle = {
-  fill?: string;
-  fillOpacity?: number;
-  stroke?: string;
-  strokeWidth?: number;
-};
+import type { ColorsStyle } from '$lib/types/plots/styles/common';
+import type { GeoFeature } from '$lib/types/plots/data/geo';
 
 export type GeoTileLayerConfig = {
   /** XYZ tile URL template, e.g. `'https://tile.openstreetmap.org/{z}/{x}/{y}.png'`. */
@@ -27,10 +19,10 @@ export type GeoZoomConfig = {
 };
 
 /**
- * `styles` prop for GeoPlot — the geo analog of `PlotStyles`. Unlike the
+ * `styles` prop for GeoPlot — the geo analog of `BasePlotStyles`. Unlike the
  * other plot kinds, GeoPlot's styling needs (base map, choropleth ramp, tile
  * background, zoom, click handling) are unlike anything x/y plots need, so
- * this is its own type rather than a reuse of `PlotStyles`.
+ * this is its own type rather than a reuse of `BasePlotStyles`.
  */
 export type GeoStyles<TProps extends Record<string, unknown> = Record<string, unknown>> = {
   /** Base map fill, used when a feature isn't styled by `segments` or the choropleth ramp. */

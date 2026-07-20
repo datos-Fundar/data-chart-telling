@@ -13,14 +13,20 @@
   import { isTopology, topologyToGeoJson } from '$lib/plots/utils/topojson';
   import { makeColorScale } from '$lib/utils/color';
   import { getConfiguration } from '$lib/configuration/config.svelte';
-  import { numericMargin, GEO_MARGIN_ESTIMATE } from '$lib/layout/plot/margins';
-  import GeoPlotLayout from '$lib/layout/geo/GeoPlotLayout.svelte';
-  import InsetMarker from './InsetMarker.svelte';
-  import ContourClip from './ContourClip.svelte';
-  import type { GeoPlotProps } from '$lib/types/plots/geo/props';
-  import type { GeoFeature } from '$lib/types/plots/geo/common';
-  import type { GeoSegmentStyle } from '$lib/types/plots/geo/styles';
-  import type { GeoMarker, GeoHoverMarkerConfig, GeoDotMarker, GeoInsetMarker } from '$lib/types/plots/geo/markers';
+  import { GEO_MARGIN_ESTIMATE } from '$lib/layout/plot/margins';
+  import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
+  import GeoLayout from '$lib/layout/geo/GeoLayout.svelte';
+  import { resolveProjection } from '$lib/layout/geo/resolveProjection';
+  import HoverMarker from '$lib/markers/HoverMarker.svelte';
+  import { createGeoZoom } from '$lib/plots/geo/zoom.svelte';
+  import { createGeoRotate, type GeoRotate } from '$lib/plots/geo/rotate.svelte';
+  import InsetMarker from '$lib/markers/inset/InsetMarker.svelte';
+  import ContourClipMarker from '$lib/markers/ContourClipMarker.svelte';
+  import type { BasePlotProps, GeoScalesConfig } from '$lib/types/plots/props';
+  import type { GeoFeature, GeoDataProps } from '$lib/types/plots/data/geo';
+  import type { GeoStyles } from '$lib/types/plots/styles/geo';
+  import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
+  import type { GeoMarker, GeoHoverMarkerConfig, GeoDotMarker, GeoInsetMarker } from '$lib/types/markers/geo';
 
   /**
    * A map, rendered from GeoJSON (or, optionally, TopoJSON — see
@@ -32,6 +38,15 @@
    * graticule/sphere — is a `markers` entry.
    */
   type TaggedFeature = GeoFeature<TProps> & { __id: string; __cx: number; __cy: number };
+
+  type Props = BasePlotProps<
+    GeoDataProps<TProps>,
+    GeoFeature<TProps>,
+    GeoStyles<TProps>,
+    GeoSegmentStyle,
+    GeoMarker,
+    GeoScalesConfig
+  >;
 
   let {
     data,
@@ -47,7 +62,7 @@
     scales = {},
     margins,
     tooltip = undefined,
-  }: GeoPlotProps<TProps> = $props();
+  }: Props = $props();
 
   const cfg = $derived(getConfiguration());
 
@@ -139,28 +154,6 @@
     }
   });
 
-  const resolvedProjection = $derived(scales.projection ?? (styles.tileLayer ? 'mercator' : undefined));
-
-  /**
-   * Same margin resolution `GeoPlotLayout` feeds svelteplot's `<Plot
-   * margin>` — needed here too because an `inset` marker's box (see below)
-   * is positioned in the same absolute SVG coordinate space as the map
-   * itself. svelteplot bakes margins into the projection's own
-   * scale/translate rather than wrapping children in a translating `<g>`, so
-   * the map's actual content sits inset by this amount from every edge of
-   * `width`/`height` — an inset box computed against the raw, un-inset
-   * `width`/`height` would be measuring its own `margin` gap from the wrong
-   * edge, landing outside the map's visible frame once the map itself fills
-   * that frame tightly (as an auto-fitting projection does).
-   */
-  const insetContentBox = $derived.by(() => {
-    const top = numericMargin('top', margins?.top, GEO_MARGIN_ESTIMATE);
-    const right = numericMargin('right', margins?.right, GEO_MARGIN_ESTIMATE);
-    const bottom = numericMargin('bottom', margins?.bottom, GEO_MARGIN_ESTIMATE);
-    const left = numericMargin('left', margins?.left, GEO_MARGIN_ESTIMATE);
-    return { left, top, width: Math.max(0, width - left - right), height: Math.max(0, height - top - bottom) };
-  });
-
   // ── Choropleth color scale (mirrors heatmap's styles.colors/scales.z) ────
   const minColor = $derived(styles.colors?.min ?? cfg.continuous.min);
   const maxColor = $derived(styles.colors?.max ?? cfg.continuous.max);
@@ -223,22 +216,11 @@
     return [...groups.values()];
   });
 
-  // ── Hover / tooltip — always nearest base-map feature (2-D, punctual) ────
-  const hoverMarkerConfig = $derived(markers.find((m): m is GeoHoverMarkerConfig => m.type === 'hover'));
-
-  $effect(() => {
-    if (hoverMarkerConfig?.strategy === 'nearest-point') {
-      console.warn(
-        "GeoPlot: the hover marker's strategy 'nearest-point' isn't implemented yet — falling back to 'nearest-feature'.",
-      );
-    }
-  });
-
   /**
    * Hover/click candidates — like `features`, but one row per disjoint
    * geometry part instead of per feature, so a multi-part feature's hover
    * point isn't stranded somewhere between its parts (see
-   * `geometryPartCentroids`). Only used for hover matching (`GeoPlotLayout`'s
+   * `geometryPartCentroids`). Only used for hover matching (`BasePlotLayout`'s
    * `data`/`hoverPoints`) — `<Geo>` itself still renders from
    * `features`/`styleGroups`, one entry per feature, unaffected by this.
    */
@@ -262,9 +244,96 @@
       marker.behind === true
     );
   }
+
+  const hoverMarkerConfig = $derived(markers.find((m): m is GeoHoverMarkerConfig => m.type === 'hover'));
+
+  $effect(() => {
+    if (hoverMarkerConfig?.strategy === 'nearest-point') {
+      console.warn(
+        "GeoPlot: the hover marker's strategy 'nearest-point' isn't implemented yet — falling back to 'nearest-feature'.",
+      );
+    }
+  });
+
+  const hoverActive = $derived(tooltip != null || hoverMarkerConfig != null);
+
+  // ── Projection ────────────────────────────────────────────────────────────
+  const resolvedProjection = $derived(
+    resolveProjection(scales.projection ?? (styles.tileLayer ? 'mercator' : undefined), hoverCandidates),
+  );
+
+  // ── Pan / zoom / rotate — owned here (not GeoLayout) since the resulting
+  // rotated projection must reach `BasePlotLayout`'s own `<Plot projection>`
+  // prop, and a component nested *inside* that `<Plot>` (as GeoLayout is)
+  // has no way to reach back out to a prop on its own ancestor. GeoLayout
+  // only renders the *result* (`zoomTransform`) as its `<g transform>`. ────
+  let containerEl = $state<HTMLDivElement>();
+  const zoomEnabled = $derived(styles.zoom !== false && styles.zoom != null);
+  const zoomConfig = $derived(typeof styles.zoom === 'object' ? styles.zoom : undefined);
+
+  /**
+   * Orthographic (and other azimuthal, hemisphere-style) projections don't
+   * gain anything from drag-to-*pan* — panning just slides the same globe a
+   * few pixels within the frame — so when `zoom` is enabled on one, drag
+   * instead rotates the globe (`createGeoRotate`) and wheel/pinch keeps
+   * scaling it (`createGeoZoom`, with its own drag disabled below so the two
+   * gestures don't fight over the same pointer events).
+   */
+  const projectionType = $derived(
+    typeof resolvedProjection === 'string' ? resolvedProjection : resolvedProjection?.type,
+  );
+  const rotateEnabled = $derived(zoomEnabled && projectionType === 'orthographic');
+  const baseRotate = $derived.by((): GeoRotate => {
+    const configured = typeof resolvedProjection === 'object' ? resolvedProjection?.rotate : undefined;
+    return [configured?.[0] ?? 0, configured?.[1] ?? 0, configured?.[2] ?? 0];
+  });
+
+  const geoZoom = createGeoZoom({
+    enabled: () => zoomEnabled,
+    config: () => zoomConfig,
+    node: () => containerEl ?? null,
+    disableDrag: () => rotateEnabled,
+  });
+
+  const geoRotate = createGeoRotate({
+    enabled: () => rotateEnabled,
+    baseRotate: () => baseRotate,
+    scale: () => geoZoom.transform.k,
+    node: () => containerEl ?? null,
+  });
+
+  const finalProjection = $derived.by(() => {
+    if (!rotateEnabled) return resolvedProjection;
+    return {
+      ...(typeof resolvedProjection === 'string' ? { type: resolvedProjection } : resolvedProjection),
+      rotate: geoRotate.rotate,
+    };
+  });
+
+  /**
+   * This plot's own hover must never fire while the cursor is actually over
+   * an `inset` marker's panel — an inset draws its own content at its own
+   * scale/projection, so the main map's `Pointer` has no way to know it's
+   * there and would otherwise still match/show whatever main-map feature
+   * happens to be nearest that screen position underneath the inset.
+   *
+   * Checked via `e.target` (which `InsetMarker`'s own hit-test `<rect>`, or
+   * one of its feature `<path>`s, tags with the `dct-geo-inset` ancestor —
+   * see `InsetMarker.svelte`) rather than by comparing pixel coordinates against a
+   * precomputed inset box: svelteplot's `<Plot>` doesn't necessarily render
+   * at a 1:1 scale between its `width`/`height` props and actual client
+   * pixels (its internal `viewBox` can differ), which would silently desync
+   * any independently-computed pixel math from what's really on screen. The
+   * browser's own hit-testing has no such problem — it already resolves
+   * `e.target` against whatever is actually painted, accounting for any such
+   * scaling automatically.
+   */
+  function isOverInset(e: PointerEvent): boolean {
+    return (e.target as Element | null)?.closest?.('.dct-geo-inset') != null;
+  }
 </script>
 
-{#snippet marker_(marker: GeoMarker)}
+{#snippet marker_(marker: GeoMarker, numericMargins: { top: number; right: number; bottom: number; left: number })}
       {#if marker.type === 'graticule'}
         <Graticule
           step={marker.step}
@@ -362,7 +431,7 @@
           (`'none'` isn't a recognized CSS color, so svelteplot doesn't treat
           it as a literal output value the way it does e.g. `'currentColor'`).
         -->
-        <ContourClip mode={marker.clip} {features}>
+        <ContourClipMarker mode={marker.clip} {features}>
           <Contour
             class="contour"
             data={marker.data}
@@ -378,10 +447,16 @@
             blur={marker.blur}
             interpolate={marker.interpolate}
           />
-        </ContourClip>
+        </ContourClipMarker>
       {:else if marker.type === 'component'}
         <marker.component {...marker.props} data={marker.data ?? features} />
       {:else if marker.type === 'inset'}
+        {@const insetContentBox = {
+          left: numericMargins.left,
+          top: numericMargins.top,
+          width: Math.max(0, width - numericMargins.left - numericMargins.right),
+          height: Math.max(0, height - numericMargins.top - numericMargins.bottom),
+        }}
         <InsetMarker
           marker={marker as GeoInsetMarker<TProps>}
           features={allFeatures}
@@ -394,45 +469,80 @@
       {/if}
 {/snippet}
 
-<GeoPlotLayout
+<!--
+  `x`/`y`: pins the plot's generic linear x/y scales to the full lon/lat
+  range. Every geo-aware mark (Geo, Dot, Vector, Link, …) bypasses these
+  entirely when a projection is active, routing through it instead — except
+  svelteplot's own `Contour` mark, whose scatter/sampler-mode grid is
+  hardcoded to read `plot.scales.x`/`y` (see `Contour.svelte`) regardless of
+  any active projection. Left unset, that scale would auto-fit to just the
+  contour data's own point extent — a different frame than the projection's
+  own (typically whole-world) fit, so the contour would sit at the wrong
+  scale/position relative to the map under it. Pinning both to the world
+  range only helps `contour` markers align (best exactly under an
+  `equirectangular` projection, whose x/y truly are linear in lon/lat) and
+  is a no-op for every other mark type.
+-->
+<BasePlotLayout
   {width}
   {height}
-  {margins}
-  projection={resolvedProjection}
   data={hoverCandidates}
   getX={hoverGetX}
   getY={hoverGetY}
   {hoverPoints}
   label={(f) => f.__id}
   {tooltip}
-  hoverMarker={hoverMarkerConfig}
-  zoom={styles.zoom ?? false}
-  tileLayer={styles.tileLayer}
+  {hoverActive}
+  hoverStrategy="punctual"
+  hoverSync={tooltip?.sync ?? false}
+  x={{ domain: [-180, 180] }}
+  y={{ domain: [90, -90] }}
+  projection={finalProjection}
+  {margins}
+  marginEstimate={GEO_MARGIN_ESTIMATE}
+  excludeHover={isOverInset}
+  touchAction={zoomEnabled ? 'none' : undefined}
+  bind:containerEl
 >
-    {#each markers as marker, i (marker.type + '-' + i)}
-      {#if isBehindMarker(marker)}
-        {@render marker_(marker)}
-      {/if}
-    {/each}
+  {#snippet children({ matchedPoints, numericMargins })}
+    <GeoLayout {width} {height} {numericMargins} zoomTransform={geoZoom.transform} tileLayer={styles.tileLayer}>
+      {#each markers as marker, i (marker.type + '-' + i)}
+        {#if isBehindMarker(marker)}
+          {@render marker_(marker, numericMargins)}
+        {/if}
+      {/each}
 
-    {#each styleGroups as group (JSON.stringify(group.style))}
-      <Geo
-        data={group.data}
-        fill={(d: TaggedFeature) => group.style.fill ?? resolveBaseFill(d)}
-        fillOpacity={group.style.fillOpacity ?? styles.fillOpacity ?? 1}
-        stroke={group.style.stroke ?? styles.stroke ?? cfg.axis.color}
-        strokeWidth={group.style.strokeWidth ?? styles.strokeWidth ?? 0.5}
-        style="vector-effect: non-scaling-stroke"
-        onclick={styles.onFeatureClick
-          ? (e: Event, d: TaggedFeature) => styles.onFeatureClick?.(d, e)
-          : undefined}
+      {#each styleGroups as group (JSON.stringify(group.style))}
+        <Geo
+          data={group.data}
+          fill={(d: TaggedFeature) => group.style.fill ?? resolveBaseFill(d)}
+          fillOpacity={group.style.fillOpacity ?? styles.fillOpacity ?? 1}
+          stroke={group.style.stroke ?? styles.stroke ?? cfg.axis.color}
+          strokeWidth={group.style.strokeWidth ?? styles.strokeWidth ?? 0.5}
+          style="vector-effect: non-scaling-stroke"
+          onclick={styles.onFeatureClick
+            ? (e: Event, d: TaggedFeature) => styles.onFeatureClick?.(d, e)
+            : undefined}
+        />
+      {/each}
+
+      {#each markers as marker, i (marker.type + '-' + i)}
+        {#if !isBehindMarker(marker)}
+          {@render marker_(marker, numericMargins)}
+        {/if}
+      {/each}
+    </GeoLayout>
+
+    {#if hoverMarkerConfig}
+      <HoverMarker
+        data={matchedPoints}
+        ruleX={null}
+        ruleY={null}
+        showLabels={hoverMarkerConfig.showLabels ?? true}
+        format={hoverMarkerConfig.format}
+        dotStyle={hoverMarkerConfig.dotStyle}
+        fontStyle={hoverMarkerConfig.fontStyle}
       />
-    {/each}
-
-    {#each markers as marker, i (marker.type + '-' + i)}
-      {#if !isBehindMarker(marker)}
-        {@render marker_(marker)}
-      {/if}
-    {/each}
-
-</GeoPlotLayout>
+    {/if}
+  {/snippet}
+</BasePlotLayout>

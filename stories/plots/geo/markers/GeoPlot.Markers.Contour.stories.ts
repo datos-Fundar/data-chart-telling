@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/plots/geo/markers';
+import type { GeoMarker } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, WORLD_TEMPERATURE } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -9,7 +9,8 @@ import { WORLD_COUNTRIES, WORLD_TEMPERATURE } from '../data';
 // scatter of stations, spatially interpolated into smooth bands. `equirectangular`
 // (not `mercator`) here, deliberately: svelteplot's `Contour` mark always
 // interpolates over the plot's plain linear x/y scales (see
-// `GeoPlotLayout.svelte`'s doc comment on `x`/`y`), never through the active
+// `GeoPlot`'s own `Plot.svelte`, where its `<PlotLayout x y>` call pins
+// them to the world lon/lat range), never through the active
 // projection the way every other geo-aware mark does — `equirectangular`'s x/y
 // truly are linear in lon/lat, so it's the one projection where that
 // mismatch doesn't produce a visible misalignment between the contour and

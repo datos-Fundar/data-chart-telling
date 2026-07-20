@@ -1,4 +1,4 @@
-import type { GeoFeature } from '$lib/types/plots/geo/common';
+import type { GeoFeature } from '$lib/types/plots/data/geo';
 
 function flattenCoords(geom: GeoJSON.Geometry, out: [number, number][]): void {
   switch (geom.type) {

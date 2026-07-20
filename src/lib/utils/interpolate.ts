@@ -1,6 +1,7 @@
 import type { EasingName, EasingFn } from '$lib/types/charts/interpolate';
 import type { TimeValue, TimelineInterpolation } from '$lib/types/charts/common';
-import type { Accessor, AxisValue } from '$lib/types/plots/common';
+import type { AxisValue } from '$lib/types/plots/axis';
+import type { Accessor } from '$lib/types/plots/data/common';
 
 const EASINGS: Record<EasingName, EasingFn> = {
   linear: (t) => t,

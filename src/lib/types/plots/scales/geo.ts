@@ -61,12 +61,3 @@ export type GeoProjectionConfig =
        */
       domain?: GeoJSON.GeoJsonObject | GeoJSON.FeatureCollection | GeoJSON.Feature | 'data';
     };
-
-export type GeoScalesConfig = {
-  /** Which map projection to draw with. Defaults to `'equal-earth'`. */
-  projection?: GeoProjectionConfig;
-  /** Continuous choropleth value domain — mirrors heatmap's `scales.z.domain`. */
-  color?: {
-    domain?: [number, number];
-  };
-};

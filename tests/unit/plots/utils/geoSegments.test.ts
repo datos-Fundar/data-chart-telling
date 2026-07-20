@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { resolveSegmentsForFeature, resolveFeatureStyle } from '$lib/plots/utils/geoSegments';
-import type { Segments } from '$lib/types/plots/styles';
-import type { GeoSegmentStyle } from '$lib/types/plots/geo/styles';
+import type { SegmentsConfig } from '$lib/types/plots/props';
+import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
 
 // ── resolveSegmentsForFeature ──────────────────────────────────────────────────
 
@@ -11,17 +11,17 @@ describe('resolveSegmentsForFeature', () => {
   });
 
   test('returns only default entries when the feature has no specific key', () => {
-    const segments: Segments<GeoSegmentStyle> = { default: [{ style: { fill: 'grey' } }] };
+    const segments: SegmentsConfig<GeoSegmentStyle> = { default: [{ style: { fill: 'grey' } }] };
     expect(resolveSegmentsForFeature(segments, 'chile')).toEqual([{ style: { fill: 'grey' } }]);
   });
 
   test('returns only feature-specific entries when there is no default', () => {
-    const segments: Segments<GeoSegmentStyle> = { argentina: [{ style: { fill: 'tomato' } }] };
+    const segments: SegmentsConfig<GeoSegmentStyle> = { argentina: [{ style: { fill: 'tomato' } }] };
     expect(resolveSegmentsForFeature(segments, 'argentina')).toEqual([{ style: { fill: 'tomato' } }]);
   });
 
   test('default entries come first, feature-specific entries last', () => {
-    const segments: Segments<GeoSegmentStyle> = {
+    const segments: SegmentsConfig<GeoSegmentStyle> = {
       default: [{ style: { fill: 'grey' } }],
       argentina: [{ style: { fill: 'tomato' } }],
     };
@@ -32,7 +32,7 @@ describe('resolveSegmentsForFeature', () => {
   });
 
   test('a feature with an unrelated key present in segments is unaffected', () => {
-    const segments: Segments<GeoSegmentStyle> = { chile: [{ style: { fill: 'blue' } }] };
+    const segments: SegmentsConfig<GeoSegmentStyle> = { chile: [{ style: { fill: 'blue' } }] };
     expect(resolveSegmentsForFeature(segments, 'argentina')).toEqual([]);
   });
 });
@@ -45,12 +45,12 @@ describe('resolveFeatureStyle', () => {
   });
 
   test('applies the default style when no feature-specific entry exists', () => {
-    const segments: Segments<GeoSegmentStyle> = { default: [{ style: { fill: 'grey', strokeWidth: 1 } }] };
+    const segments: SegmentsConfig<GeoSegmentStyle> = { default: [{ style: { fill: 'grey', strokeWidth: 1 } }] };
     expect(resolveFeatureStyle<GeoSegmentStyle>(segments, 'chile')).toEqual({ fill: 'grey', strokeWidth: 1 });
   });
 
   test('a feature-specific style overrides the default on conflicting keys', () => {
-    const segments: Segments<GeoSegmentStyle> = {
+    const segments: SegmentsConfig<GeoSegmentStyle> = {
       default: [{ style: { fill: 'grey', strokeWidth: 1 } }],
       argentina: [{ style: { fill: 'tomato' } }],
     };
@@ -59,19 +59,19 @@ describe('resolveFeatureStyle', () => {
   });
 
   test('multiple entries under the same key merge in order, later wins', () => {
-    const segments: Segments<GeoSegmentStyle> = {
+    const segments: SegmentsConfig<GeoSegmentStyle> = {
       argentina: [{ style: { fill: 'grey' } }, { style: { fill: 'tomato', strokeWidth: 2 } }],
     };
     expect(resolveFeatureStyle<GeoSegmentStyle>(segments, 'argentina')).toEqual({ fill: 'tomato', strokeWidth: 2 });
   });
 
   test('an entry with no style contributes nothing', () => {
-    const segments: Segments<GeoSegmentStyle> = { argentina: [{}] };
+    const segments: SegmentsConfig<GeoSegmentStyle> = { argentina: [{}] };
     expect(resolveFeatureStyle<GeoSegmentStyle>(segments, 'argentina')).toEqual({});
   });
 
   test('a feature with no matching key at all falls back to an empty style', () => {
-    const segments: Segments<GeoSegmentStyle> = { chile: [{ style: { fill: 'blue' } }] };
+    const segments: SegmentsConfig<GeoSegmentStyle> = { chile: [{ style: { fill: 'blue' } }] };
     expect(resolveFeatureStyle<GeoSegmentStyle>(segments, 'argentina')).toEqual({});
   });
 });

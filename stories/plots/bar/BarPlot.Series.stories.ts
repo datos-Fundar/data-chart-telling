@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
-import type { Series } from '$lib/types/plots/common';
+import type { Series } from '$lib/types/plots/data/common';
 import {
   LIFE_EXPECTANCY_BY_PROVINCE,
   MALE_LIFE_EXPECTANCY_BY_PROVINCE,

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { PlotStyles } from '$lib/types/plots/styles';
+import type { BasePlotStyles } from '$lib/types/plots/styles/common';
 import {
   FEMALE_LIFE_EXPECTANCY,
   MALE_LIFE_EXPECTANCY,
@@ -79,7 +79,7 @@ export const ShowValues: Story = {
     ],
     styles: {
       values: { show: true },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
     margins: { right: 80 },
   },
 };
@@ -104,7 +104,7 @@ export const CustomFormat: Story = {
         show: true,
         format: (v: number, name: string) => `${name} → ${v.toFixed(1)} yr`,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
     margins: { right: 120 },
   },
 };
@@ -136,7 +136,7 @@ export const TwoSeriesWithLabels: Story = {
         show: true,
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
     margins: { right: 80 },
   },
 };
@@ -162,7 +162,7 @@ export const AnchorStart: Story = {
         anchor: 'start',
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
     margins: { right: 80 },
   },
 };
@@ -188,7 +188,7 @@ export const AnchorOutside: Story = {
         anchor: 'outside',
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
     margins: { right: 80 },
   },
 };
@@ -221,7 +221,7 @@ export const TwoSeriesLabelsOutside: Story = {
         anchor: 'outside',
         format: (v: number, name: string) => `${name}: ${v.toFixed(1)} yr`,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
     margins: { right: 80 },
   },
 };
@@ -251,7 +251,7 @@ export const CustomOffsets: Story = {
         format: (v: number) => `${v.toFixed(1)} yr`,
         dy: -18,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
     margins: { right: 80 },
   },
 };
@@ -278,7 +278,7 @@ export const AnchorMiddle: Story = {
         format: (v: number) => `${v.toFixed(1)} yr`,
         dy: 18,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
     margins: { right: 80 },
   },
 };
@@ -304,7 +304,7 @@ export const AnchorEnd: Story = {
         dy: -18,
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
     margins: { right: 80 },
   },
 };
@@ -334,7 +334,7 @@ export const LowLevelTextPlacement: Story = {
         dy: -10,
         dx: 0,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
     margins: { right: 80 },
   },
 };

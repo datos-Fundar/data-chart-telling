@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoFeature } from '$lib/types/plots/geo/common';
+import type { GeoFeature } from '$lib/types/plots/data/geo';
 import { ARGENTINA_PROVINCES } from '../../../../stories/plots/geo/data';
 import { waitForSvg } from '../_helpers/svg';
 

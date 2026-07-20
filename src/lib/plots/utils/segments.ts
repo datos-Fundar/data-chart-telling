@@ -1,13 +1,9 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
-import type { AxisValue, Series } from '$lib/types/plots/common';
-import type {
-  Area,
-  Segment,
-  Segments,
-  LineSegmentStyle,
-  VisualGroup,
-  VisualSegment,
-} from '$lib/types/plots/styles';
+import type { AxisValue } from '$lib/types/plots/axis';
+import type { Series } from '$lib/types/plots/data/common';
+import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
+import type { Area, Segment, VisualGroup, VisualSegment } from '$lib/types/plots/segments/config';
+import type { SegmentsConfig } from '$lib/types/plots/props';
 
 const DEFAULT_KEY = 'default';
 
@@ -17,7 +13,7 @@ const DEFAULT_KEY = 'default';
  * series-specific catch-alls win over default catch-alls on tie-breaks.
  */
 export function resolveSegmentsForSeries<TStyle>(
-  segments: Segments<TStyle>,
+  segments: SegmentsConfig<TStyle>,
   seriesName: string,
 ): Segment<TStyle>[] {
   const specific = segments[seriesName] ?? [];
@@ -74,7 +70,7 @@ export function getDataForSegments<TData, TStyle>(
  * (no `areas`) in the same series list. Since catch-alls are evaluated last
  * and in order, only the first one can ever match; later ones are dead code.
  */
-export function validateSegments<TStyle>(segments: Segments<TStyle>): void {
+export function validateSegments<TStyle>(segments: SegmentsConfig<TStyle>): void {
   const check = (label: string, segs: Segment<TStyle>[]) => {
     const catchAlls = segs.filter((s) => !s.areas || s.areas.length === 0).length;
     if (catchAlls > 1) {
@@ -242,7 +238,7 @@ export function buildGroupedSeries<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   S extends Series<any>,
   TStyle = LineSegmentStyle,
->(seriesList: S[], segments: Segments<TStyle>, connect = true): VisualGroup<S, TStyle>[] {
+>(seriesList: S[], segments: SegmentsConfig<TStyle>, connect = true): VisualGroup<S, TStyle>[] {
   return seriesList.map((s) => ({
     series: s,
     visualSegments: resolveSeriesSegments<S, TStyle>(

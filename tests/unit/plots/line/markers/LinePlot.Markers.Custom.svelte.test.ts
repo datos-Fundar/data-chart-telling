@@ -1,11 +1,12 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import DotMarker from '$lib/plots/markers/DotMarker.svelte';
-import TextMarker from '$lib/plots/markers/TextMarker.svelte';
-import PeakMarker from '$lib/plots/markers/PeakMarker.svelte';
-import type { Marker } from '$lib/types/plots/markers';
-import type { Segments, LineSegmentStyle } from '$lib/types/plots/styles';
+import DotMarker from '$lib/markers/DotMarker.svelte';
+import TextMarker from '$lib/markers/TextMarker.svelte';
+import PeakMarker from '$lib/markers/PeakMarker.svelte';
+import type { Marker } from '$lib/types/markers/common';
+import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
+import type { SegmentsConfig } from '$lib/types/plots/props';
 import type { YearPoint } from '../../../../../stories/plots/line/data';
 import { FEMALE_LIFE_EXPECTANCY, MALE_LIFE_EXPECTANCY } from '../../../../../stories/plots/line/data';
 import { waitForSvg, countDotMarks, countTextLabels } from '../../_helpers/svg';
@@ -94,7 +95,7 @@ describe('LinePlot – markers.custom (component)', () => {
   });
 
   test('PeakMarker with scope "segment" highlights once per segment', async () => {
-    const segments: Segments<LineSegmentStyle> = {
+    const segments: SegmentsConfig<LineSegmentStyle> = {
       female: [
         { areas: [{ x: { to: 2014 } }], style: {} },
         { areas: [{ x: { from: 2014 } }], style: { stroke: { strokeDasharray: '6 4' } } },

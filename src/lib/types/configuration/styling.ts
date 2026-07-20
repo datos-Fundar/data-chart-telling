@@ -1,4 +1,4 @@
-import type { StrokeStyle, DotStyle, FontStyle } from '$lib/types/plots/styles';
+import type { StrokeStyle, DotStyle, FontStyle } from '$lib/types/plots/styling';
 
 export type TextStyle = {
   /** font-family */

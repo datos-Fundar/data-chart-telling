@@ -6,12 +6,20 @@
   import { paletteColor } from '$lib/utils/color';
   import { buildSeries } from '$lib/utils/grouping';
   import { buildGroupedSeries, validateSegments, resolveSegmentsForSeries, matchesSegmentX, getDataForSegments } from '$lib/plots/utils/segments';
-  import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
-  import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
-  import type { PlotProps } from '$lib/types/plots/props';
-  import type { Series, AxisValue, ScalesConfig } from '$lib/types/plots/common';
-  import type { BarSegmentStyle, ValueAnchor } from '$lib/types/plots/styles';
-  import type { Marker } from '$lib/types/plots/markers';
+  import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
+  import AxisLayout from '$lib/layout/plot/AxisLayout.svelte';
+  import GridLayout from '$lib/layout/plot/GridLayout.svelte';
+  import RuleLayout from '$lib/layout/plot/RuleLayout.svelte';
+  import HoverMarker from '$lib/markers/HoverMarker.svelte';
+  import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
+  import type { BasePlotProps } from '$lib/types/plots/props';
+  import type { AxisValue } from '$lib/types/plots/axis';
+  import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
+  import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
+  import type { BasePlotStyles } from '$lib/types/plots/styles/common';
+  import type { ValueAnchor } from '$lib/types/plots/constants';
+  import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
+  import type { Marker } from '$lib/types/markers/common';
 
   /**
    * A population-pyramid-style diverging bar chart: each series is mirrored
@@ -29,6 +37,15 @@
   type PyramidSide = 'left' | 'right';
   type InternalSeries = Series<TData> & { side: PyramidSide };
 
+  type Props = BasePlotProps<
+    SeriesProps<TData> | DataProps<TData>,
+    TData,
+    BasePlotStyles,
+    BarSegmentStyle,
+    Marker,
+    AxisBasedScalesConfig<TData>
+  >;
+
   let {
     width,
     height,
@@ -43,7 +60,7 @@
     segments = {},
     markers = [],
     tooltip = undefined,
-  }: PlotProps<TData, BarSegmentStyle> = $props();
+  }: Props = $props();
 
   $effect(() => { validateSegments(segments); });
 
@@ -156,12 +173,12 @@
     return map;
   });
 
-  // The single, fully-resolved scales object PlotLayout reads for
+  // The single, fully-resolved scales object BasePlotLayout reads for
   // everything (ticks, grid, sort, and the real svelteplot scale) — avoids
   // keeping a second, separately-defaulted copy of `scales.x`/`scales.y`
   // (our own diverging-domain + band-scale defaults) out of sync with the
   // one actually forwarded.
-  const resolvedScales = $derived<ScalesConfig<TData>>({
+  const resolvedScales = $derived<AxisBasedScalesConfig<TData>>({
     ...scales,
     x: {
       domain: [-maxMagnitude, maxMagnitude],
@@ -170,9 +187,13 @@
     },
     y: { type: 'band', padding: 0.2, domain: yDomain, ...(scales.y ?? {}) },
   });
+
+  const hoverActive = $derived(tooltip != null || hasHoverMarker(markers));
+  const hoverStrategy = $derived(resolveHoverStrategy(tooltip?.strategy, markers, 'y'));
+  const hoverSync = $derived(resolveHoverSync(tooltip?.sync, markers));
 </script>
 
-<PlotLayout
+<BasePlotLayout
   {width}
   {height}
   data={flat}
@@ -181,13 +202,17 @@
   {hoverPoints}
   label={labelFor}
   {tooltip}
-  {markers}
-  seriesData={resolvedSeries}
+  {hoverActive}
+  {hoverStrategy}
+  {hoverSync}
   scales={resolvedScales}
   {margins}
-  defaultStrategy="y"
+  xTickRotate={resolvedScales?.x?.tickRotate}
 >
-  {#snippet children({ matchedPoints, ruleX, ruleY, impliesRuleX, impliesRuleY })}
+  {#snippet children({ matchedPoints, ruleX, ruleY, impliesRuleX, impliesRuleY, numericMargins })}
+  <AxisLayout data={flat} {getX} {getY} {width} {height} {numericMargins} scales={resolvedScales} />
+  <GridLayout scales={resolvedScales} />
+  <RuleLayout {markers} seriesData={resolvedSeries} {matchedPoints} {ruleX} {ruleY} {impliesRuleX} {impliesRuleY}>
     {#each groupedSeries as group (group.series.name)}
       {@const defaultColor = group.series.side === 'left' ? leftColor : rightColor}
       {@const getCategory = resolveAccessor(group.series.x)}
@@ -301,5 +326,6 @@
         {/if}
       {/each}
     {/each}
+  </RuleLayout>
   {/snippet}
-</PlotLayout>
+</BasePlotLayout>

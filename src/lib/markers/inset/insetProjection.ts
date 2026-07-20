@@ -15,7 +15,7 @@ import {
   geoTransverseMercator,
   type GeoProjection,
 } from 'd3-geo';
-import type { GeoInsetProjectionConfig, GeoInsetProjectionName } from '$lib/types/plots/geo/markers';
+import type { GeoInsetProjectionConfig, GeoInsetProjectionName } from '$lib/types/markers/geo';
 
 const NAMED_PROJECTIONS: Record<GeoInsetProjectionName, () => GeoProjection> = {
   'albers-usa': geoAlbersUsa,

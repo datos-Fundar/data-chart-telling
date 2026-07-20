@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-import type { Segments, BarSegmentStyle, Area } from '$lib/types/plots/styles';
+import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
+import type { Area } from '$lib/types/plots/segments/config';
+import type { SegmentsConfig } from '$lib/types/plots/props';
 import { AGE_GROUPS, POPULATION_PYRAMID } from '../../data/population-pyramid';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -59,7 +61,7 @@ export const HighlightedSegments: Story = {
         { areas: areasFor(['80-84', '85+']), style: { fillOpacity: 1 } },
         { style: { fillOpacity: 0.25 } },
       ],
-    } satisfies Segments<BarSegmentStyle>,
+    } satisfies SegmentsConfig<BarSegmentStyle>,
   },
 };
 
@@ -84,7 +86,7 @@ export const WorkingAgeHighlight: Story = {
         },
         { style: { fillOpacity: 0.2 } },
       ],
-    } satisfies Segments<BarSegmentStyle>,
+    } satisfies SegmentsConfig<BarSegmentStyle>,
   },
 };
 
@@ -109,7 +111,7 @@ export const YouthAndElderlyHighlight: Story = {
         },
         { style: { fillOpacity: 0.2 } },
       ],
-    } satisfies Segments<BarSegmentStyle>,
+    } satisfies SegmentsConfig<BarSegmentStyle>,
   },
 };
 
@@ -136,7 +138,7 @@ export const ByDecadePattern: Story = {
           style: { fillOpacity: 0.3 },
         },
       ],
-    } satisfies Segments<BarSegmentStyle>,
+    } satisfies SegmentsConfig<BarSegmentStyle>,
   },
 };
 
@@ -166,7 +168,7 @@ export const AsymmetricHighlight: Story = {
         },
         { style: { fillOpacity: 0.25 } },
       ],
-    } satisfies Segments<BarSegmentStyle>,
+    } satisfies SegmentsConfig<BarSegmentStyle>,
   },
 };
 
@@ -186,6 +188,6 @@ export const CustomColorHighlight: Story = {
         { areas: areasFor(['80-84', '85+']), style: { fill: '#d6336c', fillOpacity: 0.9 } },
         { style: { fillOpacity: 0.2 } },
       ],
-    } satisfies Segments<BarSegmentStyle>,
+    } satisfies SegmentsConfig<BarSegmentStyle>,
   },
 };

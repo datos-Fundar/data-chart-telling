@@ -4,7 +4,7 @@
   import { makeColorScale } from '$lib/utils/color';
   import { argentinaBicontinental } from '$lib/plots/geo/projections/argentina';
   import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from './data';
-  import type { GeoFeature } from '$lib/types/plots/geo/common';
+  import type { GeoFeature } from '$lib/types/plots/data/geo';
 
   const cfg = getConfiguration();
 

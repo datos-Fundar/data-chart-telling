@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-import type { Series } from '$lib/types/plots/common';
+import type { Series } from '$lib/types/plots/data/common';
 import { AGE_GROUPS, POPULATION_PYRAMID, type PopulationRow } from '../../../../stories/data/population-pyramid';
 import { waitForSvg, countBarRects } from '../_helpers/svg';
 

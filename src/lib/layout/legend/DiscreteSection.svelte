@@ -2,7 +2,7 @@
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { paletteColor } from '$lib/utils/color';
   import type { DiscreteLegendSection } from '$lib/types/charts/legend';
-  import type { LineStyle } from '$lib/types/plots/styles';
+  import type { LineStyle } from '$lib/types/plots/constants';
 
   let { section }: { section: DiscreteLegendSection } = $props();
 

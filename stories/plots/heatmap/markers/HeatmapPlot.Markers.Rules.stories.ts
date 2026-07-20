@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-import type { Marker } from '$lib/types/plots/markers';
+import type { Marker } from '$lib/types/markers/common';
 import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────

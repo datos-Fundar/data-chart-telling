@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-import type { ScalesConfig } from '$lib/types/plots/common';
+import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
 import { LIFE_EXPECTANCY_BY_PROVINCE_SEX, PROVINCES, SEXES } from '../../../../stories/plots/heatmap/data';
 import { waitForSvg, countCells } from '../_helpers/svg';
 
@@ -19,7 +19,7 @@ describe('HeatmapPlot – scales', () => {
       width: 400,
       height: 300,
       ...DATA_PROPS,
-      scales: { x: { domain: PROVINCES } } satisfies ScalesConfig,
+      scales: { x: { domain: PROVINCES } } satisfies AxisBasedScalesConfig,
     });
     const svg = await waitForSvg(container);
     const ticks = Array.from(svg.querySelectorAll('g.axis-x text')).map((t) => t.textContent);
@@ -31,7 +31,7 @@ describe('HeatmapPlot – scales', () => {
       width: 400,
       height: 300,
       ...DATA_PROPS,
-      scales: { y: { domain: SEXES } } satisfies ScalesConfig,
+      scales: { y: { domain: SEXES } } satisfies AxisBasedScalesConfig,
     });
     const svg = await waitForSvg(container);
     const ticks = Array.from(svg.querySelectorAll('g.axis-y text')).map((t) => t.textContent);
@@ -44,7 +44,7 @@ describe('HeatmapPlot – scales', () => {
         width: 400,
         height: 300,
         ...DATA_PROPS,
-        scales: { y: { reverse } } satisfies ScalesConfig,
+        scales: { y: { reverse } } satisfies AxisBasedScalesConfig,
       });
       const svg = await waitForSvg(container);
       const label = Array.from(svg.querySelectorAll('g.axis-y text')).find((t) => t.textContent === tick);
@@ -62,7 +62,7 @@ describe('HeatmapPlot – scales', () => {
       width: 400,
       height: 300,
       ...DATA_PROPS,
-      scales: { x: { label: 'Province' }, y: { label: 'Sex' } } satisfies ScalesConfig,
+      scales: { x: { label: 'Province' }, y: { label: 'Sex' } } satisfies AxisBasedScalesConfig,
       margins: { bottom: 50, left: 100 },
     });
     const svg = await waitForSvg(container);

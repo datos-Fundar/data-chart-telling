@@ -1,5 +1,5 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
-import type { Series } from '$lib/types/plots/common';
+import type { Series } from '$lib/types/plots/data/common';
 import type { DeltaConfig, DeltaTarget } from '$lib/types/plots/delta';
 
 export type ResolvedDelta = {

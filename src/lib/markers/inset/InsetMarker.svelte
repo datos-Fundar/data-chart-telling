@@ -3,8 +3,9 @@
   import { buildInsetProjection } from './insetProjection';
   import { insetBox } from './insetLayout';
   import { filterGeometryParts } from '$lib/plots/utils/geoAccessors';
-  import type { GeoInsetMarker } from '$lib/types/plots/geo/markers';
-  import type { GeoFeature } from '$lib/types/plots/geo/common';
+  import TooltipLayout from '$lib/layout/tooltip/TooltipLayout.svelte';
+  import type { GeoInsetMarker } from '$lib/types/markers/geo';
+  import type { GeoFeature } from '$lib/types/plots/data/geo';
 
   /**
    * A small, independently-projected map panel anchored to a corner/edge of
@@ -82,10 +83,51 @@
     );
     return geoPath(projection);
   });
+
+  /**
+   * Nearest-feature hover, local to this inset only — mirrors the main
+   * map's own "always nearest feature centroid" behaviour (see `Plot.svelte`),
+   * but computed against this inset's own fitted `path`/projection instead
+   * of the plot's shared one, since svelteplot's `<Pointer>` (which drives
+   * the main map's hover) only ever matches the main projection's own
+   * feature positions — it has no way to reach content an inset draws at a
+   * wholly different scale/location.
+   */
+  const centroids = $derived.by(() => {
+    if (!path) return [];
+    return insetFeatures.map((f) => ({ feature: f, centroid: path.centroid(f as GeoJSON.Feature) }));
+  });
+
+  let hovered = $state<{ feature: GeoFeature<Record<string, unknown>>; x: number; y: number } | null>(null);
+
+  // Any point within the inset box always matches its nearest feature —
+  // there's no reason for a hover inside a small, self-contained panel to
+  // ever come up empty, so the threshold is just the box's own diagonal.
+  const maxDistance = $derived(Math.hypot(box.width, box.height));
+
+  function onInsetPointerMove(e: PointerEvent) {
+    const rect = (e.currentTarget as SVGRectElement).getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    let nearest: (typeof centroids)[number] | null = null;
+    let nearestDist = Infinity;
+    for (const c of centroids) {
+      const d = Math.hypot(c.centroid[0] - x, c.centroid[1] - y);
+      if (d < nearestDist) {
+        nearestDist = d;
+        nearest = c;
+      }
+    }
+    hovered = nearest && nearestDist <= maxDistance ? { feature: nearest.feature, x, y } : null;
+  }
+
+  function onInsetPointerLeave() {
+    hovered = null;
+  }
 </script>
 
 {#if path}
-  <g class="inset" transform="translate({box.left + left}, {box.top + top})">
+  <g class="dct-geo-inset" transform="translate({box.left + left}, {box.top + top})">
     {#each insetFeatures as f, i (i)}
       <path
         d={path(f as GeoJSON.Feature) ?? undefined}
@@ -96,5 +138,33 @@
         style="vector-effect: non-scaling-stroke"
       />
     {/each}
+    {#if marker.tooltip}
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <rect
+        x={0}
+        y={0}
+        width={box.width}
+        height={box.height}
+        fill="transparent"
+        onpointermove={onInsetPointerMove}
+        onpointerleave={onInsetPointerLeave}
+      />
+    {/if}
+    {#if marker.tooltip}
+      {@const tooltip = marker.tooltip}
+      <foreignObject x={0} y={0} width={box.width} height={box.height} style="overflow: visible; pointer-events: none;">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: 100%; height: 100%;">
+          <TooltipLayout
+            visible={hovered != null}
+            x={hovered?.x ?? 0}
+            y={hovered?.y ?? 0}
+            bounds={{ width: box.width, height: box.height }}
+            rows={hovered ? [hovered.feature] : []}
+            format={tooltip.format}
+            content={tooltip.content}
+          />
+        </div>
+      </foreignObject>
+    {/if}
   </g>
 {/if}

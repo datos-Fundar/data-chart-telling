@@ -1,8 +1,9 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
-import type { Marker } from '$lib/types/plots/markers';
-import type { Segments, BarSegmentStyle } from '$lib/types/plots/styles';
+import type { Marker } from '$lib/types/markers/common';
+import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
+import type { SegmentsConfig } from '$lib/types/plots/props';
 import { FEMALE_LIFE_EXPECTANCY_BY_PROVINCE, LIFE_EXPECTANCY_BY_PROVINCE } from '../../../../../stories/plots/bar/data';
 import { waitForSvg, countDotMarks, countTextLabels } from '../../_helpers/svg';
 
@@ -40,7 +41,7 @@ describe('BarPlot – markers.hover', () => {
   });
 
   test('does not crash with scope "segment" over a segmented series', async () => {
-    const segments: Segments<BarSegmentStyle> = {
+    const segments: SegmentsConfig<BarSegmentStyle> = {
       female: [
         { areas: [{ x: { from: 'Buenos Aires', to: 'Córdoba' } }], style: {} },
         { style: { fillOpacity: 0.4 } },

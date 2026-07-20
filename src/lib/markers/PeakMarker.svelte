@@ -1,8 +1,8 @@
 <script lang="ts">
   import DotMarker from './DotMarker.svelte';
   import TextMarker from './TextMarker.svelte';
-  import type { MarkerProps } from '$lib/types/plots/markers';
-  import type { DotStyle, FontStyle } from '$lib/types/plots/styles';
+  import type { MarkerProps } from '$lib/types/markers/props';
+  import type { DotStyle, FontStyle } from '$lib/types/plots/styling';
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   interface Props extends MarkerProps<Record<string, any>> {

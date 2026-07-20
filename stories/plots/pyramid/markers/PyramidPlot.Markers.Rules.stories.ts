@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-import type { Marker } from '$lib/types/plots/markers';
+import type { Marker } from '$lib/types/markers/common';
 import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../data/population-pyramid';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────

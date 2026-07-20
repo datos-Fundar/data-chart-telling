@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/plots/geo/markers';
+import type { GeoMarker } from '$lib/types/markers/geo';
 import { argentinaBicontinental } from '$lib/plots/geo/projections/argentina';
 import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '../data';
 

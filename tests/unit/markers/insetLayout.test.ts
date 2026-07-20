@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { parseInsetLocation, insetBox } from '$lib/plots/geo/insetLayout';
+import { parseInsetLocation, insetBox } from '$lib/markers/inset/insetLayout';
 
 describe('parseInsetLocation', () => {
   test('side-anchor and anchor-side orders parse to the same position', () => {

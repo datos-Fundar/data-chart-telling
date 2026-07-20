@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { Series, ScalesConfig } from '$lib/types/plots/common';
+import type { Series } from '$lib/types/plots/data/common';
+import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
 import {
   FEMALE_LIFE_EXPECTANCY,
   LIFE_EXPECTANCY,
@@ -82,7 +83,7 @@ export const CustomYDomain: Story = {
     ],
     scales: {
       y: { domain: [78, 85] },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -104,7 +105,7 @@ export const CustomXDomain: Story = {
     ],
     scales: {
       x: { domain: [2010, 2020] },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -126,7 +127,7 @@ export const WithAxisLabels: Story = {
     scales: {
       x: { label: 'Year' },
       y: { label: 'Life expectancy (years)' },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
     margins: { bottom: 50 },
   },
 };
@@ -148,7 +149,7 @@ export const ReversedY: Story = {
     ],
     scales: {
       y: { reverse: true },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -168,7 +169,7 @@ export const WithGrid: Story = {
     ],
     scales: {
       y: { grid: true },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -189,7 +190,7 @@ export const CustomTicks: Story = {
     ],
     scales: {
       x: { ticks: [2008, 2012, 2016, 2020] },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -211,7 +212,7 @@ export const CustomTickFormat: Story = {
       y: {
         tickFormat: (d: unknown) => `${d} yr`,
       },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -233,7 +234,7 @@ export const RotatedXTicks: Story = {
       x: {
         tickRotate: -45,
       },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -254,7 +255,7 @@ export const ZeroAnchoredY: Story = {
     ],
     scales: {
       y: { zero: true },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -271,7 +272,7 @@ export const CombinedOverrides: Story = {
     scales: {
       x: { label: 'Year', ticks: [2008, 2012, 2016, 2020], grid: false },
       y: { label: 'Life expectancy (years)', domain: [60, 90], grid: true },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
     margins: { bottom: 50 },
   },
 };
@@ -389,7 +390,7 @@ export const MonthNamesSameYear: Story = {
     ],
     scales: {
       x: { sort: byMonth },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -428,7 +429,7 @@ export const MonthYearAcrossYears: Story = {
     ],
     scales: {
       x: { sort: byMonthYear },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -455,7 +456,7 @@ export const VerticalYLabelTop: Story = {
     ],
     scales: {
       y: { label: 'Life expectancy (years)', labelOrientation: 'vertical', labelPosition: 'top' },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
     margins: { left: 60 },
   },
 };
@@ -478,7 +479,7 @@ export const VerticalYLabelMiddle: Story = {
     ],
     scales: {
       y: { label: 'Life expectancy (years)', labelOrientation: 'vertical' },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
     margins: { left: 60 },
   },
 };
@@ -502,7 +503,7 @@ export const GridOnlyNoTickMarks: Story = {
     ],
     scales: {
       y: { grid: true, tickSize: 0 },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -523,6 +524,6 @@ export const DottedGrid: Story = {
     ],
     scales: {
       y: { grid: { strokeDasharray: '2 3', strokeOpacity: 0.5 } },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };

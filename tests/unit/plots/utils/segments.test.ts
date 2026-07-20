@@ -1,7 +1,8 @@
 import { describe, test, expect, vi, afterEach } from 'vitest';
 import { buildGroupedSeries, validateSegments } from '$lib/plots/utils/segments';
-import type { Series } from '$lib/types/plots/common';
-import type { LineSegmentStyle, Segments } from '$lib/types/plots/styles';
+import type { Series } from '$lib/types/plots/data/common';
+import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
+import type { SegmentsConfig } from '$lib/types/plots/props';
 
 // ── Shared fixtures ───────────────────────────────────────────────────────────
 
@@ -92,7 +93,7 @@ describe('buildGroupedSeries – area filtering', () => {
 
 describe('buildGroupedSeries – segment continuity', () => {
   test('adjacent area segments have a 2-point connector that bridges the gap', () => {
-    const segments: Segments<LineSegmentStyle> = {
+    const segments: SegmentsConfig<LineSegmentStyle> = {
       a: [
         { areas: [{ x: { to: 3 } }], style: { stroke: { stroke: 'red' } } },
         { areas: [{ x: { from: 3 } }], style: { stroke: { stroke: 'blue' } } },
@@ -124,7 +125,7 @@ describe('buildGroupedSeries – style pass-through', () => {
   });
 
   test('different area segments can have different styles', () => {
-    const segments: Segments<LineSegmentStyle> = {
+    const segments: SegmentsConfig<LineSegmentStyle> = {
       a: [
         { areas: [{ x: { to: 2 } }], style: { stroke: { stroke: 'red' } } },
         { areas: [{ x: { from: 4 } }], style: { stroke: { stroke: 'blue' } } },
@@ -170,7 +171,7 @@ describe('buildGroupedSeries – function accessor', () => {
 
 describe('buildGroupedSeries – catch-all style merging', () => {
   test('area segment with dots-only inherits stroke from catch-all', () => {
-    const segments: Segments<LineSegmentStyle> = {
+    const segments: SegmentsConfig<LineSegmentStyle> = {
       a: [
         { style: { stroke: { stroke: 'red' } } },                                       // catch-all
         { areas: [{ x: { from: 2, to: 4 } }], style: { dots: { dotRadius: 5 } } },     // dots only
@@ -185,7 +186,7 @@ describe('buildGroupedSeries – catch-all style merging', () => {
   });
 
   test('area segment stroke overrides catch-all stroke', () => {
-    const segments: Segments<LineSegmentStyle> = {
+    const segments: SegmentsConfig<LineSegmentStyle> = {
       a: [
         { style: { stroke: { stroke: 'yellow' } } },                                        // catch-all
         { areas: [{ x: { from: 2, to: 4 } }], style: { stroke: { stroke: 'blue' } } },     // override
@@ -197,7 +198,7 @@ describe('buildGroupedSeries – catch-all style merging', () => {
   });
 
   test('catch-all run uses catch-all style directly (no double-merging)', () => {
-    const segments: Segments<LineSegmentStyle> = {
+    const segments: SegmentsConfig<LineSegmentStyle> = {
       a: [
         { style: { stroke: { stroke: 'red' } } },                                       // catch-all
         { areas: [{ x: { from: 2, to: 4 } }], style: { dots: { dotRadius: 5 } } },
@@ -210,14 +211,14 @@ describe('buildGroupedSeries – catch-all style merging', () => {
   });
 
   test('no catch-all → area segment style is used unchanged', () => {
-    const segments: Segments<LineSegmentStyle> = { a: [{ areas: [{ x: { from: 2, to: 4 } }], style: { dots: { dotRadius: 5 } } }] };
+    const segments: SegmentsConfig<LineSegmentStyle> = { a: [{ areas: [{ x: { from: 2, to: 4 } }], style: { dots: { dotRadius: 5 } } }] };
     const groups = buildGroupedSeries([SERIES], segments);
     const areaSeg = groups[0].visualSegments.find((s) => s.data.some((d) => d.x === 3));
     expect(areaSeg?.style).toEqual({ dots: { dotRadius: 5 } });
   });
 
   test('default key catch-all merges into area segments for all series', () => {
-    const segments: Segments<LineSegmentStyle> = {
+    const segments: SegmentsConfig<LineSegmentStyle> = {
       default: [
         { style: { stroke: { stroke: 'green' } } },                                     // default catch-all
         { areas: [{ x: { from: 2, to: 4 } }], style: { dots: { dotRadius: 8 } } },
@@ -234,7 +235,7 @@ describe('buildGroupedSeries – catch-all style merging', () => {
   });
 
   test('series catch-all merges with default area segment', () => {
-    const segments: Segments<LineSegmentStyle> = {
+    const segments: SegmentsConfig<LineSegmentStyle> = {
       a: [{ style: { stroke: { stroke: 'tomato' } } }],
       default: [{ areas: [{ x: { from: 2, to: 4 } }], style: { dots: { dotRadius: 6 } } }],
     };
@@ -247,7 +248,7 @@ describe('buildGroupedSeries – catch-all style merging', () => {
   });
 
   test('area dots key replaces catch-all dots key entirely', () => {
-    const segments: Segments<LineSegmentStyle> = {
+    const segments: SegmentsConfig<LineSegmentStyle> = {
       a: [
         { style: { stroke: { stroke: 'purple' }, dots: { dotRadius: 3 } } },            // catch-all with dots
         { areas: [{ x: { from: 2, to: 4 } }], style: { dots: { dotRadius: 10 } } },    // override dots

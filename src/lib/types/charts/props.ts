@@ -1,7 +1,10 @@
 import type { Snippet } from 'svelte';
-import type { Accessor, AxisValue, ScalesConfig, MarginConfig } from '$lib/types/plots/common';
-import type { PlotStyles, Segments } from '$lib/types/plots/styles';
-import type { Marker } from '$lib/types/plots/markers';
+import type { AxisValue } from '$lib/types/plots/axis';
+import type { Accessor } from '$lib/types/plots/data/common';
+import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
+import type { BasePlotStyles } from '$lib/types/plots/styles/common';
+import type { SegmentsConfig, MarginConfig } from '$lib/types/plots/props';
+import type { Marker } from '$lib/types/markers/common';
 import type { TooltipProp } from '$lib/types/layout/tooltip';
 import type { LegendSection } from '$lib/types/charts/legend';
 import type { FacetConfig, TimelineConfig } from '$lib/types/charts/common';
@@ -31,10 +34,10 @@ export type ChartProps<
   x: Accessor<TRow, AxisValue>;
   y: Accessor<TRow, AxisValue>;
   z?: Accessor<TRow, unknown>;
-  styles?: PlotStyles;
-  segments?: Segments<TSegmentStyle>;
+  styles?: BasePlotStyles;
+  segments?: SegmentsConfig<TSegmentStyle>;
   markers?: Marker[];
-  scales?: ScalesConfig<TRow>;
+  scales?: AxisBasedScalesConfig<TRow>;
   margins?: MarginConfig;
   facet?: FacetConfig<TRow>;
   timeline?: TimelineConfig<TRow>;

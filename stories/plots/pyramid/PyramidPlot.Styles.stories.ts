@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-import type { PlotStyles } from '$lib/types/plots/styles';
+import type { BasePlotStyles } from '$lib/types/plots/styles/common';
 import { AGE_GROUPS, POPULATION_PYRAMID } from '../../data/population-pyramid';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -59,7 +59,7 @@ export const CustomColors: Story = {
     },
     styles: {
       colors: { left: '#ff6b9d', right: '#4ecdc4' },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
   },
 };
 
@@ -79,7 +79,7 @@ export const WithValueLabels: Story = {
     },
     styles: {
       values: { show: true },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
   },
 };
 
@@ -99,7 +99,7 @@ export const CustomValueFormat: Story = {
     },
     styles: {
       values: { show: true, format: (v: number) => `${v.toFixed(1)}%` },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
   },
 };
 
@@ -122,7 +122,7 @@ export const LabelsInside: Story = {
         fill: '#ffffff',
         fontWeight: 'bold',
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
   },
 };
 
@@ -146,7 +146,7 @@ export const LabelsWithOffset: Story = {
         format: (v: number) => `${v.toFixed(1)}%`,
         dy: 8,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
   },
 };
 
@@ -167,6 +167,6 @@ export const CustomColorsAndLabels: Story = {
     styles: {
       colors: { left: '#9c27b0', right: '#ff9800' },
       values: { show: true, format: (v: number) => `${v.toFixed(1)}%` },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
   },
 };

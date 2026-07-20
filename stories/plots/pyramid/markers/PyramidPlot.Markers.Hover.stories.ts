@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-import type { Marker } from '$lib/types/plots/markers';
-import type { Series } from '$lib/types/plots/common';
+import type { Marker } from '$lib/types/markers/common';
+import type { Series } from '$lib/types/plots/data/common';
 import { AGE_GROUPS, POPULATION_PYRAMID, type PopulationRow } from '../../../data/population-pyramid';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────

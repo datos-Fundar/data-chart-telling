@@ -1,9 +1,11 @@
-import type { Accessor } from '$lib/types/plots/common';
-import type { DotStyle, FontStyle, StrokeStyle, ColorsStyle } from '$lib/types/plots/styles';
+import type { Snippet } from 'svelte';
+import type { Accessor } from '$lib/types/plots/data/common';
+import type { ColorsStyle } from '$lib/types/plots/styles/common';
+import type { DotStyle, FontStyle, StrokeStyle } from '$lib/types/plots/styling';
 import type { HoverDisplayPoint } from '$lib/types/layout/tooltip';
-import type { GeoFeature, GeoJsonInput } from '$lib/types/plots/geo/common';
-import type { GeoSegmentStyle } from '$lib/types/plots/geo/styles';
-import type { GeoProjectionName } from '$lib/types/plots/geo/scales';
+import type { GeoFeature, GeoJsonInput } from '$lib/types/plots/data/geo';
+import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
+import type { GeoProjectionName } from '$lib/types/plots/scales/geo';
 
 /** Longitude/latitude gridlines — svelteplot's `Graticule`. */
 export type GeoGraticuleMarker = {
@@ -178,6 +180,23 @@ export type GeoInsetLocation =
  */
 export type GeoInsetProjectionName = Exclude<GeoProjectionName, 'identity' | 'reflect-y'>;
 
+/**
+ * Independent hover tooltip scoped to just one `inset` marker's own rendered
+ * features. Matched by nearest projected centroid within the inset's own
+ * local mini-projection/box — entirely decoupled from the plot's own
+ * top-level `tooltip`, which only ever matches the main map's own features
+ * (an inset draws in its own coordinate space, at its own scale, so the
+ * main map's hover has no way to reach it). No `facetId`/`sync`/`strategy`
+ * here, unlike the top-level `TooltipConfig` — an inset never broadcasts
+ * its hover to other facets and always matches punctually.
+ */
+export type GeoInsetTooltipConfig = {
+  /** Tooltip text for the nearest feature (by centroid) to the cursor, within this inset. */
+  format: (feature: GeoFeature<Record<string, unknown>>) => string;
+  /** Custom tooltip body; replaces `format` when given. */
+  content?: Snippet<[{ rows: GeoFeature<Record<string, unknown>>[] }]>;
+};
+
 /** Projection config for an `inset` marker — like `GeoProjectionConfig`, minus `inset`/`domain` (insets always auto-fit to their own content) and custom factories (which can't guarantee `fitExtent`). */
 export type GeoInsetProjectionConfig =
   | GeoInsetProjectionName
@@ -229,6 +248,8 @@ export type GeoInsetMarker<TProps extends Record<string, unknown> = Record<strin
   /** Gap between the inset box and the plot's own edge, in pixels. Defaults to `8`. */
   margin?: number;
   style?: GeoSegmentStyle;
+  /** Independent hover tooltip for just this inset's own rendered features — see `GeoInsetTooltipConfig`. */
+  tooltip?: GeoInsetTooltipConfig;
 };
 
 export type GeoMarker =

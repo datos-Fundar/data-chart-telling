@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-import type { ScalesConfig } from '$lib/types/plots/common';
+import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
 import { AGE_GROUPS, POPULATION_PYRAMID } from '../../data/population-pyramid';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -51,7 +51,7 @@ export const WithAgeGroupDomain: Story = {
     x: 'pct',
     y: 'ageGroup',
     z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } } satisfies ScalesConfig,
+    scales: { y: { domain: AGE_GROUPS } } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -68,7 +68,7 @@ export const WithAxisLabels: Story = {
     scales: {
       x: { label: 'Population %' },
       y: { label: 'Age Group', domain: AGE_GROUPS },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -85,7 +85,7 @@ export const CustomXDomain: Story = {
     scales: {
       x: { domain: [0, 6] },
       y: { domain: AGE_GROUPS },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -105,7 +105,7 @@ export const CustomXTickFormat: Story = {
         tickFormat: (d: unknown) => `${d}%`,
       },
       y: { label: 'Age Group', domain: AGE_GROUPS },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -122,7 +122,7 @@ export const WithXGrid: Story = {
     scales: {
       x: { grid: true, label: 'Population %' },
       y: { label: 'Age Group', domain: AGE_GROUPS },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -144,7 +144,7 @@ export const CombinedOverrides: Story = {
         grid: true,
       },
       y: { label: 'Age Group', domain: AGE_GROUPS },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
     margins: { left: 60, bottom: 50 },
   },
 };

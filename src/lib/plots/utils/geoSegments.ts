@@ -1,9 +1,10 @@
-import type { Segment, Segments } from '$lib/types/plots/styles';
+import type { Segment } from '$lib/types/plots/segments/config';
+import type { SegmentsConfig } from '$lib/types/plots/props';
 
 const DEFAULT_KEY = 'default';
 
 /** Feature-specific segments listed after 'default' so they override it on merge (see `resolveFeatureStyle`). */
-export function resolveSegmentsForFeature<TStyle>(segments: Segments<TStyle>, featureId: string): Segment<TStyle>[] {
+export function resolveSegmentsForFeature<TStyle>(segments: SegmentsConfig<TStyle>, featureId: string): Segment<TStyle>[] {
   return [...(segments[DEFAULT_KEY] ?? []), ...(segments[featureId] ?? [])];
 }
 
@@ -16,7 +17,7 @@ export function resolveSegmentsForFeature<TStyle>(segments: Segments<TStyle>, fe
  * area-based semantics that don't hold here, since every geo segment entry
  * merges rather than being dropped.
  */
-export function resolveFeatureStyle<TStyle extends object>(segments: Segments<TStyle>, featureId: string): TStyle {
+export function resolveFeatureStyle<TStyle extends object>(segments: SegmentsConfig<TStyle>, featureId: string): TStyle {
   return resolveSegmentsForFeature(segments, featureId).reduce(
     (acc, seg) => ({ ...acc, ...(seg.style ?? {}) }),
     {} as TStyle,

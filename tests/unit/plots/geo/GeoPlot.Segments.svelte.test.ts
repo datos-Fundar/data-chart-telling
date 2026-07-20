@@ -1,9 +1,9 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { Segments } from '$lib/types/plots/styles';
-import type { GeoSegmentStyle } from '$lib/types/plots/geo/styles';
-import type { GeoFeature } from '$lib/types/plots/geo/common';
+import type { SegmentsConfig } from '$lib/types/plots/props';
+import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
+import type { GeoFeature } from '$lib/types/plots/data/geo';
 import { ARGENTINA_PROVINCES } from '../../../../stories/plots/geo/data';
 import { waitForSvg, countGeoPaths } from '../_helpers/svg';
 
@@ -25,7 +25,7 @@ describe('GeoPlot – segments (keyed by feature id)', () => {
       segments: {
         'Buenos Aires': [{ style: { fill: '#e11d48' } }],
         default: [{ style: { fill: '#94a3b8' } }],
-      } satisfies Segments<GeoSegmentStyle>,
+      } satisfies SegmentsConfig<GeoSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     expect(countGeoPaths(svg)).toBe(ARGENTINA_PROVINCES.length);
@@ -43,7 +43,7 @@ describe('GeoPlot – segments (keyed by feature id)', () => {
         'Buenos Aires': [{ style: { fill: '#1d4ed8' } }],
         Córdoba: [{ style: { fill: '#f59e0b' } }],
         default: [{ style: { fill: '#e2e8f0' } }],
-      } satisfies Segments<GeoSegmentStyle>,
+      } satisfies SegmentsConfig<GeoSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     const styles = styleAttrs(svg);
@@ -60,7 +60,7 @@ describe('GeoPlot – segments (keyed by feature id)', () => {
       segments: {
         default: [{ style: { fill: '#94a3b8', strokeWidth: 2 } }],
         Mendoza: [{ style: { fillOpacity: 0.4 } }],
-      } satisfies Segments<GeoSegmentStyle>,
+      } satisfies SegmentsConfig<GeoSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     const styles = styleAttrs(svg);

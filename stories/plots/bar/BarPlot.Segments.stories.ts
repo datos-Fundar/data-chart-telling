@@ -1,9 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
-import type {
-  Segments,
-  BarSegmentStyle,
-} from '$lib/types/plots/styles';
+import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
+import type { SegmentsConfig } from '$lib/types/plots/props';
 import {
   FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
   LIFE_EXPECTANCY_BY_PROVINCE,
@@ -90,7 +88,7 @@ export const HighlightedProvincesSegment: Story = {
           },
         },
       ],
-    } satisfies Segments<BarSegmentStyle>,
+    } satisfies SegmentsConfig<BarSegmentStyle>,
   },
 };
 
@@ -121,7 +119,7 @@ export const MultipleAreasOneSegment: Story = {
           style: { fillOpacity: 0.3 },
         },
       ],
-    } satisfies Segments<BarSegmentStyle>,
+    } satisfies SegmentsConfig<BarSegmentStyle>,
   },
 };
 
@@ -151,7 +149,7 @@ export const TwoSegmentsDifferentStyles: Story = {
           style: { fillOpacity: 0.4 },
         },
       ],
-    } satisfies Segments<BarSegmentStyle>,
+    } satisfies SegmentsConfig<BarSegmentStyle>,
   },
 };
 
@@ -176,7 +174,7 @@ export const TwoSegmentsOnAllSeries: Story = {
           style: { fillOpacity: 0.4 },
         },
       ],
-    } satisfies Segments<BarSegmentStyle>,
+    } satisfies SegmentsConfig<BarSegmentStyle>,
   },
 };
 
@@ -204,7 +202,7 @@ export const SegmentsOnOneSeriesOnly: Story = {
           style: { fillOpacity: 0.3 },
         },
       ],
-    } satisfies Segments<BarSegmentStyle>,
+    } satisfies SegmentsConfig<BarSegmentStyle>,
   },
 };
 
@@ -231,6 +229,6 @@ export const CustomFillsPerSeries: Story = {
           style: { fill: '#1971c2', fillOpacity: 0.85 },
         },
       ],
-    } satisfies Segments<BarSegmentStyle>,
+    } satisfies SegmentsConfig<BarSegmentStyle>,
   },
 };

@@ -1,5 +1,5 @@
-import type { AxisValue } from '$lib/types/plots/common';
-import type { StrokeStyle, FontStyle, DotStyle } from '$lib/types/plots/styles';
+import type { AxisValue } from '$lib/types/plots/axis';
+import type { StrokeStyle, FontStyle, DotStyle } from '$lib/types/plots/styling';
 
 export type DeltaTarget =
   | { type: 'series'; series: string }

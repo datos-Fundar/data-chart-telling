@@ -1,8 +1,9 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
   import { BarX, BarY } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
-  import type { Series } from '$lib/types/plots/common';
-  import type { BarSegmentStyle, VisualGroup } from '$lib/types/plots/styles';
+  import type { Series } from '$lib/types/plots/data/common';
+  import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
+  import type { VisualGroup } from '$lib/types/plots/segments/config';
   import type { BarLayout } from './layout.svelte';
 
   /**

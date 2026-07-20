@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-import type { Series } from '$lib/types/plots/common';
+import type { Series } from '$lib/types/plots/data/common';
 import { LIFE_EXPECTANCY_BY_PROVINCE_SEX, type ProvinceSexCell } from '../../../../stories/plots/heatmap/data';
 import { waitForSvg, countCells } from '../_helpers/svg';
 

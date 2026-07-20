@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { ScalesConfig } from '$lib/types/plots/common';
+import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
 import { FEMALE_LIFE_EXPECTANCY } from '../../../../stories/plots/line/data';
 import { waitForSvg, countLinePaths } from '../_helpers/svg';
 
@@ -19,7 +19,7 @@ describe('LinePlot – scales', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      scales: { y: { domain: [78, 85] } } satisfies ScalesConfig,
+      scales: { y: { domain: [78, 85] } } satisfies AxisBasedScalesConfig,
     });
     const svg = await waitForSvg(container);
     expect(countLinePaths(svg)).toBe(1);
@@ -37,7 +37,7 @@ describe('LinePlot – scales', () => {
           data: FEMALE_LIFE_EXPECTANCY.filter((d) => d.year >= 2010 && d.year <= 2020),
         },
       ],
-      scales: { x: { domain: [2010, 2020] } } satisfies ScalesConfig,
+      scales: { x: { domain: [2010, 2020] } } satisfies AxisBasedScalesConfig,
     });
     const svg = await waitForSvg(container);
     expect(countLinePaths(svg)).toBe(1);
@@ -49,7 +49,7 @@ describe('LinePlot – scales', () => {
         width: 400,
         height: 300,
         series: SERIES,
-        scales: { y: { reverse } } satisfies ScalesConfig,
+        scales: { y: { reverse } } satisfies AxisBasedScalesConfig,
       });
       const svg = await waitForSvg(container);
       const label = Array.from(svg.querySelectorAll('g.axis-y text')).find((t) => t.textContent === tick);
@@ -67,7 +67,7 @@ describe('LinePlot – scales', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      scales: { x: { ticks: [2008, 2016, 2020] } } satisfies ScalesConfig,
+      scales: { x: { ticks: [2008, 2016, 2020] } } satisfies AxisBasedScalesConfig,
     });
     const svg = await waitForSvg(container);
     const ticks = Array.from(svg.querySelectorAll('g.axis-x text')).map((t) => t.textContent);
@@ -81,7 +81,7 @@ describe('LinePlot – scales', () => {
       series: SERIES,
       scales: {
         y: { ticks: [80], tickFormat: () => 'custom' },
-      } satisfies ScalesConfig,
+      } satisfies AxisBasedScalesConfig,
     });
     const svg = await waitForSvg(container);
     const ticks = Array.from(svg.querySelectorAll('g.axis-y text')).map((t) => t.textContent);
@@ -93,7 +93,7 @@ describe('LinePlot – scales', () => {
       width: 400,
       height: 300,
       series: SERIES,
-      scales: { y: { grid: true } } satisfies ScalesConfig,
+      scales: { y: { grid: true } } satisfies AxisBasedScalesConfig,
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.grid-y line').length).toBeGreaterThan(0);

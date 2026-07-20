@@ -1,5 +1,5 @@
 <script lang="ts" generics="TRow extends Record<string, unknown>">
-  import Chart from '$lib/charts/Chart.svelte';
+  import BaseChart from '$lib/charts/BaseChart.svelte';
   import LinePlot from '$lib/plots/line/Plot.svelte';
   import {
     resolveTooltip,
@@ -9,14 +9,14 @@
   } from '$lib/layout/tooltip/utils';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { resolveTimelineInterpolation } from '$lib/utils/interpolate';
-  import type { LineSegmentStyle } from '$lib/types/plots/styles';
+  import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
   import type { ChartProps } from '$lib/types/charts/props';
 
   /**
    * High-level line chart. It takes flat rows plus `x`/`y`/`z` encodings, groups
    * by `z` into one line per group, and hands the result to {@link LinePlot}.
    * Everything chrome-related (title, legend, timeline, facets) is delegated to
-   * {@link Chart}; this component only owns the flat-data → line-series adaption.
+   * {@link BaseChart}; this component only owns the flat-data → line-series adaption.
    */
   let {
     width,
@@ -68,7 +68,7 @@
   });
 </script>
 
-<Chart
+<BaseChart
   {width}
   {height}
   {title}
@@ -107,4 +107,4 @@
         : undefined}
     />
   {/snippet}
-</Chart>
+</BaseChart>

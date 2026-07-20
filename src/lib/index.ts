@@ -8,7 +8,7 @@ export { default as GeoPlot } from './plots/geo/Plot.svelte';
 
 // ── Charts ──────────────────────────────────────────────────────────────────
 // High-level, plot-agnostic chrome plus ready-made chart kinds.
-export { default as Chart } from './charts/Chart.svelte';
+export { default as BaseChart } from './charts/BaseChart.svelte';
 export { default as BarChart } from './charts/bar/Chart.svelte';
 export { default as HeatmapChart } from './charts/heatmap/Chart.svelte';
 export { default as LineChart } from './charts/line/Chart.svelte';
@@ -16,8 +16,8 @@ export { default as PyramidChart } from './charts/pyramid/Chart.svelte';
 
 // Interchangeable layout primitives (compose your own chart kinds with these).
 export { default as ChartContainer } from './charts/container/ChartContainer.svelte';
-export { default as PlotLayout } from './layout/plot/PlotLayout.svelte';
-export { default as GeoPlotLayout } from './layout/geo/GeoPlotLayout.svelte';
+export { default as BasePlotLayout } from './layout/plot/BasePlotLayout.svelte';
+export { default as GeoLayout } from './layout/geo/GeoLayout.svelte';
 export { default as TileLayer } from './plots/geo/TileLayer.svelte';
 
 // Custom geo projections — usable as `scales.projection.type`.
@@ -29,11 +29,11 @@ export { default as LegendLayout } from './layout/legend/LegendLayout.svelte';
 export { default as Tooltip } from './layout/tooltip/Tooltip.svelte';
 
 // Markers
-export { default as DeltaMarker } from './plots/markers/DeltaMarker.svelte';
-export { default as DotMarker } from './plots/markers/DotMarker.svelte';
-export { default as HoverMarker } from './plots/markers/HoverMarker.svelte';
-export { default as PeakMarker } from './plots/markers/PeakMarker.svelte';
-export { default as TextMarker } from './plots/markers/TextMarker.svelte';
+export { default as DeltaMarker } from './markers/DeltaMarker.svelte';
+export { default as DotMarker } from './markers/DotMarker.svelte';
+export { default as HoverMarker } from './markers/HoverMarker.svelte';
+export { default as PeakMarker } from './markers/PeakMarker.svelte';
+export { default as TextMarker } from './markers/TextMarker.svelte';
 
 export {
   setConfiguration,
@@ -56,58 +56,58 @@ export {
 } from './utils/color';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
+export type { AxisValue, AxisScale } from './types/plots/axis';
+export type { Accessor, Series, SeriesProps, DataProps } from './types/plots/data/common';
 export type {
-  AxisValue,
-  Accessor,
-  AxisScale,
+  BasePlotProps,
+  StylesConfig,
+  MarkersConfig,
+  SegmentsConfig,
+  AxisBasedScalesConfig,
+  GeoScalesConfig,
   ScalesConfig,
-  Series,
-  SeriesProps,
-  DataProps
-} from './types/plots/common';
+  MarginConfig,
+  TooltipConfig,
+} from './types/plots/props';
 export type {
   DeltaConfig,
 } from './types/plots/delta';
 export type {
-  SymbolType,
-  LineStyle,
-  StrokeStyle,
-  DotStyle,
-  FontStyle,
-  LineSegmentStyle,
-  BarSegmentStyle,
-  CellSegmentStyle,
-  Range,
-  Area,
-  Segment,
-  SeriesAwareSegmentsMap,
-  DefaultSegmentsMap,
-  SegmentsStyle,
-  Segments,
-  ValueAnchor,
   ValuesStyle,
   ColorsStyle,
-  PlotStyles,
-} from './types/plots/styles';
-export type { Marker, MarkerProps } from './types/plots/markers';
-export type { PlotProps } from './types/plots/props';
-export type { GeoPlotProps } from './types/plots/geo/props';
-export type { GeoFeature, GeoJsonInput, GeoDataProps, Topology } from './types/plots/geo/common';
+  BasePlotStyles,
+} from './types/plots/styles/common';
+export type { LineSegmentStyle, BarSegmentStyle, CellSegmentStyle, GeoSegmentStyle } from './types/plots/segments/common';
+export type { Range, Area, Segment } from './types/plots/segments/config';
 export type {
-  GeoScalesConfig,
+  ValueAnchor,
+  SymbolType,
+  LineStyle,
+  LineCap,
+  LineJoin,
+  FontWeight,
+  FontStyleKeyword,
+  TextAnchor,
+  LineAnchor,
+} from './types/plots/constants';
+export type { FontStyle, StrokeStyle, DotStyle } from './types/plots/styling';
+export type { Marker } from './types/markers/common';
+export type { MarkerProps } from './types/markers/props';
+export type { GeoFeature, GeoJsonInput, GeoDataProps, Topology } from './types/plots/data/geo';
+export type {
   GeoProjectionName,
   GeoProjectionConfig,
   GeoCustomProjection,
   GeoCustomProjectionFactory,
-} from './types/plots/geo/scales';
-export type { GeoSegmentStyle, GeoStyles, GeoTileLayerConfig, GeoZoomConfig } from './types/plots/geo/styles';
+} from './types/plots/scales/geo';
+export type { GeoStyles, GeoTileLayerConfig, GeoZoomConfig } from './types/plots/styles/geo';
 export type {
   GeoMarker,
   GeoInsetMarker,
   GeoInsetLocation,
   GeoInsetProjectionName,
   GeoInsetProjectionConfig,
-} from './types/plots/geo/markers';
+} from './types/markers/geo';
 export type {
   TimeValue,
   Orientation,
@@ -127,7 +127,6 @@ export type {
   HoverStrategy,
   TooltipOptions,
   TooltipProp,
-  TooltipRuntime,
 } from './types/layout/tooltip';
 export type { ChartConfig, ChartConfigInput, TextStyle } from './types/configuration/styling';
 export type { ChartProps } from './types/charts/props';

@@ -1,7 +1,8 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-import type { Segments, CellSegmentStyle } from '$lib/types/plots/styles';
+import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
+import type { SegmentsConfig } from '$lib/types/plots/props';
 import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from '../../../../stories/plots/heatmap/data';
 import { waitForSvg, countCells } from '../_helpers/svg';
 
@@ -26,7 +27,7 @@ describe('HeatmapPlot – segments (areas, "default" key)', () => {
           { areas: [{ x: { from: xFrom, to: xTo }, y: { from: yFrom, to: yTo } }], style: { fillOpacity: 1 } },
           { style: { fillOpacity: 0.3 } },
         ],
-      } satisfies Segments<CellSegmentStyle>,
+      } satisfies SegmentsConfig<CellSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     expect(countCells(svg)).toBe(LIFE_EXPECTANCY_BY_PROVINCE_SEX.length);
@@ -48,7 +49,7 @@ describe('HeatmapPlot – segments (areas, "default" key)', () => {
       ...DATA_PROPS,
       segments: {
         default: [{ style: {} }, { style: {} }], // two catch-alls → ambiguous
-      } satisfies Segments<CellSegmentStyle>,
+      } satisfies SegmentsConfig<CellSegmentStyle>,
     });
     await vi.waitFor(() => {
       expect(warn).toHaveBeenCalledWith(expect.stringContaining('no areas'));
@@ -62,7 +63,7 @@ describe('HeatmapPlot – segments (areas, "default" key)', () => {
       width: 400,
       height: 300,
       ...DATA_PROPS,
-      segments: { life_expectancy: [{ style: {} }] } satisfies Segments<CellSegmentStyle>,
+      segments: { life_expectancy: [{ style: {} }] } satisfies SegmentsConfig<CellSegmentStyle>,
     });
     await vi.waitFor(() => {
       expect(warn).toHaveBeenCalledWith(expect.stringContaining('life_expectancy'));
@@ -82,7 +83,7 @@ describe('HeatmapPlot – segments (catch-all + area merging)', () => {
           { style: { fill: '#e11d48' } },
           { areas: [{ x: { from: 'Buenos Aires', to: 'Formosa' } }], style: { fillOpacity: 0.5 } },
         ],
-      } satisfies Segments<CellSegmentStyle>,
+      } satisfies SegmentsConfig<CellSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     const styles = styleAttrs(svg);

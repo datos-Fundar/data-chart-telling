@@ -1,7 +1,9 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-import type { Segments, BarSegmentStyle, Area } from '$lib/types/plots/styles';
+import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
+import type { Area } from '$lib/types/plots/segments/config';
+import type { SegmentsConfig } from '$lib/types/plots/props';
 import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../../stories/data/population-pyramid';
 import { waitForSvg } from '../_helpers/svg';
 
@@ -32,7 +34,7 @@ describe('PyramidPlot – segments ("default" key applies to every series)', () 
           { areas: areasFor(highlighted), style: { fillOpacity: 1 } },
           { style: { fillOpacity: 0.25 } },
         ],
-      } satisfies Segments<BarSegmentStyle>,
+      } satisfies SegmentsConfig<BarSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     const styles = barStyles(svg);
@@ -51,7 +53,7 @@ describe('PyramidPlot – segments ("default" key applies to every series)', () 
       ...DATA_PROPS,
       segments: {
         default: [{ style: {} }, { style: {} }],
-      } satisfies Segments<BarSegmentStyle>,
+      } satisfies SegmentsConfig<BarSegmentStyle>,
     });
     await vi.waitFor(() => {
       expect(warn).toHaveBeenCalledWith(expect.stringContaining('no areas'));
@@ -70,7 +72,7 @@ describe('PyramidPlot – segments ("default" key applies to every series)', () 
           { style: { fill: '#e11d48' } },
           { areas: areasFor(['80-84', '85+']), style: { fillOpacity: 0.5 } },
         ],
-      } satisfies Segments<BarSegmentStyle>,
+      } satisfies SegmentsConfig<BarSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     const styles = barStyles(svg);
@@ -91,7 +93,7 @@ describe('PyramidPlot – segments keyed by series name', () => {
           { areas: areasFor(['80-84', '85+']), style: { fillOpacity: 1 } },
           { style: { fillOpacity: 0.25 } },
         ],
-      } satisfies Segments<BarSegmentStyle>,
+      } satisfies SegmentsConfig<BarSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     const styles = barStyles(svg);
@@ -121,7 +123,7 @@ describe('PyramidPlot – segments keyed by series name', () => {
           { areas: areasFor(AGE_GROUPS.filter((ag) => parseInt(ag) >= 25 && parseInt(ag) < 55)), style: { fillOpacity: 1 } },
           { style: { fillOpacity: 0.25 } },
         ],
-      } satisfies Segments<BarSegmentStyle>,
+      } satisfies SegmentsConfig<BarSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     const styles = barStyles(svg);

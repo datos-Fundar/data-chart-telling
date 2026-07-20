@@ -5,7 +5,7 @@
     FacetColumns,
     FacetCellSnippet,
   } from '$lib/types/charts/common';
-  import type { Accessor } from '$lib/types/plots/common';
+  import type { Accessor } from '$lib/types/plots/data/common';
 
   /**
    * Small-multiples layout. It splits the data by `by`, arranges the groups in a

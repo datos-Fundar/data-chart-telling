@@ -1,5 +1,6 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
-import type { Series, AxisValue, Accessor } from '$lib/types/plots/common';
+import type { AxisValue } from '$lib/types/plots/axis';
+import type { Series, Accessor } from '$lib/types/plots/data/common';
 
 /**
  * Splits rows into ordered groups keyed by the stringified accessor value.

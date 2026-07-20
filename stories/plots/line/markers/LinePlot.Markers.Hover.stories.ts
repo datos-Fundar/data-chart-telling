@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { Marker } from '$lib/types/plots/markers';
+import type { Marker } from '$lib/types/markers/common';
 import {
   FEMALE_LIFE_EXPECTANCY,
   MALE_LIFE_EXPECTANCY,

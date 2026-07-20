@@ -1,7 +1,8 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
-import type { Segments, BarSegmentStyle } from '$lib/types/plots/styles';
+import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
+import type { SegmentsConfig } from '$lib/types/plots/props';
 import { FEMALE_LIFE_EXPECTANCY_BY_PROVINCE, LIFE_EXPECTANCY_BY_PROVINCE } from '../../../../stories/plots/bar/data';
 import { waitForSvg, countBarRects } from '../_helpers/svg';
 
@@ -20,7 +21,7 @@ describe('BarPlot – segments (areas)', () => {
           { areas: [{ x: { from: 'Buenos Aires', to: 'Córdoba' } }], style: { fillOpacity: 0.9 } },
           { style: { fillOpacity: 0.3 } },
         ],
-      } satisfies Segments<BarSegmentStyle>,
+      } satisfies SegmentsConfig<BarSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     expect(countBarRects(svg)).toBe(FEMALE_LIFE_EXPECTANCY_BY_PROVINCE.length);
@@ -37,7 +38,7 @@ describe('BarPlot – segments (areas)', () => {
       series: [{ name: 'female', x: 'province', y: 'value', data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE }],
       segments: {
         female: [{ style: {} }, { style: {} }], // two catch-alls → ambiguous
-      } satisfies Segments<BarSegmentStyle>,
+      } satisfies SegmentsConfig<BarSegmentStyle>,
     });
     await vi.waitFor(() => {
       expect(warn).toHaveBeenCalledWith(expect.stringContaining('no areas'));
@@ -55,7 +56,7 @@ describe('BarPlot – segments (areas)', () => {
       z: 'sex',
       segments: {
         default: [{ style: { fillOpacity: 0.5 } }],
-      } satisfies Segments<BarSegmentStyle>,
+      } satisfies SegmentsConfig<BarSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     const styles = styleAttrs(svg);
@@ -75,7 +76,7 @@ describe('BarPlot – segments (catch-all + area merging)', () => {
           { style: { fill: '#e11d48' } },
           { areas: [{ x: { from: 'Buenos Aires', to: 'Córdoba' } }], style: { fillOpacity: 0.5 } },
         ],
-      } satisfies Segments<BarSegmentStyle>,
+      } satisfies SegmentsConfig<BarSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     const styles = styleAttrs(svg);

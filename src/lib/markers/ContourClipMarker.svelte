@@ -2,7 +2,7 @@
   import { geoPath, type GeoPath } from 'd3-geo';
   import { usePlot } from 'svelteplot';
   import type { Snippet } from 'svelte';
-  import type { GeoFeature } from '$lib/types/plots/geo/common';
+  import type { GeoFeature } from '$lib/types/plots/data/geo';
 
   /**
    * Masks a `contour` marker to just the landmass (`'land'`) or just the

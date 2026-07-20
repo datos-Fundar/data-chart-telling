@@ -1,4 +1,4 @@
-import type { SymbolType, LineStyle } from '$lib/types/plots/styles';
+import type { SymbolType, LineStyle } from '$lib/types/plots/constants';
 
 export type LegendSectionType = 'discrete' | 'continuous';
 

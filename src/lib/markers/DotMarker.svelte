@@ -1,8 +1,8 @@
 <script lang="ts" generics="TData = Record<string, unknown>">
   import { Dot } from 'svelteplot';
-  import type { MarkerProps } from '$lib/types/plots/markers';
-  import type { AxisValue } from '$lib/types/plots/common';
-  import type { DotStyle } from '$lib/types/plots/styles';
+  import type { MarkerProps } from '$lib/types/markers/props';
+  import type { AxisValue } from '$lib/types/plots/axis';
+  import type { DotStyle } from '$lib/types/plots/styling';
 
   interface Props extends MarkerProps<TData> {
     x?: AxisValue | ((d: TData) => AxisValue);

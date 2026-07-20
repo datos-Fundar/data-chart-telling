@@ -1,5 +1,6 @@
 import type { Snippet } from 'svelte';
-import type { Accessor, AxisValue } from '$lib/types/plots/common';
+import type { AxisValue } from '$lib/types/plots/axis';
+import type { Accessor } from '$lib/types/plots/data/common';
 import type { EasingName, EasingFn } from '$lib/types/charts/interpolate';
 
 export type TimeValue = number;

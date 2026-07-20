@@ -5,10 +5,18 @@
   import { buildSeries } from '$lib/utils/grouping';
   import { makeColorScale } from '$lib/utils/color';
   import { getConfiguration } from '$lib/configuration/config.svelte';
-  import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
-  import type { PlotProps } from '$lib/types/plots/props';
-  import type { AxisValue, ScalesConfig } from '$lib/types/plots/common';
-  import type { CellSegmentStyle } from '$lib/types/plots/styles';
+  import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
+  import AxisLayout from '$lib/layout/plot/AxisLayout.svelte';
+  import GridLayout from '$lib/layout/plot/GridLayout.svelte';
+  import RuleLayout from '$lib/layout/plot/RuleLayout.svelte';
+  import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
+  import type { BasePlotProps } from '$lib/types/plots/props';
+  import type { AxisValue } from '$lib/types/plots/axis';
+  import type { SeriesProps, DataProps } from '$lib/types/plots/data/common';
+  import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
+  import type { BasePlotStyles } from '$lib/types/plots/styles/common';
+  import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
+  import type { Marker } from '$lib/types/markers/common';
 
   /**
    * A categorical grid of value-coloured cells. Accepts either a pre-built
@@ -19,6 +27,15 @@
    * The colour domain is read from `scales.z.domain`; when absent it is derived
    * from the visible slice of data.
    */
+  type Props = BasePlotProps<
+    SeriesProps<TData> | DataProps<TData>,
+    TData,
+    BasePlotStyles,
+    CellSegmentStyle,
+    Marker,
+    AxisBasedScalesConfig<TData>
+  >;
+
   let {
     width,
     height,
@@ -33,7 +50,7 @@
     margins,
     markers = [],
     tooltip = undefined,
-  }: PlotProps<TData, CellSegmentStyle> = $props();
+  }: Props = $props();
 
   $effect(() => {
     validateSegments(segments);
@@ -167,19 +184,23 @@
     return [...groups.values()];
   });
 
-  // The single, fully-resolved scales object PlotLayout reads for
+  // The single, fully-resolved scales object BasePlotLayout reads for
   // everything (ticks, grid, sort, and the real svelteplot scale) — avoids
   // keeping a second, separately-defaulted copy of `scales.x`/`scales.y`
   // (our own band-scale + domain defaults) out of sync with the one
   // actually forwarded.
-  const resolvedScales = $derived<ScalesConfig<TData>>({
+  const resolvedScales = $derived<AxisBasedScalesConfig<TData>>({
     ...scales,
     x: { type: 'band', labelAnchor: 'right', domain: xDomain, ...(scales.x ?? {}) },
     y: { type: 'band', domain: yDomain, ...(scales.y ?? {}) },
   });
+
+  const hoverActive = $derived(tooltip != null || hasHoverMarker(markers));
+  const hoverStrategy = $derived(resolveHoverStrategy(tooltip?.strategy, markers, 'punctual'));
+  const hoverSync = $derived(resolveHoverSync(tooltip?.sync, markers));
 </script>
 
-<PlotLayout
+<BasePlotLayout
   {width}
   {height}
   data={flat}
@@ -188,13 +209,16 @@
   {hoverPoints}
   label={(d) => fmtVal(Number(getZ(d)), '')}
   {tooltip}
-  {markers}
-  seriesData={resolvedSeries}
+  {hoverActive}
+  {hoverStrategy}
+  {hoverSync}
   scales={resolvedScales}
   {margins}
-  showHoverLabels={false}
-  defaultStrategy="punctual"
 >
+  {#snippet children({ matchedPoints, ruleX, ruleY, impliesRuleX, impliesRuleY, numericMargins })}
+  <AxisLayout data={flat} {getX} {getY} {width} {height} {numericMargins} scales={resolvedScales} />
+  <GridLayout scales={resolvedScales} />
+  <RuleLayout {markers} seriesData={resolvedSeries} {matchedPoints} {ruleX} {ruleY} {impliesRuleX} {impliesRuleY} showHoverLabels={false}>
   {#each styleGroups as group, i (i)}
     <Cell
       data={group.data as unknown as Record<string | symbol, never>[]}
@@ -231,4 +255,6 @@
       textClass={styles.values?.textClass}
     />
   {/if}
-</PlotLayout>
+  </RuleLayout>
+  {/snippet}
+</BasePlotLayout>

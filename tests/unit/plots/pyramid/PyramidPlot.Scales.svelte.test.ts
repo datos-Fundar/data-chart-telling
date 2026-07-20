@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-import type { ScalesConfig } from '$lib/types/plots/common';
+import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
 import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../../stories/data/population-pyramid';
 import { waitForSvg, countBarRects } from '../_helpers/svg';
 
@@ -24,7 +24,7 @@ describe('PyramidPlot – scales', () => {
       width: 560,
       height: 520,
       ...DATA_PROPS,
-      scales: { y: { domain: AGE_GROUPS } } satisfies ScalesConfig,
+      scales: { y: { domain: AGE_GROUPS } } satisfies AxisBasedScalesConfig,
     });
     const svg = await waitForSvg(container);
     const ticks = Array.from(svg.querySelectorAll('g.axis-y text')).map((t) => t.textContent);
@@ -36,7 +36,7 @@ describe('PyramidPlot – scales', () => {
       width: 560,
       height: 520,
       ...DATA_PROPS,
-      scales: { x: { domain: [-6, 6] }, y: { domain: AGE_GROUPS } } satisfies ScalesConfig,
+      scales: { x: { domain: [-6, 6] }, y: { domain: AGE_GROUPS } } satisfies AxisBasedScalesConfig,
     });
     const svg = await waitForSvg(container);
     expect(countBarRects(svg)).toBe(DATA_PROPS.data.length);
@@ -49,7 +49,7 @@ describe('PyramidPlot – scales', () => {
         height: 520,
         ...DATA_PROPS,
         styles: { colors: { left: '#ff0000', right: '#0000ff' } },
-        scales: { y: { domain: AGE_GROUPS }, z: { reverse } } satisfies ScalesConfig,
+        scales: { y: { domain: AGE_GROUPS }, z: { reverse } } satisfies AxisBasedScalesConfig,
       });
       const svg = await waitForSvg(container);
       return Array.from(svg.querySelectorAll('g.bar-x rect')).map((r) => getComputedStyle(r).fill);
@@ -67,7 +67,7 @@ describe('PyramidPlot – scales', () => {
       scales: {
         x: { label: 'Population %' },
         y: { label: 'Age Group', domain: AGE_GROUPS },
-      } satisfies ScalesConfig,
+      } satisfies AxisBasedScalesConfig,
       margins: { left: 80, bottom: 50 },
     });
     const svg = await waitForSvg(container);

@@ -1,7 +1,8 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { Segments, LineSegmentStyle } from '$lib/types/plots/styles';
+import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
+import type { SegmentsConfig } from '$lib/types/plots/props';
 import { FEMALE_LIFE_EXPECTANCY, LIFE_EXPECTANCY } from '../../../../stories/plots/line/data';
 import { waitForSvg, countLinePaths, countDotMarks } from '../_helpers/svg';
 
@@ -18,7 +19,7 @@ describe('LinePlot – segments (areas)', () => {
           { areas: [{ x: { to: 2014 } }], style: { stroke: { stroke: '#4f46e5' } } },
           { areas: [{ x: { from: 2014 } }], style: { stroke: { stroke: '#4f46e5', strokeDasharray: '6 4' } } },
         ],
-      } satisfies Segments<LineSegmentStyle>,
+      } satisfies SegmentsConfig<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     // Two area segments plus the connector bridging the gap between them.
@@ -46,7 +47,7 @@ describe('LinePlot – segments (areas)', () => {
       series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }],
       segments: {
         female: [{ style: {} }, { style: {} }], // two catch-alls → ambiguous
-      } satisfies Segments<LineSegmentStyle>,
+      } satisfies SegmentsConfig<LineSegmentStyle>,
     });
     await vi.waitFor(() => {
       expect(warn).toHaveBeenCalledWith(expect.stringContaining('no areas'));
@@ -65,7 +66,7 @@ describe('LinePlot – segments (dots)', () => {
       series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }],
       segments: {
         female: [{ style: { stroke: { stroke: '#4f46e5' } } }],
-      } satisfies Segments<LineSegmentStyle>,
+      } satisfies SegmentsConfig<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     expect(countDotMarks(svg)).toBe(0);
@@ -78,7 +79,7 @@ describe('LinePlot – segments (dots)', () => {
       series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }],
       segments: {
         female: [{ style: { dots: { dotRadius: 4 } } }],
-      } satisfies Segments<LineSegmentStyle>,
+      } satisfies SegmentsConfig<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     expect(countDotMarks(svg)).toBe(FEMALE_LIFE_EXPECTANCY.length);
@@ -97,7 +98,7 @@ describe('LinePlot – segments (dots)', () => {
             style: { stroke: { strokeDasharray: '5 5' }, dots: { dotRadius: 4 } },
           },
         ],
-      } satisfies Segments<LineSegmentStyle>,
+      } satisfies SegmentsConfig<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     expect(countDotMarks(svg)).toBe(FEMALE_LIFE_EXPECTANCY.length);
@@ -110,7 +111,7 @@ describe('LinePlot – segments (dots)', () => {
       series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }],
       segments: {
         female: [{ style: { stroke: { stroke: '#dc2626' }, dots: { dotRadius: 4 } } }],
-      } satisfies Segments<LineSegmentStyle>,
+      } satisfies SegmentsConfig<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     const dot = svg.querySelector('g.dot path');
@@ -125,7 +126,7 @@ describe('LinePlot – segments (dots)', () => {
         series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }],
         segments: {
           female: [{ style: { dots: { dotRadius } } }],
-        } satisfies Segments<LineSegmentStyle>,
+        } satisfies SegmentsConfig<LineSegmentStyle>,
       });
       const svg = await waitForSvg(container);
       return svg.querySelector('g.dot path')?.getAttribute('d');
@@ -151,7 +152,7 @@ describe('LinePlot – segments (catch-all + area merging)', () => {
           { style: { stroke: { stroke: '#e11d48' } } },
           { areas: [{ x: { from: 2016 } }], style: { dots: { dotRadius: 5 } } },
         ],
-      } satisfies Segments<LineSegmentStyle>,
+      } satisfies SegmentsConfig<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     // Every line path (catch-all run + area run + connector) keeps the inherited color.
@@ -170,7 +171,7 @@ describe('LinePlot – segments (catch-all + area merging)', () => {
       z: 'sex',
       segments: {
         default: [{ style: { dots: { dotRadius: 4 } } }],
-      } satisfies Segments<LineSegmentStyle>,
+      } satisfies SegmentsConfig<LineSegmentStyle>,
     });
     const svg = await waitForSvg(container);
     expect(countDotMarks(svg)).toBe(LIFE_EXPECTANCY.length);

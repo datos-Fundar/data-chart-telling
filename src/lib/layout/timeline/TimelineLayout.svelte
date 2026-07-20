@@ -8,7 +8,7 @@
     TimelineChildSnippet,
     TimelineInterpolation,
   } from '$lib/types/charts/common';
-  import type { Accessor } from '$lib/types/plots/common';
+  import type { Accessor } from '$lib/types/plots/data/common';
 
   /**
    * Couples a scrubber `progress` to a discrete sequence of time steps. It picks

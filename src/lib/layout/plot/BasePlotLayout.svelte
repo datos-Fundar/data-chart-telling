@@ -1,0 +1,302 @@
+<script lang="ts" generics="TData extends Record<string, unknown>">
+  import type { ComponentProps, Snippet } from 'svelte';
+  import { SvelteSet } from 'svelte/reactivity';
+  import { Plot, Pointer } from 'svelteplot';
+  import { getConfiguration } from '$lib/configuration/config.svelte';
+  import { AUTO_MARGIN_ESTIMATE, numericMargin } from '$lib/layout/plot/margins';
+  import { getHover, createHover } from '$lib/layout/tooltip/hover.svelte';
+  import { createHoverController } from '$lib/layout/tooltip/controller.svelte';
+  import TooltipLayout from '$lib/layout/tooltip/TooltipLayout.svelte';
+  import type { AxisValue, AxisScale } from '$lib/types/plots/axis';
+  import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
+  import type { GeoProjectionConfig } from '$lib/types/plots/scales/geo';
+  import type { HoverStrategy, HoverPoint } from '$lib/types/layout/tooltip';
+  import type { MarginConfig, TooltipConfig } from '$lib/types/plots/props';
+
+  type SveltePlotProps = ComponentProps<typeof Plot>;
+
+  /**
+   * Shared chrome around every plot kind's svelteplot markup: the pointer-event
+   * wrapper, the hover/tooltip state machine, the `<Plot>` element itself, and
+   * the floating tooltip. Deliberately marker/axis-agnostic — axis-having plot
+   * kinds (line/bar/heatmap/pyramid) additionally compose `AxisLayout` /
+   * `GridLayout` / `RuleLayout` inside `children`; `GeoPlot` composes `GeoLayout`
+   * instead, since a map has no x/y axis pair. Every plot kind supplies its own
+   * `<Plot x y projection>` scale config (either directly via `x`/`y`/`projection`,
+   * or by leaving `x`/`y` unset so this component derives them from `scales`) and
+   * its own marks/markers through `children`.
+   */
+  let {
+    width,
+    height,
+    data,
+    getX,
+    getY,
+    hoverPoints,
+    label,
+    tooltip = undefined,
+    hoverActive,
+    hoverStrategy = undefined,
+    hoverSync = undefined,
+    x = undefined,
+    y = undefined,
+    scales = undefined,
+    projection = undefined,
+    margins,
+    marginEstimate = AUTO_MARGIN_ESTIMATE,
+    xTickRotate = undefined,
+    excludeHover = undefined,
+    touchAction = undefined,
+    containerEl = $bindable(undefined),
+    children,
+  }: {
+    width: number;
+    height: number;
+    /** Flat rows fed to svelteplot's `<Pointer>` for nearest-point matching. */
+    data: TData[];
+    getX: (d: TData) => AxisValue;
+    getY: (d: TData) => AxisValue;
+    hoverPoints: HoverPoint<TData>[];
+    label: (row: TData) => string;
+    tooltip?: TooltipConfig<TData>;
+    /** Whether the pointer/hover/tooltip machinery should mount at all. */
+    hoverActive: boolean;
+    /** Resolved hover strategy for the *local* hover store (ignored once a shared store is in scope). */
+    hoverStrategy?: HoverStrategy;
+    /** Resolved sync flag for the *local* hover store (ignored once a shared store is in scope). */
+    hoverSync?: boolean;
+    /** Explicit `<Plot x>` override — bypasses `scales`-derived resolution (e.g. GeoPlot's fixed lon/lat domain). */
+    x?: SveltePlotProps['x'];
+    /** Explicit `<Plot y>` override — see `x`. */
+    y?: SveltePlotProps['y'];
+    /** Scale config `x`/`y` are derived from when not given directly. */
+    scales?: AxisBasedScalesConfig<TData>;
+    /** Forwarded to `<Plot projection>` — GeoPlot only. */
+    projection?: GeoProjectionConfig;
+    /** Partial margin override — merged on top of the theme. */
+    margins?: MarginConfig;
+    /** Numeric fallback for a margin side that resolved to `'auto'` — see `numericMargin`'s doc comment. */
+    marginEstimate?: Record<'top' | 'right' | 'bottom' | 'left', number>;
+    /** Boosts the bottom margin for a rotated x tick label — axis-having plot kinds only. */
+    xTickRotate?: number;
+    /**
+     * When it returns `true` for a pointer event, that event is treated as a
+     * leave instead of a move — lets a nested layout (e.g. GeoLayout's inset
+     * markers) opt specific screen regions out of this plot's own hover
+     * matching without this component needing to know why.
+     */
+    excludeHover?: (e: PointerEvent) => boolean;
+    /** Forwarded to the wrapper div's `touch-action` CSS — GeoPlot's zoom/pan only. */
+    touchAction?: string;
+    /** The wrapper div's own element — bind for a nested layout that needs it for its own gesture handling (e.g. GeoLayout's zoom/rotate). */
+    containerEl?: HTMLDivElement;
+    /**
+     * `matchedPoints` carries the source `row` alongside the display fields
+     * — needed by plot kinds whose semantic value isn't tied to a fixed
+     * visual axis (e.g. `BarPlot`'s category, which can be drawn on either
+     * axis depending on orientation), so a template can resolve it straight
+     * off `row` instead of assuming which of `.x`/`.y` it landed on.
+     * `impliesRuleX`/`impliesRuleY` tell the plot kind whether the active
+     * strategy implies a crosshair rule on each axis by default.
+     * `numericMargins` lets a nested layout align itself with the plot's own
+     * content box without recomputing margins itself.
+     */
+    children: Snippet<
+      [{
+        matchedPoints: HoverPoint<TData>[];
+        ruleX: AxisValue | null;
+        ruleY: AxisValue | null;
+        impliesRuleX: boolean;
+        impliesRuleY: boolean;
+        numericMargins: { top: number; right: number; bottom: number; left: number };
+      }]
+    >;
+  } = $props();
+
+  const cfg = $derived(getConfiguration());
+
+  /**
+   * Margins passed straight to `<Plot margin={…}>`. Each side defaults to
+   * `'auto'` (from the theme), which lets svelteplot size it to whatever it
+   * actually renders there — tick labels, an axis title, rotated ticks —
+   * rather than a fixed guess that either clips content or wastes space.
+   * `margins`/`cfg.margins` can still pin a side to an exact number.
+   */
+  const computedMargins = $derived.by(() => {
+    const base = { ...cfg.margins, ...margins };
+    // Auto margins already measure the real (rotated) label bounding box, so
+    // this manual boost is only needed when the caller pinned bottom to a
+    // fixed number, which bypasses that measurement.
+    if (!xTickRotate || typeof base.bottom !== 'number') return base;
+    const rad = Math.abs(xTickRotate) * Math.PI / 180;
+    return {
+      ...base,
+      bottom: base.bottom + Math.ceil(Math.sin(rad) * 20),
+    };
+  });
+
+  const numericMargins = $derived({
+    top: numericMargin('top', computedMargins.top, marginEstimate),
+    right: numericMargin('right', computedMargins.right, marginEstimate),
+    bottom: numericMargin('bottom', computedMargins.bottom, marginEstimate),
+    left: numericMargin('left', computedMargins.left, marginEstimate),
+  });
+
+  /** One representative row per unique axis value (first occurrence in `data`). */
+  function uniqueRows(rows: TData[], getAxisValue: (d: TData) => AxisValue): TData[] {
+    const seen = new SvelteSet<AxisValue>();
+    const out: TData[] = [];
+    for (const row of rows) {
+      const v = getAxisValue(row);
+      if (seen.has(v)) continue;
+      seen.add(v);
+      out.push(row);
+    }
+    return out;
+  }
+
+  /**
+   * svelteplot's own `sort` scale option only toggles a fixed ascending sort
+   * (lexicographic for strings) — it can't take a custom comparator. When the
+   * caller supplies one via `scales.x.sort`/`scales.y.sort` for a string-valued
+   * axis (e.g. dates formatted as text, or categories ordered by another
+   * field), compute the ordered domain ourselves and hand it to the scale as
+   * an explicit `domain`, which svelteplot does respect as-is for ordinal
+   * scales. The comparator receives one representative row per unique axis
+   * value, not just the axis value itself, so it can sort by this axis's own
+   * value or by any other field on the row.
+   */
+  function sortedScale(scale: AxisScale<TData> | undefined, rows: TData[], getAxisValue: (d: TData) => AxisValue): AxisScale<TData> | undefined {
+    const sort = scale?.sort;
+    if (!sort || scale?.domain) return scale;
+    const reps = uniqueRows(rows, getAxisValue);
+    if (reps.length === 0 || !reps.every((r) => typeof getAxisValue(r) === 'string')) return scale;
+    const domain = [...reps].sort(sort).map(getAxisValue);
+    return { ...scale, domain };
+  }
+
+  /**
+   * `grid`/`seriesLayout`/`seriesPadding` and a vertical `label` are rendered
+   * by `GridLayout`/`AxisLayout` themselves rather than passed through to
+   * svelteplot (which only draws a fixed-style implicit grid, and never
+   * rotates the axis title) — stripped here so they don't also trigger
+   * svelteplot's own (duplicate, unstyled) rendering of them. Also the single
+   * place a plot kind's fully-resolved `scales.x`/`scales.y` (defaults
+   * already merged in by the plot itself) turns into what svelteplot's own,
+   * narrower scale option type actually accepts.
+   */
+  function finalizeScale(scale: AxisScale<TData> | undefined, rows: TData[], getAxisValue: (d: TData) => AxisValue): AxisScale<TData> | undefined {
+    const sorted = sortedScale(scale, rows, getAxisValue);
+    if (!sorted) return sorted;
+    const out = { ...sorted };
+    delete out.grid;
+    delete out.seriesLayout;
+    delete out.seriesPadding;
+    if (scale?.labelOrientation === 'vertical') delete out.label;
+    return out;
+  }
+
+  // Cast to svelteplot's own (narrower, axis-specific) scale option type:
+  // finalizeScale has already stripped the fields that don't exist there
+  // (grid, the vertical label config, BarPlot's series-layout knobs).
+  const resolvedX = $derived(x !== undefined ? x : (finalizeScale(scales?.x, data, getX) as SveltePlotProps['x']));
+  const resolvedY = $derived(y !== undefined ? y : (finalizeScale(scales?.y, data, getY) as SveltePlotProps['y']));
+
+  // ── Hover / tooltip ───────────────────────────────────────────────────────
+  const sharedHover = getHover();
+  const localHover = createHover();
+  const hover = $derived(sharedHover ?? localHover);
+
+  /**
+   * Which axes svelteplot's `<Pointer>` should search along — derived from
+   * the *active* strategy rather than taken as separate props. Passing
+   * `undefined` for an axis collapses every point to the same coordinate on
+   * that axis in the search quadtree, making the nearest-neighbor match
+   * ignore it entirely: `'x'` (line/bar) searches x only, `'y'` (pyramid —
+   * its category sits on y, and a bar's own magnitude on x shouldn't pull in
+   * a *different* row just because that row's bar tip is nearer in x)
+   * searches y only, and `'punctual'` (heatmap/geo's 2D grid) needs both.
+   * Reactive to `hover.strategy`, so a caller overriding `tooltip.strategy`/a
+   * hover marker's `strategy` away from the plot kind's default gets
+   * correctly-dimensioned matching too.
+   */
+  const pointerMatchX = $derived(hover.strategy === 'y' ? undefined : getX);
+  const pointerMatchY = $derived(hover.strategy === 'x' ? undefined : getY);
+
+  $effect(() => {
+    if (sharedHover) return;
+    localHover.strategy = hoverStrategy ?? 'x';
+    localHover.sync = hoverSync ?? false;
+  });
+
+  const ctrl = createHoverController<TData>({
+    hover: () => hover,
+    facetId: () => tooltip?.facetId ?? '',
+    points: () => hoverPoints,
+    getX: () => getX,
+    getY: () => getY,
+    label: () => label,
+    seriesFilter: () => tooltip?.series,
+    width: () => width,
+    height: () => height,
+  });
+
+  function onMove(e: PointerEvent) {
+    if (excludeHover?.(e)) {
+      ctrl.onLeave();
+      return;
+    }
+    ctrl.onMove(e);
+  }
+</script>
+
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div
+  class="dct-plot"
+  bind:this={containerEl}
+  style:color={cfg.axis.color}
+  style:touch-action={touchAction}
+  onpointermove={hoverActive ? onMove : undefined}
+  onpointerleave={hoverActive ? ctrl.onLeave : undefined}
+>
+  <Plot
+    {width}
+    {height}
+    margin={computedMargins}
+    x={resolvedX}
+    y={resolvedY}
+    projection={projection as SveltePlotProps['projection']}
+  >
+    {@render children({
+      matchedPoints: ctrl.points,
+      ruleX: ctrl.ruleX,
+      ruleY: ctrl.ruleY,
+      impliesRuleX: ctrl.impliesRuleX,
+      impliesRuleY: ctrl.impliesRuleY,
+      numericMargins,
+    })}
+
+    {#if hoverActive}
+      <Pointer {data} x={pointerMatchX} y={pointerMatchY} maxDistance={400} onupdate={ctrl.onPointer} />
+    {/if}
+  </Plot>
+
+  {#if tooltip}
+    <TooltipLayout
+      visible={ctrl.showTooltip && ctrl.tooltipPosition != null}
+      x={ctrl.tooltipPosition?.x ?? 0}
+      y={ctrl.tooltipPosition?.y ?? 0}
+      bounds={{ width, height }}
+      rows={ctrl.matchedRows.map((p) => p.row)}
+      format={tooltip.format}
+      content={tooltip.content}
+    />
+  {/if}
+</div>
+
+<style>
+  .dct-plot {
+    position: relative;
+    line-height: 0;
+  }
+</style>

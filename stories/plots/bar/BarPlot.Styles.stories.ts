@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
-import type { Series, ScalesConfig } from '$lib/types/plots/common';
-import type { PlotStyles } from '$lib/types/plots/styles';
+import type { Series } from '$lib/types/plots/data/common';
+import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
+import type { BasePlotStyles } from '$lib/types/plots/styles/common';
 import {
   FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
   MALE_LIFE_EXPECTANCY_BY_PROVINCE,
@@ -83,7 +84,7 @@ export const ShowValues: Story = {
     series: [FEMALE],
     styles: {
       values: { show: true },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
   },
 };
 
@@ -100,7 +101,7 @@ export const AnchorOutside: Story = {
         anchor: 'outside',
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
   },
 };
 
@@ -118,7 +119,7 @@ export const AnchorEnd: Story = {
         dy: -10,
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
   },
 };
 
@@ -135,7 +136,7 @@ export const AnchorMiddle: Story = {
         anchor: 'middle',
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
   },
 };
 
@@ -153,7 +154,7 @@ export const AnchorStart: Story = {
         dy: 10,
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
   },
 };
 
@@ -170,7 +171,7 @@ export const CustomFormat: Story = {
         show: true,
         format: (v: number, name: string) => `${name} → ${v.toFixed(1)} yr`,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
   },
 };
 
@@ -192,7 +193,7 @@ export const CustomOffsets: Story = {
         format: (v: number) => `${v.toFixed(1)} yr`,
         dy: -12,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
   },
 };
 
@@ -209,7 +210,7 @@ export const TwoSeriesWithLabels: Story = {
         show: true,
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
   },
 };
 
@@ -226,7 +227,7 @@ export const TwoSeriesLabelsMiddle: Story = {
         anchor: 'middle',
         format: (v: number, name: string) => `${name}: ${v.toFixed(1)} yr`,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
   },
 };
 
@@ -243,10 +244,10 @@ export const TwoSeriesGroupedLabelsMiddle: Story = {
         anchor: 'middle',
         format: (v: number, name: string) => `${name}\n(${v.toFixed(1)} yr)`,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
     scales: {
       z: { seriesLayout: 'grouped', seriesPadding: 0.2 },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -263,10 +264,10 @@ export const TwoSeriesStackedLabelsMiddle: Story = {
         anchor: 'middle',
         format: (v: number, name: string) => `${name}\n(${v.toFixed(1)} yr)`,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
     scales: {
       z: { seriesLayout: 'stacked' },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -288,6 +289,6 @@ export const LowLevelTextPlacement: Story = {
         dy: -8,
         dx: 0,
       },
-    } satisfies PlotStyles,
+    } satisfies BasePlotStyles,
   },
 };

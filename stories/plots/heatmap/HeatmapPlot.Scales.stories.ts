@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-import type { Series, ScalesConfig } from '$lib/types/plots/common';
+import type { Series } from '$lib/types/plots/data/common';
+import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
 import { LIFE_EXPECTANCY_BY_PROVINCE_SEX, PROVINCES, SEXES, type ProvinceSexCell } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -64,7 +65,7 @@ export const WithAxisLabels: Story = {
     scales: {
       x: { label: 'Province' },
       y: { label: 'Sex' },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -87,7 +88,7 @@ export const ExplicitXDomain: Story = {
     scales: {
       x: { domain: PROVINCES, label: 'Province' },
       y: { domain: SEXES, label: 'Sex' },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -111,7 +112,7 @@ export const ExplicitZDomain: Story = {
     ],
     scales: {
       z: { domain: [70, 85] },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -133,7 +134,7 @@ export const ReversedY: Story = {
     scales: {
       y: { reverse: true },
       z: { domain: [70, 85] },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -155,7 +156,7 @@ export const RotatedXTicks: Story = {
     scales: {
       x: { tickRotate: -45 },
       z: { domain: [70, 85] },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
   },
 };
 
@@ -178,7 +179,7 @@ export const CombinedOverrides: Story = {
       x: { domain: PROVINCES, label: 'Province', tickRotate: -45 },
       y: { domain: SEXES, label: 'Sex' },
       z: { domain: [70, 85] },
-    } satisfies ScalesConfig,
+    } satisfies AxisBasedScalesConfig,
     margins: { bottom: 50, left: 100 },
   },
 };

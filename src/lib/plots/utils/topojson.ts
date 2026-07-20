@@ -1,4 +1,4 @@
-import type { GeoFeature, Topology } from '$lib/types/plots/geo/common';
+import type { GeoFeature, Topology } from '$lib/types/plots/data/geo';
 
 export function isTopology(data: unknown): data is Topology {
   return !!data && typeof data === 'object' && (data as { type?: unknown }).type === 'Topology';

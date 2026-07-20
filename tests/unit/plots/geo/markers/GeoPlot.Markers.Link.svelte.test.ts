@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/plots/geo/markers';
+import type { GeoMarker } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, FLIGHT_ROUTES } from '../../../../../stories/plots/geo/data';
 import { waitForSvg, countLinkPaths } from '../../_helpers/svg';
 

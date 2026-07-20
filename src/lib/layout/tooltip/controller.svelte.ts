@@ -6,7 +6,7 @@ import {
   filterBySeries,
 } from '$lib/layout/tooltip/utils';
 import type { HoverStore, HoverPoint } from '$lib/types/layout/tooltip';
-import type { AxisValue } from '$lib/types/plots/common';
+import type { AxisValue } from '$lib/types/plots/axis';
 
 /**
  * The plot-agnostic hover state machine shared by every plot. Given reactive
@@ -26,7 +26,6 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
   getY: () => (d: T) => AxisValue;
   /** Short label drawn next to the highlight dot (e.g. the value). */
   label: () => (row: T) => string;
-  format: () => (row: T) => string;
   /** Named subset of series the tooltip text/content should be limited to. */
   seriesFilter?: () => string[] | undefined;
   /** This facet's own box, used to convert the cursor to/from a sync-broadcast fraction. */
@@ -63,7 +62,7 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
   const highlight = $derived(matched.map(({ x, y, label, series, color, dx, dy, row }) => ({ x, y, label, series, color, dx, dy, row })));
 
   // Raw hover position — available whenever there are matched points.
-  // PlotLayout gates actual display with impliesRuleX/Y + the marker's ruleX/Y props.
+  // BasePlotLayout gates actual display with impliesRuleX/Y + the marker's ruleX/Y props.
   const ruleX = $derived(matched.length > 0 ? args.hover().activeX : null);
   const ruleY = $derived(matched.length > 0 ? args.hover().activeY : null);
 
@@ -77,10 +76,6 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
     if (h.source === args.facetId()) return cursor != null;
     return h.sync;
   });
-  const tooltipText = $derived(
-    matchedRows.length ? matchedRows.map((p) => args.format()(p.row)).join('\n') : '',
-  );
-
   function onPointer(data: T[]) {
     const h = args.hover();
     if (data.length) {
@@ -148,9 +143,6 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
     },
     get showTooltip() {
       return showTooltip;
-    },
-    get tooltipText() {
-      return tooltipText;
     },
     get tooltipPosition() {
       return tooltipPosition;

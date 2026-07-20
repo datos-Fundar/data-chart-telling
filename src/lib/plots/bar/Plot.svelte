@@ -13,18 +13,35 @@
   import { buildHoverPoints } from '$lib/plots/bar/hoverPoints';
   import BarSegments from '$lib/plots/bar/BarSegments.svelte';
   import ValueLabels from '$lib/plots/bar/ValueLabels.svelte';
-  import PlotLayout from '$lib/layout/plot/PlotLayout.svelte';
-  import HoverMarker from '$lib/plots/markers/HoverMarker.svelte';
-  import type { Marker } from '$lib/types/plots/markers';
-  import type { PlotProps } from '$lib/types/plots/props';
-  import type { Series, AxisScale } from '$lib/types/plots/common';
-  import type { BarSegmentStyle, ValueAnchor } from '$lib/types/plots/styles';
+  import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
+  import AxisLayout from '$lib/layout/plot/AxisLayout.svelte';
+  import GridLayout from '$lib/layout/plot/GridLayout.svelte';
+  import RuleLayout from '$lib/layout/plot/RuleLayout.svelte';
+  import HoverMarker from '$lib/markers/HoverMarker.svelte';
+  import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
+  import type { Marker } from '$lib/types/markers/common';
+  import type { BasePlotProps } from '$lib/types/plots/props';
+  import type { AxisScale } from '$lib/types/plots/axis';
+  import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
+  import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
+  import type { BasePlotStyles } from '$lib/types/plots/styles/common';
+  import type { ValueAnchor } from '$lib/types/plots/constants';
+  import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 
   /**
    * A bar chart, vertical by default. Accepts either a pre-built `series`
    * array or flat `data/x/y/z` props — mirrors the line/heatmap plot contract
    * so the chart-level container/timeline/facet/legend wrap it unchanged.
    */
+  type Props = BasePlotProps<
+    SeriesProps<TData> | DataProps<TData>,
+    TData,
+    BasePlotStyles,
+    BarSegmentStyle,
+    Marker,
+    AxisBasedScalesConfig<TData>
+  >;
+
   let {
     width,
     height,
@@ -39,7 +56,7 @@
     scales = {},
     margins,
     tooltip = undefined,
-  }: PlotProps<TData, BarSegmentStyle> = $props();
+  }: Props = $props();
 
   $effect(() => { validateSegments(segments); });
 
@@ -108,7 +125,7 @@
     delete rest.type;
     return rest;
   }
-  // The single, fully-resolved scales object PlotLayout reads for
+  // The single, fully-resolved scales object BasePlotLayout reads for
   // everything (ticks, grid, sort, and the real svelteplot scale) — avoids
   // keeping a second, separately-patched copy of `scales.x`/`scales.y` in
   // sync with the one actually forwarded.
@@ -139,14 +156,18 @@
     groupedSeries: () => groupedSeries,
   });
 
-  // `x`/`y` here are visual (matched against PlotLayout's own getX/getY,
+  // `x`/`y` here are visual (matched against BasePlotLayout's own getX/getY,
   // which drive tick/domain computation and the Pointer's hit-testing) —
-  // `row` (see PlotLayout/HoverPoint) is what lets the template recover the
+  // `row` (see BasePlotLayout/HoverPoint) is what lets the template recover the
   // semantic category regardless of which axis it landed on.
   const hoverPoints = $derived(buildHoverPoints(resolvedSeries, isHorizontal, barLayout, cfg.palette));
+
+  const hoverActive = $derived(tooltip != null || hasHoverMarker(markers));
+  const hoverStrategy = $derived(resolveHoverStrategy(tooltip?.strategy, markers, categoricalAxis));
+  const hoverSync = $derived(resolveHoverSync(tooltip?.sync, markers));
 </script>
 
-<PlotLayout
+<BasePlotLayout
   {width}
   {height}
   data={flat}
@@ -155,13 +176,17 @@
   {hoverPoints}
   label={(r) => String(yAcc(r))}
   {tooltip}
-  {markers}
-  seriesData={resolvedSeries}
+  {hoverActive}
+  {hoverStrategy}
+  {hoverSync}
   scales={resolvedScales}
   {margins}
-  defaultStrategy={categoricalAxis}
+  xTickRotate={resolvedScales?.x?.tickRotate}
 >
-  {#snippet children({ matchedPoints, ruleX, ruleY, impliesRuleX, impliesRuleY })}
+  {#snippet children({ matchedPoints, ruleX, ruleY, impliesRuleX, impliesRuleY, numericMargins })}
+  <AxisLayout data={flat} getX={plotGetX} getY={plotGetY} {width} {height} {numericMargins} scales={resolvedScales} />
+  <GridLayout scales={resolvedScales} />
+  <RuleLayout {markers} seriesData={resolvedSeries} {matchedPoints} {ruleX} {ruleY} {impliesRuleX} {impliesRuleY}>
   {#each groupedSeries as group, seriesIndex (group.series.name)}
     {@const defaultColor = paletteColor(seriesIndex, cfg.palette)}
     <BarSegments {group} {seriesIndex} {barLayout} {isHorizontal} {BarMark} {defaultColor} />
@@ -206,5 +231,6 @@
       {/if}
     {/each}
   {/each}
+  </RuleLayout>
   {/snippet}
-</PlotLayout>
+</BasePlotLayout>

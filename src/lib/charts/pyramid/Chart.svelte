@@ -1,5 +1,5 @@
 <script lang="ts" generics="TRow extends Record<string, unknown>">
-  import Chart from '$lib/charts/Chart.svelte';
+  import BaseChart from '$lib/charts/BaseChart.svelte';
   import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
   import {
     resolveTooltip,
@@ -9,8 +9,9 @@
   } from '$lib/layout/tooltip/utils';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { resolveTimelineInterpolation } from '$lib/utils/interpolate';
-  import type { Accessor, AxisValue } from '$lib/types/plots/common';
-  import type { BarSegmentStyle } from '$lib/types/plots/styles';
+  import type { AxisValue } from '$lib/types/plots/axis';
+  import type { Accessor } from '$lib/types/plots/data/common';
+  import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
   import type { ChartProps } from '$lib/types/charts/props';
 
   /**
@@ -19,7 +20,7 @@
    * into series and assigns left/right sides automatically from the
    * alphabetical order of `z` values. Pass `scales.z.reverse: true` to flip
    * which side goes first. Delegates all chrome (title, legend, timeline,
-   * facets) to {@link Chart}.
+   * facets) to {@link BaseChart}.
    */
   let {
     width,
@@ -89,7 +90,7 @@
   );
 </script>
 
-<Chart
+<BaseChart
   {width}
   {height}
   {title}
@@ -128,4 +129,4 @@
         : undefined}
     />
   {/snippet}
-</Chart>
+</BaseChart>

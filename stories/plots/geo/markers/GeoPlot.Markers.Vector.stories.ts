@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/plots/geo/markers';
+import type { GeoMarker } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, POPULATION_SHIFT } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────

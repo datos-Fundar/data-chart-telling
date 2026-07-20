@@ -1,4 +1,4 @@
-import type { GeoProjectionConfig } from '$lib/types/plots/geo/scales';
+import type { GeoProjectionConfig } from '$lib/types/plots/scales/geo';
 
 /**
  * `data` (see `resolveProjection`) is one row per disjoint geometry *part*
@@ -26,9 +26,9 @@ function dedupeByGeometry<TFeature extends { geometry?: unknown }>(data: TFeatur
 
 /**
  * Resolves a `GeoScalesConfig['projection']` into what svelteplot's own
- * `<Plot projection>` expects — kept separate from `GeoPlotLayout.svelte` so
- * adding more projection-level behavior (like the `domain: 'data'` sentinel
- * below) doesn't grow the layout component itself.
+ * `<Plot projection>` expects — kept separate from `GeoPlot`'s own
+ * `Plot.svelte` so adding more projection-level behavior (like the
+ * `domain: 'data'` sentinel below) doesn't grow that component itself.
  */
 export function resolveProjection<TFeature extends Record<string, unknown> & { geometry?: unknown }>(
   projection: GeoProjectionConfig | undefined,

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { Segments } from '$lib/types/plots/styles';
-import type { GeoSegmentStyle } from '$lib/types/plots/geo/styles';
+import type { SegmentsConfig } from '$lib/types/plots/props';
+import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
 import { argentinaBicontinental } from '$lib/plots/geo/projections/argentina';
 import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from './data';
 
@@ -50,7 +50,7 @@ export const HighlightOneProvince: Story = {
     segments: {
       'Buenos Aires': [{ style: { fill: 'tomato' } }],
       default: [{ style: { fill: '#cbd5e1', fillOpacity: 0.6 } }],
-    } satisfies Segments<GeoSegmentStyle>,
+    } satisfies SegmentsConfig<GeoSegmentStyle>,
   },
 };
 
@@ -62,7 +62,7 @@ export const HighlightSeveralProvinces: Story = {
       Córdoba: [{ style: { fill: '#f59e0b' } }],
       Mendoza: [{ style: { fill: '#16a34a' } }],
       default: [{ style: { fill: '#e2e8f0' } }],
-    } satisfies Segments<GeoSegmentStyle>,
+    } satisfies SegmentsConfig<GeoSegmentStyle>,
   },
 };
 
@@ -76,7 +76,7 @@ export const DefaultMergesWithFeatureStyle: Story = {
     segments: {
       default: [{ style: { fill: '#94a3b8', stroke: '#1e293b', strokeWidth: 1 } }],
       Mendoza: [{ style: { fillOpacity: 0.3 } }],
-    } satisfies Segments<GeoSegmentStyle>,
+    } satisfies SegmentsConfig<GeoSegmentStyle>,
   },
 };
 
@@ -86,6 +86,6 @@ export const HighlightWithStroke: Story = {
     segments: {
       Chubut: [{ style: { stroke: '#dc2626', strokeWidth: 3 } }],
       default: [{ style: { fill: '#e2e8f0', stroke: '#94a3b8', strokeWidth: 0.5 } }],
-    } satisfies Segments<GeoSegmentStyle>,
+    } satisfies SegmentsConfig<GeoSegmentStyle>,
   },
 };
