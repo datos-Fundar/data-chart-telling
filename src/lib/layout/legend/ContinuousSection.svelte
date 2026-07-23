@@ -26,10 +26,25 @@
   // ── Drag-to-narrow-margins ────────────────────────────────────────────────
   const interaction = getLegendInteraction() ?? createLegendInteraction();
 
-  // Seeded once from the section's own bounds (deliberately untracked — this
-  // component doesn't follow later `section.min`/`max` prop changes).
+  // Seeded once from the section's own bounds (deliberately untracked — a
+  // later `section.min`/`max` change re-clamps the existing lo/hi instead of
+  // resetting them back out to the new full range, see below).
   let lo = $state(untrack(() => section.min));
   let hi = $state(untrack(() => section.max));
+
+  // `section.min`/`max` can shift under an already-active selection — e.g. a
+  // consumer swaps `data` for a different year on its own timeline, and the
+  // value that used to be the max is no longer present. Re-clamping (instead
+  // of leaving lo/hi at their old absolute values) keeps the handles inside
+  // whatever range now actually exists: the lower handle can only move up to
+  // meet a risen min, the upper handle can only move down to meet a fallen
+  // max. Clamping each bound against *both* of the new min/max first (not
+  // just its own side) keeps lo/hi from inverting if the domain shifts
+  // entirely past the old selection.
+  $effect(() => {
+    lo = Math.min(Math.max(lo, section.min), section.max);
+    hi = Math.max(Math.min(hi, section.max), section.min);
+  });
 
   function toT(v: number): number {
     return (v - section.min) / (section.max - section.min || 1);
