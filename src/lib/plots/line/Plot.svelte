@@ -8,6 +8,8 @@
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { paletteColor } from '$lib/utils/color';
   import { buildSeries } from '$lib/utils/grouping';
+  import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
+  import { disabledStrokeOverride, disabledDotsOverride } from '$lib/plots/utils/legendDisabled';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import AxisLayout from '$lib/layout/plot/AxisLayout.svelte';
   import GridLayout from '$lib/layout/plot/GridLayout.svelte';
@@ -50,6 +52,7 @@
   }: Props = $props();
 
   const resolvedSeries = $derived(series ?? buildSeries(data!, x!, y!, z));
+  const legendInteraction = $derived(getLegendInteraction());
 
   $effect(() => { validateSegments(segments); });
 
@@ -82,8 +85,11 @@
   const xAcc = $derived(resolveAccessor(resolvedSeries[0]?.x ?? ((d: TData) => d)));
   const yAcc = $derived(resolveAccessor(resolvedSeries[0]?.y ?? ((d: TData) => d)));
   const flat = $derived(resolvedSeries.flatMap((s) => s.data));
+  // A legend-disabled series is dimmed on the mark itself, but never surfaces
+  // in hover/tooltip — its points are simply absent from the candidate list.
   const hoverPoints = $derived(
     resolvedSeries.flatMap((s, idx) => {
+      if (legendInteraction?.disabledSeries.has(s.name)) return [];
       const sx = resolveAccessor(s.x);
       const sy = resolveAccessor(s.y);
       return s.data.map((d) => ({
@@ -131,6 +137,9 @@
   <RuleLayout {markers} seriesData={resolvedSeries} {matchedPoints} {ruleX} {ruleY} {impliesRuleX} {impliesRuleY}>
   {#each groupedSeries as group, seriesIndex (group.series.name)}
     {@const defaultColor = paletteColor(seriesIndex, cfg.palette)}
+    {@const disabledOverride = legendInteraction?.disabledSeries.get(group.series.name)}
+    {@const disabledStroke = disabledStrokeOverride(disabledOverride)}
+    {@const disabledDots = disabledDotsOverride(disabledOverride)}
     {#each group.visualSegments as seg, i (`${group.series.name}-${i}`)}
       {@const strokeStyle = seg.style.stroke}
       {@const lineData = seg.data as unknown as Record<string | symbol, never>[]}
@@ -138,12 +147,12 @@
         data={lineData}
         x={resolveAccessor(group.series.x)}
         y={resolveAccessor(group.series.y)}
-        stroke={strokeStyle?.stroke ?? defaultColor}
-        strokeWidth={strokeStyle?.strokeWidth ?? cfg.line.strokeWidth}
-        strokeOpacity={strokeStyle?.strokeOpacity ?? 1}
-        strokeDasharray={strokeStyle?.strokeDasharray}
-        strokeLinejoin={strokeStyle?.strokeLinejoin}
-        strokeLinecap={strokeStyle?.strokeLinecap}
+        stroke={disabledStroke?.stroke ?? strokeStyle?.stroke ?? defaultColor}
+        strokeWidth={disabledStroke?.strokeWidth ?? strokeStyle?.strokeWidth ?? cfg.line.strokeWidth}
+        strokeOpacity={disabledStroke?.strokeOpacity ?? strokeStyle?.strokeOpacity ?? 1}
+        strokeDasharray={disabledStroke?.strokeDasharray ?? strokeStyle?.strokeDasharray}
+        strokeLinejoin={disabledStroke?.strokeLinejoin ?? strokeStyle?.strokeLinejoin}
+        strokeLinecap={disabledStroke?.strokeLinecap ?? strokeStyle?.strokeLinecap}
       />
       {#if seg.style.dots}
         {@const dotStyle = seg.style.dots}
@@ -151,14 +160,14 @@
           data={seg.data}
           x={resolveAccessor(group.series.x)}
           y={resolveAccessor(group.series.y)}
-          r={dotStyle.dotRadius ?? cfg.line.dotRadius}
-          fill={dotStyle.dotFill ?? strokeStyle?.stroke ?? defaultColor}
-          symbol={dotStyle.dotSymbol ?? 'circle'}
-          stroke={dotStyle.dotStroke ?? strokeStyle?.stroke ?? defaultColor}
-          strokeWidth={dotStyle.dotStrokeWidth ?? 1}
-          fillOpacity={dotStyle.dotFillOpacity ?? strokeStyle?.strokeOpacity ?? 1}
-          strokeOpacity={dotStyle.dotStrokeOpacity ?? strokeStyle?.strokeOpacity ?? 1}
-          strokeDasharray={dotStyle.dotStrokeDasharray}
+          r={disabledDots?.dotRadius ?? dotStyle.dotRadius ?? cfg.line.dotRadius}
+          fill={disabledDots?.dotFill ?? dotStyle.dotFill ?? strokeStyle?.stroke ?? defaultColor}
+          symbol={disabledDots?.dotSymbol ?? dotStyle.dotSymbol ?? 'circle'}
+          stroke={disabledDots?.dotStroke ?? dotStyle.dotStroke ?? strokeStyle?.stroke ?? defaultColor}
+          strokeWidth={disabledDots?.dotStrokeWidth ?? dotStyle.dotStrokeWidth ?? 1}
+          fillOpacity={disabledDots?.dotFillOpacity ?? dotStyle.dotFillOpacity ?? strokeStyle?.strokeOpacity ?? 1}
+          strokeOpacity={disabledDots?.dotStrokeOpacity ?? dotStyle.dotStrokeOpacity ?? strokeStyle?.strokeOpacity ?? 1}
+          strokeDasharray={disabledDots?.dotStrokeDasharray ?? dotStyle.dotStrokeDasharray}
         />
       {/if}
     {/each}

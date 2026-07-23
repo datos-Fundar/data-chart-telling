@@ -13,6 +13,8 @@
   import { isTopology, topologyToGeoJson } from '$lib/plots/utils/topojson';
   import { makeColorScale } from '$lib/utils/color';
   import { getConfiguration } from '$lib/configuration/config.svelte';
+  import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
+  import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
   import { GEO_MARGIN_ESTIMATE } from '$lib/layout/plot/margins';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import GeoLayout from '$lib/layout/geo/GeoLayout.svelte';
@@ -165,8 +167,16 @@
     return vals.length ? [Math.min(...vals), Math.max(...vals)] : null;
   });
 
+  // ── Legend-driven range filter (mirrors HeatmapPlot's own) ────────────────
+  const legendInteraction = $derived(getLegendInteraction());
+  const range = $derived(legendInteraction?.continuousRange);
+  const effectiveDomain = $derived.by((): [number, number] | null => {
+    if (!valueDomain) return null;
+    return range && range.mode === 'rescale' ? [range.min, range.max] : valueDomain;
+  });
+
   const colorScale = $derived(
-    valueDomain ? makeColorScale(valueDomain[0], valueDomain[1], minColor, maxColor) : null,
+    effectiveDomain ? makeColorScale(effectiveDomain[0], effectiveDomain[1], minColor, maxColor) : null,
   );
 
   function resolveBaseFill(f: TaggedFeature): string {
@@ -175,6 +185,14 @@
       if (v != null) return colorScale(v);
     }
     return styles.fill ?? cfg.palette[0];
+  }
+
+  function rangeFilteredStyle(base: GeoSegmentStyle, f: TaggedFeature): GeoSegmentStyle {
+    const r = range;
+    if (r == null || !value) return base;
+    const v = value(f);
+    if (v == null || (v >= r.min && v <= r.max)) return base;
+    return { ...base, ...disabledFillOverride(r.disabledStyle) };
   }
 
   /** Per-marker color ramp for a `dot` marker's `value` channel — independent of the base map's own choropleth ramp. */
@@ -197,7 +215,7 @@
   // shared numeric-scale machinery collapses a per-row fillOpacity/strokeWidth
   // *accessor* to a single value, so literal per-call constants are required.)
   function getFeatureStyle(f: TaggedFeature): GeoSegmentStyle {
-    return resolveFeatureStyle<GeoSegmentStyle>(segments, f.__id);
+    return rangeFilteredStyle(resolveFeatureStyle<GeoSegmentStyle>(segments, f.__id), f);
   }
 
   type StyleGroup = { style: GeoSegmentStyle; data: TaggedFeature[] };
@@ -228,7 +246,18 @@
     features.flatMap((f) => geometryPartCentroids(f.geometry).map(([cx, cy]) => ({ ...f, __cx: cx, __cy: cy }))),
   );
 
-  const hoverPoints = $derived(hoverCandidates.map((f) => ({ x: f.__cx, y: f.__cy, row: f, label: f.__id })));
+  // A feature outside the active range is dimmed in place, but never
+  // surfaces in hover/tooltip — it's simply absent from the candidate list.
+  const hoverPoints = $derived(
+    hoverCandidates
+      .filter((f) => {
+        const r = range;
+        if (r == null || !value) return true;
+        const v = value(f);
+        return v == null || (v >= r.min && v <= r.max);
+      })
+      .map((f) => ({ x: f.__cx, y: f.__cy, row: f, label: f.__id })),
+  );
   const hoverGetX = (f: TaggedFeature) => f.__cx;
   const hoverGetY = (f: TaggedFeature) => f.__cy;
 

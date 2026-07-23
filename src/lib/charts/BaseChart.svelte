@@ -5,6 +5,7 @@
   import LegendLayout from '$lib/layout/legend/LegendLayout.svelte';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { provideHover } from '$lib/layout/tooltip/hover.svelte';
+  import { provideLegendInteraction } from '$lib/layout/legend/interaction.svelte';
   import type { Snippet } from 'svelte';
   import type { LegendSection } from '$lib/types/charts/legend';
   import type { HoverStrategy } from '$lib/types/layout/tooltip';
@@ -59,6 +60,7 @@
   const cfg = $derived(getConfiguration());
 
   const hoverStore = provideHover();
+  provideLegendInteraction();
   $effect(() => {
     hoverStore.strategy = hover?.strategy ?? 'x';
     hoverStore.sync = hover?.sync ?? false;

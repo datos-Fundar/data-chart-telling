@@ -18,6 +18,7 @@
     isHorizontal,
     BarMark,
     defaultColor,
+    disabledFill,
   }: {
     group: VisualGroup<Series<TData>, BarSegmentStyle>;
     seriesIndex: number;
@@ -25,6 +26,7 @@
     isHorizontal: boolean;
     BarMark: typeof BarX | typeof BarY;
     defaultColor: string;
+    disabledFill?: { fill?: string; fillOpacity?: number };
   } = $props();
 
   const xFn = $derived(resolveAccessor(group.series.x));
@@ -39,7 +41,8 @@
     {...isHorizontal
       ? { y: xFn, x1: stackedBaselineFn, x2: stackedTopFn }
       : { x: xFn, y1: stackedBaselineFn, y2: stackedTopFn }}
-    fill={defaultColor}
+    fill={disabledFill?.fill ?? defaultColor}
+    fillOpacity={disabledFill?.fillOpacity ?? 1}
   />
 {:else}
   {#each group.visualSegments as seg, i (`${group.series.name}-${i}`)}
@@ -48,8 +51,8 @@
       {...isHorizontal
         ? { y: xFn, x1: barLayout.valueBaseline, x2: yFn }
         : { x: xFn, y1: barLayout.valueBaseline, y2: yFn }}
-      fill={seg.style.fill ?? defaultColor}
-      fillOpacity={seg.style.fillOpacity ?? 1}
+      fill={disabledFill?.fill ?? seg.style.fill ?? defaultColor}
+      fillOpacity={disabledFill?.fillOpacity ?? seg.style.fillOpacity ?? 1}
       {...barLayout.layout === 'grouped'
         ? isHorizontal
           ? {

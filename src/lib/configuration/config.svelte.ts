@@ -54,6 +54,7 @@ export const DEFAULT_CONFIG: ChartConfig = {
     titleWeight: 500,
     gap: '0.5rem 2rem',
     swatchSize: '1.25rem',
+    disabledOpacity: 0.12,
   },
 
   axis: {

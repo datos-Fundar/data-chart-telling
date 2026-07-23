@@ -1,13 +1,42 @@
 <script lang="ts">
+  import { SvelteSet } from 'svelte/reactivity';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { paletteColor } from '$lib/utils/color';
-  import type { DiscreteLegendSection } from '$lib/types/charts/legend';
+  import { getLegendInteraction, createLegendInteraction } from '$lib/layout/legend/interaction.svelte';
+  import type { DiscreteLegendSection, LegendItem } from '$lib/types/charts/legend';
   import type { LineStyle } from '$lib/types/plots/constants';
 
   let { section }: { section: DiscreteLegendSection } = $props();
 
   const cfg = $derived(getConfiguration());
   const columns = $derived(section.columns ?? 1);
+  const interaction = getLegendInteraction() ?? createLegendInteraction();
+
+  const seeded = new SvelteSet<string>();
+  $effect(() => {
+    for (const item of section.items) {
+      if (seeded.has(item.name)) continue;
+      seeded.add(item.name);
+      if (item.disabled) {
+        interaction.disabledSeries.set(item.name, section.disabledStyle ?? { opacity: cfg.legend.disabledOpacity });
+      }
+    }
+  });
+
+  function toggle(item: LegendItem): void {
+    if (!section.interactive) return;
+    if (interaction.disabledSeries.has(item.name)) {
+      interaction.disabledSeries.delete(item.name);
+    } else {
+      interaction.disabledSeries.set(item.name, section.disabledStyle ?? { opacity: cfg.legend.disabledOpacity });
+    }
+  }
+
+  function onKeydown(event: KeyboardEvent, item: LegendItem): void {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    toggle(item);
+  }
 
   function dashArray(style?: LineStyle): string | undefined {
     switch (style) {
@@ -25,8 +54,23 @@
 
 <div class="dct-discrete" style:grid-template-columns="repeat({columns}, max-content)">
   {#each section.items as item, i (item.name)}
-    {@const color = item.color ?? paletteColor(i, cfg.palette)}
-    <div class="dct-discrete__item" style:opacity={item.opacity ?? 1}>
+    {@const disabledStyle = interaction.disabledSeries.get(item.name)}
+    {@const color = disabledStyle?.fill ?? disabledStyle?.stroke?.stroke ?? item.color ?? paletteColor(i, cfg.palette)}
+    {@const itemOpacity = disabledStyle ? (disabledStyle.opacity ?? cfg.legend.disabledOpacity) : (item.opacity ?? 1)}
+    <div
+      class="dct-discrete__item"
+      class:dct-discrete__item--interactive={section.interactive}
+      style:opacity={itemOpacity}
+      {...section.interactive
+        ? {
+            role: 'button',
+            tabindex: 0,
+            'aria-pressed': disabledStyle != null,
+            onclick: () => toggle(item),
+            onkeydown: (e: KeyboardEvent) => onKeydown(e, item),
+          }
+        : {}}
+    >
       <svg class="dct-discrete__swatch" viewBox="0 0 15 10">
         {#if item.symbol === 'circle'}
           <circle cx="5" cy="5" r="4" fill={color} />
@@ -70,6 +114,14 @@
     align-items: center;
     gap: 0.35rem;
     min-width: 0;
+    transition: opacity 0.15s ease;
+  }
+  .dct-discrete__item--interactive {
+    cursor: pointer;
+  }
+  .dct-discrete__item--interactive:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
   }
   .dct-discrete__swatch {
     width: var(--dct-legend-swatch, 1.25rem);

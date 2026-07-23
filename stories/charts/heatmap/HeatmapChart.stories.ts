@@ -2,11 +2,11 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapChart from '$lib/charts/heatmap/Chart.svelte';
 import HeatmapTimeline from './HeatmapTimeline.svelte';
 import { HEAT_CELLS, type HeatCell } from '../../data/heat-cells';
-import type { LegendSection } from '$lib/types/charts/legend';
+import type { ContinuousLegendSection } from '$lib/types/charts/legend';
 
 const maxPct = Math.max(...HEAT_CELLS.map((d) => d.pct));
 
-const continuousLegend: LegendSection[] = [
+const continuousLegend: ContinuousLegendSection[] = [
   {
     type: 'continuous',
     title: 'Porcentaje',
@@ -57,6 +57,39 @@ export const Default: Story = {
     data: HEAT_CELLS.filter((d) => d.scenario === 'Base' && d.year === 2022),
     z: 'pct',
     legend: continuousLegend,
+    styles: { values: { format: (v: number) => `${(v * 100).toFixed(0)}%` } },
+  },
+};
+
+/**
+ * `interactive: true` on the continuous legend adds drag handles to its
+ * lower/upper edge — dragging narrows the visible range and mutes
+ * (`disabledStyle`) whatever cell falls outside it. `mode: 'filter'` (the
+ * default) keeps the color ramp's original domain, so in-range cells keep
+ * exactly the color they'd have without any filter active.
+ */
+export const InteractiveLegendFilter: Story = {
+  args: {
+    title: 'Hogares por personas y ambientes',
+    subtitle: "Leyenda interactiva · mode: 'filter'",
+    caption: 'Arrastrá los extremos de la leyenda: el rango angosto solo excluye celdas, no reescala el color.',
+    data: HEAT_CELLS.filter((d) => d.scenario === 'Base' && d.year === 2022),
+    z: 'pct',
+    tooltip: true,
+    legend: [{ ...continuousLegend[0], interactive: true, mode: 'filter' }],
+    styles: { values: { format: (v: number) => `${(v * 100).toFixed(0)}%` } },
+  },
+};
+
+/** Same drag interaction, but `mode: 'rescale'` reprojects the color ramp onto the narrowed range. */
+export const InteractiveLegendRescale: Story = {
+  args: {
+    title: 'Hogares por personas y ambientes',
+    subtitle: "Leyenda interactiva · mode: 'rescale'",
+    caption: 'Mismo drag que el ejemplo anterior, pero el color se reproyecta sobre el nuevo rango.',
+    data: HEAT_CELLS.filter((d) => d.scenario === 'Base' && d.year === 2022),
+    z: 'pct',
+    legend: [{ ...continuousLegend[0], interactive: true, mode: 'rescale' }],
     styles: { values: { format: (v: number) => `${(v * 100).toFixed(0)}%` } },
   },
 };

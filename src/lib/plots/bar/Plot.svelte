@@ -5,6 +5,8 @@
   import { SvelteMap } from 'svelte/reactivity';
   import { paletteColor } from '$lib/utils/color';
   import { buildSeries } from '$lib/utils/grouping';
+  import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
+  import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
   import { BarX, BarY } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { getConfiguration } from '$lib/configuration/config.svelte';
@@ -160,7 +162,14 @@
   // which drive tick/domain computation and the Pointer's hit-testing) —
   // `row` (see BasePlotLayout/HoverPoint) is what lets the template recover the
   // semantic category regardless of which axis it landed on.
-  const hoverPoints = $derived(buildHoverPoints(resolvedSeries, isHorizontal, barLayout, cfg.palette));
+  const legendInteraction = $derived(getLegendInteraction());
+  // A legend-disabled series is dimmed on the bar itself, but never surfaces
+  // in hover/tooltip — its points are simply absent from the candidate list.
+  const hoverPoints = $derived(
+    buildHoverPoints(resolvedSeries, isHorizontal, barLayout, cfg.palette).filter(
+      (p) => !legendInteraction?.disabledSeries.has(p.series!),
+    ),
+  );
 
   const hoverActive = $derived(tooltip != null || hasHoverMarker(markers));
   const hoverStrategy = $derived(resolveHoverStrategy(tooltip?.strategy, markers, categoricalAxis));
@@ -189,7 +198,8 @@
   <RuleLayout {markers} seriesData={resolvedSeries} {matchedPoints} {ruleX} {ruleY} {impliesRuleX} {impliesRuleY}>
   {#each groupedSeries as group, seriesIndex (group.series.name)}
     {@const defaultColor = paletteColor(seriesIndex, cfg.palette)}
-    <BarSegments {group} {seriesIndex} {barLayout} {isHorizontal} {BarMark} {defaultColor} />
+    {@const disabledFill = disabledFillOverride(legendInteraction?.disabledSeries.get(group.series.name))}
+    <BarSegments {group} {seriesIndex} {barLayout} {isHorizontal} {BarMark} {defaultColor} {disabledFill} />
 
     {#if showVals}
       <ValueLabels {group} {seriesIndex} {barLayout} {isHorizontal} {valAnchor} {fmtVal} values={styles.values} axisColor={cfg.axis.color} />

@@ -80,6 +80,35 @@ export const GroupedWithLegend: Story = {
   },
 };
 
+/**
+ * `interactive: true` on the discrete legend section turns each item into a
+ * toggle: click "PBI" or "Empleo" to dim that line (and its dots) in place,
+ * click again to bring it back. `disabledStyle` is caller-provided — here a
+ * near-full fade; omit it to fall back to the package's default dim opacity.
+ * `tooltip: true` is on here specifically to show that a hidden series also
+ * drops out of hover/tooltip matching — it's not just a visual fade.
+ */
+export const InteractiveLegend: Story = {
+  args: {
+    title: 'PBI vs. Empleo',
+    subtitle: 'Leyenda interactiva — click en una categoría para ocultarla',
+    data: TIME_SERIES.filter((d) => d.region === 'Norte'),
+    z: 'metric' as keyof SeriesPoint,
+    tooltip: true,
+    legend: [{
+      type: 'discrete',
+      title: 'Indicador',
+      interactive: true,
+      disabledStyle: { opacity: 0.08 },
+      items: [
+        { name: 'PBI', symbol: 'line' },
+        { name: 'Empleo', symbol: 'line' },
+      ],
+      columns: 2,
+    }],
+  },
+};
+
 // ── Timeline ────────────────────────────────────────────────────────────────────
 
 /**

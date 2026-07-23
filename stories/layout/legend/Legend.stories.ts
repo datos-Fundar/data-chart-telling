@@ -101,6 +101,76 @@ export const DiscreteAndContinuous: Story = {
   },
 };
 
+/**
+ * `interactive: true` makes each item clickable — click to dim it (and,
+ * inside a real chart, its series) via `disabledStyle`; click again to
+ * restore it. Omitting `disabledStyle` falls back to the package's default
+ * dim opacity (`cfg.legend.disabledOpacity`).
+ */
+export const InteractiveDiscrete: Story = {
+  args: {
+    sections: [
+      {
+        type: 'discrete',
+        title: 'Indicador (click para ocultar)',
+        interactive: true,
+        disabledStyle: { opacity: 0.15 },
+        items: [
+          { name: 'PBI', label: 'PBI', color: '#4f46e5', symbol: 'line' },
+          { name: 'Empleo', label: 'Empleo', color: '#e6580d', symbol: 'line' },
+        ],
+      },
+    ] satisfies LegendSection[],
+  },
+};
+
+/**
+ * `interactive: true` on a continuous section adds drag handles at each
+ * edge. `mode: 'filter'` (the default) keeps the gradient's original
+ * min/max — narrowing the range only excludes values, it never recolors
+ * what's left.
+ */
+export const InteractiveContinuousFilter: Story = {
+  args: {
+    sections: [
+      {
+        type: 'continuous',
+        title: "Porcentaje (mode: 'filter')",
+        interactive: true,
+        mode: 'filter',
+        min: 0,
+        max: 0.2,
+        colorMin: '#e0e7ff',
+        colorMax: '#4f46e5',
+        ticks: [0.05, 0.1, 0.15],
+        format: (v) => `${(v * 100).toFixed(0)}%`,
+        width: 220,
+      },
+    ] satisfies LegendSection[],
+  },
+};
+
+/** Same drag interaction, but `mode: 'rescale'` reprojects the ramp onto the narrowed range. */
+export const InteractiveContinuousRescale: Story = {
+  args: {
+    sections: [
+      {
+        type: 'continuous',
+        title: "Porcentaje (mode: 'rescale')",
+        interactive: true,
+        mode: 'rescale',
+        min: 0,
+        max: 0.2,
+        colorMin: '#e0e7ff',
+        colorMax: '#4f46e5',
+        ticks: [0.05, 0.1, 0.15],
+        format: (v) => `${(v * 100).toFixed(0)}%`,
+        width: 220,
+      },
+    ] satisfies LegendSection[],
+  },
+};
+
 /** Four discrete items in two columns, to show the `columns` wrap. */
 export const ManyItemsInColumns: Story = {
   args: {

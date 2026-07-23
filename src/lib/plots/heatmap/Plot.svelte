@@ -5,6 +5,8 @@
   import { buildSeries } from '$lib/utils/grouping';
   import { makeColorScale } from '$lib/utils/color';
   import { getConfiguration } from '$lib/configuration/config.svelte';
+  import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
+  import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import AxisLayout from '$lib/layout/plot/AxisLayout.svelte';
   import GridLayout from '$lib/layout/plot/GridLayout.svelte';
@@ -86,15 +88,6 @@
   const getY = $derived(resolveAccessor<TData>(resolvedSeries[0]?.y ?? y!));
   const getZ = $derived(resolveAccessor<TData>(resolvedSeries[0]?.z ?? z!));
 
-  const hoverPoints = $derived(
-    flat.map((d) => ({
-      x: getX(d) as AxisValue,
-      y: getY(d) as AxisValue,
-      row: d,
-      label: fmtVal(Number(getZ(d)), ''),
-    })),
-  );
-
   const xDomain = $derived([...new Set(flat.map((d) => getX(d) as AxisValue))]);
   const yDomain = $derived([...new Set(flat.map((d) => getY(d) as AxisValue))]);
 
@@ -106,8 +99,42 @@
     return vals.length ? [Math.min(...vals, 0), Math.max(...vals)] : [0, 1];
   });
 
+  // ── Legend-driven range filter ────────────────────────────────────────────
+  const legendInteraction = $derived(getLegendInteraction());
+  const range = $derived(legendInteraction?.continuousRange);
+  // 'rescale' reprojects the ramp onto the narrowed range; 'filter' (and no
+  // active range) keeps the original domain — only which cells are hidden
+  // changes.
+  const effectiveDomain = $derived.by((): [number, number] =>
+    range && range.mode === 'rescale' ? [range.min, range.max] : valueDomain,
+  );
+
+  function rangeFilteredStyle(base: CellSegmentStyle, value: number): CellSegmentStyle {
+    const r = range;
+    if (r == null || (value >= r.min && value <= r.max)) return base;
+    return { ...base, ...disabledFillOverride(r.disabledStyle) };
+  }
+
   const colorScale = $derived(
-    makeColorScale(valueDomain[0], valueDomain[1], minColor, maxColor),
+    makeColorScale(effectiveDomain[0], effectiveDomain[1], minColor, maxColor),
+  );
+
+  // A cell outside the active range is dimmed in place, but never surfaces
+  // in hover/tooltip — it's simply absent from the candidate list.
+  const hoverPoints = $derived(
+    flat
+      .filter((d) => {
+        const r = range;
+        if (r == null) return true;
+        const v = Number(getZ(d));
+        return v >= r.min && v <= r.max;
+      })
+      .map((d) => ({
+        x: getX(d) as AxisValue,
+        y: getY(d) as AxisValue,
+        row: d,
+        label: fmtVal(Number(getZ(d)), ''),
+      })),
   );
 
   const segList = $derived(segments.default ?? []);
@@ -152,7 +179,11 @@
   });
 
   const getCellStyle = $derived(
-    (d: TData) => segStyleMap.get(`${String(getX(d))}::${String(getY(d))}`) ?? {},
+    (d: TData) =>
+      rangeFilteredStyle(
+        segStyleMap.get(`${String(getX(d))}::${String(getY(d))}`) ?? {},
+        Number(getZ(d)),
+      ),
   );
 
   /**

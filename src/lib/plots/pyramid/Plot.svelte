@@ -5,6 +5,8 @@
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { paletteColor } from '$lib/utils/color';
   import { buildSeries } from '$lib/utils/grouping';
+  import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
+  import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
   import { buildGroupedSeries, validateSegments, resolveSegmentsForSeries, matchesSegmentX, getDataForSegments } from '$lib/plots/utils/segments';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import AxisLayout from '$lib/layout/plot/AxisLayout.svelte';
@@ -65,6 +67,7 @@
   $effect(() => { validateSegments(segments); });
 
   const cfg = $derived(getConfiguration());
+  const legendInteraction = $derived(getLegendInteraction());
   const leftColor = $derived(styles.colors?.left ?? paletteColor(0, cfg.palette));
   const rightColor = $derived(styles.colors?.right ?? paletteColor(1, cfg.palette));
   const showVals = $derived(styles.values?.show ?? false);
@@ -134,15 +137,19 @@
   const getY = (d: TaggedRow) => d.__y;
   const labelFor = (d: TaggedRow) => d.__label;
 
+  // A legend-disabled series is dimmed on the bar itself, but never surfaces
+  // in hover/tooltip — its points are simply absent from the candidate list.
   const hoverPoints = $derived(
-    flat.map((d) => ({
-      x: d.__x,
-      y: d.__y,
-      row: d,
-      label: d.__label,
-      series: d.__series,
-      color: d.__side === 'left' ? leftColor : rightColor,
-    })),
+    flat
+      .filter((d) => !legendInteraction?.disabledSeries.has(d.__series))
+      .map((d) => ({
+        x: d.__x,
+        y: d.__y,
+        row: d,
+        label: d.__label,
+        series: d.__series,
+        color: d.__side === 'left' ? leftColor : rightColor,
+      })),
   );
 
   const yDomain = $derived([
@@ -216,14 +223,15 @@
     {#each groupedSeries as group (group.series.name)}
       {@const defaultColor = group.series.side === 'left' ? leftColor : rightColor}
       {@const getCategory = resolveAccessor(group.series.x)}
+      {@const disabledFill = disabledFillOverride(legendInteraction?.disabledSeries.get(group.series.name))}
       {#each group.visualSegments as seg, i (`${group.series.name}-${i}`)}
         <BarX
           data={seg.data}
           x1={0}
           x2={(d: TData) => signedValue(group.series, d)}
           y={getCategory}
-          fill={seg.style.fill ?? defaultColor}
-          fillOpacity={seg.style.fillOpacity ?? 1}
+          fill={disabledFill?.fill ?? seg.style.fill ?? defaultColor}
+          fillOpacity={disabledFill?.fillOpacity ?? seg.style.fillOpacity ?? 1}
         />
       {/each}
 

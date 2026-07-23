@@ -122,6 +122,7 @@ export type {
   DiscreteLegendSection,
   ContinuousLegendSection,
   LegendItem,
+  LegendDisabledStyle,
 } from './types/charts/legend';
 export type {
   HoverStrategy,

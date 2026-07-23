@@ -46,6 +46,8 @@ export type ChartConfig = {
     gap: string;
     /** swatch square size */
     swatchSize: string;
+    /** Fallback opacity for a legend-disabled series/value when a section doesn't set its own `disabledStyle`. */
+    disabledOpacity: number;
   };
 
   // ── Axes (consumed by plots) ────────────────────────────────────────────────
