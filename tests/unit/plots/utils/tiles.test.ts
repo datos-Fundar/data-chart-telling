@@ -149,6 +149,80 @@ describe('buildMercatorFit', () => {
   });
 });
 
+describe('buildMercatorFit / visibleTiles — a tall/narrow domain letterboxed into a wide/short box', () => {
+  // A tall, narrow country (Argentina's rough bbox) fit into cells of a
+  // facet grid at increasing row counts — a fixed panel width split across
+  // more rows leaves each cell much shorter relative to its width, which is
+  // exactly the "1x3 looks fine, 2x2/3x2 look broken" symptom reported: the
+  // fit's scale is pinned to the constraining (height) axis, so the
+  // unconstrained (width) axis' now-large letterboxed margin can imply more
+  // of the earth than actually exists once inverted.
+  const argentinaBbox: GeoJSON.Polygon = {
+    type: 'Polygon',
+    coordinates: [
+      [
+        [-73, -22],
+        [-53, -22],
+        [-53, -55],
+        [-73, -55],
+        [-73, -22],
+      ],
+    ],
+  };
+
+  function fitInto(bounds: { left: number; top: number; width: number; height: number }) {
+    return toProjectionLike(
+      geoMercator().fitExtent(
+        [
+          [bounds.left, bounds.top],
+          [bounds.left + bounds.width, bounds.top + bounds.height],
+        ],
+        argentinaBbox,
+      ),
+    );
+  }
+
+  test('a 1-row cell (tall/narrow, aspect ratio close to the data) fits cleanly', () => {
+    const bounds = { left: 0, top: 0, width: 392, height: 476 };
+    const projection = fitInto(bounds);
+    const tiles = visibleTiles(projection, bounds, 256, 0, 19);
+    const fit = buildMercatorFit(projection, bounds, tiles[0].z);
+    expect(fit).not.toBeNull();
+    expect(fit!.pxPerTileX).toBeGreaterThan(0);
+    expect(fit!.pxPerTileY).toBeGreaterThan(0);
+  });
+
+  // Note: a real slippy-map tile grid *always* has partial tiles hanging past
+  // the exact requested viewport edge (tile boundaries rarely land exactly
+  // on it) — even the already-fine 1-row case above overshoots its own
+  // bounds by tens of pixels per side. So "some overshoot" isn't the bug;
+  // what actually broke was `pxPerTileX`/`pxPerTileY` going *negative* (the
+  // corners' inverted longitude order got reversed by the antimeridian
+  // wrap), which independently of any specific pixel tolerance is simply
+  // never a valid tile-space scale.
+  test('a 2-row cell (wide/short) no longer produces a negative/inverted scale', () => {
+    const bounds = { left: 0, top: 0, width: 594, height: 220 };
+    const projection = fitInto(bounds);
+    const tiles = visibleTiles(projection, bounds, 256, 0, 19);
+    expect(tiles.length).toBeGreaterThan(0);
+    const fit = buildMercatorFit(projection, bounds, tiles[0].z);
+    expect(fit).not.toBeNull();
+    expect(fit!.pxPerTileX).toBeGreaterThan(0);
+    expect(fit!.pxPerTileY).toBeGreaterThan(0);
+  });
+
+  test('an even wider/shorter cell (3 rows) behaves the same way', () => {
+    const bounds = { left: 0, top: 0, width: 392, height: 220 };
+    const projection = fitInto(bounds);
+    const tiles = visibleTiles(projection, bounds, 256, 0, 19);
+    expect(tiles.length).toBeGreaterThan(0);
+    const fit = buildMercatorFit(projection, bounds, tiles[0].z);
+    expect(fit).not.toBeNull();
+    expect(fit!.pxPerTileX).toBeGreaterThan(0);
+    expect(fit!.pxPerTileY).toBeGreaterThan(0);
+  });
+});
+
 describe('tileScreenBounds', () => {
   test('returns a positive-size box for every tile a fit was built for — the whole point of `buildMercatorFit` is that this never nulls out mid-grid tiles the way forward-projecting each corner individually used to', () => {
     // A projection whose fitted scale/translate differ sharply from a real

@@ -82,6 +82,39 @@ function estimateZoomLevel(
 }
 
 /**
+ * Clamps `bounds`' horizontal extent to at most one world-width, centered on
+ * the box's own center, before any corner of it gets inverted.
+ *
+ * A Mercator(-family) projection wraps a single world onto a *finite* pixel
+ * span at any given scale. `visibleTiles`/`buildMercatorFit` invert `bounds`'
+ * corners and assume the result increases monotonically left-to-right — true
+ * only up to one world-width. Past that, the inverted longitude wraps around
+ * the antimeridian and comes back the other way, silently reversing the
+ * corner ordering (`buildMercatorFit` was seen to compute a *negative*
+ * `pxPerTileX` from this). This bites specifically when a plot's actual
+ * geographic content occupies far less of its box than the box's own aspect
+ * ratio does — e.g. a tall, narrow country's choropleth fit into a short,
+ * wide facet-grid cell: the fit shrinks scale to match the constraining
+ * (height) axis, and the *unconstrained* (width) axis's letterboxed margin
+ * can then span more of the earth than actually exists. Clamping first means
+ * that margin still renders tiles (real basemap, not blank) up to a full
+ * world, and simply stops there instead of wrapping into a bogus repeat.
+ */
+function clampBoundsToWorld(projection: ProjectionLike, bounds: ScreenBounds): ScreenBounds {
+  if (!projection.invert) return bounds;
+  const centerX = bounds.left + bounds.width / 2;
+  const centerY = bounds.top + bounds.height / 2;
+  const centerLonLat = projection.invert([centerX, centerY]);
+  if (!centerLonLat) return bounds;
+  const west = projection([-180, centerLonLat[1]]);
+  const east = projection([180, centerLonLat[1]]);
+  if (!west || !east) return bounds;
+  const worldWidth = Math.abs(east[0] - west[0]);
+  if (!(worldWidth > 0) || bounds.width <= worldWidth) return bounds;
+  return { ...bounds, left: centerX - worldWidth / 2, width: worldWidth };
+}
+
+/**
  * Derives the visible XYZ tile grid from svelteplot's own already-fitted
  * projection (rather than this package computing/duplicating a `d3-geo` fit
  * itself) — see `TileLayer.svelte`. Only correct for Mercator-family
@@ -91,12 +124,13 @@ function estimateZoomLevel(
  */
 export function visibleTiles(
   projection: ProjectionLike,
-  bounds: ScreenBounds,
+  rawBounds: ScreenBounds,
   tileSize = 256,
   minZoom = 0,
   maxZoom = 19,
 ): TileCoord[] {
   if (!projection.invert) return [];
+  const bounds = clampBoundsToWorld(projection, rawBounds);
 
   const corners: [number, number][] = [
     [bounds.left, bounds.top],
@@ -162,8 +196,9 @@ export type MercatorFit = {
  * affine in screen space by construction, so one linear fit applies
  * uniformly to every tile in the grid.
  */
-export function buildMercatorFit(projection: ProjectionLike, bounds: ScreenBounds, z: number): MercatorFit | null {
+export function buildMercatorFit(projection: ProjectionLike, rawBounds: ScreenBounds, z: number): MercatorFit | null {
   if (!projection.invert) return null;
+  const bounds = clampBoundsToWorld(projection, rawBounds);
   const topLeft = projection.invert([bounds.left, bounds.top]);
   const bottomRight = projection.invert([bounds.left + bounds.width, bounds.top + bounds.height]);
   if (!topLeft || !bottomRight) return null;

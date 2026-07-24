@@ -31,6 +31,58 @@ function valueOf(container: Element, label: string): Promise<number> {
 	});
 }
 
+describe('ContinuousSection – tracking the domain until the user actually drags', () => {
+	test('with no interaction yet, lo/hi fully track a changing domain in both directions', async () => {
+		const section: ContinuousLegendSection = {
+			type: 'continuous',
+			min: 10,
+			max: 90,
+			width: 200,
+			interactive: true
+		};
+		const { container, rerender } = await render(ContinuousSection, { section });
+
+		expect(await valueOf(container, 'Margen inferior')).toBe(10);
+		expect(await valueOf(container, 'Margen superior')).toBe(90);
+
+		// Domain narrows — untouched lo/hi must follow it inward, not stay put.
+		await rerender({ section: { ...section, min: 30, max: 70 } });
+		expect(await valueOf(container, 'Margen inferior')).toBe(30);
+		expect(await valueOf(container, 'Margen superior')).toBe(70);
+
+		// Domain then widens back out past the *original* bounds — untouched
+		// lo/hi must follow it back out too, not stay clamped at 30/70. This is
+		// the actual reported bug: a legend whose numbers no longer matched any
+		// value in the data at all after the underlying domain changed once,
+		// because a plain narrowing-only clamp never re-expands.
+		await rerender({ section: { ...section, min: 1, max: 150 } });
+		expect(await valueOf(container, 'Margen inferior')).toBe(1);
+		expect(await valueOf(container, 'Margen superior')).toBe(150);
+	});
+
+	test('once the user drags, further domain changes clamp the selection instead of overriding it', async () => {
+		const section: ContinuousLegendSection = {
+			type: 'continuous',
+			min: 0,
+			max: 100,
+			width: 200,
+			interactive: true
+		};
+		const { container, rerender } = await render(ContinuousSection, { section });
+
+		const lo = container.querySelector('circle[aria-label="Margen inferior"]')!;
+		await dragBy(lo, 60); // lo ~30, an active selection now exists
+		const loBefore = await valueOf(container, 'Margen inferior');
+		expect(loBefore).toBeGreaterThan(0);
+
+		// A domain change that easily fits the active selection must leave it
+		// alone (not reset it back out to the new full range).
+		await rerender({ section: { ...section, min: 0, max: 200 } });
+		expect(await valueOf(container, 'Margen inferior')).toBe(loBefore);
+		expect(await valueOf(container, 'Margen superior')).toBe(200);
+	});
+});
+
 describe('ContinuousSection – re-clamping an active range when the domain shifts', () => {
 	test('a dragged lo/hi that falls outside a later min/max is pulled back in, not reset', async () => {
 		const section: ContinuousLegendSection = {

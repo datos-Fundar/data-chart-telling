@@ -26,24 +26,32 @@
   // ── Drag-to-narrow-margins ────────────────────────────────────────────────
   const interaction = getLegendInteraction() ?? createLegendInteraction();
 
-  // Seeded once from the section's own bounds (deliberately untracked — a
-  // later `section.min`/`max` change re-clamps the existing lo/hi instead of
-  // resetting them back out to the new full range, see below).
+  // Seeded once from the section's own bounds (deliberately untracked — see
+  // the tracking/clamping effect below for how later prop changes are
+  // handled instead).
   let lo = $state(untrack(() => section.min));
   let hi = $state(untrack(() => section.max));
 
-  // `section.min`/`max` can shift under an already-active selection — e.g. a
-  // consumer swaps `data` for a different year on its own timeline, and the
-  // value that used to be the max is no longer present. Re-clamping (instead
-  // of leaving lo/hi at their old absolute values) keeps the handles inside
-  // whatever range now actually exists: the lower handle can only move up to
-  // meet a risen min, the upper handle can only move down to meet a fallen
-  // max. Clamping each bound against *both* of the new min/max first (not
-  // just its own side) keeps lo/hi from inverting if the domain shifts
-  // entirely past the old selection.
+  // Whether the user has actually dragged *that* handle off its default
+  // position — tracked per handle, not as one combined flag, so dragging one
+  // doesn't freeze the other: until the other is touched, it must keep
+  // tracking `section.min`/`max` exactly, since a consumer's domain routinely
+  // changes with no interaction at all (e.g. a different year picked on its
+  // own timeline), and with nothing to protect there the legend should
+  // always read the true current extent rather than some earlier domain's
+  // stale numbers.
+  let loAdjusted = $state(false);
+  let hiAdjusted = $state(false);
+
+  // Once a handle *has* been dragged, a later domain change (same scenario as
+  // above, but now with a selection to protect) instead re-clamps it to stay
+  // valid: the lower handle only moves up to meet a risen min, the upper
+  // handle only moves down to meet a fallen max. Clamping against *both* of
+  // the new min/max first (not just its own side) keeps a handle from
+  // crossing the other if the domain shifts entirely past its old position.
   $effect(() => {
-    lo = Math.min(Math.max(lo, section.min), section.max);
-    hi = Math.max(Math.min(hi, section.max), section.min);
+    lo = loAdjusted ? Math.min(Math.max(lo, section.min), section.max) : section.min;
+    hi = hiAdjusted ? Math.max(Math.min(hi, section.max), section.min) : section.max;
   });
 
   function toT(v: number): number {
@@ -89,6 +97,8 @@
     return (event: PointerEvent) => {
       if (!section.interactive) return;
       event.preventDefault();
+      if (which === 'lo') loAdjusted = true;
+      else hiAdjusted = true;
       const target = event.currentTarget as SVGElement;
       target.setPointerCapture(event.pointerId);
       const startX = event.clientX;
@@ -117,8 +127,13 @@
 
   function resetHandle(which: 'lo' | 'hi') {
     return () => {
-      if (which === 'lo') lo = section.min;
-      else hi = section.max;
+      if (which === 'lo') {
+        lo = section.min;
+        loAdjusted = false;
+      } else {
+        hi = section.max;
+        hiAdjusted = false;
+      }
     };
   }
 </script>
