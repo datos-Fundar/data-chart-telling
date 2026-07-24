@@ -6,7 +6,6 @@
     tileScreenBounds,
     tileUrl,
     toProjectionLike,
-    clipBoundsToData,
     type StreamingProjection,
   } from '$lib/plots/utils/tiles';
   import type { GeoTileLayerConfig } from '$lib/types/plots/styles/geo';
@@ -27,15 +26,12 @@
     top,
     width,
     height,
-    dataLonLatBounds,
   }: {
     config: GeoTileLayerConfig;
     left: number;
     top: number;
     width: number;
     height: number;
-    /** The rendered geometry's own lon/lat extent — see `clipBoundsToData`. */
-    dataLonLatBounds?: [number, number, number, number] | null;
   } = $props();
 
   const plot = usePlot();
@@ -48,18 +44,9 @@
   const rawProjection = $derived(plot.scales.projection as unknown as StreamingProjection | undefined);
   const projection = $derived(rawProjection ? toProjectionLike(rawProjection) : undefined);
 
-  // Clipped to where the map's own geometry actually is — see
-  // `clipBoundsToData`'s doc comment for why the raw `{left,top,width,height}`
-  // box alone isn't safe to hand to `visibleTiles`/`buildMercatorFit`.
-  const clippedBounds = $derived.by(() => {
-    const full = { left, top, width, height };
-    if (!projection) return full;
-    return clipBoundsToData(projection, full, dataLonLatBounds);
-  });
-
   const tiles = $derived.by(() => {
     if (!projection) return [];
-    return visibleTiles(projection, clippedBounds, tileSize, config.minZoom ?? 0, config.maxZoom ?? 19);
+    return visibleTiles(projection, { left, top, width, height }, tileSize, config.minZoom ?? 0, config.maxZoom ?? 19);
   });
 
   // One affine fit per zoom level, shared across every tile in `tiles` — see
@@ -67,7 +54,7 @@
   // each tile's own corners individually.
   const fit = $derived.by(() => {
     if (!projection || tiles.length === 0) return null;
-    return buildMercatorFit(projection, clippedBounds, tiles[0].z);
+    return buildMercatorFit(projection, { left, top, width, height }, tiles[0].z);
   });
 </script>
 

@@ -82,13 +82,14 @@ function estimateZoomLevel(
 }
 
 /**
- * Clamps `bounds`' horizontal extent to at most one world-width, centered on
- * the box's own center, before any corner of it gets inverted.
+ * Clamps `bounds`' horizontal extent to at most *half* a world-width (180°
+ * of longitude), centered on the box's own center, before any corner of it
+ * gets inverted.
  *
  * A Mercator(-family) projection wraps a single world onto a *finite* pixel
  * span at any given scale. `visibleTiles`/`buildMercatorFit` invert `bounds`'
  * corners and assume the result increases monotonically left-to-right — true
- * only up to one world-width. Past that, the inverted longitude wraps around
+ * only up to one world-width; past that the inverted longitude wraps around
  * the antimeridian and comes back the other way, silently reversing the
  * corner ordering (`buildMercatorFit` was seen to compute a *negative*
  * `pxPerTileX` from this). This bites specifically when a plot's actual
@@ -96,9 +97,19 @@ function estimateZoomLevel(
  * ratio does — e.g. a tall, narrow country's choropleth fit into a short,
  * wide facet-grid cell: the fit shrinks scale to match the constraining
  * (height) axis, and the *unconstrained* (width) axis's letterboxed margin
- * can then span more of the earth than actually exists. Clamping first means
- * that margin still renders tiles (real basemap, not blank) up to a full
- * world, and simply stops there instead of wrapping into a bogus repeat.
+ * can then imply more of the earth than actually exists.
+ *
+ * The cap is *half* a world rather than a full one specifically so the two
+ * edges of an extreme letterboxed margin can never reach all the way out to
+ * the region exactly opposite the map's own — a full-world cap's two edges
+ * meet exactly at that antipode (e.g. Argentina's own facet map, letterboxed
+ * enough to hit a full-world cap, would show Buenos Aires' antipode —
+ * Australia — prominently at both edges). Halving it keeps every visible
+ * tile within one quarter-turn of the data's own center, which for any real
+ * facet-grid cell is already a deliberately generous amount of basemap
+ * context (ocean, neighboring countries) — typical facet aspect ratios don't
+ * come close to needing the full 180° this still allows before clamping
+ * kicks in at all.
  */
 function clampBoundsToWorld(projection: ProjectionLike, bounds: ScreenBounds): ScreenBounds {
   if (!projection.invert) return bounds;
@@ -109,63 +120,9 @@ function clampBoundsToWorld(projection: ProjectionLike, bounds: ScreenBounds): S
   const west = projection([-180, centerLonLat[1]]);
   const east = projection([180, centerLonLat[1]]);
   if (!west || !east) return bounds;
-  const worldWidth = Math.abs(east[0] - west[0]);
-  if (!(worldWidth > 0) || bounds.width <= worldWidth) return bounds;
-  return { ...bounds, left: centerX - worldWidth / 2, width: worldWidth };
-}
-
-/**
- * Clips `bounds` down to the screen-space box its actual geo data occupies
- * — `dataLonLatBounds`' four extremes, forward-projected — intersected with
- * `bounds` itself.
- *
- * A `domain: 'data'`-fitted Mercator projection scales to the *constraining*
- * axis of its box (see `clampBoundsToWorld`'s doc comment): a tall/narrow
- * region (Argentina) fit into a short/wide facet cell only fills a fraction
- * of the box's width, and the letterboxed margin on either side is real,
- * inverts to real (if occasionally distant) lon/lat, and so gets real tiles
- * drawn under it — `clampBoundsToWorld` only stops that margin from
- * wrapping *more* than one world-width once inverted, it doesn't stop a
- * *single* world-width's worth of legitimate-but-irrelevant coverage from
- * rendering there. For Argentina specifically that margin is wide enough to
- * reach Argentina's own antipodal region — Australia — which is what a
- * viewer actually sees. Clipping to the data's own footprint removes the
- * letterboxed margin's tiles entirely rather than trying to pick a
- * "more correct" set of tiles to show there.
- *
- * Only valid for a Mercator-family projection, same as the rest of this
- * module: `x` is assumed to depend only on longitude and `y` only on
- * latitude, so each axis's screen extent can be found by projecting just
- * two opposite corners of the lon/lat bbox rather than tracing its full
- * outline.
- */
-export function clipBoundsToData(
-  projection: ProjectionLike,
-  bounds: ScreenBounds,
-  dataLonLatBounds: [number, number, number, number] | null | undefined,
-): ScreenBounds {
-  if (!dataLonLatBounds) return bounds;
-  const [minLon, minLat, maxLon, maxLat] = dataLonLatBounds;
-  const midLon = (minLon + maxLon) / 2;
-  const midLat = (minLat + maxLat) / 2;
-  const west = projection([minLon, midLat]);
-  const east = projection([maxLon, midLat]);
-  const south = projection([midLon, minLat]);
-  const north = projection([midLon, maxLat]);
-  if (!west || !east || !south || !north) return bounds;
-
-  const dataLeft = Math.min(west[0], east[0]);
-  const dataRight = Math.max(west[0], east[0]);
-  const dataTop = Math.min(north[1], south[1]);
-  const dataBottom = Math.max(north[1], south[1]);
-
-  const left = Math.max(bounds.left, dataLeft);
-  const top = Math.max(bounds.top, dataTop);
-  const right = Math.min(bounds.left + bounds.width, dataRight);
-  const bottom = Math.min(bounds.top + bounds.height, dataBottom);
-  if (!(right > left) || !(bottom > top)) return bounds;
-
-  return { left, top, width: right - left, height: bottom - top };
+  const maxWidth = Math.abs(east[0] - west[0]) / 2;
+  if (!(maxWidth > 0) || bounds.width <= maxWidth) return bounds;
+  return { ...bounds, left: centerX - maxWidth / 2, width: maxWidth };
 }
 
 /**

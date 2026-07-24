@@ -58,63 +58,6 @@ export function geometryCentroid(geometry: GeoJSON.Geometry): [number, number] {
 }
 
 /**
- * A geometry's flattened lon/lat bounding box — `[minLon, minLat, maxLon,
- * maxLat]`, or `null` for a geometry with no coordinates at all. Same
- * bbox-not-geodesic caveat as `geometryCentroid` (no antimeridian handling),
- * acceptable for the same reason: real feature sets fed through this
- * package (Argentina's provinces, etc.) don't straddle it. Used to derive
- * `GeoPlot`'s rendered data's own screen-space extent (see `Plot.svelte`'s
- * `dataLonLatBounds`), so `TileLayer` can clip its raster grid to where the
- * map's own geometry actually is instead of a projection's full letterboxed
- * fit box (see `clipBoundsToData`).
- */
-export function geometryLonLatBounds(geometry: GeoJSON.Geometry): [number, number, number, number] | null {
-  const coords: [number, number][] = [];
-  flattenCoords(geometry, coords);
-  if (coords.length === 0) return null;
-  let minLon = Infinity;
-  let maxLon = -Infinity;
-  let minLat = Infinity;
-  let maxLat = -Infinity;
-  for (const [lon, lat] of coords) {
-    if (lon < minLon) minLon = lon;
-    if (lon > maxLon) maxLon = lon;
-    if (lat < minLat) minLat = lat;
-    if (lat > maxLat) maxLat = lat;
-  }
-  return [minLon, minLat, maxLon, maxLat];
-}
-
-/**
- * The width:height aspect ratio a Mercator(-family) projection naturally
- * produces for a `[minLon, minLat, maxLon, maxLat]` bounding box — i.e.
- * what a `domain: 'data'`-style projection fit (see `resolveProjection.ts`)
- * implicitly commits to before any letterboxing into a differently-shaped
- * box. `null` for a degenerate box: no lon or lat span, or a latitude
- * at/past ±90° where Mercator's `y` isn't finite.
- *
- * Longitude maps linearly to Mercator's `x`; latitude maps through the
- * standard `ln(tan(π/4 + φ/2))` transform to `y` — the same one
- * `tiles.ts`'s `latToTileY` uses, left unscaled by tile count here since
- * only the *ratio* between the two axes is wanted. Both axes share the same
- * scale by construction (Mercator is conformal), so this ratio is exactly
- * what a real `d3-geo` fit would produce for the same bbox — used by
- * `GeoPlot` to size itself down to its own data's footprint instead of
- * stretching into whatever box a facet grid happens to hand it (see
- * `Plot.svelte`'s `containedSize`).
- */
-export function mercatorAspectRatio(bounds: [number, number, number, number]): number | null {
-  const [minLon, minLat, maxLon, maxLat] = bounds;
-  if (minLat <= -90 || maxLat >= 90) return null;
-  const toRad = (deg: number) => (deg * Math.PI) / 180;
-  const lonSpan = toRad(maxLon - minLon);
-  const mercatorY = (lat: number) => Math.log(Math.tan(Math.PI / 4 + toRad(lat) / 2));
-  const latSpan = Math.abs(mercatorY(maxLat) - mercatorY(minLat));
-  if (!(lonSpan > 0) || !(latSpan > 0) || !Number.isFinite(latSpan)) return null;
-  return lonSpan / latSpan;
-}
-
-/**
  * Splits a geometry into its disjoint parts: one `Polygon` per element of a
  * `MultiPolygon`'s `coordinates`, one `LineString` per element of a
  * `MultiLineString`'s, `GeometryCollection` recursed and flattened, and any
