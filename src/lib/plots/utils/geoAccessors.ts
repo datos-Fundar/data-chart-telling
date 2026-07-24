@@ -86,6 +86,35 @@ export function geometryLonLatBounds(geometry: GeoJSON.Geometry): [number, numbe
 }
 
 /**
+ * The width:height aspect ratio a Mercator(-family) projection naturally
+ * produces for a `[minLon, minLat, maxLon, maxLat]` bounding box — i.e.
+ * what a `domain: 'data'`-style projection fit (see `resolveProjection.ts`)
+ * implicitly commits to before any letterboxing into a differently-shaped
+ * box. `null` for a degenerate box: no lon or lat span, or a latitude
+ * at/past ±90° where Mercator's `y` isn't finite.
+ *
+ * Longitude maps linearly to Mercator's `x`; latitude maps through the
+ * standard `ln(tan(π/4 + φ/2))` transform to `y` — the same one
+ * `tiles.ts`'s `latToTileY` uses, left unscaled by tile count here since
+ * only the *ratio* between the two axes is wanted. Both axes share the same
+ * scale by construction (Mercator is conformal), so this ratio is exactly
+ * what a real `d3-geo` fit would produce for the same bbox — used by
+ * `GeoPlot` to size itself down to its own data's footprint instead of
+ * stretching into whatever box a facet grid happens to hand it (see
+ * `Plot.svelte`'s `containedSize`).
+ */
+export function mercatorAspectRatio(bounds: [number, number, number, number]): number | null {
+  const [minLon, minLat, maxLon, maxLat] = bounds;
+  if (minLat <= -90 || maxLat >= 90) return null;
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const lonSpan = toRad(maxLon - minLon);
+  const mercatorY = (lat: number) => Math.log(Math.tan(Math.PI / 4 + toRad(lat) / 2));
+  const latSpan = Math.abs(mercatorY(maxLat) - mercatorY(minLat));
+  if (!(lonSpan > 0) || !(latSpan > 0) || !Number.isFinite(latSpan)) return null;
+  return lonSpan / latSpan;
+}
+
+/**
  * Splits a geometry into its disjoint parts: one `Polygon` per element of a
  * `MultiPolygon`'s `coordinates`, one `LineString` per element of a
  * `MultiLineString`'s, `GeometryCollection` recursed and flattened, and any

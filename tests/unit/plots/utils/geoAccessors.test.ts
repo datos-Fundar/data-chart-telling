@@ -1,6 +1,8 @@
 import { describe, test, expect } from 'vitest';
 import {
   geometryCentroid,
+  geometryLonLatBounds,
+  mercatorAspectRatio,
   geometryPartCentroids,
   splitGeometryParts,
   filterGeometryParts,
@@ -125,5 +127,56 @@ describe('filterGeometryParts', () => {
     };
     const result = filterGeometryParts(geometry, (part) => part.centroid[0] < 10);
     expect(result).toEqual({ type: 'MultiLineString', coordinates: [[[0, 0], [2, 0]]] });
+  });
+});
+
+// ── geometryLonLatBounds ──────────────────────────────────────────────────────
+
+describe('geometryLonLatBounds', () => {
+  test('returns [minLon, minLat, maxLon, maxLat] across every coordinate', () => {
+    const geometry: GeoJSON.Geometry = {
+      type: 'MultiPolygon',
+      coordinates: [
+        [[[-73, -22], [-53, -22], [-53, -55], [-73, -55], [-73, -22]]],
+        [[[-70, -50], [-60, -50], [-60, -60], [-70, -60], [-70, -50]]],
+      ],
+    };
+    expect(geometryLonLatBounds(geometry)).toEqual([-73, -60, -53, -22]);
+  });
+
+  test('returns null for a geometry with no coordinates', () => {
+    expect(geometryLonLatBounds({ type: 'GeometryCollection', geometries: [] })).toBeNull();
+  });
+});
+
+// ── mercatorAspectRatio ────────────────────────────────────────────────────────
+
+describe('mercatorAspectRatio', () => {
+  test('is close to 1 for a roughly square box centered near the equator', () => {
+    // Near φ=0, Mercator's y-transform derivative is ~1, so a small
+    // symmetric box there is barely distorted relative to plain lon/lat.
+    const ratio = mercatorAspectRatio([-5, -5, 5, 5]);
+    expect(ratio).not.toBeNull();
+    expect(ratio!).toBeCloseTo(1, 1);
+  });
+
+  test("is well under 1 for Argentina's own bbox — reported taller than wide, matching its real shape", () => {
+    const ratio = mercatorAspectRatio([-73, -55, -53, -22]);
+    expect(ratio).not.toBeNull();
+    expect(ratio!).toBeGreaterThan(0.3);
+    expect(ratio!).toBeLessThan(0.6);
+  });
+
+  test('returns null for a zero-width box (no longitude span)', () => {
+    expect(mercatorAspectRatio([-58, -40, -58, -20])).toBeNull();
+  });
+
+  test('returns null for a zero-height box (no latitude span)', () => {
+    expect(mercatorAspectRatio([-60, -40, -50, -40])).toBeNull();
+  });
+
+  test('returns null when a latitude reaches ±90°, where Mercator y is not finite', () => {
+    expect(mercatorAspectRatio([-60, -90, -50, -40])).toBeNull();
+    expect(mercatorAspectRatio([-60, -40, -50, 90])).toBeNull();
   });
 });

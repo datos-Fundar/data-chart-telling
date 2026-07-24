@@ -6,6 +6,7 @@
   import {
     geometryCentroid,
     geometryLonLatBounds,
+    mercatorAspectRatio,
     geometryPartCentroids,
     filterGeometryParts,
     defaultFeatureId,
@@ -145,13 +146,19 @@
     });
   });
 
-  // ── Tile-layer clipping — the rendered geometry's own lon/lat extent, so
-  // `TileLayer` can clip its raster grid to where the map actually is
-  // instead of a `domain: 'data'` fit's full (possibly letterboxed) box —
-  // see `clipBoundsToData`'s doc comment. Only computed when a tile layer is
-  // actually configured, since it's an O(total coordinate count) pass. ────
+  // ── Data footprint — the rendered geometry's own lon/lat extent. Powers
+  // two independent things below: `TileLayer`'s clip-to-data (see
+  // `clipBoundsToData`'s doc comment) and `containedSize`'s contain-and-center
+  // sizing. Only computed for a `domain: 'data'` fit (see `usesDataFit`) —
+  // that's the specific case where the projection's own scale was chosen to
+  // match *this* extent, so it's also the only case this bbox is a correct
+  // stand-in for "what the projection actually fit to". Cost is a single
+  // O(total coordinate count) pass. ────
+  const usesDataFit = $derived(
+    typeof scales.projection === 'object' && scales.projection?.domain === 'data',
+  );
   const dataLonLatBounds = $derived.by((): [number, number, number, number] | null => {
-    if (!styles.tileLayer) return null;
+    if (!usesDataFit) return null;
     let minLon = Infinity;
     let maxLon = -Infinity;
     let minLat = Infinity;
@@ -165,6 +172,38 @@
       if (b[3] > maxLat) maxLat = b[3];
     }
     return minLon === Infinity ? null : [minLon, minLat, maxLon, maxLat];
+  });
+
+  /**
+   * The box the map itself actually renders into — `width`/`height`
+   * shrunk (never grown) to `dataLonLatBounds`' own Mercator aspect ratio,
+   * the same way `object-fit: contain` sizes an image. Without this, a
+   * `domain: 'data'` fit already internally letterboxes the *projection*
+   * to preserve the data's true shape whenever the outer box's aspect
+   * doesn't match it (e.g. a tall/narrow country handed a short/wide facet
+   * cell) — but previously the outer SVG itself stayed stretched to the
+   * full box regardless, leaving that letterboxed margin as dead space
+   * (blank, or — before `clipBoundsToData` — filled with irrelevant tiles).
+   * Shrinking the actual rendered box to match removes that margin instead
+   * of just hiding what was in it; the template below centers this smaller
+   * box within the full `{width}×{height}` area so the map still occupies
+   * the same visual position within its facet cell.
+   *
+   * Margins (`margins`/`GEO_MARGIN_ESTIMATE`) are deliberately not netted
+   * out of this fit — they're small relative to typical facet-cell sizes,
+   * and doing this exactly would mean duplicating `BasePlotLayout`'s own
+   * private margin resolution here.
+   */
+  const containedSize = $derived.by((): { width: number; height: number } => {
+    const full = { width, height };
+    if (!dataLonLatBounds) return full;
+    const aspect = mercatorAspectRatio(dataLonLatBounds);
+    if (!aspect) return full;
+    const boxAspect = width / height;
+    if (!(boxAspect > 0)) return full;
+    return aspect > boxAspect
+      ? { width, height: width / aspect }
+      : { width: height * aspect, height };
   });
 
   // ── Tile-layer / projection compatibility ────────────────────────────────
@@ -506,8 +545,8 @@
         {@const insetContentBox = {
           left: numericMargins.left,
           top: numericMargins.top,
-          width: Math.max(0, width - numericMargins.left - numericMargins.right),
-          height: Math.max(0, height - numericMargins.top - numericMargins.bottom),
+          width: Math.max(0, containedSize.width - numericMargins.left - numericMargins.right),
+          height: Math.max(0, containedSize.height - numericMargins.top - numericMargins.bottom),
         }}
         <InsetMarker
           marker={marker as GeoInsetMarker<TProps>}
@@ -535,9 +574,10 @@
   `equirectangular` projection, whose x/y truly are linear in lon/lat) and
   is a no-op for every other mark type.
 -->
+<div class="dct-geo-contain" style:width="{width}px" style:height="{height}px">
 <BasePlotLayout
-  {width}
-  {height}
+  width={containedSize.width}
+  height={containedSize.height}
   data={hoverCandidates}
   getX={hoverGetX}
   getY={hoverGetY}
@@ -558,8 +598,8 @@
 >
   {#snippet children({ matchedPoints, numericMargins })}
     <GeoLayout
-      {width}
-      {height}
+      width={containedSize.width}
+      height={containedSize.height}
       {numericMargins}
       zoomTransform={geoZoom.transform}
       tileLayer={styles.tileLayer}
@@ -605,3 +645,17 @@
     {/if}
   {/snippet}
 </BasePlotLayout>
+</div>
+
+<style>
+  /**
+   * Centers `BasePlotLayout`'s own (possibly smaller, `containedSize`-fit)
+   * box within the full area the facet grid actually allotted this plot —
+   * see `containedSize`'s doc comment.
+   */
+  .dct-geo-contain {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
