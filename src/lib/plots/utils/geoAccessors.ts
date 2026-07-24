@@ -135,6 +135,30 @@ export function defaultFeatureId<TProps extends Record<string, unknown>>(f: GeoF
   return String(f.id ?? props?.id ?? props?.name ?? '');
 }
 
+/**
+ * `[minLon, minLat, maxLon, maxLat]` across every coordinate of a geometry —
+ * `null` for one with none (an empty `GeometryCollection`). Used by
+ * `Plot.svelte`'s `dataLonLatBounds` to cap how far a tile layer's
+ * letterboxed margin reaches (see `clampBoundsToDataPadding` in
+ * `$lib/plots/utils/tiles`).
+ */
+export function geometryLonLatBounds(geometry: GeoJSON.Geometry): [number, number, number, number] | null {
+  const coords: [number, number][] = [];
+  flattenCoords(geometry, coords);
+  if (coords.length === 0) return null;
+  let minLon = Infinity;
+  let maxLon = -Infinity;
+  let minLat = Infinity;
+  let maxLat = -Infinity;
+  for (const [lon, lat] of coords) {
+    if (lon < minLon) minLon = lon;
+    if (lon > maxLon) maxLon = lon;
+    if (lat < minLat) minLat = lat;
+    if (lat > maxLat) maxLat = lat;
+  }
+  return [minLon, minLat, maxLon, maxLat];
+}
+
 function toRad(deg: number): number {
   return (deg * Math.PI) / 180;
 }

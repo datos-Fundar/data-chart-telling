@@ -22,6 +22,7 @@
     numericMargins,
     zoomTransform,
     tileLayer,
+    dataLonLatBounds,
     children,
   }: {
     width: number;
@@ -29,6 +30,8 @@
     numericMargins: { top: number; right: number; bottom: number; left: number };
     zoomTransform: { x: number; y: number; k: number };
     tileLayer?: GeoTileLayerConfig;
+    /** Forwarded to `TileLayer` — see `Plot.svelte`'s `dataLonLatBounds`. */
+    dataLonLatBounds?: [number, number, number, number] | null;
     children: Snippet;
   } = $props();
 </script>
@@ -41,6 +44,7 @@
       top={numericMargins.top}
       width={Math.max(0, width - numericMargins.left - numericMargins.right)}
       height={Math.max(0, height - numericMargins.top - numericMargins.bottom)}
+      {dataLonLatBounds}
     />
   {/if}
   {@render children()}

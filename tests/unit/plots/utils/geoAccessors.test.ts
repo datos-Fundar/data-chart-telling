@@ -1,6 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import {
   geometryCentroid,
+  geometryLonLatBounds,
   geometryPartCentroids,
   splitGeometryParts,
   filterGeometryParts,
@@ -125,5 +126,24 @@ describe('filterGeometryParts', () => {
     };
     const result = filterGeometryParts(geometry, (part) => part.centroid[0] < 10);
     expect(result).toEqual({ type: 'MultiLineString', coordinates: [[[0, 0], [2, 0]]] });
+  });
+});
+
+// ── geometryLonLatBounds ──────────────────────────────────────────────────────
+
+describe('geometryLonLatBounds', () => {
+  test('returns [minLon, minLat, maxLon, maxLat] across every coordinate', () => {
+    const geometry: GeoJSON.Geometry = {
+      type: 'MultiPolygon',
+      coordinates: [
+        [[[-73, -22], [-53, -22], [-53, -55], [-73, -55], [-73, -22]]],
+        [[[-70, -50], [-60, -50], [-60, -60], [-70, -60], [-70, -50]]],
+      ],
+    };
+    expect(geometryLonLatBounds(geometry)).toEqual([-73, -60, -53, -22]);
+  });
+
+  test('returns null for a geometry with no coordinates', () => {
+    expect(geometryLonLatBounds({ type: 'GeometryCollection', geometries: [] })).toBeNull();
   });
 });

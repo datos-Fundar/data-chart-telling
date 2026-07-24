@@ -26,12 +26,15 @@
     top,
     width,
     height,
+    dataLonLatBounds,
   }: {
     config: GeoTileLayerConfig;
     left: number;
     top: number;
     width: number;
     height: number;
+    /** Forwarded to `visibleTiles`/`buildMercatorFit` — see `Plot.svelte`'s `dataLonLatBounds`. */
+    dataLonLatBounds?: [number, number, number, number] | null;
   } = $props();
 
   const plot = usePlot();
@@ -46,7 +49,14 @@
 
   const tiles = $derived.by(() => {
     if (!projection) return [];
-    return visibleTiles(projection, { left, top, width, height }, tileSize, config.minZoom ?? 0, config.maxZoom ?? 19);
+    return visibleTiles(
+      projection,
+      { left, top, width, height },
+      tileSize,
+      config.minZoom ?? 0,
+      config.maxZoom ?? 19,
+      dataLonLatBounds,
+    );
   });
 
   // One affine fit per zoom level, shared across every tile in `tiles` — see
@@ -54,7 +64,7 @@
   // each tile's own corners individually.
   const fit = $derived.by(() => {
     if (!projection || tiles.length === 0) return null;
-    return buildMercatorFit(projection, { left, top, width, height }, tiles[0].z);
+    return buildMercatorFit(projection, { left, top, width, height }, tiles[0].z, dataLonLatBounds);
   });
 </script>
 

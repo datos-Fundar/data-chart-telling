@@ -85,31 +85,6 @@ function estimateZoomLevel(
  * Clamps `bounds`' horizontal extent to at most *half* a world-width (180°
  * of longitude), centered on the box's own center, before any corner of it
  * gets inverted.
- *
- * A Mercator(-family) projection wraps a single world onto a *finite* pixel
- * span at any given scale. `visibleTiles`/`buildMercatorFit` invert `bounds`'
- * corners and assume the result increases monotonically left-to-right — true
- * only up to one world-width; past that the inverted longitude wraps around
- * the antimeridian and comes back the other way, silently reversing the
- * corner ordering (`buildMercatorFit` was seen to compute a *negative*
- * `pxPerTileX` from this). This bites specifically when a plot's actual
- * geographic content occupies far less of its box than the box's own aspect
- * ratio does — e.g. a tall, narrow country's choropleth fit into a short,
- * wide facet-grid cell: the fit shrinks scale to match the constraining
- * (height) axis, and the *unconstrained* (width) axis's letterboxed margin
- * can then imply more of the earth than actually exists.
- *
- * The cap is *half* a world rather than a full one specifically so the two
- * edges of an extreme letterboxed margin can never reach all the way out to
- * the region exactly opposite the map's own — a full-world cap's two edges
- * meet exactly at that antipode (e.g. Argentina's own facet map, letterboxed
- * enough to hit a full-world cap, would show Buenos Aires' antipode —
- * Australia — prominently at both edges). Halving it keeps every visible
- * tile within one quarter-turn of the data's own center, which for any real
- * facet-grid cell is already a deliberately generous amount of basemap
- * context (ocean, neighboring countries) — typical facet aspect ratios don't
- * come close to needing the full 180° this still allows before clamping
- * kicks in at all.
  */
 function clampBoundsToWorld(projection: ProjectionLike, bounds: ScreenBounds): ScreenBounds {
   if (!projection.invert) return bounds;
@@ -126,6 +101,65 @@ function clampBoundsToWorld(projection: ProjectionLike, bounds: ScreenBounds): S
 }
 
 /**
+ * How far a letterboxed tile margin may reach beyond the data's own
+ * bounding box (see `Plot.svelte`'s `dataLonLatBounds`), on either side —
+ * the product-level cap on how much basemap "context" gets shown, well
+ * inside `clampBoundsToWorld`'s own (much looser) antimeridian-safety cap.
+ *
+ * Picked to comfortably clear the nearest *other* landmass in any direction
+ * from Argentina — this package's one real-world `domain: 'data'` +
+ * tile-layer consumer. The tightest real constraint is the Atlantic side:
+ * Argentina's own east edge sits at -53°, and the nearest land across it
+ * (West Africa) starts around -17° — a 36°-wide ocean gap. A flat 20° here
+ * stays comfortably inside that gap on the tight side, while every other
+ * direction (west into the Pacific, especially) has far more real ocean to
+ * spare than this uses.
+ */
+const CONTEXT_PADDING_DEGREES = 20;
+
+/**
+ * A raster tile is atomic — one straddling the padding boundary above still
+ * renders in full, so at a low enough zoom a single tile can overshoot
+ * `CONTEXT_PADDING_DEGREES` by tens of degrees (confirmed empirically: a
+ * small facet cell naturally estimates z≈1–2, where a tile is 90°–180°
+ * wide, dragging in all of Africa well past the intended padding). Flooring
+ * the zoom to at least this, whenever `clampBoundsToDataPadding` actually
+ * reduced the bounds, guarantees a tile is at most 360/2⁶ = 5.625° wide —
+ * comfortably under half of `CONTEXT_PADDING_DEGREES`, so the worst-case
+ * overshoot still lands well short of real land.
+ */
+const MIN_ZOOM_WHEN_CONTEXT_CLAMPED = 6;
+
+/**
+ * Clamps `bounds`' horizontal extent to the data's own lon/lat bbox padded
+ * by `CONTEXT_PADDING_DEGREES` on each side, at the box's own center
+ * latitude — a no-op when `dataLonLatBounds` isn't supplied (a plot with no
+ * tile-layer-relevant data footprint, e.g. not a `domain: 'data'` fit; see
+ * `Plot.svelte`'s `usesDataFit`). Independent of, and applied on top of,
+ * `clampBoundsToWorld`'s own antimeridian-safety cap — that cap alone still
+ * permits up to a quarter-turn of the globe each way, comfortably reaching
+ * an unrelated continent instead of just nearby ocean (see `GeoPlot/Facet`
+ * stories' `Rows2Cols2` for the regression this fixes).
+ */
+function clampBoundsToDataPadding(
+  projection: ProjectionLike,
+  bounds: ScreenBounds,
+  dataLonLatBounds: [number, number, number, number] | null | undefined,
+): ScreenBounds {
+  if (!dataLonLatBounds || !projection.invert) return bounds;
+  const [minLon, , maxLon] = dataLonLatBounds;
+  const centerLonLat = projection.invert([bounds.left + bounds.width / 2, bounds.top + bounds.height / 2]);
+  if (!centerLonLat) return bounds;
+  const west = projection([minLon - CONTEXT_PADDING_DEGREES, centerLonLat[1]]);
+  const east = projection([maxLon + CONTEXT_PADDING_DEGREES, centerLonLat[1]]);
+  if (!west || !east) return bounds;
+  const left = Math.max(bounds.left, Math.min(west[0], east[0]));
+  const right = Math.min(bounds.left + bounds.width, Math.max(west[0], east[0]));
+  if (!(right > left)) return bounds;
+  return { ...bounds, left, width: right - left };
+}
+
+/**
  * Derives the visible XYZ tile grid from svelteplot's own already-fitted
  * projection (rather than this package computing/duplicating a `d3-geo` fit
  * itself) — see `TileLayer.svelte`. Only correct for Mercator-family
@@ -139,9 +173,11 @@ export function visibleTiles(
   tileSize = 256,
   minZoom = 0,
   maxZoom = 19,
+  dataLonLatBounds?: [number, number, number, number] | null,
 ): TileCoord[] {
   if (!projection.invert) return [];
-  const bounds = clampBoundsToWorld(projection, rawBounds);
+  const bounds = clampBoundsToDataPadding(projection, clampBoundsToWorld(projection, rawBounds), dataLonLatBounds);
+  const contextClamped = bounds.width < rawBounds.width;
 
   const corners: [number, number][] = [
     [bounds.left, bounds.top],
@@ -152,11 +188,15 @@ export function visibleTiles(
   const lonLats = corners.map((c) => projection.invert!(c)).filter((p): p is [number, number] => p != null);
   if (lonLats.length === 0) return [];
 
+  const effectiveMinZoom = contextClamped ? Math.max(minZoom, MIN_ZOOM_WHEN_CONTEXT_CLAMPED) : minZoom;
   const centerScreen: [number, number] = [bounds.left + bounds.width / 2, bounds.top + bounds.height / 2];
   const center = projection.invert(centerScreen);
   const z = center
-    ? Math.max(minZoom, Math.min(maxZoom, estimateZoomLevel(projection, center[0], center[1], tileSize) ?? minZoom))
-    : minZoom;
+    ? Math.max(
+        effectiveMinZoom,
+        Math.min(maxZoom, estimateZoomLevel(projection, center[0], center[1], tileSize) ?? effectiveMinZoom),
+      )
+    : effectiveMinZoom;
 
   const lons = lonLats.map((p) => p[0]);
   const lats = lonLats.map((p) => p[1]);
@@ -207,9 +247,14 @@ export type MercatorFit = {
  * affine in screen space by construction, so one linear fit applies
  * uniformly to every tile in the grid.
  */
-export function buildMercatorFit(projection: ProjectionLike, rawBounds: ScreenBounds, z: number): MercatorFit | null {
+export function buildMercatorFit(
+  projection: ProjectionLike,
+  rawBounds: ScreenBounds,
+  z: number,
+  dataLonLatBounds?: [number, number, number, number] | null,
+): MercatorFit | null {
   if (!projection.invert) return null;
-  const bounds = clampBoundsToWorld(projection, rawBounds);
+  const bounds = clampBoundsToDataPadding(projection, clampBoundsToWorld(projection, rawBounds), dataLonLatBounds);
   const topLeft = projection.invert([bounds.left, bounds.top]);
   const bottomRight = projection.invert([bounds.left + bounds.width, bounds.top + bounds.height]);
   if (!topLeft || !bottomRight) return null;

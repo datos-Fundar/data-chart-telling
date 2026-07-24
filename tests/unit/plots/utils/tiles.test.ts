@@ -261,6 +261,76 @@ describe('buildMercatorFit / visibleTiles — a tall/narrow domain letterboxed i
   });
 });
 
+describe('buildMercatorFit / visibleTiles — dataLonLatBounds caps the tile-layer context', () => {
+  // Same rough Argentina bbox as the describe block above, expressed the way
+  // `Plot.svelte`'s `dataLonLatBounds` hands it to `TileLayer`.
+  const argentinaBbox: GeoJSON.Polygon = {
+    type: 'Polygon',
+    coordinates: [
+      [
+        [-73, -22],
+        [-53, -22],
+        [-53, -55],
+        [-73, -55],
+        [-73, -22],
+      ],
+    ],
+  };
+  const dataLonLatBounds: [number, number, number, number] = [-73, -55, -53, -22];
+
+  function fitInto(bounds: { left: number; top: number; width: number; height: number }) {
+    return toProjectionLike(
+      geoMercator().fitExtent(
+        [
+          [bounds.left, bounds.top],
+          [bounds.left + bounds.width, bounds.top + bounds.height],
+        ],
+        argentinaBbox,
+      ),
+    );
+  }
+
+  // Regression for the follow-up bug: a *small* facet cell (not just a wide
+  // one) naturally estimates a very low zoom, where a single 90°+-wide tile
+  // still renders in full even past `clampBoundsToWorld`'s half-world cap —
+  // dragging in all of Africa (confirmed via the `GeoPlot/Facet` Storybook
+  // stories' `Rows2Cols2` at real-world facet-cell sizes). `dataLonLatBounds`
+  // must keep the shown context inside the Atlantic gap regardless.
+  test('a small facet cell (low natural zoom) stays within the safe ocean gap, not a whole extra continent', () => {
+    const bounds = { left: 0, top: 0, width: 244, height: 60 };
+    const projection = fitInto(bounds);
+    const tiles = visibleTiles(projection, bounds, 256, 0, 19, dataLonLatBounds);
+    expect(tiles.length).toBeGreaterThan(0);
+
+    const z = tiles[0].z;
+    const minTileX = Math.min(...tiles.map((t) => t.x));
+    const maxTileX = Math.max(...tiles.map((t) => t.x));
+    const tileXToLon = (x: number) => (x / 2 ** z) * 360 - 180;
+    const west = tileXToLon(minTileX);
+    const east = tileXToLon(maxTileX + 1);
+
+    // West Africa's coast sits around -17°E — comfortably clear of it.
+    expect(east).toBeLessThan(-17);
+    // Deep in open Pacific on the other side — nowhere near land.
+    expect(west).toBeGreaterThan(-140);
+  });
+
+  test('the zoom floor engages once the context clamp actually reduces the bounds, so a single tile cannot overshoot into land', () => {
+    const bounds = { left: 0, top: 0, width: 244, height: 60 };
+    const projection = fitInto(bounds);
+    const tiles = visibleTiles(projection, bounds, 256, 0, 19, dataLonLatBounds);
+    expect(tiles[0].z).toBeGreaterThanOrEqual(6);
+  });
+
+  test('a cell whose aspect ratio is already close to the data is unaffected by dataLonLatBounds', () => {
+    const bounds = { left: 0, top: 0, width: 392, height: 476 };
+    const projection = fitInto(bounds);
+    const withoutBounds = visibleTiles(projection, bounds, 256, 0, 19);
+    const withBounds = visibleTiles(projection, bounds, 256, 0, 19, dataLonLatBounds);
+    expect(withBounds).toEqual(withoutBounds);
+  });
+});
+
 describe('tileScreenBounds', () => {
   test('returns a positive-size box for every tile a fit was built for — the whole point of `buildMercatorFit` is that this never nulls out mid-grid tiles the way forward-projecting each corner individually used to', () => {
     // A projection whose fitted scale/translate differ sharply from a real

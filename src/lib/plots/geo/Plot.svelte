@@ -5,6 +5,7 @@
   import { resolveFeatureStyle } from '$lib/plots/utils/geoSegments';
   import {
     geometryCentroid,
+    geometryLonLatBounds,
     geometryPartCentroids,
     filterGeometryParts,
     defaultFeatureId,
@@ -154,6 +155,23 @@
         `GeoPlot: styles.tileLayer only renders correctly with a mercator-family projection — got "${name}". Rendering anyway.`,
       );
     }
+  });
+
+  const dataLonLatBounds = $derived.by((): [number, number, number, number] | null => {
+    if (!styles.tileLayer) return null;
+    let minLon = Infinity;
+    let maxLon = -Infinity;
+    let minLat = Infinity;
+    let maxLat = -Infinity;
+    for (const f of features) {
+      const b = geometryLonLatBounds(f.geometry);
+      if (!b) continue;
+      if (b[0] < minLon) minLon = b[0];
+      if (b[2] > maxLon) maxLon = b[2];
+      if (b[1] < minLat) minLat = b[1];
+      if (b[3] > maxLat) maxLat = b[3];
+    }
+    return minLon === Infinity ? null : [minLon, minLat, maxLon, maxLat];
   });
 
   // ── Choropleth color scale (mirrors heatmap's styles.colors/scales.z) ────
@@ -534,7 +552,14 @@
   bind:containerEl
 >
   {#snippet children({ matchedPoints, numericMargins })}
-    <GeoLayout {width} {height} {numericMargins} zoomTransform={geoZoom.transform} tileLayer={styles.tileLayer}>
+    <GeoLayout
+      {width}
+      {height}
+      {numericMargins}
+      zoomTransform={geoZoom.transform}
+      tileLayer={styles.tileLayer}
+      {dataLonLatBounds}
+    >
       {#each markers as marker, i (marker.type + '-' + i)}
         {#if isBehindMarker(marker)}
           {@render marker_(marker, numericMargins)}
