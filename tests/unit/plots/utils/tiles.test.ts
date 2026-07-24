@@ -6,6 +6,7 @@ import {
   tileScreenBounds,
   tileUrl,
   toProjectionLike,
+  clipBoundsToData,
   type ProjectionLike,
 } from '$lib/plots/utils/tiles';
 
@@ -221,6 +222,86 @@ describe('buildMercatorFit / visibleTiles — a tall/narrow domain letterboxed i
     expect(fit!.pxPerTileX).toBeGreaterThan(0);
     expect(fit!.pxPerTileY).toBeGreaterThan(0);
   });
+});
+
+// ── clipBoundsToData ─────────────────────────────────────────────────────────
+
+describe('clipBoundsToData', () => {
+  test('returns the original bounds unchanged when no data bounds are given', () => {
+    const projection = makeMockProjection(4, 400, 300);
+    const bounds = { left: 0, top: 0, width: 400, height: 300 };
+    expect(clipBoundsToData(projection, bounds, null)).toEqual(bounds);
+    expect(clipBoundsToData(projection, bounds, undefined)).toEqual(bounds);
+  });
+
+  test("shrinks a box down to the data's own screen footprint", () => {
+    const projection = makeMockProjection(4, 400, 300); // 4px/degree, origin at box center
+    const bounds = { left: 0, top: 0, width: 400, height: 300 };
+    const clipped = clipBoundsToData(projection, bounds, [-5, -20, 5, 20]);
+    expect(clipped.width).toBeLessThan(bounds.width);
+    expect(clipped.height).toBeLessThan(bounds.height);
+    expect(clipped.left).toBeGreaterThan(bounds.left);
+  });
+
+  test('never expands past the original bounds even when the data bbox is larger', () => {
+    const projection = makeMockProjection(4, 400, 300);
+    const bounds = { left: 0, top: 0, width: 400, height: 300 };
+    const clipped = clipBoundsToData(projection, bounds, [-180, -90, 180, 90]);
+    expect(clipped.width).toBeLessThanOrEqual(bounds.width);
+    expect(clipped.height).toBeLessThanOrEqual(bounds.height);
+  });
+
+  test('falls back to the original bounds when the projection cannot place the data bbox', () => {
+    const alwaysNull = (() => null) as unknown as ProjectionLike;
+    const bounds = { left: 0, top: 0, width: 400, height: 300 };
+    expect(clipBoundsToData(alwaysNull, bounds, [-5, -20, 5, 20])).toEqual(bounds);
+  });
+
+  test(
+    "regression: Argentina fit into a wide/short facet cell — clipping removes the " +
+      "letterboxed margin that used to expose tiles from clear across the globe " +
+      "(Argentina's own antipode sits in Australia)",
+    () => {
+      const argentinaBbox: GeoJSON.Polygon = {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [-73, -22],
+            [-53, -22],
+            [-53, -55],
+            [-73, -55],
+            [-73, -22],
+          ],
+        ],
+      };
+      const bounds = { left: 0, top: 0, width: 594, height: 220 }; // wide/short cell
+      const projection = toProjectionLike(
+        geoMercator().fitExtent(
+          [
+            [bounds.left, bounds.top],
+            [bounds.left + bounds.width, bounds.top + bounds.height],
+          ],
+          argentinaBbox,
+        ),
+      );
+      const dataLonLatBounds: [number, number, number, number] = [-73, -55, -53, -22];
+
+      const clipped = clipBoundsToData(projection, bounds, dataLonLatBounds);
+      expect(clipped.width).toBeLessThan(bounds.width);
+
+      const unclippedTiles = visibleTiles(projection, bounds, 256, 0, 19);
+      const clippedTiles = visibleTiles(projection, clipped, 256, 0, 19);
+      expect(clippedTiles.length).toBeGreaterThan(0);
+      expect(clippedTiles.length).toBeLessThan(unclippedTiles.length);
+
+      // Before clipping, the letterboxed margin spread tile-x coverage
+      // across nearly the whole zoom level's world width. After clipping it
+      // should hug just Argentina's own longitude band.
+      const spread = (ts: { x: number }[]) => Math.max(...ts.map((t) => t.x)) - Math.min(...ts.map((t) => t.x));
+      const z = clippedTiles[0].z;
+      expect(spread(clippedTiles)).toBeLessThan(spread(unclippedTiles.filter((t) => t.z === z)));
+    },
+  );
 });
 
 describe('tileScreenBounds', () => {

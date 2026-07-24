@@ -115,6 +115,60 @@ function clampBoundsToWorld(projection: ProjectionLike, bounds: ScreenBounds): S
 }
 
 /**
+ * Clips `bounds` down to the screen-space box its actual geo data occupies
+ * — `dataLonLatBounds`' four extremes, forward-projected — intersected with
+ * `bounds` itself.
+ *
+ * A `domain: 'data'`-fitted Mercator projection scales to the *constraining*
+ * axis of its box (see `clampBoundsToWorld`'s doc comment): a tall/narrow
+ * region (Argentina) fit into a short/wide facet cell only fills a fraction
+ * of the box's width, and the letterboxed margin on either side is real,
+ * inverts to real (if occasionally distant) lon/lat, and so gets real tiles
+ * drawn under it — `clampBoundsToWorld` only stops that margin from
+ * wrapping *more* than one world-width once inverted, it doesn't stop a
+ * *single* world-width's worth of legitimate-but-irrelevant coverage from
+ * rendering there. For Argentina specifically that margin is wide enough to
+ * reach Argentina's own antipodal region — Australia — which is what a
+ * viewer actually sees. Clipping to the data's own footprint removes the
+ * letterboxed margin's tiles entirely rather than trying to pick a
+ * "more correct" set of tiles to show there.
+ *
+ * Only valid for a Mercator-family projection, same as the rest of this
+ * module: `x` is assumed to depend only on longitude and `y` only on
+ * latitude, so each axis's screen extent can be found by projecting just
+ * two opposite corners of the lon/lat bbox rather than tracing its full
+ * outline.
+ */
+export function clipBoundsToData(
+  projection: ProjectionLike,
+  bounds: ScreenBounds,
+  dataLonLatBounds: [number, number, number, number] | null | undefined,
+): ScreenBounds {
+  if (!dataLonLatBounds) return bounds;
+  const [minLon, minLat, maxLon, maxLat] = dataLonLatBounds;
+  const midLon = (minLon + maxLon) / 2;
+  const midLat = (minLat + maxLat) / 2;
+  const west = projection([minLon, midLat]);
+  const east = projection([maxLon, midLat]);
+  const south = projection([midLon, minLat]);
+  const north = projection([midLon, maxLat]);
+  if (!west || !east || !south || !north) return bounds;
+
+  const dataLeft = Math.min(west[0], east[0]);
+  const dataRight = Math.max(west[0], east[0]);
+  const dataTop = Math.min(north[1], south[1]);
+  const dataBottom = Math.max(north[1], south[1]);
+
+  const left = Math.max(bounds.left, dataLeft);
+  const top = Math.max(bounds.top, dataTop);
+  const right = Math.min(bounds.left + bounds.width, dataRight);
+  const bottom = Math.min(bounds.top + bounds.height, dataBottom);
+  if (!(right > left) || !(bottom > top)) return bounds;
+
+  return { left, top, width: right - left, height: bottom - top };
+}
+
+/**
  * Derives the visible XYZ tile grid from svelteplot's own already-fitted
  * projection (rather than this package computing/duplicating a `d3-geo` fit
  * itself) — see `TileLayer.svelte`. Only correct for Mercator-family

@@ -58,6 +58,34 @@ export function geometryCentroid(geometry: GeoJSON.Geometry): [number, number] {
 }
 
 /**
+ * A geometry's flattened lon/lat bounding box — `[minLon, minLat, maxLon,
+ * maxLat]`, or `null` for a geometry with no coordinates at all. Same
+ * bbox-not-geodesic caveat as `geometryCentroid` (no antimeridian handling),
+ * acceptable for the same reason: real feature sets fed through this
+ * package (Argentina's provinces, etc.) don't straddle it. Used to derive
+ * `GeoPlot`'s rendered data's own screen-space extent (see `Plot.svelte`'s
+ * `dataLonLatBounds`), so `TileLayer` can clip its raster grid to where the
+ * map's own geometry actually is instead of a projection's full letterboxed
+ * fit box (see `clipBoundsToData`).
+ */
+export function geometryLonLatBounds(geometry: GeoJSON.Geometry): [number, number, number, number] | null {
+  const coords: [number, number][] = [];
+  flattenCoords(geometry, coords);
+  if (coords.length === 0) return null;
+  let minLon = Infinity;
+  let maxLon = -Infinity;
+  let minLat = Infinity;
+  let maxLat = -Infinity;
+  for (const [lon, lat] of coords) {
+    if (lon < minLon) minLon = lon;
+    if (lon > maxLon) maxLon = lon;
+    if (lat < minLat) minLat = lat;
+    if (lat > maxLat) maxLat = lat;
+  }
+  return [minLon, minLat, maxLon, maxLat];
+}
+
+/**
  * Splits a geometry into its disjoint parts: one `Polygon` per element of a
  * `MultiPolygon`'s `coordinates`, one `LineString` per element of a
  * `MultiLineString`'s, `GeometryCollection` recursed and flattened, and any
