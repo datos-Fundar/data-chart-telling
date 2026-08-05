@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-  import { Cell, Text } from 'svelteplot';
+  import { Cell } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { validateSegments } from '$lib/plots/utils/segments';
   import { buildSeries } from '$lib/utils/grouping';
@@ -11,6 +11,7 @@
   import AxisLayout from '$lib/layout/plot/AxisLayout.svelte';
   import GridLayout from '$lib/layout/plot/GridLayout.svelte';
   import RuleLayout from '$lib/layout/plot/RuleLayout.svelte';
+  import ValueLabels from '$lib/plots/heatmap/ValueLabels.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
   import type { BasePlotProps } from '$lib/types/plots/props';
   import type { AxisValue } from '$lib/types/plots/axis';
@@ -77,9 +78,6 @@
   const maxColor = $derived(styles.colors?.max ?? cfg.continuous.max);
   const showVals = $derived(styles.values?.show ?? true);
   const fmtVal = $derived(styles.values?.format ?? ((v: number) => `${v}`));
-  // 'outside' is a per-point escape hatch resolved by HoverMarker; heatmaps
-  // have no signed axis to resolve it against, so treat it as unset.
-  const resolvedTextAnchor = $derived(styles.values?.textAnchor === 'outside' ? undefined : styles.values?.textAnchor);
 
   const resolvedSeries = $derived(series ?? buildSeries(data!, x!, y!, undefined));
   const flat = $derived(resolvedSeries.flatMap((s) => s.data));
@@ -264,26 +262,14 @@
   {/each}
 
   {#if showVals}
-    <Text
+    <ValueLabels
       data={flat}
-      x={getX}
-      y={getY}
-      text={(d) => fmtVal(Number(getZ(d)), '')}
-      fill={styles.values?.fill ?? cfg.continuous.labelColor}
-      fontSize={styles.values?.fontSize ?? 12}
-      fontWeight={styles.values?.fontWeight ?? 600}
-      fontStyle={styles.values?.fontStyle}
-      textAnchor={resolvedTextAnchor ?? 'middle'}
-      lineAnchor={styles.values?.lineAnchor ?? 'middle'}
-      dx={styles.values?.dx ?? 0}
-      dy={styles.values?.dy ?? 0}
-      lineHeight={styles.values?.lineHeight}
-      rotate={styles.values?.rotate}
-      stroke={styles.values?.stroke}
-      strokeWidth={styles.values?.strokeWidth}
-      paintOrder={styles.values?.paintOrder}
-      class={styles.values?.class}
-      textClass={styles.values?.textClass}
+      {getX}
+      {getY}
+      {getZ}
+      {fmtVal}
+      values={styles.values}
+      defaultColor={cfg.continuous.labelColor}
     />
   {/if}
   </RuleLayout>

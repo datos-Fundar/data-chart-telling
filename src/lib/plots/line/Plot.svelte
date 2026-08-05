@@ -3,7 +3,7 @@
   generics="TData extends Record<string, unknown>"
 >
   import { SvelteMap } from 'svelte/reactivity';
-  import { Line, Dot, Text } from 'svelteplot';
+  import { Line, Dot } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { paletteColor } from '$lib/utils/color';
@@ -15,6 +15,7 @@
   import GridLayout from '$lib/layout/plot/GridLayout.svelte';
   import RuleLayout from '$lib/layout/plot/RuleLayout.svelte';
   import HoverMarker from '$lib/markers/HoverMarker.svelte';
+  import ValueLabels from '$lib/plots/line/ValueLabels.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
   import { buildGroupedSeries, validateSegments, resolveSegmentsForSeries, matchesSegmentX, getDataForSegments } from '$lib/plots/utils/segments';
   import type { BasePlotProps } from '$lib/types/plots/props';
@@ -22,7 +23,6 @@
   import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
   import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
   import type { BasePlotStyles } from '$lib/types/plots/styles/common';
-  import type { ValueAnchor } from '$lib/types/plots/constants';
   import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
   import type { Marker } from '$lib/types/markers/common';
 
@@ -73,14 +73,6 @@
 
   const cfg = $derived(getConfiguration());
   const showVals = $derived(styles.values?.show ?? false);
-  const fmtVal = $derived(
-    styles.values?.format ?? ((v: number, name: string) => `${name} - ${v}`),
-  );
-  const valAnchor = $derived<ValueAnchor>(styles.values?.anchor ?? 'start');
-  // 'outside' is a per-point escape hatch resolved by HoverMarker; line's own
-  // value labels already have their own `anchor: 'outside'` concept above,
-  // so treat it as unset here.
-  const resolvedTextAnchor = $derived(styles.values?.textAnchor === 'outside' ? undefined : styles.values?.textAnchor);
 
   const xAcc = $derived(resolveAccessor(resolvedSeries[0]?.x ?? ((d: TData) => d)));
   const yAcc = $derived(resolveAccessor(resolvedSeries[0]?.y ?? ((d: TData) => d)));
@@ -236,37 +228,7 @@
   {/each}
 
   {#if showVals}
-    {@const defaultDx = valAnchor === 'start' ? 6 : valAnchor === 'end' ? -6 : 0}
-    {@const defaultDy = valAnchor === 'outside' ? -8 : 0}
-    {@const defaultTA = valAnchor === 'start'
-      ? ('start' as const)
-      : valAnchor === 'end'
-      ? ('end' as const)
-      : ('middle' as const)}
-    {@const defaultLA = valAnchor === 'outside'
-      ? ('bottom' as const)
-      : ('middle' as const)}
-    {#each lastPoints as { series: s, lastRow, seriesIndex } (s.name)}
-      {@const xFn = resolveAccessor(s.x)}
-      {@const yFn = resolveAccessor(s.y)}
-      {@const seriesColor = paletteColor(seriesIndex, cfg.palette)}
-      <Text
-        data={[lastRow]}
-        x={xFn}
-        y={yFn}
-        text={() => fmtVal(Number(yFn(lastRow)), s.name)}
-        dx={styles.values?.dx ?? defaultDx}
-        dy={styles.values?.dy ?? defaultDy}
-        textAnchor={resolvedTextAnchor ?? defaultTA}
-        lineAnchor={styles.values?.lineAnchor ?? defaultLA}
-        lineHeight={styles.values?.lineHeight}
-        rotate={styles.values?.rotate}
-        class={styles.values?.class}
-        textClass={styles.values?.textClass}
-        fill={seriesColor}
-        fontSize={12}
-      />
-    {/each}
+    <ValueLabels {lastPoints} values={styles.values} />
   {/if}
   </RuleLayout>
   {/snippet}

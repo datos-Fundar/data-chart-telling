@@ -85,6 +85,7 @@ export const ShowValues: Story = {
     styles: {
       values: { show: true },
     } satisfies BasePlotStyles,
+    margins: { top: 20 },
   },
 };
 
@@ -102,6 +103,7 @@ export const AnchorOutside: Story = {
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
     } satisfies BasePlotStyles,
+    margins: { top: 20 },
   },
 };
 
@@ -116,8 +118,8 @@ export const AnchorEnd: Story = {
       values: {
         show: true,
         anchor: 'end',
-        dy: -10,
         format: (v: number) => `${v.toFixed(1)} yr`,
+        fontStyle: { dy: -10 },
       },
     } satisfies BasePlotStyles,
   },
@@ -151,8 +153,8 @@ export const AnchorStart: Story = {
       values: {
         show: true,
         anchor: 'start',
-        dy: 10,
         format: (v: number) => `${v.toFixed(1)} yr`,
+        fontStyle: { dy: 10 },
       },
     } satisfies BasePlotStyles,
   },
@@ -172,6 +174,7 @@ export const CustomFormat: Story = {
         format: (v: number, name: string) => `${name} → ${v.toFixed(1)} yr`,
       },
     } satisfies BasePlotStyles,
+    margins: { top: 20 },
   },
 };
 
@@ -191,9 +194,10 @@ export const CustomOffsets: Story = {
         show: true,
         anchor: 'outside',
         format: (v: number) => `${v.toFixed(1)} yr`,
-        dy: -12,
+        fontStyle: { dy: -12 },
       },
     } satisfies BasePlotStyles,
+    margins: { top: 20 },
   },
 };
 
@@ -211,6 +215,7 @@ export const TwoSeriesWithLabels: Story = {
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
     } satisfies BasePlotStyles,
+    margins: { top: 20 },
   },
 };
 
@@ -284,11 +289,14 @@ export const LowLevelTextPlacement: Story = {
       values: {
         show: true,
         format: (v: number) => `${v.toFixed(1)} yr`,
-        textAnchor: 'end',
-        lineAnchor: 'bottom',
-        dy: -8,
-        dx: 0,
+        fontStyle: {
+          textAnchor: 'end',
+          lineAnchor: 'bottom',
+          dy: -8,
+          dx: 0,
+        },
       },
     } satisfies BasePlotStyles,
+    margins: { top: 20 },
   },
 };

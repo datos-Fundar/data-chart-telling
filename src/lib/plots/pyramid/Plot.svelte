@@ -1,6 +1,6 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
   import { SvelteMap } from 'svelte/reactivity';
-  import { BarX, Text } from 'svelteplot';
+  import { BarX } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { paletteColor } from '$lib/utils/color';
@@ -13,6 +13,7 @@
   import GridLayout from '$lib/layout/plot/GridLayout.svelte';
   import RuleLayout from '$lib/layout/plot/RuleLayout.svelte';
   import HoverMarker from '$lib/markers/HoverMarker.svelte';
+  import ValueLabels from '$lib/plots/pyramid/ValueLabels.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
   import type { BasePlotProps } from '$lib/types/plots/props';
   import type { AxisValue } from '$lib/types/plots/axis';
@@ -73,10 +74,6 @@
   const showVals = $derived(styles.values?.show ?? false);
   const fmtVal = $derived(styles.values?.format ?? ((v: number) => `${v}`));
   const valAnchor = $derived<ValueAnchor>(styles.values?.anchor ?? 'outside');
-  // 'outside' is a per-point escape hatch resolved by HoverMarker; pyramid's
-  // own value labels already have their own `anchor: 'outside'` concept
-  // above, so treat it as unset here.
-  const resolvedTextAnchor = $derived(styles.values?.textAnchor === 'outside' ? undefined : styles.values?.textAnchor);
 
   // Sort series names alphabetically; even index → left, odd → right.
   // scales.z.reverse flips the assignment so the second name goes left.
@@ -236,41 +233,7 @@
       {/each}
 
       {#if showVals}
-        {@const isLeft = group.series.side === 'left'}
-        {@const xFn = valAnchor === 'middle'
-          ? (d: TData) => signedValue(group.series, d) / 2
-          : valAnchor === 'end'
-          ? () => 0
-          : (d: TData) => signedValue(group.series, d)}
-        {@const defaultDx = valAnchor === 'middle' ? 0
-          : valAnchor === 'end' ? (isLeft ? -4 : 4)
-          : (isLeft ? -6 : 6)}
-        {@const defaultTextAnchor = valAnchor === 'middle'
-          ? ('middle' as const)
-          : isLeft
-          ? ('end' as const)
-          : ('start' as const)}
-        <Text
-          data={group.series.data}
-          x={xFn}
-          y={getCategory}
-          text={(d: TData) => fmtVal(Math.abs(Number(resolveAccessor(group.series.y)(d))), group.series.name)}
-          dx={styles.values?.dx ?? defaultDx}
-          dy={styles.values?.dy ?? 0}
-          textAnchor={resolvedTextAnchor ?? defaultTextAnchor}
-          lineAnchor={styles.values?.lineAnchor ?? 'middle'}
-          lineHeight={styles.values?.lineHeight}
-          rotate={styles.values?.rotate}
-          class={styles.values?.class}
-          textClass={styles.values?.textClass}
-          fill={styles.values?.fill ?? cfg.axis.color}
-          fontSize={styles.values?.fontSize ?? 12}
-          fontWeight={styles.values?.fontWeight}
-          fontStyle={styles.values?.fontStyle}
-          stroke={styles.values?.stroke}
-          strokeWidth={styles.values?.strokeWidth}
-          paintOrder={styles.values?.paintOrder}
-        />
+        <ValueLabels {group} {valAnchor} {fmtVal} values={styles.values} axisColor={cfg.axis.color} />
       {/if}
 
       {#each seriesMarkers.get(group.series.name) ?? [] as marker, i (`series-${group.series.name}-${marker.type}-${i}`)}

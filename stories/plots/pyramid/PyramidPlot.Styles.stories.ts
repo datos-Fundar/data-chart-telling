@@ -119,8 +119,7 @@ export const LabelsInside: Story = {
         show: true,
         anchor: 'end',
         format: (v: number) => `${v.toFixed(1)}%`,
-        fill: '#ffffff',
-        fontWeight: 'bold',
+        fontStyle: { fill: '#ffffff', fontWeight: 'bold' },
       },
     } satisfies BasePlotStyles,
   },
@@ -144,7 +143,7 @@ export const LabelsWithOffset: Story = {
       values: {
         show: true,
         format: (v: number) => `${v.toFixed(1)}%`,
-        dy: 8,
+        fontStyle: { dy: 8 },
       },
     } satisfies BasePlotStyles,
   },
