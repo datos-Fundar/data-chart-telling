@@ -400,7 +400,7 @@ const OVERLAP_DEMO_SERIES = OVERLAP_DEMO_PROVINCES.map(({ label, sex, province }
  * Tucumán · M to be grouped with it going in, but close enough that once
  * the cluster's own labels spread out, Tucumán · M's *decluttered* label
  * lands right on top of it. Grouping has to key off the post-declutter
- * (final) gap, not the original one, to catch this. See `mirrorRanks`'s
+ * (final) gap, not the original one, to catch this. See `declutter1D`'s
  * doc comment in `declutter.ts`.
  */
 const NEAR_MISS_SERIES = {

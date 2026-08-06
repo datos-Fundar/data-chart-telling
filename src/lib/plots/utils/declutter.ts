@@ -46,14 +46,13 @@ export type Declutter1DResult<T> = {
  * that side, so a plain 50/50 blend would still ask the up-pass and
  * down-pass to pull the block symmetrically toward *both* edges before
  * `fitRunsWithinBounds` shifts/shrinks it back — the up-pass reaching for
- * room that was never really there. That round trip is exactly what makes
- * individual members travel far past their neighbours' original positions
- * (`laneAssignment`'s doc comment calls this out as the thing that forces an
- * unsafe, overlapping travel span), so a run near an edge leans toward
- * whichever pass already grows away from it instead — the block still
- * expands to clear `minGap` everywhere, just mostly in the one direction
- * that was actually available, the way a person sliding books apart on a
- * shelf pinned against one wall would.
+ * room that was never really there, needlessly widening how far members end
+ * up travelling from their original positions (`laneAssignment`'s own lane
+ * count grows with exactly that travel distance — see its doc comment) — so
+ * a run near an edge leans toward whichever pass already grows away from it
+ * instead — the block still expands to clear `minGap` everywhere, just
+ * mostly in the one direction that was actually available, the way a person
+ * sliding books apart on a shelf pinned against one wall would.
  */
 export function declutter1D<T extends { pos: number }>(
   items: T[],
@@ -156,41 +155,60 @@ function fitRunsWithinBounds(positions: number[], connected: boolean[], [lo, hi]
 
 /**
  * Groups `declutter1D`'s own `connected` flags into runs (maximal stretches
- * of consecutive connected pairs), then assigns each run member a lane by
- * *mirrored* position — the run's top and bottom member share lane 0, the
- * next-in-from-top and next-in-from-bottom share lane 1, and so on toward
- * the run's centre (an odd-sized run's exact middle member gets the
- * innermost lane alone) — but only after checking that a proposed pair's
- * *travel spans* (`[min(original, final), max(original, final)]`, the pixel
- * range a leader line's vertical segment actually sweeps through) don't
- * overlap. A pair that would collide is split into two lanes of its own
- * instead of one shared one, so correctness never depends on the pairing
- * being right — only on this check.
+ * of consecutive connected pairs), then gives every run member its own,
+ * unique lane — no two members ever share one, deliberately (see below) —
+ * ordered so that a leader line drawn through lane `rank` never crosses, or
+ * even draws visually flush against, one drawn through any other lane of
+ * the same run.
  *
- * Mirrored position is still the *first* thing tried, not span-overlap
- * colouring picking lanes on its own, because minimizing lane count isn't
- * actually the goal here — a run of `n` safely-non-overlapping members could
- * often be greedily packed into far fewer than `ceil(n / 2)` lanes, but
- * doing that defeats the point: it's what visually fans a pileup's leader
- * lines apart in the first place. Mirrored pairing keeps that fan-out
- * exactly where it's safe (the common case for `declutter1D`'s own output),
- * and only degrades — never breaks — where it isn't.
+ * Every member's leader line is the same three-segment elbow: a horizontal
+ * stub from the data point out to its lane, a vertical run up/down that
+ * lane to the label's height, then a final horizontal run in to the shared
+ * label column. Two such elbows, `i` (in the tighter of the two lanes) and
+ * `j` (further out), are safe from crossing *specifically* when neither of
+ * these can happen:
+ * - `j`'s own stub (at `j`'s original height) reaches out past `i`'s lane
+ *   while `i`'s vertical run passes through that height — `j`'s stub would
+ *   cut across `i`'s vertical segment.
+ * - `i`'s final run (at `i`'s label height) reaches past `i`'s own lane out
+ *   to the shared column, and in doing so crosses `j`'s lane while `j`'s
+ *   vertical run passes through *that* height — `i`'s own final segment
+ *   would cut across `j`'s vertical segment.
  *
- * A run whose members still end up with genuinely overlapping travel spans
- * (heavy, edge-adjacent compression) has no lane assignment that's both
- * crossing-free *and* touch-free under this shared-`px`/shared-`labelX`
- * elbow geometry — sharing draws two segments on top of each other, splitting
- * draws an actual crossing. `declutter1D`'s bounds-aware margin bias (see its
- * own doc comment) exists specifically to keep that from happening in the
- * first place, by keeping a run's displacement mostly one-directional when
- * it sits close to an edge, rather than papering over it here.
+ * Whether `i` can safely take the tighter lane depends on both members'
+ * *actual* pixel geometry — not simply on which one moved further — so each
+ * pair is checked directly per {@link saferNearer} rather than inferred from
+ * a single sort key. A pair with a clean, provable answer either way (the
+ * overwhelmingly common case for `declutter1D`'s own output) is ordered by
+ * that answer; a pair with no clean answer (both directions equally
+ * "unsafe," or, symmetrically, both fine) falls back to the same *travel
+ * distance* heuristic used before this per-pair check existed — furthest
+ * `|final - original|` first — which is what decides ties and keeps the
+ * "furthest traveller gets the tightest lane, so it starts bending
+ * immediately rather than reaching across everyone else's leader lines
+ * first" intent for every pair the geometry itself doesn't already settle.
+ *
+ * No sharing, ever, is the other half of this: two members can only have
+ * non-overlapping travel spans (and so pass the old, now-removed,
+ * share-a-lane check) by sitting far apart along the axis — but "far apart"
+ * is exactly the case with the most room to spare, so it never needed the
+ * lane it would save by sharing, while any pair close enough to actually be
+ * short on room has spans close enough together that sharing draws their
+ * two leader lines only a couple pixels apart — visually indistinguishable
+ * from one continuous line touching the next label down. A run of `n`
+ * members uses exactly `n` lanes; letting the lane count grow is the price
+ * of a fan that never has two leader lines touching *or* crossing, and
+ * `ValueLabels`' own auto-margin measurement (see its doc comment) already
+ * grows `margins.right` to fit however many lanes that turns out to be, so
+ * nothing has to be guessed up front.
  *
  * `rank` is the lane index (0-indexed) to drive a leader line's routing:
  * `rank` 0 bends right off the data point (a short first stub); higher
  * ranks travel further before bending (right up to the shared label
- * column). `lanesUsed` is the run's own total lane count (shared by every
- * member); `runSize` is the run's member count, for callers that just need
- * to know whether a given member belongs to a real run at all.
+ * column). `lanesUsed` is the run's own total lane count — always equal to
+ * `runSize` — shared by every member; `runSize` is the run's member count,
+ * for callers that just need to know whether a given member belongs to a
+ * real run at all.
  */
 export function laneAssignment(
   originals: number[],
@@ -204,7 +222,16 @@ export function laneAssignment(
     const b = finals[k];
     return a < b ? [a, b] : [b, a];
   };
-  const overlaps = (a: [number, number], b: [number, number]) => a[0] < b[1] && b[0] < a[1];
+  const distance = (k: number) => Math.abs(finals[k] - originals[k]);
+
+  /** Whether lane-`i`-nearer-than-`j` is provably crossing-free — see this function's doc comment. */
+  function saferNearer(i: number, j: number): boolean {
+    const [loI, hiI] = span(i);
+    const [loJ, hiJ] = span(j);
+    const jStubCutsI = originals[j] >= loI && originals[j] <= hiI;
+    const iFinalCutsJ = finals[i] >= loJ && finals[i] <= hiJ;
+    return !jStubCutsI && !iFinalCutsJ;
+  }
 
   let i = 0;
   while (i < n) {
@@ -212,30 +239,20 @@ export function laneAssignment(
     while (j < connected.length && connected[j]) j++;
     const runSize = j - i + 1;
     if (runSize > 1) {
-      const rankOf = new Array<number>(runSize);
-      let lo = 0;
-      let hi = runSize - 1;
-      let nextLane = 0;
-      while (lo <= hi) {
-        if (lo === hi) {
-          rankOf[lo] = nextLane;
-          nextLane += 1;
-        } else if (!overlaps(span(i + lo), span(i + hi))) {
-          rankOf[lo] = nextLane;
-          rankOf[hi] = nextLane;
-          nextLane += 1;
-        } else {
-          rankOf[lo] = nextLane;
-          rankOf[hi] = nextLane + 1;
-          nextLane += 2;
-        }
-        lo += 1;
-        hi -= 1;
-      }
-      const lanesUsed = nextLane;
-      for (let k = 0; k < runSize; k++) {
-        out[i + k] = { rank: rankOf[k], lanesUsed, runSize };
-      }
+      // Members of this run, ordered so each is provably safe to place
+      // nearer than the next whenever that's decidable, furthest-travelled
+      // first otherwise (ties keep their original — i.e. top-to-bottom —
+      // order, since `sort` is stable). Position in this order *is* the
+      // rank: no sharing.
+      const order = Array.from({ length: runSize }, (_, k) => i + k).sort((a, b) => {
+        const aNearer = saferNearer(a, b);
+        const bNearer = saferNearer(b, a);
+        if (aNearer !== bNearer) return aNearer ? -1 : 1;
+        return distance(b) - distance(a);
+      });
+      order.forEach((k, rank) => {
+        out[k] = { rank, lanesUsed: runSize, runSize };
+      });
     }
     i = j + 1;
   }
