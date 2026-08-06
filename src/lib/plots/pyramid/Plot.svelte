@@ -192,9 +192,14 @@
     y: { type: 'band', padding: 0.2, domain: yDomain, ...(scales.y ?? {}) },
   });
 
-  const hoverActive = $derived(tooltip != null || hasHoverMarker(markers));
-  const hoverStrategy = $derived(resolveHoverStrategy(tooltip?.strategy, markers, 'y'));
-  const hoverSync = $derived(resolveHoverSync(tooltip?.sync, markers));
+  const hover = $derived({
+    active: tooltip != null || hasHoverMarker(markers),
+    points: hoverPoints,
+    label: labelFor,
+    strategy: resolveHoverStrategy(tooltip?.strategy, markers, 'y'),
+    sync: resolveHoverSync(tooltip?.sync, markers),
+    tooltip,
+  });
 </script>
 
 <BasePlotLayout
@@ -203,12 +208,7 @@
   data={flat}
   {getX}
   {getY}
-  {hoverPoints}
-  label={labelFor}
-  {tooltip}
-  {hoverActive}
-  {hoverStrategy}
-  {hoverSync}
+  {hover}
   scales={resolvedScales}
   {margins}
   xTickRotate={resolvedScales?.x?.tickRotate}

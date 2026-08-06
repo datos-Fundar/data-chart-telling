@@ -10,8 +10,8 @@
   import type { AxisValue, AxisScale } from '$lib/types/plots/axis';
   import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
   import type { GeoProjectionConfig } from '$lib/types/plots/scales/geo';
-  import type { HoverStrategy, HoverPoint } from '$lib/types/layout/tooltip';
-  import type { MarginConfig, TooltipConfig } from '$lib/types/plots/props';
+  import type { HoverPoint } from '$lib/types/layout/tooltip';
+  import type { MarginConfig, HoverConfig } from '$lib/types/plots/props';
 
   type SveltePlotProps = ComponentProps<typeof Plot>;
 
@@ -32,12 +32,7 @@
     data,
     getX,
     getY,
-    hoverPoints,
-    label,
-    tooltip = undefined,
-    hoverActive,
-    hoverStrategy = undefined,
-    hoverSync = undefined,
+    hover,
     x = undefined,
     y = undefined,
     scales = undefined,
@@ -45,7 +40,6 @@
     margins,
     marginEstimate = AUTO_MARGIN_ESTIMATE,
     xTickRotate = undefined,
-    excludeHover = undefined,
     touchAction = undefined,
     containerEl = $bindable(undefined),
     children,
@@ -56,15 +50,8 @@
     data: TData[];
     getX: (d: TData) => AxisValue;
     getY: (d: TData) => AxisValue;
-    hoverPoints: HoverPoint<TData>[];
-    label: (row: TData) => string;
-    tooltip?: TooltipConfig<TData>;
-    /** Whether the pointer/hover/tooltip machinery should mount at all. */
-    hoverActive: boolean;
-    /** Resolved hover strategy for the *local* hover store (ignored once a shared store is in scope). */
-    hoverStrategy?: HoverStrategy;
-    /** Resolved sync flag for the *local* hover store (ignored once a shared store is in scope). */
-    hoverSync?: boolean;
+    /** Every hover/tooltip prop this component's own hover machinery reads — see {@link HoverConfig}. */
+    hover: HoverConfig<TData>;
     /** Explicit `<Plot x>` override — bypasses `scales`-derived resolution (e.g. GeoPlot's fixed lon/lat domain). */
     x?: SveltePlotProps['x'];
     /** Explicit `<Plot y>` override — see `x`. */
@@ -79,13 +66,6 @@
     marginEstimate?: Record<'top' | 'right' | 'bottom' | 'left', number>;
     /** Boosts the bottom margin for a rotated x tick label — axis-having plot kinds only. */
     xTickRotate?: number;
-    /**
-     * When it returns `true` for a pointer event, that event is treated as a
-     * leave instead of a move — lets a nested layout (e.g. GeoLayout's inset
-     * markers) opt specific screen regions out of this plot's own hover
-     * matching without this component needing to know why.
-     */
-    excludeHover?: (e: PointerEvent) => boolean;
     /** Forwarded to the wrapper div's `touch-action` CSS — GeoPlot's zoom/pan only. */
     touchAction?: string;
     /** The wrapper div's own element — bind for a nested layout that needs it for its own gesture handling (e.g. GeoLayout's zoom/rotate). */
@@ -100,6 +80,9 @@
      * strategy implies a crosshair rule on each axis by default.
      * `numericMargins` lets a nested layout align itself with the plot's own
      * content box without recomputing margins itself.
+     * `setHoverMatch`/`clearHoverMatch` let a plot kind drive the match
+     * itself instead of svelteplot's distance-based `<Pointer>` — see
+     * `hover.match`.
      */
     children: Snippet<
       [{
@@ -109,6 +92,8 @@
         impliesRuleX: boolean;
         impliesRuleY: boolean;
         numericMargins: { top: number; right: number; bottom: number; left: number };
+        setHoverMatch: (rows: TData[]) => void;
+        clearHoverMatch: () => void;
       }]
     >;
   } = $props();
@@ -205,7 +190,10 @@
   // ── Hover / tooltip ───────────────────────────────────────────────────────
   const sharedHover = getHover();
   const localHover = createHover();
-  const hover = $derived(sharedHover ?? localHover);
+  const hoverStore = $derived(sharedHover ?? localHover);
+
+  /** Declared intent, defaulted — see {@link HoverConfig.match}. */
+  const matchStrategy = $derived(hover.match ?? 'nearest');
 
   /**
    * Which axes svelteplot's `<Pointer>` should search along — derived from
@@ -216,33 +204,33 @@
    * its category sits on y, and a bar's own magnitude on x shouldn't pull in
    * a *different* row just because that row's bar tip is nearer in x)
    * searches y only, and `'punctual'` (heatmap/geo's 2D grid) needs both.
-   * Reactive to `hover.strategy`, so a caller overriding `tooltip.strategy`/a
-   * hover marker's `strategy` away from the plot kind's default gets
-   * correctly-dimensioned matching too.
+   * Reactive to `hoverStore.strategy`, so a caller overriding
+   * `hover.tooltip.strategy`/a hover marker's `strategy` away from the plot
+   * kind's default gets correctly-dimensioned matching too.
    */
-  const pointerMatchX = $derived(hover.strategy === 'y' ? undefined : getX);
-  const pointerMatchY = $derived(hover.strategy === 'x' ? undefined : getY);
+  const pointerMatchX = $derived(hoverStore.strategy === 'y' ? undefined : getX);
+  const pointerMatchY = $derived(hoverStore.strategy === 'x' ? undefined : getY);
 
   $effect(() => {
     if (sharedHover) return;
-    localHover.strategy = hoverStrategy ?? 'x';
-    localHover.sync = hoverSync ?? false;
+    localHover.strategy = hover.strategy ?? 'x';
+    localHover.sync = hover.sync ?? false;
   });
 
   const ctrl = createHoverController<TData>({
-    hover: () => hover,
-    facetId: () => tooltip?.facetId ?? '',
-    points: () => hoverPoints,
+    hover: () => hoverStore,
+    facetId: () => hover.tooltip?.facetId ?? '',
+    points: () => hover.points,
     getX: () => getX,
     getY: () => getY,
-    label: () => label,
-    seriesFilter: () => tooltip?.series,
+    label: () => hover.label,
+    seriesFilter: () => hover.tooltip?.series,
     width: () => width,
     height: () => height,
   });
 
   function onMove(e: PointerEvent) {
-    if (excludeHover?.(e)) {
+    if (hover.exclude?.(e)) {
       ctrl.onLeave();
       return;
     }
@@ -256,8 +244,8 @@
   bind:this={containerEl}
   style:color={cfg.axis.color}
   style:touch-action={touchAction}
-  onpointermove={hoverActive ? onMove : undefined}
-  onpointerleave={hoverActive ? ctrl.onLeave : undefined}
+  onpointermove={hover.active ? onMove : undefined}
+  onpointerleave={hover.active ? ctrl.onLeave : undefined}
 >
   <Plot
     {width}
@@ -274,22 +262,24 @@
       impliesRuleX: ctrl.impliesRuleX,
       impliesRuleY: ctrl.impliesRuleY,
       numericMargins,
+      setHoverMatch: ctrl.onPointer,
+      clearHoverMatch: ctrl.onLeave,
     })}
 
-    {#if hoverActive}
+    {#if hover.active && matchStrategy === 'nearest'}
       <Pointer {data} x={pointerMatchX} y={pointerMatchY} maxDistance={400} onupdate={ctrl.onPointer} />
     {/if}
   </Plot>
 
-  {#if tooltip}
+  {#if hover.tooltip}
     <TooltipLayout
       visible={ctrl.showTooltip && ctrl.tooltipPosition != null}
       x={ctrl.tooltipPosition?.x ?? 0}
       y={ctrl.tooltipPosition?.y ?? 0}
       bounds={{ width, height }}
       rows={ctrl.matchedRows.map((p) => p.row)}
-      format={tooltip.format}
-      content={tooltip.content}
+      format={hover.tooltip.format}
+      content={hover.tooltip.content}
     />
   {/if}
 </div>

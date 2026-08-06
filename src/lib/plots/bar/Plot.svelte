@@ -171,9 +171,14 @@
     ),
   );
 
-  const hoverActive = $derived(tooltip != null || hasHoverMarker(markers));
-  const hoverStrategy = $derived(resolveHoverStrategy(tooltip?.strategy, markers, categoricalAxis));
-  const hoverSync = $derived(resolveHoverSync(tooltip?.sync, markers));
+  const hover = $derived({
+    active: tooltip != null || hasHoverMarker(markers),
+    points: hoverPoints,
+    label: (r: TData) => String(yAcc(r)),
+    strategy: resolveHoverStrategy(tooltip?.strategy, markers, categoricalAxis),
+    sync: resolveHoverSync(tooltip?.sync, markers),
+    tooltip,
+  });
 </script>
 
 <BasePlotLayout
@@ -182,12 +187,7 @@
   data={flat}
   getX={plotGetX}
   getY={plotGetY}
-  {hoverPoints}
-  label={(r) => String(yAcc(r))}
-  {tooltip}
-  {hoverActive}
-  {hoverStrategy}
-  {hoverSync}
+  {hover}
   scales={resolvedScales}
   {margins}
   xTickRotate={resolvedScales?.x?.tickRotate}

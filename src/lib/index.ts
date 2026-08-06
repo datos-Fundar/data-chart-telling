@@ -68,6 +68,8 @@ export type {
   ScalesConfig,
   MarginConfig,
   TooltipConfig,
+  HoverConfig,
+  HoverMatchStrategy,
 } from './types/plots/props';
 export type {
   DeltaConfig,

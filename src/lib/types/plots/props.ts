@@ -1,4 +1,4 @@
-import type { TooltipOptions } from '$lib/types/layout/tooltip';
+import type { HoverPoint, HoverStrategy, TooltipOptions } from '$lib/types/layout/tooltip';
 import type { Segment } from '$lib/types/plots/segments/config';
 import type { AxisScale } from '$lib/types/plots/axis';
 import type { GeoProjectionConfig } from '$lib/types/plots/scales/geo';
@@ -60,6 +60,55 @@ export type TooltipConfig<TRow extends Record<string, unknown>> = Omit<TooltipOp
   format: (row: TRow) => string;
   sync: boolean;
   facetId: string;
+};
+
+/**
+ * How a hover event resolves to a candidate point:
+ * - `'nearest'` — the candidate point closest to the cursor, within a
+ *   distance threshold (svelteplot's own `<Pointer>`). The right choice for
+ *   discrete marks positioned at exact coordinates (a line's dots, a bar's
+ *   center) where "closest" and "the mark you're pointing at" coincide.
+ * - `'contains'` — the candidate whose own rendered shape actually contains
+ *   the cursor. The right choice when candidates are irregular filled
+ *   regions (`GeoPlot`'s features) — a shape's true center can sit far from
+ *   where the cursor is on a large or oddly-shaped feature, so "nearest
+ *   center" and "the feature you're pointing at" routinely diverge. Backed
+ *   by the browser's own SVG hit-testing on each candidate's rendered path,
+ *   via the `setHoverMatch`/`clearHoverMatch` handlers `BasePlotLayout`
+ *   hands back through its `children` snippet, rather than an approximation
+ *   by distance to a centroid.
+ */
+export type HoverMatchStrategy = 'nearest' | 'contains';
+
+/**
+ * `BasePlotLayout`'s single `hover` prop — every plot kind's own resolved
+ * hover/tooltip wiring (previously eight separate, always-passed-together
+ * props: `hoverPoints`, `label`, `tooltip`, `hoverActive`, `hoverStrategy`,
+ * `hoverSync`, `excludeHover`, `disablePointerMatch`) bundled into one
+ * config, since every `Plot.svelte` computes and forwards the whole group
+ * as a unit anyway.
+ */
+export type HoverConfig<TRow extends Record<string, unknown>> = {
+  /** Whether the pointer/hover/tooltip machinery should mount at all. */
+  active: boolean;
+  /** Candidate points hover matching searches against. */
+  points: HoverPoint<TRow>[];
+  /** Short label drawn next to the highlight dot (e.g. the value). */
+  label: (row: TRow) => string;
+  /** Resolved hover strategy for the *local* hover store (ignored once a shared store is in scope). */
+  strategy?: HoverStrategy;
+  /** Resolved sync flag for the *local* hover store (ignored once a shared store is in scope). */
+  sync?: boolean;
+  tooltip?: TooltipConfig<TRow>;
+  /**
+   * When it returns `true` for a pointer event, that event is treated as a
+   * leave instead of a move — lets a nested layout (e.g. GeoLayout's inset
+   * markers) opt specific screen regions out of this plot's own hover
+   * matching without `BasePlotLayout` needing to know why.
+   */
+  exclude?: (e: PointerEvent) => boolean;
+  /** How to resolve a pointer event to a candidate point — see {@link HoverMatchStrategy}. Defaults to `'nearest'`. */
+  match?: HoverMatchStrategy;
 };
 
 /**

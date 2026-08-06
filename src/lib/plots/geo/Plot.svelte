@@ -280,6 +280,24 @@
   const hoverGetY = (f: TaggedFeature) => f.__cy;
 
   /**
+   * One `hoverPoints` entry per feature `__id` (first part wins — every part
+   * of the same feature shares the same `row`, so any one is equally good
+   * for tooltip/highlight purposes). Looked up from the exact feature the
+   * browser's own SVG hit-testing resolved a pointer event to (see the
+   * `<Geo onpointerenter>` below) — the actual match, not an approximation
+   * of it, unlike the bounding-box-centroid distance search this replaces.
+   * A feature absent here was filtered out of `hoverPoints` (out of the
+   * active legend range) and correctly produces no match.
+   */
+  const hoverPointById = $derived.by(() => {
+    const map = new SvelteMap<string, (typeof hoverPoints)[number]>();
+    for (const p of hoverPoints) {
+      if (!map.has(p.row.__id)) map.set(p.row.__id, p);
+    }
+    return map;
+  });
+
+  /**
    * `markers` otherwise always render after (on top of) the base map's own
    * `styleGroups`, regardless of array order — a marker opts into drawing
    * underneath it instead by setting `behind: true` (see e.g.
@@ -303,6 +321,22 @@
   });
 
   const hoverActive = $derived(tooltip != null || hoverMarkerConfig != null);
+
+  const hover = $derived({
+    active: hoverActive,
+    points: hoverPoints,
+    label: (f: TaggedFeature) => f.__id,
+    strategy: 'punctual' as const,
+    sync: tooltip?.sync ?? false,
+    tooltip,
+    exclude: isOverInset,
+    // A feature's true visual center can sit far from where the cursor
+    // actually is on a large/irregular shape (e.g. an elongated province) —
+    // 'contains' matches the feature the cursor is really over, via the
+    // browser's own SVG hit-testing on each rendered feature path (see the
+    // `<Geo onpointerenter>` below), rather than 'nearest' centroid distance.
+    match: 'contains' as const,
+  });
 
   // ── Projection ────────────────────────────────────────────────────────────
   const resolvedProjection = $derived(
@@ -536,22 +570,25 @@
   data={hoverCandidates}
   getX={hoverGetX}
   getY={hoverGetY}
-  {hoverPoints}
-  label={(f) => f.__id}
-  {tooltip}
-  {hoverActive}
-  hoverStrategy="punctual"
-  hoverSync={tooltip?.sync ?? false}
+  {hover}
   x={{ domain: [-180, 180] }}
   y={{ domain: [90, -90] }}
   projection={finalProjection}
   {margins}
   marginEstimate={GEO_MARGIN_ESTIMATE}
-  excludeHover={isOverInset}
   touchAction={zoomEnabled ? 'none' : undefined}
   bind:containerEl
 >
-  {#snippet children({ matchedPoints, numericMargins })}
+  {#snippet children({ matchedPoints, numericMargins, setHoverMatch, clearHoverMatch })}
+    {@const onFeaturePointerEnter = (e: Event, d: TaggedFeature) => {
+      if (isOverInset(e as PointerEvent)) return;
+      const hp = hoverPointById.get(d.__id);
+      if (hp) setHoverMatch([hp.row]);
+    }}
+    {@const onFeaturePointerLeave = (e: Event) => {
+      if (isOverInset(e as PointerEvent)) return;
+      clearHoverMatch();
+    }}
     <GeoLayout
       {width}
       {height}
@@ -577,6 +614,8 @@
           onclick={styles.onFeatureClick
             ? (e: Event, d: TaggedFeature) => styles.onFeatureClick?.(d, e)
             : undefined}
+          onpointerenter={hoverActive ? onFeaturePointerEnter : undefined}
+          onpointerleave={hoverActive ? onFeaturePointerLeave : undefined}
         />
       {/each}
 

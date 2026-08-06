@@ -224,9 +224,14 @@
     y: { type: 'band', domain: yDomain, ...(scales.y ?? {}) },
   });
 
-  const hoverActive = $derived(tooltip != null || hasHoverMarker(markers));
-  const hoverStrategy = $derived(resolveHoverStrategy(tooltip?.strategy, markers, 'punctual'));
-  const hoverSync = $derived(resolveHoverSync(tooltip?.sync, markers));
+  const hover = $derived({
+    active: tooltip != null || hasHoverMarker(markers),
+    points: hoverPoints,
+    label: (d: TData) => fmtVal(Number(getZ(d)), ''),
+    strategy: resolveHoverStrategy(tooltip?.strategy, markers, 'punctual'),
+    sync: resolveHoverSync(tooltip?.sync, markers),
+    tooltip,
+  });
 </script>
 
 <BasePlotLayout
@@ -235,12 +240,7 @@
   data={flat}
   {getX}
   {getY}
-  {hoverPoints}
-  label={(d) => fmtVal(Number(getZ(d)), '')}
-  {tooltip}
-  {hoverActive}
-  {hoverStrategy}
-  {hoverSync}
+  {hover}
   scales={resolvedScales}
   {margins}
 >

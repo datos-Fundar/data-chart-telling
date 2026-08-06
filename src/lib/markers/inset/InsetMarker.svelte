@@ -84,44 +84,33 @@
     return geoPath(projection);
   });
 
-  /**
-   * Nearest-feature hover, local to this inset only — mirrors the main
-   * map's own "always nearest feature centroid" behaviour (see `Plot.svelte`),
-   * but computed against this inset's own fitted `path`/projection instead
-   * of the plot's shared one, since svelteplot's `<Pointer>` (which drives
-   * the main map's hover) only ever matches the main projection's own
-   * feature positions — it has no way to reach content an inset draws at a
-   * wholly different scale/location.
-   */
-  const centroids = $derived.by(() => {
-    if (!path) return [];
-    return insetFeatures.map((f) => ({ feature: f, centroid: path.centroid(f as GeoJSON.Feature) }));
-  });
-
   let hovered = $state<{ feature: GeoFeature<Record<string, unknown>>; x: number; y: number } | null>(null);
 
-  // Any point within the inset box always matches its nearest feature —
-  // there's no reason for a hover inside a small, self-contained panel to
-  // ever come up empty, so the threshold is just the box's own diagonal.
-  const maxDistance = $derived(Math.hypot(box.width, box.height));
+  /**
+   * Purely a coordinate reference (`pointer-events: none` — never itself a
+   * hover target) sized exactly to the inset's own box, so `onInsetPointer*`
+   * below can convert a screen-space pointer event into the same box-local
+   * `x`/`y` space `TooltipLayout`'s `bounds` expects, the same way
+   * `BasePlotLayout`'s own cursor tracking does for the main map.
+   */
+  let boxRectEl = $state<SVGRectElement>();
 
-  function onInsetPointerMove(e: PointerEvent) {
-    const rect = (e.currentTarget as SVGRectElement).getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    let nearest: (typeof centroids)[number] | null = null;
-    let nearestDist = Infinity;
-    for (const c of centroids) {
-      const d = Math.hypot(c.centroid[0] - x, c.centroid[1] - y);
-      if (d < nearestDist) {
-        nearestDist = d;
-        nearest = c;
-      }
-    }
-    hovered = nearest && nearestDist <= maxDistance ? { feature: nearest.feature, x, y } : null;
+  /**
+   * Which exact feature `<path>` the browser's own SVG hit-testing resolved
+   * the event to — mirrors the main map's own `<Geo onpointerenter>` (see
+   * `Plot.svelte`) rather than approximating it by nearest centroid
+   * distance, which used to make hover pick the wrong (if geometrically
+   * nearer-by-centroid) neighboring feature, exactly the bug that fix
+   * addressed for the main map.
+   */
+  function onInsetFeaturePointer(e: PointerEvent, f: GeoFeature<Record<string, unknown>>) {
+    const rect = boxRectEl?.getBoundingClientRect();
+    const x = e.clientX - (rect?.left ?? 0);
+    const y = e.clientY - (rect?.top ?? 0);
+    hovered = { feature: f, x, y };
   }
 
-  function onInsetPointerLeave() {
+  function onInsetFeatureLeave() {
     hovered = null;
   }
 </script>
@@ -129,6 +118,7 @@
 {#if path}
   <g class="dct-geo-inset" transform="translate({box.left + left}, {box.top + top})">
     {#each insetFeatures as f, i (i)}
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
       <path
         d={path(f as GeoJSON.Feature) ?? undefined}
         fill={marker.style?.fill ?? defaultFill}
@@ -136,19 +126,14 @@
         stroke={marker.style?.stroke ?? 'currentColor'}
         stroke-width={marker.style?.strokeWidth ?? 0.5}
         style="vector-effect: non-scaling-stroke"
+        onpointerenter={marker.tooltip ? (e: PointerEvent) => onInsetFeaturePointer(e, f) : undefined}
+        onpointermove={marker.tooltip ? (e: PointerEvent) => onInsetFeaturePointer(e, f) : undefined}
+        onpointerleave={marker.tooltip ? onInsetFeatureLeave : undefined}
       />
     {/each}
     {#if marker.tooltip}
       <!-- svelte-ignore a11y_no_static_element_interactions -->
-      <rect
-        x={0}
-        y={0}
-        width={box.width}
-        height={box.height}
-        fill="transparent"
-        onpointermove={onInsetPointerMove}
-        onpointerleave={onInsetPointerLeave}
-      />
+      <rect x={0} y={0} width={box.width} height={box.height} fill="transparent" pointer-events="none" bind:this={boxRectEl} />
     {/if}
     {#if marker.tooltip}
       {@const tooltip = marker.tooltip}
