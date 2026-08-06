@@ -81,7 +81,17 @@ export const DEFAULT_CONFIG: ChartConfig = {
   margins: { top: 'auto', right: 'auto', bottom: 'auto', left: 'auto' },
   palette: ['#4f46e5', '#e6580d', '#16a34a', '#dc2626', '#0891b2', '#9333ea', '#ca8a04', '#db2777'],
   continuous: { min: '#e0e7ff', max: '#4f46e5', labelColor: '#111827' },
-  line: { strokeWidth: 3, dotRadius: 4 },
+  line: {
+    strokeWidth: 3,
+    dotRadius: 4,
+    valueLabels: {
+      elbowGap: 10,
+      laneStep: 7,
+      labelGap: 6,
+      connectorColor: '#94a3b8',
+      connectorWidth: 0.5,
+    },
+  },
   timeline: { axisColor: 'currentColor', activeColor: '#e6580d', thickness: 60 },
   hover: {
     rule: { stroke: '#e6580d', strokeOpacity: 0.35, strokeWidth: 1.5, strokeDasharray: '4 4' },

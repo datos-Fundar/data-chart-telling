@@ -86,7 +86,27 @@ export type ChartConfig = {
   /** Continuous gradient endpoints + on-cell label colour. */
   continuous: { min: string; max: string; labelColor: string };
   /** Default line geometry. */
-  line: { strokeWidth: number; dotRadius: number };
+  line: {
+    strokeWidth: number;
+    dotRadius: number;
+    /**
+     * End-of-line value-label declutter geometry and connector styling —
+     * `LinePlot`-specific, since only line charts spread colliding
+     * end-point labels apart with elbow-routed leader lines.
+     */
+    valueLabels: {
+      /** Shortest lane's distance (px) from the data point before a leader line bends. */
+      elbowGap: number;
+      /** Extra distance (px) each subsequent lane sits out from the last. */
+      laneStep: number;
+      /** Clearance (px) between the outermost lane and the label text it feeds into. */
+      labelGap: number;
+      /** Default leader-line colour — overridable per-plot via `styles.values.strokeStyle`. */
+      connectorColor: string;
+      /** Default leader-line width — overridable per-plot via `styles.values.strokeStyle`. */
+      connectorWidth: number;
+    };
+  };
   /** Timeline gutter styling. */
   timeline: { axisColor: string; activeColor: string; thickness: number };
   /** In-SVG hover highlight (crosshair rule, dot, and value label). */

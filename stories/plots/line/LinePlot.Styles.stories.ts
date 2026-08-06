@@ -85,7 +85,6 @@ export const ShowValues: Story = {
     styles: {
       values: { show: true },
     } satisfies BasePlotStyles,
-    margins: { right: 80 },
   },
 };
 
@@ -110,7 +109,6 @@ export const CustomFormat: Story = {
         format: (v: number, name: string) => `${name} → ${v.toFixed(1)} yr`,
       },
     } satisfies BasePlotStyles,
-    margins: { right: 120 },
   },
 };
 
@@ -142,7 +140,6 @@ export const TwoSeriesWithLabels: Story = {
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
     } satisfies BasePlotStyles,
-    margins: { right: 80 },
   },
 };
 
@@ -168,7 +165,6 @@ export const AnchorStart: Story = {
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
     } satisfies BasePlotStyles,
-    margins: { right: 80 },
   },
 };
 
@@ -194,7 +190,6 @@ export const AnchorOutside: Story = {
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
     } satisfies BasePlotStyles,
-    margins: { right: 80 },
   },
 };
 
@@ -227,7 +222,6 @@ export const TwoSeriesLabelsOutside: Story = {
         format: (v: number, name: string) => `${name}: ${v.toFixed(1)} yr`,
       },
     } satisfies BasePlotStyles,
-    margins: { right: 80 },
   },
 };
 
@@ -257,7 +251,6 @@ export const CustomOffsets: Story = {
         fontStyle: { dy: -18 },
       },
     } satisfies BasePlotStyles,
-    margins: { right: 80 },
   },
 };
 
@@ -284,7 +277,6 @@ export const AnchorMiddle: Story = {
         fontStyle: { dy: 18 },
       },
     } satisfies BasePlotStyles,
-    margins: { right: 80 },
   },
 };
 
@@ -310,7 +302,6 @@ export const AnchorEnd: Story = {
         fontStyle: { dy: -18 },
       },
     } satisfies BasePlotStyles,
-    margins: { right: 80 },
   },
 };
 
@@ -342,7 +333,6 @@ export const LowLevelTextPlacement: Story = {
         },
       },
     } satisfies BasePlotStyles,
-    margins: { right: 80 },
   },
 };
 
@@ -440,7 +430,6 @@ export const DeclutteredLabels: Story = {
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
     } satisfies BasePlotStyles,
-    margins: { right: 150, top: 20 },
   },
 };
 
@@ -474,7 +463,6 @@ export const DeclutteredLabelsCustomStyle: Story = {
         },
       },
     } satisfies BasePlotStyles,
-    margins: { right: 150, top: 20 },
   },
 };
 
@@ -497,6 +485,52 @@ export const DeclutteredLabelsNearMissSeries: Story = {
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
     } satisfies BasePlotStyles,
-    margins: { right: 150, top: 20 },
+  },
+};
+
+const ALL_PROVINCES = ['Buenos Aires', 'Córdoba', 'Santa Fe', 'Formosa', 'Tucumán', 'La Rioja'];
+const BOUNDS_DEMO_REAL_VALUES = [
+  ...ALL_PROVINCES.map((p) => provinceValue(MALE_LIFE_EXPECTANCY_BY_PROVINCE, p)),
+  ...ALL_PROVINCES.map((p) => provinceValue(FEMALE_LIFE_EXPECTANCY_BY_PROVINCE, p)),
+];
+const BOUNDS_DEMO_TARGETS = compressTowardMean(BOUNDS_DEMO_REAL_VALUES, 0.12);
+const BOUNDS_DEMO_SERIES = ALL_PROVINCES.flatMap((province, i) => [
+  {
+    name: `${province} · M`,
+    x: 'year' as const,
+    y: 'value' as const,
+    data: provinceTrajectory(MALE_LIFE_EXPECTANCY, BOUNDS_DEMO_TARGETS[i]),
+  },
+  {
+    name: `${province} · F`,
+    x: 'year' as const,
+    y: 'value' as const,
+    data: provinceTrajectory(FEMALE_LIFE_EXPECTANCY, BOUNDS_DEMO_TARGETS[ALL_PROVINCES.length + i]),
+  },
+]);
+
+/**
+ * Twelve series compressed toward a single value, close enough together
+ * that the plot's own top edge — not just neighbouring labels — constrains
+ * how they can spread. Exercises `bounds`-aware clamping in `declutter1D`:
+ * labels stay inside the plot's content box instead of spilling past it,
+ * while a run's leader lines still fan out cleanly.
+ *
+ * 400px, not the package default, deliberately: twelve labels need at least
+ * `11 * minGap` (~185px) of clearance to legibly separate at all, so a
+ * shorter plot wouldn't be testing bounds-clamping so much as asking for
+ * more vertical space than exists at any spacing — a real constraint, but a
+ * different one than this story means to demonstrate.
+ */
+export const DeclutteredLabelsBoundedByPlot: Story = {
+  args: {
+    height: 400,
+    series: BOUNDS_DEMO_SERIES,
+    styles: {
+      values: {
+        show: true,
+        format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
+      },
+    } satisfies BasePlotStyles,
   },
 };
