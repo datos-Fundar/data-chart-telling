@@ -4,6 +4,7 @@ import type { Series } from '$lib/types/plots/data/common';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { Area, Segment, VisualGroup, VisualSegment } from '$lib/types/plots/segments/config';
 import type { SegmentsConfig } from '$lib/types/plots/props';
+import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
 
 const DEFAULT_KEY = 'default';
 
@@ -43,26 +44,6 @@ function areaMatchesXY(xVal: AxisValue, yVal: AxisValue, area: Area): boolean {
   return (area.y.from === undefined || (yVal as any) >= area.y.from) &&
          // eslint-disable-next-line @typescript-eslint/no-explicit-any
          (area.y.to   === undefined || (yVal as any) <= area.y.to);
-}
-
-/**
- * For each segment in `segs`, returns the subset of `data` rows whose x value
- * (from `xAccessor`) falls inside any of the segment's x ranges. Rows are
- * not deduplicated across segments — a row that matches multiple segments
- * appears in each resulting array.
- *
- * Used by component and hover markers with the `'segment'` strategy.
- */
-export function getDataForSegments<TData, TStyle>(
-  data: TData[],
-  xAccessor: (d: TData) => AxisValue,
-  segs: Segment<TStyle>[],
-): TData[][] {
-  return segs.map((seg) => {
-    const areas = seg.areas;
-    if (!areas || areas.length === 0) return data;
-    return data.filter((d) => areas.some((area) => areaMatchesX(xAccessor(d), area)));
-  });
 }
 
 /**
@@ -247,4 +228,41 @@ export function buildGroupedSeries<
       connect,
     ),
   }));
+}
+
+/**
+ * Builds the `ScopedMarkerGroup[]` a `Plot.svelte` hands to `GeometryLayout`
+ * for rendering `series`-scoped `hover`/`component` markers — one group per
+ * series, carrying its resolved segments' match predicates and colors.
+ * `colorFor` resolves a series' own default color; `segmentColorFor` reads
+ * whichever field counts as "color" out of that plot kind's segment style
+ * shape (e.g. `fill` vs `stroke.stroke`), since that's the only part of this
+ * that isn't shared across plot kinds.
+ */
+export function buildScopedMarkerGroups<
+  TData extends Record<string, unknown>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  S extends Series<any>,
+  TStyle,
+>(args: {
+  groupedSeries: VisualGroup<S, TStyle>[];
+  segments: SegmentsConfig<TStyle>;
+  colorFor: (series: S, seriesIndex: number) => string;
+  segmentColorFor: (style: TStyle | undefined, defaultColor: string) => string;
+}): ScopedMarkerGroup<TData>[] {
+  const { groupedSeries, segments, colorFor, segmentColorFor } = args;
+  return groupedSeries.map((group, seriesIndex) => {
+    const defaultColor = colorFor(group.series, seriesIndex);
+    const xFor = resolveAccessor(group.series.x);
+    const segs = resolveSegmentsForSeries(segments, group.series.name);
+    return {
+      name: group.series.name,
+      data: group.series.data as TData[],
+      color: defaultColor,
+      segments: segs.map((seg) => ({
+        match: (row: TData) => matchesSegmentX(xFor(row), seg),
+        color: segmentColorFor(seg.style, defaultColor),
+      })),
+    };
+  });
 }

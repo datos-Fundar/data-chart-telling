@@ -2,7 +2,6 @@
   lang="ts"
   generics="TData extends Record<string, unknown>"
 >
-  import { SvelteMap } from 'svelte/reactivity';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { paletteColor } from '$lib/utils/color';
@@ -14,10 +13,9 @@
   import AxisLayout from '$lib/layout/plot/AxisLayout.svelte';
   import GridLayout from '$lib/layout/plot/GridLayout.svelte';
   import GeometryLayout from '$lib/layout/plot/GeometryLayout.svelte';
-  import HoverMarker from '$lib/markers/HoverMarker.svelte';
   import ValueLabels from '$lib/plots/line/ValueLabels.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
-  import { buildGroupedSeries, validateSegments, resolveSegmentsForSeries, matchesSegmentX, getDataForSegments } from '$lib/plots/utils/segments';
+  import { buildGroupedSeries, validateSegments, buildScopedMarkerGroups } from '$lib/plots/utils/segments';
   import type { BasePlotProps } from '$lib/types/plots/props';
   import type { AxisValue } from '$lib/types/plots/axis';
   import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
@@ -59,17 +57,6 @@
   const groupedSeries = $derived(
     buildGroupedSeries<Series<TData>, LineSegmentStyle>(resolvedSeries, segments),
   );
-
-  const seriesMarkers = $derived.by(() => {
-    const map = new SvelteMap<string, Marker[]>();
-    for (const marker of markers) {
-      if ((marker.type === 'component' || marker.type === 'hover') && marker.series) {
-        if (!map.has(marker.series)) map.set(marker.series, []);
-        map.get(marker.series)!.push(marker);
-      }
-    }
-    return map;
-  });
 
   const cfg = $derived(getConfiguration());
   const showVals = $derived(styles.values?.show ?? false);
@@ -118,6 +105,15 @@
       disabledDotsFor: (name) => disabledDotsOverride(legendInteraction?.disabledSeries.get(name)),
     }),
   );
+
+  const scopedGroups = $derived(
+    buildScopedMarkerGroups<TData, Series<TData>, LineSegmentStyle>({
+      groupedSeries,
+      segments,
+      colorFor: (_series, seriesIndex) => paletteColor(seriesIndex, cfg.palette),
+      segmentColorFor: (style, defaultColor) => style?.stroke?.stroke ?? defaultColor,
+    }),
+  );
 </script>
 
 <BasePlotLayout
@@ -134,69 +130,7 @@
   {#snippet children({ matchedPoints, activePoint, impliesCrosshairX, impliesCrosshairY, numericMargins })}
   <AxisLayout data={flat} getX={xAcc} getY={(d) => Number(yAcc(d))} {width} {height} {numericMargins} {scales} />
   <GridLayout {scales} />
-  <GeometryLayout markers={[...lineMarkers, ...markers]} seriesData={resolvedSeries} {matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY}>
-  {#each groupedSeries as group, seriesIndex (group.series.name)}
-    {@const defaultColor = paletteColor(seriesIndex, cfg.palette)}
-
-    {#each seriesMarkers.get(group.series.name) ?? [] as marker, i (`series-${group.series.name}-${marker.type}-${i}`)}
-      {#if marker.type === 'component'}
-        {#if marker.scope === 'segment'}
-          {@const segs = resolveSegmentsForSeries(segments, group.series.name)}
-          {@const xAccessor = resolveAccessor(group.series.x)}
-          {@const segmentDataArrays = getDataForSegments(group.series.data, xAccessor, segs)}
-          {#each segmentDataArrays as segmentData, segIdx (`${group.series.name}-marker-segment-${segIdx}`)}
-            {#if segmentData.length > 0}
-              {@const segmentColor = segs[segIdx]?.style?.stroke?.stroke ?? defaultColor}
-              <marker.component
-                {...marker.props}
-                series={group.series.name}
-                data={segmentData}
-                seriesColor={segmentColor}
-              />
-            {/if}
-          {/each}
-        {:else}
-          {@const segs = resolveSegmentsForSeries(segments, group.series.name)}
-          {@const seriesColor = segs[0]?.style?.stroke?.stroke ?? defaultColor}
-          <marker.component
-            {...marker.props}
-            series={group.series.name}
-            data={group.series.data}
-            seriesColor={seriesColor}
-          />
-        {/if}
-      {:else if marker.type === 'hover'}
-        {@const seriesPoints = matchedPoints.filter((p) => p.series === group.series.name)}
-        {#if marker.scope === 'segment'}
-          {@const segs = resolveSegmentsForSeries(segments, group.series.name)}
-          {#each segs as seg, segIdx (`${group.series.name}-hover-segment-${segIdx}`)}
-            {@const segPoints = seriesPoints.filter((p) => matchesSegmentX(p.x, seg))}
-            {#if segPoints.length > 0}
-              <HoverMarker
-                {marker}
-                data={segPoints}
-                activePoint={segPoints[0] ?? null}
-                {impliesCrosshairX}
-                {impliesCrosshairY}
-                seriesColor={seg.style?.stroke?.stroke ?? defaultColor}
-              />
-            {/if}
-          {/each}
-        {:else}
-          {@const segs = resolveSegmentsForSeries(segments, group.series.name)}
-          <HoverMarker
-            {marker}
-            data={seriesPoints}
-            activePoint={seriesPoints[0] ?? null}
-            {impliesCrosshairX}
-            {impliesCrosshairY}
-            seriesColor={segs[0]?.style?.stroke?.stroke ?? defaultColor}
-          />
-        {/if}
-      {/if}
-    {/each}
-  {/each}
-
+  <GeometryLayout markers={[...lineMarkers, ...markers]} seriesData={resolvedSeries} {scopedGroups} {matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY}>
   {#if showVals}
     <ValueLabels {lastPoints} values={styles.values} />
   {/if}

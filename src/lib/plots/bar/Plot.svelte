@@ -2,14 +2,13 @@
   lang="ts"
   generics="TData extends Record<string, unknown>"
 >
-  import { SvelteMap } from 'svelte/reactivity';
   import { paletteColor } from '$lib/utils/color';
   import { buildSeries } from '$lib/utils/grouping';
   import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
   import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { getConfiguration } from '$lib/configuration/config.svelte';
-  import { buildGroupedSeries, validateSegments, resolveSegmentsForSeries, matchesSegmentX } from '$lib/plots/utils/segments';
+  import { buildGroupedSeries, validateSegments, buildScopedMarkerGroups } from '$lib/plots/utils/segments';
   import { createBarLayout } from '$lib/plots/bar/layout.svelte';
   import { buildHoverPoints } from '$lib/plots/bar/hoverPoints';
   import { buildBarMarkers } from '$lib/plots/bar/buildBarMarkers';
@@ -18,7 +17,6 @@
   import AxisLayout from '$lib/layout/plot/AxisLayout.svelte';
   import GridLayout from '$lib/layout/plot/GridLayout.svelte';
   import GeometryLayout from '$lib/layout/plot/GeometryLayout.svelte';
-  import HoverMarker from '$lib/markers/HoverMarker.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
   import type { Marker } from '$lib/types/markers/common';
   import type { BasePlotProps } from '$lib/types/plots/props';
@@ -72,22 +70,20 @@
   const fmtVal = $derived(styles.values?.format ?? ((v: number) => `${v}`));
   const valAnchor = $derived<ValueAnchor>(styles.values?.anchor ?? 'outside');
 
-  const seriesMarkers = $derived.by(() => {
-    const map = new SvelteMap<string, Marker[]>();
-    for (const marker of markers) {
-      if (marker.type === 'hover' && marker.series) {
-        if (!map.has(marker.series)) map.set(marker.series, []);
-        map.get(marker.series)!.push(marker);
-      }
-    }
-    return map;
-  });
-
   // `xAcc`/`yAcc` are always data-semantic (category/value) — independent of
   // which *visual* axis ends up drawing them, decided by `categoricalAxis`.
   const xAcc = $derived(resolveAccessor(resolvedSeries[0]?.x ?? ((d: TData) => d)));
   const yAcc = $derived(resolveAccessor(resolvedSeries[0]?.y ?? ((d: TData) => d)));
   const flat = $derived(resolvedSeries.flatMap((s) => s.data));
+
+  const scopedGroups = $derived(
+    buildScopedMarkerGroups<TData, Series<TData>, BarSegmentStyle>({
+      groupedSeries,
+      segments,
+      colorFor: (_series, seriesIndex) => paletteColor(seriesIndex, cfg.palette),
+      segmentColorFor: (style, defaultColor) => style?.fill ?? defaultColor,
+    }),
+  );
 
   /**
    * Which visual axis draws the category, and therefore whether this renders
@@ -213,46 +209,12 @@
   })}
   <AxisLayout data={flat} getX={plotGetX} getY={plotGetY} {width} {height} {numericMargins} scales={resolvedScales} />
   <GridLayout scales={resolvedScales} />
-  <GeometryLayout markers={[...barMarkers, ...markers]} seriesData={resolvedSeries} {matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY}>
-  {#each groupedSeries as group, seriesIndex (group.series.name)}
-    {@const defaultColor = paletteColor(seriesIndex, cfg.palette)}
-
-    {#if showVals}
+  <GeometryLayout markers={[...barMarkers, ...markers]} seriesData={resolvedSeries} {scopedGroups} {matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY}>
+  {#if showVals}
+    {#each groupedSeries as group, seriesIndex (group.series.name)}
       <ValueLabels {group} {seriesIndex} {barLayout} {isHorizontal} {valAnchor} {fmtVal} values={styles.values} axisColor={cfg.axis.color} />
-    {/if}
-
-    {#each seriesMarkers.get(group.series.name) ?? [] as marker, i (`series-${group.series.name}-hover-${i}`)}
-      {#if marker.type === 'hover'}
-        {@const seriesPoints = matchedPoints.filter((p) => p.series === group.series.name)}
-        {#if marker.scope === 'segment'}
-          {@const segs = resolveSegmentsForSeries(segments, group.series.name)}
-          {#each segs as seg, segIdx (`${group.series.name}-hover-segment-${segIdx}`)}
-            {@const segPoints = seriesPoints.filter((p) => matchesSegmentX(xAcc(p.row), seg))}
-            {#if segPoints.length > 0}
-              <HoverMarker
-                {marker}
-                data={segPoints}
-                activePoint={segPoints[0] ?? null}
-                {impliesCrosshairX}
-                {impliesCrosshairY}
-                seriesColor={seg.style?.fill ?? defaultColor}
-              />
-            {/if}
-          {/each}
-        {:else}
-          {@const segs = resolveSegmentsForSeries(segments, group.series.name)}
-          <HoverMarker
-            {marker}
-            data={seriesPoints}
-            activePoint={seriesPoints[0] ?? null}
-            {impliesCrosshairX}
-            {impliesCrosshairY}
-            seriesColor={segs[0]?.style?.fill ?? defaultColor}
-          />
-        {/if}
-      {/if}
     {/each}
-  {/each}
+  {/if}
   </GeometryLayout>
   {/snippet}
 </BasePlotLayout>
