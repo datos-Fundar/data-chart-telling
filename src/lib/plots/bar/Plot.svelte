@@ -7,13 +7,12 @@
   import { buildSeries } from '$lib/utils/grouping';
   import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
   import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
-  import { BarX, BarY } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { buildGroupedSeries, validateSegments, resolveSegmentsForSeries, matchesSegmentX } from '$lib/plots/utils/segments';
   import { createBarLayout } from '$lib/plots/bar/layout.svelte';
   import { buildHoverPoints } from '$lib/plots/bar/hoverPoints';
-  import BarSegments from '$lib/plots/bar/BarSegments.svelte';
+  import { buildBarMarkers } from '$lib/plots/bar/buildBarMarkers';
   import ValueLabels from '$lib/plots/bar/ValueLabels.svelte';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import AxisLayout from '$lib/layout/plot/AxisLayout.svelte';
@@ -112,7 +111,6 @@
     return yCategorical ? 'y' : 'x';
   });
   const isHorizontal = $derived(categoricalAxis === 'y');
-  const BarMark = $derived(isHorizontal ? BarX : BarY);
 
   /**
    * `'categorical'` is our own sentinel (BarPlot-only), not a real svelteplot
@@ -178,6 +176,15 @@
     strategy: resolveHoverStrategy(tooltip?.strategy, markers, categoricalAxis),
     sync: resolveHoverSync(tooltip?.sync, markers),
     tooltip,
+    // The category axis is a band scale — `<Pointer>`'s nearest-point-by-
+    // distance match (svelteplot's own projection of each candidate's band
+    // centre) can disagree by a couple of pixels with where `<BarX>`/`<BarY>`
+    // (via svelteplot's `RectPath`) actually render that band, which is
+    // enough to mismatch the neighbouring category once bands get thin
+    // (many categories). The `role: 'hitArea'` bar markers `buildBarMarkers`
+    // emits hit-test the category bands directly instead — see its own doc
+    // comment.
+    match: 'contains' as const,
   });
 </script>
 
@@ -192,14 +199,23 @@
   {margins}
   xTickRotate={resolvedScales?.x?.tickRotate}
 >
-  {#snippet children({ matchedPoints, ruleX, ruleY, impliesRuleX, impliesRuleY, numericMargins })}
+  {#snippet children({ matchedPoints, ruleX, ruleY, impliesRuleX, impliesRuleY, numericMargins, setHoverMatch, clearHoverMatch })}
+  {@const barMarkers = buildBarMarkers({
+    groupedSeries,
+    barLayout,
+    isHorizontal,
+    hoverPoints,
+    palette: cfg.palette,
+    disabledFillFor: (name) => disabledFillOverride(legendInteraction?.disabledSeries.get(name)),
+    active: hover.active,
+    setHoverMatch,
+    clearHoverMatch,
+  })}
   <AxisLayout data={flat} getX={plotGetX} getY={plotGetY} {width} {height} {numericMargins} scales={resolvedScales} />
   <GridLayout scales={resolvedScales} />
-  <RuleLayout {markers} seriesData={resolvedSeries} {matchedPoints} {ruleX} {ruleY} {impliesRuleX} {impliesRuleY}>
+  <RuleLayout markers={[...barMarkers, ...markers]} seriesData={resolvedSeries} {matchedPoints} {ruleX} {ruleY} {impliesRuleX} {impliesRuleY}>
   {#each groupedSeries as group, seriesIndex (group.series.name)}
     {@const defaultColor = paletteColor(seriesIndex, cfg.palette)}
-    {@const disabledFill = disabledFillOverride(legendInteraction?.disabledSeries.get(group.series.name))}
-    <BarSegments {group} {seriesIndex} {barLayout} {isHorizontal} {BarMark} {defaultColor} {disabledFill} />
 
     {#if showVals}
       <ValueLabels {group} {seriesIndex} {barLayout} {isHorizontal} {valAnchor} {fmtVal} values={styles.values} axisColor={cfg.axis.color} />

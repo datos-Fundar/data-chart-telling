@@ -1,13 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
+import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
 import RichTooltip from './RichTooltip.svelte';
+import StackedRichTooltip from './StackedRichTooltip.svelte';
 import {
   FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
   MALE_LIFE_EXPECTANCY_BY_PROVINCE,
   LIFE_EXPECTANCY_BY_PROVINCE,
+  AGE_BRACKET_BY_PROVINCE,
+  provinceSort,
   type ProvincePoint,
   type ProvinceLifeExpectancy,
+  type AgeBracketPoint,
 } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -230,4 +235,70 @@ export const GroupedDataSeriesFiltered: Story = {
  */
 export const CustomContent: StoryObj = {
   render: () => ({ Component: RichTooltip }),
+};
+
+// ── Horizontal, many categories ─────────────────────────────────────────────
+
+/**
+ * Horizontal, stacked, many categories — province on the y-axis (24 of
+ * them, so long labels don't need to rotate), age-bracket series stacked to
+ * 100% per province. Exercises the same hover-hit-area path as the stories
+ * above, just with a much larger, thinner-banded category count.
+ */
+export const HorizontalStackedTooltip: Story = {
+  args: {
+    width: 900,
+    height: 900,
+    data: AGE_BRACKET_BY_PROVINCE,
+    x: 'province',
+    y: 'value',
+    z: 'bracket',
+    scales: {
+      y: { type: 'categorical', sort: provinceSort },
+      z: { seriesLayout: 'stacked' },
+    } satisfies AxisBasedScalesConfig,
+    tooltip: {
+      facetId: '',
+      sync: false,
+      format: (row) => {
+        const { province, bracket, value } = row as AgeBracketPoint;
+        return `${province} / ${bracket}: ${value}`;
+      },
+    },
+    markers: [{ type: 'hover', showLabels: false }],
+  },
+};
+
+/**
+ * Same horizontal, many-category layout as above, but a single bracket —
+ * no stacking, no `z`.
+ */
+export const HorizontalSingleSeriesTooltip: Story = {
+  args: {
+    width: 900,
+    height: 900,
+    data: AGE_BRACKET_BY_PROVINCE.filter((d) => d.bracket === '0 a 14 años'),
+    x: 'province',
+    y: 'value',
+    scales: {
+      y: { type: 'categorical', sort: provinceSort },
+    } satisfies AxisBasedScalesConfig,
+    tooltip: {
+      facetId: '',
+      sync: false,
+      format: (row) => {
+        const { province, value } = row as AgeBracketPoint;
+        return `${province}: ${value}`;
+      },
+    },
+  },
+};
+
+/**
+ * `HorizontalStackedTooltip`'s data/layout with a fully custom `content`
+ * card instead of the default tooltip box — see `CustomContent` above for
+ * the two-series version and `StackedRichTooltip.svelte` for the markup.
+ */
+export const HorizontalStackedCustomTooltip: StoryObj = {
+  render: () => ({ Component: StackedRichTooltip }),
 };

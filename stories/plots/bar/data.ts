@@ -40,3 +40,35 @@ export const LIFE_EXPECTANCY_BY_PROVINCE: ProvinceLifeExpectancy[] = PROVINCES.f
     { province, value: male?.value || 0, sex: 'male' },
   ];
 });
+
+export type AgeBracketPoint = { province: string; bracket: string; value: number; year: number };
+
+// All 24 provinces (unlike the curated 6 above) — deliberately large so the
+// stories using it exercise many thin, stacked, horizontal bands at once.
+const ALL_PROVINCES = [
+  'Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba', 'Corrientes',
+  'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa', 'La Rioja', 'Mendoza', 'Misiones',
+  'Neuquén', 'Río Negro', 'Salta', 'San Juan', 'San Luis', 'Santa Cruz', 'Santa Fe',
+  'Santiago del Estero', 'Tierra del Fuego', 'Tucumán',
+];
+export const AGE_BRACKETS = ['0 a 14 años', '15 a 64 años', '65 y más'];
+
+const ageBracketValues: Record<string, [number, number, number]> = {};
+let seed = 7;
+function rnd() {
+  seed = (seed * 16807) % 2147483647;
+  return seed / 2147483647;
+}
+for (const p of ALL_PROVINCES) {
+  const young = 12 + rnd() * 6;
+  const old = 12 + rnd() * 10;
+  ageBracketValues[p] = [Number(young.toFixed(2)), Number((100 - young - old).toFixed(2)), Number(old.toFixed(2))];
+}
+
+export const AGE_BRACKET_BY_PROVINCE: AgeBracketPoint[] = ALL_PROVINCES.flatMap((province) =>
+  AGE_BRACKETS.map((bracket, i) => ({ province, bracket, value: ageBracketValues[province][i], year: 2040 })),
+);
+
+export function provinceSort(a: Record<string, unknown>, b: Record<string, unknown>): number {
+  return String(a.province).localeCompare(String(b.province), 'es');
+}

@@ -55,3 +55,14 @@ export type DotStyle = {
   dotStrokeOpacity?: number;
   dotStrokeDasharray?: string | LineStyle;
 };
+
+/** Styling for a rectangular mark — a bar segment, a bar-shaped hover highlight. */
+export type BarStyle = {
+  fill?: string;
+  fillOpacity?: number;
+  stroke?: string;
+  strokeWidth?: number;
+  strokeOpacity?: number;
+  strokeDasharray?: string | LineStyle;
+  borderRadius?: number;
+};
