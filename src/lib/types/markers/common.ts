@@ -2,15 +2,10 @@ import type { AxisValue } from '$lib/types/plots/axis';
 import type { DotStyle, FontStyle, StrokeStyle, BarStyle } from '$lib/types/plots/styling';
 import type { HoverStrategy, HoverDisplayPoint } from '$lib/types/layout/tooltip';
 
-export type RuleXMarkerConfig = {
-  type: 'ruleX';
-  x: AxisValue;
-  style?: StrokeStyle;
-};
-
-export type RuleYMarkerConfig = {
-  type: 'ruleY';
-  y: AxisValue;
+export type RuleMarkerConfig = {
+  type: 'rule';
+  axis: 'x' | 'y';
+  value: AxisValue;
   style?: StrokeStyle;
 };
 
@@ -48,7 +43,7 @@ export type CustomComponentMarkerConfig = {
 
 /**
  * A single rectangular bar mark, emitted by `BarPlot` itself (via
- * `buildBarMarkers`) rather than authored directly — `RuleLayout` renders
+ * `buildBarMarkers`) rather than authored directly — `GeometryLayout` renders
  * whatever `'bar'` markers it's given, the same way it renders any other
  * marker kind.
  *
@@ -91,8 +86,7 @@ export type BarMarkerConfig = {
 };
 
 export type Marker =
-  | RuleXMarkerConfig
-  | RuleYMarkerConfig
+  | RuleMarkerConfig
   | HoverMarkerConfig
   | CustomComponentMarkerConfig
   | BarMarkerConfig;

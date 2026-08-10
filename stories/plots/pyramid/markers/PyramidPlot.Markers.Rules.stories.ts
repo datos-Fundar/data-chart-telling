@@ -44,8 +44,9 @@ export const WithRuleXMarker: Story = {
     scales: { y: { domain: AGE_GROUPS } },
     markers: [
       {
-        type: 'ruleX',
-        x: 3,
+        type: 'rule',
+        axis: 'x',
+        value: 3,
         style: {
           stroke: '#f59f00',
           strokeDasharray: '4 4',
@@ -69,8 +70,9 @@ export const MultipleThresholdMarkers: Story = {
     scales: { y: { domain: AGE_GROUPS } },
     markers: [
       {
-        type: 'ruleX',
-        x: 2.5,
+        type: 'rule',
+        axis: 'x',
+        value: 2.5,
         style: {
           stroke: '#51cf66',
           strokeDasharray: '6 4',
@@ -78,8 +80,9 @@ export const MultipleThresholdMarkers: Story = {
         },
       } satisfies Marker,
       {
-        type: 'ruleX',
-        x: 3.5,
+        type: 'rule',
+        axis: 'x',
+        value: 3.5,
         style: {
           stroke: '#ff6b6b',
           strokeDasharray: '4 4',
@@ -104,8 +107,9 @@ export const SymmetricMarkers: Story = {
     scales: { y: { domain: AGE_GROUPS } },
     markers: [
       {
-        type: 'ruleX',
-        x: -2,
+        type: 'rule',
+        axis: 'x',
+        value: -2,
         style: {
           stroke: '#748ffc',
           strokeWidth: 1.5,
@@ -113,8 +117,9 @@ export const SymmetricMarkers: Story = {
         },
       } satisfies Marker,
       {
-        type: 'ruleX',
-        x: 2,
+        type: 'rule',
+        axis: 'x',
+        value: 2,
         style: {
           stroke: '#748ffc',
           strokeWidth: 1.5,
@@ -138,8 +143,9 @@ export const AverageMarker: Story = {
     scales: { y: { domain: AGE_GROUPS } },
     markers: [
       {
-        type: 'ruleX',
-        x: 3.0,
+        type: 'rule',
+        axis: 'x',
+        value: 3.0,
         style: {
           stroke: '#495057',
           strokeWidth: 2,
@@ -164,8 +170,9 @@ export const PolicyThresholdMarker: Story = {
     scales: { y: { domain: AGE_GROUPS } },
     markers: [
       {
-        type: 'ruleX',
-        x: 4.0,
+        type: 'rule',
+        axis: 'x',
+        value: 4.0,
         style: {
           stroke: '#d9480f',
           strokeWidth: 2.5,

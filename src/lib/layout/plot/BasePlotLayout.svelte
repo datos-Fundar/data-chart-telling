@@ -20,7 +20,7 @@
    * wrapper, the hover/tooltip state machine, the `<Plot>` element itself, and
    * the floating tooltip. Deliberately marker/axis-agnostic — axis-having plot
    * kinds (line/bar/heatmap/pyramid) additionally compose `AxisLayout` /
-   * `GridLayout` / `RuleLayout` inside `children`; `GeoPlot` composes `GeoLayout`
+   * `GridLayout` / `GeometryLayout` inside `children`; `GeoPlot` composes `GeoLayout`
    * instead, since a map has no x/y axis pair. Every plot kind supplies its own
    * `<Plot x y projection>` scale config (either directly via `x`/`y`/`projection`,
    * or by leaving `x`/`y` unset so this component derives them from `scales`) and
@@ -76,8 +76,10 @@
      * visual axis (e.g. `BarPlot`'s category, which can be drawn on either
      * axis depending on orientation), so a template can resolve it straight
      * off `row` instead of assuming which of `.x`/`.y` it landed on.
-     * `impliesRuleX`/`impliesRuleY` tell the plot kind whether the active
-     * strategy implies a crosshair rule on each axis by default.
+     * `activePoint` is the one matched point actually under the cursor —
+     * read its `.x`/`.y` for the hover crosshair position; `impliesCrosshairX`/
+     * `impliesCrosshairY` tell the plot kind whether the active strategy
+     * implies a crosshair rule on each axis by default.
      * `numericMargins` lets a nested layout align itself with the plot's own
      * content box without recomputing margins itself.
      * `setHoverMatch`/`clearHoverMatch` let a plot kind drive the match
@@ -87,10 +89,9 @@
     children: Snippet<
       [{
         matchedPoints: HoverPoint<TData>[];
-        ruleX: AxisValue | null;
-        ruleY: AxisValue | null;
-        impliesRuleX: boolean;
-        impliesRuleY: boolean;
+        activePoint: HoverPoint<TData> | null;
+        impliesCrosshairX: boolean;
+        impliesCrosshairY: boolean;
         numericMargins: { top: number; right: number; bottom: number; left: number };
         setHoverMatch: (rows: TData[]) => void;
         clearHoverMatch: () => void;
@@ -257,10 +258,9 @@
   >
     {@render children({
       matchedPoints: ctrl.points,
-      ruleX: ctrl.ruleX,
-      ruleY: ctrl.ruleY,
-      impliesRuleX: ctrl.impliesRuleX,
-      impliesRuleY: ctrl.impliesRuleY,
+      activePoint: ctrl.activePoint,
+      impliesCrosshairX: ctrl.impliesCrosshairX,
+      impliesCrosshairY: ctrl.impliesCrosshairY,
       numericMargins,
       setHoverMatch: ctrl.onPointer,
       clearHoverMatch: ctrl.onLeave,

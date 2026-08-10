@@ -13,7 +13,7 @@
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import AxisLayout from '$lib/layout/plot/AxisLayout.svelte';
   import GridLayout from '$lib/layout/plot/GridLayout.svelte';
-  import RuleLayout from '$lib/layout/plot/RuleLayout.svelte';
+  import GeometryLayout from '$lib/layout/plot/GeometryLayout.svelte';
   import HoverMarker from '$lib/markers/HoverMarker.svelte';
   import ValueLabels from '$lib/plots/line/ValueLabels.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
@@ -123,10 +123,10 @@
   {margins}
   xTickRotate={scales?.x?.tickRotate}
 >
-  {#snippet children({ matchedPoints, ruleX, ruleY, impliesRuleX, impliesRuleY, numericMargins })}
+  {#snippet children({ matchedPoints, activePoint, impliesCrosshairX, impliesCrosshairY, numericMargins })}
   <AxisLayout data={flat} getX={xAcc} getY={(d) => Number(yAcc(d))} {width} {height} {numericMargins} {scales} />
   <GridLayout {scales} />
-  <RuleLayout {markers} seriesData={resolvedSeries} {matchedPoints} {ruleX} {ruleY} {impliesRuleX} {impliesRuleY}>
+  <GeometryLayout {markers} seriesData={resolvedSeries} {matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY}>
   {#each groupedSeries as group, seriesIndex (group.series.name)}
     {@const defaultColor = paletteColor(seriesIndex, cfg.palette)}
     {@const disabledOverride = legendInteraction?.disabledSeries.get(group.series.name)}
@@ -199,13 +199,11 @@
             {@const segPoints = seriesPoints.filter((p) => matchesSegmentX(p.x, seg))}
             {#if segPoints.length > 0}
               <HoverMarker
+                {marker}
                 data={segPoints}
-                ruleX={marker.ruleX !== false && (impliesRuleX || marker.ruleX === true) ? ruleX : null}
-                ruleY={marker.ruleY !== false && (impliesRuleY || marker.ruleY === true) ? ruleY : null}
-                showLabels={marker.showLabels}
-                ruleStyle={marker.ruleStyle}
-                dotStyle={marker.dotStyle}
-                fontStyle={marker.fontStyle}
+                activePoint={segPoints[0] ?? null}
+                {impliesCrosshairX}
+                {impliesCrosshairY}
                 seriesColor={seg.style?.stroke?.stroke ?? defaultColor}
               />
             {/if}
@@ -213,13 +211,11 @@
         {:else}
           {@const segs = resolveSegmentsForSeries(segments, group.series.name)}
           <HoverMarker
+            {marker}
             data={seriesPoints}
-            ruleX={marker.ruleX !== false && (impliesRuleX || marker.ruleX === true) ? ruleX : null}
-            ruleY={marker.ruleY !== false && (impliesRuleY || marker.ruleY === true) ? ruleY : null}
-            showLabels={marker.showLabels}
-            ruleStyle={marker.ruleStyle}
-            dotStyle={marker.dotStyle}
-            fontStyle={marker.fontStyle}
+            activePoint={seriesPoints[0] ?? null}
+            {impliesCrosshairX}
+            {impliesCrosshairY}
             seriesColor={segs[0]?.style?.stroke?.stroke ?? defaultColor}
           />
         {/if}
@@ -230,6 +226,6 @@
   {#if showVals}
     <ValueLabels {lastPoints} values={styles.values} />
   {/if}
-  </RuleLayout>
+  </GeometryLayout>
   {/snippet}
 </BasePlotLayout>

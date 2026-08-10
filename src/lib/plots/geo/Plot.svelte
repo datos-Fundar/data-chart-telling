@@ -627,15 +627,7 @@
     </GeoLayout>
 
     {#if hoverMarkerConfig}
-      <HoverMarker
-        data={matchedPoints}
-        ruleX={null}
-        ruleY={null}
-        showLabels={hoverMarkerConfig.showLabels ?? true}
-        format={hoverMarkerConfig.format}
-        dotStyle={hoverMarkerConfig.dotStyle}
-        fontStyle={hoverMarkerConfig.fontStyle}
-      />
+      <HoverMarker marker={hoverMarkerConfig} data={matchedPoints} />
     {/if}
   {/snippet}
 </BasePlotLayout>

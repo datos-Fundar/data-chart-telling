@@ -29,10 +29,12 @@ export { default as LegendLayout } from './layout/legend/LegendLayout.svelte';
 export { default as Tooltip } from './layout/tooltip/Tooltip.svelte';
 
 // Markers
+export { default as BarMarker } from './markers/BarMarker.svelte';
 export { default as DeltaMarker } from './markers/DeltaMarker.svelte';
 export { default as DotMarker } from './markers/DotMarker.svelte';
 export { default as HoverMarker } from './markers/HoverMarker.svelte';
 export { default as PeakMarker } from './markers/PeakMarker.svelte';
+export { default as RuleMarker } from './markers/RuleMarker.svelte';
 export { default as TextMarker } from './markers/TextMarker.svelte';
 
 export {

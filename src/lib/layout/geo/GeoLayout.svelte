@@ -5,7 +5,7 @@
 
   /**
    * Geo-only chrome nested inside `BasePlotLayout` (the `GeoPlot` analog of
-   * `AxisLayout`/`GridLayout`/`RuleLayout`) — just the pan/zoom transform
+   * `AxisLayout`/`GridLayout`/`GeometryLayout`) — just the pan/zoom transform
    * group and the raster tile layer underneath the map's own marks.
    * Everything else GeoPlot used to duplicate from `BasePlotLayout` (the hover
    * state machine, `<Plot>` itself, `<Pointer>`, the tooltip) now lives

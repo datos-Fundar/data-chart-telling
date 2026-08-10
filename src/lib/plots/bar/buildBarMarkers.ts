@@ -19,7 +19,7 @@ import type { BarLayout } from './layout.svelte';
  * Geometry for `'hitArea'` markers is left unresolved (just `category` +
  * `data`) — turning that into pixels needs svelteplot's live scale via
  * `usePlot()`, which is only available where the marker actually renders
- * (inside `RuleLayout`), not here.
+ * (inside `GeometryLayout`), not here.
  */
 export function buildBarMarkers<TData extends Record<string, unknown>>(args: {
   groupedSeries: VisualGroup<Series<TData>, BarSegmentStyle>[];

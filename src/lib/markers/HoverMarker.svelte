@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { RuleX, RuleY } from 'svelteplot';
   import DotMarker from './DotMarker.svelte';
   import TextMarker from './TextMarker.svelte';
+  import RuleMarker from './RuleMarker.svelte';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import type { MarkerProps } from '$lib/types/markers/props';
-  import type { AxisValue } from '$lib/types/plots/axis';
-  import type { DotStyle, FontStyle, StrokeStyle } from '$lib/types/plots/styling';
+  import type { HoverMarkerConfig } from '$lib/types/markers/common';
   import type { HoverDisplayPoint } from '$lib/types/layout/tooltip';
 
   /**
@@ -14,30 +13,51 @@
    * correctly in every facet — that is what makes cross-facet sync work without
    * any pixel math. Draws optional x/y crosshair rules plus a dot + value label
    * for each matched point.
+   *
+   * Takes the raw `marker` config plus the couple of things it can't know on
+   * its own — `activePoint` (the specific matched point actually under the
+   * cursor, for the crosshair position; see `controller.svelte.ts`'s own doc
+   * comment) and whether the active hover strategy implies a crosshair on
+   * each axis by default — the same "component owns its own rendering"
+   * pattern `BarMarker`/`RuleMarker` follow. `activePoint`/
+   * `impliesCrosshairX`/`impliesCrosshairY` are all optional and default to
+   * "no crosshair" — `GeoPlot` (no crosshair concept at all) just omits them.
    */
   interface Props extends MarkerProps<HoverDisplayPoint> {
-    ruleX?: AxisValue | null;
-    ruleY?: AxisValue | null;
-    showLabels?: boolean;
-    format?: (point: HoverDisplayPoint) => string;
-    ruleStyle?: StrokeStyle;
-    dotStyle?: DotStyle;
-    fontStyle?: FontStyle;
+    /**
+     * Deliberately narrowed to just the fields this component reads —
+     * `HoverMarkerConfig` also carries routing/scoping fields
+     * (`series`/`scope`/`strategy`/`sync`) it has no use for, so keeping
+     * only these lets `GeoPlot`'s own `GeoHoverMarkerConfig` — structurally
+     * identical here, just with a differently-typed `strategy` it doesn't
+     * share — satisfy this prop too, without a cast.
+     */
+    marker: Pick<HoverMarkerConfig, 'ruleX' | 'ruleY' | 'showLabels' | 'format' | 'ruleStyle' | 'dotStyle' | 'fontStyle'>;
+    activePoint?: HoverDisplayPoint | null;
+    impliesCrosshairX?: boolean;
+    impliesCrosshairY?: boolean;
   }
 
   let {
     data = [],
-    ruleX = null,
-    ruleY = null,
-    showLabels = true,
-    format,
-    ruleStyle,
-    dotStyle,
-    fontStyle,
+    marker,
+    activePoint = null,
+    impliesCrosshairX = false,
+    impliesCrosshairY = false,
     seriesColor,
   }: Props = $props();
 
   const cfg = $derived(getConfiguration());
+
+  const showCrosshairX = $derived(marker.ruleX !== false && (impliesCrosshairX || marker.ruleX === true));
+  const showCrosshairY = $derived(marker.ruleY !== false && (impliesCrosshairY || marker.ruleY === true));
+  const ruleX = $derived(showCrosshairX ? (activePoint?.x ?? null) : null);
+  const ruleY = $derived(showCrosshairY ? (activePoint?.y ?? null) : null);
+  const showLabels = $derived(marker.showLabels ?? true);
+  const format = $derived(marker.format);
+  const ruleStyle = $derived(marker.ruleStyle);
+  const dotStyle = $derived(marker.dotStyle);
+  const fontStyle = $derived(marker.fontStyle);
 
   /** Explicit style wins; otherwise fall back to the series color, then the point's own resolved color. */
   const resolveColor = (explicit: string | undefined, point: HoverDisplayPoint) =>
@@ -81,25 +101,11 @@
 </script>
 
 {#if ruleX != null}
-  <RuleX
-    data={[{ v: ruleX }]}
-    x={(d) => d.v}
-    stroke={ruleStyle?.stroke ?? cfg.hover.rule.stroke}
-    strokeOpacity={ruleStyle?.strokeOpacity ?? cfg.hover.rule.strokeOpacity}
-    strokeWidth={ruleStyle?.strokeWidth ?? cfg.hover.rule.strokeWidth}
-    strokeDasharray={ruleStyle?.strokeDasharray ?? cfg.hover.rule.strokeDasharray}
-  />
+  <RuleMarker axis="x" value={ruleX} style={{ ...cfg.hover.rule, ...ruleStyle }} />
 {/if}
 
 {#if ruleY != null}
-  <RuleY
-    data={[{ v: ruleY }]}
-    y={(d) => d.v}
-    stroke={ruleStyle?.stroke ?? cfg.hover.rule.stroke}
-    strokeOpacity={ruleStyle?.strokeOpacity ?? cfg.hover.rule.strokeOpacity}
-    strokeWidth={ruleStyle?.strokeWidth ?? cfg.hover.rule.strokeWidth}
-    strokeDasharray={ruleStyle?.strokeDasharray ?? cfg.hover.rule.strokeDasharray}
-  />
+  <RuleMarker axis="y" value={ruleY} style={{ ...cfg.hover.rule, ...ruleStyle }} />
 {/if}
 
 {#if data.length > 0}

@@ -37,12 +37,12 @@ export function matchByStrategy<T>(points: HoverPoint<T>[], hover: HoverStore): 
 }
 
 /** Whether the strategy implies an x crosshair rule by default. */
-export function impliesRuleX(strategy: HoverStrategy): boolean {
+export function impliesCrosshairX(strategy: HoverStrategy): boolean {
   return strategy === 'x' || strategy === 'punctual';
 }
 
 /** Whether the strategy implies a y crosshair rule by default. */
-export function impliesRuleY(strategy: HoverStrategy): boolean {
+export function impliesCrosshairY(strategy: HoverStrategy): boolean {
   return strategy === 'y' || strategy === 'punctual';
 }
 

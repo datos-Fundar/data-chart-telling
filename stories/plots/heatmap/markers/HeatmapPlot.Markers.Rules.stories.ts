@@ -48,16 +48,18 @@ export const WithRuleXMarkers: Story = {
     series: SERIES,
     markers: [
       {
-        type: 'ruleX',
-        x: 'Córdoba',
+        type: 'rule',
+        axis: 'x',
+        value: 'Córdoba',
         style: {
           strokeDasharray: '4 4',
           strokeOpacity: 0.7,
         },
       } satisfies Marker,
       {
-        type: 'ruleX',
-        x: 'Tucumán',
+        type: 'rule',
+        axis: 'x',
+        value: 'Tucumán',
         style: {
           strokeDasharray: '4 4',
           strokeOpacity: 0.7,
@@ -76,16 +78,18 @@ export const WithRuleYMarkers: Story = {
     series: SERIES,
     markers: [
       {
-        type: 'ruleY',
-        y: 'Female',
+        type: 'rule',
+        axis: 'y',
+        value: 'Female',
         style: {
           strokeDasharray: '6 6',
           strokeOpacity: 0.5,
         },
       } satisfies Marker,
       {
-        type: 'ruleY',
-        y: 'Male',
+        type: 'rule',
+        axis: 'y',
+        value: 'Male',
         style: {
           strokeDasharray: '6 6',
           strokeOpacity: 0.5,
@@ -107,16 +111,18 @@ export const WithMixedMarkers: Story = {
     z: 'value',
     markers: [
       {
-        type: 'ruleX',
-        x: 'Buenos Aires',
+        type: 'rule',
+        axis: 'x',
+        value: 'Buenos Aires',
         style: {
           strokeDasharray: '4 4',
           strokeOpacity: 0.6,
         },
       } satisfies Marker,
       {
-        type: 'ruleY',
-        y: 'Female',
+        type: 'rule',
+        axis: 'y',
+        value: 'Female',
         style: {
           strokeDasharray: '6 6',
           strokeOpacity: 0.5,

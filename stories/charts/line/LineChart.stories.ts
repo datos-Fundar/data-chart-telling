@@ -182,8 +182,9 @@ export const WithMarkers: Story = {
     z: 'metric' as keyof SeriesPoint,
     markers: [
       {
-        type: 'ruleX',
-        x: 2020,
+        type: 'rule',
+        axis: 'x',
+        value: 2020,
         style: {
           strokeDasharray: '4 4',
           strokeOpacity: 0.6

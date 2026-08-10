@@ -13,7 +13,7 @@ describe('LinePlot – markers.rules', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'ruleX', x: 2016 } satisfies Marker],
+      markers: [{ type: 'rule', axis: 'x', value: 2016 } satisfies Marker],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-x line').length).toBe(1);
@@ -24,7 +24,7 @@ describe('LinePlot – markers.rules', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'ruleY', y: 80 } satisfies Marker],
+      markers: [{ type: 'rule', axis: 'y', value: 80 } satisfies Marker],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-y line').length).toBe(1);
@@ -36,8 +36,8 @@ describe('LinePlot – markers.rules', () => {
       height: 300,
       series: [FEMALE],
       markers: [
-        { type: 'ruleX', x: 2010 } satisfies Marker,
-        { type: 'ruleX', x: 2018 } satisfies Marker,
+        { type: 'rule', axis: 'x', value: 2010 } satisfies Marker,
+        { type: 'rule', axis: 'x', value: 2018 } satisfies Marker,
       ],
     });
     const svg = await waitForSvg(container);
@@ -50,8 +50,8 @@ describe('LinePlot – markers.rules', () => {
       height: 300,
       series: [FEMALE],
       markers: [
-        { type: 'ruleX', x: 2016 } satisfies Marker,
-        { type: 'ruleY', y: 80 } satisfies Marker,
+        { type: 'rule', axis: 'x', value: 2016 } satisfies Marker,
+        { type: 'rule', axis: 'y', value: 80 } satisfies Marker,
       ],
     });
     const svg = await waitForSvg(container);
@@ -64,7 +64,7 @@ describe('LinePlot – markers.rules', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'ruleX', x: 2016, style: { stroke: '#e11d48' } } satisfies Marker],
+      markers: [{ type: 'rule', axis: 'x', value: 2016, style: { stroke: '#e11d48' } } satisfies Marker],
     });
     const svg = await waitForSvg(container);
     const line = svg.querySelector('g.rule-x line');

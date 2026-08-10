@@ -1,8 +1,8 @@
 import {
   eq,
   matchByStrategy,
-  impliesRuleX,
-  impliesRuleY,
+  impliesCrosshairX,
+  impliesCrosshairY,
   filterBySeries,
 } from '$lib/layout/tooltip/utils';
 import type { HoverStore, HoverPoint } from '$lib/types/layout/tooltip';
@@ -61,14 +61,28 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
   // plot's category, regardless of which visual axis it's drawn on.
   const highlight = $derived(matched.map(({ x, y, label, series, color, dx, dy, row }) => ({ x, y, label, series, color, dx, dy, row })));
 
-  // Raw hover position — available whenever there are matched points.
-  // BasePlotLayout gates actual display with impliesRuleX/Y + the marker's ruleX/Y props.
-  const ruleX = $derived(matched.length > 0 ? args.hover().activeX : null);
-  const ruleY = $derived(matched.length > 0 ? args.hover().activeY : null);
+  /**
+   * The specific matched point that was actually hovered — found by the
+   * shared store's `activeSeries` (set from whichever row was hit), falling
+   * back to the first match when there's no series concept (punctual
+   * matches) or nothing tags a series. Consumers read `.x`/`.y` off this
+   * for the crosshair rule position — every point in `matched` already
+   * shares the "implied" axis's value by construction of `matchByStrategy`,
+   * and picking the actively-hovered one is what makes forcing a rule on
+   * the *other* axis (e.g. `ruleY: true` under an `'x'`-strategy chart)
+   * point at the row under the cursor rather than an arbitrary matched
+   * sibling. `BasePlotLayout` gates actual display with
+   * `impliesCrosshairX`/`Y` + the marker's own `ruleX`/`ruleY` props.
+   */
+  const activePoint = $derived.by((): HoverPoint<T> | null => {
+    if (matched.length === 0) return null;
+    const series = args.hover().activeSeries;
+    return matched.find((p) => p.series === series) ?? matched[0];
+  });
 
   // Whether the current strategy implies a crosshair rule on each axis by default.
-  const _impliesRuleX = $derived(impliesRuleX(args.hover().strategy));
-  const _impliesRuleY = $derived(impliesRuleY(args.hover().strategy));
+  const _impliesCrosshairX = $derived(impliesCrosshairX(args.hover().strategy));
+  const _impliesCrosshairY = $derived(impliesCrosshairY(args.hover().strategy));
 
   const showTooltip = $derived.by(() => {
     if (matchedRows.length === 0) return false;
@@ -129,17 +143,14 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
     get matchedRows() {
       return matchedRows;
     },
-    get ruleX() {
-      return ruleX;
+    get activePoint() {
+      return activePoint;
     },
-    get ruleY() {
-      return ruleY;
+    get impliesCrosshairX() {
+      return _impliesCrosshairX;
     },
-    get impliesRuleX() {
-      return _impliesRuleX;
-    },
-    get impliesRuleY() {
-      return _impliesRuleY;
+    get impliesCrosshairY() {
+      return _impliesCrosshairY;
     },
     get showTooltip() {
       return showTooltip;

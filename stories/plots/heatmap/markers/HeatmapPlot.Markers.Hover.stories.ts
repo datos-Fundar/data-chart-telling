@@ -46,9 +46,10 @@ const SERIES = [
 /**
  * Basic hover marker — a dot appears on the hovered cell as the cursor moves
  * over the plot, along with a full crosshair (both `ruleX` and `ruleY` are
- * implied by the heatmap's `'punctual'` hover strategy). No value label by
- * default — heatmap cells already show their value permanently, so the
- * marker's own label defaults off. No floating HTML tooltip is involved.
+ * implied by the heatmap's `'punctual'` hover strategy) and a value label,
+ * on by default like every other plot kind. Since heatmap cells already show
+ * their value permanently, the label next to the hover dot duplicates it —
+ * see `WithoutLabels` to turn it off. No floating HTML tooltip is involved.
  */
 export const Basic: Story = {
   args: {
@@ -62,22 +63,20 @@ export const Basic: Story = {
 };
 
 /**
- * With labels — `showLabels: true` overrides the heatmap's default-off value
- * label, drawing it next to the hover dot in addition to each cell's own
- * permanent text.
+ * Without labels — `showLabels: false` turns off the hover marker's own
+ * value label, the recommended setting for heatmaps specifically: each
+ * cell already shows its value permanently, so the hover dot's own label
+ * would just duplicate it right next to it.
  */
-export const WithLabels: Story = {
+export const WithoutLabels: Story = {
   args: {
     series: SERIES,
     markers: [
       {
         type: 'hover',
-        showLabels: true,
+        showLabels: false,
       } satisfies Marker,
     ],
-    styles: {
-      values: { show: false },
-    }
   },
 };
 

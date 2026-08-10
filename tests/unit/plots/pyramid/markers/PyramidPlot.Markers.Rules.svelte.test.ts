@@ -19,7 +19,7 @@ describe('PyramidPlot – markers.rules', () => {
       width: 560,
       height: 520,
       ...DATA_PROPS,
-      markers: [{ type: 'ruleX', x: 3 } satisfies Marker],
+      markers: [{ type: 'rule', axis: 'x', value: 3 } satisfies Marker],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-x line').length).toBe(1);
@@ -31,8 +31,8 @@ describe('PyramidPlot – markers.rules', () => {
       height: 520,
       ...DATA_PROPS,
       markers: [
-        { type: 'ruleX', x: 2.5 } satisfies Marker,
-        { type: 'ruleX', x: 3.5 } satisfies Marker,
+        { type: 'rule', axis: 'x', value: 2.5 } satisfies Marker,
+        { type: 'rule', axis: 'x', value: 3.5 } satisfies Marker,
       ],
     });
     const svg = await waitForSvg(container);
@@ -45,8 +45,8 @@ describe('PyramidPlot – markers.rules', () => {
       height: 520,
       ...DATA_PROPS,
       markers: [
-        { type: 'ruleX', x: -2 } satisfies Marker,
-        { type: 'ruleX', x: 2 } satisfies Marker,
+        { type: 'rule', axis: 'x', value: -2 } satisfies Marker,
+        { type: 'rule', axis: 'x', value: 2 } satisfies Marker,
       ],
     });
     const svg = await waitForSvg(container);
@@ -58,7 +58,7 @@ describe('PyramidPlot – markers.rules', () => {
       width: 560,
       height: 520,
       ...DATA_PROPS,
-      markers: [{ type: 'ruleX', x: 3, style: { stroke: '#e11d48' } } satisfies Marker],
+      markers: [{ type: 'rule', axis: 'x', value: 3, style: { stroke: '#e11d48' } } satisfies Marker],
     });
     const svg = await waitForSvg(container);
     const line = svg.querySelector('g.rule-x line');

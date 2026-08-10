@@ -10,7 +10,7 @@
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import AxisLayout from '$lib/layout/plot/AxisLayout.svelte';
   import GridLayout from '$lib/layout/plot/GridLayout.svelte';
-  import RuleLayout from '$lib/layout/plot/RuleLayout.svelte';
+  import GeometryLayout from '$lib/layout/plot/GeometryLayout.svelte';
   import ValueLabels from '$lib/plots/heatmap/ValueLabels.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
   import type { BasePlotProps } from '$lib/types/plots/props';
@@ -244,10 +244,10 @@
   scales={resolvedScales}
   {margins}
 >
-  {#snippet children({ matchedPoints, ruleX, ruleY, impliesRuleX, impliesRuleY, numericMargins })}
+  {#snippet children({ matchedPoints, activePoint, impliesCrosshairX, impliesCrosshairY, numericMargins })}
   <AxisLayout data={flat} {getX} {getY} {width} {height} {numericMargins} scales={resolvedScales} />
   <GridLayout scales={resolvedScales} />
-  <RuleLayout {markers} seriesData={resolvedSeries} {matchedPoints} {ruleX} {ruleY} {impliesRuleX} {impliesRuleY} showHoverLabels={false}>
+  <GeometryLayout {markers} seriesData={resolvedSeries} {matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY}>
   {#each styleGroups as group, i (i)}
     <Cell
       data={group.data as unknown as Record<string | symbol, never>[]}
@@ -272,6 +272,6 @@
       defaultColor={cfg.continuous.labelColor}
     />
   {/if}
-  </RuleLayout>
+  </GeometryLayout>
   {/snippet}
 </BasePlotLayout>

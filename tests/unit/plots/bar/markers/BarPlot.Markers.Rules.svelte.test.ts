@@ -13,7 +13,7 @@ describe('BarPlot – markers.rules', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'ruleX', x: 'Córdoba' } satisfies Marker],
+      markers: [{ type: 'rule', axis: 'x', value: 'Córdoba' } satisfies Marker],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-x line').length).toBe(1);
@@ -24,7 +24,7 @@ describe('BarPlot – markers.rules', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'ruleY', y: 82 } satisfies Marker],
+      markers: [{ type: 'rule', axis: 'y', value: 82 } satisfies Marker],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-y line').length).toBe(1);
@@ -36,8 +36,8 @@ describe('BarPlot – markers.rules', () => {
       height: 300,
       series: [FEMALE],
       markers: [
-        { type: 'ruleX', x: 'Córdoba' } satisfies Marker,
-        { type: 'ruleX', x: 'Tucumán' } satisfies Marker,
+        { type: 'rule', axis: 'x', value: 'Córdoba' } satisfies Marker,
+        { type: 'rule', axis: 'x', value: 'Tucumán' } satisfies Marker,
       ],
     });
     const svg = await waitForSvg(container);
@@ -50,8 +50,8 @@ describe('BarPlot – markers.rules', () => {
       height: 300,
       series: [FEMALE],
       markers: [
-        { type: 'ruleX', x: 'Córdoba' } satisfies Marker,
-        { type: 'ruleY', y: 82 } satisfies Marker,
+        { type: 'rule', axis: 'x', value: 'Córdoba' } satisfies Marker,
+        { type: 'rule', axis: 'y', value: 82 } satisfies Marker,
       ],
     });
     const svg = await waitForSvg(container);
@@ -64,7 +64,7 @@ describe('BarPlot – markers.rules', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'ruleX', x: 'Córdoba', style: { stroke: '#e11d48' } } satisfies Marker],
+      markers: [{ type: 'rule', axis: 'x', value: 'Córdoba', style: { stroke: '#e11d48' } } satisfies Marker],
     });
     const svg = await waitForSvg(container);
     const line = svg.querySelector('g.rule-x line');
