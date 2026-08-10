@@ -3,13 +3,13 @@
   generics="TData extends Record<string, unknown>"
 >
   import { SvelteMap } from 'svelte/reactivity';
-  import { Line, Dot } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { paletteColor } from '$lib/utils/color';
   import { buildSeries } from '$lib/utils/grouping';
   import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
   import { disabledStrokeOverride, disabledDotsOverride } from '$lib/plots/utils/legendDisabled';
+  import { buildLineMarkers } from '$lib/plots/line/buildLineMarkers';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import AxisLayout from '$lib/layout/plot/AxisLayout.svelte';
   import GridLayout from '$lib/layout/plot/GridLayout.svelte';
@@ -110,6 +110,14 @@
     sync: resolveHoverSync(tooltip?.sync, markers),
     tooltip,
   });
+
+  const lineMarkers = $derived(
+    buildLineMarkers({
+      groupedSeries,
+      disabledStrokeFor: (name) => disabledStrokeOverride(legendInteraction?.disabledSeries.get(name)),
+      disabledDotsFor: (name) => disabledDotsOverride(legendInteraction?.disabledSeries.get(name)),
+    }),
+  );
 </script>
 
 <BasePlotLayout
@@ -126,43 +134,9 @@
   {#snippet children({ matchedPoints, activePoint, impliesCrosshairX, impliesCrosshairY, numericMargins })}
   <AxisLayout data={flat} getX={xAcc} getY={(d) => Number(yAcc(d))} {width} {height} {numericMargins} {scales} />
   <GridLayout {scales} />
-  <GeometryLayout {markers} seriesData={resolvedSeries} {matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY}>
+  <GeometryLayout markers={[...lineMarkers, ...markers]} seriesData={resolvedSeries} {matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY}>
   {#each groupedSeries as group, seriesIndex (group.series.name)}
     {@const defaultColor = paletteColor(seriesIndex, cfg.palette)}
-    {@const disabledOverride = legendInteraction?.disabledSeries.get(group.series.name)}
-    {@const disabledStroke = disabledStrokeOverride(disabledOverride)}
-    {@const disabledDots = disabledDotsOverride(disabledOverride)}
-    {#each group.visualSegments as seg, i (`${group.series.name}-${i}`)}
-      {@const strokeStyle = seg.style.stroke}
-      {@const lineData = seg.data as unknown as Record<string | symbol, never>[]}
-      <Line
-        data={lineData}
-        x={resolveAccessor(group.series.x)}
-        y={resolveAccessor(group.series.y)}
-        stroke={disabledStroke?.stroke ?? strokeStyle?.stroke ?? defaultColor}
-        strokeWidth={disabledStroke?.strokeWidth ?? strokeStyle?.strokeWidth ?? cfg.line.strokeWidth}
-        strokeOpacity={disabledStroke?.strokeOpacity ?? strokeStyle?.strokeOpacity ?? 1}
-        strokeDasharray={disabledStroke?.strokeDasharray ?? strokeStyle?.strokeDasharray}
-        strokeLinejoin={disabledStroke?.strokeLinejoin ?? strokeStyle?.strokeLinejoin}
-        strokeLinecap={disabledStroke?.strokeLinecap ?? strokeStyle?.strokeLinecap}
-      />
-      {#if seg.style.dots}
-        {@const dotStyle = seg.style.dots}
-        <Dot
-          data={seg.data}
-          x={resolveAccessor(group.series.x)}
-          y={resolveAccessor(group.series.y)}
-          r={disabledDots?.dotRadius ?? dotStyle.dotRadius ?? cfg.line.dotRadius}
-          fill={disabledDots?.dotFill ?? dotStyle.dotFill ?? strokeStyle?.stroke ?? defaultColor}
-          symbol={disabledDots?.dotSymbol ?? dotStyle.dotSymbol ?? 'circle'}
-          stroke={disabledDots?.dotStroke ?? dotStyle.dotStroke ?? strokeStyle?.stroke ?? defaultColor}
-          strokeWidth={disabledDots?.dotStrokeWidth ?? dotStyle.dotStrokeWidth ?? 1}
-          fillOpacity={disabledDots?.dotFillOpacity ?? dotStyle.dotFillOpacity ?? strokeStyle?.strokeOpacity ?? 1}
-          strokeOpacity={disabledDots?.dotStrokeOpacity ?? dotStyle.dotStrokeOpacity ?? strokeStyle?.strokeOpacity ?? 1}
-          strokeDasharray={disabledDots?.dotStrokeDasharray ?? dotStyle.dotStrokeDasharray}
-        />
-      {/if}
-    {/each}
 
     {#each seriesMarkers.get(group.series.name) ?? [] as marker, i (`series-${group.series.name}-${marker.type}-${i}`)}
       {#if marker.type === 'component'}

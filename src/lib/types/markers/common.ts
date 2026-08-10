@@ -10,10 +10,9 @@ export type RuleMarkerConfig = {
 };
 
 /**
- * The in-SVG hover highlight (crosshair + dot + label), opt-in via `markers`
- * so it can be combined freely with — or used entirely without — the HTML
- * tooltip. Omitting `series` mounts it unscoped (all series); scoping it to
- * one series follows the same targeting fields as {@link CustomComponentMarkerConfig}.
+ * In-SVG hover highlight (crosshair + dot + label). Omitting `series`
+ * applies it to all series; scoping follows the same fields as
+ * {@link CustomComponentMarkerConfig}.
  */
 export type HoverMarkerConfig = {
   type: 'hover';
@@ -42,21 +41,13 @@ export type CustomComponentMarkerConfig = {
 };
 
 /**
- * A single rectangular bar mark, emitted by `BarPlot` itself (via
- * `buildBarMarkers`) rather than authored directly — `GeometryLayout` renders
- * whatever `'bar'` markers it's given, the same way it renders any other
- * marker kind.
+ * A single bar mark, built by `BarPlot` (via `buildBarMarkers`) rather than
+ * authored directly.
  *
- * `role: 'segment'` is a visible bar/segment: `x`/`y`/`x1`/`x2`/`y1`/`y2`
- * are channel accessors fed straight into svelteplot's `<BarX>`/`<BarY>`
- * (matching whichever pair `isHorizontal` implies), alongside `data` (the
- * rows this call renders) and `style`.
- *
- * `role: 'hitArea'` is an invisible, full-value-axis-extent hit region for
- * one category — `category` and `data` (every row across every series at
- * that category) are used to resolve its pixel geometry against the live
- * scale at render time; `onpointerenter`/`onpointerleave` drive the hover
- * match directly (see `HoverStore`/`setHoverMatch`).
+ * `role: 'segment'` is a visible bar: `x`/`y`/`x1`/`x2`/`y1`/`y2` map to
+ * svelteplot's `<BarX>`/`<BarY>` per `isHorizontal`. `role: 'hitArea'` is an
+ * invisible per-category hit region for hover, resolved against the live
+ * scale at render time.
  */
 export type BarMarkerConfig = {
   type: 'bar';
@@ -85,8 +76,53 @@ export type BarMarkerConfig = {
   onpointerleave?: () => void;
 };
 
+/**
+ * A single line-segment stroke, built by `LinePlot` (via `buildLineMarkers`).
+ * Endpoint dots are a separate `'dot'` marker rather than a field here.
+ */
+export type LineMarkerConfig = {
+  type: 'line';
+  data: Record<string, unknown>[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  x: (d: any) => AxisValue;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  y: (d: any) => AxisValue;
+  style?: StrokeStyle;
+};
+
+/** A set of point marks (svelteplot's `Dot`) — a line's endpoint dots, or authored directly. */
+export type DotMarkerConfig = {
+  type: 'dot';
+  data: Record<string, unknown>[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  x: (d: any) => AxisValue;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  y: (d: any) => AxisValue;
+  style?: DotStyle;
+};
+
+/**
+ * A single heatmap cell mark, built by `HeatmapPlot` (via `buildCellMarkers`).
+ * `fill` stays a per-row accessor; the rest of the style is constant per call.
+ */
+export type CellMarkerConfig = {
+  type: 'cell';
+  data: Record<string, unknown>[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  x: (d: any) => AxisValue;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  y: (d: any) => AxisValue;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fill: (d: any) => string;
+  style?: { fillOpacity?: number; stroke?: string; strokeWidth?: number };
+  inset?: number;
+};
+
 export type Marker =
   | RuleMarkerConfig
   | HoverMarkerConfig
   | CustomComponentMarkerConfig
-  | BarMarkerConfig;
+  | BarMarkerConfig
+  | LineMarkerConfig
+  | DotMarkerConfig
+  | CellMarkerConfig;

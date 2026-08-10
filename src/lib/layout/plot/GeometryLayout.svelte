@@ -1,6 +1,9 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
   import type { Snippet } from 'svelte';
   import BarMarker from '$lib/markers/BarMarker.svelte';
+  import LineMarker from '$lib/markers/LineMarker.svelte';
+  import CellMarker from '$lib/markers/CellMarker.svelte';
+  import DotMarker from '$lib/markers/DotMarker.svelte';
   import RuleMarker from '$lib/markers/RuleMarker.svelte';
   import HoverMarker from '$lib/markers/HoverMarker.svelte';
   import type { Series } from '$lib/types/plots/data/common';
@@ -8,27 +11,20 @@
   import type { HoverPoint } from '$lib/types/layout/tooltip';
 
   /**
-   * Renders every *unscoped* marker in `markers`, in array order — one flat
-   * list of "geometries," each delegated to the one component that already
-   * knows how to draw itself (`BarMarker`/`HoverMarker`, or a `'component'`
-   * marker's own `marker.component`) — `'rule'` markers go straight to the
-   * shared `RuleMarker` primitive with their own `axis`, since it's a
-   * one-line delegation to it and doesn't warrant its own wrapper component
-   * for a single call site. This layout owns none of
-   * the "how a marker looks" logic — only routing, plus the couple of props
-   * a marker kind needs beyond its own config (live hover-controller state,
-   * for `hover`).
+   * Renders every *unscoped* marker in `markers`, in array order, each
+   * delegated to the component that knows how to draw it. This layout owns
+   * only routing, plus the few extra props a marker kind needs beyond its
+   * own config (live hover-controller state, for `hover`).
    *
-   * Order is entirely the caller's responsibility: each `Plot.svelte` is
-   * expected to build its own `markers` array as `[...its own default
-   * marks (e.g. BarPlot's bars), ...the author's own markers prop, in the
-   * order given]`. `children` (a plot kind's value labels + scoped
-   * markers) renders last, on top of everything in this list.
+   * Order is the caller's responsibility: each `Plot.svelte` builds its own
+   * `markers` array as its default marks followed by the author's own
+   * `markers` prop. `children` (value labels + scoped markers) renders
+   * last, on top of everything here.
    *
-   * Markers scoped to one `series` (`hover`/`component`) are excluded here
-   * — each plot kind still renders those itself, inline per series/segment
-   * (inside `children`), since that needs per-series `matchedPoints`
-   * filtering this layout has no concept of.
+   * Markers scoped to one `series` (`hover`/`component`) are excluded —
+   * each plot kind renders those itself, inline per series/segment, since
+   * that needs per-series `matchedPoints` filtering this layout has no
+   * concept of.
    */
   let {
     markers = [],
@@ -64,6 +60,12 @@
 {#each geometryMarkers as marker, i (markerKey(marker, i))}
   {#if marker.type === 'bar'}
     <BarMarker {marker} />
+  {:else if marker.type === 'line'}
+    <LineMarker {marker} />
+  {:else if marker.type === 'cell'}
+    <CellMarker {marker} />
+  {:else if marker.type === 'dot'}
+    <DotMarker data={marker.data} x={marker.x} y={marker.y} style={marker.style} />
   {:else if marker.type === 'rule'}
     <RuleMarker axis={marker.axis} value={marker.value} style={marker.style} />
   {:else if marker.type === 'component'}

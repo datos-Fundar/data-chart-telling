@@ -3,12 +3,10 @@
   import type { BarMarkerConfig } from '$lib/types/markers/common';
 
   /**
-   * Renders one `'bar'` marker — `role: 'segment'` is a visible bar/segment
-   * (`<BarX>`/`<BarY>`, per `marker.isHorizontal`); `role: 'hitArea'` is an
-   * invisible, full-value-axis-extent hit region for one category, whose
-   * pixel geometry needs the live band/value scale — only available via
-   * `usePlot()` here, where the marker actually renders (not where
-   * `buildBarMarkers` builds the marker list).
+   * Renders one `'bar'` marker — `role: 'segment'` is a visible bar
+   * (`<BarX>`/`<BarY>`, per `isHorizontal`); `role: 'hitArea'` is an
+   * invisible hit region for one category, resolved against the live scale
+   * via `usePlot()`.
    */
   let { marker }: { marker: BarMarkerConfig } = $props();
 

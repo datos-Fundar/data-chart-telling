@@ -1,12 +1,12 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
   import { SvelteMap } from 'svelte/reactivity';
-  import { BarX } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { paletteColor } from '$lib/utils/color';
   import { buildSeries } from '$lib/utils/grouping';
   import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
   import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
+  import { buildPyramidBarMarkers } from '$lib/plots/pyramid/buildPyramidBarMarkers';
   import { buildGroupedSeries, validateSegments, resolveSegmentsForSeries, matchesSegmentX, getDataForSegments } from '$lib/plots/utils/segments';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import AxisLayout from '$lib/layout/plot/AxisLayout.svelte';
@@ -200,6 +200,15 @@
     sync: resolveHoverSync(tooltip?.sync, markers),
     tooltip,
   });
+
+  const pyramidMarkers = $derived(
+    buildPyramidBarMarkers({
+      groupedSeries,
+      valueFor: signedValue,
+      colorFor: (s) => (s.side === 'left' ? leftColor : rightColor),
+      disabledFillFor: (name) => disabledFillOverride(legendInteraction?.disabledSeries.get(name)),
+    }),
+  );
 </script>
 
 <BasePlotLayout
@@ -216,21 +225,10 @@
   {#snippet children({ matchedPoints, activePoint, impliesCrosshairX, impliesCrosshairY, numericMargins })}
   <AxisLayout data={flat} {getX} {getY} {width} {height} {numericMargins} scales={resolvedScales} />
   <GridLayout scales={resolvedScales} />
-  <GeometryLayout {markers} seriesData={resolvedSeries} {matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY}>
+  <GeometryLayout markers={[...pyramidMarkers, ...markers]} seriesData={resolvedSeries} {matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY}>
     {#each groupedSeries as group (group.series.name)}
       {@const defaultColor = group.series.side === 'left' ? leftColor : rightColor}
       {@const getCategory = resolveAccessor(group.series.x)}
-      {@const disabledFill = disabledFillOverride(legendInteraction?.disabledSeries.get(group.series.name))}
-      {#each group.visualSegments as seg, i (`${group.series.name}-${i}`)}
-        <BarX
-          data={seg.data}
-          x1={0}
-          x2={(d: TData) => signedValue(group.series, d)}
-          y={getCategory}
-          fill={disabledFill?.fill ?? seg.style.fill ?? defaultColor}
-          fillOpacity={disabledFill?.fillOpacity ?? seg.style.fillOpacity ?? 1}
-        />
-      {/each}
 
       {#if showVals}
         <ValueLabels {group} {valAnchor} {fmtVal} values={styles.values} axisColor={cfg.axis.color} />

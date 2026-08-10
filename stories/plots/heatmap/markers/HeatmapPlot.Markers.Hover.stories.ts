@@ -115,6 +115,23 @@ export const RowRuleOnly: Story = {
 };
 
 /**
+ * Column rule only — `ruleY: false` keeps just the vertical (`ruleX`) rule,
+ * highlighting the hovered cell's sex column without the horizontal sex rule.
+ */
+export const ColumnRuleOnly: Story = {
+  args: {
+    series: SERIES,
+    markers: [
+      {
+        type: 'hover',
+        ruleX: true,
+        ruleY: false,
+      } satisfies Marker,
+    ],
+  },
+};
+
+/**
  * Custom rule style — `ruleStyle` overrides the crosshair stroke. Here the
  * rules render in red with a solid line and higher opacity.
  */
@@ -124,6 +141,7 @@ export const WithCustomRuleStyle: Story = {
     markers: [
       {
         type: 'hover',
+        showLabels: false,
         ruleStyle: {
           stroke: '#e63946',
           strokeOpacity: 0.3,

@@ -1,5 +1,4 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-  import { Cell } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { validateSegments } from '$lib/plots/utils/segments';
   import { buildSeries } from '$lib/utils/grouping';
@@ -7,6 +6,7 @@
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
   import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
+  import { buildCellMarkers } from '$lib/plots/heatmap/buildCellMarkers';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import AxisLayout from '$lib/layout/plot/AxisLayout.svelte';
   import GridLayout from '$lib/layout/plot/GridLayout.svelte';
@@ -185,17 +185,10 @@
   );
 
   /**
-   * One `<Cell>` call per *distinct resolved style*, not one call for the
-   * whole dataset. svelteplot registers `fillOpacity`/`strokeWidth` under
-   * its shared "opacity"/numeric scale machinery — passed as a per-row
-   * accessor that genuinely varies within a single mark instance, that
-   * scale collapses every row to the same (wrong) value instead of the
-   * literal numbers set on each segment. A literal, per-call constant (one
-   * call per style bucket) bypasses that entirely, which is exactly how
-   * bar/line avoid the same trap (one mark per visual segment). `fill`
-   * stays a per-cell accessor within each group — unlike fillOpacity, it
-   * must keep varying continuously with the underlying value wherever a
-   * segment doesn't explicitly override it.
+   * One marker per *distinct resolved style*, not one for the whole
+   * dataset — svelteplot's opacity/numeric scale machinery requires
+   * `fillOpacity`/`strokeWidth` to be constant per mark instance, unlike
+   * `fill`, which stays a per-row accessor.
    */
   type StyleGroup = { style: CellSegmentStyle; data: TData[] };
   const styleGroups = $derived.by((): StyleGroup[] => {
@@ -232,6 +225,8 @@
     sync: resolveHoverSync(tooltip?.sync, markers),
     tooltip,
   });
+
+  const cellMarkers = $derived(buildCellMarkers({ styleGroups, getX, getY, getZ, colorScale }));
 </script>
 
 <BasePlotLayout
@@ -247,20 +242,7 @@
   {#snippet children({ matchedPoints, activePoint, impliesCrosshairX, impliesCrosshairY, numericMargins })}
   <AxisLayout data={flat} {getX} {getY} {width} {height} {numericMargins} scales={resolvedScales} />
   <GridLayout scales={resolvedScales} />
-  <GeometryLayout {markers} seriesData={resolvedSeries} {matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY}>
-  {#each styleGroups as group, i (i)}
-    <Cell
-      data={group.data as unknown as Record<string | symbol, never>[]}
-      x={getX}
-      y={getY}
-      fill={(d) => group.style.fill ?? colorScale(Number(getZ(d as TData)))}
-      fillOpacity={group.style.fillOpacity ?? 1}
-      stroke={group.style.stroke}
-      strokeWidth={group.style.strokeWidth ?? 0}
-      inset={0.5}
-    />
-  {/each}
-
+  <GeometryLayout markers={[...cellMarkers, ...markers]} seriesData={resolvedSeries} {matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY}>
   {#if showVals}
     <ValueLabels
       data={flat}

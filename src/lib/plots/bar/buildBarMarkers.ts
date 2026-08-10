@@ -10,16 +10,13 @@ import type { BarLayout } from './layout.svelte';
 
 /**
  * Every `'bar'` marker for one BarPlot render: one `role: 'segment'` marker
- * per series (`'stacked'`) or per visual segment (`'grouped'`/`'overlap'`) —
- * a straight port of what `BarSegments.svelte` used to render directly —
- * plus one `role: 'hitArea'` marker per category, ported from
- * `HoverHitAreas.svelte`'s `byCategory` grouping. Both come out of this one
- * call so a chart can never get segment markers without their hit areas.
+ * per series (stacked) or per visual segment (grouped/overlap), plus one
+ * `role: 'hitArea'` marker per category, so a chart never gets segment
+ * markers without their hit areas.
  *
- * Geometry for `'hitArea'` markers is left unresolved (just `category` +
- * `data`) — turning that into pixels needs svelteplot's live scale via
- * `usePlot()`, which is only available where the marker actually renders
- * (inside `GeometryLayout`), not here.
+ * `'hitArea'` geometry is left unresolved (just `category` + `data`) —
+ * resolving it to pixels needs svelteplot's live scale, only available
+ * where the marker actually renders.
  */
 export function buildBarMarkers<TData extends Record<string, unknown>>(args: {
   groupedSeries: VisualGroup<Series<TData>, BarSegmentStyle>[];

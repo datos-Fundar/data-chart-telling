@@ -5,14 +5,9 @@
 
   /**
    * A single vertical (`axis: 'x'`) or horizontal (`axis: 'y'`) reference
-   * line at `value` — the shared primitive behind `GeometryLayout`'s
-   * `'rule'` marker dispatch (an author-configured rule) and
-   * `HoverMarker` (the hover crosshair), the same way `DotMarker`/
-   * `TextMarker` back both the marker-dispatch system and `HoverMarker`'s
-   * own dot/label. Callers merge in their own default style (e.g.
-   * `HoverMarker` layers `cfg.hover.rule` under an author override) — this
-   * component's own fallback (`'currentColor'`/`1`) only kicks in when
-   * neither supplies a value.
+   * line at `value` — shared by author-configured `'rule'` markers and
+   * `HoverMarker`'s crosshair. Falls back to `'currentColor'`/`1` when the
+   * caller supplies no style.
    */
   let { axis, value, style }: { axis: 'x' | 'y'; value: AxisValue; style?: StrokeStyle } = $props();
 
