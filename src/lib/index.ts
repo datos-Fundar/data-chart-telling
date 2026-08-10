@@ -105,7 +105,7 @@ export type {
 export type { GeoStyles, GeoTileLayerConfig, GeoZoomConfig } from './types/plots/styles/geo';
 export type {
   GeoMarker,
-  GeoInsetMarker,
+  GeoInsetMarkerConfig,
   GeoInsetLocation,
   GeoInsetProjectionName,
   GeoInsetProjectionConfig,

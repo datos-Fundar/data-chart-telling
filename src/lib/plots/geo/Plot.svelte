@@ -29,7 +29,7 @@
   import type { GeoFeature, GeoDataProps } from '$lib/types/plots/data/geo';
   import type { GeoStyles } from '$lib/types/plots/styles/geo';
   import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
-  import type { GeoMarker, GeoHoverMarkerConfig, GeoDotMarker, GeoInsetMarker } from '$lib/types/markers/geo';
+  import type { GeoMarker, GeoHoverMarkerConfig, GeoDotMarkerConfig, GeoInsetMarkerConfig } from '$lib/types/markers/geo';
 
   /**
    * A map, rendered from GeoJSON (or, optionally, TopoJSON — see
@@ -214,7 +214,7 @@
   }
 
   /** Per-marker color ramp for a `dot` marker's `value` channel — independent of the base map's own choropleth ramp. */
-  function makeDotColorScale(marker: GeoDotMarker): ((v: number) => string) | null {
+  function makeDotColorScale(marker: GeoDotMarkerConfig): ((v: number) => string) | null {
     if (!marker.value) return null;
     const getValue = resolveAccessor(marker.value);
     const vals = marker.data.map((d) => Number(getValue(d))).filter((v) => Number.isFinite(v));
@@ -301,7 +301,7 @@
    * `markers` otherwise always render after (on top of) the base map's own
    * `styleGroups`, regardless of array order — a marker opts into drawing
    * underneath it instead by setting `behind: true` (see e.g.
-   * `GeoSphereMarker.behind`).
+   * `GeoSphereMarkerConfig.behind`).
    */
   function isBehindMarker(marker: GeoMarker): boolean {
     return (
@@ -539,7 +539,7 @@
           height: Math.max(0, height - numericMargins.top - numericMargins.bottom),
         }}
         <InsetMarker
-          marker={marker as GeoInsetMarker<TProps>}
+          marker={marker as GeoInsetMarkerConfig<TProps>}
           features={allFeatures}
           width={insetContentBox.width}
           height={insetContentBox.height}

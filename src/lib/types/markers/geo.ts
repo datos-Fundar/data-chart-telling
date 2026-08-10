@@ -8,7 +8,7 @@ import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
 import type { GeoProjectionName } from '$lib/types/plots/scales/geo';
 
 /** Longitude/latitude gridlines — svelteplot's `Graticule`. */
-export type GeoGraticuleMarker = {
+export type GeoGraticuleMarkerConfig = {
   type: 'graticule';
   step?: number;
   stepX?: number;
@@ -25,7 +25,7 @@ export type GeoGraticuleMarker = {
 };
 
 /** The outer globe outline (for orthographic-type projections) — svelteplot's `Sphere`. */
-export type GeoSphereMarker = {
+export type GeoSphereMarkerConfig = {
   type: 'sphere';
   style?: StrokeStyle & { fill?: string; fillOpacity?: number };
   /**
@@ -43,7 +43,7 @@ export type GeoSphereMarker = {
  * Point markers by longitude/latitude, sized/colored by value —
  * svelteplot's `Dot`. https://svelteplot.dev/examples/dot/weather
  */
-export type GeoDotMarker<TRow extends Record<string, unknown> = Record<string, unknown>> = {
+export type GeoDotMarkerConfig<TRow extends Record<string, unknown> = Record<string, unknown>> = {
   type: 'dot';
   data: TRow[];
   x: Accessor<TRow, number>;
@@ -58,7 +58,7 @@ export type GeoDotMarker<TRow extends Record<string, unknown> = Record<string, u
  * Arrows/spikes at points — svelteplot's `Vector`.
  * https://svelteplot.dev/examples/vector/shift-map
  */
-export type GeoVectorMarker<TRow extends Record<string, unknown> = Record<string, unknown>> = {
+export type GeoVectorMarkerConfig<TRow extends Record<string, unknown> = Record<string, unknown>> = {
   type: 'vector';
   data: TRow[];
   x: Accessor<TRow, number>;
@@ -75,7 +75,7 @@ export type GeoVectorMarker<TRow extends Record<string, unknown> = Record<string
  * `curve: 'auto'` traces a great-circle arc on a geographic projection).
  * https://svelteplot.dev/examples/link/spherical-link
  */
-export type GeoLinkMarker<TRow extends Record<string, unknown> = Record<string, unknown>> = {
+export type GeoLinkMarkerConfig<TRow extends Record<string, unknown> = Record<string, unknown>> = {
   type: 'link';
   data: TRow[];
   x1: Accessor<TRow, number>;
@@ -94,7 +94,7 @@ export type GeoLinkMarker<TRow extends Record<string, unknown> = Record<string, 
  * spatially interpolate a scatter of samples, or omit `data` and pass
  * `value` as an `(x, y) => number` sampling function.
  */
-export type GeoContourMarker<TRow extends Record<string, unknown> = Record<string, unknown>> = {
+export type GeoContourMarkerConfig<TRow extends Record<string, unknown> = Record<string, unknown>> = {
   type: 'contour';
   data?: TRow[];
   x?: Accessor<TRow, number>;
@@ -135,8 +135,8 @@ export type GeoHoverMarkerConfig = {
   fontStyle?: FontStyle;
 };
 
-/** Mounts an arbitrary Svelte component as a mark — the geo analog of `CustomComponentMarker` (no `series` concept here). */
-export type GeoCustomComponentMarker = {
+/** Mounts an arbitrary Svelte component as a mark — the geo analog of `CustomComponentMarkerConfig` (no `series` concept here). */
+export type GeoCustomComponentMarkerConfig = {
   type: 'component';
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   component: any;
@@ -220,7 +220,7 @@ export type GeoInsetProjectionConfig =
  * both are given) — the inset's own mini-projection is fit to whichever one
  * applies, independently of the main map's projection/zoom.
  */
-export type GeoInsetMarker<TProps extends Record<string, unknown> = Record<string, unknown>> = {
+export type GeoInsetMarkerConfig<TProps extends Record<string, unknown> = Record<string, unknown>> = {
   type: 'inset';
   location: GeoInsetLocation;
   /** Feature ids (matching the plot's own `featureId`) to filter from the plot's own `data`. Ignored when `data` is set. */
@@ -253,12 +253,12 @@ export type GeoInsetMarker<TProps extends Record<string, unknown> = Record<strin
 };
 
 export type GeoMarker =
-  | GeoGraticuleMarker
-  | GeoSphereMarker
-  | GeoDotMarker
-  | GeoVectorMarker
-  | GeoLinkMarker
-  | GeoContourMarker
+  | GeoGraticuleMarkerConfig
+  | GeoSphereMarkerConfig
+  | GeoDotMarkerConfig
+  | GeoVectorMarkerConfig
+  | GeoLinkMarkerConfig
+  | GeoContourMarkerConfig
   | GeoHoverMarkerConfig
-  | GeoCustomComponentMarker
-  | GeoInsetMarker;
+  | GeoCustomComponentMarkerConfig
+  | GeoInsetMarkerConfig;

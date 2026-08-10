@@ -100,7 +100,7 @@ export function geometryPartCentroids(geometry: GeoJSON.Geometry): [number, numb
  * based on a per-part predicate, reassembling a geometry of the same type
  * from whatever survives — `null` if nothing does. Used to let a single
  * feature's geometry be split between the main map and an `inset` marker
- * (see `GeoDataProps.excludeParts`/`GeoInsetMarker.featurePartsFilter`)
+ * (see `GeoDataProps.excludeParts`/`GeoInsetMarkerConfig.featurePartsFilter`)
  * without preprocessing the source data: e.g. a province whose `MultiPolygon`
  * spans both a mainland part and a far-flung part can have the main map
  * exclude the latter while an inset shows only it.

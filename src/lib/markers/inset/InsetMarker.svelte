@@ -4,12 +4,12 @@
   import { insetBox } from './insetLayout';
   import { filterGeometryParts } from '$lib/plots/utils/geoAccessors';
   import TooltipLayout from '$lib/layout/tooltip/TooltipLayout.svelte';
-  import type { GeoInsetMarker } from '$lib/types/markers/geo';
+  import type { GeoInsetMarkerConfig } from '$lib/types/markers/geo';
   import type { GeoFeature } from '$lib/types/plots/data/geo';
 
   /**
    * A small, independently-projected map panel anchored to a corner/edge of
-   * the plot — see `GeoInsetMarker`'s doc comment. Renders raw `<path>`s via
+   * the plot — see `GeoInsetMarkerConfig`'s doc comment. Renders raw `<path>`s via
    * its own `d3-geo` `geoPath`, deliberately not svelteplot's `<Geo>` mark:
    * that mark is bound to the plot's *shared* projection scale, but an inset
    * needs its own, independently fit to just what it's showing.
@@ -23,7 +23,7 @@
     top = 0,
     defaultFill,
   }: {
-    marker: GeoInsetMarker<TProps>;
+    marker: GeoInsetMarkerConfig<TProps>;
     /**
      * The plot's own already-tagged features (`__id` set), with full,
      * unreduced geometry regardless of the plot's own `excludeParts` — used

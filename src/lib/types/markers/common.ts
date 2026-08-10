@@ -2,13 +2,13 @@ import type { AxisValue } from '$lib/types/plots/axis';
 import type { DotStyle, FontStyle, StrokeStyle, BarStyle } from '$lib/types/plots/styling';
 import type { HoverStrategy, HoverDisplayPoint } from '$lib/types/layout/tooltip';
 
-export type RuleXMarker = {
+export type RuleXMarkerConfig = {
   type: 'ruleX';
   x: AxisValue;
   style?: StrokeStyle;
 };
 
-export type RuleYMarker = {
+export type RuleYMarkerConfig = {
   type: 'ruleY';
   y: AxisValue;
   style?: StrokeStyle;
@@ -18,7 +18,7 @@ export type RuleYMarker = {
  * The in-SVG hover highlight (crosshair + dot + label), opt-in via `markers`
  * so it can be combined freely with — or used entirely without — the HTML
  * tooltip. Omitting `series` mounts it unscoped (all series); scoping it to
- * one series follows the same targeting fields as {@link CustomComponentMarker}.
+ * one series follows the same targeting fields as {@link CustomComponentMarkerConfig}.
  */
 export type HoverMarkerConfig = {
   type: 'hover';
@@ -35,7 +35,7 @@ export type HoverMarkerConfig = {
   fontStyle?: FontStyle;
 };
 
-export type CustomComponentMarker = {
+export type CustomComponentMarkerConfig = {
   type: 'component';
   series?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -63,7 +63,7 @@ export type CustomComponentMarker = {
  * scale at render time; `onpointerenter`/`onpointerleave` drive the hover
  * match directly (see `HoverStore`/`setHoverMatch`).
  */
-export type BarMarker = {
+export type BarMarkerConfig = {
   type: 'bar';
   role: 'segment' | 'hitArea';
   isHorizontal: boolean;
@@ -91,8 +91,8 @@ export type BarMarker = {
 };
 
 export type Marker =
-  | RuleXMarker
-  | RuleYMarker
+  | RuleXMarkerConfig
+  | RuleYMarkerConfig
   | HoverMarkerConfig
-  | CustomComponentMarker
-  | BarMarker;
+  | CustomComponentMarkerConfig
+  | BarMarkerConfig;

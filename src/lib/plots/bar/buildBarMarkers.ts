@@ -5,7 +5,7 @@ import type { Series } from '$lib/types/plots/data/common';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { VisualGroup } from '$lib/types/plots/segments/config';
 import type { HoverPoint } from '$lib/types/layout/tooltip';
-import type { BarMarker } from '$lib/types/markers/common';
+import type { BarMarkerConfig } from '$lib/types/markers/common';
 import type { BarLayout } from './layout.svelte';
 
 /**
@@ -31,10 +31,10 @@ export function buildBarMarkers<TData extends Record<string, unknown>>(args: {
   active: boolean;
   setHoverMatch: (rows: TData[]) => void;
   clearHoverMatch: () => void;
-}): BarMarker[] {
+}): BarMarkerConfig[] {
   const { groupedSeries, barLayout, isHorizontal, hoverPoints, palette, disabledFillFor, active, setHoverMatch, clearHoverMatch } = args;
 
-  const segmentMarkers: BarMarker[] = [];
+  const segmentMarkers: BarMarkerConfig[] = [];
   groupedSeries.forEach((group, seriesIndex) => {
     const xFn = resolveAccessor(group.series.x);
     const yFn = resolveAccessor(group.series.y);
@@ -44,7 +44,7 @@ export function buildBarMarkers<TData extends Record<string, unknown>>(args: {
     if (barLayout.layout === 'stacked') {
       const stackedBaselineFn = (d: TData) => barLayout.stackedBaseline(xFn(d), seriesIndex);
       const stackedTopFn = (d: TData) => barLayout.stackedBaseline(xFn(d), seriesIndex) + Number(yFn(d));
-      const marker: BarMarker = {
+      const marker: BarMarkerConfig = {
         type: 'bar',
         role: 'segment',
         isHorizontal,
@@ -68,7 +68,7 @@ export function buildBarMarkers<TData extends Record<string, unknown>>(args: {
     }
 
     for (const seg of group.visualSegments) {
-      const marker: BarMarker = {
+      const marker: BarMarkerConfig = {
         type: 'bar',
         role: 'segment',
         isHorizontal,
@@ -107,7 +107,7 @@ export function buildBarMarkers<TData extends Record<string, unknown>>(args: {
     if (list) list.push(p);
     else byCategory.set(key, [p]);
   }
-  const hitAreaMarkers: BarMarker[] = [...byCategory.entries()].map(([category, points]) => ({
+  const hitAreaMarkers: BarMarkerConfig[] = [...byCategory.entries()].map(([category, points]) => ({
     type: 'bar',
     role: 'hitArea',
     isHorizontal,

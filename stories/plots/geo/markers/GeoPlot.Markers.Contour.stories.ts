@@ -72,7 +72,7 @@ export const TemperatureBands: Story = {
  * puts the whole contour under the base map's own stroke-only coastlines
  * instead of over them, so the borders stay crisp on top of the coloring
  * rather than the fill covering them (markers otherwise always draw over
- * the base map, regardless of position in `markers` — see `GeoSphereMarker.
+ * the base map, regardless of position in `markers` — see `GeoSphereMarkerConfig.
  * behind`'s doc comment for the same mechanism).
  */
 export const FilledBands: Story = {

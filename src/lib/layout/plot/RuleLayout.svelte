@@ -4,7 +4,7 @@
   import HoverMarker from '$lib/markers/HoverMarker.svelte';
   import type { AxisValue } from '$lib/types/plots/axis';
   import type { Series } from '$lib/types/plots/data/common';
-  import type { Marker, BarMarker } from '$lib/types/markers/common';
+  import type { Marker, BarMarkerConfig } from '$lib/types/markers/common';
   import type { HoverPoint } from '$lib/types/layout/tooltip';
 
   /**
@@ -52,7 +52,7 @@
   );
 
   const barMarkers = $derived(
-    markers.filter((marker): marker is BarMarker => marker.type === 'bar'),
+    markers.filter((marker): marker is BarMarkerConfig => marker.type === 'bar'),
   );
 
   /**
