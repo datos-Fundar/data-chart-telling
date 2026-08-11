@@ -2,7 +2,7 @@
   import BarPlot from '$lib/plots/bar/Plot.svelte';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { paletteColor } from '$lib/utils/color';
-  import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
+  import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
   import TooltipCard from '../../common/TooltipCard.svelte';
   import { AGE_BRACKET_BY_PROVINCE, AGE_BRACKETS, provinceSort, type AgeBracketPoint } from './data';
 

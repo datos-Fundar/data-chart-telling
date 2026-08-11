@@ -6,7 +6,7 @@ import {
   filterBySeries,
 } from '$lib/layout/tooltip/utils';
 import type { HoverStore, HoverPoint } from '$lib/types/layout/tooltip';
-import type { AxisValue } from '$lib/types/plots/axis';
+import type { AxisValue } from '$lib/types/layout/scales';
 
 /**
  * The plot-agnostic hover state machine shared by every plot. Given reactive

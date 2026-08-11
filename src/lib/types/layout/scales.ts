@@ -49,3 +49,15 @@ export type AxisScale<TData = Record<string, unknown>> = {
   seriesLayout?: 'overlap' | 'grouped' | 'stacked';
   seriesPadding?: number;
 };
+
+/**
+ * Per-axis scale overrides, passed as a single `scales` prop to every
+ * axis-based plot kind (`GeoPlot` uses `GeoScalesConfig` instead — a map has
+ * no x/y/z axis pair). `TData` threads through to {@link AxisScale.sort} on
+ * each axis.
+ */
+export type AxisBasedScalesConfig<TData = Record<string, unknown>> = {
+  x?: AxisScale<TData>;
+  y?: AxisScale<TData>;
+  z?: AxisScale<TData>;
+};

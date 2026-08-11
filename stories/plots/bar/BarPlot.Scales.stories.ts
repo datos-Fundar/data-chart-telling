@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
+import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import {
   FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
   LIFE_EXPECTANCY_BY_PROVINCE,

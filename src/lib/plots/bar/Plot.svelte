@@ -14,15 +14,13 @@
   import { buildBarMarkers } from '$lib/plots/bar/buildBarMarkers';
   import ValueLabels from '$lib/plots/bar/ValueLabels.svelte';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
-  import AxisLayout from '$lib/layout/plot/AxisLayout.svelte';
-  import GridLayout from '$lib/layout/plot/GridLayout.svelte';
+  import ScalesLayout from '$lib/layout/scales/ScalesLayout.svelte';
   import GeometryLayout from '$lib/layout/plot/GeometryLayout.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
   import type { Marker } from '$lib/types/markers/common';
   import type { BasePlotProps } from '$lib/types/plots/props';
-  import type { AxisScale } from '$lib/types/plots/axis';
+  import type { AxisScale, AxisBasedScalesConfig } from '$lib/types/layout/scales';
   import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
-  import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
   import type { BasePlotStyles } from '$lib/types/plots/styles/common';
   import type { ValueAnchor } from '$lib/types/plots/constants';
   import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
@@ -207,8 +205,7 @@
     setHoverMatch,
     clearHoverMatch,
   })}
-  <AxisLayout data={flat} getX={plotGetX} getY={plotGetY} {width} {height} {numericMargins} scales={resolvedScales} />
-  <GridLayout scales={resolvedScales} />
+  <ScalesLayout data={flat} getX={plotGetX} getY={plotGetY} {width} {height} {numericMargins} scales={resolvedScales} />
   <GeometryLayout markers={[...barMarkers, ...markers]} seriesData={resolvedSeries} {scopedGroups} {matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY}>
   {#if showVals}
     {#each groupedSeries as group, seriesIndex (group.series.name)}

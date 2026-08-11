@@ -1,4 +1,4 @@
-import type { AxisValue } from '$lib/types/plots/axis';
+import type { AxisValue } from '$lib/types/layout/scales';
 import type { Series } from '$lib/types/plots/data/common';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 

@@ -9,7 +9,7 @@
   } from '$lib/layout/tooltip/utils';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import type { Accessor } from '$lib/types/plots/data/common';
-  import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
+  import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
   import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
   import type { ChartProps } from '$lib/types/charts/props';
 

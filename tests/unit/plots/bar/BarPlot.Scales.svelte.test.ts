@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
-import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
+import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import {
   FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
   LIFE_EXPECTANCY_BY_PROVINCE,

@@ -1,4 +1,4 @@
-import type { AxisValue } from '$lib/types/plots/axis';
+import type { AxisValue } from '$lib/types/layout/scales';
 import type { StrokeStyle, FontStyle, DotStyle } from '$lib/types/plots/styling';
 
 export type DeltaTarget =

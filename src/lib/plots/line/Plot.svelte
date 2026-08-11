@@ -10,16 +10,14 @@
   import { disabledStrokeOverride, disabledDotsOverride } from '$lib/plots/utils/legendDisabled';
   import { buildLineMarkers } from '$lib/plots/line/buildLineMarkers';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
-  import AxisLayout from '$lib/layout/plot/AxisLayout.svelte';
-  import GridLayout from '$lib/layout/plot/GridLayout.svelte';
+  import ScalesLayout from '$lib/layout/scales/ScalesLayout.svelte';
   import GeometryLayout from '$lib/layout/plot/GeometryLayout.svelte';
   import ValueLabels from '$lib/plots/line/ValueLabels.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
   import { buildGroupedSeries, validateSegments, buildScopedMarkerGroups } from '$lib/plots/utils/segments';
   import type { BasePlotProps } from '$lib/types/plots/props';
-  import type { AxisValue } from '$lib/types/plots/axis';
+  import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
   import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
-  import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
   import type { BasePlotStyles } from '$lib/types/plots/styles/common';
   import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
   import type { Marker } from '$lib/types/markers/common';
@@ -128,8 +126,7 @@
   xTickRotate={scales?.x?.tickRotate}
 >
   {#snippet children({ matchedPoints, activePoint, impliesCrosshairX, impliesCrosshairY, numericMargins })}
-  <AxisLayout data={flat} getX={xAcc} getY={(d) => Number(yAcc(d))} {width} {height} {numericMargins} {scales} />
-  <GridLayout {scales} />
+  <ScalesLayout data={flat} getX={xAcc} getY={(d) => Number(yAcc(d))} {width} {height} {numericMargins} {scales} />
   <GeometryLayout markers={[...lineMarkers, ...markers]} seriesData={resolvedSeries} {scopedGroups} {matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY}>
   {#if showVals}
     <ValueLabels {lastPoints} values={styles.values} />

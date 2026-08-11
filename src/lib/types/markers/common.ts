@@ -1,4 +1,4 @@
-import type { AxisValue } from '$lib/types/plots/axis';
+import type { AxisValue } from '$lib/types/layout/scales';
 import type { DotStyle, FontStyle, StrokeStyle, BarStyle } from '$lib/types/plots/styling';
 import type { HoverStrategy, HoverDisplayPoint } from '$lib/types/layout/tooltip';
 

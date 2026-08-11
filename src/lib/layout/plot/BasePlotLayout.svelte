@@ -1,14 +1,13 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
   import type { ComponentProps, Snippet } from 'svelte';
-  import { SvelteSet } from 'svelte/reactivity';
   import { Plot, Pointer } from 'svelteplot';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { AUTO_MARGIN_ESTIMATE, numericMargin } from '$lib/layout/plot/margins';
+  import { buildScale } from '$lib/layout/scales/buildScale';
   import { getHover, createHover } from '$lib/layout/tooltip/hover.svelte';
   import { createHoverController } from '$lib/layout/tooltip/controller.svelte';
   import TooltipLayout from '$lib/layout/tooltip/TooltipLayout.svelte';
-  import type { AxisValue, AxisScale } from '$lib/types/plots/axis';
-  import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
+  import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
   import type { GeoProjectionConfig } from '$lib/types/plots/scales/geo';
   import type { HoverPoint } from '$lib/types/layout/tooltip';
   import type { MarginConfig, HoverConfig } from '$lib/types/plots/props';
@@ -19,8 +18,8 @@
    * Shared chrome around every plot kind's svelteplot markup: the pointer-event
    * wrapper, the hover/tooltip state machine, the `<Plot>` element itself, and
    * the floating tooltip. Deliberately marker/axis-agnostic — axis-having plot
-   * kinds (line/bar/heatmap/pyramid) additionally compose `AxisLayout` /
-   * `GridLayout` / `GeometryLayout` inside `children`; `GeoPlot` composes `GeoLayout`
+   * kinds (line/bar/heatmap/pyramid) additionally compose `ScalesLayout` /
+   * `GeometryLayout` inside `children`; `GeoPlot` composes `GeoLayout`
    * instead, since a map has no x/y axis pair. Every plot kind supplies its own
    * `<Plot x y projection>` scale config (either directly via `x`/`y`/`projection`,
    * or by leaving `x`/`y` unset so this component derives them from `scales`) and
@@ -128,65 +127,11 @@
     left: numericMargin('left', computedMargins.left, marginEstimate),
   });
 
-  /** One representative row per unique axis value (first occurrence in `data`). */
-  function uniqueRows(rows: TData[], getAxisValue: (d: TData) => AxisValue): TData[] {
-    const seen = new SvelteSet<AxisValue>();
-    const out: TData[] = [];
-    for (const row of rows) {
-      const v = getAxisValue(row);
-      if (seen.has(v)) continue;
-      seen.add(v);
-      out.push(row);
-    }
-    return out;
-  }
-
-  /**
-   * svelteplot's own `sort` scale option only toggles a fixed ascending sort
-   * (lexicographic for strings) — it can't take a custom comparator. When the
-   * caller supplies one via `scales.x.sort`/`scales.y.sort` for a string-valued
-   * axis (e.g. dates formatted as text, or categories ordered by another
-   * field), compute the ordered domain ourselves and hand it to the scale as
-   * an explicit `domain`, which svelteplot does respect as-is for ordinal
-   * scales. The comparator receives one representative row per unique axis
-   * value, not just the axis value itself, so it can sort by this axis's own
-   * value or by any other field on the row.
-   */
-  function sortedScale(scale: AxisScale<TData> | undefined, rows: TData[], getAxisValue: (d: TData) => AxisValue): AxisScale<TData> | undefined {
-    const sort = scale?.sort;
-    if (!sort || scale?.domain) return scale;
-    const reps = uniqueRows(rows, getAxisValue);
-    if (reps.length === 0 || !reps.every((r) => typeof getAxisValue(r) === 'string')) return scale;
-    const domain = [...reps].sort(sort).map(getAxisValue);
-    return { ...scale, domain };
-  }
-
-  /**
-   * `grid`/`seriesLayout`/`seriesPadding` and a vertical `label` are rendered
-   * by `GridLayout`/`AxisLayout` themselves rather than passed through to
-   * svelteplot (which only draws a fixed-style implicit grid, and never
-   * rotates the axis title) — stripped here so they don't also trigger
-   * svelteplot's own (duplicate, unstyled) rendering of them. Also the single
-   * place a plot kind's fully-resolved `scales.x`/`scales.y` (defaults
-   * already merged in by the plot itself) turns into what svelteplot's own,
-   * narrower scale option type actually accepts.
-   */
-  function finalizeScale(scale: AxisScale<TData> | undefined, rows: TData[], getAxisValue: (d: TData) => AxisValue): AxisScale<TData> | undefined {
-    const sorted = sortedScale(scale, rows, getAxisValue);
-    if (!sorted) return sorted;
-    const out = { ...sorted };
-    delete out.grid;
-    delete out.seriesLayout;
-    delete out.seriesPadding;
-    if (scale?.labelOrientation === 'vertical') delete out.label;
-    return out;
-  }
-
   // Cast to svelteplot's own (narrower, axis-specific) scale option type:
-  // finalizeScale has already stripped the fields that don't exist there
+  // buildScale has already stripped the fields that don't exist there
   // (grid, the vertical label config, BarPlot's series-layout knobs).
-  const resolvedX = $derived(x !== undefined ? x : (finalizeScale(scales?.x, data, getX) as SveltePlotProps['x']));
-  const resolvedY = $derived(y !== undefined ? y : (finalizeScale(scales?.y, data, getY) as SveltePlotProps['y']));
+  const resolvedX = $derived(x !== undefined ? x : (buildScale(scales?.x, data, getX) as SveltePlotProps['x']));
+  const resolvedY = $derived(y !== undefined ? y : (buildScale(scales?.y, data, getY) as SveltePlotProps['y']));
 
   // ── Hover / tooltip ───────────────────────────────────────────────────────
   const sharedHover = getHover();

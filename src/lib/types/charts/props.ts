@@ -1,7 +1,6 @@
 import type { Snippet } from 'svelte';
-import type { AxisValue } from '$lib/types/plots/axis';
+import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { Accessor } from '$lib/types/plots/data/common';
-import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
 import type { BasePlotStyles } from '$lib/types/plots/styles/common';
 import type { SegmentsConfig, MarginConfig } from '$lib/types/plots/props';
 import type { Marker } from '$lib/types/markers/common';

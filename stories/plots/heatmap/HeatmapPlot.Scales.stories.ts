@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
+import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import { LIFE_EXPECTANCY_BY_PROVINCE_SEX, PROVINCES, SEXES, type ProvinceSexCell } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────

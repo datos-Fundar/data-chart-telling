@@ -1,5 +1,5 @@
 import type { Snippet } from 'svelte';
-import type { AxisValue } from '$lib/types/plots/axis';
+import type { AxisValue } from '$lib/types/layout/scales';
 
 /**
  * How the hover highlight finds related points within a facet.

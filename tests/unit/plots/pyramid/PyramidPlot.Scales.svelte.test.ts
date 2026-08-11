@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
+import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../../stories/data/population-pyramid';
 import { waitForSvg, countBarRects } from '../_helpers/svg';
 

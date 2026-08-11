@@ -1,6 +1,6 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
 import { paletteColor } from '$lib/utils/color';
-import type { AxisValue } from '$lib/types/plots/axis';
+import type { AxisValue } from '$lib/types/layout/scales';
 import type { Series } from '$lib/types/plots/data/common';
 import type { HoverPoint } from '$lib/types/layout/tooltip';
 import type { BarLayout } from './layout.svelte';

@@ -1,6 +1,6 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
   import { Text } from 'svelteplot';
-  import type { AxisValue } from '$lib/types/plots/axis';
+  import type { AxisValue } from '$lib/types/layout/scales';
   import type { ValuesStyle } from '$lib/types/plots/styles/common';
 
   /**

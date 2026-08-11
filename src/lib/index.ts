@@ -60,14 +60,13 @@ export {
 } from './utils/color';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-export type { AxisValue, AxisScale } from './types/plots/axis';
+export type { AxisValue, AxisScale, AxisBasedScalesConfig } from './types/layout/scales';
 export type { Accessor, Series, SeriesProps, DataProps } from './types/plots/data/common';
 export type {
   BasePlotProps,
   StylesConfig,
   MarkersConfig,
   SegmentsConfig,
-  AxisBasedScalesConfig,
   GeoScalesConfig,
   ScalesConfig,
   MarginConfig,

@@ -9,7 +9,7 @@
   } from '$lib/layout/tooltip/utils';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { resolveTimelineInterpolation } from '$lib/utils/interpolate';
-  import type { AxisValue } from '$lib/types/plots/axis';
+  import type { AxisValue } from '$lib/types/layout/scales';
   import type { Accessor } from '$lib/types/plots/data/common';
   import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
   import type { ChartProps } from '$lib/types/charts/props';

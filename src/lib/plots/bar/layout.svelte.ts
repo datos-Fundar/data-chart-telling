@@ -2,9 +2,8 @@ import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { resolveAccessor } from '$lib/plots/utils/accessors';
 import { numericMargin } from '$lib/layout/plot/margins';
-import type { AxisValue } from '$lib/types/plots/axis';
+import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { Series } from '$lib/types/plots/data/common';
-import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { VisualGroup } from '$lib/types/plots/segments/config';
 import type { MarginConfig } from '$lib/types/plots/props';
@@ -32,7 +31,7 @@ export function createBarLayout<TData extends Record<string, unknown>>(args: {
 
   /**
    * How series sharing the same category are arranged — see
-   * {@link import('$lib/types/plots/axis').AxisScale.seriesLayout}. Read
+   * {@link import('$lib/types/layout/scales').AxisScale.seriesLayout}. Read
    * off `scales.z` since it's the grouping axis, not the category axis itself.
    */
   const layout = $derived<BarSeriesLayout>(args.scales().z?.seriesLayout ?? 'overlap');

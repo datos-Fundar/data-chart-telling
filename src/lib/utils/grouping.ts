@@ -1,5 +1,5 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
-import type { AxisValue } from '$lib/types/plots/axis';
+import type { AxisValue } from '$lib/types/layout/scales';
 import type { Series, Accessor } from '$lib/types/plots/data/common';
 
 /**

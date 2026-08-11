@@ -1,4 +1,4 @@
-import type { AxisValue } from '$lib/types/plots/axis';
+import type { AxisValue } from '$lib/types/layout/scales';
 import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
 import type { CellMarkerConfig } from '$lib/types/markers/common';
 

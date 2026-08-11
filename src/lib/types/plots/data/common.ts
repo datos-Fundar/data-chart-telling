@@ -1,4 +1,4 @@
-import type { AxisValue } from '$lib/types/plots/axis';
+import type { AxisValue } from '$lib/types/layout/scales';
 
 /**
  * A field key or accessor function. Mirrors the shorthand used across plots

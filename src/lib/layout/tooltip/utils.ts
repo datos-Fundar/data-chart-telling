@@ -1,4 +1,4 @@
-import type { AxisValue } from '$lib/types/plots/axis';
+import type { AxisValue } from '$lib/types/layout/scales';
 import type { Marker, HoverMarkerConfig } from '$lib/types/markers/common';
 import type {
   HoverStore,

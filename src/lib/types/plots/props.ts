@@ -1,6 +1,6 @@
 import type { HoverPoint, HoverStrategy, TooltipOptions } from '$lib/types/layout/tooltip';
 import type { Segment } from '$lib/types/plots/segments/config';
-import type { AxisScale } from '$lib/types/plots/axis';
+import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { GeoProjectionConfig } from '$lib/types/plots/scales/geo';
 
 /** The `styles` prop accepted by every plot kind — its own
@@ -109,18 +109,6 @@ export type HoverConfig<TRow extends Record<string, unknown>> = {
   exclude?: (e: PointerEvent) => boolean;
   /** How to resolve a pointer event to a candidate point — see {@link HoverMatchStrategy}. Defaults to `'nearest'`. */
   match?: HoverMatchStrategy;
-};
-
-/**
- * Per-axis scale overrides, passed as a single `scales` prop to every
- * axis-based plot kind (`GeoPlot` uses {@link GeoScalesConfig} instead — a
- * map has no x/y/z axis pair). `TData` threads through to
- * {@link AxisScale.sort} on each axis.
- */
-export type AxisBasedScalesConfig<TData = Record<string, unknown>> = {
-  x?: AxisScale<TData>;
-  y?: AxisScale<TData>;
-  z?: AxisScale<TData>;
 };
 
 /**

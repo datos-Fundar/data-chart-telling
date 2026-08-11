@@ -1,6 +1,6 @@
 <script lang="ts">
   import { RuleX, RuleY } from 'svelteplot';
-  import type { AxisValue } from '$lib/types/plots/axis';
+  import type { AxisValue } from '$lib/types/layout/scales';
   import type { StrokeStyle } from '$lib/types/plots/styling';
 
   /**

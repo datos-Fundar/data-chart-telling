@@ -1,16 +1,13 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-  import { AxisX, AxisY } from 'svelteplot';
+  import { AxisX, AxisY, GridX, GridY } from 'svelteplot';
   import { getConfiguration } from '$lib/configuration/config.svelte';
-  import type { AxisValue } from '$lib/types/plots/axis';
-  import type { AxisBasedScalesConfig } from '$lib/types/plots/props';
+  import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
 
   /**
-   * Axis ticks/titles for the plot kinds that have an x/y axis pair
-   * (line/bar/heatmap/pyramid) — reads the scale/tick config off `scales`,
-   * against the plot's own resolved margins. Not used by `GeoPlot`, whose
-   * position comes from a `d3-geo` projection instead (see `GeoLayout`).
-   * `AxisX`/`AxisY` themselves inherit their actual scale from svelteplot's
-   * `<Plot>` context — this only supplies their cosmetic/tick-count props.
+   * Axis ticks/titles and grid lines for plot kinds with an x/y axis pair
+   * (line/bar/heatmap/pyramid). Not used by `GeoPlot` (see `GeoLayout`
+   * instead). The scale itself is resolved by `buildScale` and applied via
+   * `BasePlotLayout`'s `<Plot x y>` — this only renders the cosmetics.
    */
   let {
     data,
@@ -35,13 +32,7 @@
   const xValues = $derived(data.map(getX));
   const yValues = $derived(data.map(getY));
 
-  /**
-   * Caps the requested tick count to the axis's own number of distinct
-   * values, but never above what the pixel width would naturally request —
-   * so a narrow domain (e.g. 5 whole years) never gets subdivided into
-   * fractional ticks (2020, 2020.5, 2021, …) just to fill the space. Skipped
-   * whenever the caller already controls tick density directly.
-   */
+  /** Caps tick count to the axis's distinct value count, never above what fits the pixel span. Skipped once the caller sets tick density directly. */
   function autoTickCount(scale: AxisBasedScalesConfig<TData>['x'], values: AxisValue[], span: number, spacing: number, min: number): number | undefined {
     if (scale?.ticks != null || scale?.tickSpacing != null || scale?.interval != null) return undefined;
     const uniqueCount = new Set(values.map(String)).size;
@@ -92,4 +83,20 @@
     fill={cfg.axis.color}
     opacity="0.8"
   >{verticalYLabel.text}</text>
+{/if}
+{#if scales?.x?.grid}
+  <GridX
+    stroke={typeof scales.x.grid === 'object' ? scales.x.grid.stroke : undefined}
+    strokeWidth={typeof scales.x.grid === 'object' ? scales.x.grid.strokeWidth : undefined}
+    strokeOpacity={typeof scales.x.grid === 'object' ? scales.x.grid.strokeOpacity : undefined}
+    strokeDasharray={typeof scales.x.grid === 'object' ? scales.x.grid.strokeDasharray : undefined}
+  />
+{/if}
+{#if scales?.y?.grid}
+  <GridY
+    stroke={typeof scales.y.grid === 'object' ? scales.y.grid.stroke : undefined}
+    strokeWidth={typeof scales.y.grid === 'object' ? scales.y.grid.strokeWidth : undefined}
+    strokeOpacity={typeof scales.y.grid === 'object' ? scales.y.grid.strokeOpacity : undefined}
+    strokeDasharray={typeof scales.y.grid === 'object' ? scales.y.grid.strokeDasharray : undefined}
+  />
 {/if}
