@@ -11,7 +11,7 @@
   import { buildLineMarkers } from '$lib/plots/line/buildLineMarkers';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import ScalesLayout from '$lib/layout/scales/ScalesLayout.svelte';
-  import GeometryLayout from '$lib/layout/plot/GeometryLayout.svelte';
+  import GeometryLayout from '$lib/layout/geometry/GeometryLayout.svelte';
   import ValueLabels from '$lib/plots/line/ValueLabels.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
   import { buildGroupedSeries, validateSegments, buildScopedMarkerGroups } from '$lib/plots/utils/segments';

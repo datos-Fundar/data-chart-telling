@@ -9,7 +9,7 @@
   import { buildCellMarkers } from '$lib/plots/heatmap/buildCellMarkers';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import ScalesLayout from '$lib/layout/scales/ScalesLayout.svelte';
-  import GeometryLayout from '$lib/layout/plot/GeometryLayout.svelte';
+  import GeometryLayout from '$lib/layout/geometry/GeometryLayout.svelte';
   import ValueLabels from '$lib/plots/heatmap/ValueLabels.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
   import type { BasePlotProps } from '$lib/types/plots/props';
