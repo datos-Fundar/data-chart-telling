@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { Marker } from '$lib/types/markers/common';
+import type { LineMarkersConfig } from '$lib/types/markers/line';
 import { FEMALE_LIFE_EXPECTANCY } from '../../../../../stories/plots/line/data';
 import { waitForSvg } from '../../_helpers/svg';
 
@@ -13,7 +13,7 @@ describe('LinePlot – markers.rules', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'rule', axis: 'x', value: 2016 } satisfies Marker],
+      markers: [{ type: 'rule', axis: 'x', value: 2016 }] satisfies LineMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-x line').length).toBe(1);
@@ -24,7 +24,7 @@ describe('LinePlot – markers.rules', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'rule', axis: 'y', value: 80 } satisfies Marker],
+      markers: [{ type: 'rule', axis: 'y', value: 80 }] satisfies LineMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-y line').length).toBe(1);
@@ -36,9 +36,9 @@ describe('LinePlot – markers.rules', () => {
       height: 300,
       series: [FEMALE],
       markers: [
-        { type: 'rule', axis: 'x', value: 2010 } satisfies Marker,
-        { type: 'rule', axis: 'x', value: 2018 } satisfies Marker,
-      ],
+        { type: 'rule', axis: 'x', value: 2010 },
+        { type: 'rule', axis: 'x', value: 2018 },
+      ] satisfies LineMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-x line').length).toBe(2);
@@ -50,9 +50,9 @@ describe('LinePlot – markers.rules', () => {
       height: 300,
       series: [FEMALE],
       markers: [
-        { type: 'rule', axis: 'x', value: 2016 } satisfies Marker,
-        { type: 'rule', axis: 'y', value: 80 } satisfies Marker,
-      ],
+        { type: 'rule', axis: 'x', value: 2016 },
+        { type: 'rule', axis: 'y', value: 80 },
+      ] satisfies LineMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-x line').length).toBe(1);
@@ -64,7 +64,7 @@ describe('LinePlot – markers.rules', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'rule', axis: 'x', value: 2016, style: { stroke: '#e11d48' } } satisfies Marker],
+      markers: [{ type: 'rule', axis: 'x', value: 2016, style: { stroke: '#e11d48' } }] satisfies LineMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     const line = svg.querySelector('g.rule-x line');

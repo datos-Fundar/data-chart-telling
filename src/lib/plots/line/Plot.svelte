@@ -18,14 +18,14 @@
   import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
   import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
   import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
-  import type { Marker } from '$lib/types/markers/common';
+  import type { LineMarkersConfig } from '$lib/types/markers/line';
 
   type Props = BasePlotProps<
     SeriesProps<TData> | DataProps<TData>,
     TData,
     BasePlotStylesConfig,
     LineSegmentStyle,
-    Marker,
+    LineMarkersConfig,
     AxisBasedScalesConfig<TData>
   >;
 

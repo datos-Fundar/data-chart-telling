@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 import { ARGENTINA_PROVINCES, CABA_COMUNAS, AMBA_PARTIDOS, type ArgentinaProvinceProps } from '../data';
 
@@ -74,8 +74,8 @@ export const FilterByFeatureName: Story = {
         location: 'right-middle',
         features: ['Ciudad Autónoma de Buenos Aires'],
         style: { fill: '#dc2626' },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };
 
@@ -87,8 +87,8 @@ export const MultipleFeatures: Story = {
         type: 'inset',
         location: 'right-middle',
         features: ['Ciudad Autónoma de Buenos Aires', 'Buenos Aires'],
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };
 
@@ -105,8 +105,8 @@ export const ExplicitDataset: Story = {
         location: 'right-middle',
         data: AMBA_PARTIDOS,
         style: { stroke: '#dc2626', strokeWidth: 1 },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };
 
@@ -144,8 +144,8 @@ export const AntarcticSector: Story = {
         features: [TIERRA_DEL_FUEGO],
         featurePartsFilter: isAntarcticPart,
         projection: { type: 'azimuthal-equidistant', rotate: [49.5, 90] },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };
 
@@ -166,15 +166,15 @@ export const CombinedInsets: Story = {
         location: 'right-middle',
         data: CABA_COMUNAS,
         style: { stroke: '#dc2626', strokeWidth: 1 },
-      } satisfies GeoMarker,
+      },
       {
         type: 'inset',
         location: 'bottom-right',
         features: [TIERRA_DEL_FUEGO],
         featurePartsFilter: isAntarcticPart,
         projection: { type: 'azimuthal-equidistant', rotate: [49.5, 90] },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };
 
@@ -189,7 +189,7 @@ export const CustomSize: Story = {
         width: 0.4,
         height: 0.3,
         margin: 20,
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };

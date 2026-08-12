@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import type { GeoScalesConfig, CoordinatesConfig } from '$lib/types/layout/coordinates';
-import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 import { WORLD_COUNTRIES, ARGENTINA_PROVINCES, USA_COUNTRY, type WorldCountryProps } from './data';
 
@@ -127,7 +127,7 @@ export const AzimuthalEquidistantUnitedNationsEmblem: Story = {
     coordinates: {
       projection: { type: 'azimuthal-equidistant', rotate: [0, -90], clip: 148 },
     } satisfies CoordinatesConfig,
-    markers: [{ type: 'graticule', style: { stroke: '#94a3b8', strokeOpacity: 0.6 } } satisfies GeoMarker],
+    markers: [{ type: 'graticule', style: { stroke: '#94a3b8', strokeOpacity: 0.6 } }] satisfies GeoMarkersConfig[],
   },
 };
 

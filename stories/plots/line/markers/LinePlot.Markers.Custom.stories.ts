@@ -5,7 +5,7 @@ import DotMarker from '$lib/markers/DotMarker.svelte';
 import TextMarker from '$lib/markers/TextMarker.svelte';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
-import type { Marker } from '$lib/types/markers/common';
+import type { LineMarkersConfig } from '$lib/types/markers/line';
 import { FEMALE_LIFE_EXPECTANCY, type YearPoint } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -69,8 +69,8 @@ export const WithDotMarker: Story = {
           x: (d: YearPoint) => d.year,
           y: (d: YearPoint) => d.value,
         },
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };
 
@@ -100,8 +100,8 @@ export const WithTextMarker: Story = {
             dy: -10,
           }
         },
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };
 
@@ -147,8 +147,8 @@ export const WithPeakMarker: any = {
             mode,
             label: mode === 'max' ? 'Max' : 'Min',
           },
-        } satisfies Marker,
-      ],
+        },
+      ] satisfies LineMarkersConfig[],
     },
   }),
 };
@@ -227,7 +227,7 @@ export const WithMarkerStrategies: Story = {
           mode: 'max',
           label: 'Max',
         },
-      } satisfies Marker,
+      },
       {
         type: 'component',
         series: 'series3',
@@ -239,7 +239,7 @@ export const WithMarkerStrategies: Story = {
           mode: 'max',
           label: 'Max',
         },
-      } satisfies Marker,
+      },
       {
         type: 'component',
         series: 'series4',
@@ -251,7 +251,7 @@ export const WithMarkerStrategies: Story = {
           mode: 'max',
           label: 'Max',
         },
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };

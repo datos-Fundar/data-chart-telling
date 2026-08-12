@@ -3,7 +3,7 @@ import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales'
 import type { Accessor } from '$lib/types/plots/data/common';
 import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
 import type { SegmentsConfig, MarginConfig } from '$lib/types/plots/props';
-import type { Marker } from '$lib/types/markers/common';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { TooltipProp } from '$lib/types/layout/tooltip';
 import type { LegendSection } from '$lib/types/charts/legend';
 import type { FacetConfig, TimelineConfig } from '$lib/types/charts/common';
@@ -35,7 +35,7 @@ export type ChartProps<
   z?: Accessor<TRow, unknown>;
   styles?: BasePlotStylesConfig;
   segments?: SegmentsConfig<TSegmentStyle>;
-  markers?: Marker[];
+  markers?: AxisBasedMarkersConfig[];
   scales?: AxisBasedScalesConfig<TRow>;
   margins?: MarginConfig;
   facet?: FacetConfig<TRow>;

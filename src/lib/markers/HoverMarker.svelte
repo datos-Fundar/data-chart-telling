@@ -21,17 +21,10 @@
    * each axis by default — the same "component owns its own rendering"
    * pattern `BarMarker`/`RuleMarker` follow. `activePoint`/
    * `impliesCrosshairX`/`impliesCrosshairY` are all optional and default to
-   * "no crosshair" — `GeoPlot` (no crosshair concept at all) just omits them.
+   * "no crosshair".
    */
   interface Props extends MarkerProps<HoverDisplayPoint> {
-    /**
-     * Deliberately narrowed to just the fields this component reads —
-     * `HoverMarkerConfig` also carries routing/scoping fields
-     * (`series`/`scope`/`strategy`/`sync`) it has no use for, so keeping
-     * only these lets `GeoPlot`'s own `GeoHoverMarkerConfig` — structurally
-     * identical here, just with a differently-typed `strategy` it doesn't
-     * share — satisfy this prop too, without a cast.
-     */
+    /** Narrowed to just the fields this component reads — `HoverMarkerConfig` also carries routing/scoping fields (`series`/`scope`/`strategy`/`sync`) it has no use for. */
     marker: Pick<HoverMarkerConfig, 'ruleX' | 'ruleY' | 'showLabels' | 'format' | 'ruleStyle' | 'dotStyle' | 'fontStyle'>;
     activePoint?: HoverDisplayPoint | null;
     impliesCrosshairX?: boolean;

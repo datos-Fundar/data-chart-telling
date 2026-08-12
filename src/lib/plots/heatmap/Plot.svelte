@@ -15,7 +15,7 @@
   import type { SeriesProps, DataProps } from '$lib/types/plots/data/common';
   import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
   import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
-  import type { Marker } from '$lib/types/markers/common';
+  import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
   /**
    * A categorical grid of value-coloured cells. Accepts either a pre-built
@@ -31,7 +31,7 @@
     TData,
     BasePlotStylesConfig,
     CellSegmentStyle,
-    Marker,
+    AxisBasedMarkersConfig,
     AxisBasedScalesConfig<TData>
   >;
 

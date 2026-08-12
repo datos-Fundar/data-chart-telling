@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-import type { Marker } from '$lib/types/markers/common';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../../../stories/data/population-pyramid';
 import { waitForSvg } from '../../_helpers/svg';
 
@@ -19,7 +19,7 @@ describe('PyramidPlot – markers.rules', () => {
       width: 560,
       height: 520,
       ...DATA_PROPS,
-      markers: [{ type: 'rule', axis: 'x', value: 3 } satisfies Marker],
+      markers: [{ type: 'rule', axis: 'x', value: 3 }] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-x line').length).toBe(1);
@@ -31,9 +31,9 @@ describe('PyramidPlot – markers.rules', () => {
       height: 520,
       ...DATA_PROPS,
       markers: [
-        { type: 'rule', axis: 'x', value: 2.5 } satisfies Marker,
-        { type: 'rule', axis: 'x', value: 3.5 } satisfies Marker,
-      ],
+        { type: 'rule', axis: 'x', value: 2.5 },
+        { type: 'rule', axis: 'x', value: 3.5 },
+      ] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-x line').length).toBe(2);
@@ -45,9 +45,9 @@ describe('PyramidPlot – markers.rules', () => {
       height: 520,
       ...DATA_PROPS,
       markers: [
-        { type: 'rule', axis: 'x', value: -2 } satisfies Marker,
-        { type: 'rule', axis: 'x', value: 2 } satisfies Marker,
-      ],
+        { type: 'rule', axis: 'x', value: -2 },
+        { type: 'rule', axis: 'x', value: 2 },
+      ] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-x line').length).toBe(2);
@@ -58,7 +58,7 @@ describe('PyramidPlot – markers.rules', () => {
       width: 560,
       height: 520,
       ...DATA_PROPS,
-      markers: [{ type: 'rule', axis: 'x', value: 3, style: { stroke: '#e11d48' } } satisfies Marker],
+      markers: [{ type: 'rule', axis: 'x', value: 3, style: { stroke: '#e11d48' } }] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     const line = svg.querySelector('g.rule-x line');

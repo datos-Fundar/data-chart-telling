@@ -1,78 +1,45 @@
 import { render } from 'vitest-browser-svelte';
-import { describe, test, expect, vi } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
 import { ARGENTINA_PROVINCES } from '../../../../../stories/plots/geo/data';
-import { waitForSvg, countDotMarks, countTextLabels } from '../../_helpers/svg';
+import { waitForSvg, countGeoPaths } from '../../_helpers/svg';
 
 const DATA_PROPS = {
   data: ARGENTINA_PROVINCES,
   featureId: (f: GeoFeature) => (f.properties as { nombre: string }).nombre,
 };
 
-// The hover marker's dot/label only render on an actual cursor match via
-// svelteplot's <Pointer>, which needs real pointer events — these tests only
-// assert the static/no-hover baseline (no dot/label yet) and that varied
+// The hover marker only restyles a feature on an actual cursor match via
+// SVG hit-testing, which needs real pointer events — these tests only assert
+// the static/no-hover baseline (no extra overlay path) and that varied
 // configs don't crash, mirroring the same boundary BarPlot's/HeatmapPlot's
 // hover marker tests already draw.
 
 describe('GeoPlot – hover marker (static baseline)', () => {
-  test('no dot/label before any hover', async () => {
+  test('no overlay path before any hover', async () => {
     const { container } = render(GeoPlot, {
       width: 400,
       height: 300,
       ...DATA_PROPS,
-      markers: [{ type: 'hover' } satisfies GeoMarker],
+      markers: [{ type: 'geo-hover' }] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
-    expect(countDotMarks(svg)).toBe(0);
-    expect(countTextLabels(svg)).toBe(0);
+    expect(countGeoPaths(svg)).toBe(ARGENTINA_PROVINCES.length);
   });
 
-  test('showLabels: false does not crash', async () => {
-    const { container } = render(GeoPlot, {
-      width: 400,
-      height: 300,
-      ...DATA_PROPS,
-      markers: [{ type: 'hover', showLabels: false } satisfies GeoMarker],
-    });
-    const svg = await waitForSvg(container);
-    expect(svg).toBeTruthy();
-  });
-
-  test('custom format/dotStyle/fontStyle do not crash', async () => {
+  test('custom style does not crash', async () => {
     const { container } = render(GeoPlot, {
       width: 400,
       height: 300,
       ...DATA_PROPS,
       markers: [
-        {
-          type: 'hover',
-          format: (p) => `📍 ${p.label}`,
-          dotStyle: { dotFill: '#dc2626', dotRadius: 8 },
-          fontStyle: { fill: '#7f1d1d', fontWeight: 'bold' },
-        } satisfies GeoMarker,
-      ],
+        { type: 'geo-hover', style: { fill: '#facc15', fillOpacity: 0.4, stroke: '#7f1d1d', strokeWidth: 3 } },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
-  });
-
-  test('strategy "nearest-point" warns and falls back without crashing', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const { container } = render(GeoPlot, {
-      width: 400,
-      height: 300,
-      ...DATA_PROPS,
-      markers: [{ type: 'hover', strategy: 'nearest-point' } satisfies GeoMarker],
-    });
-    const svg = await waitForSvg(container);
-    expect(svg).toBeTruthy();
-    await vi.waitFor(() => {
-      expect(warn).toHaveBeenCalledWith(expect.stringContaining("'nearest-point'"));
-    });
-    warn.mockRestore();
   });
 
   test('does not crash with an empty markers array', async () => {

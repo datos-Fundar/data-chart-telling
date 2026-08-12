@@ -3,7 +3,7 @@ import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import DotMarker from '$lib/markers/DotMarker.svelte';
 import TextMarker from '$lib/markers/TextMarker.svelte';
-import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, WEATHER_STATIONS, type WeatherStation } from '../../../../../stories/plots/geo/data';
 import { waitForSvg, countDotMarks, countTextLabels } from '../../_helpers/svg';
 
@@ -16,15 +16,15 @@ describe('GeoPlot – custom component marker', () => {
       coordinates: { projection: 'mercator' },
       markers: [
         {
-          type: 'component',
+          type: 'geo-component',
           component: DotMarker,
           data: WEATHER_STATIONS,
           props: {
             x: (d: WeatherStation) => d.lon,
             y: (d: WeatherStation) => d.lat,
           },
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countDotMarks(svg)).toBe(WEATHER_STATIONS.length);
@@ -38,7 +38,7 @@ describe('GeoPlot – custom component marker', () => {
       coordinates: { projection: 'mercator' },
       markers: [
         {
-          type: 'component',
+          type: 'geo-component',
           component: TextMarker,
           data: WEATHER_STATIONS,
           props: {
@@ -46,8 +46,8 @@ describe('GeoPlot – custom component marker', () => {
             y: (d: WeatherStation) => d.lat,
             text: (d: WeatherStation) => d.city,
           },
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countTextLabels(svg)).toBe(WEATHER_STATIONS.length);
@@ -60,11 +60,11 @@ describe('GeoPlot – custom component marker', () => {
       data: WORLD_COUNTRIES,
       markers: [
         {
-          type: 'component',
+          type: 'geo-component',
           component: DotMarker,
           props: { x: () => 0, y: () => 0 },
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countDotMarks(svg)).toBe(WORLD_COUNTRIES.length);

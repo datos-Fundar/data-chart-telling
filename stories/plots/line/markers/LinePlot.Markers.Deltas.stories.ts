@@ -1,15 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import DeltaMarker from '$lib/markers/DeltaMarker.svelte';
-import type { Marker } from '$lib/types/markers/common';
-import type { DeltaConfig } from '$lib/types/plots/delta';
+import type { LineMarkersConfig } from '$lib/types/markers/line';
 import { FEMALE_LIFE_EXPECTANCY, LIFE_EXPECTANCY } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
-// Delta annotations are rendered via `DeltaMarker`, a custom component marker:
-// `data` carries the series it needs to resolve `from`/`to` against, and
-// `props` is a `DeltaConfig` (axis included).
+// Delta annotations are a `'delta'` marker, LinePlot's own kind-specific
+// marker kind: `data` (the plot's own resolved series) is supplied
+// automatically, so a delta marker only ever needs its own config fields.
 
 const meta = {
   title: 'Plots/LinePlot/Markers/Deltas',
@@ -59,19 +57,16 @@ export const XDeltaBetweenTwoSeries: Story = {
     z: 'sex',
     markers: [
       {
-        type: 'component',
-        component: DeltaMarker,
-        props: {
-          axis: 'x',
-          at: 2018,
-          from: { type: 'series', series: 'female' },
-          to: { type: 'series', series: 'male' },
-          strokeStyle: { stroke: 'grey', strokeDasharray: '6 6' },
-          formatDiff: (d) => d.toFixed(0),
-          fontStyle: { dx: 12, lineAnchor: 'middle' },
-        } satisfies DeltaConfig,
-      } satisfies Marker,
-    ],
+        type: 'delta',
+        axis: 'x',
+        at: 2018,
+        from: { type: 'series', series: 'female' },
+        to: { type: 'series', series: 'male' },
+        strokeStyle: { stroke: 'grey', strokeDasharray: '6 6' },
+        formatDiff: (d) => d.toFixed(0),
+        fontStyle: { dx: 12, lineAnchor: 'middle' },
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };
 
@@ -91,19 +86,14 @@ export const XDeltaToBaseline: Story = {
     ],
     markers: [
       {
-        type: 'component',
-        component: DeltaMarker,
-        props: {
-          yDomain: [78, 85],
-          ...({
-            axis: 'x',
-            at: 2018,
-            from: { type: 'series', series: 'female' },
-            fontStyle: { dx: 20, lineAnchor: 'middle' },
-          } satisfies DeltaConfig),
-        },
-      } satisfies Marker,
-    ],
+        type: 'delta',
+        yDomain: [78, 85],
+        axis: 'x',
+        at: 2018,
+        from: { type: 'series', series: 'female' },
+        fontStyle: { dx: 20, lineAnchor: 'middle' },
+      },
+    ] satisfies LineMarkersConfig[],
     scales: { y: { domain: [78, 85] } },
   },
 };
@@ -123,17 +113,14 @@ export const XDeltaToAxisValue: Story = {
     ],
     markers: [
       {
-        type: 'component',
-        component: DeltaMarker,
-        props: {
-          axis: 'x',
-          at: 2018,
-          from: { type: 'series', series: 'female' },
-          to: { type: 'axis', value: 80 },
-          fontStyle: { dx: 20, lineAnchor: 'middle' },
-        } satisfies DeltaConfig,
-      } satisfies Marker,
-    ],
+        type: 'delta',
+        axis: 'x',
+        at: 2018,
+        from: { type: 'series', series: 'female' },
+        to: { type: 'axis', value: 80 },
+        fontStyle: { dx: 20, lineAnchor: 'middle' },
+      },
+    ] satisfies LineMarkersConfig[],
     scales: { y: { domain: [78, 85] } },
   },
 };
@@ -149,30 +136,24 @@ export const MultipleXDeltas: Story = {
     z: 'sex',
     markers: [
       {
-        type: 'component',
-        component: DeltaMarker,
-        props: {
-          axis: 'x',
-          at: 2020,
-          from: { type: 'series', series: 'female' },
-          to: { type: 'series', series: 'male' },
-          formatDiff: (d) => d.toFixed(0),
-          fontStyle: { dx: -12, lineAnchor: 'middle' },
-        } satisfies DeltaConfig,
-      } satisfies Marker,
+        type: 'delta',
+        axis: 'x',
+        at: 2020,
+        from: { type: 'series', series: 'female' },
+        to: { type: 'series', series: 'male' },
+        formatDiff: (d) => d.toFixed(0),
+        fontStyle: { dx: -12, lineAnchor: 'middle' },
+      },
       {
-        type: 'component',
-        component: DeltaMarker,
-        props: {
-          axis: 'x',
-          at: 2008,
-          from: { type: 'series', series: 'female' },
-          to: { type: 'series', series: 'male' },
-          formatDiff: (d) => d.toFixed(0),
-          fontStyle: { dx: 12, lineAnchor: 'middle' },
-        } satisfies DeltaConfig,
-      } satisfies Marker,
-    ],
+        type: 'delta',
+        axis: 'x',
+        at: 2008,
+        from: { type: 'series', series: 'female' },
+        to: { type: 'series', series: 'male' },
+        formatDiff: (d) => d.toFixed(0),
+        fontStyle: { dx: 12, lineAnchor: 'middle' },
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };
 
@@ -190,18 +171,15 @@ export const YDeltaBetweenTwoSeries: Story = {
     z: 'sex',
     markers: [
       {
-        type: 'component',
-        component: DeltaMarker,
-        props: {
-          axis: 'y',
-          at: 78,
-          from: { type: 'series', series: 'female' },
-          to: { type: 'series', series: 'male' },
-          formatDiff: (d) => `${d} yr`,
-          fontStyle: { dy: -10, lineAnchor: 'middle' },
-        } satisfies DeltaConfig,
-      } satisfies Marker,
-    ],
+        type: 'delta',
+        axis: 'y',
+        at: 78,
+        from: { type: 'series', series: 'female' },
+        to: { type: 'series', series: 'male' },
+        formatDiff: (d) => `${d} yr`,
+        fontStyle: { dy: -10, lineAnchor: 'middle' },
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };
 
@@ -223,20 +201,15 @@ export const YDeltaToBaseline: Story = {
     ],
     markers: [
       {
-        type: 'component',
-        component: DeltaMarker,
-        props: {
-          xDomain: [2008, 2020],
-          ...({
-            axis: 'y',
-            at: 81,
-            from: { type: 'series', series: 'female' },
-            formatDiff: (d) => `${d.toFixed(0)} yr`,
-            fontStyle: { dy: -10, lineAnchor: 'middle' },
-          } satisfies DeltaConfig),
-        },
-      } satisfies Marker,
-    ],
+        type: 'delta',
+        xDomain: [2008, 2020],
+        axis: 'y',
+        at: 81,
+        from: { type: 'series', series: 'female' },
+        formatDiff: (d) => `${d.toFixed(0)} yr`,
+        fontStyle: { dy: -10, lineAnchor: 'middle' },
+      },
+    ] satisfies LineMarkersConfig[],
     scales: { x: { domain: [2008, 2020] } },
   },
 };
@@ -257,19 +230,16 @@ export const YDeltaToAxisValue: Story = {
     ],
     markers: [
       {
-        type: 'component',
-        component: DeltaMarker,
-        props: {
-          axis: 'y',
-          at: 81,
-          from: { type: 'series', series: 'female' },
-          to: { type: 'axis', value: 2016 },
-          strokeStyle: { strokeDasharray: '6 4' },
-          formatDiff: (d) => `${d} yr`,
-          fontStyle: { dy: -10, lineAnchor: 'middle' },
-        } satisfies DeltaConfig,
-      } satisfies Marker,
-    ],
+        type: 'delta',
+        axis: 'y',
+        at: 81,
+        from: { type: 'series', series: 'female' },
+        to: { type: 'axis', value: 2016 },
+        strokeStyle: { strokeDasharray: '6 4' },
+        formatDiff: (d) => `${d} yr`,
+        fontStyle: { dy: -10, lineAnchor: 'middle' },
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };
 
@@ -284,29 +254,23 @@ export const MultipleYDeltas: Story = {
     z: 'sex',
     markers: [
       {
-        type: 'component',
-        component: DeltaMarker,
-        props: {
-          axis: 'y',
-          at: 78,
-          from: { type: 'series', series: 'female' },
-          to: { type: 'series', series: 'male' },
-          formatDiff: (d) => `${d} yr`,
-          fontStyle: { dy: -10, lineAnchor: 'middle' },
-        } satisfies DeltaConfig,
-      } satisfies Marker,
+        type: 'delta',
+        axis: 'y',
+        at: 78,
+        from: { type: 'series', series: 'female' },
+        to: { type: 'series', series: 'male' },
+        formatDiff: (d) => `${d} yr`,
+        fontStyle: { dy: -10, lineAnchor: 'middle' },
+      },
       {
-        type: 'component',
-        component: DeltaMarker,
-        props: {
-          axis: 'y',
-          at: 79,
-          from: { type: 'series', series: 'female' },
-          to: { type: 'series', series: 'male' },
-          formatDiff: (d) => `${d} yr`,
-          fontStyle: { dy: -10, lineAnchor: 'middle' },
-        } satisfies DeltaConfig,
-      } satisfies Marker,
-    ],
+        type: 'delta',
+        axis: 'y',
+        at: 79,
+        from: { type: 'series', series: 'female' },
+        to: { type: 'series', series: 'male' },
+        formatDiff: (d) => `${d} yr`,
+        fontStyle: { dy: -10, lineAnchor: 'middle' },
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };

@@ -1,6 +1,6 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
 import type { Series } from '$lib/types/plots/data/common';
-import type { DeltaConfig, DeltaTarget } from '$lib/types/plots/delta';
+import type { DeltaConfig, DeltaTarget } from '$lib/types/markers/line';
 
 export type ResolvedDelta = {
   cfg: DeltaConfig;

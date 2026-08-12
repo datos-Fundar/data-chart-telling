@@ -1,4 +1,4 @@
-import type { StrokeStyle, DotStyle, BarStyle } from '$lib/types/plots/styling';
+import type { StrokeStyle, DotStyle, AreaStyle } from '$lib/types/plots/styling';
 
 /** Per-segment styling for a line: its stroke and/or its endpoint dots. */
 export type LineSegmentStyle = {
@@ -7,15 +7,10 @@ export type LineSegmentStyle = {
 };
 
 /** Per-segment styling for a bar-shaped mark. Shared by `BarPlot` and `PyramidPlot`. */
-export type BarSegmentStyle = BarStyle;
+export type BarSegmentStyle = AreaStyle;
 
 /** Per-cell styling override for a heatmap cell. */
-export type CellSegmentStyle = {
-  fill?: string;
-  fillOpacity?: number;
-  stroke?: string;
-  strokeWidth?: number;
-};
+export type CellSegmentStyle = AreaStyle;
 
 /** Per-feature styling override for `GeoPlot` — the geo analog of `CellSegmentStyle`. */
 export type GeoSegmentStyle = {

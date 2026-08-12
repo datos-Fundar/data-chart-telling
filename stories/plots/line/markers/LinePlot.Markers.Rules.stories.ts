@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { Marker } from '$lib/types/markers/common';
+import type { LineMarkersConfig } from '$lib/types/markers/line';
 import {
   FEMALE_LIFE_EXPECTANCY,
   LIFE_EXPECTANCY,
@@ -67,7 +67,7 @@ export const WithRuleXMarkers: Story = {
           strokeDasharray: '4 4',
           strokeOpacity: 0.7
         }
-      } satisfies Marker,
+      },
       {
         type: 'rule',
         axis: 'x',
@@ -76,8 +76,8 @@ export const WithRuleXMarkers: Story = {
           strokeDasharray: '4 4',
           strokeOpacity: 0.7
         }
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };
 
@@ -103,7 +103,7 @@ export const WithRuleYMarkers: Story = {
           strokeDasharray: '6 6',
           strokeOpacity: 0.5
         }
-      } satisfies Marker,
+      },
       {
         type: 'rule',
         axis: 'y',
@@ -112,8 +112,8 @@ export const WithRuleYMarkers: Story = {
           strokeDasharray: '6 6',
           strokeOpacity: 0.5
         }
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };
 
@@ -135,7 +135,7 @@ export const WithMixedMarkers: Story = {
           strokeDasharray: '4 4',
           strokeOpacity: 0.6
         }
-      } satisfies Marker,
+      },
       {
         type: 'rule',
         axis: 'y',
@@ -144,7 +144,7 @@ export const WithMixedMarkers: Story = {
           strokeDasharray: '6 6',
           strokeOpacity: 0.5
         }
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };

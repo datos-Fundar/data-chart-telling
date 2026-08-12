@@ -15,7 +15,7 @@
   import ValueLabels from '$lib/plots/bar/ValueLabels.svelte';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
-  import type { Marker } from '$lib/types/markers/common';
+  import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
   import type { BasePlotProps } from '$lib/types/plots/props';
   import type { AxisScale, AxisBasedScalesConfig } from '$lib/types/layout/scales';
   import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
@@ -33,7 +33,7 @@
     TData,
     BasePlotStylesConfig,
     BarSegmentStyle,
-    Marker,
+    AxisBasedMarkersConfig,
     AxisBasedScalesConfig<TData>
   >;
 
@@ -176,7 +176,7 @@
     // (many categories). The `role: 'hitArea'` bar markers `buildBarMarkers`
     // emits hit-test the category bands directly instead — see its own doc
     // comment.
-    match: 'contains' as const,
+    pointMatching: 'contains' as const,
   });
 </script>
 

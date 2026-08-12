@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, FLIGHT_ROUTES } from '../../../../../stories/plots/geo/data';
 import { waitForSvg, countLinkPaths } from '../../_helpers/svg';
 
@@ -20,8 +20,8 @@ describe('GeoPlot – link marker', () => {
           y1: 'fromLat',
           x2: 'toLon',
           y2: 'toLat',
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countLinkPaths(svg)).toBe(FLIGHT_ROUTES.length);
@@ -42,8 +42,8 @@ describe('GeoPlot – link marker', () => {
           x2: 'toLon',
           y2: 'toLat',
           curve,
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countLinkPaths(svg)).toBe(FLIGHT_ROUTES.length);
@@ -64,8 +64,8 @@ describe('GeoPlot – link marker', () => {
           x2: 'toLon',
           y2: 'toLat',
           style: { stroke: '#e11d48', strokeWidth: 2 },
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     const paths = svg.querySelectorAll('g.link path, path.link');

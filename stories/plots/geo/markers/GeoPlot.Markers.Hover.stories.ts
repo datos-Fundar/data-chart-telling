@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '../data';
 
@@ -38,45 +38,27 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/**
- * Basic hover marker — a dot + label appears on the nearest feature's
- * centroid as the cursor moves over the map. Matching is always 2-D/nearest-
- * feature for GeoPlot — there's no x-only/y-only axis to restrict it to.
- */
+/** Basic hover marker — the feature under the cursor outlines itself. Matching follows the browser's own SVG hit-testing, not distance to a centroid. */
 export const Basic: Story = {
   args: {
-    markers: [{ type: 'hover' } satisfies GeoMarker],
+    markers: [{ type: 'geo-hover' }] satisfies GeoMarkersConfig[],
   },
 };
 
-/** No labels — `showLabels: false` keeps just the highlight dot, no text next to it. */
-export const WithoutLabels: Story = {
-  args: {
-    markers: [{ type: 'hover', showLabels: false } satisfies GeoMarker],
-  },
-};
-
-/** Custom format — the label text is derived from the matched point instead of the default feature id. */
-export const CustomFormat: Story = {
-  args: {
-    markers: [
-      {
-        type: 'hover',
-        format: (p) => `📍 ${p.label}`,
-      } satisfies GeoMarker,
-    ],
-  },
-};
-
-/** Custom dot/font style — overrides the highlight dot's fill/radius and the label's font. */
+/** Custom style — overrides the hovered feature's stroke. */
 export const CustomStyle: Story = {
   args: {
     markers: [
-      {
-        type: 'hover',
-        dotStyle: { dotFill: '#dc2626', dotRadius: 8, dotStrokeOpacity: 1, dotStroke: '#7f1d1d' },
-        fontStyle: { fill: '#7f1d1d', fontWeight: 'bold', fontSize: 14 },
-      } satisfies GeoMarker,
-    ],
+      { type: 'geo-hover', style: { stroke: '#7f1d1d', strokeWidth: 3 } },
+    ] satisfies GeoMarkersConfig[],
+  },
+};
+
+/** Filled highlight — a semi-transparent fill on top of the feature's own choropleth color. */
+export const FilledHighlight: Story = {
+  args: {
+    markers: [
+      { type: 'geo-hover', style: { fill: '#facc15', fillOpacity: 0.4, stroke: '#a16207', strokeWidth: 2 } },
+    ] satisfies GeoMarkersConfig[],
   },
 };

@@ -71,11 +71,8 @@ export type {
   MarginConfig,
   TooltipConfig,
   HoverConfig,
-  HoverMatchStrategy,
+  PointMatchingStrategy,
 } from './types/plots/props';
-export type {
-  DeltaConfig,
-} from './types/plots/delta';
 export type {
   ValuesStyle,
   ColorsStyle,
@@ -96,8 +93,9 @@ export type {
   TextAnchor,
   LineAnchor,
 } from './types/plots/constants';
-export type { FontStyle, StrokeStyle, DotStyle } from './types/plots/styling';
-export type { Marker } from './types/markers/common';
+export type { FontStyle, StrokeStyle, DotStyle, AreaStyle } from './types/plots/styling';
+export type { AxisBasedMarkersConfig } from './types/markers/common';
+export type { LineMarkersConfig, DeltaMarkerConfig, DeltaConfig, DeltaTarget } from './types/markers/line';
 export type { MarkerProps } from './types/markers/props';
 export type { GeoFeature, GeoJsonInput, GeoDataProps, Topology } from './types/plots/data/geo';
 export type {
@@ -110,7 +108,7 @@ export type {
   CoordinatesConfig,
 } from './types/layout/coordinates';
 export type {
-  GeoMarker,
+  GeoMarkersConfig,
   GeoInsetMarkerConfig,
   GeoInsetLocation,
   GeoInsetProjectionName,

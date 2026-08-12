@@ -2,7 +2,7 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
-import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { ARGENTINA_PROVINCES } from '../../../../stories/plots/geo/data';
 import { waitForSvg, countGeoPaths } from '../_helpers/svg';
 
@@ -58,8 +58,8 @@ describe('GeoPlot – excludeParts', () => {
           location: 'bottom-right',
           features: [TIERRA_DEL_FUEGO],
           featurePartsFilter: isAntarcticPart,
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     // Every province still renders on the main map (Tierra del Fuego just

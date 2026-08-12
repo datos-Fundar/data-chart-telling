@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '../../../../../stories/plots/geo/data';
 import { waitForSvg } from '../../_helpers/svg';
 
@@ -19,8 +19,8 @@ describe('GeoPlot – inset marker', () => {
       data: ARGENTINA_PROVINCES,
       featureId,
       markers: [
-        { type: 'inset', location: 'right-middle', features: ['Ciudad Autónoma de Buenos Aires'] } satisfies GeoMarker,
-      ],
+        { type: 'inset', location: 'right-middle', features: ['Ciudad Autónoma de Buenos Aires'] },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countInsetPaths(svg)).toBe(1);
@@ -37,8 +37,8 @@ describe('GeoPlot – inset marker', () => {
           type: 'inset',
           location: 'right-middle',
           features: ['Ciudad Autónoma de Buenos Aires', 'Córdoba'],
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countInsetPaths(svg)).toBe(2);
@@ -50,7 +50,7 @@ describe('GeoPlot – inset marker', () => {
       height: 300,
       data: ARGENTINA_PROVINCES,
       featureId,
-      markers: [{ type: 'inset', location: 'right-middle', features: ['Not A Real Province'] } satisfies GeoMarker],
+      markers: [{ type: 'inset', location: 'right-middle', features: ['Not A Real Province'] }] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countInsetPaths(svg)).toBe(0);
@@ -63,7 +63,7 @@ describe('GeoPlot – inset marker', () => {
       height: 300,
       data: ARGENTINA_PROVINCES,
       featureId,
-      markers: [{ type: 'inset', location: 'right-middle', data: [separateFeature] } satisfies GeoMarker],
+      markers: [{ type: 'inset', location: 'right-middle', data: [separateFeature] }] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countInsetPaths(svg)).toBe(1);
@@ -82,8 +82,8 @@ describe('GeoPlot – inset marker', () => {
           // `features` would match 2; `data` should win and draw just 1.
           features: ['Ciudad Autónoma de Buenos Aires', 'Córdoba'],
           data: [ARGENTINA_PROVINCES[0]],
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countInsetPaths(svg)).toBe(1);
@@ -105,8 +105,8 @@ describe('GeoPlot – inset marker', () => {
           height: 0.3,
           margin: 20,
           style: { fill: '#dc2626', strokeWidth: 2 },
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countInsetPaths(svg)).toBe(1);
@@ -122,7 +122,7 @@ describe('GeoPlot – inset marker', () => {
       height: 300,
       data: ARGENTINA_PROVINCES,
       featureId,
-      markers: [{ type: 'inset', location: 'bottom-right', features: [tdf] } satisfies GeoMarker],
+      markers: [{ type: 'inset', location: 'bottom-right', features: [tdf] }] satisfies GeoMarkersConfig[],
     });
     const unfilteredSvg = await waitForSvg(unfiltered.container);
     const unfilteredCount = countInsetPaths(unfilteredSvg);
@@ -138,8 +138,8 @@ describe('GeoPlot – inset marker', () => {
           location: 'bottom-right',
           features: [tdf],
           featurePartsFilter: (part) => isAntarcticPart(part),
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const filteredSvg = await waitForSvg(filtered.container);
     const filteredCount = countInsetPaths(filteredSvg);
@@ -166,8 +166,8 @@ describe('GeoPlot – inset marker', () => {
           location: 'bottom-right',
           features: ['Córdoba', 'Mendoza'],
           featurePartsFilter: (_part, feature) => feature.__id === 'Córdoba',
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     // Mendoza is matched by `features` but every one of its parts is
@@ -183,9 +183,9 @@ describe('GeoPlot – inset marker', () => {
       data: ARGENTINA_PROVINCES,
       featureId,
       markers: [
-        { type: 'inset', location: 'top-left', features: ['Córdoba'] } satisfies GeoMarker,
-        { type: 'inset', location: 'bottom-right', features: ['Mendoza'] } satisfies GeoMarker,
-      ],
+        { type: 'inset', location: 'top-left', features: ['Córdoba'] },
+        { type: 'inset', location: 'bottom-right', features: ['Mendoza'] },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countInsetPaths(svg)).toBe(2);

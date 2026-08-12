@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import DotMarker from '$lib/markers/DotMarker.svelte';
 import TextMarker from '$lib/markers/TextMarker.svelte';
-import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, WEATHER_STATIONS, type WeatherStation } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -44,7 +44,7 @@ export const WithDotMarker: Story = {
   args: {
     markers: [
       {
-        type: 'component',
+        type: 'geo-component',
         component: DotMarker,
         data: WEATHER_STATIONS,
         props: {
@@ -52,8 +52,8 @@ export const WithDotMarker: Story = {
           y: (d: WeatherStation) => d.lat,
           style: { dotFill: '#0891b2', dotRadius: 6 },
         },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };
 
@@ -62,7 +62,7 @@ export const WithTextMarker: Story = {
   args: {
     markers: [
       {
-        type: 'component',
+        type: 'geo-component',
         component: DotMarker,
         data: WEATHER_STATIONS,
         props: {
@@ -70,9 +70,9 @@ export const WithTextMarker: Story = {
           y: (d: WeatherStation) => d.lat,
           style: { dotFill: '#0891b2', dotRadius: 4 },
         },
-      } satisfies GeoMarker,
+      },
       {
-        type: 'component',
+        type: 'geo-component',
         component: TextMarker,
         data: WEATHER_STATIONS,
         props: {
@@ -81,7 +81,7 @@ export const WithTextMarker: Story = {
           text: (d: WeatherStation) => d.city,
           style: { dy: -10, fontWeight: 'bold' },
         },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };

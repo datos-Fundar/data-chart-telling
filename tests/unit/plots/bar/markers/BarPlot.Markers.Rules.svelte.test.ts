@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
-import type { Marker } from '$lib/types/markers/common';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { FEMALE_LIFE_EXPECTANCY_BY_PROVINCE } from '../../../../../stories/plots/bar/data';
 import { waitForSvg } from '../../_helpers/svg';
 
@@ -13,7 +13,7 @@ describe('BarPlot – markers.rules', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'rule', axis: 'x', value: 'Córdoba' } satisfies Marker],
+      markers: [{ type: 'rule', axis: 'x', value: 'Córdoba' }] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-x line').length).toBe(1);
@@ -24,7 +24,7 @@ describe('BarPlot – markers.rules', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'rule', axis: 'y', value: 82 } satisfies Marker],
+      markers: [{ type: 'rule', axis: 'y', value: 82 }] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-y line').length).toBe(1);
@@ -36,9 +36,9 @@ describe('BarPlot – markers.rules', () => {
       height: 300,
       series: [FEMALE],
       markers: [
-        { type: 'rule', axis: 'x', value: 'Córdoba' } satisfies Marker,
-        { type: 'rule', axis: 'x', value: 'Tucumán' } satisfies Marker,
-      ],
+        { type: 'rule', axis: 'x', value: 'Córdoba' },
+        { type: 'rule', axis: 'x', value: 'Tucumán' },
+      ] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-x line').length).toBe(2);
@@ -50,9 +50,9 @@ describe('BarPlot – markers.rules', () => {
       height: 300,
       series: [FEMALE],
       markers: [
-        { type: 'rule', axis: 'x', value: 'Córdoba' } satisfies Marker,
-        { type: 'rule', axis: 'y', value: 82 } satisfies Marker,
-      ],
+        { type: 'rule', axis: 'x', value: 'Córdoba' },
+        { type: 'rule', axis: 'y', value: 82 },
+      ] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-x line').length).toBe(1);
@@ -64,7 +64,7 @@ describe('BarPlot – markers.rules', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'rule', axis: 'x', value: 'Córdoba', style: { stroke: '#e11d48' } } satisfies Marker],
+      markers: [{ type: 'rule', axis: 'x', value: 'Córdoba', style: { stroke: '#e11d48' } }] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     const line = svg.querySelector('g.rule-x line');

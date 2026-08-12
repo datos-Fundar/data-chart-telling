@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { Marker } from '$lib/types/markers/common';
+import type { LineMarkersConfig } from '$lib/types/markers/line';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
 import { FEMALE_LIFE_EXPECTANCY, LIFE_EXPECTANCY } from '../../../../../stories/plots/line/data';
@@ -19,7 +19,7 @@ describe('LinePlot – markers.hover', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'hover' } satisfies Marker],
+      markers: [{ type: 'hover' }] satisfies LineMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countDotMarks(svg)).toBe(0);
@@ -34,7 +34,7 @@ describe('LinePlot – markers.hover', () => {
       x: 'year',
       y: 'value',
       z: 'sex',
-      markers: [{ type: 'hover', series: 'female' } satisfies Marker],
+      markers: [{ type: 'hover', series: 'female' }] satisfies LineMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
@@ -52,7 +52,7 @@ describe('LinePlot – markers.hover', () => {
       height: 300,
       series: [FEMALE],
       segments,
-      markers: [{ type: 'hover', series: 'female', scope: 'segment' } satisfies Marker],
+      markers: [{ type: 'hover', series: 'female', scope: 'segment' }] satisfies LineMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
@@ -63,7 +63,7 @@ describe('LinePlot – markers.hover', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'hover', ruleX: false, ruleY: false } satisfies Marker],
+      markers: [{ type: 'hover', ruleX: false, ruleY: false }] satisfies LineMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
@@ -80,8 +80,8 @@ describe('LinePlot – markers.hover', () => {
           dotStyle: { dotRadius: 6, dotFill: '#e11d48' },
           fontStyle: { fontSize: 14 },
           ruleStyle: { strokeDasharray: '2 2' },
-        } satisfies Marker,
-      ],
+        },
+      ] satisfies LineMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
@@ -96,8 +96,8 @@ describe('LinePlot – markers.hover', () => {
         {
           type: 'hover',
           format: (point) => `${point.x}: ${point.y}`,
-        } satisfies Marker,
-      ],
+        },
+      ] satisfies LineMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();

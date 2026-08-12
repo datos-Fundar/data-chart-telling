@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, WEATHER_STATIONS } from '../../../../../stories/plots/geo/data';
 import { waitForSvg, countContourPaths } from '../../_helpers/svg';
 
@@ -20,8 +20,8 @@ describe('GeoPlot – contour marker', () => {
           y: 'lat',
           value: 'tempC',
           thresholds: 6,
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countContourPaths(svg)).toBeGreaterThan(0);
@@ -41,8 +41,8 @@ describe('GeoPlot – contour marker', () => {
           y: 'lat',
           value: 'tempC',
           thresholds: [15, 20, 25, 30],
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countContourPaths(svg)).toBeGreaterThan(0);
@@ -64,8 +64,8 @@ describe('GeoPlot – contour marker', () => {
           thresholds: 6,
           fill: 'value',
           blur: 2,
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, WORLD_TEMPERATURE } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -61,8 +61,8 @@ export const TemperatureBands: Story = {
         thresholds: 9,
         stroke: 'value',
         style: { strokeWidth: 1.5, strokeOpacity: 0.8 },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };
 
@@ -89,8 +89,8 @@ export const FilledBands: Story = {
         fill: 'value',
         blur: 2,
         style: { fillOpacity: 0.6, strokeOpacity: 0 },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };
 
@@ -107,8 +107,8 @@ export const ExplicitThresholds: Story = {
         thresholds: [-20, -10, 0, 10, 20, 30],
         stroke: 'value',
         style: { strokeWidth: 2 },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };
 
@@ -138,8 +138,8 @@ export const ClippedToLand: Story = {
         fill: 'value',
         blur: 2,
         style: { fillOpacity: 0.8, strokeOpacity: 0 },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };
 
@@ -160,7 +160,7 @@ export const ClippedToOcean: Story = {
         fill: 'value',
         blur: 2,
         style: { fillOpacity: 0.8, strokeOpacity: 0 },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };

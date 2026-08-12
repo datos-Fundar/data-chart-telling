@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
-import type { Marker } from '$lib/types/markers/common';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import {
   FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
   MALE_LIFE_EXPECTANCY_BY_PROVINCE,
@@ -64,8 +64,8 @@ export const Basic: Story = {
     markers: [
       {
         type: 'hover',
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -87,8 +87,8 @@ export const WithoutLabels: Story = {
       {
         type: 'hover',
         showLabels: false,
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -110,8 +110,8 @@ export const WithoutRule: Story = {
       {
         type: 'hover',
         ruleX: false,
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -135,8 +135,8 @@ export const WithBothAxis: Story = {
         type: 'hover',
         ruleX: true,
         ruleY: true,
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -163,8 +163,8 @@ export const WithCustomRuleStyle: Story = {
           strokeWidth: 2,
           strokeDasharray: '6 3',
         },
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -194,8 +194,8 @@ export const TwoSeries: Story = {
         fontStyle: {
           dy: -10,
         }
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -226,8 +226,8 @@ export const SeriesScoped: Story = {
       {
         type: 'hover',
         series: 'female',
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -247,8 +247,8 @@ export const FromGroupedData: Story = {
         fontStyle: {
           dy: -10,
         }
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -266,8 +266,8 @@ export const OverlapedSeriesScoped: Story = {
       {
         type: 'hover',
         series: 'female',
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -288,8 +288,8 @@ export const GroupedSeries: Story = {
     markers: [
       {
         type: 'hover',
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -310,7 +310,7 @@ export const StackedSeries: Story = {
     markers: [
       {
         type: 'hover',
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };

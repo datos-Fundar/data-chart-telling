@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, EARTHQUAKES } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -36,7 +36,7 @@ type Story = StoryObj<typeof meta>;
 export const Basic: Story = {
   args: {
     data: WORLD_COUNTRIES,
-    markers: [{ type: 'graticule' } satisfies GeoMarker],
+    markers: [{ type: 'graticule' }] satisfies GeoMarkersConfig[],
   },
 };
 
@@ -50,8 +50,8 @@ export const CustomStepAndStyle: Story = {
         type: 'graticule',
         step: 20,
         style: { stroke: '#94a3b8', strokeOpacity: 0.5, strokeDasharray: '2 2' },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };
 
@@ -74,9 +74,9 @@ export const SphereOutline: Story = {
         type: 'sphere',
         behind: true,
         style: { fill: '#eff6ff', stroke: 'currentColor', strokeWidth: 1 },
-      } satisfies GeoMarker,
-      { type: 'graticule', style: { stroke: '#cbd5e1', strokeOpacity: 0.6 } } satisfies GeoMarker,
-    ],
+      },
+      { type: 'graticule', style: { stroke: '#cbd5e1', strokeOpacity: 0.6 } },
+    ] satisfies GeoMarkersConfig[],
   },
 };
 
@@ -90,8 +90,8 @@ export const WithEarthquakeDots: Story = {
     data: WORLD_COUNTRIES,
     coordinates: { projection: { type: 'orthographic', rotate: [65, 15] }, zoom: true },
     markers: [
-      { type: 'sphere', behind: true, style: { fill: '#f8fafc', stroke: 'currentColor' } } satisfies GeoMarker,
-      { type: 'graticule', style: { stroke: '#e2e8f0' } } satisfies GeoMarker,
+      { type: 'sphere', behind: true, style: { fill: '#f8fafc', stroke: 'currentColor' } },
+      { type: 'graticule', style: { stroke: '#e2e8f0' } },
       {
         type: 'dot',
         data: EARTHQUAKES,
@@ -99,7 +99,7 @@ export const WithEarthquakeDots: Story = {
         y: 'lat',
         r: (d) => Math.max(3, (d as { magnitude: number }).magnitude * 2),
         style: { dotFill: '#dc2626', dotFillOpacity: 0.6, dotStroke: '#7f1d1d' },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };

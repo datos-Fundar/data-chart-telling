@@ -1,5 +1,4 @@
 import type { AxisValue } from '$lib/types/layout/scales';
-import type { Marker, HoverMarkerConfig } from '$lib/types/markers/common';
 import type {
   HoverStore,
   HoverStrategy,
@@ -71,38 +70,39 @@ export function resolveTooltip<TRow extends Record<string, unknown>>(
 }
 
 /**
- * Resolve the strategy that should drive the shared hover store:
- * the tooltip's own `strategy` wins when tooltip text is enabled, else the first
- * hover marker's `strategy`, else the chart kind's default.
+ * Resolve the strategy that should drive the shared hover store: the
+ * tooltip's own `strategy` wins, else the first hover marker's `strategy`,
+ * else the chart kind's default. Generic over the caller's own marker union,
+ * like {@link findHoverMarker}.
  */
-export function resolveHoverStrategy(
+export function resolveHoverStrategy<T extends { type: string }>(
   tooltipStrategy: HoverStrategy | undefined,
-  markers: Marker[] | undefined,
+  markers: T[] | undefined,
   defaultStrategy: HoverStrategy,
 ): HoverStrategy {
-  return tooltipStrategy ?? findHoverMarker(markers)?.strategy ?? defaultStrategy;
+  const marker = findHoverMarker(markers) as { strategy?: HoverStrategy } | undefined;
+  return tooltipStrategy ?? marker?.strategy ?? defaultStrategy;
 }
 
-/**
- * Resolve whether the hover should be broadcast across facets:
- * the tooltip's own `sync` wins when tooltip text is enabled, else the first
- * hover marker's `sync`, else false.
- */
-export function resolveHoverSync(
+/** Resolve whether the hover should be broadcast across facets. Generic — see {@link resolveHoverStrategy}. */
+export function resolveHoverSync<T extends { type: string }>(
   tooltipSync: boolean | undefined,
-  markers: Marker[] | undefined,
+  markers: T[] | undefined,
 ): boolean {
-  return tooltipSync ?? findHoverMarker(markers)?.sync ?? false;
+  const marker = findHoverMarker(markers) as { sync?: boolean } | undefined;
+  return tooltipSync ?? marker?.sync ?? false;
 }
 
-/** Whether any marker in the list is a hover marker. */
-export function hasHoverMarker(markers: Marker[] | undefined): boolean {
-  return (markers ?? []).some((m) => m.type === 'hover');
+/** Whether any marker in the list is a hover marker — axis-based (`'hover'`) or geo (`'geo-hover'`). */
+export function hasHoverMarker(markers: { type: string }[] | undefined): boolean {
+  return (markers ?? []).some((m) => m.type === 'hover' || m.type === 'geo-hover');
 }
 
-/** First hover marker in the list, if any. */
-export function findHoverMarker(markers: Marker[] | undefined): HoverMarkerConfig | undefined {
-  return (markers ?? []).find((m): m is HoverMarkerConfig => m.type === 'hover');
+/** First hover marker in the list, if any — generic over the caller's own marker union. */
+export function findHoverMarker<T extends { type: string }>(
+  markers: T[] | undefined,
+): Extract<T, { type: 'hover' }> | undefined {
+  return (markers ?? []).find((m): m is Extract<T, { type: 'hover' }> => m.type === 'hover');
 }
 
 /** Narrow matched points down to a named subset of series (no-op if `series` is empty/undefined). */

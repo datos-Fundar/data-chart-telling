@@ -17,24 +17,22 @@
   import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
   import type { HoverPoint } from '$lib/types/layout/tooltip';
   import type { MarginConfig, HoverConfig } from '$lib/types/plots/props';
-  import type { Marker } from '$lib/types/markers/common';
+  import type { MarkerConfig } from '$lib/types/markers/all';
   import type { Series } from '$lib/types/plots/data/common';
+  import type { GeoFeature } from '$lib/types/plots/data/geo';
 
   type SveltePlotProps = ComponentProps<typeof Plot>;
 
   /**
-   * Shared chrome around every plot kind's svelteplot markup: the pointer-event
-   * wrapper, the hover/tooltip state machine, and the floating tooltip.
-   * Composes the Coordinates and Styles layers around every plot kind's own
-   * content — a no-op identity transform and no embellishments unless the
-   * caller passes `coordinates`/`styles` (currently only `GeoPlot` does).
-   * Axis-having plot kinds (line/bar/heatmap/pyramid) additionally get
-   * `ScalesLayout`/`GeometryLayout` composed automatically by passing their
-   * own `markers` (even `[]`) — `GeoPlot` omits it and renders its own marks
-   * directly through `children` instead, since it has no `Marker`/
-   * `GeometryLayout` routing today. Every plot kind supplies its own
-   * `<Plot x y projection>` scale config (either directly via `x`/`y`, or by
-   * leaving `x`/`y` unset so this component derives them from `scales`).
+   * Shared chrome around every plot kind's svelteplot markup: the
+   * pointer-event wrapper, the hover/tooltip state machine, and the floating
+   * tooltip. Composes the Coordinates and Styles layers around every plot
+   * kind's own content, plus `GeometryLayout` (which renders nothing extra
+   * when `markers` is empty/unset). `ScalesLayout` composes in
+   * independently, only when `scales` is passed. Every plot kind supplies
+   * its own `<Plot x y projection>` scale config, either directly via
+   * `x`/`y` or by leaving them unset so this component derives them from
+   * `scales`.
    */
   let {
     width,
@@ -54,12 +52,13 @@
     markers = undefined,
     seriesData = undefined,
     scopedGroups = undefined,
+    geoAllFeatures = undefined,
     containerEl = $bindable(undefined),
     children,
   }: {
     width: number;
     height: number;
-    /** Flat rows fed to svelteplot's `<Pointer>` for nearest-point matching. */
+    /** Flat rows fed to svelteplot's `<Pointer>` for nearest-point matching, and to `CoordinatesLayout` for a `domain: 'data'` projection auto-fit. */
     data: TData[];
     getX: (d: TData) => AxisValue;
     getY: (d: TData) => AxisValue;
@@ -82,46 +81,35 @@
     /** This plot kind's own `styles` prop, forwarded to the Styles layer. */
     styles?: StylesLayoutConfig;
     /**
-     * This plot kind's own markers array — presence switches on the built-in
-     * `ScalesLayout`/`GeometryLayout` composition (see this component's own
-     * doc). Accepts a plain array, or a builder function for a plot kind
-     * whose own marker construction needs `setHoverMatch`/`clearHoverMatch`
-     * (e.g. `BarPlot`'s hit-area markers) — those only exist once this
-     * component's own hover controller is set up, unlike everything else a
-     * `Plot.svelte` already has at its own top level.
+     * This plot kind's own markers array. Accepts a plain array, or a
+     * builder function for a plot kind whose own marker construction needs
+     * `setHoverMatch`/`clearHoverMatch`, only available once this
+     * component's own hover controller is set up.
      */
-    markers?: Marker[] | ((hover: { setHoverMatch: (rows: TData[]) => void; clearHoverMatch: () => void }) => Marker[]);
-    /**
-     * All resolved series, forwarded to `GeometryLayout` — axis-based kinds
-     * only. Independently generic over `TSeries` (defaults to `TData`)
-     * because a plot kind's own series rows aren't always the same shape as
-     * `data`/`getX`/`getY` (e.g. `PyramidPlot` tags its `data` rows with
-     * internal `__x`/`__y`/… fields for hover-quadtree-clone survival, but
-     * its series still carry the plain untagged row shape).
-     */
+    markers?:
+      | MarkerConfig[]
+      | ((hover: { setHoverMatch: (rows: TData[]) => void; clearHoverMatch: () => void }) => MarkerConfig[]);
+    /** All resolved series, forwarded to `GeometryLayout` — axis-based kinds only. Independently generic over `TSeries` (defaults to `TData`). */
     seriesData?: Series<TSeries>[];
     /** Per-series `GeometryLayout` groups — axis-based kinds only, same `TSeries` as `seriesData`. */
     scopedGroups?: ScopedMarkerGroup<TSeries>[];
+    /** `GeoPlot`'s own untouched, tagged features, forwarded to `GeometryLayout` — `inset` marker only. */
+    geoAllFeatures?: (GeoFeature<Record<string, unknown>> & { __id: string })[];
     /** The wrapper div's own element — bind for a nested layout that needs it for its own gesture handling (e.g. `CoordinatesLayout`'s zoom/rotate). */
     containerEl?: HTMLDivElement;
     /**
-     * `matchedPoints` carries the source `row` alongside the display fields
-     * — needed by plot kinds whose semantic value isn't tied to a fixed
-     * visual axis (e.g. `BarPlot`'s category, which can be drawn on either
-     * axis depending on orientation), so a template can resolve it straight
-     * off `row` instead of assuming which of `.x`/`.y` it landed on.
-     * `activePoint` is the one matched point actually under the cursor —
-     * read its `.x`/`.y` for the hover crosshair position; `impliesCrosshairX`/
-     * `impliesCrosshairY` tell the plot kind whether the active strategy
-     * implies a crosshair rule on each axis by default.
-     * `numericMargins` lets a nested layout align itself with the plot's own
-     * content box without recomputing margins itself.
-     * `setHoverMatch`/`clearHoverMatch` let a plot kind drive the match
-     * itself instead of svelteplot's distance-based `<Pointer>` — see
-     * `hover.match`. When `markers` is given, this is `GeometryLayout`'s own
-     * `children` (typically value labels) instead of raw plot content.
+     * `matchedPoints` carries the source `row` alongside the display fields,
+     * so a template can resolve it straight off `row` instead of assuming
+     * which visual axis it landed on. `activePoint` is the one matched point
+     * under the cursor. `numericMargins` lets a nested layout align itself
+     * with the plot's own content box. `setHoverMatch`/`clearHoverMatch` let
+     * a plot kind drive the match itself instead of svelteplot's
+     * distance-based `<Pointer>` — see `hover.pointMatching`. When `markers`
+     * is given, this is `GeometryLayout`'s own `children` instead of raw
+     * plot content. Optional — a plot kind whose every mark is a `markers`
+     * entry has nothing left to render here.
      */
-    children: Snippet<
+    children?: Snippet<
       [{
         matchedPoints: HoverPoint<TData>[];
         activePoint: HoverPoint<TData> | null;
@@ -177,21 +165,13 @@
   const localHover = createHover();
   const hoverStore = $derived(sharedHover ?? localHover);
 
-  /** Declared intent, defaulted — see {@link HoverConfig.match}. */
-  const matchStrategy = $derived(hover.match ?? 'nearest');
+  /** Declared intent, defaulted — see {@link HoverConfig.pointMatching}. */
+  const pointMatchingStrategy = $derived(hover.pointMatching ?? 'nearest');
 
   /**
-   * Which axes svelteplot's `<Pointer>` should search along — derived from
-   * the *active* strategy rather than taken as separate props. Passing
-   * `undefined` for an axis collapses every point to the same coordinate on
-   * that axis in the search quadtree, making the nearest-neighbor match
-   * ignore it entirely: `'x'` (line/bar) searches x only, `'y'` (pyramid —
-   * its category sits on y, and a bar's own magnitude on x shouldn't pull in
-   * a *different* row just because that row's bar tip is nearer in x)
-   * searches y only, and `'punctual'` (heatmap/geo's 2D grid) needs both.
-   * Reactive to `hoverStore.strategy`, so a caller overriding
-   * `hover.tooltip.strategy`/a hover marker's `strategy` away from the plot
-   * kind's default gets correctly-dimensioned matching too.
+   * Which axes svelteplot's `<Pointer>` should search along, derived from
+   * the active strategy. `undefined` for an axis collapses every point to
+   * the same coordinate on that axis, excluding it from the match entirely.
    */
   const pointerMatchX = $derived(hoverStore.strategy === 'y' ? undefined : getX);
   const pointerMatchY = $derived(hoverStore.strategy === 'x' ? undefined : getY);
@@ -225,6 +205,10 @@
   const resolvedMarkers = $derived(
     typeof markers === 'function' ? markers({ setHoverMatch: ctrl.onPointer, clearHoverMatch: ctrl.onLeave }) : markers,
   );
+
+  /** `hover.crosshair === false` forces both off, overriding the strategy-implied default — see {@link HoverConfig.crosshair}. */
+  const effectiveImpliesCrosshairX = $derived(hover.crosshair === false ? false : ctrl.impliesCrosshairX);
+  const effectiveImpliesCrosshairY = $derived(hover.crosshair === false ? false : ctrl.impliesCrosshairY);
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -247,40 +231,35 @@
     {containerEl}
   >
     <StylesLayout {styles} {width} {height} {numericMargins} />
-    {#if markers !== undefined}
+    {#if scales !== undefined}
       <ScalesLayout {data} {getX} {getY} {width} {height} {numericMargins} {scales} />
-      <GeometryLayout
-        markers={resolvedMarkers}
-        seriesData={seriesData ?? []}
-        scopedGroups={scopedGroups ?? []}
-        matchedPoints={ctrl.points}
-        activePoint={ctrl.activePoint}
-        impliesCrosshairX={ctrl.impliesCrosshairX}
-        impliesCrosshairY={ctrl.impliesCrosshairY}
-      >
-        {@render children({
-          matchedPoints: ctrl.points,
-          activePoint: ctrl.activePoint,
-          impliesCrosshairX: ctrl.impliesCrosshairX,
-          impliesCrosshairY: ctrl.impliesCrosshairY,
-          numericMargins,
-          setHoverMatch: ctrl.onPointer,
-          clearHoverMatch: ctrl.onLeave,
-        })}
-      </GeometryLayout>
-    {:else}
-      {@render children({
+    {/if}
+    <GeometryLayout
+      markers={resolvedMarkers}
+      seriesData={seriesData ?? []}
+      scopedGroups={scopedGroups ?? []}
+      matchedPoints={ctrl.points}
+      activePoint={ctrl.activePoint}
+      impliesCrosshairX={effectiveImpliesCrosshairX}
+      impliesCrosshairY={effectiveImpliesCrosshairY}
+      {width}
+      {height}
+      {numericMargins}
+      {data}
+      {geoAllFeatures}
+    >
+      {@render children?.({
         matchedPoints: ctrl.points,
         activePoint: ctrl.activePoint,
-        impliesCrosshairX: ctrl.impliesCrosshairX,
-        impliesCrosshairY: ctrl.impliesCrosshairY,
+        impliesCrosshairX: effectiveImpliesCrosshairX,
+        impliesCrosshairY: effectiveImpliesCrosshairY,
         numericMargins,
         setHoverMatch: ctrl.onPointer,
         clearHoverMatch: ctrl.onLeave,
       })}
-    {/if}
+    </GeometryLayout>
 
-    {#if hover.active && matchStrategy === 'nearest'}
+    {#if hover.active && pointMatchingStrategy === 'nearest'}
       <Pointer {data} x={pointerMatchX} y={pointerMatchY} maxDistance={400} onupdate={ctrl.onPointer} />
     {/if}
   </CoordinatesLayout>

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { Marker } from '$lib/types/markers/common';
+import type { LineMarkersConfig } from '$lib/types/markers/line';
 import {
   FEMALE_LIFE_EXPECTANCY,
   MALE_LIFE_EXPECTANCY,
@@ -64,8 +64,8 @@ export const Basic: Story = {
     markers: [
       {
         type: 'hover',
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };
 
@@ -87,8 +87,8 @@ export const WithoutLabels: Story = {
       {
         type: 'hover',
         showLabels: false,
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };
 
@@ -110,8 +110,8 @@ export const WithoutRule: Story = {
       {
         type: 'hover',
         ruleX: false,
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };
 
@@ -136,8 +136,8 @@ export const WithBothAxis: Story = {
         type: 'hover',
         ruleX: true,
         ruleY: true,
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };
 
@@ -164,8 +164,8 @@ export const WithCustomRuleStyle: Story = {
           strokeWidth: 2,
           strokeDasharray: '6 3'
         },
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };
 
@@ -192,8 +192,8 @@ export const TwoSeries: Story = {
     markers: [
       {
         type: 'hover',
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };
 
@@ -224,8 +224,8 @@ export const SeriesScoped: Story = {
       {
         type: 'hover',
         series: 'female',
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };
 
@@ -242,8 +242,8 @@ export const FromGroupedData: Story = {
     markers: [
       {
         type: 'hover',
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };
 
@@ -261,7 +261,7 @@ export const GroupedSeriesScoped: Story = {
       {
         type: 'hover',
         series: 'female',
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies LineMarkersConfig[],
   },
 };

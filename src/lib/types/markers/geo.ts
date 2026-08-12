@@ -1,11 +1,10 @@
 import type { Snippet } from 'svelte';
 import type { Accessor } from '$lib/types/plots/data/common';
-import type { ColorsStyle } from '$lib/types/layout/styles';
-import type { DotStyle, FontStyle, StrokeStyle } from '$lib/types/plots/styling';
-import type { HoverDisplayPoint } from '$lib/types/layout/tooltip';
+import type { AreaStyle, StrokeStyle } from '$lib/types/plots/styling';
 import type { GeoFeature, GeoJsonInput } from '$lib/types/plots/data/geo';
 import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
 import type { GeoProjectionName } from '$lib/types/layout/coordinates';
+import type { BaseMarkersConfig } from './base';
 
 /** Longitude/latitude gridlines — svelteplot's `Graticule`. */
 export type GeoGraticuleMarkerConfig = {
@@ -14,13 +13,7 @@ export type GeoGraticuleMarkerConfig = {
   stepX?: number;
   stepY?: number;
   style?: StrokeStyle;
-  /**
-   * Renders behind the base map's own fill/stroke instead of on top of it
-   * (markers otherwise always draw over the base map, regardless of their
-   * position in the `markers` array). Useful for a graticule meant to read
-   * as a faint background reference frame rather than an overlay obscuring
-   * the geometry above it.
-   */
+  /** Renders behind the base map's own fill/stroke instead of on top of it (markers otherwise draw over the base map). */
   behind?: boolean;
 };
 
@@ -28,30 +21,8 @@ export type GeoGraticuleMarkerConfig = {
 export type GeoSphereMarkerConfig = {
   type: 'sphere';
   style?: StrokeStyle & { fill?: string; fillOpacity?: number };
-  /**
-   * Renders behind the base map's own fill/stroke instead of on top of it —
-   * needed any time `style.fill` is set, since a filled sphere otherwise
-   * covers every feature drawn under it (the sphere is the full globe
-   * outline, larger than any geometry on it). Off by default so an
-   * unfilled/stroke-only sphere (the common case, tracing just the globe's
-   * edge) keeps drawing on top where it stays visible over ocean fills.
-   */
+  /** Renders behind the base map's own fill/stroke instead of on top of it — needed when `style.fill` is set. */
   behind?: boolean;
-};
-
-/**
- * Point markers by longitude/latitude, sized/colored by value —
- * svelteplot's `Dot`. https://svelteplot.dev/examples/dot/weather
- */
-export type GeoDotMarkerConfig<TRow extends Record<string, unknown> = Record<string, unknown>> = {
-  type: 'dot';
-  data: TRow[];
-  x: Accessor<TRow, number>;
-  y: Accessor<TRow, number>;
-  r?: Accessor<TRow, number> | number;
-  /** Continuous value used to color each dot through a ramp — see `style.colors`. */
-  value?: Accessor<TRow, number>;
-  style?: DotStyle & { colors?: ColorsStyle };
 };
 
 /**
@@ -106,38 +77,33 @@ export type GeoContourMarkerConfig<TRow extends Record<string, unknown> = Record
   blur?: number;
   interpolate?: 'none' | 'nearest' | 'barycentric' | 'random-walk';
   style?: { strokeWidth?: number; fillOpacity?: number; strokeOpacity?: number };
-  /**
-   * Masks the contour to just the base map's landmass (`'land'`) or just
-   * its water (`'ocean'`) — e.g. a temperature contour that should only
-   * shade land, leaving the ocean bare (or the reverse).
-   */
+  /** Masks the contour to just the base map's landmass (`'land'`) or water (`'ocean'`). */
   clip?: 'land' | 'ocean';
-  /**
-   * Renders behind the base map's own fill/stroke instead of on top of it —
-   * lets a filled contour read as background shading with the base map's
-   * feature borders drawn crisply over it, rather than the contour
-   * obscuring them.
-   */
+  /** Renders behind the base map's own fill/stroke instead of on top of it. */
   behind?: boolean;
 };
 
 /**
- * The in-map hover highlight. `strategy` chooses which candidate point set
- * drives matching: `'nearest-feature'` (base-map feature centroids —
- * choropleth-style hover) or `'nearest-point'` (a `dot` marker's own rows).
+ * The in-map hover highlight — restyles the hovered feature's own shape.
+ * Its own `type: 'geo-hover'` tag (rather than the axis-based `'hover'`)
+ * keeps it unambiguous: both configs are all-optional, so an author writing
+ * `{ type: 'hover' }` for a `GeoPlot` would otherwise be structurally
+ * indistinguishable from the axis-based marker.
  */
 export type GeoHoverMarkerConfig = {
-  type: 'hover';
-  strategy?: 'nearest-feature' | 'nearest-point';
-  showLabels?: boolean;
-  format?: (point: HoverDisplayPoint) => string;
-  dotStyle?: DotStyle;
-  fontStyle?: FontStyle;
+  type: 'geo-hover';
+  style?: AreaStyle;
 };
 
-/** Mounts an arbitrary Svelte component as a mark — the geo analog of `CustomComponentMarkerConfig` (no `series` concept here). */
+/**
+ * Mounts an arbitrary Svelte component as a mark — the geo analog of
+ * `CustomComponentMarkerConfig` (no `series` concept here). Its own
+ * `type: 'geo-component'` tag (rather than the axis-based `'component'`)
+ * keeps the two unambiguous at `GeometryLayout`'s dispatch — same reasoning
+ * as `GeoHoverMarkerConfig`'s `'geo-hover'` tag.
+ */
 export type GeoCustomComponentMarkerConfig = {
-  type: 'component';
+  type: 'geo-component';
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   component: any;
   props?: Record<string, unknown>;
@@ -146,11 +112,10 @@ export type GeoCustomComponentMarkerConfig = {
 };
 
 /**
- * Which edge of the plot frame an inset is anchored to, and where along that
- * edge — a `side-anchor` pair joined by `-`, in either word order (so
- * `'bottom-right'` and `'right-bottom'` are the same corner). `side` is
- * `top`/`bottom`/`left`/`right`; `anchor` is the same four plus `middle`
- * (e.g. `'right-middle'` centers the inset vertically along the right edge).
+ * Which edge of the plot frame an inset is anchored to, and where along it
+ * — a `side-anchor` pair in either word order (`'bottom-right'` ==
+ * `'right-bottom'`). `side` is `top`/`bottom`/`left`/`right`; `anchor` is
+ * the same four plus `middle`.
  */
 export type GeoInsetLocation =
   | 'top-left'
@@ -171,24 +136,13 @@ export type GeoInsetLocation =
   | 'bottom-right'
   | 'right-bottom';
 
-/**
- * Named projections an `inset` marker can use for its own independently-fit
- * mini-map — everything `GeoProjectionName` offers except `'identity'`/
- * `'reflect-y'`, which have no scale/translate of their own to fit (see
- * `GeoProjectionConfig.domain`'s doc comment) and so can't auto-fit the way
- * every inset needs to.
- */
+/** Named projections an `inset` marker can use, minus `'identity'`/`'reflect-y'`, which have no scale/translate to auto-fit. */
 export type GeoInsetProjectionName = Exclude<GeoProjectionName, 'identity' | 'reflect-y'>;
 
 /**
  * Independent hover tooltip scoped to just one `inset` marker's own rendered
- * features. Matched by nearest projected centroid within the inset's own
- * local mini-projection/box — entirely decoupled from the plot's own
- * top-level `tooltip`, which only ever matches the main map's own features
- * (an inset draws in its own coordinate space, at its own scale, so the
- * main map's hover has no way to reach it). No `facetId`/`sync`/`strategy`
- * here, unlike the top-level `TooltipConfig` — an inset never broadcasts
- * its hover to other facets and always matches punctually.
+ * features, matched by nearest projected centroid within the inset's own
+ * local mini-projection. Decoupled from the plot's own top-level `tooltip`.
  */
 export type GeoInsetTooltipConfig = {
   /** Tooltip text for the nearest feature (by centroid) to the cursor, within this inset. */
@@ -210,15 +164,10 @@ export type GeoInsetProjectionConfig =
 
 /**
  * A small, independently-projected map panel anchored to a corner/edge of
- * the plot — for showing a region at a different, more legible scale than
- * the main map (a disjoint territory, a dense metro area, etc.), the way
- * national mapping agencies commonly draw insets for exactly this reason.
- *
- * What it shows is either a filtered subset of the plot's own `data` (via
- * `features`, matched the same way `segments` keys are) or a wholly
- * separate dataset (`data`, which takes precedence over `features` when
- * both are given) — the inset's own mini-projection is fit to whichever one
- * applies, independently of the main map's projection/zoom.
+ * the plot, showing a region at a different scale than the main map. Shows
+ * either a filtered subset of the plot's own `data` (via `features`) or a
+ * wholly separate dataset (`data`, which takes precedence when both are
+ * given).
  */
 export type GeoInsetMarkerConfig<TProps extends Record<string, unknown> = Record<string, unknown>> = {
   type: 'inset';
@@ -226,13 +175,10 @@ export type GeoInsetMarkerConfig<TProps extends Record<string, unknown> = Record
   /** Feature ids (matching the plot's own `featureId`) to filter from the plot's own `data`. Ignored when `data` is set. */
   features?: string[];
   /**
-   * Narrows each `features`-matched feature down to just the geometry parts
-   * that pass this predicate (each polygon of a `MultiPolygon`, each line of
-   * a `MultiLineString`) — same `(part, feature)` signature as
-   * `GeoDataProps.excludeParts`, so the same predicate can be passed to both
-   * to split one feature's geometry between the main map and this inset
-   * without preprocessing the source data. Omitted → every part of each
-   * matched feature renders, as before. Ignored when `data` is set.
+   * Narrows each `features`-matched feature to just the geometry parts that
+   * pass this predicate — same signature as `GeoDataProps.excludeParts`, so
+   * one feature's geometry can be split between the main map and this inset.
+   * Ignored when `data` is set.
    */
   featurePartsFilter?: (
     part: { centroid: [number, number]; geometry: GeoJSON.Geometry },
@@ -252,13 +198,39 @@ export type GeoInsetMarkerConfig<TProps extends Record<string, unknown> = Record
   tooltip?: GeoInsetTooltipConfig;
 };
 
-export type GeoMarker =
+/**
+ * `GeoPlot`'s own `markers` prop type — unions {@link BaseMarkersConfig} with
+ * every geo-only kind. Independent of `AxisBasedMarkersConfig`
+ * (`types/markers/common.ts`): geo has no axis to `rule` against, and its
+ * `hover`/`component` variants differ in shape from the axis-based kinds'.
+ */
+export type GeoMarkersConfig =
+  | BaseMarkersConfig
   | GeoGraticuleMarkerConfig
   | GeoSphereMarkerConfig
-  | GeoDotMarkerConfig
   | GeoVectorMarkerConfig
   | GeoLinkMarkerConfig
   | GeoContourMarkerConfig
   | GeoHoverMarkerConfig
   | GeoCustomComponentMarkerConfig
   | GeoInsetMarkerConfig;
+
+/**
+ * The base choropleth/base-map mark — one per distinct resolved feature
+ * style. Never author-facing: `buildGeoMarkers` builds it from `GeoPlot`'s
+ * own `styleGroups`.
+ */
+export type GeoFeaturesMarkerConfig = {
+  type: 'geo';
+  data: Record<string, unknown>[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fill: (d: any) => string;
+  fillOpacity?: number;
+  stroke?: string;
+  strokeWidth?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onclick?: (e: Event, d: any) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onpointerenter?: (e: Event, d: any) => void;
+  onpointerleave?: (e: Event) => void;
+};

@@ -1,4 +1,4 @@
-import type { StrokeStyle, DotStyle, FontStyle } from '$lib/types/plots/styling';
+import type { StrokeStyle, DotStyle, FontStyle, AreaStyle } from '$lib/types/plots/styling';
 
 export type TextStyle = {
   /** font-family */
@@ -109,8 +109,8 @@ export type ChartConfig = {
   };
   /** Timeline gutter styling. */
   timeline: { axisColor: string; activeColor: string; thickness: number };
-  /** In-SVG hover highlight (crosshair rule, dot, and value label). */
-  hover: { rule: StrokeStyle; dot: DotStyle; font: FontStyle };
+  /** In-SVG hover highlight: crosshair rule, dot + value label, and geo feature restyle. */
+  hover: { rule: StrokeStyle; dot: DotStyle; font: FontStyle; area: AreaStyle };
 };
 
 /** Deep-partial input accepted by `setConfiguration`. */

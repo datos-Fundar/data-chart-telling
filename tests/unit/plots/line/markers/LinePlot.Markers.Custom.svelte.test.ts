@@ -4,7 +4,7 @@ import LinePlot from '$lib/plots/line/Plot.svelte';
 import DotMarker from '$lib/markers/DotMarker.svelte';
 import TextMarker from '$lib/markers/TextMarker.svelte';
 import PeakMarker from '$lib/markers/PeakMarker.svelte';
-import type { Marker } from '$lib/types/markers/common';
+import type { LineMarkersConfig } from '$lib/types/markers/line';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
 import type { YearPoint } from '../../../../../stories/plots/line/data';
@@ -26,8 +26,8 @@ describe('LinePlot – markers.custom (component)', () => {
           series: 'female',
           component: DotMarker,
           props: { x: (d: YearPoint) => d.year, y: (d: YearPoint) => d.value },
-        } satisfies Marker,
-      ],
+        },
+      ] satisfies LineMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countDotMarks(svg)).toBe(FEMALE_LIFE_EXPECTANCY.length);
@@ -48,8 +48,8 @@ describe('LinePlot – markers.custom (component)', () => {
             y: (d: YearPoint) => d.value,
             text: (d: YearPoint) => String(d.value),
           },
-        } satisfies Marker,
-      ],
+        },
+      ] satisfies LineMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countTextLabels(svg)).toBe(FEMALE_LIFE_EXPECTANCY.length);
@@ -66,8 +66,8 @@ describe('LinePlot – markers.custom (component)', () => {
           series: 'female',
           component: DotMarker,
           props: { x: (d: YearPoint) => d.year, y: (d: YearPoint) => d.value },
-        } satisfies Marker,
-      ],
+        },
+      ] satisfies LineMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     // Only female's points get dots — male has none.
@@ -85,8 +85,8 @@ describe('LinePlot – markers.custom (component)', () => {
           series: 'female',
           component: PeakMarker,
           props: { xProp: 'year', yProp: 'value', mode: 'max', label: 'Max' },
-        } satisfies Marker,
-      ],
+        },
+      ] satisfies LineMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     // One dot + one label for the single peak point.
@@ -113,8 +113,8 @@ describe('LinePlot – markers.custom (component)', () => {
           scope: 'segment',
           component: PeakMarker,
           props: { xProp: 'year', yProp: 'value', mode: 'max', label: 'Max' },
-        } satisfies Marker,
-      ],
+        },
+      ] satisfies LineMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     // Two segments → two peaks highlighted.

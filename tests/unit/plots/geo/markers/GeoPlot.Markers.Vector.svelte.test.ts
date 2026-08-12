@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, POPULATION_SHIFT } from '../../../../../stories/plots/geo/data';
 import { waitForSvg, countVectorMarks } from '../../_helpers/svg';
 
@@ -20,8 +20,8 @@ describe('GeoPlot – vector marker', () => {
           y: 'lat',
           length: 'magnitude',
           rotate: 'direction',
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countVectorMarks(svg)).toBe(POPULATION_SHIFT.length);
@@ -42,8 +42,8 @@ describe('GeoPlot – vector marker', () => {
           length: 'magnitude',
           rotate: 'direction',
           shape,
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countVectorMarks(svg)).toBe(POPULATION_SHIFT.length);

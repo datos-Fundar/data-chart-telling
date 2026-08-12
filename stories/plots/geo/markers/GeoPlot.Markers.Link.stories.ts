@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, FLIGHT_ROUTES } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -52,8 +52,8 @@ export const SphericalLinks: Story = {
         x2: 'toLon',
         y2: 'toLat',
         style: { stroke: '#dc2626', strokeWidth: 1.5, strokeOpacity: 0.8 },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };
 
@@ -75,8 +75,8 @@ export const LinearLinks: Story = {
         y2: 'toLat',
         curve: 'linear',
         style: { stroke: '#0891b2', strokeWidth: 1.5, strokeOpacity: 0.8 },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };
 
@@ -92,8 +92,8 @@ export const OnOrthographicGlobe: Story = {
   args: {
     coordinates: { projection: { type: 'orthographic', rotate: [60, -10] }, zoom: true },
     markers: [
-      { type: 'sphere', behind: true, style: { fill: '#f8fafc', stroke: 'currentColor' } } satisfies GeoMarker,
-      { type: 'graticule', style: { stroke: '#e2e8f0' } } satisfies GeoMarker,
+      { type: 'sphere', behind: true, style: { fill: '#f8fafc', stroke: 'currentColor' } },
+      { type: 'graticule', style: { stroke: '#e2e8f0' } },
       {
         type: 'link',
         data: FLIGHT_ROUTES,
@@ -102,7 +102,7 @@ export const OnOrthographicGlobe: Story = {
         x2: 'toLon',
         y2: 'toLat',
         style: { stroke: '#dc2626', strokeWidth: 1.5 },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };

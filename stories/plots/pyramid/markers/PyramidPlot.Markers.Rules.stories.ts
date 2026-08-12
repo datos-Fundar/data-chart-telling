@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-import type { Marker } from '$lib/types/markers/common';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../data/population-pyramid';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -52,8 +52,8 @@ export const WithRuleXMarker: Story = {
           strokeDasharray: '4 4',
           strokeOpacity: 0.7,
         },
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -78,7 +78,7 @@ export const MultipleThresholdMarkers: Story = {
           strokeDasharray: '6 4',
           strokeOpacity: 0.6,
         },
-      } satisfies Marker,
+      },
       {
         type: 'rule',
         axis: 'x',
@@ -88,8 +88,8 @@ export const MultipleThresholdMarkers: Story = {
           strokeDasharray: '4 4',
           strokeOpacity: 0.6,
         },
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -115,7 +115,7 @@ export const SymmetricMarkers: Story = {
           strokeWidth: 1.5,
           strokeOpacity: 0.5,
         },
-      } satisfies Marker,
+      },
       {
         type: 'rule',
         axis: 'x',
@@ -125,8 +125,8 @@ export const SymmetricMarkers: Story = {
           strokeWidth: 1.5,
           strokeOpacity: 0.5,
         },
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -152,8 +152,8 @@ export const AverageMarker: Story = {
           strokeDasharray: '2 4',
           strokeOpacity: 0.7,
         },
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -179,7 +179,7 @@ export const PolicyThresholdMarker: Story = {
           strokeDasharray: '3 3',
           strokeOpacity: 0.8,
         },
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };

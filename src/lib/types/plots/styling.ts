@@ -56,8 +56,8 @@ export type DotStyle = {
   dotStrokeDasharray?: string | LineStyle;
 };
 
-/** Styling for a rectangular mark — a bar segment, a bar-shaped hover highlight. */
-export type BarStyle = {
+/** Styling for a 2D area mark — a bar segment, a heatmap cell, a geo feature highlight. */
+export type AreaStyle = {
   fill?: string;
   fillOpacity?: number;
   stroke?: string;

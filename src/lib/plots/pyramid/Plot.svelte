@@ -16,7 +16,7 @@
   import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
   import type { ValueAnchor } from '$lib/types/plots/constants';
   import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
-  import type { Marker } from '$lib/types/markers/common';
+  import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
   /**
    * A population-pyramid-style diverging bar chart: each series is mirrored
@@ -39,7 +39,7 @@
     TData,
     BasePlotStylesConfig,
     BarSegmentStyle,
-    Marker,
+    AxisBasedMarkersConfig,
     AxisBasedScalesConfig<TData>
   >;
 

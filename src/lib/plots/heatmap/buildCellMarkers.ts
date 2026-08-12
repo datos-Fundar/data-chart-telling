@@ -29,6 +29,9 @@ export function buildCellMarkers<TData extends Record<string, unknown>>(args: {
       fillOpacity: group.style.fillOpacity ?? 1,
       stroke: group.style.stroke,
       strokeWidth: group.style.strokeWidth ?? 0,
+      strokeOpacity: group.style.strokeOpacity,
+      strokeDasharray: group.style.strokeDasharray,
+      borderRadius: group.style.borderRadius,
     },
     inset: 0.5,
   }));

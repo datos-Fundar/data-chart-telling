@@ -3,7 +3,7 @@ import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import RichTooltip from './RichTooltip.svelte';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 import { ARGENTINA_PROVINCES, CABA_COMUNAS, type ArgentinaProvinceProps, type CabaComunaProps } from './data';
-import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -153,7 +153,7 @@ export const TooltipOnInsets: Story = {
             return `Comuna ${comuna}\n${barrios}`;
           },
         },
-      } satisfies GeoMarker,
+      },
       {
         type: 'inset',
         location: 'bottom-right',
@@ -163,7 +163,7 @@ export const TooltipOnInsets: Story = {
         tooltip: {
           format: () => 'Antártida e Islas del Atlántico Sur',
         },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };

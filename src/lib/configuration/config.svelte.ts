@@ -97,6 +97,7 @@ export const DEFAULT_CONFIG: ChartConfig = {
     rule: { stroke: '#e6580d', strokeOpacity: 0.35, strokeWidth: 1.5, strokeDasharray: '4 4' },
     dot: { dotRadius: 5, dotFill: 'currentColor' },
     font: { fill: 'currentColor', fontSize: 12, dy: -18 },
+    area: { stroke: '#e6580d', strokeWidth: 2, fillOpacity: 0 },
   },
 };
 

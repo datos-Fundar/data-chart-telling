@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, POPULATION_SHIFT } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -46,8 +46,8 @@ export const Basic: Story = {
         y: 'lat',
         length: 'magnitude',
         rotate: 'direction',
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };
 
@@ -65,8 +65,8 @@ export const SpikeShape: Story = {
         shape: 'spike',
         anchor: 'start',
         style: { fill: '#7c3aed' },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };
 
@@ -83,7 +83,7 @@ export const FilledArrow: Story = {
         rotate: 'direction',
         shape: 'arrow-filled',
         style: { fill: '#0891b2', stroke: '#164e63', strokeWidth: 1 },
-      } satisfies GeoMarker,
-    ],
+      },
+    ] satisfies GeoMarkersConfig[],
   },
 };

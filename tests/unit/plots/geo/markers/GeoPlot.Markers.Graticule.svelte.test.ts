@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES } from '../../../../../stories/plots/geo/data';
 import { waitForSvg, countGeoPaths } from '../../_helpers/svg';
 
@@ -11,7 +11,7 @@ describe('GeoPlot – graticule marker', () => {
       width: 400,
       height: 300,
       data: WORLD_COUNTRIES,
-      markers: [{ type: 'graticule' } satisfies GeoMarker],
+      markers: [{ type: 'graticule' }] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     // Base map paths + at least one graticule path.
@@ -24,8 +24,8 @@ describe('GeoPlot – graticule marker', () => {
       height: 300,
       data: WORLD_COUNTRIES,
       markers: [
-        { type: 'graticule', step: 20, style: { stroke: '#94a3b8', strokeDasharray: '2 2' } } satisfies GeoMarker,
-      ],
+        { type: 'graticule', step: 20, style: { stroke: '#94a3b8', strokeDasharray: '2 2' } },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
@@ -39,7 +39,7 @@ describe('GeoPlot – sphere marker', () => {
       height: 300,
       data: WORLD_COUNTRIES,
       coordinates: { projection: 'orthographic' },
-      markers: [{ type: 'sphere' } satisfies GeoMarker],
+      markers: [{ type: 'sphere' }] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countGeoPaths(svg)).toBeGreaterThan(WORLD_COUNTRIES.length);
@@ -51,7 +51,7 @@ describe('GeoPlot – sphere marker', () => {
       height: 300,
       data: WORLD_COUNTRIES,
       coordinates: { projection: 'orthographic' },
-      markers: [{ type: 'sphere', style: { fill: '#eff6ff', stroke: 'currentColor' } } satisfies GeoMarker],
+      markers: [{ type: 'sphere', style: { fill: '#eff6ff', stroke: 'currentColor' } }] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();

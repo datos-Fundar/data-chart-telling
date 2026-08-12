@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
-import type { Marker } from '$lib/types/markers/common';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
 import { FEMALE_LIFE_EXPECTANCY_BY_PROVINCE, LIFE_EXPECTANCY_BY_PROVINCE } from '../../../../../stories/plots/bar/data';
@@ -19,7 +19,7 @@ describe('BarPlot – markers.hover', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'hover' } satisfies Marker],
+      markers: [{ type: 'hover' }] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countDotMarks(svg)).toBe(0);
@@ -34,7 +34,7 @@ describe('BarPlot – markers.hover', () => {
       x: 'province',
       y: 'value',
       z: 'sex',
-      markers: [{ type: 'hover', series: 'female' } satisfies Marker],
+      markers: [{ type: 'hover', series: 'female' }] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
@@ -52,7 +52,7 @@ describe('BarPlot – markers.hover', () => {
       height: 300,
       series: [FEMALE],
       segments,
-      markers: [{ type: 'hover', series: 'female', scope: 'segment' } satisfies Marker],
+      markers: [{ type: 'hover', series: 'female', scope: 'segment' }] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
@@ -63,7 +63,7 @@ describe('BarPlot – markers.hover', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'hover', ruleX: false, ruleY: false } satisfies Marker],
+      markers: [{ type: 'hover', ruleX: false, ruleY: false }] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
@@ -80,8 +80,8 @@ describe('BarPlot – markers.hover', () => {
           dotStyle: { dotRadius: 6, dotFill: '#e11d48' },
           fontStyle: { fontSize: 14 },
           ruleStyle: { strokeDasharray: '2 2' },
-        } satisfies Marker,
-      ],
+        },
+      ] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
@@ -96,8 +96,8 @@ describe('BarPlot – markers.hover', () => {
         {
           type: 'hover',
           format: (point) => `${point.x}: ${point.y}`,
-        } satisfies Marker,
-      ],
+        },
+      ] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();

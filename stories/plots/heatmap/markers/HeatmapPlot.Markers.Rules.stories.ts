@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-import type { Marker } from '$lib/types/markers/common';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ export const WithRuleXMarkers: Story = {
           strokeDasharray: '4 4',
           strokeOpacity: 0.7,
         },
-      } satisfies Marker,
+      },
       {
         type: 'rule',
         axis: 'x',
@@ -64,8 +64,8 @@ export const WithRuleXMarkers: Story = {
           strokeDasharray: '4 4',
           strokeOpacity: 0.7,
         },
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -85,7 +85,7 @@ export const WithRuleYMarkers: Story = {
           strokeDasharray: '6 6',
           strokeOpacity: 0.5,
         },
-      } satisfies Marker,
+      },
       {
         type: 'rule',
         axis: 'y',
@@ -94,8 +94,8 @@ export const WithRuleYMarkers: Story = {
           strokeDasharray: '6 6',
           strokeOpacity: 0.5,
         },
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -118,7 +118,7 @@ export const WithMixedMarkers: Story = {
           strokeDasharray: '4 4',
           strokeOpacity: 0.6,
         },
-      } satisfies Marker,
+      },
       {
         type: 'rule',
         axis: 'y',
@@ -127,7 +127,7 @@ export const WithMixedMarkers: Story = {
           strokeDasharray: '6 6',
           strokeOpacity: 0.5,
         },
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };

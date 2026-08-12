@@ -14,5 +14,8 @@
   fillOpacity={marker.style?.fillOpacity ?? 1}
   stroke={marker.style?.stroke}
   strokeWidth={marker.style?.strokeWidth ?? 0}
+  strokeOpacity={marker.style?.strokeOpacity}
+  strokeDasharray={marker.style?.strokeDasharray}
+  borderRadius={marker.style?.borderRadius}
   inset={marker.inset ?? 0.5}
 />

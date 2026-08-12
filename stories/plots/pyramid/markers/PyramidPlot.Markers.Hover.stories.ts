@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-import type { Marker } from '$lib/types/markers/common';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { Series } from '$lib/types/plots/data/common';
 import { AGE_GROUPS, POPULATION_PYRAMID, type PopulationRow } from '../../../data/population-pyramid';
 
@@ -47,8 +47,8 @@ export const Basic: Story = {
     markers: [
       {
         type: 'hover',
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -67,8 +67,8 @@ export const WithoutLabels: Story = {
       {
         type: 'hover',
         showLabels: false,
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -87,8 +87,8 @@ export const WithoutRule: Story = {
       {
         type: 'hover',
         ruleY: false,
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -109,8 +109,8 @@ export const WithBothAxis: Story = {
         type: 'hover',
         ruleX: true,
         ruleY: true,
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -137,8 +137,8 @@ export const WithCustomRuleStyle: Story = {
           strokeWidth: 2,
           strokeDasharray: '6 3',
         },
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -164,8 +164,8 @@ export const LabelOutsideDot: Story = {
         fontStyle: {
           textAnchor: 'outside',
         },
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -190,8 +190,8 @@ export const SeriesScoped: Story = {
         fontStyle: {
           textAnchor: 'outside',
         },
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };
 
@@ -224,7 +224,7 @@ export const FromExplicitSeries: Story = {
         fontStyle: {
           textAnchor: 'outside',
         },
-      } satisfies Marker,
-    ],
+      },
+    ] satisfies AxisBasedMarkersConfig[],
   },
 };

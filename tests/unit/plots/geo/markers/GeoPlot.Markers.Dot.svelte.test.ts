@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoMarker } from '$lib/types/markers/geo';
+import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, WEATHER_STATIONS, type WeatherStation } from '../../../../../stories/plots/geo/data';
 import { waitForSvg, countDotMarks } from '../../_helpers/svg';
 
@@ -12,7 +12,7 @@ describe('GeoPlot – dot marker', () => {
       height: 300,
       data: WORLD_COUNTRIES,
       coordinates: { projection: 'mercator' },
-      markers: [{ type: 'dot', data: WEATHER_STATIONS, x: 'lon', y: 'lat' } satisfies GeoMarker],
+      markers: [{ type: 'dot', data: WEATHER_STATIONS, x: 'lon', y: 'lat' }] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countDotMarks(svg)).toBe(WEATHER_STATIONS.length);
@@ -31,8 +31,8 @@ describe('GeoPlot – dot marker', () => {
           x: 'lon',
           y: 'lat',
           r: (d) => (d as WeatherStation).tempC / 2,
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countDotMarks(svg)).toBe(WEATHER_STATIONS.length);
@@ -52,8 +52,8 @@ describe('GeoPlot – dot marker', () => {
           y: 'lat',
           value: 'tempC',
           style: { colors: { min: '#3b82f6', max: '#dc2626' } },
-        } satisfies GeoMarker,
-      ],
+        },
+      ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     const fills = [...svg.querySelectorAll('g.dot path')].map(
@@ -67,7 +67,7 @@ describe('GeoPlot – dot marker', () => {
       width: 400,
       height: 300,
       data: WORLD_COUNTRIES,
-      markers: [{ type: 'dot', data: [], x: 'lon', y: 'lat' } satisfies GeoMarker],
+      markers: [{ type: 'dot', data: [], x: 'lon', y: 'lat' }] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(countDotMarks(svg)).toBe(0);
