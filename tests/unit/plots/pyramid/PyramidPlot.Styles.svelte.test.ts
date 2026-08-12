@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-import type { BasePlotStyles } from '$lib/types/plots/styles/common';
+import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
 import type { ValueAnchor } from '$lib/types/plots/constants';
 import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../../stories/data/population-pyramid';
 import { waitForSvg, countTextLabels } from '../_helpers/svg';
@@ -25,7 +25,7 @@ describe('PyramidPlot – styles.colors', () => {
       width: 560,
       height: 520,
       ...DATA_PROPS,
-      styles: { colors: { left: '#ff0000', right: '#0000ff' } } satisfies BasePlotStyles,
+      styles: { colors: { left: '#ff0000', right: '#0000ff' } } satisfies BasePlotStylesConfig,
     });
     const svg = await waitForSvg(container);
     const fills = new Set(barFills(svg));
@@ -46,7 +46,7 @@ describe('PyramidPlot – styles.values', () => {
       width: 560,
       height: 520,
       ...DATA_PROPS,
-      styles: { values: { show: true } } satisfies BasePlotStyles,
+      styles: { values: { show: true } } satisfies BasePlotStylesConfig,
     });
     const svg = await waitForSvg(container);
     expect(countTextLabels(svg)).toBe(DATA_2022.length);
@@ -59,7 +59,7 @@ describe('PyramidPlot – styles.values', () => {
       ...DATA_PROPS,
       styles: {
         values: { show: true, format: (v: number) => `${v.toFixed(1)}%` },
-      } satisfies BasePlotStyles,
+      } satisfies BasePlotStylesConfig,
     });
     const svg = await waitForSvg(container);
     const labels = Array.from(svg.querySelectorAll('g.text text')).map((t) => t.textContent);
@@ -73,7 +73,7 @@ describe('PyramidPlot – styles.values', () => {
         height: 520,
         ...DATA_PROPS,
         scales: { y: { domain: AGE_GROUPS } },
-        styles: { values: { show: true, anchor } } satisfies BasePlotStyles,
+        styles: { values: { show: true, anchor } } satisfies BasePlotStylesConfig,
       });
       const svg = await waitForSvg(container);
       return svg.querySelector('g.text text')?.getAttribute('transform');

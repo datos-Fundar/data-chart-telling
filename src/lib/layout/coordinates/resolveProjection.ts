@@ -1,4 +1,4 @@
-import type { GeoProjectionConfig } from '$lib/types/plots/scales/geo';
+import type { GeoProjectionConfig } from '$lib/types/layout/coordinates';
 
 /**
  * `data` (see `resolveProjection`) is one row per disjoint geometry *part*

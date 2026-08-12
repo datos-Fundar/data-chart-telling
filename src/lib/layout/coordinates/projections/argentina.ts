@@ -1,5 +1,5 @@
 import { geoAzimuthalEquidistant } from 'd3-geo';
-import type { GeoCustomProjection, GeoCustomProjectionFactory } from '$lib/types/plots/scales/geo';
+import type { GeoCustomProjection, GeoCustomProjectionFactory } from '$lib/types/layout/coordinates';
 import { pointsToFitFeature } from './fit';
 
 // Representative extremity points — not real border geometry (which stays

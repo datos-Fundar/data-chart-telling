@@ -2,7 +2,7 @@
   import GeoPlot from '$lib/plots/geo/Plot.svelte';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { makeColorScale } from '$lib/utils/color';
-  import { argentinaBicontinental } from '$lib/plots/geo/projections/argentina';
+  import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
   import TooltipCard from '../../common/TooltipCard.svelte';
   import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from './data';
   import type { GeoFeature } from '$lib/types/plots/data/geo';
@@ -38,7 +38,8 @@
     data={ARGENTINA_PROVINCES}
     featureId={(f) => f.properties!.nombre}
     value={(f) => f.properties!.population}
-    scales={{ projection: { type: argentinaBicontinental }, color: { domain: VALUE_DOMAIN } }}
+    scales={{ color: { domain: VALUE_DOMAIN } }}
+    coordinates={{ projection: { type: argentinaBicontinental } }}
     tooltip={{
       facetId: '',
       sync: false,

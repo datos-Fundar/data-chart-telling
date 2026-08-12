@@ -11,7 +11,7 @@ describe('GeoPlot – contour marker', () => {
       width: 400,
       height: 300,
       data: WORLD_COUNTRIES,
-      scales: { projection: 'mercator' },
+      coordinates: { projection: 'mercator' },
       markers: [
         {
           type: 'contour',
@@ -32,7 +32,7 @@ describe('GeoPlot – contour marker', () => {
       width: 400,
       height: 300,
       data: WORLD_COUNTRIES,
-      scales: { projection: 'mercator' },
+      coordinates: { projection: 'mercator' },
       markers: [
         {
           type: 'contour',
@@ -53,7 +53,7 @@ describe('GeoPlot – contour marker', () => {
       width: 400,
       height: 300,
       data: WORLD_COUNTRIES,
-      scales: { projection: 'mercator' },
+      coordinates: { projection: 'mercator' },
       markers: [
         {
           type: 'contour',

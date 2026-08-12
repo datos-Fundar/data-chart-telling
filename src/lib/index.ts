@@ -17,11 +17,11 @@ export { default as PyramidChart } from './charts/pyramid/Chart.svelte';
 // Interchangeable layout primitives (compose your own chart kinds with these).
 export { default as ChartContainer } from './charts/container/ChartContainer.svelte';
 export { default as BasePlotLayout } from './layout/plot/BasePlotLayout.svelte';
-export { default as GeoLayout } from './layout/geo/GeoLayout.svelte';
-export { default as TileLayer } from './plots/geo/TileLayer.svelte';
+export { default as CoordinatesLayout } from './layout/coordinates/CoordinatesLayout.svelte';
+export { default as TileLayer } from './layout/styles/TileLayer.svelte';
 
 // Custom geo projections — usable as `scales.projection.type`.
-export { argentinaBicontinental } from './plots/geo/projections/argentina';
+export { argentinaBicontinental } from './layout/coordinates/projections/argentina';
 export { default as Timeline } from './layout/timeline/Timeline.svelte';
 export { default as TimelineLayout } from './layout/timeline/TimelineLayout.svelte';
 export { default as FacetLayout } from './layout/facet/FacetLayout.svelte';
@@ -67,7 +67,6 @@ export type {
   StylesConfig,
   MarkersConfig,
   SegmentsConfig,
-  GeoScalesConfig,
   ScalesConfig,
   MarginConfig,
   TooltipConfig,
@@ -80,8 +79,10 @@ export type {
 export type {
   ValuesStyle,
   ColorsStyle,
-  BasePlotStyles,
-} from './types/plots/styles/common';
+  BasePlotStylesConfig,
+  GeoStylesConfig,
+  GeoTileLayerConfig,
+} from './types/layout/styles';
 export type { LineSegmentStyle, BarSegmentStyle, CellSegmentStyle, GeoSegmentStyle } from './types/plots/segments/common';
 export type { Range, Area, Segment } from './types/plots/segments/config';
 export type {
@@ -104,8 +105,10 @@ export type {
   GeoProjectionConfig,
   GeoCustomProjection,
   GeoCustomProjectionFactory,
-} from './types/plots/scales/geo';
-export type { GeoStyles, GeoTileLayerConfig, GeoZoomConfig } from './types/plots/styles/geo';
+  GeoScalesConfig,
+  GeoZoomConfig,
+  CoordinatesConfig,
+} from './types/layout/coordinates';
 export type {
   GeoMarker,
   GeoInsetMarkerConfig,

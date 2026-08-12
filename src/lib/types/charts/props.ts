@@ -1,7 +1,7 @@
 import type { Snippet } from 'svelte';
 import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { Accessor } from '$lib/types/plots/data/common';
-import type { BasePlotStyles } from '$lib/types/plots/styles/common';
+import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
 import type { SegmentsConfig, MarginConfig } from '$lib/types/plots/props';
 import type { Marker } from '$lib/types/markers/common';
 import type { TooltipProp } from '$lib/types/layout/tooltip';
@@ -33,7 +33,7 @@ export type ChartProps<
   x: Accessor<TRow, AxisValue>;
   y: Accessor<TRow, AxisValue>;
   z?: Accessor<TRow, unknown>;
-  styles?: BasePlotStyles;
+  styles?: BasePlotStylesConfig;
   segments?: SegmentsConfig<TSegmentStyle>;
   markers?: Marker[];
   scales?: AxisBasedScalesConfig<TRow>;

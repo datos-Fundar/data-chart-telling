@@ -1,10 +1,10 @@
 import type { HoverPoint, HoverStrategy, TooltipOptions } from '$lib/types/layout/tooltip';
 import type { Segment } from '$lib/types/plots/segments/config';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import type { GeoProjectionConfig } from '$lib/types/plots/scales/geo';
+import type { GeoScalesConfig } from '$lib/types/layout/coordinates';
 
 /** The `styles` prop accepted by every plot kind — its own
- * styles shape ({@link BasePlotStyles}, `GeoStyles`, …). */
+ * styles shape ({@link BasePlotStylesConfig}, `GeoStylesConfig`, …). */
 export type StylesConfig<TStyles extends object> = TStyles;
 
 /** The `markers` prop accepted by every plot kind — a list of that
@@ -102,25 +102,13 @@ export type HoverConfig<TRow extends Record<string, unknown>> = {
   tooltip?: TooltipConfig<TRow>;
   /**
    * When it returns `true` for a pointer event, that event is treated as a
-   * leave instead of a move — lets a nested layout (e.g. GeoLayout's inset
+   * leave instead of a move — lets a nested layout (e.g. GeoPlot's inset
    * markers) opt specific screen regions out of this plot's own hover
    * matching without `BasePlotLayout` needing to know why.
    */
   exclude?: (e: PointerEvent) => boolean;
   /** How to resolve a pointer event to a candidate point — see {@link HoverMatchStrategy}. Defaults to `'nearest'`. */
   match?: HoverMatchStrategy;
-};
-
-/**
- * `scales` prop for GeoPlot — the geo analog of {@link AxisBasedScalesConfig}.
- * A map has no x/y/z axis pair, so this configures the projection and the
- * choropleth colour domain instead.
- */
-export type GeoScalesConfig = {
-  /** Which map projection to draw with. Defaults to `'equal-earth'`. */
-  projection?: GeoProjectionConfig;
-  /** Continuous choropleth value domain — mirrors heatmap's `scales.z.domain`. */
-  color?: { domain?: [number, number] };
 };
 
 /**
@@ -139,9 +127,12 @@ export type ScalesConfig<TData = Record<string, unknown>> =
  * everything that varies by plot kind: `TDataContract` is the kind's own
  * data shape ({@link SeriesProps}`|`{@link DataProps} for the axis-based
  * kinds, `GeoDataProps` for `GeoPlot`), `TRow` is what `tooltip` resolves
- * against, and `TStyles`/`TSegmentStyle`/`TMarker`/`TScales` are that kind's
- * own segment/style/marker/scale shapes. Each `Plot.svelte` instantiates
- * this directly with its own concrete arguments rather than going through a
+ * against, and `TStyles`/`TSegmentStyle`/`TMarker`/`TScales`/`TCoordinates`
+ * are that kind's own segment/style/marker/scale/coordinate-system shapes.
+ * `TCoordinates` defaults to `undefined` — only `GeoPlot` instantiates it as
+ * {@link CoordinatesConfig}; every other kind has no coordinate system to
+ * configure (cartesian is implicit). Each `Plot.svelte` instantiates this
+ * directly with its own concrete arguments rather than going through a
  * shared per-kind alias — segments/styles/markers already diverge in shape
  * across kinds today (or will soon), so a shared alias would just be an
  * extra layer to keep in sync.
@@ -153,6 +144,7 @@ export type BasePlotProps<
   TSegmentStyle extends object,
   TMarker,
   TScales extends ScalesConfig<TRow>,
+  TCoordinates = undefined,
 > = TDataContract & {
   width: number;
   height: number;
@@ -160,6 +152,7 @@ export type BasePlotProps<
   segments?: SegmentsConfig<TSegmentStyle>;
   markers?: MarkersConfig<TMarker>;
   scales?: TScales;
+  coordinates?: TCoordinates;
   margins?: MarginConfig;
   tooltip?: TooltipConfig<TRow>;
 };

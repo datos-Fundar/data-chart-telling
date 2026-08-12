@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import type { SegmentsConfig } from '$lib/types/plots/props';
 import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
-import { argentinaBicontinental } from '$lib/plots/geo/projections/argentina';
+import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -22,7 +22,7 @@ const meta = {
     height: 500,
     data: ARGENTINA_PROVINCES,
     featureId: (f) => (f.properties as ArgentinaProvinceProps).nombre,
-    scales: { projection: { type: argentinaBicontinental } },
+    coordinates: { projection: { type: argentinaBicontinental } },
   },
   argTypes: {
     width: { control: { type: 'range', min: 320, max: 950, step: 20 } },

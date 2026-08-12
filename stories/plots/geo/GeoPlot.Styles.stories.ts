@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoStyles } from '$lib/types/plots/styles/geo';
-import { argentinaBicontinental } from '$lib/plots/geo/projections/argentina';
+import type { GeoStylesConfig } from '$lib/types/layout/styles';
+import type { CoordinatesConfig } from '$lib/types/layout/coordinates';
+import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -9,7 +10,7 @@ import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from './data';
 // stories) so the mainland and Antarctic sector both show up. Tile-layer
 // basemaps are the one exception — raster tiles only line up under a
 // Mercator-family projection, so every tile story below overrides
-// `scales.projection` back to `'mercator'`.
+// `coordinates.projection` back to `'mercator'`.
 
 const meta = {
   title: 'Plots/GeoPlot/Styles',
@@ -20,7 +21,7 @@ const meta = {
     height: 500,
     data: ARGENTINA_PROVINCES,
     featureId: (f) => (f.properties as ArgentinaProvinceProps).nombre,
-    scales: { projection: { type: argentinaBicontinental } },
+    coordinates: { projection: { type: argentinaBicontinental } },
   },
   argTypes: {
     width: { control: { type: 'range', min: 320, max: 950, step: 20 } },
@@ -68,7 +69,7 @@ export const CustomFillStroke: Story = {
       fill: '#cbd5e1',
       stroke: '#1e293b',
       strokeWidth: 1.5,
-    } satisfies GeoStyles<ArgentinaProvinceProps>,
+    } satisfies GeoStylesConfig<ArgentinaProvinceProps>,
   },
 };
 
@@ -82,16 +83,17 @@ export const CustomFillStroke: Story = {
 export const ChoroplethColorRamp: Story = {
   args: {
     value: (f) => (f.properties as ArgentinaProvinceProps).population,
-    // `scales` is set here too, not just `color` — Storybook merges `args`
-    // shallowly, so a story-level `scales` object replaces the meta's
-    // `scales: { projection: … }` entirely rather than merging into it;
-    // omitting `projection` here would silently fall back to `equal-earth`.
-    scales: { projection: { type: argentinaBicontinental }, color: { domain: POPULATION_DOMAIN } },
+    // `coordinates` is set here too, not just `scales.color` — Storybook merges
+    // `args` shallowly, so a story-level `coordinates` object replaces the
+    // meta's `coordinates: { projection: … }` entirely rather than merging
+    // into it; omitting `projection` here would silently fall back to `equal-earth`.
+    scales: { color: { domain: POPULATION_DOMAIN } },
+    coordinates: { projection: { type: argentinaBicontinental } } satisfies CoordinatesConfig,
     styles: {
       colors: { min: '#e0e7ff', max: '#4f46e5' },
       stroke: '#ffffff',
       strokeWidth: 1,
-    } satisfies GeoStyles<ArgentinaProvinceProps>,
+    } satisfies GeoStylesConfig<ArgentinaProvinceProps>,
   },
 };
 
@@ -99,50 +101,51 @@ export const ChoroplethColorRamp: Story = {
 export const InvertedColorRamp: Story = {
   args: {
     value: (f) => (f.properties as ArgentinaProvinceProps).population,
-    // `scales` is set here too, not just `color` — Storybook merges `args`
-    // shallowly, so a story-level `scales` object replaces the meta's
-    // `scales: { projection: … }` entirely rather than merging into it;
-    // omitting `projection` here would silently fall back to `equal-earth`.
-    scales: { projection: { type: argentinaBicontinental }, color: { domain: POPULATION_DOMAIN } },
+    // `coordinates` is set here too, not just `scales.color` — Storybook merges
+    // `args` shallowly, so a story-level `coordinates` object replaces the
+    // meta's `coordinates: { projection: … }` entirely rather than merging
+    // into it; omitting `projection` here would silently fall back to `equal-earth`.
+    scales: { color: { domain: POPULATION_DOMAIN } },
+    coordinates: { projection: { type: argentinaBicontinental } } satisfies CoordinatesConfig,
     styles: {
       colors: { min: '#4f46e5', max: '#e0e7ff' },
-    } satisfies GeoStyles<ArgentinaProvinceProps>,
+    } satisfies GeoStylesConfig<ArgentinaProvinceProps>,
   },
 };
 
 /**
- * Pan + zoom enabled — `styles.zoom: true` turns on drag-to-pan and
+ * Pan + zoom enabled — `coordinates.zoom: true` turns on drag-to-pan and
  * scroll-to-zoom. Try it directly in the canvas below.
  */
 export const ZoomEnabled: Story = {
   args: {
-    styles: {
+    coordinates: {
       zoom: true,
-    } satisfies GeoStyles<ArgentinaProvinceProps>,
+    } satisfies CoordinatesConfig,
   },
 };
 
-/** Zoom with limits — `styles.zoom.min`/`max` clamp how far in/out the scroll wheel can go. */
+/** Zoom with limits — `coordinates.zoom.min`/`max` clamp how far in/out the scroll wheel can go. */
 export const ZoomWithLimits: Story = {
   args: {
-    styles: {
+    coordinates: {
       zoom: { min: 1, max: 4 },
-    } satisfies GeoStyles<ArgentinaProvinceProps>,
+    } satisfies CoordinatesConfig,
   },
 };
 
 /**
  * Raster tile basemap — `styles.tileLayer` draws OpenStreetMap tiles under
  * the vector geometry. Only correct for Mercator-family projections, so
- * `scales.projection` is set back to `'mercator'` here, overriding this
- * file's `argentinaBicontinental` default (`scales.projection` also
+ * `coordinates.projection` is set back to `'mercator'` here, overriding this
+ * file's `argentinaBicontinental` default (`coordinates.projection` also
  * defaults to `'mercator'` automatically when a tile layer is set and no
  * projection is given at all — the explicit override here is only needed
  * because this file's meta sets one).
  */
 export const TileLayerBasemap: Story = {
   args: {
-    scales: { projection: { type: 'mercator', domain: 'data' } },
+    coordinates: { projection: { type: 'mercator', domain: 'data' } },
     excludeParts: isAntarcticPart,
     styles: {
       fillOpacity: 0.35,
@@ -153,7 +156,7 @@ export const TileLayerBasemap: Story = {
         attribution: '© OpenStreetMap contributors',
         opacity: 0.8,
       },
-    } satisfies GeoStyles<ArgentinaProvinceProps>,
+    } satisfies GeoStylesConfig<ArgentinaProvinceProps>,
   },
 };
 
@@ -169,7 +172,7 @@ const IGN_ATTRIBUTION = '© Instituto Geográfico Nacional (IGN)';
 /** IGN's default "Argenmap" basemap — the standard full-color street map. */
 export const TileLayerIgnArgenmap: Story = {
   args: {
-    scales: { projection: { type: 'mercator', domain: 'data' } },
+    coordinates: { projection: { type: 'mercator', domain: 'data' } },
     excludeParts: isAntarcticPart,
     styles: {
       fillOpacity: 0.35,
@@ -180,14 +183,14 @@ export const TileLayerIgnArgenmap: Story = {
         attribution: IGN_ATTRIBUTION,
         opacity: 0.8,
       },
-    } satisfies GeoStyles<ArgentinaProvinceProps>,
+    } satisfies GeoStylesConfig<ArgentinaProvinceProps>,
   },
 };
 
 /** IGN's "Argenmap gris" basemap — a muted grayscale variant, useful under a strong choropleth. */
 export const TileLayerIgnArgenmapGris: Story = {
   args: {
-    scales: { projection: { type: 'mercator', domain: 'data' } },
+    coordinates: { projection: { type: 'mercator', domain: 'data' } },
     excludeParts: isAntarcticPart,
     styles: {
       fillOpacity: 0.35,
@@ -198,14 +201,14 @@ export const TileLayerIgnArgenmapGris: Story = {
         attribution: IGN_ATTRIBUTION,
         opacity: 0.8,
       },
-    } satisfies GeoStyles<ArgentinaProvinceProps>,
+    } satisfies GeoStylesConfig<ArgentinaProvinceProps>,
   },
 };
 
 /** IGN's "Argenmap topográfico" basemap — shows terrain/elevation shading and contour detail. */
 export const TileLayerIgnArgenmapTopografico: Story = {
   args: {
-    scales: { projection: { type: 'mercator', domain: 'data' } },
+    coordinates: { projection: { type: 'mercator', domain: 'data' } },
     excludeParts: isAntarcticPart,
     styles: {
       fillOpacity: 0.35,
@@ -216,14 +219,14 @@ export const TileLayerIgnArgenmapTopografico: Story = {
         attribution: IGN_ATTRIBUTION,
         opacity: 0.8,
       },
-    } satisfies GeoStyles<ArgentinaProvinceProps>,
+    } satisfies GeoStylesConfig<ArgentinaProvinceProps>,
   },
 };
 
 /** IGN's "Argenmap oscuro" basemap — a dark-themed variant, pairs well with a light-colored choropleth ramp. */
 export const TileLayerIgnArgenmapOscuro: Story = {
   args: {
-    scales: { projection: { type: 'mercator', domain: 'data' } },
+    coordinates: { projection: { type: 'mercator', domain: 'data' } },
     excludeParts: isAntarcticPart,
     styles: {
       fillOpacity: 0.35,
@@ -234,14 +237,14 @@ export const TileLayerIgnArgenmapOscuro: Story = {
         attribution: IGN_ATTRIBUTION,
         opacity: 0.8,
       },
-    } satisfies GeoStyles<ArgentinaProvinceProps>,
+    } satisfies GeoStylesConfig<ArgentinaProvinceProps>,
   },
 };
 
 /** IGN's "Argenmap híbrido" basemap — satellite imagery with street/label overlays. */
 export const TileLayerIgnArgenmapHibrido: Story = {
   args: {
-    scales: { projection: { type: 'mercator', domain: 'data' } },
+    coordinates: { projection: { type: 'mercator', domain: 'data' } },
     excludeParts: isAntarcticPart,
     styles: {
       fillOpacity: 0.25,
@@ -252,7 +255,7 @@ export const TileLayerIgnArgenmapHibrido: Story = {
         attribution: IGN_ATTRIBUTION,
         opacity: 0.8,
       },
-    } satisfies GeoStyles<ArgentinaProvinceProps>,
+    } satisfies GeoStylesConfig<ArgentinaProvinceProps>,
   },
 };
 
@@ -267,6 +270,6 @@ export const OnFeatureClick: Story = {
       onFeatureClick: (feature) => {
         alert(`GeoPlot: clicked ${(feature.properties as ArgentinaProvinceProps).nombre}`);
       },
-    } satisfies GeoStyles,
+    } satisfies GeoStylesConfig,
   },
 };

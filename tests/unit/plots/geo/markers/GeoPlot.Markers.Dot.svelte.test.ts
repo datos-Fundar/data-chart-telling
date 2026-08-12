@@ -11,7 +11,7 @@ describe('GeoPlot – dot marker', () => {
       width: 400,
       height: 300,
       data: WORLD_COUNTRIES,
-      scales: { projection: 'mercator' },
+      coordinates: { projection: 'mercator' },
       markers: [{ type: 'dot', data: WEATHER_STATIONS, x: 'lon', y: 'lat' } satisfies GeoMarker],
     });
     const svg = await waitForSvg(container);
@@ -23,7 +23,7 @@ describe('GeoPlot – dot marker', () => {
       width: 400,
       height: 300,
       data: WORLD_COUNTRIES,
-      scales: { projection: 'mercator' },
+      coordinates: { projection: 'mercator' },
       markers: [
         {
           type: 'dot',
@@ -43,7 +43,7 @@ describe('GeoPlot – dot marker', () => {
       width: 400,
       height: 300,
       data: WORLD_COUNTRIES,
-      scales: { projection: 'mercator' },
+      coordinates: { projection: 'mercator' },
       markers: [
         {
           type: 'dot',

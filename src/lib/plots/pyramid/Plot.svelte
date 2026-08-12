@@ -8,14 +8,12 @@
   import { buildPyramidBarMarkers } from '$lib/plots/pyramid/buildPyramidBarMarkers';
   import { buildGroupedSeries, validateSegments, buildScopedMarkerGroups } from '$lib/plots/utils/segments';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
-  import ScalesLayout from '$lib/layout/scales/ScalesLayout.svelte';
-  import GeometryLayout from '$lib/layout/geometry/GeometryLayout.svelte';
   import ValueLabels from '$lib/plots/pyramid/ValueLabels.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
   import type { BasePlotProps } from '$lib/types/plots/props';
   import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
   import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
-  import type { BasePlotStyles } from '$lib/types/plots/styles/common';
+  import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
   import type { ValueAnchor } from '$lib/types/plots/constants';
   import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
   import type { Marker } from '$lib/types/markers/common';
@@ -39,7 +37,7 @@
   type Props = BasePlotProps<
     SeriesProps<TData> | DataProps<TData>,
     TData,
-    BasePlotStyles,
+    BasePlotStylesConfig,
     BarSegmentStyle,
     Marker,
     AxisBasedScalesConfig<TData>
@@ -208,6 +206,7 @@
 <BasePlotLayout
   {width}
   {height}
+  {styles}
   data={flat}
   {getX}
   {getY}
@@ -215,15 +214,13 @@
   scales={resolvedScales}
   {margins}
   xTickRotate={resolvedScales?.x?.tickRotate}
+  markers={[...pyramidMarkers, ...markers]}
+  seriesData={resolvedSeries}
+  {scopedGroups}
 >
-  {#snippet children({ matchedPoints, activePoint, impliesCrosshairX, impliesCrosshairY, numericMargins })}
-  <ScalesLayout data={flat} {getX} {getY} {width} {height} {numericMargins} scales={resolvedScales} />
-  <GeometryLayout markers={[...pyramidMarkers, ...markers]} seriesData={resolvedSeries} {scopedGroups} {matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY}>
-    {#if showVals}
-      {#each groupedSeries as group (group.series.name)}
-        <ValueLabels {group} {valAnchor} {fmtVal} values={styles.values} axisColor={cfg.axis.color} />
-      {/each}
-    {/if}
-  </GeometryLayout>
-  {/snippet}
+  {#if showVals}
+    {#each groupedSeries as group (group.series.name)}
+      <ValueLabels {group} {valAnchor} {fmtVal} values={styles.values} axisColor={cfg.axis.color} />
+    {/each}
+  {/if}
 </BasePlotLayout>

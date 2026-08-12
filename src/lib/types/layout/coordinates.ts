@@ -1,3 +1,5 @@
+import type { GeoProjection } from 'd3-geo';
+
 /**
  * The projection names svelteplot's `<Plot projection>` accepts as a string
  * (svelteplot itself doesn't export this as a type — defined here so authors
@@ -20,8 +22,6 @@ export type GeoProjectionName =
   | 'orthographic'
   | 'stereographic'
   | 'transverse-mercator';
-
-import type { GeoProjection } from 'd3-geo';
 
 /**
  * What a custom projection factory (e.g. `argentinaBicontinental` under
@@ -61,3 +61,32 @@ export type GeoProjectionConfig =
        */
       domain?: GeoJSON.GeoJsonObject | GeoJSON.FeatureCollection | GeoJSON.Feature | 'data';
     };
+
+/**
+ * `scales` prop for GeoPlot — the geo analog of `AxisBasedScalesConfig`.
+ * A map has no x/y/z axis pair, so this only configures the choropleth
+ * colour domain (the coordinate system itself is `coordinates.projection`).
+ */
+export type GeoScalesConfig = {
+  /** Continuous choropleth value domain — mirrors heatmap's `scales.z.domain`. */
+  color?: { domain?: [number, number] };
+};
+
+export type GeoZoomConfig = {
+  min?: number;
+  max?: number;
+  initial?: { x?: number; y?: number; k?: number };
+};
+
+/**
+ * `coordinates` prop for GeoPlot — the only plot kind with a coordinate
+ * system other than implicit cartesian. Bundles the projection (a `GoG`
+ * Coordinates concern) and pan/zoom (navigating within that coordinate
+ * system), resolved together by `CoordinatesLayout`.
+ */
+export type CoordinatesConfig = {
+  /** Which map projection to draw with. Defaults to `'equal-earth'`. */
+  projection?: GeoProjectionConfig;
+  /** `true`/config enables drag-pan + scroll-zoom. Omitted/`false` = static map. */
+  zoom?: boolean | GeoZoomConfig;
+};

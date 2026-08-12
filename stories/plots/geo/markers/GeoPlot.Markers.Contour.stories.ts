@@ -24,7 +24,7 @@ const meta = {
     width: 950,
     height: 500,
     data: WORLD_COUNTRIES,
-    scales: { projection: 'equirectangular' },
+    coordinates: { projection: 'equirectangular' },
     styles: { fillOpacity: 0, stroke: '#94a3b8' },
   },
   argTypes: {

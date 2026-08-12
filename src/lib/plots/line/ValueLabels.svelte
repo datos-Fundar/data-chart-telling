@@ -9,7 +9,7 @@
   import { paletteColor } from '$lib/utils/color';
   import { declutter1D, laneAssignment } from '$lib/plots/utils/declutter';
   import type { Series } from '$lib/types/plots/data/common';
-  import type { ValuesStyle } from '$lib/types/plots/styles/common';
+  import type { ValuesStyle } from '$lib/types/layout/styles';
   import type { ValueAnchor } from '$lib/types/plots/constants';
 
   // svelteplot's own type for this context isn't part of its public export

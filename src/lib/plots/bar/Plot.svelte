@@ -14,14 +14,12 @@
   import { buildBarMarkers } from '$lib/plots/bar/buildBarMarkers';
   import ValueLabels from '$lib/plots/bar/ValueLabels.svelte';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
-  import ScalesLayout from '$lib/layout/scales/ScalesLayout.svelte';
-  import GeometryLayout from '$lib/layout/geometry/GeometryLayout.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
   import type { Marker } from '$lib/types/markers/common';
   import type { BasePlotProps } from '$lib/types/plots/props';
   import type { AxisScale, AxisBasedScalesConfig } from '$lib/types/layout/scales';
   import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
-  import type { BasePlotStyles } from '$lib/types/plots/styles/common';
+  import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
   import type { ValueAnchor } from '$lib/types/plots/constants';
   import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 
@@ -33,7 +31,7 @@
   type Props = BasePlotProps<
     SeriesProps<TData> | DataProps<TData>,
     TData,
-    BasePlotStyles,
+    BasePlotStylesConfig,
     BarSegmentStyle,
     Marker,
     AxisBasedScalesConfig<TData>
@@ -185,6 +183,7 @@
 <BasePlotLayout
   {width}
   {height}
+  {styles}
   data={flat}
   getX={plotGetX}
   getY={plotGetY}
@@ -192,26 +191,26 @@
   scales={resolvedScales}
   {margins}
   xTickRotate={resolvedScales?.x?.tickRotate}
+  markers={({ setHoverMatch, clearHoverMatch }) => [
+    ...buildBarMarkers({
+      groupedSeries,
+      barLayout,
+      isHorizontal,
+      hoverPoints,
+      palette: cfg.palette,
+      disabledFillFor: (name) => disabledFillOverride(legendInteraction?.disabledSeries.get(name)),
+      active: hover.active,
+      setHoverMatch,
+      clearHoverMatch,
+    }),
+    ...markers,
+  ]}
+  seriesData={resolvedSeries}
+  {scopedGroups}
 >
-  {#snippet children({ matchedPoints, activePoint, impliesCrosshairX, impliesCrosshairY, numericMargins, setHoverMatch, clearHoverMatch })}
-  {@const barMarkers = buildBarMarkers({
-    groupedSeries,
-    barLayout,
-    isHorizontal,
-    hoverPoints,
-    palette: cfg.palette,
-    disabledFillFor: (name) => disabledFillOverride(legendInteraction?.disabledSeries.get(name)),
-    active: hover.active,
-    setHoverMatch,
-    clearHoverMatch,
-  })}
-  <ScalesLayout data={flat} getX={plotGetX} getY={plotGetY} {width} {height} {numericMargins} scales={resolvedScales} />
-  <GeometryLayout markers={[...barMarkers, ...markers]} seriesData={resolvedSeries} {scopedGroups} {matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY}>
   {#if showVals}
     {#each groupedSeries as group, seriesIndex (group.series.name)}
       <ValueLabels {group} {seriesIndex} {barLayout} {isHorizontal} {valAnchor} {fmtVal} values={styles.values} axisColor={cfg.axis.color} />
     {/each}
   {/if}
-  </GeometryLayout>
-  {/snippet}
 </BasePlotLayout>

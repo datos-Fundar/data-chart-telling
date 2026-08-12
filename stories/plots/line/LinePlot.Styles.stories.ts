@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { BasePlotStyles } from '$lib/types/plots/styles/common';
+import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
 import type { YearPoint } from './data';
 import {
   FEMALE_LIFE_EXPECTANCY,
@@ -84,7 +84,7 @@ export const ShowValues: Story = {
     ],
     styles: {
       values: { show: true },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };
 
@@ -108,7 +108,7 @@ export const CustomFormat: Story = {
         show: true,
         format: (v: number, name: string) => `${name} → ${v.toFixed(1)} yr`,
       },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };
 
@@ -139,7 +139,7 @@ export const TwoSeriesWithLabels: Story = {
         show: true,
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };
 
@@ -164,7 +164,7 @@ export const AnchorStart: Story = {
         anchor: 'start',
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };
 
@@ -189,7 +189,7 @@ export const AnchorOutside: Story = {
         anchor: 'outside',
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };
 
@@ -221,7 +221,7 @@ export const TwoSeriesLabelsOutside: Story = {
         anchor: 'outside',
         format: (v: number, name: string) => `${name}: ${v.toFixed(1)} yr`,
       },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };
 
@@ -250,7 +250,7 @@ export const CustomOffsets: Story = {
         format: (v: number) => `${v.toFixed(1)} yr`,
         fontStyle: { dy: -18 },
       },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };
 
@@ -276,7 +276,7 @@ export const AnchorMiddle: Story = {
         format: (v: number) => `${v.toFixed(1)} yr`,
         fontStyle: { dy: 18 },
       },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };
 
@@ -301,7 +301,7 @@ export const AnchorEnd: Story = {
         format: (v: number) => `${v.toFixed(1)} yr`,
         fontStyle: { dy: -18 },
       },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };
 
@@ -332,7 +332,7 @@ export const LowLevelTextPlacement: Story = {
           dx: 0,
         },
       },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };
 
@@ -429,7 +429,7 @@ export const DeclutteredLabels: Story = {
         show: true,
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };
 
@@ -462,7 +462,7 @@ export const DeclutteredLabelsCustomStyle: Story = {
           strokeDasharray: '2 3',
         },
       },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };
 
@@ -484,7 +484,7 @@ export const DeclutteredLabelsNearMissSeries: Story = {
         show: true,
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };
 
@@ -531,6 +531,6 @@ export const DeclutteredLabelsBoundedByPlot: Story = {
         show: true,
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };

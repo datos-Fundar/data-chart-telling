@@ -40,18 +40,23 @@ describe('GeoPlot – choropleth color ramp', () => {
 });
 
 describe('GeoPlot – zoom', () => {
-  test('styles.zoom: true renders without crashing', async () => {
-    const { container } = render(GeoPlot, { width: 400, height: 300, data: ARGENTINA_PROVINCES, styles: { zoom: true } });
-    const svg = await waitForSvg(container);
-    expect(countGeoPaths(svg)).toBe(ARGENTINA_PROVINCES.length);
-  });
-
-  test('styles.zoom with min/max limits renders without crashing', async () => {
+  test('coordinates.zoom: true renders without crashing', async () => {
     const { container } = render(GeoPlot, {
       width: 400,
       height: 300,
       data: ARGENTINA_PROVINCES,
-      styles: { zoom: { min: 1, max: 4 } },
+      coordinates: { zoom: true },
+    });
+    const svg = await waitForSvg(container);
+    expect(countGeoPaths(svg)).toBe(ARGENTINA_PROVINCES.length);
+  });
+
+  test('coordinates.zoom with min/max limits renders without crashing', async () => {
+    const { container } = render(GeoPlot, {
+      width: 400,
+      height: 300,
+      data: ARGENTINA_PROVINCES,
+      coordinates: { zoom: { min: 1, max: 4 } },
     });
     const svg = await waitForSvg(container);
     expect(countGeoPaths(svg)).toBe(ARGENTINA_PROVINCES.length);
@@ -76,7 +81,7 @@ describe('GeoPlot – tile layer', () => {
       width: 400,
       height: 300,
       data: ARGENTINA_PROVINCES,
-      scales: { projection: 'orthographic' },
+      coordinates: { projection: 'orthographic' },
       styles: { tileLayer: { url: 'https://tile.example/{z}/{x}/{y}.png' } },
     });
     const svg = await waitForSvg(container);
@@ -93,7 +98,7 @@ describe('GeoPlot – tile layer', () => {
       width: 400,
       height: 300,
       data: ARGENTINA_PROVINCES,
-      scales: { projection: 'mercator' },
+      coordinates: { projection: 'mercator' },
       styles: { tileLayer: { url: 'https://tile.example/{z}/{x}/{y}.png' } },
     });
     await waitForSvg(container);

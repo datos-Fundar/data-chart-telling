@@ -8,14 +8,12 @@
   import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
   import { buildCellMarkers } from '$lib/plots/heatmap/buildCellMarkers';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
-  import ScalesLayout from '$lib/layout/scales/ScalesLayout.svelte';
-  import GeometryLayout from '$lib/layout/geometry/GeometryLayout.svelte';
   import ValueLabels from '$lib/plots/heatmap/ValueLabels.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
   import type { BasePlotProps } from '$lib/types/plots/props';
   import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
   import type { SeriesProps, DataProps } from '$lib/types/plots/data/common';
-  import type { BasePlotStyles } from '$lib/types/plots/styles/common';
+  import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
   import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
   import type { Marker } from '$lib/types/markers/common';
 
@@ -31,7 +29,7 @@
   type Props = BasePlotProps<
     SeriesProps<TData> | DataProps<TData>,
     TData,
-    BasePlotStyles,
+    BasePlotStylesConfig,
     CellSegmentStyle,
     Marker,
     AxisBasedScalesConfig<TData>
@@ -230,16 +228,16 @@
 <BasePlotLayout
   {width}
   {height}
+  {styles}
   data={flat}
   {getX}
   {getY}
   {hover}
   scales={resolvedScales}
   {margins}
+  markers={[...cellMarkers, ...markers]}
+  seriesData={resolvedSeries}
 >
-  {#snippet children({ matchedPoints, activePoint, impliesCrosshairX, impliesCrosshairY, numericMargins })}
-  <ScalesLayout data={flat} {getX} {getY} {width} {height} {numericMargins} scales={resolvedScales} />
-  <GeometryLayout markers={[...cellMarkers, ...markers]} seriesData={resolvedSeries} {matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY}>
   {#if showVals}
     <ValueLabels
       data={flat}
@@ -251,6 +249,4 @@
       defaultColor={cfg.continuous.labelColor}
     />
   {/if}
-  </GeometryLayout>
-  {/snippet}
 </BasePlotLayout>

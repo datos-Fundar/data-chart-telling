@@ -1,6 +1,6 @@
 import { select } from 'd3-selection';
 import { zoom as d3zoom, zoomIdentity, type D3ZoomEvent } from 'd3-zoom';
-import type { GeoZoomConfig } from '$lib/types/plots/styles/geo';
+import type { GeoZoomConfig } from '$lib/types/layout/coordinates';
 
 export type GeoZoomTransform = { x: number; y: number; k: number };
 

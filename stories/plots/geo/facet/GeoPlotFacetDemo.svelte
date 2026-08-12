@@ -62,7 +62,7 @@
       data={ARGENTINA_PROVINCES}
       featureId={(f) => (f.properties as ArgentinaProvinceProps).nombre}
       excludeParts={isAntarcticPart}
-      scales={{ projection: { type: 'mercator', domain: 'data' } }}
+      coordinates={{ projection: { type: 'mercator', domain: 'data' } }}
       styles={{
         fillOpacity: 0.35,
         stroke: '#4f46e5',

@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoScalesConfig } from '$lib/types/plots/props';
+import type { GeoScalesConfig, CoordinatesConfig } from '$lib/types/layout/coordinates';
 import type { GeoMarker } from '$lib/types/markers/geo';
-import { argentinaBicontinental } from '$lib/plots/geo/projections/argentina';
+import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 import { WORLD_COUNTRIES, ARGENTINA_PROVINCES, USA_COUNTRY, type WorldCountryProps } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -45,74 +45,74 @@ export const Default: Story = {
 /** `'mercator'` — the classic web-map projection. Conformal (preserves shape/angles locally) but area grows sharply near the poles. */
 export const Mercator: Story = {
   args: {
-    scales: { projection: 'mercator' } satisfies GeoScalesConfig,
+    coordinates: { projection: 'mercator' } satisfies CoordinatesConfig,
   },
 };
 
 /** `'transverse-mercator'` — Mercator rotated 90°; conformal along a chosen meridian instead of the equator. */
 export const TransverseMercator: Story = {
   args: {
-    scales: { projection: 'transverse-mercator' } satisfies GeoScalesConfig,
+    coordinates: { projection: 'transverse-mercator' } satisfies CoordinatesConfig,
   },
 };
 
 /** `'equal-earth'` — equal-area, designed to look more natural than older equal-area projections (e.g. Gall-Peters). */
 export const EqualEarth: Story = {
   args: {
-    scales: { projection: 'equal-earth' } satisfies GeoScalesConfig,
+    coordinates: { projection: 'equal-earth' } satisfies CoordinatesConfig,
   },
 };
 
 /** `'equirectangular'` — simplest possible projection: longitude/latitude mapped directly to x/y. Heavily distorted away from the equator. */
 export const Equirectangular: Story = {
   args: {
-    scales: { projection: 'equirectangular' } satisfies GeoScalesConfig,
+    coordinates: { projection: 'equirectangular' } satisfies CoordinatesConfig,
   },
 };
 
 /** `'orthographic'` — a view of the globe as if seen from space; pairs well with a `sphere` marker (see Markers/Graticule) for the outer globe outline. */
 export const Orthographic: Story = {
   args: {
-    scales: { projection: 'orthographic' } satisfies GeoScalesConfig,
+    coordinates: { projection: 'orthographic' } satisfies CoordinatesConfig,
   },
 };
 
 /** `'orthographic'` rotated to center on South America via `rotate` — `[λ, φ, γ]` in degrees (negative longitude rotates eastward). */
 export const OrthographicRotated: Story = {
   args: {
-    scales: {
+    coordinates: {
       projection: { type: 'orthographic', rotate: [60, 20] },
-    } satisfies GeoScalesConfig,
+    } satisfies CoordinatesConfig,
   },
 };
 
 /** `'stereographic'` — conformal azimuthal projection, commonly used for polar maps. */
 export const Stereographic: Story = {
   args: {
-    scales: { projection: 'stereographic' } satisfies GeoScalesConfig,
+    coordinates: { projection: 'stereographic' } satisfies CoordinatesConfig,
   },
 };
 
 /** `'gnomonic'` — every great circle appears as a straight line; used for radio/navigation charts. Cannot show a full hemisphere. */
 export const Gnomonic: Story = {
   args: {
-    scales: { projection: 'gnomonic' } satisfies GeoScalesConfig,
+    coordinates: { projection: 'gnomonic' } satisfies CoordinatesConfig,
   },
 };
 
 /** `'azimuthal-equal-area'` — equal-area azimuthal projection, useful for polar or regional equal-area maps. */
 export const AzimuthalEqualArea: Story = {
   args: {
-    scales: { projection: 'azimuthal-equal-area' } satisfies GeoScalesConfig,
+    coordinates: { projection: 'azimuthal-equal-area' } satisfies CoordinatesConfig,
   },
 };
 
 /** `'azimuthal-equidistant'` — distances from the center point are shown at true scale; a polar view of it is the basis of the United Nations emblem (see `AzimuthalEquidistantUnitedNationsEmblem`). */
 export const AzimuthalEquidistant: Story = {
   args: {
-    scales: { projection:
+    coordinates: { projection:
       { type: 'azimuthal-equidistant', rotate: [0, -90] }
-    } satisfies GeoScalesConfig,
+    } satisfies CoordinatesConfig,
   },
 };
 
@@ -124,9 +124,9 @@ export const AzimuthalEquidistant: Story = {
  */
 export const AzimuthalEquidistantUnitedNationsEmblem: Story = {
   args: {
-    scales: {
+    coordinates: {
       projection: { type: 'azimuthal-equidistant', rotate: [0, -90], clip: 148 },
-    } satisfies GeoScalesConfig,
+    } satisfies CoordinatesConfig,
     markers: [{ type: 'graticule', style: { stroke: '#94a3b8', strokeOpacity: 0.6 } } satisfies GeoMarker],
   },
 };
@@ -134,21 +134,21 @@ export const AzimuthalEquidistantUnitedNationsEmblem: Story = {
 /** `'conic-conformal'` — a conic projection that preserves local angles; good for regions spanning a wide east-west extent at similar latitudes. */
 export const ConicConformal: Story = {
   args: {
-    scales: { projection: 'conic-conformal' } satisfies GeoScalesConfig,
+    coordinates: { projection: 'conic-conformal' } satisfies CoordinatesConfig,
   },
 };
 
 /** `'conic-equal-area'` — the conic family's equal-area member; a common choice for national/continental thematic maps. */
 export const ConicEqualArea: Story = {
   args: {
-    scales: { projection: 'conic-equal-area' } satisfies GeoScalesConfig,
+    coordinates: { projection: 'conic-equal-area' } satisfies CoordinatesConfig,
   },
 };
 
 /** `'conic-equidistant'` — meridians are equally spaced along parallels; a middle ground between the conformal and equal-area conic variants. */
 export const ConicEquidistant: Story = {
   args: {
-    scales: { projection: 'conic-equidistant' } satisfies GeoScalesConfig,
+    coordinates: { projection: 'conic-equidistant' } satisfies CoordinatesConfig,
   },
 };
 
@@ -165,14 +165,14 @@ export const ConicEquidistant: Story = {
 export const AlbersUsa: Story = {
   args: {
     data: USA_COUNTRY,
-    scales: { projection: 'albers-usa' } satisfies GeoScalesConfig,
+    coordinates: { projection: 'albers-usa' } satisfies CoordinatesConfig,
   },
 };
 
 /** `'albers'` — the (non-composite) conic equal-area projection `albers-usa` is built on top of; usable for any mid-latitude region, not just the US. */
 export const Albers: Story = {
   args: {
-    scales: { projection: 'albers' } satisfies GeoScalesConfig,
+    coordinates: { projection: 'albers' } satisfies CoordinatesConfig,
   },
 };
 
@@ -188,9 +188,9 @@ export const Albers: Story = {
 export const ArgentinaBicontinental: Story = {
   args: {
     data: ARGENTINA_PROVINCES,
-    scales: {
+    coordinates: {
       projection: { type: argentinaBicontinental },
-    } satisfies GeoScalesConfig,
+    } satisfies CoordinatesConfig,
   },
 };
 
@@ -204,9 +204,9 @@ export const ArgentinaBicontinental: Story = {
  */
 export const Identity: Story = {
   args: {
-    scales: {
+    coordinates: {
       projection: { type: 'identity', domain: 'data' },
-    } satisfies GeoScalesConfig,
+    } satisfies CoordinatesConfig,
   },
 };
 
@@ -218,9 +218,9 @@ export const Identity: Story = {
  */
 export const ReflectY: Story = {
   args: {
-    scales: {
+    coordinates: {
       projection: { type: 'reflect-y', domain: 'data' },
-    } satisfies GeoScalesConfig,
+    } satisfies CoordinatesConfig,
   },
 };
 
@@ -235,8 +235,10 @@ export const ExplicitColorDomain: Story = {
   args: {
     value: (f) => (f.properties as WorldCountryProps).pop_est,
     scales: {
-      projection: 'equal-earth',
       color: { domain: [1_000_000, 1_400_000_000] },
     } satisfies GeoScalesConfig,
+    coordinates: {
+      projection: 'equal-earth',
+    } satisfies CoordinatesConfig,
   },
 };

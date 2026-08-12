@@ -11,7 +11,7 @@ describe('GeoPlot – link marker', () => {
       width: 400,
       height: 300,
       data: WORLD_COUNTRIES,
-      scales: { projection: 'equal-earth' },
+      coordinates: { projection: 'equal-earth' },
       markers: [
         {
           type: 'link',
@@ -32,7 +32,7 @@ describe('GeoPlot – link marker', () => {
       width: 400,
       height: 300,
       data: WORLD_COUNTRIES,
-      scales: { projection: 'equal-earth' },
+      coordinates: { projection: 'equal-earth' },
       markers: [
         {
           type: 'link',
@@ -54,7 +54,7 @@ describe('GeoPlot – link marker', () => {
       width: 400,
       height: 300,
       data: WORLD_COUNTRIES,
-      scales: { projection: 'equal-earth' },
+      coordinates: { projection: 'equal-earth' },
       markers: [
         {
           type: 'link',

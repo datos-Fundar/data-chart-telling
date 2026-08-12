@@ -1,29 +1,40 @@
-<script lang="ts" generics="TData extends Record<string, unknown>">
+<script lang="ts" generics="TData extends Record<string, unknown>, TSeries extends Record<string, unknown> = TData">
   import type { ComponentProps, Snippet } from 'svelte';
   import { Plot, Pointer } from 'svelteplot';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { AUTO_MARGIN_ESTIMATE, numericMargin } from '$lib/layout/plot/margins';
   import { buildScale } from '$lib/layout/scales/buildScale';
+  import ScalesLayout from '$lib/layout/scales/ScalesLayout.svelte';
+  import GeometryLayout from '$lib/layout/geometry/GeometryLayout.svelte';
+  import CoordinatesLayout from '$lib/layout/coordinates/CoordinatesLayout.svelte';
+  import StylesLayout from '$lib/layout/styles/StylesLayout.svelte';
   import { getHover, createHover } from '$lib/layout/tooltip/hover.svelte';
   import { createHoverController } from '$lib/layout/tooltip/controller.svelte';
   import TooltipLayout from '$lib/layout/tooltip/TooltipLayout.svelte';
   import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
-  import type { GeoProjectionConfig } from '$lib/types/plots/scales/geo';
+  import type { CoordinatesConfig } from '$lib/types/layout/coordinates';
+  import type { StylesLayoutConfig } from '$lib/types/layout/styles';
+  import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
   import type { HoverPoint } from '$lib/types/layout/tooltip';
   import type { MarginConfig, HoverConfig } from '$lib/types/plots/props';
+  import type { Marker } from '$lib/types/markers/common';
+  import type { Series } from '$lib/types/plots/data/common';
 
   type SveltePlotProps = ComponentProps<typeof Plot>;
 
   /**
    * Shared chrome around every plot kind's svelteplot markup: the pointer-event
-   * wrapper, the hover/tooltip state machine, the `<Plot>` element itself, and
-   * the floating tooltip. Deliberately marker/axis-agnostic — axis-having plot
-   * kinds (line/bar/heatmap/pyramid) additionally compose `ScalesLayout` /
-   * `GeometryLayout` inside `children`; `GeoPlot` composes `GeoLayout`
-   * instead, since a map has no x/y axis pair. Every plot kind supplies its own
-   * `<Plot x y projection>` scale config (either directly via `x`/`y`/`projection`,
-   * or by leaving `x`/`y` unset so this component derives them from `scales`) and
-   * its own marks/markers through `children`.
+   * wrapper, the hover/tooltip state machine, and the floating tooltip.
+   * Composes the Coordinates and Styles layers around every plot kind's own
+   * content — a no-op identity transform and no embellishments unless the
+   * caller passes `coordinates`/`styles` (currently only `GeoPlot` does).
+   * Axis-having plot kinds (line/bar/heatmap/pyramid) additionally get
+   * `ScalesLayout`/`GeometryLayout` composed automatically by passing their
+   * own `markers` (even `[]`) — `GeoPlot` omits it and renders its own marks
+   * directly through `children` instead, since it has no `Marker`/
+   * `GeometryLayout` routing today. Every plot kind supplies its own
+   * `<Plot x y projection>` scale config (either directly via `x`/`y`, or by
+   * leaving `x`/`y` unset so this component derives them from `scales`).
    */
   let {
     width,
@@ -35,11 +46,14 @@
     x = undefined,
     y = undefined,
     scales = undefined,
-    projection = undefined,
+    coordinates = undefined,
     margins,
     marginEstimate = AUTO_MARGIN_ESTIMATE,
     xTickRotate = undefined,
-    touchAction = undefined,
+    styles = undefined,
+    markers = undefined,
+    seriesData = undefined,
+    scopedGroups = undefined,
     containerEl = $bindable(undefined),
     children,
   }: {
@@ -57,17 +71,38 @@
     y?: SveltePlotProps['y'];
     /** Scale config `x`/`y` are derived from when not given directly. */
     scales?: AxisBasedScalesConfig<TData>;
-    /** Forwarded to `<Plot projection>` — GeoPlot only. */
-    projection?: GeoProjectionConfig;
+    /** This plot kind's coordinate system config — `GeoPlot` only (a projection + pan/zoom). */
+    coordinates?: CoordinatesConfig;
     /** Partial margin override — merged on top of the theme. */
     margins?: MarginConfig;
     /** Numeric fallback for a margin side that resolved to `'auto'` — see `numericMargin`'s doc comment. */
     marginEstimate?: Record<'top' | 'right' | 'bottom' | 'left', number>;
     /** Boosts the bottom margin for a rotated x tick label — axis-having plot kinds only. */
     xTickRotate?: number;
-    /** Forwarded to the wrapper div's `touch-action` CSS — GeoPlot's zoom/pan only. */
-    touchAction?: string;
-    /** The wrapper div's own element — bind for a nested layout that needs it for its own gesture handling (e.g. GeoLayout's zoom/rotate). */
+    /** This plot kind's own `styles` prop, forwarded to the Styles layer. */
+    styles?: StylesLayoutConfig;
+    /**
+     * This plot kind's own markers array — presence switches on the built-in
+     * `ScalesLayout`/`GeometryLayout` composition (see this component's own
+     * doc). Accepts a plain array, or a builder function for a plot kind
+     * whose own marker construction needs `setHoverMatch`/`clearHoverMatch`
+     * (e.g. `BarPlot`'s hit-area markers) — those only exist once this
+     * component's own hover controller is set up, unlike everything else a
+     * `Plot.svelte` already has at its own top level.
+     */
+    markers?: Marker[] | ((hover: { setHoverMatch: (rows: TData[]) => void; clearHoverMatch: () => void }) => Marker[]);
+    /**
+     * All resolved series, forwarded to `GeometryLayout` — axis-based kinds
+     * only. Independently generic over `TSeries` (defaults to `TData`)
+     * because a plot kind's own series rows aren't always the same shape as
+     * `data`/`getX`/`getY` (e.g. `PyramidPlot` tags its `data` rows with
+     * internal `__x`/`__y`/… fields for hover-quadtree-clone survival, but
+     * its series still carry the plain untagged row shape).
+     */
+    seriesData?: Series<TSeries>[];
+    /** Per-series `GeometryLayout` groups — axis-based kinds only, same `TSeries` as `seriesData`. */
+    scopedGroups?: ScopedMarkerGroup<TSeries>[];
+    /** The wrapper div's own element — bind for a nested layout that needs it for its own gesture handling (e.g. `CoordinatesLayout`'s zoom/rotate). */
     containerEl?: HTMLDivElement;
     /**
      * `matchedPoints` carries the source `row` alongside the display fields
@@ -83,7 +118,8 @@
      * content box without recomputing margins itself.
      * `setHoverMatch`/`clearHoverMatch` let a plot kind drive the match
      * itself instead of svelteplot's distance-based `<Pointer>` — see
-     * `hover.match`.
+     * `hover.match`. When `markers` is given, this is `GeometryLayout`'s own
+     * `children` (typically value labels) instead of raw plot content.
      */
     children: Snippet<
       [{
@@ -132,6 +168,9 @@
   // (grid, the vertical label config, BarPlot's series-layout knobs).
   const resolvedX = $derived(x !== undefined ? x : (buildScale(scales?.x, data, getX) as SveltePlotProps['x']));
   const resolvedY = $derived(y !== undefined ? y : (buildScale(scales?.y, data, getY) as SveltePlotProps['y']));
+
+  /** Only ever meaningful for `GeoPlot` — every other kind leaves `coordinates` unset. */
+  const touchAction = $derived(coordinates?.zoom !== false && coordinates?.zoom != null ? 'none' : undefined);
 
   // ── Hover / tooltip ───────────────────────────────────────────────────────
   const sharedHover = getHover();
@@ -182,6 +221,10 @@
     }
     ctrl.onMove(e);
   }
+
+  const resolvedMarkers = $derived(
+    typeof markers === 'function' ? markers({ setHoverMatch: ctrl.onPointer, clearHoverMatch: ctrl.onLeave }) : markers,
+  );
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -193,28 +236,54 @@
   onpointermove={hover.active ? onMove : undefined}
   onpointerleave={hover.active ? ctrl.onLeave : undefined}
 >
-  <Plot
+  <CoordinatesLayout
     {width}
     {height}
     margin={computedMargins}
     x={resolvedX}
     y={resolvedY}
-    projection={projection as SveltePlotProps['projection']}
+    {coordinates}
+    {data}
+    {containerEl}
   >
-    {@render children({
-      matchedPoints: ctrl.points,
-      activePoint: ctrl.activePoint,
-      impliesCrosshairX: ctrl.impliesCrosshairX,
-      impliesCrosshairY: ctrl.impliesCrosshairY,
-      numericMargins,
-      setHoverMatch: ctrl.onPointer,
-      clearHoverMatch: ctrl.onLeave,
-    })}
+    <StylesLayout {styles} {width} {height} {numericMargins} />
+    {#if markers !== undefined}
+      <ScalesLayout {data} {getX} {getY} {width} {height} {numericMargins} {scales} />
+      <GeometryLayout
+        markers={resolvedMarkers}
+        seriesData={seriesData ?? []}
+        scopedGroups={scopedGroups ?? []}
+        matchedPoints={ctrl.points}
+        activePoint={ctrl.activePoint}
+        impliesCrosshairX={ctrl.impliesCrosshairX}
+        impliesCrosshairY={ctrl.impliesCrosshairY}
+      >
+        {@render children({
+          matchedPoints: ctrl.points,
+          activePoint: ctrl.activePoint,
+          impliesCrosshairX: ctrl.impliesCrosshairX,
+          impliesCrosshairY: ctrl.impliesCrosshairY,
+          numericMargins,
+          setHoverMatch: ctrl.onPointer,
+          clearHoverMatch: ctrl.onLeave,
+        })}
+      </GeometryLayout>
+    {:else}
+      {@render children({
+        matchedPoints: ctrl.points,
+        activePoint: ctrl.activePoint,
+        impliesCrosshairX: ctrl.impliesCrosshairX,
+        impliesCrosshairY: ctrl.impliesCrosshairY,
+        numericMargins,
+        setHoverMatch: ctrl.onPointer,
+        clearHoverMatch: ctrl.onLeave,
+      })}
+    {/if}
 
     {#if hover.active && matchStrategy === 'nearest'}
       <Pointer {data} x={pointerMatchX} y={pointerMatchY} maxDistance={400} onupdate={ctrl.onPointer} />
     {/if}
-  </Plot>
+  </CoordinatesLayout>
 
   {#if hover.tooltip}
     <TooltipLayout

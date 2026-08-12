@@ -16,7 +16,7 @@ const meta = {
     width: 950,
     height: 500,
     data: WORLD_COUNTRIES,
-    scales: { projection: 'mercator' },
+    coordinates: { projection: 'mercator' },
   },
   argTypes: {
     width: { control: { type: 'range', min: 320, max: 950, step: 20 } },

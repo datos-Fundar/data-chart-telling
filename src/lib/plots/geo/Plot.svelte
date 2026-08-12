@@ -5,7 +5,6 @@
   import { resolveFeatureStyle } from '$lib/plots/utils/geoSegments';
   import {
     geometryCentroid,
-    geometryLonLatBounds,
     geometryPartCentroids,
     filterGeometryParts,
     defaultFeatureId,
@@ -16,18 +15,15 @@
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
   import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
-  import { GEO_MARGIN_ESTIMATE } from '$lib/layout/plot/margins';
+  import { GEO_MARGIN_ESTIMATE } from '$lib/layout/coordinates/margins';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
-  import GeoLayout from '$lib/layout/geo/GeoLayout.svelte';
-  import { resolveProjection } from '$lib/layout/geo/resolveProjection';
   import HoverMarker from '$lib/markers/HoverMarker.svelte';
-  import { createGeoZoom } from '$lib/plots/geo/zoom.svelte';
-  import { createGeoRotate, type GeoRotate } from '$lib/plots/geo/rotate.svelte';
   import InsetMarker from '$lib/markers/inset/InsetMarker.svelte';
   import ContourClipMarker from '$lib/markers/ContourClipMarker.svelte';
-  import type { BasePlotProps, GeoScalesConfig } from '$lib/types/plots/props';
+  import type { BasePlotProps } from '$lib/types/plots/props';
+  import type { GeoScalesConfig, CoordinatesConfig } from '$lib/types/layout/coordinates';
   import type { GeoFeature, GeoDataProps } from '$lib/types/plots/data/geo';
-  import type { GeoStyles } from '$lib/types/plots/styles/geo';
+  import type { GeoStylesConfig } from '$lib/types/layout/styles';
   import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
   import type { GeoMarker, GeoHoverMarkerConfig, GeoDotMarkerConfig, GeoInsetMarkerConfig } from '$lib/types/markers/geo';
 
@@ -45,10 +41,11 @@
   type Props = BasePlotProps<
     GeoDataProps<TProps>,
     GeoFeature<TProps>,
-    GeoStyles<TProps>,
+    GeoStylesConfig<TProps>,
     GeoSegmentStyle,
     GeoMarker,
-    GeoScalesConfig
+    GeoScalesConfig,
+    CoordinatesConfig
   >;
 
   let {
@@ -63,6 +60,7 @@
     segments = {},
     markers = [],
     scales = {},
+    coordinates = {},
     margins,
     tooltip = undefined,
   }: Props = $props();
@@ -148,7 +146,7 @@
   // ── Tile-layer / projection compatibility ────────────────────────────────
   $effect(() => {
     if (!styles.tileLayer) return;
-    const proj = scales.projection;
+    const proj = coordinates.projection;
     const name = typeof proj === 'string' ? proj : proj?.type;
     if (name && name !== 'mercator' && name !== 'transverse-mercator') {
       console.warn(
@@ -157,22 +155,28 @@
     }
   });
 
-  const dataLonLatBounds = $derived.by((): [number, number, number, number] | null => {
-    if (!styles.tileLayer) return null;
-    let minLon = Infinity;
-    let maxLon = -Infinity;
-    let minLat = Infinity;
-    let maxLat = -Infinity;
-    for (const f of features) {
-      const b = geometryLonLatBounds(f.geometry);
-      if (!b) continue;
-      if (b[0] < minLon) minLon = b[0];
-      if (b[2] > maxLon) maxLon = b[2];
-      if (b[1] < minLat) minLat = b[1];
-      if (b[3] > maxLat) maxLat = b[3];
-    }
-    return minLon === Infinity ? null : [minLon, minLat, maxLon, maxLat];
-  });
+  /**
+   * `coordinates.projection`, defaulted to `'mercator'` when unset and
+   * `styles.tileLayer` is active (the only projection family `TileLayer`
+   * renders correctly under) — folded in here, before `coordinates` reaches
+   * `BasePlotLayout`/`CoordinatesLayout`, since neither knows about
+   * `styles.tileLayer`.
+   */
+  const resolvedCoordinates = $derived.by((): CoordinatesConfig => ({
+    ...coordinates,
+    projection: coordinates.projection ?? (styles.tileLayer ? 'mercator' : undefined),
+  }));
+
+  /**
+   * `styles`, with `features` tacked onto `tileLayer` (never author-facing —
+   * `GeoTileLayerConfig` doesn't declare it) so `StylesLayout` can compute
+   * the tile layer's auto-fit bounds without raw geometry threaded through
+   * as a separate prop. `excludeParts`-reduced `features`, matching what
+   * actually renders.
+   */
+  const resolvedStyles = $derived.by(() =>
+    styles.tileLayer ? { ...styles, tileLayer: { ...styles.tileLayer, features } } : styles,
+  );
 
   // ── Choropleth color scale (mirrors heatmap's styles.colors/scales.z) ────
   const minColor = $derived(styles.colors?.min ?? cfg.continuous.min);
@@ -336,59 +340,6 @@
     // browser's own SVG hit-testing on each rendered feature path (see the
     // `<Geo onpointerenter>` below), rather than 'nearest' centroid distance.
     match: 'contains' as const,
-  });
-
-  // ── Projection ────────────────────────────────────────────────────────────
-  const resolvedProjection = $derived(
-    resolveProjection(scales.projection ?? (styles.tileLayer ? 'mercator' : undefined), hoverCandidates),
-  );
-
-  // ── Pan / zoom / rotate — owned here (not GeoLayout) since the resulting
-  // rotated projection must reach `BasePlotLayout`'s own `<Plot projection>`
-  // prop, and a component nested *inside* that `<Plot>` (as GeoLayout is)
-  // has no way to reach back out to a prop on its own ancestor. GeoLayout
-  // only renders the *result* (`zoomTransform`) as its `<g transform>`. ────
-  let containerEl = $state<HTMLDivElement>();
-  const zoomEnabled = $derived(styles.zoom !== false && styles.zoom != null);
-  const zoomConfig = $derived(typeof styles.zoom === 'object' ? styles.zoom : undefined);
-
-  /**
-   * Orthographic (and other azimuthal, hemisphere-style) projections don't
-   * gain anything from drag-to-*pan* — panning just slides the same globe a
-   * few pixels within the frame — so when `zoom` is enabled on one, drag
-   * instead rotates the globe (`createGeoRotate`) and wheel/pinch keeps
-   * scaling it (`createGeoZoom`, with its own drag disabled below so the two
-   * gestures don't fight over the same pointer events).
-   */
-  const projectionType = $derived(
-    typeof resolvedProjection === 'string' ? resolvedProjection : resolvedProjection?.type,
-  );
-  const rotateEnabled = $derived(zoomEnabled && projectionType === 'orthographic');
-  const baseRotate = $derived.by((): GeoRotate => {
-    const configured = typeof resolvedProjection === 'object' ? resolvedProjection?.rotate : undefined;
-    return [configured?.[0] ?? 0, configured?.[1] ?? 0, configured?.[2] ?? 0];
-  });
-
-  const geoZoom = createGeoZoom({
-    enabled: () => zoomEnabled,
-    config: () => zoomConfig,
-    node: () => containerEl ?? null,
-    disableDrag: () => rotateEnabled,
-  });
-
-  const geoRotate = createGeoRotate({
-    enabled: () => rotateEnabled,
-    baseRotate: () => baseRotate,
-    scale: () => geoZoom.transform.k,
-    node: () => containerEl ?? null,
-  });
-
-  const finalProjection = $derived.by(() => {
-    if (!rotateEnabled) return resolvedProjection;
-    return {
-      ...(typeof resolvedProjection === 'string' ? { type: resolvedProjection } : resolvedProjection),
-      rotate: geoRotate.rotate,
-    };
   });
 
   /**
@@ -573,11 +524,10 @@
   {hover}
   x={{ domain: [-180, 180] }}
   y={{ domain: [90, -90] }}
-  projection={finalProjection}
+  coordinates={resolvedCoordinates}
   {margins}
   marginEstimate={GEO_MARGIN_ESTIMATE}
-  touchAction={zoomEnabled ? 'none' : undefined}
-  bind:containerEl
+  styles={resolvedStyles}
 >
   {#snippet children({ matchedPoints, numericMargins, setHoverMatch, clearHoverMatch })}
     {@const onFeaturePointerEnter = (e: Event, d: TaggedFeature) => {
@@ -589,42 +539,33 @@
       if (isOverInset(e as PointerEvent)) return;
       clearHoverMatch();
     }}
-    <GeoLayout
-      {width}
-      {height}
-      {numericMargins}
-      zoomTransform={geoZoom.transform}
-      tileLayer={styles.tileLayer}
-      {dataLonLatBounds}
-    >
-      {#each markers as marker, i (marker.type + '-' + i)}
-        {#if isBehindMarker(marker)}
-          {@render marker_(marker, numericMargins)}
-        {/if}
-      {/each}
+    {#each markers as marker, i (marker.type + '-' + i)}
+      {#if isBehindMarker(marker)}
+        {@render marker_(marker, numericMargins)}
+      {/if}
+    {/each}
 
-      {#each styleGroups as group (JSON.stringify(group.style))}
-        <Geo
-          data={group.data}
-          fill={(d: TaggedFeature) => group.style.fill ?? resolveBaseFill(d)}
-          fillOpacity={group.style.fillOpacity ?? styles.fillOpacity ?? 1}
-          stroke={group.style.stroke ?? styles.stroke ?? cfg.axis.color}
-          strokeWidth={group.style.strokeWidth ?? styles.strokeWidth ?? 0.5}
-          style="vector-effect: non-scaling-stroke"
-          onclick={styles.onFeatureClick
-            ? (e: Event, d: TaggedFeature) => styles.onFeatureClick?.(d, e)
-            : undefined}
-          onpointerenter={hoverActive ? onFeaturePointerEnter : undefined}
-          onpointerleave={hoverActive ? onFeaturePointerLeave : undefined}
-        />
-      {/each}
+    {#each styleGroups as group (JSON.stringify(group.style))}
+      <Geo
+        data={group.data}
+        fill={(d: TaggedFeature) => group.style.fill ?? resolveBaseFill(d)}
+        fillOpacity={group.style.fillOpacity ?? styles.fillOpacity ?? 1}
+        stroke={group.style.stroke ?? styles.stroke ?? cfg.axis.color}
+        strokeWidth={group.style.strokeWidth ?? styles.strokeWidth ?? 0.5}
+        style="vector-effect: non-scaling-stroke"
+        onclick={styles.onFeatureClick
+          ? (e: Event, d: TaggedFeature) => styles.onFeatureClick?.(d, e)
+          : undefined}
+        onpointerenter={hoverActive ? onFeaturePointerEnter : undefined}
+        onpointerleave={hoverActive ? onFeaturePointerLeave : undefined}
+      />
+    {/each}
 
-      {#each markers as marker, i (marker.type + '-' + i)}
-        {#if !isBehindMarker(marker)}
-          {@render marker_(marker, numericMargins)}
-        {/if}
-      {/each}
-    </GeoLayout>
+    {#each markers as marker, i (marker.type + '-' + i)}
+      {#if !isBehindMarker(marker)}
+        {@render marker_(marker, numericMargins)}
+      {/if}
+    {/each}
 
     {#if hoverMarkerConfig}
       <HoverMarker marker={hoverMarkerConfig} data={matchedPoints} />

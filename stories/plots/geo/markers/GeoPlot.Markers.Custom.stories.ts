@@ -20,7 +20,7 @@ const meta = {
     width: 950,
     height: 500,
     data: WORLD_COUNTRIES,
-    scales: { projection: 'mercator' },
+    coordinates: { projection: 'mercator' },
     styles: { fill: '#e2e8f0', stroke: '#94a3b8' },
   },
   argTypes: {

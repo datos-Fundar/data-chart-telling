@@ -1,7 +1,7 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
   import { Text } from 'svelteplot';
   import type { AxisValue } from '$lib/types/layout/scales';
-  import type { ValuesStyle } from '$lib/types/plots/styles/common';
+  import type { ValuesStyle } from '$lib/types/layout/styles';
 
   /**
    * Renders every cell's value label in one mark — heatmaps have no

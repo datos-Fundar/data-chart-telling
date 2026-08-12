@@ -44,7 +44,7 @@ export const Basic: Story = {
 export const CustomStepAndStyle: Story = {
   args: {
     data: WORLD_COUNTRIES,
-    scales: { projection: 'orthographic' },
+    coordinates: { projection: 'orthographic' },
     markers: [
       {
         type: 'graticule',
@@ -62,14 +62,13 @@ export const CustomStepAndStyle: Story = {
  * makes the fill work as ocean-colored background here rather than an
  * opaque layer painted over every country on top of it — markers otherwise
  * always draw over the base map regardless of their position in `markers`.
- * `styles.zoom: true` also enables drag-to-rotate on an orthographic
+ * `coordinates.zoom: true` also enables drag-to-rotate on an orthographic
  * projection — drag the globe below to spin it.
  */
 export const SphereOutline: Story = {
   args: {
     data: WORLD_COUNTRIES,
-    scales: { projection: { type: 'orthographic', rotate: [60, 20] } },
-    styles: { zoom: true },
+    coordinates: { projection: { type: 'orthographic', rotate: [60, 20] }, zoom: true },
     markers: [
       {
         type: 'sphere',
@@ -89,8 +88,7 @@ export const SphereOutline: Story = {
 export const WithEarthquakeDots: Story = {
   args: {
     data: WORLD_COUNTRIES,
-    scales: { projection: { type: 'orthographic', rotate: [65, 15] } },
-    styles: { zoom: true },
+    coordinates: { projection: { type: 'orthographic', rotate: [65, 15] }, zoom: true },
     markers: [
       { type: 'sphere', behind: true, style: { fill: '#f8fafc', stroke: 'currentColor' } } satisfies GeoMarker,
       { type: 'graticule', style: { stroke: '#e2e8f0' } } satisfies GeoMarker,

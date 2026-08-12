@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import type { GeoMarker } from '$lib/types/markers/geo';
-import { argentinaBicontinental } from '$lib/plots/geo/projections/argentina';
+import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 import { ARGENTINA_PROVINCES, CABA_COMUNAS, AMBA_PARTIDOS, type ArgentinaProvinceProps } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -21,7 +21,7 @@ const meta = {
     height: 500,
     data: ARGENTINA_PROVINCES,
     featureId: (f) => (f.properties as ArgentinaProvinceProps).nombre,
-    scales: { projection: { type: argentinaBicontinental } },
+    coordinates: { projection: { type: argentinaBicontinental } },
   },
   argTypes: {
     width: { control: { type: 'range', min: 320, max: 950, step: 20 } },
@@ -121,7 +121,7 @@ export const ExplicitDataset: Story = {
  * twice — Tierra del Fuego's mainland part is untouched, still visible on
  * the main map.
  *
- * `scales.projection` is overridden here to a plain, auto-fitting
+ * `coordinates.projection` is overridden here to a plain, auto-fitting
  * `'mercator'` (`domain: 'data'` fits it to whatever the map is *actually*
  * showing at render time), replacing this file's `argentinaBicontinental`
  * default — that custom projection's own scale/translate are fixed at
@@ -135,7 +135,7 @@ export const ExplicitDataset: Story = {
  */
 export const AntarcticSector: Story = {
   args: {
-    scales: { projection: { type: 'mercator', domain: 'data' } },
+    coordinates: { projection: { type: 'mercator', domain: 'data' } },
     excludeParts: isAntarcticPart,
     markers: [
       {
@@ -153,12 +153,12 @@ export const AntarcticSector: Story = {
  * Two insets at once — CABA's own comunas (`CABA_COMUNAS`, a separate,
  * finer-grained dataset than the single CABA feature in `ARGENTINA_PROVINCES`)
  * and the Antarctic sector (see `AntarcticSector` above for why
- * `excludeParts`/`featurePartsFilter`/`scales.projection` are needed there)
+ * `excludeParts`/`featurePartsFilter`/`coordinates.projection` are needed there)
  * — mirroring the layout Argentina's IGN uses on official maps.
  */
 export const CombinedInsets: Story = {
   args: {
-    scales: { projection: { type: 'mercator', domain: 'data' } },
+    coordinates: { projection: { type: 'mercator', domain: 'data' } },
     excludeParts: isAntarcticPart,
     markers: [
       {

@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { GeoProjectionName } from '$lib/types/plots/scales/geo';
+import type { GeoProjectionName } from '$lib/types/layout/coordinates';
 import { WORLD_COUNTRIES } from '../../../../stories/plots/geo/data';
 import { waitForSvg, countGeoPaths } from '../_helpers/svg';
 
@@ -36,7 +36,7 @@ describe('GeoPlot – projections', () => {
       width: 400,
       height: 300,
       data: WORLD_COUNTRIES,
-      scales: { projection },
+      coordinates: { projection },
     });
     const svg = await waitForSvg(container);
     expect(countGeoPaths(svg)).toBe(WORLD_COUNTRIES.length);
@@ -47,7 +47,7 @@ describe('GeoPlot – projections', () => {
       width: 400,
       height: 300,
       data: WORLD_COUNTRIES,
-      scales: { projection: { type: 'orthographic', rotate: [60, 20] } },
+      coordinates: { projection: { type: 'orthographic', rotate: [60, 20] } },
     });
     const svg = await waitForSvg(container);
     expect(countGeoPaths(svg)).toBe(WORLD_COUNTRIES.length);

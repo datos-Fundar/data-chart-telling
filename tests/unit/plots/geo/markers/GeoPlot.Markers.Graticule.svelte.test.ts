@@ -38,7 +38,7 @@ describe('GeoPlot – sphere marker', () => {
       width: 400,
       height: 300,
       data: WORLD_COUNTRIES,
-      scales: { projection: 'orthographic' },
+      coordinates: { projection: 'orthographic' },
       markers: [{ type: 'sphere' } satisfies GeoMarker],
     });
     const svg = await waitForSvg(container);
@@ -50,7 +50,7 @@ describe('GeoPlot – sphere marker', () => {
       width: 400,
       height: 300,
       data: WORLD_COUNTRIES,
-      scales: { projection: 'orthographic' },
+      coordinates: { projection: 'orthographic' },
       markers: [{ type: 'sphere', style: { fill: '#eff6ff', stroke: 'currentColor' } } satisfies GeoMarker],
     });
     const svg = await waitForSvg(container);

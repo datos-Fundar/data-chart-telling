@@ -5,8 +5,8 @@
 
   /**
    * Axis ticks/titles and grid lines for plot kinds with an x/y axis pair
-   * (line/bar/heatmap/pyramid). Not used by `GeoPlot` (see `GeoLayout`
-   * instead). The scale itself is resolved by `buildScale` and applied via
+   * (line/bar/heatmap/pyramid). Not used by `GeoPlot` (a map has no x/y axis
+   * pair). The scale itself is resolved by `buildScale` and applied via
    * `BasePlotLayout`'s `<Plot x y>` — this only renders the cosmetics.
    */
   let {

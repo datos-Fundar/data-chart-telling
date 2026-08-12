@@ -42,7 +42,7 @@ type Story = StoryObj<typeof meta>;
  */
 export const SphericalLinks: Story = {
   args: {
-    scales: { projection: 'equal-earth' },
+    coordinates: { projection: 'equal-earth' },
     markers: [
       {
         type: 'link',
@@ -64,7 +64,7 @@ export const SphericalLinks: Story = {
  */
 export const LinearLinks: Story = {
   args: {
-    scales: { projection: 'equal-earth' },
+    coordinates: { projection: 'equal-earth' },
     markers: [
       {
         type: 'link',
@@ -82,7 +82,7 @@ export const LinearLinks: Story = {
 
 /**
  * Spherical links on an orthographic globe — the geodesic curvature is most
- * visually obvious on a hemisphere view. `styles.zoom: true` also enables
+ * visually obvious on a hemisphere view. `coordinates.zoom: true` also enables
  * drag-to-rotate here (orthographic-specific: dragging spins the globe
  * instead of panning it, since panning a globe within its own frame isn't
  * useful) — drag the canvas below to see a route's great-circle arc land
@@ -90,8 +90,7 @@ export const LinearLinks: Story = {
  */
 export const OnOrthographicGlobe: Story = {
   args: {
-    scales: { projection: { type: 'orthographic', rotate: [60, -10] } },
-    styles: { zoom: true },
+    coordinates: { projection: { type: 'orthographic', rotate: [60, -10] }, zoom: true },
     markers: [
       { type: 'sphere', behind: true, style: { fill: '#f8fafc', stroke: 'currentColor' } } satisfies GeoMarker,
       { type: 'graticule', style: { stroke: '#e2e8f0' } } satisfies GeoMarker,

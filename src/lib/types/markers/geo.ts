@@ -1,11 +1,11 @@
 import type { Snippet } from 'svelte';
 import type { Accessor } from '$lib/types/plots/data/common';
-import type { ColorsStyle } from '$lib/types/plots/styles/common';
+import type { ColorsStyle } from '$lib/types/layout/styles';
 import type { DotStyle, FontStyle, StrokeStyle } from '$lib/types/plots/styling';
 import type { HoverDisplayPoint } from '$lib/types/layout/tooltip';
 import type { GeoFeature, GeoJsonInput } from '$lib/types/plots/data/geo';
 import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
-import type { GeoProjectionName } from '$lib/types/plots/scales/geo';
+import type { GeoProjectionName } from '$lib/types/layout/coordinates';
 
 /** Longitude/latitude gridlines — svelteplot's `Graticule`. */
 export type GeoGraticuleMarkerConfig = {

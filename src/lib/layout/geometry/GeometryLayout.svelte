@@ -1,4 +1,4 @@
-<script lang="ts" generics="TData extends Record<string, unknown>">
+<script lang="ts" generics="TData extends Record<string, unknown>, TSeries extends Record<string, unknown> = TData">
   import type { Snippet } from 'svelte';
   import { SvelteMap } from 'svelte/reactivity';
   import BarMarker from '$lib/markers/BarMarker.svelte';
@@ -42,10 +42,16 @@
     children,
   }: {
     markers?: Marker[];
-    /** All resolved series, forwarded to unscoped component markers (e.g. DeltaMarker). */
-    seriesData?: Series<TData>[];
-    /** One entry per series that can own a `series`-scoped marker — see this component's own doc. */
-    scopedGroups?: ScopedMarkerGroup<TData>[];
+    /**
+     * All resolved series, forwarded to unscoped component markers (e.g.
+     * DeltaMarker). Independently generic over `TSeries` (defaults to
+     * `TData`) — a plot kind's series rows aren't always the same shape as
+     * its hover points' `row` (e.g. `PyramidPlot` tags hover rows with
+     * internal `__x`/`__y`/… fields its series don't carry).
+     */
+    seriesData?: Series<TSeries>[];
+    /** One entry per series that can own a `series`-scoped marker — see this component's own doc. Same `TSeries` as `seriesData`. */
+    scopedGroups?: ScopedMarkerGroup<TSeries>[];
     matchedPoints: HoverPoint<TData>[];
     /** The specific matched point actually under the cursor — see `controller.svelte.ts`'s own doc comment. */
     activePoint: HoverPoint<TData> | null;
@@ -100,7 +106,8 @@
       {@const seriesPoints = matchedPoints.filter((p) => p.series === group.name)}
       {#if marker.scope === 'segment'}
         {#each group.segments as seg, segIdx (`${group.name}-hover-segment-${segIdx}`)}
-          {@const segPoints = seriesPoints.filter((p) => seg.match(p.row))}
+          <!-- p.row is TData, a plot kind's own (possibly tagged) hover-point row — always a superset of TSeries (its series row shape) in practice, just not provable across two independent generics. -->
+          {@const segPoints = seriesPoints.filter((p) => seg.match(p.row as unknown as TSeries))}
           {#if segPoints.length > 0}
             <HoverMarker
               {marker}

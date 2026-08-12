@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-import type { BasePlotStyles } from '$lib/types/plots/styles/common';
+import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
 import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -57,7 +57,7 @@ export const NoValueLabels: Story = {
     },
     styles: {
       values: { show: false },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };
 
@@ -76,7 +76,7 @@ export const CustomValueFormat: Story = {
     },
     styles: {
       values: { format: (v: number) => `${v.toFixed(1)} yr` },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };
 
@@ -96,7 +96,7 @@ export const WarmColorRamp: Story = {
     styles: {
       colors: { min: 'darkblue', max: 'cornflowerblue' },
       values: { format: (v: number) => `${v.toFixed(1)} yr` },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };
 
@@ -116,7 +116,7 @@ export const CustomColorRamp: Story = {
     styles: {
       colors: { min: '#ff6b6b', max: '#51cf66' },
       values: { format: (v: number) => `${v.toFixed(1)} yr` },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };
 
@@ -136,6 +136,6 @@ export const InvertedColorRamp: Story = {
     styles: {
       colors: { min: '#51cf66', max: '#ff6b6b' },
       values: { format: (v: number) => `${v.toFixed(1)} yr` },
-    } satisfies BasePlotStyles,
+    } satisfies BasePlotStylesConfig,
   },
 };

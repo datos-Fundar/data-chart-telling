@@ -2,7 +2,7 @@
   import { Text } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import type { Series } from '$lib/types/plots/data/common';
-  import type { ValuesStyle } from '$lib/types/plots/styles/common';
+  import type { ValuesStyle } from '$lib/types/layout/styles';
   import type { ValueAnchor } from '$lib/types/plots/constants';
   import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
   import type { VisualGroup } from '$lib/types/plots/segments/config';

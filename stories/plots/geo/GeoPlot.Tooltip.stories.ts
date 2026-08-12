@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import RichTooltip from './RichTooltip.svelte';
-import { argentinaBicontinental } from '$lib/plots/geo/projections/argentina';
+import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 import { ARGENTINA_PROVINCES, CABA_COMUNAS, type ArgentinaProvinceProps, type CabaComunaProps } from './data';
 import type { GeoMarker } from '$lib/types/markers/geo';
 
@@ -16,7 +16,7 @@ const meta = {
     height: 500,
     data: ARGENTINA_PROVINCES,
     featureId: (f) => (f.properties as ArgentinaProvinceProps).nombre,
-    scales: { projection: { type: argentinaBicontinental } },
+    coordinates: { projection: { type: argentinaBicontinental } },
   },
   argTypes: {
     width: { control: { type: 'range', min: 320, max: 950, step: 20 } },
@@ -134,7 +134,7 @@ const isAntarcticPart = (part: { centroid: [number, number] }, feature: { __id: 
  */
 export const TooltipOnInsets: Story = {
   args: {
-    scales: { projection: { type: 'mercator', domain: 'data' } },
+    coordinates: { projection: { type: 'mercator', domain: 'data' } },
     excludeParts: isAntarcticPart,
     tooltip: {
       facetId: '',

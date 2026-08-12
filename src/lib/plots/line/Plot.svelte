@@ -10,22 +10,20 @@
   import { disabledStrokeOverride, disabledDotsOverride } from '$lib/plots/utils/legendDisabled';
   import { buildLineMarkers } from '$lib/plots/line/buildLineMarkers';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
-  import ScalesLayout from '$lib/layout/scales/ScalesLayout.svelte';
-  import GeometryLayout from '$lib/layout/geometry/GeometryLayout.svelte';
   import ValueLabels from '$lib/plots/line/ValueLabels.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
   import { buildGroupedSeries, validateSegments, buildScopedMarkerGroups } from '$lib/plots/utils/segments';
   import type { BasePlotProps } from '$lib/types/plots/props';
   import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
   import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
-  import type { BasePlotStyles } from '$lib/types/plots/styles/common';
+  import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
   import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
   import type { Marker } from '$lib/types/markers/common';
 
   type Props = BasePlotProps<
     SeriesProps<TData> | DataProps<TData>,
     TData,
-    BasePlotStyles,
+    BasePlotStylesConfig,
     LineSegmentStyle,
     Marker,
     AxisBasedScalesConfig<TData>
@@ -117,6 +115,7 @@
 <BasePlotLayout
   {width}
   {height}
+  {styles}
   data={flat}
   getX={xAcc}
   getY={(d) => Number(yAcc(d))}
@@ -124,13 +123,11 @@
   {scales}
   {margins}
   xTickRotate={scales?.x?.tickRotate}
+  markers={[...lineMarkers, ...markers]}
+  seriesData={resolvedSeries}
+  {scopedGroups}
 >
-  {#snippet children({ matchedPoints, activePoint, impliesCrosshairX, impliesCrosshairY, numericMargins })}
-  <ScalesLayout data={flat} getX={xAcc} getY={(d) => Number(yAcc(d))} {width} {height} {numericMargins} {scales} />
-  <GeometryLayout markers={[...lineMarkers, ...markers]} seriesData={resolvedSeries} {scopedGroups} {matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY}>
   {#if showVals}
     <ValueLabels {lastPoints} values={styles.values} />
   {/if}
-  </GeometryLayout>
-  {/snippet}
 </BasePlotLayout>
