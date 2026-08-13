@@ -270,3 +270,35 @@ export const GroupedDataSeriesFiltered: Story = {
 export const CustomContent: StoryObj = {
   render: () => ({ Component: RichTooltip }),
 };
+
+/**
+ * `anchorX`/`anchorY` override the system default (`'right'`/`'bottom'` —
+ * the tooltip sits to the right of the cursor and below it, so it never
+ * covers the hovered point). Here it's pinned above-and-to-the-left
+ * instead. Whatever side is picked, it still falls back toward the opposite
+ * side (via the centered position) if the cursor gets close enough to an
+ * edge that the preferred side would overflow — try hovering near the plot's
+ * own left/top edges to see it happen.
+ */
+export const CustomAnchor: Story = {
+  args: {
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY,
+      }
+    ],
+    tooltip: {
+      facetId: '',
+      sync: false,
+      anchorX: 'left',
+      anchorY: 'top',
+      format: (row) => {
+        const { year, value } = row as YearPoint;
+        return `${year}: ${value.toFixed(1)} yr`;
+      },
+    },
+  },
+};

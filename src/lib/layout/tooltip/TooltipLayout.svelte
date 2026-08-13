@@ -1,6 +1,7 @@
 <script lang="ts" generics="TRow extends Record<string, unknown>">
   import type { Snippet } from 'svelte';
   import Tooltip from './Tooltip.svelte';
+  import type { TooltipAnchorX, TooltipAnchorY } from '$lib/types/layout/tooltip';
 
   /**
    * The "resolve + render" step every hoverable plot repeats verbatim:
@@ -20,6 +21,8 @@
     rows,
     format,
     content,
+    anchorX,
+    anchorY,
   }: {
     visible: boolean;
     x: number;
@@ -31,11 +34,14 @@
     format: (row: TRow) => string;
     /** Custom tooltip body; replaces the joined `format` text when given. */
     content?: Snippet<[{ rows: TRow[] }]>;
+    /** Preferred anchor — forwarded to `Tooltip` as-is; `undefined` falls through to its own system default. */
+    anchorX?: TooltipAnchorX;
+    anchorY?: TooltipAnchorY;
   } = $props();
 </script>
 
 {#if visible}
-  <Tooltip {x} {y} {bounds} plain={!!content}>
+  <Tooltip {x} {y} {bounds} plain={!!content} {anchorX} {anchorY}>
     {#if content}
       {@render content({ rows })}
     {:else}

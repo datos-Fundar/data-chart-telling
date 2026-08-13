@@ -23,7 +23,7 @@
   import type { Series } from '$lib/types/plots/data/common';
   import type { HoverMarkerConfig, CustomComponentMarkerConfig } from '$lib/types/markers/common';
   import type { MarkerConfig } from '$lib/types/markers/all';
-  import type { HoverPoint } from '$lib/types/layout/tooltip';
+  import type { HoverPoint, TooltipAnchorX, TooltipAnchorY } from '$lib/types/layout/tooltip';
   import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
   import type { GeoFeature } from '$lib/types/plots/data/geo';
 
@@ -56,6 +56,8 @@
     numericMargins,
     data = [],
     geoAllFeatures = [],
+    tooltipAnchorX,
+    tooltipAnchorY,
     children,
   }: {
     /** The plot's own outer width/height — `inset` marker only, to size its content box. */
@@ -77,6 +79,9 @@
     data?: TData[];
     /** `GeoPlot`'s own untouched, tagged features — `inset` marker only (shows a part the main map may exclude). */
     geoAllFeatures?: (GeoFeature<Record<string, unknown>> & { __id: string })[];
+    /** The plot's own top-level `tooltip.anchorX`/`anchorY` — `inset` marker only, as the fallback its own tooltip inherits when unset. */
+    tooltipAnchorX?: TooltipAnchorX;
+    tooltipAnchorY?: TooltipAnchorY;
     /** Rendered last, on top of every marker — typically value labels. Optional; a plot kind may have nothing extra to add. */
     children?: Snippet;
   } = $props();
@@ -158,6 +163,8 @@
       left={numericMargins?.left ?? 0}
       top={numericMargins?.top ?? 0}
       defaultFill={cfg.palette[0]}
+      {tooltipAnchorX}
+      {tooltipAnchorY}
     />
   {:else if marker.type === 'component'}
     <marker.component {...marker.props} data={marker.data ?? seriesData} />

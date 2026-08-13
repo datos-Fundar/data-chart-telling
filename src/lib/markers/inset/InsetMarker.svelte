@@ -6,6 +6,7 @@
   import TooltipLayout from '$lib/layout/tooltip/TooltipLayout.svelte';
   import type { GeoInsetMarkerConfig } from '$lib/types/markers/geo';
   import type { GeoFeature } from '$lib/types/plots/data/geo';
+  import type { TooltipAnchorX, TooltipAnchorY } from '$lib/types/layout/tooltip';
 
   /**
    * A small, independently-projected map panel anchored to a corner/edge of
@@ -22,6 +23,8 @@
     left = 0,
     top = 0,
     defaultFill,
+    tooltipAnchorX,
+    tooltipAnchorY,
   }: {
     marker: GeoInsetMarkerConfig<TProps>;
     /**
@@ -45,6 +48,9 @@
     left?: number;
     top?: number;
     defaultFill: string;
+    /** The plot's own top-level `tooltip.anchorX`/`anchorY` — the fallback this inset's own tooltip inherits when its own is unset, before the system default. */
+    tooltipAnchorX?: TooltipAnchorX;
+    tooltipAnchorY?: TooltipAnchorY;
   } = $props();
 
   const insetFeatures = $derived.by((): GeoFeature<Record<string, unknown>>[] => {
@@ -147,6 +153,8 @@
             rows={hovered ? [hovered.feature] : []}
             format={tooltip.format}
             content={tooltip.content}
+            anchorX={tooltip.anchorX ?? tooltipAnchorX}
+            anchorY={tooltip.anchorY ?? tooltipAnchorY}
           />
         </div>
       </foreignObject>

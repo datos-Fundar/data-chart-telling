@@ -110,6 +110,25 @@ export const CustomContent: StoryObj = {
   render: () => ({ Component: RichTooltip }),
 };
 
+/**
+ * `anchorX`/`anchorY` override the system default (`'right'`/`'bottom'`).
+ * Here it's pinned above-and-to-the-left of the cursor instead — still
+ * falls back toward the opposite side (via the centered position) if the
+ * cursor gets close enough to an edge that the preferred side would
+ * overflow.
+ */
+export const CustomAnchor: Story = {
+  args: {
+    tooltip: {
+      facetId: '',
+      sync: false,
+      anchorX: 'left',
+      anchorY: 'top',
+      format: (f) => (f.properties as ArgentinaProvinceProps).nombre,
+    },
+  },
+};
+
 const TIERRA_DEL_FUEGO = 'Tierra del Fuego, Antártida e Islas del Atlántico Sur';
 
 /** See `Markers/Inset`'s `isAntarcticPart` for why this predicate is needed (splits one feature's geometry between the main map and an inset). */
@@ -161,6 +180,60 @@ export const TooltipOnInsets: Story = {
         featurePartsFilter: isAntarcticPart,
         projection: { type: 'azimuthal-equidistant', rotate: [49.5, 90] },
         tooltip: {
+          format: () => 'Antártida e Islas del Atlántico Sur',
+        },
+      },
+    ] satisfies GeoMarkersConfig[],
+  },
+};
+
+/**
+ * An inset's own `tooltip.anchorX`/`anchorY` fall back to the plot's own
+ * top-level `tooltip.anchorX`/`anchorY` when unset — only reaching the
+ * system default (`'right'`/`'bottom'`) if *neither* sets one. Here the
+ * top-level tooltip explicitly sets `anchorX: 'left', anchorY: 'top'`:
+ *
+ * - The CABA comunas inset (top-right corner) sets no anchor of its own, so
+ *   it inherits the top-level's `left`/`top`.
+ * - The Antarctic inset (bottom-right corner) sets its own `anchorX: 'right'`
+ *   explicitly, which wins over the inherited `'left'` — its `anchorY` is
+ *   still unset, so it inherits the top-level's `'top'`.
+ *
+ * Hover each panel (and the main map) to compare.
+ */
+export const TooltipOnInsetsWithAnchorInheritance: Story = {
+  args: {
+    coordinates: { projection: { type: 'mercator', domain: 'data' } },
+    excludeParts: isAntarcticPart,
+    tooltip: {
+      facetId: '',
+      sync: false,
+      anchorX: 'left',
+      anchorY: 'top',
+      format: (f) => (f.properties as ArgentinaProvinceProps).nombre,
+    },
+    markers: [
+      {
+        type: 'inset',
+        location: 'right-middle',
+        data: CABA_COMUNAS,
+        style: { stroke: '#dc2626', strokeWidth: 1 },
+        tooltip: {
+          // No anchorX/anchorY here — inherits the top-level's 'left'/'top'.
+          format: (f) => {
+            const { comuna, barrios } = f.properties as CabaComunaProps;
+            return `Comuna ${comuna}\n${barrios}`;
+          },
+        },
+      },
+      {
+        type: 'inset',
+        location: 'bottom-right',
+        features: [TIERRA_DEL_FUEGO],
+        featurePartsFilter: isAntarcticPart,
+        projection: { type: 'azimuthal-equidistant', rotate: [49.5, 90] },
+        tooltip: {
+          anchorX: 'right', // Own override — wins over the inherited 'left'.
           format: () => 'Antártida e Islas del Atlántico Sur',
         },
       },

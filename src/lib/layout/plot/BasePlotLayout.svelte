@@ -247,6 +247,8 @@
       {numericMargins}
       {data}
       {geoAllFeatures}
+      tooltipAnchorX={hover.tooltip?.anchorX}
+      tooltipAnchorY={hover.tooltip?.anchorY}
     >
       {@render children?.({
         matchedPoints: ctrl.points,
@@ -273,6 +275,8 @@
       rows={ctrl.matchedRows.map((p) => p.row)}
       format={hover.tooltip.format}
       content={hover.tooltip.content}
+      anchorX={hover.tooltip.anchorX}
+      anchorY={hover.tooltip.anchorY}
     />
   {/if}
 </div>

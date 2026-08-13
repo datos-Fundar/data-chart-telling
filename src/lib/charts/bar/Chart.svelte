@@ -101,6 +101,8 @@
             sync: tip.sync,
             series: tip.series,
             content: tip.content,
+            anchorX: tip.anchorX,
+            anchorY: tip.anchorY,
           }
         : undefined}
     />

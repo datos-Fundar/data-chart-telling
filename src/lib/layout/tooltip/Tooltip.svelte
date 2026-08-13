@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import { resolveTooltipPlacement } from './resolveTooltipPlacement';
+  import type { TooltipAnchorX, TooltipAnchorY } from '$lib/types/layout/tooltip';
 
   /**
    * Presentational tooltip positioned at `(x, y)` within a `position: relative`
@@ -7,10 +9,11 @@
    * {@link ChartContainer} stamps from the config, so it themes for free. Plots
    * that implement hovering can render this with their own content snippet.
    *
-   * Placement is boundary-aware: it prefers sitting centered above the point,
-   * but flips below when it would overflow the top and shifts horizontally
-   * when it would overflow the left/right, so it always stays clear of the
-   * `bounds` box (typically the plot's own width/height).
+   * Placement is boundary-aware: it prefers sitting `anchorX`/`anchorY` of the
+   * point (default: to the right and below — clear of the cursor so the
+   * tooltip never covers what's being hovered), falling back toward the
+   * opposite side (via the centered position) when the preferred side would
+   * overflow the `bounds` box — see `resolveTooltipPlacement`.
    */
   let {
     x,
@@ -20,6 +23,8 @@
     color,
     bounds,
     plain = false,
+    anchorX = 'right',
+    anchorY = 'bottom',
     children,
   }: {
     x: number;
@@ -36,28 +41,19 @@
      * so a custom card can match its own corners via `--dct-tooltip-radius`.
      */
     plain?: boolean;
+    /** Preferred horizontal anchor relative to the cursor. Defaults to `'right'`. */
+    anchorX?: TooltipAnchorX;
+    /** Preferred vertical anchor relative to the cursor. Defaults to `'bottom'`. */
+    anchorY?: TooltipAnchorY;
     children: Snippet;
   } = $props();
-
-  const GAP = 10;
-  const EDGE_MARGIN = 6;
 
   let boxWidth = $state(0);
   let boxHeight = $state(0);
 
-  const placement = $derived.by(() => {
-    const boundsWidth = bounds?.width ?? Infinity;
-    const boundsHeight = bounds?.height ?? Infinity;
-
-    let top = y - GAP - boxHeight;
-    if (top < EDGE_MARGIN) top = y + GAP;
-    top = Math.min(Math.max(top, EDGE_MARGIN), Math.max(EDGE_MARGIN, boundsHeight - boxHeight - EDGE_MARGIN));
-
-    let left = x - boxWidth / 2;
-    left = Math.min(Math.max(left, EDGE_MARGIN), Math.max(EDGE_MARGIN, boundsWidth - boxWidth - EDGE_MARGIN));
-
-    return { left, top };
-  });
+  const placement = $derived(
+    resolveTooltipPlacement({ x, y, boxWidth, boxHeight, bounds, anchorX, anchorY }),
+  );
 </script>
 
 {#if visible}

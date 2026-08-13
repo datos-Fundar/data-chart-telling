@@ -4,6 +4,7 @@ import type { AreaStyle, StrokeStyle } from '$lib/types/plots/styling';
 import type { GeoFeature, GeoJsonInput } from '$lib/types/plots/data/geo';
 import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
 import type { GeoProjectionName } from '$lib/types/layout/coordinates';
+import type { TooltipAnchorX, TooltipAnchorY } from '$lib/types/layout/tooltip';
 import type { BaseMarkersConfig } from './base';
 
 /** Longitude/latitude gridlines — svelteplot's `Graticule`. */
@@ -149,6 +150,13 @@ export type GeoInsetTooltipConfig = {
   format: (feature: GeoFeature<Record<string, unknown>>) => string;
   /** Custom tooltip body; replaces `format` when given. */
   content?: Snippet<[{ rows: GeoFeature<Record<string, unknown>>[] }]>;
+  /**
+   * Preferred anchor for this inset's own tooltip. Unset falls back to the
+   * plot's own top-level `tooltip.anchorX`/`anchorY` when explicitly set
+   * there, then to the system default — see {@link TooltipAnchorX}.
+   */
+  anchorX?: TooltipAnchorX;
+  anchorY?: TooltipAnchorY;
 };
 
 /** Projection config for an `inset` marker — like `GeoProjectionConfig`, minus `inset`/`domain` (insets always auto-fit to their own content) and custom factories (which can't guarantee `fitExtent`). */

@@ -237,6 +237,29 @@ export const CustomContent: StoryObj = {
   render: () => ({ Component: RichTooltip }),
 };
 
+/**
+ * `anchorX`/`anchorY` override the system default (`'right'`/`'bottom'`).
+ * Here it's pinned above-and-to-the-left of the cursor instead — still
+ * falls back toward the opposite side (via the centered position) if the
+ * cursor gets close enough to an edge that the preferred side would
+ * overflow.
+ */
+export const CustomAnchor: Story = {
+  args: {
+    series: [FEMALE],
+    tooltip: {
+      facetId: '',
+      sync: false,
+      anchorX: 'left',
+      anchorY: 'top',
+      format: (row) => {
+        const { province, value } = row as ProvincePoint;
+        return `${province}: ${value.toFixed(1)} yr`;
+      },
+    },
+  },
+};
+
 // ── Horizontal, many categories ─────────────────────────────────────────────
 
 /**

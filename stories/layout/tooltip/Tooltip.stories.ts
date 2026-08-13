@@ -20,6 +20,11 @@ import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
  * - `'x'`        all points sharing the hovered x (default for line/bar).
  * - `'y'`        all points sharing the hovered y (default for pyramid).
  * - `'punctual'` exact XY match — one cell at a time (default for heatmap).
+ *
+ * `tooltip.anchorX`/`anchorY` set which side of the cursor the floating box
+ * prefers (default: `'right'`/`'bottom'`, clear of the cursor), falling back
+ * toward the opposite side when the preferred one would overflow the chart's
+ * own bounds — see the `CustomAnchor` story below.
  */
 const meta = {
   title: 'Layout/Tooltip',
@@ -154,4 +159,24 @@ export const FacetSyncHeatmap: StoryObj = {
 /** Faceted pyramid — `y` strategy highlights the same age group across years. */
 export const FacetSyncPyramid: StoryObj = {
   render: () => ({ Component: TooltipSyncDemo, props: { kind: 'pyramid' } }),
+};
+
+/**
+ * `tooltip.anchorX`/`anchorY` control which side of the cursor the floating
+ * tooltip prefers — the system default (`'right'`/`'bottom'`) keeps it clear
+ * of the cursor so it never covers the hovered point. Here it's pinned
+ * above-and-to-the-left instead. Whichever side is picked, it still falls
+ * back toward the opposite side (via the centered position) if the cursor
+ * gets close enough to an edge that the preferred side would overflow — try
+ * hovering near the chart's own left/top edges to see it happen.
+ */
+export const CustomAnchor: Story = {
+  args: {
+    title: 'Anchor personalizado',
+    subtitle: 'El tooltip se ancla arriba a la izquierda del cursor',
+    data: TIME_SERIES.filter((d) => d.region === 'Norte'),
+    z: 'metric' as keyof SeriesPoint,
+    tooltip: { strategy: 'x', anchorX: 'left', anchorY: 'top' },
+    markers: [{ type: 'hover' }],
+  },
 };

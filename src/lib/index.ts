@@ -113,6 +113,7 @@ export type {
 export type {
   GeoMarkersConfig,
   GeoInsetMarkerConfig,
+  GeoInsetTooltipConfig,
   GeoInsetLocation,
   GeoInsetProjectionName,
   GeoInsetProjectionConfig,
@@ -137,6 +138,8 @@ export type {
   HoverStrategy,
   TooltipOptions,
   TooltipProp,
+  TooltipAnchorX,
+  TooltipAnchorY,
 } from './types/layout/tooltip';
 export type { ChartConfig, ChartConfigInput, TextStyle } from './types/configuration/styling';
 export type { ChartProps } from './types/charts/props';

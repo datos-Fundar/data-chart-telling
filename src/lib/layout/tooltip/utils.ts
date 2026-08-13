@@ -5,6 +5,8 @@ import type {
   HoverPoint,
   TooltipProp,
   TooltipOptions,
+  TooltipAnchorX,
+  TooltipAnchorY,
 } from '$lib/types/layout/tooltip';
 
 /** Value equality that also handles `Date` (compared by timestamp). */
@@ -56,6 +58,8 @@ export function resolveTooltip<TRow extends Record<string, unknown>>(
   format?: (row: TRow) => string;
   series?: string[];
   content?: TooltipOptions<TRow>['content'];
+  anchorX?: TooltipAnchorX;
+  anchorY?: TooltipAnchorY;
 } {
   if (!tooltip) return { enabled: false, strategy: defaultStrategy, sync: false };
   if (tooltip === true) return { enabled: true, strategy: defaultStrategy, sync: false };
@@ -66,6 +70,8 @@ export function resolveTooltip<TRow extends Record<string, unknown>>(
     format: tooltip.format,
     series: tooltip.series,
     content: tooltip.content,
+    anchorX: tooltip.anchorX,
+    anchorY: tooltip.anchorY,
   };
 }
 

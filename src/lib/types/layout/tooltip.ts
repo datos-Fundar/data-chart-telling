@@ -9,6 +9,23 @@ import type { AxisValue } from '$lib/types/layout/scales';
  */
 export type HoverStrategy = 'x' | 'y' | 'punctual';
 
+/**
+ * Preferred horizontal placement of the floating tooltip relative to the
+ * cursor: `'right'`/`'left'` offset it clear of the cursor (so it never
+ * covers the hovered point); `'middle'` centers it on the cursor's x, same
+ * as the plot's own vertical `'middle'`. Falls back toward the opposite
+ * side (via `'middle'`) when the preferred side would overflow the plot's
+ * bounds — see {@link resolveTooltipPlacement}. System default: `'right'`.
+ */
+export type TooltipAnchorX = 'left' | 'middle' | 'right';
+
+/**
+ * Preferred vertical placement of the floating tooltip relative to the
+ * cursor — same fallback behavior as {@link TooltipAnchorX}, along the other
+ * axis. System default: `'bottom'`.
+ */
+export type TooltipAnchorY = 'top' | 'middle' | 'bottom';
+
 /** Author-facing tooltip option on the chart kinds. `true` = enable with defaults. */
 export type TooltipOptions<TRow extends Record<string, unknown>> = {
   /** Matching strategy. Defaults to the chart kind's own default. */
@@ -24,6 +41,10 @@ export type TooltipOptions<TRow extends Record<string, unknown>> = {
   series?: string[];
   /** Custom tooltip body; replaces `format` when given. */
   content?: Snippet<[{ rows: TRow[] }]>;
+  /** Preferred horizontal anchor — see {@link TooltipAnchorX}. */
+  anchorX?: TooltipAnchorX;
+  /** Preferred vertical anchor — see {@link TooltipAnchorY}. */
+  anchorY?: TooltipAnchorY;
 };
 
 /** Either a bare on/off flag or the full option object. */
