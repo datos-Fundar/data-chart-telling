@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Frame } from 'svelteplot';
   import TileLayer from '$lib/layout/styles/TileLayer.svelte';
   import { geometryLonLatBounds } from '$lib/plots/utils/geoAccessors';
   import type { StylesLayoutConfig } from '$lib/types/layout/styles';
@@ -7,8 +8,9 @@
    * Non-data cosmetic embellishments driven by a plot kind's own `styles`
    * prop. Composed by `BasePlotLayout` for every plot kind, nested inside
    * `CoordinatesLayout` so embellishments pan/zoom together with whatever
-   * they're placed alongside. Today, just the raster basemap `tileLayer`
-   * (`GeoPlot` only — other kinds' `styles` simply don't declare it).
+   * they're placed alongside: the raster basemap `tileLayer` (`GeoPlot`
+   * only — other kinds' `styles` simply don't declare it) and the `frame`
+   * border, available on every plot kind.
    */
   let {
     styles,
@@ -21,6 +23,9 @@
     height: number;
     numericMargins: { top: number; right: number; bottom: number; left: number };
   } = $props();
+
+  const frame = $derived(styles?.frame);
+  const frameStyle = $derived(typeof frame === 'object' ? frame : undefined);
 
   /** Auto-fits `TileLayer` to the tile-layer feature set `GeoPlot` tacks onto `styles.tileLayer.features` — see `StylesLayoutConfig`'s own doc comment. */
   const dataLonLatBounds = $derived.by((): [number, number, number, number] | null => {
@@ -50,5 +55,21 @@
     width={Math.max(0, width - numericMargins.left - numericMargins.right)}
     height={Math.max(0, height - numericMargins.top - numericMargins.bottom)}
     {dataLonLatBounds}
+  />
+{/if}
+{#if frame}
+  <Frame
+    fill={frameStyle?.fill}
+    fillOpacity={frameStyle?.fillOpacity}
+    stroke={frameStyle?.stroke}
+    strokeWidth={frameStyle?.strokeWidth}
+    strokeOpacity={frameStyle?.strokeOpacity}
+    strokeDasharray={frameStyle?.strokeDasharray}
+    borderRadius={frameStyle?.borderRadius}
+    inset={frameStyle?.inset}
+    insetTop={frameStyle?.insetTop}
+    insetRight={frameStyle?.insetRight}
+    insetBottom={frameStyle?.insetBottom}
+    insetLeft={frameStyle?.insetLeft}
   />
 {/if}

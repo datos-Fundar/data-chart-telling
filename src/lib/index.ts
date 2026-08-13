@@ -78,6 +78,8 @@ export type {
 export type {
   ValuesStyle,
   ColorsStyle,
+  FrameStyle,
+  FrameProp,
   BasePlotStylesConfig,
   GeoStylesConfig,
   GeoTileLayerConfig,

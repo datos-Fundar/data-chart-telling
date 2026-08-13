@@ -1,5 +1,5 @@
 import type { ValueAnchor } from '$lib/types/plots/constants';
-import type { FontStyle, StrokeStyle } from '$lib/types/plots/styling';
+import type { FontStyle, StrokeStyle, AreaStyle } from '$lib/types/plots/styling';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
 
 /**
@@ -46,6 +46,24 @@ export type ColorsStyle = {
 };
 
 /**
+ * Decorative border around the plot's own content box — svelteplot's
+ * `Frame` mark, purely cosmetic (drawn from the box geometry, never from
+ * data). `true` enables it with svelteplot's own defaults; an object
+ * enables it and overrides its look field-by-field. Insets pull the frame
+ * in from the content box's own edges, in pixels.
+ */
+export type FrameStyle = AreaStyle & {
+  inset?: number;
+  insetTop?: number;
+  insetRight?: number;
+  insetBottom?: number;
+  insetLeft?: number;
+};
+
+/** Author-facing `styles.frame` prop — see {@link FrameStyle}. */
+export type FrameProp = boolean | FrameStyle;
+
+/**
  * Top-level rendering style overrides shared by the non-geo plot kinds.
  * Passed as the `styles` prop. Each plot reads only the fields it cares
  * about.
@@ -53,6 +71,8 @@ export type ColorsStyle = {
 export type BasePlotStylesConfig = {
   values?: ValuesStyle;
   colors?: ColorsStyle;
+  /** Decorative border around the plot's content box — see {@link FrameStyle}. Available on every plot kind. */
+  frame?: FrameProp;
 };
 
 export type GeoTileLayerConfig = {
@@ -84,6 +104,8 @@ export type GeoStylesConfig<TProps extends Record<string, unknown> = Record<stri
   tileLayer?: GeoTileLayerConfig;
   /** Fired when a base-map feature is clicked. */
   onFeatureClick?: (feature: GeoFeature<TProps>, event: Event) => void;
+  /** Decorative border around the plot's content box — see {@link FrameStyle}. Available on every plot kind. */
+  frame?: FrameProp;
 };
 
 /**
@@ -105,5 +127,6 @@ type GeoTileLayerConfigWithFeatures = GeoTileLayerConfig & {
  */
 export type StylesLayoutConfig = {
   tileLayer?: GeoTileLayerConfigWithFeatures;
+  frame?: FrameProp;
   [key: string]: unknown;
 };

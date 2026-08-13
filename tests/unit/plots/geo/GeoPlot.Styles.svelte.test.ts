@@ -133,3 +133,24 @@ describe('GeoPlot – onFeatureClick', () => {
     expect(() => path?.dispatchEvent(new MouseEvent('click', { bubbles: true }))).not.toThrow();
   });
 });
+
+describe('GeoPlot – styles.frame', () => {
+  test('no frame by default', async () => {
+    const { container } = render(GeoPlot, { width: 400, height: 300, data: ARGENTINA_PROVINCES });
+    const svg = await waitForSvg(container);
+    expect(svg.querySelector('.frame')).toBeNull();
+  });
+
+  test('styles.frame renders a border around the map, same as every other plot kind', async () => {
+    const { container } = render(GeoPlot, {
+      width: 400,
+      height: 300,
+      data: ARGENTINA_PROVINCES,
+      styles: { frame: { stroke: '#0f172a', strokeWidth: 2 } },
+    });
+    const svg = await waitForSvg(container);
+    const frame = svg.querySelector('rect.frame') as HTMLElement;
+    expect(frame).toBeTruthy();
+    expect(frame.style.stroke).toBe('rgb(15, 23, 42)');
+  });
+});

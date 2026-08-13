@@ -273,3 +273,20 @@ export const OnFeatureClick: Story = {
     } satisfies GeoStylesConfig,
   },
 };
+
+/**
+ * `styles.frame` — same purely decorative border as every other plot kind
+ * (see `Plots/LinePlot/Styles`'s `FrameDefault`/`FrameCustomStyle`), just as
+ * available here since it's rendered by the shared `StylesLayout`, not
+ * anything geo-specific.
+ */
+export const Frame: Story = {
+  args: {
+    styles: {
+      fill: '#f8fafc',
+      stroke: '#94a3b8',
+      strokeWidth: 0.5,
+      frame: { stroke: '#0f172a', strokeWidth: 2 },
+    } satisfies GeoStylesConfig<ArgentinaProvinceProps>,
+  },
+};

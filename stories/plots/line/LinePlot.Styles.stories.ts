@@ -534,3 +534,55 @@ export const DeclutteredLabelsBoundedByPlot: Story = {
     } satisfies BasePlotStylesConfig,
   },
 };
+
+// ── Frame ─────────────────────────────────────────────────────────────────────
+
+/**
+ * `styles.frame: true` draws a plain border around the plot's own content
+ * box — purely decorative, svelteplot's `Frame` mark. `true` uses its own
+ * defaults (a thin `currentColor` stroke, no fill). Available on every plot
+ * kind via `styles.frame`, not just `LinePlot`.
+ */
+export const FrameDefault: Story = {
+  args: {
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY,
+      },
+    ],
+    styles: {
+      frame: true,
+    } satisfies BasePlotStylesConfig,
+  },
+};
+
+/**
+ * `styles.frame` as an object overrides the border's look field-by-field —
+ * same style fields as a segment/cell's own fill+stroke bag, plus `inset*`
+ * to pull the frame in from the content box's own edges.
+ */
+export const FrameCustomStyle: Story = {
+  args: {
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY,
+      },
+    ],
+    styles: {
+      frame: {
+        stroke: '#6366f1',
+        strokeWidth: 2,
+        fill: '#6366f1',
+        fillOpacity: 0.04,
+        borderRadius: 8,
+        inset: 4,
+      },
+    } satisfies BasePlotStylesConfig,
+  },
+};
