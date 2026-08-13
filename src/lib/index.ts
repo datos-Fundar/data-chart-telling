@@ -27,6 +27,7 @@ export { argentinaBicontinental } from './layout/coordinates/projections/argenti
 export { default as Timeline } from './layout/timeline/Timeline.svelte';
 export { default as TimelineLayout } from './layout/timeline/TimelineLayout.svelte';
 export { default as FacetLayout } from './layout/facet/FacetLayout.svelte';
+export { default as FacetIndicator } from './layout/facet/FacetIndicator.svelte';
 export { default as LegendLayout } from './layout/legend/LegendLayout.svelte';
 export { default as Tooltip } from './layout/tooltip/Tooltip.svelte';
 
@@ -123,8 +124,15 @@ export type {
 export type {
   TimeValue,
   Orientation,
+  Responsive,
   FacetColumns,
+  FacetMode,
   FacetConfig,
+  FacetIndicatorContext,
+  FacetIndicatorSnippet,
+  FacetNavDirection,
+  FacetNavContext,
+  FacetNavSnippet,
   TimelineConfig,
   ChartPlotContext,
   ChartPlotSnippet,

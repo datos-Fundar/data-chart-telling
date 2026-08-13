@@ -75,6 +75,12 @@
       columns={facet.columns}
       values={facet.values}
       gap={facet.gap}
+      mode={facet.mode}
+      visible={facet.visible}
+      pageSize={facet.pageSize}
+      formatIndicator={facet.formatIndicator}
+      indicator={facet.indicator}
+      navButton={facet.navButton}
       width={w}
       height={h}
     >

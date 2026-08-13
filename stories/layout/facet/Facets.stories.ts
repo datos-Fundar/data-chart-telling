@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import FacetDemo from './FacetDemo.svelte';
+import FacetThemeDemo from './FacetThemeDemo.svelte';
 
 /**
  * `FacetLayout` is the small-multiples layout: it splits data by a field,
@@ -17,6 +18,9 @@ const meta = {
     height: { control: { type: 'range', min: 300, max: 800, step: 20 } },
     groupCount: { control: false },
     columns: { control: false },
+    mode: { control: false },
+    visible: { control: { type: 'range', min: 1, max: 4, step: 1 } },
+    pageSize: { control: { type: 'range', min: 1, max: 9, step: 1 } },
   },
 } satisfies Meta<typeof FacetDemo>;
 
@@ -46,4 +50,37 @@ export const Six: Story = {
 /** Nine groups in a 3×3 grid. */
 export const Nine: Story = {
   args: { groupCount: 9, columns: 3 },
+};
+
+/** `mode: 'carousel'`, one facet visible at a time — swipe/drag to browse. */
+export const Carousel: Story = {
+  args: { groupCount: 6, columns: 3, mode: 'carousel', visible: 1 },
+};
+
+/** `mode: 'carousel'`, two facets visible at once. */
+export const CarouselTwoVisible: Story = {
+  args: { groupCount: 6, columns: 3, mode: 'carousel', visible: 2 },
+};
+
+/** `mode: 'paginated'`, a 2×2 grid per page with prev/next controls. */
+export const Paginated: Story = {
+  args: { groupCount: 9, columns: 2, mode: 'paginated', pageSize: 4 },
+};
+
+/**
+ * Same `setConfiguration({ facet: {...} })` theming mechanism as the rest of the
+ * package — switch themes to see the indicator badge and pagination buttons restyle.
+ */
+export const PaginatedThemeSwitcher: StoryObj = {
+  render: () => ({ Component: FacetThemeDemo }),
+};
+
+/** Fully custom `indicator` snippet replacing the default badge. */
+export const CarouselCustomIndicator: Story = {
+  args: { groupCount: 6, columns: 3, mode: 'carousel', visible: 1, customIndicator: true },
+};
+
+/** Fully custom `navButton` snippet replacing the default prev/next buttons. */
+export const PaginatedCustomButtons: Story = {
+  args: { groupCount: 9, columns: 2, mode: 'paginated', pageSize: 4, customNavButton: true },
 };

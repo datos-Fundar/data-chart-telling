@@ -100,6 +100,22 @@ export const DEFAULT_CONFIG: ChartConfig = {
     font: { fill: 'currentColor', fontSize: 12, dy: -18 },
     area: { stroke: '#e6580d', strokeWidth: 2, fillOpacity: 0 },
   },
+  facet: {
+    indicator: {
+      background: '#111827',
+      color: '#ffffff',
+      fontSize: '0.8125rem',
+      padding: '0.125rem 0.5rem',
+      radius: '999px',
+    },
+    navButton: {
+      background: '#111827',
+      color: '#ffffff',
+      size: '2rem',
+      fontSize: '1.1rem',
+      disabledOpacity: 0.3,
+    },
+  },
 };
 
 // ── Merge ─────────────────────────────────────────────────────────────────────
@@ -190,6 +206,18 @@ export function configToCssVars(c: ChartConfig): Record<string, string> {
     '--dct-heat-min': c.continuous.min,
     '--dct-heat-max': c.continuous.max,
     '--dct-heat-text': c.continuous.labelColor,
+
+    '--dct-facet-indicator-bg': c.facet.indicator.background,
+    '--dct-facet-indicator-color': c.facet.indicator.color,
+    '--dct-facet-indicator-size': c.facet.indicator.fontSize,
+    '--dct-facet-indicator-pad': c.facet.indicator.padding,
+    '--dct-facet-indicator-radius': c.facet.indicator.radius,
+
+    '--dct-facet-nav-bg': c.facet.navButton.background,
+    '--dct-facet-nav-color': c.facet.navButton.color,
+    '--dct-facet-nav-btn-size': c.facet.navButton.size,
+    '--dct-facet-nav-font-size': c.facet.navButton.fontSize,
+    '--dct-facet-nav-disabled-opacity': String(c.facet.navButton.disabledOpacity),
   };
 }
 

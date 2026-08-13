@@ -113,6 +113,27 @@ export type ChartConfig = {
   timeline: { axisColor: string; activeColor: string; thickness: number };
   /** In-SVG hover highlight: crosshair rule, dot + value label, and geo feature restyle. */
   hover: { rule: StrokeStyle; dot: DotStyle; font: FontStyle; area: AreaStyle };
+
+  // ── Facet (small multiples) ──────────────────────────────────────────────────
+  facet: {
+    /** Position badge shown in `carousel`/`paginated` facet modes. */
+    indicator: {
+      background: string;
+      color: string;
+      fontSize: string;
+      padding: string;
+      radius: string;
+    };
+    /** Prev/next buttons shown in `paginated` facet mode. */
+    navButton: {
+      background: string;
+      color: string;
+      /** Button diameter (width and height). */
+      size: string;
+      fontSize: string;
+      disabledOpacity: number;
+    };
+  };
 };
 
 /** Deep-partial input accepted by `setConfiguration`. */
