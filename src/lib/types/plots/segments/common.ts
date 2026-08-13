@@ -12,6 +12,9 @@ export type BarSegmentStyle = AreaStyle;
 /** Per-cell styling override for a heatmap cell. */
 export type CellSegmentStyle = AreaStyle;
 
+/** Per-segment styling for a scatter point cloud. */
+export type ScatterSegmentStyle = DotStyle;
+
 /** Per-feature styling override for `GeoPlot` — the geo analog of `CellSegmentStyle`. */
 export type GeoSegmentStyle = {
   fill?: string;

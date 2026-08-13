@@ -107,6 +107,8 @@ export type ChartConfig = {
       connectorWidth: number;
     };
   };
+  /** Default scatter point geometry. */
+  scatter: { dotRadius: number };
   /** Timeline gutter styling. */
   timeline: { axisColor: string; activeColor: string; thickness: number };
   /** In-SVG hover highlight: crosshair rule, dot + value label, and geo feature restyle. */

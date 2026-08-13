@@ -110,6 +110,35 @@
       segmentColorFor: (style, defaultColor) => style?.stroke?.stroke ?? defaultColor,
     }),
   );
+
+  // End-of-line labels can grow past the plot's own content box, into its
+  // margin — reserving real space there (rather than padding the domain,
+  // which would falsely imply data exists past the last real point) is
+  // what ValueLabels's own overflow measurement feeds into here. Grown
+  // monotonically (never shrunk) from that real `getBBox()` measurement:
+  // once the real overflow reaches ~0 (the margin now fits it), reporting
+  // that same value again is a no-op (`Math.max` of an unchanged value),
+  // which is what keeps this converging instead of oscillating between
+  // "shrink margin → overflow reappears → grow margin → …". Local to this
+  // one `<Plot>` instance — see ValueLabels.svelte's own doc comment for
+  // why that locality (vs. svelteplot's shared margin context) matters.
+  let measuredLabelMargin = $state({ left: 0, right: 0 });
+
+  function handleLabelOverflow(overflow: { left: number; right: number }) {
+    const left = Math.max(measuredLabelMargin.left, overflow.left);
+    const right = Math.max(measuredLabelMargin.right, overflow.right);
+    if (left !== measuredLabelMargin.left || right !== measuredLabelMargin.right) {
+      measuredLabelMargin = { left, right };
+    }
+  }
+
+  const resolvedMargins = $derived.by(() => {
+    if (measuredLabelMargin.left <= 0 && measuredLabelMargin.right <= 0) return margins;
+    const out = { ...margins };
+    if (measuredLabelMargin.right > 0 && margins?.right === undefined) out.right = measuredLabelMargin.right;
+    if (measuredLabelMargin.left > 0 && margins?.left === undefined) out.left = measuredLabelMargin.left;
+    return out;
+  });
 </script>
 
 <BasePlotLayout
@@ -121,13 +150,13 @@
   getY={(d) => Number(yAcc(d))}
   {hover}
   {scales}
-  {margins}
+  margins={resolvedMargins}
   xTickRotate={scales?.x?.tickRotate}
   markers={[...lineMarkers, ...markers]}
   seriesData={resolvedSeries}
   {scopedGroups}
 >
   {#if showVals}
-    <ValueLabels {lastPoints} values={styles.values} />
+    <ValueLabels {lastPoints} values={styles.values} onOverflow={handleLabelOverflow} />
   {/if}
 </BasePlotLayout>

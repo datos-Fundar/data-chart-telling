@@ -4,6 +4,7 @@ export { default as BarPlot } from './plots/bar/Plot.svelte';
 export { default as HeatmapPlot } from './plots/heatmap/Plot.svelte';
 export { default as LinePlot } from './plots/line/Plot.svelte';
 export { default as PyramidPlot } from './plots/pyramid/Plot.svelte';
+export { default as ScatterPlot } from './plots/scatter/Plot.svelte';
 export { default as GeoPlot } from './plots/geo/Plot.svelte';
 
 // ── Charts ──────────────────────────────────────────────────────────────────
@@ -13,6 +14,7 @@ export { default as BarChart } from './charts/bar/Chart.svelte';
 export { default as HeatmapChart } from './charts/heatmap/Chart.svelte';
 export { default as LineChart } from './charts/line/Chart.svelte';
 export { default as PyramidChart } from './charts/pyramid/Chart.svelte';
+export { default as ScatterChart } from './charts/scatter/Chart.svelte';
 
 // Interchangeable layout primitives (compose your own chart kinds with these).
 export { default as ChartContainer } from './charts/container/ChartContainer.svelte';
@@ -80,7 +82,7 @@ export type {
   GeoStylesConfig,
   GeoTileLayerConfig,
 } from './types/layout/styles';
-export type { LineSegmentStyle, BarSegmentStyle, CellSegmentStyle, GeoSegmentStyle } from './types/plots/segments/common';
+export type { LineSegmentStyle, BarSegmentStyle, CellSegmentStyle, GeoSegmentStyle, ScatterSegmentStyle } from './types/plots/segments/common';
 export type { Range, Area, Segment } from './types/plots/segments/config';
 export type {
   ValueAnchor,
@@ -98,6 +100,7 @@ export type { AxisBasedMarkersConfig } from './types/markers/common';
 export type { LineMarkersConfig, DeltaMarkerConfig, DeltaConfig, DeltaTarget } from './types/markers/line';
 export type { MarkerProps } from './types/markers/props';
 export type { GeoFeature, GeoJsonInput, GeoDataProps, Topology } from './types/plots/data/geo';
+export type { ScatterDataProps } from './types/plots/data/scatter';
 export type {
   GeoProjectionName,
   GeoProjectionConfig,

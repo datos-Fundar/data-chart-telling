@@ -1,8 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-  import { getContext } from 'svelte';
-  import { get } from 'svelte/store';
   import { SvelteMap } from 'svelte/reactivity';
-  import type { Writable } from 'svelte/store';
   import { Text, usePlot } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { getConfiguration } from '$lib/configuration/config.svelte';
@@ -11,20 +8,6 @@
   import type { Series } from '$lib/types/plots/data/common';
   import type { ValuesStyle } from '$lib/types/layout/styles';
   import type { ValueAnchor } from '$lib/types/plots/constants';
-
-  // svelteplot's own type for this context isn't part of its public export
-  // surface, but the context itself (keyed by this fixed string, set by its
-  // `<Plot>`) is — every axis mark already reads/writes it this way to
-  // auto-size margins around what it actually renders. Mirroring that here
-  // is what lets `margins.right: 'auto'` (the default) grow to fit these
-  // labels on its own, instead of the caller having to guess a fixed
-  // `margins.right` up front.
-  type AutoMarginStores = {
-    autoMarginTop: Writable<Map<string, number>>;
-    autoMarginLeft: Writable<Map<string, number>>;
-    autoMarginRight: Writable<Map<string, number>>;
-    autoMarginBottom: Writable<Map<string, number>>;
-  };
 
   /**
    * End-point value labels for `LinePlot` — one label per series at its last
@@ -37,9 +20,12 @@
   let {
     lastPoints,
     values,
+    onOverflow,
   }: {
     lastPoints: { series: Series<TData>; lastRow: TData; seriesIndex: number }[];
     values: ValuesStyle | undefined;
+    /** Reports how far the rendered labels overflow the plot's own content box, in pixels, on each side (0 = no overflow). */
+    onOverflow?: (overflow: { left: number; right: number }) => void;
   } = $props();
 
   const cfg = $derived(getConfiguration());
@@ -76,54 +62,43 @@
     valAnchor === 'start' ? ('start' as const) : valAnchor === 'end' ? ('end' as const) : ('middle' as const),
   );
   const defaultLA = $derived(valAnchor === 'outside' ? ('bottom' as const) : ('middle' as const));
+  const fontSize = $derived(typeof font?.fontSize === 'number' ? font.fontSize : 12);
 
   const plot = usePlot();
 
-  // ── Auto margin ──────────────────────────────────────────────────────────
-  // Registers how far these labels (+ their leader lines) actually extend
-  // past the plot's own content box, on whichever side they grow toward, so
-  // `margins.{left,right}: 'auto'` (the default) sizes itself to fit them —
-  // the same mechanism svelteplot's own axis labels use, rather than a
-  // fixed margin the caller has to guess and hard-code up front.
-  const autoMargins = getContext<AutoMarginStores | undefined>('svelteplot/autoMargins');
-  const marginId = `line-value-labels-${Math.random().toString(36).slice(2)}`;
+  // ── Overflow measurement ─────────────────────────────────────────────────
+  // Measures how far the rendered labels extend past the plot's own content
+  // box and reports it to the caller (`Plot.svelte`), which grows its own
+  // local margin state to fit — real `getBBox()` measurement, same as the
+  // approach this used to register directly into svelteplot's *shared*
+  // margin-auto-sizing context. Reporting through a plain callback instead
+  // keeps this entirely local to one `<Plot>` instance: nothing here is
+  // shared across instances, which is what made the old approach spike
+  // CPU/memory into unresponsiveness when many instances mounted/unmounted
+  // together (e.g. a multi-story docs page → single story).
   let groupEl: SVGGElement | undefined = $state();
 
   $effect(() => {
-    // Depend on whatever actually changes the rendered label layout —
-    // getBBox() below is a plain DOM read, not itself tracked, so without
-    // this the effect would only ever measure once.
+    // getBBox() below is a plain DOM read, not itself tracked — depend on
+    // whatever actually changes the rendered label layout so this re-runs.
     void lastPoints;
     void values;
     const el = groupEl;
-    if (!autoMargins || !el) return;
+    if (!el || !onOverflow) return;
     const xRange = plot.scales.x?.fn?.range?.()?.map(Number);
     if (!xRange) return;
     const plotLeft = Math.min(xRange[0], xRange[1]);
     const plotRight = Math.max(xRange[0], xRange[1]);
-    // getBBox() is in the <svg>'s own user-space coordinates — the same
-    // pixel space `plot.scales.*.fn()` already produces everywhere else in
-    // this file, so no viewport/DOM conversion is needed here.
     let box: { x: number; width: number };
     try {
       box = el.getBBox();
     } catch {
       return;
     }
-    const overflowRight = Math.ceil(Math.max(0, box.x + box.width - plotRight));
-    const overflowLeft = Math.ceil(Math.max(0, plotLeft - box.x));
-    const rightMargins = get(autoMargins.autoMarginRight);
-    const leftMargins = get(autoMargins.autoMarginLeft);
-    if (rightMargins.get(marginId) !== overflowRight) rightMargins.set(marginId, overflowRight);
-    if (leftMargins.get(marginId) !== overflowLeft) leftMargins.set(marginId, overflowLeft);
-  });
-
-  $effect(() => {
-    return () => {
-      if (!autoMargins) return;
-      get(autoMargins.autoMarginRight).delete(marginId);
-      get(autoMargins.autoMarginLeft).delete(marginId);
-    };
+    onOverflow({
+      left: Math.ceil(Math.max(0, plotLeft - box.x)),
+      right: Math.ceil(Math.max(0, box.x + box.width - plotRight)),
+    });
   });
 
   /**
@@ -151,7 +126,6 @@
     if (lastPoints.length < 2) return map;
     const yScale = plot.scales.y?.fn;
     if (!yScale) return map;
-    const fontSize = font?.fontSize ?? 12;
     const minGap = Math.max(16, fontSize * 1.4);
     const items = lastPoints.map(({ series: s, lastRow }) => ({
       name: s.name,
@@ -192,6 +166,9 @@
   {@const labelDx = offset?.inGroup
     ? dir * (elbowGap + (numLanes - 1) * laneStep + labelGap)
     : baseDx}
+  {@const text = fmtVal(Number(yFn(lastRow)), s.name)}
+  {@const preferredTA = resolvedTextAnchor ?? defaultTA}
+  {@const preferredLA = font?.lineAnchor ?? defaultLA}
   {#if offset?.inGroup && plot.scales.x?.fn && plot.scales.y?.fn}
     {@const px = Number(plot.scales.x.fn(xFn(lastRow)))}
     {@const py = Number(plot.scales.y.fn(Number(yFn(lastRow))))}
@@ -212,17 +189,17 @@
     data={[lastRow]}
     x={xFn}
     y={yFn}
-    text={() => fmtVal(Number(yFn(lastRow)), s.name)}
+    text={() => text}
     dx={labelDx}
     dy={(font?.dy ?? defaultDy) + extraDy}
-    textAnchor={resolvedTextAnchor ?? defaultTA}
-    lineAnchor={font?.lineAnchor ?? defaultLA}
+    textAnchor={preferredTA}
+    lineAnchor={preferredLA}
     lineHeight={font?.lineHeight}
     rotate={font?.rotate}
     class={font?.class}
     textClass={font?.textClass}
     fill={font?.fill ?? seriesColor}
-    fontSize={font?.fontSize ?? 12}
+    {fontSize}
     fontWeight={font?.fontWeight}
     fontStyle={font?.fontStyle}
     stroke={font?.stroke}

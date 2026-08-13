@@ -92,6 +92,7 @@ export const DEFAULT_CONFIG: ChartConfig = {
       connectorWidth: 0.5,
     },
   },
+  scatter: { dotRadius: 5 },
   timeline: { axisColor: 'currentColor', activeColor: '#e6580d', thickness: 60 },
   hover: {
     rule: { stroke: '#e6580d', strokeOpacity: 0.35, strokeWidth: 1.5, strokeDasharray: '4 4' },

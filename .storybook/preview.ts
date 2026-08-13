@@ -162,6 +162,21 @@ const preview: Preview = {
               ],
               'Tooltip',
             ],
+            'ScatterPlot',
+            [
+              'Series',
+              'Scales',
+              'Styles',
+              'Segments',
+              'Bubble',
+              'Markers',
+              [
+                'Rules',
+                'Hover',
+                'Custom',
+              ],
+              'Tooltip',
+            ],
             'GeoPlot',
             [
               'Series',
