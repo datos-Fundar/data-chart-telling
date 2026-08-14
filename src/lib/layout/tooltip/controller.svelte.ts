@@ -73,11 +73,23 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
    * point at the row under the cursor rather than an arbitrary matched
    * sibling. `BasePlotLayout` gates actual display with
    * `impliesCrosshairX`/`Y` + the marker's own `ruleX`/`ruleY` props.
+   *
+   * `activeSeries` alone can't disambiguate two matched rows that share the
+   * same (or absent) series tag — e.g. an ungrouped bar/line chart where two
+   * categories tie on the matched axis value. `onPointer` sets `activeX`/
+   * `activeY` straight from the hit row, so when more than one series-tied
+   * candidate remains, narrowing to the one whose own x/y equals the hit
+   * row's picks the actual row under the cursor instead of an arbitrary tie.
    */
   const activePoint = $derived.by((): HoverPoint<T> | null => {
     if (matched.length === 0) return null;
-    const series = args.hover().activeSeries;
-    return matched.find((p) => p.series === series) ?? matched[0];
+    const h = args.hover();
+    const bySeries = matched.filter((p) => p.series === h.activeSeries);
+    const candidates = bySeries.length > 0 ? bySeries : matched;
+    if (candidates.length === 1) return candidates[0];
+    const { activeX, activeY } = h;
+    if (activeX == null || activeY == null) return candidates[0];
+    return candidates.find((p) => eq(p.x, activeX) && eq(p.y, activeY)) ?? candidates[0];
   });
 
   // Whether the current strategy implies a crosshair rule on each axis by default.

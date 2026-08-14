@@ -102,7 +102,7 @@
 {/if}
 
 {#if data.length > 0}
-  {#each data as point (point.series ?? `${point.x}_${point.y}`)}
+  {#each data as point (`${point.series ?? ''}_${point.x}_${point.y}`)}
     <!-- Pixel nudge for plot kinds whose series position isn't fully captured
          by x/y alone (e.g. BarPlot's 'grouped' layout) — see HoverDisplayPoint.dx/dy. -->
     <g transform="translate({point.dx ?? 0}, {point.dy ?? 0})">
@@ -120,7 +120,7 @@
     </g>
   {/each}
   {#if showLabels}
-    {#each data as point (point.series ?? `${point.x}_${point.y}`)}
+    {#each data as point (`${point.series ?? ''}_${point.x}_${point.y}`)}
       <g transform="translate({point.dx ?? 0}, {point.dy ?? 0})">
         <TextMarker
           data={[point]}

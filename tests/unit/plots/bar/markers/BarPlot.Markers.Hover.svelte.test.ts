@@ -1,5 +1,5 @@
 import { render } from 'vitest-browser-svelte';
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, vi } from 'vitest';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
@@ -101,5 +101,55 @@ describe('BarPlot – markers.hover', () => {
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
+  });
+
+  // Regression: two categories tied on the same value, matched with
+  // `strategy: 'x'` on a horizontal (ungrouped, single-series) bar chart —
+  // both rows fall back to the same default series name, so `matched` ends
+  // up with two same-series points. HoverMarker's `{#each}` used to key
+  // purely by `point.series ?? \`${x}_${y}\``, which only fell back to x/y
+  // when series was nullish; here series is the truthy default 'series' for
+  // both points, so the key collided and Svelte threw a duplicate-key error.
+  test('does not crash when two categories tie under strategy: "x" (hover.activePoint tie-break)', async () => {
+    const data = [
+      { province: 'Buenos Aires', value: 1.38 },
+      { province: 'Mendoza', value: 1.38 },
+      { province: 'CABA', value: 2.1 },
+    ];
+    const { container } = await render(BarPlot, {
+      width: 400,
+      height: 300,
+      data,
+      x: 'province',
+      y: 'value',
+      scales: { y: { type: 'categorical' } },
+      tooltip: {
+        facetId: '',
+        sync: false,
+        strategy: 'x',
+        format: (row) => `${(row as { province: string }).province}`,
+      },
+      markers: [{ type: 'hover' }] satisfies AxisBasedMarkersConfig[],
+    });
+    const svg = await waitForSvg(container);
+    // Per-category hit areas — distinct from the plot's own full-box
+    // pointer-catcher rect, which also renders `fill="transparent"` but
+    // carries `pointer-events="all"`.
+    const hitAreas = svg.querySelectorAll('rect[fill="transparent"]:not([pointer-events])');
+    expect(hitAreas.length).toBe(3);
+    const target = hitAreas[0] as SVGRectElement;
+    const rect = target.getBoundingClientRect();
+    target.dispatchEvent(
+      new PointerEvent('pointerenter', {
+        bubbles: true,
+        clientX: rect.left + rect.width / 2,
+        clientY: rect.top + rect.height / 2,
+      }),
+    );
+    // Both tied rows (Buenos Aires and Mendoza) should highlight — proving
+    // the render survived without crashing on the duplicate key.
+    await vi.waitFor(() => {
+      expect(countDotMarks(svg)).toBe(2);
+    });
   });
 });
