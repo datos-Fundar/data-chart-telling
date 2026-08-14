@@ -10,11 +10,11 @@ const meta = {
   component: PyramidPlot,
   tags: ['autodocs'],
   args: {
-    width: 950,
+    width: 940,
     height: 520,
   },
   argTypes: {
-    width: { control: { type: 'range', min: 320, max: 950, step: 20 } },
+    width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
     height: { control: { type: 'range', min: 320, max: 800, step: 20 } },
     markers: { control: false },
   },

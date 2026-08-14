@@ -13,13 +13,13 @@ const meta = {
   component: BarPlot,
   tags: ['autodocs'],
   args: {
-    width: 950,
+    width: 940,
     height: 500,
   },
   argTypes: {
     width: {
       description: 'Plot width in pixels.',
-      control: { type: 'range', min: 300, max: 950, step: 50 },
+      control: { type: 'range', min: 300, max: 940, step: 50 },
     },
     height: {
       description: 'Plot height in pixels.',

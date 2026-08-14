@@ -15,11 +15,11 @@ const meta = {
   component: LinePlot,
   tags: ['autodocs'],
   args: {
-    width: 950,
+    width: 940,
     height: 400,
   },
   argTypes: {
-    width: { control: { type: 'range', min: 300, max: 950, step: 50 } },
+    width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
     height: { control: { type: 'range', min: 200, max: 700, step: 50 } },
     series: { control: false },
     styles: { control: false },

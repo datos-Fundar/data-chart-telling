@@ -106,7 +106,7 @@ describe('PyramidPlot – tooltip', () => {
 describe('PyramidPlot – hover matches by row (y), not by bar magnitude (x)', () => {
   test('hovering near the zero baseline at a long-bar row still matches that row', async () => {
     const { container } = await render(PyramidPlot, {
-      width: 950,
+      width: 940,
       height: 520,
       ...DATA_PROPS,
       scales: { y: { domain: AGE_GROUPS } },

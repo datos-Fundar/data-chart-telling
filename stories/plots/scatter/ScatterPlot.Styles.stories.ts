@@ -10,14 +10,14 @@ const meta = {
   component: ScatterPlot,
   tags: ['autodocs'],
   args: {
-    width: 950,
+    width: 940,
     height: 500,
     data: AMERICAS,
     x: 'gdpPerCapita',
     y: 'lifeExpectancy',
   },
   argTypes: {
-    width: { control: { type: 'range', min: 300, max: 950, step: 50 } },
+    width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
     height: { control: { type: 'range', min: 200, max: 700, step: 50 } },
     data: { control: false },
     styles: { description: 'Rendering style overrides.', control: false },

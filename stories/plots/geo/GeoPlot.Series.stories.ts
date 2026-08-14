@@ -13,11 +13,11 @@ const meta = {
   component: GeoPlot,
   tags: ['autodocs'],
   args: {
-    width: 950,
+    width: 940,
     height: 500,
   },
   argTypes: {
-    width: { control: { type: 'range', min: 320, max: 950, step: 20 } },
+    width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
     height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
     data: { control: false },
   },

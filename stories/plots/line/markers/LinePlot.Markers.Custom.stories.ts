@@ -15,13 +15,13 @@ const meta = {
   component: LinePlot,
   tags: ['autodocs'],
   args: {
-    width: 950,
+    width: 940,
     height: 400,
   },
   argTypes: {
     width: {
       description: 'Plot width in pixels.',
-      control: { type: 'range', min: 300, max: 950, step: 50 },
+      control: { type: 'range', min: 300, max: 940, step: 50 },
     },
     height: {
       description: 'Plot height in pixels.',
@@ -112,7 +112,7 @@ export const WithTextMarker: Story = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const WithPeakMarker: any = {
   args: {
-    width: 950,
+    width: 940,
     height: 400,
     mode: 'max',
     series: [
