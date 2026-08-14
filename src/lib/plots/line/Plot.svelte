@@ -9,6 +9,8 @@
   import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
   import { disabledStrokeOverride, disabledDotsOverride } from '$lib/plots/utils/legendDisabled';
   import { buildLineMarkers } from '$lib/plots/line/buildLineMarkers';
+  import { buildGapMarkers } from '$lib/plots/line/buildGapMarkers';
+  import { isGapValue } from '$lib/plots/utils/gaps';
   import { createLabelMarginTracker } from '$lib/plots/utils/labelOverflow.svelte';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import ValueLabels from '$lib/plots/line/ValueLabels.svelte';
@@ -20,6 +22,7 @@
   import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
   import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
   import type { LineMarkersConfig } from '$lib/types/markers/line';
+  import type { GapsConfig } from '$lib/types/plots/props';
   import type { LegendDisabledStyle } from '$lib/types/layout/legend';
 
   type Props = BasePlotProps<
@@ -29,7 +32,10 @@
     LineSegmentStyle,
     LineMarkersConfig,
     AxisBasedScalesConfig<TData>
-  >;
+  > & {
+    /** Fills leading/internal/trailing missing-data holes with an interpolated, distinctly-styled bridge, resolved per series like `segments` — see {@link GapsConfig}. */
+    gaps?: GapsConfig<LineSegmentStyle>;
+  };
 
   let {
     width,
@@ -42,6 +48,7 @@
     styles = {},
     segments = {},
     markers = [],
+    gaps = {},
     scales = {},
     margins,
     tooltip = undefined,
@@ -80,27 +87,36 @@
   const flat = $derived(resolvedSeries.flatMap((s) => s.data));
   // A legend-disabled series is dimmed on the mark itself, but never surfaces
   // in hover/tooltip — its points are simply absent from the candidate list.
+  // A gap row (see `gaps`) is excluded the same way — it carries no real
+  // value to hover.
   const hoverPoints = $derived(
     resolvedSeries.flatMap((s, idx) => {
       if (legendInteraction?.disabledSeries.has(s.name)) return [];
       const sx = resolveAccessor(s.x);
       const sy = resolveAccessor(s.y);
-      return s.data.map((d) => ({
-        x: sx(d) as AxisValue,
-        y: Number(sy(d)),
-        row: d,
-        label: String(sy(d)),
-        series: s.name,
-        color: paletteColor(idx, cfg.palette),
-      }));
+      return s.data
+        .filter((d) => !isGapValue(sy(d)))
+        .map((d) => ({
+          x: sx(d) as AxisValue,
+          y: Number(sy(d)),
+          row: d,
+          label: String(sy(d)),
+          series: s.name,
+          color: paletteColor(idx, cfg.palette),
+        }));
     }),
   );
 
-  // Last data point per series, with its palette index for colour.
+  // Last *real* data point per series (skipping any trailing gap row), with
+  // its palette index for colour.
   const lastPoints = $derived(
     resolvedSeries
-      .map((s, idx) => ({ series: s, lastRow: s.data[s.data.length - 1], seriesIndex: idx }))
-      .filter(({ lastRow }) => lastRow !== undefined),
+      .map((s, idx) => {
+        const sy = resolveAccessor(s.y);
+        const lastRow = [...s.data].reverse().find((d) => !isGapValue(sy(d)));
+        return { series: s, lastRow, seriesIndex: idx };
+      })
+      .filter((p): p is { series: Series<TData>; lastRow: TData; seriesIndex: number } => p.lastRow !== undefined),
   );
 
   const hover = $derived({
@@ -117,6 +133,14 @@
       groupedSeries,
       disabledStrokeFor: (name) => disabledStrokeOverride(effectiveDisabledFor(name)),
       disabledDotsFor: (name) => disabledDotsOverride(effectiveDisabledFor(name)),
+    }),
+  );
+
+  const gapMarkers = $derived(
+    buildGapMarkers<TData>({
+      seriesList: resolvedSeries,
+      gaps,
+      colorFor: (seriesIndex) => paletteColor(seriesIndex, cfg.palette),
     }),
   );
 
@@ -150,7 +174,7 @@
   {scales}
   margins={labelMargin.resolvedMargins}
   xTickRotate={scales?.x?.tickRotate}
-  markers={[...lineMarkers, ...markers]}
+  markers={[...gapMarkers, ...lineMarkers, ...markers]}
   seriesData={resolvedSeries}
   {scopedGroups}
 >

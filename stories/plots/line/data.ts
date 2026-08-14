@@ -34,3 +34,26 @@ export const FEMALE_LIFE_EXPECTANCY: YearPoint[] = LIFE_EXPECTANCY
 export const MALE_LIFE_EXPECTANCY: YearPoint[] = LIFE_EXPECTANCY
   .filter((d) => d.sex === 'male')
   .map((d) => ({ year: d.year, value: d.value }));
+
+export type MonthReading = { month: number; temp: number | null };
+
+/**
+ * Monthly sensor readings with three kinds of holes: no sensor installed
+ * yet for the first two months, a two-month reporting outage in the
+ * middle, and no readings yet for the last two months — used to
+ * demonstrate `LinePlot`'s `gaps` fill (start/middle/end).
+ */
+export const TEMPERATURE_WITH_GAPS: MonthReading[] = [
+  { month: 1, temp: null },
+  { month: 2, temp: null },
+  { month: 3, temp: 12.4 },
+  { month: 4, temp: 14.1 },
+  { month: 5, temp: 17.8 },
+  { month: 6, temp: null },
+  { month: 7, temp: null },
+  { month: 8, temp: 21.6 },
+  { month: 9, temp: 19.3 },
+  { month: 10, temp: 15.7 },
+  { month: 11, temp: null },
+  { month: 12, temp: null },
+];

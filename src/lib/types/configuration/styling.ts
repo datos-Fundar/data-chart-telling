@@ -90,6 +90,12 @@ export type ChartConfig = {
     strokeWidth: number;
     dotRadius: number;
     /**
+     * Default gap-fill bridge styling (`LinePlot`'s `gaps` prop) — the
+     * fallback merged under whatever a gap zone's own `style` sets, the
+     * same way `hover.rule`/`hover.dot` back every hover marker's style.
+     */
+    gap: { stroke: StrokeStyle; dots: DotStyle };
+    /**
      * End-of-line value-label declutter geometry and connector styling —
      * `LinePlot`-specific, since only line charts spread colliding
      * end-point labels apart with elbow-routed leader lines.

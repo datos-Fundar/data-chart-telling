@@ -84,6 +84,10 @@ export const DEFAULT_CONFIG: ChartConfig = {
   line: {
     strokeWidth: 3,
     dotRadius: 4,
+    gap: {
+      stroke: { strokeOpacity: 0.6, strokeDasharray: '4 4' },
+      dots: {},
+    },
     valueLabels: {
       elbowGap: 10,
       laneStep: 7,
