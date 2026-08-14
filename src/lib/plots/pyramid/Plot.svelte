@@ -6,6 +6,7 @@
   import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
   import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
   import { buildPyramidBarMarkers } from '$lib/plots/pyramid/buildPyramidBarMarkers';
+  import { createLabelMarginTracker } from '$lib/plots/utils/labelOverflow.svelte';
   import { buildGroupedSeries, validateSegments, buildScopedMarkerGroups } from '$lib/plots/utils/segments';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import ValueLabels from '$lib/plots/pyramid/ValueLabels.svelte';
@@ -17,6 +18,7 @@
   import type { ValueAnchor } from '$lib/types/plots/constants';
   import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
   import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
+  import type { LegendDisabledStyle } from '$lib/types/layout/legend';
 
   /**
    * A population-pyramid-style diverging bar chart: each series is mirrored
@@ -63,10 +65,27 @@
 
   const cfg = $derived(getConfiguration());
   const legendInteraction = $derived(getLegendInteraction());
+  const hoverIsolate = $derived(styles.values?.hoverIsolate ?? false);
+
+  // A value label hovered while `styles.values.hoverIsolate` is on dims
+  // every other series exactly like a legend toggle would — local to this
+  // one `<Plot>` instance (not the shared HoverStore) so the gesture can't
+  // leak into unrelated tooltip/crosshair behavior.
+  let hoverIsolatedSeries = $state<string | null>(null);
+
+  function effectiveDisabledFor(name: string): LegendDisabledStyle | undefined {
+    return (
+      legendInteraction?.disabledSeries.get(name) ??
+      (hoverIsolate && hoverIsolatedSeries && hoverIsolatedSeries !== name
+        ? { opacity: cfg.legend.disabledOpacity }
+        : undefined)
+    );
+  }
+
   const leftColor = $derived(styles.colors?.left ?? paletteColor(0, cfg.palette));
   const rightColor = $derived(styles.colors?.right ?? paletteColor(1, cfg.palette));
   const showVals = $derived(styles.values?.show ?? false);
-  const fmtVal = $derived(styles.values?.format ?? ((v: number) => `${v}`));
+  const formatValue = $derived(styles.values?.format ?? ((v: number) => `${v}`));
   const valAnchor = $derived<ValueAnchor>(styles.values?.anchor ?? 'outside');
 
   // Sort series names alphabetically; even index → left, odd → right.
@@ -117,7 +136,7 @@
           __side: s.side,
           __x: s.side === 'left' ? -v : v,
           __y: getCategory(d) as AxisValue,
-          __label: fmtVal(v, s.name),
+          __label: formatValue(v, s.name),
           __series: s.name,
         } as TaggedRow;
       });
@@ -169,7 +188,7 @@
     ...scales,
     x: {
       domain: [-maxMagnitude, maxMagnitude],
-      tickFormat: (v: unknown) => fmtVal(Math.abs(Number(v)), ''),
+      tickFormat: (v: unknown) => formatValue(Math.abs(Number(v)), ''),
       ...(scales.x ?? {}),
     },
     y: { type: 'band', padding: 0.2, domain: yDomain, ...(scales.y ?? {}) },
@@ -189,7 +208,7 @@
       groupedSeries,
       valueFor: signedValue,
       colorFor: (s) => (s.side === 'left' ? leftColor : rightColor),
-      disabledFillFor: (name) => disabledFillOverride(legendInteraction?.disabledSeries.get(name)),
+      disabledFillFor: (name) => disabledFillOverride(effectiveDisabledFor(name)),
     }),
   );
 
@@ -201,6 +220,12 @@
       segmentColorFor: (style, defaultColor) => style?.fill ?? defaultColor,
     }),
   );
+
+  // A pyramid bar's value label can grow past the plot's own content box —
+  // reserving real space there is what each label's own overflow
+  // measurement feeds into here, via a tracker local to this one `<Plot>`
+  // instance. See `labelOverflow.svelte.ts`.
+  const labelMargin = createLabelMarginTracker(() => margins);
 </script>
 
 <BasePlotLayout
@@ -212,7 +237,7 @@
   {getY}
   {hover}
   scales={resolvedScales}
-  {margins}
+  margins={labelMargin.resolvedMargins}
   xTickRotate={resolvedScales?.x?.tickRotate}
   markers={[...pyramidMarkers, ...markers]}
   seriesData={resolvedSeries}
@@ -220,7 +245,17 @@
 >
   {#if showVals}
     {#each groupedSeries as group (group.series.name)}
-      <ValueLabels {group} {valAnchor} {fmtVal} values={styles.values} axisColor={cfg.axis.color} />
+      <ValueLabels
+        {group}
+        {valAnchor}
+        {formatValue}
+        values={styles.values}
+        axisColor={cfg.axis.color}
+        disabled={effectiveDisabledFor(group.series.name)}
+        onHoverSeries={hoverIsolate ? () => { hoverIsolatedSeries = group.series.name; } : undefined}
+        onHoverEnd={hoverIsolate ? () => { hoverIsolatedSeries = null; } : undefined}
+        onOverflow={labelMargin.report}
+      />
     {/each}
   {/if}
 </BasePlotLayout>

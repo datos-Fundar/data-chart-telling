@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Plot, RuleX, RuleY, Text } from 'svelteplot';
-  import type { Orientation, TimeValue } from '$lib/types/charts/common';
+  import type { Orientation, TimeValue } from '$lib/types/layout/timeline';
 
   /**
    * Purely visual time axis: a baseline rule plus the ordered step labels with

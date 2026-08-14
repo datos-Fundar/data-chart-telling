@@ -2,7 +2,7 @@
   import FacetLayout from '$lib/layout/facet/FacetLayout.svelte';
   import BarPlot from '$lib/plots/bar/Plot.svelte';
   import { getConfiguration, configToCssVars, cssVarsStyle } from '$lib/configuration/config.svelte';
-  import type { FacetColumns, FacetMode, Responsive } from '$lib/types/charts/common';
+  import type { FacetColumns, FacetMode, Responsive } from '$lib/types/layout/facet';
 
   /**
    * `FacetLayout` is data/plot-agnostic: it just splits rows by `by`, hands

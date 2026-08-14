@@ -3,7 +3,7 @@
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { paletteColor } from '$lib/utils/color';
   import { getLegendInteraction, createLegendInteraction } from '$lib/layout/legend/interaction.svelte';
-  import type { DiscreteLegendSection, LegendItem } from '$lib/types/charts/legend';
+  import type { DiscreteLegendSection, LegendItem } from '$lib/types/layout/legend';
   import type { LineStyle } from '$lib/types/plots/constants';
 
   let { section }: { section: DiscreteLegendSection } = $props();

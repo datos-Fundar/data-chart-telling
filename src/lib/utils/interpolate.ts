@@ -1,5 +1,5 @@
 import type { EasingName, EasingFn } from '$lib/types/charts/interpolate';
-import type { TimeValue, TimelineInterpolation } from '$lib/types/charts/common';
+import type { TimeValue, TimelineInterpolation } from '$lib/types/layout/timeline';
 import type { AxisValue } from '$lib/types/layout/scales';
 import type { Accessor } from '$lib/types/plots/data/common';
 

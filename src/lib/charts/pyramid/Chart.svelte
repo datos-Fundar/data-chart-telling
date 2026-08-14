@@ -48,7 +48,7 @@
   const getMagnitude = $derived(resolveAccessor<TRow>(magnitude));
   const getCategory = $derived(resolveAccessor<TRow>(category));
   const getSides = $derived(resolveAccessor<TRow>(sides));
-  const fmtVal = $derived(styles.values?.format ?? ((v: number) => `${v}`));
+  const formatValue = $derived(styles.values?.format ?? ((v: number) => `${v}`));
 
   // Computed once over the full dataset (not the per-facet/timeline-filtered
   // rows) so the diverging axis and category bands stay comparable across
@@ -86,7 +86,7 @@
   const resolvedStrategy = $derived(resolveHoverStrategy(tip.enabled ? tip.strategy : undefined, markers, 'y'));
   const resolvedSync = $derived(resolveHoverSync(tip.enabled ? tip.sync : undefined, markers));
   const defaultFormat = $derived(
-    (row: TRow) => `${String(getSides(row))}\n${String(getCategory(row))}: ${fmtVal(Number(getMagnitude(row)), String(getSides(row)))}`,
+    (row: TRow) => `${String(getSides(row))}\n${String(getCategory(row))}: ${formatValue(Number(getMagnitude(row)), String(getSides(row)))}`,
   );
 </script>
 

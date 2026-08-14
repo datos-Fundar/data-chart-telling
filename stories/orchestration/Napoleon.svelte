@@ -4,7 +4,7 @@
 	import Scrubber from '../common/Scrubber.svelte';
 	import { WORLD_TOPOLOGY } from '../plots/geo/data';
 	import { MINARD_TROOPS, MINARD_COUNTRY_LABELS, type MinardRow } from '../data/minard';
-	import type { LegendSection } from '$lib/types/charts/legend';
+	import type { LegendSection } from '$lib/types/layout/legend';
 
 	/**
 	 * The point of this story: `BaseChart` doesn't know or care what's inside

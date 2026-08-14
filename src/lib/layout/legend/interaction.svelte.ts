@@ -18,7 +18,15 @@ export function provideLegendInteraction(): LegendInteractionStore {
   return store;
 }
 
-/** Read the shared legend-interaction store, or `null` when there is no provider. */
+/**
+ * Read the shared legend-interaction store, or `null` when there is no provider.
+ *
+ * Only resolves correctly when called during a real descendant component's
+ * own `<script>` instantiation, not from inside a `{@render}`ed snippet body
+ * — snippets run in their author's scope rather than as a fresh component
+ * instance. `BaseChart`'s `plot` snippet gets the same data via its `legend`
+ * context field instead, which works from either scope.
+ */
 export function getLegendInteraction(): LegendInteractionStore | null {
   return getContext<LegendInteractionStore | undefined>(LEGEND_INTERACTION_KEY) ?? null;
 }

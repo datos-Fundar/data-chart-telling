@@ -1,11 +1,15 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-  import { Text } from 'svelteplot';
+  import { Text, usePlot } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
+  import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
+  import { watchLabelOverflow } from '$lib/plots/utils/labelOverflow.svelte';
   import type { Series } from '$lib/types/plots/data/common';
   import type { ValuesStyle } from '$lib/types/layout/styles';
   import type { ValueAnchor } from '$lib/types/plots/constants';
   import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
   import type { VisualGroup } from '$lib/types/plots/segments/config';
+  import type { LegendDisabledStyle } from '$lib/types/layout/legend';
+  import type { MarginOverflow } from '$lib/plots/utils/labelOverflow.svelte';
   import type { BarLayout } from './layout.svelte';
 
   /**
@@ -21,19 +25,55 @@
     barLayout,
     isHorizontal,
     valAnchor,
-    fmtVal,
+    formatValue,
     values,
     axisColor,
+    disabled,
+    onHoverSeries,
+    onHoverEnd,
+    onOverflow,
   }: {
     group: VisualGroup<Series<TData>, BarSegmentStyle>;
     seriesIndex: number;
     barLayout: BarLayout<TData>;
     isHorizontal: boolean;
     valAnchor: ValueAnchor;
-    fmtVal: (value: number, seriesName: string) => string;
+    formatValue: (value: number, seriesName: string) => string;
     values: ValuesStyle | undefined;
     axisColor: string;
+    /** Resolved legend/hover-isolate dimming style for this group's series, if any. */
+    disabled?: LegendDisabledStyle;
+    /** Fired when the pointer enters this series' label — only wired when hover-isolate is enabled. */
+    onHoverSeries?: () => void;
+    onHoverEnd?: () => void;
+    /** Reports how far this label overflows the plot's own content box, in pixels, on each side (0 = no overflow). */
+    onOverflow?: (overflow: MarginOverflow) => void;
   } = $props();
+
+  const fillOverride = $derived(disabledFillOverride(disabled));
+  const plot = usePlot();
+  let groupEl: SVGGElement | undefined = $state();
+
+  watchLabelOverflow({
+    el: () => groupEl,
+    bounds: () => {
+      // getBBox() inside isn't itself tracked — depend on whatever actually
+      // changes the rendered label layout so this re-measures.
+      void group;
+      void values;
+      void valAnchor;
+      const xRange = plot.scales.x?.fn?.range?.()?.map(Number);
+      const yRange = plot.scales.y?.fn?.range?.()?.map(Number);
+      if (!xRange || !yRange) return undefined;
+      return {
+        left: Math.min(xRange[0], xRange[1]),
+        right: Math.max(xRange[0], xRange[1]),
+        top: Math.min(yRange[0], yRange[1]),
+        bottom: Math.max(yRange[0], yRange[1]),
+      };
+    },
+    onOverflow: (overflow) => onOverflow?.(overflow),
+  });
 
   const xFn = $derived(resolveAccessor(group.series.x));
   const yFn = $derived(resolveAccessor(group.series.y));
@@ -68,23 +108,29 @@
   const resolvedTextAnchor = $derived(font?.textAnchor === 'outside' ? undefined : font?.textAnchor);
 </script>
 
-<Text
-  data={group.series.data}
-  {...isHorizontal ? { y: xFn, x: valueTextFn } : { x: xFn, y: valueTextFn }}
-  text={(d: TData) => fmtVal(Number(yFn(d)), group.series.name)}
-  dx={font?.dx ?? (isHorizontal ? defaultOffset : groupOffset.dx)}
-  dy={font?.dy ?? (isHorizontal ? groupOffset.dy : defaultOffset)}
-  textAnchor={resolvedTextAnchor ?? (isHorizontal ? (valAnchor === 'outside' || valAnchor === 'end' ? 'start' : valAnchor === 'start' ? 'end' : 'middle') : 'middle')}
-  lineAnchor={font?.lineAnchor ?? (isHorizontal ? 'middle' : defaultLA)}
-  lineHeight={font?.lineHeight}
-  rotate={font?.rotate}
-  class={font?.class}
-  textClass={font?.textClass}
-  fill={font?.fill ?? axisColor}
-  fontSize={font?.fontSize ?? 12}
-  fontWeight={font?.fontWeight}
-  fontStyle={font?.fontStyle}
-  stroke={font?.stroke}
-  strokeWidth={font?.strokeWidth}
-  paintOrder={font?.paintOrder}
-/>
+<!-- svelteplot's Text mark never wires pointer handlers to its DOM node,
+     despite declaring them in its types — a wrapping <g> catches the
+     boundary crossing instead (pointerenter/leave fire on every ancestor). -->
+<g bind:this={groupEl} role="presentation" onpointerenter={onHoverSeries} onpointerleave={onHoverEnd}>
+  <Text
+    data={group.series.data}
+    {...isHorizontal ? { y: xFn, x: valueTextFn } : { x: xFn, y: valueTextFn }}
+    text={(d: TData) => formatValue(Number(yFn(d)), group.series.name)}
+    dx={font?.dx ?? (isHorizontal ? defaultOffset : groupOffset.dx)}
+    dy={font?.dy ?? (isHorizontal ? groupOffset.dy : defaultOffset)}
+    textAnchor={resolvedTextAnchor ?? (isHorizontal ? (valAnchor === 'outside' || valAnchor === 'end' ? 'start' : valAnchor === 'start' ? 'end' : 'middle') : 'middle')}
+    lineAnchor={font?.lineAnchor ?? (isHorizontal ? 'middle' : defaultLA)}
+    lineHeight={font?.lineHeight}
+    rotate={font?.rotate}
+    class={font?.class}
+    textClass={font?.textClass}
+    fill={font?.fill ?? axisColor}
+    fillOpacity={fillOverride?.fillOpacity}
+    fontSize={font?.fontSize ?? 12}
+    fontWeight={font?.fontWeight}
+    fontStyle={font?.fontStyle}
+    stroke={font?.stroke}
+    strokeWidth={font?.strokeWidth}
+    paintOrder={font?.paintOrder}
+  />
+</g>

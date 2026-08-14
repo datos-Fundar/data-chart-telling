@@ -9,6 +9,7 @@
   import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
   import { disabledStrokeOverride, disabledDotsOverride } from '$lib/plots/utils/legendDisabled';
   import { buildLineMarkers } from '$lib/plots/line/buildLineMarkers';
+  import { createLabelMarginTracker } from '$lib/plots/utils/labelOverflow.svelte';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import ValueLabels from '$lib/plots/line/ValueLabels.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
@@ -19,6 +20,7 @@
   import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
   import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
   import type { LineMarkersConfig } from '$lib/types/markers/line';
+  import type { LegendDisabledStyle } from '$lib/types/layout/legend';
 
   type Props = BasePlotProps<
     SeriesProps<TData> | DataProps<TData>,
@@ -56,6 +58,22 @@
 
   const cfg = $derived(getConfiguration());
   const showVals = $derived(styles.values?.show ?? false);
+  const hoverIsolate = $derived(styles.values?.hoverIsolate ?? false);
+
+  // A value label hovered while `styles.values.hoverIsolate` is on dims
+  // every other series exactly like a legend toggle would — local to this
+  // one `<Plot>` instance (not the shared HoverStore) so the gesture can't
+  // leak into unrelated tooltip/crosshair behavior.
+  let hoverIsolatedSeries = $state<string | null>(null);
+
+  function effectiveDisabledFor(name: string): LegendDisabledStyle | undefined {
+    return (
+      legendInteraction?.disabledSeries.get(name) ??
+      (hoverIsolate && hoverIsolatedSeries && hoverIsolatedSeries !== name
+        ? { opacity: cfg.legend.disabledOpacity }
+        : undefined)
+    );
+  }
 
   const xAcc = $derived(resolveAccessor(resolvedSeries[0]?.x ?? ((d: TData) => d)));
   const yAcc = $derived(resolveAccessor(resolvedSeries[0]?.y ?? ((d: TData) => d)));
@@ -97,8 +115,8 @@
   const lineMarkers = $derived(
     buildLineMarkers({
       groupedSeries,
-      disabledStrokeFor: (name) => disabledStrokeOverride(legendInteraction?.disabledSeries.get(name)),
-      disabledDotsFor: (name) => disabledDotsOverride(legendInteraction?.disabledSeries.get(name)),
+      disabledStrokeFor: (name) => disabledStrokeOverride(effectiveDisabledFor(name)),
+      disabledDotsFor: (name) => disabledDotsOverride(effectiveDisabledFor(name)),
     }),
   );
 
@@ -114,31 +132,11 @@
   // End-of-line labels can grow past the plot's own content box, into its
   // margin — reserving real space there (rather than padding the domain,
   // which would falsely imply data exists past the last real point) is
-  // what ValueLabels's own overflow measurement feeds into here. Grown
-  // monotonically (never shrunk) from that real `getBBox()` measurement:
-  // once the real overflow reaches ~0 (the margin now fits it), reporting
-  // that same value again is a no-op (`Math.max` of an unchanged value),
-  // which is what keeps this converging instead of oscillating between
-  // "shrink margin → overflow reappears → grow margin → …". Local to this
-  // one `<Plot>` instance — see ValueLabels.svelte's own doc comment for
-  // why that locality (vs. svelteplot's shared margin context) matters.
-  let measuredLabelMargin = $state({ left: 0, right: 0 });
-
-  function handleLabelOverflow(overflow: { left: number; right: number }) {
-    const left = Math.max(measuredLabelMargin.left, overflow.left);
-    const right = Math.max(measuredLabelMargin.right, overflow.right);
-    if (left !== measuredLabelMargin.left || right !== measuredLabelMargin.right) {
-      measuredLabelMargin = { left, right };
-    }
-  }
-
-  const resolvedMargins = $derived.by(() => {
-    if (measuredLabelMargin.left <= 0 && measuredLabelMargin.right <= 0) return margins;
-    const out = { ...margins };
-    if (measuredLabelMargin.right > 0 && margins?.right === undefined) out.right = measuredLabelMargin.right;
-    if (measuredLabelMargin.left > 0 && margins?.left === undefined) out.left = measuredLabelMargin.left;
-    return out;
-  });
+  // what ValueLabels's own overflow measurement feeds into here, via a
+  // tracker local to this one `<Plot>` instance — see ValueLabels.svelte's
+  // own doc comment for why that locality (vs. svelteplot's shared margin
+  // context) matters.
+  const labelMargin = createLabelMarginTracker(() => margins);
 </script>
 
 <BasePlotLayout
@@ -150,13 +148,20 @@
   getY={(d) => Number(yAcc(d))}
   {hover}
   {scales}
-  margins={resolvedMargins}
+  margins={labelMargin.resolvedMargins}
   xTickRotate={scales?.x?.tickRotate}
   markers={[...lineMarkers, ...markers]}
   seriesData={resolvedSeries}
   {scopedGroups}
 >
   {#if showVals}
-    <ValueLabels {lastPoints} values={styles.values} onOverflow={handleLabelOverflow} />
+    <ValueLabels
+      {lastPoints}
+      values={styles.values}
+      onOverflow={labelMargin.report}
+      disabledFor={effectiveDisabledFor}
+      onHoverSeries={hoverIsolate ? (name) => { hoverIsolatedSeries = name; } : undefined}
+      onHoverEnd={hoverIsolate ? () => { hoverIsolatedSeries = null; } : undefined}
+    />
   {/if}
 </BasePlotLayout>

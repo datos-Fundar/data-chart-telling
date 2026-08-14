@@ -2,7 +2,7 @@
   import TimelineLayout from '$lib/layout/timeline/TimelineLayout.svelte';
   import BarPlot from '$lib/plots/bar/Plot.svelte';
   import Scrubber from '../../common/Scrubber.svelte';
-  import type { Orientation } from '$lib/types/charts/common';
+  import type { Orientation } from '$lib/types/layout/timeline';
 
   /**
    * `TimelineLayout`'s own `interpolate` option has no chart-level `y`/`z` to

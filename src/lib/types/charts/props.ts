@@ -5,8 +5,9 @@ import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
 import type { SegmentsConfig, MarginConfig } from '$lib/types/plots/props';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { TooltipProp } from '$lib/types/layout/tooltip';
-import type { LegendSection } from '$lib/types/charts/legend';
-import type { FacetConfig, TimelineConfig } from '$lib/types/charts/common';
+import type { LegendSection } from '$lib/types/layout/legend';
+import type { FacetConfig } from '$lib/types/layout/facet';
+import type { TimelineConfig } from '$lib/types/layout/timeline';
 
 /**
  * Common props accepted by every chart component (bar, line, heatmap, pyramid,

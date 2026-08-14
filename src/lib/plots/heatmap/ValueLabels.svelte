@@ -14,7 +14,7 @@
     getX,
     getY,
     getZ,
-    fmtVal,
+    formatValue,
     values,
     defaultColor,
   }: {
@@ -22,7 +22,7 @@
     getX: (d: TData) => AxisValue;
     getY: (d: TData) => AxisValue;
     getZ: (d: TData) => unknown;
-    fmtVal: (value: number, seriesName: string) => string;
+    formatValue: (value: number, seriesName: string) => string;
     values: ValuesStyle | undefined;
     defaultColor: string;
   } = $props();
@@ -37,7 +37,7 @@
   {data}
   x={getX}
   y={getY}
-  text={(d: TData) => fmtVal(Number(getZ(d)), '')}
+  text={(d: TData) => formatValue(Number(getZ(d)), '')}
   fill={font?.fill ?? defaultColor}
   fontSize={font?.fontSize ?? 12}
   fontWeight={font?.fontWeight ?? 600}

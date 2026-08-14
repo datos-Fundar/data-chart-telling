@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapChart from '$lib/charts/heatmap/Chart.svelte';
 import HeatmapTimeline from './HeatmapTimeline.svelte';
 import { HEAT_CELLS, type HeatCell } from '../../data/heat-cells';
-import type { ContinuousLegendSection } from '$lib/types/charts/legend';
+import type { ContinuousLegendSection } from '$lib/types/layout/legend';
 
 const maxPct = Math.max(...HEAT_CELLS.map((d) => d.pct));
 

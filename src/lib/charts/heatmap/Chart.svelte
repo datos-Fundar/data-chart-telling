@@ -46,7 +46,7 @@
   const getX = $derived(resolveAccessor<TRow>(x));
   const getY = $derived(resolveAccessor<TRow>(y));
   const getZ = $derived(resolveAccessor<TRow>(z));
-  const fmtVal = $derived(styles.values?.format ?? ((v: number) => `${v}`));
+  const formatValue = $derived(styles.values?.format ?? ((v: number) => `${v}`));
 
   // Compute domain over the full dataset so colour is comparable across facets/timeline steps.
   // Caller-provided `scales.z.domain` always takes precedence.
@@ -66,7 +66,7 @@
   const defaultFormat = $derived((row: TRow) => {
     const xl = scales.x?.label || 'x';
     const yl = scales.y?.label || 'y';
-    return `${xl} ${getX(row)} · ${yl} ${getY(row)}\n${fmtVal(Number(getZ(row)), '')}`;
+    return `${xl} ${getX(row)} · ${yl} ${getY(row)}\n${formatValue(Number(getZ(row)), '')}`;
   });
 </script>
 

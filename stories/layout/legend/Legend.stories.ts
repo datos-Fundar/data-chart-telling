@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LegendLayout from '$lib/layout/legend/LegendLayout.svelte';
-import type { LegendSection } from '$lib/types/charts/legend';
+import type { LegendSection } from '$lib/types/layout/legend';
 
 /**
  * `Legend` renders one or more sections side by side — discrete (swatch +

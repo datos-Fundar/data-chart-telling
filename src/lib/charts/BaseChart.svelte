@@ -7,14 +7,11 @@
   import { provideHover } from '$lib/layout/tooltip/hover.svelte';
   import { provideLegendInteraction } from '$lib/layout/legend/interaction.svelte';
   import type { Snippet } from 'svelte';
-  import type { LegendSection } from '$lib/types/charts/legend';
+  import type { LegendSection } from '$lib/types/layout/legend';
   import type { HoverStrategy } from '$lib/types/layout/tooltip';
-  import type {
-    ChartPlotSnippet,
-    FacetConfig,
-    TimeValue,
-    TimelineConfig,
-  } from '$lib/types/charts/common';
+  import type { ChartPlotSnippet } from '$lib/types/charts/common';
+  import type { FacetConfig } from '$lib/types/layout/facet';
+  import type { TimeValue, TimelineConfig } from '$lib/types/layout/timeline';
 
   /**
    * The orchestrator. It wires together the four interchangeable layout
@@ -60,7 +57,11 @@
   const cfg = $derived(getConfiguration());
 
   const hoverStore = provideHover();
-  provideLegendInteraction();
+  const legendInteraction = provideLegendInteraction();
+  const legendPlotContext = $derived({
+    disabledSeries: new Set(legendInteraction.disabledSeries.keys()),
+    isDisabled: (name: string) => legendInteraction.disabledSeries.has(name),
+  });
   $effect(() => {
     hoverStore.strategy = hover?.strategy ?? 'x';
     hoverStore.sync = hover?.sync ?? false;
@@ -90,12 +91,13 @@
           width: cw,
           height: ch,
           facetValue,
-          selectedValue
+          selectedValue,
+          legend: legendPlotContext
         })}
       {/snippet}
     </FacetLayout>
   {:else}
-    {@render plot({ data: rows, width: w, height: h, selectedValue })}
+    {@render plot({ data: rows, width: w, height: h, selectedValue, legend: legendPlotContext })}
   {/if}
 {/snippet}
 

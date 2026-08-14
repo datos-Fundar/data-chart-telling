@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import ContinuousSection from '$lib/layout/legend/ContinuousSection.svelte';
-import type { ContinuousLegendSection } from '$lib/types/charts/legend';
+import type { ContinuousLegendSection } from '$lib/types/layout/legend';
 
 async function dragBy(el: Element, dx: number): Promise<void> {
 	const rect = el.getBoundingClientRect();

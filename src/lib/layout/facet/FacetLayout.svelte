@@ -10,7 +10,7 @@
     FacetIndicatorSnippet,
     FacetNavSnippet,
     FacetNavDirection,
-  } from '$lib/types/charts/common';
+  } from '$lib/types/layout/facet';
   import type { Accessor } from '$lib/types/plots/data/common';
 
   /**

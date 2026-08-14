@@ -1,6 +1,6 @@
 <script lang="ts">
   import Timeline from '$lib/layout/timeline/Timeline.svelte';
-  import type { Orientation, TimeValue } from '$lib/types/charts/common';
+  import type { Orientation, TimeValue } from '$lib/types/layout/timeline';
 
   /**
    * Plain wrapper that gives `Timeline` an explicitly CSS-sized box to render

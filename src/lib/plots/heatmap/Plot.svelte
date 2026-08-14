@@ -73,7 +73,7 @@
   const minColor = $derived(styles.colors?.min ?? cfg.continuous.min);
   const maxColor = $derived(styles.colors?.max ?? cfg.continuous.max);
   const showVals = $derived(styles.values?.show ?? true);
-  const fmtVal = $derived(styles.values?.format ?? ((v: number) => `${v}`));
+  const formatValue = $derived(styles.values?.format ?? ((v: number) => `${v}`));
 
   const resolvedSeries = $derived(series ?? buildSeries(data!, x!, y!, undefined));
   const flat = $derived(resolvedSeries.flatMap((s) => s.data));
@@ -127,7 +127,7 @@
         x: getX(d) as AxisValue,
         y: getY(d) as AxisValue,
         row: d,
-        label: fmtVal(Number(getZ(d)), ''),
+        label: formatValue(Number(getZ(d)), ''),
       })),
   );
 
@@ -216,7 +216,7 @@
   const hover = $derived({
     active: tooltip != null || hasHoverMarker(markers),
     points: hoverPoints,
-    label: (d: TData) => fmtVal(Number(getZ(d)), ''),
+    label: (d: TData) => formatValue(Number(getZ(d)), ''),
     strategy: resolveHoverStrategy(tooltip?.strategy, markers, 'punctual'),
     sync: resolveHoverSync(tooltip?.sync, markers),
     tooltip,
@@ -244,7 +244,7 @@
       {getX}
       {getY}
       {getZ}
-      {fmtVal}
+      {formatValue}
       values={styles.values}
       defaultColor={cfg.continuous.labelColor}
     />

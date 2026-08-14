@@ -13,20 +13,9 @@ import type { GeoFeature } from '$lib/types/plots/data/geo';
 export type ValuesStyle = {
   show?: boolean;
   anchor?: ValueAnchor;
-  /** Called with the numeric value and the series name. Return a string to render. */
   format?: (value: number, seriesName: string) => string;
-  /** Text styling for the label itself. */
+  hoverIsolate?: boolean;
   fontStyle?: FontStyle;
-  /**
-   * Style for the leader line drawn from a label displaced to clear an
-   * overlap with another series' label, back to its real data point.
-   * Labels only ever move when they'd otherwise collide — this is a no-op
-   * style until that happens. Falls back to a neutral grey, thin, solid
-   * stroke — deliberately not the series' own colour or stroke width, since
-   * matching the data line reads as more data rather than as a leader,
-   * right where several lines are already converging. Unset fields keep
-   * that fallback.
-   */
   strokeStyle?: StrokeStyle;
 };
 

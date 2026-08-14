@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { LegendSection } from '$lib/types/charts/legend';
+  import type { LegendSection } from '$lib/types/layout/legend';
   import DiscreteSection from '$lib/layout/legend/DiscreteSection.svelte';
   import ContinuousSection from '$lib/layout/legend/ContinuousSection.svelte';
 

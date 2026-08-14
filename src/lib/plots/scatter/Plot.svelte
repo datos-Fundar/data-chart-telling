@@ -10,6 +10,7 @@
   import { disabledDotsOverride } from '$lib/plots/utils/legendDisabled';
   import { buildScatterMarkers } from '$lib/plots/scatter/buildScatterMarkers';
   import { resolveRadiusPaddedDomain } from '$lib/plots/scatter/resolveRadiusPaddedDomain';
+  import { createLabelMarginTracker } from '$lib/plots/utils/labelOverflow.svelte';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import ValueLabels from '$lib/plots/scatter/ValueLabels.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
@@ -22,6 +23,7 @@
   import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
   import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
   import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
+  import type { LegendDisabledStyle } from '$lib/types/layout/legend';
 
   /**
    * A point cloud on continuous x/y axes. Accepts either a pre-built `series`
@@ -71,7 +73,23 @@
 
   const cfg = $derived(getConfiguration());
   const showVals = $derived(styles.values?.show ?? false);
-  const fmtVal = $derived(styles.values?.format ?? ((v: number) => `${v}`));
+  const formatValue = $derived(styles.values?.format ?? ((v: number) => `${v}`));
+  const hoverIsolate = $derived(styles.values?.hoverIsolate ?? false);
+
+  // A value label hovered while `styles.values.hoverIsolate` is on dims
+  // every other series exactly like a legend toggle would — local to this
+  // one `<Plot>` instance (not the shared HoverStore) so the gesture can't
+  // leak into unrelated tooltip/crosshair behavior.
+  let hoverIsolatedSeries = $state<string | null>(null);
+
+  function effectiveDisabledFor(name: string): LegendDisabledStyle | undefined {
+    return (
+      legendInteraction?.disabledSeries.get(name) ??
+      (hoverIsolate && hoverIsolatedSeries && hoverIsolatedSeries !== name
+        ? { opacity: cfg.legend.disabledOpacity }
+        : undefined)
+    );
+  }
 
   const xAcc = $derived(resolveAccessor(resolvedSeries[0]?.x ?? ((d: TData) => d)));
   const yAcc = $derived(resolveAccessor(resolvedSeries[0]?.y ?? ((d: TData) => d)));
@@ -110,7 +128,7 @@
     buildScatterMarkers({
       groupedSeries,
       r,
-      disabledDotsFor: (name) => disabledDotsOverride(legendInteraction?.disabledSeries.get(name)),
+      disabledDotsFor: (name) => disabledDotsOverride(effectiveDisabledFor(name)),
     }),
   );
 
@@ -184,6 +202,13 @@
       y: paddedY ? { ...scales.y, domain: paddedY } : scales.y,
     };
   });
+
+  // A scatter point's value label can grow past the plot's own content box
+  // (e.g. a point volcado toward a corner, past what its own edge-aware flip
+  // can fit) — reserving real space there is what each label's own overflow
+  // measurement feeds into here, via a tracker local to this one `<Plot>`
+  // instance. See `labelOverflow.svelte.ts`.
+  const labelMargin = createLabelMarginTracker(() => margins);
 </script>
 
 <BasePlotLayout
@@ -195,12 +220,23 @@
   getY={(d) => Number(yAcc(d))}
   {hover}
   scales={resolvedScales}
-  {margins}
+  margins={labelMargin.resolvedMargins}
   markers={[...scatterMarkers, ...markers]}
   seriesData={resolvedSeries}
   {scopedGroups}
 >
   {#if showVals}
-    <ValueLabels data={flat} getX={xAcc} getY={(d) => Number(yAcc(d))} {fmtVal} values={styles.values} defaultColor={cfg.axis.color} />
+    {#each groupedSeries as group (group.series.name)}
+      <ValueLabels
+        {group}
+        {formatValue}
+        values={styles.values}
+        defaultColor={cfg.axis.color}
+        disabled={effectiveDisabledFor(group.series.name)}
+        onHoverSeries={hoverIsolate ? () => { hoverIsolatedSeries = group.series.name; } : undefined}
+        onHoverEnd={hoverIsolate ? () => { hoverIsolatedSeries = null; } : undefined}
+        onOverflow={labelMargin.report}
+      />
+    {/each}
   {/if}
 </BasePlotLayout>

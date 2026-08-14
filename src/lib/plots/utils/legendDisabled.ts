@@ -1,4 +1,4 @@
-import type { LegendDisabledStyle } from '$lib/types/charts/legend';
+import type { LegendDisabledStyle } from '$lib/types/layout/legend';
 import type { StrokeStyle, DotStyle } from '$lib/types/plots/styling';
 
 /**

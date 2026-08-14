@@ -10,6 +10,7 @@
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { buildGroupedSeries, validateSegments, buildScopedMarkerGroups } from '$lib/plots/utils/segments';
   import { createBarLayout } from '$lib/plots/bar/layout.svelte';
+  import { createLabelMarginTracker } from '$lib/plots/utils/labelOverflow.svelte';
   import { buildHoverPoints } from '$lib/plots/bar/hoverPoints';
   import { buildBarMarkers } from '$lib/plots/bar/buildBarMarkers';
   import ValueLabels from '$lib/plots/bar/ValueLabels.svelte';
@@ -22,6 +23,7 @@
   import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
   import type { ValueAnchor } from '$lib/types/plots/constants';
   import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
+  import type { LegendDisabledStyle } from '$lib/types/layout/legend';
 
   /**
    * A bar chart, vertical by default. Accepts either a pre-built `series`
@@ -63,7 +65,7 @@
     buildGroupedSeries<Series<TData>, BarSegmentStyle>(resolvedSeries, segments, false),
   );
   const showVals = $derived(styles.values?.show ?? false);
-  const fmtVal = $derived(styles.values?.format ?? ((v: number) => `${v}`));
+  const formatValue = $derived(styles.values?.format ?? ((v: number) => `${v}`));
   const valAnchor = $derived<ValueAnchor>(styles.values?.anchor ?? 'outside');
 
   // `xAcc`/`yAcc` are always data-semantic (category/value) — independent of
@@ -153,6 +155,23 @@
   // `row` (see BasePlotLayout/HoverPoint) is what lets the template recover the
   // semantic category regardless of which axis it landed on.
   const legendInteraction = $derived(getLegendInteraction());
+  const hoverIsolate = $derived(styles.values?.hoverIsolate ?? false);
+
+  // A value label hovered while `styles.values.hoverIsolate` is on dims
+  // every other series exactly like a legend toggle would — local to this
+  // one `<Plot>` instance (not the shared HoverStore) so the gesture can't
+  // leak into unrelated tooltip/crosshair behavior.
+  let hoverIsolatedSeries = $state<string | null>(null);
+
+  function effectiveDisabledFor(name: string): LegendDisabledStyle | undefined {
+    return (
+      legendInteraction?.disabledSeries.get(name) ??
+      (hoverIsolate && hoverIsolatedSeries && hoverIsolatedSeries !== name
+        ? { opacity: cfg.legend.disabledOpacity }
+        : undefined)
+    );
+  }
+
   // A legend-disabled series is dimmed on the bar itself, but never surfaces
   // in hover/tooltip — its points are simply absent from the candidate list.
   const hoverPoints = $derived(
@@ -178,6 +197,13 @@
     // comment.
     pointMatching: 'contains' as const,
   });
+
+  // A bar's value label can grow past the plot's own content box (e.g. a
+  // tall bar's `anchor: 'outside'` label pushing past the top margin) —
+  // reserving real space there is what each label's own overflow
+  // measurement feeds into here, via a tracker local to this one `<Plot>`
+  // instance. See `labelOverflow.svelte.ts`.
+  const labelMargin = createLabelMarginTracker(() => margins);
 </script>
 
 <BasePlotLayout
@@ -189,7 +215,7 @@
   getY={plotGetY}
   {hover}
   scales={resolvedScales}
-  {margins}
+  margins={labelMargin.resolvedMargins}
   xTickRotate={resolvedScales?.x?.tickRotate}
   markers={({ setHoverMatch, clearHoverMatch }) => [
     ...buildBarMarkers({
@@ -198,7 +224,7 @@
       isHorizontal,
       hoverPoints,
       palette: cfg.palette,
-      disabledFillFor: (name) => disabledFillOverride(legendInteraction?.disabledSeries.get(name)),
+      disabledFillFor: (name) => disabledFillOverride(effectiveDisabledFor(name)),
       active: hover.active,
       setHoverMatch,
       clearHoverMatch,
@@ -210,7 +236,20 @@
 >
   {#if showVals}
     {#each groupedSeries as group, seriesIndex (group.series.name)}
-      <ValueLabels {group} {seriesIndex} {barLayout} {isHorizontal} {valAnchor} {fmtVal} values={styles.values} axisColor={cfg.axis.color} />
+      <ValueLabels
+        {group}
+        {seriesIndex}
+        {barLayout}
+        {isHorizontal}
+        {valAnchor}
+        {formatValue}
+        values={styles.values}
+        axisColor={cfg.axis.color}
+        disabled={effectiveDisabledFor(group.series.name)}
+        onHoverSeries={hoverIsolate ? () => { hoverIsolatedSeries = group.series.name; } : undefined}
+        onHoverEnd={hoverIsolate ? () => { hoverIsolatedSeries = null; } : undefined}
+        onOverflow={labelMargin.report}
+      />
     {/each}
   {/if}
 </BasePlotLayout>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte';
-  import type { ContinuousLegendSection } from '$lib/types/charts/legend';
+  import type { ContinuousLegendSection } from '$lib/types/layout/legend';
   import { makeColorScale } from '$lib/utils/color';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { getLegendInteraction, createLegendInteraction } from '$lib/layout/legend/interaction.svelte';

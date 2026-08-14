@@ -2,7 +2,7 @@
   import HeatmapChart from '$lib/charts/heatmap/Chart.svelte';
   import Scrubber from '../../common/Scrubber.svelte';
   import { HEAT_CELLS, type HeatCell } from '../../data/heat-cells';
-  import type { LegendSection } from '$lib/types/charts/legend';
+  import type { LegendSection } from '$lib/types/layout/legend';
 
   const { faceted = false }: { faceted?: boolean } = $props();
 

@@ -7,7 +7,7 @@
     TimeValue,
     TimelineChildSnippet,
     TimelineInterpolation,
-  } from '$lib/types/charts/common';
+  } from '$lib/types/layout/timeline';
   import type { Accessor } from '$lib/types/plots/data/common';
 
   /**

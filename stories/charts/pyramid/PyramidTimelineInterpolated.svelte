@@ -2,7 +2,7 @@
   import PyramidChart from '$lib/charts/pyramid/Chart.svelte';
   import Scrubber from '../../common/Scrubber.svelte';
   import { AGE_GROUPS, POPULATION_PYRAMID, type PopulationRow } from '../../data/population-pyramid';
-  import type { LegendSection } from '$lib/types/charts/legend';
+  import type { LegendSection } from '$lib/types/layout/legend';
 
   const legend: LegendSection[] = [
     {

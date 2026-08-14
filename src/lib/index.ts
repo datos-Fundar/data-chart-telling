@@ -30,6 +30,11 @@ export { default as FacetLayout } from './layout/facet/FacetLayout.svelte';
 export { default as FacetIndicator } from './layout/facet/FacetIndicator.svelte';
 export { default as LegendLayout } from './layout/legend/LegendLayout.svelte';
 export { default as Tooltip } from './layout/tooltip/Tooltip.svelte';
+export {
+  getLegendInteraction,
+  provideLegendInteraction,
+  createLegendInteraction,
+} from './layout/legend/interaction.svelte';
 
 // Markers
 export { default as BarMarker } from './markers/BarMarker.svelte';
@@ -122,8 +127,15 @@ export type {
   GeoInsetProjectionConfig,
 } from './types/markers/geo';
 export type {
+  ChartPlotContext,
+  ChartPlotSnippet,
+} from './types/charts/common';
+export type {
   TimeValue,
   Orientation,
+  TimelineConfig,
+} from './types/layout/timeline';
+export type {
   Responsive,
   FacetColumns,
   FacetMode,
@@ -133,17 +145,16 @@ export type {
   FacetNavDirection,
   FacetNavContext,
   FacetNavSnippet,
-  TimelineConfig,
-  ChartPlotContext,
-  ChartPlotSnippet,
-} from './types/charts/common';
+} from './types/layout/facet';
 export type {
   LegendSection,
   DiscreteLegendSection,
   ContinuousLegendSection,
   LegendItem,
   LegendDisabledStyle,
-} from './types/charts/legend';
+  LegendInteractionStore,
+  LegendPlotContext,
+} from './types/layout/legend';
 export type {
   HoverStrategy,
   TooltipOptions,

@@ -7,7 +7,7 @@
 	import { buildSeries } from '$lib/utils/grouping';
 	import { TIME_SERIES, type SeriesPoint } from '../data/time-series';
 	import { HEAT_CELLS, type HeatCell } from '../data/heat-cells';
-	import type { LegendSection } from '$lib/types/charts/legend';
+	import type { LegendSection } from '$lib/types/layout/legend';
 
 	/**
 	 * One generic <BaseChart> orchestrator, three different leaf plots. The container,

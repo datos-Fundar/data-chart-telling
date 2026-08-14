@@ -2,7 +2,7 @@
   import FacetLayout from '$lib/layout/facet/FacetLayout.svelte';
   import GeoPlot from '$lib/plots/geo/Plot.svelte';
   import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '../data';
-  import type { FacetColumns } from '$lib/types/charts/common';
+  import type { FacetColumns } from '$lib/types/layout/facet';
 
   /**
    * Exercises `FacetLayout` + `GeoPlot`'s tile-layer basemap together across

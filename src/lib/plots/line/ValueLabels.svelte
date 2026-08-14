@@ -5,9 +5,13 @@
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { paletteColor } from '$lib/utils/color';
   import { declutter1D, laneAssignment } from '$lib/plots/utils/declutter';
+  import { disabledFillOverride, disabledStrokeOverride } from '$lib/plots/utils/legendDisabled';
+  import { watchLabelOverflow } from '$lib/plots/utils/labelOverflow.svelte';
   import type { Series } from '$lib/types/plots/data/common';
   import type { ValuesStyle } from '$lib/types/layout/styles';
   import type { ValueAnchor } from '$lib/types/plots/constants';
+  import type { LegendDisabledStyle } from '$lib/types/layout/legend';
+  import type { MarginOverflow } from '$lib/plots/utils/labelOverflow.svelte';
 
   /**
    * End-point value labels for `LinePlot` — one label per series at its last
@@ -21,11 +25,19 @@
     lastPoints,
     values,
     onOverflow,
+    disabledFor,
+    onHoverSeries,
+    onHoverEnd,
   }: {
     lastPoints: { series: Series<TData>; lastRow: TData; seriesIndex: number }[];
     values: ValuesStyle | undefined;
     /** Reports how far the rendered labels overflow the plot's own content box, in pixels, on each side (0 = no overflow). */
-    onOverflow?: (overflow: { left: number; right: number }) => void;
+    onOverflow?: (overflow: MarginOverflow) => void;
+    /** Resolved legend/hover-isolate dimming style for a series, if any. */
+    disabledFor?: (name: string) => LegendDisabledStyle | undefined;
+    /** Fired when the pointer enters a label — only wired when hover-isolate is enabled. */
+    onHoverSeries?: (name: string) => void;
+    onHoverEnd?: () => void;
   } = $props();
 
   const cfg = $derived(getConfiguration());
@@ -49,7 +61,7 @@
 
   const font = $derived(values?.fontStyle);
   const connector = $derived(values?.strokeStyle);
-  const fmtVal = $derived(values?.format ?? ((v: number, name: string) => `${name} - ${v}`));
+  const formatValue = $derived(values?.format ?? ((v: number, name: string) => `${name} - ${v}`));
   const valAnchor = $derived<ValueAnchor>(values?.anchor ?? 'start');
   // 'outside' is a per-point escape hatch resolved by HoverMarker; line's own
   // value labels already have their own `anchor: 'outside'` concept above,
@@ -69,36 +81,33 @@
   // ── Overflow measurement ─────────────────────────────────────────────────
   // Measures how far the rendered labels extend past the plot's own content
   // box and reports it to the caller (`Plot.svelte`), which grows its own
-  // local margin state to fit — real `getBBox()` measurement, same as the
-  // approach this used to register directly into svelteplot's *shared*
-  // margin-auto-sizing context. Reporting through a plain callback instead
-  // keeps this entirely local to one `<Plot>` instance: nothing here is
-  // shared across instances, which is what made the old approach spike
+  // local margin state to fit — see `labelOverflow.svelte.ts` for the actual
+  // `getBBox()` measurement. Reporting through a plain callback instead of
+  // registering directly into svelteplot's *shared* margin-auto-sizing
+  // context keeps this entirely local to one `<Plot>` instance: nothing here
+  // is shared across instances, which is what made that old approach spike
   // CPU/memory into unresponsiveness when many instances mounted/unmounted
   // together (e.g. a multi-story docs page → single story).
   let groupEl: SVGGElement | undefined = $state();
 
-  $effect(() => {
-    // getBBox() below is a plain DOM read, not itself tracked — depend on
-    // whatever actually changes the rendered label layout so this re-runs.
-    void lastPoints;
-    void values;
-    const el = groupEl;
-    if (!el || !onOverflow) return;
-    const xRange = plot.scales.x?.fn?.range?.()?.map(Number);
-    if (!xRange) return;
-    const plotLeft = Math.min(xRange[0], xRange[1]);
-    const plotRight = Math.max(xRange[0], xRange[1]);
-    let box: { x: number; width: number };
-    try {
-      box = el.getBBox();
-    } catch {
-      return;
-    }
-    onOverflow({
-      left: Math.ceil(Math.max(0, plotLeft - box.x)),
-      right: Math.ceil(Math.max(0, box.x + box.width - plotRight)),
-    });
+  watchLabelOverflow({
+    el: () => groupEl,
+    bounds: () => {
+      // getBBox() inside isn't itself tracked — depend on whatever actually
+      // changes the rendered label layout so this re-measures.
+      void lastPoints;
+      void values;
+      const xRange = plot.scales.x?.fn?.range?.()?.map(Number);
+      const yRange = plot.scales.y?.fn?.range?.()?.map(Number);
+      if (!xRange || !yRange) return undefined;
+      return {
+        left: Math.min(xRange[0], xRange[1]),
+        right: Math.max(xRange[0], xRange[1]),
+        top: Math.min(yRange[0], yRange[1]),
+        bottom: Math.max(yRange[0], yRange[1]),
+      };
+    },
+    onOverflow: (overflow) => onOverflow?.(overflow),
   });
 
   /**
@@ -166,9 +175,12 @@
   {@const labelDx = offset?.inGroup
     ? dir * (elbowGap + (numLanes - 1) * laneStep + labelGap)
     : baseDx}
-  {@const text = fmtVal(Number(yFn(lastRow)), s.name)}
+  {@const text = formatValue(Number(yFn(lastRow)), s.name)}
   {@const preferredTA = resolvedTextAnchor ?? defaultTA}
   {@const preferredLA = font?.lineAnchor ?? defaultLA}
+  {@const disabled = disabledFor?.(s.name)}
+  {@const disabledStroke = disabledStrokeOverride(disabled)}
+  {@const disabledFill = disabledFillOverride(disabled)}
   {#if offset?.inGroup && plot.scales.x?.fn && plot.scales.y?.fn}
     {@const px = Number(plot.scales.x.fn(xFn(lastRow)))}
     {@const py = Number(plot.scales.y.fn(Number(yFn(lastRow))))}
@@ -179,32 +191,42 @@
       fill="none"
       stroke={connector?.stroke ?? defaultConnectorColor}
       stroke-width={connector?.strokeWidth ?? defaultConnectorWidth}
-      stroke-opacity={connector?.strokeOpacity ?? 1}
+      stroke-opacity={connector?.strokeOpacity ?? disabledStroke?.strokeOpacity ?? 1}
       stroke-dasharray={connector?.strokeDasharray}
       stroke-linecap={connector?.strokeLinecap ?? 'square'}
       stroke-linejoin={connector?.strokeLinejoin ?? 'miter'}
     />
   {/if}
-  <Text
-    data={[lastRow]}
-    x={xFn}
-    y={yFn}
-    text={() => text}
-    dx={labelDx}
-    dy={(font?.dy ?? defaultDy) + extraDy}
-    textAnchor={preferredTA}
-    lineAnchor={preferredLA}
-    lineHeight={font?.lineHeight}
-    rotate={font?.rotate}
-    class={font?.class}
-    textClass={font?.textClass}
-    fill={font?.fill ?? seriesColor}
-    {fontSize}
-    fontWeight={font?.fontWeight}
-    fontStyle={font?.fontStyle}
-    stroke={font?.stroke}
-    strokeWidth={font?.strokeWidth}
-    paintOrder={font?.paintOrder}
-  />
+  <!-- svelteplot's Text mark never wires pointer handlers to its DOM node,
+       despite declaring them in its types — a wrapping <g> catches the
+       boundary crossing instead (pointerenter/leave fire on every ancestor). -->
+  <g
+    role="presentation"
+    onpointerenter={onHoverSeries && (() => onHoverSeries(s.name))}
+    onpointerleave={onHoverEnd}
+  >
+    <Text
+      data={[lastRow]}
+      x={xFn}
+      y={yFn}
+      text={() => text}
+      dx={labelDx}
+      dy={(font?.dy ?? defaultDy) + extraDy}
+      textAnchor={preferredTA}
+      lineAnchor={preferredLA}
+      lineHeight={font?.lineHeight}
+      rotate={font?.rotate}
+      class={font?.class}
+      textClass={font?.textClass}
+      fill={font?.fill ?? seriesColor}
+      fillOpacity={disabledFill?.fillOpacity}
+      {fontSize}
+      fontWeight={font?.fontWeight}
+      fontStyle={font?.fontStyle}
+      stroke={font?.stroke}
+      strokeWidth={font?.strokeWidth}
+      paintOrder={font?.paintOrder}
+    />
+  </g>
 {/each}
 </g>
