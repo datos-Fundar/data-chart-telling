@@ -41,26 +41,34 @@ export function buildBarMarkers<TData extends Record<string, unknown>>(args: {
     if (barLayout.layout === 'stacked') {
       const stackedBaselineFn = (d: TData) => barLayout.stackedBaseline(xFn(d), seriesIndex);
       const stackedTopFn = (d: TData) => barLayout.stackedBaseline(xFn(d), seriesIndex) + Number(yFn(d));
-      const marker: BarMarkerConfig = {
-        type: 'bar',
-        role: 'segment',
-        isHorizontal,
-        data: group.series.data,
-        style: {
-          fill: disabledFill?.fill ?? defaultColor,
-          fillOpacity: disabledFill?.fillOpacity ?? 1,
-        },
-      };
-      if (isHorizontal) {
-        marker.y = xFn;
-        marker.x1 = stackedBaselineFn;
-        marker.x2 = stackedTopFn;
-      } else {
-        marker.x = xFn;
-        marker.y1 = stackedBaselineFn;
-        marker.y2 = stackedTopFn;
+      // Mirrors the grouped/overlap branch below: a series-scoped `segments`
+      // catch-all style (e.g. an explicit `fill`) must win over the
+      // index-derived `defaultColor`, same as it already does there. Stacked
+      // bars were previously drawn straight from `group.series.data`, which
+      // skipped `group.visualSegments` entirely and silently dropped any such
+      // override.
+      for (const seg of group.visualSegments) {
+        const marker: BarMarkerConfig = {
+          type: 'bar',
+          role: 'segment',
+          isHorizontal,
+          data: seg.data,
+          style: {
+            fill: disabledFill?.fill ?? seg.style.fill ?? defaultColor,
+            fillOpacity: disabledFill?.fillOpacity ?? seg.style.fillOpacity ?? 1,
+          },
+        };
+        if (isHorizontal) {
+          marker.y = xFn;
+          marker.x1 = stackedBaselineFn;
+          marker.x2 = stackedTopFn;
+        } else {
+          marker.x = xFn;
+          marker.y1 = stackedBaselineFn;
+          marker.y2 = stackedTopFn;
+        }
+        segmentMarkers.push(marker);
       }
-      segmentMarkers.push(marker);
       return;
     }
 
