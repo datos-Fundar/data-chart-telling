@@ -114,27 +114,6 @@ export const InvertedColorRamp: Story = {
 };
 
 /**
- * Pan + zoom enabled — `coordinates.zoom: true` turns on drag-to-pan and
- * scroll-to-zoom. Try it directly in the canvas below.
- */
-export const ZoomEnabled: Story = {
-  args: {
-    coordinates: {
-      zoom: true,
-    } satisfies CoordinatesConfig,
-  },
-};
-
-/** Zoom with limits — `coordinates.zoom.min`/`max` clamp how far in/out the scroll wheel can go. */
-export const ZoomWithLimits: Story = {
-  args: {
-    coordinates: {
-      zoom: { min: 1, max: 4 },
-    } satisfies CoordinatesConfig,
-  },
-};
-
-/**
  * Raster tile basemap — `styles.tileLayer` draws OpenStreetMap tiles under
  * the vector geometry. Only correct for Mercator-family projections, so
  * `coordinates.projection` is set back to `'mercator'` here, overriding this
