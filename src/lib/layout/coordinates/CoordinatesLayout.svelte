@@ -41,7 +41,9 @@
     children: Snippet;
   } = $props();
 
-  const resolvedProjection = $derived(resolveProjection(coordinates?.projection, data));
+  const resolvedProjection = $derived(
+    coordinates ? resolveProjection(coordinates.projection, data) : undefined,
+  );
 
   const zoomEnabled = $derived(coordinates?.zoom !== false && coordinates?.zoom != null);
   const zoomConfig = $derived(typeof coordinates?.zoom === 'object' ? coordinates.zoom : undefined);
