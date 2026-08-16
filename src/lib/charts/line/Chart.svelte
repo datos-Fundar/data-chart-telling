@@ -10,7 +10,7 @@
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { resolveTimelineInterpolation } from '$lib/utils/interpolate';
   import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
-  import type { ChartProps } from '$lib/types/charts/props';
+  import type { GapsAwareChartProps } from '$lib/types/charts/props';
 
   /**
    * High-level line chart. It takes flat rows plus `x`/`y`/`z` encodings, groups
@@ -39,7 +39,7 @@
     facet,
     timeline,
     tooltip,
-  }: ChartProps<TRow, LineSegmentStyle> = $props();
+  }: GapsAwareChartProps<TRow, LineSegmentStyle> = $props();
 
   // A line should grow into its full extent over time, not snap to a single
   // year's point — so default to a cumulative reveal unless the caller wants

@@ -1,7 +1,7 @@
 import type { Snippet } from 'svelte';
 import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { Accessor } from '$lib/types/plots/data/common';
-import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
+import type { AxisBasedStylesConfig, GapsAwarePlotStylesConfig } from '$lib/types/layout/styles';
 import type { SegmentsConfig, MarginConfig } from '$lib/types/plots/props';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { TooltipProp } from '$lib/types/layout/tooltip';
@@ -34,7 +34,7 @@ export type ChartProps<
   x: Accessor<TRow, AxisValue>;
   y: Accessor<TRow, AxisValue>;
   z?: Accessor<TRow, unknown>;
-  styles?: BasePlotStylesConfig;
+  styles?: AxisBasedStylesConfig;
   segments?: SegmentsConfig<TSegmentStyle>;
   markers?: AxisBasedMarkersConfig[];
   scales?: AxisBasedScalesConfig<TRow>;
@@ -42,4 +42,17 @@ export type ChartProps<
   facet?: FacetConfig<TRow>;
   timeline?: TimelineConfig<TRow>;
   tooltip?: TooltipProp<TRow>;
+};
+
+/**
+ * `ChartProps` for the chart kinds with gap-fill (`BarChart`/`LineChart`/
+ * `PyramidChart`) — identical shape, but `styles` accepts
+ * `GapsAwarePlotStylesConfig<TSegmentStyle>` (adds `styles.gaps`) instead of
+ * the plain `AxisBasedStylesConfig` every other chart kind uses.
+ */
+export type GapsAwareChartProps<
+  TRow extends Record<string, unknown>,
+  TSegmentStyle extends object = object,
+> = Omit<ChartProps<TRow, TSegmentStyle>, 'styles'> & {
+  styles?: GapsAwarePlotStylesConfig<TSegmentStyle>;
 };

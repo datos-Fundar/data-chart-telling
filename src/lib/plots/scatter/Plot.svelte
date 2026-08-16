@@ -20,7 +20,7 @@
   import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
   import type { Series } from '$lib/types/plots/data/common';
   import type { ScatterDataProps } from '$lib/types/plots/data/scatter';
-  import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
+  import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
   import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
   import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
   import type { LegendDisabledStyle } from '$lib/types/layout/legend';
@@ -36,7 +36,7 @@
   type Props = BasePlotProps<
     ScatterDataProps<TData>,
     TData,
-    BasePlotStylesConfig,
+    AxisBasedStylesConfig,
     ScatterSegmentStyle,
     AxisBasedMarkersConfig,
     AxisBasedScalesConfig<TData>

@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
+import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import { AMERICAS } from '../../../../stories/plots/scatter/data';
 import { waitForSvg } from '../_helpers/svg';
 
@@ -43,7 +43,7 @@ describe('ScatterPlot – frame overflow', () => {
       data: AMERICAS,
       x: 'gdpPerCapita',
       y: 'lifeExpectancy',
-      styles: { values: { show: true } } satisfies BasePlotStylesConfig,
+      styles: { values: { show: true } } satisfies AxisBasedStylesConfig,
     });
     const svg = await waitForSvg(container);
     const svgBox = svg.getBoundingClientRect();

@@ -87,9 +87,17 @@ export type {
   FrameStyle,
   FrameProp,
   BasePlotStylesConfig,
+  AxisBasedStylesConfig,
+  GapsAwarePlotStylesConfig,
   GeoStylesConfig,
   GeoTileLayerConfig,
 } from './types/layout/styles';
+export type {
+  GapsConfig,
+  GapZonesConfig,
+  GapZoneConfig,
+  OpenGapZoneConfig,
+} from './types/plots/gaps';
 export type { LineSegmentStyle, BarSegmentStyle, CellSegmentStyle, GeoSegmentStyle, ScatterSegmentStyle } from './types/plots/segments/common';
 export type { Range, Area, Segment } from './types/plots/segments/config';
 export type {
@@ -163,4 +171,4 @@ export type {
   TooltipAnchorY,
 } from './types/layout/tooltip';
 export type { ChartConfig, ChartConfigInput, TextStyle } from './types/configuration/styling';
-export type { ChartProps } from './types/charts/props';
+export type { ChartProps, GapsAwareChartProps } from './types/charts/props';

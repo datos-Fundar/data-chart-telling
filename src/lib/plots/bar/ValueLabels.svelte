@@ -3,6 +3,7 @@
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
   import { watchLabelOverflow } from '$lib/plots/utils/labelOverflow.svelte';
+  import { isGapValue } from '$lib/plots/utils/gaps';
   import type { Series } from '$lib/types/plots/data/common';
   import type { ValuesStyle } from '$lib/types/layout/styles';
   import type { ValueAnchor } from '$lib/types/plots/constants';
@@ -77,6 +78,9 @@
 
   const xFn = $derived(resolveAccessor(group.series.x));
   const yFn = $derived(resolveAccessor(group.series.y));
+  // A gap row — missing data, whether or not `styles.gaps` fills it with a
+  // synthetic bar — never gets a value label, same as LinePlot's `lastPoints`.
+  const labelData = $derived(group.series.data.filter((d) => !isGapValue(yFn(d))));
 
   const valueTextFn = $derived(
     barLayout.layout === 'stacked'
@@ -113,7 +117,7 @@
      boundary crossing instead (pointerenter/leave fire on every ancestor). -->
 <g bind:this={groupEl} role="presentation" onpointerenter={onHoverSeries} onpointerleave={onHoverEnd}>
   <Text
-    data={group.series.data}
+    data={labelData}
     {...isHorizontal ? { y: xFn, x: valueTextFn } : { x: xFn, y: valueTextFn }}
     text={(d: TData) => formatValue(Number(yFn(d)), group.series.name)}
     dx={font?.dx ?? (isHorizontal ? defaultOffset : groupOffset.dx)}

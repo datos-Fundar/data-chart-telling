@@ -2,27 +2,22 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, afterEach } from 'vitest';
 import LinePlot from '$lib/plots/line/Plot.svelte';
 import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
-import type { GapsConfig } from '$lib/types/plots/props';
+import type { GapsConfig } from '$lib/types/plots/gaps';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
-import { TEMPERATURE_WITH_GAPS } from '../../../../stories/plots/line/data';
-import { waitForSvg, countLinePaths, countDotMarks } from '../_helpers/svg';
+import { FEMALE_LIFE_EXPECTANCY_WITH_GAPS, MALE_LIFE_EXPECTANCY_WITH_GAPS } from '../../../../../stories/plots/line/data';
+import { waitForSvg, countLinePaths, countDotMarks } from '../../_helpers/svg';
 
-const SENSOR = { name: 'sensor', x: 'month' as const, y: 'temp' as const, data: TEMPERATURE_WITH_GAPS };
+const FEMALE = { name: 'female', x: 'year' as const, y: 'value' as const, data: FEMALE_LIFE_EXPECTANCY_WITH_GAPS };
 
 // A second series whose gap sits in a different place, for series-aware tests.
-const OTHER_SENSOR = {
-  name: 'other-sensor',
-  x: 'month' as const,
-  y: 'temp' as const,
-  data: TEMPERATURE_WITH_GAPS.map((d) => ({ month: d.month, temp: d.temp == null ? null : d.temp - 4 })),
-};
+const MALE = { name: 'male', x: 'year' as const, y: 'value' as const, data: MALE_LIFE_EXPECTANCY_WITH_GAPS };
 
 describe('LinePlot – gaps (no config)', () => {
   test('renders a single path, even though the data has null-value holes', async () => {
     const { container } = await render(LinePlot, {
       width: 400,
       height: 300,
-      series: [SENSOR],
+      series: [FEMALE],
     });
     const svg = await waitForSvg(container);
     // svelteplot's own Line mark already breaks visually at null values via
@@ -38,8 +33,8 @@ describe('LinePlot – gaps (middle)', () => {
     const { container } = await render(LinePlot, {
       width: 400,
       height: 300,
-      series: [SENSOR],
-      gaps: { default: { middle: {} } } satisfies GapsConfig<LineSegmentStyle>,
+      series: [FEMALE],
+      styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<LineSegmentStyle> },
     });
     const svg = await waitForSvg(container);
     expect(countLinePaths(svg)).toBe(2);
@@ -49,8 +44,8 @@ describe('LinePlot – gaps (middle)', () => {
     const { container } = await render(LinePlot, {
       width: 400,
       height: 300,
-      series: [SENSOR],
-      gaps: { default: { middle: {} } } satisfies GapsConfig<LineSegmentStyle>,
+      series: [FEMALE],
+      styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<LineSegmentStyle> },
     });
     const svg = await waitForSvg(container);
     // 1 base line + 1 middle bridge only — no start/end bridge without an explicit target.
@@ -63,8 +58,8 @@ describe('LinePlot – gaps (start/end, opt-in)', () => {
     const { container } = await render(LinePlot, {
       width: 400,
       height: 300,
-      series: [SENSOR],
-      gaps: { default: { start: { x: 0 } } } satisfies GapsConfig<LineSegmentStyle>,
+      series: [FEMALE],
+      styles: { gaps: { default: { start: { x: 2006 } } } satisfies GapsConfig<LineSegmentStyle> },
     });
     const svg = await waitForSvg(container);
     expect(countLinePaths(svg)).toBe(2);
@@ -74,8 +69,8 @@ describe('LinePlot – gaps (start/end, opt-in)', () => {
     const { container } = await render(LinePlot, {
       width: 400,
       height: 300,
-      series: [SENSOR],
-      gaps: { default: { end: { x: 13 } } } satisfies GapsConfig<LineSegmentStyle>,
+      series: [FEMALE],
+      styles: { gaps: { default: { end: { x: 2022 } } } satisfies GapsConfig<LineSegmentStyle> },
     });
     const svg = await waitForSvg(container);
     expect(countLinePaths(svg)).toBe(2);
@@ -85,10 +80,12 @@ describe('LinePlot – gaps (start/end, opt-in)', () => {
     const { container } = await render(LinePlot, {
       width: 400,
       height: 300,
-      series: [SENSOR],
-      gaps: {
-        default: { start: { x: 0 }, middle: {}, end: { x: 13 } },
-      } satisfies GapsConfig<LineSegmentStyle>,
+      series: [FEMALE],
+      styles: {
+        gaps: {
+          default: { start: { x: 2006 }, middle: {}, end: { x: 2022 } },
+        } satisfies GapsConfig<LineSegmentStyle>,
+      },
     });
     const svg = await waitForSvg(container);
     expect(countLinePaths(svg)).toBe(4);
@@ -100,8 +97,8 @@ describe('LinePlot – gaps (styling)', () => {
     const { container } = await render(LinePlot, {
       width: 400,
       height: 300,
-      series: [SENSOR],
-      gaps: { default: { middle: {} } } satisfies GapsConfig<LineSegmentStyle>,
+      series: [FEMALE],
+      styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<LineSegmentStyle> },
     });
     const svg = await waitForSvg(container);
     expect(countDotMarks(svg)).toBe(0);
@@ -111,10 +108,12 @@ describe('LinePlot – gaps (styling)', () => {
     const { container } = await render(LinePlot, {
       width: 400,
       height: 300,
-      series: [SENSOR],
-      gaps: {
-        default: { middle: { style: { dots: { dotRadius: 4 } } } },
-      } satisfies GapsConfig<LineSegmentStyle>,
+      series: [FEMALE],
+      styles: {
+        gaps: {
+          default: { middle: { style: { dots: { dotRadius: 4 } } } },
+        } satisfies GapsConfig<LineSegmentStyle>,
+      },
     });
     const svg = await waitForSvg(container);
     expect(countDotMarks(svg)).toBe(2);
@@ -124,10 +123,12 @@ describe('LinePlot – gaps (styling)', () => {
     const { container } = await render(LinePlot, {
       width: 400,
       height: 300,
-      series: [SENSOR],
-      gaps: {
-        default: { middle: { style: { stroke: { stroke: '#16a34a' } } } },
-      } satisfies GapsConfig<LineSegmentStyle>,
+      series: [FEMALE],
+      styles: {
+        gaps: {
+          default: { middle: { style: { stroke: { stroke: '#16a34a' } } } },
+        } satisfies GapsConfig<LineSegmentStyle>,
+      },
     });
     const svg = await waitForSvg(container);
     const paths = svg.querySelectorAll('g.lines path');
@@ -142,8 +143,8 @@ describe('LinePlot – gaps (styling)', () => {
       const { container } = await render(LinePlot, {
         width: 400,
         height: 300,
-        series: [SENSOR],
-        gaps: { default: { middle: zone } } satisfies GapsConfig<LineSegmentStyle>,
+        series: [FEMALE],
+        styles: { gaps: { default: { middle: zone } } satisfies GapsConfig<LineSegmentStyle> },
       });
       const svg = await waitForSvg(container);
       // The base series path is unaffected by `interpolate` — only the
@@ -164,11 +165,11 @@ describe('LinePlot – gaps (series-aware)', () => {
     const { container } = await render(LinePlot, {
       width: 400,
       height: 300,
-      series: [SENSOR, OTHER_SENSOR],
-      gaps: { sensor: { middle: {} } } satisfies GapsConfig<LineSegmentStyle>,
+      series: [FEMALE, MALE],
+      styles: { gaps: { female: { middle: {} } } satisfies GapsConfig<LineSegmentStyle> },
     });
     const svg = await waitForSvg(container);
-    // 2 base lines (sensor + other-sensor) + 1 bridge on `sensor` only.
+    // 2 base lines (female + male) + 1 bridge on `female` only.
     expect(countLinePaths(svg)).toBe(3);
   });
 
@@ -176,8 +177,8 @@ describe('LinePlot – gaps (series-aware)', () => {
     const { container } = await render(LinePlot, {
       width: 400,
       height: 300,
-      series: [SENSOR, OTHER_SENSOR],
-      gaps: { default: { middle: {} } } satisfies GapsConfig<LineSegmentStyle>,
+      series: [FEMALE, MALE],
+      styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<LineSegmentStyle> },
     });
     const svg = await waitForSvg(container);
     // 2 base lines + a middle bridge on each of the two series.
@@ -188,16 +189,20 @@ describe('LinePlot – gaps (series-aware)', () => {
     const { container } = await render(LinePlot, {
       width: 400,
       height: 300,
-      series: [SENSOR, OTHER_SENSOR],
-      gaps: {
-        default: { start: { x: 0 }, middle: {} },
-        // `sensor` overrides only `middle`; it still inherits `start` from `default`.
-        sensor: { middle: { style: { stroke: { stroke: '#16a34a' } } } },
-      } satisfies GapsConfig<LineSegmentStyle>,
+      series: [FEMALE, MALE],
+      styles: {
+        gaps: {
+          default: { start: { x: 2006 }, middle: {} },
+          // `female` overrides only `middle`; it still inherits `start` from `default`.
+          female: { middle: { style: { stroke: { stroke: '#16a34a' } } } },
+        } satisfies GapsConfig<LineSegmentStyle>,
+      },
     });
     const svg = await waitForSvg(container);
-    // Each series: 1 base + 1 start bridge (inherited) + 1 middle bridge = 3. Two series = 6.
-    expect(countLinePaths(svg)).toBe(6);
+    // `female`: 1 base + 1 start bridge (inherited) + 1 middle bridge = 3.
+    // `male` has no leading gap (its only hole is internal), so `start` is a
+    // no-op for it: 1 base + 1 middle bridge = 2. Total 5.
+    expect(countLinePaths(svg)).toBe(5);
     const bridgeHasCustomColor = Array.from(svg.querySelectorAll('g.lines path')).some((p) =>
       p.getAttribute('style')?.includes('stroke: rgb(22, 163, 74)'),
     );
@@ -215,8 +220,8 @@ describe('LinePlot – gaps (cfg.line.gap)', () => {
     const { container } = await render(LinePlot, {
       width: 400,
       height: 300,
-      series: [SENSOR],
-      gaps: { default: { middle: {} } } satisfies GapsConfig<LineSegmentStyle>,
+      series: [FEMALE],
+      styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<LineSegmentStyle> },
     });
     const svg = await waitForSvg(container);
     const bridgeStyle = Array.from(svg.querySelectorAll('g.lines path'))
@@ -230,10 +235,12 @@ describe('LinePlot – gaps (cfg.line.gap)', () => {
     const { container } = await render(LinePlot, {
       width: 400,
       height: 300,
-      series: [SENSOR],
-      gaps: {
-        default: { middle: { style: { stroke: { strokeDasharray: '9 1' } } } },
-      } satisfies GapsConfig<LineSegmentStyle>,
+      series: [FEMALE],
+      styles: {
+        gaps: {
+          default: { middle: { style: { stroke: { strokeDasharray: '9 1' } } } },
+        } satisfies GapsConfig<LineSegmentStyle>,
+      },
     });
     const svg = await waitForSvg(container);
     const styles = Array.from(svg.querySelectorAll('g.lines path')).map((p) => p.getAttribute('style') ?? '');
@@ -246,8 +253,8 @@ describe('LinePlot – gaps (cfg.line.gap)', () => {
     const { container } = await render(LinePlot, {
       width: 400,
       height: 300,
-      series: [SENSOR],
-      gaps: { default: { middle: { style: { dots: {} } } } } satisfies GapsConfig<LineSegmentStyle>,
+      series: [FEMALE],
+      styles: { gaps: { default: { middle: { style: { dots: {} } } } } satisfies GapsConfig<LineSegmentStyle> },
     });
     const svg = await waitForSvg(container);
     expect(countDotMarks(svg)).toBe(2);

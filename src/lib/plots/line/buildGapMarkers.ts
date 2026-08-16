@@ -2,7 +2,7 @@ import { resolveGapRuns, resolveGapsForSeries } from '$lib/plots/utils/gaps';
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import type { GapPoint } from '$lib/plots/utils/gaps';
 import type { Series } from '$lib/types/plots/data/common';
-import type { GapsConfig } from '$lib/types/plots/props';
+import type { GapsConfig } from '$lib/types/plots/gaps';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { LineMarkerConfig, DotMarkerConfig } from '$lib/types/markers/common';
 

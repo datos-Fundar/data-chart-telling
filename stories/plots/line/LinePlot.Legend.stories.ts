@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
+import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import { FEMALE_LIFE_EXPECTANCY, MALE_LIFE_EXPECTANCY } from './data';
 import LineValuesLegendDemo from './LineValuesLegendDemo.svelte';
 
@@ -75,6 +75,6 @@ export const HoverIsolate: Story = {
         hoverIsolate: true,
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };

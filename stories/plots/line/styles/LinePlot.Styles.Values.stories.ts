@@ -1,20 +1,20 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
-import type { YearPoint } from './data';
+import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
+import type { YearPoint } from '../data';
 import {
   FEMALE_LIFE_EXPECTANCY,
   MALE_LIFE_EXPECTANCY,
-} from './data';
+} from '../data';
 import {
   FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
   MALE_LIFE_EXPECTANCY_BY_PROVINCE,
-} from '../bar/data';
+} from '../../bar/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Plots/LinePlot/Styles',
+  title: 'Plots/LinePlot/Styles/Values',
   component: LinePlot,
   tags: ['autodocs'],
   args: {
@@ -53,7 +53,7 @@ type Story = StoryObj<typeof meta>;
  * No style overrides, the plot uses the configured theme defaults.
  */
 export const Default: Story = {
-  args: { 
+  args: {
     series: [
       {
         name: 'female',
@@ -84,7 +84,7 @@ export const ShowValues: Story = {
     ],
     styles: {
       values: { show: true },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -108,7 +108,7 @@ export const CustomFormat: Story = {
         show: true,
         format: (v: number, name: string) => `${name} → ${v.toFixed(1)} yr`,
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -139,7 +139,7 @@ export const TwoSeriesWithLabels: Story = {
         show: true,
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -164,7 +164,7 @@ export const AnchorStart: Story = {
         anchor: 'start',
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -189,7 +189,7 @@ export const AnchorOutside: Story = {
         anchor: 'outside',
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -221,7 +221,7 @@ export const TwoSeriesLabelsOutside: Story = {
         anchor: 'outside',
         format: (v: number, name: string) => `${name}: ${v.toFixed(1)} yr`,
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -250,7 +250,7 @@ export const CustomOffsets: Story = {
         format: (v: number) => `${v.toFixed(1)} yr`,
         fontStyle: { dy: -18 },
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -276,7 +276,7 @@ export const AnchorMiddle: Story = {
         format: (v: number) => `${v.toFixed(1)} yr`,
         fontStyle: { dy: 18 },
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -301,7 +301,7 @@ export const AnchorEnd: Story = {
         format: (v: number) => `${v.toFixed(1)} yr`,
         fontStyle: { dy: -18 },
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -332,7 +332,7 @@ export const LowLevelTextPlacement: Story = {
           dx: 0,
         },
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -429,7 +429,7 @@ export const DeclutteredLabels: Story = {
         show: true,
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -462,7 +462,7 @@ export const DeclutteredLabelsCustomStyle: Story = {
           strokeDasharray: '2 3',
         },
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -484,7 +484,7 @@ export const DeclutteredLabelsNearMissSeries: Story = {
         show: true,
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -531,58 +531,6 @@ export const DeclutteredLabelsBoundedByPlot: Story = {
         show: true,
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
-    } satisfies BasePlotStylesConfig,
-  },
-};
-
-// ── Frame ─────────────────────────────────────────────────────────────────────
-
-/**
- * `styles.frame: true` draws a plain border around the plot's own content
- * box — purely decorative, svelteplot's `Frame` mark. `true` uses its own
- * defaults (a thin `currentColor` stroke, no fill). Available on every plot
- * kind via `styles.frame`, not just `LinePlot`.
- */
-export const FrameDefault: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      },
-    ],
-    styles: {
-      frame: true,
-    } satisfies BasePlotStylesConfig,
-  },
-};
-
-/**
- * `styles.frame` as an object overrides the border's look field-by-field —
- * same style fields as a segment/cell's own fill+stroke bag, plus `inset*`
- * to pull the frame in from the content box's own edges.
- */
-export const FrameCustomStyle: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      },
-    ],
-    styles: {
-      frame: {
-        stroke: '#6366f1',
-        strokeWidth: 2,
-        fill: '#6366f1',
-        fillOpacity: 0.04,
-        borderRadius: 8,
-        inset: 4,
-      },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };

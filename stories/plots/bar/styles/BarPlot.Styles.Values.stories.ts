@@ -2,17 +2,17 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
+import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import {
   FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
   MALE_LIFE_EXPECTANCY_BY_PROVINCE,
   type ProvincePoint,
-} from './data';
+} from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Plots/BarPlot/Styles',
+  title: 'Plots/BarPlot/Styles/Values',
   component: BarPlot,
   tags: ['autodocs'],
   args: {
@@ -84,7 +84,7 @@ export const ShowValues: Story = {
     series: [FEMALE],
     styles: {
       values: { show: true },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
     margins: { top: 20 },
   },
 };
@@ -102,7 +102,7 @@ export const AnchorOutside: Story = {
         anchor: 'outside',
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
     margins: { top: 20 },
   },
 };
@@ -121,7 +121,7 @@ export const AnchorEnd: Story = {
         format: (v: number) => `${v.toFixed(1)} yr`,
         fontStyle: { dy: -10 },
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -138,7 +138,7 @@ export const AnchorMiddle: Story = {
         anchor: 'middle',
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -156,7 +156,7 @@ export const AnchorStart: Story = {
         format: (v: number) => `${v.toFixed(1)} yr`,
         fontStyle: { dy: 10 },
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -173,7 +173,7 @@ export const CustomFormat: Story = {
         show: true,
         format: (v: number, name: string) => `${name} → ${v.toFixed(1)} yr`,
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
     margins: { top: 20 },
   },
 };
@@ -196,7 +196,7 @@ export const CustomOffsets: Story = {
         format: (v: number) => `${v.toFixed(1)} yr`,
         fontStyle: { dy: -12 },
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
     margins: { top: 20 },
   },
 };
@@ -214,7 +214,7 @@ export const TwoSeriesWithLabels: Story = {
         show: true,
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
     margins: { top: 20 },
   },
 };
@@ -232,7 +232,7 @@ export const TwoSeriesLabelsMiddle: Story = {
         anchor: 'middle',
         format: (v: number, name: string) => `${name}: ${v.toFixed(1)} yr`,
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -249,7 +249,7 @@ export const TwoSeriesGroupedLabelsMiddle: Story = {
         anchor: 'middle',
         format: (v: number, name: string) => `${name}\n(${v.toFixed(1)} yr)`,
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
     scales: {
       z: { seriesLayout: 'grouped', seriesPadding: 0.2 },
     } satisfies AxisBasedScalesConfig,
@@ -269,7 +269,7 @@ export const TwoSeriesStackedLabelsMiddle: Story = {
         anchor: 'middle',
         format: (v: number, name: string) => `${name}\n(${v.toFixed(1)} yr)`,
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
     scales: {
       z: { seriesLayout: 'stacked' },
     } satisfies AxisBasedScalesConfig,
@@ -296,7 +296,7 @@ export const LowLevelTextPlacement: Story = {
           dx: 0,
         },
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
     margins: { top: 20 },
   },
 };

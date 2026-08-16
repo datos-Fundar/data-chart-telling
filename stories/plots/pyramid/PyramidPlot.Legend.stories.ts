@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
+import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import { AGE_GROUPS, POPULATION_PYRAMID } from '../../data/population-pyramid';
 import PyramidValuesLegendDemo from './PyramidValuesLegendDemo.svelte';
 
@@ -66,6 +66,6 @@ export const HoverIsolate: Story = {
     },
     styles: {
       values: { show: true, hoverIsolate: true, format: (v: number) => `${v.toFixed(1)}%` },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };

@@ -2,11 +2,13 @@ import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { resolveAccessor } from '$lib/plots/utils/accessors';
 import { numericMargin } from '$lib/layout/plot/margins';
+import { isGapValue } from '$lib/plots/utils/gaps';
 import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { Series } from '$lib/types/plots/data/common';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { VisualGroup } from '$lib/types/plots/segments/config';
 import type { MarginConfig } from '$lib/types/plots/props';
+import type { DiscreteGapFill } from '$lib/plots/utils/gaps';
 
 export type BarSeriesLayout = 'overlap' | 'grouped' | 'stacked';
 
@@ -26,6 +28,7 @@ export function createBarLayout<TData extends Record<string, unknown>>(args: {
   flat: () => TData[];
   xAcc: () => (d: TData) => AxisValue;
   groupedSeries: () => VisualGroup<Series<TData>, BarSegmentStyle>[];
+  gapFillMaps: () => Map<string, Map<TData, DiscreteGapFill<BarSegmentStyle>>>;
 }) {
   const cfg = $derived(getConfiguration());
 
@@ -115,7 +118,11 @@ export function createBarLayout<TData extends Record<string, unknown>>(args: {
         const seriesXFn = resolveAccessor(group.series.x);
         const seriesYFn = resolveAccessor(group.series.y);
         const row = group.series.data.find((d) => seriesXFn(d) === category);
-        running += row ? Number(seriesYFn(row)) : 0;
+        if (row) {
+          const raw = seriesYFn(row);
+          const fill = args.gapFillMaps().get(group.series.name)?.get(row);
+          running += fill ? fill.value : isGapValue(raw) ? 0 : Number(raw);
+        }
       }
       sums.set(category, prefix);
     }

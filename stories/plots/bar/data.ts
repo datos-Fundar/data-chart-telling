@@ -72,3 +72,33 @@ export const AGE_BRACKET_BY_PROVINCE: AgeBracketPoint[] = ALL_PROVINCES.flatMap(
 export function provinceSort(a: Record<string, unknown>, b: Record<string, unknown>): number {
   return String(a.province).localeCompare(String(b.province), 'es');
 }
+
+export type CategoryReading = { category: string; value: number | null };
+
+// Unlike the province datasets above (no inherent order), months have a
+// natural ascending order — the same reason `FEMALE_LIFE_EXPECTANCY_WITH_GAPS`
+// (LinePlot) reads well as an interpolation demo: a trend, not an arbitrary
+// bag of categories. Three kinds of holes, all `value: null`: no reading for
+// Ene–Feb (start), an outage at Jun–Jul (middle), and nothing yet for
+// Nov–Dic (end).
+export const READINGS_WITH_GAPS: CategoryReading[] = [
+  { category: 'Ene', value: null },
+  { category: 'Feb', value: null },
+  { category: 'Mar', value: 12.4 },
+  { category: 'Abr', value: 14.1 },
+  { category: 'May', value: 17.8 },
+  { category: 'Jun', value: null },
+  { category: 'Jul', value: null },
+  { category: 'Ago', value: 21.6 },
+  { category: 'Sep', value: 19.3 },
+  { category: 'Oct', value: 15.7 },
+  { category: 'Nov', value: null },
+  { category: 'Dic', value: null },
+];
+
+// Fully real across the same categories — pairs with `READINGS_WITH_GAPS`
+// for series-aware ('default' vs. named-entry) and stacked/grouped coverage.
+export const OTHER_READINGS_NO_GAPS: CategoryReading[] = READINGS_WITH_GAPS.map((d, i) => ({
+  category: d.category,
+  value: 8 + i,
+}));

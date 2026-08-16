@@ -35,25 +35,23 @@ export const MALE_LIFE_EXPECTANCY: YearPoint[] = LIFE_EXPECTANCY
   .filter((d) => d.sex === 'male')
   .map((d) => ({ year: d.year, value: d.value }));
 
-export type MonthReading = { month: number; temp: number | null };
+export type YearPointWithGaps = { year: number; value: number | null };
 
 /**
- * Monthly sensor readings with three kinds of holes: no sensor installed
- * yet for the first two months, a two-month reporting outage in the
- * middle, and no readings yet for the last two months — used to
- * demonstrate `LinePlot`'s `gaps` fill (start/middle/end).
+ * `FEMALE_LIFE_EXPECTANCY` with three holes — the first year (start), one
+ * internal year bounded by real data on both sides (middle), and the last
+ * year (end) — used to demonstrate `LinePlot`'s `styles.gaps` fill on the
+ * same series every other LinePlot story already uses.
  */
-export const TEMPERATURE_WITH_GAPS: MonthReading[] = [
-  { month: 1, temp: null },
-  { month: 2, temp: null },
-  { month: 3, temp: 12.4 },
-  { month: 4, temp: 14.1 },
-  { month: 5, temp: 17.8 },
-  { month: 6, temp: null },
-  { month: 7, temp: null },
-  { month: 8, temp: 21.6 },
-  { month: 9, temp: 19.3 },
-  { month: 10, temp: 15.7 },
-  { month: 11, temp: null },
-  { month: 12, temp: null },
-];
+export const FEMALE_LIFE_EXPECTANCY_WITH_GAPS: YearPointWithGaps[] = FEMALE_LIFE_EXPECTANCY.map((d, i) =>
+  i === 0 || i === 3 || i === FEMALE_LIFE_EXPECTANCY.length - 1 ? { year: d.year, value: null } : d,
+);
+
+/**
+ * `MALE_LIFE_EXPECTANCY` with a single hole in a different place than
+ * `FEMALE_LIFE_EXPECTANCY_WITH_GAPS` — for series-aware `styles.gaps` demos
+ * (a named entry vs. `'default'`).
+ */
+export const MALE_LIFE_EXPECTANCY_WITH_GAPS: YearPointWithGaps[] = MALE_LIFE_EXPECTANCY.map((d, i) =>
+  i === 4 ? { year: d.year, value: null } : d,
+);

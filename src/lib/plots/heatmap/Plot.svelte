@@ -13,7 +13,7 @@
   import type { BasePlotProps } from '$lib/types/plots/props';
   import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
   import type { SeriesProps, DataProps } from '$lib/types/plots/data/common';
-  import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
+  import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
   import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
   import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
@@ -29,7 +29,7 @@
   type Props = BasePlotProps<
     SeriesProps<TData> | DataProps<TData>,
     TData,
-    BasePlotStylesConfig,
+    AxisBasedStylesConfig,
     CellSegmentStyle,
     AxisBasedMarkersConfig,
     AxisBasedScalesConfig<TData>

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
+import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import { FEMALE_LIFE_EXPECTANCY_BY_PROVINCE, MALE_LIFE_EXPECTANCY_BY_PROVINCE, type ProvincePoint } from './data';
 import BarValuesLegendDemo from './BarValuesLegendDemo.svelte';
 
@@ -77,7 +77,7 @@ export const HoverIsolate: Story = {
         hoverIsolate: true,
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
     margins: { top: 20 },
   },
 };

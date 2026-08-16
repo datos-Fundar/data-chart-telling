@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
-import { AGE_GROUPS, POPULATION_PYRAMID } from '../../data/population-pyramid';
+import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
+import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../data/population-pyramid';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Plots/PyramidPlot/Styles',
+  title: 'Plots/PyramidPlot/Styles/Values',
   component: PyramidPlot,
   tags: ['autodocs'],
   args: {
@@ -31,39 +31,6 @@ const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * No style overrides — the plot uses the configured theme defaults.
- * The palette chooses colors for left/right (female/male) automatically.
- */
-export const Default: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-  },
-};
-
-/**
- * Custom left/right colours — overrides the default palette with explicit
- * colors for the left (Mujeres) and right (Varones) sides of the pyramid.
- */
-export const CustomColors: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: {
-      y: { domain: AGE_GROUPS }
-    },
-    styles: {
-      colors: { left: '#ff6b9d', right: '#4ecdc4' },
-    } satisfies BasePlotStylesConfig,
-  },
-};
-
-/**
  * Value labels enabled — displays the population percentage at each bar.
  * `styles.values.show: true` renders the numeric value at the end of each bar.
  */
@@ -79,7 +46,7 @@ export const WithValueLabels: Story = {
     },
     styles: {
       values: { show: true },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -99,7 +66,7 @@ export const CustomValueFormat: Story = {
     },
     styles: {
       values: { show: true, format: (v: number) => `${v.toFixed(1)}%` },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -121,7 +88,7 @@ export const LabelsInside: Story = {
         format: (v: number) => `${v.toFixed(1)}%`,
         fontStyle: { fill: '#ffffff', fontWeight: 'bold' },
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -145,27 +112,6 @@ export const LabelsWithOffset: Story = {
         format: (v: number) => `${v.toFixed(1)}%`,
         fontStyle: { dy: 8 },
       },
-    } satisfies BasePlotStylesConfig,
-  },
-};
-
-/**
- * Custom colors with value labels — combines a distinct color scheme with
- * on-bar annotations for maximum information density.
- */
-export const CustomColorsAndLabels: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: {
-      x: { domain: [-6, 6] },
-      y: { domain: AGE_GROUPS }
-    },
-    styles: {
-      colors: { left: '#9c27b0', right: '#ff9800' },
-      values: { show: true, format: (v: number) => `${v.toFixed(1)}%` },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };

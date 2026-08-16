@@ -1,5 +1,6 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
 import { paletteColor } from '$lib/utils/color';
+import { isGapValue } from '$lib/plots/utils/gaps';
 import type { AxisValue } from '$lib/types/layout/scales';
 import type { Series } from '$lib/types/plots/data/common';
 import type { HoverPoint } from '$lib/types/layout/tooltip';
@@ -25,7 +26,7 @@ export function buildHoverPoints<TData extends Record<string, unknown>>(
   return resolvedSeries.flatMap((s, idx) => {
     const sx = resolveAccessor(s.x);
     const sy = resolveAccessor(s.y);
-    return s.data.map((d) => {
+    return s.data.filter((d) => !isGapValue(sy(d))).map((d) => {
       const category = sx(d) as AxisValue;
       const rawValue = Number(sy(d));
       const value = geometry.layout === 'stacked' ? geometry.stackedBaseline(category, idx) + rawValue : rawValue;

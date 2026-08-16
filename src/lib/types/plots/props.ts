@@ -1,11 +1,10 @@
 import type { HoverPoint, HoverStrategy, TooltipOptions } from '$lib/types/layout/tooltip';
 import type { Segment } from '$lib/types/plots/segments/config';
-import type { GapZonesConfig } from '$lib/types/plots/gaps';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { GeoScalesConfig } from '$lib/types/layout/coordinates';
 
 /** The `styles` prop accepted by every plot kind — its own
- * styles shape ({@link BasePlotStylesConfig}, `GeoStylesConfig`, …). */
+ * styles shape ({@link AxisBasedStylesConfig}, `GeoStylesConfig`, …). */
 export type StylesConfig<TStyles extends object> = TStyles;
 
 /** The `markers` prop accepted by every plot kind — a list of that kind's own marker union. */
@@ -18,15 +17,6 @@ export type MarkersConfig<TMarker> = TMarker[];
  * area-specific segments merge on top and win on conflict.
  */
 export type SegmentsConfig<TStyle> = Record<string, Segment<TStyle>[]>;
-
-/**
- * The `gaps` prop `LinePlot` accepts — series name (or `'default'` for all
- * series) to that series' {@link GapZonesConfig}. Mirrors `SegmentsConfig`'s
- * series-keyed shape: a named entry applies only to that series; `'default'`
- * fills in whichever of its zones (`start`/`middle`/`end`) the named entry
- * itself leaves unset, at zone granularity rather than a merged style.
- */
-export type GapsConfig<TStyle> = Record<string, GapZonesConfig<TStyle>>;
 
 /**
  * Partial margin override — unset sides fall back to the theme (itself

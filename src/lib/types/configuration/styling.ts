@@ -90,7 +90,7 @@ export type ChartConfig = {
     strokeWidth: number;
     dotRadius: number;
     /**
-     * Default gap-fill bridge styling (`LinePlot`'s `gaps` prop) — the
+     * Default gap-fill bridge styling (`LinePlot`'s `styles.gaps`) — the
      * fallback merged under whatever a gap zone's own `style` sets, the
      * same way `hover.rule`/`hover.dot` back every hover marker's style.
      */
@@ -112,6 +112,16 @@ export type ChartConfig = {
       /** Default leader-line width — overridable per-plot via `styles.values.strokeStyle`. */
       connectorWidth: number;
     };
+  };
+  /** Default bar-mark styling. */
+  bar: {
+    /** Default gap-fill styling (`BarPlot`'s `styles.gaps`) — the fallback merged under whatever a gap zone's own `style` sets. */
+    gap: AreaStyle;
+  };
+  /** Default pyramid-bar styling. */
+  pyramid: {
+    /** Default gap-fill styling (`PyramidPlot`'s `styles.gaps`) — the fallback merged under whatever a gap zone's own `style` sets. */
+    gap: AreaStyle;
   };
   /** Default scatter point geometry. */
   scatter: { dotRadius: number };

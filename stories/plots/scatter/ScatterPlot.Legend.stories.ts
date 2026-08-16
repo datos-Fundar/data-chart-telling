@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
+import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import { AMERICAS, COUNTRIES } from './data';
 import ScatterValuesLegendDemo from './ScatterValuesLegendDemo.svelte';
 
@@ -67,6 +67,6 @@ export const HoverIsolate: Story = {
         hoverIsolate: true,
         format: (v: number) => v.toFixed(0),
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };

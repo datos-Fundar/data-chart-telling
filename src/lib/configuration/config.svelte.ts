@@ -96,6 +96,8 @@ export const DEFAULT_CONFIG: ChartConfig = {
       connectorWidth: 0.5,
     },
   },
+  bar: { gap: { fillOpacity: 0.5 } },
+  pyramid: { gap: { fillOpacity: 0.5 } },
   scatter: { dotRadius: 5 },
   timeline: { axisColor: 'currentColor', activeColor: '#e6580d', thickness: 60 },
   hover: {

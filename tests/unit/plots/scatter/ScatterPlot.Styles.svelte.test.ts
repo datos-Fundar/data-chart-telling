@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
+import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import { AMERICAS } from '../../../../stories/plots/scatter/data';
 import { waitForSvg, countDotMarks, countTextLabels } from '../_helpers/svg';
 
@@ -20,7 +20,7 @@ describe('ScatterPlot – styles.values', () => {
       width: 400,
       height: 300,
       ...DATA_PROPS,
-      styles: { values: { show: true } } satisfies BasePlotStylesConfig,
+      styles: { values: { show: true } } satisfies AxisBasedStylesConfig,
     });
     const svg = await waitForSvg(container);
     expect(countTextLabels(svg)).toBe(AMERICAS.length);
@@ -35,7 +35,7 @@ describe('ScatterPlot – styles.values', () => {
       ...DATA_PROPS,
       styles: {
         values: { show: true, format: (v: number) => `${v.toFixed(1)} yr` },
-      } satisfies BasePlotStylesConfig,
+      } satisfies AxisBasedStylesConfig,
     });
     const svg = await waitForSvg(container);
     const labels = Array.from(svg.querySelectorAll('g.text text')).map((t) => t.textContent);

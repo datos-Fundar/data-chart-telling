@@ -3,6 +3,7 @@
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
   import { watchLabelOverflow } from '$lib/plots/utils/labelOverflow.svelte';
+  import { isGapValue } from '$lib/plots/utils/gaps';
   import type { Series } from '$lib/types/plots/data/common';
   import type { ValuesStyle } from '$lib/types/layout/styles';
   import type { ValueAnchor } from '$lib/types/plots/constants';
@@ -70,6 +71,9 @@
   const isLeft = $derived(group.series.side === 'left');
   const getCategory = $derived(resolveAccessor(group.series.x));
   const getMagnitude = $derived(resolveAccessor(group.series.y));
+  // A gap row — missing data, whether or not `styles.gaps` fills it with a
+  // synthetic bar — never gets a value label, same as LinePlot's `lastPoints`.
+  const labelData = $derived(group.series.data.filter((d) => !isGapValue(getMagnitude(d))));
   const signedValue = $derived((d: TData) => {
     const v = Math.abs(Number(getMagnitude(d)));
     return isLeft ? -v : v;
@@ -102,7 +106,7 @@
      boundary crossing instead (pointerenter/leave fire on every ancestor). -->
 <g bind:this={groupEl} role="presentation" onpointerenter={onHoverSeries} onpointerleave={onHoverEnd}>
   <Text
-    data={group.series.data}
+    data={labelData}
     x={xFn}
     y={getCategory}
     text={(d: TData) => formatValue(Math.abs(Number(getMagnitude(d))), group.series.name)}

@@ -2,6 +2,7 @@ import { resolveAccessor } from './accessors';
 import { resolveEasing } from '$lib/utils/interpolate';
 import type { Series } from '$lib/types/plots/data/common';
 import type { GapZonesConfig, GapZoneConfig } from '$lib/types/plots/gaps';
+import type { AreaStyle } from '$lib/types/plots/styling';
 
 const DEFAULT_KEY = 'default';
 
@@ -110,4 +111,86 @@ export function resolveGapRuns<T extends Record<string, unknown>, TStyle>(
   }
 
   return runs;
+}
+
+/** One gap row's resolved fill — the interpolated value to render instead of the missing one, and which zone produced it. */
+export type DiscreteGapFill<TStyle> = {
+  value: number;
+  kind: 'start' | 'middle' | 'end';
+  style?: TStyle;
+};
+
+/**
+ * Bar/pyramid analog of `resolveGapRuns`: a category axis has no continuous
+ * bridge to sample, so this returns one interpolated value per *individual*
+ * gap row instead. Runs are detected by `series.data`'s own array order
+ * (not a numeric `x` sort like `resolveGapRuns` — a category axis is often
+ * nominal, so there's no meaningful numeric ordering to sort by). Keyed by
+ * row object reference rather than category, since a series' `y` accessor
+ * may be an arbitrary function — there's no general way to write the
+ * interpolated value back onto a row, so callers look it up here instead.
+ */
+export function resolveDiscreteGapFills<T extends Record<string, unknown>, TStyle>(
+  series: Series<T>,
+  gaps: GapZonesConfig<TStyle>,
+): Map<T, DiscreteGapFill<TStyle>> {
+  const result = new Map<T, DiscreteGapFill<TStyle>>();
+  if (!gaps.start && !gaps.middle && !gaps.end) return result;
+
+  const yFn = resolveAccessor(series.y);
+  const rows = series.data;
+  const valueAt = (i: number) => Number(yFn(rows[i]));
+  const validIdx = rows.reduce<number[]>((acc, row, i) => {
+    if (!isGapValue(yFn(row))) acc.push(i);
+    return acc;
+  }, []);
+  if (validIdx.length === 0) return result;
+
+  function fillRun(indices: number[], from: number, to: number, zone: GapZoneConfig<TStyle>, kind: DiscreteGapFill<TStyle>['kind']) {
+    const ease = resolveEasing(zone.interpolate);
+    const span = indices.length + 1;
+    indices.forEach((idx, i) => {
+      const t = (i + 1) / span;
+      result.set(rows[idx], { value: from + (to - from) * ease(t), kind, style: zone.style });
+    });
+  }
+
+  const firstValid = validIdx[0];
+  if (firstValid > 0 && gaps.start) {
+    const to = valueAt(firstValid);
+    const from = gaps.start.y != null ? Number(gaps.start.y) : to;
+    fillRun(Array.from({ length: firstValid }, (_, i) => i), from, to, gaps.start, 'start');
+  }
+
+  if (gaps.middle) {
+    for (let k = 0; k < validIdx.length - 1; k++) {
+      const a = validIdx[k];
+      const b = validIdx[k + 1];
+      if (b - a > 1) {
+        fillRun(Array.from({ length: b - a - 1 }, (_, i) => a + 1 + i), valueAt(a), valueAt(b), gaps.middle, 'middle');
+      }
+    }
+  }
+
+  const lastValid = validIdx[validIdx.length - 1];
+  if (lastValid < rows.length - 1 && gaps.end) {
+    const from = valueAt(lastValid);
+    const to = gaps.end.y != null ? Number(gaps.end.y) : from;
+    fillRun(Array.from({ length: rows.length - 1 - lastValid }, (_, i) => lastValid + 1 + i), from, to, gaps.end, 'end');
+  }
+
+  return result;
+}
+
+/** Field-by-field style fallback for a discrete gap-fill marker — mirrors how `buildGapMarkers.ts` merges a line gap zone's style under `cfg.line.gap`. */
+export function resolveGapAreaStyle(zoneStyle: AreaStyle | undefined, defaultColor: string, gapDefaults: AreaStyle): AreaStyle {
+  return {
+    fill: zoneStyle?.fill ?? gapDefaults.fill ?? defaultColor,
+    fillOpacity: zoneStyle?.fillOpacity ?? gapDefaults.fillOpacity ?? 1,
+    stroke: zoneStyle?.stroke ?? gapDefaults.stroke,
+    strokeWidth: zoneStyle?.strokeWidth ?? gapDefaults.strokeWidth,
+    strokeOpacity: zoneStyle?.strokeOpacity ?? gapDefaults.strokeOpacity,
+    strokeDasharray: zoneStyle?.strokeDasharray ?? gapDefaults.strokeDasharray,
+    borderRadius: zoneStyle?.borderRadius ?? gapDefaults.borderRadius,
+  };
 }

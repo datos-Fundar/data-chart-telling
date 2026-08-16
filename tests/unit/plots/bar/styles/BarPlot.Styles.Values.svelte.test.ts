@@ -1,9 +1,9 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
-import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
-import { FEMALE_LIFE_EXPECTANCY_BY_PROVINCE, MALE_LIFE_EXPECTANCY_BY_PROVINCE } from '../../../../stories/plots/bar/data';
-import { waitForSvg, countTextLabels } from '../_helpers/svg';
+import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
+import { FEMALE_LIFE_EXPECTANCY_BY_PROVINCE, MALE_LIFE_EXPECTANCY_BY_PROVINCE } from '../../../../../stories/plots/bar/data';
+import { waitForSvg, countTextLabels } from '../../_helpers/svg';
 
 const FEMALE = { name: 'female', x: 'province' as const, y: 'value' as const, data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE };
 const MALE = { name: 'male', x: 'province' as const, y: 'value' as const, data: MALE_LIFE_EXPECTANCY_BY_PROVINCE };
@@ -20,7 +20,7 @@ describe('BarPlot – styles.values', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      styles: { values: { show: true } } satisfies BasePlotStylesConfig,
+      styles: { values: { show: true } } satisfies AxisBasedStylesConfig,
     });
     const svg = await waitForSvg(container);
     expect(countTextLabels(svg)).toBe(FEMALE_LIFE_EXPECTANCY_BY_PROVINCE.length);
@@ -37,7 +37,7 @@ describe('BarPlot – styles.values', () => {
       series: [FEMALE],
       styles: {
         values: { show: true, format: (v: number, name: string) => `${name}: ${v.toFixed(1)} yr` },
-      } satisfies BasePlotStylesConfig,
+      } satisfies AxisBasedStylesConfig,
     });
     const svg = await waitForSvg(container);
     const labels = Array.from(svg.querySelectorAll('g.text text')).map((t) => t.textContent);
@@ -55,7 +55,7 @@ describe('BarPlot – styles.values', () => {
       series: [FEMALE, MALE],
       styles: {
         values: { show: true, format: (v: number, name: string) => `${name} (${v})` },
-      } satisfies BasePlotStylesConfig,
+      } satisfies AxisBasedStylesConfig,
     });
     const svg = await waitForSvg(container);
     expect(countTextLabels(svg)).toBe(
@@ -72,7 +72,7 @@ describe('BarPlot – styles.values', () => {
         width: 400,
         height: 300,
         series: [FEMALE],
-        styles: { values: { show: true, anchor } } satisfies BasePlotStylesConfig,
+        styles: { values: { show: true, anchor } } satisfies AxisBasedStylesConfig,
       });
       const svg = await waitForSvg(container);
       return svg.querySelector('g.text text')?.getAttribute('transform');

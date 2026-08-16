@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
+import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import { AMERICAS, COUNTRIES } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -42,7 +42,7 @@ export const ShowValues: Story = {
   args: {
     styles: {
       values: { show: true },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -54,7 +54,7 @@ export const CustomFormat: Story = {
         show: true,
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -68,7 +68,7 @@ export const GroupedWithLabels: Story = {
         show: true,
         format: (v: number) => v.toFixed(0),
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -81,7 +81,7 @@ export const CustomFontStyle: Story = {
         format: (v: number) => `${v.toFixed(1)} yr`,
         fontStyle: { fill: '#7f1d1d', fontWeight: 'bold', fontSize: 13 },
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };
 
@@ -95,6 +95,6 @@ export const CenteredOnPoint: Story = {
         format: (v: number) => v.toFixed(0),
         fontStyle: { textAnchor: 'middle', lineAnchor: 'middle', dx: 0, fill: '#ffffff', fontSize: 10 },
       },
-    } satisfies BasePlotStylesConfig,
+    } satisfies AxisBasedStylesConfig,
   },
 };

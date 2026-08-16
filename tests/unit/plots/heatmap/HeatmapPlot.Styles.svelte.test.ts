@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
+import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from '../../../../stories/plots/heatmap/data';
 import { waitForSvg, countCells, countTextLabels } from '../_helpers/svg';
 
@@ -27,7 +27,7 @@ describe('HeatmapPlot – styles.values', () => {
       width: 400,
       height: 300,
       ...DATA_PROPS,
-      styles: { values: { show: false } } satisfies BasePlotStylesConfig,
+      styles: { values: { show: false } } satisfies AxisBasedStylesConfig,
     });
     const svg = await waitForSvg(container);
     expect(countTextLabels(svg)).toBe(0);
@@ -39,7 +39,7 @@ describe('HeatmapPlot – styles.values', () => {
       width: 400,
       height: 300,
       ...DATA_PROPS,
-      styles: { values: { format: (v: number) => `${v.toFixed(1)} yr` } } satisfies BasePlotStylesConfig,
+      styles: { values: { format: (v: number) => `${v.toFixed(1)} yr` } } satisfies AxisBasedStylesConfig,
     });
     const svg = await waitForSvg(container);
     const labels = Array.from(svg.querySelectorAll('g.text text')).map((t) => t.textContent);
@@ -59,7 +59,7 @@ describe('HeatmapPlot – styles.colors', () => {
       width: 400,
       height: 300,
       ...DATA_PROPS,
-      styles: { colors: { min: '#ff6b6b', max: '#51cf66' } } satisfies BasePlotStylesConfig,
+      styles: { colors: { min: '#ff6b6b', max: '#51cf66' } } satisfies AxisBasedStylesConfig,
     });
     const customSvg = await waitForSvg(customRender.container);
     const customFills = cellFills(customSvg);

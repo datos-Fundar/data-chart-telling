@@ -12,7 +12,7 @@
   import type { AxisValue } from '$lib/types/layout/scales';
   import type { Accessor } from '$lib/types/plots/data/common';
   import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
-  import type { ChartProps } from '$lib/types/charts/props';
+  import type { GapsAwareChartProps } from '$lib/types/charts/props';
 
   /**
    * High-level population-pyramid-style chart. Forwards flat rows and the
@@ -43,7 +43,7 @@
     facet,
     timeline,
     tooltip,
-  }: ChartProps<TRow, BarSegmentStyle> & { x: Accessor<TRow, number>; z: Accessor<TRow, unknown> } = $props();
+  }: GapsAwareChartProps<TRow, BarSegmentStyle> & { x: Accessor<TRow, number>; z: Accessor<TRow, unknown> } = $props();
 
   const getMagnitude = $derived(resolveAccessor<TRow>(magnitude));
   const getCategory = $derived(resolveAccessor<TRow>(category));

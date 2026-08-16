@@ -13,6 +13,7 @@
   import { createLabelMarginTracker } from '$lib/plots/utils/labelOverflow.svelte';
   import { buildHoverPoints } from '$lib/plots/bar/hoverPoints';
   import { buildBarMarkers } from '$lib/plots/bar/buildBarMarkers';
+  import { resolveGapsForSeries, resolveDiscreteGapFills } from '$lib/plots/utils/gaps';
   import ValueLabels from '$lib/plots/bar/ValueLabels.svelte';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
@@ -20,7 +21,7 @@
   import type { BasePlotProps } from '$lib/types/plots/props';
   import type { AxisScale, AxisBasedScalesConfig } from '$lib/types/layout/scales';
   import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
-  import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
+  import type { GapsAwarePlotStylesConfig } from '$lib/types/layout/styles';
   import type { ValueAnchor } from '$lib/types/plots/constants';
   import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
   import type { LegendDisabledStyle } from '$lib/types/layout/legend';
@@ -33,7 +34,7 @@
   type Props = BasePlotProps<
     SeriesProps<TData> | DataProps<TData>,
     TData,
-    BasePlotStylesConfig,
+    GapsAwarePlotStylesConfig<BarSegmentStyle>,
     BarSegmentStyle,
     AxisBasedMarkersConfig,
     AxisBasedScalesConfig<TData>
@@ -67,6 +68,14 @@
   const showVals = $derived(styles.values?.show ?? false);
   const formatValue = $derived(styles.values?.format ?? ((v: number) => `${v}`));
   const valAnchor = $derived<ValueAnchor>(styles.values?.anchor ?? 'outside');
+
+  // Fills leading/internal/trailing missing-data holes with an
+  // interpolated, distinctly-styled bar, resolved per series like
+  // `segments` — see `GapsAwarePlotStylesConfig` (`types/layout/styles.ts`).
+  const gaps = $derived(styles.gaps ?? {});
+  const gapFillMaps = $derived(
+    new Map(resolvedSeries.map((s) => [s.name, resolveDiscreteGapFills(s, resolveGapsForSeries(gaps, s.name))])),
+  );
 
   // `xAcc`/`yAcc` are always data-semantic (category/value) — independent of
   // which *visual* axis ends up drawing them, decided by `categoricalAxis`.
@@ -148,6 +157,7 @@
     flat: () => flat,
     xAcc: () => xAcc,
     groupedSeries: () => groupedSeries,
+    gapFillMaps: () => gapFillMaps,
   });
 
   // `x`/`y` here are visual (matched against BasePlotLayout's own getX/getY,
@@ -228,6 +238,7 @@
       active: hover.active,
       setHoverMatch,
       clearHoverMatch,
+      gapFillMaps,
     }),
     ...markers,
   ]}

@@ -8,13 +8,14 @@
   import { buildPyramidBarMarkers } from '$lib/plots/pyramid/buildPyramidBarMarkers';
   import { createLabelMarginTracker } from '$lib/plots/utils/labelOverflow.svelte';
   import { buildGroupedSeries, validateSegments, buildScopedMarkerGroups } from '$lib/plots/utils/segments';
+  import { isGapValue, resolveGapsForSeries, resolveDiscreteGapFills } from '$lib/plots/utils/gaps';
   import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
   import ValueLabels from '$lib/plots/pyramid/ValueLabels.svelte';
   import { hasHoverMarker, resolveHoverStrategy, resolveHoverSync } from '$lib/layout/tooltip/utils';
   import type { BasePlotProps } from '$lib/types/plots/props';
   import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
   import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
-  import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
+  import type { GapsAwarePlotStylesConfig } from '$lib/types/layout/styles';
   import type { ValueAnchor } from '$lib/types/plots/constants';
   import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
   import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
@@ -39,7 +40,7 @@
   type Props = BasePlotProps<
     SeriesProps<TData> | DataProps<TData>,
     TData,
-    BasePlotStylesConfig,
+    GapsAwarePlotStylesConfig<BarSegmentStyle>,
     BarSegmentStyle,
     AxisBasedMarkersConfig,
     AxisBasedScalesConfig<TData>
@@ -112,6 +113,20 @@
     return s.side === 'left' ? -v : v;
   }
 
+  // Signs an already-resolved magnitude (e.g. a gap-fill's interpolated
+  // value, which has no row of its own to read via `signedValue`).
+  function signFor(s: InternalSeries, magnitude: number): number {
+    return s.side === 'left' ? -magnitude : magnitude;
+  }
+
+  // Fills leading/internal/trailing missing-data holes with an
+  // interpolated, distinctly-styled bar, resolved per series like
+  // `segments` — see `GapsAwarePlotStylesConfig` (`types/layout/styles.ts`).
+  const gaps = $derived(styles.gaps ?? {});
+  const gapFillMaps = $derived(
+    new Map(resolvedSeries.map((s) => [s.name, resolveDiscreteGapFills(s, resolveGapsForSeries(gaps, s.name))])),
+  );
+
   // svelteplot's `Pointer` rebuilds its quadtree from shallow-cloned rows
   // (`{ ...d }`), never the original references, so a row's owning series
   // can't be recovered by identity once hover is active. Pre-compute
@@ -129,17 +144,19 @@
     resolvedSeries.flatMap((s) => {
       const getCategory = resolveAccessor(s.x);
       const getMagnitude = resolveAccessor(s.y);
-      return s.data.map((d) => {
-        const v = Math.abs(Number(getMagnitude(d)));
-        return {
-          ...d,
-          __side: s.side,
-          __x: s.side === 'left' ? -v : v,
-          __y: getCategory(d) as AxisValue,
-          __label: formatValue(v, s.name),
-          __series: s.name,
-        } as TaggedRow;
-      });
+      return s.data
+        .filter((d) => !isGapValue(getMagnitude(d)))
+        .map((d) => {
+          const v = Math.abs(Number(getMagnitude(d)));
+          return {
+            ...d,
+            __side: s.side,
+            __x: s.side === 'left' ? -v : v,
+            __y: getCategory(d) as AxisValue,
+            __label: formatValue(v, s.name),
+            __series: s.name,
+          } as TaggedRow;
+        });
     }),
   );
 
@@ -174,7 +191,13 @@
   const maxMagnitude = $derived.by(() => {
     const vals = resolvedSeries.flatMap((s) => {
       const getMagnitude = resolveAccessor(s.y);
-      return s.data.map((d) => Math.abs(Number(getMagnitude(d))));
+      const fillMap = gapFillMaps.get(s.name);
+      return s.data.flatMap((d) => {
+        const raw = getMagnitude(d);
+        if (!isGapValue(raw)) return [Math.abs(Number(raw))];
+        const fill = fillMap?.get(d);
+        return fill ? [Math.abs(fill.value)] : [];
+      });
     });
     return vals.length ? Math.max(...vals) : 1;
   });
@@ -207,8 +230,10 @@
     buildPyramidBarMarkers({
       groupedSeries,
       valueFor: signedValue,
+      signFor,
       colorFor: (s) => (s.side === 'left' ? leftColor : rightColor),
       disabledFillFor: (name) => disabledFillOverride(effectiveDisabledFor(name)),
+      gapFillMaps,
     }),
   );
 

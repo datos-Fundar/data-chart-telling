@@ -26,6 +26,8 @@ export const AGE_GROUPS = [
   '85+',
 ];
 
+export type PopulationRowWithGaps = { ageGroup: string; sex: 'Mujeres' | 'Varones'; pct: number | null };
+
 export const POPULATION_PYRAMID: PopulationRow[] = [
   { year: 1991, ageGroup: '0-4', sex: 'Mujeres', pct: 5.8 },
   { year: 1991, ageGroup: '0-4', sex: 'Varones', pct: 6.0 },
@@ -244,3 +246,18 @@ export const POPULATION_PYRAMID: PopulationRow[] = [
   { year: 2040, ageGroup: '85+', sex: 'Mujeres', pct: 1.8 },
   { year: 2040, ageGroup: '85+', sex: 'Varones', pct: 1.0 },
 ];
+
+/**
+ * `POPULATION_PYRAMID`'s 2022 'Mujeres' series with three holes — the first
+ * two age groups (start), an internal pair bounded by real data on both
+ * sides (middle), and the last two (end) — used to demonstrate
+ * `PyramidPlot`'s `styles.gaps` fill on the same series every other
+ * PyramidPlot story already uses.
+ */
+export const MUJERES_2022_WITH_GAPS: PopulationRowWithGaps[] = POPULATION_PYRAMID
+  .filter((d) => d.year === 2022 && d.sex === 'Mujeres')
+  .map((d, i) => ({
+    ageGroup: d.ageGroup,
+    sex: d.sex,
+    pct: i < 2 || (i >= 8 && i < 10) || i >= AGE_GROUPS.length - 2 ? null : d.pct,
+  }));

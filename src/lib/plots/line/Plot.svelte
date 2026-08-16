@@ -19,23 +19,19 @@
   import type { BasePlotProps } from '$lib/types/plots/props';
   import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
   import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
-  import type { BasePlotStylesConfig } from '$lib/types/layout/styles';
+  import type { GapsAwarePlotStylesConfig } from '$lib/types/layout/styles';
   import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
   import type { LineMarkersConfig } from '$lib/types/markers/line';
-  import type { GapsConfig } from '$lib/types/plots/props';
   import type { LegendDisabledStyle } from '$lib/types/layout/legend';
 
   type Props = BasePlotProps<
     SeriesProps<TData> | DataProps<TData>,
     TData,
-    BasePlotStylesConfig,
+    GapsAwarePlotStylesConfig<LineSegmentStyle>,
     LineSegmentStyle,
     LineMarkersConfig,
     AxisBasedScalesConfig<TData>
-  > & {
-    /** Fills leading/internal/trailing missing-data holes with an interpolated, distinctly-styled bridge, resolved per series like `segments` — see {@link GapsConfig}. */
-    gaps?: GapsConfig<LineSegmentStyle>;
-  };
+  >;
 
   let {
     width,
@@ -48,11 +44,15 @@
     styles = {},
     segments = {},
     markers = [],
-    gaps = {},
     scales = {},
     margins,
     tooltip = undefined,
   }: Props = $props();
+
+  // Fills leading/internal/trailing missing-data holes with an
+  // interpolated, distinctly-styled bridge, resolved per series like
+  // `segments` — see `GapsAwarePlotStylesConfig` (`types/layout/styles.ts`).
+  const gaps = $derived(styles.gaps ?? {});
 
   const resolvedSeries = $derived(series ?? buildSeries(data!, x!, y!, z));
   const legendInteraction = $derived(getLegendInteraction());
