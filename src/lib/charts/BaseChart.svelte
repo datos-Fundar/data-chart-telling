@@ -79,6 +79,7 @@
       mode={facet.mode}
       visible={facet.visible}
       pageSize={facet.pageSize}
+      navLayout={facet.navLayout}
       formatIndicator={facet.formatIndicator}
       indicator={facet.indicator}
       navButton={facet.navButton}
