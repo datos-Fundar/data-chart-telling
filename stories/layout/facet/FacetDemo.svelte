@@ -2,7 +2,7 @@
   import FacetLayout from '$lib/layout/facet/FacetLayout.svelte';
   import BarPlot from '$lib/plots/bar/Plot.svelte';
   import { getConfiguration, configToCssVars, cssVarsStyle } from '$lib/configuration/config.svelte';
-  import type { FacetColumns, FacetMode, Responsive } from '$lib/types/layout/facet';
+  import type { FacetColumns, FacetMode, FacetNavLayout, Responsive } from '$lib/types/layout/facet';
 
   /**
    * `FacetLayout` is data/plot-agnostic: it just splits rows by `by`, hands
@@ -24,6 +24,7 @@
     mode = 'grid',
     visible = 1,
     pageSize,
+    navLayout = 'overlay',
     customIndicator = false,
     customNavButton = false,
     width = 720,
@@ -34,6 +35,7 @@
     mode?: Responsive<FacetMode>;
     visible?: number;
     pageSize?: number;
+    navLayout?: FacetNavLayout;
     customIndicator?: boolean;
     customNavButton?: boolean;
     width?: number;
@@ -69,6 +71,7 @@
     {mode}
     {visible}
     {pageSize}
+    {navLayout}
     {width}
     {height}
     indicator={customIndicator ? indicatorSnippet : undefined}

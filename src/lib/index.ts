@@ -147,6 +147,7 @@ export type {
   Responsive,
   FacetColumns,
   FacetMode,
+  FacetNavLayout,
   FacetConfig,
   FacetIndicatorContext,
   FacetIndicatorSnippet,

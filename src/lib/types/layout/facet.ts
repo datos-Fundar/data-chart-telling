@@ -4,6 +4,7 @@ import type { Accessor } from '$lib/types/plots/data/common';
 export type Responsive<T> = T | { desktop: T; mobile: T };
 export type FacetColumns = Responsive<number>;
 export type FacetMode = 'grid' | 'carousel' | 'paginated';
+export type FacetNavLayout = 'overlay' | 'below';
 
 export type FacetCellContext<TRow extends Record<string, unknown>> = {
   facetValue: string;
@@ -30,6 +31,7 @@ export type FacetConfig<TRow extends Record<string, unknown>> = {
   mode?: Responsive<FacetMode>;
   visible?: number;
   pageSize?: number;
+  navLayout?: FacetNavLayout;
   formatIndicator?: (current: number, total: number) => string;
   indicator?: FacetIndicatorSnippet;
   navButton?: FacetNavSnippet;

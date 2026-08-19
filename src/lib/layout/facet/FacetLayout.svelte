@@ -5,6 +5,7 @@
   import type {
     FacetColumns,
     FacetMode,
+    FacetNavLayout,
     Responsive,
     FacetCellSnippet,
     FacetIndicatorSnippet,
@@ -32,6 +33,7 @@
     mode = 'grid',
     visible = 1,
     pageSize,
+    navLayout = 'overlay',
     formatIndicator,
     indicator,
     navButton,
@@ -47,6 +49,7 @@
     mode?: Responsive<FacetMode>;
     visible?: number;
     pageSize?: number;
+    navLayout?: FacetNavLayout;
     formatIndicator?: (current: number, total: number) => string;
     indicator?: FacetIndicatorSnippet;
     navButton?: FacetNavSnippet;
@@ -73,20 +76,16 @@
 
   const resolvedMode = $derived(resolveResponsive(mode, $isMobile));
 
-  const cols = $derived.by(() => {
+  // Columns/rows for a "full" grid of every entry — used for plain grid-mode
+  // layout, and as the default `pageSize` (one page = one full screen).
+  const gridCols = $derived.by(() => {
     const desired = resolveResponsive(columns, $isMobile);
     return Math.max(1, Math.min(desired, entries.length || 1));
   });
-
-  const rows = $derived(Math.ceil((entries.length || 1) / cols));
-  const cellWidth = $derived(Math.max(0, Math.floor((width - (cols - 1) * gap) / cols)));
-  const TITLE_H = 24;
-  const cellHeight = $derived(
-    Math.max(0, Math.floor((height - (rows - 1) * gap) / rows) - TITLE_H),
-  );
+  const gridRows = $derived(Math.ceil((entries.length || 1) / gridCols));
 
   // ── paginated ────────────────────────────────────────────────────────────
-  const resolvedPageSize = $derived(Math.max(1, pageSize ?? cols * rows));
+  const resolvedPageSize = $derived(Math.max(1, pageSize ?? gridCols * gridRows));
   let page = $state(0);
   const totalPages = $derived(Math.max(1, Math.ceil(entries.length / resolvedPageSize)));
   const pageEntries = $derived(
@@ -103,6 +102,37 @@
   function nextPage(): void {
     page = Math.min(totalPages - 1, page + 1);
   }
+
+  const showNav = $derived(resolvedMode === 'paginated' && totalPages > 1);
+  const NAV_BELOW_H = 44;
+
+  // Columns/rows actually used to size each rendered cell. `grid` mode always
+  // renders every entry, so it sizes off `gridCols`/`gridRows` as before. In
+  // `paginated` mode only `pageEntries` (at most `pageSize`, possibly fewer
+  // on the last page) are ever on screen at once — sizing off the *total*
+  // entry count instead (as `gridCols`/`gridRows` do) left a page with fewer
+  // entries than a full grid mostly blank, e.g. `pageSize: 1` still reserved
+  // room for every other page's rows instead of filling the chart area with
+  // its one cell.
+  const cols = $derived(
+    resolvedMode === 'paginated' ? Math.max(1, Math.min(gridCols, pageEntries.length || 1)) : gridCols,
+  );
+  const rows = $derived(
+    resolvedMode === 'paginated' ? Math.ceil((pageEntries.length || 1) / cols) : gridRows,
+  );
+  // In `navLayout: 'below'`, the nav row sits in normal flow beneath the
+  // grid rather than floating over it, so the cells must be measured against
+  // the height left over after reserving space for that row.
+  const contentHeight = $derived(
+    resolvedMode === 'paginated' && navLayout === 'below' && showNav
+      ? Math.max(0, height - NAV_BELOW_H)
+      : height,
+  );
+  const cellWidth = $derived(Math.max(0, Math.floor((width - (cols - 1) * gap) / cols)));
+  const TITLE_H = 24;
+  const cellHeight = $derived(
+    Math.max(0, Math.floor((contentHeight - (rows - 1) * gap) / rows) - TITLE_H),
+  );
 
   // ── carousel ─────────────────────────────────────────────────────────────
   const visibleCount = $derived(Math.max(1, Math.min(visible, entries.length || 1)));
@@ -152,13 +182,17 @@
   }
 </script>
 
+{#snippet indicatorContent(current: number, total: number)}
+  {#if indicator}
+    {@render indicator({ current, total })}
+  {:else}
+    <FacetIndicator {current} {total} format={formatIndicator} />
+  {/if}
+{/snippet}
+
 {#snippet indicatorSlot(current: number, total: number)}
   <div class="dct-facet-indicator-slot">
-    {#if indicator}
-      {@render indicator({ current, total })}
-    {:else}
-      <FacetIndicator {current} {total} format={formatIndicator} />
-    {/if}
+    {@render indicatorContent(current, total)}
   </div>
 {/snippet}
 
@@ -196,12 +230,20 @@
 {#if resolvedMode === 'paginated'}
   <div class="dct-facet-paginated" style:width="{width}px" style:height="{height}px">
     {@render grid(pageEntries)}
-    {#if totalPages > 1}
-      <div class="dct-facet-paginated__nav">
-        {@render navButtons('prev', page === 0, prevPage, 'Previous page', '‹')}
-        {@render navButtons('next', page >= totalPages - 1, nextPage, 'Next page', '›')}
-      </div>
-      {@render indicatorSlot(page + 1, totalPages)}
+    {#if showNav}
+      {#if navLayout === 'below'}
+        <div class="dct-facet-paginated__nav-below" style:height="{NAV_BELOW_H}px">
+          {@render navButtons('prev', page === 0, prevPage, 'Previous page', '‹')}
+          {@render indicatorContent(page + 1, totalPages)}
+          {@render navButtons('next', page >= totalPages - 1, nextPage, 'Next page', '›')}
+        </div>
+      {:else}
+        <div class="dct-facet-paginated__nav">
+          {@render navButtons('prev', page === 0, prevPage, 'Previous page', '‹')}
+          {@render navButtons('next', page >= totalPages - 1, nextPage, 'Next page', '›')}
+        </div>
+        {@render indicatorSlot(page + 1, totalPages)}
+      {/if}
     {/if}
   </div>
 {:else if resolvedMode === 'carousel'}
@@ -248,6 +290,14 @@
     display: grid;
     width: 100%;
     height: 100%;
+    /* Only takes effect when `.dct-facet` is itself a flex item (inside
+       `.dct-facet-paginated`): lets it shrink to the space left over after
+       a `flex: 0 0 auto` sibling (the below-layout nav row) claims its
+       fixed height, instead of overflowing past the fixed-height parent
+       the way a bare `height: 100%` would. No-op outside a flex parent
+       (e.g. plain `grid` mode), where `width/height: 100%` alone applies. */
+    flex: 1 1 auto;
+    min-height: 0;
   }
   .dct-facet__cell {
     display: flex;
@@ -280,6 +330,13 @@
   }
   .dct-facet-nav-slot {
     pointer-events: auto;
+  }
+  .dct-facet-paginated__nav-below {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--dct-facet-nav-below-gap, 0.75rem);
   }
   .dct-facet-paginated__btn {
     border: none;

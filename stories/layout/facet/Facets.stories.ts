@@ -21,6 +21,7 @@ const meta = {
     mode: { control: false },
     visible: { control: { type: 'range', min: 1, max: 4, step: 1 } },
     pageSize: { control: { type: 'range', min: 1, max: 9, step: 1 } },
+    navLayout: { control: { type: 'radio' }, options: ['overlay', 'below'] },
   },
 } satisfies Meta<typeof FacetDemo>;
 
@@ -65,6 +66,23 @@ export const CarouselTwoVisible: Story = {
 /** `mode: 'paginated'`, a 2×2 grid per page with prev/next controls. */
 export const Paginated: Story = {
   args: { groupCount: 9, columns: 2, mode: 'paginated', pageSize: 4 },
+};
+
+/**
+ * `pageSize: 1` out of 9 total facets — the single cell per page fills the
+ * whole chart area rather than being sized as if it were one of a 5-row
+ * grid (the total-entries-based sizing bug this exercises).
+ */
+export const PaginatedSingleFacet: Story = {
+  args: { groupCount: 9, columns: 3, mode: 'paginated', pageSize: 1 },
+};
+
+/**
+ * `navLayout: 'below'` — prev/next buttons and the page indicator sit in a
+ * row beneath the chart instead of overlaid on top of it.
+ */
+export const PaginatedNavBelow: Story = {
+  args: { groupCount: 9, columns: 3, mode: 'paginated', pageSize: 1, navLayout: 'below' },
 };
 
 /**
