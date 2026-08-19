@@ -178,14 +178,19 @@
   seriesData={resolvedSeries}
   {scopedGroups}
 >
-  {#if showVals}
-    <ValueLabels
-      {lastPoints}
-      values={styles.values}
-      onOverflow={labelMargin.report}
-      disabledFor={effectiveDisabledFor}
-      onHoverSeries={hoverIsolate ? (name) => { hoverIsolatedSeries = name; } : undefined}
-      onHoverEnd={hoverIsolate ? () => { hoverIsolatedSeries = null; } : undefined}
-    />
-  {/if}
+  {#snippet children({ numericMargins })}
+    {#if showVals}
+      <ValueLabels
+        {lastPoints}
+        values={styles.values}
+        {width}
+        {height}
+        {numericMargins}
+        onOverflow={labelMargin.report}
+        disabledFor={effectiveDisabledFor}
+        onHoverSeries={hoverIsolate ? (name) => { hoverIsolatedSeries = name; } : undefined}
+        onHoverEnd={hoverIsolate ? () => { hoverIsolatedSeries = null; } : undefined}
+      />
+    {/if}
+  {/snippet}
 </BasePlotLayout>

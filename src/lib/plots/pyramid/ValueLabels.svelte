@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-  import { Text, usePlot } from 'svelteplot';
+  import { Text } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
   import { watchLabelOverflow } from '$lib/plots/utils/labelOverflow.svelte';
@@ -25,6 +25,9 @@
     values,
     axisColor,
     disabled,
+    width,
+    height,
+    numericMargins,
     onHoverSeries,
     onHoverEnd,
     onOverflow,
@@ -36,6 +39,11 @@
     axisColor: string;
     /** Resolved legend/hover-isolate dimming style for this group's series, if any. */
     disabled?: LegendDisabledStyle;
+    /** The plot's own pixel size — together with `numericMargins`, the ground truth for its content box (see `bounds()` below). */
+    width: number;
+    height: number;
+    /** `BasePlotLayout`'s resolved margins, already numeric on every side. */
+    numericMargins: { top: number; right: number; bottom: number; left: number };
     /** Fired when the pointer enters this series' label — only wired when hover-isolate is enabled. */
     onHoverSeries?: () => void;
     onHoverEnd?: () => void;
@@ -44,25 +52,26 @@
   } = $props();
 
   const fillOverride = $derived(disabledFillOverride(disabled));
-  const plot = usePlot();
   let groupEl: SVGGElement | undefined = $state();
 
   watchLabelOverflow({
     el: () => groupEl,
+    // Built from our own `width`/`height`/`numericMargins` rather than
+    // `usePlot().scales.x/y.fn.range()` — see line/ValueLabels.svelte's
+    // matching comment for why that scale's exposed range can't be trusted
+    // once a caller fixes `width`/`height` explicitly (every plot kind here
+    // does).
     bounds: () => {
       // getBBox() inside isn't itself tracked — depend on whatever actually
       // changes the rendered label layout so this re-measures.
       void group;
       void values;
       void valAnchor;
-      const xRange = plot.scales.x?.fn?.range?.()?.map(Number);
-      const yRange = plot.scales.y?.fn?.range?.()?.map(Number);
-      if (!xRange || !yRange) return undefined;
       return {
-        left: Math.min(xRange[0], xRange[1]),
-        right: Math.max(xRange[0], xRange[1]),
-        top: Math.min(yRange[0], yRange[1]),
-        bottom: Math.max(yRange[0], yRange[1]),
+        left: numericMargins.left,
+        right: width - numericMargins.right,
+        top: numericMargins.top,
+        bottom: height - numericMargins.bottom,
       };
     },
     onOverflow: (overflow) => onOverflow?.(overflow),

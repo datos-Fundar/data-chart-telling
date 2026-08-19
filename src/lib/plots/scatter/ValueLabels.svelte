@@ -29,6 +29,9 @@
     values,
     defaultColor,
     disabled,
+    width,
+    height,
+    numericMargins,
     onHoverSeries,
     onHoverEnd,
     onOverflow,
@@ -39,6 +42,11 @@
     defaultColor: string;
     /** Resolved legend/hover-isolate dimming style for this group's series, if any. */
     disabled?: LegendDisabledStyle;
+    /** The plot's own pixel size — together with `numericMargins`, the ground truth for its content box (see `bounds()` below). */
+    width: number;
+    height: number;
+    /** `BasePlotLayout`'s resolved margins, already numeric on every side. */
+    numericMargins: { top: number; right: number; bottom: number; left: number };
     /** Fired when the pointer enters this series' label — only wired when hover-isolate is enabled. */
     onHoverSeries?: () => void;
     onHoverEnd?: () => void;
@@ -54,19 +62,22 @@
 
   watchLabelOverflow({
     el: () => groupEl,
+    // Built from our own `width`/`height`/`numericMargins` rather than
+    // `usePlot().scales.x/y.fn.range()` — see line/ValueLabels.svelte's
+    // matching comment for why that scale's exposed range can't be trusted
+    // once a caller fixes `width`/`height` explicitly (every plot kind here
+    // does). `plot.plotWidth`/`plotHeight` (used below for edge-aware
+    // placement) don't have this problem — only the scale's own `.range()`.
     bounds: () => {
       // getBBox() inside isn't itself tracked — depend on whatever actually
       // changes the rendered label layout so this re-measures.
       void data;
       void values;
-      const xRange = plot.scales.x?.fn?.range?.()?.map(Number);
-      const yRange = plot.scales.y?.fn?.range?.()?.map(Number);
-      if (!xRange || !yRange) return undefined;
       return {
-        left: Math.min(xRange[0], xRange[1]),
-        right: Math.max(xRange[0], xRange[1]),
-        top: Math.min(yRange[0], yRange[1]),
-        bottom: Math.max(yRange[0], yRange[1]),
+        left: numericMargins.left,
+        right: width - numericMargins.right,
+        top: numericMargins.top,
+        bottom: height - numericMargins.bottom,
       };
     },
     onOverflow: (overflow) => onOverflow?.(overflow),

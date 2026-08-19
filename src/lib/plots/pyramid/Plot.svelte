@@ -262,25 +262,30 @@
   {getY}
   {hover}
   scales={resolvedScales}
-  margins={labelMargin.resolvedMargins}
+  {...labelMargin.plotProps}
   xTickRotate={resolvedScales?.x?.tickRotate}
   markers={[...pyramidMarkers, ...markers]}
   seriesData={resolvedSeries}
   {scopedGroups}
 >
-  {#if showVals}
-    {#each groupedSeries as group (group.series.name)}
-      <ValueLabels
-        {group}
-        {valAnchor}
-        {formatValue}
-        values={styles.values}
-        axisColor={cfg.axis.color}
-        disabled={effectiveDisabledFor(group.series.name)}
-        onHoverSeries={hoverIsolate ? () => { hoverIsolatedSeries = group.series.name; } : undefined}
-        onHoverEnd={hoverIsolate ? () => { hoverIsolatedSeries = null; } : undefined}
-        onOverflow={labelMargin.report}
-      />
-    {/each}
-  {/if}
+  {#snippet children({ numericMargins })}
+    {#if showVals}
+      {#each groupedSeries as group (group.series.name)}
+        <ValueLabels
+          {group}
+          {valAnchor}
+          {formatValue}
+          values={styles.values}
+          axisColor={cfg.axis.color}
+          disabled={effectiveDisabledFor(group.series.name)}
+          {width}
+          {height}
+          {numericMargins}
+          onHoverSeries={hoverIsolate ? () => { hoverIsolatedSeries = group.series.name; } : undefined}
+          onHoverEnd={hoverIsolate ? () => { hoverIsolatedSeries = null; } : undefined}
+          onOverflow={labelMargin.report}
+        />
+      {/each}
+    {/if}
+  {/snippet}
 </BasePlotLayout>

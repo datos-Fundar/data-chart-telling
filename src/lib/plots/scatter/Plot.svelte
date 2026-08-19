@@ -220,23 +220,28 @@
   getY={(d) => Number(yAcc(d))}
   {hover}
   scales={resolvedScales}
-  margins={labelMargin.resolvedMargins}
+  {...labelMargin.plotProps}
   markers={[...scatterMarkers, ...markers]}
   seriesData={resolvedSeries}
   {scopedGroups}
 >
-  {#if showVals}
-    {#each groupedSeries as group (group.series.name)}
-      <ValueLabels
-        {group}
-        {formatValue}
-        values={styles.values}
-        defaultColor={cfg.axis.color}
-        disabled={effectiveDisabledFor(group.series.name)}
-        onHoverSeries={hoverIsolate ? () => { hoverIsolatedSeries = group.series.name; } : undefined}
-        onHoverEnd={hoverIsolate ? () => { hoverIsolatedSeries = null; } : undefined}
-        onOverflow={labelMargin.report}
-      />
-    {/each}
-  {/if}
+  {#snippet children({ numericMargins })}
+    {#if showVals}
+      {#each groupedSeries as group (group.series.name)}
+        <ValueLabels
+          {group}
+          {formatValue}
+          values={styles.values}
+          defaultColor={cfg.axis.color}
+          disabled={effectiveDisabledFor(group.series.name)}
+          {width}
+          {height}
+          {numericMargins}
+          onHoverSeries={hoverIsolate ? () => { hoverIsolatedSeries = group.series.name; } : undefined}
+          onHoverEnd={hoverIsolate ? () => { hoverIsolatedSeries = null; } : undefined}
+          onOverflow={labelMargin.report}
+        />
+      {/each}
+    {/if}
+  {/snippet}
 </BasePlotLayout>

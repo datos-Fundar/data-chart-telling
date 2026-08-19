@@ -1,5 +1,4 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-  import { untrack } from 'svelte';
   import { SvelteMap } from 'svelte/reactivity';
   import { Text, usePlot } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
@@ -25,6 +24,9 @@
   let {
     lastPoints,
     values,
+    width,
+    height,
+    numericMargins,
     onOverflow,
     disabledFor,
     onHoverSeries,
@@ -32,6 +34,11 @@
   }: {
     lastPoints: { series: Series<TData>; lastRow: TData; seriesIndex: number }[];
     values: ValuesStyle | undefined;
+    /** The plot's own pixel size — together with `numericMargins`, the ground truth for its content box (see `bounds()` below for why `usePlot()`'s own scale range can't be trusted for this). */
+    width: number;
+    height: number;
+    /** `BasePlotLayout`'s resolved margins, already numeric on every side. */
+    numericMargins: { top: number; right: number; bottom: number; left: number };
     /** Reports how far the rendered labels overflow the plot's own content box, in pixels, on each side (0 = no overflow). */
     onOverflow?: (overflow: MarginOverflow) => void;
     /** Resolved legend/hover-isolate dimming style for a series, if any. */
@@ -93,33 +100,31 @@
 
   watchLabelOverflow({
     el: () => groupEl,
+    // Deliberately built from our own `width`/`height`/`numericMargins`
+    // (all already correctly sized off the `width`/`height` this `<Plot>`
+    // was actually mounted with — see `BasePlotLayout`'s own `numericMargins`
+    // doc comment), not from `usePlot().scales.x/y.fn.range()`: svelteplot's
+    // `<Plot>` accepts an explicit `width`/`height` (our `fixedWidth`) for
+    // its own real layout, but the scale object it exposes through context
+    // is computed off its *internal* auto-detected size instead — normally
+    // the same number, but never reconciled with `fixedWidth` when one is
+    // given. That left `.range()` reporting a stale/placeholder boundary
+    // (svelteplot's own internal default, unrelated to this plot's actual
+    // pixel size) wherever a caller fixes `width`/`height` explicitly — which
+    // every plot kind here does — so this watcher never saw genuine
+    // right/bottom overflow past the *real* edge and never grew the margin
+    // to fit it, leaving end-point labels to render past the plot's true
+    // right edge with no space reserved for them.
     bounds: () => {
       // getBBox() inside isn't itself tracked — depend on whatever actually
       // changes the rendered label layout so this re-measures.
       void lastPoints;
       void values;
-      // The scale range itself is read `untrack`ed on purpose: this margin
-      // watcher's own report (see labelOverflow.svelte.ts) grows the plot's
-      // margin to fit the labels, which feeds back into svelteplot's own
-      // auto-margin sizing and nudges this same range — occasionally by a
-      // permanent, never-settling ±1px each render. Treating the range as a
-      // tracked dependency here reran the whole watcher every single time it
-      // twitched, which (when it never settles) never let the watcher's own
-      // "poll until stable" loop finish — an infinite effect-restart loop
-      // that tripped Svelte's effect_update_depth_exceeded guard. Reading it
-      // untracked still measures against the *current* range on every
-      // re-run triggered by `lastPoints`/`values` above; it just stops the
-      // range's own fluctuations from being what triggers those re-runs.
-      const { xRange, yRange } = untrack(() => ({
-        xRange: plot.scales.x?.fn?.range?.()?.map(Number),
-        yRange: plot.scales.y?.fn?.range?.()?.map(Number),
-      }));
-      if (!xRange || !yRange) return undefined;
       return {
-        left: Math.min(xRange[0], xRange[1]),
-        right: Math.max(xRange[0], xRange[1]),
-        top: Math.min(yRange[0], yRange[1]),
-        bottom: Math.max(yRange[0], yRange[1]),
+        left: numericMargins.left,
+        right: width - numericMargins.right,
+        top: numericMargins.top,
+        bottom: height - numericMargins.bottom,
       };
     },
     onOverflow: (overflow) => onOverflow?.(overflow),
