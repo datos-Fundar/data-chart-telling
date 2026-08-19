@@ -172,7 +172,7 @@
   getY={(d) => Number(yAcc(d))}
   {hover}
   {scales}
-  margins={labelMargin.resolvedMargins}
+  {...labelMargin.plotProps}
   xTickRotate={scales?.x?.tickRotate}
   markers={[...gapMarkers, ...lineMarkers, ...markers]}
   seriesData={resolvedSeries}

@@ -47,6 +47,7 @@
     coordinates = undefined,
     margins,
     marginEstimate = AUTO_MARGIN_ESTIMATE,
+    marginRemountKey = undefined,
     xTickRotate = undefined,
     styles = undefined,
     markers = undefined,
@@ -76,6 +77,23 @@
     margins?: MarginConfig;
     /** Numeric fallback for a margin side that resolved to `'auto'` — see `numericMargin`'s doc comment. */
     marginEstimate?: Record<'top' | 'right' | 'bottom' | 'left', number>;
+    /**
+     * Forces svelteplot's own `<Plot>` to fully unmount/remount (via
+     * `{#key}`) whenever this changes, instead of reacting to a `margins`
+     * prop change on an already-mounted instance. Only needed by a caller
+     * (line's own `Plot.svelte`) whose `margins` grows *after* mount, from
+     * measuring rendered content (see `createLabelMarginTracker`) — handing
+     * svelteplot's `<Plot>` a live post-mount margin change (rather than the
+     * same final value from its very first mount) was observed to send its
+     * own internal auto-margin sizing into a permanent one-pixel
+     * bottom-margin oscillation for line's end-point value labels
+     * specifically, which in turn kept re-triggering the overflow watcher
+     * that grew the margin in the first place — an infinite effect loop
+     * that tripped Svelte's `effect_update_depth_exceeded` guard. A static
+     * `margins` prop (the common case — every other plot kind) never needs
+     * this; leave it unset there.
+     */
+    marginRemountKey?: string | number;
     /** Boosts the bottom margin for a rotated x tick label — axis-having plot kinds only. */
     xTickRotate?: number;
     /** This plot kind's own `styles` prop, forwarded to the Styles layer. */
@@ -229,6 +247,7 @@
     {coordinates}
     {data}
     {containerEl}
+    remountKey={marginRemountKey}
   >
     <StylesLayout {styles} {width} {height} {numericMargins} />
     {#if scales !== undefined}

@@ -1,4 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
+  import { untrack } from 'svelte';
   import { SvelteMap } from 'svelte/reactivity';
   import { Text, usePlot } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
@@ -97,8 +98,22 @@
       // changes the rendered label layout so this re-measures.
       void lastPoints;
       void values;
-      const xRange = plot.scales.x?.fn?.range?.()?.map(Number);
-      const yRange = plot.scales.y?.fn?.range?.()?.map(Number);
+      // The scale range itself is read `untrack`ed on purpose: this margin
+      // watcher's own report (see labelOverflow.svelte.ts) grows the plot's
+      // margin to fit the labels, which feeds back into svelteplot's own
+      // auto-margin sizing and nudges this same range — occasionally by a
+      // permanent, never-settling ±1px each render. Treating the range as a
+      // tracked dependency here reran the whole watcher every single time it
+      // twitched, which (when it never settles) never let the watcher's own
+      // "poll until stable" loop finish — an infinite effect-restart loop
+      // that tripped Svelte's effect_update_depth_exceeded guard. Reading it
+      // untracked still measures against the *current* range on every
+      // re-run triggered by `lastPoints`/`values` above; it just stops the
+      // range's own fluctuations from being what triggers those re-runs.
+      const { xRange, yRange } = untrack(() => ({
+        xRange: plot.scales.x?.fn?.range?.()?.map(Number),
+        yRange: plot.scales.y?.fn?.range?.()?.map(Number),
+      }));
       if (!xRange || !yRange) return undefined;
       return {
         left: Math.min(xRange[0], xRange[1]),

@@ -118,8 +118,20 @@ export function createLabelMarginTracker(margins: () => MarginConfig | undefined
     return out;
   });
 
+  // Bundles `resolvedMargins` with a remount key derived from `measured`,
+  // ready to spread straight onto `<BasePlotLayout>` as its `margins`/
+  // `marginRemountKey` props (see that prop's doc comment for *why* a
+  // remount key is needed here at all) — keeps the caller from re-deriving
+  // the same key by hand, and from having to know it's `measured` that key
+  // must track.
+  const plotProps = $derived.by(() => ({
+    margins: resolvedMargins,
+    marginRemountKey: JSON.stringify(measured),
+  }));
+
   return {
     report,
     get resolvedMargins() { return resolvedMargins; },
+    get plotProps() { return plotProps; },
   };
 }

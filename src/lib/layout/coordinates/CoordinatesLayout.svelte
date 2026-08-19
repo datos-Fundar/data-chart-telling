@@ -27,6 +27,7 @@
     coordinates = undefined,
     data,
     containerEl,
+    remountKey = undefined,
     children,
   }: {
     width: number;
@@ -38,6 +39,8 @@
     /** Fed to `resolveProjection`'s `domain: 'data'` sentinel — the same rows `BasePlotLayout` uses for hover matching. */
     data: TData[];
     containerEl?: HTMLDivElement;
+    /** See `BasePlotLayout`'s own `remountKey` doc comment — forwarded verbatim to key svelteplot's `<Plot>` itself. */
+    remountKey?: string | number;
     children: Snippet;
   } = $props();
 
@@ -88,8 +91,10 @@
   });
 </script>
 
-<Plot {width} {height} {margin} {x} {y} projection={finalProjection as SveltePlotProps['projection']}>
-  <g transform="translate({geoZoom.transform.x}, {geoZoom.transform.y}) scale({geoZoom.transform.k})">
-    {@render children()}
-  </g>
-</Plot>
+{#key remountKey}
+  <Plot {width} {height} {margin} {x} {y} projection={finalProjection as SveltePlotProps['projection']}>
+    <g transform="translate({geoZoom.transform.x}, {geoZoom.transform.y}) scale({geoZoom.transform.k})">
+      {@render children()}
+    </g>
+  </Plot>
+{/key}
