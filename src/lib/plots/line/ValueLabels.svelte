@@ -3,7 +3,6 @@
   import { Text, usePlot } from 'svelteplot';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import { getConfiguration } from '$lib/configuration/config.svelte';
-  import { paletteColor } from '$lib/utils/color';
   import { declutter1D, laneAssignment } from '$lib/plots/utils/declutter';
   import { disabledFillOverride, disabledStrokeOverride } from '$lib/plots/utils/legendDisabled';
   import { watchLabelOverflow } from '$lib/plots/utils/labelOverflow.svelte';
@@ -32,7 +31,7 @@
     onHoverSeries,
     onHoverEnd,
   }: {
-    lastPoints: { series: Series<TData>; lastRow: TData; seriesIndex: number }[];
+    lastPoints: { series: Series<TData>; lastRow: TData; color: string }[];
     values: ValuesStyle | undefined;
     /** The plot's own pixel size — together with `numericMargins`, the ground truth for its content box (see `bounds()` below for why `usePlot()`'s own scale range can't be trusted for this). */
     width: number;
@@ -183,10 +182,9 @@
 </script>
 
 <g bind:this={groupEl}>
-{#each lastPoints as { series: s, lastRow, seriesIndex } (s.name)}
+{#each lastPoints as { series: s, lastRow, color: seriesColor } (s.name)}
   {@const xFn = resolveAccessor(s.x)}
   {@const yFn = resolveAccessor(s.y)}
-  {@const seriesColor = paletteColor(seriesIndex, cfg.palette)}
   {@const offset = declutteredOffsets.get(s.name)}
   {@const extraDy = offset?.inGroup ? offset.extraDy : 0}
   {@const baseDx = font?.dx ?? defaultDx}

@@ -107,18 +107,6 @@
     }),
   );
 
-  // Last *real* data point per series (skipping any trailing gap row), with
-  // its palette index for colour.
-  const lastPoints = $derived(
-    resolvedSeries
-      .map((s, idx) => {
-        const sy = resolveAccessor(s.y);
-        const lastRow = [...s.data].reverse().find((d) => !isGapValue(sy(d)));
-        return { series: s, lastRow, seriesIndex: idx };
-      })
-      .filter((p): p is { series: Series<TData>; lastRow: TData; seriesIndex: number } => p.lastRow !== undefined),
-  );
-
   const hover = $derived({
     active: tooltip != null || hasHoverMarker(markers),
     points: hoverPoints,
@@ -151,6 +139,21 @@
       colorFor: (_series, seriesIndex) => paletteColor(seriesIndex, cfg.palette),
       segmentColorFor: (style, defaultColor) => style?.stroke?.stroke ?? defaultColor,
     }),
+  );
+
+  const lastPoints = $derived(
+    resolvedSeries
+      .map((s, idx) => {
+        const sy = resolveAccessor(s.y);
+        const lastRow = [...s.data].reverse().find((d) => !isGapValue(sy(d)));
+        if (lastRow === undefined) return undefined;
+        const group = scopedGroups.find((g) => g.name === s.name);
+        const matchedSeg = group?.segments.find((seg) => seg.match(lastRow));
+        const color =
+          matchedSeg?.color ?? group?.segments[0]?.color ?? group?.color ?? paletteColor(idx, cfg.palette);
+        return { series: s, lastRow, color };
+      })
+      .filter((p): p is { series: Series<TData>; lastRow: TData; color: string } => p !== undefined),
   );
 
   // End-of-line labels can grow past the plot's own content box, into its
