@@ -31,9 +31,9 @@ export { default as FacetIndicator } from './layout/facet/FacetIndicator.svelte'
 export { default as LegendLayout } from './layout/legend/LegendLayout.svelte';
 export { default as Tooltip } from './layout/tooltip/Tooltip.svelte';
 export {
-  getLegendInteraction,
-  provideLegendInteraction,
-  createLegendInteraction,
+	getLegendInteraction,
+	provideLegendInteraction,
+	createLegendInteraction
 } from './layout/legend/interaction.svelte';
 
 // Markers
@@ -48,128 +48,131 @@ export { default as RuleMarker } from './markers/RuleMarker.svelte';
 export { default as TextMarker } from './markers/TextMarker.svelte';
 
 export {
-  setConfiguration,
-  getConfiguration,
-  resetConfiguration,
-  configToCssVars,
-  cssVarsStyle,
-  DEFAULT_CONFIG,
+	setConfiguration,
+	getConfiguration,
+	resetConfiguration,
+	configToCssVars,
+	cssVarsStyle,
+	DEFAULT_CONFIG
 } from './configuration/config.svelte';
 export { THEMES } from './configuration/themes';
 export type { ThemeName } from './configuration/themes';
 
 // ── Utils ─────────────────────────────────────────────────────────────────────
 export { groupBy, buildSeries } from './utils/grouping';
-export {
-  makeColorScale,
-  normalize,
-  resolveCssColor,
-  paletteColor
-} from './utils/color';
+export { makeColorScale, normalize, resolveCssColor, paletteColor } from './utils/color';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export type { AxisValue, AxisScale, AxisBasedScalesConfig } from './types/layout/scales';
 export type { Accessor, Series, SeriesProps, DataProps } from './types/plots/data/common';
 export type {
-  BasePlotProps,
-  StylesConfig,
-  MarkersConfig,
-  SegmentsConfig,
-  ScalesConfig,
-  MarginConfig,
-  TooltipConfig,
-  HoverConfig,
-  PointMatchingStrategy,
+	BasePlotProps,
+	StylesConfig,
+	MarkersConfig,
+	SegmentsConfig,
+	ScalesConfig,
+	MarginConfig,
+	TooltipConfig,
+	HoverConfig,
+	PointMatchingStrategy
 } from './types/plots/props';
 export type {
-  ValuesStyle,
-  ColorsStyle,
-  FrameStyle,
-  FrameProp,
-  BasePlotStylesConfig,
-  AxisBasedStylesConfig,
-  GapsAwarePlotStylesConfig,
-  GeoStylesConfig,
-  GeoTileLayerConfig,
+	ValuesStyle,
+	ColorsStyle,
+	FrameStyle,
+	FrameProp,
+	BasePlotStylesConfig,
+	AxisBasedStylesConfig,
+	GapsAwarePlotStylesConfig,
+	GeoStylesConfig,
+	GeoTileLayerConfig
 } from './types/layout/styles';
 export type {
-  GapsConfig,
-  GapZonesConfig,
-  GapZoneConfig,
-  OpenGapZoneConfig,
+	GapsConfig,
+	GapZonesConfig,
+	GapZoneConfig,
+	OpenGapZoneConfig
 } from './types/plots/gaps';
-export type { LineSegmentStyle, BarSegmentStyle, CellSegmentStyle, GeoSegmentStyle, ScatterSegmentStyle } from './types/plots/segments/common';
+export type {
+	LineSegmentStyle,
+	BarSegmentStyle,
+	CellSegmentStyle,
+	GeoSegmentStyle,
+	ScatterSegmentStyle
+} from './types/plots/segments/common';
 export type { Range, Area, Segment } from './types/plots/segments/config';
 export type {
-  ValueAnchor,
-  SymbolType,
-  LineStyle,
-  LineCap,
-  LineJoin,
-  FontWeight,
-  FontStyleKeyword,
-  TextAnchor,
-  LineAnchor,
+	ValueAnchor,
+	SymbolType,
+	LineStyle,
+	LineCap,
+	LineJoin,
+	FontWeight,
+	FontStyleKeyword,
+	TextAnchor,
+	LineAnchor
 } from './types/plots/constants';
 export type { FontStyle, StrokeStyle, DotStyle, AreaStyle } from './types/plots/styling';
 export type { AxisBasedMarkersConfig } from './types/markers/common';
-export type { LineMarkersConfig, DeltaMarkerConfig, DeltaConfig, DeltaTarget } from './types/markers/line';
+export type {
+	LineMarkersConfig,
+	DeltaMarkerConfig,
+	DeltaConfig,
+	DeltaTarget
+} from './types/markers/line';
 export type { MarkerProps } from './types/markers/props';
 export type { GeoFeature, GeoJsonInput, GeoDataProps, Topology } from './types/plots/data/geo';
 export type { ScatterDataProps } from './types/plots/data/scatter';
 export type {
-  GeoProjectionName,
-  GeoProjectionConfig,
-  GeoCustomProjection,
-  GeoCustomProjectionFactory,
-  GeoScalesConfig,
-  GeoZoomConfig,
-  CoordinatesConfig,
+	GeoProjectionName,
+	GeoProjectionConfig,
+	GeoCustomProjection,
+	GeoCustomProjectionFactory,
+	GeoScalesConfig,
+	GeoZoomConfig,
+	CoordinatesConfig
 } from './types/layout/coordinates';
 export type {
-  GeoMarkersConfig,
-  GeoInsetMarkerConfig,
-  GeoInsetTooltipConfig,
-  GeoInsetLocation,
-  GeoInsetProjectionName,
-  GeoInsetProjectionConfig,
+	GeoMarkersConfig,
+	GeoInsetMarkerConfig,
+	GeoInsetTooltipConfig,
+	GeoInsetLocation,
+	GeoInsetProjectionName,
+	GeoInsetProjectionConfig
 } from './types/markers/geo';
+export type { ChartPlotContext, ChartPlotSnippet } from './types/charts/common';
+export type { TimeValue, Orientation, TimelineConfig } from './types/layout/timeline';
 export type {
-  ChartPlotContext,
-  ChartPlotSnippet,
-} from './types/charts/common';
-export type {
-  TimeValue,
-  Orientation,
-  TimelineConfig,
-} from './types/layout/timeline';
-export type {
-  Responsive,
-  FacetColumns,
-  FacetMode,
-  FacetNavLayout,
-  FacetConfig,
-  FacetIndicatorContext,
-  FacetIndicatorSnippet,
-  FacetNavDirection,
-  FacetNavContext,
-  FacetNavSnippet,
+	Responsive,
+	FacetColumns,
+	FacetMode,
+	FacetNavLayout,
+	FacetConfig,
+	FacetIndicatorContext,
+	FacetIndicatorSnippet,
+	FacetNavDirection,
+	FacetNavContext,
+	FacetNavSnippet
 } from './types/layout/facet';
 export type {
-  LegendSection,
-  DiscreteLegendSection,
-  ContinuousLegendSection,
-  LegendItem,
-  LegendDisabledStyle,
-  LegendInteractionStore,
-  LegendPlotContext,
+	LegendSection,
+	DiscreteLegendSection,
+	ContinuousLegendSection,
+	LegendItem,
+	LegendDisabledStyle,
+	LegendItemsLayout,
+	LegendNavDirection,
+	LegendNavContext,
+	LegendNavSnippet,
+	LegendInteractionStore,
+	LegendPlotContext
 } from './types/layout/legend';
 export type {
-  HoverStrategy,
-  TooltipOptions,
-  TooltipProp,
-  TooltipAnchorX,
-  TooltipAnchorY,
+	HoverStrategy,
+	TooltipOptions,
+	TooltipProp,
+	TooltipAnchorX,
+	TooltipAnchorY
 } from './types/layout/tooltip';
 export type { ChartConfig, ChartConfigInput, TextStyle } from './types/configuration/styling';
 export type { ChartProps, GapsAwareChartProps } from './types/charts/props';
