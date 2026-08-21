@@ -417,9 +417,11 @@ const NEAR_MISS_SERIES = {
  * female upper-range) plus one province sitting alone well below both. At
  * the default plot height, each pileup's labels would otherwise land closer
  * together than a label's own height; instead they spread apart just enough
- * to clear one another, independently of the other pileup, each reconnected
- * to its real end point with a thin leader line. The isolated series's
- * label, far from any neighbour, is untouched — nothing to resolve there.
+ * to clear one another, each reconnected to its real end point with a thin
+ * leader line. Every label — including the isolated series, which needs no
+ * decluttering of its own — reaches out to the same shared column, so the
+ * whole set lines up on one horizontal line rather than each pileup settling
+ * at its own, differently-sized fan.
  */
 export const DeclutteredLabels: Story = {
   args: {

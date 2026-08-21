@@ -49,9 +49,8 @@
     tooltip = undefined,
   }: Props = $props();
 
-  // Fills leading/internal/trailing missing-data holes with an
-  // interpolated, distinctly-styled bridge, resolved per series like
-  // `segments` — see `GapsAwarePlotStylesConfig` (`types/layout/styles.ts`).
+  // Fills missing-data gaps with an interpolated, distinctly-styled bridge,
+  // resolved per series.
   const gaps = $derived(styles.gaps ?? {});
 
   const resolvedSeries = $derived(series ?? buildSeries(data!, x!, y!, z));
@@ -67,10 +66,8 @@
   const showVals = $derived(styles.values?.show ?? false);
   const hoverIsolate = $derived(styles.values?.hoverIsolate ?? false);
 
-  // A value label hovered while `styles.values.hoverIsolate` is on dims
-  // every other series exactly like a legend toggle would — local to this
-  // one `<Plot>` instance (not the shared HoverStore) so the gesture can't
-  // leak into unrelated tooltip/crosshair behavior.
+  // Dims every other series like a legend toggle when a value label is
+  // hovered, local to this `<Plot>` instance.
   let hoverIsolatedSeries = $state<string | null>(null);
 
   function effectiveDisabledFor(name: string): LegendDisabledStyle | undefined {
@@ -85,10 +82,7 @@
   const xAcc = $derived(resolveAccessor(resolvedSeries[0]?.x ?? ((d: TData) => d)));
   const yAcc = $derived(resolveAccessor(resolvedSeries[0]?.y ?? ((d: TData) => d)));
   const flat = $derived(resolvedSeries.flatMap((s) => s.data));
-  // A legend-disabled series is dimmed on the mark itself, but never surfaces
-  // in hover/tooltip — its points are simply absent from the candidate list.
-  // A gap row (see `gaps`) is excluded the same way — it carries no real
-  // value to hover.
+  // Legend-disabled series and gap rows are excluded from hover candidates.
   const hoverPoints = $derived(
     resolvedSeries.flatMap((s, idx) => {
       if (legendInteraction?.disabledSeries.has(s.name)) return [];
@@ -156,13 +150,7 @@
       .filter((p): p is { series: Series<TData>; lastRow: TData; color: string } => p !== undefined),
   );
 
-  // End-of-line labels can grow past the plot's own content box, into its
-  // margin — reserving real space there (rather than padding the domain,
-  // which would falsely imply data exists past the last real point) is
-  // what ValueLabels's own overflow measurement feeds into here, via a
-  // tracker local to this one `<Plot>` instance — see ValueLabels.svelte's
-  // own doc comment for why that locality (vs. svelteplot's shared margin
-  // context) matters.
+  // Grows the plot's margin to fit value labels that overflow the content box.
   const labelMargin = createLabelMarginTracker(() => margins);
 </script>
 

@@ -13,12 +13,8 @@
   import type { MarginOverflow } from '$lib/plots/utils/labelOverflow.svelte';
 
   /**
-   * End-point value labels for `LinePlot` — one label per series at its last
-   * data point, with automatic collision resolution whenever several series
-   * end up with close last values. Rendered as a proper descendant of
-   * svelteplot's `<Plot>` (not just of `LinePlot` itself) so `usePlot()`
-   * below resolves the real, live y-scale needed to measure pixel-space
-   * overlap.
+   * End-of-line value labels for `LinePlot`, with automatic collision
+   * resolution and shared horizontal alignment across labels.
    */
   let {
     lastPoints,
@@ -33,7 +29,7 @@
   }: {
     lastPoints: { series: Series<TData>; lastRow: TData; color: string }[];
     values: ValuesStyle | undefined;
-    /** The plot's own pixel size — together with `numericMargins`, the ground truth for its content box (see `bounds()` below for why `usePlot()`'s own scale range can't be trusted for this). */
+    /** Plot pixel size, used with `numericMargins` to compute the content box. */
     width: number;
     height: number;
     /** `BasePlotLayout`'s resolved margins, already numeric on every side. */
@@ -49,17 +45,10 @@
 
   const cfg = $derived(getConfiguration());
 
-  // Elbow-routed leader line geometry (pixels), configurable project-wide
-  // via `setConfiguration({ line: { valueLabels: {...} } })` — each lane a
-  // run's members get spread across (see `laneAssignment`'s doc comment for
-  // how lanes are picked without crossing) is `laneStep` further out than
-  // the last; `elbowGap` is the shortest lane (rank 0, right off the data
-  // point); `labelGap` is the small clearance between the outermost lane and
-  // the label text it feeds into. `connectorColor`/`connectorWidth` are the
-  // leader line's own default look — deliberately *not* each series' own
-  // colour or stroke weight (matching the data line reads as more data, not
-  // as a leader, right where several lines are already converging) — both
-  // still overridable per-plot via `values.strokeStyle`.
+  // Elbow-routed leader line geometry (pixels), configurable via
+  // `setConfiguration({ line: { valueLabels: {...} } })`. `connectorColor`/
+  // `connectorWidth` default to a neutral look rather than each series' own
+  // colour, overridable per-plot via `values.strokeStyle`.
   const elbowGap = $derived(cfg.line.valueLabels.elbowGap);
   const laneStep = $derived(cfg.line.valueLabels.laneStep);
   const labelGap = $derived(cfg.line.valueLabels.labelGap);
@@ -70,12 +59,12 @@
   const connector = $derived(values?.strokeStyle);
   const formatValue = $derived(values?.format ?? ((v: number, name: string) => `${name} - ${v}`));
   const valAnchor = $derived<ValueAnchor>(values?.anchor ?? 'start');
-  // 'outside' is a per-point escape hatch resolved by HoverMarker; line's own
-  // value labels already have their own `anchor: 'outside'` concept above,
-  // so treat it as unset here.
+  // 'outside' is handled separately by HoverMarker, so it's treated as unset here.
   const resolvedTextAnchor = $derived(font?.textAnchor === 'outside' ? undefined : font?.textAnchor);
 
   const defaultDx = $derived(valAnchor === 'start' ? 6 : valAnchor === 'end' ? -6 : 0);
+  const baseDx = $derived(font?.dx ?? defaultDx);
+  const dir = $derived(Math.sign(baseDx) || 1);
   const defaultDy = $derived(valAnchor === 'outside' ? -8 : 0);
   const defaultTA = $derived(
     valAnchor === 'start' ? ('start' as const) : valAnchor === 'end' ? ('end' as const) : ('middle' as const),
@@ -85,38 +74,21 @@
 
   const plot = usePlot();
 
-  // ── Overflow measurement ─────────────────────────────────────────────────
-  // Measures how far the rendered labels extend past the plot's own content
-  // box and reports it to the caller (`Plot.svelte`), which grows its own
-  // local margin state to fit — see `labelOverflow.svelte.ts` for the actual
-  // `getBBox()` measurement. Reporting through a plain callback instead of
-  // registering directly into svelteplot's *shared* margin-auto-sizing
-  // context keeps this entirely local to one `<Plot>` instance: nothing here
-  // is shared across instances, which is what made that old approach spike
-  // CPU/memory into unresponsiveness when many instances mounted/unmounted
-  // together (e.g. a multi-story docs page → single story).
+  // Measures how far the rendered labels extend past the plot's content box
+  // and reports it to the caller (`Plot.svelte`), which grows its own local
+  // margin state to fit. Reported via a plain callback rather than
+  // svelteplot's shared margin context, to keep it local per `<Plot>`
+  // instance.
   let groupEl: SVGGElement | undefined = $state();
 
   watchLabelOverflow({
     el: () => groupEl,
-    // Deliberately built from our own `width`/`height`/`numericMargins`
-    // (all already correctly sized off the `width`/`height` this `<Plot>`
-    // was actually mounted with — see `BasePlotLayout`'s own `numericMargins`
-    // doc comment), not from `usePlot().scales.x/y.fn.range()`: svelteplot's
-    // `<Plot>` accepts an explicit `width`/`height` (our `fixedWidth`) for
-    // its own real layout, but the scale object it exposes through context
-    // is computed off its *internal* auto-detected size instead — normally
-    // the same number, but never reconciled with `fixedWidth` when one is
-    // given. That left `.range()` reporting a stale/placeholder boundary
-    // (svelteplot's own internal default, unrelated to this plot's actual
-    // pixel size) wherever a caller fixes `width`/`height` explicitly — which
-    // every plot kind here does — so this watcher never saw genuine
-    // right/bottom overflow past the *real* edge and never grew the margin
-    // to fit it, leaving end-point labels to render past the plot's true
-    // right edge with no space reserved for them.
+    // Built from `width`/`height`/`numericMargins` rather than the live
+    // scale's own `.range()`, which doesn't reconcile with an explicitly
+    // sized `<Plot>`.
     bounds: () => {
-      // getBBox() inside isn't itself tracked — depend on whatever actually
-      // changes the rendered label layout so this re-measures.
+      // getBBox() isn't tracked reactively — depend on whatever changes the
+      // label layout so this re-measures.
       void lastPoints;
       void values;
       return {
@@ -130,27 +102,20 @@
   });
 
   /**
-   * Pixel-space collision fix-up for end-point labels: resolves each label's
-   * true pixel Y through the plot's own live y-scale, then runs the shared
-   * two-pass declutter over those pixels to find how far each one needs to
-   * move to clear its neighbours. The result is a pure pixel *offset*
-   * (`extraDy`), applied the same way `<Text dy>` already is everywhere else
-   * in this file — it never becomes a data-space Y fed back into a mark,
-   * which would extend the y-scale's own domain and provoke an infinite
-   * autoscale ↔ declutter feedback loop.
+   * Pixel-space collision fix-up for end-point labels: resolves each
+   * label's pixel Y through the live y-scale, then declutters those pixels
+   * to find how far each needs to move to clear its neighbours (`extraDy`).
+   * `rank`/`lanesUsed`/`runSize` come from `laneAssignment`, which turns the
+   * decluttered runs into lane assignments.
    *
-   * `inGroup`/`rank`/`lanesUsed` come from `laneAssignment`, fed by
-   * `declutter1D`'s own `connected` record rather than re-inferred from
-   * positions — see both functions' doc comments for why that's the only
-   * reliable source: position-based heuristics either miss a series that
-   * only had to move because a neighbour got pushed into it, or wrongly
-   * bridge two unrelated clusters that each happened to need decluttering
-   * on their own. The elbow connector below turns `rank` into a lane index.
-   * A series with nothing nearby is absent from the map, and its label
-   * renders with no extra offset.
+   * Every label reaches out to the same shared lane column (`reach`/
+   * `laneReach`), not just the ones in its own cluster, so the whole set of
+   * end-of-line labels lines up on one horizontal line. A label that didn't
+   * need to move for collision avoidance still gets a connector to cover
+   * the resulting gap — see the `aligned` gate in the markup below.
    */
   const declutteredOffsets = $derived.by(() => {
-    const map = new SvelteMap<string, { extraDy: number; inGroup: boolean; rank: number; lanesUsed: number }>();
+    const map = new SvelteMap<string, { extraDy: number; aligned: boolean; rank: number; reach: number; laneReach: number }>();
     if (lastPoints.length < 2) return map;
     const yScale = plot.scales.y?.fn;
     if (!yScale) return map;
@@ -160,20 +125,25 @@
       pos: Number(yScale(Number(resolveAccessor(s.y)(lastRow)))),
     }));
     const sorted = [...items].sort((a, b) => a.pos - b.pos);
-    // Same content-box source as `watchLabelOverflow`'s `bounds()` above,
-    // not `yScale.range()` — see that call's doc comment for why.
+    // Same content-box source as `watchLabelOverflow`'s `bounds()` above.
     const bounds: [number, number] = [numericMargins.top, height - numericMargins.bottom];
     const { positions: spread, connected } = declutter1D(items, minGap, bounds);
     const spreadByName = new Map(spread.map((d) => [d.name, d.pos]));
     const originals = sorted.map((item) => item.pos);
     const finals = sorted.map((item) => spreadByName.get(item.name) ?? item.pos);
     const ranks = laneAssignment(originals, finals, connected);
+
+    const anyGrouped = ranks.some((r) => r.runSize > 1);
+    const globalLanes = anyGrouped ? Math.max(...ranks.map((r) => r.lanesUsed)) : 1;
+    const reach = elbowGap + (globalLanes - 1) * laneStep + labelGap;
+
     sorted.forEach((item, i) => {
       map.set(item.name, {
         extraDy: finals[i] - originals[i],
-        inGroup: ranks[i].runSize > 1,
+        aligned: anyGrouped,
         rank: ranks[i].rank,
-        lanesUsed: ranks[i].lanesUsed,
+        reach,
+        laneReach: elbowGap + ranks[i].rank * laneStep,
       });
     });
     return map;
@@ -185,23 +155,18 @@
   {@const xFn = resolveAccessor(s.x)}
   {@const yFn = resolveAccessor(s.y)}
   {@const offset = declutteredOffsets.get(s.name)}
-  {@const extraDy = offset?.inGroup ? offset.extraDy : 0}
-  {@const baseDx = font?.dx ?? defaultDx}
-  {@const dir = Math.sign(baseDx) || 1}
-  {@const numLanes = offset?.inGroup ? offset.lanesUsed : 0}
-  {@const labelDx = offset?.inGroup
-    ? dir * (elbowGap + (numLanes - 1) * laneStep + labelGap)
-    : baseDx}
+  {@const extraDy = offset?.aligned ? offset.extraDy : 0}
+  {@const labelDx = offset?.aligned ? dir * offset.reach : baseDx}
   {@const text = formatValue(Number(yFn(lastRow)), s.name)}
   {@const preferredTA = resolvedTextAnchor ?? defaultTA}
   {@const preferredLA = font?.lineAnchor ?? defaultLA}
   {@const disabled = disabledFor?.(s.name)}
   {@const disabledStroke = disabledStrokeOverride(disabled)}
   {@const disabledFill = disabledFillOverride(disabled)}
-  {#if offset?.inGroup && plot.scales.x?.fn && plot.scales.y?.fn}
+  {#if offset?.aligned && plot.scales.x?.fn && plot.scales.y?.fn}
     {@const px = Number(plot.scales.x.fn(xFn(lastRow)))}
     {@const py = Number(plot.scales.y.fn(Number(yFn(lastRow))))}
-    {@const laneX = px + dir * (elbowGap + offset.rank * laneStep)}
+    {@const laneX = px + dir * offset.laneReach}
     {@const targetY = py + extraDy}
     <path
       d={`M ${px} ${py} H ${laneX} V ${targetY} H ${px + labelDx}`}
@@ -214,9 +179,7 @@
       stroke-linejoin={connector?.strokeLinejoin ?? 'miter'}
     />
   {/if}
-  <!-- svelteplot's Text mark never wires pointer handlers to its DOM node,
-       despite declaring them in its types — a wrapping <g> catches the
-       boundary crossing instead (pointerenter/leave fire on every ancestor). -->
+  <!-- Text marks don't wire pointer handlers; a wrapping <g> catches them instead. -->
   <g
     role="presentation"
     onpointerenter={onHoverSeries && (() => onHoverSeries(s.name))}
