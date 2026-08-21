@@ -160,10 +160,9 @@
       pos: Number(yScale(Number(resolveAccessor(s.y)(lastRow)))),
     }));
     const sorted = [...items].sort((a, b) => a.pos - b.pos);
-    const range = yScale.range?.().map(Number);
-    const bounds: [number, number] | undefined = range
-      ? [Math.min(range[0], range[1]), Math.max(range[0], range[1])]
-      : undefined;
+    // Same content-box source as `watchLabelOverflow`'s `bounds()` above,
+    // not `yScale.range()` — see that call's doc comment for why.
+    const bounds: [number, number] = [numericMargins.top, height - numericMargins.bottom];
     const { positions: spread, connected } = declutter1D(items, minGap, bounds);
     const spreadByName = new Map(spread.map((d) => [d.name, d.pos]));
     const originals = sorted.map((item) => item.pos);
