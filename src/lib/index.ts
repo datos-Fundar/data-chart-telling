@@ -132,6 +132,7 @@ export type {
 	GeoZoomConfig,
 	CoordinatesConfig
 } from './types/layout/coordinates';
+export type { GeoCameraTarget, GeoCameraConfig, GeoCameraTransition } from './types/plots/camera';
 export type {
 	GeoMarkersConfig,
 	GeoInsetMarkerConfig,
