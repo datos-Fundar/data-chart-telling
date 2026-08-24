@@ -141,6 +141,99 @@ describe('LinePlot – styles.values', () => {
 		expect(new Set(readings).size).toBeLessThanOrEqual(2);
 	});
 
+	test('overflow measured against an earlier, differently-shaped frame does not linger after the data changes', async () => {
+		// Regression test: `createLabelMarginTracker`'s margin growth is
+		// monotonic *within* a stable dataset (see its own doc comment) — but
+		// `LinePlot`'s `data`/`series` prop changes on every tick of a timeline
+		// scrubber, revealing a different slice of rows each time. Before
+		// `resolvedSeries` was wired in as a reset key, an overflow measured
+		// against one frame's clustered end-point labels (needing several
+		// declutter lanes, reaching well past the content box) stuck around
+		// forever — even once the scrubber moved on to a frame simple enough to
+		// need no extra margin at all, permanently narrowing the plot from
+		// whichever side that one frame happened to overflow.
+		const clustered = [
+			{
+				name: 'a',
+				x: 'year' as const,
+				y: 'value' as const,
+				data: [
+					{ year: 2016, value: 4.9 },
+					{ year: 2017, value: 5.0 }
+				]
+			},
+			{
+				name: 'b',
+				x: 'year' as const,
+				y: 'value' as const,
+				data: [
+					{ year: 2016, value: 5.0 },
+					{ year: 2017, value: 5.05 }
+				]
+			},
+			{
+				name: 'c',
+				x: 'year' as const,
+				y: 'value' as const,
+				data: [
+					{ year: 2016, value: 5.1 },
+					{ year: 2017, value: 5.1 }
+				]
+			},
+			{
+				name: 'd',
+				x: 'year' as const,
+				y: 'value' as const,
+				data: [
+					{ year: 2016, value: 5.2 },
+					{ year: 2017, value: 5.15 }
+				]
+			},
+			{
+				name: 'e',
+				x: 'year' as const,
+				y: 'value' as const,
+				data: [
+					{ year: 2016, value: 5.3 },
+					{ year: 2017, value: 5.2 }
+				]
+			}
+		];
+		// Widely spaced, single point per series — nothing to declutter, no
+		// lane reach, nothing that should ever need extra margin.
+		const settled = [
+			{ name: 'a', x: 'year' as const, y: 'value' as const, data: [{ year: 2016, value: 1 }] },
+			{ name: 'b', x: 'year' as const, y: 'value' as const, data: [{ year: 2016, value: 20 }] }
+		];
+
+		const renderProps = {
+			width: 400,
+			height: 300,
+			styles: { values: { show: true }, frame: true } satisfies AxisBasedStylesConfig,
+			scales: { y: { domain: [0, 20] as [number, number] } }
+		};
+
+		const { container, rerender } = await render(LinePlot, { ...renderProps, series: clustered });
+		await waitForSvg(container);
+		// Give the clustered frame room to fully grow (and lock in) its margin
+		// before scrubbing away from it.
+		await new Promise((r) => setTimeout(r, 600));
+
+		await rerender({ series: settled });
+		await new Promise((r) => setTimeout(r, 600));
+		const scrubbedWidth = Number(container.querySelector('rect.frame')?.getAttribute('width'));
+
+		const { container: freshContainer } = await render(LinePlot, {
+			...renderProps,
+			series: settled
+		});
+		await waitForSvg(freshContainer);
+		await new Promise((r) => setTimeout(r, 600));
+		const freshWidth = Number(freshContainer.querySelector('rect.frame')?.getAttribute('width'));
+
+		expect(scrubbedWidth).toBe(freshWidth);
+	});
+
 	test('two series get two independent end-point labels', async () => {
 		const { container } = await render(LinePlot, {
 			width: 400,

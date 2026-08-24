@@ -97,9 +97,46 @@ export function watchLabelOverflow(args: {
  * "shrink margin → overflow reappears → grow margin → …". Each side is only
  * ever set when the caller's own `margins` prop hasn't already pinned it, so
  * an explicit caller override always wins over this auto-grown one.
+ *
+ * That monotonic growth is only sound for a *stable* dataset — it assumes
+ * every reading describes the same thing being measured, just possibly at an
+ * earlier, not-yet-settled frame. It stops being sound once the caller's own
+ * data changes identity underneath it (e.g. a timeline scrubber revealing a
+ * different slice of rows on every tick): an overflow measured against
+ * *that* frame's rendered labels doesn't describe the next frame's, so
+ * carrying it forward forever can leave a plot permanently — and wrongly —
+ * margin-inflated by whatever the single most cluttered frame it ever
+ * passed through needed, long after scrubbing away from it. `resetKey`, if
+ * given, is compared by identity on every call; a change drops `measured`
+ * back to zero so the next frame's overflow is measured fresh against only
+ * what's actually on screen now. Pass whatever reactive value identifies
+ * "what's currently being plotted" for the caller (e.g. its own resolved
+ * series list) — a plain reference/value comparison, not a deep one, so it
+ * only need change identity when the rendered content actually does.
  */
-export function createLabelMarginTracker(margins: () => MarginConfig | undefined) {
+export function createLabelMarginTracker(
+	margins: () => MarginConfig | undefined,
+	resetKey?: () => unknown
+) {
 	let measured = $state<MarginOverflow>(NO_OVERFLOW);
+
+	// Skips the reset on the very first run (there's nothing to reset yet,
+	// and `measured` already starts at `NO_OVERFLOW`) so only a later,
+	// genuine change to `resetKey` clears accumulated growth.
+	let resetKeyInitialized = false;
+	let lastResetKey: unknown;
+	$effect(() => {
+		const key = resetKey?.();
+		if (!resetKeyInitialized) {
+			resetKeyInitialized = true;
+			lastResetKey = key;
+			return;
+		}
+		if (key !== lastResetKey) {
+			lastResetKey = key;
+			measured = NO_OVERFLOW;
+		}
+	});
 
 	function report(overflow: MarginOverflow) {
 		const next: MarginOverflow = {
