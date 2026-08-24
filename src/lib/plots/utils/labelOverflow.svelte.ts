@@ -179,15 +179,18 @@ export function createLabelMarginTracker(
 		return out;
 	});
 
-	// Bundles `resolvedMargins` with a remount key derived from `measured`,
-	// ready to spread straight onto `<BasePlotLayout>` as its `margins`/
-	// `marginRemountKey` props (see that prop's doc comment for *why* a
-	// remount key is needed here at all) — keeps the caller from re-deriving
-	// the same key by hand, and from having to know it's `measured` that key
-	// must track.
+	// Bundles `resolvedMargins` with a remount key, ready to spread straight
+	// onto `<BasePlotLayout>` as its `margins`/`marginRemountKey` props (see
+	// that prop's doc comment for *why* a remount key is needed here at all)
+	// — keeps the caller from re-deriving the same key by hand. Tracks both
+	// `measured` (this tracker's own auto-grown overflow) and the caller's
+	// own `margins()` — a caller that changes its explicit margins prop
+	// after mount (e.g. locking in a previously-measured value) needs that
+	// picked up just as cleanly as internal growth does; keying only on
+	// `measured` would silently miss it.
 	const plotProps = $derived.by(() => ({
 		margins: resolvedMargins,
-		marginRemountKey: JSON.stringify(measured)
+		marginRemountKey: JSON.stringify({ base: margins(), measured })
 	}));
 
 	return {

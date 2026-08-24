@@ -21,7 +21,7 @@
 		validateSegments,
 		buildScopedMarkerGroups
 	} from '$lib/plots/utils/segments';
-	import type { BasePlotProps } from '$lib/types/plots/props';
+	import type { BasePlotProps, MarginConfig } from '$lib/types/plots/props';
 	import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
 	import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
 	import type { GapsAwarePlotStylesConfig } from '$lib/types/layout/styles';
@@ -50,7 +50,7 @@
 		segments = {},
 		markers = [],
 		scales = {},
-		margins,
+		margins = $bindable(),
 		tooltip = undefined
 	}: Props = $props();
 
@@ -169,6 +169,26 @@
 		() => margins,
 		() => resolvedSeries
 	);
+
+	// Writes the resolved margin back into the bindable `margins` prop once it
+	// settles, so a caller binding it (`bind:margins`) can capture and reuse a
+	// fixed margin later. `lastWritten` is a plain variable (not `$state`) so
+	// the effect only depends on `resolvedMargins`, never on `margins` itself.
+	let lastWritten: MarginConfig | undefined;
+	$effect(() => {
+		const next = labelMargin.resolvedMargins;
+		if (!next) return;
+		const changed =
+			!lastWritten ||
+			next.top !== lastWritten.top ||
+			next.right !== lastWritten.right ||
+			next.bottom !== lastWritten.bottom ||
+			next.left !== lastWritten.left;
+		if (changed) {
+			lastWritten = { top: next.top, right: next.right, bottom: next.bottom, left: next.left };
+			margins = next;
+		}
+	});
 </script>
 
 <BasePlotLayout
