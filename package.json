@@ -1,6 +1,6 @@
 {
 	"name": "@fundar/data-chart-telling",
-	"version": "0.0.39",
+	"version": "0.0.40",
 	"type": "module",
 	"scripts": {
 		"build": "svelte-package",
