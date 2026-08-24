@@ -1,3 +1,4 @@
+import { AUTO_MARGIN_ESTIMATE } from '$lib/layout/plot/margins';
 import type { MarginConfig } from '$lib/types/plots/props';
 
 /** How far a value label's rendered box extends past the plot's own content box, in pixels, on each side (0 = no overflow). */
@@ -107,14 +108,22 @@ export function createLabelMarginTracker(margins: () => MarginConfig | undefined
     }
   }
 
+  // `measured` is overflow *past* the current margin, not the total margin
+  // needed — grown on top of `AUTO_MARGIN_ESTIMATE` (the same fallback
+  // svelteplot's own 'auto' sizing is estimated by elsewhere), not the raw
+  // overflow alone, or growth would silently replace whatever room 'auto'
+  // would have reserved for the axis itself (tick labels, title) with a
+  // number that only accounts for the value label. `AUTO_MARGIN_ESTIMATE` is
+  // a fixed constant, not `numericMargins`' own already-grown value, so this
+  // can't compound into unbounded growth across repeated reports.
   const resolvedMargins = $derived.by((): MarginConfig | undefined => {
     const base = margins();
     if (measured.left <= 0 && measured.right <= 0 && measured.top <= 0 && measured.bottom <= 0) return base;
     const out: MarginConfig = { ...base };
-    if (measured.right > 0 && base?.right === undefined) out.right = measured.right;
-    if (measured.left > 0 && base?.left === undefined) out.left = measured.left;
-    if (measured.top > 0 && base?.top === undefined) out.top = measured.top;
-    if (measured.bottom > 0 && base?.bottom === undefined) out.bottom = measured.bottom;
+    if (measured.right > 0 && base?.right === undefined) out.right = AUTO_MARGIN_ESTIMATE.right + measured.right;
+    if (measured.left > 0 && base?.left === undefined) out.left = AUTO_MARGIN_ESTIMATE.left + measured.left;
+    if (measured.top > 0 && base?.top === undefined) out.top = AUTO_MARGIN_ESTIMATE.top + measured.top;
+    if (measured.bottom > 0 && base?.bottom === undefined) out.bottom = AUTO_MARGIN_ESTIMATE.bottom + measured.bottom;
     return out;
   });
 

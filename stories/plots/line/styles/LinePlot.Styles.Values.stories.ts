@@ -536,3 +536,89 @@ export const DeclutteredLabelsBoundedByPlot: Story = {
     } satisfies AxisBasedStylesConfig,
   },
 };
+
+// Real INDEC poverty-rate series (% of population below the poverty line,
+// by province, 2016–2025) — the exact dataset and provinces that surfaced
+// both bugs below in a consuming app: `GENERAL_10` from the reporting API
+// this package is embedded in.
+const POVERTY_RATE_BY_PROVINCE: Record<string, YearPoint[]> = {
+  'San Juan': [
+    { year: 2016, value: 43.6 },
+    { year: 2017, value: 32.41 },
+  ],
+  Jujuy: [
+    { year: 2016, value: 36.92 },
+    { year: 2017, value: 32.02 },
+  ],
+  Formosa: [
+    { year: 2016, value: 33.48 },
+    { year: 2017, value: 31.06 },
+  ],
+  'Buenos Aires': [
+    { year: 2016, value: 32.49 },
+    { year: 2017, value: 25.58 },
+  ],
+  Chubut: [
+    { year: 2016, value: 22.38 },
+    { year: 2017, value: 19.68 },
+  ],
+};
+const POVERTY_RATE_SERIES = Object.entries(POVERTY_RATE_BY_PROVINCE).map(([name, data]) => ({
+  name,
+  x: 'year' as const,
+  y: 'value' as const,
+  data,
+}));
+
+/**
+ * `Chubut`'s 2017 rate (19.68) has no neighbouring label to collide with —
+ * San Juan/Jujuy/Formosa/Buenos Aires cluster well above it — but the
+ * y-domain is pinned to a floor of 20, just above that real value, so the
+ * scale places its point (and label) past the plot's own bottom edge.
+ * Bounds-clamping only ran for multi-label runs; a lone label like this one
+ * passed through untouched, free to render past the edge same as before
+ * that fix. Clamped back in here the same way a run is.
+ */
+export const IsolatedLabelBoundedByPlot: Story = {
+  args: {
+    series: POVERTY_RATE_SERIES,
+    scales: { y: { domain: [20, 45] } },
+    styles: {
+      values: {
+        show: true,
+        format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
+      },
+    } satisfies AxisBasedStylesConfig,
+  },
+};
+
+/**
+ * The same five provinces, but each series truncated to only its 2016
+ * point — the "last" point every label anchors to — with the x-domain
+ * still pinned out to 2025 and `anchor: 'end'`. This is the shape a
+ * scroll/scrub caller re-slicing series data produces at the very start of
+ * its timeline: every label's point sits right at the domain's left edge,
+ * against the Y axis, and a tight pileup (San Juan/Jujuy/Formosa/Buenos
+ * Aires are all within ~11 points of each other in 2016) fans its labels
+ * further left still. `ValueLabels.svelte`'s `declutteredOffsets` flips that
+ * fan to the right instead of reaching further into the axis, so the labels
+ * themselves never collide with the Y axis's own tick labels — the left
+ * margin still ends up wider than this particular render strictly needs,
+ * since the very first (pre-clustering) paint can measure real overflow
+ * before the flip resolves, and that gets grown in permanently; narrowing
+ * that margin further isn't safe without risking the growth/remount loop
+ * oscillating (see `createLabelMarginTracker`'s own doc comment).
+ */
+export const FirstPointOnlyBoundedByAxis: Story = {
+  args: {
+    series: POVERTY_RATE_SERIES.map((s) => ({ ...s, data: s.data.slice(0, 1) })),
+    scales: { x: { domain: [2016, 2025] } },
+    styles: {
+      values: {
+        show: true,
+        anchor: 'end',
+        format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
+      },
+    } satisfies AxisBasedStylesConfig,
+  },
+};

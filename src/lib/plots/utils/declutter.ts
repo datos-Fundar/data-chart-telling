@@ -122,10 +122,10 @@ function runBiasWeights(down: number[], up: number[], connected: boolean[], [lo,
  * it lands entirely inside `[lo, hi]`. A run's own relative spacing is
  * preserved as-is (just translated) whenever it already fits in `hi - lo`;
  * only a run wider than the available space gets uniformly scaled down
- * around its centre first. Lone, unconnected positions pass through
- * untouched — they were never pushed by `declutter1D` in the first place,
- * so clamping one to the bounds would move a label away from the data point
- * it's honestly reporting, for no collision-avoidance reason at all.
+ * around its centre first. A lone, unconnected position is simply clamped
+ * to the nearer bound instead — its own value never needed decluttering,
+ * but it can still sit close enough to the scale's own edge to overflow on
+ * its own.
  */
 function fitRunsWithinBounds(positions: number[], connected: boolean[], [lo, hi]: readonly [number, number]): number[] {
   const out = [...positions];
@@ -147,6 +147,8 @@ function fitRunsWithinBounds(positions: number[], connected: boolean[], [lo, hi]
           out[k] = newCenter + (out[k] - idealCenter) * scale;
         }
       }
+    } else {
+      out[i] = Math.min(Math.max(out[i], lo), hi);
     }
     i = j + 1;
   }
