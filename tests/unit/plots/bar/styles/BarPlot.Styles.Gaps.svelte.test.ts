@@ -1,5 +1,5 @@
 import { render } from 'vitest-browser-svelte';
-import { describe, test, expect, afterEach } from 'vitest';
+import { describe, test, expect, afterEach, vi } from 'vitest';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
 import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 import type { GapsConfig } from '$lib/types/plots/gaps';
@@ -219,5 +219,51 @@ describe('BarPlot – gaps (stacked layout)', () => {
     // implicit 0 contribution an unfilled gap leaves — b's bar, stacked on
     // top, should sit higher (smaller SVG y = higher on screen) once filled.
     expect(filledY).toBeLessThan(unfilledY);
+  });
+});
+
+// ── Legend / hover-isolate dimming ──────────────────────────────────────────
+// Unlike LinePlot's gap bridge (a separate marker `buildGapMarkers.ts` never
+// wired to the disabled override — see the LinePlot legend/gaps tests), this
+// file's `buildBarMarkers.ts` already threads the same `disabledFillFor`
+// through its gap-fill loop as its real-segment loop (see `style:` in both
+// the real-segment and gap-fill loops there) — so bar gap fills were never
+// affected by that bug. This is a regression test confirming that stays
+// true, not a bugfix.
+
+describe('BarPlot – gaps (hover-isolate dimming)', () => {
+  test('isolating one series dims its gap-fill bars exactly like its real ones', async () => {
+    const { container } = await render(BarPlot, {
+      width: 400,
+      height: 300,
+      series: [SERIES, OTHER_SERIES],
+      styles: {
+        // The default bar `values.format` omits the series name (unlike
+        // Line/Pyramid) — supply one so the right label group is findable
+        // below.
+        values: { show: true, hoverIsolate: true, format: (v: number, name: string) => `${name}: ${v}` },
+        gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle>,
+      },
+    });
+    const svg = await waitForSvg(container);
+
+    const otherLabelGroup = Array.from(svg.querySelectorAll('g[role="presentation"]')).find((g) =>
+      g.textContent?.includes('other'),
+    );
+    expect(otherLabelGroup).toBeTruthy();
+    otherLabelGroup!.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
+
+    await vi.waitFor(() => {
+      const dimmedCount = Array.from(svg.querySelectorAll('g.bar-y rect')).filter((r) =>
+        r.getAttribute('style')?.includes('fill-opacity: 0.12'),
+      ).length;
+      if (dimmedCount === 0) throw new Error('nothing dimmed yet');
+    });
+
+    const rects = Array.from(svg.querySelectorAll('g.bar-y rect'));
+    const dimmed = rects.filter((r) => r.getAttribute('style')?.includes('fill-opacity: 0.12'));
+    // Every one of `reading`'s bars — its `REAL_COUNT` real ones plus the 2
+    // gap-fill bars the middle zone adds — dims, not just the real ones.
+    expect(dimmed).toHaveLength(REAL_COUNT + 2);
   });
 });

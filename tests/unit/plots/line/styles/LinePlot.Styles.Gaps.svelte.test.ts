@@ -1,5 +1,5 @@
 import { render } from 'vitest-browser-svelte';
-import { describe, test, expect, afterEach } from 'vitest';
+import { describe, test, expect, afterEach, vi } from 'vitest';
 import LinePlot from '$lib/plots/line/Plot.svelte';
 import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 import type { GapsConfig } from '$lib/types/plots/gaps';
@@ -259,4 +259,65 @@ describe('LinePlot – gaps (cfg.line.gap)', () => {
     const svg = await waitForSvg(container);
     expect(countDotMarks(svg)).toBe(2);
   });
+});
+
+// ── Legend / hover-isolate dimming ──────────────────────────────────────────
+// A gap bridge is drawn by its own, separate `'line'`/`'dot'` marker (see
+// `buildGapMarkers.ts`) — it must dim the same way the real line does when
+// its series is disabled, whether via a legend click or `styles.values.
+// hoverIsolate`. The legend-click path is covered end-to-end in
+// `tests/unit/plots/line/legend/LinePlot.Legend.GapsDisable.svelte.test.ts`;
+// the override precedence itself (disabled stroke/dots beating the zone's
+// own style beating the shared default) is covered directly, as a pure
+// function, in `buildGapMarkers.svelte.test.ts`. This covers the other
+// repro path: `styles.values.hoverIsolate`.
+
+// The interpolated bridge samples `BRIDGE_STEPS + 1` (25) points — far more
+// `L` commands than the 1–2-point-per-subpath real line ever produces for
+// these small fixtures — which is what tells a bridge path apart from a real
+// one purely from its rendered `d`.
+function bridgePaths(svg: SVGElement): SVGPathElement[] {
+  return Array.from(svg.querySelectorAll<SVGPathElement>('g.lines path')).filter(
+    (p) => (p.getAttribute('d')?.match(/L/g)?.length ?? 0) > 10,
+  );
+}
+
+describe('LinePlot – gaps (hover-isolate dimming)', () => {
+  test('hovering one series\' value label dims the OTHER series\' gap bridge, not its own', async () => {
+    const { container } = await render(LinePlot, {
+      width: 400,
+      height: 300,
+      series: [FEMALE, MALE],
+      styles: {
+        values: { show: true, hoverIsolate: true },
+        gaps: { default: { middle: {} } } satisfies GapsConfig<LineSegmentStyle>,
+      },
+    });
+    const svg = await waitForSvg(container);
+
+    const labelGroups = Array.from(svg.querySelectorAll('g[role="presentation"]'));
+    const femaleLabelGroup = labelGroups.find((g) => g.textContent?.includes('female'));
+    expect(femaleLabelGroup).toBeTruthy();
+    femaleLabelGroup!.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
+
+    await vi.waitFor(() => {
+      const dimmed = bridgePaths(svg).some((p) => p.getAttribute('style')?.includes('stroke-opacity: 0.12'));
+      if (!dimmed) throw new Error('bridge not yet dimmed');
+    });
+
+    const bridges = bridgePaths(svg);
+    expect(bridges).toHaveLength(2);
+    const opacities = bridges.map((p) => p.getAttribute('style') ?? '');
+    // male — isolated out by hovering female's label — dims to the shared
+    // legend `disabledOpacity` (0.12), same as its real line would.
+    expect(opacities.some((s) => s.includes('stroke-opacity: 0.12'))).toBe(true);
+    // female's own bridge is untouched: still the plain gap default (0.6).
+    expect(opacities.some((s) => s.includes('stroke-opacity: 0.6'))).toBe(true);
+  });
+
+  // No "leaving the label undims it again" counterpart here: a synthetic
+  // `pointerleave` dispatch never clears `hoverIsolatedSeries` in this
+  // browser test setup — reproducible with `styles.gaps` entirely absent,
+  // on the *real* line's own dimming, so it's unrelated to this fix (and
+  // untested territory already, not a regression this change introduces).
 });

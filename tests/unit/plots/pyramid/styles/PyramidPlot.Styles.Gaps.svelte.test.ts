@@ -1,5 +1,5 @@
 import { render } from 'vitest-browser-svelte';
-import { describe, test, expect, afterEach } from 'vitest';
+import { describe, test, expect, afterEach, vi } from 'vitest';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
 import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 import type { GapsConfig } from '$lib/types/plots/gaps';
@@ -149,5 +149,46 @@ describe('PyramidPlot – gaps (value labels)', () => {
     });
     const svg = await waitForSvg(container);
     expect(countTextLabels(svg)).toBe(REAL_COUNT);
+  });
+});
+
+// ── Legend / hover-isolate dimming ──────────────────────────────────────────
+// Unlike LinePlot's gap bridge (a separate marker `buildGapMarkers.ts` never
+// wired to the disabled override — see the LinePlot legend/gaps tests for
+// that bug), `buildPyramidBarMarkers.ts` already threads the same
+// `disabledFillFor` through its gap-fill loop as its real-segment loop.
+// These are regression tests confirming that stays true, not a bugfix.
+
+describe('PyramidPlot – gaps (hover-isolate dimming)', () => {
+  test('isolating one series dims its gap-fill bars exactly like its real ones', async () => {
+    const { container } = await render(PyramidPlot, {
+      width: 500,
+      height: 400,
+      series: [MUJERES, VARONES],
+      styles: {
+        values: { show: true, hoverIsolate: true, format: (v: number, name: string) => `${name}: ${v}` },
+        gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle>,
+      },
+    });
+    const svg = await waitForSvg(container);
+
+    const varonesLabelGroup = Array.from(svg.querySelectorAll('g[role="presentation"]')).find((g) =>
+      g.textContent?.includes('Varones'),
+    );
+    expect(varonesLabelGroup).toBeTruthy();
+    varonesLabelGroup!.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
+
+    await vi.waitFor(() => {
+      const dimmedCount = Array.from(svg.querySelectorAll('g.bar-x rect')).filter((r) =>
+        r.getAttribute('style')?.includes('fill-opacity: 0.12'),
+      ).length;
+      if (dimmedCount === 0) throw new Error('nothing dimmed yet');
+    });
+
+    const rects = Array.from(svg.querySelectorAll('g.bar-x rect'));
+    const dimmed = rects.filter((r) => r.getAttribute('style')?.includes('fill-opacity: 0.12'));
+    // Every one of Mujeres's bars — its `REAL_COUNT` real ones plus the 2
+    // gap-fill bars the middle zone adds — dims, not just the real ones.
+    expect(dimmed).toHaveLength(REAL_COUNT + 2);
   });
 });

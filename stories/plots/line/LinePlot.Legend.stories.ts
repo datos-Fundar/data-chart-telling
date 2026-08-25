@@ -1,8 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { FEMALE_LIFE_EXPECTANCY, MALE_LIFE_EXPECTANCY } from './data';
+import type { AxisBasedStylesConfig, GapsAwarePlotStylesConfig } from '$lib/types/layout/styles';
+import type { GapsConfig } from '$lib/types/plots/gaps';
+import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
+import {
+  FEMALE_LIFE_EXPECTANCY,
+  MALE_LIFE_EXPECTANCY,
+  FEMALE_LIFE_EXPECTANCY_WITH_GAPS,
+  MALE_LIFE_EXPECTANCY_WITH_GAPS,
+} from './data';
 import LineValuesLegendDemo from './LineValuesLegendDemo.svelte';
+import LineGapsLegendDemo from './LineGapsLegendDemo.svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Kept in its own file/docs page, separate from `LinePlot.Styles` — the
@@ -48,6 +56,17 @@ export const LegendDisabledDimsLabel: StoryObj = {
 };
 
 /**
+ * A legend-disabled series also dims its gap-fill bridge, not just its real
+ * line. Both `female` and `male` have a `styles.gaps.default.middle` bridge
+ * filling their internal outage — toggling either off in the legend above
+ * should fade its bridge right along with the rest of the line, instead of
+ * leaving the dashed bridge at full opacity while the real line fades.
+ */
+export const LegendDisabledDimsGapBridge: StoryObj = {
+  render: () => ({ Component: LineGapsLegendDemo }),
+};
+
+/**
  * `styles.values.hoverIsolate: true` dims every other series while the
  * pointer rests over a value label, exactly like toggling that series off
  * in the legend would — reverting on mouse-leave. Hover either series'
@@ -76,5 +95,40 @@ export const HoverIsolate: Story = {
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
     } satisfies AxisBasedStylesConfig,
+  },
+};
+
+/**
+ * `styles.values.hoverIsolate` also dims a hovered-out series' gap-fill
+ * bridge, not just its real line — mirrors `LegendDisabledDimsGapBridge`
+ * above, but triggered by hovering a value label instead of clicking the
+ * legend. Both `female` and `male` have a `styles.gaps.default.middle`
+ * bridge filling their internal outage; hover either series' end-of-line
+ * label to see the *other* series' bridge fade along with its line.
+ */
+export const HoverIsolateDimsGapBridge: StoryObj = {
+  args: {
+    series: [
+      {
+        name: 'female',
+        x: 'year',
+        y: 'value',
+        data: FEMALE_LIFE_EXPECTANCY_WITH_GAPS,
+      },
+      {
+        name: 'male',
+        x: 'year',
+        y: 'value',
+        data: MALE_LIFE_EXPECTANCY_WITH_GAPS,
+      },
+    ],
+    styles: {
+      values: {
+        show: true,
+        hoverIsolate: true,
+        format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
+      },
+      gaps: { default: { middle: {} } } satisfies GapsConfig<LineSegmentStyle>,
+    } satisfies GapsAwarePlotStylesConfig<LineSegmentStyle>,
   },
 };

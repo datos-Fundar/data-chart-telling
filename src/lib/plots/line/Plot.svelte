@@ -129,7 +129,9 @@
 		buildGapMarkers<TData>({
 			seriesList: resolvedSeries,
 			gaps,
-			colorFor: (seriesIndex) => paletteColor(seriesIndex, cfg.palette)
+			colorFor: (seriesIndex) => paletteColor(seriesIndex, cfg.palette),
+			disabledStrokeFor: (name) => disabledStrokeOverride(effectiveDisabledFor(name)),
+			disabledDotsFor: (name) => disabledDotsOverride(effectiveDisabledFor(name))
 		})
 	);
 
