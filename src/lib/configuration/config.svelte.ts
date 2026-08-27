@@ -65,6 +65,25 @@ export const DEFAULT_CONFIG: ChartConfig = {
 			size: '1.5rem',
 			fontSize: '1rem',
 			disabledOpacity: 0.3
+		},
+		continuous: {
+			// A slim vertical bar handle, taller than the 12px gradient track.
+			handle: {
+				width: '6px',
+				height: '20px',
+				radius: '3px',
+				fill: 'currentColor',
+				stroke: 'var(--dct-bg, #fff)',
+				strokeWidth: '1.5px'
+			},
+			tick: {
+				color: 'currentColor',
+				width: '1px',
+				length: '6px'
+			},
+			label: {
+				rotate: '0deg'
+			}
 		}
 	},
 
@@ -213,6 +232,17 @@ export function configToCssVars(c: ChartConfig): Record<string, string> {
 		'--dct-legend-nav-size': c.legend.navButton.size,
 		'--dct-legend-nav-font-size': c.legend.navButton.fontSize,
 		'--dct-legend-nav-disabled-opacity': String(c.legend.navButton.disabledOpacity),
+
+		'--dct-continuous-handle-width': c.legend.continuous.handle.width,
+		'--dct-continuous-handle-height': c.legend.continuous.handle.height,
+		'--dct-continuous-handle-radius': c.legend.continuous.handle.radius,
+		'--dct-continuous-handle-fill': c.legend.continuous.handle.fill,
+		'--dct-continuous-handle-stroke': c.legend.continuous.handle.stroke,
+		'--dct-continuous-handle-stroke-width': c.legend.continuous.handle.strokeWidth,
+		'--dct-continuous-tick-color': c.legend.continuous.tick.color,
+		'--dct-continuous-tick-width': c.legend.continuous.tick.width,
+		'--dct-continuous-tick-length': c.legend.continuous.tick.length,
+		'--dct-continuous-label-rotate': c.legend.continuous.label.rotate,
 
 		'--dct-axis-color': c.axis.color,
 

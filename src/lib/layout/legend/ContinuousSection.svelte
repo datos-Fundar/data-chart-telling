@@ -13,6 +13,13 @@
 
   const fmt = $derived(section.format ?? ((v: number) => String(v)));
 
+  // Fill/opacity for the excluded-margin rects.
+  const excludedStyle = $derived.by((): { fill: string; opacity: number } => {
+    const d = section.disabledStyle;
+    if (d?.fill) return { fill: d.fill, opacity: d.fillOpacity ?? d.opacity ?? 1 };
+    return { fill: 'currentColor', opacity: d?.fillOpacity ?? d?.opacity ?? 0.35 };
+  });
+
   const tickPositions = $derived(
     section.interactive
       ? []
@@ -93,6 +100,26 @@
           };
   });
 
+  // Mirrors an externally-set `interaction.continuousRange` into lo/hi.
+  $effect(() => {
+    if (!section.interactive) return;
+    const range = interaction.continuousRange;
+    if (range === null) {
+      if (untrack(() => loAdjusted || hiAdjusted)) {
+        loAdjusted = false;
+        hiAdjusted = false;
+      }
+      return;
+    }
+    const [currentLo, currentHi] = untrack(() => [lo, hi]);
+    if (range.min !== currentLo || range.max !== currentHi) {
+      lo = range.min;
+      hi = range.max;
+      loAdjusted = true;
+      hiAdjusted = true;
+    }
+  });
+
   function startDrag(which: 'lo' | 'hi') {
     return (event: PointerEvent) => {
       if (!section.interactive) return;
@@ -149,51 +176,59 @@
     </defs>
     <rect width={barWidth} height="12" rx="2" fill="url(#{gradientId})" />
     {#each tickPositions as tick (tick.v)}
-      <line
-        x1={tick.t * barWidth}
-        y1="12"
-        x2={tick.t * barWidth}
-        y2="18"
-        stroke="currentColor"
-        stroke-width="1"
-      />
+      <rect class="dct-continuous__tick-mark" x={tick.t * barWidth} y="12" />
     {/each}
 
     {#if section.interactive}
       {#if loT > 0}
-        <rect x="0" y="0" width={loT * barWidth} height="12" rx="2" fill="currentColor" fill-opacity="0.35" />
+        <rect x="0" y="0" width={loT * barWidth} height="12" rx="2" fill={excludedStyle.fill} fill-opacity={excludedStyle.opacity} />
       {/if}
       {#if hiT < 1}
-        <rect x={hiT * barWidth} y="0" width={barWidth - hiT * barWidth} height="12" rx="2" fill="currentColor" fill-opacity="0.35" />
+        <rect x={hiT * barWidth} y="0" width={barWidth - hiT * barWidth} height="12" rx="2" fill={excludedStyle.fill} fill-opacity={excludedStyle.opacity} />
       {/if}
-      <circle
-        class="dct-continuous__handle"
-        cx={loT * barWidth}
-        cy="6"
-        r="6"
-        onpointerdown={startDrag('lo')}
-        ondblclick={resetHandle('lo')}
-        role="slider"
-        aria-label="Margen inferior"
-        aria-valuemin={section.min}
-        aria-valuemax={hi}
-        aria-valuenow={lo}
-        tabindex="0"
-      />
-      <circle
-        class="dct-continuous__handle"
-        cx={hiT * barWidth}
-        cy="6"
-        r="6"
-        onpointerdown={startDrag('hi')}
-        ondblclick={resetHandle('hi')}
-        role="slider"
-        aria-label="Margen superior"
-        aria-valuemin={lo}
-        aria-valuemax={section.max}
-        aria-valuenow={hi}
-        tabindex="0"
-      />
+      {#if section.handle}
+        {@render section.handle({
+          which: 'lo',
+          value: lo,
+          position: loT,
+          onpointerdown: startDrag('lo'),
+          ondoubleclick: resetHandle('lo'),
+        })}
+        {@render section.handle({
+          which: 'hi',
+          value: hi,
+          position: hiT,
+          onpointerdown: startDrag('hi'),
+          ondoubleclick: resetHandle('hi'),
+        })}
+      {:else}
+        <rect
+          class="dct-continuous__handle"
+          x={loT * barWidth}
+          y="6"
+          onpointerdown={startDrag('lo')}
+          ondblclick={resetHandle('lo')}
+          role="slider"
+          aria-label="Margen inferior"
+          aria-valuemin={section.min}
+          aria-valuemax={hi}
+          aria-valuenow={lo}
+          tabindex="0"
+        />
+        <rect
+          class="dct-continuous__handle"
+          x={hiT * barWidth}
+          y="6"
+          onpointerdown={startDrag('hi')}
+          ondblclick={resetHandle('hi')}
+          role="slider"
+          aria-label="Margen superior"
+          aria-valuemin={lo}
+          aria-valuemax={section.max}
+          aria-valuenow={hi}
+          tabindex="0"
+        />
+      {/if}
     {/if}
   </svg>
 
@@ -225,6 +260,7 @@
   }
   .dct-continuous__edge {
     position: absolute;
+    transform: rotate(var(--dct-continuous-label-rotate, 0deg));
   }
   .dct-continuous__edge--start {
     left: 0;
@@ -234,7 +270,7 @@
   }
   .dct-continuous__tick {
     position: absolute;
-    transform: translateX(-50%);
+    transform: translateX(-50%) rotate(var(--dct-continuous-label-rotate, 0deg));
   }
   /*
    * Anchored outward (not centered, unlike a plain tick) so the label always
@@ -247,15 +283,30 @@
     font-weight: 600;
   }
   .dct-continuous__tick--handle-lo {
-    transform: none;
+    transform: rotate(var(--dct-continuous-label-rotate, 0deg));
   }
   .dct-continuous__tick--handle-hi {
-    transform: translateX(-100%);
+    transform: translateX(-100%) rotate(var(--dct-continuous-label-rotate, 0deg));
   }
+  /* Tick mark below the bar at each non-interactive tick's position. */
+  .dct-continuous__tick-mark {
+    width: var(--dct-continuous-tick-width, 1px);
+    height: var(--dct-continuous-tick-length, 6px);
+    fill: var(--dct-continuous-tick-color, currentColor);
+    transform-box: fill-box;
+    transform: translateX(-50%);
+  }
+  /* Draggable lo/hi handle. */
   .dct-continuous__handle {
-    fill: currentColor;
-    stroke: var(--dct-bg, #fff);
-    stroke-width: 1.5;
+    width: var(--dct-continuous-handle-width, 6px);
+    height: var(--dct-continuous-handle-height, 20px);
+    rx: var(--dct-continuous-handle-radius, 3px);
+    fill: var(--dct-continuous-handle-fill, currentColor);
+    stroke: var(--dct-continuous-handle-stroke, var(--dct-bg, #fff));
+    stroke-width: var(--dct-continuous-handle-stroke-width, 1.5px);
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: translate(-50%, -50%);
     cursor: ew-resize;
     touch-action: none;
   }

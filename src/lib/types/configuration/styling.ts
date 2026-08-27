@@ -56,6 +56,28 @@ export type ChartConfig = {
 			fontSize: string;
 			disabledOpacity: number;
 		};
+		/** Continuous section styling: the draggable lo/hi handles and the tick/edge labels. */
+		continuous: {
+			/** The draggable lo/hi handle. */
+			handle: {
+				width: string;
+				height: string;
+				radius: string;
+				fill: string;
+				stroke: string;
+				strokeWidth: string;
+			};
+			tick: {
+				color: string;
+				width: string;
+				/** Length of the tick mark below the gradient bar. */
+				length: string;
+			};
+			label: {
+				/** Rotation applied to tick/edge label text. */
+				rotate: string;
+			};
+		};
 	};
 
 	// ── Axes (consumed by plots) ────────────────────────────────────────────────

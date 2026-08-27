@@ -1,7 +1,9 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import ContinuousSection from '$lib/layout/legend/ContinuousSection.svelte';
+import ExternalSyncHarness from './_ExternalSyncHarness.svelte';
 import type { ContinuousLegendSection } from '$lib/types/layout/legend';
+import type { LegendInteractionStore } from '$lib/types/layout/legend';
 
 async function dragBy(el: Element, dx: number): Promise<void> {
 	const rect = el.getBoundingClientRect();
@@ -24,7 +26,7 @@ async function dragBy(el: Element, dx: number): Promise<void> {
 
 function valueOf(container: Element, label: string): Promise<number> {
 	return vi.waitFor(() => {
-		const el = container.querySelector(`circle[aria-label="${label}"]`);
+		const el = container.querySelector(`rect[aria-label="${label}"]`);
 		const raw = el?.getAttribute('aria-valuenow');
 		if (raw == null) throw new Error(`${label} handle not yet rendered`);
 		return Number(raw);
@@ -70,7 +72,7 @@ describe('ContinuousSection – tracking the domain until the user actually drag
 		};
 		const { container, rerender } = await render(ContinuousSection, { section });
 
-		const lo = container.querySelector('circle[aria-label="Margen inferior"]')!;
+		const lo = container.querySelector('rect[aria-label="Margen inferior"]')!;
 		await dragBy(lo, 60); // lo ~30, an active selection now exists
 		const loBefore = await valueOf(container, 'Margen inferior');
 		expect(loBefore).toBeGreaterThan(0);
@@ -95,11 +97,11 @@ describe('ContinuousSection – re-clamping an active range when the domain shif
 		const { container, rerender } = await render(ContinuousSection, { section });
 
 		const lo = await vi.waitFor(() => {
-			const el = container.querySelector('circle[aria-label="Margen inferior"]');
+			const el = container.querySelector('rect[aria-label="Margen inferior"]');
 			if (!el) throw new Error('lo handle not yet rendered');
 			return el;
 		});
-		const hi = container.querySelector('circle[aria-label="Margen superior"]')!;
+		const hi = container.querySelector('rect[aria-label="Margen superior"]')!;
 
 		await dragBy(lo, 80);
 		await dragBy(hi, -80);
@@ -136,8 +138,8 @@ describe('ContinuousSection – re-clamping an active range when the domain shif
 		};
 		const { container, rerender } = await render(ContinuousSection, { section });
 
-		const lo = container.querySelector('circle[aria-label="Margen inferior"]')!;
-		const hi = container.querySelector('circle[aria-label="Margen superior"]')!;
+		const lo = container.querySelector('rect[aria-label="Margen inferior"]')!;
+		const hi = container.querySelector('rect[aria-label="Margen superior"]')!;
 		await dragBy(lo, 60); // lo ~30
 		await dragBy(hi, -70); // hi ~65 (both now well inside [0, 100])
 
@@ -152,5 +154,48 @@ describe('ContinuousSection – re-clamping an active range when the domain shif
 		expect(loAfter).toBeLessThanOrEqual(hiAfter);
 		expect(loAfter).toBeGreaterThanOrEqual(hiBefore + 20);
 		expect(hiAfter).toBeLessThanOrEqual(hiBefore + 40);
+	});
+});
+
+describe('ContinuousSection – syncing with an externally-set range', () => {
+	test('setting interaction.continuousRange from outside moves the handles to match, and clearing it resets them', async () => {
+		const section: ContinuousLegendSection = {
+			type: 'continuous',
+			min: 0,
+			max: 100,
+			width: 200,
+			interactive: true,
+			mode: 'rescale'
+		};
+		let interaction: LegendInteractionStore | undefined;
+		const { container } = await render(ExternalSyncHarness, {
+			section,
+			onReady: (store) => {
+				interaction = store;
+			}
+		});
+		if (!interaction) throw new Error('interaction store not provided');
+
+		expect(await valueOf(container, 'Margen inferior')).toBe(0);
+		expect(await valueOf(container, 'Margen superior')).toBe(100);
+
+		// A click on some *other* legend (e.g. a facet-level mini legend)
+		// narrows the shared range directly, without ever touching this
+		// section's own drag handles. The sync effect only flushes on a later
+		// tick, so poll (like `valueOf` already does for "not yet rendered")
+		// instead of asserting immediately.
+		interaction.continuousRange = { min: 20, max: 60, mode: 'rescale', disabledStyle: {} };
+		await vi.waitFor(async () => {
+			expect(await valueOf(container, 'Margen inferior')).toBe(20);
+			expect(await valueOf(container, 'Margen superior')).toBe(60);
+		});
+
+		// Clearing it externally (full range again) resets the handles back
+		// out to the section's own min/max, exactly like a manual reset would.
+		interaction.continuousRange = null;
+		await vi.waitFor(async () => {
+			expect(await valueOf(container, 'Margen inferior')).toBe(0);
+			expect(await valueOf(container, 'Margen superior')).toBe(100);
+		});
 	});
 });

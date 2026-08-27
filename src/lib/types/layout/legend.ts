@@ -49,6 +49,19 @@ export type LegendNavContext = {
 /** Custom prev/next button renderer for a paginated horizontal section. Falls back to a small default arrow button. */
 export type LegendNavSnippet = Snippet<[LegendNavContext]>;
 
+export type LegendHandleWhich = 'lo' | 'hi';
+export type LegendHandleContext = {
+	which: LegendHandleWhich;
+	/** The handle's current data value. */
+	value: number;
+	/** The handle's position along the bar, from 0 to 1. */
+	position: number;
+	onpointerdown: (event: PointerEvent) => void;
+	ondoubleclick: () => void;
+};
+/** Custom drag-handle renderer for an interactive continuous section. */
+export type LegendHandleSnippet = Snippet<[LegendHandleContext]>;
+
 export type DiscreteLegendSection = {
 	type: 'discrete';
 	title?: string;
@@ -80,6 +93,8 @@ export type ContinuousLegendSection = {
 	 */
 	mode?: 'rescale' | 'filter';
 	disabledStyle?: LegendDisabledStyle;
+	/** Custom renderer for the draggable lo/hi handles. */
+	handle?: LegendHandleSnippet;
 };
 
 export type LegendSection = DiscreteLegendSection | ContinuousLegendSection;
