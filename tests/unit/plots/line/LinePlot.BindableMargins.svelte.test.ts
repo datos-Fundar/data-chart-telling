@@ -91,9 +91,12 @@ describe('LinePlot – bindable margins (capture-and-freeze)', () => {
 	});
 
 	test('bind:margins captures the resolved margin once it settles', async () => {
+		// A precomputed floor (from the pinned `scales.y.domain`) seeds the
+		// tracker synchronously, so capture no longer waits on DOM-measured
+		// overflow to arrive asynchronously — no assertion of "still null right
+		// after mount" here, unlike before that floor existed.
 		const { container } = await render(LinePlotMarginsProbe, { ...renderProps, series: CLUSTERED });
 		await waitForSvg(container);
-		expect(probeMargins(container)).toBeNull();
 		await new Promise((r) => setTimeout(r, 600));
 		const captured = probeMargins(container) as { right?: number } | null;
 		expect(captured).not.toBeNull();
