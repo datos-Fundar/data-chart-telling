@@ -2,9 +2,11 @@
   import { Text, usePlot } from 'svelteplot';
   import { SvelteMap } from 'svelte/reactivity';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
+  import { getConfiguration } from '$lib/configuration/config.svelte';
   import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
   import { watchLabelOverflow } from '$lib/plots/utils/labelOverflow.svelte';
-  import { resolveEdgeAwareAnchor, estimateTextWidth } from '$lib/utils/edgeAwareAnchor';
+  import { resolveEdgeAwareAnchor } from '$lib/utils/edgeAwareAnchor';
+  import { measureTextWidth } from '$lib/layout/plot/measureText';
   import type { Series } from '$lib/types/plots/data/common';
   import type { ValuesStyle } from '$lib/types/layout/styles';
   import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
@@ -83,6 +85,7 @@
     onOverflow: (overflow) => onOverflow?.(overflow),
   });
 
+  const cfg = $derived(getConfiguration());
   const font = $derived(values?.fontStyle);
   const preferredTextAnchor = $derived(
     font?.textAnchor === 'outside' || font?.textAnchor === undefined ? 'start' : font.textAnchor,
@@ -91,6 +94,7 @@
   const gapX = $derived(Math.abs(font?.dx ?? 8));
   const gapY = $derived(Math.abs(font?.dy ?? 0));
   const fontSize = $derived(typeof font?.fontSize === 'number' ? font.fontSize : 11);
+  const canvasFont = $derived(`${fontSize}px ${cfg.font === 'inherit' ? 'sans-serif' : cfg.font}`);
   const fillOverride = $derived(disabledFillOverride(disabled));
 
   function textOf(d: TData): string {
@@ -118,8 +122,7 @@
           lineAnchor: preferredLineAnchor,
           gapX,
           gapY,
-          // Rough average glyph width — these labels are short numeric/formatted strings, not measured DOM text.
-          extent: { width: estimateTextWidth(text, fontSize), height: fontSize * 1.2 },
+          extent: { width: measureTextWidth(text, canvasFont), height: fontSize * 1.2 },
         }),
       );
     }

@@ -56,6 +56,35 @@ describe('ScatterPlot – frame overflow', () => {
     }
   });
 
+  // The edge-aware flip decides whether a label fits using a measured (not
+  // estimated-from-character-count) text width. A run of wide glyphs like
+  // "M"/"W" is exactly where a character-count estimate under-measures the
+  // most — wide enough here that even the flip can't fully avoid overflow
+  // for every point, so `onOverflow`'s margin growth (see the runaway-loop
+  // test below) does the rest; the settle wait matches that test's.
+  test('a wide-glyph label at the domain edge still ends up within the plot box', async () => {
+    const { container } = await render(ScatterPlot, {
+      width: 400,
+      height: 300,
+      data: AMERICAS,
+      x: 'gdpPerCapita',
+      y: 'lifeExpectancy',
+      styles: {
+        values: { show: true, format: () => 'MMMMMMMMMM' },
+      } satisfies AxisBasedStylesConfig,
+    });
+    const svg = await waitForSvg(container);
+    await new Promise((r) => setTimeout(r, 800));
+    const svgBox = svg.getBoundingClientRect();
+    const labels = svg.querySelectorAll('g.text text');
+    expect(labels.length).toBe(AMERICAS.length);
+    for (const label of labels) {
+      const box = (label as SVGGraphicsElement).getBoundingClientRect();
+      expect(box.left).toBeGreaterThanOrEqual(svgBox.left - 1);
+      expect(box.right).toBeLessThanOrEqual(svgBox.right + 1);
+    }
+  });
+
   test('growing the margin to fit an overflowing label never triggers a runaway effect loop', async () => {
     // Regression test: `onOverflow` grows the plot's margin *after* mount,
     // once a label is measured to overflow the frame — that live post-mount

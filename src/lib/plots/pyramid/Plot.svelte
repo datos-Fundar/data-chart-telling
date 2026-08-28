@@ -7,6 +7,7 @@
 	import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
 	import { buildPyramidBarMarkers } from '$lib/plots/pyramid/buildPyramidBarMarkers';
 	import { createLabelMarginTracker } from '$lib/plots/utils/labelOverflow.svelte';
+	import { measureTextWidth } from '$lib/layout/plot/measureText';
 	import {
 		buildGroupedSeries,
 		validateSegments,
@@ -28,6 +29,7 @@
 	import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 	import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 	import type { LegendDisabledStyle } from '$lib/types/layout/legend';
+	import type { MarginOverflow } from '$lib/plots/utils/labelOverflow.svelte';
 
 	/**
 	 * A population-pyramid-style diverging bar chart: each series is mirrored
@@ -261,15 +263,50 @@
 		})
 	);
 
+	// Estimated overflow for an `'outside'`- or `'start'`-anchored value label
+	// (both anchor at the row's own full magnitude, pushed further outward —
+	// see `ValueLabels.svelte`'s `xFn`) at the most extreme value on each
+	// side of the whole dataset, not just the current frame, so it stays
+	// stable across a timeline scrubber instead of resetting to zero and
+	// regrowing on every tick. `'middle'`/`'end'` anchor inside the bar,
+	// toward its own zero baseline, so they carry no such risk.
+	const valueLabelFloor = $derived.by((): MarginOverflow | undefined => {
+		if (!showVals || valAnchor === 'middle' || valAnchor === 'end') return undefined;
+		const font = styles.values?.fontStyle;
+		const fontSize = typeof font?.fontSize === 'number' ? font.fontSize : 12;
+		const canvasFont = `${fontSize}px ${cfg.font === 'inherit' ? 'sans-serif' : cfg.font}`;
+		const offset = Math.abs(typeof font?.dx === 'number' ? font.dx : 6);
+
+		let leftWidth = 0;
+		let rightWidth = 0;
+		for (const s of resolvedSeries) {
+			const sy = resolveAccessor(s.y);
+			let extreme = 0;
+			let extremeRow: TData | undefined;
+			for (const d of s.data) {
+				const v = Math.abs(Number(sy(d)));
+				if (Number.isNaN(v)) continue;
+				if (extremeRow === undefined || v > extreme) {
+					extreme = v;
+					extremeRow = d;
+				}
+			}
+			if (extremeRow === undefined) continue;
+			const labelWidth = measureTextWidth(formatValue(extreme, s.name), canvasFont);
+			if (s.side === 'left') leftWidth = Math.max(leftWidth, labelWidth);
+			else rightWidth = Math.max(rightWidth, labelWidth);
+		}
+		return { left: Math.ceil(offset + leftWidth), right: Math.ceil(offset + rightWidth), top: 0, bottom: 0 };
+	});
+
 	// A pyramid bar's value label can grow past the plot's own content box —
-	// reserving real space there is what each label's own overflow
-	// measurement feeds into here, via a tracker local to this one `<Plot>`
-	// instance. See `labelOverflow.svelte.ts`. Resets on `resolvedSeries` so
-	// overflow from an earlier, differently-shaped frame doesn't linger once
-	// that frame is gone.
+	// `valueLabelFloor` covers the common case up front; each label's own
+	// rendered overflow still feeds `labelMargin.report` for whatever that
+	// estimate doesn't cover. See `labelOverflow.svelte.ts`.
 	const labelMargin = createLabelMarginTracker(
 		() => margins,
-		() => resolvedSeries
+		() => resolvedSeries,
+		() => valueLabelFloor ?? { left: 0, right: 0, top: 0, bottom: 0 }
 	);
 </script>
 
