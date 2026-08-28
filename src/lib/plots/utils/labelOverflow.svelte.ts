@@ -116,13 +116,24 @@ export function watchLabelOverflow(args: {
  */
 export function createLabelMarginTracker(
 	margins: () => MarginConfig | undefined,
-	resetKey?: () => unknown
+	resetKey?: () => unknown,
+	/**
+	 * A precomputed overflow estimate — from the full dataset, not just the
+	 * current frame — used as the reset target instead of zero. Since it's
+	 * derived from stable inputs, a `resetKey` change resets `measured` back
+	 * to roughly the same value instead of zero, so DOM growth rarely needs
+	 * to re-detect and re-grow it (which would otherwise remount the plot on
+	 * every reset). DOM measurement can still grow past it for whatever this
+	 * estimate doesn't cover.
+	 */
+	floor?: () => MarginOverflow
 ) {
-	let measured = $state<MarginOverflow>(NO_OVERFLOW);
+	const floorValue = () => floor?.() ?? NO_OVERFLOW;
+	let measured = $state<MarginOverflow>(floorValue());
 
 	// Skips the reset on the very first run (there's nothing to reset yet,
-	// and `measured` already starts at `NO_OVERFLOW`) so only a later,
-	// genuine change to `resetKey` clears accumulated growth.
+	// and `measured` already starts at the floor) so only a later, genuine
+	// change to `resetKey` clears accumulated growth.
 	let resetKeyInitialized = false;
 	let lastResetKey: unknown;
 	$effect(() => {
@@ -134,7 +145,7 @@ export function createLabelMarginTracker(
 		}
 		if (key !== lastResetKey) {
 			lastResetKey = key;
-			measured = NO_OVERFLOW;
+			measured = floorValue();
 		}
 	});
 

@@ -2,6 +2,8 @@
   import { isMobile } from '$lib/stores/device';
   import { groupBy } from '$lib/utils/grouping';
   import FacetIndicator from '$lib/layout/facet/FacetIndicator.svelte';
+  import { getConfiguration } from '$lib/configuration/config.svelte';
+  import { measureMaxLabelWidth } from '$lib/layout/plot/measureText';
   import type {
     FacetColumns,
     FacetMode,
@@ -13,6 +15,7 @@
     FacetNavDirection,
   } from '$lib/types/layout/facet';
   import type { Accessor } from '$lib/types/plots/data/common';
+  import type { MarginConfig } from '$lib/types/plots/props';
 
   /**
    * Small-multiples layout. It splits the data by `by` and hands each group to
@@ -23,6 +26,10 @@
    * `mode` picks how the groups are arranged: `'grid'` (default) lays them all
    * out at once; `'paginated'` pages through the same grid in fixed chunks;
    * `'carousel'` shows `visible` groups at a time with touch-drag/snap.
+   *
+   * `labelsForMargin`, if given, sizes one shared left margin across every
+   * facet — pass it through `cell`'s own `margins` to a faceted plot's
+   * `margins` prop so they all share the same content box.
    */
   let {
     data,
@@ -40,6 +47,7 @@
     width,
     height,
     cell,
+    labelsForMargin,
   }: {
     data: TRow[];
     by: Accessor<TRow, unknown>;
@@ -56,6 +64,7 @@
     width: number;
     height: number;
     cell: FacetCellSnippet<TRow>;
+    labelsForMargin?: (rows: TRow[]) => string[];
   } = $props();
 
   function resolveResponsive<T>(value: Responsive<T>, mobile: boolean): T {
@@ -72,6 +81,18 @@
     return values
       .filter((v) => groups.has(v))
       .map((v) => [v, groups.get(v)!] as [string, TRow[]]);
+  });
+
+  // One shared left margin, sized to the widest label across every facet —
+  // measured off-DOM (canvas), so it's correct from the very first render
+  // with no mount/remount needed. `undefined` when `labelsForMargin` isn't given.
+  const cfg = $derived(getConfiguration());
+  const axisFont = $derived(`${cfg.axis.fontSize}px ${cfg.font === 'inherit' ? 'sans-serif' : cfg.font}`);
+  const cellMargins = $derived.by((): MarginConfig | undefined => {
+    if (!labelsForMargin) return undefined;
+    const labels = entries.flatMap(([, rows]) => labelsForMargin(rows));
+    const left = Math.ceil(measureMaxLabelWidth(labels, axisFont)) + cfg.axis.yTickSize + cfg.axis.yTickPadding;
+    return { left };
   });
 
   const resolvedMode = $derived(resolveResponsive(mode, $isMobile));
@@ -220,7 +241,7 @@
       <div class="dct-facet__cell">
         <div class="dct-facet__title">{facetValue}</div>
         {#if cellWidth > 0 && cellHeight > 0}
-          {@render cell({ facetValue, data: rowsForCell, width: cellWidth, height: cellHeight })}
+          {@render cell({ facetValue, data: rowsForCell, width: cellWidth, height: cellHeight, margins: cellMargins })}
         {/if}
       </div>
     {/each}
@@ -272,6 +293,7 @@
               data: rowsForCell,
               width: carouselCellWidth,
               height: carouselCellHeight,
+              margins: cellMargins,
             })}
           {/if}
         </div>

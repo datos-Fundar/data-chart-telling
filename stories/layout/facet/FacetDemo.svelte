@@ -1,3 +1,22 @@
+<script module lang="ts">
+  export type FacetDemoRow = { group: string; category: string; value: number };
+
+  const CATEGORIES = ['A', 'B', 'C', 'D'];
+  const GROUP_NAMES = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
+
+  /** `data` for `groupCount` groups — exported for the story's docs source override, see `stories/common/docsSource.ts`. */
+  export function dataForGroupCount(groupCount: number): FacetDemoRow[] {
+    const names = GROUP_NAMES.slice(0, groupCount);
+    return names.flatMap((group, gi) =>
+      CATEGORIES.map((category, ci) => ({
+        group: `Grupo ${group}`,
+        category,
+        value: Math.round(30 + 15 * Math.sin(gi * 1.3 + ci) + 15),
+      })),
+    );
+  }
+</script>
+
 <script lang="ts">
   import FacetLayout from '$lib/layout/facet/FacetLayout.svelte';
   import BarPlot from '$lib/plots/bar/Plot.svelte';
@@ -42,21 +61,7 @@
     height?: number;
   } = $props();
 
-  type Row = { group: string; category: string; value: number };
-
-  const CATEGORIES = ['A', 'B', 'C', 'D'];
-  const GROUP_NAMES = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
-
-  const data = $derived.by((): Row[] => {
-    const names = GROUP_NAMES.slice(0, groupCount);
-    return names.flatMap((group, gi) =>
-      CATEGORIES.map((category, ci) => ({
-        group: `Grupo ${group}`,
-        category,
-        value: Math.round(30 + 15 * Math.sin(gi * 1.3 + ci) + 15),
-      })),
-    );
-  });
+  const data = $derived(dataForGroupCount(groupCount));
 
   // FacetLayout is used bare here (no BaseChart/ChartContainer around it), so
   // stamp the `--dct-*` vars ourselves — normally ChartContainer does this.

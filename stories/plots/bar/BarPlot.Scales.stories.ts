@@ -102,6 +102,9 @@ export const WithAxisLabels: Story = {
       x: { label: 'Province' },
       y: { label: 'Life expectancy (years)' },
     } satisfies AxisBasedScalesConfig,
+    // Non-rotated X ticks sit directly below the bars with barely any room
+    // of their own — svelteplot's own auto-sizing doesn't add extra height
+    // for the axis title stacked underneath them, so it overlaps without this.
     margins: { bottom: 50 },
   },
 };
@@ -165,7 +168,6 @@ export const CustomTickFormat: Story = {
         tickFormat: (d: unknown) => `${d} yr`,
       },
     } satisfies AxisBasedScalesConfig,
-    margins: { left: 40 },
   },
 };
 
@@ -188,7 +190,6 @@ export const RotatedXTicks: Story = {
         tickRotate: -45,
       },
     } satisfies AxisBasedScalesConfig,
-    margins: { bottom: 80 },
   },
 };
 
@@ -251,7 +252,6 @@ export const CombinedOverrides: Story = {
       x: { label: 'Province', tickRotate: -45 },
       y: { label: 'Life expectancy (years)', domain: [70, 85], grid: true },
     } satisfies AxisBasedScalesConfig,
-    margins: { bottom: 80, left: 60 },
   },
 };
 
@@ -373,7 +373,6 @@ export const HorizontalBars: Story = {
     scales: {
       y: { type: 'categorical' },
     } satisfies AxisBasedScalesConfig,
-    margins: { left: 90 },
   },
 };
 
@@ -392,6 +391,5 @@ export const HorizontalGroupedSeries: Story = {
       y: { type: 'categorical' },
       z: { seriesLayout: 'grouped' },
     } satisfies AxisBasedScalesConfig,
-    margins: { left: 90 },
   },
 };

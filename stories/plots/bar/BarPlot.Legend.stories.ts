@@ -78,6 +78,5 @@ export const HoverIsolate: Story = {
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
     } satisfies AxisBasedStylesConfig,
-    margins: { top: 20 },
   },
 };

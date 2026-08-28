@@ -95,6 +95,7 @@ const preview: Preview = {
 						]
 					],
 					'Layout',
+					['Facets', ['Grid', 'MarginAlignment', 'Paginated', 'Carousel']],
 					'Configuration',
 					'Charts',
 					'Orchestration'

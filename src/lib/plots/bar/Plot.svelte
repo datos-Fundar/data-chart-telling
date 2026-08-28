@@ -12,6 +12,7 @@
 	} from '$lib/plots/utils/segments';
 	import { createBarLayout } from '$lib/plots/bar/layout.svelte';
 	import { createLabelMarginTracker } from '$lib/plots/utils/labelOverflow.svelte';
+	import { measureTextWidth } from '$lib/layout/plot/measureText';
 	import { buildHoverPoints } from '$lib/plots/bar/hoverPoints';
 	import { buildBarMarkers } from '$lib/plots/bar/buildBarMarkers';
 	import { resolveGapsForSeries, resolveDiscreteGapFills } from '$lib/plots/utils/gaps';
@@ -30,6 +31,7 @@
 	import type { ValueAnchor } from '$lib/types/plots/constants';
 	import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 	import type { LegendDisabledStyle } from '$lib/types/layout/legend';
+	import type { MarginOverflow } from '$lib/plots/utils/labelOverflow.svelte';
 
 	/**
 	 * A bar chart, vertical by default. Accepts either a pre-built `series`
@@ -220,17 +222,50 @@
 		pointMatching: 'contains' as const
 	});
 
+	// Estimated overflow for an `'outside'`-anchored value label at the most
+	// extreme value in the whole dataset — not just the current frame, so it
+	// stays stable across a timeline scrubber instead of resetting to zero
+	// and regrowing on every tick. Stacked labels sit at their own segment's
+	// midpoint (see `valueTextFn` above), well inside the bar, so they carry
+	// no such risk; `start`/`end` anchors sit inside the bar too.
+	const valueLabelFloor = $derived.by((): MarginOverflow | undefined => {
+		if (!showVals || valAnchor !== 'outside' || barLayout.layout === 'stacked') return undefined;
+		const font = styles.values?.fontStyle;
+		const fontSize = typeof font?.fontSize === 'number' ? font.fontSize : 12;
+		const canvasFont = `${fontSize}px ${cfg.font === 'inherit' ? 'sans-serif' : cfg.font}`;
+		if (isHorizontal) {
+			const offset = Math.abs(typeof font?.dx === 'number' ? font.dx : 6);
+			let widestLabel = 0;
+			for (const s of resolvedSeries) {
+				const sy = resolveAccessor(s.y);
+				let extremeValue = 0;
+				let extremeRow: TData | undefined;
+				for (const d of s.data) {
+					const v = Number(sy(d));
+					if (Number.isNaN(v)) continue;
+					if (extremeRow === undefined || Math.abs(v) > Math.abs(extremeValue)) {
+						extremeValue = v;
+						extremeRow = d;
+					}
+				}
+				if (extremeRow === undefined) continue;
+				widestLabel = Math.max(widestLabel, measureTextWidth(formatValue(extremeValue, s.name), canvasFont));
+			}
+			return { left: 0, right: Math.ceil(offset + widestLabel), top: 0, bottom: 0 };
+		}
+		const offset = Math.abs(typeof font?.dy === 'number' ? font.dy : 6);
+		return { left: 0, right: 0, top: Math.ceil(offset + fontSize * 1.2), bottom: 0 };
+	});
+
 	// A bar's value label can grow past the plot's own content box (e.g. a
 	// tall bar's `anchor: 'outside'` label pushing past the top margin) —
-	// reserving real space there is what each label's own overflow
-	// measurement feeds into here, via a tracker local to this one `<Plot>`
-	// instance. See `labelOverflow.svelte.ts`. Resets on `resolvedSeries` so
-	// overflow from an earlier, differently-shaped frame (e.g. a timeline
-	// scrubber revealing a different slice of rows) doesn't linger once
-	// that frame is gone.
+	// `valueLabelFloor` covers the common case up front; each label's own
+	// rendered overflow still feeds `labelMargin.report` for whatever that
+	// estimate doesn't cover. See `labelOverflow.svelte.ts`.
 	const labelMargin = createLabelMarginTracker(
 		() => margins,
-		() => resolvedSeries
+		() => resolvedSeries,
+		() => valueLabelFloor ?? { left: 0, right: 0, top: 0, bottom: 0 }
 	);
 </script>
 

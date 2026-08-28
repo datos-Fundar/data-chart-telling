@@ -85,7 +85,6 @@ export const ShowValues: Story = {
     styles: {
       values: { show: true },
     } satisfies AxisBasedStylesConfig,
-    margins: { top: 20 },
   },
 };
 
@@ -103,7 +102,6 @@ export const AnchorOutside: Story = {
         format: (v: number) => `${v.toFixed(1)} yr`,
       },
     } satisfies AxisBasedStylesConfig,
-    margins: { top: 20 },
   },
 };
 
@@ -174,7 +172,6 @@ export const CustomFormat: Story = {
         format: (v: number, name: string) => `${name} → ${v.toFixed(1)} yr`,
       },
     } satisfies AxisBasedStylesConfig,
-    margins: { top: 20 },
   },
 };
 
@@ -197,7 +194,6 @@ export const CustomOffsets: Story = {
         fontStyle: { dy: -12 },
       },
     } satisfies AxisBasedStylesConfig,
-    margins: { top: 20 },
   },
 };
 
@@ -215,7 +211,6 @@ export const TwoSeriesWithLabels: Story = {
         format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
       },
     } satisfies AxisBasedStylesConfig,
-    margins: { top: 20 },
   },
 };
 
@@ -297,7 +292,6 @@ export const LowLevelTextPlacement: Story = {
         },
       },
     } satisfies AxisBasedStylesConfig,
-    margins: { top: 20 },
   },
 };
 
