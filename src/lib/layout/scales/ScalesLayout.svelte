@@ -32,20 +32,53 @@
   const xValues = $derived(data.map(getX));
   const yValues = $derived(data.map(getY));
 
-  /** Caps tick count to the axis's distinct value count, never above what fits the pixel span. Skipped once the caller sets tick density directly. */
+  function naturalTickCount(span: number, spacing: number, min: number): number {
+    return Math.max(min, Math.round(span / spacing));
+  }
+
+  /** `[min, max]` of a pinned `scale.domain` (if numeric), else the extent of `values`. */
+  function axisExtent(scale: AxisBasedScalesConfig<TData>['x'], values: AxisValue[]): [number, number] | undefined {
+    const domainNumbers = scale?.domain?.filter((d): d is number => typeof d === 'number');
+    const source = domainNumbers && domainNumbers.length >= 2 ? domainNumbers : values.filter((v): v is number => typeof v === 'number');
+    if (source.length < 2) return undefined;
+    const lo = Math.min(...source);
+    const hi = Math.max(...source);
+    return hi > lo ? [lo, hi] : undefined;
+  }
+
+  /** Caps tick count to the axis's distinct value count, never above what fits the pixel span. Skipped once the caller sets tick density directly, or pins the domain. */
   function autoTickCount(scale: AxisBasedScalesConfig<TData>['x'], values: AxisValue[], span: number, spacing: number, min: number): number | undefined {
-    if (scale?.ticks != null || scale?.tickSpacing != null || scale?.interval != null) return undefined;
+    if (scale?.ticks != null || scale?.tickSpacing != null || scale?.interval != null || scale?.domain != null) return undefined;
     const uniqueCount = new Set(values.map(String)).size;
-    const natural = Math.max(min, Math.round(span / spacing));
+    const natural = naturalTickCount(span, spacing, min);
     return uniqueCount >= 2 && uniqueCount < natural ? uniqueCount : undefined;
   }
 
-  const xTickCount = $derived(
-    autoTickCount(scales?.x, xValues, Math.max(0, width - numericMargins.left - numericMargins.right), 80, 3),
-  );
-  const yTickCount = $derived(
-    autoTickCount(scales?.y, yValues, Math.max(0, height - numericMargins.top - numericMargins.bottom), 50, 2),
-  );
+  /** Forces a whole-unit tick interval on an integer domain that spans fewer integers than the pixel span would naturally want ticks for. */
+  function integerTickInterval(
+    scale: AxisBasedScalesConfig<TData>['x'],
+    values: AxisValue[],
+    span: number,
+    spacing: number,
+    min: number
+  ): number | undefined {
+    if (scale?.ticks != null || scale?.tickSpacing != null || scale?.interval != null) return undefined;
+    if (scale?.type != null && scale.type !== 'linear' && scale.type !== 'auto') return undefined;
+    const extent = axisExtent(scale, values);
+    if (!extent) return undefined;
+    const [lo, hi] = extent;
+    if (!Number.isInteger(lo) || !Number.isInteger(hi)) return undefined;
+    return hi - lo < naturalTickCount(span, spacing, min) ? 1 : undefined;
+  }
+
+  const xSpan = $derived(Math.max(0, width - numericMargins.left - numericMargins.right));
+  const ySpan = $derived(Math.max(0, height - numericMargins.top - numericMargins.bottom));
+
+  const xTickCount = $derived(autoTickCount(scales?.x, xValues, xSpan, 80, 3));
+  const yTickCount = $derived(autoTickCount(scales?.y, yValues, ySpan, 50, 2));
+
+  const xTickInterval = $derived(integerTickInterval(scales?.x, xValues, xSpan, 80, 3));
+  const yTickInterval = $derived(integerTickInterval(scales?.y, yValues, ySpan, 50, 2));
 
   /** Vertical Y-axis title placement, when `scales.y.labelOrientation === 'vertical'`. */
   const verticalYLabel = $derived.by(() => {
@@ -61,6 +94,7 @@
 
 <AxisX
   tickCount={xTickCount}
+  interval={xTickInterval}
   tickSize={scales?.x?.tickSize ?? cfg.axis.xTickSize}
   tickPadding={scales?.x?.tickPadding ?? cfg.axis.xTickPadding}
   tickFontSize={cfg.axis.fontSize}
@@ -68,6 +102,7 @@
 />
 <AxisY
   tickCount={yTickCount}
+  interval={yTickInterval}
   tickSize={scales?.y?.tickSize ?? cfg.axis.yTickSize}
   tickPadding={scales?.y?.tickPadding ?? cfg.axis.yTickPadding}
   tickFontSize={cfg.axis.fontSize}
