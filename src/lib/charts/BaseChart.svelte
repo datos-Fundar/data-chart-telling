@@ -20,9 +20,12 @@
    *
    *   container ▸ timeline (one shared scrubber) ▸ facet (split per small-multiple) ▸ plot
    *
-   * The leaf snippet receives `{ data, width, height, facetValue?, selectedValue? }`
-   * and knows nothing about how that box or that data slice was produced, which
-   * is what lets any plot (line, bar, heatmap, …) drop in unchanged.
+   * The leaf snippet receives `{ data, width, height, facetValue?, selectedValue?,
+   * margins? }` and knows nothing about how that box or that data slice was
+   * produced, which is what lets any plot (line, bar, heatmap, …) drop in
+   * unchanged. `margins` is only present when `facet.labelsForMargin` is
+   * given — forward it to the plot's own `margins` prop so every facet
+   * shares the same content box.
    */
   let {
     width,
@@ -83,17 +86,19 @@
       formatIndicator={facet.formatIndicator}
       indicator={facet.indicator}
       navButton={facet.navButton}
+      labelsForMargin={facet.labelsForMargin}
       width={w}
       height={h}
     >
-      {#snippet cell({ facetValue, data: cellData, width: cw, height: ch })}
+      {#snippet cell({ facetValue, data: cellData, width: cw, height: ch, margins })}
         {@render plot({
           data: cellData,
           width: cw,
           height: ch,
           facetValue,
           selectedValue,
-          legend: legendPlotContext
+          legend: legendPlotContext,
+          margins
         })}
       {/snippet}
     </FacetLayout>
