@@ -170,14 +170,8 @@
 			.filter((p): p is { series: Series<TData>; lastRow: TData; color: string } => p !== undefined)
 	);
 
-	// Estimated overflow for a rightward-fanning end-of-line label — see
-	// `estimateLineValueLabelMargin`'s own doc comment for the covered case,
-	// the stability rationale (worst-case lane count, domain-pinned text), and
-	// its "close but not exact" caveat versus `ValueLabels.svelte`'s real
-	// declutter/connector geometry (see `LinePlot.ValueLabelStability`'s own
-	// test for what "settled" means here). Shared with a faceted caller's own
-	// `FacetConfig.marginsForFacet`, so a single plot and a facet-wide margin
-	// are always computed by the exact same code.
+	// Estimated overflow for the end-of-line label fan and its own vertical
+	// reach — see `estimateLineValueLabelMargin`'s own doc comment.
 	const valueLabelFloor = $derived.by((): MarginOverflow | undefined => {
 		if (!showVals) return undefined;
 		return estimateLineValueLabelMargin(resolvedSeries, {

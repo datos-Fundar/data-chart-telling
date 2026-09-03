@@ -1,4 +1,5 @@
 import { measureMaxLabelWidth } from '$lib/layout/plot/measureText';
+import type { LineAnchor } from '$lib/types/plots/constants';
 
 /**
  * The one calculation every value-label-drawing plot (`LinePlot`, `BarPlot`,
@@ -44,6 +45,33 @@ export function estimateValueLabelMargin(
 	const textFraction = options.textFraction ?? 1;
 	const reach = options.reach ?? 0;
 	return Math.ceil(reach + textFraction * maxWidth);
+}
+
+/** Estimated full rendered height of a single-line value label at `fontSize`. */
+export function estimateLabelHeight(fontSize: number): number {
+	return fontSize * 1.2;
+}
+
+/** Vertical analogue of `estimateValueLabelMargin`: how far a value label's text extends above/below its anchor point. */
+export function estimateValueLabelVerticalMargin(options: {
+	fontSize: number;
+	lineAnchor: LineAnchor;
+	/** Pixel offset from the anchor point to the label's line-anchor edge, same sign as SVG's `dy`. */
+	dy?: number;
+}): { top: number; bottom: number } {
+	const height = estimateLabelHeight(options.fontSize);
+	const dy = options.dy ?? 0;
+	if (options.lineAnchor === 'top') {
+		return { top: 0, bottom: Math.ceil(Math.max(0, dy) + height) + 2 };
+	}
+	if (options.lineAnchor === 'bottom') {
+		return { top: Math.ceil(Math.max(0, -dy) + height) + 2, bottom: 0 };
+	}
+	const half = height / 2;
+	return {
+		top: Math.ceil(Math.max(0, half - dy)) + 2,
+		bottom: Math.ceil(Math.max(0, half + dy)) + 2
+	};
 }
 
 /**

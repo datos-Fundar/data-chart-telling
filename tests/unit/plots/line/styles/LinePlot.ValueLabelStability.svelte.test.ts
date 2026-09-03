@@ -64,3 +64,77 @@ describe('LinePlot – rightward value labels reserve room up front', () => {
 		expect(container.querySelector('svg')).toBe(svg);
 	});
 });
+
+describe('LinePlot – leftward value labels reserve room up front', () => {
+	test("the left margin already fits the pinned domain's widest label on the very first render", async () => {
+		const props = {
+			...renderProps,
+			styles: {
+				values: { show: true, anchor: 'end' as const },
+				frame: true
+			} satisfies AxisBasedStylesConfig,
+			series: seriesUpTo(2016)
+		};
+		const withLabels = await render(LinePlot, props);
+		const withoutLabels = await render(LinePlot, {
+			...props,
+			styles: { frame: true } satisfies AxisBasedStylesConfig
+		});
+		await waitForSvg(withLabels.container);
+		await waitForSvg(withoutLabels.container);
+		const width = (c: Element) => Number(c.querySelector('rect.frame')?.getAttribute('width'));
+		expect(width(withLabels.container)).toBeLessThan(width(withoutLabels.container));
+	});
+});
+
+describe("LinePlot – a value label's own vertical reach reserves room up front", () => {
+	// A value pinned at the y domain's own top extreme.
+	function seriesAtTop() {
+		return [{ name: 'a', x: 'year' as const, y: 'value' as const, data: [{ year: 2016, value: 1_000_000 }] }];
+	}
+
+	test('the top margin already fits the label on the very first render', async () => {
+		const withLabels = await render(LinePlot, { ...renderProps, series: seriesAtTop() });
+		const withoutLabels = await render(LinePlot, {
+			...renderProps,
+			series: seriesAtTop(),
+			styles: { frame: true } satisfies AxisBasedStylesConfig
+		});
+		await waitForSvg(withLabels.container);
+		await waitForSvg(withoutLabels.container);
+		const height = (c: Element) => Number(c.querySelector('rect.frame')?.getAttribute('height'));
+		expect(height(withLabels.container)).toBeLessThan(height(withoutLabels.container));
+	});
+
+	test('settles without a remount as a timeline scrubber reveals more of the pinned domain', async () => {
+		function seriesUpToAtTop(year: number) {
+			const years = [2016, 2017, 2018, 2019, 2020].filter((y) => y <= year);
+			return [
+				{
+					name: 'a',
+					x: 'year' as const,
+					y: 'value' as const,
+					data: years.map((y) => ({ year: y, value: y === 2016 ? 1_000_000 : y * 100 }))
+				}
+			];
+		}
+		const { container, rerender } = await render(LinePlot, {
+			...renderProps,
+			series: seriesUpToAtTop(2016)
+		});
+		await waitForSvg(container);
+		await new Promise((r) => setTimeout(r, 300));
+
+		await rerender({ series: seriesUpToAtTop(2017) });
+		await new Promise((r) => setTimeout(r, 300));
+		const svg = container.querySelector('svg')!;
+
+		for (const year of [2018, 2019, 2020]) {
+			await rerender({ series: seriesUpToAtTop(year) });
+			await new Promise((r) => setTimeout(r, 150));
+		}
+
+		expect(svg.isConnected).toBe(true);
+		expect(container.querySelector('svg')).toBe(svg);
+	});
+});
