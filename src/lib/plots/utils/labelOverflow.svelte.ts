@@ -178,18 +178,23 @@ export function createLabelMarginTracker(
 		}
 	});
 
+	// Pure `Math.max` — no `maxOverflow` cap here. `measured` is a *tracked*
+	// value, not the applied margin, and must stay strictly monotonic
+	// regardless of anything else changing (see this function's own doc
+	// comment on why shrinking it back oscillates). `maxOverflow` is
+	// typically sized off the plot's own live `width`/`height` (see
+	// `halfDimensionOverflowCap`), which moves continuously during a resize
+	// — capping *here* would let a shrinking cap force `measured` down mid-
+	// resize, immediately re-exposing the overflow that grew it in the first
+	// place and re-triggering growth, over and over, fast enough to trip
+	// Svelte's `effect_update_depth_exceeded` guard. The cap is applied only
+	// where it can't feed back into `measured` itself — see `resolvedMargins`.
 	function report(overflow: MarginOverflow) {
-		const cap = maxOverflow?.() ?? {
-			left: Infinity,
-			right: Infinity,
-			top: Infinity,
-			bottom: Infinity
-		};
 		const next: MarginOverflow = {
-			left: Math.min(cap.left, Math.max(measured.left, overflow.left)),
-			right: Math.min(cap.right, Math.max(measured.right, overflow.right)),
-			top: Math.min(cap.top, Math.max(measured.top, overflow.top)),
-			bottom: Math.min(cap.bottom, Math.max(measured.bottom, overflow.bottom))
+			left: Math.max(measured.left, overflow.left),
+			right: Math.max(measured.right, overflow.right),
+			top: Math.max(measured.top, overflow.top),
+			bottom: Math.max(measured.bottom, overflow.bottom)
 		};
 		if (
 			next.left !== measured.left ||
@@ -209,34 +214,56 @@ export function createLabelMarginTracker(
 	// number that only accounts for the value label. `AUTO_MARGIN_ESTIMATE` is
 	// a fixed constant, not `numericMargins`' own already-grown value, so this
 	// can't compound into unbounded growth across repeated reports.
+	//
+	// `maxOverflow`, if given, clamps `measured` down to a live cap *here*,
+	// read-only — every render re-reads the current cap and applies it fresh
+	// to the unclamped, monotonically-tracked `measured`, without ever
+	// writing the clamped value back into `measured` itself (see `report`'s
+	// own doc comment for why that distinction matters).
 	const resolvedMargins = $derived.by((): MarginConfig | undefined => {
 		const base = margins();
-		if (measured.left <= 0 && measured.right <= 0 && measured.top <= 0 && measured.bottom <= 0)
+		const cap = maxOverflow?.() ?? {
+			left: Infinity,
+			right: Infinity,
+			top: Infinity,
+			bottom: Infinity
+		};
+		const clamped: MarginOverflow = {
+			left: Math.min(measured.left, cap.left),
+			right: Math.min(measured.right, cap.right),
+			top: Math.min(measured.top, cap.top),
+			bottom: Math.min(measured.bottom, cap.bottom)
+		};
+		if (clamped.left <= 0 && clamped.right <= 0 && clamped.top <= 0 && clamped.bottom <= 0)
 			return base;
 		const out: MarginConfig = { ...base };
-		if (measured.right > 0 && base?.right === undefined)
-			out.right = AUTO_MARGIN_ESTIMATE.right + measured.right;
-		if (measured.left > 0 && base?.left === undefined)
-			out.left = AUTO_MARGIN_ESTIMATE.left + measured.left;
-		if (measured.top > 0 && base?.top === undefined)
-			out.top = AUTO_MARGIN_ESTIMATE.top + measured.top;
-		if (measured.bottom > 0 && base?.bottom === undefined)
-			out.bottom = AUTO_MARGIN_ESTIMATE.bottom + measured.bottom;
+		if (clamped.right > 0 && base?.right === undefined)
+			out.right = AUTO_MARGIN_ESTIMATE.right + clamped.right;
+		if (clamped.left > 0 && base?.left === undefined)
+			out.left = AUTO_MARGIN_ESTIMATE.left + clamped.left;
+		if (clamped.top > 0 && base?.top === undefined)
+			out.top = AUTO_MARGIN_ESTIMATE.top + clamped.top;
+		if (clamped.bottom > 0 && base?.bottom === undefined)
+			out.bottom = AUTO_MARGIN_ESTIMATE.bottom + clamped.bottom;
 		return out;
 	});
 
 	// Bundles `resolvedMargins` with a remount key, ready to spread straight
 	// onto `<BasePlotLayout>` as its `margins`/`marginRemountKey` props (see
 	// that prop's doc comment for *why* a remount key is needed here at all)
-	// — keeps the caller from re-deriving the same key by hand. Tracks both
-	// `measured` (this tracker's own auto-grown overflow) and the caller's
-	// own `margins()` — a caller that changes its explicit margins prop
-	// after mount (e.g. locking in a previously-measured value) needs that
-	// picked up just as cleanly as internal growth does; keying only on
-	// `measured` would silently miss it.
+	// — keeps the caller from re-deriving the same key by hand. Keyed off
+	// `resolvedMargins` itself (the actually-applied value) rather than raw
+	// `measured` — with a `maxOverflow` cap in play, `measured` can keep
+	// climbing past the point where it's clamped without the applied margin
+	// changing at all, and remounting for that would be pure waste. Also
+	// tracks the caller's own `margins()` — a caller that changes its
+	// explicit margins prop after mount (e.g. locking in a previously-
+	// measured value) needs that picked up just as cleanly as internal
+	// growth does; `resolvedMargins` alone already reflects that too, but
+	// spelling it out keeps the key's intent obvious.
 	const plotProps = $derived.by(() => ({
 		margins: resolvedMargins,
-		marginRemountKey: JSON.stringify({ base: margins(), measured })
+		marginRemountKey: JSON.stringify({ base: margins(), resolvedMargins })
 	}));
 
 	return {
