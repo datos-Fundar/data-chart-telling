@@ -7,7 +7,10 @@
 	import { disabledDotsOverride } from '$lib/plots/utils/legendDisabled';
 	import { buildScatterMarkers } from '$lib/plots/scatter/buildScatterMarkers';
 	import { resolveRadiusPaddedDomain } from '$lib/plots/scatter/resolveRadiusPaddedDomain';
-	import { createLabelMarginTracker } from '$lib/plots/utils/labelOverflow.svelte';
+	import {
+		createLabelMarginTracker,
+		halfDimensionOverflowCap
+	} from '$lib/plots/utils/labelOverflow.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
 	import ValueLabels from '$lib/plots/scatter/ValueLabels.svelte';
 	import {
@@ -214,6 +217,11 @@
 		};
 	});
 
+	// See `halfDimensionOverflowCap`'s own doc comment — relevant here mainly
+	// for a corner point with no room in any direction even after
+	// `resolveEdgeAwareAnchor`'s own flip.
+	const maxLabelOverflow = $derived(halfDimensionOverflowCap(width, height));
+
 	// A scatter point's value label can grow past the plot's own content box
 	// (e.g. a point volcado toward a corner, past what its own edge-aware flip
 	// can fit) — reserving real space there is what each label's own overflow
@@ -223,7 +231,9 @@
 	// that frame is gone.
 	const labelMargin = createLabelMarginTracker(
 		() => margins,
-		() => resolvedSeries
+		() => resolvedSeries,
+		undefined,
+		() => maxLabelOverflow
 	);
 </script>
 

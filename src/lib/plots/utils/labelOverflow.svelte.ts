@@ -7,6 +7,24 @@ export type MarginOverflow = { left: number; right: number; top: number; bottom:
 const NO_OVERFLOW: MarginOverflow = { left: 0, right: 0, top: 0, bottom: 0 };
 
 /**
+ * A generic `maxOverflow` cap for {@link createLabelMarginTracker}: half of
+ * each dimension, so a facet cramped enough that its own value label can
+ * never fully fit still leaves the plot's own content box the other half,
+ * rather than `measured` growing without bound (see that function's own
+ * `maxOverflow` doc comment). The same backstop applies regardless of *what*
+ * overflows or *why* — every value-label-drawing plot (line/bar/pyramid/
+ * scatter) passes this, sized off its own `width`/`height`.
+ */
+export function halfDimensionOverflowCap(width: number, height: number): MarginOverflow {
+	return {
+		left: Math.max(0, width * 0.5),
+		right: Math.max(0, width * 0.5),
+		top: Math.max(0, height * 0.5),
+		bottom: Math.max(0, height * 0.5)
+	};
+}
+
+/**
  * Watches an SVG group's rendered bounding box against the plot's own
  * content box (`bounds`) and reports how far it overflows on each side.
  * Polled across successive paints until two consecutive readings agree,

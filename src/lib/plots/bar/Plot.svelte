@@ -11,7 +11,10 @@
 		buildScopedMarkerGroups
 	} from '$lib/plots/utils/segments';
 	import { createBarLayout } from '$lib/plots/bar/layout.svelte';
-	import { createLabelMarginTracker } from '$lib/plots/utils/labelOverflow.svelte';
+	import {
+		createLabelMarginTracker,
+		halfDimensionOverflowCap
+	} from '$lib/plots/utils/labelOverflow.svelte';
 	import { estimateValueLabelMargin } from '$lib/plots/utils/valueLabelMargin';
 	import { buildHoverPoints } from '$lib/plots/bar/hoverPoints';
 	import { buildBarMarkers } from '$lib/plots/bar/buildBarMarkers';
@@ -258,6 +261,9 @@
 		return { left: 0, right: 0, top: Math.ceil(offset + fontSize * 1.2), bottom: 0 };
 	});
 
+	// See `halfDimensionOverflowCap`'s own doc comment.
+	const maxLabelOverflow = $derived(halfDimensionOverflowCap(width, height));
+
 	// A bar's value label can grow past the plot's own content box (e.g. a
 	// tall bar's `anchor: 'outside'` label pushing past the top margin) —
 	// `valueLabelFloor` covers the common case up front; each label's own
@@ -266,7 +272,8 @@
 	const labelMargin = createLabelMarginTracker(
 		() => margins,
 		() => resolvedSeries,
-		() => valueLabelFloor ?? { left: 0, right: 0, top: 0, bottom: 0 }
+		() => valueLabelFloor ?? { left: 0, right: 0, top: 0, bottom: 0 },
+		() => maxLabelOverflow
 	);
 </script>
 

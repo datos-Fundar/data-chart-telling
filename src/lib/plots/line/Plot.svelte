@@ -8,7 +8,10 @@
 	import { buildLineMarkers } from '$lib/plots/line/buildLineMarkers';
 	import { buildGapMarkers } from '$lib/plots/line/buildGapMarkers';
 	import { isGapValue } from '$lib/plots/utils/gaps';
-	import { createLabelMarginTracker } from '$lib/plots/utils/labelOverflow.svelte';
+	import {
+		createLabelMarginTracker,
+		halfDimensionOverflowCap
+	} from '$lib/plots/utils/labelOverflow.svelte';
 	import { estimateLineValueLabelMargin } from '$lib/plots/line/valueLabelMargin';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
 	import ValueLabels from '$lib/plots/line/ValueLabels.svelte';
@@ -185,17 +188,8 @@
 		});
 	});
 
-	// A facet cramped enough that its own end-of-line label can never fully
-	// fit would otherwise grow `measured` without bound (see
-	// `createLabelMarginTracker`'s own doc comment) — capped at half of each
-	// dimension, so the plot's own content box never shrinks past the other
-	// half no matter how little room a label has to work with.
-	const maxLabelOverflow = $derived({
-		left: Math.max(0, width * 0.5),
-		right: Math.max(0, width * 0.5),
-		top: Math.max(0, height * 0.5),
-		bottom: Math.max(0, height * 0.5)
-	});
+	// See `halfDimensionOverflowCap`'s own doc comment.
+	const maxLabelOverflow = $derived(halfDimensionOverflowCap(width, height));
 
 	// Grows the plot's margin to fit value labels that overflow the content
 	// box. `valueLabelFloor` covers the common rightward case up front; each

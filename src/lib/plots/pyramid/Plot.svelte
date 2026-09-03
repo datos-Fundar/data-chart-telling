@@ -6,7 +6,10 @@
 	import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
 	import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
 	import { buildPyramidBarMarkers } from '$lib/plots/pyramid/buildPyramidBarMarkers';
-	import { createLabelMarginTracker } from '$lib/plots/utils/labelOverflow.svelte';
+	import {
+		createLabelMarginTracker,
+		halfDimensionOverflowCap
+	} from '$lib/plots/utils/labelOverflow.svelte';
 	import { estimateValueLabelMargin } from '$lib/plots/utils/valueLabelMargin';
 	import {
 		buildGroupedSeries,
@@ -301,6 +304,9 @@
 		return { left, right, top: 0, bottom: 0 };
 	});
 
+	// See `halfDimensionOverflowCap`'s own doc comment.
+	const maxLabelOverflow = $derived(halfDimensionOverflowCap(width, height));
+
 	// A pyramid bar's value label can grow past the plot's own content box —
 	// `valueLabelFloor` covers the common case up front; each label's own
 	// rendered overflow still feeds `labelMargin.report` for whatever that
@@ -308,7 +314,8 @@
 	const labelMargin = createLabelMarginTracker(
 		() => margins,
 		() => resolvedSeries,
-		() => valueLabelFloor ?? { left: 0, right: 0, top: 0, bottom: 0 }
+		() => valueLabelFloor ?? { left: 0, right: 0, top: 0, bottom: 0 },
+		() => maxLabelOverflow
 	);
 </script>
 
