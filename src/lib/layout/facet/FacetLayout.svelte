@@ -2,8 +2,6 @@
   import { isMobile } from '$lib/stores/device';
   import { groupBy } from '$lib/utils/grouping';
   import FacetIndicator from '$lib/layout/facet/FacetIndicator.svelte';
-  import { getConfiguration } from '$lib/configuration/config.svelte';
-  import { measureMaxLabelWidth } from '$lib/layout/plot/measureText';
   import type {
     FacetColumns,
     FacetMode,
@@ -27,9 +25,13 @@
    * out at once; `'paginated'` pages through the same grid in fixed chunks;
    * `'carousel'` shows `visible` groups at a time with touch-drag/snap.
    *
-   * `labelsForMargin`, if given, sizes one shared left margin across every
-   * facet — pass it through `cell`'s own `margins` to a faceted plot's
-   * `margins` prop so they all share the same content box.
+   * `marginsForFacet`, if given, sizes one shared margin (any/all sides)
+   * across every facet — pass it through `cell`'s own `margins` to a
+   * faceted plot's `margins` prop so they all share the same content box,
+   * instead of each facet growing its own margin independently off what its
+   * own content happens to need (which drifts out of alignment facet to
+   * facet, and — for a facet cramped enough that its content can never fully
+   * fit — can grow without bound).
    */
   let {
     data,
@@ -47,7 +49,7 @@
     width,
     height,
     cell,
-    labelsForMargin,
+    marginsForFacet,
   }: {
     data: TRow[];
     by: Accessor<TRow, unknown>;
@@ -64,7 +66,7 @@
     width: number;
     height: number;
     cell: FacetCellSnippet<TRow>;
-    labelsForMargin?: (rows: TRow[]) => string[];
+    marginsForFacet?: (rows: TRow[]) => MarginConfig;
   } = $props();
 
   function resolveResponsive<T>(value: Responsive<T>, mobile: boolean): T {
@@ -83,16 +85,30 @@
       .map((v) => [v, groups.get(v)!] as [string, TRow[]]);
   });
 
-  // One shared left margin, sized to the widest label across every facet —
-  // measured off-DOM (canvas), so it's correct from the very first render
-  // with no mount/remount needed. `undefined` when `labelsForMargin` isn't given.
-  const cfg = $derived(getConfiguration());
-  const axisFont = $derived(`${cfg.axis.fontSize}px ${cfg.font === 'inherit' ? 'sans-serif' : cfg.font}`);
+  // One shared margin, sized to whatever each facet's own `marginsForFacet`
+  // reports it naturally needs — componentwise `max` per side across every
+  // facet. `FacetLayout` itself measures nothing here (no font, no axis
+  // config, no plot-specific knowledge at all) — that's each plot type's
+  // own concern, expressed however it estimates its own margin (see e.g.
+  // `estimateLineValueLabelMargin`); this just compares already-resolved
+  // numbers. `undefined` when `marginsForFacet` isn't given; any side no
+  // facet reports (or reports as `'auto'`, which isn't comparable) stays
+  // unset, falling back to the plot's own default ('auto') sizing.
+  const MARGIN_SIDES = ['left', 'right', 'top', 'bottom'] as const;
   const cellMargins = $derived.by((): MarginConfig | undefined => {
-    if (!labelsForMargin) return undefined;
-    const labels = entries.flatMap(([, rows]) => labelsForMargin(rows));
-    const left = Math.ceil(measureMaxLabelWidth(labels, axisFont)) + cfg.axis.yTickSize + cfg.axis.yTickPadding;
-    return { left };
+    if (!marginsForFacet) return undefined;
+    const perFacet = entries.map(([, rows]) => marginsForFacet(rows));
+    const out: MarginConfig = {};
+    for (const side of MARGIN_SIDES) {
+      let max: number | undefined;
+      for (const margin of perFacet) {
+        const value = margin[side];
+        if (typeof value !== 'number') continue;
+        max = max === undefined ? value : Math.max(max, value);
+      }
+      if (max !== undefined) out[side] = max;
+    }
+    return out;
   });
 
   const resolvedMode = $derived(resolveResponsive(mode, $isMobile));

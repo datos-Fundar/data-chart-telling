@@ -30,10 +30,11 @@
   import BarPlot from '$lib/plots/bar/Plot.svelte';
   import LinePlot from '$lib/plots/line/Plot.svelte';
   import { getConfiguration, configToCssVars, cssVarsStyle } from '$lib/configuration/config.svelte';
+  import { estimateCategoricalAxisMargin } from '$lib/plots/utils/categoricalAxisMargin';
 
   /**
    * `aligned = false`: each facet's own `margins` stays unset, so its plot
-   * auto-sizes its own left margin. `aligned = true`: `labelsForMargin`
+   * auto-sizes its own left margin. `aligned = true`: `marginsForFacet`
    * measures every facet's candidate labels and feeds back one shared
    * `margins.left`.
    */
@@ -60,7 +61,9 @@
       columns={3}
       {width}
       {height}
-      labelsForMargin={aligned ? (rows) => rows.map((r) => truncate(r.category)) : undefined}
+      marginsForFacet={aligned
+        ? (rows) => ({ left: estimateCategoricalAxisMargin(rows.map((r) => truncate(r.category))) })
+        : undefined}
     >
       {#snippet cell({ facetValue, data: cellData, width: w, height: h, margins })}
         {@const name = String(facetValue)}
@@ -80,8 +83,10 @@
       columns={3}
       {width}
       {height}
-      labelsForMargin={aligned
-        ? (rows) => rows.map((r) => r.value.toLocaleString('en-US'))
+      marginsForFacet={aligned
+        ? (rows) => ({
+            left: estimateCategoricalAxisMargin(rows.map((r) => r.value.toLocaleString('en-US'))),
+          })
         : undefined}
     >
       {#snippet cell({ facetValue, data: cellData, width: w, height: h, margins })}

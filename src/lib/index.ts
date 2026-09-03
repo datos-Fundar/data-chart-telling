@@ -61,6 +61,8 @@ export type { ThemeName } from './configuration/themes';
 // ── Utils ─────────────────────────────────────────────────────────────────────
 export { groupBy, buildSeries } from './utils/grouping';
 export { makeColorScale, normalize, resolveCssColor, paletteColor } from './utils/color';
+export { estimateCategoricalAxisMargin } from './plots/utils/categoricalAxisMargin';
+export { estimateLineValueLabelMargin } from './plots/line/valueLabelMargin';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export type { AxisValue, AxisScale, AxisBasedScalesConfig } from './types/layout/scales';

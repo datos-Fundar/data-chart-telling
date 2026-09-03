@@ -13,7 +13,7 @@ export type ChartPlotContext<TRow extends Record<string, unknown>> = {
   facetValue?: string;
   selectedValue?: TimeValue;
   legend?: LegendPlotContext;
-  /** Present only when faceted with `facet.labelsForMargin` — forward to the plot's own `margins` prop so every facet shares the same content box. */
+  /** Present only when faceted with `facet.marginsForFacet` — forward to the plot's own `margins` prop so every facet shares the same content box. */
   margins?: MarginConfig;
 };
 export type ChartPlotSnippet<TRow extends Record<string, unknown>> = Snippet<

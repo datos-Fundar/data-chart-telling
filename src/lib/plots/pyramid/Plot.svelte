@@ -7,7 +7,7 @@
 	import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
 	import { buildPyramidBarMarkers } from '$lib/plots/pyramid/buildPyramidBarMarkers';
 	import { createLabelMarginTracker } from '$lib/plots/utils/labelOverflow.svelte';
-	import { measureTextWidth } from '$lib/layout/plot/measureText';
+	import { estimateValueLabelMargin } from '$lib/plots/utils/valueLabelMargin';
 	import {
 		buildGroupedSeries,
 		validateSegments,
@@ -277,8 +277,8 @@
 		const canvasFont = `${fontSize}px ${cfg.font === 'inherit' ? 'sans-serif' : cfg.font}`;
 		const offset = Math.abs(typeof font?.dx === 'number' ? font.dx : 6);
 
-		let leftWidth = 0;
-		let rightWidth = 0;
+		const leftTexts: string[] = [];
+		const rightTexts: string[] = [];
 		for (const s of resolvedSeries) {
 			const sy = resolveAccessor(s.y);
 			let extreme = 0;
@@ -292,11 +292,13 @@
 				}
 			}
 			if (extremeRow === undefined) continue;
-			const labelWidth = measureTextWidth(formatValue(extreme, s.name), canvasFont);
-			if (s.side === 'left') leftWidth = Math.max(leftWidth, labelWidth);
-			else rightWidth = Math.max(rightWidth, labelWidth);
+			const text = formatValue(extreme, s.name);
+			if (s.side === 'left') leftTexts.push(text);
+			else rightTexts.push(text);
 		}
-		return { left: Math.ceil(offset + leftWidth), right: Math.ceil(offset + rightWidth), top: 0, bottom: 0 };
+		const left = estimateValueLabelMargin(leftTexts, { canvasFont, reach: offset });
+		const right = estimateValueLabelMargin(rightTexts, { canvasFont, reach: offset });
+		return { left, right, top: 0, bottom: 0 };
 	});
 
 	// A pyramid bar's value label can grow past the plot's own content box —

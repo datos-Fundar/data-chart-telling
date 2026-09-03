@@ -12,7 +12,7 @@
 	} from '$lib/plots/utils/segments';
 	import { createBarLayout } from '$lib/plots/bar/layout.svelte';
 	import { createLabelMarginTracker } from '$lib/plots/utils/labelOverflow.svelte';
-	import { measureTextWidth } from '$lib/layout/plot/measureText';
+	import { estimateValueLabelMargin } from '$lib/plots/utils/valueLabelMargin';
 	import { buildHoverPoints } from '$lib/plots/bar/hoverPoints';
 	import { buildBarMarkers } from '$lib/plots/bar/buildBarMarkers';
 	import { resolveGapsForSeries, resolveDiscreteGapFills } from '$lib/plots/utils/gaps';
@@ -235,7 +235,7 @@
 		const canvasFont = `${fontSize}px ${cfg.font === 'inherit' ? 'sans-serif' : cfg.font}`;
 		if (isHorizontal) {
 			const offset = Math.abs(typeof font?.dx === 'number' ? font.dx : 6);
-			let widestLabel = 0;
+			const texts: string[] = [];
 			for (const s of resolvedSeries) {
 				const sy = resolveAccessor(s.y);
 				let extremeValue = 0;
@@ -249,9 +249,10 @@
 					}
 				}
 				if (extremeRow === undefined) continue;
-				widestLabel = Math.max(widestLabel, measureTextWidth(formatValue(extremeValue, s.name), canvasFont));
+				texts.push(formatValue(extremeValue, s.name));
 			}
-			return { left: 0, right: Math.ceil(offset + widestLabel), top: 0, bottom: 0 };
+			const right = estimateValueLabelMargin(texts, { canvasFont, reach: offset });
+			return { left: 0, right, top: 0, bottom: 0 };
 		}
 		const offset = Math.abs(typeof font?.dy === 'number' ? font.dy : 6);
 		return { left: 0, right: 0, top: Math.ceil(offset + fontSize * 1.2), bottom: 0 };

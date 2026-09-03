@@ -126,7 +126,18 @@ export function createLabelMarginTracker(
 	 * every reset). DOM measurement can still grow past it for whatever this
 	 * estimate doesn't cover.
 	 */
-	floor?: () => MarginOverflow
+	floor?: () => MarginOverflow,
+	/**
+	 * Ceiling on how far `measured` can grow on each side, independent of
+	 * `floor`. Without one, a cell too small to ever fully fit its own label
+	 * (e.g. a narrow facet) keeps reporting overflow after every growth-
+	 * triggered remount — since the label's absolute size never shrinks —
+	 * and `measured` grows without bound, eventually leaving nothing for the
+	 * plot's own content box. Capping it trades a permanently-clipped label
+	 * in that case for a plot that still renders. Pass `Infinity` on a side
+	 * (the default) to leave it uncapped.
+	 */
+	maxOverflow?: () => MarginOverflow
 ) {
 	const floorValue = () => floor?.() ?? NO_OVERFLOW;
 	let measured = $state<MarginOverflow>(floorValue());
@@ -150,11 +161,17 @@ export function createLabelMarginTracker(
 	});
 
 	function report(overflow: MarginOverflow) {
+		const cap = maxOverflow?.() ?? {
+			left: Infinity,
+			right: Infinity,
+			top: Infinity,
+			bottom: Infinity
+		};
 		const next: MarginOverflow = {
-			left: Math.max(measured.left, overflow.left),
-			right: Math.max(measured.right, overflow.right),
-			top: Math.max(measured.top, overflow.top),
-			bottom: Math.max(measured.bottom, overflow.bottom)
+			left: Math.min(cap.left, Math.max(measured.left, overflow.left)),
+			right: Math.min(cap.right, Math.max(measured.right, overflow.right)),
+			top: Math.min(cap.top, Math.max(measured.top, overflow.top)),
+			bottom: Math.min(cap.bottom, Math.max(measured.bottom, overflow.bottom))
 		};
 		if (
 			next.left !== measured.left ||

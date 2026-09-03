@@ -12,7 +12,7 @@ export type FacetCellContext<TRow extends Record<string, unknown>> = {
   data: TRow[];
   width: number;
   height: number;
-  /** Left margin sized to the widest label across every facet — see `labelsForMargin`. Present only when it's given. */
+  /** Margin sized off every facet's own natural need, per side — see `marginsForFacet`. Present only when it's given. */
   margins?: MarginConfig;
 };
 export type FacetCellSnippet<TRow extends Record<string, unknown>> = Snippet<
@@ -38,6 +38,23 @@ export type FacetConfig<TRow extends Record<string, unknown>> = {
   formatIndicator?: (current: number, total: number) => string;
   indicator?: FacetIndicatorSnippet;
   navButton?: FacetNavSnippet;
-  /** Candidate label strings for one facet's own rows — measured across every facet to size a shared left margin (`cell`'s own `margins`). */
-  labelsForMargin?: (rows: TRow[]) => string[];
+  /**
+   * One facet's own natural margin need, per side — measured across every
+   * facet and combined with `Math.max` per side (`FacetLayout`'s own
+   * `cellMargins`) to size one shared margin every facet's `cell` receives
+   * through its own `margins`, instead of each facet growing its own margin
+   * independently off what its own content happens to need (which drifts
+   * out of alignment facet to facet, and — for a facet cramped enough that
+   * its content can never fully fit — can grow without bound). A plot type
+   * that draws content needing this (a categorical axis's labels, a value
+   * label's own text) implements this by calling its own margin-estimating
+   * export against the facet's rows — e.g. `BarPlot`'s left margin from its
+   * category labels, `LinePlot`'s right margin from its end-of-line value
+   * labels (see each plot's own docs for what its estimator assumes, such as
+   * `LinePlot`'s one-line-per-facet caveat) — this callback only carries
+   * that per-facet result up to where every facet's results can be compared.
+   * Any side left unset by every facet stays unpinned, falling back to the
+   * plot's own default (`'auto'`) sizing.
+   */
+  marginsForFacet?: (rows: TRow[]) => MarginConfig;
 };

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import FacetMarginAlignmentDemo, { barData, lineData, truncate } from './FacetMarginAlignmentDemo.svelte';
 import { renderSource } from '../../common/docsSource';
+import { estimateCategoricalAxisMargin } from '$lib/plots/utils/categoricalAxisMargin';
 
 // `FacetMarginAlignmentDemo` renders through a wrapper, so
 // `parameters.docs.source.code` overrides the "show code" panel with the
@@ -10,7 +11,13 @@ function barSource(aligned: boolean) {
     data: barData,
     by: 'province',
     columns: 3,
-    ...(aligned ? { labelsForMargin: (rows: { category: string }[]) => rows.map((r) => truncate(r.category)) } : {}),
+    ...(aligned
+      ? {
+          marginsForFacet: (rows: { category: string }[]) => ({
+            left: estimateCategoricalAxisMargin(rows.map((r) => truncate(r.category))),
+          }),
+        }
+      : {}),
   });
 }
 
@@ -20,7 +27,11 @@ function lineSource(aligned: boolean) {
     by: 'province',
     columns: 3,
     ...(aligned
-      ? { labelsForMargin: (rows: { value: number }[]) => rows.map((r) => r.value.toLocaleString('en-US')) }
+      ? {
+          marginsForFacet: (rows: { value: number }[]) => ({
+            left: estimateCategoricalAxisMargin(rows.map((r) => r.value.toLocaleString('en-US'))),
+          }),
+        }
       : {}),
   });
 }
@@ -28,7 +39,7 @@ function lineSource(aligned: boolean) {
 /**
  * Each facet auto-sizes its own left margin to its own axis's widest label
  * — different labels across facets, different margins, content starting at
- * different x. `labelsForMargin` measures every facet's candidate labels
+ * different x. `marginsForFacet` measures every facet's candidate labels
  * (off-DOM, via canvas) and feeds back one shared `margins.left`.
  */
 const meta = {

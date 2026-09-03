@@ -23,9 +23,9 @@
    * The leaf snippet receives `{ data, width, height, facetValue?, selectedValue?,
    * margins? }` and knows nothing about how that box or that data slice was
    * produced, which is what lets any plot (line, bar, heatmap, …) drop in
-   * unchanged. `margins` is only present when `facet.labelsForMargin` is
-   * given — forward it to the plot's own `margins` prop so every facet
-   * shares the same content box.
+   * unchanged. `margins` only has a side set when `facet.marginsForFacet`
+   * reports it — forward it to the plot's own `margins` prop so every facet
+   * shares the same content box on that side.
    */
   let {
     width,
@@ -86,7 +86,7 @@
       formatIndicator={facet.formatIndicator}
       indicator={facet.indicator}
       navButton={facet.navButton}
-      labelsForMargin={facet.labelsForMargin}
+      marginsForFacet={facet.marginsForFacet}
       width={w}
       height={h}
     >
