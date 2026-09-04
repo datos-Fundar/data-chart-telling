@@ -62,6 +62,28 @@ export type LegendHandleContext = {
 /** Custom drag-handle renderer for an interactive continuous section. */
 export type LegendHandleSnippet = Snippet<[LegendHandleContext]>;
 
+/**
+ * Item look for an interactive discrete section. `'badge'` (the default once
+ * `interactive.enabled` is on) draws each item as a pill filled with its
+ * series color, with the symbol icon and label auto-contrasted against that
+ * fill and an eye icon on the right — crossed out once the item is toggled
+ * off. `'basic'` keeps the plain swatch + label, same as a non-interactive
+ * section.
+ */
+export type LegendInteractiveStyle = 'badge' | 'basic';
+
+/** Click-to-toggle configuration for a discrete section: whether it's on, how toggled items look, and the style applied to a toggled-off one. */
+export type DiscreteInteractiveConfig = {
+	/** Turns click-to-toggle on for every item in the section. */
+	enabled?: boolean;
+	/** Item look while `enabled`. Defaults to `'badge'`. */
+	legendStyle?: LegendInteractiveStyle;
+	/** Style applied to a toggled-off item. Defaults to `{ opacity: cfg.legend.disabledOpacity }`. */
+	disabledStyle?: LegendDisabledStyle;
+	/** Shows the symbol icon inside a `'badge'` pill. Defaults to `true`; ignored by `'basic'`, which always shows it. */
+	showIcon?: boolean;
+};
+
 export type DiscreteLegendSection = {
 	type: 'discrete';
 	title?: string;
@@ -69,9 +91,24 @@ export type DiscreteLegendSection = {
 	columns?: number;
 	/** Item flow direction. Defaults to `{ type: 'vertical' }` (unchanged prior behaviour). */
 	layout?: LegendItemsLayout;
-	interactive?: boolean;
-	disabledStyle?: LegendDisabledStyle;
+	interactive?: DiscreteInteractiveConfig;
 	navButton?: LegendNavSnippet;
+};
+
+/** Drag-to-narrow configuration for a continuous section: whether it's on, how the range behaves, and its look. */
+export type ContinuousInteractiveConfig = {
+	/** Turns drag-to-narrow on, adding lo/hi handles at the edges of the excluded range. */
+	enabled?: boolean;
+	/**
+	 * How the color ramp responds to a narrowed range: `'rescale'` reprojects
+	 * it onto the new bounds, `'filter'` keeps the original domain and only
+	 * excludes out-of-range values. Defaults to `'filter'`.
+	 */
+	mode?: 'rescale' | 'filter';
+	/** Style applied to the excluded (narrowed-out) range. Defaults to `{ opacity: cfg.legend.disabledOpacity }`. */
+	disabledStyle?: LegendDisabledStyle;
+	/** Custom renderer for the draggable lo/hi handles. */
+	handle?: LegendHandleSnippet;
 };
 
 export type ContinuousLegendSection = {
@@ -85,16 +122,7 @@ export type ContinuousLegendSection = {
 	ticks?: number[];
 	width?: number;
 	format?: (v: number) => string;
-	interactive?: boolean;
-	/**
-	 * How the color ramp responds to a narrowed range: `'rescale'` reprojects
-	 * it onto the new bounds, `'filter'` keeps the original domain and only
-	 * excludes out-of-range values. Defaults to `'filter'`.
-	 */
-	mode?: 'rescale' | 'filter';
-	disabledStyle?: LegendDisabledStyle;
-	/** Custom renderer for the draggable lo/hi handles. */
-	handle?: LegendHandleSnippet;
+	interactive?: ContinuousInteractiveConfig;
 };
 
 export type LegendSection = DiscreteLegendSection | ContinuousLegendSection;

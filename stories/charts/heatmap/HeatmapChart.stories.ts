@@ -62,11 +62,11 @@ export const Default: Story = {
 };
 
 /**
- * `interactive: true` on the continuous legend adds drag handles to its
- * lower/upper edge — dragging narrows the visible range and mutes
- * (`disabledStyle`) whatever cell falls outside it. `mode: 'filter'` (the
- * default) keeps the color ramp's original domain, so in-range cells keep
- * exactly the color they'd have without any filter active.
+ * `interactive: { enabled: true }` on the continuous legend adds drag
+ * handles to its lower/upper edge — dragging narrows the visible range and
+ * mutes (`disabledStyle`) whatever cell falls outside it. `mode: 'filter'`
+ * (the default) keeps the color ramp's original domain, so in-range cells
+ * keep exactly the color they'd have without any filter active.
  */
 export const InteractiveLegendFilter: Story = {
   args: {
@@ -76,7 +76,7 @@ export const InteractiveLegendFilter: Story = {
     data: HEAT_CELLS.filter((d) => d.scenario === 'Base' && d.year === 2022),
     z: 'pct',
     tooltip: true,
-    legend: [{ ...continuousLegend[0], interactive: true, mode: 'filter' }],
+    legend: [{ ...continuousLegend[0], interactive: { enabled: true, mode: 'filter' } }],
     styles: { values: { format: (v: number) => `${(v * 100).toFixed(0)}%` } },
   },
 };
@@ -89,7 +89,7 @@ export const InteractiveLegendRescale: Story = {
     caption: 'Mismo drag que el ejemplo anterior, pero el color se reproyecta sobre el nuevo rango.',
     data: HEAT_CELLS.filter((d) => d.scenario === 'Base' && d.year === 2022),
     z: 'pct',
-    legend: [{ ...continuousLegend[0], interactive: true, mode: 'rescale' }],
+    legend: [{ ...continuousLegend[0], interactive: { enabled: true, mode: 'rescale' } }],
     styles: { values: { format: (v: number) => `${(v * 100).toFixed(0)}%` } },
   },
 };

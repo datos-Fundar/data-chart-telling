@@ -40,7 +40,7 @@ describe('ContinuousSection – tracking the domain until the user actually drag
 			min: 10,
 			max: 90,
 			width: 200,
-			interactive: true
+			interactive: { enabled: true }
 		};
 		const { container, rerender } = await render(ContinuousSection, { section });
 
@@ -68,7 +68,7 @@ describe('ContinuousSection – tracking the domain until the user actually drag
 			min: 0,
 			max: 100,
 			width: 200,
-			interactive: true
+			interactive: { enabled: true }
 		};
 		const { container, rerender } = await render(ContinuousSection, { section });
 
@@ -92,7 +92,7 @@ describe('ContinuousSection – re-clamping an active range when the domain shif
 			min: 0,
 			max: 100,
 			width: 200,
-			interactive: true
+			interactive: { enabled: true }
 		};
 		const { container, rerender } = await render(ContinuousSection, { section });
 
@@ -134,7 +134,7 @@ describe('ContinuousSection – re-clamping an active range when the domain shif
 			min: 0,
 			max: 100,
 			width: 200,
-			interactive: true
+			interactive: { enabled: true }
 		};
 		const { container, rerender } = await render(ContinuousSection, { section });
 
@@ -164,8 +164,7 @@ describe('ContinuousSection – syncing with an externally-set range', () => {
 			min: 0,
 			max: 100,
 			width: 200,
-			interactive: true,
-			mode: 'rescale'
+			interactive: { enabled: true, mode: 'rescale' }
 		};
 		let interaction: LegendInteractionStore | undefined;
 		const { container } = await render(ExternalSyncHarness, {

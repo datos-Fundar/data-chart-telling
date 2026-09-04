@@ -60,7 +60,14 @@ export type { ThemeName } from './configuration/themes';
 
 // ── Utils ─────────────────────────────────────────────────────────────────────
 export { groupBy, buildSeries } from './utils/grouping';
-export { makeColorScale, normalize, resolveCssColor, paletteColor } from './utils/color';
+export {
+	makeColorScale,
+	normalize,
+	resolveCssColor,
+	paletteColor,
+	contrastTextColor,
+	contrastRatio
+} from './utils/color';
 export { estimateCategoricalAxisMargin } from './plots/utils/categoricalAxisMargin';
 export { estimateLineValueLabelMargin } from './plots/line/valueLabelMargin';
 
@@ -164,6 +171,9 @@ export type {
 	LegendItem,
 	LegendDisabledStyle,
 	LegendItemsLayout,
+	LegendInteractiveStyle,
+	DiscreteInteractiveConfig,
+	ContinuousInteractiveConfig,
 	LegendNavDirection,
 	LegendNavContext,
 	LegendNavSnippet,

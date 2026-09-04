@@ -16,7 +16,7 @@
       {
         type: 'discrete',
         title: 'Sexo',
-        interactive: true,
+        interactive: { enabled: true },
         items: [
           { name: 'female', label: 'Mujeres', symbol: 'square' },
           { name: 'male', label: 'Varones', symbol: 'square' },

@@ -63,9 +63,9 @@ export const GroupedWithLegend: Story = {
 };
 
 /**
- * `interactive: true` on the legend turns each region into a toggle: click
- * to dim that region's points in place (and drop them from hover/tooltip),
- * click again to bring them back.
+ * `interactive: { enabled: true }` on the legend turns each region into a
+ * toggle: click to dim that region's points in place (and drop them from
+ * hover/tooltip), click again to bring them back.
  */
 export const InteractiveLegend: Story = {
   args: {
@@ -76,8 +76,7 @@ export const InteractiveLegend: Story = {
     legend: [{
       type: 'discrete',
       title: 'Región',
-      interactive: true,
-      disabledStyle: { opacity: 0.08 },
+      interactive: { enabled: true, disabledStyle: { opacity: 0.08 } },
       items: [
         { name: 'Americas', symbol: 'circle' },
         { name: 'Europe', symbol: 'circle' },

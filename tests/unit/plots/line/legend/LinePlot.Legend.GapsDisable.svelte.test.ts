@@ -8,17 +8,18 @@ import LineGapsLegendDemo from '../../../../../stories/plots/line/LineGapsLegend
 // it already dims the series' real line — before the fix, the bridge stayed
 // at full opacity regardless of the legend state.
 
-// `LegendLayout`'s own swatch icons (`<svg class="dct-discrete__swatch">`)
-// mount before `LinePlot`'s own `<svg>` here, so a plain "first svg in the
-// container" lookup (as plain `waitForSvg` does) would grab a swatch instead
-// — this demo composes both as siblings, unlike every other Plot-level test
-// that renders exactly one `<svg>`.
+// Returns the first `<svg>` that isn't one of `LegendLayout`'s own icons —
+// the swatch (`dct-discrete__swatch`) or, since this section is
+// `interactive: { enabled: true }`, the badge's eye icon
+// (`dct-discrete__eye`) — both of which mount before `LinePlot`'s own `<svg>`
+// in this demo's sibling layout, unlike every other Plot-level test that
+// renders exactly one `<svg>`.
 async function waitForPlotSvg(container: Element): Promise<SVGElement> {
   let svg: SVGElement | undefined;
   await vi.waitFor(
     () => {
       svg = Array.from(container.querySelectorAll('svg')).find(
-        (s) => !s.classList.contains('dct-discrete__swatch'),
+        (s) => !s.classList.contains('dct-discrete__swatch') && !s.classList.contains('dct-discrete__eye'),
       );
       if (!svg) throw new Error('plot SVG not yet rendered');
     },

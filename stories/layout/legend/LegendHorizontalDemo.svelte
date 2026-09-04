@@ -88,7 +88,7 @@
 				type: 'discrete',
 				title: 'Jurisdicción',
 				items,
-				interactive,
+				interactive: { enabled: interactive },
 				layout: { type: 'horizontal', maxRows },
 				navButton: customNavButton ? navSnippet : undefined
 			}

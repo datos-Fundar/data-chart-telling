@@ -16,7 +16,7 @@
       {
         type: 'discrete',
         title: 'Región',
-        interactive: true,
+        interactive: { enabled: true },
         items: [
           { name: 'Americas', symbol: 'circle' },
           { name: 'Europe', symbol: 'circle' },

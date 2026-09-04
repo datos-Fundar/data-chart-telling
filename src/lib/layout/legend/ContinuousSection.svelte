@@ -12,16 +12,17 @@
   const barWidth = $derived(section.width ?? 170);
 
   const fmt = $derived(section.format ?? ((v: number) => String(v)));
+  const isInteractive = $derived(section.interactive?.enabled ?? false);
 
   // Fill/opacity for the excluded-margin rects.
   const excludedStyle = $derived.by((): { fill: string; opacity: number } => {
-    const d = section.disabledStyle;
+    const d = section.interactive?.disabledStyle;
     if (d?.fill) return { fill: d.fill, opacity: d.fillOpacity ?? d.opacity ?? 1 };
     return { fill: 'currentColor', opacity: d?.fillOpacity ?? d?.opacity ?? 0.35 };
   });
 
   const tickPositions = $derived(
-    section.interactive
+    isInteractive
       ? []
       : (section.ticks ?? []).map((v) => ({
           v,
@@ -68,7 +69,9 @@
   const hiT = $derived(toT(hi));
 
   const colorDomain = $derived.by((): [number, number] =>
-    section.interactive && (section.mode ?? 'filter') === 'rescale' ? [lo, hi] : [section.min, section.max],
+    isInteractive && (section.interactive?.mode ?? 'filter') === 'rescale'
+      ? [lo, hi]
+      : [section.min, section.max],
   );
   const colorScale = $derived(
     makeColorScale(
@@ -88,21 +91,21 @@
   );
 
   $effect(() => {
-    if (!section.interactive) return;
+    if (!isInteractive) return;
     interaction.continuousRange =
       lo <= section.min && hi >= section.max
         ? null
         : {
             min: lo,
             max: hi,
-            mode: section.mode ?? 'filter',
-            disabledStyle: section.disabledStyle ?? { opacity: cfg.legend.disabledOpacity },
+            mode: section.interactive?.mode ?? 'filter',
+            disabledStyle: section.interactive?.disabledStyle ?? { opacity: cfg.legend.disabledOpacity },
           };
   });
 
   // Mirrors an externally-set `interaction.continuousRange` into lo/hi.
   $effect(() => {
-    if (!section.interactive) return;
+    if (!isInteractive) return;
     const range = interaction.continuousRange;
     if (range === null) {
       if (untrack(() => loAdjusted || hiAdjusted)) {
@@ -122,7 +125,7 @@
 
   function startDrag(which: 'lo' | 'hi') {
     return (event: PointerEvent) => {
-      if (!section.interactive) return;
+      if (!isInteractive) return;
       event.preventDefault();
       if (which === 'lo') loAdjusted = true;
       else hiAdjusted = true;
@@ -179,22 +182,22 @@
       <rect class="dct-continuous__tick-mark" x={tick.t * barWidth} y="12" />
     {/each}
 
-    {#if section.interactive}
+    {#if isInteractive}
       {#if loT > 0}
         <rect x="0" y="0" width={loT * barWidth} height="12" rx="2" fill={excludedStyle.fill} fill-opacity={excludedStyle.opacity} />
       {/if}
       {#if hiT < 1}
         <rect x={hiT * barWidth} y="0" width={barWidth - hiT * barWidth} height="12" rx="2" fill={excludedStyle.fill} fill-opacity={excludedStyle.opacity} />
       {/if}
-      {#if section.handle}
-        {@render section.handle({
+      {#if section.interactive?.handle}
+        {@render section.interactive.handle({
           which: 'lo',
           value: lo,
           position: loT,
           onpointerdown: startDrag('lo'),
           ondoubleclick: resetHandle('lo'),
         })}
-        {@render section.handle({
+        {@render section.interactive.handle({
           which: 'hi',
           value: hi,
           position: hiT,
@@ -233,7 +236,7 @@
   </svg>
 
   <div class="dct-continuous__labels" style:width="{barWidth}px">
-    {#if section.interactive}
+    {#if isInteractive}
       <span class="dct-continuous__tick dct-continuous__tick--handle-lo" style:left="{loT * barWidth}px">{fmt(lo)}</span>
       <span class="dct-continuous__tick dct-continuous__tick--handle-hi" style:left="{hiT * barWidth}px">{fmt(hi)}</span>
     {:else}
