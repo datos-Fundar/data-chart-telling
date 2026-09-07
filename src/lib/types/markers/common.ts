@@ -26,10 +26,10 @@ export type HoverMarkerConfig = {
   ruleX?: boolean;
   ruleY?: boolean;
   /**
-   * Thickened area in place of a thin crosshair — the width of the hovered
-   * bar/cell (see `AreaStyle.width` to override), spanning the full opposite
-   * axis. Off by default; meaningful only on a band (categorical) scale, so
-   * it renders nothing on a line/scatter plot's continuous axis.
+   * Thickened area in place of a thin crosshair — sized to the hovered
+   * bar/cell's own width, spanning the full opposite axis. Off by default;
+   * meaningful only on a band (categorical) scale, so it renders nothing on
+   * a line/scatter plot's continuous axis.
    */
   areaX?: boolean;
   areaY?: boolean;
@@ -59,8 +59,7 @@ export type LineMarkerConfig = {
  * for hover, resolved against the live scale at render time; `role:
  * 'highlight'` is `HoverMarkerConfig`'s `areaX`/`areaY` highlight — a
  * visible, non-interactive rect centered on `category`, spanning the full
- * opposite axis, `style.width` pixels wide (defaulting to the category
- * band's own width plus 2px when unset).
+ * opposite axis, sized to the category band's own width plus 2px.
  */
 export type BarMarkerConfig = {
   type: 'bar';

@@ -317,11 +317,11 @@ export const StackedSeries: Story = {
 
 /**
  * `areaY: true` — a translucent area the height of the hovered province's
- * own row, spanning the full plot width, replacing the thin crosshair rule
- * with a highlight closer to how a hovered row often reads in a horizontal
- * bar chart. Defaults to a neutral gray sized to the row's own band width
- * plus 2px; overridable via `areaStyle` (see `WithCustomHighlightArea`) or
- * the `hover.area` theme config.
+ * own row (its band width plus 2px), spanning the full plot width,
+ * replacing the thin crosshair rule with a highlight closer to how a
+ * hovered row often reads in a horizontal bar chart. Defaults to a neutral
+ * gray, overridable via `areaStyle` (see `WithCustomHighlightArea`) or the
+ * `hover.area` theme config.
  */
 export const WithHighlightArea: Story = {
   args: {
@@ -346,10 +346,10 @@ export const WithHighlightArea: Story = {
 };
 
 /**
- * `areaStyle` overrides the highlight area's color/opacity and, via `width`,
- * its thickness — otherwise defaulted from the hovered bar's own width.
- * `areaX`/`areaY` and the crosshair rule are independent and can be combined;
- * here the rule is turned off so the area is the only highlight.
+ * `areaStyle` overrides the highlight area's color/opacity; its thickness is
+ * always sized to the hovered bar's own width plus 2px. `areaX`/`areaY` and
+ * the crosshair rule are independent and can be combined; here the rule is
+ * turned off so the area is the only highlight.
  */
 export const WithCustomHighlightArea: Story = {
   args: {
@@ -367,7 +367,6 @@ export const WithCustomHighlightArea: Story = {
         areaX: true,
         ruleX: false,
         areaStyle: {
-          width: 28,
           fill: '#0891b2',
           fillOpacity: 0.18,
         },

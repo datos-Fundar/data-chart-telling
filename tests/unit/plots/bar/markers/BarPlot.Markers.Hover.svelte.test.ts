@@ -251,22 +251,6 @@ describe('BarPlot – markers.hover areaX/areaY', () => {
     });
   });
 
-  test('an explicit areaStyle.width overrides the computed band-width default', async () => {
-    const { container } = await render(BarPlot, {
-      width: 400,
-      height: 300,
-      series: [FEMALE],
-      markers: [{ type: 'hover', areaX: true, areaStyle: { width: 42 } }] satisfies AxisBasedMarkersConfig[],
-    });
-    const svg = await waitForSvg(container);
-    hoverFirstCategory(svg);
-    await vi.waitFor(() => {
-      expect(countHoverAreas(svg)).toBe(1);
-    });
-    const area = svg.querySelector('rect.hover-area')!;
-    expect(Number(area.getAttribute('width'))).toBe(42);
-  });
-
   test('renders with the neutral gray default fill when no areaStyle is given', async () => {
     const { container } = await render(BarPlot, {
       width: 400,

@@ -91,7 +91,7 @@
         />
       {/if}
     {:else}
-      {@const thickness = marker.style?.width ?? bandwidth + 2}
+      {@const thickness = bandwidth + 2}
       {@const center = bandStart + bandwidth / 2}
       {#if marker.isHorizontal}
         <rect
