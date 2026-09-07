@@ -99,7 +99,9 @@ const preview: Preview = {
 						'Facets',
 						['Grid', 'MarginAlignment', 'Paginated', 'Carousel'],
 						'Legend',
-						['Discrete', 'Continuous', 'Composition', 'Interactive', 'Paginated']
+						['Discrete', 'Continuous', 'Composition', 'Interactive', 'Paginated'],
+						'Tooltip',
+						['Basics', 'MultiSeries', 'Customization', 'FacetSync']
 					],
 					'Configuration',
 					'Charts',
