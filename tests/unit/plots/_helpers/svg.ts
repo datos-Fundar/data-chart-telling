@@ -39,6 +39,13 @@ export function countCells(svg: SVGElement): number {
   return svg.querySelectorAll('g.cell rect').length;
 }
 
+// HoverMarker's optional `areaX`/`areaY` highlight — a plain `<rect>`
+// tagged with this class (see `BarMarker.svelte`'s `role: 'highlight'`),
+// distinct from a bar/pyramid plot's own `g.bar-y rect`/`g.bar-x rect` marks.
+export function countHoverAreas(svg: SVGElement): number {
+  return svg.querySelectorAll('rect.hover-area').length;
+}
+
 // GeoPlot's base map, `graticule`, and `sphere` markers all render through
 // svelteplot's `Geo` mark — `Graticule`/`Sphere` are thin wrappers around
 // `Geo` internally. `Geo` only puts the `geo` class on its wrapping `<g>`

@@ -196,6 +196,29 @@ export const SeriesScoped: Story = {
 };
 
 /**
+ * `areaY: true` — a translucent area across the hovered age group's full
+ * row, spanning both sides of the pyramid, in place of (or alongside) the
+ * thin `ruleY` crosshair. Defaults to a neutral gray sized to the row's own
+ * band width plus 2px; `areaX` has no effect here since pyramid's diverging
+ * magnitude axis isn't a band scale.
+ */
+export const WithHighlightArea: Story = {
+  args: {
+    data: DATA,
+    x: 'pct',
+    y: 'ageGroup',
+    z: 'sex',
+    scales: { y: { domain: AGE_GROUPS } },
+    markers: [
+      {
+        type: 'hover',
+        areaY: true,
+      },
+    ] satisfies AxisBasedMarkersConfig[],
+  },
+};
+
+/**
  * Hover marker on explicit series — the same unscoped hover marker behaves
  * identically whether the pyramid is built from the data/x/y/z shorthand
  * (see `Basic`) or, as here, an explicit two-series array (see `ExplicitSeries`

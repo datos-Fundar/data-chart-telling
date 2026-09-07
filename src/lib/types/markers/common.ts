@@ -25,9 +25,18 @@ export type HoverMarkerConfig = {
   sync?: boolean;
   ruleX?: boolean;
   ruleY?: boolean;
+  /**
+   * Thickened area in place of a thin crosshair — the width of the hovered
+   * bar/cell (see `AreaStyle.width` to override), spanning the full opposite
+   * axis. Off by default; meaningful only on a band (categorical) scale, so
+   * it renders nothing on a line/scatter plot's continuous axis.
+   */
+  areaX?: boolean;
+  areaY?: boolean;
   showLabels?: boolean;
   format?: (point: HoverDisplayPoint) => string;
   ruleStyle?: StrokeStyle;
+  areaStyle?: AreaStyle;
   dotStyle?: DotStyle;
   fontStyle?: FontStyle;
 };
@@ -47,11 +56,15 @@ export type LineMarkerConfig = {
  * A single bar mark. `role: 'segment'` is a visible bar
  * (`x`/`y`/`x1`/`x2`/`y1`/`y2` map to svelteplot's `<BarX>`/`<BarY>` per
  * `isHorizontal`); `role: 'hitArea'` is an invisible per-category hit region
- * for hover, resolved against the live scale at render time.
+ * for hover, resolved against the live scale at render time; `role:
+ * 'highlight'` is `HoverMarkerConfig`'s `areaX`/`areaY` highlight — a
+ * visible, non-interactive rect centered on `category`, spanning the full
+ * opposite axis, `style.width` pixels wide (defaulting to the category
+ * band's own width plus 2px when unset).
  */
 export type BarMarkerConfig = {
   type: 'bar';
-  role: 'segment' | 'hitArea';
+  role: 'segment' | 'hitArea' | 'highlight';
   isHorizontal: boolean;
   data: Record<string, unknown>[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

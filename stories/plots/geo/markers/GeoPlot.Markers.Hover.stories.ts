@@ -38,7 +38,7 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** Basic hover marker — the feature under the cursor outlines itself. Matching follows the browser's own SVG hit-testing, not distance to a centroid. */
+/** Basic hover marker — the feature under the cursor gets a neutral translucent fill (the shared `hover.area` theme default). Matching follows the browser's own SVG hit-testing, not distance to a centroid. */
 export const Basic: Story = {
   args: {
     markers: [{ type: 'geo-hover' }] satisfies GeoMarkersConfig[],

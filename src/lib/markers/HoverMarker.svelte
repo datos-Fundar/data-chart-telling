@@ -2,6 +2,7 @@
   import DotMarker from './DotMarker.svelte';
   import TextMarker from './TextMarker.svelte';
   import RuleMarker from './RuleMarker.svelte';
+  import BarMarker from './BarMarker.svelte';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import type { MarkerProps } from '$lib/types/markers/props';
   import type { HoverMarkerConfig } from '$lib/types/markers/common';
@@ -22,10 +23,19 @@
    * pattern `BarMarker`/`RuleMarker` follow. `activePoint`/
    * `impliesCrosshairX`/`impliesCrosshairY` are all optional and default to
    * "no crosshair".
+   *
+   * `areaX`/`areaY` are a separate, always-explicit opt-in (no implied
+   * default) for a thickened area highlight in place of the thin crosshair —
+   * see `HoverMarkerConfig`'s own doc comment. Rendered via `BarMarker`'s
+   * `role: 'highlight'`, so it renders nothing on an axis without a band
+   * scale (e.g. a line/scatter plot's continuous axis).
    */
   interface Props extends MarkerProps<HoverDisplayPoint> {
     /** Narrowed to just the fields this component reads — `HoverMarkerConfig` also carries routing/scoping fields (`series`/`scope`/`strategy`/`sync`) it has no use for. */
-    marker: Pick<HoverMarkerConfig, 'ruleX' | 'ruleY' | 'showLabels' | 'format' | 'ruleStyle' | 'dotStyle' | 'fontStyle'>;
+    marker: Pick<
+      HoverMarkerConfig,
+      'ruleX' | 'ruleY' | 'areaX' | 'areaY' | 'showLabels' | 'format' | 'ruleStyle' | 'areaStyle' | 'dotStyle' | 'fontStyle'
+    >;
     activePoint?: HoverDisplayPoint | null;
     impliesCrosshairX?: boolean;
     impliesCrosshairY?: boolean;
@@ -46,9 +56,13 @@
   const showCrosshairY = $derived(marker.ruleY !== false && (impliesCrosshairY || marker.ruleY === true));
   const ruleX = $derived(showCrosshairX ? (activePoint?.x ?? null) : null);
   const ruleY = $derived(showCrosshairY ? (activePoint?.y ?? null) : null);
+  // areaX/areaY have no implied default — always off unless explicitly set.
+  const areaX = $derived(marker.areaX === true ? (activePoint?.x ?? null) : null);
+  const areaY = $derived(marker.areaY === true ? (activePoint?.y ?? null) : null);
   const showLabels = $derived(marker.showLabels ?? true);
   const format = $derived(marker.format);
   const ruleStyle = $derived(marker.ruleStyle);
+  const areaStyle = $derived({ ...cfg.hover.area, ...marker.areaStyle });
   const dotStyle = $derived(marker.dotStyle);
   const fontStyle = $derived(marker.fontStyle);
 
@@ -92,6 +106,32 @@
     };
   }
 </script>
+
+{#if areaX != null}
+  <BarMarker
+    marker={{
+      type: 'bar',
+      role: 'highlight',
+      isHorizontal: false,
+      data: [],
+      category: areaX,
+      style: areaStyle,
+    }}
+  />
+{/if}
+
+{#if areaY != null}
+  <BarMarker
+    marker={{
+      type: 'bar',
+      role: 'highlight',
+      isHorizontal: true,
+      data: [],
+      category: areaY,
+      style: areaStyle,
+    }}
+  />
+{/if}
 
 {#if ruleX != null}
   <RuleMarker axis="x" value={ruleX} style={{ ...cfg.hover.rule, ...ruleStyle }} />

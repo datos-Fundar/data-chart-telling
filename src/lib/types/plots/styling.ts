@@ -65,4 +65,6 @@ export type AreaStyle = {
   strokeOpacity?: number;
   strokeDasharray?: string | LineStyle;
   borderRadius?: number;
+  /** `HoverMarkerConfig`'s `areaX`/`areaY` only — explicit thickness in pixels, defaulting to the hovered bar/cell's own width plus 2px. Unused elsewhere. */
+  width?: number;
 };

@@ -162,7 +162,11 @@ export type ChartConfig = {
 	scatter: { dotRadius: number };
 	/** Timeline gutter styling. */
 	timeline: { axisColor: string; activeColor: string; thickness: number };
-	/** In-SVG hover highlight: crosshair rule, dot + value label, and geo feature restyle. */
+	/**
+	 * In-SVG hover highlight: crosshair rule, dot + value label, and the area
+	 * highlight — a restyled feature on `GeoPlot`, or an `areaX`/`areaY` band
+	 * on an axis-based plot's band scale.
+	 */
 	hover: { rule: StrokeStyle; dot: DotStyle; font: FontStyle; area: AreaStyle };
 
 	// ── Facet (small multiples) ──────────────────────────────────────────────────

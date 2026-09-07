@@ -5,8 +5,9 @@
   /**
    * Renders one `'bar'` marker — `role: 'segment'` is a visible bar
    * (`<BarX>`/`<BarY>`, per `isHorizontal`); `role: 'hitArea'` is an
-   * invisible hit region for one category, resolved against the live scale
-   * via `usePlot()`.
+   * invisible hit region for one category; `role: 'highlight'` is a visible,
+   * non-interactive area highlight. The latter two resolve their geometry
+   * against the live scale via `usePlot()`.
    */
   let { marker }: { marker: BarMarkerConfig } = $props();
 
@@ -66,27 +67,65 @@
     {@const bandwidth = categoryScale.fn.bandwidth()}
     {@const bandStart = Number(categoryScale.fn(marker.category as never) ?? 0)}
     {@const [valueMin, valueMax] = valueExtentFor(marker.isHorizontal)}
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    {#if marker.isHorizontal}
-      <rect
-        x={valueMin}
-        y={bandStart}
-        width={Math.max(0, valueMax - valueMin)}
-        height={bandwidth}
-        fill="transparent"
-        onpointerenter={marker.onpointerenter}
-        onpointerleave={marker.onpointerleave}
-      />
+    {#if marker.role === 'hitArea'}
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      {#if marker.isHorizontal}
+        <rect
+          x={valueMin}
+          y={bandStart}
+          width={Math.max(0, valueMax - valueMin)}
+          height={bandwidth}
+          fill="transparent"
+          onpointerenter={marker.onpointerenter}
+          onpointerleave={marker.onpointerleave}
+        />
+      {:else}
+        <rect
+          x={bandStart}
+          y={valueMin}
+          width={bandwidth}
+          height={Math.max(0, valueMax - valueMin)}
+          fill="transparent"
+          onpointerenter={marker.onpointerenter}
+          onpointerleave={marker.onpointerleave}
+        />
+      {/if}
     {:else}
-      <rect
-        x={bandStart}
-        y={valueMin}
-        width={bandwidth}
-        height={Math.max(0, valueMax - valueMin)}
-        fill="transparent"
-        onpointerenter={marker.onpointerenter}
-        onpointerleave={marker.onpointerleave}
-      />
+      {@const thickness = marker.style?.width ?? bandwidth + 2}
+      {@const center = bandStart + bandwidth / 2}
+      {#if marker.isHorizontal}
+        <rect
+          class="hover-area"
+          x={valueMin}
+          y={center - thickness / 2}
+          width={Math.max(0, valueMax - valueMin)}
+          height={thickness}
+          fill={marker.style?.fill}
+          fill-opacity={marker.style?.fillOpacity}
+          stroke={marker.style?.stroke}
+          stroke-width={marker.style?.strokeWidth}
+          stroke-opacity={marker.style?.strokeOpacity}
+          stroke-dasharray={marker.style?.strokeDasharray}
+          rx={marker.style?.borderRadius}
+          pointer-events="none"
+        />
+      {:else}
+        <rect
+          class="hover-area"
+          x={center - thickness / 2}
+          y={valueMin}
+          width={thickness}
+          height={Math.max(0, valueMax - valueMin)}
+          fill={marker.style?.fill}
+          fill-opacity={marker.style?.fillOpacity}
+          stroke={marker.style?.stroke}
+          stroke-width={marker.style?.strokeWidth}
+          stroke-opacity={marker.style?.strokeOpacity}
+          stroke-dasharray={marker.style?.strokeDasharray}
+          ry={marker.style?.borderRadius}
+          pointer-events="none"
+        />
+      {/if}
     {/if}
   {/if}
 {/if}

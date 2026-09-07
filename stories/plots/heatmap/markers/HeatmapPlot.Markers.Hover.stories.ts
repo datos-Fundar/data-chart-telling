@@ -160,6 +160,25 @@ export const WithCustomRuleStyle: Story = {
 };
 
 /**
+ * `areaX`/`areaY` together — since both of a heatmap's axes are band scales,
+ * the two translucent highlight areas cross exactly at the hovered cell,
+ * highlighting its full row and column at once. Each defaults to a neutral
+ * gray sized to the cell's own width/height plus 2px.
+ */
+export const WithHighlightCross: Story = {
+  args: {
+    series: SERIES,
+    markers: [
+      {
+        type: 'hover',
+        areaX: true,
+        areaY: true,
+      },
+    ] satisfies AxisBasedMarkersConfig[],
+  },
+};
+
+/**
  * Two series from separate per-sex arrays — the unscoped hover marker
  * responds identically whether the grid comes from one combined series or,
  * as here, two merged per-sex series (see `TwoSeriesBySex` in the Series
