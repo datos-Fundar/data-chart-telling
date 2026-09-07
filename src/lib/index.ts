@@ -59,7 +59,7 @@ export { THEMES } from './configuration/themes';
 export type { ThemeName } from './configuration/themes';
 
 // ── Utils ─────────────────────────────────────────────────────────────────────
-export { groupBy, buildSeries } from './utils/grouping';
+export { groupBy } from './utils/grouping';
 export {
 	makeColorScale,
 	normalize,
@@ -170,6 +170,7 @@ export type {
 	ContinuousLegendSection,
 	LegendItem,
 	LegendDisabledStyle,
+	LegendDisabledAction,
 	LegendItemsLayout,
 	LegendInteractiveStyle,
 	DiscreteInteractiveConfig,

@@ -2,7 +2,12 @@
 	import { paletteColor } from '$lib/utils/color';
 	import { buildSeries } from '$lib/utils/grouping';
 	import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
-	import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
+	import {
+		disabledFillOverride,
+		resolveEffectiveDisabledStyle,
+		omitDisabledSeries,
+		buildSeriesColorIndex
+	} from '$lib/plots/utils/legendDisabled';
 	import { resolveAccessor } from '$lib/plots/utils/accessors';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import {
@@ -71,7 +76,15 @@
 	});
 
 	const cfg = $derived(getConfiguration());
-	const resolvedSeries = $derived(series ?? buildSeries(data!, x!, y!, z));
+	const legendInteraction = $derived(getLegendInteraction());
+	// Unfiltered series list, for stable per-name color indexing.
+	const fullSeries = $derived(series ?? buildSeries(data!, x!, y!, z));
+	const colorIndex = $derived(buildSeriesColorIndex(fullSeries));
+	function colorForSeries(name: string): string {
+		return paletteColor(colorIndex.get(name) ?? 0, cfg.palette);
+	}
+	// Drops series toggled off with `disabled: { mode: 'omit' }`.
+	const resolvedSeries = $derived(omitDisabledSeries(fullSeries, legendInteraction));
 	const groupedSeries = $derived(
 		// connect: false — bars are discrete; there's no visual gap between
 		// adjacent categories to bridge (see buildGroupedSeries's own doc).
@@ -104,7 +117,7 @@
 		buildScopedMarkerGroups<TData, Series<TData>, BarSegmentStyle>({
 			groupedSeries,
 			segments,
-			colorFor: (_series, seriesIndex) => paletteColor(seriesIndex, cfg.palette),
+			colorFor: (series) => colorForSeries(series.name),
 			segmentColorFor: (style, defaultColor) => style?.fill ?? defaultColor
 		})
 	);
@@ -181,7 +194,6 @@
 	// which drive tick/domain computation and the Pointer's hit-testing) —
 	// `row` (see BasePlotLayout/HoverPoint) is what lets the template recover the
 	// semantic category regardless of which axis it landed on.
-	const legendInteraction = $derived(getLegendInteraction());
 	const hoverIsolate = $derived(styles.values?.hoverIsolate ?? false);
 
 	// A value label hovered while `styles.values.hoverIsolate` is on dims
@@ -191,18 +203,19 @@
 	let hoverIsolatedSeries = $state<string | null>(null);
 
 	function effectiveDisabledFor(name: string): LegendDisabledStyle | undefined {
-		return (
-			legendInteraction?.disabledSeries.get(name) ??
-			(hoverIsolate && hoverIsolatedSeries && hoverIsolatedSeries !== name
-				? { opacity: cfg.legend.disabledOpacity }
-				: undefined)
+		return resolveEffectiveDisabledStyle(
+			name,
+			legendInteraction,
+			cfg.legend.disabledOpacity,
+			hoverIsolate,
+			hoverIsolatedSeries
 		);
 	}
 
 	// A legend-disabled series is dimmed on the bar itself, but never surfaces
 	// in hover/tooltip — its points are simply absent from the candidate list.
 	const hoverPoints = $derived(
-		buildHoverPoints(resolvedSeries, isHorizontal, barLayout, cfg.palette).filter(
+		buildHoverPoints(resolvedSeries, isHorizontal, barLayout, colorForSeries).filter(
 			(p) => !legendInteraction?.disabledSeries.has(p.series!)
 		)
 	);
@@ -294,7 +307,7 @@
 			barLayout,
 			isHorizontal,
 			hoverPoints,
-			palette: cfg.palette,
+			colorFor: colorForSeries,
 			disabledFillFor: (name) => disabledFillOverride(effectiveDisabledFor(name)),
 			active: hover.active,
 			setHoverMatch,

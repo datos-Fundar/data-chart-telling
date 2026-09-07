@@ -20,6 +20,9 @@ export type LegendDisabledStyle = {
 	fillOpacity?: number;
 };
 
+/** What a legend toggle does to a series once it's off: `'style'` dims it in place, `'omit'` removes it from the plot entirely. */
+export type LegendDisabledAction = { mode: 'style'; style?: LegendDisabledStyle } | { mode: 'omit' };
+
 export type LegendItem = {
 	name: string;
 	label?: string;
@@ -32,11 +35,9 @@ export type LegendItem = {
 };
 
 /**
- * How a discrete section's items flow. `'vertical'` (the default) stacks them
- * in a `columns`-wide grid, as it always has. `'horizontal'` flows them left
- * to right, wrapping to new rows as needed — and once wrapped rows exceed
- * `maxRows` (default 1), the section paginates instead of growing taller,
- * surfacing prev/next arrows to page through the rest.
+ * How a discrete section's items flow. `'vertical'` stacks them in a
+ * `columns`-wide grid; `'horizontal'` flows them left to right, paginating
+ * past `maxRows` (default 1) with prev/next arrows.
  */
 export type LegendItemsLayout = { type: 'vertical' } | { type: 'horizontal'; maxRows?: number };
 
@@ -78,8 +79,8 @@ export type DiscreteInteractiveConfig = {
 	enabled?: boolean;
 	/** Item look while `enabled`. Defaults to `'badge'`. */
 	legendStyle?: LegendInteractiveStyle;
-	/** Style applied to a toggled-off item. Defaults to `{ opacity: cfg.legend.disabledOpacity }`. */
-	disabledStyle?: LegendDisabledStyle;
+	/** What happens to a toggled-off item. Defaults to `{ mode: 'style' }`. */
+	disabled?: LegendDisabledAction;
 	/** Shows the symbol icon inside a `'badge'` pill. Defaults to `true`; ignored by `'basic'`, which always shows it. */
 	showIcon?: boolean;
 };
@@ -89,7 +90,7 @@ export type DiscreteLegendSection = {
 	title?: string;
 	items: LegendItem[];
 	columns?: number;
-	/** Item flow direction. Defaults to `{ type: 'vertical' }` (unchanged prior behaviour). */
+	/** Item flow direction. Defaults to horizontal for a lone section, vertical once there's more than one. */
 	layout?: LegendItemsLayout;
 	interactive?: DiscreteInteractiveConfig;
 	navButton?: LegendNavSnippet;
@@ -137,8 +138,8 @@ export type LegendSection = DiscreteLegendSection | ContinuousLegendSection;
  * own private store via `createLegendInteraction`.
  */
 export type LegendInteractionStore = {
-	/** Legend item name → resolved style to apply. Presence in the map means "disabled". */
-	disabledSeries: SvelteMap<string, LegendDisabledStyle>;
+	/** Legend item name → action to apply. Presence in the map means "disabled". */
+	disabledSeries: SvelteMap<string, LegendDisabledAction>;
 	/**
 	 * The active drag state of the (first) interactive continuous section, or
 	 * `null` when none is interactive or the user hasn't narrowed it yet (full

@@ -3,6 +3,7 @@ import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import { AMERICAS, COUNTRIES } from './data';
 import ScatterValuesLegendDemo from './ScatterValuesLegendDemo.svelte';
+import ScatterOmitLegendDemo from './ScatterOmitLegendDemo.svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Kept in its own file/docs page, separate from `ScatterPlot.Styles` — the
@@ -49,6 +50,11 @@ type Story = StoryObj<typeof meta>;
  */
 export const LegendDisabledDimsLabels: StoryObj = {
   render: () => ({ Component: ScatterValuesLegendDemo }),
+};
+
+/** `interactive.disabled: { mode: 'omit' }` removes a toggled-off region from the plot and rescales both axes. See `ScatterOmitLegendDemo.svelte`. */
+export const LegendOmitRescalesDomain: StoryObj = {
+  render: () => ({ Component: ScatterOmitLegendDemo }),
 };
 
 /**

@@ -83,9 +83,9 @@ export const GroupedWithLegend: Story = {
 /**
  * `interactive: { enabled: true }` on the discrete legend section turns each
  * item into a toggle: click "PBI" or "Empleo" to dim that line (and its
- * dots) in place, click again to bring it back. `disabledStyle` is
- * caller-provided — here a near-full fade; omit it to fall back to the
- * package's default dim opacity. A hidden series also drops out of
+ * dots) in place, click again to bring it back. `disabled: { mode: 'style',
+ * style }` is caller-provided — here a near-full fade; omit `style` to fall
+ * back to the package's default dim opacity. A hidden series also drops out of
  * hover/tooltip matching, not just the visual fade — `tooltip: true` shows that.
  */
 export const InteractiveLegend: Story = {
@@ -98,7 +98,7 @@ export const InteractiveLegend: Story = {
     legend: [{
       type: 'discrete',
       title: 'Indicador',
-      interactive: { enabled: true, disabledStyle: { opacity: 0.08 } },
+      interactive: { enabled: true, disabled: { mode: 'style', style: { opacity: 0.08 } } },
       items: [
         { name: 'PBI', symbol: 'line' },
         { name: 'Empleo', symbol: 'line' },

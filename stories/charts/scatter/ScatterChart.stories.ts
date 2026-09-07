@@ -76,7 +76,7 @@ export const InteractiveLegend: Story = {
     legend: [{
       type: 'discrete',
       title: 'Región',
-      interactive: { enabled: true, disabledStyle: { opacity: 0.08 } },
+      interactive: { enabled: true, disabled: { mode: 'style', style: { opacity: 0.08 } } },
       items: [
         { name: 'Americas', symbol: 'circle' },
         { name: 'Europe', symbol: 'circle' },

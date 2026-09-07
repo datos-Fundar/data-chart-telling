@@ -46,7 +46,7 @@ export type ChartConfig = {
 		gap: string;
 		/** swatch square size */
 		swatchSize: string;
-		/** Fallback opacity for a legend-disabled series/value when a section doesn't set its own `disabledStyle`. */
+		/** Fallback opacity for a legend-disabled series/value when a section doesn't set its own style. */
 		disabledOpacity: number;
 		/** Prev/next arrows shown when a `layout: { type: 'horizontal' }` discrete section overflows `maxRows`. */
 		navButton: {

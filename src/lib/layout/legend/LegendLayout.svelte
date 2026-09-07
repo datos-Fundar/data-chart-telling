@@ -1,13 +1,18 @@
 <script lang="ts">
-  import type { LegendSection } from '$lib/types/layout/legend';
+  import type { LegendItemsLayout, LegendSection } from '$lib/types/layout/legend';
   import DiscreteSection from '$lib/layout/legend/DiscreteSection.svelte';
   import ContinuousSection from '$lib/layout/legend/ContinuousSection.svelte';
 
   /**
    * Renders one or more legend sections side by side, dispatching each to the
    * matching section renderer. Discrete and continuous sections can be mixed.
+   * A lone discrete section's items default to horizontal flow; vertical once
+   * a second section joins. A section's own `layout` always wins.
    */
   let { sections }: { sections: LegendSection[] } = $props();
+  const defaultItemsLayout = $derived<LegendItemsLayout>(
+    sections.length === 1 ? { type: 'horizontal' } : { type: 'vertical' }
+  );
 </script>
 
 <div class="dct-legend">
@@ -17,7 +22,7 @@
         <div class="dct-legend__title">{section.title}</div>
       {/if}
       {#if section.type === 'discrete'}
-        <DiscreteSection {section} />
+        <DiscreteSection {section} {defaultItemsLayout} />
       {:else if section.type === 'continuous'}
         <ContinuousSection {section} />
       {/if}

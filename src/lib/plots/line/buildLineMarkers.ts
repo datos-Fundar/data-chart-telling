@@ -1,5 +1,4 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
-import { paletteColor } from '$lib/utils/color';
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
@@ -14,15 +13,16 @@ import type { LineMarkerConfig, DotMarkerConfig } from '$lib/types/markers/commo
  */
 export function buildLineMarkers<TData extends Record<string, unknown>>(args: {
   groupedSeries: VisualGroup<Series<TData>, LineSegmentStyle>[];
+  colorFor: (seriesName: string) => string;
   disabledStrokeFor: (seriesName: string) => StrokeStyle | undefined;
   disabledDotsFor: (seriesName: string) => DotStyle | undefined;
 }): (LineMarkerConfig | DotMarkerConfig)[] {
-  const { groupedSeries, disabledStrokeFor, disabledDotsFor } = args;
+  const { groupedSeries, colorFor, disabledStrokeFor, disabledDotsFor } = args;
   const cfg = getConfiguration();
 
   const markers: (LineMarkerConfig | DotMarkerConfig)[] = [];
-  groupedSeries.forEach((group, seriesIndex) => {
-    const defaultColor = paletteColor(seriesIndex, cfg.palette);
+  groupedSeries.forEach((group) => {
+    const defaultColor = colorFor(group.series.name);
     const disabledStroke = disabledStrokeFor(group.series.name);
     const disabledDots = disabledDotsFor(group.series.name);
     const xFn = resolveAccessor(group.series.x);

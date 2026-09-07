@@ -6,18 +6,25 @@
 		getLegendInteraction,
 		createLegendInteraction
 	} from '$lib/layout/legend/interaction.svelte';
+	import { resolveDisabledStyle } from '$lib/plots/utils/legendDisabled';
 	import DiscreteBadgeItem from '$lib/layout/legend/DiscreteBadgeItem.svelte';
 	import DiscreteSwatchItem from '$lib/layout/legend/DiscreteSwatchItem.svelte';
 	import type {
 		DiscreteLegendSection,
+		LegendDisabledAction,
 		LegendItem,
+		LegendItemsLayout,
 		LegendNavDirection
 	} from '$lib/types/layout/legend';
 
-	let { section }: { section: DiscreteLegendSection } = $props();
+	/** `defaultItemsLayout` is the fallback used when `section.layout` isn't set. */
+	let {
+		section,
+		defaultItemsLayout = { type: 'vertical' }
+	}: { section: DiscreteLegendSection; defaultItemsLayout?: LegendItemsLayout } = $props();
 
 	const cfg = $derived(getConfiguration());
-	const layout = $derived(section.layout ?? { type: 'vertical' as const });
+	const layout = $derived(section.layout ?? defaultItemsLayout);
 	const isHorizontal = $derived(layout.type === 'horizontal');
 	const maxRows = $derived(layout.type === 'horizontal' ? Math.max(1, layout.maxRows ?? 1) : 1);
 	const columns = $derived(section.columns ?? 1);
@@ -26,8 +33,8 @@
 		isInteractive && (section.interactive?.legendStyle ?? 'badge') === 'badge'
 	);
 	const showIcon = $derived(section.interactive?.showIcon ?? true);
-	const disabledStyle = $derived(
-		section.interactive?.disabledStyle ?? { opacity: cfg.legend.disabledOpacity }
+	const disabledAction = $derived<LegendDisabledAction>(
+		section.interactive?.disabled ?? { mode: 'style' }
 	);
 	const interaction = getLegendInteraction() ?? createLegendInteraction();
 
@@ -37,7 +44,7 @@
 			if (seeded.has(item.name)) continue;
 			seeded.add(item.name);
 			if (item.disabled) {
-				interaction.disabledSeries.set(item.name, disabledStyle);
+				interaction.disabledSeries.set(item.name, disabledAction);
 			}
 		}
 	});
@@ -47,7 +54,7 @@
 		if (interaction.disabledSeries.has(item.name)) {
 			interaction.disabledSeries.delete(item.name);
 		} else {
-			interaction.disabledSeries.set(item.name, disabledStyle);
+			interaction.disabledSeries.set(item.name, disabledAction);
 		}
 	}
 
@@ -142,8 +149,14 @@
 </script>
 
 {#snippet discreteItem(item: LegendItem, i: number)}
-	{@const disabledStyle = interaction.disabledSeries.get(item.name)}
-	{@const isDisabled = disabledStyle != null}
+	{@const action = interaction.disabledSeries.get(item.name)}
+	{@const isDisabled = action != null}
+	{@const omitMode = disabledAction.mode === 'omit'}
+	{@const disabledStyle = isDisabled
+		? omitMode
+			? { opacity: cfg.legend.disabledOpacity }
+			: resolveDisabledStyle(action, cfg.legend.disabledOpacity)
+		: undefined}
 	{@const color =
 		disabledStyle?.fill ??
 		disabledStyle?.stroke?.stroke ??
@@ -167,7 +180,7 @@
 			: {}}
 	>
 		{#if useBadge}
-			<DiscreteBadgeItem {item} {color} disabled={isDisabled} {showIcon} />
+			<DiscreteBadgeItem {item} {color} disabled={isDisabled} {showIcon} {omitMode} />
 		{:else}
 			<DiscreteSwatchItem {item} {color} />
 		{/if}

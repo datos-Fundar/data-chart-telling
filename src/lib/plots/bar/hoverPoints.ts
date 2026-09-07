@@ -1,5 +1,4 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
-import { paletteColor } from '$lib/utils/color';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import type { AxisValue } from '$lib/types/layout/scales';
 import type { Series } from '$lib/types/plots/data/common';
@@ -21,7 +20,7 @@ export function buildHoverPoints<TData extends Record<string, unknown>>(
   resolvedSeries: Series<TData>[],
   isHorizontal: boolean,
   geometry: Pick<BarLayout<TData>, 'layout' | 'stackedBaseline' | 'groupOffset'>,
-  palette: string[],
+  colorFor: (seriesName: string) => string,
 ): HoverPoint<TData>[] {
   return resolvedSeries.flatMap((s, idx) => {
     const sx = resolveAccessor(s.x);
@@ -39,7 +38,7 @@ export function buildHoverPoints<TData extends Record<string, unknown>>(
         row: d,
         label: String(sy(d)),
         series: s.name,
-        color: paletteColor(idx, palette),
+        color: colorFor(s.name),
       };
     });
   });

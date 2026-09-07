@@ -1,38 +1,5 @@
-<script lang="ts">
-	import LegendLayout from '$lib/layout/legend/LegendLayout.svelte';
-	import {
-		getConfiguration,
-		configToCssVars,
-		cssVarsStyle
-	} from '$lib/configuration/config.svelte';
-	import type { LegendItem, LegendNavContext } from '$lib/types/layout/legend';
-
-	/**
-	 * `layout: { type: 'horizontal', maxRows }` can't be exercised meaningfully
-	 * from a plain `sections` args array — wrapping/pagination only kicks in
-	 * once the section is narrower than its items need, so this wrapper adds
-	 * the one thing a story arg object can't express: a fixed-width container
-	 * to wrap against. `customNavButton` exercises the other override path, a
-	 * `navButton` snippet replacing the section's default arrow buttons.
-	 *
-	 * `LegendLayout` is used bare here (no `BaseChart`/`ChartContainer` around
-	 * it), so — same as `FacetDemo` for facets — stamp the `--dct-*` vars
-	 * ourselves; without them, `setConfiguration` changes the live config but
-	 * nothing on screen ever reads it back out.
-	 */
-	let {
-		itemCount = 24,
-		maxRows = 1,
-		width = 460,
-		interactive = false,
-		customNavButton = false
-	}: {
-		itemCount?: number;
-		maxRows?: number;
-		width?: number;
-		interactive?: boolean;
-		customNavButton?: boolean;
-	} = $props();
+<script module lang="ts">
+	import type { LegendItem } from '$lib/types/layout/legend';
 
 	const JURISDICCIONES = [
 		'Buenos Aires',
@@ -71,12 +38,52 @@
 		'#db2777'
 	];
 
-	const items = $derived.by((): LegendItem[] =>
-		JURISDICCIONES.slice(0, itemCount).map((name, i) => ({
+	/** The `items` this component feeds `<LegendLayout>` — exported for the story's docs source override, see `stories/common/docsSource.ts`. */
+	export function jurisdictionItems(count: number): LegendItem[] {
+		return JURISDICCIONES.slice(0, count).map((name, i) => ({
 			name,
 			color: PALETTE[i % PALETTE.length]
-		}))
-	);
+		}));
+	}
+</script>
+
+<script lang="ts">
+	import LegendLayout from '$lib/layout/legend/LegendLayout.svelte';
+	import {
+		getConfiguration,
+		configToCssVars,
+		cssVarsStyle
+	} from '$lib/configuration/config.svelte';
+	import type { LegendNavContext } from '$lib/types/layout/legend';
+
+	/**
+	 * `layout: { type: 'horizontal', maxRows }` can't be exercised meaningfully
+	 * from a plain `sections` args array — wrapping/pagination only kicks in
+	 * once the section is narrower than its items need, so this wrapper adds
+	 * the one thing a story arg object can't express: a fixed-width container
+	 * to wrap against. `customNavButton` exercises the other override path, a
+	 * `navButton` snippet replacing the section's default arrow buttons.
+	 *
+	 * `LegendLayout` is used bare here (no `BaseChart`/`ChartContainer` around
+	 * it), so — same as `FacetDemo` for facets — stamp the `--dct-*` vars
+	 * ourselves; without them, `setConfiguration` changes the live config but
+	 * nothing on screen ever reads it back out.
+	 */
+	let {
+		itemCount = 24,
+		maxRows = 1,
+		width = 460,
+		interactive = false,
+		customNavButton = false
+	}: {
+		itemCount?: number;
+		maxRows?: number;
+		width?: number;
+		interactive?: boolean;
+		customNavButton?: boolean;
+	} = $props();
+
+	const items = $derived(jurisdictionItems(itemCount));
 
 	const themeStyle = $derived(cssVarsStyle(configToCssVars(getConfiguration())));
 </script>

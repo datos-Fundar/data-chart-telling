@@ -4,18 +4,23 @@
 	import type { LegendItem } from '$lib/types/layout/legend';
 
 	/**
-	 * The `interactive.legendStyle: 'badge'` item look: a pill filled with the
-	 * series color, its symbol icon (unless `showIcon` is off) and label
-	 * auto-contrasted against that fill, and an eye icon that's crossed out
-	 * while `disabled`. The toggled-off dim itself is applied by the parent
-	 * `.dct-discrete__item`.
+	 * The `interactive.legendStyle: 'badge'` item look: a pill with the series
+	 * color, symbol icon, label, and a toggle icon — an eye (crossed out when
+	 * `disabled`) for `'style'` mode, or a plus/cross pair for `'omit'`.
 	 */
 	let {
 		item,
 		color,
 		disabled,
-		showIcon = true
-	}: { item: LegendItem; color: string; disabled: boolean; showIcon?: boolean } = $props();
+		showIcon = true,
+		omitMode = false
+	}: {
+		item: LegendItem;
+		color: string;
+		disabled: boolean;
+		showIcon?: boolean;
+		omitMode?: boolean;
+	} = $props();
 	const textColor = $derived(contrastTextColor(color));
 </script>
 
@@ -25,7 +30,15 @@
 	{/if}
 	<span class="dct-discrete__label">{item.label || item.name}</span>
 	<svg class="dct-discrete__eye" viewBox="0 0 24 24" aria-hidden="true">
-		{#if disabled}
+		{#if omitMode}
+			{#if disabled}
+				<line x1="12" y1="5" x2="12" y2="19" />
+				<line x1="5" y1="12" x2="19" y2="12" />
+			{:else}
+				<line x1="6" y1="6" x2="18" y2="18" />
+				<line x1="6" y1="18" x2="18" y2="6" />
+			{/if}
+		{:else if disabled}
 			<path
 				d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
 			/>

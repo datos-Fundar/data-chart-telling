@@ -1,6 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import DiscreteSectionWidthProbe from './DiscreteSectionWidthProbe.svelte';
+import LegendLayout from '$lib/layout/legend/LegendLayout.svelte';
 import type { DiscreteLegendSection, LegendItem } from '$lib/types/layout/legend';
 
 // Labels are deliberately much wider than any of the test container widths
@@ -43,14 +44,40 @@ async function waitForRows(container: Element): Promise<void> {
 	});
 }
 
-describe('DiscreteSection – layout: { type: "vertical" } (default)', () => {
-	test('omitting layout keeps the original grid, with no pagination chrome at all', async () => {
-		const section: DiscreteLegendSection = { type: 'discrete', items: longItems(6) };
+describe('DiscreteSection – layout: { type: "vertical" } (explicit)', () => {
+	test('an explicit vertical layout keeps the grid, with no pagination chrome at all', async () => {
+		const section: DiscreteLegendSection = {
+			type: 'discrete',
+			items: longItems(6),
+			layout: { type: 'vertical' }
+		};
 		const { container } = await render(DiscreteSectionWidthProbe, { section, width: 150 });
 
 		expect(container.querySelector('.dct-discrete--horizontal')).toBeFalsy();
 		expect(container.querySelector('.dct-discrete-paginated__btn')).toBeFalsy();
 		expect(container.querySelectorAll('.dct-discrete__label').length).toBe(6);
+	});
+});
+
+describe('DiscreteSection – a lone section defaults to horizontal layout', () => {
+	test('omitting layout renders horizontally when the legend has only this one section', async () => {
+		const section: DiscreteLegendSection = { type: 'discrete', items: longItems(3) };
+		const { container } = await render(DiscreteSectionWidthProbe, { section, width: 2000 });
+
+		await waitForRows(container);
+		expect(visibleLabels(container).length).toBe(3);
+		expect(container.querySelector('.dct-discrete-paginated__btn')).toBeFalsy();
+	});
+
+	test('a second section (of either type) reverts the discrete section to vertical', async () => {
+		const sections: DiscreteLegendSection[] = [
+			{ type: 'discrete', items: longItems(3) },
+			{ type: 'discrete', items: longItems(2) }
+		];
+		const { container } = await render(LegendLayout, { sections });
+
+		expect(container.querySelectorAll('.dct-discrete--horizontal').length).toBe(0);
+		expect(container.querySelectorAll('.dct-discrete__label').length).toBe(5);
 	});
 });
 

@@ -1,5 +1,4 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
-import { paletteColor } from '$lib/utils/color';
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { isGapValue, resolveGapAreaStyle } from '$lib/plots/utils/gaps';
 import type { AxisValue } from '$lib/types/layout/scales';
@@ -36,21 +35,21 @@ export function buildBarMarkers<TData extends Record<string, unknown>>(args: {
   barLayout: BarLayout<TData>;
   isHorizontal: boolean;
   hoverPoints: HoverPoint<TData>[];
-  palette: string[];
+  colorFor: (seriesName: string) => string;
   disabledFillFor: (seriesName: string) => { fill?: string; fillOpacity?: number } | undefined;
   active: boolean;
   setHoverMatch: (rows: TData[]) => void;
   clearHoverMatch: () => void;
   gapFillMaps: Map<string, Map<TData, DiscreteGapFill<BarSegmentStyle>>>;
 }): BarMarkerConfig[] {
-  const { groupedSeries, barLayout, isHorizontal, hoverPoints, palette, disabledFillFor, active, setHoverMatch, clearHoverMatch, gapFillMaps } = args;
+  const { groupedSeries, barLayout, isHorizontal, hoverPoints, colorFor, disabledFillFor, active, setHoverMatch, clearHoverMatch, gapFillMaps } = args;
   const gapDefaults = getConfiguration().bar.gap;
 
   const segmentMarkers: BarMarkerConfig[] = [];
   groupedSeries.forEach((group, seriesIndex) => {
     const xFn = resolveAccessor(group.series.x);
     const yFn = resolveAccessor(group.series.y);
-    const defaultColor = paletteColor(seriesIndex, palette);
+    const defaultColor = colorFor(group.series.name);
     const disabledFill = disabledFillFor(group.series.name);
 
     // Places one series' bar(s) — real or gap-fill — using whichever

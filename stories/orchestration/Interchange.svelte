@@ -4,7 +4,6 @@
 	import BarPlot from '$lib/plots/bar/Plot.svelte';
 	import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
 	import Scrubber from '../common/Scrubber.svelte';
-	import { buildSeries } from '$lib/utils/grouping';
 	import { TIME_SERIES, type SeriesPoint } from '../data/time-series';
 	import { HEAT_CELLS, type HeatCell } from '../data/heat-cells';
 	import type { LegendSection } from '$lib/types/layout/legend';
@@ -97,7 +96,7 @@
 			>
 				{#snippet plot({ data, width, height })}
 					{#if kind === 'line'}
-						<LinePlot {width} {height} series={buildSeries(data, 'year', 'value', 'metric')} />
+						<LinePlot {width} {height} {data} x="year" y="value" z="metric" />
 					{:else}
 						<BarPlot {width} {height} {data} x="year" y="value" />
 					{/if}

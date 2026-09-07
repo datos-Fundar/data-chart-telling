@@ -4,7 +4,10 @@
 	import { paletteColor } from '$lib/utils/color';
 	import { buildSeries } from '$lib/utils/grouping';
 	import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
-	import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
+	import {
+		disabledFillOverride,
+		resolveEffectiveDisabledStyle
+	} from '$lib/plots/utils/legendDisabled';
 	import { buildPyramidBarMarkers } from '$lib/plots/pyramid/buildPyramidBarMarkers';
 	import {
 		createLabelMarginTracker,
@@ -90,11 +93,12 @@
 	let hoverIsolatedSeries = $state<string | null>(null);
 
 	function effectiveDisabledFor(name: string): LegendDisabledStyle | undefined {
-		return (
-			legendInteraction?.disabledSeries.get(name) ??
-			(hoverIsolate && hoverIsolatedSeries && hoverIsolatedSeries !== name
-				? { opacity: cfg.legend.disabledOpacity }
-				: undefined)
+		return resolveEffectiveDisabledStyle(
+			name,
+			legendInteraction,
+			cfg.legend.disabledOpacity,
+			hoverIsolate,
+			hoverIsolatedSeries
 		);
 	}
 

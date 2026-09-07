@@ -4,7 +4,12 @@
 	import { paletteColor } from '$lib/utils/color';
 	import { buildSeries } from '$lib/utils/grouping';
 	import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
-	import { disabledDotsOverride } from '$lib/plots/utils/legendDisabled';
+	import {
+		disabledDotsOverride,
+		resolveEffectiveDisabledStyle,
+		omitDisabledSeries,
+		buildSeriesColorIndex
+	} from '$lib/plots/utils/legendDisabled';
 	import { buildScatterMarkers } from '$lib/plots/scatter/buildScatterMarkers';
 	import { resolveRadiusPaddedDomain } from '$lib/plots/scatter/resolveRadiusPaddedDomain';
 	import {
@@ -67,8 +72,16 @@
 		tooltip = undefined
 	}: Props = $props();
 
-	const resolvedSeries = $derived(series ?? buildSeries(data!, x!, y!, z));
+	const cfg = $derived(getConfiguration());
 	const legendInteraction = $derived(getLegendInteraction());
+	// Unfiltered series list, for stable per-name color indexing.
+	const fullSeries = $derived(series ?? buildSeries(data!, x!, y!, z));
+	const colorIndex = $derived(buildSeriesColorIndex(fullSeries));
+	function colorForSeries(name: string): string {
+		return paletteColor(colorIndex.get(name) ?? 0, cfg.palette);
+	}
+	// Drops series toggled off with `disabled: { mode: 'omit' }`.
+	const resolvedSeries = $derived(omitDisabledSeries(fullSeries, legendInteraction));
 
 	$effect(() => {
 		validateSegments(segments);
@@ -81,7 +94,6 @@
 		buildGroupedSeries<Series<TData>, ScatterSegmentStyle>(resolvedSeries, segments, false)
 	);
 
-	const cfg = $derived(getConfiguration());
 	const showVals = $derived(styles.values?.show ?? false);
 	const formatValue = $derived(styles.values?.format ?? ((v: number) => `${v}`));
 	const hoverIsolate = $derived(styles.values?.hoverIsolate ?? false);
@@ -93,11 +105,12 @@
 	let hoverIsolatedSeries = $state<string | null>(null);
 
 	function effectiveDisabledFor(name: string): LegendDisabledStyle | undefined {
-		return (
-			legendInteraction?.disabledSeries.get(name) ??
-			(hoverIsolate && hoverIsolatedSeries && hoverIsolatedSeries !== name
-				? { opacity: cfg.legend.disabledOpacity }
-				: undefined)
+		return resolveEffectiveDisabledStyle(
+			name,
+			legendInteraction,
+			cfg.legend.disabledOpacity,
+			hoverIsolate,
+			hoverIsolatedSeries
 		);
 	}
 
@@ -108,7 +121,7 @@
 	// A legend-disabled series is dimmed on the mark itself, but never surfaces
 	// in hover/tooltip — its points are simply absent from the candidate list.
 	const hoverPoints = $derived(
-		resolvedSeries.flatMap((s, idx) => {
+		resolvedSeries.flatMap((s) => {
 			if (legendInteraction?.disabledSeries.has(s.name)) return [];
 			const sx = resolveAccessor(s.x);
 			const sy = resolveAccessor(s.y);
@@ -118,7 +131,7 @@
 				row: d,
 				label: `${sx(d)}, ${sy(d)}`,
 				series: s.name,
-				color: paletteColor(idx, cfg.palette)
+				color: colorForSeries(s.name)
 			}));
 		})
 	);
@@ -138,6 +151,7 @@
 		buildScatterMarkers({
 			groupedSeries,
 			r,
+			colorFor: colorForSeries,
 			disabledDotsFor: (name) => disabledDotsOverride(effectiveDisabledFor(name))
 		})
 	);
@@ -146,7 +160,7 @@
 		buildScopedMarkerGroups<TData, Series<TData>, ScatterSegmentStyle>({
 			groupedSeries,
 			segments,
-			colorFor: (_series, seriesIndex) => paletteColor(seriesIndex, cfg.palette),
+			colorFor: (series) => colorForSeries(series.name),
 			segmentColorFor: (style, defaultColor) => style?.dotFill ?? defaultColor
 		})
 	);

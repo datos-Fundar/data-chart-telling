@@ -21,7 +21,7 @@
 		{
 			type: 'discrete',
 			title: 'Indicador (click para ocultar)',
-			interactive: { enabled: true, disabledStyle: { opacity: 0.15 } },
+			interactive: { enabled: true, disabled: { mode: 'style', style: { opacity: 0.15 } } },
 			items: [
 				{ name: 'PBI', label: 'PBI', color: '#4f46e5', symbol: 'line' },
 				{ name: 'Empleo', label: 'Empleo', color: '#e6580d', symbol: 'line' },

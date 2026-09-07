@@ -57,6 +57,58 @@ describe('DiscreteSection – interactive badge style', () => {
 		expect(item.getAttribute('aria-pressed')).toBe('false');
 	});
 
+	test('interactive.disabled: { mode: "omit" } keeps the item in the legend, dimmed rather than hidden', async () => {
+		const section: DiscreteLegendSection = {
+			type: 'discrete',
+			interactive: { enabled: true, disabled: { mode: 'omit' } },
+			items: [{ name: 'a', label: 'Serie A', color: '#4f46e5' }]
+		};
+		const { container } = await render(DiscreteSectionWidthProbe, { section });
+
+		const item = container.querySelector('[role="button"]') as HTMLElement;
+		expect(item.style.opacity).toBe('1');
+
+		item.click();
+		await vi.waitFor(() => {
+			if (item.getAttribute('aria-pressed') !== 'true') throw new Error('not yet toggled');
+		});
+
+		expect(container.querySelector('.dct-discrete__badge')).toBeTruthy();
+		expect(item.style.opacity).toBe('0.12');
+
+		item.click();
+		await vi.waitFor(() => {
+			if (item.getAttribute('aria-pressed') !== 'false') throw new Error('not yet restored');
+		});
+	});
+
+	test('interactive.disabled: { mode: "omit" } swaps the eye for a plus/cross icon instead of a crossed-out eye', async () => {
+		const section: DiscreteLegendSection = {
+			type: 'discrete',
+			layout: { type: 'vertical' },
+			interactive: { enabled: true, disabled: { mode: 'omit' } },
+			items: [{ name: 'a', label: 'Serie A', color: '#4f46e5' }]
+		};
+		const { container } = await render(DiscreteSectionWidthProbe, { section });
+		const item = container.querySelector('[role="button"]') as HTMLElement;
+		const hasVerticalLine = (): boolean =>
+			Array.from(container.querySelectorAll('.dct-discrete__eye line')).some(
+				(l) => l.getAttribute('x1') === l.getAttribute('x2')
+			);
+
+		expect(container.querySelectorAll('.dct-discrete__eye line')).toHaveLength(2);
+		expect(container.querySelector('.dct-discrete__eye path')).toBeFalsy();
+		expect(hasVerticalLine()).toBe(false);
+
+		item.click();
+		await vi.waitFor(() => {
+			if (item.getAttribute('aria-pressed') !== 'true') throw new Error('not yet toggled');
+		});
+
+		expect(container.querySelector('.dct-discrete__eye path')).toBeFalsy();
+		expect(hasVerticalLine()).toBe(true);
+	});
+
 	test('interactive.legendStyle: "basic" keeps the plain swatch + label, no badge chip', async () => {
 		const section: DiscreteLegendSection = {
 			type: 'discrete',
@@ -69,10 +121,10 @@ describe('DiscreteSection – interactive badge style', () => {
 		expect(container.querySelector('.dct-discrete__swatch')).toBeTruthy();
 	});
 
-	test('interactive.disabledStyle overrides the dim opacity applied to a toggled-off item', async () => {
+	test('interactive.disabled overrides the dim opacity applied to a toggled-off item', async () => {
 		const section: DiscreteLegendSection = {
 			type: 'discrete',
-			interactive: { enabled: true, disabledStyle: { opacity: 0.42 } },
+			interactive: { enabled: true, disabled: { mode: 'style', style: { opacity: 0.42 } } },
 			items: [{ name: 'a', label: 'Serie A', color: '#4f46e5' }]
 		};
 		const { container } = await render(DiscreteSectionWidthProbe, { section });

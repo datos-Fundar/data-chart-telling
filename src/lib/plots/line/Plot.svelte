@@ -4,7 +4,13 @@
 	import { paletteColor } from '$lib/utils/color';
 	import { buildSeries } from '$lib/utils/grouping';
 	import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
-	import { disabledStrokeOverride, disabledDotsOverride } from '$lib/plots/utils/legendDisabled';
+	import {
+		disabledStrokeOverride,
+		disabledDotsOverride,
+		resolveEffectiveDisabledStyle,
+		omitDisabledSeries,
+		buildSeriesColorIndex
+	} from '$lib/plots/utils/legendDisabled';
 	import { buildLineMarkers } from '$lib/plots/line/buildLineMarkers';
 	import { buildGapMarkers } from '$lib/plots/line/buildGapMarkers';
 	import { isGapValue } from '$lib/plots/utils/gaps';
@@ -64,8 +70,16 @@
 	// resolved per series.
 	const gaps = $derived(styles.gaps ?? {});
 
-	const resolvedSeries = $derived(series ?? buildSeries(data!, x!, y!, z));
+	const cfg = $derived(getConfiguration());
 	const legendInteraction = $derived(getLegendInteraction());
+	// Unfiltered series list, for stable per-name color indexing.
+	const fullSeries = $derived(series ?? buildSeries(data!, x!, y!, z));
+	const colorIndex = $derived(buildSeriesColorIndex(fullSeries));
+	function colorForSeries(name: string): string {
+		return paletteColor(colorIndex.get(name) ?? 0, cfg.palette);
+	}
+	// Drops series toggled off with `disabled: { mode: 'omit' }`.
+	const resolvedSeries = $derived(omitDisabledSeries(fullSeries, legendInteraction));
 
 	$effect(() => {
 		validateSegments(segments);
@@ -75,7 +89,6 @@
 		buildGroupedSeries<Series<TData>, LineSegmentStyle>(resolvedSeries, segments)
 	);
 
-	const cfg = $derived(getConfiguration());
 	const showVals = $derived(styles.values?.show ?? false);
 	const hoverIsolate = $derived(styles.values?.hoverIsolate ?? false);
 	const valAnchor = $derived<ValueAnchor>(styles.values?.anchor ?? 'start');
@@ -86,11 +99,12 @@
 	let hoverIsolatedSeries = $state<string | null>(null);
 
 	function effectiveDisabledFor(name: string): LegendDisabledStyle | undefined {
-		return (
-			legendInteraction?.disabledSeries.get(name) ??
-			(hoverIsolate && hoverIsolatedSeries && hoverIsolatedSeries !== name
-				? { opacity: cfg.legend.disabledOpacity }
-				: undefined)
+		return resolveEffectiveDisabledStyle(
+			name,
+			legendInteraction,
+			cfg.legend.disabledOpacity,
+			hoverIsolate,
+			hoverIsolatedSeries
 		);
 	}
 
@@ -99,7 +113,7 @@
 	const flat = $derived(resolvedSeries.flatMap((s) => s.data));
 	// Legend-disabled series and gap rows are excluded from hover candidates.
 	const hoverPoints = $derived(
-		resolvedSeries.flatMap((s, idx) => {
+		resolvedSeries.flatMap((s) => {
 			if (legendInteraction?.disabledSeries.has(s.name)) return [];
 			const sx = resolveAccessor(s.x);
 			const sy = resolveAccessor(s.y);
@@ -111,7 +125,7 @@
 					row: d,
 					label: String(sy(d)),
 					series: s.name,
-					color: paletteColor(idx, cfg.palette)
+					color: colorForSeries(s.name)
 				}));
 		})
 	);
@@ -128,6 +142,7 @@
 	const lineMarkers = $derived(
 		buildLineMarkers({
 			groupedSeries,
+			colorFor: colorForSeries,
 			disabledStrokeFor: (name) => disabledStrokeOverride(effectiveDisabledFor(name)),
 			disabledDotsFor: (name) => disabledDotsOverride(effectiveDisabledFor(name))
 		})
@@ -137,7 +152,7 @@
 		buildGapMarkers<TData>({
 			seriesList: resolvedSeries,
 			gaps,
-			colorFor: (seriesIndex) => paletteColor(seriesIndex, cfg.palette),
+			colorFor: (seriesIndex) => colorForSeries(resolvedSeries[seriesIndex].name),
 			disabledStrokeFor: (name) => disabledStrokeOverride(effectiveDisabledFor(name)),
 			disabledDotsFor: (name) => disabledDotsOverride(effectiveDisabledFor(name))
 		})
@@ -147,14 +162,14 @@
 		buildScopedMarkerGroups<TData, Series<TData>, LineSegmentStyle>({
 			groupedSeries,
 			segments,
-			colorFor: (_series, seriesIndex) => paletteColor(seriesIndex, cfg.palette),
+			colorFor: (series) => colorForSeries(series.name),
 			segmentColorFor: (style, defaultColor) => style?.stroke?.stroke ?? defaultColor
 		})
 	);
 
 	const lastPoints = $derived(
 		resolvedSeries
-			.map((s, idx) => {
+			.map((s) => {
 				const sy = resolveAccessor(s.y);
 				const lastRow = [...s.data].reverse().find((d) => !isGapValue(sy(d)));
 				if (lastRow === undefined) return undefined;
@@ -164,7 +179,7 @@
 					matchedSeg?.color ??
 					group?.segments[0]?.color ??
 					group?.color ??
-					paletteColor(idx, cfg.palette);
+					colorForSeries(s.name);
 				return { series: s, lastRow, color };
 			})
 			.filter((p): p is { series: Series<TData>; lastRow: TData; color: string } => p !== undefined)
