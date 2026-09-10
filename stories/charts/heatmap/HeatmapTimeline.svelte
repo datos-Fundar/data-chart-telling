@@ -6,7 +6,7 @@
 
   const { faceted = false }: { faceted?: boolean } = $props();
 
-  const data = $derived(faceted ? HEAT_CELLS : HEAT_CELLS.filter((d) => d.scenario === 'Base'));
+  const data = $derived(faceted ? HEAT_CELLS : HEAT_CELLS.filter((d) => d.scenario === 'Baseline'));
 
   const maxPct = Math.max(...HEAT_CELLS.map((d) => d.pct));
   const legend: LegendSection[] = [

@@ -29,7 +29,7 @@ type Story = StoryObj<typeof meta>;
 export const MultiSeriesCrossing: Story = {
 	args: {
 		title: 'Todas las series cruzando el x',
-		data: TIME_SERIES.filter((d) => d.region === 'Norte'),
+		data: TIME_SERIES.filter((d) => d.region === 'North'),
 		z: 'metric' as keyof SeriesPoint,
 		tooltip: { strategy: 'x' },
 		markers: [{ type: 'hover' }]
@@ -40,9 +40,9 @@ export const MultiSeriesCrossing: Story = {
 export const SeriesSubset: Story = {
 	args: {
 		title: 'Tooltip acotado a una serie',
-		data: TIME_SERIES.filter((d) => d.region === 'Norte'),
+		data: TIME_SERIES.filter((d) => d.region === 'North'),
 		z: 'metric' as keyof SeriesPoint,
-		tooltip: { strategy: 'x', series: ['PBI'] },
-		markers: [{ type: 'hover', series: 'PBI' }]
+		tooltip: { strategy: 'x', series: ['GDP'] },
+		markers: [{ type: 'hover', series: 'GDP' }]
 	}
 };

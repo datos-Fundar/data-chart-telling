@@ -9,7 +9,7 @@ export type HeatCell = {
   pct: number; // value
 };
 
-export const HEAT_CELLS: HeatCell[] = ['Base', 'Proyectado'].flatMap((scenario, si) =>
+export const HEAT_CELLS: HeatCell[] = ['Baseline', 'Projected'].flatMap((scenario, si) =>
   [1991, 2001, 2010, 2022].flatMap((year, yi) =>
     [1, 2, 3, 4].flatMap((rooms) =>
       [1, 2, 3, 4].map((people) => {

@@ -30,7 +30,7 @@ type Story = StoryObj<typeof meta>;
 export const CustomFormat: Story = {
 	args: {
 		title: 'Formato personalizado',
-		data: TIME_SERIES.filter((d) => d.region === 'Norte'),
+		data: TIME_SERIES.filter((d) => d.region === 'North'),
 		z: 'metric' as keyof SeriesPoint,
 		tooltip: {
 			strategy: 'x',
@@ -52,7 +52,7 @@ export const CustomAnchor: Story = {
 	args: {
 		title: 'Anchor personalizado',
 		subtitle: 'El tooltip se ancla arriba a la izquierda del cursor',
-		data: TIME_SERIES.filter((d) => d.region === 'Norte'),
+		data: TIME_SERIES.filter((d) => d.region === 'North'),
 		z: 'metric' as keyof SeriesPoint,
 		tooltip: { strategy: 'x', anchorX: 'left', anchorY: 'top' },
 		markers: [{ type: 'hover' }]

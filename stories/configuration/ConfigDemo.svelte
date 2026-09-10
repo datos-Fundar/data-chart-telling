@@ -27,8 +27,8 @@
   });
 
   const maxPct = Math.max(...HEAT_CELLS.map((d) => d.pct));
-  const lineData = TIME_SERIES.filter((d) => d.region === 'Norte');
-  const heatData = HEAT_CELLS.filter((d) => d.scenario === 'Base' && d.year === 2022);
+  const lineData = TIME_SERIES.filter((d) => d.region === 'North');
+  const heatData = HEAT_CELLS.filter((d) => d.scenario === 'Baseline' && d.year === 2022);
 </script>
 
 <div class="demo">
@@ -63,8 +63,8 @@
           title: 'Indicador',
           columns: 2,
           items: [
-            { name: 'PBI', label: 'PBI', symbol: 'line' },
-            { name: 'Empleo', label: 'Empleo', symbol: 'line' },
+            { name: 'GDP', label: 'PBI', symbol: 'line' },
+            { name: 'Employment', label: 'Empleo', symbol: 'line' },
           ],
         },
       ]}

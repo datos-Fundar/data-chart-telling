@@ -6,8 +6,9 @@ import type { AxisValue } from '$lib/types/layout/scales';
  * - `'x'` all points sharing the hovered x (default for line / bar).
  * - `'y'` all points sharing the hovered y (default for pyramid).
  * - `'punctual'` exact XY match — one cell at a time (default for heatmap).
+ * - `'series'` all points sharing the hovered series, regardless of x/y.
  */
-export type HoverStrategy = 'x' | 'y' | 'punctual';
+export type HoverStrategy = 'x' | 'y' | 'punctual' | 'series';
 
 /**
  * Preferred horizontal placement of the floating tooltip relative to the

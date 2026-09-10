@@ -116,7 +116,7 @@ export const ComputedFormat: Story = {
 };
 
 /**
- * Series-filtered tooltip — `series: ['Mujeres']` restricts hover matching
+ * Series-filtered tooltip — `series: ['Female']` restricts hover matching
  * to bars that belong to the female side only. Hovering over male bars shows
  * no tooltip.
  */
@@ -130,7 +130,7 @@ export const FemaleOnly: Story = {
     tooltip: {
       facetId: '',
       sync: false,
-      series: ['Mujeres'],
+      series: ['Female'],
       format: (row) => {
         const { ageGroup, pct } = row as PopulationRow;
         return `Female - ${ageGroup}: ${pct.toFixed(2)}%`;
@@ -140,7 +140,7 @@ export const FemaleOnly: Story = {
 };
 
 /**
- * Series-filtered to males — same as FemaleOnly but for the male (Varones) side.
+ * Series-filtered to males — same as FemaleOnly but for the male side.
  */
 export const MaleOnly: Story = {
   args: {
@@ -152,7 +152,7 @@ export const MaleOnly: Story = {
     tooltip: {
       facetId: '',
       sync: false,
-      series: ['Varones'],
+      series: ['Male'],
       format: (row) => {
         const { ageGroup, pct } = row as PopulationRow;
         return `Male - ${ageGroup}: ${pct.toFixed(2)}%`;
@@ -177,7 +177,7 @@ export const BothSidesFormatted: Story = {
       sync: false,
       format: (row) => {
         const { sex, ageGroup, pct } = row as PopulationRow;
-        const sexEmoji = sex === 'Mujeres' ? '♀' : '♂';
+        const sexEmoji = sex === 'Female' ? '♀' : '♂';
         return `${sexEmoji} ${sex}\n${ageGroup}: ${pct.toFixed(2)}%`;
       },
     },

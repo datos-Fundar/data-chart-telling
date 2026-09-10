@@ -2,7 +2,7 @@
   import LineChart from '$lib/charts/line/Chart.svelte';
   import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
 
-  const data = TIME_SERIES.filter((d) => d.region === 'Norte');
+  const data = TIME_SERIES.filter((d) => d.region === 'North');
 </script>
 
 <LineChart
@@ -15,7 +15,7 @@
   legend={[{
     type: 'discrete',
     title: 'Indicador',
-    items: [{ name: 'PBI', symbol: 'line' }, { name: 'Empleo', symbol: 'line' }],
+    items: [{ name: 'GDP', symbol: 'line' }, { name: 'Employment', symbol: 'line' }],
     columns: 2,
   }]}
 >

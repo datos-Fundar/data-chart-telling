@@ -8,13 +8,13 @@
   const cfg = getConfiguration();
   const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
 
-  // Series are sorted alphabetically inside PyramidPlot ('Mujeres' < 'Varones'),
+  // Series are sorted alphabetically inside PyramidPlot ('Female' < 'Male'),
   // which is also what drives left/right placement and colour assignment —
   // kept in lockstep here since `content` only gets the raw rows back, not
   // their resolved side/colour.
   const SERIES_COLORS: Record<string, string> = {
-    Mujeres: paletteColor(0, cfg.palette),
-    Varones: paletteColor(1, cfg.palette),
+    Female: paletteColor(0, cfg.palette),
+    Male: paletteColor(1, cfg.palette),
   };
 </script>
 

@@ -27,6 +27,9 @@ export function matchByStrategy<T>(points: HoverPoint<T>[], hover: HoverStore): 
   if (strategy === 'y') {
     return activeY == null ? [] : points.filter((p) => eq(p.y, activeY));
   }
+  if (strategy === 'series') {
+    return activeSeries == null ? [] : points.filter((p) => p.series === activeSeries);
+  }
   // 'punctual': exact XY match, respecting series identity when both sides carry it
   if (activeX == null || activeY == null) return [];
   return points.filter(

@@ -33,7 +33,7 @@ export const Basic: Story = {
 	args: {
 		title: 'PBI vs. Empleo',
 		subtitle: 'Pasá el cursor por las líneas',
-		data: TIME_SERIES.filter((d) => d.region === 'Norte'),
+		data: TIME_SERIES.filter((d) => d.region === 'North'),
 		z: 'metric' as keyof SeriesPoint,
 		tooltip: true,
 		markers: [{ type: 'hover' }]
@@ -44,7 +44,7 @@ export const Basic: Story = {
 export const TooltipOnly: Story = {
 	args: {
 		title: 'Solo tooltip (sin marcador)',
-		data: TIME_SERIES.filter((d) => d.region === 'Norte'),
+		data: TIME_SERIES.filter((d) => d.region === 'North'),
 		z: 'metric' as keyof SeriesPoint,
 		tooltip: true
 	}
@@ -54,7 +54,7 @@ export const TooltipOnly: Story = {
 export const MarkerOnly: Story = {
 	args: {
 		title: 'Solo marcador (sin tooltip)',
-		data: TIME_SERIES.filter((d) => d.region === 'Norte'),
+		data: TIME_SERIES.filter((d) => d.region === 'North'),
 		z: 'metric' as keyof SeriesPoint,
 		markers: [{ type: 'hover' }]
 	}

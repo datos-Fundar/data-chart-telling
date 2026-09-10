@@ -37,7 +37,7 @@ const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
 
 /**
  * A legend-disabled side dims its value labels too, not just its bars.
- * Toggling "Mujeres" or "Varones" off in the legend above fades that
+ * Toggling "Female" or "Male" off in the legend above fades that
  * side's labels along with its bars, instead of leaving the labels at full
  * opacity while the bars fade. Composed here with `provideLegendInteraction()`
  * + `LegendLayout` directly around `PyramidPlot` (no `BaseChart`) — the same
@@ -51,8 +51,8 @@ export const LegendDisabledDimsLabels: StoryObj = {
 /**
  * `styles.values.hoverIsolate: true` dims every other series while the
  * pointer rests over a value label, exactly like toggling that side off in
- * the legend would — reverting on mouse-leave. Hover a "Mujeres" or
- * "Varones" label to see the other side's bars and labels fade.
+ * the legend would — reverting on mouse-leave. Hover a "Female" or
+ * "Male" label to see the other side's bars and labels fade.
  */
 export const HoverIsolate: Story = {
   args: {

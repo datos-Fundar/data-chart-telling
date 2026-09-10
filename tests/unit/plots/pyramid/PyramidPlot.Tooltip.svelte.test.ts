@@ -65,7 +65,7 @@ describe('PyramidPlot – tooltip', () => {
       tooltip: {
         facetId: '',
         sync: false,
-        series: ['Mujeres'],
+        series: ['Female'],
         format: (row) => `Female: ${(row as PopulationRow).pct.toFixed(1)}%`,
       },
     });
@@ -79,16 +79,16 @@ describe('PyramidPlot – tooltip', () => {
       height: 520,
       series: [
         {
-          name: 'Mujeres',
+          name: 'Female',
           x: 'ageGroup',
           y: 'pct',
-          data: DATA_2022.filter((d) => d.sex === 'Mujeres'),
+          data: DATA_2022.filter((d) => d.sex === 'Female'),
         } satisfies Series<PopulationRow>,
         {
-          name: 'Varones',
+          name: 'Male',
           x: 'ageGroup',
           y: 'pct',
-          data: DATA_2022.filter((d) => d.sex === 'Varones'),
+          data: DATA_2022.filter((d) => d.sex === 'Male'),
         } satisfies Series<PopulationRow>,
       ],
       scales: { y: { domain: AGE_GROUPS } },

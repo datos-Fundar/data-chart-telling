@@ -48,13 +48,13 @@
 		<HeatmapChart
 			width={760}
 			height={460}
-			title="Hogares por ambientes (2022)"
+			title="Households by rooms (2022)"
 			subtitle="Strategy: {strategy} · Sync: {sync ? 'on' : 'off'}"
 			data={heatData}
 			x={'rooms' as keyof HeatCell}
 			y={'people' as keyof HeatCell}
 			z={'pct' as keyof HeatCell}
-			scales={{ x: { label: 'Ambientes' }, y: { label: 'Personas' } }}
+			scales={{ x: { label: 'Rooms' }, y: { label: 'People' } }}
 			styles={{ values: { show: false, format: (v) => `${(v * 100).toFixed(0)}%` } }}
 			facet={{ by: 'scenario' as keyof HeatCell, columns: 2 }}
 			tooltip={{ strategy, sync }}
@@ -64,7 +64,7 @@
 		<BarChart
 			width={760}
 			height={420}
-			title="Valor por región y año"
+			title="Value by region and year"
 			subtitle="Strategy: {strategy} · Sync: {sync ? 'on' : 'off'}"
 			data={REGION_BARS}
 			x={'region' as keyof RegionYear}
@@ -77,7 +77,7 @@
 		<PyramidChart
 			width={760}
 			height={520}
-			title="Pirámide poblacional por año"
+			title="Population pyramid by year"
 			subtitle="Strategy: {strategy} · Sync: {sync ? 'on' : 'off'}"
 			data={pyramidData}
 			y={'ageGroup' as keyof PopulationRow}
@@ -96,7 +96,7 @@
 		<LineChart
 			width={760}
 			height={440}
-			title="PBI vs. Empleo por región"
+			title="GDP vs. Employment by region"
 			subtitle="Strategy: {strategy} · Sync: {sync ? 'on' : 'off'}"
 			data={TIME_SERIES}
 			x="year"
@@ -105,11 +105,11 @@
 			legend={[
 				{
 					type: 'discrete',
-					title: 'Indicador',
+					title: 'Indicator',
 					columns: 2,
 					items: [
-						{ name: 'PBI', symbol: 'line' },
-						{ name: 'Empleo', symbol: 'line' }
+						{ name: 'GDP', symbol: 'line' },
+						{ name: 'Employment', symbol: 'line' }
 					]
 				}
 			]}

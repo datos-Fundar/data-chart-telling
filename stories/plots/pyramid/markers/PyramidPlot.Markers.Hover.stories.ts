@@ -170,7 +170,7 @@ export const LabelOutsideDot: Story = {
 };
 
 /**
- * Series-scoped marker — `series: 'Mujeres'` restricts the hover dot to the
+ * Series-scoped marker — `series: 'Female'` restricts the hover dot to the
  * female (left) side only. Hovering over the male bars produces no dot even
  * though both sides are rendered.
  *
@@ -186,7 +186,7 @@ export const SeriesScoped: Story = {
     markers: [
       {
         type: 'hover',
-        series: 'Mujeres',
+        series: 'Female',
         fontStyle: {
           textAnchor: 'outside',
         },
@@ -228,16 +228,16 @@ export const FromExplicitSeries: Story = {
   args: {
     series: [
       {
-        name: 'Mujeres',
+        name: 'Female',
         x: 'ageGroup',
         y: 'pct',
-        data: DATA.filter((d) => d.sex === 'Mujeres'),
+        data: DATA.filter((d) => d.sex === 'Female'),
       } satisfies Series<PopulationRow>,
       {
-        name: 'Varones',
+        name: 'Male',
         x: 'ageGroup',
         y: 'pct',
-        data: DATA.filter((d) => d.sex === 'Varones'),
+        data: DATA.filter((d) => d.sex === 'Male'),
       } satisfies Series<PopulationRow>,
     ],
     scales: { y: { domain: AGE_GROUPS } },

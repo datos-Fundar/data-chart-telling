@@ -11,8 +11,8 @@
     {
       type: 'discrete',
       items: [
-        { name: 'Mujeres', color: '#d6336c', symbol: 'square' },
-        { name: 'Varones', color: '#1971c2', symbol: 'square' },
+        { name: 'Female', color: '#d6336c', symbol: 'square' },
+        { name: 'Male', color: '#1971c2', symbol: 'square' },
       ],
       columns: 2,
     },
@@ -22,7 +22,7 @@
     highlight.length === 0
       ? undefined
       : Object.fromEntries(
-          (['Mujeres', 'Varones'] as const).map((name) => [
+          (['Female', 'Male'] as const).map((name) => [
             name,
             AGE_GROUPS.map((ageGroup) => ({
               from: ageGroup,

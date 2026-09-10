@@ -233,8 +233,8 @@
 		// (via svelteplot's `RectPath`) actually render that band, which is
 		// enough to mismatch the neighbouring category once bands get thin
 		// (many categories). The `role: 'hitArea'` bar markers `buildBarMarkers`
-		// emits hit-test the category bands directly instead — see its own doc
-		// comment.
+		// emits hit-test each series' own segment directly instead — see its
+		// own doc comment.
 		pointMatching: 'contains' as const
 	});
 

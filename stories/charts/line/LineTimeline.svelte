@@ -3,7 +3,7 @@
   import Scrubber from '../../common/Scrubber.svelte';
   import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
 
-  const data = TIME_SERIES.filter((d) => d.region === 'Norte');
+  const data = TIME_SERIES.filter((d) => d.region === 'North');
   const years = [...new Set(data.map((d) => d.year))].sort((a, b) => a - b);
 </script>
 

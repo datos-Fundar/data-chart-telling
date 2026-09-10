@@ -47,7 +47,7 @@ function bucketStart(ageGroup: string): number {
 
 /**
  * `segments` dims every age group except a few highlighted ones. Applied via
- * the `default` key, so the same rule affects both series (Mujeres, Varones).
+ * the `default` key, so the same rule affects both series (Female, Male).
  */
 export const HighlightedSegments: Story = {
   args: {
@@ -155,11 +155,11 @@ export const AsymmetricHighlight: Story = {
     z: 'sex',
     scales: { y: { domain: AGE_GROUPS } },
     segments: {
-      Mujeres: [
+      Female: [
         { areas: areasFor(['80-84', '85+']), style: { fillOpacity: 1 } },
         { style: { fillOpacity: 0.25 } },
       ],
-      Varones: [
+      Male: [
         {
           areas: areasFor(
             AGE_GROUPS.filter((ag) => bucketStart(ag) >= 25 && bucketStart(ag) < 55),

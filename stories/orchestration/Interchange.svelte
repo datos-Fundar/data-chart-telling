@@ -27,15 +27,7 @@
 		}
 	];
 
-	// `TIME_SERIES` is shared across many other stories, so its raw `metric`
-	// values ('PBI'/'Empleo') stay as-is there — translated only here, right
-	// before display, so this story's legend/facet titles/hover labels (all
-	// driven by `metric`) read in English without touching the shared fixture.
-	const METRIC_LABELS: Record<string, string> = { PBI: 'GDP', Empleo: 'Employment' };
-	const northSeries = TIME_SERIES.filter((d) => d.region === 'Norte').map((d) => ({
-		...d,
-		metric: METRIC_LABELS[d.metric] ?? d.metric
-	}));
+	const northSeries = TIME_SERIES.filter((d) => d.region === 'North');
 </script>
 
 <div class="switcher">
@@ -52,7 +44,7 @@
 				height={520}
 				title="Same chrome, interchangeable plot"
 				subtitle="Leaf: HeatmapPlot"
-				data={HEAT_CELLS.filter((d) => d.scenario === 'Base')}
+				data={HEAT_CELLS.filter((d) => d.scenario === 'Baseline')}
 				legend={continuousLegend}
 				timeline={{ accessor: 'year', progress, orientation: 'vertical' }}
 			>

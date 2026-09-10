@@ -46,7 +46,7 @@ export const Default: Story = {
 
 /**
  * Custom left/right colours — overrides the default palette with explicit
- * colors for the left (Mujeres) and right (Varones) sides of the pyramid.
+ * colors for the left (Female) and right (Male) sides of the pyramid.
  */
 export const CustomColors: Story = {
   args: {

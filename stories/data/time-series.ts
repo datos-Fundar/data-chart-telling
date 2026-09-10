@@ -9,8 +9,8 @@ export type SeriesPoint = {
   value: number;
 };
 
-const REGIONS = ['Norte', 'Sur'] as const;
-const METRICS = ['PBI', 'Empleo'] as const;
+const REGIONS = ['North', 'South'] as const;
+const METRICS = ['GDP', 'Employment'] as const;
 
 // Deterministic pseudo-data so stories are stable.
 function wave(seed: number, year: number): number {

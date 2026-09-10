@@ -32,9 +32,9 @@ type Story = StoryObj<typeof meta>;
 /**
  * Two mirrored series from grouped data — women on the left, men on the right.
  *
- * PyramidPlot automatically creates one series per unique `z` value (sex: 'Mujeres' | 'Varones'),
+ * PyramidPlot automatically creates one series per unique `z` value (sex: 'Female' | 'Male'),
  * using the sex's name from the grouping column. Series are sorted alphabetically,
- * so 'Mujeres' < 'Varones' and appears on the left.
+ * so 'Female' < 'Male' and appears on the left.
  */
 export const Default: Story = {
   args: {
@@ -59,16 +59,16 @@ export const ExplicitSeries: Story = {
   args: {
     series: [
       {
-        name: 'Mujeres',
+        name: 'Female',
         x: 'ageGroup',
         y: 'pct',
-        data: POPULATION_PYRAMID.filter((d) => d.year === 2022 && d.sex === 'Mujeres'),
+        data: POPULATION_PYRAMID.filter((d) => d.year === 2022 && d.sex === 'Female'),
       } satisfies Series<PopulationRow>,
       {
-        name: 'Varones',
+        name: 'Male',
         x: 'ageGroup',
         y: 'pct',
-        data: POPULATION_PYRAMID.filter((d) => d.year === 2022 && d.sex === 'Varones'),
+        data: POPULATION_PYRAMID.filter((d) => d.year === 2022 && d.sex === 'Male'),
       } satisfies Series<PopulationRow>,
     ],
     scales: { y: { label: 'Grupo de edad', domain: AGE_GROUPS } },

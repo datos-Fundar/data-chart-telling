@@ -20,8 +20,8 @@
         title: 'Sexo',
         interactive: { enabled: true },
         items: [
-          { name: 'Mujeres', symbol: 'square' },
-          { name: 'Varones', symbol: 'square' },
+          { name: 'Female', symbol: 'square' },
+          { name: 'Male', symbol: 'square' },
         ],
       },
     ]}

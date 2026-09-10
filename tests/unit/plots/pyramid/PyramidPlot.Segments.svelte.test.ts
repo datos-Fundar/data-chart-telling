@@ -89,7 +89,7 @@ describe('PyramidPlot – segments keyed by series name', () => {
       ...DATA_PROPS,
       scales: { y: { domain: AGE_GROUPS } },
       segments: {
-        Mujeres: [
+        Female: [
           { areas: areasFor(['80-84', '85+']), style: { fillOpacity: 1 } },
           { style: { fillOpacity: 0.25 } },
         ],
@@ -98,10 +98,10 @@ describe('PyramidPlot – segments keyed by series name', () => {
     const svg = await waitForSvg(container);
     const styles = barStyles(svg);
     const highlightedFemaleRows = DATA_2022.filter(
-      (d) => d.sex === 'Mujeres' && ['80-84', '85+'].includes(d.ageGroup),
+      (d) => d.sex === 'Female' && ['80-84', '85+'].includes(d.ageGroup),
     ).length;
-    const maleRows = DATA_2022.filter((d) => d.sex === 'Varones').length;
-    // Varones bars are untouched by the Mujeres-only segments, so they fall
+    const maleRows = DATA_2022.filter((d) => d.sex === 'Male').length;
+    // Male bars are untouched by the Female-only segments, so they fall
     // back to BarX's own default fillOpacity (1), same as the highlighted rows.
     expect(styles.filter((s) => s.includes('fill-opacity: 1;')).length).toBe(
       highlightedFemaleRows + maleRows,
@@ -115,11 +115,11 @@ describe('PyramidPlot – segments keyed by series name', () => {
       ...DATA_PROPS,
       scales: { y: { domain: AGE_GROUPS } },
       segments: {
-        Mujeres: [
+        Female: [
           { areas: areasFor(['80-84', '85+']), style: { fillOpacity: 1 } },
           { style: { fillOpacity: 0.25 } },
         ],
-        Varones: [
+        Male: [
           { areas: areasFor(AGE_GROUPS.filter((ag) => parseInt(ag) >= 25 && parseInt(ag) < 55)), style: { fillOpacity: 1 } },
           { style: { fillOpacity: 0.25 } },
         ],

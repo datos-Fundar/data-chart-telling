@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LineChart from '$lib/charts/line/Chart.svelte';
 import TooltipSyncDemo, { heatData, pyramidData } from './TooltipSyncDemo.svelte';
+import FacetSyncBarBySeriesDemo from './FacetSyncBarBySeriesDemo.svelte';
 import { renderSource } from '../../common/docsSource';
 import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
-import { REGION_BARS } from '../../data/region-bars';
+import { REGION_BARS, REGION_SECTOR_BARS, type RegionSector } from '../../data/region-bars';
 import { AGE_GROUPS } from '../../data/population-pyramid';
 
 /** `tooltip.sync: true` broadcasts the hover to every faceted panel with a match. */
@@ -37,8 +38,8 @@ type Story = StoryObj<typeof meta>;
  */
 export const MultiFacetBroadcast: Story = {
 	args: {
-		title: 'Tooltip en cada faceta sincronizada',
-		subtitle: 'Pasá el cursor por una región — la otra también muestra su tooltip',
+		title: 'Tooltip on every synced facet',
+		subtitle: 'Hover over one region — the other also shows its tooltip',
 		z: 'metric' as keyof SeriesPoint,
 		facet: { by: 'region' as keyof SeriesPoint, columns: 2 },
 		tooltip: { strategy: 'x', sync: true },
@@ -53,7 +54,7 @@ export const FacetSyncLine: StoryObj = {
 		docs: {
 			source: {
 				code: renderSource('LineChart', {
-					title: 'PBI vs. Empleo por región',
+					title: 'GDP vs. Employment by region',
 					subtitle: 'Strategy: x · Sync: on',
 					data: TIME_SERIES,
 					x: 'year',
@@ -62,11 +63,11 @@ export const FacetSyncLine: StoryObj = {
 					legend: [
 						{
 							type: 'discrete',
-							title: 'Indicador',
+							title: 'Indicator',
 							columns: 2,
 							items: [
-								{ name: 'PBI', symbol: 'line' },
-								{ name: 'Empleo', symbol: 'line' }
+								{ name: 'GDP', symbol: 'line' },
+								{ name: 'Employment', symbol: 'line' }
 							]
 						}
 					],
@@ -86,13 +87,43 @@ export const FacetSyncBar: StoryObj = {
 		docs: {
 			source: {
 				code: renderSource('BarChart', {
-					title: 'Valor por región y año',
+					title: 'Value by region and year',
 					subtitle: 'Strategy: x · Sync: on',
 					data: REGION_BARS,
 					x: 'region',
 					y: 'value',
 					facet: { by: 'year', columns: 3 },
 					tooltip: { strategy: 'x', sync: true },
+					markers: [{ type: 'hover' }]
+				})
+			}
+		}
+	}
+};
+
+/**
+ * Faceted by the bar's own category — `'series'` syncs by sector instead of
+ * x/y. Toggle layout (stacked/grouped) and orientation to try every combo.
+ */
+export const FacetSyncBarBySeries: StoryObj = {
+	render: () => ({ Component: FacetSyncBarBySeriesDemo }),
+	parameters: {
+		docs: {
+			source: {
+				code: renderSource('BarChart', {
+					title: 'Value by sector, faceted by region',
+					subtitle: 'Strategy: series · Sync: on',
+					data: REGION_SECTOR_BARS,
+					x: 'region',
+					y: 'value',
+					z: 'sector',
+					scales: { z: { seriesLayout: 'stacked' } },
+					facet: { by: 'region', columns: 2 },
+					tooltip: {
+						strategy: 'series',
+						sync: true,
+						format: (row: RegionSector) => `${row.sector}: ${row.value}`
+					},
 					markers: [{ type: 'hover' }]
 				})
 			}
@@ -107,13 +138,13 @@ export const FacetSyncHeatmap: StoryObj = {
 		docs: {
 			source: {
 				code: renderSource('HeatmapChart', {
-					title: 'Hogares por ambientes (2022)',
+					title: 'Households by rooms (2022)',
 					subtitle: 'Strategy: punctual · Sync: on',
 					data: heatData,
 					x: 'rooms',
 					y: 'people',
 					z: 'pct',
-					scales: { x: { label: 'Ambientes' }, y: { label: 'Personas' } },
+					scales: { x: { label: 'Rooms' }, y: { label: 'People' } },
 					styles: { values: { show: false, format: (v: number) => `${(v * 100).toFixed(0)}%` } },
 					facet: { by: 'scenario', columns: 2 },
 					tooltip: { strategy: 'punctual', sync: true },
@@ -131,7 +162,7 @@ export const FacetSyncPyramid: StoryObj = {
 		docs: {
 			source: {
 				code: renderSource('PyramidChart', {
-					title: 'Pirámide poblacional por año',
+					title: 'Population pyramid by year',
 					subtitle: 'Strategy: y · Sync: on',
 					data: pyramidData,
 					y: 'ageGroup',

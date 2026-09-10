@@ -10,10 +10,10 @@
 	// Matches the `z: 'metric'` grouping order below, which is what drives
 	// colour assignment inside LineChart — kept in lockstep here since `content`
 	// only gets the raw rows back, not their series colour.
-	const METRICS = ['PBI', 'Empleo'];
+	const METRICS = ['GDP', 'Employment'];
 	const METRIC_COLORS = [paletteColor(0, cfg.palette), paletteColor(1, cfg.palette)];
 
-	const data = TIME_SERIES.filter((d) => d.region === 'Norte');
+	const data = TIME_SERIES.filter((d) => d.region === 'North');
 </script>
 
 {#snippet content({ rows }: { rows: SeriesPoint[] })}

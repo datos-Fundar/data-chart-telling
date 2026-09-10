@@ -41,7 +41,7 @@ export const Default: Story = {
     title: 'Indicador económico',
     subtitle: 'Región Norte · serie única',
     caption: 'Fuente: datos sintéticos de demostración.',
-    data: TIME_SERIES.filter((d) => d.region === 'Norte' && d.metric === 'PBI'),
+    data: TIME_SERIES.filter((d) => d.region === 'North' && d.metric === 'GDP'),
   },
 };
 
@@ -50,7 +50,7 @@ export const GroupedByZ: Story = {
   args: {
     title: 'PBI vs. Empleo',
     subtitle: 'Agrupado por `z = metric`',
-    data: TIME_SERIES.filter((d) => d.region === 'Norte'),
+    data: TIME_SERIES.filter((d) => d.region === 'North'),
     z: 'metric' as keyof SeriesPoint,
   },
 };
@@ -61,17 +61,17 @@ export const GroupedWithLegend: Story = {
     title: 'PBI vs. Empleo',
     subtitle: 'Con leyenda discreta',
     caption: 'La leyenda y el gráfico utilizan el mapa de colores default.',
-    data: TIME_SERIES.filter((d) => d.region === 'Norte'),
+    data: TIME_SERIES.filter((d) => d.region === 'North'),
     z: 'metric' as keyof SeriesPoint,
     legend: [{
       type: 'discrete',
       title: 'Indicador',
       items: [
         {
-          name: 'PBI',
+          name: 'GDP',
           symbol: 'line',
         },{
-          name: 'Empleo',
+          name: 'Employment',
           symbol: 'line',
         }
       ],
@@ -92,7 +92,7 @@ export const InteractiveLegend: Story = {
   args: {
     title: 'PBI vs. Empleo',
     subtitle: 'Leyenda interactiva — click en una categoría para ocultarla',
-    data: TIME_SERIES.filter((d) => d.region === 'Norte'),
+    data: TIME_SERIES.filter((d) => d.region === 'North'),
     z: 'metric' as keyof SeriesPoint,
     tooltip: true,
     legend: [{
@@ -100,8 +100,8 @@ export const InteractiveLegend: Story = {
       title: 'Indicador',
       interactive: { enabled: true, disabled: { mode: 'style', style: { opacity: 0.08 } } },
       items: [
-        { name: 'PBI', symbol: 'line' },
-        { name: 'Empleo', symbol: 'line' },
+        { name: 'GDP', symbol: 'line' },
+        { name: 'Employment', symbol: 'line' },
       ],
       columns: 2,
     }],
@@ -146,10 +146,10 @@ export const Faceted: Story = {
       title: 'Indicador',
       items: [
         {
-          name: 'PBI',
+          name: 'GDP',
           symbol: 'line',
         },{
-          name: 'Empleo',
+          name: 'Employment',
           symbol: 'line',
         }
       ],
@@ -177,7 +177,7 @@ export const WithCustomHeaderAndFooter: StoryObj = {
 export const WithMarkers: Story = {
   args: {
     title: 'Con marcadores',
-    data: TIME_SERIES.filter((d) => d.region === 'Norte'),
+    data: TIME_SERIES.filter((d) => d.region === 'North'),
     z: 'metric' as keyof SeriesPoint,
     markers: [
       {

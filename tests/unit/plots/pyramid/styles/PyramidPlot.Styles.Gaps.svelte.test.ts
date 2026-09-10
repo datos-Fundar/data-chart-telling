@@ -5,24 +5,24 @@ import { setConfiguration, resetConfiguration } from '$lib/configuration/config.
 import type { GapsConfig } from '$lib/types/plots/gaps';
 import type { GapsAwarePlotStylesConfig } from '$lib/types/layout/styles';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
-import { POPULATION_PYRAMID, MUJERES_2022_WITH_GAPS } from '../../../../../stories/data/population-pyramid';
+import { POPULATION_PYRAMID, FEMALE_2022_WITH_GAPS } from '../../../../../stories/data/population-pyramid';
 import { waitForSvg, countBarRects, countTextLabels } from '../../_helpers/svg';
 
 // PyramidPlot's `Series.x`/`.y` are category/magnitude (not the top-level
 // `x`/`y` prop names, which mean magnitude/category) — see Plot.svelte's
 // own `flat`/`signedValue`, which read `s.x` as category and `s.y` as value.
-const MUJERES = { name: 'Mujeres', x: 'ageGroup' as const, y: 'pct' as const, data: MUJERES_2022_WITH_GAPS };
-const VARONES = {
-  name: 'Varones',
+const FEMALE = { name: 'Female', x: 'ageGroup' as const, y: 'pct' as const, data: FEMALE_2022_WITH_GAPS };
+const MALE = {
+  name: 'Male',
   x: 'ageGroup' as const,
   y: 'pct' as const,
-  data: POPULATION_PYRAMID.filter((d) => d.year === 2022 && d.sex === 'Varones'),
+  data: POPULATION_PYRAMID.filter((d) => d.year === 2022 && d.sex === 'Male'),
 };
-const REAL_COUNT = MUJERES_2022_WITH_GAPS.filter((d) => d.pct != null).length;
+const REAL_COUNT = FEMALE_2022_WITH_GAPS.filter((d) => d.pct != null).length;
 
 describe('PyramidPlot – gaps (no config)', () => {
   test('a missing value renders no bar, not a fake-zero one', async () => {
-    const { container } = await render(PyramidPlot, { width: 500, height: 400, series: [MUJERES] });
+    const { container } = await render(PyramidPlot, { width: 500, height: 400, series: [FEMALE] });
     const svg = await waitForSvg(container);
     expect(countBarRects(svg)).toBe(REAL_COUNT);
   });
@@ -31,7 +31,7 @@ describe('PyramidPlot – gaps (no config)', () => {
     // Before the fix, an `undefined` (NaN) magnitude poisoned `maxMagnitude`
     // for the whole plot — every bar (including the real ones) would render
     // with NaN geometry. Real bars should still render fine here.
-    const { container } = await render(PyramidPlot, { width: 500, height: 400, series: [MUJERES, VARONES] });
+    const { container } = await render(PyramidPlot, { width: 500, height: 400, series: [FEMALE, MALE] });
     const svg = await waitForSvg(container);
     const widths = Array.from(svg.querySelectorAll('g.bar-x rect')).map((r) => Number(r.getAttribute('width')));
     expect(widths.length).toBeGreaterThan(0);
@@ -44,7 +44,7 @@ describe('PyramidPlot – gaps (middle)', () => {
     const { container } = await render(PyramidPlot, {
       width: 500,
       height: 400,
-      series: [MUJERES],
+      series: [FEMALE],
       styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> },
     });
     const svg = await waitForSvg(container);
@@ -57,36 +57,36 @@ describe('PyramidPlot – gaps (start/end, opt-in)', () => {
     const { container } = await render(PyramidPlot, {
       width: 500,
       height: 400,
-      series: [MUJERES],
+      series: [FEMALE],
       styles: {
         gaps: { default: { start: { x: 0 }, middle: {}, end: { x: 0 } } } satisfies GapsConfig<BarSegmentStyle>,
       },
     });
     const svg = await waitForSvg(container);
-    expect(countBarRects(svg)).toBe(MUJERES_2022_WITH_GAPS.length);
+    expect(countBarRects(svg)).toBe(FEMALE_2022_WITH_GAPS.length);
   });
 });
 
 describe('PyramidPlot – gaps (sign correctness)', () => {
   test('a series on the left keeps its filled bars negative; a series on the right keeps them positive', async () => {
-    // 'Mujeres' < 'Varones' alphabetically, so 'Mujeres' renders on the left
-    // (negative x) and 'Varones' on the right (positive x).
+    // 'Female' < 'Male' alphabetically, so 'Female' renders on the left
+    // (negative x) and 'Male' on the right (positive x).
     const { container } = await render(PyramidPlot, {
       width: 500,
       height: 400,
-      series: [MUJERES, VARONES],
-      styles: { gaps: { Mujeres: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> },
+      series: [FEMALE, MALE],
+      styles: { gaps: { Female: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> },
     });
     const svg = await waitForSvg(container);
     const groups = svg.querySelectorAll('g.bar-x');
-    // Mujeres: real (12 rects) + gap-fill (2 rects); Varones: real (18 rects, no gaps).
+    // Female: real (12 rects) + gap-fill (2 rects); Male: real (18 rects, no gaps).
     expect(groups.length).toBe(3);
-    const mujeresGapRect = groups[1].querySelector('rect')!;
-    const mujeresX = Number(mujeresGapRect.getAttribute('transform')?.match(/translate\(([^,]+),/)?.[1]);
-    const varonesX = Number(groups[2].querySelector('rect')!.getAttribute('transform')?.match(/translate\(([^,]+),/)?.[1]);
+    const femaleGapRect = groups[1].querySelector('rect')!;
+    const femaleX = Number(femaleGapRect.getAttribute('transform')?.match(/translate\(([^,]+),/)?.[1]);
+    const maleX = Number(groups[2].querySelector('rect')!.getAttribute('transform')?.match(/translate\(([^,]+),/)?.[1]);
     // The diverging baseline sits at the plot's horizontal midpoint —
-    // Mujeres's bar should extend left of it (smaller x), Varones's right.
-    expect(mujeresX).toBeLessThan(varonesX);
+    // Female's bar should extend left of it (smaller x), Male's right.
+    expect(femaleX).toBeLessThan(maleX);
   });
 });
 
@@ -98,7 +98,7 @@ describe('PyramidPlot – gaps (styling)', () => {
     const { container } = await render(PyramidPlot, {
       width: 500,
       height: 400,
-      series: [MUJERES],
+      series: [FEMALE],
       styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> },
     });
     const svg = await waitForSvg(container);
@@ -111,7 +111,7 @@ describe('PyramidPlot – gaps (styling)', () => {
     const { container } = await render(PyramidPlot, {
       width: 500,
       height: 400,
-      series: [MUJERES],
+      series: [FEMALE],
       styles: {
         gaps: { default: { middle: { style: { fillOpacity: 0.9 } } } } satisfies GapsConfig<BarSegmentStyle>,
       },
@@ -128,11 +128,11 @@ describe('PyramidPlot – gaps (series-aware)', () => {
     const { container } = await render(PyramidPlot, {
       width: 500,
       height: 400,
-      series: [MUJERES, VARONES],
-      styles: { gaps: { Mujeres: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> },
+      series: [FEMALE, MALE],
+      styles: { gaps: { Female: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> },
     });
     const svg = await waitForSvg(container);
-    expect(countBarRects(svg)).toBe(REAL_COUNT + VARONES.data.length + 2);
+    expect(countBarRects(svg)).toBe(REAL_COUNT + MALE.data.length + 2);
   });
 });
 
@@ -141,7 +141,7 @@ describe('PyramidPlot – gaps (value labels)', () => {
     const { container } = await render(PyramidPlot, {
       width: 500,
       height: 400,
-      series: [MUJERES],
+      series: [FEMALE],
       styles: {
         values: { show: true },
         gaps: { default: { middle: {} } },
@@ -164,7 +164,7 @@ describe('PyramidPlot – gaps (hover-isolate dimming)', () => {
     const { container } = await render(PyramidPlot, {
       width: 500,
       height: 400,
-      series: [MUJERES, VARONES],
+      series: [FEMALE, MALE],
       styles: {
         values: { show: true, hoverIsolate: true, format: (v: number, name: string) => `${name}: ${v}` },
         gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle>,
@@ -172,11 +172,11 @@ describe('PyramidPlot – gaps (hover-isolate dimming)', () => {
     });
     const svg = await waitForSvg(container);
 
-    const varonesLabelGroup = Array.from(svg.querySelectorAll('g[role="presentation"]')).find((g) =>
-      g.textContent?.includes('Varones'),
+    const maleLabelGroup = Array.from(svg.querySelectorAll('g[role="presentation"]')).find((g) =>
+      g.textContent?.includes('Male'),
     );
-    expect(varonesLabelGroup).toBeTruthy();
-    varonesLabelGroup!.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
+    expect(maleLabelGroup).toBeTruthy();
+    maleLabelGroup!.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
 
     await vi.waitFor(() => {
       const dimmedCount = Array.from(svg.querySelectorAll('g.bar-x rect')).filter((r) =>
@@ -187,7 +187,7 @@ describe('PyramidPlot – gaps (hover-isolate dimming)', () => {
 
     const rects = Array.from(svg.querySelectorAll('g.bar-x rect'));
     const dimmed = rects.filter((r) => r.getAttribute('style')?.includes('fill-opacity: 0.12'));
-    // Every one of Mujeres's bars — its `REAL_COUNT` real ones plus the 2
+    // Every one of Female's bars — its `REAL_COUNT` real ones plus the 2
     // gap-fill bars the middle zone adds — dims, not just the real ones.
     expect(dimmed).toHaveLength(REAL_COUNT + 2);
   });

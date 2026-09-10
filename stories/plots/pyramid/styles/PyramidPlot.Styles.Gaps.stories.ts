@@ -2,16 +2,16 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
 import type { GapsConfig } from '$lib/types/plots/gaps';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
-import { AGE_GROUPS, POPULATION_PYRAMID, MUJERES_2022_WITH_GAPS } from '../../../data/population-pyramid';
+import { AGE_GROUPS, POPULATION_PYRAMID, FEMALE_2022_WITH_GAPS } from '../../../data/population-pyramid';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
-// `MUJERES_2022_WITH_GAPS` — the same 2022 slice every other PyramidPlot
+// `FEMALE_2022_WITH_GAPS` — the same 2022 slice every other PyramidPlot
 // story already uses — has three holes, all `pct: null`: the first two age
 // groups (start), an internal pair (middle), and the last two (end).
 // Without `styles.gaps`, a missing value renders no bar at all —
 // `styles.gaps` fills it with a distinctly-styled bar at an interpolated
-// magnitude instead, on whichever side ('Mujeres'/'Varones') that series
+// magnitude instead, on whichever side ('Female'/'Male') that series
 // already renders.
 
 const meta = {
@@ -21,7 +21,7 @@ const meta = {
   args: {
     width: 940,
     height: 520,
-    series: [{ name: 'Mujeres', x: 'ageGroup', y: 'pct', data: MUJERES_2022_WITH_GAPS }],
+    series: [{ name: 'Female', x: 'ageGroup', y: 'pct', data: FEMALE_2022_WITH_GAPS }],
     scales: { y: { domain: AGE_GROUPS } },
   },
   argTypes: {
@@ -83,25 +83,25 @@ export const LeadingAndTrailingGapsOptIn: Story = {
 
 // ── Series-aware form, both sides ─────────────────────────────────────────────
 
-const MUJERES_AND_VARONES_2022 = [
-  { name: 'Mujeres', x: 'ageGroup' as const, y: 'pct' as const, data: MUJERES_2022_WITH_GAPS },
+const FEMALE_AND_MALE_2022 = [
+  { name: 'Female', x: 'ageGroup' as const, y: 'pct' as const, data: FEMALE_2022_WITH_GAPS },
   {
-    name: 'Varones',
+    name: 'Male',
     x: 'ageGroup' as const,
     y: 'pct' as const,
-    data: POPULATION_PYRAMID.filter((d) => d.year === 2022 && d.sex === 'Varones'),
+    data: POPULATION_PYRAMID.filter((d) => d.year === 2022 && d.sex === 'Male'),
   },
 ];
 
 /**
  * A gap entry keyed by series name applies only to that series — here only
- * `Mujeres` (left side) gets its middle gap filled; `Varones` (right side,
+ * `Female` (left side) gets its middle gap filled; `Male` (right side,
  * no missing readings of its own) is unaffected either way.
  */
 export const GapsOnOneSeriesOnly: Story = {
   args: {
-    series: MUJERES_AND_VARONES_2022,
-    styles: { gaps: { Mujeres: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> },
+    series: FEMALE_AND_MALE_2022,
+    styles: { gaps: { Female: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> },
   },
 };
 
