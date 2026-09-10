@@ -158,14 +158,27 @@
 		delete rest.type;
 		return rest;
 	}
-	// The single, fully-resolved scales object BasePlotLayout reads for
-	// everything (ticks, grid, sort, and the real svelteplot scale) — avoids
-	// keeping a second, separately-patched copy of `scales.x`/`scales.y` in
-	// sync with the one actually forwarded.
+	// Backs the category axis's `paddingInner`/`paddingOuter` — the gap
+	// *between* category groups — with the theme's `bar.paddingInner`/
+	// `paddingOuter` default, when the plot doesn't set its own (or the
+	// `padding` shorthand). BarPlot-only, unlike svelteplot's own hardcoded
+	// 0.15 fallback for every band scale.
+	function withDefaultPadding(scale?: AxisScale<TData>): AxisScale<TData> {
+		return {
+			...scale,
+			paddingInner: scale?.paddingInner ?? scale?.padding ?? cfg.bar.paddingInner,
+			paddingOuter: scale?.paddingOuter ?? scale?.padding ?? cfg.bar.paddingOuter
+		};
+	}
+	// The single, fully-resolved scales object both BasePlotLayout (ticks,
+	// grid, sort, the real svelteplot scale) and `createBarLayout` (the
+	// grouped-bar-width estimate) read for everything — avoids keeping a
+	// second, separately-patched copy of `scales.x`/`scales.y` in sync with
+	// the one actually forwarded.
 	const resolvedScales = $derived({
 		...scales,
-		x: stripCategoricalType(scales.x),
-		y: stripCategoricalType(scales.y)
+		x: stripCategoricalType(categoricalAxis === 'x' ? withDefaultPadding(scales.x) : scales.x),
+		y: stripCategoricalType(categoricalAxis === 'y' ? withDefaultPadding(scales.y) : scales.y)
 	});
 
 	// The accessor feeding each *visual* channel — swapped from the
@@ -179,7 +192,7 @@
 	 * rendering, value labels, and hover markers below. See `layout.svelte.ts`.
 	 */
 	const barLayout = createBarLayout<TData>({
-		scales: () => scales,
+		scales: () => resolvedScales,
 		isHorizontal: () => isHorizontal,
 		width: () => width,
 		height: () => height,

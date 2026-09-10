@@ -38,14 +38,16 @@
 </script>
 
 {#if marker.role === 'segment'}
+	{@const categoryScale = categoryScaleFor(marker.isHorizontal)}
+	{@const bandwidth = categoryScale?.type === 'band' ? categoryScale.fn.bandwidth() : 0}
 	{#if marker.isHorizontal}
 		<BarX
 			data={marker.data}
 			y={marker.y}
 			x1={marker.x1}
 			x2={marker.x2}
-			insetTop={marker.insetTop}
-			insetBottom={marker.insetBottom}
+			insetTop={marker.insetTop != null ? marker.insetTop * bandwidth : undefined}
+			insetBottom={marker.insetBottom != null ? marker.insetBottom * bandwidth : undefined}
 			fill={marker.style?.fill}
 			fillOpacity={marker.style?.fillOpacity}
 			stroke={marker.style?.stroke}
@@ -60,8 +62,8 @@
 			x={marker.x}
 			y1={marker.y1}
 			y2={marker.y2}
-			insetLeft={marker.insetLeft}
-			insetRight={marker.insetRight}
+			insetLeft={marker.insetLeft != null ? marker.insetLeft * bandwidth : undefined}
+			insetRight={marker.insetRight != null ? marker.insetRight * bandwidth : undefined}
 			fill={marker.style?.fill}
 			fillOpacity={marker.style?.fillOpacity}
 			stroke={marker.style?.stroke}
@@ -80,10 +82,10 @@
 			{@const [rangeMin, rangeMax] = marker.isHorizontal
 				? hitAreaValueRangeFor(marker.isHorizontal, marker.x1, marker.x2)
 				: hitAreaValueRangeFor(marker.isHorizontal, marker.y1, marker.y2)}
-			{@const insetLeft = marker.insetLeft ?? 0}
-			{@const insetRight = marker.insetRight ?? 0}
-			{@const insetTop = marker.insetTop ?? 0}
-			{@const insetBottom = marker.insetBottom ?? 0}
+			{@const insetLeft = (marker.insetLeft ?? 0) * bandwidth}
+			{@const insetRight = (marker.insetRight ?? 0) * bandwidth}
+			{@const insetTop = (marker.insetTop ?? 0) * bandwidth}
+			{@const insetBottom = (marker.insetBottom ?? 0) * bandwidth}
 			{#if marker.isHorizontal}
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<rect

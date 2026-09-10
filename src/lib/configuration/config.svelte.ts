@@ -126,7 +126,12 @@ export const DEFAULT_CONFIG: ChartConfig = {
 			connectorWidth: 0.5
 		}
 	},
-	bar: { gap: { fillOpacity: 0.5 } },
+	bar: {
+		gap: { fillOpacity: 0.5 },
+		seriesPadding: 0.2,
+		paddingInner: 0.15,
+		paddingOuter: 0.15
+	},
 	pyramid: { gap: { fillOpacity: 0.5 } },
 	scatter: { dotRadius: 5 },
 	timeline: { axisColor: 'currentColor', activeColor: '#e6580d', thickness: 60 },

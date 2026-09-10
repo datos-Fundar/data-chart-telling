@@ -276,25 +276,6 @@ export const OverlappingSeries: Story = {
 };
 
 /**
- * `seriesLayout: 'grouped'` gives each series its own slice of the category
- * band, side by side — the classic grouped-bar-chart look. The slice width
- * is only an estimate (derived from this plot's own width/margins, not
- * svelteplot's actual measured scale), so it can be slightly off when an
- * `'auto'` margin ends up wider than expected.
- */
-export const GroupedSeries: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE,
-    x: 'province',
-    y: 'value',
-    z: 'sex',
-    scales: {
-      z: { seriesLayout: 'grouped' },
-    } satisfies AxisBasedScalesConfig,
-  },
-};
-
-/**
  * `seriesLayout: 'stacked'` stacks series cumulatively within each category's
  * band instead of placing them side by side. Each series keeps its single
  * resolved colour; per-area `segments` style overrides aren't applied in
@@ -313,10 +294,33 @@ export const StackedSeries: Story = {
 };
 
 /**
+ * `seriesLayout: 'grouped'` gives each series its own slice of the category
+ * band, side by side — the classic grouped-bar-chart look. The slice width
+ * is only an estimate (derived from this plot's own width/margins, not
+ * svelteplot's actual measured scale), so it can be slightly off when an
+ * `'auto'` margin ends up wider than expected. The gap between bars within a
+ * group comes from the theme's `bar.seriesPadding` (0.2 by default) — see
+ * `GroupedWithSeriesPadding` below to override it per-plot.
+ */
+export const GroupedSeries: Story = {
+  args: {
+    data: LIFE_EXPECTANCY_BY_PROVINCE,
+    x: 'province',
+    y: 'value',
+    z: 'sex',
+    scales: {
+      z: { seriesLayout: 'grouped' },
+    } satisfies AxisBasedScalesConfig,
+  },
+};
+
+/**
  * `scales.z.seriesPadding` (0–1) reserves a fraction of each series' own
- * slice as a gap on either side, separating bars within the same group.
- * Space *between* groups is controlled separately, by the category axis's
- * own `paddingInner`/`paddingOuter` (see `WideGroupSpacing` below).
+ * slice as a gap on either side, separating bars within the same group —
+ * this overrides the theme's default (0.2, see `GroupedSeries` above) with a
+ * narrower gap. Pass `0` to opt back out to touching bars. Space *between*
+ * groups is controlled separately, by the category axis's own
+ * `paddingInner`/`paddingOuter` (see `WideGroupSpacing` below).
  */
 export const GroupedWithSeriesPadding: Story = {
   args: {
@@ -325,7 +329,7 @@ export const GroupedWithSeriesPadding: Story = {
     y: 'value',
     z: 'sex',
     scales: {
-      z: { seriesLayout: 'grouped', seriesPadding: 0.3 },
+      z: { seriesLayout: 'grouped', seriesPadding: 0.1 },
     } satisfies AxisBasedScalesConfig,
   },
 };
@@ -343,7 +347,7 @@ export const WideGroupSpacing: Story = {
     z: 'sex',
     scales: {
       x: { paddingInner: 0.4 },
-      z: { seriesLayout: 'grouped', seriesPadding: 0.3 },
+      z: { seriesLayout: 'grouped' },
     } satisfies AxisBasedScalesConfig,
   },
 };

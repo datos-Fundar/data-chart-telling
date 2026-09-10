@@ -88,16 +88,13 @@ export function buildBarMarkers<TData extends Record<string, unknown>>(args: {
 					marker.y2 = valueFn;
 				}
 				if (barLayout.layout === 'grouped') {
+					const { start, end } = barLayout.groupInsetFraction(seriesIndex);
 					if (isHorizontal) {
-						marker.insetTop = seriesIndex * barLayout.seriesStep + barLayout.seriesGap / 2;
-						marker.insetBottom =
-							(barLayout.seriesCount - 1 - seriesIndex) * barLayout.seriesStep +
-							barLayout.seriesGap / 2;
+						marker.insetTop = start;
+						marker.insetBottom = end;
 					} else {
-						marker.insetLeft = seriesIndex * barLayout.seriesStep + barLayout.seriesGap / 2;
-						marker.insetRight =
-							(barLayout.seriesCount - 1 - seriesIndex) * barLayout.seriesStep +
-							barLayout.seriesGap / 2;
+						marker.insetLeft = start;
+						marker.insetRight = end;
 					}
 				}
 			}
@@ -132,16 +129,13 @@ export function buildBarMarkers<TData extends Record<string, unknown>>(args: {
 					marker.y2 = valueFn(d);
 				}
 				if (barLayout.layout === 'grouped') {
+					const { start, end } = barLayout.groupInsetFraction(seriesIndex);
 					if (isHorizontal) {
-						marker.insetTop = seriesIndex * barLayout.seriesStep + barLayout.seriesGap / 2;
-						marker.insetBottom =
-							(barLayout.seriesCount - 1 - seriesIndex) * barLayout.seriesStep +
-							barLayout.seriesGap / 2;
+						marker.insetTop = start;
+						marker.insetBottom = end;
 					} else {
-						marker.insetLeft = seriesIndex * barLayout.seriesStep + barLayout.seriesGap / 2;
-						marker.insetRight =
-							(barLayout.seriesCount - 1 - seriesIndex) * barLayout.seriesStep +
-							barLayout.seriesGap / 2;
+						marker.insetLeft = start;
+						marker.insetRight = end;
 					}
 				}
 			}

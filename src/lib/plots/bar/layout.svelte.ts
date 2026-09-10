@@ -77,7 +77,12 @@ export function createBarLayout<TData extends Record<string, unknown>>(args: {
 	 * band-scale formula (and 0.15 default padding) svelteplot itself uses,
 	 * so the category axis's own `paddingInner`/`paddingOuter` — the space
 	 * *between* categories — is reflected here too, not just svelteplot's
-	 * real render.
+	 * real render. In practice `categoricalScale` always carries a resolved
+	 * `paddingInner`/`paddingOuter` by the time it gets here — `Plot.svelte`
+	 * backs its own category axis with the theme's `bar.paddingInner`/
+	 * `paddingOuter` before either this estimate or the real svelteplot
+	 * scale sees it, so the two stay in sync; the literal fallback below is
+	 * only a defensive last resort.
 	 */
 	const estimatedBandwidth = $derived.by(() => {
 		const categoryCount = new SvelteSet(args.flat().map((d) => args.xAcc()(d))).size;
@@ -103,13 +108,15 @@ export function createBarLayout<TData extends Record<string, unknown>>(args: {
 	});
 
 	const seriesCount = $derived(args.groupedSeries().length);
-	// Each series gets an equal slice of the band; `seriesPadding` (0–1, space
-	// *within* a group, between its series) reserves a fraction of that slice
-	// as a gap split evenly on either side of the bar.
-	const seriesStep = $derived(seriesCount > 0 ? estimatedBandwidth / seriesCount : 0);
-	const seriesGap = $derived(
-		Math.max(0, Math.min(1, args.scales().z?.seriesPadding ?? 0)) * seriesStep
+	// `seriesPadding` (0–1, space *within* a group, between its series)
+	// reserves a fraction of each series' own slice as a gap split evenly on
+	// either side of the bar.
+	const seriesGapFraction = $derived(
+		Math.max(0, Math.min(1, args.scales().z?.seriesPadding ?? cfg.bar.seriesPadding))
 	);
+	// Each series gets an equal slice of the band.
+	const seriesStep = $derived(seriesCount > 0 ? estimatedBandwidth / seriesCount : 0);
+	const seriesGap = $derived(seriesGapFraction * seriesStep);
 
 	/**
 	 * Per-category cumulative sums for 'stacked' layout — `stackedPrefixSums.get(category)[i]`
@@ -155,6 +162,28 @@ export function createBarLayout<TData extends Record<string, unknown>>(args: {
 		return args.isHorizontal() ? { dx: 0, dy: -offset } : { dx: offset, dy: 0 };
 	}
 
+	/**
+	 * A 'grouped' series' own slice of the category band, as fractions (0–1)
+	 * of the *whole* band rather than pixels — unlike {@link groupOffset},
+	 * which bakes in `estimatedBandwidth`'s own guess, these stay exact
+	 * regardless of how far off that guess ends up: `BarMarker` multiplies
+	 * them by the band's real, svelteplot-measured width at render time
+	 * (only available once mounted inside the actual `<Plot>`, which this
+	 * module isn't), so a bar's own visible width/position is never off by
+	 * the estimate's error the way `estimatedBandwidth`-derived pixels can be
+	 * — most noticeable in a small faceted cell, where a fixed margin
+	 * estimate is proportionally least accurate.
+	 */
+	function groupInsetFraction(seriesIndex: number): { start: number; end: number } {
+		if (layout !== 'grouped' || seriesCount === 0) return { start: 0, end: 0 };
+		const sliceFraction = 1 / seriesCount;
+		const gapFraction = (seriesGapFraction * sliceFraction) / 2;
+		return {
+			start: seriesIndex * sliceFraction + gapFraction,
+			end: (seriesCount - 1 - seriesIndex) * sliceFraction + gapFraction
+		};
+	}
+
 	return {
 		get layout() {
 			return layout;
@@ -175,7 +204,8 @@ export function createBarLayout<TData extends Record<string, unknown>>(args: {
 			return seriesGap;
 		},
 		stackedBaseline,
-		groupOffset
+		groupOffset,
+		groupInsetFraction
 	};
 }
 
