@@ -316,6 +316,31 @@ export const GroupedSeriesWithHighlightArea: Story = {
 };
 
 /**
+ * `areaY: true` on `'grouped'` series, horizontal orientation — the
+ * highlight narrows to the hovered series' own bar, same as
+ * `GroupedSeriesWithHighlightArea` but on the other axis.
+ */
+export const GroupedSeriesWithHighlightAreaHorizontal: Story = {
+  args: {
+    data: LIFE_EXPECTANCY_BY_PROVINCE,
+    x: 'province',
+    y: 'value',
+    z: 'sex',
+    scales: {
+      y: { type: 'categorical' },
+      z: { seriesLayout: 'grouped', seriesPadding: 0.2 },
+    },
+    markers: [
+      {
+        type: 'hover',
+        areaY: true,
+        ruleY: false,
+      },
+    ] satisfies AxisBasedMarkersConfig[],
+  },
+};
+
+/**
  * Hover marker on `'stacked'` series — the dot and label land at each
  * series' cumulative height (its own segment's top), not at its raw value
  * from a zero baseline, so they sit on the correct segment of the stack.

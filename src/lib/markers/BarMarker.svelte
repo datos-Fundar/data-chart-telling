@@ -115,7 +115,7 @@
 			{@const [valueMin, valueMax] = valueExtentFor(marker.isHorizontal)}
 			{#if marker.isHorizontal}
 				{@const thickness = Math.max(0, bandwidth - insetTop - insetBottom) + 2}
-				{@const center = bandStart + insetTop + (bandwidth - insetTop - insetBottom) / 2}
+				{@const center = bandStart + insetBottom + (bandwidth - insetTop - insetBottom) / 2}
 				<rect
 					class="hover-area"
 					x={valueMin}
