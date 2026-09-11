@@ -8,6 +8,7 @@
 		omitDisabledSeries,
 		buildSeriesColorIndex
 	} from '$lib/plots/utils/legendDisabled';
+	import { SvelteMap } from 'svelte/reactivity';
 	import { resolveAccessor } from '$lib/plots/utils/accessors';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import {
@@ -15,6 +16,9 @@
 		validateSegments,
 		buildScopedMarkerGroups
 	} from '$lib/plots/utils/segments';
+	import { isGapValue } from '$lib/plots/utils/gaps';
+	import { niceDomain, naturalTickCount } from '$lib/layout/scales/niceDomain';
+	import { AUTO_MARGIN_ESTIMATE } from '$lib/layout/plot/margins';
 	import { createBarLayout } from '$lib/plots/bar/layout.svelte';
 	import {
 		createLabelMarginTracker,
@@ -33,7 +37,7 @@
 	} from '$lib/layout/tooltip/utils';
 	import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 	import type { BasePlotProps } from '$lib/types/plots/props';
-	import type { AxisScale, AxisBasedScalesConfig } from '$lib/types/layout/scales';
+	import type { AxisValue, AxisScale, AxisBasedScalesConfig } from '$lib/types/layout/scales';
 	import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
 	import type { GapsAwarePlotStylesConfig } from '$lib/types/layout/styles';
 	import type { ValueAnchor } from '$lib/types/plots/constants';
@@ -170,6 +174,78 @@
 			paddingOuter: scale?.paddingOuter ?? scale?.padding ?? cfg.bar.paddingOuter
 		};
 	}
+
+	// Mirrors `createBarLayout`'s own `layout` derivation, read off the raw
+	// `scales` prop rather than `resolvedScales` — `valueExtent`/
+	// `withValueDomain` below feed `resolvedScales`, so reading it back off
+	// `resolvedScales` (or `barLayout.layout`, built from it) would be circular.
+	const seriesLayout = $derived(scales.z?.seriesLayout ?? 'overlap');
+
+	/**
+	 * The value axis's real rendered range — `[0, ...]` for 'grouped'/'overlap'
+	 * (each row's own value, same range `svelteplot`'s own auto-domain would
+	 * find), but for 'stacked' the *per-category total* (every series summed),
+	 * which a plain per-row scan can't see. Needed so `withValueDomain` can
+	 * nice-widen the axis itself instead of deferring to `buildScale`'s
+	 * `nice: true` default, which only ever sees raw per-row values and would
+	 * under-widen a stacked total's real top.
+	 */
+	const valueExtent = $derived.by((): [number, number] | undefined => {
+		let lo = 0;
+		let hi = 0;
+		if (seriesLayout === 'stacked') {
+			const totals = new SvelteMap<AxisValue, number>();
+			for (const s of resolvedSeries) {
+				const sx = resolveAccessor(s.x);
+				const sy = resolveAccessor(s.y);
+				for (const row of s.data) {
+					const raw = sy(row);
+					if (isGapValue(raw)) continue;
+					const cat = sx(row);
+					totals.set(cat, (totals.get(cat) ?? 0) + Number(raw));
+				}
+			}
+			for (const total of totals.values()) {
+				lo = Math.min(lo, total);
+				hi = Math.max(hi, total);
+			}
+		} else {
+			for (const s of resolvedSeries) {
+				const sy = resolveAccessor(s.y);
+				for (const row of s.data) {
+					const raw = sy(row);
+					if (isGapValue(raw)) continue;
+					const v = Number(raw);
+					lo = Math.min(lo, v);
+					hi = Math.max(hi, v);
+				}
+			}
+		}
+		return hi > lo ? [lo, hi] : undefined;
+	});
+
+	/**
+	 * Nice-widens the value axis using `valueExtent` (baseline/stack-aware,
+	 * unlike `buildScale`'s own `nice: true` default) with an epsilon
+	 * tolerance — see `niceDomain` — so a stacked total that's supposed to
+	 * land exactly on a round number (a "parts of a whole" dataset, e.g.
+	 * percentages summing to 100) doesn't get bumped a full step further by
+	 * float noise from summing already-rounded parts. Skipped once the
+	 * caller sets their own `domain`/`ticks`/`nice`.
+	 */
+	function withValueDomain(scale?: AxisScale<TData>): AxisScale<TData> | undefined {
+		if (scale?.domain != null || scale?.ticks != null || scale?.nice != null) return scale;
+		if (!valueExtent) return scale;
+		const [lo, hi] = valueExtent;
+		const spacing = isHorizontal ? 80 : 50;
+		const marginEstimate = isHorizontal
+			? AUTO_MARGIN_ESTIMATE.left + AUTO_MARGIN_ESTIMATE.right
+			: AUTO_MARGIN_ESTIMATE.top + AUTO_MARGIN_ESTIMATE.bottom;
+		const span = Math.max(0, (isHorizontal ? width : height) - marginEstimate);
+		const count = naturalTickCount(span, spacing, 2);
+		return { ...scale, domain: niceDomain(lo, hi, count) };
+	}
+
 	// The single, fully-resolved scales object both BasePlotLayout (ticks,
 	// grid, sort, the real svelteplot scale) and `createBarLayout` (the
 	// grouped-bar-width estimate) read for everything — avoids keeping a
@@ -177,8 +253,12 @@
 	// the one actually forwarded.
 	const resolvedScales = $derived({
 		...scales,
-		x: stripCategoricalType(categoricalAxis === 'x' ? withDefaultPadding(scales.x) : scales.x),
-		y: stripCategoricalType(categoricalAxis === 'y' ? withDefaultPadding(scales.y) : scales.y)
+		x: stripCategoricalType(
+			categoricalAxis === 'x' ? withDefaultPadding(scales.x) : withValueDomain(scales.x)
+		),
+		y: stripCategoricalType(
+			categoricalAxis === 'y' ? withDefaultPadding(scales.y) : withValueDomain(scales.y)
+		)
 	});
 
 	// The accessor feeding each *visual* channel — swapped from the

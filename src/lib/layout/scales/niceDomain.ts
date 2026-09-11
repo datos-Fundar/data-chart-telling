@@ -30,3 +30,28 @@ export function ticksInRange(start: number, stop: number, step: number): number[
 export function naturalTickCount(span: number, spacing: number, min: number): number {
   return Math.max(min, Math.round(span / spacing));
 }
+
+/**
+ * Widens `[lo, hi]` outward to the nearest `count`-ish "nice" step —
+ * equivalent to d3's own `scale.nice(count)`, except a value within
+ * `epsilonFraction × step` of a step boundary is treated as already sitting
+ * on it, rather than needing a full extra step to clear it.
+ *
+ * Exists because plain `Math.ceil`/`Math.floor` (what `nice()` uses
+ * internally, both here and in d3) has zero tolerance: a value meant to be
+ * exactly `100` that comes out `100.00000000000001` after summing several
+ * independently-rounded parts (a common shape for "these categories add up
+ * to a whole" data, e.g. percentages of a total) still fails `hi <= step*N`
+ * and gets rounded up a full step further than the data actually warrants
+ * (`100` → `110`, not just a hair past `100`). `epsilonFraction` defaults to
+ * 1% of the step — small enough to only catch rounding/summation noise, not
+ * data that's genuinely meaningfully past the boundary.
+ */
+export function niceDomain(lo: number, hi: number, count = 5, epsilonFraction = 0.01): [number, number] {
+  if (!(hi > lo)) return [lo, hi];
+  const step = tickStep(lo, hi, count);
+  const eps = step * epsilonFraction;
+  const niceLo = Math.floor((lo + eps) / step) * step;
+  const niceHi = Math.ceil((hi - eps) / step) * step;
+  return [niceLo, niceHi];
+}
