@@ -59,7 +59,7 @@ export { THEMES } from './configuration/themes';
 export type { ThemeName } from './configuration/themes';
 
 // ── Utils ─────────────────────────────────────────────────────────────────────
-export { groupBy } from './utils/grouping';
+export { groupBy, buildSeries } from './utils/grouping';
 export {
 	makeColorScale,
 	normalize,
