@@ -23,7 +23,8 @@
   import type { Series } from '$lib/types/plots/data/common';
   import type { HoverMarkerConfig, CustomComponentMarkerConfig } from '$lib/types/markers/common';
   import type { MarkerConfig } from '$lib/types/markers/all';
-  import type { HoverPoint, TooltipAnchorX, TooltipAnchorY } from '$lib/types/layout/tooltip';
+  import type { TooltipAnchorX, TooltipAnchorY } from '$lib/types/layout/tooltip';
+  import type { HoverController } from '$lib/layout/tooltip/controller.svelte';
   import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
   import type { GeoFeature } from '$lib/types/plots/data/geo';
 
@@ -49,10 +50,7 @@
     markers = [],
     seriesData = [],
     scopedGroups = [],
-    matchedPoints,
-    activePoint,
-    impliesCrosshairX,
-    impliesCrosshairY,
+    ctrl,
     numericMargins,
     data = [],
     geoAllFeatures = [],
@@ -68,11 +66,8 @@
     seriesData?: Series<TSeries>[];
     /** One entry per series that can own a `series`-scoped marker. Same `TSeries` as `seriesData`. */
     scopedGroups?: ScopedMarkerGroup<TSeries>[];
-    matchedPoints: HoverPoint<TData>[];
-    /** The specific matched point actually under the cursor. */
-    activePoint: HoverPoint<TData> | null;
-    impliesCrosshairX: boolean;
-    impliesCrosshairY: boolean;
+    /** `BasePlotLayout`'s own hover controller. */
+    ctrl: HoverController<TData>;
     /** The plot's own resolved margins — `inset` marker only, to place its content box. */
     numericMargins?: { top: number; right: number; bottom: number; left: number };
     /** `BasePlotLayout`'s own rows — `contour` (clip) and unscoped `geo-component` fallback data. */
@@ -171,9 +166,16 @@
   {:else if marker.type === 'geo-component'}
     <marker.component {...marker.props} data={marker.data ?? data} />
   {:else if marker.type === 'hover'}
-    <HoverMarker {marker} data={matchedPoints} {activePoint} {impliesCrosshairX} {impliesCrosshairY} />
+    <HoverMarker
+      {marker}
+      data={ctrl.points}
+      activePoint={ctrl.activePoint}
+      impliesCrosshairX={ctrl.impliesCrosshairX}
+      impliesCrosshairY={ctrl.impliesCrosshairY}
+      onActivePointPixel={ctrl.reportActivePointPixel}
+    />
   {:else if marker.type === 'geo-hover'}
-    <GeoHoverMarker {marker} data={matchedPoints} />
+    <GeoHoverMarker {marker} data={ctrl.points} />
   {:else if marker.type === 'delta'}
     <DeltaMarker {marker} data={seriesData} />
   {/if}
@@ -182,7 +184,7 @@
 {#each scopedGroups as group (group.name)}
   {#each scopedMarkersByName.get(group.name) ?? [] as marker, i (`${group.name}-${marker.type}-${i}`)}
     {#if marker.type === 'hover'}
-      {@const seriesPoints = matchedPoints.filter((p) => p.series === group.name)}
+      {@const seriesPoints = ctrl.points.filter((p) => p.series === group.name)}
       {#if marker.scope === 'segment'}
         {#each group.segments as seg, segIdx (`${group.name}-hover-segment-${segIdx}`)}
           <!-- p.row (TData) is always a superset of TSeries in practice, not provable across two independent generics. -->
@@ -192,8 +194,8 @@
               {marker}
               data={segPoints}
               activePoint={segPoints[0] ?? null}
-              {impliesCrosshairX}
-              {impliesCrosshairY}
+              impliesCrosshairX={ctrl.impliesCrosshairX}
+              impliesCrosshairY={ctrl.impliesCrosshairY}
               seriesColor={seg.color}
             />
           {/if}
@@ -203,8 +205,8 @@
           {marker}
           data={seriesPoints}
           activePoint={seriesPoints[0] ?? null}
-          {impliesCrosshairX}
-          {impliesCrosshairY}
+          impliesCrosshairX={ctrl.impliesCrosshairX}
+          impliesCrosshairY={ctrl.impliesCrosshairY}
           seriesColor={group.segments[0]?.color ?? group.color}
         />
       {/if}

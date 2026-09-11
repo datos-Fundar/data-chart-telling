@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { usePlot } from 'svelteplot';
   import DotMarker from './DotMarker.svelte';
   import TextMarker from './TextMarker.svelte';
   import RuleMarker from './RuleMarker.svelte';
@@ -39,6 +40,8 @@
     activePoint?: HoverDisplayPoint | null;
     impliesCrosshairX?: boolean;
     impliesCrosshairY?: boolean;
+    /** Reports `activePoint`'s real pixel position within this facet's own box, or `null` when nothing's matched. */
+    onActivePointPixel?: (pos: { x: number; y: number } | null) => void;
   }
 
   let {
@@ -48,9 +51,35 @@
     impliesCrosshairX = false,
     impliesCrosshairY = false,
     seriesColor,
+    onActivePointPixel,
   }: Props = $props();
 
   const cfg = $derived(getConfiguration());
+  const plot = usePlot();
+
+  /** Scaled pixel position of `value`, centered within its band for a band scale. */
+  function scaledPixel(scale: { type?: string; fn?: (v: never) => unknown } | undefined, value: unknown): number | null {
+    if (!scale?.fn || value == null) return null;
+    const raw = Number(scale.fn(value as never));
+    if (!Number.isFinite(raw)) return null;
+    if (scale.type === 'band') {
+      const bandwidth = (scale.fn as { bandwidth?: () => number }).bandwidth?.() ?? 0;
+      return raw + bandwidth / 2;
+    }
+    return raw;
+  }
+
+  const activePixel = $derived.by((): { x: number; y: number } | null => {
+    if (!activePoint) return null;
+    const x = scaledPixel(plot.scales.x, activePoint.x);
+    const y = scaledPixel(plot.scales.y, activePoint.y);
+    if (x == null || y == null) return null;
+    return { x: x + (activePoint.dx ?? 0), y: y + (activePoint.dy ?? 0) };
+  });
+
+  $effect(() => {
+    onActivePointPixel?.(activePixel);
+  });
 
   const showCrosshairX = $derived(marker.ruleX !== false && (impliesCrosshairX || marker.ruleX === true));
   const showCrosshairY = $derived(marker.ruleY !== false && (impliesCrosshairY || marker.ruleY === true));
@@ -115,6 +144,8 @@
       isHorizontal: false,
       data: [],
       category: areaX,
+      insetLeft: activePoint?.areaInset?.start,
+      insetRight: activePoint?.areaInset?.end,
       style: areaStyle,
     }}
   />
@@ -128,17 +159,23 @@
       isHorizontal: true,
       data: [],
       category: areaY,
+      insetTop: activePoint?.areaInset?.start,
+      insetBottom: activePoint?.areaInset?.end,
       style: areaStyle,
     }}
   />
 {/if}
 
 {#if ruleX != null}
-  <RuleMarker axis="x" value={ruleX} style={{ ...cfg.hover.rule, ...ruleStyle }} />
+  <g transform="translate({activePoint?.dx ?? 0}, {activePoint?.dy ?? 0})">
+    <RuleMarker axis="x" value={ruleX} style={{ ...cfg.hover.rule, ...ruleStyle }} />
+  </g>
 {/if}
 
 {#if ruleY != null}
-  <RuleMarker axis="y" value={ruleY} style={{ ...cfg.hover.rule, ...ruleStyle }} />
+  <g transform="translate({activePoint?.dx ?? 0}, {activePoint?.dy ?? 0})">
+    <RuleMarker axis="y" value={ruleY} style={{ ...cfg.hover.rule, ...ruleStyle }} />
+  </g>
 {/if}
 
 {#if data.length > 0}

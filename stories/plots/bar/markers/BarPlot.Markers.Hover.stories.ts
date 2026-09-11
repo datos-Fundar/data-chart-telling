@@ -272,9 +272,8 @@ export const OverlapedSeriesScoped: Story = {
 };
 
 /**
- * Hover marker on `'grouped'` series — the dot and label land on each
- * series' own bar slice (offset sideways from the category center), not
- * stacked on top of each other at the shared category position.
+ * Hover marker on `'grouped'` series — the dot, label, and crosshair rule
+ * land on each series' own bar slice, not the shared category center.
  */
 export const GroupedSeries: Story = {
   args: {
@@ -288,6 +287,29 @@ export const GroupedSeries: Story = {
     markers: [
       {
         type: 'hover',
+      },
+    ] satisfies AxisBasedMarkersConfig[],
+  },
+};
+
+/**
+ * `areaX: true` on `'grouped'` series — the highlight narrows to the
+ * hovered series' own bar, not the whole two-bar group.
+ */
+export const GroupedSeriesWithHighlightArea: Story = {
+  args: {
+    data: LIFE_EXPECTANCY_BY_PROVINCE,
+    x: 'province',
+    y: 'value',
+    z: 'sex',
+    scales: {
+      z: { seriesLayout: 'grouped', seriesPadding: 0.2 },
+    },
+    markers: [
+      {
+        type: 'hover',
+        areaX: true,
+        ruleX: false,
       },
     ] satisfies AxisBasedMarkersConfig[],
   },

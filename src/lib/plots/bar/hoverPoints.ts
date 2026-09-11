@@ -19,12 +19,13 @@ import type { BarLayout } from './layout.svelte';
 export function buildHoverPoints<TData extends Record<string, unknown>>(
   resolvedSeries: Series<TData>[],
   isHorizontal: boolean,
-  geometry: Pick<BarLayout<TData>, 'layout' | 'stackedBaseline' | 'groupOffset'>,
+  geometry: Pick<BarLayout<TData>, 'layout' | 'stackedBaseline' | 'groupOffset' | 'groupInsetFraction'>,
   colorFor: (seriesName: string) => string,
 ): HoverPoint<TData>[] {
   return resolvedSeries.flatMap((s, idx) => {
     const sx = resolveAccessor(s.x);
     const sy = resolveAccessor(s.y);
+    const areaInset = geometry.layout === 'grouped' ? geometry.groupInsetFraction(idx) : undefined;
     return s.data.filter((d) => !isGapValue(sy(d))).map((d) => {
       const category = sx(d) as AxisValue;
       const rawValue = Number(sy(d));
@@ -35,6 +36,7 @@ export function buildHoverPoints<TData extends Record<string, unknown>>(
         y: isHorizontal ? category : value,
         dx,
         dy,
+        areaInset,
         row: d,
         label: String(sy(d)),
         series: s.name,

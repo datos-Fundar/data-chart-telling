@@ -2,6 +2,10 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LineChart from '$lib/charts/line/Chart.svelte';
 import TooltipSyncDemo, { heatData, pyramidData } from './TooltipSyncDemo.svelte';
 import FacetSyncBarBySeriesDemo from './FacetSyncBarBySeriesDemo.svelte';
+import FacetSyncBarUnrelatedOrderDemo, {
+	UNRELATED_SORT_DATA,
+	type GroupValue
+} from './FacetSyncBarUnrelatedOrderDemo.svelte';
 import { renderSource } from '../../common/docsSource';
 import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
 import { REGION_BARS, REGION_SECTOR_BARS, type RegionSector } from '../../data/region-bars';
@@ -148,6 +152,38 @@ export const FacetSyncHeatmap: StoryObj = {
 					styles: { values: { show: false, format: (v: number) => `${(v * 100).toFixed(0)}%` } },
 					facet: { by: 'scenario', columns: 2 },
 					tooltip: { strategy: 'punctual', sync: true },
+					markers: [{ type: 'hover' }]
+				})
+			}
+		}
+	}
+};
+
+/**
+ * Faceted bar chart where each facet sorts its own bars by value, giving
+ * `Group 1`/`Group 2` two unrelated orderings. The tooltip lands on the row
+ * that actually matched in the other facet, wherever it sits there.
+ */
+export const FacetSyncBarUnrelatedOrder: StoryObj = {
+	render: () => ({ Component: FacetSyncBarUnrelatedOrderDemo }),
+	parameters: {
+		docs: {
+			source: {
+				code: renderSource('BarChart', {
+					title: 'Value by category, two unrelated groups',
+					subtitle: 'Strategy: y · Sync: on — each facet sorted by its own value',
+					data: UNRELATED_SORT_DATA,
+					x: 'category',
+					y: 'value',
+					scales: {
+						y: { type: 'categorical', sort: (a: GroupValue, b: GroupValue) => a.value - b.value }
+					},
+					facet: { by: 'group', columns: 2 },
+					tooltip: {
+						strategy: 'y',
+						sync: true,
+						format: (row: GroupValue) => `${row.category}: ${row.value}`
+					},
 					markers: [{ type: 'hover' }]
 				})
 			}

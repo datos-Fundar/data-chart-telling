@@ -8,6 +8,9 @@ import {
 import type { HoverStore, HoverPoint } from '$lib/types/layout/tooltip';
 import type { AxisValue } from '$lib/types/layout/scales';
 
+/** Return type of {@link createHoverController}. */
+export type HoverController<T extends Record<string, unknown>> = ReturnType<typeof createHoverController<T>>;
+
 /**
  * The plot-agnostic hover state machine shared by every plot. Given reactive
  * accessors for the current hover store, this facet's id, and the local points,
@@ -31,8 +34,12 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
 	/** This facet's own box, used to convert the cursor to/from a sync-broadcast fraction. */
 	width: () => number;
 	height: () => number;
+	/** Forces the crosshair rule(s) off entirely — see {@link import('$lib/types/plots/props').HoverConfig.crosshair}. */
+	crosshair?: () => boolean | undefined;
 }) {
 	let cursor = $state<{ x: number; y: number } | null>(null);
+	// This facet's own `activePoint`, as a pixel position reported by `HoverMarker`.
+	let activePointPixel = $state<{ x: number; y: number } | null>(null);
 
 	// Finds the matching hoverPoint for a hit row — by identity first, then
 	// by x/y value (for svelteplot's `Pointer`, which hands back clones).
@@ -104,9 +111,13 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
 		return candidates.find((p) => eq(p.x, activeX) && eq(p.y, activeY)) ?? candidates[0];
 	});
 
-	// Whether the current strategy implies a crosshair rule on each axis by default.
-	const _impliesCrosshairX = $derived(impliesCrosshairX(args.hover().strategy));
-	const _impliesCrosshairY = $derived(impliesCrosshairY(args.hover().strategy));
+	// Whether the current strategy implies a crosshair rule on each axis, unless `crosshair: false`.
+	const _impliesCrosshairX = $derived(
+		args.crosshair?.() === false ? false : impliesCrosshairX(args.hover().strategy)
+	);
+	const _impliesCrosshairY = $derived(
+		args.crosshair?.() === false ? false : impliesCrosshairY(args.hover().strategy)
+	);
 
 	const showTooltip = $derived.by(() => {
 		if (matchedRows.length === 0) return false;
@@ -152,8 +163,10 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
 		}
 	}
 
+	/** This facet's tooltip position: the cursor, else `activePointPixel`, else the source facet's cursor fraction reprojected onto this box. */
 	const tooltipPosition = $derived.by((): { x: number; y: number } | null => {
 		if (cursor) return cursor;
+		if (activePointPixel) return activePointPixel;
 		const frac = args.hover().cursorFrac;
 		return frac ? { x: frac.x * args.width(), y: frac.y * args.height() } : null;
 	});
@@ -162,6 +175,9 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
 		onPointer,
 		onMove,
 		onLeave,
+		reportActivePointPixel(pos: { x: number; y: number } | null) {
+			activePointPixel = pos;
+		},
 		get points() {
 			return highlight;
 		},

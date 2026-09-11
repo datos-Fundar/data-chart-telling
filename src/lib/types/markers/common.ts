@@ -59,7 +59,8 @@ export type LineMarkerConfig = {
  * for hover, resolved against the live scale at render time; `role:
  * 'highlight'` is `HoverMarkerConfig`'s `areaX`/`areaY` highlight — a
  * visible, non-interactive rect centered on `category`, spanning the full
- * opposite axis, sized to the category band's own width plus 2px.
+ * opposite axis, sized to the category band's own width plus 2px (or a
+ * single series' own slice, via `insetTop`/etc.).
  */
 export type BarMarkerConfig = {
   type: 'bar';

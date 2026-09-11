@@ -78,14 +78,14 @@
 	{#if categoryScale?.type === 'band'}
 		{@const bandwidth = categoryScale.fn.bandwidth()}
 		{@const bandStart = Number(categoryScale.fn(marker.category as never) ?? 0)}
+		{@const insetLeft = (marker.insetLeft ?? 0) * bandwidth}
+		{@const insetRight = (marker.insetRight ?? 0) * bandwidth}
+		{@const insetTop = (marker.insetTop ?? 0) * bandwidth}
+		{@const insetBottom = (marker.insetBottom ?? 0) * bandwidth}
 		{#if marker.role === 'hitArea'}
 			{@const [rangeMin, rangeMax] = marker.isHorizontal
 				? hitAreaValueRangeFor(marker.isHorizontal, marker.x1, marker.x2)
 				: hitAreaValueRangeFor(marker.isHorizontal, marker.y1, marker.y2)}
-			{@const insetLeft = (marker.insetLeft ?? 0) * bandwidth}
-			{@const insetRight = (marker.insetRight ?? 0) * bandwidth}
-			{@const insetTop = (marker.insetTop ?? 0) * bandwidth}
-			{@const insetBottom = (marker.insetBottom ?? 0) * bandwidth}
 			{#if marker.isHorizontal}
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<rect
@@ -113,9 +113,9 @@
 			{/if}
 		{:else}
 			{@const [valueMin, valueMax] = valueExtentFor(marker.isHorizontal)}
-			{@const thickness = bandwidth + 2}
-			{@const center = bandStart + bandwidth / 2}
 			{#if marker.isHorizontal}
+				{@const thickness = Math.max(0, bandwidth - insetTop - insetBottom) + 2}
+				{@const center = bandStart + insetTop + (bandwidth - insetTop - insetBottom) / 2}
 				<rect
 					class="hover-area"
 					x={valueMin}
@@ -132,6 +132,8 @@
 					pointer-events="none"
 				/>
 			{:else}
+				{@const thickness = Math.max(0, bandwidth - insetLeft - insetRight) + 2}
+				{@const center = bandStart + insetLeft + (bandwidth - insetLeft - insetRight) / 2}
 				<rect
 					class="hover-area"
 					x={center - thickness / 2}

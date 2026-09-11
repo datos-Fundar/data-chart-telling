@@ -100,6 +100,8 @@ export type HoverDisplayPoint = {
    */
   dx?: number;
   dy?: number;
+  /** A 'grouped' series' own slice of the category band, as start/end fractions (0–1) of the whole band. `undefined` means the whole band. */
+  areaInset?: { start: number; end: number };
 };
 
 /** A candidate point for hover matching/highlighting — also carries its source row. */

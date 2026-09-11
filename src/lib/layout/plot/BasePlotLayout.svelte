@@ -227,7 +227,8 @@
 		label: () => hover.label,
 		seriesFilter: () => hover.tooltip?.series,
 		width: () => width,
-		height: () => height
+		height: () => height,
+		crosshair: () => hover.crosshair
 	});
 
 	function onMove(e: PointerEvent) {
@@ -242,14 +243,6 @@
 		typeof markers === 'function'
 			? markers({ setHoverMatch: ctrl.onPointer, clearHoverMatch: ctrl.onLeave })
 			: markers
-	);
-
-	/** `hover.crosshair === false` forces both off, overriding the strategy-implied default — see {@link HoverConfig.crosshair}. */
-	const effectiveImpliesCrosshairX = $derived(
-		hover.crosshair === false ? false : ctrl.impliesCrosshairX
-	);
-	const effectiveImpliesCrosshairY = $derived(
-		hover.crosshair === false ? false : ctrl.impliesCrosshairY
 	);
 </script>
 
@@ -281,10 +274,7 @@
 			markers={resolvedMarkers}
 			seriesData={seriesData ?? []}
 			scopedGroups={scopedGroups ?? []}
-			matchedPoints={ctrl.points}
-			activePoint={ctrl.activePoint}
-			impliesCrosshairX={effectiveImpliesCrosshairX}
-			impliesCrosshairY={effectiveImpliesCrosshairY}
+			{ctrl}
 			{width}
 			{height}
 			{numericMargins}
@@ -296,8 +286,8 @@
 			{@render children?.({
 				matchedPoints: ctrl.points,
 				activePoint: ctrl.activePoint,
-				impliesCrosshairX: effectiveImpliesCrosshairX,
-				impliesCrosshairY: effectiveImpliesCrosshairY,
+				impliesCrosshairX: ctrl.impliesCrosshairX,
+				impliesCrosshairY: ctrl.impliesCrosshairY,
 				numericMargins,
 				setHoverMatch: ctrl.onPointer,
 				clearHoverMatch: ctrl.onLeave
