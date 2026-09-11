@@ -73,7 +73,6 @@ export const WithAxisLabels: Story = {
       x: { label: 'PBI per cápita (miles USD)' },
       y: { label: 'Esperanza de vida (años)' },
     } satisfies AxisBasedScalesConfig,
-    margins: { bottom: 50 },
   },
 };
 
@@ -100,6 +99,5 @@ export const CombinedOverrides: Story = {
       x: { type: 'log', label: 'PBI per cápita (miles USD)' },
       y: { domain: [50, 90], label: 'Esperanza de vida (años)', grid: true },
     } satisfies AxisBasedScalesConfig,
-    margins: { bottom: 50 },
   },
 };

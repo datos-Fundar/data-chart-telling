@@ -70,7 +70,6 @@ export const LegendDisabledDimsLabels: StoryObj = {
         code: renderSource('BarPlot', {
           width: 950,
           height: 500,
-          margins: { top: 20 },
           series: [FEMALE, MALE],
           styles: {
             values: {

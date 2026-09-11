@@ -128,7 +128,6 @@ export const WithAxisLabels: Story = {
       x: { label: 'Year' },
       y: { label: 'Life expectancy (years)' },
     } satisfies AxisBasedScalesConfig,
-    margins: { bottom: 50 },
   },
 };
 
@@ -261,7 +260,7 @@ export const ZeroAnchoredY: Story = {
 
 /**
  * All overrides combined on a two-series chart: labelled axes, a tighter
- * Y domain, explicit tick values, custom bottom margin and a Y grid.
+ * Y domain, explicit tick values and a Y grid.
  */
 export const CombinedOverrides: Story = {
   args: {
@@ -273,7 +272,6 @@ export const CombinedOverrides: Story = {
       x: { label: 'Year', ticks: [2008, 2012, 2016, 2020], grid: false },
       y: { label: 'Life expectancy (years)', domain: [60, 90], grid: true },
     } satisfies AxisBasedScalesConfig,
-    margins: { bottom: 50 },
   },
 };
 

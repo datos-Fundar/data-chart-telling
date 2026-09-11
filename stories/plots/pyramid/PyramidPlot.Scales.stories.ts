@@ -127,8 +127,8 @@ export const WithXGrid: Story = {
 };
 
 /**
- * Combined overrides — labelled axes with custom domain, custom tick format,
- * grid on X, and expanded margins to accommodate labels.
+ * Combined overrides — labelled axes with custom domain, custom tick format
+ * and grid on X.
  */
 export const CombinedOverrides: Story = {
   args: {
@@ -145,6 +145,5 @@ export const CombinedOverrides: Story = {
       },
       y: { label: 'Age Group', domain: AGE_GROUPS },
     } satisfies AxisBasedScalesConfig,
-    margins: { left: 60, bottom: 50 },
   },
 };

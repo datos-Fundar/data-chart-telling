@@ -161,8 +161,7 @@ export const RotatedXTicks: Story = {
 };
 
 /**
- * Combined overrides — labelled axes, explicit domain ordering for both axes,
- * and custom margins to accommodate labels and rotated ticks.
+ * Combined overrides — labelled axes and explicit domain ordering for both axes.
  */
 export const CombinedOverrides: Story = {
   args: {
@@ -180,6 +179,5 @@ export const CombinedOverrides: Story = {
       y: { domain: SEXES, label: 'Sex' },
       z: { domain: [70, 85] },
     } satisfies AxisBasedScalesConfig,
-    margins: { bottom: 50, left: 100 },
   },
 };

@@ -63,7 +63,7 @@ export const Default: Story = {
 };
 
 /**
- * Constrained Y domain — tightens the visible range to [75, 85], which makes
+ * Constrained Y domain — tightens the visible range to [75, 88], which makes
  * the variation in life expectancy more visible. Compare with `Default` to see
  * how the bars appear more spread out when the Y range is reduced.
  */
@@ -78,7 +78,7 @@ export const CustomYDomain: Story = {
       } satisfies Series<ProvincePoint>,
     ],
     scales: {
-      y: { domain: [70, 85] },
+      y: { domain: [70, 88] },
     } satisfies AxisBasedScalesConfig,
   },
 };
@@ -102,10 +102,6 @@ export const WithAxisLabels: Story = {
       x: { label: 'Province' },
       y: { label: 'Life expectancy (years)' },
     } satisfies AxisBasedScalesConfig,
-    // Non-rotated X ticks sit directly below the bars with barely any room
-    // of their own — svelteplot's own auto-sizing doesn't add extra height
-    // for the axis title stacked underneath them, so it overlaps without this.
-    margins: { bottom: 50 },
   },
 };
 
