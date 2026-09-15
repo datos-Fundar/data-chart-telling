@@ -80,7 +80,7 @@
     box-sizing: border-box;
     max-width: 100%;
     max-height: 100%;
-    padding: var(--dct-bleed, 8px);
+    padding: var(--dct-bleed, 12px);
     overflow: hidden;
     color: var(--dct-fg, currentColor);
     background: var(--dct-bg, transparent);
