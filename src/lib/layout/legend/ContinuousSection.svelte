@@ -273,6 +273,7 @@
   }
   .dct-continuous__tick {
     position: absolute;
+    white-space: nowrap;
     transform: translateX(-50%) rotate(var(--dct-continuous-label-rotate, 0deg));
   }
   /*
