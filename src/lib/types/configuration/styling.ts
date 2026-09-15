@@ -27,6 +27,7 @@ export type ChartConfig = {
 		headerPadding: string;
 		legendPadding: string;
 		captionPadding: string;
+		bleed: string;
 	};
 
 	// ── Text blocks ─────────────────────────────────────────────────────────────

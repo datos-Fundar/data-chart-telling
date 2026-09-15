@@ -77,8 +77,10 @@
   .dct-chart {
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
     max-width: 100%;
     max-height: 100%;
+    padding: var(--dct-bleed, 8px);
     overflow: hidden;
     color: var(--dct-fg, currentColor);
     background: var(--dct-bg, transparent);

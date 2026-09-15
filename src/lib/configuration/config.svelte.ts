@@ -38,7 +38,8 @@ export const DEFAULT_CONFIG: ChartConfig = {
 	spacing: {
 		headerPadding: '0.75rem 0 1rem',
 		legendPadding: '0.75rem 0',
-		captionPadding: '0.5rem 0'
+		captionPadding: '0.5rem 0',
+		bleed: '8px'
 	},
 
 	title: text({ size: '1.5rem', weight: 500, leading: '1.2' }),
@@ -218,6 +219,7 @@ export function configToCssVars(c: ChartConfig): Record<string, string> {
 		'--dct-header-pad': c.spacing.headerPadding,
 		'--dct-legend-pad': c.spacing.legendPadding,
 		'--dct-caption-pad': c.spacing.captionPadding,
+		'--dct-bleed': c.spacing.bleed,
 
 		...t('title', c.title),
 		...t('subtitle', c.subtitle),
