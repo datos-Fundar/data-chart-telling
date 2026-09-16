@@ -83,7 +83,9 @@ export const DEFAULT_CONFIG: ChartConfig = {
 				length: '6px'
 			},
 			label: {
-				rotate: '0deg'
+				rotate: '0deg',
+				size: '0.875rem',
+				weight: 600
 			}
 		}
 	},
@@ -250,6 +252,8 @@ export function configToCssVars(c: ChartConfig): Record<string, string> {
 		'--dct-continuous-tick-width': c.legend.continuous.tick.width,
 		'--dct-continuous-tick-length': c.legend.continuous.tick.length,
 		'--dct-continuous-label-rotate': c.legend.continuous.label.rotate,
+		'--dct-continuous-label-size': c.legend.continuous.label.size,
+		'--dct-continuous-label-weight': String(c.legend.continuous.label.weight),
 
 		'--dct-axis-color': c.axis.color,
 

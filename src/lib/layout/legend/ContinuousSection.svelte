@@ -258,7 +258,7 @@
   .dct-continuous__labels {
     position: relative;
     height: 1rem;
-    font-size: var(--dct-legend-size, 0.75rem);
+    font-size: var(--dct-continuous-label-size, 0.875rem);
     user-select: none;
   }
   .dct-continuous__edge {
@@ -284,7 +284,7 @@
    */
   .dct-continuous__tick--handle-lo,
   .dct-continuous__tick--handle-hi {
-    font-weight: 600;
+    font-weight: var(--dct-continuous-label-weight, 600);
   }
   .dct-continuous__tick--handle-lo {
     transform: rotate(var(--dct-continuous-label-rotate, 0deg));

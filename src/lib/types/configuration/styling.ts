@@ -77,6 +77,10 @@ export type ChartConfig = {
 			label: {
 				/** Rotation applied to tick/edge label text. */
 				rotate: string;
+				/** font-size of the tick/edge/handle labels. */
+				size: string;
+				/** font-weight of the draggable lo/hi handle labels. */
+				weight: number | string;
 			};
 		};
 	};
