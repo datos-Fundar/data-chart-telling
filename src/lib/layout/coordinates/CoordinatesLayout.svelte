@@ -172,3 +172,9 @@
 		</g>
 	</Plot>
 {/key}
+
+<style>
+	:global(figure.svelteplot svg) {
+		overflow: visible;
+	}
+</style>
