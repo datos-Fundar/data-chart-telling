@@ -319,13 +319,21 @@
     white-space: nowrap;
     font-weight: var(--dct-continuous-label-weight, 600);
   }
-  .dct-continuous__tick--handle-lo.dct-continuous__tick--vertical {
+  /*
+   * Once the two handle labels would otherwise collide, both read
+   * top-to-bottom instead of left-to-right — the *same* rotation and the
+   * *same* pivot corner for lo and hi, so the two read identically instead
+   * of one appearing mirrored against the other. Pivoting on the label's
+   * own bottom-left corner (exactly where `left: <anchor>px` already
+   * places it) means the rotation doesn't shift the label off its anchor
+   * at all — it grows right-and-down from the point it was already
+   * sitting at, the same "grow into the bar, not off the container's edge"
+   * reasoning as the horizontal anchoring above.
+   */
+  .dct-continuous__tick--handle-lo.dct-continuous__tick--vertical,
+  .dct-continuous__tick--handle-hi.dct-continuous__tick--vertical {
     transform-origin: left bottom;
     transform: rotate(var(--dct-continuous-label-overlap-rotate, 90deg));
-  }
-  .dct-continuous__tick--handle-hi.dct-continuous__tick--vertical {
-    transform-origin: right bottom;
-    transform: rotate(calc(var(--dct-continuous-label-overlap-rotate, 90deg) * -1));
   }
   /* Tick mark below the bar at each non-interactive tick's position. */
   .dct-continuous__tick-mark {
