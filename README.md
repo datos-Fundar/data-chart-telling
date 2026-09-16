@@ -399,6 +399,193 @@ Omitting `segments` (or passing `[]`) renders every mark in its default palette 
 
 ---
 
+## Theming & configuration
+
+The whole package reads its default styling — fonts, colours, spacing, legend/tooltip/axis chrome, plot geometry — from one global, reactive config store (`src/lib/configuration/config.svelte.ts`). Overriding it re-themes every chart on screen; nothing needs to be passed prop-by-prop to each component.
+
+```ts
+import { setConfiguration, getConfiguration, resetConfiguration } from '@fundar/data-chart-telling';
+
+setConfiguration({
+  font: '"Inter", sans-serif',
+  palette: ['#4f46e5', '#e6580d', '#16a34a'],
+  legend: { continuous: { label: { size: '0.8125rem', weight: 400 } } }
+});
+
+getConfiguration();   // read the live, merged config
+resetConfiguration(); // restore shipped defaults
+```
+
+- `setConfiguration` takes a **deep-partial** patch (`ChartConfigInput`) and deep-merges it into the current config — you only specify the leaves you want to change, everything else keeps its previous value. It's reactive (`$state`-backed), so applying it re-renders every mounted chart.
+- Call it once at app startup (or per-theme-switch); it's global, not per-chart. A single chart can still override specific visuals via its own props (`styles`, `scales`, a section's own `format`/`color`, etc.) — those always win over the global config.
+
+### How values reach the DOM
+
+The config feeds two different consumers, and a field is **one or the other**, never both:
+
+1. **CSS custom properties** — `configToCssVars` flattens the relevant fields into `--dct-*` variables, which `ChartContainer` stamps on its own root element; every component's scoped `<style>` block reads them with a hardcoded fallback (e.g. `font-size: var(--dct-continuous-label-size, 0.875rem)`). These are the fields listed with a **CSS variable** below — you can also override them directly with plain CSS on a wrapping element instead of going through `setConfiguration`, if you only need a one-off, non-reactive tweak.
+2. **Plain JS values** — read directly by plot components as props svelteplot needs (numeric tick sizes, the categorical `palette` array, margins, gradient endpoints, hover geometry, per-mark defaults). These have **no** CSS variable — `setConfiguration` (or editing `DEFAULT_CONFIG`) is the only way to change them.
+
+### Reference
+
+All types live in `src/lib/types/configuration/styling.ts`; all defaults in `src/lib/configuration/config.svelte.ts`. "CSS variable" is `—` for JS-only fields.
+
+#### Base
+
+| Field | Type | Default | CSS variable |
+| ----- | ---- | ------- | ------------- |
+| `font` | `string` | `'inherit'` | `--dct-font` |
+| `color` | `string` | `'currentColor'` | `--dct-fg` |
+| `background` | `string` | `'transparent'` | `--dct-bg` |
+| `border` | `string` | `'color-mix(in srgb, currentColor 15%, transparent)'` | `--dct-border` |
+
+#### Spacing
+
+| Field | Type | Default | CSS variable |
+| ----- | ---- | ------- | ------------- |
+| `spacing.headerPadding` | `string` | `'0.75rem 0 1rem'` | `--dct-header-pad` |
+| `spacing.legendPadding` | `string` | `'0.75rem 0'` | `--dct-legend-pad` |
+| `spacing.captionPadding` | `string` | `'0.5rem 0'` | `--dct-caption-pad` |
+| `spacing.bleed` | `string` | `'12px'` | `--dct-bleed` |
+
+#### Text blocks: `title`, `subtitle`, `caption`
+
+Each is a `TextStyle` — `{ font, size, weight, color, leading, spacing }` — mapped to `--dct-{title|subtitle|caption}-{font|size|weight|color|leading|spacing}`. Shared base before per-block overrides: `font: 'inherit'`, `size: '1rem'`, `weight: 400`, `color: 'inherit'`, `leading: '1.3'`, `spacing: 'normal'`.
+
+| Block | Overrides its own default |
+| ----- | -------------------------- |
+| `title` | `size: '1.5rem'`, `weight: 500`, `leading: '1.2'` |
+| `subtitle` | `size: '1rem'`, `weight: 400`, `color: 'color-mix(in srgb, currentColor 85%, transparent)'` |
+| `caption` | `size: '0.75rem'`, `color: 'color-mix(in srgb, currentColor 75%, transparent)'` |
+
+#### Legend
+
+| Field | Type | Default | CSS variable |
+| ----- | ---- | ------- | ------------- |
+| `legend.font` | `string` | `'inherit'` | `--dct-legend-font` |
+| `legend.size` | `string` | `'0.875rem'` | `--dct-legend-size` |
+| `legend.weight` | `number \| string` | `400` | `--dct-legend-weight` |
+| `legend.color` | `string` | `'inherit'` | `--dct-legend-color` |
+| `legend.titleSize` | `string` | `'0.875rem'` | `--dct-legend-title-size` |
+| `legend.titleWeight` | `number \| string` | `500` | `--dct-legend-title-weight` |
+| `legend.gap` | `string` (CSS `gap` shorthand) | `'0.5rem 2rem'` | `--dct-legend-gap` |
+| `legend.swatchSize` | `string` | `'1.25rem'` | `--dct-legend-swatch` |
+| `legend.disabledOpacity` | `number` | `0.12` | — (fallback for a legend-disabled series/value when a section doesn't set its own style) |
+
+`legend.navButton` — prev/next arrows on an overflowing horizontal discrete section:
+
+| Field | Type | Default | CSS variable |
+| ----- | ---- | ------- | ------------- |
+| `legend.navButton.background` | `string` | `'transparent'` | `--dct-legend-nav-bg` |
+| `legend.navButton.color` | `string` | `'currentColor'` | `--dct-legend-nav-color` |
+| `legend.navButton.size` | `string` | `'1.5rem'` | `--dct-legend-nav-size` |
+| `legend.navButton.fontSize` | `string` | `'1rem'` | `--dct-legend-nav-font-size` |
+| `legend.navButton.disabledOpacity` | `number` | `0.3` | `--dct-legend-nav-disabled-opacity` |
+
+`legend.continuous` — the gradient bar's draggable handles, ticks, and labels:
+
+| Field | Type | Default | CSS variable |
+| ----- | ---- | ------- | ------------- |
+| `legend.continuous.handle.width` | `string` | `'6px'` | `--dct-continuous-handle-width` |
+| `legend.continuous.handle.height` | `string` | `'20px'` | `--dct-continuous-handle-height` |
+| `legend.continuous.handle.radius` | `string` | `'3px'` | `--dct-continuous-handle-radius` |
+| `legend.continuous.handle.fill` | `string` | `'currentColor'` | `--dct-continuous-handle-fill` |
+| `legend.continuous.handle.stroke` | `string` | `'var(--dct-bg, #fff)'` | `--dct-continuous-handle-stroke` |
+| `legend.continuous.handle.strokeWidth` | `string` | `'1.5px'` | `--dct-continuous-handle-stroke-width` |
+| `legend.continuous.tick.color` | `string` | `'currentColor'` | `--dct-continuous-tick-color` |
+| `legend.continuous.tick.width` | `string` | `'1px'` | `--dct-continuous-tick-width` |
+| `legend.continuous.tick.length` | `string` | `'6px'` | `--dct-continuous-tick-length` |
+| `legend.continuous.label.rotate` | `string` | `'0deg'` | `--dct-continuous-label-rotate` |
+| `legend.continuous.label.size` | `string` | `'0.875rem'` | `--dct-continuous-label-size` |
+| `legend.continuous.label.weight` | `number \| string` | `600` | `--dct-continuous-label-weight` |
+
+`legend.continuous.label.overlap` — interactive mode only: once dragging brings the lo/hi handle labels too close to read side by side, both flip to read top-to-bottom instead of clipping or overlapping:
+
+| Field | Type | Default | CSS variable |
+| ----- | ---- | ------- | ------------- |
+| `legend.continuous.label.overlap.enabled` | `boolean` | `true` | — (`false` always keeps both labels horizontal, however close together) |
+| `legend.continuous.label.overlap.margin` | `number` (px) | `4` | — (horizontal slack the two labels need before they're considered overlapping) |
+| `legend.continuous.label.overlap.rotate` | `string` | `'90deg'` | `--dct-continuous-label-overlap-rotate` (lo rotates by this; hi by its negation, via `calc(... * -1)`, so both still grow inward toward the bar) |
+
+#### Axis
+
+Consumed as plain numeric/boolean props by the underlying svelteplot axes — only `color` is also exposed as a CSS variable (used by non-plot axis-adjacent chrome).
+
+| Field | Type | Default | CSS variable |
+| ----- | ---- | ------- | ------------- |
+| `axis.color` | `string` | `'currentColor'` | `--dct-axis-color` |
+| `axis.fontSize` | `number` | `14` | — |
+| `axis.labelFontSize` | `number` | `14` | — |
+| `axis.titleFontSize` | `number` | `14` | — |
+| `axis.xTickSize` | `number` | `5` | — |
+| `axis.yTickSize` | `number` | `5` | — |
+| `axis.xTickPadding` | `number` | `10` | — |
+| `axis.yTickPadding` | `number` | `10` | — |
+| `axis.grid` | `boolean` | `false` | — |
+
+#### Tooltip
+
+| Field | Type | Default | CSS variable |
+| ----- | ---- | ------- | ------------- |
+| `tooltip.background` | `string` | `'#111827'` | `--dct-tooltip-bg` |
+| `tooltip.color` | `string` | `'#ffffff'` | `--dct-tooltip-color` |
+| `tooltip.fontSize` | `string` | `'0.8125rem'` | `--dct-tooltip-size` |
+| `tooltip.padding` | `string` | `'0.5rem 0.75rem'` | `--dct-tooltip-pad` |
+| `tooltip.radius` | `string` | `'0.375rem'` | `--dct-tooltip-radius` |
+| `tooltip.border` | `string` | `'none'` | `--dct-tooltip-border` |
+
+#### Plot geometry & colour (all JS-only — no CSS variables)
+
+| Field | Type | Default |
+| ----- | ---- | ------- |
+| `margins.top/right/bottom/left` | `number \| 'auto'` | `'auto'` each — lets svelteplot size that side to fit whatever it actually renders there; a number pins it exactly |
+| `palette` | `string[]` | `['#4f46e5', '#e6580d', '#16a34a', '#dc2626', '#0891b2', '#9333ea', '#ca8a04', '#db2777']` — categorical series colours |
+| `continuous.min` / `continuous.max` | `string` | `'#e0e7ff'` / `'#4f46e5'` — heatmap/choropleth gradient endpoints |
+| `continuous.labelColor` | `string` | `'#111827'` — on-cell label colour |
+| `line.strokeWidth` | `number` | `3` |
+| `line.dotRadius` | `number` | `4` |
+| `line.gap.stroke` / `line.gap.dots` | `StrokeStyle` / `DotStyle` | `{ strokeOpacity: 0.6, strokeDasharray: '4 4' }` / `{}` — fallback for `LinePlot`'s `styles.gaps` |
+| `line.valueLabels.elbowGap` | `number` | `10` — shortest leader-line lane distance before it bends |
+| `line.valueLabels.laneStep` | `number` | `7` — extra distance each subsequent lane sits out |
+| `line.valueLabels.labelGap` | `number` | `6` — clearance between the outermost lane and its label |
+| `line.valueLabels.connectorColor` | `string` | `'#94a3b8'` |
+| `line.valueLabels.connectorWidth` | `number` | `0.5` |
+| `bar.gap` | `AreaStyle` | `{ fillOpacity: 0.5 }` — fallback for `BarPlot`'s `styles.gaps` |
+| `bar.seriesPadding` | `number` (0–1) | `0.2` — fallback `scales.z.seriesPadding` for grouped series |
+| `bar.paddingInner` | `number` (0–1) | `0.15` — gap between category groups |
+| `bar.paddingOuter` | `number` (0–1) | `0.15` — gap before the first / after the last group |
+| `pyramid.gap` | `AreaStyle` | `{ fillOpacity: 0.5 }` — fallback for `PyramidPlot`'s `styles.gaps` |
+| `scatter.dotRadius` | `number` | `5` |
+| `timeline.thickness` | `number` | `60` |
+| `hover.rule` | `StrokeStyle` | `{ stroke: '#e6580d', strokeOpacity: 0.35, strokeWidth: 1.5, strokeDasharray: '4 4' }` — hover crosshair |
+| `hover.dot` | `DotStyle` | `{ dotRadius: 5, dotFill: 'currentColor' }` |
+| `hover.font` | `FontStyle` | `{ fill: 'currentColor', fontSize: 12, dy: -18 }` |
+| `hover.area` | `AreaStyle` | `{ fill: '#94a3b8', fillOpacity: 0.25 }` — band highlight on a band scale |
+
+`timeline.axisColor` / `timeline.activeColor` are the two exceptions in this group — they *do* have CSS variables (see below), since the timeline gutter is HTML chrome, not an SVG plot mark.
+
+| Field | Type | Default | CSS variable |
+| ----- | ---- | ------- | ------------- |
+| `timeline.axisColor` | `string` | `'currentColor'` | `--dct-timeline-axis` |
+| `timeline.activeColor` | `string` | `'#e6580d'` | `--dct-timeline-active` |
+
+#### Facet (small multiples)
+
+| Field | Type | Default | CSS variable |
+| ----- | ---- | ------- | ------------- |
+| `facet.indicator.background` | `string` | `'#111827'` | `--dct-facet-indicator-bg` |
+| `facet.indicator.color` | `string` | `'#ffffff'` | `--dct-facet-indicator-color` |
+| `facet.indicator.fontSize` | `string` | `'0.8125rem'` | `--dct-facet-indicator-size` |
+| `facet.indicator.padding` | `string` | `'0.125rem 0.5rem'` | `--dct-facet-indicator-pad` |
+| `facet.indicator.radius` | `string` | `'999px'` | `--dct-facet-indicator-radius` |
+| `facet.navButton.background` | `string` | `'#111827'` | `--dct-facet-nav-bg` |
+| `facet.navButton.color` | `string` | `'#ffffff'` | `--dct-facet-nav-color` |
+| `facet.navButton.size` | `string` | `'2rem'` | `--dct-facet-nav-btn-size` |
+| `facet.navButton.fontSize` | `string` | `'1.1rem'` | `--dct-facet-nav-font-size` |
+| `facet.navButton.disabledOpacity` | `number` | `0.3` | `--dct-facet-nav-disabled-opacity` |
+
+---
+
 ## Public API
 
 ```ts

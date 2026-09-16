@@ -166,6 +166,15 @@
       }
     };
   }
+
+  let loLabelWidth = $state(0);
+  let hiLabelWidth = $state(0);
+
+  const labelsOverlap = $derived(
+    isInteractive &&
+      cfg.legend.continuous.label.overlap.enabled &&
+      (hiT - loT) * barWidth - loLabelWidth - hiLabelWidth < cfg.legend.continuous.label.overlap.margin,
+  );
 </script>
 
 <div class="dct-continuous" style:width="{barWidth}px">
@@ -237,8 +246,18 @@
 
   <div class="dct-continuous__labels" style:width="{barWidth}px">
     {#if isInteractive}
-      <span class="dct-continuous__tick dct-continuous__tick--handle-lo" style:left="{loT * barWidth}px">{fmt(lo)}</span>
-      <span class="dct-continuous__tick dct-continuous__tick--handle-hi" style:left="{hiT * barWidth}px">{fmt(hi)}</span>
+      <span class="dct-continuous__tick-measure" aria-hidden="true" bind:clientWidth={loLabelWidth}>{fmt(lo)}</span>
+      <span class="dct-continuous__tick-measure" aria-hidden="true" bind:clientWidth={hiLabelWidth}>{fmt(hi)}</span>
+      <span
+        class="dct-continuous__tick dct-continuous__tick--handle-lo"
+        class:dct-continuous__tick--vertical={labelsOverlap}
+        style:left="{loT * barWidth}px"
+      >{fmt(lo)}</span>
+      <span
+        class="dct-continuous__tick dct-continuous__tick--handle-hi"
+        class:dct-continuous__tick--vertical={labelsOverlap}
+        style:left="{hiT * barWidth}px"
+      >{fmt(hi)}</span>
     {:else}
       <span class="dct-continuous__edge dct-continuous__edge--start">{fmt(section.min)}</span>
       {#each tickPositions as tick (tick.v)}
@@ -291,6 +310,22 @@
   }
   .dct-continuous__tick--handle-hi {
     transform: translateX(-100%) rotate(var(--dct-continuous-label-rotate, 0deg));
+  }
+  /* Invisible, always-horizontal twin used only to measure a handle label's
+     natural width (see `labelsOverlap` above) — never rendered. */
+  .dct-continuous__tick-measure {
+    position: absolute;
+    visibility: hidden;
+    white-space: nowrap;
+    font-weight: var(--dct-continuous-label-weight, 600);
+  }
+  .dct-continuous__tick--handle-lo.dct-continuous__tick--vertical {
+    transform-origin: left bottom;
+    transform: rotate(var(--dct-continuous-label-overlap-rotate, 90deg));
+  }
+  .dct-continuous__tick--handle-hi.dct-continuous__tick--vertical {
+    transform-origin: right bottom;
+    transform: rotate(calc(var(--dct-continuous-label-overlap-rotate, 90deg) * -1));
   }
   /* Tick mark below the bar at each non-interactive tick's position. */
   .dct-continuous__tick-mark {

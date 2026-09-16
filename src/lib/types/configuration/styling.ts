@@ -81,6 +81,15 @@ export type ChartConfig = {
 				size: string;
 				/** font-weight of the draggable lo/hi handle labels. */
 				weight: number | string;
+				/** Interactive-mode-only: the lo/hi handle labels flip to read top-to-bottom once dragging brings them too close to read side by side. */
+				overlap: {
+					/** Whether the flip-to-vertical behavior is active at all; false always keeps both labels horizontal, however close together. */
+					enabled: boolean;
+					/** How many px of horizontal slack the two labels need between them before they're considered overlapping (and flipped). */
+					margin: number;
+					/** Rotation magnitude applied once overlapping — lo rotates by this amount, hi by its negation, so both still grow inward toward the bar instead of off its edges. */
+					rotate: string;
+				};
 			};
 		};
 	};

@@ -85,7 +85,12 @@ export const DEFAULT_CONFIG: ChartConfig = {
 			label: {
 				rotate: '0deg',
 				size: '0.875rem',
-				weight: 600
+				weight: 600,
+				overlap: {
+					enabled: true,
+					margin: 4,
+					rotate: '90deg'
+				}
 			}
 		}
 	},
@@ -254,6 +259,7 @@ export function configToCssVars(c: ChartConfig): Record<string, string> {
 		'--dct-continuous-label-rotate': c.legend.continuous.label.rotate,
 		'--dct-continuous-label-size': c.legend.continuous.label.size,
 		'--dct-continuous-label-weight': String(c.legend.continuous.label.weight),
+		'--dct-continuous-label-overlap-rotate': c.legend.continuous.label.overlap.rotate,
 
 		'--dct-axis-color': c.axis.color,
 
