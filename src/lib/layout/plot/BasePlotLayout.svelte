@@ -3,7 +3,7 @@
 	generics="TData extends Record<string, unknown>, TSeries extends Record<string, unknown> = TData"
 >
 	import type { ComponentProps, Snippet } from 'svelte';
-	import { Plot, Pointer } from 'svelteplot';
+	import { Plot, Pointer, setPlotDefaults } from 'svelteplot';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { AUTO_MARGIN_ESTIMATE, numericMargin } from '$lib/layout/plot/margins';
 	import { buildScale } from '$lib/layout/scales/buildScale';
@@ -149,6 +149,9 @@
 	} = $props();
 
 	const cfg = $derived(getConfiguration());
+	setPlotDefaults({
+		numberFormat: { useGrouping: 'min2', compactDisplay: cfg.axis.compactDisplay }
+	});
 
 	/**
 	 * Margins passed straight to `<Plot margin={…}>`. Each side defaults to
@@ -262,6 +265,7 @@
 		x={resolvedX}
 		y={resolvedY}
 		{coordinates}
+		locale={cfg.axis.locale}
 		{data}
 		{containerEl}
 		remountKey={marginRemountKey}

@@ -30,6 +30,7 @@
 		x,
 		y,
 		coordinates = undefined,
+		locale = undefined,
 		data,
 		containerEl,
 		remountKey = undefined,
@@ -41,6 +42,8 @@
 		x: SveltePlotProps['x'];
 		y: SveltePlotProps['y'];
 		coordinates?: CoordinatesConfig;
+		/** Forwarded verbatim to svelteplot's own `<Plot locale>`. */
+		locale?: SveltePlotProps['locale'];
 		/** Fed to `resolveProjection`'s `domain: 'data'` sentinel and to `coordinates.camera`'s `{features}` target resolution. */
 		data: TData[];
 		containerEl?: HTMLDivElement;
@@ -149,6 +152,7 @@
 		{margin}
 		{x}
 		{y}
+		{locale}
 		projection={finalProjection as SveltePlotProps['projection']}
 	>
 		{#if cameraActive && resolvedCameraTarget}

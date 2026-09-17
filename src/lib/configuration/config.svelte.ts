@@ -17,7 +17,11 @@ import type { ChartConfig, ChartConfigInput, TextStyle } from '$lib/types/config
 
 // ── Defaults ────────────────────────────────────────────────────────────────
 // Mirror the values the components shipped with, so adopting the config system
-// is visually a no-op until something is overridden.
+// is visually a no-op until something is overridden — except `axis.locale`,
+// which defaults to `es-AR` instead of svelteplot's own `en-US`, and
+// `axis.compactDisplay`, which defaults to `long` instead of svelteplot's
+// own `short` (Spanish's short form is inconsistent about letter case —
+// `'1 K'` vs `'10 k'` for the same unit — while its long form isn't).
 
 const text = (over: Partial<TextStyle>): TextStyle => ({
 	font: 'inherit',
@@ -104,7 +108,9 @@ export const DEFAULT_CONFIG: ChartConfig = {
 		yTickSize: 5,
 		xTickPadding: 10,
 		yTickPadding: 10,
-		grid: false
+		grid: false,
+		locale: 'es-AR',
+		compactDisplay: 'long'
 	},
 
 	tooltip: {

@@ -105,6 +105,8 @@ export type ChartConfig = {
 		xTickPadding: number;
 		yTickPadding: number;
 		grid: boolean;
+		locale: string;
+		compactDisplay: 'short' | 'long';
 	};
 
 	// ── Tooltip ─────────────────────────────────────────────────────────────────

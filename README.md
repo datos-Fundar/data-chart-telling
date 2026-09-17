@@ -522,6 +522,10 @@ Consumed as plain numeric/boolean props by the underlying svelteplot axes — on
 | `axis.xTickPadding` | `number` | `10` | — |
 | `axis.yTickPadding` | `number` | `10` | — |
 | `axis.grid` | `boolean` | `false` | — |
+| `axis.locale` | `string` | `'es-AR'` | — |
+| `axis.compactDisplay` | `'short' \| 'long'` | `'long'` | — (`'1 mil'` vs `'1 K'`) |
+
+`axis.locale`/`axis.compactDisplay` feed svelteplot's own automatic tick formatter — the one it falls back to on any axis without its own explicit `scales.x`/`scales.y.tickFormat`. Whether a given axis abbreviates at all (vs. spelling every digit out) stays svelteplot's own per-axis call, based on that axis's value range; these two only change the *wording* once it decides to. `axis.locale` updates a chart already on screen; `axis.compactDisplay` is read once when a chart mounts (it goes through svelteplot's own `setPlotDefaults` context hook, not a per-instance prop) and needs a remount to pick up a later change.
 
 #### Tooltip
 
