@@ -72,6 +72,9 @@ export const DEFAULT_CONFIG: ChartConfig = {
 			disabledOpacity: 0.3
 		},
 		continuous: {
+			height: 20,
+			barHeight: 12,
+			barRadius: 2,
 			// A slim vertical bar handle, taller than the 12px gradient track.
 			handle: {
 				width: '6px',

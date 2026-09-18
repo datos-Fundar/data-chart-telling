@@ -482,10 +482,13 @@ Each is a `TextStyle` — `{ font, size, weight, color, leading, spacing }` — 
 | `legend.navButton.fontSize` | `string` | `'1rem'` | `--dct-legend-nav-font-size` |
 | `legend.navButton.disabledOpacity` | `number` | `0.3` | `--dct-legend-nav-disabled-opacity` |
 
-`legend.continuous` — the gradient bar's draggable handles, ticks, and labels:
+`legend.continuous` — the gradient bar itself, its draggable handles, ticks, and labels:
 
 | Field | Type | Default | CSS variable |
 | ----- | ---- | ------- | ------------- |
+| `legend.continuous.height` | `number` (px) | `20` | — |
+| `legend.continuous.barHeight` | `number` (px) | `12` | — |
+| `legend.continuous.barRadius` | `number` (px) | `2` | — |
 | `legend.continuous.handle.width` | `string` | `'6px'` | `--dct-continuous-handle-width` |
 | `legend.continuous.handle.height` | `string` | `'20px'` | `--dct-continuous-handle-height` |
 | `legend.continuous.handle.radius` | `string` | `'3px'` | `--dct-continuous-handle-radius` |

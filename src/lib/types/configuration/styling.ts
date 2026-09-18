@@ -59,6 +59,12 @@ export type ChartConfig = {
 		};
 		/** Continuous section styling: the draggable lo/hi handles and the tick/edge labels. */
 		continuous: {
+			/** Total height (px) of the bar's drawing area. */
+			height: number;
+			/** Height (px) of the gradient bar itself, centered within `height`. */
+			barHeight: number;
+			/** Corner radius (px) of the gradient bar and excluded-range overlays. */
+			barRadius: number;
 			/** The draggable lo/hi handle. */
 			handle: {
 				width: string;

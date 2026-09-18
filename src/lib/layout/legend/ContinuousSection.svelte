@@ -14,6 +14,23 @@
   const fmt = $derived(section.format ?? ((v: number) => String(v)));
   const isInteractive = $derived(section.interactive?.enabled ?? false);
 
+  // How far the default handle bleeds past its 0/1 track position, so the
+  // track can be inset from `barWidth`'s edges by that much.
+  let loHandleEl = $state<SVGRectElement>();
+  const handleBleed = $derived(
+    isInteractive && !section.interactive?.handle && loHandleEl
+      ? Math.ceil(loHandleEl.getBoundingClientRect().width / 2)
+      : 0,
+  );
+  const trackWidth = $derived(Math.max(0, barWidth - handleBleed * 2));
+  function trackX(t: number): number {
+    return handleBleed + t * trackWidth;
+  }
+
+  const svgHeight = $derived(cfg.legend.continuous.height);
+  const barHeight = $derived(cfg.legend.continuous.barHeight);
+  const barRadius = $derived(cfg.legend.continuous.barRadius);
+
   // Fill/opacity for the excluded-margin rects.
   const excludedStyle = $derived.by((): { fill: string; opacity: number } => {
     const d = section.interactive?.disabledStyle;
@@ -133,7 +150,7 @@
       target.setPointerCapture(event.pointerId);
       const startX = event.clientX;
       const startValue = which === 'lo' ? lo : hi;
-      const valuePerPixel = (section.max - section.min) / barWidth;
+      const valuePerPixel = (section.max - section.min) / trackWidth;
 
       function onMove(e: PointerEvent): void {
         const next = startValue + (e.clientX - startX) * valuePerPixel;
@@ -173,12 +190,12 @@
   const labelsOverlap = $derived(
     isInteractive &&
       cfg.legend.continuous.label.overlap.enabled &&
-      (hiT - loT) * barWidth - loLabelWidth - hiLabelWidth < cfg.legend.continuous.label.overlap.margin,
+      (hiT - loT) * trackWidth - loLabelWidth - hiLabelWidth < cfg.legend.continuous.label.overlap.margin,
   );
 </script>
 
 <div class="dct-continuous" style:width="{barWidth}px">
-  <svg width={barWidth} height="20" style="overflow: visible">
+  <svg width={barWidth} height={svgHeight} style="overflow: visible">
     <defs>
       <linearGradient id={gradientId} x1="0" x2="1" y1="0" y2="0">
         {#each stops as s (s.offset)}
@@ -186,17 +203,17 @@
         {/each}
       </linearGradient>
     </defs>
-    <rect width={barWidth} height="12" rx="2" fill="url(#{gradientId})" />
+    <rect x={handleBleed} width={trackWidth} height={barHeight} rx={barRadius} fill="url(#{gradientId})" />
     {#each tickPositions as tick (tick.v)}
-      <rect class="dct-continuous__tick-mark" x={tick.t * barWidth} y="12" />
+      <rect class="dct-continuous__tick-mark" x={trackX(tick.t)} y={barHeight} />
     {/each}
 
     {#if isInteractive}
       {#if loT > 0}
-        <rect x="0" y="0" width={loT * barWidth} height="12" rx="2" fill={excludedStyle.fill} fill-opacity={excludedStyle.opacity} />
+        <rect x={handleBleed} y="0" width={loT * trackWidth} height={barHeight} rx={barRadius} fill={excludedStyle.fill} fill-opacity={excludedStyle.opacity} />
       {/if}
       {#if hiT < 1}
-        <rect x={hiT * barWidth} y="0" width={barWidth - hiT * barWidth} height="12" rx="2" fill={excludedStyle.fill} fill-opacity={excludedStyle.opacity} />
+        <rect x={trackX(hiT)} y="0" width={trackWidth - hiT * trackWidth} height={barHeight} rx={barRadius} fill={excludedStyle.fill} fill-opacity={excludedStyle.opacity} />
       {/if}
       {#if section.interactive?.handle}
         {@render section.interactive.handle({
@@ -216,8 +233,9 @@
       {:else}
         <rect
           class="dct-continuous__handle"
-          x={loT * barWidth}
-          y="6"
+          bind:this={loHandleEl}
+          x={trackX(loT)}
+          y={barHeight / 2}
           onpointerdown={startDrag('lo')}
           ondblclick={resetHandle('lo')}
           role="slider"
@@ -229,8 +247,8 @@
         />
         <rect
           class="dct-continuous__handle"
-          x={hiT * barWidth}
-          y="6"
+          x={trackX(hiT)}
+          y={barHeight / 2}
           onpointerdown={startDrag('hi')}
           ondblclick={resetHandle('hi')}
           role="slider"
@@ -251,17 +269,17 @@
       <span
         class="dct-continuous__tick dct-continuous__tick--handle-lo"
         class:dct-continuous__tick--vertical={labelsOverlap}
-        style:left="{loT * barWidth}px"
+        style:left="{trackX(loT)}px"
       >{fmt(lo)}</span>
       <span
         class="dct-continuous__tick dct-continuous__tick--handle-hi"
         class:dct-continuous__tick--vertical={labelsOverlap}
-        style:left="{hiT * barWidth}px"
+        style:left="{trackX(hiT)}px"
       >{fmt(hi)}</span>
     {:else}
       <span class="dct-continuous__edge dct-continuous__edge--start">{fmt(section.min)}</span>
       {#each tickPositions as tick (tick.v)}
-        <span class="dct-continuous__tick" style:left="{tick.t * barWidth}px">{tick.label}</span>
+        <span class="dct-continuous__tick" style:left="{trackX(tick.t)}px">{tick.label}</span>
       {/each}
       <span class="dct-continuous__edge dct-continuous__edge--end">{fmt(section.max)}</span>
     {/if}
