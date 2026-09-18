@@ -37,9 +37,13 @@ export type LegendItem = {
 /**
  * How a discrete section's items flow. `'vertical'` stacks them in a
  * `columns`-wide grid; `'horizontal'` flows them left to right, paginating
- * past `maxRows` (default 1) with prev/next arrows.
+ * past `maxRows` (default 1) with prev/next arrows; `'flex'` also flows them
+ * left to right, but wraps onto as many rows as it takes instead of paginating.
  */
-export type LegendItemsLayout = { type: 'vertical' } | { type: 'horizontal'; maxRows?: number };
+export type LegendItemsLayout =
+	| { type: 'vertical' }
+	| { type: 'horizontal'; maxRows?: number }
+	| { type: 'flex' };
 
 export type LegendNavDirection = 'prev' | 'next';
 export type LegendNavContext = {

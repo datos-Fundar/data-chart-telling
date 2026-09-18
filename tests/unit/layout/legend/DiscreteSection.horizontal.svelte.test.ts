@@ -59,6 +59,21 @@ describe('DiscreteSection – layout: { type: "vertical" } (explicit)', () => {
 	});
 });
 
+describe('DiscreteSection – layout: { type: "flex" }', () => {
+	test('wraps every item across rows, with no pagination chrome', async () => {
+		const section: DiscreteLegendSection = {
+			type: 'discrete',
+			items: longItems(6),
+			layout: { type: 'flex' }
+		};
+		const { container } = await render(DiscreteSectionWidthProbe, { section, width: 150 });
+
+		expect(container.querySelector('.dct-discrete--horizontal')).toBeTruthy();
+		expect(container.querySelector('.dct-discrete-paginated__btn')).toBeFalsy();
+		expect(container.querySelectorAll('.dct-discrete__label').length).toBe(6);
+	});
+});
+
 describe('DiscreteSection – a lone section defaults to horizontal layout', () => {
 	test('omitting layout renders horizontally when the legend has only this one section', async () => {
 		const section: DiscreteLegendSection = { type: 'discrete', items: longItems(3) };

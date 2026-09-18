@@ -26,6 +26,7 @@
 	const cfg = $derived(getConfiguration());
 	const layout = $derived(section.layout ?? defaultItemsLayout);
 	const isHorizontal = $derived(layout.type === 'horizontal');
+	const isFlex = $derived(layout.type === 'flex');
 	const maxRows = $derived(layout.type === 'horizontal' ? Math.max(1, layout.maxRows ?? 1) : 1);
 	const columns = $derived(section.columns ?? 1);
 	const isInteractive = $derived(section.interactive?.enabled ?? false);
@@ -237,6 +238,12 @@
 				'Página siguiente de referencias'
 			)}
 		{/if}
+	</div>
+{:else if isFlex}
+	<div class="dct-discrete dct-discrete--horizontal">
+		{#each section.items as item, i (item.name)}
+			{@render discreteItem(item, i)}
+		{/each}
 	</div>
 {:else}
 	<div class="dct-discrete" style:grid-template-columns="repeat({columns}, max-content)">

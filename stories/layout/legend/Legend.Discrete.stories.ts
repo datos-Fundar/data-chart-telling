@@ -48,6 +48,26 @@ export const SingleDiscreteVertical: Story = {
 	}
 };
 
+/** Same lone section as `SingleDiscrete`, with `layout: { type: 'flex' }` — flows left to right and wraps onto as many rows as it takes, with no pagination. */
+export const SingleDiscreteFlex: Story = {
+	args: {
+		sections: [
+			{
+				type: 'discrete',
+				title: 'Indicador',
+				layout: { type: 'flex' },
+				items: [
+					{ name: 'PBI', label: 'PBI', color: '#4f46e5', symbol: 'line' },
+					{ name: 'Empleo', label: 'Empleo', color: '#e6580d', symbol: 'line' },
+					{ name: 'Inflación', label: 'Inflación', color: '#16a34a', symbol: 'line' },
+					{ name: 'Exportaciones', label: 'Exportaciones', color: '#0ea5e9', symbol: 'line' },
+					{ name: 'Reservas', label: 'Reservas', color: '#f59e0b', symbol: 'line' }
+				]
+			}
+		] satisfies LegendSection[]
+	}
+};
+
 /** Four discrete items in two columns, via `columns: 2` (vertical grid only). */
 export const ManyItemsInColumns: Story = {
 	args: {
