@@ -7,7 +7,7 @@ import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { VisualGroup } from '$lib/types/plots/segments/config';
 import type { HoverPoint } from '$lib/types/layout/tooltip';
 import type { BarMarkerConfig } from '$lib/types/markers/common';
-import type { BarLayout } from './layout.svelte';
+import type { BarLayout } from '../layout.svelte';
 import type { DiscreteGapFill } from '$lib/plots/utils/gaps';
 
 const GAP_KINDS = ['start', 'middle', 'end'] as const;
@@ -20,7 +20,7 @@ type GapFillRow<TData> = TData & { __gapValue: number };
  * bars (real data + gap fills) plus one `role: 'hitArea'` hit region per row,
  * sized to that row's own segment.
  */
-export function buildBarMarkers<TData extends Record<string, unknown>>(args: {
+export function buildMarkers<TData extends Record<string, unknown>>(args: {
 	groupedSeries: VisualGroup<Series<TData>, BarSegmentStyle>[];
 	barLayout: BarLayout<TData>;
 	isHorizontal: boolean;

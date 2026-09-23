@@ -1,24 +1,12 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import { paletteColor } from '$lib/utils/color';
-	import { buildSeries } from '$lib/utils/grouping';
 	import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
 	import {
 		disabledFillOverride,
-		resolveEffectiveDisabledStyle,
-		omitDisabledSeries,
-		buildSeriesColorIndex
+		resolveEffectiveDisabledStyle
 	} from '$lib/plots/utils/legendDisabled';
-	import { SvelteMap } from 'svelte/reactivity';
 	import { resolveAccessor } from '$lib/plots/utils/accessors';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import {
-		buildGroupedSeries,
-		validateSegments,
-		buildScopedMarkerGroups
-	} from '$lib/plots/utils/segments';
-	import { isGapValue } from '$lib/plots/utils/gaps';
-	import { niceDomain, naturalTickCount } from '$lib/layout/scales/niceDomain';
-	import { AUTO_MARGIN_ESTIMATE } from '$lib/layout/plot/margins';
+	import { validateSegments } from '$lib/plots/utils/segments';
 	import { createBarLayout } from '$lib/plots/bar/layout.svelte';
 	import {
 		createLabelMarginTracker,
@@ -26,8 +14,10 @@
 	} from '$lib/plots/utils/labelOverflow.svelte';
 	import { estimateValueLabelMargin } from '$lib/plots/utils/valueLabelMargin';
 	import { buildHoverPoints } from '$lib/plots/bar/hoverPoints';
-	import { buildBarMarkers } from '$lib/plots/bar/buildBarMarkers';
-	import { resolveGapsForSeries, resolveDiscreteGapFills } from '$lib/plots/utils/gaps';
+	import { buildMarkers } from '$lib/plots/bar/phases/markers';
+	import { buildData } from '$lib/plots/bar/phases/data';
+	import { buildMapping } from '$lib/plots/bar/phases/mapping';
+	import { buildScales } from '$lib/plots/bar/phases/scales';
 	import ValueLabels from '$lib/plots/bar/ValueLabels.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
 	import {
@@ -37,8 +27,8 @@
 	} from '$lib/layout/tooltip/utils';
 	import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 	import type { BasePlotProps } from '$lib/types/plots/props';
-	import type { AxisValue, AxisScale, AxisBasedScalesConfig } from '$lib/types/layout/scales';
-	import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
+	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
+	import type { SeriesProps, DataProps } from '$lib/types/plots/data/common';
 	import type { GapsAwarePlotStylesConfig } from '$lib/types/layout/styles';
 	import type { ValueAnchor } from '$lib/types/plots/constants';
 	import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
@@ -81,185 +71,57 @@
 
 	const cfg = $derived(getConfiguration());
 	const legendInteraction = $derived(getLegendInteraction());
-	// Unfiltered series list, for stable per-name color indexing.
-	const fullSeries = $derived(series ?? buildSeries(data!, x!, y!, z));
-	const colorIndex = $derived(buildSeriesColorIndex(fullSeries));
-	function colorForSeries(name: string): string {
-		return paletteColor(colorIndex.get(name) ?? 0, cfg.palette);
-	}
-	// Drops series toggled off with `disabled: { mode: 'omit' }`.
-	const resolvedSeries = $derived(omitDisabledSeries(fullSeries, legendInteraction));
-	const groupedSeries = $derived(
-		// connect: false — bars are discrete; there's no visual gap between
-		// adjacent categories to bridge (see buildGroupedSeries's own doc).
-		buildGroupedSeries<Series<TData>, BarSegmentStyle>(resolvedSeries, segments, false)
-	);
+
 	const showVals = $derived(styles.values?.show ?? false);
 	const formatValue = $derived(styles.values?.format ?? ((v: number) => `${v}`));
 	const valAnchor = $derived<ValueAnchor>(styles.values?.anchor ?? 'outside');
 
-	// Fills leading/internal/trailing missing-data holes with an
-	// interpolated, distinctly-styled bar, resolved per series like
-	// `segments` — see `GapsAwarePlotStylesConfig` (`types/layout/styles.ts`).
-	const gaps = $derived(styles.gaps ?? {});
-	const gapFillMaps = $derived(
-		new Map(
-			resolvedSeries.map((s) => [
-				s.name,
-				resolveDiscreteGapFills(s, resolveGapsForSeries(gaps, s.name))
-			])
-		)
-	);
-
-	// `xAcc`/`yAcc` are always data-semantic (category/value) — independent of
-	// which *visual* axis ends up drawing them, decided by `categoricalAxis`.
-	const xAcc = $derived(resolveAccessor(resolvedSeries[0]?.x ?? ((d: TData) => d)));
-	const yAcc = $derived(resolveAccessor(resolvedSeries[0]?.y ?? ((d: TData) => d)));
-	const flat = $derived(resolvedSeries.flatMap((s) => s.data));
-
-	const scopedGroups = $derived(
-		buildScopedMarkerGroups<TData, Series<TData>, BarSegmentStyle>({
-			groupedSeries,
+	// "data" phase: resolved/legend-filtered/segment-grouped series, gap
+	// fills, and per-series color — see `phases/data.ts`.
+	const barSeries = $derived(
+		buildData<TData>({
+			series,
+			data,
+			x,
+			y,
+			z,
 			segments,
-			colorFor: (series) => colorForSeries(series.name),
-			segmentColorFor: (style, defaultColor) => style?.fill ?? defaultColor
+			gaps: styles.gaps ?? {},
+			legendInteraction,
+			palette: cfg.palette
 		})
 	);
+	const resolvedSeries = $derived(barSeries.resolvedSeries);
+	const groupedSeries = $derived(barSeries.groupedSeries);
+	const gapFillMaps = $derived(barSeries.gapFillMaps);
+	const flat = $derived(barSeries.flat);
+	const scopedGroups = $derived(barSeries.scopedGroups);
+	const colorForSeries = $derived(barSeries.colorForSeries);
 
-	/**
-	 * Which visual axis draws the category, and therefore whether this renders
-	 * as vertical bars (`BarY`, category on X) or horizontal bars (`BarX`,
-	 * category on Y). Mirrors how pyramid/heatmap default an `AxisScale.type`
-	 * themselves: `scales.x`/`scales.y` always describe *that visual axis*
-	 * regardless of which data field lands there, so marking `scales.y.type:
-	 * 'categorical'` simply says "the category is drawn on Y this time" — x
-	 * defaults to categorical when neither is marked.
-	 */
-	const categoricalAxis = $derived.by((): 'x' | 'y' => {
-		const xCategorical = scales.x?.type === 'categorical';
-		const yCategorical = scales.y?.type === 'categorical';
-		if (xCategorical && yCategorical) {
-			console.warn(
-				"BarPlot: scales.x.type and scales.y.type can't both be 'categorical' — " +
-					'mark only one axis as the category axis. Defaulting to x.'
-			);
-			return 'x';
-		}
-		return yCategorical ? 'y' : 'x';
-	});
-	const isHorizontal = $derived(categoricalAxis === 'y');
+	// "mapping" phase: category/value axis assignment + each channel's own
+	// data accessor — see `phases/mapping.ts`. `xAcc`/`yAcc` are always
+	// data-semantic (category/value), independent of which *visual* axis
+	// ends up drawing them, decided by `categoricalAxis`.
+	const barMapping = $derived(buildMapping<TData>({ scales, resolvedSeries }));
+	const categoricalAxis = $derived(barMapping.categoricalAxis);
+	const isHorizontal = $derived(barMapping.isHorizontal);
+	const xAcc = $derived(barMapping.channels.x.accessor);
+	const yAcc = $derived(barMapping.channels.y.accessor);
 
-	/**
-	 * `'categorical'` is our own sentinel (BarPlot-only), not a real svelteplot
-	 * scale type — svelteplot's x/y scales don't recognise it (it's valid only
-	 * for `color`/`symbol`). Strip it before the scale reaches svelteplot so it
-	 * auto-infers the real type (typically `point`/`band`) the same way it
-	 * already does when `type` is left unset entirely.
-	 */
-	function stripCategoricalType(scale?: AxisScale<TData>): AxisScale<TData> | undefined {
-		if (scale?.type !== 'categorical') return scale;
-		const rest = { ...scale };
-		delete rest.type;
-		return rest;
-	}
-	// Backs the category axis's `paddingInner`/`paddingOuter` — the gap
-	// *between* category groups — with the theme's `bar.paddingInner`/
-	// `paddingOuter` default, when the plot doesn't set its own (or the
-	// `padding` shorthand). BarPlot-only, unlike svelteplot's own hardcoded
-	// 0.15 fallback for every band scale.
-	function withDefaultPadding(scale?: AxisScale<TData>): AxisScale<TData> {
-		return {
-			...scale,
-			paddingInner: scale?.paddingInner ?? scale?.padding ?? cfg.bar.paddingInner,
-			paddingOuter: scale?.paddingOuter ?? scale?.padding ?? cfg.bar.paddingOuter
-		};
-	}
-
-	// Mirrors `createBarLayout`'s own `layout` derivation, read off the raw
-	// `scales` prop rather than `resolvedScales` — `valueExtent`/
-	// `withValueDomain` below feed `resolvedScales`, so reading it back off
-	// `resolvedScales` (or `barLayout.layout`, built from it) would be circular.
-	const seriesLayout = $derived(scales.z?.seriesLayout ?? 'overlap');
-
-	/**
-	 * The value axis's real rendered range — `[0, ...]` for 'grouped'/'overlap'
-	 * (each row's own value, same range `svelteplot`'s own auto-domain would
-	 * find), but for 'stacked' the *per-category total* (every series summed),
-	 * which a plain per-row scan can't see. Needed so `withValueDomain` can
-	 * nice-widen the axis itself instead of deferring to `buildScale`'s
-	 * `nice: true` default, which only ever sees raw per-row values and would
-	 * under-widen a stacked total's real top.
-	 */
-	const valueExtent = $derived.by((): [number, number] | undefined => {
-		let lo = 0;
-		let hi = 0;
-		if (seriesLayout === 'stacked') {
-			const totals = new SvelteMap<AxisValue, number>();
-			for (const s of resolvedSeries) {
-				const sx = resolveAccessor(s.x);
-				const sy = resolveAccessor(s.y);
-				for (const row of s.data) {
-					const raw = sy(row);
-					if (isGapValue(raw)) continue;
-					const cat = sx(row);
-					totals.set(cat, (totals.get(cat) ?? 0) + Number(raw));
-				}
-			}
-			for (const total of totals.values()) {
-				lo = Math.min(lo, total);
-				hi = Math.max(hi, total);
-			}
-		} else {
-			for (const s of resolvedSeries) {
-				const sy = resolveAccessor(s.y);
-				for (const row of s.data) {
-					const raw = sy(row);
-					if (isGapValue(raw)) continue;
-					const v = Number(raw);
-					lo = Math.min(lo, v);
-					hi = Math.max(hi, v);
-				}
-			}
-		}
-		return hi > lo ? [lo, hi] : undefined;
-	});
-
-	/**
-	 * Nice-widens the value axis using `valueExtent` (baseline/stack-aware,
-	 * unlike `buildScale`'s own `nice: true` default) with an epsilon
-	 * tolerance — see `niceDomain` — so a stacked total that's supposed to
-	 * land exactly on a round number (a "parts of a whole" dataset, e.g.
-	 * percentages summing to 100) doesn't get bumped a full step further by
-	 * float noise from summing already-rounded parts. Skipped once the
-	 * caller sets their own `domain`/`ticks`/`nice`.
-	 */
-	function withValueDomain(scale?: AxisScale<TData>): AxisScale<TData> | undefined {
-		if (scale?.domain != null || scale?.ticks != null || scale?.nice != null) return scale;
-		if (!valueExtent) return scale;
-		const [lo, hi] = valueExtent;
-		const spacing = isHorizontal ? 80 : 50;
-		const marginEstimate = isHorizontal
-			? AUTO_MARGIN_ESTIMATE.left + AUTO_MARGIN_ESTIMATE.right
-			: AUTO_MARGIN_ESTIMATE.top + AUTO_MARGIN_ESTIMATE.bottom;
-		const span = Math.max(0, (isHorizontal ? width : height) - marginEstimate);
-		const count = naturalTickCount(span, spacing, 2);
-		return { ...scale, domain: niceDomain(lo, hi, count) };
-	}
-
-	// The single, fully-resolved scales object both BasePlotLayout (ticks,
-	// grid, sort, the real svelteplot scale) and `createBarLayout` (the
-	// grouped-bar-width estimate) read for everything — avoids keeping a
-	// second, separately-patched copy of `scales.x`/`scales.y` in sync with
-	// the one actually forwarded.
-	const resolvedScales = $derived({
-		...scales,
-		x: stripCategoricalType(
-			categoricalAxis === 'x' ? withDefaultPadding(scales.x) : withValueDomain(scales.x)
-		),
-		y: stripCategoricalType(
-			categoricalAxis === 'y' ? withDefaultPadding(scales.y) : withValueDomain(scales.y)
-		)
-	});
+	// "scales" phase: resolved x/y scales, given the mapping above — see
+	// `phases/scales.ts`. Both `BasePlotLayout` and `createBarLayout` read
+	// `resolvedScales` for everything, so there's one copy to keep in sync.
+	const resolvedScales = $derived(
+		buildScales<TData>({
+			scales,
+			resolvedSeries,
+			categoricalAxis,
+			isHorizontal,
+			width,
+			height,
+			padding: { inner: cfg.bar.paddingInner, outer: cfg.bar.paddingOuter }
+		})
+	);
 
 	// The accessor feeding each *visual* channel — swapped from the
 	// data-semantic xAcc/yAcc when the category is drawn on Y.
@@ -325,7 +187,7 @@
 		// centre) can disagree by a couple of pixels with where `<BarX>`/`<BarY>`
 		// (via svelteplot's `RectPath`) actually render that band, which is
 		// enough to mismatch the neighbouring category once bands get thin
-		// (many categories). The `role: 'hitArea'` bar markers `buildBarMarkers`
+		// (many categories). The `role: 'hitArea'` bar markers `phases/markers.ts`
 		// emits hit-test each series' own segment directly instead — see its
 		// own doc comment.
 		pointMatching: 'contains' as const
@@ -395,7 +257,7 @@
 	{...labelMargin.plotProps}
 	xTickRotate={resolvedScales?.x?.tickRotate}
 	markers={({ setHoverMatch, clearHoverMatch }) => [
-		...buildBarMarkers({
+		...buildMarkers({
 			groupedSeries,
 			barLayout,
 			isHorizontal,

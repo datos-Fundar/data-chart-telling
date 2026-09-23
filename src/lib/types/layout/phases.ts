@@ -1,5 +1,7 @@
-/** A grammar-of-graphics layer: statistics (marker or plot level), scales, markers, coordinates, facet. */
+/** A grammar-of-graphics layer: data, mapping, statistics (marker or plot level), scales, markers, coordinates, facet. */
 export type PlotPhase =
+	| 'data'
+	| 'mapping'
 	| 'statistics-marker'
 	| 'statistics-plot'
 	| 'scales'

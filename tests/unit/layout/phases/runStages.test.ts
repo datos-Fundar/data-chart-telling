@@ -22,10 +22,14 @@ describe('runStages', () => {
 			stage('statistics-plot', 'stats-plot'),
 			stage('scales', 'scales'),
 			stage('statistics-marker', 'stats-marker'),
-			stage('coordinates', 'coords')
+			stage('coordinates', 'coords'),
+			stage('mapping', 'mapping'),
+			stage('data', 'data')
 		];
 		const result = runStages(stages, { log: [] }, { tag: 'x' });
 		expect(result.log).toEqual([
+			'data:x',
+			'mapping:x',
 			'stats-marker:x',
 			'stats-plot:x',
 			'scales:x',

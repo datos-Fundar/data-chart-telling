@@ -2,6 +2,8 @@ import type { PlotPhase, PhaseStage } from '$lib/types/layout/phases';
 
 /** Canonical execution order of every {@link PlotPhase}. */
 export const PHASE_ORDER: readonly PlotPhase[] = [
+	'data',
+	'mapping',
 	'statistics-marker',
 	'statistics-plot',
 	'scales',
