@@ -1,14 +1,17 @@
 import { describe, test, expect } from 'vitest';
 import { SvelteMap } from 'svelte/reactivity';
 import { buildData } from '$lib/plots/bar/phases/data';
+import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/bar/state';
 import type { Series } from '$lib/types/plots/data/common';
 import type { LegendInteractionStore } from '$lib/types/layout/legend';
+import type { ChartConfig } from '$lib/types/configuration/styling';
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
 type Row = { category: string; value: number | null };
 
 const PALETTE = ['red', 'green', 'blue'];
+const FAKE_CFG = { palette: PALETTE } as ChartConfig;
 
 function series(name: string, data: Row[]): Series<Row> {
 	return { name, x: 'category', y: 'value', data };
@@ -20,15 +23,28 @@ function legendDisabling(...names: string[]): LegendInteractionStore {
 	return { disabledSeries } as LegendInteractionStore;
 }
 
-function build(overrides: Partial<Parameters<typeof buildData<Row>>[0]> = {}) {
-	return buildData<Row>({
+type ResolvedData = Required<
+	Pick<
+		BarPlotState<Row>,
+		'resolvedSeries' | 'groupedSeries' | 'gapFillMaps' | 'flat' | 'scopedGroups' | 'colorForSeries'
+	>
+>;
+
+function build(
+	overrides: Partial<BarPlotState<Row>> = {},
+	legendInteraction?: LegendInteractionStore
+): ResolvedData {
+	const state: BarPlotState<Row> = {
 		series: [series('a', [{ category: 'X', value: 10 }])],
 		segments: {},
 		gaps: {},
-		legendInteraction: undefined,
-		palette: PALETTE,
+		scales: {},
+		width: 400,
+		height: 300,
 		...overrides
-	});
+	};
+	const ctx: BarPlotCtx = { cfg: FAKE_CFG, legendInteraction };
+	return buildData(state, ctx) as ResolvedData;
 }
 
 // ── Series resolution ─────────────────────────────────────────────────────────
@@ -45,17 +61,19 @@ describe('buildData – series resolution', () => {
 			{ category: 'X', value: 1, group: 'g1' },
 			{ category: 'Y', value: 2, group: 'g2' }
 		];
-		const result = buildData<GroupedRow>({
+		const state: BarPlotState<GroupedRow> = {
 			data,
 			x: 'category',
 			y: 'value',
 			z: 'group',
 			segments: {},
 			gaps: {},
-			legendInteraction: undefined,
-			palette: PALETTE
-		});
-		expect(result.resolvedSeries.map((s) => s.name).sort()).toEqual(['g1', 'g2']);
+			scales: {},
+			width: 400,
+			height: 300
+		};
+		const result = buildData(state, { cfg: FAKE_CFG, legendInteraction: undefined });
+		expect(result.resolvedSeries!.map((s) => s.name).sort()).toEqual(['g1', 'g2']);
 	});
 
 	test('flattens every resolved series own rows', () => {
@@ -76,19 +94,13 @@ describe('buildData – series resolution', () => {
 
 describe('buildData – legend filtering', () => {
 	test('drops a series disabled with mode: omit', () => {
-		const result = build({
-			series: [series('a', []), series('b', [])],
-			legendInteraction: legendDisabling('b')
-		});
+		const result = build({ series: [series('a', []), series('b', [])] }, legendDisabling('b'));
 		expect(result.resolvedSeries.map((s) => s.name)).toEqual(['a']);
 	});
 
 	test('color index is stable by the full (pre-filter) series list, not the filtered one', () => {
 		const withoutFilter = build({ series: [series('a', []), series('b', [])] });
-		const withFilter = build({
-			series: [series('a', []), series('b', [])],
-			legendInteraction: legendDisabling('a')
-		});
+		const withFilter = build({ series: [series('a', []), series('b', [])] }, legendDisabling('a'));
 		// "b" is index 1 in the full list either way — omitting "a" must not
 		// renumber "b" down to index 0 and shift its color.
 		expect(withFilter.colorForSeries('b')).toBe(withoutFilter.colorForSeries('b'));

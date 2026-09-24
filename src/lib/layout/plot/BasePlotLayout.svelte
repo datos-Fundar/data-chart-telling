@@ -11,9 +11,9 @@
 	import GeometryLayout from '$lib/layout/geometry/GeometryLayout.svelte';
 	import CoordinatesLayout from '$lib/layout/coordinates/CoordinatesLayout.svelte';
 	import StylesLayout from '$lib/layout/styles/StylesLayout.svelte';
-	import { getHover, createHover } from '$lib/layout/tooltip/hover.svelte';
-	import { createHoverController } from '$lib/layout/tooltip/controller.svelte';
+	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import TooltipLayout from '$lib/layout/tooltip/TooltipLayout.svelte';
+	import type { PlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
 	import type { CoordinatesConfig } from '$lib/types/layout/coordinates';
 	import type { StylesLayoutConfig } from '$lib/types/layout/styles';
@@ -58,6 +58,7 @@
 		scopedGroups = undefined,
 		geoAllFeatures = undefined,
 		containerEl = $bindable(undefined),
+		hoverController = undefined,
 		children
 	}: {
 		width: number;
@@ -121,6 +122,8 @@
 		geoAllFeatures?: (GeoFeature<Record<string, unknown>> & { __id: string })[];
 		/** The wrapper div's own element — bind for a nested layout that needs it for its own gesture handling (e.g. `CoordinatesLayout`'s zoom/rotate). */
 		containerEl?: HTMLDivElement;
+		/** An already-created hover controller, used instead of this component creating its own. */
+		hoverController?: PlotHover<TData>;
 		/**
 		 * `matchedPoints` carries the source `row` alongside the display fields,
 		 * so a template can resolve it straight off `row` instead of assuming
@@ -200,9 +203,18 @@
 	);
 
 	// ── Hover / tooltip ───────────────────────────────────────────────────────
-	const sharedHover = getHover();
-	const localHover = createHover();
-	const hoverStore = $derived(sharedHover ?? localHover);
+	// Not `$derived` — `createPlotHover` reads context and registers an `$effect`.
+	const ownHover =
+		hoverController ??
+		createPlotHover<TData>({
+			hover: () => hover,
+			getX: () => getX,
+			getY: () => getY,
+			width: () => width,
+			height: () => height
+		});
+	const hoverStore = $derived(ownHover.hoverStore);
+	const ctrl = ownHover.ctrl;
 
 	/** Declared intent, defaulted — see {@link HoverConfig.pointMatching}. */
 	const pointMatchingStrategy = $derived(hover.pointMatching ?? 'nearest');
@@ -214,25 +226,6 @@
 	 */
 	const pointerMatchX = $derived(hoverStore.strategy === 'y' ? undefined : getX);
 	const pointerMatchY = $derived(hoverStore.strategy === 'x' ? undefined : getY);
-
-	$effect(() => {
-		if (sharedHover) return;
-		localHover.strategy = hover.strategy ?? 'x';
-		localHover.sync = hover.sync ?? false;
-	});
-
-	const ctrl = createHoverController<TData>({
-		hover: () => hoverStore,
-		facetId: () => hover.tooltip?.facetId ?? '',
-		points: () => hover.points,
-		getX: () => getX,
-		getY: () => getY,
-		label: () => hover.label,
-		seriesFilter: () => hover.tooltip?.series,
-		width: () => width,
-		height: () => height,
-		crosshair: () => hover.crosshair
-	});
 
 	function onMove(e: PointerEvent) {
 		if (hover.exclude?.(e)) {

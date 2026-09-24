@@ -3,7 +3,7 @@ import { isGapValue } from '$lib/plots/utils/gaps';
 import type { AxisValue } from '$lib/types/layout/scales';
 import type { Series } from '$lib/types/plots/data/common';
 import type { HoverPoint } from '$lib/types/layout/tooltip';
-import type { BarLayout } from './layout.svelte';
+import type { BarLayout } from '$lib/types/plots/bar/layout';
 
 /**
  * Builds hover-marker candidate points for every row across every series.
@@ -17,31 +17,36 @@ import type { BarLayout } from './layout.svelte';
  * regular data value (unlike 'grouped''s pixel-only slice offset).
  */
 export function buildHoverPoints<TData extends Record<string, unknown>>(
-  resolvedSeries: Series<TData>[],
-  isHorizontal: boolean,
-  geometry: Pick<BarLayout<TData>, 'layout' | 'stackedBaseline' | 'groupOffset' | 'groupInsetFraction'>,
-  colorFor: (seriesName: string) => string,
+	resolvedSeries: Series<TData>[],
+	isHorizontal: boolean,
+	geometry: Pick<BarLayout, 'layout' | 'stackedBaseline' | 'groupOffset' | 'groupInsetFraction'>,
+	colorFor: (seriesName: string) => string
 ): HoverPoint<TData>[] {
-  return resolvedSeries.flatMap((s, idx) => {
-    const sx = resolveAccessor(s.x);
-    const sy = resolveAccessor(s.y);
-    const areaInset = geometry.layout === 'grouped' ? geometry.groupInsetFraction(idx) : undefined;
-    return s.data.filter((d) => !isGapValue(sy(d))).map((d) => {
-      const category = sx(d) as AxisValue;
-      const rawValue = Number(sy(d));
-      const value = geometry.layout === 'stacked' ? geometry.stackedBaseline(category, idx) + rawValue : rawValue;
-      const { dx, dy } = geometry.groupOffset(idx);
-      return {
-        x: isHorizontal ? value : category,
-        y: isHorizontal ? category : value,
-        dx,
-        dy,
-        areaInset,
-        row: d,
-        label: String(sy(d)),
-        series: s.name,
-        color: colorFor(s.name),
-      };
-    });
-  });
+	return resolvedSeries.flatMap((s, idx) => {
+		const sx = resolveAccessor(s.x);
+		const sy = resolveAccessor(s.y);
+		const areaInset = geometry.layout === 'grouped' ? geometry.groupInsetFraction(idx) : undefined;
+		return s.data
+			.filter((d) => !isGapValue(sy(d)))
+			.map((d) => {
+				const category = sx(d) as AxisValue;
+				const rawValue = Number(sy(d));
+				const value =
+					geometry.layout === 'stacked'
+						? geometry.stackedBaseline(category, idx) + rawValue
+						: rawValue;
+				const { dx, dy } = geometry.groupOffset(idx);
+				return {
+					x: isHorizontal ? value : category,
+					y: isHorizontal ? category : value,
+					dx,
+					dy,
+					areaInset,
+					row: d,
+					label: String(sy(d)),
+					series: s.name,
+					color: colorFor(s.name)
+				};
+			});
+	});
 }

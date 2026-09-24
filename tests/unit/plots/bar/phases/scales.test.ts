@@ -1,35 +1,55 @@
 import { describe, test, expect } from 'vitest';
 import { buildScales } from '$lib/plots/bar/phases/scales';
+import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/bar/state';
 import type { Series } from '$lib/types/plots/data/common';
+import type { ChartConfig } from '$lib/types/configuration/styling';
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
 type Row = { category: string; value: number };
 
 const PADDING = { inner: 0.2, outer: 0.1 };
+const CTX: BarPlotCtx = {
+	cfg: {
+		bar: { paddingInner: PADDING.inner, paddingOuter: PADDING.outer, seriesPadding: 0.1 },
+		margins: { top: 20, right: 20, bottom: 30, left: 40 }
+	} as ChartConfig,
+	legendInteraction: undefined
+};
 
 function series(data: Row[], name = 'a'): Series<Row> {
 	return { name, x: 'category', y: 'value', data };
 }
 
-const GROUPED_SERIES: Series<Row>[] = [
-	series([
-		{ category: 'A', value: 10 },
-		{ category: 'B', value: -5 }
-	])
+const ROWS = [
+	{ category: 'A', value: 10 },
+	{ category: 'B', value: -5 }
 ];
+const GROUPED_SERIES: Series<Row>[] = [series(ROWS)];
 
-function build(overrides: Partial<Parameters<typeof buildScales<Row>>[0]> = {}) {
-	return buildScales<Row>({
+// `buildScales` now also resolves `barLayout`, which needs data/mapping-phase
+// output these tests don't otherwise care about — filled with defaults
+// consistent with `GROUPED_SERIES` so it has something valid to compute over.
+function build(overrides: Partial<BarPlotState<Row>> = {}) {
+	const state: BarPlotState<Row> = {
+		segments: {},
+		gaps: {},
 		scales: {},
 		resolvedSeries: GROUPED_SERIES,
 		categoricalAxis: 'x',
 		isHorizontal: false,
 		width: 400,
 		height: 300,
-		padding: PADDING,
+		flat: ROWS,
+		channels: {
+			x: { accessor: (d) => d.category },
+			y: { accessor: (d) => d.value }
+		},
+		groupedSeries: [{ series: GROUPED_SERIES[0], visualSegments: [{ data: ROWS, style: {} }] }],
+		gapFillMaps: new Map(),
 		...overrides
-	});
+	};
+	return buildScales(state, CTX).scales;
 }
 
 // ── Categorical sentinel ──────────────────────────────────────────────────────

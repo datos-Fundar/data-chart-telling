@@ -1,23 +1,11 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
-import type { ResolvedChannel } from '$lib/types/layout/mapping';
-import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import type { Series } from '$lib/types/plots/data/common';
+import type { BarPlotState } from '$lib/types/plots/bar/state';
 
-export type BarMapping<TData extends Record<string, unknown>> = {
-	categoricalAxis: 'x' | 'y';
-	isHorizontal: boolean;
-	channels: {
-		x: ResolvedChannel<TData>;
-		y: ResolvedChannel<TData>;
-	};
-};
-
-/** BarPlot's category/value axis assignment and each channel's own data accessor. */
-export function buildMapping<TData extends Record<string, unknown>>(args: {
-	scales: AxisBasedScalesConfig<TData>;
-	resolvedSeries: Series<TData>[];
-}): BarMapping<TData> {
-	const { scales, resolvedSeries } = args;
+/** BarPlot's "mapping" phase: category/value axis assignment and each channel's own data accessor. Reads no ctx. */
+export function buildMapping<TData extends Record<string, unknown>>(
+	state: BarPlotState<TData>
+): BarPlotState<TData> {
+	const { scales, resolvedSeries } = state;
 
 	const xCategorical = scales.x?.type === 'categorical';
 	const yCategorical = scales.y?.type === 'categorical';
@@ -31,10 +19,11 @@ export function buildMapping<TData extends Record<string, unknown>>(args: {
 		categoricalAxis = 'y';
 	}
 
-	const xAcc = resolveAccessor(resolvedSeries[0]?.x ?? ((d: TData) => d));
-	const yAcc = resolveAccessor(resolvedSeries[0]?.y ?? ((d: TData) => d));
+	const xAcc = resolveAccessor(resolvedSeries![0]?.x ?? ((d: TData) => d));
+	const yAcc = resolveAccessor(resolvedSeries![0]?.y ?? ((d: TData) => d));
 
 	return {
+		...state,
 		categoricalAxis,
 		isHorizontal: categoricalAxis === 'y',
 		channels: {

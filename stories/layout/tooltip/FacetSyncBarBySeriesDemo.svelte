@@ -1,7 +1,7 @@
 <script lang="ts">
 	import BarChart from '$lib/charts/bar/Chart.svelte';
 	import { REGION_SECTOR_BARS, type RegionSector } from '../../data/region-bars';
-	import type { BarSeriesLayout } from '$lib/plots/bar/layout.svelte';
+	import type { BarSeriesLayout } from '$lib/types/plots/bar/layout';
 
 	type Orientation = 'vertical' | 'horizontal';
 

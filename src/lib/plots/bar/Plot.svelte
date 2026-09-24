@@ -7,17 +7,19 @@
 	import { resolveAccessor } from '$lib/plots/utils/accessors';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { validateSegments } from '$lib/plots/utils/segments';
-	import { createBarLayout } from '$lib/plots/bar/layout.svelte';
 	import {
 		createLabelMarginTracker,
 		halfDimensionOverflowCap
 	} from '$lib/plots/utils/labelOverflow.svelte';
 	import { estimateValueLabelMargin } from '$lib/plots/utils/valueLabelMargin';
 	import { buildHoverPoints } from '$lib/plots/bar/hoverPoints';
-	import { buildMarkers } from '$lib/plots/bar/phases/markers';
+	import { buildHitAreaMarkers } from '$lib/plots/bar/buildHitAreaMarkers';
 	import { buildData } from '$lib/plots/bar/phases/data';
 	import { buildMapping } from '$lib/plots/bar/phases/mapping';
 	import { buildScales } from '$lib/plots/bar/phases/scales';
+	import { buildMarkers } from '$lib/plots/bar/phases/markers';
+	import { runStages } from '$lib/layout/phases/runStages';
+	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import ValueLabels from '$lib/plots/bar/ValueLabels.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
 	import {
@@ -34,6 +36,8 @@
 	import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 	import type { LegendDisabledStyle } from '$lib/types/layout/legend';
 	import type { MarginOverflow } from '$lib/plots/utils/labelOverflow.svelte';
+	import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/bar/state';
+	import type { PhaseStage } from '$lib/types/layout/phases';
 
 	/**
 	 * A bar chart, vertical by default. Accepts either a pre-built `series`
@@ -76,85 +80,11 @@
 	const formatValue = $derived(styles.values?.format ?? ((v: number) => `${v}`));
 	const valAnchor = $derived<ValueAnchor>(styles.values?.anchor ?? 'outside');
 
-	// "data" phase: resolved/legend-filtered/segment-grouped series, gap
-	// fills, and per-series color — see `phases/data.ts`.
-	const barSeries = $derived(
-		buildData<TData>({
-			series,
-			data,
-			x,
-			y,
-			z,
-			segments,
-			gaps: styles.gaps ?? {},
-			legendInteraction,
-			palette: cfg.palette
-		})
-	);
-	const resolvedSeries = $derived(barSeries.resolvedSeries);
-	const groupedSeries = $derived(barSeries.groupedSeries);
-	const gapFillMaps = $derived(barSeries.gapFillMaps);
-	const flat = $derived(barSeries.flat);
-	const scopedGroups = $derived(barSeries.scopedGroups);
-	const colorForSeries = $derived(barSeries.colorForSeries);
-
-	// "mapping" phase: category/value axis assignment + each channel's own
-	// data accessor — see `phases/mapping.ts`. `xAcc`/`yAcc` are always
-	// data-semantic (category/value), independent of which *visual* axis
-	// ends up drawing them, decided by `categoricalAxis`.
-	const barMapping = $derived(buildMapping<TData>({ scales, resolvedSeries }));
-	const categoricalAxis = $derived(barMapping.categoricalAxis);
-	const isHorizontal = $derived(barMapping.isHorizontal);
-	const xAcc = $derived(barMapping.channels.x.accessor);
-	const yAcc = $derived(barMapping.channels.y.accessor);
-
-	// "scales" phase: resolved x/y scales, given the mapping above — see
-	// `phases/scales.ts`. Both `BasePlotLayout` and `createBarLayout` read
-	// `resolvedScales` for everything, so there's one copy to keep in sync.
-	const resolvedScales = $derived(
-		buildScales<TData>({
-			scales,
-			resolvedSeries,
-			categoricalAxis,
-			isHorizontal,
-			width,
-			height,
-			padding: { inner: cfg.bar.paddingInner, outer: cfg.bar.paddingOuter }
-		})
-	);
-
-	// The accessor feeding each *visual* channel — swapped from the
-	// data-semantic xAcc/yAcc when the category is drawn on Y.
-	const plotGetX = $derived(isHorizontal ? (d: TData) => Number(yAcc(d)) : xAcc);
-	const plotGetY = $derived(isHorizontal ? xAcc : (d: TData) => Number(yAcc(d)));
-
-	/**
-	 * Series-layout geometry (grouped/stacked offsets, band-width estimate,
-	 * value baseline) — the single source of truth shared by bar-segment
-	 * rendering, value labels, and hover markers below. See `layout.svelte.ts`.
-	 */
-	const barLayout = createBarLayout<TData>({
-		scales: () => resolvedScales,
-		isHorizontal: () => isHorizontal,
-		width: () => width,
-		height: () => height,
-		margins: () => margins,
-		flat: () => flat,
-		xAcc: () => xAcc,
-		groupedSeries: () => groupedSeries,
-		gapFillMaps: () => gapFillMaps
-	});
-
-	// `x`/`y` here are visual (matched against BasePlotLayout's own getX/getY,
-	// which drive tick/domain computation and the Pointer's hit-testing) —
-	// `row` (see BasePlotLayout/HoverPoint) is what lets the template recover the
-	// semantic category regardless of which axis it landed on.
-	const hoverIsolate = $derived(styles.values?.hoverIsolate ?? false);
-
 	// A value label hovered while `styles.values.hoverIsolate` is on dims
 	// every other series exactly like a legend toggle would — local to this
 	// one `<Plot>` instance (not the shared HoverStore) so the gesture can't
 	// leak into unrelated tooltip/crosshair behavior.
+	const hoverIsolate = $derived(styles.values?.hoverIsolate ?? false);
 	let hoverIsolatedSeries = $state<string | null>(null);
 
 	function effectiveDisabledFor(name: string): LegendDisabledStyle | undefined {
@@ -166,6 +96,45 @@
 			hoverIsolatedSeries
 		);
 	}
+
+	// The plot's own pipeline, run once via `runStages`. Hit-area markers stay
+	// outside it, below.
+	const stages: PhaseStage<BarPlotState<TData>, BarPlotCtx>[] = [
+		{ phase: 'data', run: buildData },
+		{ phase: 'mapping', run: buildMapping },
+		{ phase: 'scales', run: buildScales },
+		{ phase: 'markers', run: buildMarkers }
+	];
+	const ctx = $derived<BarPlotCtx>({
+		cfg,
+		legendInteraction,
+		disabledFillFor: (name) => disabledFillOverride(effectiveDisabledFor(name))
+	});
+	const plotState = $derived(
+		runStages<BarPlotState<TData>, BarPlotCtx>(
+			stages,
+			{ series, data, x, y, z, segments, gaps: styles.gaps ?? {}, scales, width, height, margins },
+			ctx
+		)
+	);
+
+	const resolvedSeries = $derived(plotState.resolvedSeries!);
+	const groupedSeries = $derived(plotState.groupedSeries!);
+	const scopedGroups = $derived(plotState.scopedGroups!);
+	const colorForSeries = $derived(plotState.colorForSeries!);
+	const categoricalAxis = $derived(plotState.categoricalAxis!);
+	const isHorizontal = $derived(plotState.isHorizontal!);
+	const xAcc = $derived(plotState.channels!.x.accessor);
+	const yAcc = $derived(plotState.channels!.y.accessor);
+	const resolvedScales = $derived(plotState.scales);
+	const barLayout = $derived(plotState.barLayout!);
+
+	const flat = $derived(plotState.flat!);
+
+	// The accessor feeding each *visual* channel — swapped from the
+	// data-semantic xAcc/yAcc when the category is drawn on Y.
+	const plotGetX = $derived(isHorizontal ? (d: TData) => Number(yAcc(d)) : xAcc);
+	const plotGetY = $derived(isHorizontal ? xAcc : (d: TData) => Number(yAcc(d)));
 
 	// A legend-disabled series is dimmed on the bar itself, but never surfaces
 	// in hover/tooltip — its points are simply absent from the candidate list.
@@ -187,11 +156,33 @@
 		// centre) can disagree by a couple of pixels with where `<BarX>`/`<BarY>`
 		// (via svelteplot's `RectPath`) actually render that band, which is
 		// enough to mismatch the neighbouring category once bands get thin
-		// (many categories). The `role: 'hitArea'` bar markers `phases/markers.ts`
-		// emits hit-test each series' own segment directly instead — see its
-		// own doc comment.
+		// (many categories). `buildHitAreaMarkers` hit-tests each series' own
+		// segment directly instead — see its own doc comment.
 		pointMatching: 'contains' as const
 	});
+
+	// Created once, not `$derived`.
+	const hoverController = createPlotHover<TData>({
+		hover: () => hover,
+		getX: () => plotGetX,
+		getY: () => plotGetY,
+		width: () => width,
+		height: () => height
+	});
+
+	// Bar's own extra step, outside the phase system — see `buildHitAreaMarkers`.
+	const hitAreaMarkers = $derived(
+		buildHitAreaMarkers({
+			groupedSeries,
+			barLayout,
+			isHorizontal,
+			hoverPoints,
+			active: hover.active,
+			setHoverMatch: hoverController.ctrl.onPointer,
+			clearHoverMatch: hoverController.ctrl.onLeave
+		})
+	);
+	const barMarkers = $derived([...(plotState.markers ?? []), ...hitAreaMarkers]);
 
 	// Estimated overflow for an `'outside'`-anchored value label at the most
 	// extreme value in the whole dataset — not just the current frame, so it
@@ -256,21 +247,8 @@
 	scales={resolvedScales}
 	{...labelMargin.plotProps}
 	xTickRotate={resolvedScales?.x?.tickRotate}
-	markers={({ setHoverMatch, clearHoverMatch }) => [
-		...buildMarkers({
-			groupedSeries,
-			barLayout,
-			isHorizontal,
-			hoverPoints,
-			colorFor: colorForSeries,
-			disabledFillFor: (name) => disabledFillOverride(effectiveDisabledFor(name)),
-			active: hover.active,
-			setHoverMatch,
-			clearHoverMatch,
-			gapFillMaps
-		}),
-		...markers
-	]}
+	{hoverController}
+	markers={[...barMarkers, ...markers]}
 	seriesData={resolvedSeries}
 	{scopedGroups}
 >
