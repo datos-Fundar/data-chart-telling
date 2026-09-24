@@ -1,0 +1,47 @@
+import { describe, test, expect } from 'vitest';
+import { buildMapping } from '$lib/plots/heatmap/phases/mapping';
+import type { HeatmapPlotState } from '$lib/types/plots/heatmap/state';
+import type { Series } from '$lib/types/plots/data/common';
+
+// ── Fixtures ─────────────────────────────────────────────────────────────────
+
+type Row = { row: string; col: string; value: number };
+
+const SERIES: Series<Row>[] = [
+	{ name: 'a', x: 'col', y: 'row', z: 'value', data: [{ row: 'X', col: 'A', value: 5 }] }
+];
+
+function build(overrides: Partial<HeatmapPlotState<Row>> = {}) {
+	const state: HeatmapPlotState<Row> = {
+		segments: {},
+		scales: {},
+		width: 400,
+		height: 300,
+		resolvedSeries: SERIES,
+		...overrides
+	};
+	return buildMapping(state);
+}
+
+describe('buildMapping – channels', () => {
+	test('resolves x/y/z to the first series own accessors', () => {
+		const result = build();
+		const row = SERIES[0].data[0];
+		expect(result.channels!.x.accessor(row)).toBe('A');
+		expect(result.channels!.y.accessor(row)).toBe('X');
+		expect(result.channels!.z.accessor(row)).toBe(5);
+	});
+
+	test('falls back to the top-level x/y/z props when resolvedSeries is empty', () => {
+		const result = build({
+			resolvedSeries: [],
+			x: (d) => d.col,
+			y: (d) => d.row,
+			z: (d) => d.value
+		});
+		const row: Row = { row: 'Y', col: 'B', value: 9 };
+		expect(result.channels!.x.accessor(row)).toBe('B');
+		expect(result.channels!.y.accessor(row)).toBe('Y');
+		expect(result.channels!.z.accessor(row)).toBe(9);
+	});
+});
