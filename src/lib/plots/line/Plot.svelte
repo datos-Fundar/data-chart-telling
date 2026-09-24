@@ -1,24 +1,22 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
 	import { resolveAccessor } from '$lib/plots/utils/accessors';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import { paletteColor } from '$lib/utils/color';
-	import { buildSeries } from '$lib/utils/grouping';
 	import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
 	import {
 		disabledStrokeOverride,
 		disabledDotsOverride,
-		resolveEffectiveDisabledStyle,
-		omitDisabledSeries,
-		buildSeriesColorIndex
+		resolveEffectiveDisabledStyle
 	} from '$lib/plots/utils/legendDisabled';
-	import { buildLineMarkers } from '$lib/plots/line/buildLineMarkers';
-	import { buildGapMarkers } from '$lib/plots/line/buildGapMarkers';
 	import { isGapValue } from '$lib/plots/utils/gaps';
 	import {
 		createLabelMarginTracker,
 		halfDimensionOverflowCap
 	} from '$lib/plots/utils/labelOverflow.svelte';
 	import { estimateLineValueLabelMargin } from '$lib/plots/line/valueLabelMargin';
+	import { buildData } from '$lib/plots/line/phases/data';
+	import { buildMapping } from '$lib/plots/line/phases/mapping';
+	import { buildMarkers } from '$lib/plots/line/phases/markers';
+	import { runStages } from '$lib/layout/phases/runStages';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
 	import ValueLabels from '$lib/plots/line/ValueLabels.svelte';
 	import {
@@ -26,11 +24,7 @@
 		resolveHoverStrategy,
 		resolveHoverSync
 	} from '$lib/layout/tooltip/utils';
-	import {
-		buildGroupedSeries,
-		validateSegments,
-		buildScopedMarkerGroups
-	} from '$lib/plots/utils/segments';
+	import { validateSegments } from '$lib/plots/utils/segments';
 	import type { BasePlotProps, MarginConfig } from '$lib/types/plots/props';
 	import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
 	import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
@@ -40,6 +34,8 @@
 	import type { LegendDisabledStyle } from '$lib/types/layout/legend';
 	import type { ValueAnchor } from '$lib/types/plots/constants';
 	import type { MarginOverflow } from '$lib/plots/utils/labelOverflow.svelte';
+	import type { LinePlotState, LinePlotCtx } from '$lib/types/plots/line/state';
+	import type { PhaseStage } from '$lib/types/layout/phases';
 
 	type Props = BasePlotProps<
 		SeriesProps<TData> | DataProps<TData>,
@@ -66,33 +62,18 @@
 		tooltip = undefined
 	}: Props = $props();
 
-	// Fills missing-data gaps with an interpolated, distinctly-styled bridge,
-	// resolved per series.
-	const gaps = $derived(styles.gaps ?? {});
-
-	const cfg = $derived(getConfiguration());
-	const legendInteraction = $derived(getLegendInteraction());
-	// Unfiltered series list, for stable per-name color indexing.
-	const fullSeries = $derived(series ?? buildSeries(data!, x!, y!, z));
-	const colorIndex = $derived(buildSeriesColorIndex(fullSeries));
-	function colorForSeries(name: string): string {
-		return paletteColor(colorIndex.get(name) ?? 0, cfg.palette);
-	}
-	// Drops series toggled off with `disabled: { mode: 'omit' }`.
-	const resolvedSeries = $derived(omitDisabledSeries(fullSeries, legendInteraction));
-
 	$effect(() => {
 		validateSegments(segments);
 	});
 
-	const groupedSeries = $derived(
-		buildGroupedSeries<Series<TData>, LineSegmentStyle>(resolvedSeries, segments)
-	);
-
+	const cfg = $derived(getConfiguration());
+	const legendInteraction = $derived(getLegendInteraction());
 	const showVals = $derived(styles.values?.show ?? false);
 	const hoverIsolate = $derived(styles.values?.hoverIsolate ?? false);
 	const valAnchor = $derived<ValueAnchor>(styles.values?.anchor ?? 'start');
-	const formatValue = $derived(styles.values?.format ?? ((v: number, name: string) => `${name} - ${v}`));
+	const formatValue = $derived(
+		styles.values?.format ?? ((v: number, name: string) => `${name} - ${v}`)
+	);
 
 	// Dims every other series like a legend toggle when a value label is
 	// hovered, local to this `<Plot>` instance.
@@ -108,9 +89,34 @@
 		);
 	}
 
-	const xAcc = $derived(resolveAccessor(resolvedSeries[0]?.x ?? ((d: TData) => d)));
-	const yAcc = $derived(resolveAccessor(resolvedSeries[0]?.y ?? ((d: TData) => d)));
-	const flat = $derived(resolvedSeries.flatMap((s) => s.data));
+	// The plot's own pipeline, run once via `runStages`. No "scales" stage —
+	// LinePlot forwards `scales` unresolved to `BasePlotLayout`.
+	const stages: PhaseStage<LinePlotState<TData>, LinePlotCtx>[] = [
+		{ phase: 'data', run: buildData },
+		{ phase: 'mapping', run: buildMapping },
+		{ phase: 'markers', run: buildMarkers }
+	];
+	const ctx = $derived<LinePlotCtx>({
+		cfg,
+		legendInteraction,
+		disabledStrokeFor: (name) => disabledStrokeOverride(effectiveDisabledFor(name)),
+		disabledDotsFor: (name) => disabledDotsOverride(effectiveDisabledFor(name))
+	});
+	const plotState = $derived(
+		runStages<LinePlotState<TData>, LinePlotCtx>(
+			stages,
+			{ series, data, x, y, z, segments, gaps: styles.gaps ?? {}, scales, width, height, margins },
+			ctx
+		)
+	);
+
+	const resolvedSeries = $derived(plotState.resolvedSeries!);
+	const scopedGroups = $derived(plotState.scopedGroups!);
+	const colorForSeries = $derived(plotState.colorForSeries!);
+	const flat = $derived(plotState.flat!);
+	const xAcc = $derived(plotState.channels!.x.accessor);
+	const yAcc = $derived(plotState.channels!.y.accessor);
+
 	// Legend-disabled series and gap rows are excluded from hover candidates.
 	const hoverPoints = $derived(
 		resolvedSeries.flatMap((s) => {
@@ -139,34 +145,6 @@
 		tooltip
 	});
 
-	const lineMarkers = $derived(
-		buildLineMarkers({
-			groupedSeries,
-			colorFor: colorForSeries,
-			disabledStrokeFor: (name) => disabledStrokeOverride(effectiveDisabledFor(name)),
-			disabledDotsFor: (name) => disabledDotsOverride(effectiveDisabledFor(name))
-		})
-	);
-
-	const gapMarkers = $derived(
-		buildGapMarkers<TData>({
-			seriesList: resolvedSeries,
-			gaps,
-			colorFor: (seriesIndex) => colorForSeries(resolvedSeries[seriesIndex].name),
-			disabledStrokeFor: (name) => disabledStrokeOverride(effectiveDisabledFor(name)),
-			disabledDotsFor: (name) => disabledDotsOverride(effectiveDisabledFor(name))
-		})
-	);
-
-	const scopedGroups = $derived(
-		buildScopedMarkerGroups<TData, Series<TData>, LineSegmentStyle>({
-			groupedSeries,
-			segments,
-			colorFor: (series) => colorForSeries(series.name),
-			segmentColorFor: (style, defaultColor) => style?.stroke?.stroke ?? defaultColor
-		})
-	);
-
 	const lastPoints = $derived(
 		resolvedSeries
 			.map((s) => {
@@ -176,10 +154,7 @@
 				const group = scopedGroups.find((g) => g.name === s.name);
 				const matchedSeg = group?.segments.find((seg) => seg.match(lastRow));
 				const color =
-					matchedSeg?.color ??
-					group?.segments[0]?.color ??
-					group?.color ??
-					colorForSeries(s.name);
+					matchedSeg?.color ?? group?.segments[0]?.color ?? group?.color ?? colorForSeries(s.name);
 				return { series: s, lastRow, color };
 			})
 			.filter((p): p is { series: Series<TData>; lastRow: TData; color: string } => p !== undefined)
@@ -243,7 +218,7 @@
 	{scales}
 	{...labelMargin.plotProps}
 	xTickRotate={scales?.x?.tickRotate}
-	markers={[...gapMarkers, ...lineMarkers, ...markers]}
+	markers={[...(plotState.markers ?? []), ...markers]}
 	seriesData={resolvedSeries}
 	{scopedGroups}
 >
