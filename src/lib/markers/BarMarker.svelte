@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { BarX, BarY, usePlot } from 'svelteplot';
+	import { resolveChannelFill } from '$lib/markers/resolveChannelFill';
+	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import type { BarMarkerConfig } from '$lib/types/markers/common';
 
 	/**
@@ -8,6 +10,9 @@
 	 * one segment), or `role: 'highlight'` (visible area highlight).
 	 */
 	let { marker }: { marker: BarMarkerConfig } = $props();
+
+	const cfg = $derived(getConfiguration());
+	const channelFill = $derived(resolveChannelFill(marker.data, marker.color, marker.scales, cfg));
 
 	const plot = usePlot();
 	function categoryScaleFor(isHorizontal: boolean) {
@@ -48,13 +53,13 @@
 			x2={marker.x2}
 			insetTop={marker.insetTop != null ? marker.insetTop * bandwidth : undefined}
 			insetBottom={marker.insetBottom != null ? marker.insetBottom * bandwidth : undefined}
-			fill={marker.style?.fill}
-			fillOpacity={marker.style?.fillOpacity}
-			stroke={marker.style?.stroke}
-			strokeWidth={marker.style?.strokeWidth}
-			strokeOpacity={marker.style?.strokeOpacity}
-			strokeDasharray={marker.style?.strokeDasharray}
-			borderRadius={marker.style?.borderRadius}
+			fill={channelFill ?? marker.styles?.fill}
+			fillOpacity={marker.styles?.fillOpacity}
+			stroke={marker.styles?.stroke}
+			strokeWidth={marker.styles?.strokeWidth}
+			strokeOpacity={marker.styles?.strokeOpacity}
+			strokeDasharray={marker.styles?.strokeDasharray}
+			borderRadius={marker.styles?.borderRadius}
 		/>
 	{:else}
 		<BarY
@@ -64,13 +69,13 @@
 			y2={marker.y2}
 			insetLeft={marker.insetLeft != null ? marker.insetLeft * bandwidth : undefined}
 			insetRight={marker.insetRight != null ? marker.insetRight * bandwidth : undefined}
-			fill={marker.style?.fill}
-			fillOpacity={marker.style?.fillOpacity}
-			stroke={marker.style?.stroke}
-			strokeWidth={marker.style?.strokeWidth}
-			strokeOpacity={marker.style?.strokeOpacity}
-			strokeDasharray={marker.style?.strokeDasharray}
-			borderRadius={marker.style?.borderRadius}
+			fill={channelFill ?? marker.styles?.fill}
+			fillOpacity={marker.styles?.fillOpacity}
+			stroke={marker.styles?.stroke}
+			strokeWidth={marker.styles?.strokeWidth}
+			strokeOpacity={marker.styles?.strokeOpacity}
+			strokeDasharray={marker.styles?.strokeDasharray}
+			borderRadius={marker.styles?.borderRadius}
 		/>
 	{/if}
 {:else}
@@ -122,13 +127,13 @@
 					y={center - thickness / 2}
 					width={Math.max(0, valueMax - valueMin)}
 					height={thickness}
-					fill={marker.style?.fill}
-					fill-opacity={marker.style?.fillOpacity}
-					stroke={marker.style?.stroke}
-					stroke-width={marker.style?.strokeWidth}
-					stroke-opacity={marker.style?.strokeOpacity}
-					stroke-dasharray={marker.style?.strokeDasharray}
-					rx={marker.style?.borderRadius}
+					fill={marker.styles?.fill}
+					fill-opacity={marker.styles?.fillOpacity}
+					stroke={marker.styles?.stroke}
+					stroke-width={marker.styles?.strokeWidth}
+					stroke-opacity={marker.styles?.strokeOpacity}
+					stroke-dasharray={marker.styles?.strokeDasharray}
+					rx={marker.styles?.borderRadius}
 					pointer-events="none"
 				/>
 			{:else}
@@ -140,13 +145,13 @@
 					y={valueMin}
 					width={thickness}
 					height={Math.max(0, valueMax - valueMin)}
-					fill={marker.style?.fill}
-					fill-opacity={marker.style?.fillOpacity}
-					stroke={marker.style?.stroke}
-					stroke-width={marker.style?.strokeWidth}
-					stroke-opacity={marker.style?.strokeOpacity}
-					stroke-dasharray={marker.style?.strokeDasharray}
-					ry={marker.style?.borderRadius}
+					fill={marker.styles?.fill}
+					fill-opacity={marker.styles?.fillOpacity}
+					stroke={marker.styles?.stroke}
+					stroke-width={marker.styles?.strokeWidth}
+					stroke-opacity={marker.styles?.strokeOpacity}
+					stroke-dasharray={marker.styles?.strokeDasharray}
+					ry={marker.styles?.borderRadius}
 					pointer-events="none"
 				/>
 			{/if}

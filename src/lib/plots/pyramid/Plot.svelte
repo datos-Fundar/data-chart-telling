@@ -1,6 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
 	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import { paletteColor } from '$lib/utils/color';
 	import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
 	import {
 		disabledFillOverride,
@@ -48,9 +47,12 @@
 	 * Mirrors the bar/line plot contract — series in, marks out — so the
 	 * chart-level container/timeline/facet/legend wrap it unchanged.
 	 *
-	 * Side assignment is automatic: series names are sorted alphabetically and
-	 * the first goes left, the second right. Pass `scales.z.reverse: true` to
-	 * flip the order.
+	 * Side assignment comes from `grouping` (falling back to `color` when
+	 * unset, so a lone `color` accessor still assigns sides *and* colors them,
+	 * as it always has) — series names are sorted alphabetically and the first
+	 * goes left, the second right. Pass `scales.grouping.reverse: true` to
+	 * flip the order. `scales.color`, when set, overrides the default
+	 * left/right coloring with a real per-series-name color.
 	 */
 	type Props = BasePlotProps<
 		SeriesProps<TData> | DataProps<TData>,
@@ -68,7 +70,8 @@
 		data,
 		x,
 		y,
-		z,
+		grouping,
+		color,
 		styles = {},
 		scales = {},
 		margins,
@@ -101,8 +104,6 @@
 		);
 	}
 
-	const leftColor = $derived(styles.colors?.left ?? paletteColor(0, cfg.palette));
-	const rightColor = $derived(styles.colors?.right ?? paletteColor(1, cfg.palette));
 	const showVals = $derived(styles.values?.show ?? false);
 	const formatValue = $derived(styles.values?.format ?? ((v: number) => `${v}`));
 	const valAnchor = $derived<ValueAnchor>(styles.values?.anchor ?? 'outside');
@@ -117,13 +118,25 @@
 	const ctx = $derived<PyramidPlotCtx>({
 		cfg,
 		formatValue,
-		colorForSide: (side) => (side === 'left' ? leftColor : rightColor),
 		disabledFillFor: (name) => disabledFillOverride(effectiveDisabledFor(name))
 	});
 	const plotState = $derived(
 		runStages<PyramidPlotState<TData>, PyramidPlotCtx>(
 			stages,
-			{ series, data, x, y, z, segments, gaps: styles.gaps ?? {}, scales, width, height, margins },
+			{
+				series,
+				data,
+				x,
+				y,
+				grouping,
+				color,
+				segments,
+				gaps: styles.gaps ?? {},
+				scales,
+				width,
+				height,
+				margins
+			},
 			ctx
 		)
 	);
@@ -133,6 +146,7 @@
 	const scopedGroups = $derived(plotState.scopedGroups!);
 	const flat = $derived(plotState.flat!);
 	const resolvedScales = $derived(plotState.scales);
+	const colorForSeries = $derived(plotState.colorForSeries!);
 
 	const getX = (d: PyramidTaggedRow<TData>) => d.__x;
 	const getY = (d: PyramidTaggedRow<TData>) => d.__y;
@@ -149,7 +163,7 @@
 				row: d,
 				label: d.__label,
 				series: d.__series,
-				color: d.__side === 'left' ? leftColor : rightColor
+				color: colorForSeries(d.__series)
 			}))
 	);
 
@@ -233,6 +247,7 @@
 	{getY}
 	{hover}
 	scales={resolvedScales}
+	channelScales={resolvedScales}
 	{...labelMargin.plotProps}
 	xTickRotate={resolvedScales?.x?.tickRotate}
 	{hoverController}

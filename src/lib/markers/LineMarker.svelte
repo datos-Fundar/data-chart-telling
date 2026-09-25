@@ -10,10 +10,10 @@
   data={marker.data}
   x={marker.x}
   y={marker.y}
-  stroke={marker.style?.stroke}
-  strokeWidth={marker.style?.strokeWidth}
-  strokeOpacity={marker.style?.strokeOpacity}
-  strokeDasharray={marker.style?.strokeDasharray}
-  strokeLinejoin={marker.style?.strokeLinejoin}
-  strokeLinecap={marker.style?.strokeLinecap}
+  stroke={marker.styles?.stroke}
+  strokeWidth={marker.styles?.strokeWidth}
+  strokeOpacity={marker.styles?.strokeOpacity}
+  strokeDasharray={marker.styles?.strokeDasharray}
+  strokeLinejoin={marker.styles?.strokeLinejoin}
+  strokeLinecap={marker.styles?.strokeLinecap}
 />

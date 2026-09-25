@@ -1,4 +1,5 @@
 import { buildSeries } from '$lib/utils/grouping';
+import { resolveSeriesColorFor } from '$lib/plots/utils/legendDisabled';
 import { buildGroupedSeries, buildScopedMarkerGroups } from '$lib/plots/utils/segments';
 import { resolveGapsForSeries, resolveDiscreteGapFills } from '$lib/plots/utils/gaps';
 import type { Series } from '$lib/types/plots/data/common';
@@ -14,22 +15,31 @@ export function buildData<TData extends Record<string, unknown>>(
 	state: PyramidPlotState<TData>,
 	ctx: PyramidPlotCtx
 ): PyramidPlotState<TData> {
-	const { series, data, x, y, z, segments, gaps, scales } = state;
+	const { series, data, x, y, grouping, color, segments, gaps, scales } = state;
 
 	// Series.x/.y hold the category/magnitude accessors respectively — swapped
 	// from the top-level x (magnitude)/y (category) prop names, since every
-	// other read site (scales, markers, mapping) treats them that way.
-	const base: Series<TData>[] = series ?? buildSeries(data!, y!, x!, z);
+	// other read site (scales, markers, mapping) treats them that way. A lone
+	// `color` accessor assigns sides *and* colors them (the common case) —
+	// `grouping` splits sides by a different field when given explicitly.
+	const base: Series<TData>[] = series ?? buildSeries(data!, y!, x!, grouping ?? color);
 
 	// Sort series names alphabetically; even index → left, odd → right.
-	// scales.z.reverse flips the assignment so the second name goes left.
+	// scales.grouping.reverse flips the assignment so the second name goes left.
 	const sortedNames = [...base.map((s) => s.name)].sort((a, b) => a.localeCompare(b));
-	const zReversed = scales.z?.reverse ?? false;
+	const groupingReversed = scales.grouping?.reverse ?? false;
 	const resolvedSeries = base.map((s) => {
 		const idx = sortedNames.indexOf(s.name);
-		const side = (idx % 2 === 0) !== zReversed ? 'left' : 'right';
+		const side = (idx % 2 === 0) !== groupingReversed ? 'left' : 'right';
 		return { ...s, side } as PyramidSeries<TData>;
 	});
+
+	// Default color is per-series-name (same mechanism Bar/Scatter/Line use) —
+	// `scales.color` overrides it with a real ramp/categorical scheme; a
+	// `segments` entry keyed by series name overrides a single series' fill
+	// on top of that (already supported by `buildScopedMarkerGroups` below).
+	const sortedSeries = [...resolvedSeries].sort((a, b) => a.name.localeCompare(b.name));
+	const colorForSeries = resolveSeriesColorFor(sortedSeries, scales.color, ctx.cfg.palette);
 
 	// connect: false — bars are discrete; there's no visual gap between
 	// adjacent categories to bridge (see buildGroupedSeries's own doc).
@@ -52,9 +62,9 @@ export function buildData<TData extends Record<string, unknown>>(
 	const scopedGroups = buildScopedMarkerGroups<TData, PyramidSeries<TData>, BarSegmentStyle>({
 		groupedSeries,
 		segments,
-		colorFor: (s) => ctx.colorForSide(s.side),
+		colorFor: (s) => colorForSeries(s.name),
 		segmentColorFor: (style, defaultColor) => style?.fill ?? defaultColor
 	});
 
-	return { ...state, resolvedSeries, groupedSeries, gapFillMaps, scopedGroups };
+	return { ...state, resolvedSeries, groupedSeries, gapFillMaps, scopedGroups, colorForSeries };
 }

@@ -13,9 +13,7 @@ const FLAT: Row[] = [
 ];
 
 const CTX: HeatmapPlotCtx = {
-	cfg: {} as ChartConfig,
-	minColor: '#000000',
-	maxColor: '#ffffff',
+	cfg: { continuous: { min: '#000000', max: '#ffffff' } } as ChartConfig,
 	range: undefined
 };
 
@@ -32,9 +30,9 @@ function build(
 		channels: {
 			x: { accessor: (d) => d.col },
 			y: { accessor: (d) => d.row },
-			z: { accessor: (d) => d.value }
+			color: { accessor: (d: Row) => d.value }
 		},
-		colorScale: (v) => (v >= 15 ? 'hot' : 'cold'),
+		resolveColor: (row) => (row.value >= 15 ? 'hot' : 'cold'),
 		...overrides
 	};
 	return buildMarkers(state, { ...CTX, ...ctxOverrides }).markers!;
@@ -50,7 +48,7 @@ describe('buildMarkers – style grouping', () => {
 	test('a segment style split puts cells in separate buckets', () => {
 		const markers = build({
 			segments: {
-				default: [{ areas: [{ x: { from: 'A', to: 'A' } }], style: { fill: 'red' } }]
+				default: [{ areas: [{ x: { from: 'A', to: 'A' } }], styles: { fill: 'red' } }]
 			}
 		});
 		expect(markers).toHaveLength(2);
@@ -62,13 +60,13 @@ describe('buildMarkers – segment catch-all vs area-specific priority', () => {
 		const markers = build({
 			segments: {
 				default: [
-					{ style: { fillOpacity: 0.5 } },
-					{ areas: [{ x: { from: 'A', to: 'A' } }], style: { fill: 'red' } }
+					{ styles: { fillOpacity: 0.5 } },
+					{ areas: [{ x: { from: 'A', to: 'A' } }], styles: { fill: 'red' } }
 				]
 			}
 		});
 		const cellA = markers.find((m) => (m.data as Row[]).some((d) => d.col === 'A'))!;
-		expect(cellA.style?.fillOpacity).toBe(0.5);
+		expect(cellA.styles?.fillOpacity).toBe(0.5);
 		expect((cellA.fill as (d: Row) => string)({ row: 'X', col: 'A', value: 10 })).toBe('red');
 	});
 });
@@ -80,7 +78,7 @@ describe('buildMarkers – legend range dimming', () => {
 			{ range: { min: 0, max: 15, mode: 'filter', disabledStyle: { opacity: 0.2 } } }
 		);
 		const dimmed = markers.find((m) => (m.data as Row[]).some((d) => d.value === 20))!;
-		expect(dimmed.style?.fillOpacity).toBe(0.2);
+		expect(dimmed.styles?.fillOpacity).toBe(0.2);
 	});
 
 	test('a cell inside the active range is untouched', () => {
@@ -89,12 +87,12 @@ describe('buildMarkers – legend range dimming', () => {
 			{ range: { min: 0, max: 15, mode: 'filter', disabledStyle: { opacity: 0.2 } } }
 		);
 		const inRange = markers.find((m) => (m.data as Row[]).some((d) => d.value === 10))!;
-		expect(inRange.style?.fillOpacity).toBe(1);
+		expect(inRange.styles?.fillOpacity).toBe(1);
 	});
 });
 
 describe('buildMarkers – fill', () => {
-	test('falls back to colorScale(value) when the segment sets no literal fill', () => {
+	test('falls back to resolveColor(row) when the segment sets no literal fill', () => {
 		const [marker] = build();
 		const fill = marker.fill as (d: Row) => string;
 		expect(fill({ row: 'X', col: 'A', value: 10 })).toBe('cold');

@@ -127,7 +127,7 @@ export const AzimuthalEquidistantUnitedNationsEmblem: Story = {
 			projection: { type: 'azimuthal-equidistant', rotate: [0, -90], clip: 148 }
 		} satisfies CoordinatesConfig,
 		markers: [
-			{ type: 'graticule', style: { stroke: '#94a3b8', strokeOpacity: 0.6 } }
+			{ type: 'graticule', styles: { stroke: '#94a3b8', strokeOpacity: 0.6 } }
 		] satisfies GeoMarkersConfig[]
 	}
 };

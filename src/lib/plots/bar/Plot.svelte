@@ -41,8 +41,9 @@
 
 	/**
 	 * A bar chart, vertical by default. Accepts either a pre-built `series`
-	 * array or flat `data/x/y/z` props — mirrors the line/heatmap plot contract
-	 * so the chart-level container/timeline/facet/legend wrap it unchanged.
+	 * array or flat `data/x/y/color` props — mirrors the line/heatmap plot
+	 * contract so the chart-level container/timeline/facet/legend wrap it
+	 * unchanged.
 	 */
 	type Props = BasePlotProps<
 		SeriesProps<TData> | DataProps<TData>,
@@ -60,7 +61,8 @@
 		data,
 		x,
 		y,
-		z,
+		grouping,
+		color,
 		styles = {},
 		segments = {},
 		markers = [],
@@ -113,7 +115,20 @@
 	const plotState = $derived(
 		runStages<BarPlotState<TData>, BarPlotCtx>(
 			stages,
-			{ series, data, x, y, z, segments, gaps: styles.gaps ?? {}, scales, width, height, margins },
+			{
+				series,
+				data,
+				x,
+				y,
+				grouping,
+				color,
+				segments,
+				gaps: styles.gaps ?? {},
+				scales,
+				width,
+				height,
+				margins
+			},
 			ctx
 		)
 	);
@@ -245,6 +260,7 @@
 	getY={plotGetY}
 	{hover}
 	scales={resolvedScales}
+	channelScales={resolvedScales}
 	{...labelMargin.plotProps}
 	xTickRotate={resolvedScales?.x?.tickRotate}
 	{hoverController}

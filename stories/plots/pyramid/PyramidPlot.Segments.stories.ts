@@ -8,21 +8,21 @@ import { AGE_GROUPS, POPULATION_PYRAMID } from '../../data/population-pyramid';
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Plots/PyramidPlot/Segments',
-  component: PyramidPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 520,
-  },
-  argTypes: {
-    width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
-    height: { control: { type: 'range', min: 320, max: 800, step: 20 } },
-    segments: { control: false },
-  },
-  parameters: {
-    docs: { source: { name: 'PyramidPlot' } },
-  },
+	title: 'Plots/PyramidPlot/Segments',
+	component: PyramidPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 520
+	},
+	argTypes: {
+		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
+		height: { control: { type: 'range', min: 320, max: 800, step: 20 } },
+		segments: { control: false }
+	},
+	parameters: {
+		docs: { source: { name: 'PyramidPlot' } }
+	}
 } satisfies Meta<typeof PyramidPlot>;
 
 export default meta;
@@ -36,11 +36,11 @@ const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
 // each matching bucket is listed as its own single-point area instead —
 // equality-only matching, immune to that ordering quirk.
 function areasFor(ageGroups: string[]): Area[] {
-  return ageGroups.map((ageGroup) => ({ x: { from: ageGroup, to: ageGroup } }));
+	return ageGroups.map((ageGroup) => ({ x: { from: ageGroup, to: ageGroup } }));
 }
 
 function bucketStart(ageGroup: string): number {
-  return parseInt(ageGroup.split('-')[0]);
+	return parseInt(ageGroup.split('-')[0]);
 }
 
 // ── Stories ───────────────────────────────────────────────────────────────────
@@ -50,19 +50,19 @@ function bucketStart(ageGroup: string): number {
  * the `default` key, so the same rule affects both series (Female, Male).
  */
 export const HighlightedSegments: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    segments: {
-      default: [
-        { areas: areasFor(['80-84', '85+']), style: { fillOpacity: 1 } },
-        { style: { fillOpacity: 0.25 } },
-      ],
-    } satisfies SegmentsConfig<BarSegmentStyle>,
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		segments: {
+			default: [
+				{ areas: areasFor(['80-84', '85+']), styles: { fillOpacity: 1 } },
+				{ styles: { fillOpacity: 0.25 } }
+			]
+		} satisfies SegmentsConfig<BarSegmentStyle>
+	}
 };
 
 /**
@@ -70,24 +70,22 @@ export const HighlightedSegments: Story = {
  * typically in the labour force (18-64), highlighting the economically active population.
  */
 export const WorkingAgeHighlight: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    segments: {
-      default: [
-        {
-          areas: areasFor(
-            AGE_GROUPS.filter((ag) => bucketStart(ag) >= 18 && bucketStart(ag) < 65),
-          ),
-          style: { fillOpacity: 1 },
-        },
-        { style: { fillOpacity: 0.2 } },
-      ],
-    } satisfies SegmentsConfig<BarSegmentStyle>,
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		segments: {
+			default: [
+				{
+					areas: areasFor(AGE_GROUPS.filter((ag) => bucketStart(ag) >= 18 && bucketStart(ag) < 65)),
+					styles: { fillOpacity: 1 }
+				},
+				{ styles: { fillOpacity: 0.2 } }
+			]
+		} satisfies SegmentsConfig<BarSegmentStyle>
+	}
 };
 
 /**
@@ -95,24 +93,22 @@ export const WorkingAgeHighlight: Story = {
  * young (0-24) and elderly (65+) populations.
  */
 export const YouthAndElderlyHighlight: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    segments: {
-      default: [
-        {
-          areas: areasFor(
-            AGE_GROUPS.filter((ag) => bucketStart(ag) < 25 || bucketStart(ag) >= 65),
-          ),
-          style: { fillOpacity: 0.95 },
-        },
-        { style: { fillOpacity: 0.2 } },
-      ],
-    } satisfies SegmentsConfig<BarSegmentStyle>,
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		segments: {
+			default: [
+				{
+					areas: areasFor(AGE_GROUPS.filter((ag) => bucketStart(ag) < 25 || bucketStart(ag) >= 65)),
+					styles: { fillOpacity: 0.95 }
+				},
+				{ styles: { fillOpacity: 0.2 } }
+			]
+		} satisfies SegmentsConfig<BarSegmentStyle>
+	}
 };
 
 /**
@@ -121,25 +117,25 @@ export const YouthAndElderlyHighlight: Story = {
  * falls into exactly one of the two segments, so no catch-all is needed.
  */
 export const ByDecadePattern: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    segments: {
-      default: [
-        {
-          areas: areasFor(AGE_GROUPS.filter((ag) => Math.floor(bucketStart(ag) / 10) % 2 === 0)),
-          style: { fillOpacity: 0.9 },
-        },
-        {
-          areas: areasFor(AGE_GROUPS.filter((ag) => Math.floor(bucketStart(ag) / 10) % 2 === 1)),
-          style: { fillOpacity: 0.3 },
-        },
-      ],
-    } satisfies SegmentsConfig<BarSegmentStyle>,
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		segments: {
+			default: [
+				{
+					areas: areasFor(AGE_GROUPS.filter((ag) => Math.floor(bucketStart(ag) / 10) % 2 === 0)),
+					styles: { fillOpacity: 0.9 }
+				},
+				{
+					areas: areasFor(AGE_GROUPS.filter((ag) => Math.floor(bucketStart(ag) / 10) % 2 === 1)),
+					styles: { fillOpacity: 0.3 }
+				}
+			]
+		} satisfies SegmentsConfig<BarSegmentStyle>
+	}
 };
 
 /**
@@ -148,28 +144,26 @@ export const ByDecadePattern: Story = {
  * Segments keyed by series name apply only to that series.
  */
 export const AsymmetricHighlight: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    segments: {
-      Female: [
-        { areas: areasFor(['80-84', '85+']), style: { fillOpacity: 1 } },
-        { style: { fillOpacity: 0.25 } },
-      ],
-      Male: [
-        {
-          areas: areasFor(
-            AGE_GROUPS.filter((ag) => bucketStart(ag) >= 25 && bucketStart(ag) < 55),
-          ),
-          style: { fillOpacity: 1 },
-        },
-        { style: { fillOpacity: 0.25 } },
-      ],
-    } satisfies SegmentsConfig<BarSegmentStyle>,
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		segments: {
+			Female: [
+				{ areas: areasFor(['80-84', '85+']), styles: { fillOpacity: 1 } },
+				{ styles: { fillOpacity: 0.25 } }
+			],
+			Male: [
+				{
+					areas: areasFor(AGE_GROUPS.filter((ag) => bucketStart(ag) >= 25 && bucketStart(ag) < 55)),
+					styles: { fillOpacity: 1 }
+				},
+				{ styles: { fillOpacity: 0.25 } }
+			]
+		} satisfies SegmentsConfig<BarSegmentStyle>
+	}
 };
 
 /**
@@ -177,17 +171,17 @@ export const AsymmetricHighlight: Story = {
  * with a dimmed catch-all for the rest, on the `default` key.
  */
 export const CustomColorHighlight: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    segments: {
-      default: [
-        { areas: areasFor(['80-84', '85+']), style: { fill: '#d6336c', fillOpacity: 0.9 } },
-        { style: { fillOpacity: 0.2 } },
-      ],
-    } satisfies SegmentsConfig<BarSegmentStyle>,
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		segments: {
+			default: [
+				{ areas: areasFor(['80-84', '85+']), styles: { fill: '#d6336c', fillOpacity: 0.9 } },
+				{ styles: { fillOpacity: 0.2 } }
+			]
+		} satisfies SegmentsConfig<BarSegmentStyle>
+	}
 };

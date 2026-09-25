@@ -16,7 +16,9 @@ export type ScatterPlotState<TData extends Record<string, unknown>> = {
 	data?: TData[];
 	x?: Accessor<TData, AxisValue>;
 	y?: Accessor<TData, AxisValue>;
-	z?: Accessor<TData, unknown>;
+	/** Structural grouping key — defaults to `color` when unset (see `DataProps.grouping`). */
+	grouping?: Accessor<TData, unknown>;
+	color?: Accessor<TData, unknown>;
 	r?: Accessor<TData, number> | number;
 	segments: SegmentsConfig<ScatterSegmentStyle>;
 	scales: AxisBasedScalesConfig<TData>;
@@ -37,6 +39,10 @@ export type ScatterPlotState<TData extends Record<string, unknown>> = {
 		y: ResolvedChannel<TData>;
 		/** Absent when `r` isn't given; a literal pixel radius when `r` is a plain number (not scaled); a resolved per-row channel otherwise. */
 		r?: ResolvedChannel<TData, number> | number;
+		/** Row-level accessor resolved from `grouping ?? color` — the same accessor `buildSeries` already split series by. */
+		grouping?: ResolvedChannel<TData, unknown>;
+		/** Row-level accessor resolved from `color`, when set — independent of `colorForSeries`'s per-name resolution. */
+		color?: ResolvedChannel<TData, unknown>;
 	};
 
 	// "markers" phase output.

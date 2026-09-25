@@ -5,11 +5,11 @@ import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import { READINGS_WITH_GAPS, OTHER_READINGS_NO_GAPS } from '../data';
 
-const MONTHS_ES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 /** Orders month-abbreviation rows by calendar position, not alphabetically — see `LinePlot.Scales`' own `byMonth`. */
 function byMonth(a: Record<string, unknown>, b: Record<string, unknown>): number {
-  return MONTHS_ES.indexOf(a.category as string) - MONTHS_ES.indexOf(b.category as string);
+	return MONTHS.indexOf(a.category as string) - MONTHS.indexOf(b.category as string);
 }
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -18,44 +18,45 @@ function byMonth(a: Record<string, unknown>, b: Record<string, unknown>): number
 // natural ascending order, which is what makes `styles.gaps`' interpolation
 // worth looking at here — a trend being bridged, not an arbitrary category
 // filled in. `READINGS_WITH_GAPS` has three kinds of holes, all `value:
-// null`: no reading for Ene–Feb (start), an outage at Jun–Jul (middle), and
-// nothing yet for Nov–Dic (end). Without `styles.gaps`, a missing value
+// null`: no reading for Jan–Feb (start), an outage at Jun–Jul (middle), and
+// nothing yet for Nov–Dec (end). Without `styles.gaps`, a missing value
 // renders no bar at all — `styles.gaps` fills it with a distinctly-styled
 // bar at an interpolated value instead, configured independently per zone.
 // Like `segments`, it's keyed by series name (`'default'` for every series
 // with no named entry of its own).
 
 const meta = {
-  title: 'Plots/BarPlot/Styles/Gaps',
-  component: BarPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 400,
-    series: [{ name: 'reading', x: 'category', y: 'value', data: READINGS_WITH_GAPS }],
-  },
-  argTypes: {
-    width: {
-      description: 'Plot width in pixels.',
-      control: { type: 'range', min: 300, max: 940, step: 50 },
-    },
-    height: {
-      description: 'Plot height in pixels.',
-      control: { type: 'range', min: 200, max: 700, step: 50 },
-    },
-    series: {
-      description: 'Data series to render. Missing readings are `null`-valued rows.',
-      control: false,
-      table: { type: { summary: 'Series<TData>[]' }, category: 'Data' },
-    },
-    styles: {
-      description: "`styles.gaps`: series name (or 'default') to that series' start/middle/end gap-fill config.",
-      control: false,
-    },
-  },
-  parameters: {
-    docs: { source: { name: 'BarPlot' } },
-  },
+	title: 'Plots/BarPlot/Styles/Gaps',
+	component: BarPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 400,
+		series: [{ name: 'reading', x: 'category', y: 'value', data: READINGS_WITH_GAPS }]
+	},
+	argTypes: {
+		width: {
+			description: 'Plot width in pixels.',
+			control: { type: 'range', min: 300, max: 940, step: 50 }
+		},
+		height: {
+			description: 'Plot height in pixels.',
+			control: { type: 'range', min: 200, max: 700, step: 50 }
+		},
+		series: {
+			description: 'Data series to render. Missing readings are `null`-valued rows.',
+			control: false,
+			table: { type: { summary: 'Series<TData>[]' }, category: 'Data' }
+		},
+		styles: {
+			description:
+				"`styles.gaps`: series name (or 'default') to that series' start/middle/end gap-fill config.",
+			control: false
+		}
+	},
+	parameters: {
+		docs: { source: { name: 'BarPlot' } }
+	}
 } satisfies Meta<typeof BarPlot>;
 
 export default meta;
@@ -69,9 +70,9 @@ type Story = StoryObj<typeof meta>;
  * would otherwise produce.
  */
 export const NoGapsConfigured: Story = {
-  args: {
-    scales: { x: { sort: byMonth } } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		scales: { x: { sort: byMonth } } satisfies AxisBasedScalesConfig
+	}
 };
 
 // ── Default key: gaps that apply to every series ─────────────────────────────
@@ -83,10 +84,10 @@ export const NoGapsConfigured: Story = {
  * the data itself. Default style: the series' own colour, faded.
  */
 export const MiddleGapFilled: Story = {
-  args: {
-    scales: { x: { sort: byMonth } } satisfies AxisBasedScalesConfig,
-    styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> },
-  },
+	args: {
+		scales: { x: { sort: byMonth } } satisfies AxisBasedScalesConfig,
+		styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
+	}
 };
 
 /**
@@ -97,12 +98,12 @@ export const MiddleGapFilled: Story = {
  * for a category axis, only its presence opts the zone in.
  */
 export const LeadingAndTrailingGapsOptIn: Story = {
-  args: {
-    scales: { x: { sort: byMonth } } satisfies AxisBasedScalesConfig,
-    styles: {
-      gaps: { default: { start: { x: 0 }, end: { x: 13 } } } satisfies GapsConfig<BarSegmentStyle>,
-    },
-  },
+	args: {
+		scales: { x: { sort: byMonth } } satisfies AxisBasedScalesConfig,
+		styles: {
+			gaps: { default: { start: { x: 0 }, end: { x: 13 } } } satisfies GapsConfig<BarSegmentStyle>
+		}
+	}
 };
 
 /**
@@ -110,25 +111,25 @@ export const LeadingAndTrailingGapsOptIn: Story = {
  * a visually distinct kind of "not real data".
  */
 export const AllThreeZonesDistinctStyles: Story = {
-  args: {
-    scales: { x: { sort: byMonth } } satisfies AxisBasedScalesConfig,
-    styles: {
-      gaps: {
-        default: {
-          start: { x: 0, style: { fillOpacity: 0.25 } },
-          middle: { style: { fillOpacity: 0.5 } },
-          end: { x: 13, style: { fillOpacity: 0.75 } },
-        },
-      } satisfies GapsConfig<BarSegmentStyle>,
-    },
-  },
+	args: {
+		scales: { x: { sort: byMonth } } satisfies AxisBasedScalesConfig,
+		styles: {
+			gaps: {
+				default: {
+					start: { x: 0, style: { fillOpacity: 0.25 } },
+					middle: { style: { fillOpacity: 0.5 } },
+					end: { x: 13, style: { fillOpacity: 0.75 } }
+				}
+			} satisfies GapsConfig<BarSegmentStyle>
+		}
+	}
 };
 
 // ── Series-aware form ─────────────────────────────────────────────────────────
 
 const TWO_READINGS = [
-  { name: 'reading', x: 'category' as const, y: 'value' as const, data: READINGS_WITH_GAPS },
-  { name: 'other', x: 'category' as const, y: 'value' as const, data: OTHER_READINGS_NO_GAPS },
+	{ name: 'reading', x: 'category' as const, y: 'value' as const, data: READINGS_WITH_GAPS },
+	{ name: 'other', x: 'category' as const, y: 'value' as const, data: OTHER_READINGS_NO_GAPS }
 ];
 
 /**
@@ -136,15 +137,15 @@ const TWO_READINGS = [
  * has no missing readings, so it's unaffected either way.
  */
 export const GapsOnOneSeriesOnly: Story = {
-  args: {
-    series: TWO_READINGS,
-    scales: { x: { sort: byMonth } } satisfies AxisBasedScalesConfig,
-    styles: { gaps: { reading: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> },
-  },
+	args: {
+		series: TWO_READINGS,
+		scales: { x: { sort: byMonth } } satisfies AxisBasedScalesConfig,
+		styles: { gaps: { reading: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
+	}
 };
 
 // ── Series layout ─────────────────────────────────────────────────────────────
-// `scales.z.seriesLayout` is BarPlot's own territory — a gap-fill bar picks
+// `scales.grouping.seriesLayout` is BarPlot's own territory — a gap-fill bar picks
 // up exactly the same grouped inset / stacked baseline a real bar for that
 // row would.
 
@@ -154,11 +155,14 @@ export const GapsOnOneSeriesOnly: Story = {
  * would occupy anywhere else.
  */
 export const GroupedLayout: Story = {
-  args: {
-    series: TWO_READINGS,
-    scales: { x: { sort: byMonth }, z: { seriesLayout: 'grouped' } } satisfies AxisBasedScalesConfig,
-    styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> },
-  },
+	args: {
+		series: TWO_READINGS,
+		scales: {
+			x: { sort: byMonth },
+			grouping: { seriesLayout: 'grouped' }
+		} satisfies AxisBasedScalesConfig,
+		styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
+	}
 };
 
 /**
@@ -170,11 +174,14 @@ export const GroupedLayout: Story = {
  * otherwise poison the stack with).
  */
 export const StackedLayout: Story = {
-  args: {
-    series: TWO_READINGS,
-    scales: { x: { sort: byMonth }, z: { seriesLayout: 'stacked' } } satisfies AxisBasedScalesConfig,
-    styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> },
-  },
+	args: {
+		series: TWO_READINGS,
+		scales: {
+			x: { sort: byMonth },
+			grouping: { seriesLayout: 'stacked' }
+		} satisfies AxisBasedScalesConfig,
+		styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
+	}
 };
 
 // ── Global configuration ──────────────────────────────────────────────────────
@@ -185,15 +192,16 @@ export const StackedLayout: Story = {
  * gap-fill default.
  */
 export const GlobalConfigDefault: Story = {
-  args: {
-    scales: { x: { sort: byMonth } } satisfies AxisBasedScalesConfig,
-    styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Run `setConfiguration({ bar: { gap: { fillOpacity: 0.2 } } })` to change every unfilled zone\'s default look at once.',
-      },
-    },
-  },
+	args: {
+		scales: { x: { sort: byMonth } } satisfies AxisBasedScalesConfig,
+		styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Run `setConfiguration({ bar: { gap: { fillOpacity: 0.2 } } })` to change every unfilled zone's default look at once."
+			}
+		}
+	}
 };

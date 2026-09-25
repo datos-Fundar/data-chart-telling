@@ -38,10 +38,10 @@
 		data={REGION_SECTOR_BARS}
 		x={'region' as keyof RegionSector}
 		y="value"
-		z={'sector' as keyof RegionSector}
+		color={'sector' as keyof RegionSector}
 		scales={{
 			y: orientation === 'horizontal' ? { type: 'categorical' } : undefined,
-			z: { seriesLayout: layout }
+			grouping: { seriesLayout: layout }
 		}}
 		facet={{ by: 'region' as keyof RegionSector, columns: 2 }}
 		tooltip={{

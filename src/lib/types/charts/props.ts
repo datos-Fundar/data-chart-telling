@@ -14,34 +14,36 @@ import type { TimelineConfig } from '$lib/types/layout/timeline';
  * …). The `TSegmentStyle` parameter lets each chart narrow `segments` to its
  * own style shape while keeping everything else shared.
  *
- * Note: `z` is optional here (bar/line charts) but individual charts may
+ * Note: `color` is optional here (bar/line charts) but individual charts may
  * tighten it to required and/or narrow its value type (e.g. `number` for
  * heatmap).
  */
 export type ChartProps<
-  TRow extends Record<string, unknown>,
-  TSegmentStyle extends object = object,
+	TRow extends Record<string, unknown>,
+	TSegmentStyle extends object = object
 > = {
-  width: number;
-  height: number;
-  title?: string;
-  subtitle?: string;
-  caption?: string;
-  header?: Snippet;
-  footer?: Snippet;
-  legend?: LegendSection[];
-  data: TRow[];
-  x: Accessor<TRow, AxisValue>;
-  y: Accessor<TRow, AxisValue>;
-  z?: Accessor<TRow, unknown>;
-  styles?: AxisBasedStylesConfig;
-  segments?: SegmentsConfig<TSegmentStyle>;
-  markers?: AxisBasedMarkersConfig[];
-  scales?: AxisBasedScalesConfig<TRow>;
-  margins?: MarginConfig;
-  facet?: FacetConfig<TRow>;
-  timeline?: TimelineConfig<TRow>;
-  tooltip?: TooltipProp<TRow>;
+	width: number;
+	height: number;
+	title?: string;
+	subtitle?: string;
+	caption?: string;
+	header?: Snippet;
+	footer?: Snippet;
+	legend?: LegendSection[];
+	data: TRow[];
+	x: Accessor<TRow, AxisValue>;
+	y: Accessor<TRow, AxisValue>;
+	/** Structural grouping key — defaults to `color` when unset (see `DataProps.grouping`). */
+	grouping?: Accessor<TRow, unknown>;
+	color?: Accessor<TRow, unknown>;
+	styles?: AxisBasedStylesConfig;
+	segments?: SegmentsConfig<TSegmentStyle>;
+	markers?: AxisBasedMarkersConfig[];
+	scales?: AxisBasedScalesConfig<TRow>;
+	margins?: MarginConfig;
+	facet?: FacetConfig<TRow>;
+	timeline?: TimelineConfig<TRow>;
+	tooltip?: TooltipProp<TRow>;
 };
 
 /**
@@ -51,8 +53,8 @@ export type ChartProps<
  * the plain `AxisBasedStylesConfig` every other chart kind uses.
  */
 export type GapsAwareChartProps<
-  TRow extends Record<string, unknown>,
-  TSegmentStyle extends object = object,
+	TRow extends Record<string, unknown>,
+	TSegmentStyle extends object = object
 > = Omit<ChartProps<TRow, TSegmentStyle>, 'styles'> & {
-  styles?: GapsAwarePlotStylesConfig<TSegmentStyle>;
+	styles?: GapsAwarePlotStylesConfig<TSegmentStyle>;
 };

@@ -7,35 +7,35 @@ import { LIFE_EXPECTANCY_BY_PROVINCE_SEX, type ProvinceSexCell } from './data';
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Plots/HeatmapPlot/Tooltip',
-  component: HeatmapPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 420,
-  },
-  argTypes: {
-    width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
-    height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
-    series: { control: false },
-    tooltip: { control: false },
-  },
-  parameters: {
-    docs: { source: { name: 'HeatmapPlot' } },
-  },
+	title: 'Plots/HeatmapPlot/Tooltip',
+	component: HeatmapPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 420
+	},
+	argTypes: {
+		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
+		height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
+		series: { control: false },
+		tooltip: { control: false }
+	},
+	parameters: {
+		docs: { source: { name: 'HeatmapPlot' } }
+	}
 } satisfies Meta<typeof HeatmapPlot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 const SERIES = [
-  {
-    name: 'life_expectancy',
-    x: 'province',
-    y: 'sex',
-    z: 'value',
-    data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-  } satisfies Series<ProvinceSexCell>,
+	{
+		name: 'life_expectancy',
+		x: 'province',
+		y: 'sex',
+		color: 'value',
+		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX
+	} satisfies Series<ProvinceSexCell>
 ];
 
 // ── Stories ───────────────────────────────────────────────────────────────────
@@ -45,7 +45,7 @@ const SERIES = [
  * This is the default behaviour when `tooltip` is omitted.
  */
 export const NoTooltip: Story = {
-  args: { series: SERIES },
+	args: { series: SERIES }
 };
 
 /**
@@ -56,17 +56,17 @@ export const NoTooltip: Story = {
  * `facetId: ''` and `sync: false`.
  */
 export const BasicTooltip: Story = {
-  args: {
-    series: SERIES,
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { province, sex, value } = row as ProvinceSexCell;
-        return `${province} - ${sex}: ${value.toFixed(1)} yr`;
-      },
-    },
-  },
+	args: {
+		series: SERIES,
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { province, sex, value } = row as ProvinceSexCell;
+				return `${province} - ${sex}: ${value.toFixed(1)} yr`;
+			}
+		}
+	}
 };
 
 /**
@@ -74,17 +74,17 @@ export const BasicTooltip: Story = {
  * The first line becomes the heading, the rest the body.
  */
 export const RichFormat: Story = {
-  args: {
-    series: SERIES,
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { province, sex, value } = row as ProvinceSexCell;
-        return `Province: ${province}\nSex: ${sex}\nLife expectancy: ${value.toFixed(1)} yr`;
-      },
-    },
-  },
+	args: {
+		series: SERIES,
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { province, sex, value } = row as ProvinceSexCell;
+				return `Province: ${province}\nSex: ${sex}\nLife expectancy: ${value.toFixed(1)} yr`;
+			}
+		}
+	}
 };
 
 /**
@@ -92,19 +92,19 @@ export const RichFormat: Story = {
  * Here it shows the life expectancy relative to an 80-year threshold.
  */
 export const ComputedFormat: Story = {
-  args: {
-    series: SERIES,
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { province, sex, value } = row as ProvinceSexCell;
-        const delta = (value - 80).toFixed(1);
-        const sign = value >= 80 ? '+' : '';
-        return `${province} - ${sex}: ${value.toFixed(1)} yr (${sign}${delta} vs 80)`;
-      },
-    },
-  },
+	args: {
+		series: SERIES,
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { province, sex, value } = row as ProvinceSexCell;
+				const delta = (value - 80).toFixed(1);
+				const sign = value >= 80 ? '+' : '';
+				return `${province} - ${sex}: ${value.toFixed(1)} yr (${sign}${delta} vs 80)`;
+			}
+		}
+	}
 };
 
 /**
@@ -112,17 +112,17 @@ export const ComputedFormat: Story = {
  * of years for easier interpretation at a glance.
  */
 export const RoundedValue: Story = {
-  args: {
-    series: SERIES,
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { province, sex, value } = row as ProvinceSexCell;
-        return `${province} - ${sex}\n${Math.round(value)} yr`;
-      },
-    },
-  },
+	args: {
+		series: SERIES,
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { province, sex, value } = row as ProvinceSexCell;
+				return `${province} - ${sex}\n${Math.round(value)} yr`;
+			}
+		}
+	}
 };
 
 /**
@@ -136,7 +136,7 @@ export const RoundedValue: Story = {
  * `content` is set, so the custom card fully owns the look.
  */
 export const CustomContent: StoryObj = {
-  render: () => ({ Component: RichTooltip }),
+	render: () => ({ Component: RichTooltip })
 };
 
 /**
@@ -147,17 +147,17 @@ export const CustomContent: StoryObj = {
  * overflow.
  */
 export const CustomAnchor: Story = {
-  args: {
-    series: SERIES,
-    tooltip: {
-      facetId: '',
-      sync: false,
-      anchorX: 'left',
-      anchorY: 'top',
-      format: (row) => {
-        const { province, sex, value } = row as ProvinceSexCell;
-        return `${province} - ${sex}: ${value.toFixed(1)} yr`;
-      },
-    },
-  },
+	args: {
+		series: SERIES,
+		tooltip: {
+			facetId: '',
+			sync: false,
+			anchorX: 'left',
+			anchorY: 'top',
+			format: (row) => {
+				const { province, sex, value } = row as ProvinceSexCell;
+				return `${province} - ${sex}: ${value.toFixed(1)} yr`;
+			}
+		}
+	}
 };

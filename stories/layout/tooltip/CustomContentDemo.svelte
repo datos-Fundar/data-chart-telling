@@ -7,7 +7,7 @@
 
 	const cfg = getConfiguration();
 
-	// Matches the `z: 'metric'` grouping order below, which is what drives
+	// Matches the `color: 'metric'` grouping order below, which is what drives
 	// colour assignment inside LineChart — kept in lockstep here since `content`
 	// only gets the raw rows back, not their series colour.
 	const METRICS = ['GDP', 'Employment'];
@@ -26,7 +26,7 @@
 			display: `$ ${row.value} M`
 		}))
 		.sort((a, b) => b.value - a.value)}
-	<TooltipCard heading={String(year)} {entries} footer="PBI vs. Empleo" />
+	<TooltipCard heading={String(year)} {entries} footer="GDP vs. Employment" />
 {/snippet}
 
 <div class="custom-content-demo">
@@ -36,7 +36,7 @@
 		{data}
 		x="year"
 		y="value"
-		z={'metric' as keyof SeriesPoint}
+		color={'metric' as keyof SeriesPoint}
 		tooltip={{ strategy: 'x', content }}
 		markers={[{ type: 'hover' }]}
 	/>

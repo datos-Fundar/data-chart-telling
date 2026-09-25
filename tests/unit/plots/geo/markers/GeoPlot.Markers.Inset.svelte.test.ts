@@ -104,7 +104,7 @@ describe('GeoPlot – inset marker', () => {
           width: 0.4,
           height: 0.3,
           margin: 20,
-          style: { fill: '#dc2626', strokeWidth: 2 },
+          styles: { fill: '#dc2626', strokeWidth: 2 },
         },
       ] satisfies GeoMarkersConfig[],
     });

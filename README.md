@@ -83,22 +83,22 @@ pnpm build-storybook
 
 ### Charts
 
-| Component | Import path | Description |
-| --- | --- | --- |
-| `BarChart` | `$lib/charts/bar/Chart.svelte` | Vertical bar chart with title/caption/legend/facet/timeline chrome. |
+| Component      | Import path                        | Description                                                                                                |
+| -------------- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `BarChart`     | `$lib/charts/bar/Chart.svelte`     | Vertical bar chart with title/caption/legend/facet/timeline chrome.                                        |
 | `HeatmapChart` | `$lib/charts/heatmap/Chart.svelte` | Grid of colour-coded cells. Colour domain is computed over the full dataset for cross-facet comparability. |
-| `LineChart` | `$lib/charts/line/Chart.svelte` | Line chart. Default timeline mode is `upTo` (cumulative reveal). |
-| `PyramidChart` | `$lib/charts/pyramid/Chart.svelte` | Population-pyramid-style diverging bar chart with a shared zero baseline. |
+| `LineChart`    | `$lib/charts/line/Chart.svelte`    | Line chart. Default timeline mode is `upTo` (cumulative reveal).                                           |
+| `PyramidChart` | `$lib/charts/pyramid/Chart.svelte` | Population-pyramid-style diverging bar chart with a shared zero baseline.                                  |
 
 ### Plots
 
-| Component | Import path | Description |
-| --- | --- | --- |
-| `BarPlot` | `$lib/plots/bar/Plot.svelte` | Vertical bar chart. Supports multiple series and per-series range segments. |
-| `HeatmapPlot` | `$lib/plots/heatmap/Plot.svelte` | Grid of colour-coded cells. |
-| `LinePlot` | `$lib/plots/line/Plot.svelte` | Line chart. Supports multiple series and per-series range segments with independent stroke styles. |
-| `PyramidPlot` | `$lib/plots/pyramid/Plot.svelte` | Diverging horizontal bar chart; each series is mirrored left or right of a shared zero baseline. |
-| `GeoPlot` | `$lib/plots/geo/Plot.svelte` | Geographic map rendered from GeoJSON/TopoJSON with optional choropleth styling and interactive markers. |
+| Component     | Import path                      | Description                                                                                             |
+| ------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `BarPlot`     | `$lib/plots/bar/Plot.svelte`     | Vertical bar chart. Supports multiple series and per-series range segments.                             |
+| `HeatmapPlot` | `$lib/plots/heatmap/Plot.svelte` | Grid of colour-coded cells.                                                                             |
+| `LinePlot`    | `$lib/plots/line/Plot.svelte`    | Line chart. Supports multiple series and per-series range segments with independent stroke styles.      |
+| `PyramidPlot` | `$lib/plots/pyramid/Plot.svelte` | Diverging horizontal bar chart; each series is mirrored left or right of a shared zero baseline.        |
+| `GeoPlot`     | `$lib/plots/geo/Plot.svelte`     | Geographic map rendered from GeoJSON/TopoJSON with optional choropleth styling and interactive markers. |
 
 All components accept explicit `width` and `height` in pixels (svelteplot does not auto-size).
 
@@ -106,156 +106,163 @@ All components accept explicit `width` and `height` in pixels (svelteplot does n
 
 ### Plot props (BarPlot, LinePlot, HeatmapPlot, PyramidPlot)
 
-Plots accept either `series` (pre-built `Series[]`) or the `data` + `x`/`y`/`z` flat-rows path — these are mutually exclusive.
+Plots accept either `series` (pre-built `Series[]`) or the `data` + `x`/`y`/`grouping`/`color` flat-rows path — these are mutually exclusive. `grouping` splits `data` into one series per distinct value; `color` is the value/colour channel and, when `grouping` is unset, doubles as the grouping key too (the common case — a single `color` accessor both groups _and_ colours series).
 
-| Prop | Type | Default | BarPlot | HeatmapPlot | LinePlot | PyramidPlot |
-| ---- | ---- | ------- | ------- | ----------- | -------- | ----------- |
-| `width` | `number` | — | ✅ | ✅ | ✅ | ✅ |
-| `height` | `number` | — | ✅ | ✅ | ✅ | ✅ |
-| `series` | `Series[]` | — | ✅ | ✅ | ✅ | ✅ |
-| `data` | `TData[]` | — | ✅ | ✅ | ✅ | ✅ |
-| `x` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
-| `y` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
-| `z` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
-| `segments` | `SegmentsConfig<TStyle>` | `[]` | ✅ | ✅ | ✅ | ✅ |
-| `markers` | `Marker[]` | `[]` | ✅ | ✅ | ✅ | ✅ |
-| `scales` | `AxisBasedScalesConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
-| `margins` | `MarginConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
-| `tooltip` | `TooltipConfig` | | ✅ | ✅ | ✅ | ✅ |
-| `styles` | `BasePlotStyles` | | ✅ | ✅ | ✅ | ✅ |
+| Prop       | Type                     | Default | BarPlot | HeatmapPlot                       | LinePlot | PyramidPlot |
+| ---------- | ------------------------ | ------- | ------- | --------------------------------- | -------- | ----------- |
+| `width`    | `number`                 | —       | ✅      | ✅                                | ✅       | ✅          |
+| `height`   | `number`                 | —       | ✅      | ✅                                | ✅       | ✅          |
+| `series`   | `Series[]`               | —       | ✅      | ✅                                | ✅       | ✅          |
+| `data`     | `TData[]`                | —       | ✅      | ✅                                | ✅       | ✅          |
+| `x`        | `Accessor`               | —       | ✅      | ✅                                | ✅       | ✅          |
+| `y`        | `Accessor`               | —       | ✅      | ✅                                | ✅       | ✅          |
+| `grouping` | `Accessor`               | —       | ✅      | ❌                                | ✅       | ✅          |
+| `color`    | `Accessor`               | —       | ✅      | ✅ (per-cell value, not grouping) | ✅       | ✅          |
+| `segments` | `SegmentsConfig<TStyle>` | `[]`    | ✅      | ✅                                | ✅       | ✅          |
+| `markers`  | `Marker[]`               | `[]`    | ✅      | ✅                                | ✅       | ✅          |
+| `scales`   | `AxisBasedScalesConfig`  | `{}`    | ✅      | ✅                                | ✅       | ✅          |
+| `margins`  | `MarginConfig`           | `{}`    | ✅      | ✅                                | ✅       | ✅          |
+| `tooltip`  | `TooltipConfig`          |         | ✅      | ✅                                | ✅       | ✅          |
+| `styles`   | `BasePlotStyles`         |         | ✅      | ✅                                | ✅       | ✅          |
 
 #### GeoPlot props
 
-Unlike x/y plots, `GeoPlot` uses GeoJSON/TopoJSON as its data source (no x/y/z axes). It accepts either a `FeatureCollection`, a `Feature[]`, or a TopoJSON `Topology` (with the `object` key to specify which named object to extract).
+Unlike x/y plots, `GeoPlot` uses GeoJSON/TopoJSON as its data source (no x/y axes, no `grouping`). It accepts either a `FeatureCollection`, a `Feature[]`, or a TopoJSON `Topology` (with the `object` key to specify which named object to extract).
 
-| Prop | Type | Default | Description |
-| ---- | ---- | ------- | ----------- |
-| `width` | `number` | — | Plot width in pixels. |
-| `height` | `number` | — | Plot height in pixels. |
-| `data` | `FeatureCollection \| Feature[] \| Topology` | — | GeoJSON (FeatureCollection or Feature array) or TopoJSON Topology. |
-| `object` | `string` | — | Required when `data` is a TopoJSON Topology — the key under `topology.objects` to extract. |
-| `featureId` | `Accessor<GeoFeature, string>` | `feature.id ?? feature.properties?.id ?? feature.properties?.name` | Resolver for each feature's stable id (used for `segments` lookup and hover identification). |
-| `value` | `(feature: GeoFeature) => number \| undefined` | — | Optional continuous accessor for choropleth colouring (mirrors heatmap's `z`). |
-| `excludeParts` | `(part: GeoGeometry, feature: GeoFeature) => boolean` | — | Excludes matching geometry parts from rendering/hover (e.g. for inset markers). Return `true` to exclude. |
-| `segments` | `SegmentsConfig<GeoSegmentStyle>` | `[]` | Per-feature styling (keyed by `featureId`). |
-| `markers` | `GeoMarker[]` | `[]` | Array of markers: `graticule`, `sphere`, `dot`, `vector`, `link`, `contour`, `inset`, or custom `component`. |
-| `scales` | `GeoScalesConfig` | `{}` | Projection and colour scale config. |
-| `margins` | `MarginConfig` | `{}` | Top/right/bottom/left margin overrides. |
-| `tooltip` | `TooltipConfig<GeoFeature>` | — | Hover/click tooltip configuration. |
-| `styles` | `GeoStyles<TProps>` | — | Base map fill, choropleth ramp, tile layer, zoom, and click handlers. |
+| Prop           | Type                                                  | Default                                                            | Description                                                                                                       |
+| -------------- | ----------------------------------------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `width`        | `number`                                              | —                                                                  | Plot width in pixels.                                                                                             |
+| `height`       | `number`                                              | —                                                                  | Plot height in pixels.                                                                                            |
+| `data`         | `FeatureCollection \| Feature[] \| Topology`          | —                                                                  | GeoJSON (FeatureCollection or Feature array) or TopoJSON Topology.                                                |
+| `object`       | `string`                                              | —                                                                  | Required when `data` is a TopoJSON Topology — the key under `topology.objects` to extract.                        |
+| `featureId`    | `Accessor<GeoFeature, string>`                        | `feature.id ?? feature.properties?.id ?? feature.properties?.name` | Resolver for each feature's stable id (used for `segments` lookup and hover identification).                      |
+| `color`        | `(feature: GeoFeature) => number \| undefined`        | —                                                                  | Optional continuous accessor for choropleth colouring (mirrors heatmap's `color`), configured via `scales.color`. |
+| `excludeParts` | `(part: GeoGeometry, feature: GeoFeature) => boolean` | —                                                                  | Excludes matching geometry parts from rendering/hover (e.g. for inset markers). Return `true` to exclude.         |
+| `segments`     | `SegmentsConfig<GeoSegmentStyle>`                     | `[]`                                                               | Per-feature styling (keyed by `featureId`).                                                                       |
+| `markers`      | `GeoMarker[]`                                         | `[]`                                                               | Array of markers: `graticule`, `sphere`, `dot`, `vector`, `link`, `contour`, `inset`, or custom `component`.      |
+| `scales`       | `GeoScalesConfig`                                     | `{}`                                                               | Projection and colour scale config.                                                                               |
+| `margins`      | `MarginConfig`                                        | `{}`                                                               | Top/right/bottom/left margin overrides.                                                                           |
+| `tooltip`      | `TooltipConfig<GeoFeature>`                           | —                                                                  | Hover/click tooltip configuration.                                                                                |
+| `styles`       | `GeoStyles<TProps>`                                   | —                                                                  | Base map fill, choropleth ramp, tile layer, zoom, and click handlers.                                             |
 
 #### `BasePlotStyles` sub-properties (BarPlot, LinePlot, HeatmapPlot, PyramidPlot)
 
-| Sub-prop | Type | BarPlot default | HeatmapPlot default | LinePlot default | PyramidPlot default |
-| -------- | ---- | --------------- | ------------------- | ---------------- | ------------------- |
-| `styles.values.show` | `boolean` | `false` | `true` | `false` (last point) | `false` |
-| `styles.values.format` | `(v: number, seriesName: string) => string` | `v => \`${v}\`` | `v => \`${v}\`` | `(v, name) => \`${name} - ${v}\`` | `v => \`${v}\`` |
-| `styles.values.anchor` | `'outside' \| 'start' \| 'middle' \| 'end'` | `'outside'` | — | `'start'` | `'outside'` |
-| `styles.values.dx` | `number` | | | | |
-| `styles.values.dy` | `number` | | | | |
-| `styles.values.textAnchor` | `'start' \| 'end' \| 'middle'` | | `'middle'` | | |
-| `styles.values.lineAnchor` | `'top' \| 'bottom' \| 'middle'` | | `'middle'` | | |
-| `styles.values.rotate` | `number` | | | | |
-| `styles.values.class` | `string` | | | | |
-| `styles.values.textClass` | `string` | | | | |
-| `styles.colors.min` | `string` | — | cfg `continuous.min` | — | — |
-| `styles.colors.max` | `string` | — | cfg `continuous.max` | — | — |
-| `styles.colors.left` | `string` | — | — | — | palette index 0 |
-| `styles.colors.right` | `string` | — | — | — | palette index 1 |
+| Sub-prop                   | Type                                        | BarPlot default | HeatmapPlot default | LinePlot default                  | PyramidPlot default |
+| -------------------------- | ------------------------------------------- | --------------- | ------------------- | --------------------------------- | ------------------- |
+| `styles.values.show`       | `boolean`                                   | `false`         | `true`              | `false` (last point)              | `false`             |
+| `styles.values.format`     | `(v: number, seriesName: string) => string` | `v => \`${v}\`` | `v => \`${v}\``     | `(v, name) => \`${name} - ${v}\`` | `v => \`${v}\``     |
+| `styles.values.anchor`     | `'outside' \| 'start' \| 'middle' \| 'end'` | `'outside'`     | —                   | `'start'`                         | `'outside'`         |
+| `styles.values.dx`         | `number`                                    |                 |                     |                                   |                     |
+| `styles.values.dy`         | `number`                                    |                 |                     |                                   |                     |
+| `styles.values.textAnchor` | `'start' \| 'end' \| 'middle'`              |                 | `'middle'`          |                                   |                     |
+| `styles.values.lineAnchor` | `'top' \| 'bottom' \| 'middle'`             |                 | `'middle'`          |                                   |                     |
+| `styles.values.rotate`     | `number`                                    |                 |                     |                                   |                     |
+| `styles.values.class`      | `string`                                    |                 |                     |                                   |                     |
+| `styles.values.textClass`  | `string`                                    |                 |                     |                                   |                     |
+
+PyramidPlot has no `styles.colors` — its default coloring is the same per-series-name palette cycling every other axis-based plot kind uses (see [Channels: `color` and `grouping`](#channels-color-and-grouping) below). Override it with `scales.color` (a `Record<string, string>` scheme keyed by series name covers the common "one color per side" case) or a `segments` entry keyed by series name.
 
 #### `GeoStyles` sub-properties (GeoPlot)
 
-| Sub-prop | Type | Default | Description |
-| -------- | ---- | ------- | ----------- |
-| `styles.fill` | `string` | palette[0] | Base map fill for features not styled by `segments` or choropleth. |
-| `styles.fillOpacity` | `number` | `1` | Base map fill opacity. |
-| `styles.stroke` | `string` | cfg `axis.color` | Base map feature stroke colour. |
-| `styles.strokeWidth` | `number` | `0.5` | Base map feature stroke width. |
-| `styles.colors.min` | `string` | cfg `continuous.min` | Choropleth ramp minimum colour (when `value` is provided). |
-| `styles.colors.max` | `string` | cfg `continuous.max` | Choropleth ramp maximum colour (when `value` is provided). |
-| `styles.tileLayer` | `GeoTileLayerConfig` | — | XYZ raster basemap config (URL, opacity, zoom range). Mercator-family projections only. |
-| `styles.zoom` | `boolean \| GeoZoomConfig` | `false` | Enable/configure drag-pan + scroll-zoom (`false` = static map). |
-| `styles.onFeatureClick` | `(feature: GeoFeature, event: Event) => void` | — | Click handler for base-map features. |
+| Sub-prop                | Type                                          | Default          | Description                                                                             |
+| ----------------------- | --------------------------------------------- | ---------------- | --------------------------------------------------------------------------------------- |
+| `styles.fill`           | `string`                                      | palette[0]       | Base map fill for features not styled by `segments` or choropleth.                      |
+| `styles.fillOpacity`    | `number`                                      | `1`              | Base map fill opacity.                                                                  |
+| `styles.stroke`         | `string`                                      | cfg `axis.color` | Base map feature stroke colour.                                                         |
+| `styles.strokeWidth`    | `number`                                      | `0.5`            | Base map feature stroke width.                                                          |
+| `styles.tileLayer`      | `GeoTileLayerConfig`                          | —                | XYZ raster basemap config (URL, opacity, zoom range). Mercator-family projections only. |
+| `styles.zoom`           | `boolean \| GeoZoomConfig`                    | `false`          | Enable/configure drag-pan + scroll-zoom (`false` = static map).                         |
+| `styles.onFeatureClick` | `(feature: GeoFeature, event: Event) => void` | —                | Click handler for base-map features.                                                    |
 
 #### Scales: `AxisBasedScalesConfig` (x/y plots) vs `GeoScalesConfig` (GeoPlot)
 
-X/Y plots use `AxisBasedScalesConfig` with `x`, `y`, `z` axis configurations. GeoPlot uses `GeoScalesConfig` with projection and colour settings instead. `ScalesConfig` is the union of both (`AxisBasedScalesConfig | GeoScalesConfig`) — each plot kind's own `scales` prop narrows to whichever one applies to it.
+X/Y plots use `AxisBasedScalesConfig` with `x`/`y` axis configurations plus every _channel_ (see [Channels: `color` and `grouping`](#channels-color-and-grouping) below). GeoPlot uses `GeoScalesConfig` — just the channels, plus `projection` (no x/y axis pair). `ScalesConfig` is the union of both (`AxisBasedScalesConfig | GeoScalesConfig`) — each plot kind's own `scales` prop narrows to whichever one applies to it.
 
-| Prop | AxisBasedScalesConfig (BarPlot, LinePlot, HeatmapPlot, PyramidPlot) | GeoScalesConfig (GeoPlot) |
-| ---- | ------- | ------- |
-| `x` | ✅ (AxisScale) | ❌ |
-| `y` | ✅ (AxisScale) | ❌ |
-| `z` | ✅ (AxisScale) | ❌ |
-| `projection` | ❌ | ✅ (GeoProjectionConfig) |
-| `color` | ❌ | ✅ (`{ domain?: [number, number] }`) |
+| Prop         | AxisBasedScalesConfig (BarPlot, LinePlot, HeatmapPlot, PyramidPlot) | GeoScalesConfig (GeoPlot) |
+| ------------ | ------------------------------------------------------------------- | ------------------------- |
+| `x`          | ✅ (AxisScale)                                                      | ❌                        |
+| `y`          | ✅ (AxisScale)                                                      | ❌                        |
+| `projection` | ❌                                                                  | ✅ (GeoProjectionConfig)  |
+| `color`      | ✅ (`ColorScaleConfig`)                                             | ✅ (`ColorScaleConfig`)   |
+| `grouping`   | ✅ (`GroupingScaleConfig`)                                          | ❌                        |
+
+#### Channels: `color` and `grouping`
+
+Every axis-based plot kind (BarPlot, LinePlot, HeatmapPlot, PyramidPlot) — and GeoPlot for `color` — accepts these two mapping-layer props, each configured by the matching `scales.<name>` entry:
+
+- **`color`** — the value/colour channel. `scales.color` (`ColorScaleConfig`: `{ domain?, scheme?, pivot?, unknown? }`) configures the ramp: `domain` is `[min, max]` for a continuous value or a category list, `scheme` is a named [d3-scale-chromatic](https://d3js.org/d3-scale-chromatic) ramp (e.g. `'turbo'`), 2+ literal colours to interpolate across, or a `Record<string, string>` category → colour map, `pivot` splits an array `scheme` into a diverging ramp at that domain value, `unknown` is the fallback colour for a missing/unmapped value. This package always resolves its own ramp per consumer — it never routes through svelteplot's single shared `color` scale — so a plot's own `scales.color` and a `dot` marker's own `color`/`scales` (see the Markers section) can coexist as two fully independent ramps in the same plot.
+- **`grouping`** — the structural series-splitting key for BarPlot/LinePlot/PyramidPlot (not HeatmapPlot/GeoPlot, which have no series concept). Splits flat `data` into one series per distinct value. **When `grouping` is unset but `color` is given, `color` is used as the grouping key too** — the common case, where one accessor both groups and colours series exactly like a single `z` prop used to in earlier versions. `scales.grouping` (`GroupingScaleConfig`: `{ reverse?, seriesLayout?, seriesPadding? }`) configures how the resulting groups are laid out — `reverse` flips which group sorts first (e.g. PyramidPlot's left/right side order), `seriesLayout`/`seriesPadding` control how BarPlot arranges multiple series sharing one category (`'overlap'` default, `'grouped'` side-by-side, or `'stacked'`). This is layout/ordering configuration, not a colour ramp — a different concern from `scales.color`, even when both apply to the same `grouping`-derived series.
+
+Split them when you want to group by one field and colour by another — e.g. group a dataset by `region` (`grouping: 'region'`) while colouring each point by a continuous `temperature` value (`color: 'temperature'`, `scales: { color: { domain: [0, 40] } }`).
 
 #### Props distribution across all plot kinds
 
-| Prop | BarPlot | HeatmapPlot | LinePlot | PyramidPlot | GeoPlot | Notes |
-| ---- | ------- | ----------- | -------- | ----------- | ------- | ----- |
-| `width` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots. |
-| `height` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots. |
-| `segments` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots; GeoPlot uses `SegmentsConfig<GeoSegmentStyle>`, others use their own `SegmentStyle` type. |
-| `markers` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots; GeoPlot uses `GeoMarker[]`, others use `Marker[]`. |
-| `margins` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots. |
-| `tooltip` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots; row type varies per plot. |
-| `styles` | ✅ | ✅ | ✅ | ✅ | ✅ | Common; type is `BasePlotStyles` for x/y plots, `GeoStyles<TProps>` for GeoPlot. |
-| `scales` | ✅ | ✅ | ✅ | ✅ | ✅ | Common; type is `AxisBasedScalesConfig<TData>` for x/y plots, `GeoScalesConfig` for GeoPlot. |
-| `series` | ✅ | ✅ | ✅ | ✅ | ❌ | X/Y plots only (mutually exclusive with `data`/`x`/`y`/`z`). |
-| `data` | ✅ (TData[]) | ✅ (TData[]) | ✅ (TData[]) | ✅ (TData[]) | ✅ (FeatureCollection \| Feature[] \| Topology) | Common; data shape differs — x/y plots use flat rows, GeoPlot uses geo features. |
-| `x` | ✅ | ✅ | ✅ | ✅ | ❌ | X/Y plots only. |
-| `y` | ✅ | ✅ | ✅ | ✅ | ❌ | X/Y plots only. |
-| `z` | ✅ | ✅ | ✅ | ✅ | ❌ | X/Y plots only (used as series selector in bar/line/pyramid, value accessor in heatmap). |
-| `object` | ❌ | ❌ | ❌ | ❌ | ✅ (optional) | GeoPlot only; required when `data` is a TopoJSON Topology. |
-| `featureId` | ❌ | ❌ | ❌ | ❌ | ✅ (optional) | GeoPlot only; resolves feature identity for `segments` lookup and hover. |
-| `value` | ❌ | ❌ | ❌ | ❌ | ✅ (optional) | GeoPlot only; drives choropleth colouring (analogous to heatmap's `z`). |
-| `excludeParts` | ❌ | ❌ | ❌ | ❌ | ✅ (optional) | GeoPlot only; filters geometry parts from rendering. |
+| Prop           | BarPlot      | HeatmapPlot  | LinePlot     | PyramidPlot  | GeoPlot                                         | Notes                                                                                                                                                  |
+| -------------- | ------------ | ------------ | ------------ | ------------ | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `width`        | ✅           | ✅           | ✅           | ✅           | ✅                                              | Common to all plots.                                                                                                                                   |
+| `height`       | ✅           | ✅           | ✅           | ✅           | ✅                                              | Common to all plots.                                                                                                                                   |
+| `segments`     | ✅           | ✅           | ✅           | ✅           | ✅                                              | Common to all plots; GeoPlot uses `SegmentsConfig<GeoSegmentStyle>`, others use their own `SegmentStyle` type.                                         |
+| `markers`      | ✅           | ✅           | ✅           | ✅           | ✅                                              | Common to all plots; GeoPlot uses `GeoMarker[]`, others use `Marker[]`.                                                                                |
+| `margins`      | ✅           | ✅           | ✅           | ✅           | ✅                                              | Common to all plots.                                                                                                                                   |
+| `tooltip`      | ✅           | ✅           | ✅           | ✅           | ✅                                              | Common to all plots; row type varies per plot.                                                                                                         |
+| `styles`       | ✅           | ✅           | ✅           | ✅           | ✅                                              | Common; type is `BasePlotStyles` for x/y plots, `GeoStyles<TProps>` for GeoPlot.                                                                       |
+| `scales`       | ✅           | ✅           | ✅           | ✅           | ✅                                              | Common; type is `AxisBasedScalesConfig<TData>` for x/y plots, `GeoScalesConfig` for GeoPlot.                                                           |
+| `series`       | ✅           | ✅           | ✅           | ✅           | ❌                                              | X/Y plots only (mutually exclusive with `data`/`x`/`y`/`grouping`/`color`).                                                                            |
+| `data`         | ✅ (TData[]) | ✅ (TData[]) | ✅ (TData[]) | ✅ (TData[]) | ✅ (FeatureCollection \| Feature[] \| Topology) | Common; data shape differs — x/y plots use flat rows, GeoPlot uses geo features.                                                                       |
+| `x`            | ✅           | ✅           | ✅           | ✅           | ❌                                              | X/Y plots only.                                                                                                                                        |
+| `y`            | ✅           | ✅           | ✅           | ✅           | ❌                                              | X/Y plots only.                                                                                                                                        |
+| `grouping`     | ✅           | ❌           | ✅           | ✅           | ❌                                              | Series selector — Bar/Line/Pyramid only; falls back to `color` when unset.                                                                             |
+| `color`        | ✅           | ✅           | ✅           | ✅           | ✅ (optional)                                   | The value/colour channel everywhere — series selector-or-colourer in Bar/Line/Pyramid, per-cell value in Heatmap, per-feature choropleth value in Geo. |
+| `object`       | ❌           | ❌           | ❌           | ❌           | ✅ (optional)                                   | GeoPlot only; required when `data` is a TopoJSON Topology.                                                                                             |
+| `featureId`    | ❌           | ❌           | ❌           | ❌           | ✅ (optional)                                   | GeoPlot only; resolves feature identity for `segments` lookup and hover.                                                                               |
+| `excludeParts` | ❌           | ❌           | ❌           | ❌           | ✅ (optional)                                   | GeoPlot only; filters geometry parts from rendering.                                                                                                   |
 
 ---
 
 ### Chart props
 
-| Prop | Type | Default | BarChart | HeatmapChart | LineChart | PyramidChart |
-| ---- | ---- | ------- | -------- | ------------ | --------- | ------------ |
-| `width` | `number` | — | ✅ | ✅ | ✅ | ✅ |
-| `height` | `number` | — | ✅ | ✅ | ✅ | ✅ |
-| `data` | `TRow[]` | — | ✅ | ✅ | ✅ | ✅ |
-| `x` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
-| `y` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
-| `z` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
-| `title` | `string` | | ✅ | ✅ | ✅ | ✅ |
-| `subtitle` | `string` | | ✅ | ✅ | ✅ | ✅ |
-| `caption` | `string` | | ✅ | ✅ | ✅ | ✅ |
-| `header` | `Snippet` | | ✅ | ✅ | ✅ | ✅ |
-| `footer` | `Snippet` | | ✅ | ✅ | ✅ | ✅ |
-| `legend` | `LegendSection[]` | | ✅ | ✅ | ✅ | ✅ |
-| `segments` | `SegmentsConfig<TStyle>` | `[]` | ✅ | ✅ | ✅ | ✅ |
-| `markers` | `Marker[]` | `[]` | ✅ | ✅ | ✅ | ✅ |
-| `scales` | `AxisBasedScalesConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
-| `margins` | `MarginConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
-| `facet` | `FacetConfig` | | ✅ | ✅ | ✅ | ✅ |
-| `timeline` | `TimelineConfig` | | ✅ | ✅ | ✅ | ✅ |
-| `tooltip` | `TooltipProp` | | ✅ | ✅ | ✅ | ✅ |
-| `styles` | `BasePlotStyles` | | ✅ | ✅ | ✅ | ✅ |
+| Prop       | Type                     | Default | BarChart      | HeatmapChart      | LineChart     | PyramidChart                                          |
+| ---------- | ------------------------ | ------- | ------------- | ----------------- | ------------- | ----------------------------------------------------- |
+| `width`    | `number`                 | —       | ✅            | ✅                | ✅            | ✅                                                    |
+| `height`   | `number`                 | —       | ✅            | ✅                | ✅            | ✅                                                    |
+| `data`     | `TRow[]`                 | —       | ✅            | ✅                | ✅            | ✅                                                    |
+| `x`        | `Accessor`               | —       | ✅            | ✅                | ✅            | ✅                                                    |
+| `y`        | `Accessor`               | —       | ✅            | ✅                | ✅            | ✅                                                    |
+| `grouping` | `Accessor`               | —       | ✅ (optional) | ❌                | ✅ (optional) | ✅ (optional)                                         |
+| `color`    | `Accessor`               | —       | ✅ (optional) | ✅ (**required**) | ✅ (optional) | ✅ (**required** — drives left/right side assignment) |
+| `title`    | `string`                 |         | ✅            | ✅                | ✅            | ✅                                                    |
+| `subtitle` | `string`                 |         | ✅            | ✅                | ✅            | ✅                                                    |
+| `caption`  | `string`                 |         | ✅            | ✅                | ✅            | ✅                                                    |
+| `header`   | `Snippet`                |         | ✅            | ✅                | ✅            | ✅                                                    |
+| `footer`   | `Snippet`                |         | ✅            | ✅                | ✅            | ✅                                                    |
+| `legend`   | `LegendSection[]`        |         | ✅            | ✅                | ✅            | ✅                                                    |
+| `segments` | `SegmentsConfig<TStyle>` | `[]`    | ✅            | ✅                | ✅            | ✅                                                    |
+| `markers`  | `Marker[]`               | `[]`    | ✅            | ✅                | ✅            | ✅                                                    |
+| `scales`   | `AxisBasedScalesConfig`  | `{}`    | ✅            | ✅                | ✅            | ✅                                                    |
+| `margins`  | `MarginConfig`           | `{}`    | ✅            | ✅                | ✅            | ✅                                                    |
+| `facet`    | `FacetConfig`            |         | ✅            | ✅                | ✅            | ✅                                                    |
+| `timeline` | `TimelineConfig`         |         | ✅            | ✅                | ✅            | ✅                                                    |
+| `tooltip`  | `TooltipProp`            |         | ✅            | ✅                | ✅            | ✅                                                    |
+| `styles`   | `BasePlotStyles`         |         | ✅            | ✅                | ✅            | ✅                                                    |
 
 `header` and `footer` are Svelte 5 snippets that replace the string props when richer markup is needed (custom styles, logos, links, etc.). When `header` is provided it takes full precedence over `title`/`subtitle`; when `footer` is provided it takes full precedence over `caption`. Use the natural snippet syntax:
 
 ```svelte
 <LineChart ...>
-  {#snippet header()}
-    <div style="display:flex; justify-content:space-between">
-      <h3 style="color:#2563eb">My Chart</h3>
-      <img src="/logo.svg" alt="Logo" />
-    </div>
-  {/snippet}
+	{#snippet header()}
+		<div style="display:flex; justify-content:space-between">
+			<h3 style="color:#2563eb">My Chart</h3>
+			<img src="/logo.svg" alt="Logo" />
+		</div>
+	{/snippet}
 
-  {#snippet footer()}
-    <small>Source: <a href="...">Dataset</a> · Updated Q3 2024</small>
-  {/snippet}
+	{#snippet footer()}
+		<small>Source: <a href="...">Dataset</a> · Updated Q3 2024</small>
+	{/snippet}
 </LineChart>
 ```
 
-See the [BasePlotStyles sub-properties table](#baseplotstyles-sub-properties-barplot-lineplot-heatmapplot-pyramidplot) above — charts accept the same `styles` shape and pass it through to their underlying plot.  
+See the [BasePlotStyles sub-properties table](#baseplotstyles-sub-properties-barplot-lineplot-heatmapplot-pyramidplot) above — charts accept the same `styles` shape and pass it through to their underlying plot.
 
 ---
 
@@ -263,29 +270,29 @@ See the [BasePlotStyles sub-properties table](#baseplotstyles-sub-properties-bar
 
 The `segments` prop separates data ranges from visual styling. Every plot kind shares the same underlying types; the style shape (`TStyle`) differs per mark.
 
-| Plot | `segments` type | Key structure | Lookup |
-| ---- | --------------- | ------------- | ------ |
-| `LinePlot` / `LineChart` | `SegmentsConfig<LineSegmentStyle>` | Named keys (series names) or `'default'` | By series name (`z` accessor or series index). |
-| `BarPlot` / `BarChart` | `SegmentsConfig<BarSegmentStyle>` | Named keys (series names) or `'default'` | By series name (`z` accessor or series index). |
-| `PyramidPlot` / `PyramidChart` | `SegmentsConfig<BarSegmentStyle>` | Named keys (series names) or `'default'` | By series name (`z` accessor or series index). |
-| `HeatmapPlot` / `HeatmapChart` | `SegmentsConfig<CellSegmentStyle>` | `'default'` key only | All cells (can be restricted by `areas` coordinates). |
-| `GeoPlot` | `SegmentsConfig<GeoSegmentStyle>` | Named keys (feature ids) or `'default'` | By feature id (`featureId` accessor or derived from properties). |
+| Plot                           | `segments` type                    | Key structure                            | Lookup                                                           |
+| ------------------------------ | ---------------------------------- | ---------------------------------------- | ---------------------------------------------------------------- |
+| `LinePlot` / `LineChart`       | `SegmentsConfig<LineSegmentStyle>` | Named keys (series names) or `'default'` | By series name (`grouping`/`color` accessor or series index).    |
+| `BarPlot` / `BarChart`         | `SegmentsConfig<BarSegmentStyle>`  | Named keys (series names) or `'default'` | By series name (`grouping`/`color` accessor or series index).    |
+| `PyramidPlot` / `PyramidChart` | `SegmentsConfig<BarSegmentStyle>`  | Named keys (series names) or `'default'` | By series name (`grouping`/`color` accessor or series index).    |
+| `HeatmapPlot` / `HeatmapChart` | `SegmentsConfig<CellSegmentStyle>` | `'default'` key only                     | All cells (can be restricted by `areas` coordinates).            |
+| `GeoPlot`                      | `SegmentsConfig<GeoSegmentStyle>`  | Named keys (feature ids) or `'default'`  | By feature id (`featureId` accessor or derived from properties). |
 
 **Segment styles by plot:**
 
-| SegmentStyle type | Supports | Plot(s) |
-| --- | --- | --- |
-| `LineSegmentStyle` | `stroke` (line), `dots` (endpoint markers) | `LinePlot` / `LineChart` |
-| `BarSegmentStyle` | `fill`, `fillOpacity` | `BarPlot` / `BarChart`, `PyramidPlot` / `PyramidChart` |
-| `CellSegmentStyle` | `fill`, `fillOpacity`, `stroke`, `strokeWidth` | `HeatmapPlot` / `HeatmapChart` |
-| `GeoSegmentStyle` | `fill`, `fillOpacity`, `stroke`, `strokeWidth` | `GeoPlot` |
+| SegmentStyle type  | Supports                                       | Plot(s)                                                |
+| ------------------ | ---------------------------------------------- | ------------------------------------------------------ |
+| `LineSegmentStyle` | `stroke` (line), `dots` (endpoint markers)     | `LinePlot` / `LineChart`                               |
+| `BarSegmentStyle`  | `fill`, `fillOpacity`                          | `BarPlot` / `BarChart`, `PyramidPlot` / `PyramidChart` |
+| `CellSegmentStyle` | `fill`, `fillOpacity`, `stroke`, `strokeWidth` | `HeatmapPlot` / `HeatmapChart`                         |
+| `GeoSegmentStyle`  | `fill`, `fillOpacity`, `stroke`, `strokeWidth` | `GeoPlot`                                              |
 
 #### Core types
 
 ```ts
-type Range           = { from?: AxisValue; to?: AxisValue };  // inclusive on both sides
-type Area            = { x?: Range; y?: Range };              // 2-D rectangular region
-type Segment<TStyle> = { areas?: Area[]; style?: TStyle };
+type Range = { from?: AxisValue; to?: AxisValue }; // inclusive on both sides
+type Area = { x?: Range; y?: Range }; // 2-D rectangular region
+type Segment<TStyle> = { areas?: Area[]; styles?: TStyle };
 ```
 
 A **`Segment`** matches a data point (or heatmap cell) when the point falls inside **any** of its `areas`. Omitting `areas` creates a **catch-all** that matches every data point — but catch-alls are always evaluated **last**, regardless of their position in the list, so area-specific segments always win. This lets a catch-all placed first act as a fallback baseline that highlighted ranges override.
@@ -294,23 +301,13 @@ An **`Area`** restricts by x, y, or both. Both bounds of a `Range` are **inclusi
 
 #### `Segments` structure
 
-`segments` is always an **array of groups**. Each group is a plain object whose keys map to `Segment[]` lists:
+`segments` is a plain object: each key is a series name (or feature id, for `GeoPlot`) — or `'default'` — mapped to that key's own `Segment[]` list.
 
 ```ts
-// 'default' key — applies its segments to every series
-type DefaultSegmentsMap<TStyle>     = { default: Segment<TStyle>[] };
-
-// named keys — applies segments only to the named series
-type SeriesAwareSegmentsMap<TStyle> = Record<string, Segment<TStyle>[]>;
-
-// one element of the array — either form, or a mix of both key types
-type SegmentsStyle<TStyle> = DefaultSegmentsMap<TStyle> | SeriesAwareSegmentsMap<TStyle>;
-
-// the prop type: an ordered list of groups
-type Segments<TStyle> = SegmentsStyle<TStyle>[];
+type SegmentsConfig<TStyle> = Record<string, Segment<TStyle>[]>;
 ```
 
-Having multiple groups lets you organise segments by concern — for example one group for per-series stroke colours and a second for shared dot markers applied via `'default'`. Groups are processed in order and their resolved segments are concatenated per series before evaluation.
+`'default'`'s own segments apply to every series/feature; a named key's segments apply only to that one. Both can be present at once — a named key's segments are evaluated after `'default'`'s, so a series-specific entry wins over the shared baseline on a match, while everything `'default'` doesn't override still applies.
 
 #### Examples
 
@@ -318,37 +315,43 @@ Having multiple groups lets you organise segments by concern — for example one
 
 ```svelte
 <LinePlot
-  {width} {height}
-  series={[{ name: 'gdp', x: 'year', y: 'value', data: GDP }]}
-  segments={[
-    {
-      gdp: [
-        { style: { stroke: { stroke: '#94a3b8', strokeWidth: 1 } } },
-        { areas: [{ x: { from: 2008, to: 2010 } }],
-          style: { stroke: { stroke: '#ef4444', strokeWidth: 3 } } },
-      ],
-    },
-  ]}
+	{width}
+	{height}
+	series={[{ name: 'gdp', x: 'year', y: 'value', data: GDP }]}
+	segments={{
+		gdp: [
+			{ styles: { stroke: { stroke: '#94a3b8', strokeWidth: 1 } } },
+			{
+				areas: [{ x: { from: 2008, to: 2010 } }],
+				styles: { stroke: { stroke: '#ef4444', strokeWidth: 3 } }
+			}
+		]
+	}}
 />
 ```
 
-**Line chart — per-series baseline colours + shared dot markers (two-group approach):**
+**Line chart — per-series baseline colours + shared dot markers (named keys plus `'default'` in the same object):**
 
 ```svelte
 <LinePlot
-  {width} {height}
-  data={LIFE_EXPECTANCY} x="year" y="value" z="sex"
-  segments={[
-    // Group 1: per-series catch-all stroke colours
-    { female: [{ style: { stroke: { stroke: 'steelblue' } } }],
-      male:   [{ style: { stroke: { stroke: 'tomato'    } } }] },
-    // Group 2: dots for all series in a specific range
-    { default: [
-        { areas: [{ x: { from: 2010, to: 2012 } }],
-          style: { dots: { dotRadius: 5, dotSymbol: 'circle' } } },
-      ],
-    },
-  ]}
+	{width}
+	{height}
+	data={LIFE_EXPECTANCY}
+	x="year"
+	y="value"
+	color="sex"
+	segments={{
+		// Per-series catch-all stroke colours.
+		female: [{ styles: { stroke: { stroke: 'steelblue' } } }],
+		male: [{ styles: { stroke: { stroke: 'tomato' } } }],
+		// 'default' applies to every series — dots for both, in a shared range.
+		default: [
+			{
+				areas: [{ x: { from: 2010, to: 2012 } }],
+				styles: { dots: { dotRadius: 5, dotSymbol: 'circle' } }
+			}
+		]
+	}}
 />
 ```
 
@@ -356,17 +359,24 @@ Having multiple groups lets you organise segments by concern — for example one
 
 ```svelte
 <HeatmapChart
-  {width} {height} {data} {x} {y} {z}
-  segments={[
-    {
-      default: [
-        { areas: [{ x: { from: 'Q1', to: 'Q1' } }, { x: { from: 'Q3', to: 'Q3' } }],
-          style: { stroke: '#f59e0b', strokeWidth: 2 } },
-        { areas: [{ x: { from: 'Q2', to: 'Q2' }, y: { from: 1, to: 2 } }],
-          style: { fill: '#ef4444', fillOpacity: 0.8 } },
-      ],
-    },
-  ]}
+	{width}
+	{height}
+	{data}
+	{x}
+	{y}
+	{color}
+	segments={{
+		default: [
+			{
+				areas: [{ x: { from: 'Q1', to: 'Q1' } }, { x: { from: 'Q3', to: 'Q3' } }],
+				styles: { stroke: '#f59e0b', strokeWidth: 2 }
+			},
+			{
+				areas: [{ x: { from: 'Q2', to: 'Q2' }, y: { from: 1, to: 2 } }],
+				styles: { fill: '#ef4444', fillOpacity: 0.8 }
+			}
+		]
+	}}
 />
 ```
 
@@ -374,28 +384,21 @@ Having multiple groups lets you organise segments by concern — for example one
 
 ```svelte
 <GeoPlot
-  {width} {height}
-  data={COUNTRIES_GEOJSON}
-  value={(f) => f.properties?.population}
-  segments={[
-    {
-      // Catch-all baseline (always evaluated last)
-      default: [
-        { style: { fillOpacity: 0.7, stroke: '#94a3b8' } },
-      ],
-      // Per-feature overrides (matched by feature id)
-      argentina: [
-        { style: { fill: '#3b82f6', fillOpacity: 0.9 } },
-      ],
-      brazil: [
-        { style: { fill: '#ef4444', fillOpacity: 0.9 } },
-      ],
-    },
-  ]}
+	{width}
+	{height}
+	data={COUNTRIES_GEOJSON}
+	color={(f) => f.properties?.population}
+	segments={{
+		// Catch-all baseline (always evaluated first, so a feature-specific entry wins).
+		default: [{ styles: { fillOpacity: 0.7, stroke: '#94a3b8' } }],
+		// Per-feature overrides (matched by feature id)
+		argentina: [{ styles: { fill: '#3b82f6', fillOpacity: 0.9 } }],
+		brazil: [{ styles: { fill: '#ef4444', fillOpacity: 0.9 } }]
+	}}
 />
 ```
 
-Omitting `segments` (or passing `[]`) renders every mark in its default palette colour.
+Omitting `segments` (or passing `{}`) renders every mark in its default palette colour.
 
 ---
 
@@ -407,12 +410,12 @@ The whole package reads its default styling — fonts, colours, spacing, legend/
 import { setConfiguration, getConfiguration, resetConfiguration } from '@fundar/data-chart-telling';
 
 setConfiguration({
-  font: '"Inter", sans-serif',
-  palette: ['#4f46e5', '#e6580d', '#16a34a'],
-  legend: { continuous: { label: { size: '0.8125rem', weight: 400 } } }
+	font: '"Inter", sans-serif',
+	palette: ['#4f46e5', '#e6580d', '#16a34a'],
+	legend: { continuous: { label: { size: '0.8125rem', weight: 400 } } }
 });
 
-getConfiguration();   // read the live, merged config
+getConfiguration(); // read the live, merged config
 resetConfiguration(); // restore shipped defaults
 ```
 
@@ -432,164 +435,164 @@ All types live in `src/lib/types/configuration/styling.ts`; all defaults in `src
 
 #### Base
 
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `font` | `string` | `'inherit'` | `--dct-font` |
-| `color` | `string` | `'currentColor'` | `--dct-fg` |
-| `background` | `string` | `'transparent'` | `--dct-bg` |
-| `border` | `string` | `'color-mix(in srgb, currentColor 15%, transparent)'` | `--dct-border` |
+| Field        | Type     | Default                                               | CSS variable   |
+| ------------ | -------- | ----------------------------------------------------- | -------------- |
+| `font`       | `string` | `'inherit'`                                           | `--dct-font`   |
+| `color`      | `string` | `'currentColor'`                                      | `--dct-fg`     |
+| `background` | `string` | `'transparent'`                                       | `--dct-bg`     |
+| `border`     | `string` | `'color-mix(in srgb, currentColor 15%, transparent)'` | `--dct-border` |
 
 #### Spacing
 
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `spacing.headerPadding` | `string` | `'0.75rem 0 1rem'` | `--dct-header-pad` |
-| `spacing.legendPadding` | `string` | `'0.75rem 0'` | `--dct-legend-pad` |
-| `spacing.captionPadding` | `string` | `'0.5rem 0'` | `--dct-caption-pad` |
-| `spacing.bleed` | `string` | `'12px'` | `--dct-bleed` |
+| Field                    | Type     | Default            | CSS variable        |
+| ------------------------ | -------- | ------------------ | ------------------- |
+| `spacing.headerPadding`  | `string` | `'0.75rem 0 1rem'` | `--dct-header-pad`  |
+| `spacing.legendPadding`  | `string` | `'0.75rem 0'`      | `--dct-legend-pad`  |
+| `spacing.captionPadding` | `string` | `'0.5rem 0'`       | `--dct-caption-pad` |
+| `spacing.bleed`          | `string` | `'12px'`           | `--dct-bleed`       |
 
 #### Text blocks: `title`, `subtitle`, `caption`
 
 Each is a `TextStyle` — `{ font, size, weight, color, leading, spacing }` — mapped to `--dct-{title|subtitle|caption}-{font|size|weight|color|leading|spacing}`. Shared base before per-block overrides: `font: 'inherit'`, `size: '1rem'`, `weight: 400`, `color: 'inherit'`, `leading: '1.3'`, `spacing: 'normal'`.
 
-| Block | Overrides its own default |
-| ----- | -------------------------- |
-| `title` | `size: '1.5rem'`, `weight: 500`, `leading: '1.2'` |
+| Block      | Overrides its own default                                                                   |
+| ---------- | ------------------------------------------------------------------------------------------- |
+| `title`    | `size: '1.5rem'`, `weight: 500`, `leading: '1.2'`                                           |
 | `subtitle` | `size: '1rem'`, `weight: 400`, `color: 'color-mix(in srgb, currentColor 85%, transparent)'` |
-| `caption` | `size: '0.75rem'`, `color: 'color-mix(in srgb, currentColor 75%, transparent)'` |
+| `caption`  | `size: '0.75rem'`, `color: 'color-mix(in srgb, currentColor 75%, transparent)'`             |
 
 #### Legend
 
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `legend.font` | `string` | `'inherit'` | `--dct-legend-font` |
-| `legend.size` | `string` | `'0.875rem'` | `--dct-legend-size` |
-| `legend.weight` | `number \| string` | `400` | `--dct-legend-weight` |
-| `legend.color` | `string` | `'inherit'` | `--dct-legend-color` |
-| `legend.titleSize` | `string` | `'0.875rem'` | `--dct-legend-title-size` |
-| `legend.titleWeight` | `number \| string` | `500` | `--dct-legend-title-weight` |
-| `legend.gap` | `string` (CSS `gap` shorthand) | `'0.5rem 2rem'` | `--dct-legend-gap` |
-| `legend.swatchSize` | `string` | `'1.25rem'` | `--dct-legend-swatch` |
-| `legend.disabledOpacity` | `number` | `0.12` | — (fallback for a legend-disabled series/value when a section doesn't set its own style) |
+| Field                    | Type                           | Default         | CSS variable                                                                             |
+| ------------------------ | ------------------------------ | --------------- | ---------------------------------------------------------------------------------------- |
+| `legend.font`            | `string`                       | `'inherit'`     | `--dct-legend-font`                                                                      |
+| `legend.size`            | `string`                       | `'0.875rem'`    | `--dct-legend-size`                                                                      |
+| `legend.weight`          | `number \| string`             | `400`           | `--dct-legend-weight`                                                                    |
+| `legend.color`           | `string`                       | `'inherit'`     | `--dct-legend-color`                                                                     |
+| `legend.titleSize`       | `string`                       | `'0.875rem'`    | `--dct-legend-title-size`                                                                |
+| `legend.titleWeight`     | `number \| string`             | `500`           | `--dct-legend-title-weight`                                                              |
+| `legend.gap`             | `string` (CSS `gap` shorthand) | `'0.5rem 2rem'` | `--dct-legend-gap`                                                                       |
+| `legend.swatchSize`      | `string`                       | `'1.25rem'`     | `--dct-legend-swatch`                                                                    |
+| `legend.disabledOpacity` | `number`                       | `0.12`          | — (fallback for a legend-disabled series/value when a section doesn't set its own style) |
 
 `legend.navButton` — prev/next arrows on an overflowing horizontal discrete section:
 
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `legend.navButton.background` | `string` | `'transparent'` | `--dct-legend-nav-bg` |
-| `legend.navButton.color` | `string` | `'currentColor'` | `--dct-legend-nav-color` |
-| `legend.navButton.size` | `string` | `'1.5rem'` | `--dct-legend-nav-size` |
-| `legend.navButton.fontSize` | `string` | `'1rem'` | `--dct-legend-nav-font-size` |
-| `legend.navButton.disabledOpacity` | `number` | `0.3` | `--dct-legend-nav-disabled-opacity` |
+| Field                              | Type     | Default          | CSS variable                        |
+| ---------------------------------- | -------- | ---------------- | ----------------------------------- |
+| `legend.navButton.background`      | `string` | `'transparent'`  | `--dct-legend-nav-bg`               |
+| `legend.navButton.color`           | `string` | `'currentColor'` | `--dct-legend-nav-color`            |
+| `legend.navButton.size`            | `string` | `'1.5rem'`       | `--dct-legend-nav-size`             |
+| `legend.navButton.fontSize`        | `string` | `'1rem'`         | `--dct-legend-nav-font-size`        |
+| `legend.navButton.disabledOpacity` | `number` | `0.3`            | `--dct-legend-nav-disabled-opacity` |
 
 `legend.continuous` — the gradient bar itself, its draggable handles, ticks, and labels:
 
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `legend.continuous.height` | `number` (px) | `20` | — |
-| `legend.continuous.barHeight` | `number` (px) | `12` | — |
-| `legend.continuous.barRadius` | `number` (px) | `2` | — |
-| `legend.continuous.handle.width` | `string` | `'6px'` | `--dct-continuous-handle-width` |
-| `legend.continuous.handle.height` | `string` | `'20px'` | `--dct-continuous-handle-height` |
-| `legend.continuous.handle.radius` | `string` | `'3px'` | `--dct-continuous-handle-radius` |
-| `legend.continuous.handle.fill` | `string` | `'currentColor'` | `--dct-continuous-handle-fill` |
-| `legend.continuous.handle.stroke` | `string` | `'var(--dct-bg, #fff)'` | `--dct-continuous-handle-stroke` |
-| `legend.continuous.handle.strokeWidth` | `string` | `'1.5px'` | `--dct-continuous-handle-stroke-width` |
-| `legend.continuous.tick.color` | `string` | `'currentColor'` | `--dct-continuous-tick-color` |
-| `legend.continuous.tick.width` | `string` | `'1px'` | `--dct-continuous-tick-width` |
-| `legend.continuous.tick.length` | `string` | `'6px'` | `--dct-continuous-tick-length` |
-| `legend.continuous.label.rotate` | `string` | `'0deg'` | `--dct-continuous-label-rotate` |
-| `legend.continuous.label.size` | `string` | `'0.875rem'` | `--dct-continuous-label-size` |
-| `legend.continuous.label.weight` | `number \| string` | `600` | `--dct-continuous-label-weight` |
+| Field                                  | Type               | Default                 | CSS variable                           |
+| -------------------------------------- | ------------------ | ----------------------- | -------------------------------------- |
+| `legend.continuous.height`             | `number` (px)      | `20`                    | —                                      |
+| `legend.continuous.barHeight`          | `number` (px)      | `12`                    | —                                      |
+| `legend.continuous.barRadius`          | `number` (px)      | `2`                     | —                                      |
+| `legend.continuous.handle.width`       | `string`           | `'6px'`                 | `--dct-continuous-handle-width`        |
+| `legend.continuous.handle.height`      | `string`           | `'20px'`                | `--dct-continuous-handle-height`       |
+| `legend.continuous.handle.radius`      | `string`           | `'3px'`                 | `--dct-continuous-handle-radius`       |
+| `legend.continuous.handle.fill`        | `string`           | `'currentColor'`        | `--dct-continuous-handle-fill`         |
+| `legend.continuous.handle.stroke`      | `string`           | `'var(--dct-bg, #fff)'` | `--dct-continuous-handle-stroke`       |
+| `legend.continuous.handle.strokeWidth` | `string`           | `'1.5px'`               | `--dct-continuous-handle-stroke-width` |
+| `legend.continuous.tick.color`         | `string`           | `'currentColor'`        | `--dct-continuous-tick-color`          |
+| `legend.continuous.tick.width`         | `string`           | `'1px'`                 | `--dct-continuous-tick-width`          |
+| `legend.continuous.tick.length`        | `string`           | `'6px'`                 | `--dct-continuous-tick-length`         |
+| `legend.continuous.label.rotate`       | `string`           | `'0deg'`                | `--dct-continuous-label-rotate`        |
+| `legend.continuous.label.size`         | `string`           | `'0.875rem'`            | `--dct-continuous-label-size`          |
+| `legend.continuous.label.weight`       | `number \| string` | `600`                   | `--dct-continuous-label-weight`        |
 
 `legend.continuous.label.overlap` — interactive mode only: once dragging brings the lo/hi handle labels too close to read side by side, both flip to read top-to-bottom instead of clipping or overlapping:
 
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `legend.continuous.label.overlap.enabled` | `boolean` | `true` | — (`false` always keeps both labels horizontal, however close together) |
-| `legend.continuous.label.overlap.margin` | `number` (px) | `4` | — (horizontal slack the two labels need before they're considered overlapping) |
-| `legend.continuous.label.overlap.rotate` | `string` | `'90deg'` | `--dct-continuous-label-overlap-rotate` (lo rotates by this; hi by its negation, via `calc(... * -1)`, so both still grow inward toward the bar) |
+| Field                                     | Type          | Default   | CSS variable                                                                                                                                     |
+| ----------------------------------------- | ------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `legend.continuous.label.overlap.enabled` | `boolean`     | `true`    | — (`false` always keeps both labels horizontal, however close together)                                                                          |
+| `legend.continuous.label.overlap.margin`  | `number` (px) | `4`       | — (horizontal slack the two labels need before they're considered overlapping)                                                                   |
+| `legend.continuous.label.overlap.rotate`  | `string`      | `'90deg'` | `--dct-continuous-label-overlap-rotate` (lo rotates by this; hi by its negation, via `calc(... * -1)`, so both still grow inward toward the bar) |
 
 #### Axis
 
 Consumed as plain numeric/boolean props by the underlying svelteplot axes — only `color` is also exposed as a CSS variable (used by non-plot axis-adjacent chrome).
 
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `axis.color` | `string` | `'currentColor'` | `--dct-axis-color` |
-| `axis.fontSize` | `number` | `14` | — |
-| `axis.labelFontSize` | `number` | `14` | — |
-| `axis.titleFontSize` | `number` | `14` | — |
-| `axis.xTickSize` | `number` | `5` | — |
-| `axis.yTickSize` | `number` | `5` | — |
-| `axis.xTickPadding` | `number` | `10` | — |
-| `axis.yTickPadding` | `number` | `10` | — |
-| `axis.grid` | `boolean` | `false` | — |
-| `axis.locale` | `string` | `'es-AR'` | — |
-| `axis.compactDisplay` | `'short' \| 'long'` | `'long'` | — (`'1 mil'` vs `'1 K'`) |
+| Field                 | Type                | Default          | CSS variable             |
+| --------------------- | ------------------- | ---------------- | ------------------------ |
+| `axis.color`          | `string`            | `'currentColor'` | `--dct-axis-color`       |
+| `axis.fontSize`       | `number`            | `14`             | —                        |
+| `axis.labelFontSize`  | `number`            | `14`             | —                        |
+| `axis.titleFontSize`  | `number`            | `14`             | —                        |
+| `axis.xTickSize`      | `number`            | `5`              | —                        |
+| `axis.yTickSize`      | `number`            | `5`              | —                        |
+| `axis.xTickPadding`   | `number`            | `10`             | —                        |
+| `axis.yTickPadding`   | `number`            | `10`             | —                        |
+| `axis.grid`           | `boolean`           | `false`          | —                        |
+| `axis.locale`         | `string`            | `'es-AR'`        | —                        |
+| `axis.compactDisplay` | `'short' \| 'long'` | `'long'`         | — (`'1 mil'` vs `'1 K'`) |
 
-`axis.locale`/`axis.compactDisplay` feed svelteplot's own automatic tick formatter — the one it falls back to on any axis without its own explicit `scales.x`/`scales.y.tickFormat`. Whether a given axis abbreviates at all (vs. spelling every digit out) stays svelteplot's own per-axis call, based on that axis's value range; these two only change the *wording* once it decides to. `axis.locale` updates a chart already on screen; `axis.compactDisplay` is read once when a chart mounts (it goes through svelteplot's own `setPlotDefaults` context hook, not a per-instance prop) and needs a remount to pick up a later change.
+`axis.locale`/`axis.compactDisplay` feed svelteplot's own automatic tick formatter — the one it falls back to on any axis without its own explicit `scales.x`/`scales.y.tickFormat`. Whether a given axis abbreviates at all (vs. spelling every digit out) stays svelteplot's own per-axis call, based on that axis's value range; these two only change the _wording_ once it decides to. `axis.locale` updates a chart already on screen; `axis.compactDisplay` is read once when a chart mounts (it goes through svelteplot's own `setPlotDefaults` context hook, not a per-instance prop) and needs a remount to pick up a later change.
 
 #### Tooltip
 
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `tooltip.background` | `string` | `'#111827'` | `--dct-tooltip-bg` |
-| `tooltip.color` | `string` | `'#ffffff'` | `--dct-tooltip-color` |
-| `tooltip.fontSize` | `string` | `'0.8125rem'` | `--dct-tooltip-size` |
-| `tooltip.padding` | `string` | `'0.5rem 0.75rem'` | `--dct-tooltip-pad` |
-| `tooltip.radius` | `string` | `'0.375rem'` | `--dct-tooltip-radius` |
-| `tooltip.border` | `string` | `'none'` | `--dct-tooltip-border` |
+| Field                | Type     | Default            | CSS variable           |
+| -------------------- | -------- | ------------------ | ---------------------- |
+| `tooltip.background` | `string` | `'#111827'`        | `--dct-tooltip-bg`     |
+| `tooltip.color`      | `string` | `'#ffffff'`        | `--dct-tooltip-color`  |
+| `tooltip.fontSize`   | `string` | `'0.8125rem'`      | `--dct-tooltip-size`   |
+| `tooltip.padding`    | `string` | `'0.5rem 0.75rem'` | `--dct-tooltip-pad`    |
+| `tooltip.radius`     | `string` | `'0.375rem'`       | `--dct-tooltip-radius` |
+| `tooltip.border`     | `string` | `'none'`           | `--dct-tooltip-border` |
 
 #### Plot geometry & colour (all JS-only — no CSS variables)
 
-| Field | Type | Default |
-| ----- | ---- | ------- |
-| `margins.top/right/bottom/left` | `number \| 'auto'` | `'auto'` each — lets svelteplot size that side to fit whatever it actually renders there; a number pins it exactly |
-| `palette` | `string[]` | `['#4f46e5', '#e6580d', '#16a34a', '#dc2626', '#0891b2', '#9333ea', '#ca8a04', '#db2777']` — categorical series colours |
-| `continuous.min` / `continuous.max` | `string` | `'#e0e7ff'` / `'#4f46e5'` — heatmap/choropleth gradient endpoints |
-| `continuous.labelColor` | `string` | `'#111827'` — on-cell label colour |
-| `line.strokeWidth` | `number` | `3` |
-| `line.dotRadius` | `number` | `4` |
-| `line.gap.stroke` / `line.gap.dots` | `StrokeStyle` / `DotStyle` | `{ strokeOpacity: 0.6, strokeDasharray: '4 4' }` / `{}` — fallback for `LinePlot`'s `styles.gaps` |
-| `line.valueLabels.elbowGap` | `number` | `10` — shortest leader-line lane distance before it bends |
-| `line.valueLabels.laneStep` | `number` | `7` — extra distance each subsequent lane sits out |
-| `line.valueLabels.labelGap` | `number` | `6` — clearance between the outermost lane and its label |
-| `line.valueLabels.connectorColor` | `string` | `'#94a3b8'` |
-| `line.valueLabels.connectorWidth` | `number` | `0.5` |
-| `bar.gap` | `AreaStyle` | `{ fillOpacity: 0.5 }` — fallback for `BarPlot`'s `styles.gaps` |
-| `bar.seriesPadding` | `number` (0–1) | `0.2` — fallback `scales.z.seriesPadding` for grouped series |
-| `bar.paddingInner` | `number` (0–1) | `0.15` — gap between category groups |
-| `bar.paddingOuter` | `number` (0–1) | `0.15` — gap before the first / after the last group |
-| `pyramid.gap` | `AreaStyle` | `{ fillOpacity: 0.5 }` — fallback for `PyramidPlot`'s `styles.gaps` |
-| `scatter.dotRadius` | `number` | `5` |
-| `timeline.thickness` | `number` | `60` |
-| `hover.rule` | `StrokeStyle` | `{ stroke: '#e6580d', strokeOpacity: 0.35, strokeWidth: 1.5, strokeDasharray: '4 4' }` — hover crosshair |
-| `hover.dot` | `DotStyle` | `{ dotRadius: 5, dotFill: 'currentColor' }` |
-| `hover.font` | `FontStyle` | `{ fill: 'currentColor', fontSize: 12, dy: -18 }` |
-| `hover.area` | `AreaStyle` | `{ fill: '#94a3b8', fillOpacity: 0.25 }` — band highlight on a band scale |
+| Field                               | Type                       | Default                                                                                                                 |
+| ----------------------------------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `margins.top/right/bottom/left`     | `number \| 'auto'`         | `'auto'` each — lets svelteplot size that side to fit whatever it actually renders there; a number pins it exactly      |
+| `palette`                           | `string[]`                 | `['#4f46e5', '#e6580d', '#16a34a', '#dc2626', '#0891b2', '#9333ea', '#ca8a04', '#db2777']` — categorical series colours |
+| `continuous.min` / `continuous.max` | `string`                   | `'#e0e7ff'` / `'#4f46e5'` — heatmap/choropleth gradient endpoints                                                       |
+| `continuous.labelColor`             | `string`                   | `'#111827'` — on-cell label colour                                                                                      |
+| `line.strokeWidth`                  | `number`                   | `3`                                                                                                                     |
+| `line.dotRadius`                    | `number`                   | `4`                                                                                                                     |
+| `line.gap.stroke` / `line.gap.dots` | `StrokeStyle` / `DotStyle` | `{ strokeOpacity: 0.6, strokeDasharray: '4 4' }` / `{}` — fallback for `LinePlot`'s `styles.gaps`                       |
+| `line.valueLabels.elbowGap`         | `number`                   | `10` — shortest leader-line lane distance before it bends                                                               |
+| `line.valueLabels.laneStep`         | `number`                   | `7` — extra distance each subsequent lane sits out                                                                      |
+| `line.valueLabels.labelGap`         | `number`                   | `6` — clearance between the outermost lane and its label                                                                |
+| `line.valueLabels.connectorColor`   | `string`                   | `'#94a3b8'`                                                                                                             |
+| `line.valueLabels.connectorWidth`   | `number`                   | `0.5`                                                                                                                   |
+| `bar.gap`                           | `AreaStyle`                | `{ fillOpacity: 0.5 }` — fallback for `BarPlot`'s `styles.gaps`                                                         |
+| `bar.seriesPadding`                 | `number` (0–1)             | `0.2` — fallback `scales.grouping.seriesPadding` for grouped series                                                     |
+| `bar.paddingInner`                  | `number` (0–1)             | `0.15` — gap between category groups                                                                                    |
+| `bar.paddingOuter`                  | `number` (0–1)             | `0.15` — gap before the first / after the last group                                                                    |
+| `pyramid.gap`                       | `AreaStyle`                | `{ fillOpacity: 0.5 }` — fallback for `PyramidPlot`'s `styles.gaps`                                                     |
+| `scatter.dotRadius`                 | `number`                   | `5`                                                                                                                     |
+| `timeline.thickness`                | `number`                   | `60`                                                                                                                    |
+| `hover.rule`                        | `StrokeStyle`              | `{ stroke: '#e6580d', strokeOpacity: 0.35, strokeWidth: 1.5, strokeDasharray: '4 4' }` — hover crosshair                |
+| `hover.dot`                         | `DotStyle`                 | `{ dotRadius: 5, dotFill: 'currentColor' }`                                                                             |
+| `hover.font`                        | `FontStyle`                | `{ fill: 'currentColor', fontSize: 12, dy: -18 }`                                                                       |
+| `hover.area`                        | `AreaStyle`                | `{ fill: '#94a3b8', fillOpacity: 0.25 }` — band highlight on a band scale                                               |
 
-`timeline.axisColor` / `timeline.activeColor` are the two exceptions in this group — they *do* have CSS variables (see below), since the timeline gutter is HTML chrome, not an SVG plot mark.
+`timeline.axisColor` / `timeline.activeColor` are the two exceptions in this group — they _do_ have CSS variables (see below), since the timeline gutter is HTML chrome, not an SVG plot mark.
 
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `timeline.axisColor` | `string` | `'currentColor'` | `--dct-timeline-axis` |
-| `timeline.activeColor` | `string` | `'#e6580d'` | `--dct-timeline-active` |
+| Field                  | Type     | Default          | CSS variable            |
+| ---------------------- | -------- | ---------------- | ----------------------- |
+| `timeline.axisColor`   | `string` | `'currentColor'` | `--dct-timeline-axis`   |
+| `timeline.activeColor` | `string` | `'#e6580d'`      | `--dct-timeline-active` |
 
 #### Facet (small multiples)
 
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `facet.indicator.background` | `string` | `'#111827'` | `--dct-facet-indicator-bg` |
-| `facet.indicator.color` | `string` | `'#ffffff'` | `--dct-facet-indicator-color` |
-| `facet.indicator.fontSize` | `string` | `'0.8125rem'` | `--dct-facet-indicator-size` |
-| `facet.indicator.padding` | `string` | `'0.125rem 0.5rem'` | `--dct-facet-indicator-pad` |
-| `facet.indicator.radius` | `string` | `'999px'` | `--dct-facet-indicator-radius` |
-| `facet.navButton.background` | `string` | `'#111827'` | `--dct-facet-nav-bg` |
-| `facet.navButton.color` | `string` | `'#ffffff'` | `--dct-facet-nav-color` |
-| `facet.navButton.size` | `string` | `'2rem'` | `--dct-facet-nav-btn-size` |
-| `facet.navButton.fontSize` | `string` | `'1.1rem'` | `--dct-facet-nav-font-size` |
-| `facet.navButton.disabledOpacity` | `number` | `0.3` | `--dct-facet-nav-disabled-opacity` |
+| Field                             | Type     | Default             | CSS variable                       |
+| --------------------------------- | -------- | ------------------- | ---------------------------------- |
+| `facet.indicator.background`      | `string` | `'#111827'`         | `--dct-facet-indicator-bg`         |
+| `facet.indicator.color`           | `string` | `'#ffffff'`         | `--dct-facet-indicator-color`      |
+| `facet.indicator.fontSize`        | `string` | `'0.8125rem'`       | `--dct-facet-indicator-size`       |
+| `facet.indicator.padding`         | `string` | `'0.125rem 0.5rem'` | `--dct-facet-indicator-pad`        |
+| `facet.indicator.radius`          | `string` | `'999px'`           | `--dct-facet-indicator-radius`     |
+| `facet.navButton.background`      | `string` | `'#111827'`         | `--dct-facet-nav-bg`               |
+| `facet.navButton.color`           | `string` | `'#ffffff'`         | `--dct-facet-nav-color`            |
+| `facet.navButton.size`            | `string` | `'2rem'`            | `--dct-facet-nav-btn-size`         |
+| `facet.navButton.fontSize`        | `string` | `'1.1rem'`          | `--dct-facet-nav-font-size`        |
+| `facet.navButton.disabledOpacity` | `number` | `0.3`               | `--dct-facet-nav-disabled-opacity` |
 
 ---
 

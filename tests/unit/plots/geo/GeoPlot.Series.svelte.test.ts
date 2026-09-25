@@ -38,7 +38,7 @@ describe('GeoPlot – featureId', () => {
       // '06' is Buenos Aires' own `properties.id` — the default featureId
       // chain (`feature.id ?? properties.id ?? properties.name`) picks this
       // up before falling through to any name field.
-      segments: { '06': [{ style: { fill: 'tomato' } }] },
+      segments: { '06': [{ styles: { fill: 'tomato' } }] },
     });
     const svg = await waitForSvg(container);
     const fills = [...svg.querySelectorAll('g.geo path, path.geo')].map(
@@ -53,7 +53,7 @@ describe('GeoPlot – featureId', () => {
       height: 300,
       data: ARGENTINA_PROVINCES,
       featureId: (f) => `province:${(f.properties as { nombre: string }).nombre}`,
-      segments: { 'province:Buenos Aires': [{ style: { fill: 'tomato' } }] },
+      segments: { 'province:Buenos Aires': [{ styles: { fill: 'tomato' } }] },
     });
     const svg = await waitForSvg(container);
     const fills = [...svg.querySelectorAll('g.geo path, path.geo')].map(

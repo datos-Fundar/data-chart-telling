@@ -72,7 +72,7 @@
   <DotMarker
     x={coords?.fromPt?.x ?? 0}
     y={coords?.fromPt?.y ?? 0}
-    style={{
+    styles={{
       dotRadius: 4,
       dotFill: marker.strokeStyle?.stroke,
       dotStroke: marker.strokeStyle?.stroke,
@@ -83,7 +83,7 @@
   <DotMarker
     x={coords?.toPt?.x ?? 0}
     y={coords?.toPt?.y ?? 0}
-    style={{
+    styles={{
       dotRadius: 4,
       dotFill: marker.strokeStyle?.stroke,
       dotStroke: marker.strokeStyle?.stroke,
@@ -95,7 +95,7 @@
     x={coords?.textPt?.x ?? 0}
     y={coords?.textPt?.y ?? 0}
     text={(marker.formatDiff ?? ((v: number) => v.toFixed(1)))(coords?.diff ?? 0)}
-    style={{
+    styles={{
       fontWeight: 'bold',
       fontSize: 14,
       textAnchor: 'middle',

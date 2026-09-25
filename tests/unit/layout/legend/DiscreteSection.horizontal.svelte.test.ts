@@ -11,7 +11,7 @@ import type { DiscreteLegendSection, LegendItem } from '$lib/types/layout/legend
 function longItems(count: number): LegendItem[] {
 	return Array.from({ length: count }, (_, i) => ({
 		name: `series-${i}`,
-		label: `Jurisdicción de prueba número ${i}`
+		label: `Test jurisdiction number ${i}`
 	}));
 }
 
@@ -21,7 +21,7 @@ function longItems(count: number): LegendItem[] {
 // exactly the gap needed to catch the container silently shrinking down to
 // hug whatever page happens to be showing.
 function shortItems(count: number): LegendItem[] {
-	return Array.from({ length: count }, (_, i) => ({ name: `s${i}`, label: `Ítem ${i}` }));
+	return Array.from({ length: count }, (_, i) => ({ name: `s${i}`, label: `Item ${i}` }));
 }
 
 function visibleContainer(container: Element): Element {
@@ -125,10 +125,10 @@ describe('DiscreteSection – layout: { type: "horizontal", maxRows: 1 } (defaul
 		expect(visibleLabels(container)).toEqual([items[0].label]);
 
 		const nextBtn = container.querySelector(
-			'button[aria-label="Página siguiente de referencias"]'
+			'button[aria-label="Next legend page"]'
 		) as HTMLButtonElement;
 		const prevBtn = container.querySelector(
-			'button[aria-label="Página anterior de referencias"]'
+			'button[aria-label="Previous legend page"]'
 		) as HTMLButtonElement;
 		expect(nextBtn).toBeTruthy();
 		expect(prevBtn.disabled).toBe(true);
@@ -177,7 +177,7 @@ describe('DiscreteSection – layout: { type: "horizontal", maxRows: 2 }', () =>
 		expect(visibleLabels(container)).toEqual([items[0].label, items[1].label]);
 
 		const nextBtn = container.querySelector(
-			'button[aria-label="Página siguiente de referencias"]'
+			'button[aria-label="Next legend page"]'
 		) as HTMLButtonElement;
 
 		nextBtn.click();
@@ -214,7 +214,7 @@ describe('DiscreteSection – regression: the paginated container must not shrin
 		expect(widthAtPage1).toBeGreaterThan(200);
 
 		const nextBtn = container.querySelector(
-			'button[aria-label="Página siguiente de referencias"]'
+			'button[aria-label="Next legend page"]'
 		) as HTMLButtonElement;
 
 		const seen: string[] = [...visibleLabels(container)];
@@ -247,7 +247,7 @@ describe('DiscreteSection – custom navButton snippet', () => {
 		const { container } = await render(DiscreteSectionWidthProbe, { section, width: 150 });
 
 		await waitForRows(container);
-		const nextBtn = container.querySelector('button[aria-label="Página siguiente de referencias"]');
+		const nextBtn = container.querySelector('button[aria-label="Next legend page"]');
 		expect(nextBtn).toBeTruthy();
 		expect(nextBtn?.textContent?.trim()).toBe('›');
 	});

@@ -127,10 +127,10 @@
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <path
         d={path(f as GeoJSON.Feature) ?? undefined}
-        fill={marker.style?.fill ?? defaultFill}
-        fill-opacity={marker.style?.fillOpacity}
-        stroke={marker.style?.stroke ?? 'currentColor'}
-        stroke-width={marker.style?.strokeWidth ?? 0.5}
+        fill={marker.styles?.fill ?? defaultFill}
+        fill-opacity={marker.styles?.fillOpacity}
+        stroke={marker.styles?.stroke ?? 'currentColor'}
+        stroke-width={marker.styles?.strokeWidth ?? 0.5}
         style="vector-effect: non-scaling-stroke"
         onpointerenter={marker.tooltip ? (e: PointerEvent) => onInsetFeaturePointer(e, f) : undefined}
         onpointermove={marker.tooltip ? (e: PointerEvent) => onInsetFeaturePointer(e, f) : undefined}

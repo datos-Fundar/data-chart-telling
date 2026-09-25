@@ -14,9 +14,8 @@ import type { ChartConfig } from '$lib/types/configuration/styling';
 type Row = { ageGroup: string; pct: number | null };
 
 const CTX: PyramidPlotCtx = {
-	cfg: {} as ChartConfig,
-	formatValue: (v) => `${v}`,
-	colorForSide: (side) => (side === 'left' ? 'blue' : 'orange')
+	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as ChartConfig,
+	formatValue: (v) => `${v}`
 };
 
 function series(name: string, side: 'left' | 'right', data: Row[]): PyramidSeries<Row> {
@@ -42,6 +41,7 @@ function build(
 		height: 300,
 		groupedSeries,
 		gapFillMaps: new Map(),
+		colorForSeries: (name: string) => (name === 'Female' ? 'blue' : 'orange'),
 		...overrides
 	};
 	return buildMarkers(state, { ...CTX, ...ctxOverrides }).markers!;
@@ -84,15 +84,15 @@ describe('buildMarkers – geometry', () => {
 });
 
 describe('buildMarkers – style resolution', () => {
-	test('falls back to the side color when a segment has none of its own', () => {
+	test('uses the series color when a segment has none of its own', () => {
 		const [marker] = build();
-		expect(marker.style?.fill).toBe('blue');
+		expect(marker.styles?.fill).toBe('blue');
 	});
 
-	test('a disabled-fill override wins over the segment/side color', () => {
+	test('a disabled-fill override wins over the series color', () => {
 		const [marker] = build({}, { disabledFillFor: () => ({ fill: 'gray', fillOpacity: 0.3 }) });
-		expect(marker.style?.fill).toBe('gray');
-		expect(marker.style?.fillOpacity).toBe(0.3);
+		expect(marker.styles?.fill).toBe('gray');
+		expect(marker.styles?.fillOpacity).toBe(0.3);
 	});
 });
 
@@ -105,7 +105,7 @@ describe('buildMarkers – gap fills', () => {
 			false
 		);
 		const gapFillMaps = new Map([
-			['Female', new Map([[female.data[0], { value: 5, kind: 'middle' as const, style: {} }]])]
+			['Female', new Map([[female.data[0], { value: 5, kind: 'middle' as const, styles: {} }]])]
 		]);
 		const markers = build({ groupedSeries, gapFillMaps });
 		expect(markers).toHaveLength(1);

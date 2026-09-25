@@ -13,7 +13,7 @@ export type GeoGraticuleMarkerConfig = {
   step?: number;
   stepX?: number;
   stepY?: number;
-  style?: StrokeStyle;
+  styles?: StrokeStyle;
   /** Renders behind the base map's own fill/stroke instead of on top of it (markers otherwise draw over the base map). */
   behind?: boolean;
 };
@@ -21,7 +21,7 @@ export type GeoGraticuleMarkerConfig = {
 /** The outer globe outline (for orthographic-type projections) — svelteplot's `Sphere`. */
 export type GeoSphereMarkerConfig = {
   type: 'sphere';
-  style?: StrokeStyle & { fill?: string; fillOpacity?: number };
+  styles?: StrokeStyle & { fill?: string; fillOpacity?: number };
   /** Renders behind the base map's own fill/stroke instead of on top of it — needed when `style.fill` is set. */
   behind?: boolean;
 };
@@ -39,7 +39,7 @@ export type GeoVectorMarkerConfig<TRow extends Record<string, unknown> = Record<
   rotate?: Accessor<TRow, number> | number;
   shape?: 'arrow' | 'spike' | 'arrow-filled';
   anchor?: 'start' | 'middle' | 'end';
-  style?: { fill?: string; stroke?: string; strokeWidth?: number };
+  styles?: { fill?: string; stroke?: string; strokeWidth?: number };
 };
 
 /**
@@ -55,7 +55,7 @@ export type GeoLinkMarkerConfig<TRow extends Record<string, unknown> = Record<st
   x2: Accessor<TRow, number>;
   y2: Accessor<TRow, number>;
   curve?: 'auto' | 'linear';
-  style?: StrokeStyle;
+  styles?: StrokeStyle;
 };
 
 /**
@@ -77,7 +77,7 @@ export type GeoContourMarkerConfig<TRow extends Record<string, unknown> = Record
   stroke?: 'value' | string;
   blur?: number;
   interpolate?: 'none' | 'nearest' | 'barycentric' | 'random-walk';
-  style?: { strokeWidth?: number; fillOpacity?: number; strokeOpacity?: number };
+  styles?: { strokeWidth?: number; fillOpacity?: number; strokeOpacity?: number };
   /** Masks the contour to just the base map's landmass (`'land'`) or water (`'ocean'`). */
   clip?: 'land' | 'ocean';
   /** Renders behind the base map's own fill/stroke instead of on top of it. */
@@ -93,7 +93,7 @@ export type GeoContourMarkerConfig<TRow extends Record<string, unknown> = Record
  */
 export type GeoHoverMarkerConfig = {
   type: 'geo-hover';
-  style?: AreaStyle;
+  styles?: AreaStyle;
 };
 
 /**
@@ -201,7 +201,7 @@ export type GeoInsetMarkerConfig<TProps extends Record<string, unknown> = Record
   height?: number;
   /** Gap between the inset box and the plot's own edge, in pixels. Defaults to `8`. */
   margin?: number;
-  style?: GeoSegmentStyle;
+  styles?: GeoSegmentStyle;
   /** Independent hover tooltip for just this inset's own rendered features — see `GeoInsetTooltipConfig`. */
   tooltip?: GeoInsetTooltipConfig;
 };

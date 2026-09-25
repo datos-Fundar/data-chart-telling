@@ -34,9 +34,9 @@
 <Geo
   class="link"
   data={linkFeatures}
-  stroke={marker.style?.stroke ?? 'currentColor'}
-  strokeWidth={marker.style?.strokeWidth ?? 1}
-  strokeOpacity={marker.style?.strokeOpacity}
-  strokeDasharray={marker.style?.strokeDasharray}
+  stroke={marker.styles?.stroke ?? 'currentColor'}
+  strokeWidth={marker.styles?.strokeWidth ?? 1}
+  strokeOpacity={marker.styles?.strokeOpacity}
+  strokeDasharray={marker.styles?.strokeDasharray}
   style="vector-effect: non-scaling-stroke"
 />

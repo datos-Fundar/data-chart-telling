@@ -21,18 +21,18 @@ export const MultipleDiscrete: Story = {
 		sections: [
 			{
 				type: 'discrete',
-				title: 'Región',
+				title: 'Region',
 				items: [
-					{ name: 'Norte', color: '#4f46e5', symbol: 'square' },
-					{ name: 'Sur', color: '#e6580d', symbol: 'square' }
+					{ name: 'North', color: '#4f46e5', symbol: 'square' },
+					{ name: 'South', color: '#e6580d', symbol: 'square' }
 				]
 			},
 			{
 				type: 'discrete',
-				title: 'Escenario',
+				title: 'Scenario',
 				items: [
-					{ name: 'Base', color: '#16a34a', symbol: 'line' },
-					{ name: 'Proyectado', color: '#dc2626', symbol: 'line' }
+					{ name: 'Baseline', color: '#16a34a', symbol: 'line' },
+					{ name: 'Projected', color: '#dc2626', symbol: 'line' }
 				]
 			}
 		] satisfies LegendSection[]
@@ -45,20 +45,20 @@ export const MultipleDiscreteHorizontal: Story = {
 		sections: [
 			{
 				type: 'discrete',
-				title: 'Región',
+				title: 'Region',
 				layout: { type: 'horizontal' },
 				items: [
-					{ name: 'Norte', color: '#4f46e5', symbol: 'square' },
-					{ name: 'Sur', color: '#e6580d', symbol: 'square' }
+					{ name: 'North', color: '#4f46e5', symbol: 'square' },
+					{ name: 'South', color: '#e6580d', symbol: 'square' }
 				]
 			},
 			{
 				type: 'discrete',
-				title: 'Escenario',
+				title: 'Scenario',
 				layout: { type: 'horizontal' },
 				items: [
-					{ name: 'Base', color: '#16a34a', symbol: 'line' },
-					{ name: 'Proyectado', color: '#dc2626', symbol: 'line' }
+					{ name: 'Baseline', color: '#16a34a', symbol: 'line' },
+					{ name: 'Projected', color: '#dc2626', symbol: 'line' }
 				]
 			}
 		] satisfies LegendSection[]
@@ -71,15 +71,15 @@ export const DiscreteAndContinuous: Story = {
 		sections: [
 			{
 				type: 'discrete',
-				title: 'Indicador',
+				title: 'Indicator',
 				items: [
-					{ name: 'PBI', color: '#4f46e5', symbol: 'line' },
-					{ name: 'Empleo', color: '#e6580d', symbol: 'line' }
+					{ name: 'GDP', color: '#4f46e5', symbol: 'line' },
+					{ name: 'Employment', color: '#e6580d', symbol: 'line' }
 				]
 			},
 			{
 				type: 'continuous',
-				title: 'Porcentaje',
+				title: 'Percentage',
 				min: 0,
 				max: 0.2,
 				ticks: [0.1],

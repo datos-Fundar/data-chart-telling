@@ -2,43 +2,39 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import {
-  FEMALE_LIFE_EXPECTANCY,
-  LIFE_EXPECTANCY,
-  type YearPoint,
-} from './data';
+import { FEMALE_LIFE_EXPECTANCY, LIFE_EXPECTANCY, type YearPoint } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Plots/LinePlot/Scales',
-  component: LinePlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 400,
-  },
-  argTypes: {
-    width: {
-      description: 'Plot width in pixels.',
-      control: { type: 'range', min: 300, max: 940, step: 50 },
-    },
-    height: {
-      description: 'Plot height in pixels.',
-      control: { type: 'range', min: 200, max: 700, step: 50 },
-    },
-    series: {
-      description: 'Data series to render.',
-      control: false,
-    },
-    scales: {
-      description: 'Per-axis scale configuration.',
-      control: false,
-    },
-  },
-  parameters: {
-    docs: { source: { name: 'LinePlot' } },
-  },
+	title: 'Plots/LinePlot/Scales',
+	component: LinePlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 400
+	},
+	argTypes: {
+		width: {
+			description: 'Plot width in pixels.',
+			control: { type: 'range', min: 300, max: 940, step: 50 }
+		},
+		height: {
+			description: 'Plot height in pixels.',
+			control: { type: 'range', min: 200, max: 700, step: 50 }
+		},
+		series: {
+			description: 'Data series to render.',
+			control: false
+		},
+		scales: {
+			description: 'Per-axis scale configuration.',
+			control: false
+		}
+	},
+	parameters: {
+		docs: { source: { name: 'LinePlot' } }
+	}
 } satisfies Meta<typeof LinePlot>;
 
 export default meta;
@@ -50,16 +46,16 @@ type Story = StoryObj<typeof meta>;
  * No scale overrides — both axes are auto-fitted to the data extent.
  */
 export const Default: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      } satisfies Series<YearPoint>,
-    ]
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		]
+	}
 };
 
 /**
@@ -72,19 +68,19 @@ export const Default: Story = {
  * the Y range is reduced.
  */
 export const CustomYDomain: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      } satisfies Series<YearPoint>,
-    ],
-    scales: {
-      y: { domain: [78, 85] },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			y: { domain: [78, 85] }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -94,19 +90,19 @@ export const CustomYDomain: Story = {
  * the frame at an interpolated position from an earlier out-of-range point.
  */
 export const CustomXDomain: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY.filter((d) => d.year >= 2010 && d.year <= 2020),
-      } satisfies Series<YearPoint>,
-    ],
-    scales: {
-      x: { domain: [2010, 2020] },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY.filter((d) => d.year >= 2010 && d.year <= 2020)
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			x: { domain: [2010, 2020] }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -115,20 +111,20 @@ export const CustomXDomain: Story = {
  * from the field name.
  */
 export const WithAxisLabels: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      } satisfies Series<YearPoint>,
-    ],
-    scales: {
-      x: { label: 'Year' },
-      y: { label: 'Life expectancy (years)' },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			x: { label: 'Year' },
+			y: { label: 'Life expectancy (years)' }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -137,19 +133,19 @@ export const WithAxisLabels: Story = {
  * a lower number means "better" or "further".
  */
 export const ReversedY: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      } satisfies Series<YearPoint>,
-    ],
-    scales: {
-      y: { reverse: true },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			y: { reverse: true }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -157,19 +153,19 @@ export const ReversedY: Story = {
  * tick, making it easier to read off individual values without a ruler.
  */
 export const WithGrid: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      } satisfies Series<YearPoint>,
-    ],
-    scales: {
-      y: { grid: true },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			y: { grid: true }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -178,19 +174,19 @@ export const WithGrid: Story = {
  * specific dates such as policy changes or census rounds.
  */
 export const CustomTicks: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      } satisfies Series<YearPoint>,
-    ],
-    scales: {
-      x: { ticks: [2008, 2012, 2016, 2020] },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			x: { ticks: [2008, 2012, 2016, 2020] }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -198,21 +194,21 @@ export const CustomTicks: Story = {
  * returns the display string. Here it appends " yr" to every label.
  */
 export const CustomTickFormat: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      } satisfies Series<YearPoint>,
-    ],
-    scales: {
-      y: {
-        tickFormat: (d: unknown) => `${d} yr`,
-      },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			y: {
+				tickFormat: (d: unknown) => `${d} yr`
+			}
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -220,21 +216,21 @@ export const CustomTickFormat: Story = {
  * is too narrow to show them horizontally without overlap.
  */
 export const RotatedXTicks: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      } satisfies Series<YearPoint>,
-    ],
-    scales: {
-      x: {
-        tickRotate: -45,
-      },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			x: {
+				tickRotate: -45
+			}
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -243,19 +239,19 @@ export const RotatedXTicks: Story = {
  * honest but compresses the visible trend significantly.
  */
 export const ZeroAnchoredY: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      } satisfies Series<YearPoint>,
-    ],
-    scales: {
-      y: { zero: true },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			y: { zero: true }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -263,16 +259,16 @@ export const ZeroAnchoredY: Story = {
  * Y domain, explicit tick values and a Y grid.
  */
 export const CombinedOverrides: Story = {
-  args: {
-    data: LIFE_EXPECTANCY,
-    x: 'year',
-    y: 'value',
-    z: 'sex',
-    scales: {
-      x: { label: 'Year', ticks: [2008, 2012, 2016, 2020], grid: false },
-      y: { label: 'Life expectancy (years)', domain: [60, 90], grid: true },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		data: LIFE_EXPECTANCY,
+		x: 'year',
+		y: 'value',
+		color: 'sex',
+		scales: {
+			x: { label: 'Year', ticks: [2008, 2012, 2016, 2020], grid: false },
+			y: { label: 'Life expectancy (years)', domain: [60, 90], grid: true }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 // ── Time-like X axes ─────────────────────────────────────────────────────────
@@ -282,18 +278,18 @@ type IsoDatePoint = { date: string; value: number };
 type MonthPoint = { month: string; value: number };
 type MonthYearPoint = { period: string; value: number };
 
-const MONTHS_ES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 const DATE_OBJECT_DATA: DatePoint[] = [
-  { date: new Date(2016, 0, 1), value: 12 },
-  { date: new Date(2017, 0, 1), value: 18 },
-  { date: new Date(2018, 0, 1), value: 22 },
-  { date: new Date(2019, 0, 1), value: 27 },
-  { date: new Date(2020, 0, 1), value: 24 },
-  { date: new Date(2021, 0, 1), value: 33 },
-  { date: new Date(2022, 0, 1), value: 41 },
-  { date: new Date(2023, 0, 1), value: 47 },
-  { date: new Date(2024, 0, 1), value: 52 },
+	{ date: new Date(2016, 0, 1), value: 12 },
+	{ date: new Date(2017, 0, 1), value: 18 },
+	{ date: new Date(2018, 0, 1), value: 22 },
+	{ date: new Date(2019, 0, 1), value: 27 },
+	{ date: new Date(2020, 0, 1), value: 24 },
+	{ date: new Date(2021, 0, 1), value: 33 },
+	{ date: new Date(2022, 0, 1), value: 41 },
+	{ date: new Date(2023, 0, 1), value: 47 },
+	{ date: new Date(2024, 0, 1), value: 52 }
 ];
 
 /**
@@ -304,27 +300,27 @@ const DATE_OBJECT_DATA: DatePoint[] = [
  * ticks than there are distinct years.
  */
 export const DateObjectXAxis: Story = {
-  args: {
-    series: [
-      {
-        name: 'adoption',
-        x: 'date',
-        y: 'value',
-        data: DATE_OBJECT_DATA,
-      } satisfies Series<DatePoint>,
-    ],
-  },
+	args: {
+		series: [
+			{
+				name: 'adoption',
+				x: 'date',
+				y: 'value',
+				data: DATE_OBJECT_DATA
+			} satisfies Series<DatePoint>
+		]
+	}
 };
 
 const ISO_DATE_DATA: IsoDatePoint[] = [
-  { date: '2023-01-01', value: 14 },
-  { date: '2023-04-01', value: 19 },
-  { date: '2023-07-01', value: 25 },
-  { date: '2023-10-01', value: 21 },
-  { date: '2024-01-01', value: 28 },
-  { date: '2024-04-01', value: 33 },
-  { date: '2024-07-01', value: 30 },
-  { date: '2024-10-01', value: 38 },
+	{ date: '2023-01-01', value: 14 },
+	{ date: '2023-04-01', value: 19 },
+	{ date: '2023-07-01', value: 25 },
+	{ date: '2023-10-01', value: 21 },
+	{ date: '2024-01-01', value: 28 },
+	{ date: '2024-04-01', value: 33 },
+	{ date: '2024-07-01', value: 30 },
+	{ date: '2024-10-01', value: 38 }
 ];
 
 /**
@@ -334,101 +330,101 @@ const ISO_DATE_DATA: IsoDatePoint[] = [
  * lexicographically in chronological order too.
  */
 export const IsoDateStringXAxis: Story = {
-  args: {
-    series: [
-      {
-        name: 'signups',
-        x: 'date',
-        y: 'value',
-        data: ISO_DATE_DATA,
-      } satisfies Series<IsoDatePoint>,
-    ],
-  },
+	args: {
+		series: [
+			{
+				name: 'signups',
+				x: 'date',
+				y: 'value',
+				data: ISO_DATE_DATA
+			} satisfies Series<IsoDatePoint>
+		]
+	}
 };
 
 const MONTH_DATA: MonthPoint[] = [
-  { month: 'Ene', value: 20 },
-  { month: 'Feb', value: 18 },
-  { month: 'Mar', value: 24 },
-  { month: 'Abr', value: 30 },
-  { month: 'May', value: 38 },
-  { month: 'Jun', value: 45 },
-  { month: 'Jul', value: 48 },
-  { month: 'Ago', value: 44 },
-  { month: 'Sep', value: 36 },
-  { month: 'Oct', value: 29 },
-  { month: 'Nov', value: 22 },
-  { month: 'Dic', value: 25 },
+	{ month: 'Jan', value: 20 },
+	{ month: 'Feb', value: 18 },
+	{ month: 'Mar', value: 24 },
+	{ month: 'Apr', value: 30 },
+	{ month: 'May', value: 38 },
+	{ month: 'Jun', value: 45 },
+	{ month: 'Jul', value: 48 },
+	{ month: 'Aug', value: 44 },
+	{ month: 'Sep', value: 36 },
+	{ month: 'Oct', value: 29 },
+	{ month: 'Nov', value: 22 },
+	{ month: 'Dec', value: 25 }
 ];
 
 /** Orders month-abbreviation rows by calendar position, not alphabetically. */
 function byMonth(a: Record<string, unknown>, b: Record<string, unknown>): number {
-  const { month: am } = a as MonthPoint;
-  const { month: bm } = b as MonthPoint;
-  return MONTHS_ES.indexOf(am) - MONTHS_ES.indexOf(bm);
+	const { month: am } = a as MonthPoint;
+	const { month: bm } = b as MonthPoint;
+	return MONTHS.indexOf(am) - MONTHS.indexOf(bm);
 }
 
 /**
  * Month-name strings within a single year — a plain ordinal scale would sort
- * these alphabetically (Abr, Ago, Dic, Ene, …), scrambling the seasonal
+ * these alphabetically (Apr, Aug, Dec, Jan, …), scrambling the seasonal
  * shape entirely. `scales.x.sort` supplies calendar order instead. The
  * comparator receives the full row (not just the X value), which is what
  * makes it possible to sort by any field on the row — see `SortXByYDesc`
  * below for sorting by Y instead of X.
  */
 export const MonthNamesSameYear: Story = {
-  args: {
-    series: [
-      {
-        name: 'seasonal',
-        x: 'month',
-        y: 'value',
-        data: MONTH_DATA,
-      } satisfies Series<MonthPoint>,
-    ],
-    scales: {
-      x: { sort: byMonth },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'seasonal',
+				x: 'month',
+				y: 'value',
+				data: MONTH_DATA
+			} satisfies Series<MonthPoint>
+		],
+		scales: {
+			x: { sort: byMonth }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 const MONTH_YEAR_DATA: MonthYearPoint[] = [
-  { period: 'Nov-2025', value: 40 },
-  { period: 'Dic-2025', value: 46 },
-  { period: 'Ene-2026', value: 39 },
-  { period: 'Feb-2026', value: 43 },
-  { period: 'Mar-2026', value: 50 },
-  { period: 'Abr-2026', value: 55 },
+	{ period: 'Nov-2025', value: 40 },
+	{ period: 'Dec-2025', value: 46 },
+	{ period: 'Jan-2026', value: 39 },
+	{ period: 'Feb-2026', value: 43 },
+	{ period: 'Mar-2026', value: 50 },
+	{ period: 'Apr-2026', value: 55 }
 ];
 
 function byMonthYear(a: Record<string, unknown>, b: Record<string, unknown>): number {
-  const rank = (row: Record<string, unknown>) => {
-    const { period } = row as MonthYearPoint;
-    const [month, year] = period.split('-');
-    return Number(year) * 12 + MONTHS_ES.indexOf(month);
-  };
-  return rank(a) - rank(b);
+	const rank = (row: Record<string, unknown>) => {
+		const { period } = row as MonthYearPoint;
+		const [month, year] = period.split('-');
+		return Number(year) * 12 + MONTHS.indexOf(month);
+	};
+	return rank(a) - rank(b);
 }
 
 /**
  * `'Mmm-YYYY'` strings crossing a year boundary — alphabetical order would
- * place `Abr-2026` before `Dic-2025`. `scales.x.sort` parses month + year
+ * place `Apr-2026` before `Dec-2025`. `scales.x.sort` parses month + year
  * out of each label so the axis (and the line) stay chronological.
  */
 export const MonthYearAcrossYears: Story = {
-  args: {
-    series: [
-      {
-        name: 'trend',
-        x: 'period',
-        y: 'value',
-        data: MONTH_YEAR_DATA,
-      } satisfies Series<MonthYearPoint>,
-    ],
-    scales: {
-      x: { sort: byMonthYear },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'trend',
+				x: 'period',
+				y: 'value',
+				data: MONTH_YEAR_DATA
+			} satisfies Series<MonthYearPoint>
+		],
+		scales: {
+			x: { sort: byMonthYear }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 // ── Custom axis chrome ───────────────────────────────────────────────────────
@@ -443,20 +439,20 @@ export const MonthYearAcrossYears: Story = {
  * `margins.left` wide enough for both the label and the tick digits.
  */
 export const VerticalYLabelTop: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      } satisfies Series<YearPoint>,
-    ],
-    scales: {
-      y: { label: 'Life expectancy (years)', labelOrientation: 'vertical', labelPosition: 'top' },
-    } satisfies AxisBasedScalesConfig,
-    margins: { left: 60 },
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			y: { label: 'Life expectancy (years)', labelOrientation: 'vertical', labelPosition: 'top' }
+		} satisfies AxisBasedScalesConfig,
+		margins: { left: 60 }
+	}
 };
 
 /**
@@ -466,20 +462,20 @@ export const VerticalYLabelTop: Story = {
  * Compare with `VerticalYLabelTop`.
  */
 export const VerticalYLabelMiddle: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      } satisfies Series<YearPoint>,
-    ],
-    scales: {
-      y: { label: 'Life expectancy (years)', labelOrientation: 'vertical' },
-    } satisfies AxisBasedScalesConfig,
-    margins: { left: 60 },
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			y: { label: 'Life expectancy (years)', labelOrientation: 'vertical' }
+		} satisfies AxisBasedScalesConfig,
+		margins: { left: 60 }
+	}
 };
 
 /**
@@ -490,19 +486,19 @@ export const VerticalYLabelMiddle: Story = {
  * leaving just floating tick labels plus the grid.
  */
 export const GridOnlyNoTickMarks: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      } satisfies Series<YearPoint>,
-    ],
-    scales: {
-      y: { grid: true, tickSize: 0 },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			y: { grid: true, tickSize: 0 }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -511,17 +507,17 @@ export const GridOnlyNoTickMarks: Story = {
  * a light dotted grid rather than solid lines.
  */
 export const DottedGrid: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      } satisfies Series<YearPoint>,
-    ],
-    scales: {
-      y: { grid: { strokeDasharray: '2 3', strokeOpacity: 0.5 } },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			y: { grid: { strokeDasharray: '2 3', strokeOpacity: 0.5 } }
+		} satisfies AxisBasedScalesConfig
+	}
 };

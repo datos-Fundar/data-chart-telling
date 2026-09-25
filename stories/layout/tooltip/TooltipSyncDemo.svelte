@@ -53,7 +53,7 @@
 			data={heatData}
 			x={'rooms' as keyof HeatCell}
 			y={'people' as keyof HeatCell}
-			z={'pct' as keyof HeatCell}
+			color={'pct' as keyof HeatCell}
 			scales={{ x: { label: 'Rooms' }, y: { label: 'People' } }}
 			styles={{ values: { show: false, format: (v) => `${(v * 100).toFixed(0)}%` } }}
 			facet={{ by: 'scenario' as keyof HeatCell, columns: 2 }}
@@ -82,10 +82,12 @@
 			data={pyramidData}
 			y={'ageGroup' as keyof PopulationRow}
 			x={'pct' as keyof PopulationRow}
-			z={'sex' as keyof PopulationRow}
-			scales={{ y: { domain: AGE_GROUPS } }}
+			color={'sex' as keyof PopulationRow}
+			scales={{
+				y: { domain: AGE_GROUPS },
+				color: { scheme: { Female: '#d6336c', Male: '#1971c2' } }
+			}}
 			styles={{
-				colors: { left: '#d6336c', right: '#1971c2' },
 				values: { format: (v) => `${v.toFixed(1)}%` }
 			}}
 			facet={{ by: 'year' as keyof PopulationRow, columns: 2 }}
@@ -101,7 +103,7 @@
 			data={TIME_SERIES}
 			x="year"
 			y="value"
-			z={'metric' as keyof SeriesPoint}
+			color={'metric' as keyof SeriesPoint}
 			legend={[
 				{
 					type: 'discrete',

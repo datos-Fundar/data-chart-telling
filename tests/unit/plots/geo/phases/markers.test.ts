@@ -22,8 +22,6 @@ function feature(id: string, pop: number): TaggedGeoFeature<Props> {
 
 const CTX: GeoPlotCtx<Props> = {
 	cfg: { palette: ['red'], axis: { color: '#333' } } as unknown as ChartConfig,
-	minColor: '#000000',
-	maxColor: '#ffffff',
 	range: undefined
 };
 
@@ -55,7 +53,7 @@ describe('buildMarkers – style grouping', () => {
 	test('a feature-specific segment style splits it into its own bucket', () => {
 		const { markers } = build({
 			features: [feature('a', 10), feature('b', 20)],
-			segments: { a: [{ style: { fill: 'red' } }] }
+			segments: { a: [{ styles: { fill: 'red' } }] }
 		});
 		const geoMarkers = markers!.filter((m) => m.type === 'geo') as GeoFeaturesMarkerConfig[];
 		expect(geoMarkers).toHaveLength(2);
@@ -63,13 +61,13 @@ describe('buildMarkers – style grouping', () => {
 });
 
 describe('buildMarkers – base fill resolution', () => {
-	test('uses colorScale(value(f)) when both are set', () => {
-		const { markers } = build({ value: () => 10, colorScale: (v) => `color-${v}` });
+	test('uses resolveColor(f) when set', () => {
+		const { markers } = build({ resolveColor: () => 'color-10' });
 		const [marker] = markers!.filter((m) => m.type === 'geo') as GeoFeaturesMarkerConfig[];
 		expect(marker.fill(feature('a', 10))).toBe('color-10');
 	});
 
-	test('falls back to ctx.fill, then cfg.palette[0], when no value/colorScale', () => {
+	test('falls back to ctx.fill, then cfg.palette[0], when no resolveColor', () => {
 		const { markers } = build({}, { fill: 'steelblue' });
 		const [marker] = markers!.filter((m) => m.type === 'geo') as GeoFeaturesMarkerConfig[];
 		expect(marker.fill(feature('a', 10))).toBe('steelblue');
@@ -79,7 +77,7 @@ describe('buildMarkers – base fill resolution', () => {
 describe('buildMarkers – legend range dimming', () => {
 	test('a feature outside the active range gets the disabled-style override', () => {
 		const { markers } = build(
-			{ value: (f) => (f.properties as Props).pop },
+			{ color: (f) => (f.properties as Props).pop },
 			{ range: { min: 0, max: 5, mode: 'filter', disabledStyle: { opacity: 0.2 } } }
 		);
 		const [marker] = markers!.filter((m) => m.type === 'geo') as GeoFeaturesMarkerConfig[];

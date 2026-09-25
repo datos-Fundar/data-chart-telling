@@ -37,17 +37,17 @@ describe('buildGapMarkers – disabled overrides (legend/hover-isolate dimming)'
 	test('with no override, the bridge line uses the series color and the gap default opacity', () => {
 		const markers = build();
 		const line = markers.find((m) => m.type === 'line') as LineMarkerConfig;
-		expect(line.style?.stroke).toBe('#111111');
+		expect(line.styles?.stroke).toBe('#111111');
 		// cfg.line.gap.stroke.strokeOpacity default.
-		expect(line.style?.strokeOpacity).toBe(0.6);
+		expect(line.styles?.strokeOpacity).toBe(0.6);
 	});
 
 	test('a disabled-stroke override dims the bridge line, same as it dims the real line', () => {
 		const markers = build({ strokeOpacity: 0.12 });
 		const line = markers.find((m) => m.type === 'line') as LineMarkerConfig;
-		expect(line.style?.strokeOpacity).toBe(0.12);
+		expect(line.styles?.strokeOpacity).toBe(0.12);
 		// Only opacity was overridden — color still falls through to the series default.
-		expect(line.style?.stroke).toBe('#111111');
+		expect(line.styles?.stroke).toBe('#111111');
 	});
 
 	test("a disabled-stroke override wins over the gap zone's own stroke style", () => {
@@ -59,22 +59,22 @@ describe('buildGapMarkers – disabled overrides (legend/hover-isolate dimming)'
 			disabledDotsFor: () => undefined
 		});
 		const line = markers.find((m) => m.type === 'line') as LineMarkerConfig;
-		expect(line.style?.stroke).toBe('#dc2626');
-		expect(line.style?.strokeOpacity).toBe(0.12);
+		expect(line.styles?.stroke).toBe('#dc2626');
+		expect(line.styles?.strokeOpacity).toBe(0.12);
 	});
 
 	test('with no override, a bridge endpoint dot uses full opacity (the gap dot default)', () => {
 		const markers = build();
 		const dot = markers.find((m) => m.type === 'dot') as DotMarkerConfig;
-		expect(dot.style?.dotFillOpacity).toBe(1);
-		expect(dot.style?.dotStrokeOpacity).toBe(1);
+		expect(dot.styles?.dotFillOpacity).toBe(1);
+		expect(dot.styles?.dotStrokeOpacity).toBe(1);
 	});
 
 	test('a disabled-dots override dims a bridge endpoint dot, same as it dims a real dot', () => {
 		const markers = build(undefined, { dotFillOpacity: 0.12, dotStrokeOpacity: 0.12 });
 		const dot = markers.find((m) => m.type === 'dot') as DotMarkerConfig;
-		expect(dot.style?.dotFillOpacity).toBe(0.12);
-		expect(dot.style?.dotStrokeOpacity).toBe(0.12);
+		expect(dot.styles?.dotFillOpacity).toBe(0.12);
+		expect(dot.styles?.dotStrokeOpacity).toBe(0.12);
 	});
 
 	test("an undisabled series in the same call is unaffected by another series' override", () => {
@@ -92,7 +92,7 @@ describe('buildGapMarkers – disabled overrides (legend/hover-isolate dimming)'
 			disabledDotsFor: () => undefined
 		});
 		const lines = markers.filter((m) => m.type === 'line') as LineMarkerConfig[];
-		expect(lines[0].style?.strokeOpacity).toBe(0.12);
-		expect(lines[1].style?.strokeOpacity).toBe(0.6);
+		expect(lines[0].styles?.strokeOpacity).toBe(0.12);
+		expect(lines[1].styles?.strokeOpacity).toBe(0.6);
 	});
 });

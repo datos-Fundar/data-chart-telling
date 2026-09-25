@@ -3,42 +3,42 @@ import BarPlot from '$lib/plots/bar/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import {
-  FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-  LIFE_EXPECTANCY_BY_PROVINCE,
-  type ProvincePoint,
+	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+	LIFE_EXPECTANCY_BY_PROVINCE,
+	type ProvincePoint
 } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Plots/BarPlot/Scales',
-  component: BarPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 500,
-  },
-  argTypes: {
-    width: {
-      description: 'Plot width in pixels.',
-      control: { type: 'range', min: 300, max: 940, step: 50 },
-    },
-    height: {
-      description: 'Plot height in pixels.',
-      control: { type: 'range', min: 200, max: 700, step: 50 },
-    },
-    series: {
-      description: 'Data series to render.',
-      control: false,
-    },
-    scales: {
-      description: 'Per-axis scale configuration.',
-      control: false,
-    },
-  },
-  parameters: {
-    docs: { source: { name: 'BarPlot' } },
-  },
+	title: 'Plots/BarPlot/Scales',
+	component: BarPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 500
+	},
+	argTypes: {
+		width: {
+			description: 'Plot width in pixels.',
+			control: { type: 'range', min: 300, max: 940, step: 50 }
+		},
+		height: {
+			description: 'Plot height in pixels.',
+			control: { type: 'range', min: 200, max: 700, step: 50 }
+		},
+		series: {
+			description: 'Data series to render.',
+			control: false
+		},
+		scales: {
+			description: 'Per-axis scale configuration.',
+			control: false
+		}
+	},
+	parameters: {
+		docs: { source: { name: 'BarPlot' } }
+	}
 } satisfies Meta<typeof BarPlot>;
 
 export default meta;
@@ -50,16 +50,16 @@ type Story = StoryObj<typeof meta>;
  * No scale overrides — both axes are auto-fitted to the data extent.
  */
 export const Default: Story = {
-  args: {
-    series: [
-      {
-        name: 'female_life_expectancy',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      } satisfies Series<ProvincePoint>,
-    ],
-  },
+	args: {
+		series: [
+			{
+				name: 'female_life_expectancy',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			} satisfies Series<ProvincePoint>
+		]
+	}
 };
 
 /**
@@ -68,19 +68,19 @@ export const Default: Story = {
  * how the bars appear more spread out when the Y range is reduced.
  */
 export const CustomYDomain: Story = {
-  args: {
-    series: [
-      {
-        name: 'female_life_expectancy',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      } satisfies Series<ProvincePoint>,
-    ],
-    scales: {
-      y: { domain: [70, 88] },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female_life_expectancy',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			} satisfies Series<ProvincePoint>
+		],
+		scales: {
+			y: { domain: [70, 88] }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -89,20 +89,20 @@ export const CustomYDomain: Story = {
  * from the field name.
  */
 export const WithAxisLabels: Story = {
-  args: {
-    series: [
-      {
-        name: 'female_life_expectancy',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      } satisfies Series<ProvincePoint>,
-    ],
-    scales: {
-      x: { label: 'Province' },
-      y: { label: 'Life expectancy (years)' },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female_life_expectancy',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			} satisfies Series<ProvincePoint>
+		],
+		scales: {
+			x: { label: 'Province' },
+			y: { label: 'Life expectancy (years)' }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -110,19 +110,19 @@ export const WithAxisLabels: Story = {
  * Useful for rankings where lower numbers are better.
  */
 export const ReversedY: Story = {
-  args: {
-    series: [
-      {
-        name: 'female_life_expectancy',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      } satisfies Series<ProvincePoint>,
-    ],
-    scales: {
-      y: { reverse: true },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female_life_expectancy',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			} satisfies Series<ProvincePoint>
+		],
+		scales: {
+			y: { reverse: true }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -130,19 +130,19 @@ export const ReversedY: Story = {
  * making it easier to read off individual values without a ruler.
  */
 export const WithGrid: Story = {
-  args: {
-    series: [
-      {
-        name: 'female_life_expectancy',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      } satisfies Series<ProvincePoint>,
-    ],
-    scales: {
-      y: { grid: true },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female_life_expectancy',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			} satisfies Series<ProvincePoint>
+		],
+		scales: {
+			y: { grid: true }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -150,21 +150,21 @@ export const WithGrid: Story = {
  * returns the display string. Here it appends " yr" to every label.
  */
 export const CustomTickFormat: Story = {
-  args: {
-    series: [
-      {
-        name: 'female_life_expectancy',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      } satisfies Series<ProvincePoint>,
-    ],
-    scales: {
-      y: {
-        tickFormat: (d: unknown) => `${d} yr`,
-      },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female_life_expectancy',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			} satisfies Series<ProvincePoint>
+		],
+		scales: {
+			y: {
+				tickFormat: (d: unknown) => `${d} yr`
+			}
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -172,21 +172,21 @@ export const CustomTickFormat: Story = {
  * would otherwise overlap on a horizontal axis.
  */
 export const RotatedXTicks: Story = {
-  args: {
-    series: [
-      {
-        name: 'female_life_expectancy',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      } satisfies Series<ProvincePoint>,
-    ],
-    scales: {
-      x: {
-        tickRotate: -45,
-      },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female_life_expectancy',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			} satisfies Series<ProvincePoint>
+		],
+		scales: {
+			x: {
+				tickRotate: -45
+			}
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -195,19 +195,19 @@ export const RotatedXTicks: Story = {
  * honest but compresses the visible trend significantly.
  */
 export const ZeroAnchoredY: Story = {
-  args: {
-    series: [
-      {
-        name: 'female_life_expectancy',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      } satisfies Series<ProvincePoint>,
-    ],
-    scales: {
-      y: { zero: true },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female_life_expectancy',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			} satisfies Series<ProvincePoint>
+		],
+		scales: {
+			y: { zero: true }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -217,21 +217,21 @@ export const ZeroAnchoredY: Story = {
  * `value` (or any other field) to decide the order.
  */
 export const SortXByYDescending: Story = {
-  args: {
-    series: [
-      {
-        name: 'female_life_expectancy',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      } satisfies Series<ProvincePoint>,
-    ],
-    scales: {
-      x: {
-        sort: (a, b) => (b as ProvincePoint).value - (a as ProvincePoint).value,
-      },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female_life_expectancy',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			} satisfies Series<ProvincePoint>
+		],
+		scales: {
+			x: {
+				sort: (a, b) => (b as ProvincePoint).value - (a as ProvincePoint).value
+			}
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -239,22 +239,22 @@ export const SortXByYDescending: Story = {
  * Y domain, rotated X tick labels, and a Y grid.
  */
 export const CombinedOverrides: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE,
-    x: 'province',
-    y: 'value',
-    z: 'sex',
-    scales: {
-      x: { label: 'Province', tickRotate: -45 },
-      y: { label: 'Life expectancy (years)', domain: [70, 85], grid: true },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		x: 'province',
+		y: 'value',
+		color: 'sex',
+		scales: {
+			x: { label: 'Province', tickRotate: -45 },
+			y: { label: 'Life expectancy (years)', domain: [70, 85], grid: true }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 // ── Series layout (multiple series sharing a category) ────────────────────────
-// `scales.z.seriesLayout` controls how series that share the same X category
-// are arranged — `z` because it's the grouping axis, not the category (`x`)
-// axis itself.
+// `scales.grouping.seriesLayout` controls how series that share the same X
+// category are arranged — `grouping` is its own channel (like `color`), not
+// part of the category (`x`) axis itself.
 
 /**
  * Default layout when omitted — every series draws at the same X position,
@@ -263,12 +263,12 @@ export const CombinedOverrides: Story = {
  * and `Stacked` below.
  */
 export const OverlappingSeries: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE,
-    x: 'province',
-    y: 'value',
-    z: 'sex',
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		x: 'province',
+		y: 'value',
+		color: 'sex'
+	}
 };
 
 /**
@@ -278,15 +278,15 @@ export const OverlappingSeries: Story = {
  * stacked mode.
  */
 export const StackedSeries: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE,
-    x: 'province',
-    y: 'value',
-    z: 'sex',
-    scales: {
-      z: { seriesLayout: 'stacked' },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		x: 'province',
+		y: 'value',
+		color: 'sex',
+		scales: {
+			grouping: { seriesLayout: 'stacked' }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -299,19 +299,19 @@ export const StackedSeries: Story = {
  * `GroupedWithSeriesPadding` below to override it per-plot.
  */
 export const GroupedSeries: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE,
-    x: 'province',
-    y: 'value',
-    z: 'sex',
-    scales: {
-      z: { seriesLayout: 'grouped' },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		x: 'province',
+		y: 'value',
+		color: 'sex',
+		scales: {
+			grouping: { seriesLayout: 'grouped' }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
- * `scales.z.seriesPadding` (0–1) reserves a fraction of each series' own
+ * `scales.grouping.seriesPadding` (0–1) reserves a fraction of each series' own
  * slice as a gap on either side, separating bars within the same group —
  * this overrides the theme's default (0.2, see `GroupedSeries` above) with a
  * narrower gap. Pass `0` to opt back out to touching bars. Space *between*
@@ -319,15 +319,15 @@ export const GroupedSeries: Story = {
  * `paddingInner`/`paddingOuter` (see `WideGroupSpacing` below).
  */
 export const GroupedWithSeriesPadding: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE,
-    x: 'province',
-    y: 'value',
-    z: 'sex',
-    scales: {
-      z: { seriesLayout: 'grouped', seriesPadding: 0.1 },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		x: 'province',
+		y: 'value',
+		color: 'sex',
+		scales: {
+			grouping: { seriesLayout: 'grouped', seriesPadding: 0.1 }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -336,16 +336,16 @@ export const GroupedWithSeriesPadding: Story = {
  * formula — also narrows every series' own bars accordingly.
  */
 export const WideGroupSpacing: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE,
-    x: 'province',
-    y: 'value',
-    z: 'sex',
-    scales: {
-      x: { paddingInner: 0.4 },
-      z: { seriesLayout: 'grouped' },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		x: 'province',
+		y: 'value',
+		color: 'sex',
+		scales: {
+			x: { paddingInner: 0.4 },
+			grouping: { seriesLayout: 'grouped' }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 // ── Orientation (horizontal bars) ──────────────────────────────────────────────
@@ -361,19 +361,19 @@ export const WideGroupSpacing: Story = {
  * on the Y axis and life expectancy (the value) on X.
  */
 export const HorizontalBars: Story = {
-  args: {
-    series: [
-      {
-        name: 'female_life_expectancy',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      } satisfies Series<ProvincePoint>,
-    ],
-    scales: {
-      y: { type: 'categorical' },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female_life_expectancy',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			} satisfies Series<ProvincePoint>
+		],
+		scales: {
+			y: { type: 'categorical' }
+		} satisfies AxisBasedScalesConfig
+	}
 };
 
 /**
@@ -382,14 +382,14 @@ export const HorizontalBars: Story = {
  * other.
  */
 export const HorizontalGroupedSeries: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE,
-    x: 'province',
-    y: 'value',
-    z: 'sex',
-    scales: {
-      y: { type: 'categorical' },
-      z: { seriesLayout: 'grouped' },
-    } satisfies AxisBasedScalesConfig,
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		x: 'province',
+		y: 'value',
+		color: 'sex',
+		scales: {
+			y: { type: 'categorical' },
+			grouping: { seriesLayout: 'grouped' }
+		} satisfies AxisBasedScalesConfig
+	}
 };

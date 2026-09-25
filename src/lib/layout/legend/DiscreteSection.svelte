@@ -212,7 +212,7 @@
 {#if isHorizontal}
 	<div class="dct-discrete-paginated">
 		{#if showNav}
-			{@render navButtonSlot('prev', page === 0, prevPage, 'Página anterior de referencias')}
+			{@render navButtonSlot('prev', page === 0, prevPage, 'Previous legend page')}
 		{/if}
 		<div class="dct-discrete-horizontal" bind:clientWidth={containerWidth}>
 			<div class="dct-discrete dct-discrete--horizontal">
@@ -231,12 +231,7 @@
 			</div>
 		</div>
 		{#if showNav}
-			{@render navButtonSlot(
-				'next',
-				page >= totalPages - 1,
-				nextPage,
-				'Página siguiente de referencias'
-			)}
+			{@render navButtonSlot('next', page >= totalPages - 1, nextPage, 'Next legend page')}
 		{/if}
 	</div>
 {:else if isFlex}

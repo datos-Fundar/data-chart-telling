@@ -23,12 +23,13 @@ function feature(
 	} as GeoFeature<Props> & { __id: string; __cx: number; __cy: number };
 }
 
-const FEATURES = [feature('a', 10), feature('b', 20), feature('c', 30)];
+const FEATURE_A = feature('a', 10);
+const FEATURE_C = feature('c', 30);
+const FEATURE_15 = feature('d', 15);
+const FEATURES = [FEATURE_A, feature('b', 20), FEATURE_C];
 
 const CTX: GeoPlotCtx<Props> = {
-	cfg: {} as ChartConfig,
-	minColor: '#000000',
-	maxColor: '#ffffff',
+	cfg: { continuous: { min: '#000000', max: '#ffffff' } } as ChartConfig,
 	range: undefined
 };
 
@@ -44,28 +45,28 @@ function build(
 		width: 400,
 		height: 300,
 		features: FEATURES,
-		value: (f) => (f.properties as Props).pop,
+		color: (f) => (f.properties as Props).pop,
 		...overrides
 	};
 	return buildScales(state, { ...CTX, ...ctxOverrides });
 }
 
-describe('buildScales – no value accessor', () => {
-	test('colorScale is null when no value accessor is given', () => {
-		const result = build({ value: undefined });
-		expect(result.colorScale).toBeNull();
+describe('buildScales – no color accessor', () => {
+	test('resolveColor is undefined when no color accessor is given', () => {
+		const result = build({ color: undefined });
+		expect(result.resolveColor).toBeUndefined();
 	});
 });
 
 describe('buildScales – computed domain', () => {
-	test('a value with no data at all leaves colorScale null', () => {
+	test('a color accessor with no data at all leaves resolveColor undefined', () => {
 		const result = build({ features: [] });
-		expect(result.colorScale).toBeNull();
+		expect(result.resolveColor).toBeUndefined();
 	});
 
 	test('domain spans the min/max of every feature value', () => {
 		const result = build();
-		expect(result.colorScale!(10)).not.toBe(result.colorScale!(30));
+		expect(result.resolveColor!(FEATURE_A)).not.toBe(result.resolveColor!(FEATURE_C));
 	});
 
 	test('an explicit scales.color.domain wins over the computed extent', () => {
@@ -73,7 +74,7 @@ describe('buildScales – computed domain', () => {
 		const withComputed = build();
 		// 10 sits near the bottom of the computed [10,30] extent but far from
 		// the bottom of an explicit [0,100] one — the resulting colors differ.
-		expect(withExplicit.colorScale!(10)).not.toBe(withComputed.colorScale!(10));
+		expect(withExplicit.resolveColor!(FEATURE_A)).not.toBe(withComputed.resolveColor!(FEATURE_A));
 	});
 });
 
@@ -81,12 +82,12 @@ describe('buildScales – legend range', () => {
 	test("'rescale' mode reprojects the color domain onto the narrowed range", () => {
 		const full = build();
 		const rescaled = build({}, { range: { min: 0, max: 15, mode: 'rescale', disabledStyle: {} } });
-		expect(full.colorScale!(15)).not.toBe(rescaled.colorScale!(15));
+		expect(full.resolveColor!(FEATURE_15)).not.toBe(rescaled.resolveColor!(FEATURE_15));
 	});
 
 	test("'filter' mode leaves the color domain untouched", () => {
 		const full = build();
 		const filtered = build({}, { range: { min: 0, max: 15, mode: 'filter', disabledStyle: {} } });
-		expect(full.colorScale!(15)).toBe(filtered.colorScale!(15));
+		expect(full.resolveColor!(FEATURE_15)).toBe(filtered.resolveColor!(FEATURE_15));
 	});
 });

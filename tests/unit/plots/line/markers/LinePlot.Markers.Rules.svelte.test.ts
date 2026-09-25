@@ -64,7 +64,7 @@ describe('LinePlot – markers.rules', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'rule', axis: 'x', value: 2016, style: { stroke: '#e11d48' } }] satisfies LineMarkersConfig[],
+      markers: [{ type: 'rule', axis: 'x', value: 2016, styles: { stroke: '#e11d48' } }] satisfies LineMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     const line = svg.querySelector('g.rule-x line');

@@ -6,21 +6,21 @@ import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../data/population-pyramid
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Plots/PyramidPlot/Markers/Rules',
-  component: PyramidPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 520,
-  },
-  argTypes: {
-    width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
-    height: { control: { type: 'range', min: 320, max: 800, step: 20 } },
-    markers: { control: false },
-  },
-  parameters: {
-    docs: { source: { name: 'PyramidPlot' } },
-  },
+	title: 'Plots/PyramidPlot/Markers/Rules',
+	component: PyramidPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 520
+	},
+	argTypes: {
+		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
+		height: { control: { type: 'range', min: 320, max: 800, step: 20 } },
+		markers: { control: false }
+	},
+	parameters: {
+		docs: { source: { name: 'PyramidPlot' } }
+	}
 } satisfies Meta<typeof PyramidPlot>;
 
 export default meta;
@@ -36,25 +36,25 @@ const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
  * comparative benchmark.
  */
 export const WithRuleXMarker: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    markers: [
-      {
-        type: 'rule',
-        axis: 'x',
-        value: 3,
-        style: {
-          stroke: '#f59f00',
-          strokeDasharray: '4 4',
-          strokeOpacity: 0.7,
-        },
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		markers: [
+			{
+				type: 'rule',
+				axis: 'x',
+				value: 3,
+				styles: {
+					stroke: '#f59f00',
+					strokeDasharray: '4 4',
+					strokeOpacity: 0.7
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -62,35 +62,35 @@ export const WithRuleXMarker: Story = {
  * comparing against multiple benchmarks or targets.
  */
 export const MultipleThresholdMarkers: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    markers: [
-      {
-        type: 'rule',
-        axis: 'x',
-        value: 2.5,
-        style: {
-          stroke: '#51cf66',
-          strokeDasharray: '6 4',
-          strokeOpacity: 0.6,
-        },
-      },
-      {
-        type: 'rule',
-        axis: 'x',
-        value: 3.5,
-        style: {
-          stroke: '#ff6b6b',
-          strokeDasharray: '4 4',
-          strokeOpacity: 0.6,
-        },
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		markers: [
+			{
+				type: 'rule',
+				axis: 'x',
+				value: 2.5,
+				styles: {
+					stroke: '#51cf66',
+					strokeDasharray: '6 4',
+					strokeOpacity: 0.6
+				}
+			},
+			{
+				type: 'rule',
+				axis: 'x',
+				value: 3.5,
+				styles: {
+					stroke: '#ff6b6b',
+					strokeDasharray: '4 4',
+					strokeOpacity: 0.6
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -99,35 +99,35 @@ export const MultipleThresholdMarkers: Story = {
  * a central point.
  */
 export const SymmetricMarkers: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    markers: [
-      {
-        type: 'rule',
-        axis: 'x',
-        value: -2,
-        style: {
-          stroke: '#748ffc',
-          strokeWidth: 1.5,
-          strokeOpacity: 0.5,
-        },
-      },
-      {
-        type: 'rule',
-        axis: 'x',
-        value: 2,
-        style: {
-          stroke: '#748ffc',
-          strokeWidth: 1.5,
-          strokeOpacity: 0.5,
-        },
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		markers: [
+			{
+				type: 'rule',
+				axis: 'x',
+				value: -2,
+				styles: {
+					stroke: '#748ffc',
+					strokeWidth: 1.5,
+					strokeOpacity: 0.5
+				}
+			},
+			{
+				type: 'rule',
+				axis: 'x',
+				value: 2,
+				styles: {
+					stroke: '#748ffc',
+					strokeWidth: 1.5,
+					strokeOpacity: 0.5
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -135,26 +135,26 @@ export const SymmetricMarkers: Story = {
  * size, helping identify which age groups are above or below average.
  */
 export const AverageMarker: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    markers: [
-      {
-        type: 'rule',
-        axis: 'x',
-        value: 3.0,
-        style: {
-          stroke: '#495057',
-          strokeWidth: 2,
-          strokeDasharray: '2 4',
-          strokeOpacity: 0.7,
-        },
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		markers: [
+			{
+				type: 'rule',
+				axis: 'x',
+				value: 3.0,
+				styles: {
+					stroke: '#495057',
+					strokeWidth: 2,
+					strokeDasharray: '2 4',
+					strokeOpacity: 0.7
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -162,24 +162,24 @@ export const AverageMarker: Story = {
  * population percentage threshold, useful for policy discussions or targets.
  */
 export const PolicyThresholdMarker: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    markers: [
-      {
-        type: 'rule',
-        axis: 'x',
-        value: 4.0,
-        style: {
-          stroke: '#d9480f',
-          strokeWidth: 2.5,
-          strokeDasharray: '3 3',
-          strokeOpacity: 0.8,
-        },
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		markers: [
+			{
+				type: 'rule',
+				axis: 'x',
+				value: 4.0,
+				styles: {
+					stroke: '#d9480f',
+					strokeWidth: 2.5,
+					strokeDasharray: '3 3',
+					strokeOpacity: 0.8
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };

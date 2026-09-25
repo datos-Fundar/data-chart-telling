@@ -14,9 +14,7 @@ const FLAT: Row[] = [
 ];
 
 const CTX: HeatmapPlotCtx = {
-	cfg: {} as ChartConfig,
-	minColor: '#000000',
-	maxColor: '#ffffff',
+	cfg: { continuous: { min: '#000000', max: '#ffffff' } } as ChartConfig,
 	range: undefined
 };
 
@@ -33,7 +31,7 @@ function build(
 		channels: {
 			x: { accessor: (d) => d.col },
 			y: { accessor: (d) => d.row },
-			z: { accessor: (d) => d.value }
+			color: { accessor: (d: Row) => d.value }
 		},
 		...overrides
 	};
@@ -56,18 +54,18 @@ describe('buildScales – x/y band domains', () => {
 });
 
 describe('buildScales – value domain', () => {
-	test('spans [min(0, dataMin), dataMax] when scales.z.domain is not set', () => {
+	test('spans [min(0, dataMin), dataMax] when scales.color.domain is not set', () => {
 		const result = build();
 		// -5 to 20, clamped to include 0 on the low end since the data min (-5) is already below it.
-		expect(result.colorScale!(20)).not.toBe(result.colorScale!(-5));
+		expect(result.resolveColor!(FLAT[2])).not.toBe(result.resolveColor!(FLAT[1]));
 	});
 
-	test('an explicit scales.z.domain wins over the computed one', () => {
-		const withExplicit = build({ scales: { z: { domain: [0, 100] } } });
+	test('an explicit scales.color.domain wins over the computed one', () => {
+		const withExplicit = build({ scales: { color: { domain: [0, 100] } } });
 		const withComputed = build();
 		// A value of 20 sits near the top of the computed domain but near the
 		// bottom of the explicit [0, 100] one — the resulting colors differ.
-		expect(withExplicit.colorScale!(20)).not.toBe(withComputed.colorScale!(20));
+		expect(withExplicit.resolveColor!(FLAT[2])).not.toBe(withComputed.resolveColor!(FLAT[2]));
 	});
 });
 
@@ -75,12 +73,12 @@ describe('buildScales – legend range', () => {
 	test("'rescale' mode reprojects the color domain onto the narrowed range", () => {
 		const full = build();
 		const rescaled = build({}, { range: { min: 0, max: 10, mode: 'rescale', disabledStyle: {} } });
-		expect(full.colorScale!(10)).not.toBe(rescaled.colorScale!(10));
+		expect(full.resolveColor!(FLAT[0])).not.toBe(rescaled.resolveColor!(FLAT[0]));
 	});
 
 	test("'filter' mode leaves the color domain untouched", () => {
 		const full = build();
 		const filtered = build({}, { range: { min: 0, max: 10, mode: 'filter', disabledStyle: {} } });
-		expect(full.colorScale!(10)).toBe(filtered.colorScale!(10));
+		expect(full.resolveColor!(FLAT[0])).toBe(filtered.resolveColor!(FLAT[0]));
 	});
 });

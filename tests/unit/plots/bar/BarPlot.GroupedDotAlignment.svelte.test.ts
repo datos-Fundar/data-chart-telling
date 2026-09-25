@@ -19,10 +19,10 @@ describe.each([['vertical', false] as const, ['horizontal', true] as const])(
 				data: DATA,
 				x: 'cat',
 				y: 'value',
-				z: 'series',
+				color: 'series',
 				scales: horizontal
-					? { y: { type: 'categorical' }, z: { seriesLayout: 'grouped' } }
-					: { z: { seriesLayout: 'grouped' } },
+					? { y: { type: 'categorical' }, grouping: { seriesLayout: 'grouped' } }
+					: { grouping: { seriesLayout: 'grouped' } },
 				tooltip: {
 					facetId: '',
 					sync: false,

@@ -146,7 +146,7 @@
       category: areaX,
       insetLeft: activePoint?.areaInset?.start,
       insetRight: activePoint?.areaInset?.end,
-      style: areaStyle,
+      styles: areaStyle,
     }}
   />
 {/if}
@@ -161,20 +161,20 @@
       category: areaY,
       insetTop: activePoint?.areaInset?.start,
       insetBottom: activePoint?.areaInset?.end,
-      style: areaStyle,
+      styles: areaStyle,
     }}
   />
 {/if}
 
 {#if ruleX != null}
   <g transform="translate({activePoint?.dx ?? 0}, {activePoint?.dy ?? 0})">
-    <RuleMarker axis="x" value={ruleX} style={{ ...cfg.hover.rule, ...ruleStyle }} />
+    <RuleMarker axis="x" value={ruleX} styles={{ ...cfg.hover.rule, ...ruleStyle }} />
   </g>
 {/if}
 
 {#if ruleY != null}
   <g transform="translate({activePoint?.dx ?? 0}, {activePoint?.dy ?? 0})">
-    <RuleMarker axis="y" value={ruleY} style={{ ...cfg.hover.rule, ...ruleStyle }} />
+    <RuleMarker axis="y" value={ruleY} styles={{ ...cfg.hover.rule, ...ruleStyle }} />
   </g>
 {/if}
 
@@ -187,7 +187,7 @@
         data={[point]}
         x={(d) => d.x}
         y={(d) => d.y}
-        style={{
+        styles={{
           ...cfg.hover.dot,
           ...dotStyle,
           dotFill: resolveColor(dotStyle?.dotFill, point),
@@ -204,7 +204,7 @@
           x={(d) => d.x}
           y={(d) => d.y}
           text={(d) => format ? format(d) : (d.label ?? '')}
-          style={resolveFontStyle(point)}
+          styles={resolveFontStyle(point)}
         />
       </g>
     {/each}

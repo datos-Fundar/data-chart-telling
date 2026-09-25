@@ -1,24 +1,28 @@
-import { makeColorScale } from '$lib/utils/color';
+import { resolveColorScale } from '$lib/utils/color';
 import type { AxisValue } from '$lib/types/layout/scales';
 import type { HeatmapPlotState, HeatmapPlotCtx } from '$lib/types/plots/heatmap/state';
 
-/** HeatmapPlot's "scales" phase: band x/y domains over every distinct category, and the value→color scale. */
+/** HeatmapPlot's "scales" phase: band x/y domains over every distinct category, and each row's own resolved color. */
 export function buildScales<TData extends Record<string, unknown>>(
 	state: HeatmapPlotState<TData>,
 	ctx: HeatmapPlotCtx
 ): HeatmapPlotState<TData> {
 	const { scales, flat, channels } = state;
-	const { minColor, maxColor, range } = ctx;
-	const { x: xAcc, y: yAcc, z: zAcc } = channels!;
+	const { range, cfg } = ctx;
+	const { x: xAcc, y: yAcc, color: colorAcc } = channels!;
 
 	const xDomain = [...new Set(flat!.map((d) => xAcc.accessor(d) as AxisValue))];
 	const yDomain = [...new Set(flat!.map((d) => yAcc.accessor(d) as AxisValue))];
 
 	const valueDomain: [number, number] = (() => {
-		if (scales.z?.domain && scales.z.domain.length >= 2) {
-			return [Number(scales.z.domain[0]), Number(scales.z.domain[1])];
+		if (
+			scales.color?.domain &&
+			Array.isArray(scales.color.domain) &&
+			typeof scales.color.domain[0] === 'number'
+		) {
+			return scales.color.domain as [number, number];
 		}
-		const vals = flat!.map((d) => Number(zAcc.accessor(d)));
+		const vals = flat!.map((d) => Number(colorAcc.accessor(d)));
 		return vals.length ? [Math.min(...vals, 0), Math.max(...vals)] : [0, 1];
 	})();
 
@@ -28,7 +32,12 @@ export function buildScales<TData extends Record<string, unknown>>(
 	const effectiveDomain: [number, number] =
 		range && range.mode === 'rescale' ? [range.min, range.max] : valueDomain;
 
-	const colorScale = makeColorScale(effectiveDomain[0], effectiveDomain[1], minColor, maxColor);
+	const colorScale = resolveColorScale(
+		{ ...scales.color, domain: effectiveDomain },
+		effectiveDomain,
+		[cfg.continuous.min, cfg.continuous.max]
+	);
+	const resolveColor = (row: TData) => colorScale(Number(colorAcc.accessor(row)));
 
 	return {
 		...state,
@@ -37,6 +46,6 @@ export function buildScales<TData extends Record<string, unknown>>(
 			x: { type: 'band', labelAnchor: 'right', domain: xDomain, ...(scales.x ?? {}) },
 			y: { type: 'band', domain: yDomain, ...(scales.y ?? {}) }
 		},
-		colorScale
+		resolveColor
 	};
 }

@@ -12,9 +12,8 @@ import type { ChartConfig } from '$lib/types/configuration/styling';
 type Row = { ageGroup: string; pct: number | null };
 
 const CTX: PyramidPlotCtx = {
-	cfg: {} as ChartConfig,
-	formatValue: (v) => `${v}%`,
-	colorForSide: () => 'blue'
+	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as ChartConfig,
+	formatValue: (v) => `${v}%`
 };
 
 function series(name: string, side: 'left' | 'right', data: Row[]): PyramidSeries<Row> {
@@ -56,7 +55,7 @@ describe('buildScales – x (diverging magnitude) domain', () => {
 		const result = build({
 			resolvedSeries: [female],
 			gapFillMaps: new Map([
-				['Female', new Map([[female.data[0], { value: 40, kind: 'middle' as const, style: {} }]])]
+				['Female', new Map([[female.data[0], { value: 40, kind: 'middle' as const, styles: {} }]])]
 			])
 		});
 		expect(result.x?.domain).toEqual([-40, 40]);

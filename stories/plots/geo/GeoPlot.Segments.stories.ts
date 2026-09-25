@@ -48,8 +48,8 @@ type Story = StoryObj<typeof meta>;
 export const HighlightOneProvince: Story = {
   args: {
     segments: {
-      'Buenos Aires': [{ style: { fill: 'tomato' } }],
-      default: [{ style: { fill: '#cbd5e1', fillOpacity: 0.6 } }],
+      'Buenos Aires': [{ styles: { fill: 'tomato' } }],
+      default: [{ styles: { fill: '#cbd5e1', fillOpacity: 0.6 } }],
     } satisfies SegmentsConfig<GeoSegmentStyle>,
   },
 };
@@ -58,10 +58,10 @@ export const HighlightOneProvince: Story = {
 export const HighlightSeveralProvinces: Story = {
   args: {
     segments: {
-      'Buenos Aires': [{ style: { fill: '#1d4ed8' } }],
-      Córdoba: [{ style: { fill: '#f59e0b' } }],
-      Mendoza: [{ style: { fill: '#16a34a' } }],
-      default: [{ style: { fill: '#e2e8f0' } }],
+      'Buenos Aires': [{ styles: { fill: '#1d4ed8' } }],
+      Córdoba: [{ styles: { fill: '#f59e0b' } }],
+      Mendoza: [{ styles: { fill: '#16a34a' } }],
+      default: [{ styles: { fill: '#e2e8f0' } }],
     } satisfies SegmentsConfig<GeoSegmentStyle>,
   },
 };
@@ -74,8 +74,8 @@ export const HighlightSeveralProvinces: Story = {
 export const DefaultMergesWithFeatureStyle: Story = {
   args: {
     segments: {
-      default: [{ style: { fill: '#94a3b8', stroke: '#1e293b', strokeWidth: 1 } }],
-      Mendoza: [{ style: { fillOpacity: 0.3 } }],
+      default: [{ styles: { fill: '#94a3b8', stroke: '#1e293b', strokeWidth: 1 } }],
+      Mendoza: [{ styles: { fillOpacity: 0.3 } }],
     } satisfies SegmentsConfig<GeoSegmentStyle>,
   },
 };
@@ -84,8 +84,8 @@ export const DefaultMergesWithFeatureStyle: Story = {
 export const HighlightWithStroke: Story = {
   args: {
     segments: {
-      Chubut: [{ style: { stroke: '#dc2626', strokeWidth: 3 } }],
-      default: [{ style: { fill: '#e2e8f0', stroke: '#94a3b8', strokeWidth: 0.5 } }],
+      Chubut: [{ styles: { stroke: '#dc2626', strokeWidth: 3 } }],
+      default: [{ styles: { fill: '#e2e8f0', stroke: '#94a3b8', strokeWidth: 0.5 } }],
     } satisfies SegmentsConfig<GeoSegmentStyle>,
   },
 };

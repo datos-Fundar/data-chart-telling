@@ -96,7 +96,7 @@ export const WithTextMarker: Story = {
           x: (d: YearPoint) => d.year,
           y: (d: YearPoint) => d.value,
           text: (d: YearPoint) => String(d.value),
-          style: {
+          styles: {
             dy: -10,
           }
         },
@@ -188,15 +188,15 @@ const SERIES4: YearPoint[] = [
 ];
 
 const STRATEGIES_SEGMENTS: SegmentsConfig<LineSegmentStyle> = {
-  series1: [{ style: {} }],
-  series2: [{ style: {} }],
+  series1: [{ styles: {} }],
+  series2: [{ styles: {} }],
   series3: [
-    { areas: [{ x: { to: 2020 } }], style: {} },
-    { areas: [{ x: { from: 2020 } }], style: { stroke: { strokeDasharray: '6 4' } } },
+    { areas: [{ x: { to: 2020 } }], styles: {} },
+    { areas: [{ x: { from: 2020 } }], styles: { stroke: { strokeDasharray: '6 4' } } },
   ],
   series4: [
-    { areas: [{ x: { to: 2020 } }], style: {} },
-    { areas: [{ x: { from: 2020 } }], style: { stroke: { strokeDasharray: '6 4' } } },
+    { areas: [{ x: { to: 2020 } }], styles: {} },
+    { areas: [{ x: { from: 2020 } }], styles: { stroke: { strokeDasharray: '6 4' } } },
   ],
 };
 

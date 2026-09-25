@@ -1,4 +1,4 @@
-import type { AxisValue } from '$lib/types/layout/scales';
+import type { AxisValue, ChannelScalesConfig } from '$lib/types/layout/scales';
 import type { Series } from '$lib/types/plots/data/common';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 
@@ -34,13 +34,15 @@ export type Area = {
  */
 export type Segment<TStyle> = {
   areas?: Area[];
-  style?: TStyle;
+  scales?: ChannelScalesConfig;
+  styles?: TStyle;
 };
 
 /** One contiguous, styled slice of a series' data — ready to draw as its own mark. */
 export type VisualSegment<T extends Record<string, unknown>, TStyle = LineSegmentStyle> = {
   data: T[];
-  style: TStyle;
+  scales?: ChannelScalesConfig;
+  styles: TStyle;
 };
 
 /**

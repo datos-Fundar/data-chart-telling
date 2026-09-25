@@ -93,7 +93,7 @@
 		sections={[
 			{
 				type: 'discrete',
-				title: 'Jurisdicción',
+				title: 'Jurisdiction',
 				items,
 				interactive: { enabled: interactive },
 				layout: { type: 'horizontal', maxRows },

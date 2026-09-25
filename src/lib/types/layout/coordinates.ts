@@ -1,5 +1,6 @@
 import type { GeoProjection } from 'd3-geo';
 import type { GeoCameraConfig } from '$lib/types/plots/camera';
+import type { ChannelScalesConfig } from '$lib/types/layout/scales';
 
 /**
  * The projection names svelteplot's `<Plot projection>` accepts as a string
@@ -68,14 +69,11 @@ export type GeoProjectionConfig =
 	  };
 
 /**
- * `scales` prop for GeoPlot — the geo analog of `AxisBasedScalesConfig`.
- * A map has no x/y/z axis pair, so this only configures the choropleth
- * colour domain (the coordinate system itself is `coordinates.projection`).
+ * `scales` prop for GeoPlot — the geo analog of `AxisBasedScalesConfig`. A
+ * map has no x/y axis pair (the coordinate system is `coordinates.projection`),
+ * so this only carries the channels in {@link ChannelScalesConfig}.
  */
-export type GeoScalesConfig = {
-	/** Continuous choropleth value domain — mirrors heatmap's `scales.z.domain`. */
-	color?: { domain?: [number, number] };
-};
+export type GeoScalesConfig = ChannelScalesConfig;
 
 /** Wheel/pinch scale gesture only — see `CoordinatesConfig.pan` for drag-to-translate, and `.rotate` for drag-to-spin-the-globe. */
 export type GeoZoomConfig = {

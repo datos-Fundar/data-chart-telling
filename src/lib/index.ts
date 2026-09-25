@@ -62,6 +62,7 @@ export type { ThemeName } from './configuration/themes';
 export { groupBy, buildSeries } from './utils/grouping';
 export {
 	makeColorScale,
+	resolveColorScale,
 	normalize,
 	resolveCssColor,
 	paletteColor,
@@ -72,7 +73,16 @@ export { estimateCategoricalAxisMargin } from './plots/utils/categoricalAxisMarg
 export { estimateLineValueLabelMargin } from './plots/line/valueLabelMargin';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-export type { AxisValue, AxisScale, AxisBasedScalesConfig } from './types/layout/scales';
+export type {
+	AxisValue,
+	AxisScale,
+	AxisBasedScalesConfig,
+	ColorScaleConfig,
+	GroupingScaleConfig,
+	ChannelName,
+	ChannelScaleConfig,
+	ChannelScalesConfig
+} from './types/layout/scales';
 export type { Accessor, Series, SeriesProps, DataProps } from './types/plots/data/common';
 export type {
 	BasePlotProps,
@@ -87,7 +97,6 @@ export type {
 } from './types/plots/props';
 export type {
 	ValuesStyle,
-	ColorsStyle,
 	FrameStyle,
 	FrameProp,
 	BasePlotStylesConfig,

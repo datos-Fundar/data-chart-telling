@@ -13,7 +13,7 @@
 	import StylesLayout from '$lib/layout/styles/StylesLayout.svelte';
 	import TooltipLayout from '$lib/layout/tooltip/TooltipLayout.svelte';
 	import type { PlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
-	import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
+	import type { AxisValue, AxisBasedScalesConfig, ChannelScalesConfig } from '$lib/types/layout/scales';
 	import type { CoordinatesConfig } from '$lib/types/layout/coordinates';
 	import type { StylesLayoutConfig } from '$lib/types/layout/styles';
 	import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
@@ -47,6 +47,7 @@
 		x = undefined,
 		y = undefined,
 		scales = undefined,
+		channelScales = undefined,
 		coordinates = undefined,
 		margins,
 		marginEstimate = AUTO_MARGIN_ESTIMATE,
@@ -75,6 +76,14 @@
 		y?: SveltePlotProps['y'];
 		/** Scale config `x`/`y` are derived from when not given directly. */
 		scales?: AxisBasedScalesConfig<TData>;
+		/**
+		 * This plot kind's own `color`/`grouping` channel config — the fallback
+		 * a `GeometryLayout` marker's own `scales` inherits when it sets none of
+		 * its own. Distinct from `scales` above: `GeoPlot` has no axis ticks to
+		 * derive (never passes `scales`) but still has its own channel ramp for
+		 * markers to inherit.
+		 */
+		channelScales?: ChannelScalesConfig;
 		/** This plot kind's coordinate system config — `GeoPlot` only (a projection + pan/zoom). */
 		coordinates?: CoordinatesConfig;
 		/** Partial margin override — merged on top of the theme. */
@@ -83,19 +92,11 @@
 		marginEstimate?: Record<'top' | 'right' | 'bottom' | 'left', number>;
 		/**
 		 * Forces svelteplot's own `<Plot>` to fully unmount/remount (via
-		 * `{#key}`) whenever this changes, instead of reacting to a `margins`
-		 * prop change on an already-mounted instance. Only needed by a caller
-		 * (line's own `Plot.svelte`) whose `margins` grows *after* mount, from
-		 * measuring rendered content (see `createLabelMarginTracker`) — handing
-		 * svelteplot's `<Plot>` a live post-mount margin change (rather than the
-		 * same final value from its very first mount) was observed to send its
-		 * own internal auto-margin sizing into a permanent one-pixel
-		 * bottom-margin oscillation for line's end-point value labels
-		 * specifically, which in turn kept re-triggering the overflow watcher
-		 * that grew the margin in the first place — an infinite effect loop
-		 * that tripped Svelte's `effect_update_depth_exceeded` guard. A static
-		 * `margins` prop (the common case — every other plot kind) never needs
-		 * this; leave it unset there.
+		 * `{#key}`) instead of reacting to a live `margins` change. Needed by a
+		 * caller whose `margins` grows *after* mount (line's own
+		 * `createLabelMarginTracker`) — a post-mount margin update otherwise
+		 * fights svelteplot's own auto-margin sizing into an infinite resize
+		 * loop. Leave unset for a static `margins` prop (every other kind).
 		 */
 		marginRemountKey?: string | number;
 		/** Boosts the bottom margin for a rotated x tick label — axis-having plot kinds only. */
@@ -125,16 +126,12 @@
 		/** Every plot kind creates its own via `createPlotHover` and passes it here — this component never creates one itself. */
 		hoverController: PlotHover<TData>;
 		/**
-		 * `matchedPoints` carries the source `row` alongside the display fields,
-		 * so a template can resolve it straight off `row` instead of assuming
-		 * which visual axis it landed on. `activePoint` is the one matched point
-		 * under the cursor. `numericMargins` lets a nested layout align itself
-		 * with the plot's own content box. `setHoverMatch`/`clearHoverMatch` let
-		 * a plot kind drive the match itself instead of svelteplot's
-		 * distance-based `<Pointer>` — see `hover.pointMatching`. When `markers`
-		 * is given, this is `GeometryLayout`'s own `children` instead of raw
-		 * plot content. Optional — a plot kind whose every mark is a `markers`
-		 * entry has nothing left to render here.
+		 * Renders on top of every marker. `matchedPoints` carries the source
+		 * `row` alongside the display fields; `activePoint` is the one under
+		 * the cursor; `numericMargins` lets it align with the content box;
+		 * `setHoverMatch`/`clearHoverMatch` drive the match directly instead of
+		 * svelteplot's distance-based `<Pointer>` (see `hover.pointMatching`).
+		 * Optional — a kind whose every mark is a `markers` entry needs nothing here.
 		 */
 		children?: Snippet<
 			[
@@ -261,6 +258,7 @@
 			markers={resolvedMarkers}
 			seriesData={seriesData ?? []}
 			scopedGroups={scopedGroups ?? []}
+			{channelScales}
 			{ctrl}
 			{width}
 			{height}

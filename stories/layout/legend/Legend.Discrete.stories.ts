@@ -21,10 +21,10 @@ export const SingleDiscrete: Story = {
 		sections: [
 			{
 				type: 'discrete',
-				title: 'Indicador',
+				title: 'Indicator',
 				items: [
-					{ name: 'PBI', label: 'PBI', color: '#4f46e5', symbol: 'line' },
-					{ name: 'Empleo', label: 'Empleo', color: '#e6580d', symbol: 'line' }
+					{ name: 'GDP', label: 'GDP', color: '#4f46e5', symbol: 'line' },
+					{ name: 'Employment', label: 'Employment', color: '#e6580d', symbol: 'line' }
 				]
 			}
 		] satisfies LegendSection[]
@@ -37,11 +37,11 @@ export const SingleDiscreteVertical: Story = {
 		sections: [
 			{
 				type: 'discrete',
-				title: 'Indicador',
+				title: 'Indicator',
 				layout: { type: 'vertical' },
 				items: [
-					{ name: 'PBI', label: 'PBI', color: '#4f46e5', symbol: 'line' },
-					{ name: 'Empleo', label: 'Empleo', color: '#e6580d', symbol: 'line' }
+					{ name: 'GDP', label: 'GDP', color: '#4f46e5', symbol: 'line' },
+					{ name: 'Employment', label: 'Employment', color: '#e6580d', symbol: 'line' }
 				]
 			}
 		] satisfies LegendSection[]
@@ -54,14 +54,14 @@ export const SingleDiscreteFlex: Story = {
 		sections: [
 			{
 				type: 'discrete',
-				title: 'Indicador',
+				title: 'Indicator',
 				layout: { type: 'flex' },
 				items: [
-					{ name: 'PBI', label: 'PBI', color: '#4f46e5', symbol: 'line' },
-					{ name: 'Empleo', label: 'Empleo', color: '#e6580d', symbol: 'line' },
-					{ name: 'Inflación', label: 'Inflación', color: '#16a34a', symbol: 'line' },
-					{ name: 'Exportaciones', label: 'Exportaciones', color: '#0ea5e9', symbol: 'line' },
-					{ name: 'Reservas', label: 'Reservas', color: '#f59e0b', symbol: 'line' }
+					{ name: 'GDP', label: 'GDP', color: '#4f46e5', symbol: 'line' },
+					{ name: 'Employment', label: 'Employment', color: '#e6580d', symbol: 'line' },
+					{ name: 'Inflation', label: 'Inflation', color: '#16a34a', symbol: 'line' },
+					{ name: 'Exports', label: 'Exports', color: '#0ea5e9', symbol: 'line' },
+					{ name: 'Reserves', label: 'Reserves', color: '#f59e0b', symbol: 'line' }
 				]
 			}
 		] satisfies LegendSection[]
@@ -74,7 +74,7 @@ export const ManyItemsInColumns: Story = {
 		sections: [
 			{
 				type: 'discrete',
-				title: 'Ambientes',
+				title: 'Rooms',
 				layout: { type: 'vertical' },
 				columns: 2,
 				items: [

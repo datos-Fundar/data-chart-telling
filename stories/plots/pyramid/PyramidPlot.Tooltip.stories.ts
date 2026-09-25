@@ -6,21 +6,21 @@ import { AGE_GROUPS, POPULATION_PYRAMID, type PopulationRow } from '../../data/p
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Plots/PyramidPlot/Tooltip',
-  component: PyramidPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 520,
-  },
-  argTypes: {
-    width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
-    height: { control: { type: 'range', min: 320, max: 800, step: 20 } },
-    tooltip: { control: false },
-  },
-  parameters: {
-    docs: { source: { name: 'PyramidPlot' } },
-  },
+	title: 'Plots/PyramidPlot/Tooltip',
+	component: PyramidPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 520
+	},
+	argTypes: {
+		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
+		height: { control: { type: 'range', min: 320, max: 800, step: 20 } },
+		tooltip: { control: false }
+	},
+	parameters: {
+		docs: { source: { name: 'PyramidPlot' } }
+	}
 } satisfies Meta<typeof PyramidPlot>;
 
 export default meta;
@@ -35,13 +35,13 @@ const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
  * This is the default behaviour when `tooltip` is omitted.
  */
 export const NoTooltip: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } }
+	}
 };
 
 /**
@@ -52,21 +52,21 @@ export const NoTooltip: Story = {
  * `facetId: ''` and `sync: false`.
  */
 export const BasicTooltip: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { ageGroup, sex, pct } = row as PopulationRow;
-        return `${sex} - ${ageGroup}: ${pct}%`;
-      },
-    },
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { ageGroup, sex, pct } = row as PopulationRow;
+				return `${sex} - ${ageGroup}: ${pct}%`;
+			}
+		}
+	}
 };
 
 /**
@@ -74,21 +74,21 @@ export const BasicTooltip: Story = {
  * The first line becomes the heading, the rest the body text.
  */
 export const RichFormat: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { ageGroup, sex, pct } = row as PopulationRow;
-        return `${sex}\nAge Group: ${ageGroup}\nPopulation: ${pct.toFixed(2)}%`;
-      },
-    },
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { ageGroup, sex, pct } = row as PopulationRow;
+				return `${sex}\nAge Group: ${ageGroup}\nPopulation: ${pct.toFixed(2)}%`;
+			}
+		}
+	}
 };
 
 /**
@@ -96,23 +96,23 @@ export const RichFormat: Story = {
  * Here it shows the population as a fraction and relative to a base cohort size.
  */
 export const ComputedFormat: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { ageGroup, sex, pct } = row as PopulationRow;
-        const baselinePct = 3.0;
-        const ratio = (pct / baselinePct).toFixed(2);
-        return `${sex} (${ageGroup}): ${pct.toFixed(2)}% (${ratio}× baseline)`;
-      },
-    },
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { ageGroup, sex, pct } = row as PopulationRow;
+				const baselinePct = 3.0;
+				const ratio = (pct / baselinePct).toFixed(2);
+				return `${sex} (${ageGroup}): ${pct.toFixed(2)}% (${ratio}× baseline)`;
+			}
+		}
+	}
 };
 
 /**
@@ -121,44 +121,44 @@ export const ComputedFormat: Story = {
  * no tooltip.
  */
 export const FemaleOnly: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    tooltip: {
-      facetId: '',
-      sync: false,
-      series: ['Female'],
-      format: (row) => {
-        const { ageGroup, pct } = row as PopulationRow;
-        return `Female - ${ageGroup}: ${pct.toFixed(2)}%`;
-      },
-    },
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		tooltip: {
+			facetId: '',
+			sync: false,
+			series: ['Female'],
+			format: (row) => {
+				const { ageGroup, pct } = row as PopulationRow;
+				return `Female - ${ageGroup}: ${pct.toFixed(2)}%`;
+			}
+		}
+	}
 };
 
 /**
  * Series-filtered to males — same as FemaleOnly but for the male side.
  */
 export const MaleOnly: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    tooltip: {
-      facetId: '',
-      sync: false,
-      series: ['Male'],
-      format: (row) => {
-        const { ageGroup, pct } = row as PopulationRow;
-        return `Male - ${ageGroup}: ${pct.toFixed(2)}%`;
-      },
-    },
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		tooltip: {
+			facetId: '',
+			sync: false,
+			series: ['Male'],
+			format: (row) => {
+				const { ageGroup, pct } = row as PopulationRow;
+				return `Male - ${ageGroup}: ${pct.toFixed(2)}%`;
+			}
+		}
+	}
 };
 
 /**
@@ -166,22 +166,22 @@ export const MaleOnly: Story = {
  * and male bars and includes the sex in a clear format.
  */
 export const BothSidesFormatted: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { sex, ageGroup, pct } = row as PopulationRow;
-        const sexEmoji = sex === 'Female' ? '♀' : '♂';
-        return `${sexEmoji} ${sex}\n${ageGroup}: ${pct.toFixed(2)}%`;
-      },
-    },
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { sex, ageGroup, pct } = row as PopulationRow;
+				const sexEmoji = sex === 'Female' ? '♀' : '♂';
+				return `${sexEmoji} ${sex}\n${ageGroup}: ${pct.toFixed(2)}%`;
+			}
+		}
+	}
 };
 
 /**
@@ -189,21 +189,21 @@ export const BothSidesFormatted: Story = {
  * that age-sex cohort represents.
  */
 export const CohortPercentage: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { sex, ageGroup, pct } = row as PopulationRow;
-        return `${sex} (${ageGroup})\n${pct.toFixed(2)}% of population`;
-      },
-    },
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { sex, ageGroup, pct } = row as PopulationRow;
+				return `${sex} (${ageGroup})\n${pct.toFixed(2)}% of population`;
+			}
+		}
+	}
 };
 
 /**
@@ -220,7 +220,7 @@ export const CohortPercentage: Story = {
  * `content` is set, so the custom card fully owns the look.
  */
 export const CustomContent: StoryObj = {
-  render: () => ({ Component: RichTooltip }),
+	render: () => ({ Component: RichTooltip })
 };
 
 /**
@@ -231,21 +231,21 @@ export const CustomContent: StoryObj = {
  * overflow.
  */
 export const CustomAnchor: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    tooltip: {
-      facetId: '',
-      sync: false,
-      anchorX: 'left',
-      anchorY: 'top',
-      format: (row) => {
-        const { ageGroup, sex, pct } = row as PopulationRow;
-        return `${sex} - ${ageGroup}: ${pct}%`;
-      },
-    },
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		tooltip: {
+			facetId: '',
+			sync: false,
+			anchorX: 'left',
+			anchorY: 'top',
+			format: (row) => {
+				const { ageGroup, sex, pct } = row as PopulationRow;
+				return `${sex} - ${ageGroup}: ${pct}%`;
+			}
+		}
+	}
 };

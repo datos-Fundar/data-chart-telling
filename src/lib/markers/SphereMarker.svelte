@@ -7,9 +7,9 @@
 </script>
 
 <Sphere
-  fill={marker.style?.fill}
-  fillOpacity={marker.style?.fillOpacity}
-  stroke={marker.style?.stroke ?? 'currentColor'}
-  strokeWidth={marker.style?.strokeWidth ?? 1}
+  fill={marker.styles?.fill}
+  fillOpacity={marker.styles?.fillOpacity}
+  stroke={marker.styles?.stroke ?? 'currentColor'}
+  strokeWidth={marker.styles?.strokeWidth ?? 1}
   style="vector-effect: non-scaling-stroke"
 />

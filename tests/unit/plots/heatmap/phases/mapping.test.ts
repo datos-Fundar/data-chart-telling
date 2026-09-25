@@ -8,7 +8,7 @@ import type { Series } from '$lib/types/plots/data/common';
 type Row = { row: string; col: string; value: number };
 
 const SERIES: Series<Row>[] = [
-	{ name: 'a', x: 'col', y: 'row', z: 'value', data: [{ row: 'X', col: 'A', value: 5 }] }
+	{ name: 'a', x: 'col', y: 'row', color: 'value', data: [{ row: 'X', col: 'A', value: 5 }] }
 ];
 
 function build(overrides: Partial<HeatmapPlotState<Row>> = {}) {
@@ -24,24 +24,24 @@ function build(overrides: Partial<HeatmapPlotState<Row>> = {}) {
 }
 
 describe('buildMapping – channels', () => {
-	test('resolves x/y/z to the first series own accessors', () => {
+	test('resolves x/y/color to the first series own accessors', () => {
 		const result = build();
 		const row = SERIES[0].data[0];
 		expect(result.channels!.x.accessor(row)).toBe('A');
 		expect(result.channels!.y.accessor(row)).toBe('X');
-		expect(result.channels!.z.accessor(row)).toBe(5);
+		expect(result.channels!.color.accessor(row)).toBe(5);
 	});
 
-	test('falls back to the top-level x/y/z props when resolvedSeries is empty', () => {
+	test('falls back to the top-level x/y/color props when resolvedSeries is empty', () => {
 		const result = build({
 			resolvedSeries: [],
 			x: (d) => d.col,
 			y: (d) => d.row,
-			z: (d) => d.value
+			color: (d) => d.value
 		});
 		const row: Row = { row: 'Y', col: 'B', value: 9 };
 		expect(result.channels!.x.accessor(row)).toBe('B');
 		expect(result.channels!.y.accessor(row)).toBe('Y');
-		expect(result.channels!.z.accessor(row)).toBe(9);
+		expect(result.channels!.color.accessor(row)).toBe(9);
 	});
 });

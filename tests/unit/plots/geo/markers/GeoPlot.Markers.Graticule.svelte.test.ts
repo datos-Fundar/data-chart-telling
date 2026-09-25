@@ -24,7 +24,7 @@ describe('GeoPlot – graticule marker', () => {
       height: 300,
       data: WORLD_COUNTRIES,
       markers: [
-        { type: 'graticule', step: 20, style: { stroke: '#94a3b8', strokeDasharray: '2 2' } },
+        { type: 'graticule', step: 20, styles: { stroke: '#94a3b8', strokeDasharray: '2 2' } },
       ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
@@ -51,7 +51,7 @@ describe('GeoPlot – sphere marker', () => {
       height: 300,
       data: WORLD_COUNTRIES,
       coordinates: { projection: 'orthographic' },
-      markers: [{ type: 'sphere', style: { fill: '#eff6ff', stroke: 'currentColor' } }] satisfies GeoMarkersConfig[],
+      markers: [{ type: 'sphere', styles: { fill: '#eff6ff', stroke: 'currentColor' } }] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();

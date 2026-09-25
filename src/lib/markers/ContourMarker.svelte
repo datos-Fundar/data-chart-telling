@@ -20,9 +20,9 @@
   thresholds={marker.thresholds}
   fill={marker.fill}
   stroke={marker.stroke ?? 'currentColor'}
-  strokeWidth={marker.style?.strokeWidth}
-  fillOpacity={marker.style?.fillOpacity}
-  strokeOpacity={marker.style?.strokeOpacity}
+  strokeWidth={marker.styles?.strokeWidth}
+  fillOpacity={marker.styles?.fillOpacity}
+  strokeOpacity={marker.styles?.strokeOpacity}
   blur={marker.blur}
   interpolate={marker.interpolate}
 />

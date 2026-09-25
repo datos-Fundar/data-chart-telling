@@ -39,7 +39,7 @@ describe('buildLineMarkers – geometry', () => {
 	test('emits a dot marker right after the line one when style.dots is set', () => {
 		const groupedSeries = buildGroupedSeries<Series<{ x: number; y: number }>, LineSegmentStyle>(
 			[SERIES],
-			{ default: [{ style: { dots: {} } }] }
+			{ default: [{ styles: { dots: {} } }] }
 		);
 		const markers = buildLine({ groupedSeries });
 		expect(markers.map((m) => m.type)).toEqual(['line', 'dot']);
@@ -49,15 +49,15 @@ describe('buildLineMarkers – geometry', () => {
 describe('buildLineMarkers – style resolution', () => {
 	test('falls back to the default color when a segment has no stroke of its own', () => {
 		const [marker] = buildLine({ colorFor: () => 'green' }) as [LineMarkerConfig];
-		expect(marker.style?.stroke).toBe('green');
+		expect(marker.styles?.stroke).toBe('green');
 	});
 
 	test('a disabled-stroke override wins over the segment/default color', () => {
 		const [marker] = buildLine({
 			disabledStrokeFor: () => ({ stroke: 'gray', strokeOpacity: 0.3 })
 		}) as [LineMarkerConfig];
-		expect(marker.style?.stroke).toBe('gray');
-		expect(marker.style?.strokeOpacity).toBe(0.3);
+		expect(marker.styles?.stroke).toBe('gray');
+		expect(marker.styles?.strokeOpacity).toBe(0.3);
 	});
 });
 

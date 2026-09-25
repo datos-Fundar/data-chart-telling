@@ -6,22 +6,22 @@ import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from './data';
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Plots/HeatmapPlot/Styles',
-  component: HeatmapPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 420,
-  },
-  argTypes: {
-    width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
-    height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
-    series: { control: false },
-    styles: { control: false },
-  },
-  parameters: {
-    docs: { source: { name: 'HeatmapPlot' } },
-  },
+	title: 'Plots/HeatmapPlot/Styles',
+	component: HeatmapPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 420
+	},
+	argTypes: {
+		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
+		height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
+		series: { control: false },
+		styles: { control: false }
+	},
+	parameters: {
+		docs: { source: { name: 'HeatmapPlot' } }
+	}
 } satisfies Meta<typeof HeatmapPlot>;
 
 export default meta;
@@ -34,12 +34,12 @@ type Story = StoryObj<typeof meta>;
  * Cell values are displayed and color ramp is auto-selected.
  */
 export const Default: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-    x: 'province',
-    y: 'sex',
-    z: 'value',
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+		x: 'province',
+		y: 'sex',
+		color: 'value'
+	}
 };
 
 /**
@@ -47,18 +47,18 @@ export const Default: Story = {
  * labels from each cell, useful when cells are small or data density is high.
  */
 export const NoValueLabels: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-    x: 'province',
-    y: 'sex',
-    z: 'value',
-    scales: {
-      z: { domain: [70, 85] },
-    },
-    styles: {
-      values: { show: false },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+		x: 'province',
+		y: 'sex',
+		color: 'value',
+		scales: {
+			color: { domain: [70, 85] }
+		},
+		styles: {
+			values: { show: false }
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 /**
@@ -66,18 +66,18 @@ export const NoValueLabels: Story = {
  * are displayed. Here life expectancy is shown in years with one decimal place.
  */
 export const CustomValueFormat: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-    x: 'province',
-    y: 'sex',
-    z: 'value',
-    scales: {
-      z: { domain: [70, 85] },
-    },
-    styles: {
-      values: { format: (v: number) => `${v.toFixed(1)} yr` },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+		x: 'province',
+		y: 'sex',
+		color: 'value',
+		scales: {
+			color: { domain: [70, 85] }
+		},
+		styles: {
+			values: { format: (v: number) => `${v.toFixed(1)} yr` }
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 /**
@@ -85,19 +85,18 @@ export const CustomValueFormat: Story = {
  * (dark blue to light blue) instead of the default viridis-like ramp.
  */
 export const WarmColorRamp: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-    x: 'province',
-    y: 'sex',
-    z: 'value',
-    scales: {
-      z: { domain: [70, 85] },
-    },
-    styles: {
-      colors: { min: 'darkblue', max: 'cornflowerblue' },
-      values: { format: (v: number) => `${v.toFixed(1)} yr` },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+		x: 'province',
+		y: 'sex',
+		color: 'value',
+		scales: {
+			color: { domain: [70, 85], scheme: ['darkblue', 'cornflowerblue'] }
+		},
+		styles: {
+			values: { format: (v: number) => `${v.toFixed(1)} yr` }
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 /**
@@ -105,19 +104,18 @@ export const WarmColorRamp: Story = {
  * Here a red-to-green ramp emphasizes low and high life expectancy.
  */
 export const CustomColorRamp: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-    x: 'province',
-    y: 'sex',
-    z: 'value',
-    scales: {
-      z: { domain: [70, 85] },
-    },
-    styles: {
-      colors: { min: '#ff6b6b', max: '#51cf66' },
-      values: { format: (v: number) => `${v.toFixed(1)} yr` },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+		x: 'province',
+		y: 'sex',
+		color: 'value',
+		scales: {
+			color: { domain: [70, 85], scheme: ['#ff6b6b', '#51cf66'] }
+		},
+		styles: {
+			values: { format: (v: number) => `${v.toFixed(1)} yr` }
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 /**
@@ -125,17 +123,16 @@ export const CustomColorRamp: Story = {
  * in darker tones, reversing the typical visual weight.
  */
 export const InvertedColorRamp: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-    x: 'province',
-    y: 'sex',
-    z: 'value',
-    scales: {
-      z: { domain: [70, 85] },
-    },
-    styles: {
-      colors: { min: '#51cf66', max: '#ff6b6b' },
-      values: { format: (v: number) => `${v.toFixed(1)} yr` },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+		x: 'province',
+		y: 'sex',
+		color: 'value',
+		scales: {
+			color: { domain: [70, 85], scheme: ['#51cf66', '#ff6b6b'] }
+		},
+		styles: {
+			values: { format: (v: number) => `${v.toFixed(1)} yr` }
+		} satisfies AxisBasedStylesConfig
+	}
 };

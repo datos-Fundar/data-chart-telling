@@ -7,28 +7,28 @@ import { REGION_BARS } from '../../data/region-bars';
 import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
 
 const meta = {
-  title: 'Charts/BarChart',
-  component: BarChart,
-  tags: ['autodocs'],
-  args: {
-    width: 680,
-    height: 460,
-    data: REGION_BARS,
-    x: 'region',
-    y: 'value',
-  },
-  argTypes: {
-    width: { control: { type: 'range', min: 320, max: 1000, step: 20 } },
-    height: { control: { type: 'range', min: 240, max: 700, step: 20 } },
-    data: { control: false },
-    x: { control: false },
-    y: { control: false },
-    z: { control: false },
-    segments: { control: false },
-    facet: { control: false },
-    timeline: { control: false },
-    legend: { control: false },
-  },
+	title: 'Charts/BarChart',
+	component: BarChart,
+	tags: ['autodocs'],
+	args: {
+		width: 680,
+		height: 460,
+		data: REGION_BARS,
+		x: 'region',
+		y: 'value'
+	},
+	argTypes: {
+		width: { control: { type: 'range', min: 320, max: 1000, step: 20 } },
+		height: { control: { type: 'range', min: 240, max: 700, step: 20 } },
+		data: { control: false },
+		x: { control: false },
+		y: { control: false },
+		color: { control: false },
+		segments: { control: false },
+		facet: { control: false },
+		timeline: { control: false },
+		legend: { control: false }
+	}
 } satisfies Meta<typeof BarChart>;
 
 export default meta;
@@ -36,11 +36,11 @@ type Story = StoryObj<typeof meta>;
 
 /** Single categorical bar series wrapped in the chart container. */
 export const Default: Story = {
-  args: {
-    title: 'Valor por región',
-    subtitle: 'Año 2022',
-    data: REGION_BARS.filter((d) => d.year === 2022),
-  },
+	args: {
+		title: 'Value by region',
+		subtitle: 'Year 2022',
+		data: REGION_BARS.filter((d) => d.year === 2022)
+	}
 };
 
 /**
@@ -48,17 +48,17 @@ export const Default: Story = {
  * bars redraw for the selected year. Drag the scrubber above the chart.
  */
 export const WithTimeline: StoryObj = {
-  render: () => ({ Component: BarTimeline }),
+	render: () => ({ Component: BarTimeline })
 };
 
 /**
  * `interpolate` crossfades each bar's height between its real values at the
  * two years bracketing the scrub position, instead of cutting straight from
  * one snapshot to the next — `interpolate: true` reuses the chart's own `y`
- * (and `x`/`z` as the per-bar key), no extra wiring needed.
+ * (and `x`/`color` as the per-bar key), no extra wiring needed.
  */
 export const WithInterpolatedTimeline: StoryObj = {
-  render: () => ({ Component: BarTimelineInterpolated }),
+	render: () => ({ Component: BarTimelineInterpolated })
 };
 
 /**
@@ -66,16 +66,16 @@ export const WithInterpolatedTimeline: StoryObj = {
  * Uses the grouped time-series dataset with `x = year`.
  */
 export const Faceted: Story = {
-  args: {
-    title: 'Indicadores por métrica',
-    subtitle: 'Facetado por métrica',
-    data: TIME_SERIES.filter((d) => d.region === 'North'),
-    x: 'year',
-    facet: { by: 'metric' as keyof SeriesPoint, columns: 2 },
-  },
+	args: {
+		title: 'Indicators by metric',
+		subtitle: 'Faceted by metric',
+		data: TIME_SERIES.filter((d) => d.region === 'North'),
+		x: 'year',
+		facet: { by: 'metric' as keyof SeriesPoint, columns: 2 }
+	}
 };
 
 /** Timeline + facet together: a shared year scrubber across faceted panels. */
 export const TimelineAndFacet: StoryObj = {
-  render: () => ({ Component: BarTimelineFacet }),
+	render: () => ({ Component: BarTimelineFacet })
 };

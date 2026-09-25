@@ -37,8 +37,9 @@ export type PyramidPlotState<TData extends Record<string, unknown>> = {
 	x?: Accessor<TData, AxisValue>;
 	/** Category accessor (the plot's `y` prop). */
 	y?: Accessor<TData, AxisValue>;
-	/** Side-grouping accessor (the plot's `z` prop). */
-	z?: Accessor<TData, unknown>;
+	/** Side-grouping accessor — defaults to `color` when unset (see `DataProps.grouping`). */
+	grouping?: Accessor<TData, unknown>;
+	color?: Accessor<TData, unknown>;
 	segments: SegmentsConfig<BarSegmentStyle>;
 	gaps: Record<string, GapZonesConfig<BarSegmentStyle>>;
 	scales: AxisBasedScalesConfig<TData>;
@@ -51,6 +52,7 @@ export type PyramidPlotState<TData extends Record<string, unknown>> = {
 	groupedSeries?: VisualGroup<PyramidSeries<TData>, BarSegmentStyle>[];
 	gapFillMaps?: Map<string, Map<TData, DiscreteGapFill<BarSegmentStyle>>>;
 	scopedGroups?: ScopedMarkerGroup<TData>[];
+	colorForSeries?: (name: string) => string;
 
 	// "mapping" phase output — tagged, hover-safe rows (gap rows already filtered out).
 	flat?: PyramidTaggedRow<TData>[];
@@ -68,6 +70,5 @@ export type PyramidPlotState<TData extends Record<string, unknown>> = {
 export type PyramidPlotCtx = {
 	cfg: ChartConfig;
 	formatValue: (value: number, seriesName: string) => string;
-	colorForSide: (side: PyramidSide) => string;
 	disabledFillFor?: (name: string) => { fill?: string; fillOpacity?: number } | undefined;
 };

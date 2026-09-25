@@ -6,39 +6,44 @@ import { AGE_GROUPS, POPULATION_PYRAMID, type PopulationRow } from '../../data/p
 import type { LegendSection } from '$lib/types/layout/legend';
 
 const legend: LegendSection[] = [
-  {
-    type: 'discrete',
-    items: [
-      { name: 'Female', color: '#d6336c', symbol: 'square' },
-      { name: 'Male', color: '#1971c2', symbol: 'square' },
-    ],
-    columns: 2,
-  },
+	{
+		type: 'discrete',
+		items: [
+			{ name: 'Female', color: '#d6336c', symbol: 'square' },
+			{ name: 'Male', color: '#1971c2', symbol: 'square' }
+		],
+		columns: 2
+	}
 ];
 
 const meta = {
-  title: 'Charts/PyramidChart',
-  component: PyramidChart,
-  tags: ['autodocs'],
-  args: {
-    width: 680,
-    height: 560,
-    y: 'ageGroup' as keyof PopulationRow,
-    x: 'pct' as keyof PopulationRow,
-    z: 'sex' as keyof PopulationRow,
-    scales: { y: { domain: AGE_GROUPS } },
-    styles: { colors: { left: '#d6336c', right: '#1971c2' }, values: { format: (v: number) => `${v.toFixed(1)}%` } },
-  },
-  argTypes: {
-    width: { control: { type: 'range', min: 320, max: 1000, step: 20 } },
-    height: { control: { type: 'range', min: 320, max: 800, step: 20 } },
-    data: { control: false },
-    z: { control: false },
-    segments: { control: false },
-    facet: { control: false },
-    timeline: { control: false },
-    legend: { control: false },
-  },
+	title: 'Charts/PyramidChart',
+	component: PyramidChart,
+	tags: ['autodocs'],
+	args: {
+		width: 680,
+		height: 560,
+		y: 'ageGroup' as keyof PopulationRow,
+		x: 'pct' as keyof PopulationRow,
+		color: 'sex' as keyof PopulationRow,
+		scales: {
+			y: { domain: AGE_GROUPS },
+			color: { scheme: { Female: '#d6336c', Male: '#1971c2' } }
+		},
+		styles: {
+			values: { format: (v: number) => `${v.toFixed(1)}%` }
+		}
+	},
+	argTypes: {
+		width: { control: { type: 'range', min: 320, max: 1000, step: 20 } },
+		height: { control: { type: 'range', min: 320, max: 800, step: 20 } },
+		data: { control: false },
+		color: { control: false },
+		segments: { control: false },
+		facet: { control: false },
+		timeline: { control: false },
+		legend: { control: false }
+	}
 } satisfies Meta<typeof PyramidChart>;
 
 export default meta;
@@ -46,23 +51,23 @@ type Story = StoryObj<typeof meta>;
 
 /** A static pyramid for one year, with a discrete legend for the two sides. */
 export const Default: Story = {
-  args: {
-    title: 'Pirámide poblacional',
-    subtitle: 'Censo 2022',
-    data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
-    legend,
-  },
+	args: {
+		title: 'Population pyramid',
+		subtitle: 'Census 2022',
+		data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
+		legend
+	}
 };
 
 /** `showValues` prints each bar's magnitude beside it. */
 export const WithValueLabels: Story = {
-  args: {
-    title: 'Pirámide poblacional',
-    subtitle: 'Censo 2022',
-    data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
-    legend,
-    styles: { values: { show: true } },
-  },
+	args: {
+		title: 'Population pyramid',
+		subtitle: 'Census 2022',
+		data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
+		legend,
+		styles: { values: { show: true } }
+	}
 };
 
 /**
@@ -70,18 +75,18 @@ export const WithValueLabels: Story = {
  * timelines — drag the scrubber to morph the pyramid from 1991 to 2040.
  */
 export const WithTimeline: StoryObj = {
-  render: () => ({ Component: PyramidTimeline }),
+	render: () => ({ Component: PyramidTimeline })
 };
 
 /**
  * `interpolate` crossfades each bar's magnitude between its real values at
  * the two censuses bracketing the scrub position, instead of cutting
  * straight from one snapshot to the next — `interpolate: true` reuses the
- * chart's own `value` (and `category`/`z` as the per-bar key), no extra
- * wiring needed.
+ * chart's own `x` (magnitude) as the tweened value, and `y`/`color` (or
+ * `grouping`, when set) as the per-bar key, no extra wiring needed.
  */
 export const WithInterpolatedTimeline: StoryObj = {
-  render: () => ({ Component: PyramidTimelineInterpolated }),
+	render: () => ({ Component: PyramidTimelineInterpolated })
 };
 
 /**
@@ -89,16 +94,16 @@ export const WithInterpolatedTimeline: StoryObj = {
  * runs.
  */
 export const WithTimelineAndHighlight: StoryObj = {
-  render: () => ({ Component: PyramidTimeline, props: { highlight: ['0-4', '5-9', '10-14'] } }),
+	render: () => ({ Component: PyramidTimeline, props: { highlight: ['0-4', '5-9', '10-14'] } })
 };
 
 /** Faceted small multiples — one pyramid per decade. */
 export const Faceted: Story = {
-  args: {
-    title: 'Pirámide poblacional por año',
-    subtitle: 'Facetado por año',
-    data: POPULATION_PYRAMID.filter((d) => [1991, 2022, 2030, 2040].includes(d.year)),
-    legend,
-    facet: { by: 'year' as keyof PopulationRow, columns: 2 },
-  },
+	args: {
+		title: 'Population pyramid by year',
+		subtitle: 'Faceted by year',
+		data: POPULATION_PYRAMID.filter((d) => [1991, 2022, 2030, 2040].includes(d.year)),
+		legend,
+		facet: { by: 'year' as keyof PopulationRow, columns: 2 }
+	}
 };

@@ -17,7 +17,7 @@ const meta = {
 		data: { control: false },
 		x: { control: false },
 		y: { control: false },
-		z: { control: false },
+		color: { control: false },
 		tooltip: { control: false }
 	},
 	parameters: {
@@ -31,10 +31,10 @@ type Story = StoryObj<typeof meta>;
 /** A single grouped line chart with `tooltip` + the hover marker. */
 export const Basic: Story = {
 	args: {
-		title: 'PBI vs. Empleo',
-		subtitle: 'Pasá el cursor por las líneas',
+		title: 'GDP vs. Employment',
+		subtitle: 'Hover over the lines',
 		data: TIME_SERIES.filter((d) => d.region === 'North'),
-		z: 'metric' as keyof SeriesPoint,
+		color: 'metric' as keyof SeriesPoint,
 		tooltip: true,
 		markers: [{ type: 'hover' }]
 	}
@@ -43,9 +43,9 @@ export const Basic: Story = {
 /** Tooltip text only — no in-SVG crosshair/dot. */
 export const TooltipOnly: Story = {
 	args: {
-		title: 'Solo tooltip (sin marcador)',
+		title: 'Tooltip only (no marker)',
 		data: TIME_SERIES.filter((d) => d.region === 'North'),
-		z: 'metric' as keyof SeriesPoint,
+		color: 'metric' as keyof SeriesPoint,
 		tooltip: true
 	}
 };
@@ -53,9 +53,9 @@ export const TooltipOnly: Story = {
 /** Hover marker only — no floating HTML tooltip. */
 export const MarkerOnly: Story = {
 	args: {
-		title: 'Solo marcador (sin tooltip)',
+		title: 'Marker only (no tooltip)',
 		data: TIME_SERIES.filter((d) => d.region === 'North'),
-		z: 'metric' as keyof SeriesPoint,
+		color: 'metric' as keyof SeriesPoint,
 		markers: [{ type: 'hover' }]
 	}
 };

@@ -94,6 +94,17 @@ const preview: Preview = {
 							'Tooltip'
 						]
 					],
+					'Channels',
+					[
+						'Color',
+						[
+							'Plot Level',
+							['Heatmap', 'Geo'],
+							'Marker Level',
+							['Dot', 'Cell', 'Bar'],
+							'Independent Ramps'
+						]
+					],
 					'Layout',
 					[
 						'Facets',

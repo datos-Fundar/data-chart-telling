@@ -36,11 +36,10 @@
 
 	/**
 	 * A point cloud on continuous x/y axes. Accepts either a pre-built `series`
-	 * array or flat `data/x/y/z` props — mirrors the line/bar plot contract so
-	 * the chart-level container/timeline/facet/legend wrap it unchanged. `r`
-	 * gives every dot a per-row radius (bubble sizing), independent of `z`
-	 * grouping/coloring — see {@link ScatterDataProps} for its auto-scaling
-	 * behavior.
+	 * array or flat `data/x/y/color` props — mirrors the line/bar plot contract
+	 * so the chart-level container/timeline/facet/legend wrap it unchanged. `r`
+	 * gives every dot a per-row radius (bubble sizing), independent of `color`
+	 * grouping — see {@link ScatterDataProps} for its auto-scaling behavior.
 	 */
 	type Props = BasePlotProps<
 		ScatterDataProps<TData>,
@@ -58,7 +57,8 @@
 		data,
 		x,
 		y,
-		z,
+		grouping,
+		color,
 		r,
 		styles = {},
 		segments = {},
@@ -110,7 +110,7 @@
 	const plotState = $derived(
 		runStages<ScatterPlotState<TData>, ScatterPlotCtx>(
 			stages,
-			{ series, data, x, y, z, r, segments, scales, width, height, margins },
+			{ series, data, x, y, grouping, color, r, segments, scales, width, height, margins },
 			ctx
 		)
 	);
@@ -191,6 +191,7 @@
 	getY={(d) => Number(yAcc(d))}
 	{hover}
 	scales={resolvedScales}
+	channelScales={resolvedScales}
 	{...labelMargin.plotProps}
 	{hoverController}
 	markers={[...(plotState.markers ?? []), ...markers]}

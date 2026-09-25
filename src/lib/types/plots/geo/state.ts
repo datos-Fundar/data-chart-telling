@@ -34,7 +34,10 @@ export type GeoPlotState<TProps extends Record<string, unknown>> = {
 	/** Already resolved to plain GeoJSON — TopoJSON's async conversion happens in `Plot.svelte` itself, before the pipeline runs. */
 	rawFeatures: GeoFeature<TProps>[];
 	featureId?: Accessor<GeoFeature<TProps>, string>;
-	value?: (feature: GeoFeature<TProps>) => number | undefined;
+	/** Color-value accessor — see `GeoDataProps.color`. */
+	color?: (feature: GeoFeature<TProps>) => number | undefined;
+	/** Structural grouping-bucket accessor — see `GeoDataProps.grouping`. */
+	grouping?: (feature: GeoFeature<TProps>) => string | undefined;
 	excludeParts?: (
 		part: { centroid: [number, number]; geometry: GeoJSON.Geometry },
 		feature: TaggedGeoFeature<TProps>
@@ -51,8 +54,8 @@ export type GeoPlotState<TProps extends Record<string, unknown>> = {
 	allFeatures?: TaggedGeoFeature<TProps>[];
 	features?: TaggedGeoFeature<TProps>[];
 
-	// "scales" phase output.
-	colorScale?: ((value: number) => string) | null;
+	/** "scales" phase output: each feature's own resolved color, composed from `color` and the color ramp — `undefined` where `color` itself is unset/returns nothing. */
+	resolveColor?: (feature: GeoFeature<TProps>) => string | undefined;
 
 	// "markers" phase output — full draw-order merge with `authoredMarkers`,
 	// minus live hover pointer handlers on the base 'geo' marker(s); see
@@ -64,8 +67,6 @@ export type GeoPlotState<TProps extends Record<string, unknown>> = {
 /** The environment every GeoPlot phase reads from, alongside the growing state. */
 export type GeoPlotCtx<TProps extends Record<string, unknown>> = {
 	cfg: ChartConfig;
-	minColor: string;
-	maxColor: string;
 	range: GeoRangeFilter | null | undefined;
 	fill?: string;
 	fillOpacity?: number;

@@ -4,10 +4,10 @@ import type { AxisBasedStylesConfig, GapsAwarePlotStylesConfig } from '$lib/type
 import type { GapsConfig } from '$lib/types/plots/gaps';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import {
-  FEMALE_LIFE_EXPECTANCY,
-  MALE_LIFE_EXPECTANCY,
-  FEMALE_LIFE_EXPECTANCY_WITH_GAPS,
-  MALE_LIFE_EXPECTANCY_WITH_GAPS,
+	FEMALE_LIFE_EXPECTANCY,
+	MALE_LIFE_EXPECTANCY,
+	FEMALE_LIFE_EXPECTANCY_WITH_GAPS,
+	MALE_LIFE_EXPECTANCY_WITH_GAPS
 } from './data';
 import LineValuesLegendDemo from './LineValuesLegendDemo.svelte';
 import LineGapsLegendDemo from './LineGapsLegendDemo.svelte';
@@ -22,22 +22,22 @@ import { renderSource } from '../../common/docsSource';
 // stack it onto that page's already many co-mounted `LinePlot` instances.
 
 const meta = {
-  title: 'Plots/LinePlot/Legend',
-  component: LinePlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 400,
-  },
-  argTypes: {
-    width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
-    height: { control: { type: 'range', min: 200, max: 700, step: 50 } },
-    series: { control: false },
-    styles: { control: false },
-  },
-  parameters: {
-    docs: { source: { name: 'LinePlot' } },
-  },
+	title: 'Plots/LinePlot/Legend',
+	component: LinePlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 400
+	},
+	argTypes: {
+		width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
+		height: { control: { type: 'range', min: 200, max: 700, step: 50 } },
+		series: { control: false },
+		styles: { control: false }
+	},
+	parameters: {
+		docs: { source: { name: 'LinePlot' } }
+	}
 } satisfies Meta<typeof LinePlot>;
 
 export default meta;
@@ -47,7 +47,7 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * A legend-disabled series dims its value label too, not just its line.
- * Toggling "Mujeres" or "Varones" off in the legend above fades that
+ * Toggling "Female" or "Male" off in the legend above fades that
  * series' end-of-line label along with the line itself, instead of leaving
  * the label at full opacity while the line fades. Composed here with
  * `provideLegendInteraction()` + `LegendLayout` directly around `LinePlot`
@@ -55,27 +55,27 @@ type Story = StoryObj<typeof meta>;
  * exposed for standalone composition. See `LineValuesLegendDemo.svelte`.
  */
 export const LegendDisabledDimsLabel: StoryObj = {
-  render: () => ({ Component: LineValuesLegendDemo }),
-  parameters: {
-    docs: {
-      source: {
-        code: renderSource('LinePlot', {
-          width: 950,
-          height: 400,
-          series: [
-            { name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY },
-            { name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY },
-          ],
-          styles: {
-            values: {
-              show: true,
-              format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
-            },
-          },
-        }),
-      },
-    },
-  },
+	render: () => ({ Component: LineValuesLegendDemo }),
+	parameters: {
+		docs: {
+			source: {
+				code: renderSource('LinePlot', {
+					width: 950,
+					height: 400,
+					series: [
+						{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY },
+						{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY }
+					],
+					styles: {
+						values: {
+							show: true,
+							format: (v: number, name: string) => `${name} (${v.toFixed(1)})`
+						}
+					}
+				})
+			}
+		}
+	}
 };
 
 /**
@@ -86,43 +86,43 @@ export const LegendDisabledDimsLabel: StoryObj = {
  * leaving the dashed bridge at full opacity while the real line fades.
  */
 export const LegendDisabledDimsGapBridge: StoryObj = {
-  render: () => ({ Component: LineGapsLegendDemo }),
-  parameters: {
-    docs: {
-      source: {
-        code: renderSource('LinePlot', {
-          width: 950,
-          height: 400,
-          series: [
-            { name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY_WITH_GAPS },
-            { name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY_WITH_GAPS },
-          ],
-          styles: {
-            gaps: { default: { middle: {} } },
-          },
-        }),
-      },
-    },
-  },
+	render: () => ({ Component: LineGapsLegendDemo }),
+	parameters: {
+		docs: {
+			source: {
+				code: renderSource('LinePlot', {
+					width: 950,
+					height: 400,
+					series: [
+						{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY_WITH_GAPS },
+						{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY_WITH_GAPS }
+					],
+					styles: {
+						gaps: { default: { middle: {} } }
+					}
+				})
+			}
+		}
+	}
 };
 
 /** `interactive.disabled: { mode: 'omit' }` removes a toggled-off series from the plot and rescales the y-axis. See `LineOmitLegendDemo.svelte`. */
 export const LegendOmitRescalesDomain: StoryObj = {
-  render: () => ({ Component: LineOmitLegendDemo }),
-  parameters: {
-    docs: {
-      source: {
-        code: renderSource('LinePlot', {
-          width: 950,
-          height: 400,
-          series: [
-            { name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY },
-            { name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY },
-          ],
-        }),
-      },
-    },
-  },
+	render: () => ({ Component: LineOmitLegendDemo }),
+	parameters: {
+		docs: {
+			source: {
+				code: renderSource('LinePlot', {
+					width: 950,
+					height: 400,
+					series: [
+						{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY },
+						{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY }
+					]
+				})
+			}
+		}
+	}
 };
 
 /**
@@ -132,29 +132,29 @@ export const LegendOmitRescalesDomain: StoryObj = {
  * end-of-line label to see the other line and label fade.
  */
 export const HoverIsolate: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      },
-      {
-        name: 'male',
-        x: 'year',
-        y: 'value',
-        data: MALE_LIFE_EXPECTANCY,
-      },
-    ],
-    styles: {
-      values: {
-        show: true,
-        hoverIsolate: true,
-        format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
-      },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			},
+			{
+				name: 'male',
+				x: 'year',
+				y: 'value',
+				data: MALE_LIFE_EXPECTANCY
+			}
+		],
+		styles: {
+			values: {
+				show: true,
+				hoverIsolate: true,
+				format: (v: number, name: string) => `${name} (${v.toFixed(1)})`
+			}
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 /**
@@ -166,55 +166,55 @@ export const HoverIsolate: Story = {
  * label to see the *other* series' bridge fade along with its line.
  */
 export const HoverIsolateDimsGapBridge: StoryObj = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_WITH_GAPS,
-      },
-      {
-        name: 'male',
-        x: 'year',
-        y: 'value',
-        data: MALE_LIFE_EXPECTANCY_WITH_GAPS,
-      },
-    ],
-    styles: {
-      values: {
-        show: true,
-        hoverIsolate: true,
-        format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
-      },
-      gaps: { default: { middle: {} } } satisfies GapsConfig<LineSegmentStyle>,
-    } satisfies GapsAwarePlotStylesConfig<LineSegmentStyle>,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_WITH_GAPS
+			},
+			{
+				name: 'male',
+				x: 'year',
+				y: 'value',
+				data: MALE_LIFE_EXPECTANCY_WITH_GAPS
+			}
+		],
+		styles: {
+			values: {
+				show: true,
+				hoverIsolate: true,
+				format: (v: number, name: string) => `${name} (${v.toFixed(1)})`
+			},
+			gaps: { default: { middle: {} } } satisfies GapsConfig<LineSegmentStyle>
+		} satisfies GapsAwarePlotStylesConfig<LineSegmentStyle>
+	}
 };
 
 /** `interactive.disabled: { mode: 'omit' }` combined with value labels and a gap-fill bridge. See `LineOmitValuesGapsLegendDemo.svelte`. */
 export const LegendOmitDropsLabelAndBridge: StoryObj = {
-  render: () => ({ Component: LineOmitValuesGapsLegendDemo }),
-  parameters: {
-    docs: {
-      source: {
-        code: renderSource('LinePlot', {
-          width: 950,
-          height: 400,
-          series: [
-            { name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY_WITH_GAPS },
-            { name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY_WITH_GAPS },
-          ],
-          styles: {
-            values: {
-              show: true,
-              hoverIsolate: true,
-              format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
-            },
-            gaps: { default: { middle: {} } },
-          },
-        }),
-      },
-    },
-  },
+	render: () => ({ Component: LineOmitValuesGapsLegendDemo }),
+	parameters: {
+		docs: {
+			source: {
+				code: renderSource('LinePlot', {
+					width: 950,
+					height: 400,
+					series: [
+						{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY_WITH_GAPS },
+						{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY_WITH_GAPS }
+					],
+					styles: {
+						values: {
+							show: true,
+							hoverIsolate: true,
+							format: (v: number, name: string) => `${name} (${v.toFixed(1)})`
+						},
+						gaps: { default: { middle: {} } }
+					}
+				})
+			}
+		}
+	}
 };

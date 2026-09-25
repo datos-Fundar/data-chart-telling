@@ -2,7 +2,11 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { FEMALE_LIFE_EXPECTANCY_BY_PROVINCE, MALE_LIFE_EXPECTANCY_BY_PROVINCE, type ProvincePoint } from './data';
+import {
+	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+	MALE_LIFE_EXPECTANCY_BY_PROVINCE,
+	type ProvincePoint
+} from './data';
 import BarValuesLegendDemo from './BarValuesLegendDemo.svelte';
 import BarOmitLegendDemo from './BarOmitLegendDemo.svelte';
 import BarOmitStackedLegendDemo from './BarOmitStackedLegendDemo.svelte';
@@ -16,46 +20,46 @@ import { renderSource } from '../../common/docsSource';
 // stack it onto that page's already many co-mounted `BarPlot` instances.
 
 const meta = {
-  title: 'Plots/BarPlot/Legend',
-  component: BarPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 500,
-  },
-  argTypes: {
-    width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
-    height: { control: { type: 'range', min: 200, max: 700, step: 50 } },
-    series: { control: false },
-    styles: { control: false },
-  },
-  parameters: {
-    docs: { source: { name: 'BarPlot' } },
-  },
+	title: 'Plots/BarPlot/Legend',
+	component: BarPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 500
+	},
+	argTypes: {
+		width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
+		height: { control: { type: 'range', min: 200, max: 700, step: 50 } },
+		series: { control: false },
+		styles: { control: false }
+	},
+	parameters: {
+		docs: { source: { name: 'BarPlot' } }
+	}
 } satisfies Meta<typeof BarPlot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 const FEMALE = {
-  name: 'female',
-  x: 'province',
-  y: 'value',
-  data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+	name: 'female',
+	x: 'province',
+	y: 'value',
+	data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
 } satisfies Series<ProvincePoint>;
 
 const MALE = {
-  name: 'male',
-  x: 'province',
-  y: 'value',
-  data: MALE_LIFE_EXPECTANCY_BY_PROVINCE,
+	name: 'male',
+	x: 'province',
+	y: 'value',
+	data: MALE_LIFE_EXPECTANCY_BY_PROVINCE
 } satisfies Series<ProvincePoint>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
  * A legend-disabled series dims its value labels too, not just its bars.
- * Toggling "Mujeres" or "Varones" off in the legend above fades that
+ * Toggling "Female" or "Male" off in the legend above fades that
  * series' labels along with its bars, instead of leaving the labels at full
  * opacity while the bars fade. Composed here with `provideLegendInteraction()`
  * + `LegendLayout` directly around `BarPlot` (no `BaseChart`) — the same
@@ -63,58 +67,58 @@ const MALE = {
  * composition. See `BarValuesLegendDemo.svelte`.
  */
 export const LegendDisabledDimsLabels: StoryObj = {
-  render: () => ({ Component: BarValuesLegendDemo }),
-  parameters: {
-    docs: {
-      source: {
-        code: renderSource('BarPlot', {
-          width: 950,
-          height: 500,
-          series: [FEMALE, MALE],
-          styles: {
-            values: {
-              show: true,
-              format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
-            },
-          },
-        }),
-      },
-    },
-  },
+	render: () => ({ Component: BarValuesLegendDemo }),
+	parameters: {
+		docs: {
+			source: {
+				code: renderSource('BarPlot', {
+					width: 950,
+					height: 500,
+					series: [FEMALE, MALE],
+					styles: {
+						values: {
+							show: true,
+							format: (v: number, name: string) => `${name} (${v.toFixed(1)})`
+						}
+					}
+				})
+			}
+		}
+	}
 };
 
-/** `interactive.disabled: { mode: 'omit' }` with `scales.z.seriesLayout: 'grouped'` — omitted series' bars reflow the group. See `BarOmitLegendDemo.svelte`. */
+/** `interactive.disabled: { mode: 'omit' }` with `scales.grouping.seriesLayout: 'grouped'` — omitted series' bars reflow the group. See `BarOmitLegendDemo.svelte`. */
 export const LegendOmitReflowsGroups: StoryObj = {
-  render: () => ({ Component: BarOmitLegendDemo }),
-  parameters: {
-    docs: {
-      source: {
-        code: renderSource('BarPlot', {
-          width: 950,
-          height: 500,
-          series: [FEMALE, MALE],
-          scales: { z: { seriesLayout: 'grouped' } },
-        }),
-      },
-    },
-  },
+	render: () => ({ Component: BarOmitLegendDemo }),
+	parameters: {
+		docs: {
+			source: {
+				code: renderSource('BarPlot', {
+					width: 950,
+					height: 500,
+					series: [FEMALE, MALE],
+					scales: { grouping: { seriesLayout: 'grouped' } }
+				})
+			}
+		}
+	}
 };
 
-/** Same `interactive.disabled: { mode: 'omit' }` idea, with `scales.z.seriesLayout: 'stacked'`. See `BarOmitStackedLegendDemo.svelte`. */
+/** Same `interactive.disabled: { mode: 'omit' }` idea, with `scales.grouping.seriesLayout: 'stacked'`. See `BarOmitStackedLegendDemo.svelte`. */
 export const LegendOmitReflowsStack: StoryObj = {
-  render: () => ({ Component: BarOmitStackedLegendDemo }),
-  parameters: {
-    docs: {
-      source: {
-        code: renderSource('BarPlot', {
-          width: 950,
-          height: 500,
-          series: [FEMALE, MALE],
-          scales: { z: { seriesLayout: 'stacked' } },
-        }),
-      },
-    },
-  },
+	render: () => ({ Component: BarOmitStackedLegendDemo }),
+	parameters: {
+		docs: {
+			source: {
+				code: renderSource('BarPlot', {
+					width: 950,
+					height: 500,
+					series: [FEMALE, MALE],
+					scales: { grouping: { seriesLayout: 'stacked' } }
+				})
+			}
+		}
+	}
 };
 
 /**
@@ -124,37 +128,37 @@ export const LegendOmitReflowsStack: StoryObj = {
  * "male" label to see the other series' bars and labels fade.
  */
 export const HoverIsolate: Story = {
-  args: {
-    series: [FEMALE, MALE],
-    styles: {
-      values: {
-        show: true,
-        hoverIsolate: true,
-        format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
-      },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		series: [FEMALE, MALE],
+		styles: {
+			values: {
+				show: true,
+				hoverIsolate: true,
+				format: (v: number, name: string) => `${name} (${v.toFixed(1)})`
+			}
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 /** `interactive.disabled: { mode: 'omit' }` combined with value labels and `styles.values.hoverIsolate`. See `BarOmitValuesLegendDemo.svelte`. */
 export const LegendOmitDropsLabelsHoverIsolatesRest: StoryObj = {
-  render: () => ({ Component: BarOmitValuesLegendDemo }),
-  parameters: {
-    docs: {
-      source: {
-        code: renderSource('BarPlot', {
-          width: 950,
-          height: 500,
-          series: [FEMALE, MALE],
-          styles: {
-            values: {
-              show: true,
-              hoverIsolate: true,
-              format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
-            },
-          },
-        }),
-      },
-    },
-  },
+	render: () => ({ Component: BarOmitValuesLegendDemo }),
+	parameters: {
+		docs: {
+			source: {
+				code: renderSource('BarPlot', {
+					width: 950,
+					height: 500,
+					series: [FEMALE, MALE],
+					styles: {
+						values: {
+							show: true,
+							hoverIsolate: true,
+							format: (v: number, name: string) => `${name} (${v.toFixed(1)})`
+						}
+					}
+				})
+			}
+		}
+	}
 };

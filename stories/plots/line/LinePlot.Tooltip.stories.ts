@@ -2,44 +2,44 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
 import RichTooltip from './RichTooltip.svelte';
 import {
-  FEMALE_LIFE_EXPECTANCY,
-  MALE_LIFE_EXPECTANCY,
-  LIFE_EXPECTANCY,
-  type YearPoint,
-  type LifeExpectancyPoint,
+	FEMALE_LIFE_EXPECTANCY,
+	MALE_LIFE_EXPECTANCY,
+	LIFE_EXPECTANCY,
+	type YearPoint,
+	type LifeExpectancyPoint
 } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Plots/LinePlot/Tooltip',
-  component: LinePlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 400,
-  },
-  argTypes: {
-    width: {
-      description: 'Plot width in pixels.',
-      control: { type: 'range', min: 300, max: 940, step: 50 },
-    },
-    height: {
-      description: 'Plot height in pixels.',
-      control: { type: 'range', min: 200, max: 700, step: 50 },
-    },
-    series: {
-      description: 'Data series to render.',
-      control: false,
-    },
-    tooltip: {
-      description: 'Tooltip runtime configuration.',
-      control: false,
-    },
-  },
-  parameters: {
-    docs: { source: { name: 'LinePlot' } },
-  },
+	title: 'Plots/LinePlot/Tooltip',
+	component: LinePlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 400
+	},
+	argTypes: {
+		width: {
+			description: 'Plot width in pixels.',
+			control: { type: 'range', min: 300, max: 940, step: 50 }
+		},
+		height: {
+			description: 'Plot height in pixels.',
+			control: { type: 'range', min: 200, max: 700, step: 50 }
+		},
+		series: {
+			description: 'Data series to render.',
+			control: false
+		},
+		tooltip: {
+			description: 'Tooltip runtime configuration.',
+			control: false
+		}
+	},
+	parameters: {
+		docs: { source: { name: 'LinePlot' } }
+	}
 } satisfies Meta<typeof LinePlot>;
 
 export default meta;
@@ -52,16 +52,16 @@ type Story = StoryObj<typeof meta>;
  * This is the default behaviour when `tooltip` is omitted.
  */
 export const NoTooltip: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      }
-    ],
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			}
+		]
+	}
 };
 
 /**
@@ -73,24 +73,24 @@ export const NoTooltip: Story = {
  * broadcasting applies.
  */
 export const BasicTooltip: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      }
-    ],
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { year, value } = row as YearPoint;
-        return `${year}: ${value} yr`;
-      },
-    },
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			}
+		],
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { year, value } = row as YearPoint;
+				return `${year}: ${value} yr`;
+			}
+		}
+	}
 };
 
 /**
@@ -99,24 +99,24 @@ export const BasicTooltip: Story = {
  * the body text.
  */
 export const RichFormat: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      }
-    ],
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { year, value } = row as YearPoint;
-        return `Year: ${year}\nLife expectancy: ${value.toFixed(1)} yr`;
-      },
-    },
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			}
+		],
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { year, value } = row as YearPoint;
+				return `Year: ${year}\nLife expectancy: ${value.toFixed(1)} yr`;
+			}
+		}
+	}
 };
 
 /**
@@ -124,26 +124,26 @@ export const RichFormat: Story = {
  * row. Here it shows the difference relative to an 80-year threshold.
  */
 export const ComputedFormat: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      }
-    ],
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { year, value } = row as YearPoint;
-        const delta = (value - 80).toFixed(1);
-        const sign = value >= 80 ? '+' : '';
-        return `${year}: ${value.toFixed(1)} yr (${sign}${delta} vs 80)`;
-      },
-    },
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			}
+		],
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { year, value } = row as YearPoint;
+				const delta = (value - 80).toFixed(1);
+				const sign = value >= 80 ? '+' : '';
+				return `${year}: ${value.toFixed(1)} yr (${sign}${delta} vs 80)`;
+			}
+		}
+	}
 };
 
 /**
@@ -152,30 +152,30 @@ export const ComputedFormat: Story = {
  * independently.
  */
 export const TwoSeries: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      },
-      {
-        name: 'male',
-        x: 'year',
-        y: 'value',
-        data: MALE_LIFE_EXPECTANCY,
-      }
-    ],
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { year, value } = row as YearPoint;
-        return `${year}: ${value.toFixed(1)} yr`;
-      },
-    },
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			},
+			{
+				name: 'male',
+				x: 'year',
+				y: 'value',
+				data: MALE_LIFE_EXPECTANCY
+			}
+		],
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { year, value } = row as YearPoint;
+				return `${year}: ${value.toFixed(1)} yr`;
+			}
+		}
+	}
 };
 
 /**
@@ -186,53 +186,53 @@ export const TwoSeries: Story = {
  * Compare with `TwoSeries` to see the difference.
  */
 export const SeriesFiltered: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      },
-      {
-        name: 'male',
-        x: 'year',
-        y: 'value',
-        data: MALE_LIFE_EXPECTANCY,
-      }
-    ],
-    tooltip: {
-      facetId: '',
-      sync: false,
-      series: ['female'],
-      format: (row) => {
-        const { year, value } = row as YearPoint;
-        return `Female: ${value.toFixed(1)} yr (${year})`;
-      },
-    },
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			},
+			{
+				name: 'male',
+				x: 'year',
+				y: 'value',
+				data: MALE_LIFE_EXPECTANCY
+			}
+		],
+		tooltip: {
+			facetId: '',
+			sync: false,
+			series: ['female'],
+			format: (row) => {
+				const { year, value } = row as YearPoint;
+				return `Female: ${value.toFixed(1)} yr (${year})`;
+			}
+		}
+	}
 };
 
 /**
- * Two series from grouped data — `data / x / y / z` auto-creates one series
- * per unique `z` value. The row type is `LifeExpectancyPoint`, which carries
- * the `sex` field so the format can include it directly.
+ * Two series from grouped data — `data / x / y / color` auto-creates one
+ * series per unique `color` value. The row type is `LifeExpectancyPoint`,
+ * which carries the `sex` field so the format can include it directly.
  */
 export const TwoSeriesFromGroupedData: Story = {
-  args: {
-    data: LIFE_EXPECTANCY,
-    x: 'year',
-    y: 'value',
-    z: 'sex',
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { sex, year, value } = row as LifeExpectancyPoint;
-        return `${sex} (${year}): ${value.toFixed(1)} yr`;
-      },
-    },
-  },
+	args: {
+		data: LIFE_EXPECTANCY,
+		x: 'year',
+		y: 'value',
+		color: 'sex',
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { sex, year, value } = row as LifeExpectancyPoint;
+				return `${sex} (${year}): ${value.toFixed(1)} yr`;
+			}
+		}
+	}
 };
 
 /**
@@ -240,21 +240,21 @@ export const TwoSeriesFromGroupedData: Story = {
  * rendered, the tooltip only responds to female data points.
  */
 export const GroupedDataSeriesFiltered: Story = {
-  args: {
-    data: LIFE_EXPECTANCY,
-    x: 'year',
-    y: 'value',
-    z: 'sex',
-    tooltip: {
-      facetId: '',
-      sync: false,
-      series: ['female'],
-      format: (row) => {
-        const { year, value } = row as LifeExpectancyPoint;
-        return `Female (${year}): ${value.toFixed(1)} yr`;
-      },
-    },
-  },
+	args: {
+		data: LIFE_EXPECTANCY,
+		x: 'year',
+		y: 'value',
+		color: 'sex',
+		tooltip: {
+			facetId: '',
+			sync: false,
+			series: ['female'],
+			format: (row) => {
+				const { year, value } = row as LifeExpectancyPoint;
+				return `Female (${year}): ${value.toFixed(1)} yr`;
+			}
+		}
+	}
 };
 
 /**
@@ -268,7 +268,7 @@ export const GroupedDataSeriesFiltered: Story = {
  * `content` is set, so the custom card fully owns the look.
  */
 export const CustomContent: StoryObj = {
-  render: () => ({ Component: RichTooltip }),
+	render: () => ({ Component: RichTooltip })
 };
 
 /**
@@ -281,24 +281,24 @@ export const CustomContent: StoryObj = {
  * own left/top edges to see it happen.
  */
 export const CustomAnchor: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      }
-    ],
-    tooltip: {
-      facetId: '',
-      sync: false,
-      anchorX: 'left',
-      anchorY: 'top',
-      format: (row) => {
-        const { year, value } = row as YearPoint;
-        return `${year}: ${value.toFixed(1)} yr`;
-      },
-    },
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			}
+		],
+		tooltip: {
+			facetId: '',
+			sync: false,
+			anchorX: 'left',
+			anchorY: 'top',
+			format: (row) => {
+				const { year, value } = row as YearPoint;
+				return `${year}: ${value.toFixed(1)} yr`;
+			}
+		}
+	}
 };

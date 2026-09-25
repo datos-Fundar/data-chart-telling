@@ -97,8 +97,8 @@ describe('LinePlot – markers.custom (component)', () => {
   test('PeakMarker with scope "segment" highlights once per segment', async () => {
     const segments: SegmentsConfig<LineSegmentStyle> = {
       female: [
-        { areas: [{ x: { to: 2014 } }], style: {} },
-        { areas: [{ x: { from: 2014 } }], style: { stroke: { strokeDasharray: '6 4' } } },
+        { areas: [{ x: { to: 2014 } }], styles: {} },
+        { areas: [{ x: { from: 2014 } }], styles: { stroke: { strokeDasharray: '6 4' } } },
       ],
     };
     const { container } = await render(LinePlot, {

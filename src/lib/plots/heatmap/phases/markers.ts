@@ -5,7 +5,7 @@ import type { CellMarkerConfig } from '$lib/types/markers/common';
 import type { HeatmapPlotState, HeatmapPlotCtx } from '$lib/types/plots/heatmap/state';
 
 /** One resolved-style bucket of cells. */
-type StyleGroup<TData> = { style: CellSegmentStyle; data: TData[] };
+type StyleGroup<TData> = { styles: CellSegmentStyle; data: TData[] };
 
 /**
  * HeatmapPlot's "markers" phase: one `'cell'` marker per resolved-style
@@ -17,12 +17,12 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 	state: HeatmapPlotState<TData>,
 	ctx: HeatmapPlotCtx
 ): HeatmapPlotState<TData> {
-	const { segments, flat, channels, colorScale } = state;
+	const { segments, flat, channels, resolveColor } = state;
 	const { range } = ctx;
-	const { x: xAcc, y: yAcc, z: zAcc } = channels!;
+	const { x: xAcc, y: yAcc, color: colorAcc } = channels!;
 	const getX = xAcc.accessor;
 	const getY = yAcc.accessor;
-	const getZ = zAcc.accessor;
+	const getColor = colorAcc.accessor;
 
 	/**
 	 * A catch-all (no `areas`) always matches, so evaluating segments in plain
@@ -47,7 +47,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 			const cy = getY(d) as AxisValue;
 			const key = `${String(cx)}::${String(cy)}`;
 			if (!map.has(key)) {
-				let style: CellSegmentStyle = catchAll?.style ? { ...catchAll.style } : {};
+				let styles: CellSegmentStyle = catchAll?.styles ? { ...catchAll.styles } : {};
 				for (const seg of areaSegs) {
 					const matches = seg.areas!.some((area) => {
 						/* eslint-disable @typescript-eslint/no-explicit-any */
@@ -62,9 +62,9 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 						/* eslint-enable @typescript-eslint/no-explicit-any */
 						return xOk && yOk;
 					});
-					if (matches) style = { ...style, ...seg.style };
+					if (matches) styles = { ...styles, ...seg.styles };
 				}
-				map.set(key, style);
+				map.set(key, styles);
 			}
 		}
 		return map;
@@ -78,18 +78,18 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 	function getCellStyle(d: TData): CellSegmentStyle {
 		return rangeFilteredStyle(
 			segStyleMap.get(`${String(getX(d))}::${String(getY(d))}`) ?? {},
-			Number(getZ(d))
+			Number(getColor(d))
 		);
 	}
 
 	const styleGroups = (() => {
 		const groups = new Map<string, StyleGroup<TData>>();
 		for (const d of flat!) {
-			const style = getCellStyle(d);
-			const key = JSON.stringify(style);
+			const styles = getCellStyle(d);
+			const key = JSON.stringify(styles);
 			let group = groups.get(key);
 			if (!group) {
-				group = { style, data: [] };
+				group = { styles, data: [] };
 				groups.set(key, group);
 			}
 			group.data.push(d);
@@ -102,14 +102,14 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 		data: group.data,
 		x: getX,
 		y: getY,
-		fill: (d: TData) => group.style.fill ?? colorScale!(Number(getZ(d))),
-		style: {
-			fillOpacity: group.style.fillOpacity ?? 1,
-			stroke: group.style.stroke,
-			strokeWidth: group.style.strokeWidth ?? 0,
-			strokeOpacity: group.style.strokeOpacity,
-			strokeDasharray: group.style.strokeDasharray,
-			borderRadius: group.style.borderRadius
+		fill: (d: TData) => group.styles.fill ?? resolveColor!(d),
+		styles: {
+			fillOpacity: group.styles.fillOpacity ?? 1,
+			stroke: group.styles.stroke,
+			strokeWidth: group.styles.strokeWidth ?? 0,
+			strokeOpacity: group.styles.strokeOpacity,
+			strokeDasharray: group.styles.strokeDasharray,
+			borderRadius: group.styles.borderRadius
 		},
 		inset: 0.5
 	}));

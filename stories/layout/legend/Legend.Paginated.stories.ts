@@ -19,7 +19,7 @@ export default meta;
 /**
  * A `layout: { type: 'horizontal' }` section narrower than its items need.
  * `maxRows` defaults to 1, so as soon as items would wrap to a second row the
- * section paginates instead — one jurisdicción visible per page, prev/next
+ * section paginates instead — one jurisdiction visible per page, prev/next
  * arrows to browse the rest.
  */
 export const HorizontalPaginatedDefaultMaxRows: StoryObj = {
@@ -34,7 +34,7 @@ export const HorizontalPaginatedDefaultMaxRows: StoryObj = {
 					sections: [
 						{
 							type: 'discrete',
-							title: 'Jurisdicción',
+							title: 'Jurisdiction',
 							items: jurisdictionItems(24),
 							layout: { type: 'horizontal', maxRows: 1 }
 						}
@@ -64,7 +64,7 @@ export const HorizontalPaginatedTwoRows: StoryObj = {
 					sections: [
 						{
 							type: 'discrete',
-							title: 'Jurisdicción',
+							title: 'Jurisdiction',
 							items: jurisdictionItems(24),
 							layout: { type: 'horizontal', maxRows: 2 }
 						}
@@ -88,7 +88,7 @@ export const HorizontalPaginatedInteractive: StoryObj = {
 					sections: [
 						{
 							type: 'discrete',
-							title: 'Jurisdicción',
+							title: 'Jurisdiction',
 							items: jurisdictionItems(24),
 							interactive: { enabled: true },
 							layout: { type: 'horizontal', maxRows: 1 }
@@ -113,7 +113,7 @@ export const HorizontalPaginatedCustomNavButton: StoryObj = {
 					sections: [
 						{
 							type: 'discrete',
-							title: 'Jurisdicción',
+							title: 'Jurisdiction',
 							items: jurisdictionItems(24),
 							layout: { type: 'horizontal', maxRows: 1 },
 							navButton: () => {
@@ -142,7 +142,7 @@ export const HorizontalPaginatedNavThemeSwitcher: StoryObj = {
 					sections: [
 						{
 							type: 'discrete',
-							title: 'Jurisdicción',
+							title: 'Jurisdiction',
 							items: jurisdictionItems(24),
 							layout: { type: 'horizontal', maxRows: 1 }
 						}

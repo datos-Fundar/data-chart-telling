@@ -55,7 +55,7 @@ describe('buildData – series resolution', () => {
 		expect(result.resolvedSeries.map((s) => s.name)).toEqual(['a', 'b']);
 	});
 
-	test('builds series from flat data/x/y/z when series is not given', () => {
+	test('builds series from flat data/x/y/color when series is not given', () => {
 		type GroupedRow = Row & { group: string };
 		const data: GroupedRow[] = [
 			{ category: 'X', value: 1, group: 'g1' },
@@ -65,7 +65,7 @@ describe('buildData – series resolution', () => {
 			data,
 			x: 'category',
 			y: 'value',
-			z: 'group',
+			color: 'group',
 			segments: {},
 			gaps: {},
 			scales: {},

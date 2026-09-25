@@ -64,7 +64,7 @@ describe('BarPlot – markers.rules', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'rule', axis: 'x', value: 'Córdoba', style: { stroke: '#e11d48' } }] satisfies AxisBasedMarkersConfig[],
+      markers: [{ type: 'rule', axis: 'x', value: 'Córdoba', styles: { stroke: '#e11d48' } }] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     const line = svg.querySelector('g.rule-x line');

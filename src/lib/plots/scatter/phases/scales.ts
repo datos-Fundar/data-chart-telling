@@ -50,7 +50,7 @@ export function buildScales<TData extends Record<string, unknown>>(
 				: groupedSeries!.reduce(
 						(max, group) =>
 							group.visualSegments.reduce(
-								(segMax, seg) => Math.max(segMax, seg.style.dotRadius ?? cfg.scatter.dotRadius),
+								(segMax, seg) => Math.max(segMax, seg.styles.dotRadius ?? cfg.scatter.dotRadius),
 								max
 							),
 						0

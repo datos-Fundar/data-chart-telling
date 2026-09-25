@@ -33,14 +33,14 @@ export function buildLineMarkers<TData extends Record<string, unknown>>(args: {
 		const yFn = resolveAccessor(group.series.y);
 
 		for (const seg of group.visualSegments) {
-			const strokeStyle = seg.style.stroke;
-			const dotStyle = seg.style.dots;
+			const strokeStyle = seg.styles.stroke;
+			const dotStyle = seg.styles.dots;
 			markers.push({
 				type: 'line',
 				data: seg.data,
 				x: xFn,
 				y: yFn,
-				style: {
+				styles: {
 					stroke: disabledStroke?.stroke ?? strokeStyle?.stroke ?? defaultColor,
 					strokeWidth:
 						disabledStroke?.strokeWidth ?? strokeStyle?.strokeWidth ?? cfg.line.strokeWidth,
@@ -57,7 +57,7 @@ export function buildLineMarkers<TData extends Record<string, unknown>>(args: {
 				data: seg.data,
 				x: xFn,
 				y: yFn,
-				style: {
+				styles: {
 					dotRadius: disabledDots?.dotRadius ?? dotStyle.dotRadius ?? cfg.line.dotRadius,
 					dotFill: disabledDots?.dotFill ?? dotStyle.dotFill ?? strokeStyle?.stroke ?? defaultColor,
 					dotSymbol: disabledDots?.dotSymbol ?? dotStyle.dotSymbol ?? 'circle',
@@ -131,7 +131,7 @@ export function buildGapMarkers<TData extends Record<string, unknown>>(args: {
 				data: run.points,
 				x: gx,
 				y: gy,
-				style: {
+				styles: {
 					stroke: disabledStroke?.stroke ?? strokeStyle?.stroke ?? defaultColor,
 					strokeWidth:
 						disabledStroke?.strokeWidth ??
@@ -165,7 +165,7 @@ export function buildGapMarkers<TData extends Record<string, unknown>>(args: {
 				data: endpoints,
 				x: gx,
 				y: gy,
-				style: {
+				styles: {
 					dotRadius:
 						disabledDots?.dotRadius ??
 						dotStyle.dotRadius ??

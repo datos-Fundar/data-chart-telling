@@ -54,7 +54,7 @@ describe('buildData – series resolution', () => {
 		expect(result.resolvedSeries.map((s) => s.name)).toEqual(['a', 'b']);
 	});
 
-	test('builds series from flat data/x/y/z when series is not given', () => {
+	test('builds series from flat data/x/y/color when series is not given', () => {
 		type GroupedRow = Row & { group: string };
 		const data: GroupedRow[] = [
 			{ x: 1, y: 1, group: 'g1' },
@@ -64,7 +64,7 @@ describe('buildData – series resolution', () => {
 			data,
 			x: 'x',
 			y: 'y',
-			z: 'group',
+			color: 'group',
 			segments: {},
 			scales: {},
 			width: 400,
@@ -127,7 +127,7 @@ describe('buildData – groupedSeries / scopedGroups', () => {
 	test('scoped groups read color from dotFill, not fill', () => {
 		const result = build({
 			series: [series('a', [{ x: 1, y: 1 }])],
-			segments: { default: [{ style: { dotFill: 'purple' } }] }
+			segments: { default: [{ styles: { dotFill: 'purple' } }] }
 		});
 		expect(result.scopedGroups[0].segments[0].color).toBe('purple');
 	});

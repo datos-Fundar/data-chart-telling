@@ -12,25 +12,25 @@ import ScatterOmitLegendDemo from './ScatterOmitLegendDemo.svelte';
 // stack it onto that page's already many co-mounted `ScatterPlot` instances.
 
 const meta = {
-  title: 'Plots/ScatterPlot/Legend',
-  component: ScatterPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 500,
-    data: AMERICAS,
-    x: 'gdpPerCapita',
-    y: 'lifeExpectancy',
-  },
-  argTypes: {
-    width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
-    height: { control: { type: 'range', min: 200, max: 700, step: 50 } },
-    data: { control: false },
-    styles: { description: 'Rendering style overrides.', control: false },
-  },
-  parameters: {
-    docs: { source: { name: 'ScatterPlot' } },
-  },
+	title: 'Plots/ScatterPlot/Legend',
+	component: ScatterPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 500,
+		data: AMERICAS,
+		x: 'gdpPerCapita',
+		y: 'lifeExpectancy'
+	},
+	argTypes: {
+		width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
+		height: { control: { type: 'range', min: 200, max: 700, step: 50 } },
+		data: { control: false },
+		styles: { description: 'Rendering style overrides.', control: false }
+	},
+	parameters: {
+		docs: { source: { name: 'ScatterPlot' } }
+	}
 } satisfies Meta<typeof ScatterPlot>;
 
 export default meta;
@@ -49,12 +49,12 @@ type Story = StoryObj<typeof meta>;
  * `ScatterValuesLegendDemo.svelte`.
  */
 export const LegendDisabledDimsLabels: StoryObj = {
-  render: () => ({ Component: ScatterValuesLegendDemo }),
+	render: () => ({ Component: ScatterValuesLegendDemo })
 };
 
 /** `interactive.disabled: { mode: 'omit' }` removes a toggled-off region from the plot and rescales both axes. See `ScatterOmitLegendDemo.svelte`. */
 export const LegendOmitRescalesDomain: StoryObj = {
-  render: () => ({ Component: ScatterOmitLegendDemo }),
+	render: () => ({ Component: ScatterOmitLegendDemo })
 };
 
 /**
@@ -64,15 +64,15 @@ export const LegendOmitRescalesDomain: StoryObj = {
  * to see every other region's dots and labels fade.
  */
 export const HoverIsolate: Story = {
-  args: {
-    data: COUNTRIES,
-    z: 'region',
-    styles: {
-      values: {
-        show: true,
-        hoverIsolate: true,
-        format: (v: number) => v.toFixed(0),
-      },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		data: COUNTRIES,
+		color: 'region',
+		styles: {
+			values: {
+				show: true,
+				hoverIsolate: true,
+				format: (v: number) => v.toFixed(0)
+			}
+		} satisfies AxisBasedStylesConfig
+	}
 };

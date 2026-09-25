@@ -18,7 +18,9 @@ export type BarPlotState<TData extends Record<string, unknown>> = {
 	data?: TData[];
 	x?: Accessor<TData, AxisValue>;
 	y?: Accessor<TData, AxisValue>;
-	z?: Accessor<TData, unknown>;
+	/** Structural grouping key — defaults to `color` when unset (see `DataProps.grouping`). */
+	grouping?: Accessor<TData, unknown>;
+	color?: Accessor<TData, unknown>;
 	segments: SegmentsConfig<BarSegmentStyle>;
 	gaps: Record<string, GapZonesConfig<BarSegmentStyle>>;
 	scales: AxisBasedScalesConfig<TData>;
@@ -40,6 +42,10 @@ export type BarPlotState<TData extends Record<string, unknown>> = {
 	channels?: {
 		x: ResolvedChannel<TData>;
 		y: ResolvedChannel<TData>;
+		/** Row-level accessor resolved from `grouping ?? color` — the same accessor `buildSeries` already split series by. */
+		grouping?: ResolvedChannel<TData, unknown>;
+		/** Row-level accessor resolved from `color`, when set — independent of `colorForSeries`'s per-name resolution. */
+		color?: ResolvedChannel<TData, unknown>;
 	};
 
 	// "scales" phase output (`scales` above gets overwritten too).

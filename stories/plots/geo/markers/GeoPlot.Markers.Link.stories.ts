@@ -51,7 +51,7 @@ export const SphericalLinks: Story = {
         y1: 'fromLat',
         x2: 'toLon',
         y2: 'toLat',
-        style: { stroke: '#dc2626', strokeWidth: 1.5, strokeOpacity: 0.8 },
+        styles: { stroke: '#dc2626', strokeWidth: 1.5, strokeOpacity: 0.8 },
       },
     ] satisfies GeoMarkersConfig[],
   },
@@ -74,7 +74,7 @@ export const LinearLinks: Story = {
         x2: 'toLon',
         y2: 'toLat',
         curve: 'linear',
-        style: { stroke: '#0891b2', strokeWidth: 1.5, strokeOpacity: 0.8 },
+        styles: { stroke: '#0891b2', strokeWidth: 1.5, strokeOpacity: 0.8 },
       },
     ] satisfies GeoMarkersConfig[],
   },
@@ -92,8 +92,8 @@ export const OnOrthographicGlobe: Story = {
   args: {
     coordinates: { projection: { type: 'orthographic', rotate: [60, -10] }, zoom: true },
     markers: [
-      { type: 'sphere', behind: true, style: { fill: '#f8fafc', stroke: 'currentColor' } },
-      { type: 'graticule', style: { stroke: '#e2e8f0' } },
+      { type: 'sphere', behind: true, styles: { fill: '#f8fafc', stroke: 'currentColor' } },
+      { type: 'graticule', styles: { stroke: '#e2e8f0' } },
       {
         type: 'link',
         data: FLIGHT_ROUTES,
@@ -101,7 +101,7 @@ export const OnOrthographicGlobe: Story = {
         y1: 'fromLat',
         x2: 'toLon',
         y2: 'toLat',
-        style: { stroke: '#dc2626', strokeWidth: 1.5 },
+        styles: { stroke: '#dc2626', strokeWidth: 1.5 },
       },
     ] satisfies GeoMarkersConfig[],
   },

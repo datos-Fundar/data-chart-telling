@@ -14,7 +14,7 @@
   rotate={marker.rotate}
   shape={marker.shape ?? 'arrow'}
   anchor={marker.anchor}
-  fill={marker.style?.fill ?? 'currentColor'}
-  stroke={marker.style?.stroke}
-  strokeWidth={marker.style?.strokeWidth}
+  fill={marker.styles?.fill ?? 'currentColor'}
+  stroke={marker.styles?.stroke}
+  strokeWidth={marker.styles?.strokeWidth}
 />

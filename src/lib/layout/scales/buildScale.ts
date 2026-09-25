@@ -3,25 +3,29 @@ import type { AxisValue, AxisScale } from '$lib/types/layout/scales';
 
 /** One representative row per unique axis value (first occurrence in `rows`). */
 function uniqueRows<TData>(rows: TData[], getAxisValue: (d: TData) => AxisValue): TData[] {
-  const seen = new SvelteSet<AxisValue>();
-  const out: TData[] = [];
-  for (const row of rows) {
-    const v = getAxisValue(row);
-    if (seen.has(v)) continue;
-    seen.add(v);
-    out.push(row);
-  }
-  return out;
+	const seen = new SvelteSet<AxisValue>();
+	const out: TData[] = [];
+	for (const row of rows) {
+		const v = getAxisValue(row);
+		if (seen.has(v)) continue;
+		seen.add(v);
+		out.push(row);
+	}
+	return out;
 }
 
 /** svelteplot's `sort` option only does a fixed ascending sort; a custom `scale.sort` comparator is resolved into an explicit `domain` instead, which svelteplot honors as-is. */
-function sortedScale<TData>(scale: AxisScale<TData> | undefined, rows: TData[], getAxisValue: (d: TData) => AxisValue): AxisScale<TData> | undefined {
-  const sort = scale?.sort;
-  if (!sort || scale?.domain) return scale;
-  const reps = uniqueRows(rows, getAxisValue);
-  if (reps.length === 0 || !reps.every((r) => typeof getAxisValue(r) === 'string')) return scale;
-  const domain = [...reps].sort(sort).map(getAxisValue);
-  return { ...scale, domain };
+function sortedScale<TData>(
+	scale: AxisScale<TData> | undefined,
+	rows: TData[],
+	getAxisValue: (d: TData) => AxisValue
+): AxisScale<TData> | undefined {
+	const sort = scale?.sort;
+	if (!sort || scale?.domain) return scale;
+	const reps = uniqueRows(rows, getAxisValue);
+	if (reps.length === 0 || !reps.every((r) => typeof getAxisValue(r) === 'string')) return scale;
+	const domain = [...reps].sort(sort).map(getAxisValue);
+	return { ...scale, domain };
 }
 
 /** Scale types {@link buildScale}'s default `nice` only applies to — every other type has its own tick semantics (or isn't numeric at all). */
@@ -36,21 +40,21 @@ const CONTINUOUS_NUMERIC_TYPES = new Set(['auto', 'linear', 'pow', 'sqrt', 'log'
  * scale onto categorical data and break the mark entirely.
  */
 function isNumericAxis<TData>(rows: TData[], getAxisValue: (d: TData) => AxisValue): boolean {
-  let numericSeen = 0;
-  for (const row of rows) {
-    const v = getAxisValue(row);
-    if (v == null) continue;
-    if (typeof v !== 'number') return false;
-    if (++numericSeen >= 2) return true;
-  }
-  return numericSeen > 0;
+	let numericSeen = 0;
+	for (const row of rows) {
+		const v = getAxisValue(row);
+		if (v == null) continue;
+		if (typeof v !== 'number') return false;
+		if (++numericSeen >= 2) return true;
+	}
+	return numericSeen > 0;
 }
 
 /**
  * Resolves an author-facing {@link AxisScale} into what svelteplot's
- * `<Plot x>`/`<Plot y>` accepts — strips `grid`/`seriesLayout`/
- * `seriesPadding`/a vertical `label`, since `ScalesLayout` renders those
- * itself. Also defaults `nice: true` whenever the caller hasn't pinned a
+ * `<Plot x>`/`<Plot y>` accepts — strips `grid`/a vertical `label`, since
+ * `ScalesLayout` renders those itself. Also defaults `nice: true` whenever
+ * the caller hasn't pinned a
  * `domain`/`ticks`/`nice`/non-numeric `type` of their own and the axis's own
  * values are plainly numeric ({@link isNumericAxis}), so an unpinned
  * continuous axis rounds its domain outward to whole tick steps instead of
@@ -69,20 +73,22 @@ function isNumericAxis<TData>(rows: TData[], getAxisValue: (d: TData) => AxisVal
  * axis's true rendered extent (baseline/stack included), which only the
  * calling plot kind knows — not attempted here.
  */
-export function buildScale<TData>(scale: AxisScale<TData> | undefined, rows: TData[], getAxisValue: (d: TData) => AxisValue): AxisScale<TData> | undefined {
-  const sorted = sortedScale(scale, rows, getAxisValue);
-  const wantsNice =
-    scale?.domain == null &&
-    scale?.ticks == null &&
-    scale?.nice == null &&
-    (scale?.type == null || CONTINUOUS_NUMERIC_TYPES.has(scale.type)) &&
-    isNumericAxis(rows, getAxisValue);
-  if (!sorted && !wantsNice) return sorted;
-  const out = { ...sorted };
-  delete out.grid;
-  delete out.seriesLayout;
-  delete out.seriesPadding;
-  if (scale?.labelOrientation === 'vertical') delete out.label;
-  if (wantsNice) out.nice = true;
-  return out;
+export function buildScale<TData>(
+	scale: AxisScale<TData> | undefined,
+	rows: TData[],
+	getAxisValue: (d: TData) => AxisValue
+): AxisScale<TData> | undefined {
+	const sorted = sortedScale(scale, rows, getAxisValue);
+	const wantsNice =
+		scale?.domain == null &&
+		scale?.ticks == null &&
+		scale?.nice == null &&
+		(scale?.type == null || CONTINUOUS_NUMERIC_TYPES.has(scale.type)) &&
+		isNumericAxis(rows, getAxisValue);
+	if (!sorted && !wantsNice) return sorted;
+	const out = { ...sorted };
+	delete out.grid;
+	if (scale?.labelOrientation === 'vertical') delete out.label;
+	if (wantsNice) out.nice = true;
+	return out;
 }

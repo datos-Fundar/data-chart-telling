@@ -3,27 +3,27 @@ import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import { WORLD_COUNTRIES, WORLD_TOPOLOGY, type WorldCountryProps } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// GeoPlot has no x/y/z series concept — "data" is the map itself. These
+// GeoPlot has no x/y series concept — "data" is the map itself. These
 // stories cover the shapes `data` accepts (a GeoJSON feature array, a
 // FeatureCollection, or an optional TopoJSON Topology) and the `featureId`/
 // `value` accessors read off each feature.
 
 const meta = {
-  title: 'Plots/GeoPlot/Series',
-  component: GeoPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 500,
-  },
-  argTypes: {
-    width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
-    height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
-    data: { control: false },
-  },
-  parameters: {
-    docs: { source: { name: 'GeoPlot' } },
-  },
+	title: 'Plots/GeoPlot/Series',
+	component: GeoPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 500
+	},
+	argTypes: {
+		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
+		height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
+		data: { control: false }
+	},
+	parameters: {
+		docs: { source: { name: 'GeoPlot' } }
+	}
 } satisfies Meta<typeof GeoPlot>;
 
 export default meta;
@@ -38,9 +38,9 @@ type Story = StoryObj<typeof meta>;
  * `Segments` stories for styling one of them by that id).
  */
 export const FeatureArray: Story = {
-  args: {
-    data: WORLD_COUNTRIES,
-  },
+	args: {
+		data: WORLD_COUNTRIES
+	}
 };
 
 /**
@@ -48,9 +48,9 @@ export const FeatureArray: Story = {
  * just wrapped the way most real-world GeoJSON sources hand it back.
  */
 export const FeatureCollection: Story = {
-  args: {
-    data: { type: 'FeatureCollection', features: WORLD_COUNTRIES },
-  },
+	args: {
+		data: { type: 'FeatureCollection', features: WORLD_COUNTRIES }
+	}
 };
 
 /**
@@ -61,23 +61,23 @@ export const FeatureCollection: Story = {
  * rather than its ISO code.
  */
 export const ExplicitFeatureId: Story = {
-  args: {
-    data: WORLD_COUNTRIES,
-    featureId: (f) => (f.properties as WorldCountryProps).name,
-  },
+	args: {
+		data: WORLD_COUNTRIES,
+		featureId: (f) => (f.properties as WorldCountryProps).name
+	}
 };
 
 /**
- * Continuous `value` accessor — feeds each feature's numeric value into the
+ * Continuous `color` accessor — feeds each feature's numeric value into the
  * choropleth color ramp (see the `Styles`/`Scales` stories for controlling
  * that ramp's domain and colors). Here it's each country's estimated
  * population.
  */
-export const ContinuousValue: Story = {
-  args: {
-    data: WORLD_COUNTRIES,
-    value: (f) => (f.properties as WorldCountryProps).pop_est,
-  },
+export const ContinuousColor: Story = {
+	args: {
+		data: WORLD_COUNTRIES,
+		color: (f) => (f.properties as WorldCountryProps).pop_est
+	}
 };
 
 /**
@@ -94,8 +94,8 @@ export const ContinuousValue: Story = {
  * `id`, which GeoPlot's default `featureId` accessor picks up automatically.
  */
 export const TopoJsonInput: Story = {
-  args: {
-    data: WORLD_TOPOLOGY,
-    object: 'countries',
-  },
+	args: {
+		data: WORLD_TOPOLOGY,
+		object: 'countries'
+	}
 };

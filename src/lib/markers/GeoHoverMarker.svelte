@@ -8,7 +8,7 @@
   let { marker, data }: { marker: GeoHoverMarkerConfig; data: HoverPoint<Record<string, unknown>>[] } = $props();
 
   const cfg = $derived(getConfiguration());
-  const style = $derived({ ...cfg.hover.area, ...marker.style });
+  const style = $derived({ ...cfg.hover.area, ...marker.styles });
 </script>
 
 {#if data.length > 0}

@@ -39,7 +39,7 @@ export function buildBarLayout<TData extends Record<string, unknown>>(args: {
 		seriesPaddingDefault
 	} = args;
 
-	const layout: BarSeriesLayout = scales.z?.seriesLayout ?? 'overlap';
+	const layout: BarSeriesLayout = scales.grouping?.seriesLayout ?? 'overlap';
 	const categoricalScale = isHorizontal ? scales.y : scales.x;
 	const valueScale = isHorizontal ? scales.x : scales.y;
 
@@ -82,7 +82,7 @@ export function buildBarLayout<TData extends Record<string, unknown>>(args: {
 	const seriesCount = groupedSeries.length;
 	const seriesGapFraction = Math.max(
 		0,
-		Math.min(1, scales.z?.seriesPadding ?? seriesPaddingDefault)
+		Math.min(1, scales.grouping?.seriesPadding ?? seriesPaddingDefault)
 	);
 	const seriesStep = seriesCount > 0 ? estimatedBandwidth / seriesCount : 0;
 	const seriesGap = seriesGapFraction * seriesStep;
@@ -163,7 +163,7 @@ export function buildScales<TData extends Record<string, unknown>>(
 		};
 	}
 
-	const seriesLayout = scales.z?.seriesLayout ?? 'overlap';
+	const seriesLayout = scales.grouping?.seriesLayout ?? 'overlap';
 
 	const valueExtent = ((): [number, number] | undefined => {
 		let lo = 0;

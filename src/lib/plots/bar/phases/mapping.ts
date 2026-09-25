@@ -5,7 +5,7 @@ import type { BarPlotState } from '$lib/types/plots/bar/state';
 export function buildMapping<TData extends Record<string, unknown>>(
 	state: BarPlotState<TData>
 ): BarPlotState<TData> {
-	const { scales, resolvedSeries } = state;
+	const { scales, resolvedSeries, grouping, color } = state;
 
 	const xCategorical = scales.x?.type === 'categorical';
 	const yCategorical = scales.y?.type === 'categorical';
@@ -21,6 +21,8 @@ export function buildMapping<TData extends Record<string, unknown>>(
 
 	const xAcc = resolveAccessor(resolvedSeries![0]?.x ?? ((d: TData) => d));
 	const yAcc = resolveAccessor(resolvedSeries![0]?.y ?? ((d: TData) => d));
+	const rowGrouping = grouping ?? color;
+	const rowColor = resolvedSeries![0]?.color ?? color;
 
 	return {
 		...state,
@@ -28,7 +30,9 @@ export function buildMapping<TData extends Record<string, unknown>>(
 		isHorizontal: categoricalAxis === 'y',
 		channels: {
 			x: { accessor: xAcc },
-			y: { accessor: yAcc }
+			y: { accessor: yAcc },
+			grouping: rowGrouping !== undefined ? { accessor: resolveAccessor<TData>(rowGrouping) } : undefined,
+			color: rowColor !== undefined ? { accessor: resolveAccessor<TData>(rowColor) } : undefined
 		}
 	};
 }

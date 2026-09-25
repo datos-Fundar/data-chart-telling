@@ -2,43 +2,43 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import {
-  FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-  MALE_LIFE_EXPECTANCY_BY_PROVINCE,
-  LIFE_EXPECTANCY_BY_PROVINCE,
+	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+	MALE_LIFE_EXPECTANCY_BY_PROVINCE,
+	LIFE_EXPECTANCY_BY_PROVINCE
 } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Plots/BarPlot/Markers/Hover',
-  component: BarPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 500,
-  },
-  argTypes: {
-    width: {
-      description: 'Plot width in pixels.',
-      control: { type: 'range', min: 300, max: 940, step: 50 },
-    },
-    height: {
-      description: 'Plot height in pixels.',
-      control: { type: 'range', min: 200, max: 700, step: 50 },
-    },
-    series: {
-      description: 'Data series to render.',
-      control: false,
-      table: { type: { summary: 'Series<TData>[]' }, category: 'Data' },
-    },
-    markers: {
-      description: 'Marker annotations.',
-      control: false,
-    },
-  },
-  parameters: {
-    docs: { source: { name: 'BarPlot' } },
-  },
+	title: 'Plots/BarPlot/Markers/Hover',
+	component: BarPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 500
+	},
+	argTypes: {
+		width: {
+			description: 'Plot width in pixels.',
+			control: { type: 'range', min: 300, max: 940, step: 50 }
+		},
+		height: {
+			description: 'Plot height in pixels.',
+			control: { type: 'range', min: 200, max: 700, step: 50 }
+		},
+		series: {
+			description: 'Data series to render.',
+			control: false,
+			table: { type: { summary: 'Series<TData>[]' }, category: 'Data' }
+		},
+		markers: {
+			description: 'Marker annotations.',
+			control: false
+		}
+	},
+	parameters: {
+		docs: { source: { name: 'BarPlot' } }
+	}
 } satisfies Meta<typeof BarPlot>;
 
 export default meta;
@@ -52,21 +52,21 @@ type Story = StoryObj<typeof meta>;
  * drawn by default. No floating HTML tooltip is involved.
  */
 export const Basic: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      },
-    ],
-    markers: [
-      {
-        type: 'hover',
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			}
+		],
+		markers: [
+			{
+				type: 'hover'
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -74,22 +74,22 @@ export const Basic: Story = {
  * leaving just the position indicator and the crosshair rule.
  */
 export const WithoutLabels: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      },
-    ],
-    markers: [
-      {
-        type: 'hover',
-        showLabels: false,
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			}
+		],
+		markers: [
+			{
+				type: 'hover',
+				showLabels: false
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -97,22 +97,22 @@ export const WithoutLabels: Story = {
  * only the dot and its label are drawn on hover.
  */
 export const WithoutRule: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      },
-    ],
-    markers: [
-      {
-        type: 'hover',
-        ruleX: false,
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			}
+		],
+		markers: [
+			{
+				type: 'hover',
+				ruleX: false
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -121,23 +121,23 @@ export const WithoutRule: Story = {
  * horizontal rule at the hovered value.
  */
 export const WithBothAxis: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      },
-    ],
-    markers: [
-      {
-        type: 'hover',
-        ruleX: true,
-        ruleY: true,
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			}
+		],
+		markers: [
+			{
+				type: 'hover',
+				ruleX: true,
+				ruleY: true
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -145,27 +145,27 @@ export const WithBothAxis: Story = {
  * Here the rule is rendered in red with a solid line and higher opacity.
  */
 export const WithCustomRuleStyle: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      },
-    ],
-    markers: [
-      {
-        type: 'hover',
-        ruleStyle: {
-          stroke: '#e63946',
-          strokeOpacity: 0.7,
-          strokeWidth: 2,
-          strokeDasharray: '6 3',
-        },
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			}
+		],
+		markers: [
+			{
+				type: 'hover',
+				ruleStyle: {
+					stroke: '#e63946',
+					strokeOpacity: 0.7,
+					strokeWidth: 2,
+					strokeDasharray: '6 3'
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -173,30 +173,30 @@ export const WithCustomRuleStyle: Story = {
  * is nearest the cursor.
  */
 export const TwoSeries: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      },
-      {
-        name: 'male',
-        x: 'province',
-        y: 'value',
-        data: MALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      },
-    ],
-    markers: [
-      {
-        type: 'hover',
-        fontStyle: {
-          dy: -10,
-        }
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			},
+			{
+				name: 'male',
+				x: 'province',
+				y: 'value',
+				data: MALE_LIFE_EXPECTANCY_BY_PROVINCE
+			}
+		],
+		markers: [
+			{
+				type: 'hover',
+				fontStyle: {
+					dy: -10
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -207,49 +207,49 @@ export const TwoSeries: Story = {
  * Compare with `TwoSeries` to see the difference.
  */
 export const SeriesScoped: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      },
-      {
-        name: 'male',
-        x: 'province',
-        y: 'value',
-        data: MALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      },
-    ],
-    markers: [
-      {
-        type: 'hover',
-        series: 'female',
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			},
+			{
+				name: 'male',
+				x: 'province',
+				y: 'value',
+				data: MALE_LIFE_EXPECTANCY_BY_PROVINCE
+			}
+		],
+		markers: [
+			{
+				type: 'hover',
+				series: 'female'
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
- * Two series from grouped data — `data / x / y / z` auto-creates one series
- * per unique `z` value. The unscoped hover marker responds to both.
+ * Two series from grouped data — `data / x / y / color` auto-creates one
+ * series per unique `color` value. The unscoped hover marker responds to both.
  */
 export const FromGroupedData: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE,
-    x: 'province',
-    y: 'value',
-    z: 'sex',
-    markers: [
-      {
-        type: 'hover',
-        fontStyle: {
-          dy: -10,
-        }
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		x: 'province',
+		y: 'value',
+		color: 'sex',
+		markers: [
+			{
+				type: 'hover',
+				fontStyle: {
+					dy: -10
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -257,18 +257,18 @@ export const FromGroupedData: Story = {
  * hover marker only responds to female data points.
  */
 export const OverlapedSeriesScoped: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE,
-    x: 'province',
-    y: 'value',
-    z: 'sex',
-    markers: [
-      {
-        type: 'hover',
-        series: 'female',
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		x: 'province',
+		y: 'value',
+		color: 'sex',
+		markers: [
+			{
+				type: 'hover',
+				series: 'female'
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -276,20 +276,20 @@ export const OverlapedSeriesScoped: Story = {
  * land on each series' own bar slice, not the shared category center.
  */
 export const GroupedSeries: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE,
-    x: 'province',
-    y: 'value',
-    z: 'sex',
-    scales: {
-      z: { seriesLayout: 'grouped', seriesPadding: 0.2 },
-    },
-    markers: [
-      {
-        type: 'hover',
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		x: 'province',
+		y: 'value',
+		color: 'sex',
+		scales: {
+			grouping: { seriesLayout: 'grouped', seriesPadding: 0.2 }
+		},
+		markers: [
+			{
+				type: 'hover'
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -297,22 +297,22 @@ export const GroupedSeries: Story = {
  * hovered series' own bar, not the whole two-bar group.
  */
 export const GroupedSeriesWithHighlightArea: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE,
-    x: 'province',
-    y: 'value',
-    z: 'sex',
-    scales: {
-      z: { seriesLayout: 'grouped', seriesPadding: 0.2 },
-    },
-    markers: [
-      {
-        type: 'hover',
-        areaX: true,
-        ruleX: false,
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		x: 'province',
+		y: 'value',
+		color: 'sex',
+		scales: {
+			grouping: { seriesLayout: 'grouped', seriesPadding: 0.2 }
+		},
+		markers: [
+			{
+				type: 'hover',
+				areaX: true,
+				ruleX: false
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -321,23 +321,23 @@ export const GroupedSeriesWithHighlightArea: Story = {
  * `GroupedSeriesWithHighlightArea` but on the other axis.
  */
 export const GroupedSeriesWithHighlightAreaHorizontal: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE,
-    x: 'province',
-    y: 'value',
-    z: 'sex',
-    scales: {
-      y: { type: 'categorical' },
-      z: { seriesLayout: 'grouped', seriesPadding: 0.2 },
-    },
-    markers: [
-      {
-        type: 'hover',
-        areaY: true,
-        ruleY: false,
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		x: 'province',
+		y: 'value',
+		color: 'sex',
+		scales: {
+			y: { type: 'categorical' },
+			grouping: { seriesLayout: 'grouped', seriesPadding: 0.2 }
+		},
+		markers: [
+			{
+				type: 'hover',
+				areaY: true,
+				ruleY: false
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -346,20 +346,20 @@ export const GroupedSeriesWithHighlightAreaHorizontal: Story = {
  * from a zero baseline, so they sit on the correct segment of the stack.
  */
 export const StackedSeries: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE,
-    x: 'province',
-    y: 'value',
-    z: 'sex',
-    scales: {
-      z: { seriesLayout: 'stacked' },
-    },
-    markers: [
-      {
-        type: 'hover',
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		x: 'province',
+		y: 'value',
+		color: 'sex',
+		scales: {
+			grouping: { seriesLayout: 'stacked' }
+		},
+		markers: [
+			{
+				type: 'hover'
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -371,25 +371,25 @@ export const StackedSeries: Story = {
  * `hover.area` theme config.
  */
 export const WithHighlightArea: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      },
-    ],
-    scales: {
-      y: { type: 'categorical' },
-    },
-    markers: [
-      {
-        type: 'hover',
-        areaY: true,
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			}
+		],
+		scales: {
+			y: { type: 'categorical' }
+		},
+		markers: [
+			{
+				type: 'hover',
+				areaY: true
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -399,25 +399,25 @@ export const WithHighlightArea: Story = {
  * turned off so the area is the only highlight.
  */
 export const WithCustomHighlightArea: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'province',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      },
-    ],
-    markers: [
-      {
-        type: 'hover',
-        areaX: true,
-        ruleX: false,
-        areaStyle: {
-          fill: '#0891b2',
-          fillOpacity: 0.18,
-        },
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'province',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+			}
+		],
+		markers: [
+			{
+				type: 'hover',
+				areaX: true,
+				ruleX: false,
+				areaStyle: {
+					fill: '#0891b2',
+					fillOpacity: 0.18
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };

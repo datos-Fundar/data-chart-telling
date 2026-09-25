@@ -50,7 +50,7 @@ export const WithDotMarker: Story = {
         props: {
           x: (d: WeatherStation) => d.lon,
           y: (d: WeatherStation) => d.lat,
-          style: { dotFill: '#0891b2', dotRadius: 6 },
+          styles: { dotFill: '#0891b2', dotRadius: 6 },
         },
       },
     ] satisfies GeoMarkersConfig[],
@@ -68,7 +68,7 @@ export const WithTextMarker: Story = {
         props: {
           x: (d: WeatherStation) => d.lon,
           y: (d: WeatherStation) => d.lat,
-          style: { dotFill: '#0891b2', dotRadius: 4 },
+          styles: { dotFill: '#0891b2', dotRadius: 4 },
         },
       },
       {
@@ -79,7 +79,7 @@ export const WithTextMarker: Story = {
           x: (d: WeatherStation) => d.lon,
           y: (d: WeatherStation) => d.lat,
           text: (d: WeatherStation) => d.city,
-          style: { dy: -10, fontWeight: 'bold' },
+          styles: { dy: -10, fontWeight: 'bold' },
         },
       },
     ] satisfies GeoMarkersConfig[],

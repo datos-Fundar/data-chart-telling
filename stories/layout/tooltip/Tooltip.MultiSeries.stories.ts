@@ -14,7 +14,7 @@ const meta = {
 		data: { control: false },
 		x: { control: false },
 		y: { control: false },
-		z: { control: false },
+		color: { control: false },
 		tooltip: { control: false }
 	},
 	parameters: {
@@ -28,9 +28,9 @@ type Story = StoryObj<typeof meta>;
 /** All series sharing the hovered x, blank-line separated. */
 export const MultiSeriesCrossing: Story = {
 	args: {
-		title: 'Todas las series cruzando el x',
+		title: 'All series crossing the x',
 		data: TIME_SERIES.filter((d) => d.region === 'North'),
-		z: 'metric' as keyof SeriesPoint,
+		color: 'metric' as keyof SeriesPoint,
 		tooltip: { strategy: 'x' },
 		markers: [{ type: 'hover' }]
 	}
@@ -39,9 +39,9 @@ export const MultiSeriesCrossing: Story = {
 /** Tooltip narrowed to one series via `tooltip.series`; the marker is scoped the same way via `markers.series`. */
 export const SeriesSubset: Story = {
 	args: {
-		title: 'Tooltip acotado a una serie',
+		title: 'Tooltip scoped to one series',
 		data: TIME_SERIES.filter((d) => d.region === 'North'),
-		z: 'metric' as keyof SeriesPoint,
+		color: 'metric' as keyof SeriesPoint,
 		tooltip: { strategy: 'x', series: ['GDP'] },
 		markers: [{ type: 'hover', series: 'GDP' }]
 	}

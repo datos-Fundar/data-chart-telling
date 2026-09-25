@@ -45,7 +45,7 @@ function build(overrides: Partial<BarPlotState<Row>> = {}) {
 			x: { accessor: (d) => d.category },
 			y: { accessor: (d) => d.value }
 		},
-		groupedSeries: [{ series: GROUPED_SERIES[0], visualSegments: [{ data: ROWS, style: {} }] }],
+		groupedSeries: [{ series: GROUPED_SERIES[0], visualSegments: [{ data: ROWS, styles: {} }] }],
 		gapFillMaps: new Map(),
 		...overrides
 	};
@@ -119,7 +119,7 @@ describe('buildScales – value axis domain', () => {
 		const overlap = build({ resolvedSeries: stackedSeries });
 		const stacked = build({
 			resolvedSeries: stackedSeries,
-			scales: { z: { seriesLayout: 'stacked' } }
+			scales: { grouping: { seriesLayout: 'stacked' } }
 		});
 		const [, overlapHi] = overlap.y!.domain as [number, number];
 		const [, stackedHi] = stacked.y!.domain as [number, number];

@@ -20,14 +20,14 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 		const yFn = resolveAccessor(group.series.y);
 
 		for (const seg of group.visualSegments) {
-			const dotStyle = seg.style;
+			const dotStyle = seg.styles;
 			markers.push({
 				type: 'dot',
 				data: seg.data,
 				x: xFn,
 				y: yFn,
 				r: rFn,
-				style: {
+				styles: {
 					dotRadius: disabledDots?.dotRadius ?? dotStyle.dotRadius ?? cfg.scatter.dotRadius,
 					dotFill: disabledDots?.dotFill ?? dotStyle.dotFill ?? defaultColor,
 					dotSymbol: disabledDots?.dotSymbol ?? dotStyle.dotSymbol,

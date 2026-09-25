@@ -49,7 +49,7 @@ export const CustomStepAndStyle: Story = {
       {
         type: 'graticule',
         step: 20,
-        style: { stroke: '#94a3b8', strokeOpacity: 0.5, strokeDasharray: '2 2' },
+        styles: { stroke: '#94a3b8', strokeOpacity: 0.5, strokeDasharray: '2 2' },
       },
     ] satisfies GeoMarkersConfig[],
   },
@@ -73,9 +73,9 @@ export const SphereOutline: Story = {
       {
         type: 'sphere',
         behind: true,
-        style: { fill: '#eff6ff', stroke: 'currentColor', strokeWidth: 1 },
+        styles: { fill: '#eff6ff', stroke: 'currentColor', strokeWidth: 1 },
       },
-      { type: 'graticule', style: { stroke: '#cbd5e1', strokeOpacity: 0.6 } },
+      { type: 'graticule', styles: { stroke: '#cbd5e1', strokeOpacity: 0.6 } },
     ] satisfies GeoMarkersConfig[],
   },
 };
@@ -90,15 +90,15 @@ export const WithEarthquakeDots: Story = {
     data: WORLD_COUNTRIES,
     coordinates: { projection: { type: 'orthographic', rotate: [65, 15] }, zoom: true },
     markers: [
-      { type: 'sphere', behind: true, style: { fill: '#f8fafc', stroke: 'currentColor' } },
-      { type: 'graticule', style: { stroke: '#e2e8f0' } },
+      { type: 'sphere', behind: true, styles: { fill: '#f8fafc', stroke: 'currentColor' } },
+      { type: 'graticule', styles: { stroke: '#e2e8f0' } },
       {
         type: 'dot',
         data: EARTHQUAKES,
         x: 'lon',
         y: 'lat',
         r: (d) => Math.max(3, (d as { magnitude: number }).magnitude * 2),
-        style: { dotFill: '#dc2626', dotFillOpacity: 0.6, dotStroke: '#7f1d1d' },
+        styles: { dotFill: '#dc2626', dotFillOpacity: 0.6, dotStroke: '#7f1d1d' },
       },
     ] satisfies GeoMarkersConfig[],
   },

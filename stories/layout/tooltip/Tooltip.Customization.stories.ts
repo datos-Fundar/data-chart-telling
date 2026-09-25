@@ -15,7 +15,7 @@ const meta = {
 		data: { control: false },
 		x: { control: false },
 		y: { control: false },
-		z: { control: false },
+		color: { control: false },
 		tooltip: { control: false }
 	},
 	parameters: {
@@ -29,9 +29,9 @@ type Story = StoryObj<typeof meta>;
 /** Custom tooltip text via `format`. */
 export const CustomFormat: Story = {
 	args: {
-		title: 'Formato personalizado',
+		title: 'Custom format',
 		data: TIME_SERIES.filter((d) => d.region === 'North'),
-		z: 'metric' as keyof SeriesPoint,
+		color: 'metric' as keyof SeriesPoint,
 		tooltip: {
 			strategy: 'x',
 			format: (row) => {
@@ -50,10 +50,10 @@ export const CustomFormat: Story = {
  */
 export const CustomAnchor: Story = {
 	args: {
-		title: 'Anchor personalizado',
-		subtitle: 'El tooltip se ancla arriba a la izquierda del cursor',
+		title: 'Custom anchor',
+		subtitle: 'The tooltip anchors above and to the left of the cursor',
 		data: TIME_SERIES.filter((d) => d.region === 'North'),
-		z: 'metric' as keyof SeriesPoint,
+		color: 'metric' as keyof SeriesPoint,
 		tooltip: { strategy: 'x', anchorX: 'left', anchorY: 'top' },
 		markers: [{ type: 'hover' }]
 	}

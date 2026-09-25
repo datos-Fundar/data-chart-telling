@@ -6,25 +6,25 @@ import { COUNTRIES, AMERICAS, type CountryPoint } from './data';
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Plots/ScatterPlot/Tooltip',
-  component: ScatterPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 500,
-    data: AMERICAS,
-    x: 'gdpPerCapita',
-    y: 'lifeExpectancy',
-  },
-  argTypes: {
-    width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
-    height: { control: { type: 'range', min: 200, max: 700, step: 50 } },
-    data: { control: false },
-    tooltip: { control: false },
-  },
-  parameters: {
-    docs: { source: { name: 'ScatterPlot' } },
-  },
+	title: 'Plots/ScatterPlot/Tooltip',
+	component: ScatterPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 500,
+		data: AMERICAS,
+		x: 'gdpPerCapita',
+		y: 'lifeExpectancy'
+	},
+	argTypes: {
+		width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
+		height: { control: { type: 'range', min: 200, max: 700, step: 50 } },
+		data: { control: false },
+		tooltip: { control: false }
+	},
+	parameters: {
+		docs: { source: { name: 'ScatterPlot' } }
+	}
 } satisfies Meta<typeof ScatterPlot>;
 
 export default meta;
@@ -34,7 +34,7 @@ type Story = StoryObj<typeof meta>;
 
 /** No tooltip — hovering over the plot produces no floating label. The default when `tooltip` is omitted. */
 export const NoTooltip: Story = {
-  args: {},
+	args: {}
 };
 
 /**
@@ -44,46 +44,46 @@ export const NoTooltip: Story = {
  * tooltip follows the single nearest point, not a whole vertical slice.
  */
 export const BasicTooltip: Story = {
-  args: {
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { country, gdpPerCapita, lifeExpectancy } = row as CountryPoint;
-        return `${country}: $${gdpPerCapita.toFixed(1)}k, ${lifeExpectancy.toFixed(1)} yr`;
-      },
-    },
-  },
+	args: {
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { country, gdpPerCapita, lifeExpectancy } = row as CountryPoint;
+				return `${country}: $${gdpPerCapita.toFixed(1)}k, ${lifeExpectancy.toFixed(1)} yr`;
+			}
+		}
+	}
 };
 
 /** Multi-line `format` — `\n` splits the tooltip into a heading and a body. */
 export const RichFormat: Story = {
-  args: {
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { country, gdpPerCapita, lifeExpectancy, population } = row as CountryPoint;
-        return `${country}\nGDP: $${gdpPerCapita.toFixed(1)}k · Life exp.: ${lifeExpectancy.toFixed(1)} yr\nPop.: ${population}M`;
-      },
-    },
-  },
+	args: {
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { country, gdpPerCapita, lifeExpectancy, population } = row as CountryPoint;
+				return `${country}\nGDP: $${gdpPerCapita.toFixed(1)}k · Life exp.: ${lifeExpectancy.toFixed(1)} yr\nPop.: ${population}M`;
+			}
+		}
+	}
 };
 
-/** Grouped data — `z` renders one point cloud per region; the tooltip follows whichever region's point is nearest the cursor. */
+/** Grouped data — `color` renders one point cloud per region; the tooltip follows whichever region's point is nearest the cursor. */
 export const GroupedByRegion: Story = {
-  args: {
-    data: COUNTRIES,
-    z: 'region',
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { country, region, lifeExpectancy } = row as CountryPoint;
-        return `${country} (${region}): ${lifeExpectancy.toFixed(1)} yr`;
-      },
-    },
-  },
+	args: {
+		data: COUNTRIES,
+		color: 'region',
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { country, region, lifeExpectancy } = row as CountryPoint;
+				return `${country} (${region}): ${lifeExpectancy.toFixed(1)} yr`;
+			}
+		}
+	}
 };
 
 /**
@@ -95,7 +95,7 @@ export const GroupedByRegion: Story = {
  * whenever `content` is set, so the custom card fully owns the look.
  */
 export const CustomContent: StoryObj = {
-  render: () => ({ Component: RichTooltip }),
+	render: () => ({ Component: RichTooltip })
 };
 
 /**
@@ -106,16 +106,16 @@ export const CustomContent: StoryObj = {
  * overflow.
  */
 export const CustomAnchor: Story = {
-  args: {
-    tooltip: {
-      facetId: '',
-      sync: false,
-      anchorX: 'left',
-      anchorY: 'top',
-      format: (row) => {
-        const { country, gdpPerCapita, lifeExpectancy } = row as CountryPoint;
-        return `${country}: $${gdpPerCapita.toFixed(1)}k, ${lifeExpectancy.toFixed(1)} yr`;
-      },
-    },
-  },
+	args: {
+		tooltip: {
+			facetId: '',
+			sync: false,
+			anchorX: 'left',
+			anchorY: 'top',
+			format: (row) => {
+				const { country, gdpPerCapita, lifeExpectancy } = row as CountryPoint;
+				return `${country}: $${gdpPerCapita.toFixed(1)}k, ${lifeExpectancy.toFixed(1)} yr`;
+			}
+		}
+	}
 };

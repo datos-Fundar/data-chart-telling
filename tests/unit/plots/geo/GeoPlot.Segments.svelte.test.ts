@@ -23,8 +23,8 @@ describe('GeoPlot – segments (keyed by feature id)', () => {
       height: 300,
       ...DATA_PROPS,
       segments: {
-        'Buenos Aires': [{ style: { fill: '#e11d48' } }],
-        default: [{ style: { fill: '#94a3b8' } }],
+        'Buenos Aires': [{ styles: { fill: '#e11d48' } }],
+        default: [{ styles: { fill: '#94a3b8' } }],
       } satisfies SegmentsConfig<GeoSegmentStyle>,
     });
     const svg = await waitForSvg(container);
@@ -40,9 +40,9 @@ describe('GeoPlot – segments (keyed by feature id)', () => {
       height: 300,
       ...DATA_PROPS,
       segments: {
-        'Buenos Aires': [{ style: { fill: '#1d4ed8' } }],
-        Córdoba: [{ style: { fill: '#f59e0b' } }],
-        default: [{ style: { fill: '#e2e8f0' } }],
+        'Buenos Aires': [{ styles: { fill: '#1d4ed8' } }],
+        Córdoba: [{ styles: { fill: '#f59e0b' } }],
+        default: [{ styles: { fill: '#e2e8f0' } }],
       } satisfies SegmentsConfig<GeoSegmentStyle>,
     });
     const svg = await waitForSvg(container);
@@ -58,8 +58,8 @@ describe('GeoPlot – segments (keyed by feature id)', () => {
       height: 300,
       ...DATA_PROPS,
       segments: {
-        default: [{ style: { fill: '#94a3b8', strokeWidth: 2 } }],
-        Mendoza: [{ style: { fillOpacity: 0.4 } }],
+        default: [{ styles: { fill: '#94a3b8', strokeWidth: 2 } }],
+        Mendoza: [{ styles: { fillOpacity: 0.4 } }],
       } satisfies SegmentsConfig<GeoSegmentStyle>,
     });
     const svg = await waitForSvg(container);

@@ -43,18 +43,21 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 	state: GeoPlotState<TProps>,
 	ctx: GeoPlotCtx<TProps>
 ): GeoPlotState<TProps> {
-	const { features, segments, authoredMarkers, value, colorScale } = state;
+	const { features, segments, authoredMarkers, color, grouping, resolveColor } = state;
 	const { range, fill, fillOpacity, stroke, strokeWidth, cfg, onFeatureClick } = ctx;
 
 	function rangeFilteredStyle(base: GeoSegmentStyle, f: TaggedGeoFeature<TProps>): GeoSegmentStyle {
-		if (range == null || !value) return base;
-		const v = value(f);
+		if (range == null || !color) return base;
+		const v = color(f);
 		if (v == null || (v >= range.min && v <= range.max)) return base;
 		return { ...base, ...disabledFillOverride(range.disabledStyle) };
 	}
 
 	function getFeatureStyle(f: TaggedGeoFeature<TProps>): GeoSegmentStyle {
-		return rangeFilteredStyle(resolveFeatureStyle<GeoSegmentStyle>(segments, f.__id), f);
+		return rangeFilteredStyle(
+			resolveFeatureStyle<GeoSegmentStyle>(segments, f.__id, grouping?.(f)),
+			f
+		);
 	}
 
 	const groups = new Map<string, GeoStyleGroup<TProps>>();
@@ -71,11 +74,7 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 	const styleGroups = [...groups.values()];
 
 	function resolveBaseFill(f: TaggedGeoFeature<TProps>): string {
-		if (value && colorScale) {
-			const v = value(f);
-			if (v != null) return colorScale(v);
-		}
-		return fill ?? cfg.palette[0];
+		return resolveColor?.(f) ?? fill ?? cfg.palette[0];
 	}
 
 	const featureMarkers: GeoFeaturesMarkerConfig[] = styleGroups.map((group) => ({

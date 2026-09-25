@@ -17,7 +17,7 @@ const THEME_MARGINS = {
 
 function group(name: string, data: Row[]): VisualGroup<Series<Row>, BarSegmentStyle> {
 	const series: Series<Row> = { name, x: 'category', y: 'value', data };
-	return { series, visualSegments: [{ data, style: {} }] };
+	return { series, visualSegments: [{ data, styles: {} }] };
 }
 
 const A = { category: 'A', value: 10 };
@@ -41,13 +41,13 @@ function build(overrides: Partial<Parameters<typeof buildBarLayout<Row>>[0]> = {
 }
 
 describe('buildBarLayout – layout mode', () => {
-	test('defaults to overlap when scales.z.seriesLayout is unset', () => {
+	test('defaults to overlap when scales.grouping.seriesLayout is unset', () => {
 		expect(build().layout).toBe('overlap');
 	});
 
-	test('reads the layout mode off scales.z.seriesLayout', () => {
-		expect(build({ scales: { z: { seriesLayout: 'stacked' } } }).layout).toBe('stacked');
-		expect(build({ scales: { z: { seriesLayout: 'grouped' } } }).layout).toBe('grouped');
+	test('reads the layout mode off scales.grouping.seriesLayout', () => {
+		expect(build({ scales: { grouping: { seriesLayout: 'stacked' } } }).layout).toBe('stacked');
+		expect(build({ scales: { grouping: { seriesLayout: 'grouped' } } }).layout).toBe('grouped');
 	});
 });
 
@@ -86,14 +86,14 @@ describe('buildBarLayout – estimatedBandwidth', () => {
 
 describe('buildBarLayout – grouped geometry', () => {
 	test('groupOffset/groupInsetFraction are all-zero outside grouped layout', () => {
-		const result = build({ scales: { z: { seriesLayout: 'overlap' } } });
+		const result = build({ scales: { grouping: { seriesLayout: 'overlap' } } });
 		expect(result.groupOffset(0)).toEqual({ dx: 0, dy: 0 });
 		expect(result.groupInsetFraction(0)).toEqual({ start: 0, end: 0 });
 	});
 
 	test('splits the band evenly across series when grouped', () => {
 		const result = build({
-			scales: { z: { seriesLayout: 'grouped' } },
+			scales: { grouping: { seriesLayout: 'grouped' } },
 			groupedSeries: [group('a', [A]), group('b', [A])]
 		});
 		const first = result.groupInsetFraction(0);
@@ -104,7 +104,7 @@ describe('buildBarLayout – grouped geometry', () => {
 
 	test('opposite series get opposite-signed pixel offsets', () => {
 		const result = build({
-			scales: { z: { seriesLayout: 'grouped' } },
+			scales: { grouping: { seriesLayout: 'grouped' } },
 			groupedSeries: [group('a', [A]), group('b', [A])]
 		});
 		const first = result.groupOffset(0);
@@ -116,7 +116,7 @@ describe('buildBarLayout – grouped geometry', () => {
 describe('buildBarLayout – stacked geometry', () => {
 	test('stackedBaseline sums prior series own values at that category', () => {
 		const result = build({
-			scales: { z: { seriesLayout: 'stacked' } },
+			scales: { grouping: { seriesLayout: 'stacked' } },
 			groupedSeries: [group('a', [A]), group('b', [A])],
 			flat: [A]
 		});
@@ -130,7 +130,7 @@ describe('buildBarLayout – stacked geometry', () => {
 			['a', new Map([[gapRow, { value: 7, kind: 'middle' as const }]])]
 		]);
 		const result = build({
-			scales: { z: { seriesLayout: 'stacked' } },
+			scales: { grouping: { seriesLayout: 'stacked' } },
 			groupedSeries: [group('a', [gapRow]), group('b', [A])],
 			gapFillMaps,
 			flat: [gapRow]

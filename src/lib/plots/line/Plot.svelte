@@ -54,7 +54,8 @@
 		data,
 		x,
 		y,
-		z,
+		grouping,
+		color,
 		styles = {},
 		segments = {},
 		markers = [],
@@ -106,7 +107,20 @@
 	const plotState = $derived(
 		runStages<LinePlotState<TData>, LinePlotCtx>(
 			stages,
-			{ series, data, x, y, z, segments, gaps: styles.gaps ?? {}, scales, width, height, margins },
+			{
+				series,
+				data,
+				x,
+				y,
+				grouping,
+				color,
+				segments,
+				gaps: styles.gaps ?? {},
+				scales,
+				width,
+				height,
+				margins
+			},
 			ctx
 		)
 	);
@@ -226,6 +240,7 @@
 	getY={(d) => Number(yAcc(d))}
 	{hover}
 	{scales}
+	channelScales={scales}
 	{...labelMargin.plotProps}
 	xTickRotate={scales?.x?.tickRotate}
 	{hoverController}

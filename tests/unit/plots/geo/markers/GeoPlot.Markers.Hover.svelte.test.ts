@@ -35,7 +35,7 @@ describe('GeoPlot – hover marker (static baseline)', () => {
       height: 300,
       ...DATA_PROPS,
       markers: [
-        { type: 'geo-hover', style: { fill: '#facc15', fillOpacity: 0.4, stroke: '#7f1d1d', strokeWidth: 3 } },
+        { type: 'geo-hover', styles: { fill: '#facc15', fillOpacity: 0.4, stroke: '#7f1d1d', strokeWidth: 3 } },
       ] satisfies GeoMarkersConfig[],
     });
     const svg = await waitForSvg(container);

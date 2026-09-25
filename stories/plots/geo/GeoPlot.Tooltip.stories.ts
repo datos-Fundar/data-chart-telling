@@ -165,7 +165,7 @@ export const TooltipOnInsets: Story = {
         type: 'inset',
         location: 'right-middle',
         data: CABA_COMUNAS,
-        style: { stroke: '#dc2626', strokeWidth: 1 },
+        styles: { stroke: '#dc2626', strokeWidth: 1 },
         tooltip: {
           format: (f) => {
             const { comuna, barrios } = f.properties as CabaComunaProps;
@@ -217,7 +217,7 @@ export const TooltipOnInsetsWithAnchorInheritance: Story = {
         type: 'inset',
         location: 'right-middle',
         data: CABA_COMUNAS,
-        style: { stroke: '#dc2626', strokeWidth: 1 },
+        styles: { stroke: '#dc2626', strokeWidth: 1 },
         tooltip: {
           // No anchorX/anchorY here — inherits the top-level's 'left'/'top'.
           format: (f) => {

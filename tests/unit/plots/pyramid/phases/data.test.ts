@@ -12,9 +12,8 @@ import type { ChartConfig } from '$lib/types/configuration/styling';
 type Row = { ageGroup: string; pct: number | null };
 
 const CTX: PyramidPlotCtx = {
-	cfg: {} as ChartConfig,
-	formatValue: (v) => `${v}`,
-	colorForSide: (side) => (side === 'left' ? 'blue' : 'orange')
+	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as ChartConfig,
+	formatValue: (v) => `${v}`
 };
 
 function series(name: string, data: Row[]): Series<Row> {
@@ -45,10 +44,10 @@ describe('buildData – side assignment', () => {
 		expect(result.resolvedSeries!.find((s) => s.name === 'Male')!.side).toBe('right');
 	});
 
-	test('scales.z.reverse flips the assignment', () => {
+	test('scales.grouping.reverse flips the assignment', () => {
 		const result = build({
 			series: [series('Male', []), series('Female', [])],
-			scales: { z: { reverse: true } }
+			scales: { grouping: { reverse: true } }
 		});
 		expect(result.resolvedSeries!.find((s) => s.name === 'Female')!.side).toBe('right');
 		expect(result.resolvedSeries!.find((s) => s.name === 'Male')!.side).toBe('left');
@@ -58,7 +57,7 @@ describe('buildData – side assignment', () => {
 // ── Series resolution ─────────────────────────────────────────────────────────
 
 describe('buildData – series resolution', () => {
-	test('builds series from flat data/x/y/z when series is not given', () => {
+	test('builds series from flat data/x/y/color when series is not given', () => {
 		type GroupedRow = { ageGroup: string; pct: number; sex: string };
 		const data: GroupedRow[] = [
 			{ ageGroup: '0-4', pct: 10, sex: 'Female' },
@@ -68,7 +67,7 @@ describe('buildData – series resolution', () => {
 			data,
 			x: (d) => d.pct,
 			y: (d) => d.ageGroup,
-			z: (d) => d.sex,
+			color: (d) => d.sex,
 			segments: {},
 			gaps: {},
 			scales: {},
@@ -124,13 +123,15 @@ describe('buildData – gapFillMaps', () => {
 // ── Scoped groups ─────────────────────────────────────────────────────────────
 
 describe('buildData – scopedGroups', () => {
-	test('one scoped group per resolved series, colored by its own side', () => {
+	test('one scoped group per resolved series, colored by default palette', () => {
 		const result = build({
 			series: [series('Male', []), series('Female', [])]
 		});
 		const female = result.scopedGroups!.find((g) => g.name === 'Female')!;
 		const male = result.scopedGroups!.find((g) => g.name === 'Male')!;
-		expect(female.color).toBe('blue');
-		expect(male.color).toBe('orange');
+		// Both should have a color assigned (from the default palette per name)
+		expect(female.color).toBeTruthy();
+		expect(male.color).toBeTruthy();
+		expect(female.color).not.toBe(male.color);
 	});
 });

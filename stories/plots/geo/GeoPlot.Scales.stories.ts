@@ -10,23 +10,23 @@ import { WORLD_COUNTRIES, type WorldCountryProps } from './data';
 // was split out into its own `coordinates` prop).
 
 const meta = {
-  title: 'Plots/GeoPlot/Scales',
-  component: GeoPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 500,
-    data: WORLD_COUNTRIES,
-  },
-  argTypes: {
-    width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
-    height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
-    data: { control: false },
-    scales: { control: false },
-  },
-  parameters: {
-    docs: { source: { name: 'GeoPlot' } },
-  },
+	title: 'Plots/GeoPlot/Scales',
+	component: GeoPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 500,
+		data: WORLD_COUNTRIES
+	},
+	argTypes: {
+		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
+		height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
+		data: { control: false },
+		scales: { control: false }
+	},
+	parameters: {
+		docs: { source: { name: 'GeoPlot' } }
+	}
 } satisfies Meta<typeof GeoPlot>;
 
 export default meta;
@@ -37,18 +37,18 @@ type Story = StoryObj<typeof meta>;
 /**
  * Continuous color domain — `scales.color.domain` pins the choropleth ramp
  * to a fixed `[min, max]` range instead of auto-fitting to the visible
- * data's min/max (mirrors HeatmapPlot's `scales.z.domain`). Paired with a
- * `value` accessor (see the `Series` stories) so every country's estimated
+ * data's min/max (mirrors HeatmapPlot's `scales.color.domain`). Paired with a
+ * `color` accessor (see the `Series` stories) so every country's estimated
  * population maps through the same fixed ramp.
  */
 export const ExplicitColorDomain: Story = {
-  args: {
-    value: (f) => (f.properties as WorldCountryProps).pop_est,
-    scales: {
-      color: { domain: [1_000_000, 1_400_000_000] },
-    } satisfies GeoScalesConfig,
-    coordinates: {
-      projection: 'equal-earth',
-    } satisfies CoordinatesConfig,
-  },
+	args: {
+		color: (f) => (f.properties as WorldCountryProps).pop_est,
+		scales: {
+			color: { domain: [1_000_000, 1_400_000_000] }
+		} satisfies GeoScalesConfig,
+		coordinates: {
+			projection: 'equal-earth'
+		} satisfies CoordinatesConfig
+	}
 };

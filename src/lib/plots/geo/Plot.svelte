@@ -23,11 +23,11 @@
 
 	/**
 	 * A map, rendered from GeoJSON or TopoJSON. Unlike the other plot kinds
-	 * there's no x/y/z axis pair: `data` IS the map. `segments` styles
-	 * features by id; `value` + `scales.color`/`styles.colors` drive a
-	 * continuous choropleth ramp. Everything drawn on top — points, arrows,
-	 * links, contours, graticule/sphere — is a `markers` entry, assembled by
-	 * the "markers" phase and routed through `GeometryLayout`.
+	 * there's no x/y axis pair: `data` IS the map. `segments` styles
+	 * features by id; `color` + `scales.color` drive a continuous choropleth
+	 * ramp. Everything drawn on top — points, arrows, links, contours,
+	 * graticule/sphere — is a `markers` entry, assembled by the "markers"
+	 * phase and routed through `GeometryLayout`.
 	 */
 	type TaggedFeature = TaggedGeoFeature<TProps>;
 
@@ -45,7 +45,8 @@
 		data,
 		object,
 		featureId,
-		value,
+		color,
+		grouping,
 		excludeParts,
 		width,
 		height,
@@ -124,10 +125,6 @@
 		})
 	);
 
-	// ── Choropleth color scale (mirrors heatmap's styles.colors/scales.z) ────
-	const minColor = $derived(styles.colors?.min ?? cfg.continuous.min);
-	const maxColor = $derived(styles.colors?.max ?? cfg.continuous.max);
-
 	// ── Legend-driven range filter (mirrors HeatmapPlot's own) ────────────────
 	const legendInteraction = $derived(getLegendInteraction());
 	const range = $derived(legendInteraction?.continuousRange);
@@ -142,8 +139,6 @@
 	];
 	const ctx = $derived<GeoPlotCtx<TProps>>({
 		cfg,
-		minColor,
-		maxColor,
 		range,
 		fill: styles.fill,
 		fillOpacity: styles.fillOpacity,
@@ -157,7 +152,8 @@
 			{
 				rawFeatures,
 				featureId,
-				value,
+				color,
+				grouping,
 				excludeParts,
 				segments,
 				scales,
@@ -189,8 +185,8 @@
 	const hoverPoints = $derived(
 		features
 			.filter((f) => {
-				if (range == null || !value) return true;
-				const v = value(f);
+				if (range == null || !color) return true;
+				const v = color(f);
 				return v == null || (v >= range.min && v <= range.max);
 			})
 			.map((f) => ({ x: f.__cx, y: f.__cy, row: f, label: f.__id }))
@@ -283,6 +279,7 @@
 	{margins}
 	marginEstimate={GEO_MARGIN_ESTIMATE}
 	styles={resolvedStyles}
+	channelScales={scales}
 	{hoverController}
 	markers={geoMarkers}
 	geoAllFeatures={allFeatures}

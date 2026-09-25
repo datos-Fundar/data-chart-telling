@@ -58,7 +58,7 @@
 								data,
 								x: 'rooms' as keyof HeatCell,
 								y: 'people' as keyof HeatCell,
-								z: 'pct' as keyof HeatCell
+								color: 'pct' as keyof HeatCell
 							}
 						]}
 						scales={{ x: { label: 'Rooms' }, y: { label: 'People' } }}
@@ -88,7 +88,7 @@
 			>
 				{#snippet plot({ data, width, height })}
 					{#if kind === 'line'}
-						<LinePlot {width} {height} {data} x="year" y="value" z="metric" />
+						<LinePlot {width} {height} {data} x="year" y="value" color="metric" />
 					{:else}
 						<BarPlot {width} {height} {data} x="year" y="value" />
 					{/if}

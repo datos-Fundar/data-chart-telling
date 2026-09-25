@@ -5,64 +5,64 @@ import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import RichTooltip from './RichTooltip.svelte';
 import StackedRichTooltip from './StackedRichTooltip.svelte';
 import {
-  FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-  MALE_LIFE_EXPECTANCY_BY_PROVINCE,
-  LIFE_EXPECTANCY_BY_PROVINCE,
-  AGE_BRACKET_BY_PROVINCE,
-  provinceSort,
-  type ProvincePoint,
-  type ProvinceLifeExpectancy,
-  type AgeBracketPoint,
+	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+	MALE_LIFE_EXPECTANCY_BY_PROVINCE,
+	LIFE_EXPECTANCY_BY_PROVINCE,
+	AGE_BRACKET_BY_PROVINCE,
+	provinceSort,
+	type ProvincePoint,
+	type ProvinceLifeExpectancy,
+	type AgeBracketPoint
 } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Plots/BarPlot/Tooltip',
-  component: BarPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 500,
-  },
-  argTypes: {
-    width: {
-      description: 'Plot width in pixels.',
-      control: { type: 'range', min: 300, max: 940, step: 50 },
-    },
-    height: {
-      description: 'Plot height in pixels.',
-      control: { type: 'range', min: 200, max: 700, step: 50 },
-    },
-    series: {
-      description: 'Data series to render.',
-      control: false,
-    },
-    tooltip: {
-      description: 'Tooltip runtime configuration.',
-      control: false,
-    },
-  },
-  parameters: {
-    docs: { source: { name: 'BarPlot' } },
-  },
+	title: 'Plots/BarPlot/Tooltip',
+	component: BarPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 500
+	},
+	argTypes: {
+		width: {
+			description: 'Plot width in pixels.',
+			control: { type: 'range', min: 300, max: 940, step: 50 }
+		},
+		height: {
+			description: 'Plot height in pixels.',
+			control: { type: 'range', min: 200, max: 700, step: 50 }
+		},
+		series: {
+			description: 'Data series to render.',
+			control: false
+		},
+		tooltip: {
+			description: 'Tooltip runtime configuration.',
+			control: false
+		}
+	},
+	parameters: {
+		docs: { source: { name: 'BarPlot' } }
+	}
 } satisfies Meta<typeof BarPlot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 const FEMALE = {
-  name: 'female',
-  x: 'province',
-  y: 'value',
-  data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+	name: 'female',
+	x: 'province',
+	y: 'value',
+	data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
 } satisfies Series<ProvincePoint>;
 
 const MALE = {
-  name: 'male',
-  x: 'province',
-  y: 'value',
-  data: MALE_LIFE_EXPECTANCY_BY_PROVINCE,
+	name: 'male',
+	x: 'province',
+	y: 'value',
+	data: MALE_LIFE_EXPECTANCY_BY_PROVINCE
 } satisfies Series<ProvincePoint>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
@@ -72,9 +72,9 @@ const MALE = {
  * This is the default behaviour when `tooltip` is omitted.
  */
 export const NoTooltip: Story = {
-  args: {
-    series: [FEMALE],
-  },
+	args: {
+		series: [FEMALE]
+	}
 };
 
 /**
@@ -86,17 +86,17 @@ export const NoTooltip: Story = {
  * broadcasting applies.
  */
 export const BasicTooltip: Story = {
-  args: {
-    series: [FEMALE],
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { province, value } = row as ProvincePoint;
-        return `${province}: ${value} yr`;
-      },
-    },
-  },
+	args: {
+		series: [FEMALE],
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { province, value } = row as ProvincePoint;
+				return `${province}: ${value} yr`;
+			}
+		}
+	}
 };
 
 /**
@@ -105,17 +105,17 @@ export const BasicTooltip: Story = {
  * the body text.
  */
 export const RichFormat: Story = {
-  args: {
-    series: [FEMALE],
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { province, value } = row as ProvincePoint;
-        return `Province: ${province}\nLife expectancy: ${value.toFixed(1)} yr`;
-      },
-    },
-  },
+	args: {
+		series: [FEMALE],
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { province, value } = row as ProvincePoint;
+				return `Province: ${province}\nLife expectancy: ${value.toFixed(1)} yr`;
+			}
+		}
+	}
 };
 
 /**
@@ -123,19 +123,19 @@ export const RichFormat: Story = {
  * row. Here it shows the difference relative to an 82-year threshold.
  */
 export const ComputedFormat: Story = {
-  args: {
-    series: [FEMALE],
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { province, value } = row as ProvincePoint;
-        const delta = (value - 82).toFixed(1);
-        const sign = value >= 82 ? '+' : '';
-        return `${province}: ${value.toFixed(1)} yr (${sign}${delta} vs 82)`;
-      },
-    },
-  },
+	args: {
+		series: [FEMALE],
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { province, value } = row as ProvincePoint;
+				const delta = (value - 82).toFixed(1);
+				const sign = value >= 82 ? '+' : '';
+				return `${province}: ${value.toFixed(1)} yr (${sign}${delta} vs 82)`;
+			}
+		}
+	}
 };
 
 /**
@@ -144,17 +144,17 @@ export const ComputedFormat: Story = {
  * independently.
  */
 export const TwoSeries: Story = {
-  args: {
-    series: [FEMALE, MALE],
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { province, value } = row as ProvincePoint;
-        return `${province}: ${value.toFixed(1)} yr`;
-      },
-    },
-  },
+	args: {
+		series: [FEMALE, MALE],
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { province, value } = row as ProvincePoint;
+				return `${province}: ${value.toFixed(1)} yr`;
+			}
+		}
+	}
 };
 
 /**
@@ -165,40 +165,40 @@ export const TwoSeries: Story = {
  * Compare with `TwoSeries` to see the difference.
  */
 export const SeriesFiltered: Story = {
-  args: {
-    series: [FEMALE, MALE],
-    tooltip: {
-      facetId: '',
-      sync: false,
-      series: ['female'],
-      format: (row) => {
-        const { province, value } = row as ProvincePoint;
-        return `Female - ${province}: ${value.toFixed(1)} yr`;
-      },
-    },
-  },
+	args: {
+		series: [FEMALE, MALE],
+		tooltip: {
+			facetId: '',
+			sync: false,
+			series: ['female'],
+			format: (row) => {
+				const { province, value } = row as ProvincePoint;
+				return `Female - ${province}: ${value.toFixed(1)} yr`;
+			}
+		}
+	}
 };
 
 /**
- * Two series from grouped data — `data / x / y / z` auto-creates one series
- * per unique `z` value. The row type is `ProvinceLifeExpectancy`, which carries
- * the `sex` field so the format can include it directly.
+ * Two series from grouped data — `data / x / y / color` auto-creates one
+ * series per unique `color` value. The row type is `ProvinceLifeExpectancy`,
+ * which carries the `sex` field so the format can include it directly.
  */
 export const TwoSeriesFromGroupedData: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE,
-    x: 'province',
-    y: 'value',
-    z: 'sex',
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { sex, province, value } = row as ProvinceLifeExpectancy;
-        return `${sex} (${province}): ${value.toFixed(1)} yr`;
-      },
-    },
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		x: 'province',
+		y: 'value',
+		color: 'sex',
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { sex, province, value } = row as ProvinceLifeExpectancy;
+				return `${sex} (${province}): ${value.toFixed(1)} yr`;
+			}
+		}
+	}
 };
 
 /**
@@ -206,21 +206,21 @@ export const TwoSeriesFromGroupedData: Story = {
  * rendered, the tooltip only responds to female data points.
  */
 export const GroupedDataSeriesFiltered: Story = {
-  args: {
-    data: LIFE_EXPECTANCY_BY_PROVINCE,
-    x: 'province',
-    y: 'value',
-    z: 'sex',
-    tooltip: {
-      facetId: '',
-      sync: false,
-      series: ['female'],
-      format: (row) => {
-        const { sex, province, value } = row as ProvinceLifeExpectancy;
-        return `${sex} (${province}): ${value.toFixed(1)} yr`;
-      },
-    },
-  },
+	args: {
+		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		x: 'province',
+		y: 'value',
+		color: 'sex',
+		tooltip: {
+			facetId: '',
+			sync: false,
+			series: ['female'],
+			format: (row) => {
+				const { sex, province, value } = row as ProvinceLifeExpectancy;
+				return `${sex} (${province}): ${value.toFixed(1)} yr`;
+			}
+		}
+	}
 };
 
 /**
@@ -234,7 +234,7 @@ export const GroupedDataSeriesFiltered: Story = {
  * `content` is set, so the custom card fully owns the look.
  */
 export const CustomContent: StoryObj = {
-  render: () => ({ Component: RichTooltip }),
+	render: () => ({ Component: RichTooltip })
 };
 
 /**
@@ -245,19 +245,19 @@ export const CustomContent: StoryObj = {
  * overflow.
  */
 export const CustomAnchor: Story = {
-  args: {
-    series: [FEMALE],
-    tooltip: {
-      facetId: '',
-      sync: false,
-      anchorX: 'left',
-      anchorY: 'top',
-      format: (row) => {
-        const { province, value } = row as ProvincePoint;
-        return `${province}: ${value.toFixed(1)} yr`;
-      },
-    },
-  },
+	args: {
+		series: [FEMALE],
+		tooltip: {
+			facetId: '',
+			sync: false,
+			anchorX: 'left',
+			anchorY: 'top',
+			format: (row) => {
+				const { province, value } = row as ProvincePoint;
+				return `${province}: ${value.toFixed(1)} yr`;
+			}
+		}
+	}
 };
 
 // ── Horizontal, many categories ─────────────────────────────────────────────
@@ -269,52 +269,52 @@ export const CustomAnchor: Story = {
  * above, just with a much larger, thinner-banded category count.
  */
 export const HorizontalStackedTooltip: Story = {
-  args: {
-    width: 900,
-    height: 900,
-    data: AGE_BRACKET_BY_PROVINCE,
-    x: 'province',
-    y: 'value',
-    z: 'bracket',
-    scales: {
-      y: { type: 'categorical', sort: provinceSort },
-      z: { seriesLayout: 'stacked' },
-    } satisfies AxisBasedScalesConfig,
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { province, bracket, value } = row as AgeBracketPoint;
-        return `${province} / ${bracket}: ${value}`;
-      },
-    },
-    markers: [{ type: 'hover', showLabels: false }],
-  },
+	args: {
+		width: 900,
+		height: 900,
+		data: AGE_BRACKET_BY_PROVINCE,
+		x: 'province',
+		y: 'value',
+		color: 'bracket',
+		scales: {
+			y: { type: 'categorical', sort: provinceSort },
+			grouping: { seriesLayout: 'stacked' }
+		} satisfies AxisBasedScalesConfig,
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { province, bracket, value } = row as AgeBracketPoint;
+				return `${province} / ${bracket}: ${value}`;
+			}
+		},
+		markers: [{ type: 'hover', showLabels: false }]
+	}
 };
 
 /**
  * Same horizontal, many-category layout as above, but a single bracket —
- * no stacking, no `z`.
+ * no stacking, no `color`/`grouping`.
  */
 export const HorizontalSingleSeriesTooltip: Story = {
-  args: {
-    width: 900,
-    height: 900,
-    data: AGE_BRACKET_BY_PROVINCE.filter((d) => d.bracket === '0 a 14 años'),
-    x: 'province',
-    y: 'value',
-    scales: {
-      y: { type: 'categorical', sort: provinceSort },
-    } satisfies AxisBasedScalesConfig,
-    tooltip: {
-      facetId: '',
-      sync: false,
-      format: (row) => {
-        const { province, value } = row as AgeBracketPoint;
-        return `${province}: ${value}`;
-      },
-    },
-  },
+	args: {
+		width: 900,
+		height: 900,
+		data: AGE_BRACKET_BY_PROVINCE.filter((d) => d.bracket === '0 to 14 years'),
+		x: 'province',
+		y: 'value',
+		scales: {
+			y: { type: 'categorical', sort: provinceSort }
+		} satisfies AxisBasedScalesConfig,
+		tooltip: {
+			facetId: '',
+			sync: false,
+			format: (row) => {
+				const { province, value } = row as AgeBracketPoint;
+				return `${province}: ${value}`;
+			}
+		}
+	}
 };
 
 /**
@@ -323,5 +323,5 @@ export const HorizontalSingleSeriesTooltip: Story = {
  * the two-series version and `StackedRichTooltip.svelte` for the markup.
  */
 export const HorizontalStackedCustomTooltip: StoryObj = {
-  render: () => ({ Component: StackedRichTooltip }),
+	render: () => ({ Component: StackedRichTooltip })
 };

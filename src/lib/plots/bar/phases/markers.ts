@@ -30,7 +30,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 		function makeMarker(
 			data: TData[],
 			valueFn: (d: TData) => number,
-			style: BarSegmentStyle
+			styles: BarSegmentStyle
 		): BarMarkerConfig | null {
 			if (data.length === 0) return null;
 			const marker: BarMarkerConfig = {
@@ -38,7 +38,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 				role: 'segment',
 				isHorizontal: isHorizontal!,
 				data,
-				style
+				styles
 			};
 			if (barLayout!.layout === 'stacked') {
 				const baselineFn = (d: TData) => barLayout!.stackedBaseline(xFn(d), seriesIndex);
@@ -78,12 +78,12 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 
 		for (const seg of group.visualSegments) {
 			const realData = seg.data.filter((d) => !isGapValue(yFn(d)));
-			const style: BarSegmentStyle = {
-				fill: disabledFill?.fill ?? seg.style.fill ?? defaultColor,
-				fillOpacity: disabledFill?.fillOpacity ?? seg.style.fillOpacity ?? 1
+			const styles: BarSegmentStyle = {
+				fill: disabledFill?.fill ?? seg.styles.fill ?? defaultColor,
+				fillOpacity: disabledFill?.fillOpacity ?? seg.styles.fillOpacity ?? 1
 			};
 			const valueFn = barLayout!.layout === 'stacked' ? (d: TData) => Number(yFn(d)) : yFn;
-			const marker = makeMarker(realData, valueFn, style);
+			const marker = makeMarker(realData, valueFn, styles);
 			if (marker) segmentMarkers.push(marker);
 		}
 

@@ -20,12 +20,12 @@
 	const sections: LegendSection[] = [
 		{
 			type: 'discrete',
-			title: 'Indicador (click para ocultar)',
+			title: 'Indicator (click to hide)',
 			interactive: { enabled: true, disabled: { mode: 'style', style: { opacity: 0.15 } } },
 			items: [
-				{ name: 'PBI', label: 'PBI', color: '#4f46e5', symbol: 'line' },
-				{ name: 'Empleo', label: 'Empleo', color: '#e6580d', symbol: 'line' },
-				{ name: 'Inflación', label: 'Inflación', color: '#16a34a', symbol: 'line' }
+				{ name: 'GDP', label: 'GDP', color: '#4f46e5', symbol: 'line' },
+				{ name: 'Employment', label: 'Employment', color: '#e6580d', symbol: 'line' },
+				{ name: 'Inflation', label: 'Inflation', color: '#16a34a', symbol: 'line' }
 			]
 		}
 	];

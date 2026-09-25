@@ -21,7 +21,7 @@ export const SingleContinuous: Story = {
 		sections: [
 			{
 				type: 'continuous',
-				title: 'Porcentaje',
+				title: 'Percentage',
 				min: 0,
 				max: 0.2,
 				colorMin: '#e0e7ff',

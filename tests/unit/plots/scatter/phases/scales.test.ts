@@ -18,7 +18,7 @@ const THEME_MARGINS = { top: 20, right: 20, bottom: 30, left: 40 };
 
 function group(dotRadius?: number): VisualGroup<Series<Row>, ScatterSegmentStyle> {
 	const series: Series<Row> = { name: 'a', x: 'x', y: 'y', data: FLAT };
-	return { series, visualSegments: [{ data: FLAT, style: { dotRadius } }] };
+	return { series, visualSegments: [{ data: FLAT, styles: { dotRadius } }] };
 }
 
 function build(overrides: Partial<ScatterPlotState<Row>> = {}, dotRadiusDefault = 4) {

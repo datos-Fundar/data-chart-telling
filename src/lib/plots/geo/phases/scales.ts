@@ -1,18 +1,32 @@
-import { makeColorScale } from '$lib/utils/color';
+import { resolveColorScale } from '$lib/utils/color';
+import { resolveFeatureScales } from '$lib/plots/utils/geoSegments';
 import type { GeoPlotState, GeoPlotCtx } from '$lib/types/plots/geo/state';
+import type { GeoFeature } from '$lib/types/plots/data/geo';
 
-/** GeoPlot's "scales" phase: the choropleth value→color scale (mirrors HeatmapPlot's own). */
+/**
+ * GeoPlot's "scales" phase: each feature's own resolved color (mirrors
+ * HeatmapPlot's own), with a per-feature override for whichever segment
+ * (its `grouping` bucket, or itself by id) sets its own `scales.color` —
+ * see `resolveFeatureScales`. A segment ramp's domain is built from just
+ * the features that share its own key, so e.g. two grouping buckets each
+ * get a ramp scaled to their own value range, not the whole dataset's.
+ */
 export function buildScales<TProps extends Record<string, unknown>>(
 	state: GeoPlotState<TProps>,
 	ctx: GeoPlotCtx<TProps>
 ): GeoPlotState<TProps> {
-	const { scales, features, value } = state;
-	const { minColor, maxColor, range } = ctx;
+	const { scales, features, color, grouping, segments } = state;
+	const { range, cfg } = ctx;
+
+	const configDomain =
+		scales.color?.domain && typeof scales.color.domain[0] === 'number'
+			? (scales.color.domain as [number, number])
+			: undefined;
 
 	const valueDomain: [number, number] | null = (() => {
-		if (scales.color?.domain) return scales.color.domain;
-		if (!value) return null;
-		const vals = features!.map((f) => value(f)).filter((v): v is number => v != null);
+		if (configDomain) return configDomain;
+		if (!color) return null;
+		const vals = features!.map((f) => color(f)).filter((v): v is number => v != null);
 		return vals.length ? [Math.min(...vals), Math.max(...vals)] : null;
 	})();
 
@@ -23,8 +37,50 @@ export function buildScales<TProps extends Record<string, unknown>>(
 			: valueDomain;
 
 	const colorScale = effectiveDomain
-		? makeColorScale(effectiveDomain[0], effectiveDomain[1], minColor, maxColor)
+		? resolveColorScale({ ...scales.color, domain: effectiveDomain }, effectiveDomain, [
+				cfg.continuous.min,
+				cfg.continuous.max
+			])
 		: null;
 
-	return { ...state, colorScale };
+	// Per-segment-key ramp cache — built lazily, once per distinct grouping
+	// value/feature id that actually has its own `scales.color`.
+	const segmentScaleCache = new Map<string, ((v: number) => string) | null>();
+
+	function segmentColorScaleFor(
+		key: string,
+		segScales: ReturnType<typeof resolveFeatureScales>
+	): ((v: number) => string) | null {
+		if (segmentScaleCache.has(key)) return segmentScaleCache.get(key)!;
+		const peers = grouping
+			? features!.filter((g) => grouping(g) === key)
+			: features!.filter((g) => (g as GeoFeature<TProps> & { __id?: string }).__id === key);
+		const vals = peers.map((g) => color?.(g)).filter((v): v is number => v != null);
+		const scale = vals.length
+			? resolveColorScale(
+					{ ...segScales?.color, domain: [Math.min(...vals), Math.max(...vals)] },
+					[Math.min(...vals), Math.max(...vals)],
+					[cfg.continuous.min, cfg.continuous.max]
+				)
+			: null;
+		segmentScaleCache.set(key, scale);
+		return scale;
+	}
+
+	const resolveColor = colorScale
+		? (f: GeoFeature<TProps>) => {
+				const v = color?.(f);
+				if (v == null) return undefined;
+				const groupingValue = grouping?.(f);
+				const featureId = (f as GeoFeature<TProps> & { __id?: string }).__id ?? '';
+				const segScales = resolveFeatureScales(segments, featureId, groupingValue);
+				if (segScales?.color) {
+					const scale = segmentColorScaleFor(groupingValue ?? featureId, segScales);
+					if (scale) return scale(v);
+				}
+				return colorScale ? colorScale(v) : undefined;
+			}
+		: undefined;
+
+	return { ...state, resolveColor };
 }

@@ -1,15 +1,15 @@
 import type { AxisValue } from '$lib/types/layout/scales';
 import type { FontStyle, StrokeStyle, DotStyle, AreaStyle } from '$lib/types/plots/styling';
 import type { HoverStrategy, HoverDisplayPoint } from '$lib/types/layout/tooltip';
-import type { BaseMarkersConfig } from './base';
+import type { BaseMarkersConfig, ChannelMarkerStyle } from './base';
 
-export type { DotMarkerConfig } from './base';
+export type { DotMarkerConfig, ChannelMarkerStyle } from './base';
 
 export type RuleMarkerConfig = {
   type: 'rule';
   axis: 'x' | 'y';
   value: AxisValue;
-  style?: StrokeStyle;
+  styles?: StrokeStyle;
 };
 
 /**
@@ -41,7 +41,13 @@ export type HoverMarkerConfig = {
   fontStyle?: FontStyle;
 };
 
-/** A single line-segment stroke. Endpoint dots are a separate `'dot'` marker rather than a field here. */
+/**
+ * A single line-segment stroke. Endpoint dots are a separate `'dot'` marker rather than a field here.
+ *
+ * Note: `color` and `scales` are accepted for API consistency but currently unused — a single
+ * `<Line>` stroke can't vary per point. Use a `'dot'` marker with its own color/scales
+ * for per-point coloring instead.
+ */
 export type LineMarkerConfig = {
   type: 'line';
   data: Record<string, unknown>[];
@@ -49,8 +55,8 @@ export type LineMarkerConfig = {
   x: (d: any) => AxisValue;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   y: (d: any) => AxisValue;
-  style?: StrokeStyle;
-};
+  styles?: StrokeStyle;
+} & ChannelMarkerStyle;
 
 /**
  * A single bar mark. `role: 'segment'` is a visible bar
@@ -83,11 +89,11 @@ export type BarMarkerConfig = {
   insetBottom?: number;
   insetLeft?: number;
   insetRight?: number;
-  style?: AreaStyle;
+  styles?: AreaStyle;
   category?: AxisValue;
   onpointerenter?: () => void;
   onpointerleave?: () => void;
-};
+} & ChannelMarkerStyle;
 
 /** A single heatmap cell mark. `fill` stays a per-row accessor; the rest of the style is constant per call. */
 export type CellMarkerConfig = {
@@ -99,9 +105,9 @@ export type CellMarkerConfig = {
   y: (d: any) => AxisValue;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fill: (d: any) => string;
-  style?: AreaStyle;
+  styles?: AreaStyle;
   inset?: number;
-};
+} & ChannelMarkerStyle;
 
 export type CustomComponentMarkerConfig = {
   type: 'component';

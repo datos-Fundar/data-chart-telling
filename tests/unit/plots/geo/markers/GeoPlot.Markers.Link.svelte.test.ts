@@ -63,7 +63,7 @@ describe('GeoPlot – link marker', () => {
           y1: 'fromLat',
           x2: 'toLon',
           y2: 'toLat',
-          style: { stroke: '#e11d48', strokeWidth: 2 },
+          styles: { stroke: '#e11d48', strokeWidth: 2 },
         },
       ] satisfies GeoMarkersConfig[],
     });

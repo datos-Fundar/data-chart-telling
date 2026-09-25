@@ -64,7 +64,7 @@ describe('buildMarkers – radius channel', () => {
 describe('buildMarkers – style resolution', () => {
 	test('falls back to the default color when a segment has none of its own', () => {
 		const [marker] = build({ colorForSeries: () => 'green' });
-		expect(marker.style?.dotFill).toBe('green');
+		expect(marker.styles?.dotFill).toBe('green');
 	});
 
 	test('a disabled-dots override wins over the segment/default color', () => {
@@ -72,7 +72,7 @@ describe('buildMarkers – style resolution', () => {
 			{ colorForSeries: () => 'green' },
 			{ disabledDotsFor: () => ({ dotFill: 'gray', dotFillOpacity: 0.3 }) }
 		);
-		expect(marker.style?.dotFill).toBe('gray');
-		expect(marker.style?.dotFillOpacity).toBe(0.3);
+		expect(marker.styles?.dotFill).toBe('gray');
+		expect(marker.styles?.dotFillOpacity).toBe(0.3);
 	});
 });

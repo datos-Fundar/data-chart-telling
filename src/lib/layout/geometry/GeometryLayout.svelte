@@ -29,6 +29,7 @@
 	import type { HoverController } from '$lib/layout/tooltip/controller.svelte';
 	import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
 	import type { GeoFeature } from '$lib/types/plots/data/geo';
+	import type { ChannelScalesConfig } from '$lib/types/layout/scales';
 
 	/**
 	 * Renders every marker in `markers`, in array order, each delegated to the
@@ -51,6 +52,7 @@
 		markers = [],
 		seriesData = [],
 		scopedGroups = [],
+		channelScales = undefined,
 		ctrl,
 		numericMargins,
 		data = [],
@@ -66,6 +68,8 @@
 		seriesData?: Series<TSeries>[];
 		/** One entry per series that can own a `series`-scoped marker. Same `TSeries` as `seriesData`. */
 		scopedGroups?: ScopedMarkerGroup<TSeries>[];
+		/** This plot kind's own `color`/`grouping` channel config — the fallback a marker's own `scales` inherits when it sets none of its own. */
+		channelScales?: ChannelScalesConfig;
 		/** `BasePlotLayout`'s own hover controller. */
 		ctrl: HoverController<TData>;
 		/** The plot's own resolved margins — `inset` marker only, to place its content box. */
@@ -128,8 +132,9 @@
 			y={resolveAccessor(marker.y)}
 			r={typeof marker.r === 'number' || marker.r == null ? marker.r : resolveAccessor(marker.r)}
 			fill={marker.fill}
-			value={marker.value ? resolveAccessor(marker.value) : undefined}
-			style={marker.style}
+			color={marker.color ? resolveAccessor(marker.color) : undefined}
+			scales={marker.scales ?? channelScales}
+			styles={marker.styles}
 		/>
 	{:else if marker.type === 'text'}
 		<TextMarker
@@ -137,10 +142,10 @@
 			x={resolveAccessor(marker.x)}
 			y={resolveAccessor(marker.y)}
 			text={marker.text}
-			style={marker.style}
+			styles={marker.styles}
 		/>
 	{:else if marker.type === 'rule'}
-		<RuleMarker axis={marker.axis} value={marker.value} style={marker.style} />
+		<RuleMarker axis={marker.axis} value={marker.value} styles={marker.styles} />
 	{:else if marker.type === 'geo'}
 		<GeoFeaturesMarker {marker} />
 	{:else if marker.type === 'graticule'}

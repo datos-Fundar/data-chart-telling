@@ -174,7 +174,7 @@ export type ChartConfig = {
 	bar: {
 		/** Default gap-fill styling (`BarPlot`'s `styles.gaps`) — the fallback merged under whatever a gap zone's own `style` sets. */
 		gap: AreaStyle;
-		/** Fallback `scales.z.seriesPadding` (0–1) for 'grouped' series layout, when a plot doesn't set its own. */
+		/** Fallback `scales.grouping.seriesPadding` (0–1) for 'grouped' series layout, when a plot doesn't set its own. */
 		seriesPadding: number;
 		/** Fallback gap (0–1) *between* category groups on BarPlot's own category axis, when a plot doesn't set its own `scales.x/y.paddingInner`. */
 		paddingInner: number;

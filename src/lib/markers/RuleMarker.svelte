@@ -9,7 +9,7 @@
    * `HoverMarker`'s crosshair. Falls back to `'currentColor'`/`1` when the
    * caller supplies no style.
    */
-  let { axis, value, style }: { axis: 'x' | 'y'; value: AxisValue; style?: StrokeStyle } = $props();
+  let { axis, value, styles }: { axis: 'x' | 'y'; value: AxisValue; styles?: StrokeStyle } = $props();
 
   const RuleMark = $derived(axis === 'x' ? RuleX : RuleY);
 </script>
@@ -17,8 +17,8 @@
 <RuleMark
   data={[{ v: value }]}
   {...axis === 'x' ? { x: (d: { v: AxisValue }) => d.v } : { y: (d: { v: AxisValue }) => d.v }}
-  stroke={style?.stroke ?? 'currentColor'}
-  strokeWidth={style?.strokeWidth ?? 1}
-  strokeOpacity={style?.strokeOpacity ?? 1}
-  strokeDasharray={style?.strokeDasharray}
+  stroke={styles?.stroke ?? 'currentColor'}
+  strokeWidth={styles?.strokeWidth ?? 1}
+  strokeOpacity={styles?.strokeOpacity ?? 1}
+  strokeDasharray={styles?.strokeDasharray}
 />

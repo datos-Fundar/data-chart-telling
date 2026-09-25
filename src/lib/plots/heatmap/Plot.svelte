@@ -26,12 +26,13 @@
 
 	/**
 	 * A categorical grid of value-coloured cells. Accepts either a pre-built
-	 * `series` array (each {@link Series} may carry `z` as the colour accessor) or
-	 * flat `data/x/y/z` props — mirrors the line/bar plot contract so the
-	 * chart-level container/timeline/facet/legend wrap it unchanged.
+	 * `series` array (each {@link Series} may carry `color` as the colour
+	 * accessor) or flat `data/x/y/color` props — mirrors the line/bar plot
+	 * contract so the chart-level container/timeline/facet/legend wrap it
+	 * unchanged.
 	 *
-	 * The colour domain is read from `scales.z.domain`; when absent it is derived
-	 * from the visible slice of data.
+	 * The colour ramp is configured via `scales.color` (domain/scheme/pivot);
+	 * an unset domain is derived from the visible slice of data.
 	 */
 	type Props = BasePlotProps<
 		SeriesProps<TData> | DataProps<TData>,
@@ -49,7 +50,7 @@
 		data,
 		x,
 		y,
-		z,
+		color,
 		styles = {},
 		segments = {},
 		scales = {},
@@ -77,8 +78,6 @@
 	});
 
 	const cfg = $derived(getConfiguration());
-	const minColor = $derived(styles.colors?.min ?? cfg.continuous.min);
-	const maxColor = $derived(styles.colors?.max ?? cfg.continuous.max);
 	const showVals = $derived(styles.values?.show ?? true);
 	const formatValue = $derived(styles.values?.format ?? ((v: number) => `${v}`));
 
@@ -92,11 +91,11 @@
 		{ phase: 'scales', run: buildScales },
 		{ phase: 'markers', run: buildMarkers }
 	];
-	const ctx = $derived<HeatmapPlotCtx>({ cfg, minColor, maxColor, range });
+	const ctx = $derived<HeatmapPlotCtx>({ cfg, range });
 	const plotState = $derived(
 		runStages<HeatmapPlotState<TData>, HeatmapPlotCtx>(
 			stages,
-			{ series, data, x, y, z, segments, scales, width, height, margins },
+			{ series, data, x, y, color, segments, scales, width, height, margins },
 			ctx
 		)
 	);
@@ -105,7 +104,7 @@
 	const flat = $derived(plotState.flat!);
 	const getX = $derived(plotState.channels!.x.accessor);
 	const getY = $derived(plotState.channels!.y.accessor);
-	const getZ = $derived(plotState.channels!.z.accessor);
+	const getColor = $derived(plotState.channels!.color.accessor);
 	const resolvedScales = $derived(plotState.scales);
 
 	// A cell outside the active range is dimmed in place, but never surfaces
@@ -114,21 +113,21 @@
 		flat
 			.filter((d) => {
 				if (range == null) return true;
-				const v = Number(getZ(d));
+				const v = Number(getColor(d));
 				return v >= range.min && v <= range.max;
 			})
 			.map((d) => ({
 				x: getX(d) as AxisValue,
 				y: getY(d) as AxisValue,
 				row: d,
-				label: formatValue(Number(getZ(d)), '')
+				label: formatValue(Number(getColor(d)), '')
 			}))
 	);
 
 	const hover = $derived({
 		active: tooltip != null || hasHoverMarker(markers),
 		points: hoverPoints,
-		label: (d: TData) => formatValue(Number(getZ(d)), ''),
+		label: (d: TData) => formatValue(Number(getColor(d)), ''),
 		strategy: resolveHoverStrategy(tooltip?.strategy, markers, 'punctual'),
 		sync: resolveHoverSync(tooltip?.sync, markers),
 		tooltip
@@ -153,6 +152,7 @@
 	{getY}
 	{hover}
 	scales={resolvedScales}
+	channelScales={resolvedScales}
 	{margins}
 	{hoverController}
 	markers={[...(plotState.markers ?? []), ...markers]}
@@ -163,7 +163,7 @@
 			data={flat}
 			{getX}
 			{getY}
-			{getZ}
+			{getColor}
 			{formatValue}
 			values={styles.values}
 			defaultColor={cfg.continuous.labelColor}

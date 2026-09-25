@@ -23,7 +23,7 @@ const meta = {
 		data: { control: false },
 		x: { control: false },
 		y: { control: false },
-		z: { control: false },
+		color: { control: false },
 		facet: { control: false },
 		tooltip: { control: false }
 	},
@@ -44,7 +44,7 @@ export const MultiFacetBroadcast: Story = {
 	args: {
 		title: 'Tooltip on every synced facet',
 		subtitle: 'Hover over one region — the other also shows its tooltip',
-		z: 'metric' as keyof SeriesPoint,
+		color: 'metric' as keyof SeriesPoint,
 		facet: { by: 'region' as keyof SeriesPoint, columns: 2 },
 		tooltip: { strategy: 'x', sync: true },
 		markers: [{ type: 'hover' }]
@@ -63,7 +63,7 @@ export const FacetSyncLine: StoryObj = {
 					data: TIME_SERIES,
 					x: 'year',
 					y: 'value',
-					z: 'metric',
+					color: 'metric',
 					legend: [
 						{
 							type: 'discrete',
@@ -120,8 +120,8 @@ export const FacetSyncBarBySeries: StoryObj = {
 					data: REGION_SECTOR_BARS,
 					x: 'region',
 					y: 'value',
-					z: 'sector',
-					scales: { z: { seriesLayout: 'stacked' } },
+					color: 'sector',
+					scales: { grouping: { seriesLayout: 'stacked' } },
 					facet: { by: 'region', columns: 2 },
 					tooltip: {
 						strategy: 'series',
@@ -147,7 +147,7 @@ export const FacetSyncHeatmap: StoryObj = {
 					data: heatData,
 					x: 'rooms',
 					y: 'people',
-					z: 'pct',
+					color: 'pct',
 					scales: { x: { label: 'Rooms' }, y: { label: 'People' } },
 					styles: { values: { show: false, format: (v: number) => `${(v * 100).toFixed(0)}%` } },
 					facet: { by: 'scenario', columns: 2 },
@@ -203,10 +203,12 @@ export const FacetSyncPyramid: StoryObj = {
 					data: pyramidData,
 					y: 'ageGroup',
 					x: 'pct',
-					z: 'sex',
-					scales: { y: { domain: AGE_GROUPS } },
+					color: 'sex',
+					scales: {
+						y: { domain: AGE_GROUPS },
+						color: { scheme: { Female: '#d6336c', Male: '#1971c2' } }
+					},
 					styles: {
-						colors: { left: '#d6336c', right: '#1971c2' },
 						values: { format: (v: number) => `${v.toFixed(1)}%` }
 					},
 					facet: { by: 'year', columns: 2 },

@@ -49,7 +49,7 @@ export const Basic: Story = {
 export const CustomStyle: Story = {
   args: {
     markers: [
-      { type: 'geo-hover', style: { stroke: '#7f1d1d', strokeWidth: 3 } },
+      { type: 'geo-hover', styles: { stroke: '#7f1d1d', strokeWidth: 3 } },
     ] satisfies GeoMarkersConfig[],
   },
 };
@@ -58,7 +58,7 @@ export const CustomStyle: Story = {
 export const FilledHighlight: Story = {
   args: {
     markers: [
-      { type: 'geo-hover', style: { fill: '#facc15', fillOpacity: 0.4, stroke: '#a16207', strokeWidth: 2 } },
+      { type: 'geo-hover', styles: { fill: '#facc15', fillOpacity: 0.4, stroke: '#a16207', strokeWidth: 2 } },
     ] satisfies GeoMarkersConfig[],
   },
 };

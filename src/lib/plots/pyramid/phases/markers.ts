@@ -47,7 +47,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 	for (const group of groupedSeries!) {
 		const getCategory = resolveAccessor(group.series.x);
 		const getMagnitude = resolveAccessor(group.series.y);
-		const defaultColor = ctx.colorForSide(group.series.side);
+		const defaultColor = state.colorForSeries!(group.series.name);
 		const disabledFill = ctx.disabledFillFor?.(group.series.name);
 
 		for (const seg of group.visualSegments) {
@@ -61,9 +61,9 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 				y: getCategory,
 				x1: 0,
 				x2: (d: TData) => valueFor(group.series, d),
-				style: {
-					fill: disabledFill?.fill ?? seg.style.fill ?? defaultColor,
-					fillOpacity: disabledFill?.fillOpacity ?? seg.style.fillOpacity ?? 1
+				styles: {
+					fill: disabledFill?.fill ?? seg.styles.fill ?? defaultColor,
+					fillOpacity: disabledFill?.fillOpacity ?? seg.styles.fillOpacity ?? 1
 				}
 			});
 		}
@@ -94,7 +94,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 				y: getCategory,
 				x1: 0,
 				x2: (d: TData) => (d as GapFillRow<TData>).__gapValue,
-				style: {
+				styles: {
 					...base,
 					fill: disabledFill?.fill ?? base.fill,
 					fillOpacity: disabledFill?.fillOpacity ?? base.fillOpacity

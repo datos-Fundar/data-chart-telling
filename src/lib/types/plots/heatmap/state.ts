@@ -24,8 +24,8 @@ export type HeatmapPlotState<TData extends Record<string, unknown>> = {
 	data?: TData[];
 	x?: Accessor<TData, AxisValue>;
 	y?: Accessor<TData, AxisValue>;
-	/** Color-value accessor (no grouping meaning here, unlike other kinds' `z`). */
-	z?: Accessor<TData, unknown>;
+	/** Color-value accessor — a pre-built `series` entry carries this as its own `.color` too (see `Series`). */
+	color?: Accessor<TData, unknown>;
 	segments: SegmentsConfig<CellSegmentStyle>;
 	scales: AxisBasedScalesConfig<TData>;
 	width: number;
@@ -40,11 +40,11 @@ export type HeatmapPlotState<TData extends Record<string, unknown>> = {
 	channels?: {
 		x: ResolvedChannel<TData>;
 		y: ResolvedChannel<TData>;
-		z: ResolvedChannel<TData, unknown>;
+		color: ResolvedChannel<TData, unknown>;
 	};
 
-	// "scales" phase output (`scales` above gets overwritten too).
-	colorScale?: (value: number) => string;
+	/** "scales" phase output: each row's own resolved color, composed from `channels.color` and the color ramp. */
+	resolveColor?: (row: TData) => string;
 
 	// "markers" phase output.
 	markers?: CellMarkerConfig[];
@@ -53,7 +53,5 @@ export type HeatmapPlotState<TData extends Record<string, unknown>> = {
 /** The environment every HeatmapPlot phase reads from, alongside the growing state. */
 export type HeatmapPlotCtx = {
 	cfg: ChartConfig;
-	minColor: string;
-	maxColor: string;
 	range: HeatmapRangeFilter | null | undefined;
 };

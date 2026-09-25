@@ -29,8 +29,8 @@ describe.each([['stacked'], ['grouped']] as const)(
 				data: DATA,
 				x: 'cat',
 				y: 'value',
-				z: 'series',
-				scales: { z: { seriesLayout } },
+				color: 'series',
+				scales: { grouping: { seriesLayout } },
 				tooltip: {
 					facetId: '',
 					sync: false,

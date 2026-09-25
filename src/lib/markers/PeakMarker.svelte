@@ -66,7 +66,7 @@
     data={[peakPoint]}
     x={() => peakX}
     y={() => peakY}
-    style={resolvedDotStyle}
+    styles={resolvedDotStyle}
   />
   {#if label}
     <TextMarker
@@ -74,7 +74,7 @@
       x={() => peakX}
       y={() => peakY}
       text={label}
-      style={resolvedTextStyle}
+      styles={resolvedTextStyle}
     />
   {/if}
 {/if}

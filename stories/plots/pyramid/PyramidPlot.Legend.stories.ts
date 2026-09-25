@@ -11,21 +11,21 @@ import PyramidValuesLegendDemo from './PyramidValuesLegendDemo.svelte';
 // stack it onto that page's already many co-mounted `PyramidPlot` instances.
 
 const meta = {
-  title: 'Plots/PyramidPlot/Legend',
-  component: PyramidPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 520,
-  },
-  argTypes: {
-    width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
-    height: { control: { type: 'range', min: 320, max: 800, step: 20 } },
-    styles: { control: false },
-  },
-  parameters: {
-    docs: { source: { name: 'PyramidPlot' } },
-  },
+	title: 'Plots/PyramidPlot/Legend',
+	component: PyramidPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 520
+	},
+	argTypes: {
+		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
+		height: { control: { type: 'range', min: 320, max: 800, step: 20 } },
+		styles: { control: false }
+	},
+	parameters: {
+		docs: { source: { name: 'PyramidPlot' } }
+	}
 } satisfies Meta<typeof PyramidPlot>;
 
 export default meta;
@@ -45,7 +45,7 @@ const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
  * composition. See `PyramidValuesLegendDemo.svelte`.
  */
 export const LegendDisabledDimsLabels: StoryObj = {
-  render: () => ({ Component: PyramidValuesLegendDemo }),
+	render: () => ({ Component: PyramidValuesLegendDemo })
 };
 
 /**
@@ -55,17 +55,17 @@ export const LegendDisabledDimsLabels: StoryObj = {
  * "Male" label to see the other side's bars and labels fade.
  */
 export const HoverIsolate: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: {
-      x: { domain: [-6, 6] },
-      y: { domain: AGE_GROUPS },
-    },
-    styles: {
-      values: { show: true, hoverIsolate: true, format: (v: number) => `${v.toFixed(1)}%` },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: {
+			x: { domain: [-6, 6] },
+			y: { domain: AGE_GROUPS }
+		},
+		styles: {
+			values: { show: true, hoverIsolate: true, format: (v: number) => `${v.toFixed(1)}%` }
+		} satisfies AxisBasedStylesConfig
+	}
 };

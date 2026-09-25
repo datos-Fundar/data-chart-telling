@@ -8,7 +8,7 @@ import type { Series } from '$lib/types/plots/data/common';
 type Row = { row: string; col: string; value: number };
 
 function series(name: string, data: Row[]): Series<Row> {
-	return { name, x: 'col', y: 'row', z: 'value', data };
+	return { name, x: 'col', y: 'row', color: 'value', data };
 }
 
 function build(overrides: Partial<HeatmapPlotState<Row>> = {}) {

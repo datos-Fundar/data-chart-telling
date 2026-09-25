@@ -2,26 +2,30 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { Series } from '$lib/types/plots/data/common';
-import { AGE_GROUPS, POPULATION_PYRAMID, type PopulationRow } from '../../../data/population-pyramid';
+import {
+	AGE_GROUPS,
+	POPULATION_PYRAMID,
+	type PopulationRow
+} from '../../../data/population-pyramid';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Plots/PyramidPlot/Markers/Hover',
-  component: PyramidPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 520,
-  },
-  argTypes: {
-    width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
-    height: { control: { type: 'range', min: 320, max: 800, step: 20 } },
-    markers: { control: false },
-  },
-  parameters: {
-    docs: { source: { name: 'PyramidPlot' } },
-  },
+	title: 'Plots/PyramidPlot/Markers/Hover',
+	component: PyramidPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 520
+	},
+	argTypes: {
+		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
+		height: { control: { type: 'range', min: 320, max: 800, step: 20 } },
+		markers: { control: false }
+	},
+	parameters: {
+		docs: { source: { name: 'PyramidPlot' } }
+	}
 } satisfies Meta<typeof PyramidPlot>;
 
 export default meta;
@@ -38,18 +42,18 @@ const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
  * by row, not by side). No floating HTML tooltip is involved.
  */
 export const Basic: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    markers: [
-      {
-        type: 'hover',
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		markers: [
+			{
+				type: 'hover'
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -57,19 +61,19 @@ export const Basic: Story = {
  * dot, leaving just the position indicators and the crosshair rule.
  */
 export const WithoutLabels: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    markers: [
-      {
-        type: 'hover',
-        showLabels: false,
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		markers: [
+			{
+				type: 'hover',
+				showLabels: false
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -77,19 +81,19 @@ export const WithoutLabels: Story = {
  * that's implied by default, so only the dots and their labels are drawn.
  */
 export const WithoutRule: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    markers: [
-      {
-        type: 'hover',
-        ruleY: false,
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		markers: [
+			{
+				type: 'hover',
+				ruleY: false
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -98,20 +102,20 @@ export const WithoutRule: Story = {
  * crosshair per side.
  */
 export const WithBothAxis: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    markers: [
-      {
-        type: 'hover',
-        ruleX: true,
-        ruleY: true,
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		markers: [
+			{
+				type: 'hover',
+				ruleX: true,
+				ruleY: true
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -119,27 +123,27 @@ export const WithBothAxis: Story = {
  * rule renders in red with a solid line and higher opacity.
  */
 export const WithCustomRuleStyle: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: {
-      x: { domain: [-6, 6] },
-      y: { domain: AGE_GROUPS }
-    },
-    markers: [
-      {
-        type: 'hover',
-        ruleStyle: {
-          stroke: '#e63946',
-          strokeOpacity: 0.7,
-          strokeWidth: 2,
-          strokeDasharray: '6 3',
-        },
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: {
+			x: { domain: [-6, 6] },
+			y: { domain: AGE_GROUPS }
+		},
+		markers: [
+			{
+				type: 'hover',
+				ruleStyle: {
+					stroke: '#e63946',
+					strokeOpacity: 0.7,
+					strokeWidth: 2,
+					strokeDasharray: '6 3'
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -149,24 +153,24 @@ export const WithCustomRuleStyle: Story = {
  * mirroring the value labels' own `anchor: 'outside'` convention.
  */
 export const LabelOutsideDot: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: {
-      x: { domain: [-6, 6] },
-      y: { domain: AGE_GROUPS },
-    },
-    markers: [
-      {
-        type: 'hover',
-        fontStyle: {
-          textAnchor: 'outside',
-        },
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: {
+			x: { domain: [-6, 6] },
+			y: { domain: AGE_GROUPS }
+		},
+		markers: [
+			{
+				type: 'hover',
+				fontStyle: {
+					textAnchor: 'outside'
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -177,22 +181,22 @@ export const LabelOutsideDot: Story = {
  * Compare with `Basic` to see the difference.
  */
 export const SeriesScoped: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    markers: [
-      {
-        type: 'hover',
-        series: 'Female',
-        fontStyle: {
-          textAnchor: 'outside',
-        },
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		markers: [
+			{
+				type: 'hover',
+				series: 'Female',
+				fontStyle: {
+					textAnchor: 'outside'
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
@@ -203,51 +207,51 @@ export const SeriesScoped: Story = {
  * magnitude axis isn't a band scale.
  */
 export const WithHighlightArea: Story = {
-  args: {
-    data: DATA,
-    x: 'pct',
-    y: 'ageGroup',
-    z: 'sex',
-    scales: { y: { domain: AGE_GROUPS } },
-    markers: [
-      {
-        type: 'hover',
-        areaY: true,
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		data: DATA,
+		x: 'pct',
+		y: 'ageGroup',
+		color: 'sex',
+		scales: { y: { domain: AGE_GROUPS } },
+		markers: [
+			{
+				type: 'hover',
+				areaY: true
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };
 
 /**
  * Hover marker on explicit series — the same unscoped hover marker behaves
- * identically whether the pyramid is built from the data/x/y/z shorthand
+ * identically whether the pyramid is built from the data/x/y/color shorthand
  * (see `Basic`) or, as here, an explicit two-series array (see `ExplicitSeries`
  * in the Series stories).
  */
 export const FromExplicitSeries: Story = {
-  args: {
-    series: [
-      {
-        name: 'Female',
-        x: 'ageGroup',
-        y: 'pct',
-        data: DATA.filter((d) => d.sex === 'Female'),
-      } satisfies Series<PopulationRow>,
-      {
-        name: 'Male',
-        x: 'ageGroup',
-        y: 'pct',
-        data: DATA.filter((d) => d.sex === 'Male'),
-      } satisfies Series<PopulationRow>,
-    ],
-    scales: { y: { domain: AGE_GROUPS } },
-    markers: [
-      {
-        type: 'hover',
-        fontStyle: {
-          textAnchor: 'outside',
-        },
-      },
-    ] satisfies AxisBasedMarkersConfig[],
-  },
+	args: {
+		series: [
+			{
+				name: 'Female',
+				x: 'ageGroup',
+				y: 'pct',
+				data: DATA.filter((d) => d.sex === 'Female')
+			} satisfies Series<PopulationRow>,
+			{
+				name: 'Male',
+				x: 'ageGroup',
+				y: 'pct',
+				data: DATA.filter((d) => d.sex === 'Male')
+			} satisfies Series<PopulationRow>
+		],
+		scales: { y: { domain: AGE_GROUPS } },
+		markers: [
+			{
+				type: 'hover',
+				fontStyle: {
+					textAnchor: 'outside'
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
 };

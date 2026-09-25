@@ -95,7 +95,7 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
   connect: boolean,
 ): VisualSegment<S['data'][number], TStyle>[] {
   if (!segs.length) {
-    return [{ data: series.data, style: {} as TStyle }];
+    return [{ data: series.data, styles: {} as TStyle, scales: undefined }];
   }
 
   const getX = resolveAccessor(series.x);
@@ -147,8 +147,8 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
   // Dots are excluded to avoid duplicate marks at the shared boundary points.
   const catchAll = segs.find((s) => !s.areas || s.areas.length === 0);
   const connectorStyle: TStyle = (() => {
-    if (!catchAll?.style) return {} as TStyle;
-    const { dots: _, ...rest } = catchAll.style as Record<string, unknown>;
+    if (!catchAll?.styles) return {} as TStyle;
+    const { dots: _, ...rest } = catchAll.styles as Record<string, unknown>;
     return rest as TStyle;
   })();
 
@@ -169,18 +169,19 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
         if (r > 0) bridged.unshift(runs[r - 1].data[runs[r - 1].data.length - 1]);
         if (r < runs.length - 1) bridged.push(runs[r + 1].data[0]);
       }
-      defaultVisual.push({ data: bridged, style: {} as TStyle });
+      defaultVisual.push({ data: bridged, styles: {} as TStyle, scales: undefined });
     } else {
       const seg = segs[run.segIdx];
-      const segStyle = seg.style ?? ({} as TStyle);
+      const segStyle = seg.styles ?? ({} as TStyle);
       // Area-specific segments merge the catch-all as a baseline: catch-all
       // keys fill in whatever the area segment omits; the area wins on conflict.
       const isAreaSpecific = seg.areas != null && seg.areas.length > 0;
       const resolvedStyle: TStyle =
-        isAreaSpecific && catchAll?.style
-          ? mergeStyles(catchAll.style as TStyle, segStyle)
+        isAreaSpecific && catchAll?.styles
+          ? mergeStyles(catchAll.styles as TStyle, segStyle)
           : segStyle;
-      userVisual.push({ data: run.data, style: resolvedStyle });
+      const resolvedScales = seg.scales ?? (isAreaSpecific && catchAll?.scales ? catchAll.scales : undefined);
+      userVisual.push({ data: run.data, styles: resolvedStyle, scales: resolvedScales });
       // When the next run is also a user segment (no unmatched data between them),
       // insert a line-only connector so the lines join without a gap. Using a
       // separate mark (rather than appending a bridge point to the current run)
@@ -191,7 +192,8 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
       if (connect && nextRun && nextRun.segIdx !== -1) {
         connectors.push({
           data: [run.data[run.data.length - 1], nextRun.data[0]],
-          style: connectorStyle,
+          styles: connectorStyle,
+          scales: undefined
         });
       }
     }
@@ -248,7 +250,7 @@ export function buildScopedMarkerGroups<
   groupedSeries: VisualGroup<S, TStyle>[];
   segments: SegmentsConfig<TStyle>;
   colorFor: (series: S, seriesIndex: number) => string;
-  segmentColorFor: (style: TStyle | undefined, defaultColor: string) => string;
+  segmentColorFor: (styles: TStyle | undefined, defaultColor: string) => string;
 }): ScopedMarkerGroup<TData>[] {
   const { groupedSeries, segments, colorFor, segmentColorFor } = args;
   return groupedSeries.map((group, seriesIndex) => {
@@ -261,7 +263,7 @@ export function buildScopedMarkerGroups<
       color: defaultColor,
       segments: segs.map((seg) => ({
         match: (row: TData) => matchesSegmentX(xFor(row), seg),
-        color: segmentColorFor(seg.style, defaultColor),
+        color: segmentColorFor(seg.styles, defaultColor),
       })),
     };
   });
