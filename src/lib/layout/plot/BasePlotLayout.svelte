@@ -11,7 +11,6 @@
 	import GeometryLayout from '$lib/layout/geometry/GeometryLayout.svelte';
 	import CoordinatesLayout from '$lib/layout/coordinates/CoordinatesLayout.svelte';
 	import StylesLayout from '$lib/layout/styles/StylesLayout.svelte';
-	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import TooltipLayout from '$lib/layout/tooltip/TooltipLayout.svelte';
 	import type { PlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
@@ -29,13 +28,14 @@
 	/**
 	 * Shared chrome around every plot kind's svelteplot markup: the
 	 * pointer-event wrapper, the hover/tooltip state machine, and the floating
-	 * tooltip. Composes the Coordinates and Styles layers around every plot
-	 * kind's own content, plus `GeometryLayout` (which renders nothing extra
-	 * when `markers` is empty/unset). `ScalesLayout` composes in
-	 * independently, only when `scales` is passed. Every plot kind supplies
-	 * its own `<Plot x y projection>` scale config, either directly via
-	 * `x`/`y` or by leaving them unset so this component derives them from
-	 * `scales`.
+	 * tooltip. `StylesLayout`/`ScalesLayout`/`GeometryLayout` render as
+	 * siblings inside `CoordinatesLayout` (which owns svelteplot's own
+	 * `<Plot>`) — `ScalesLayout` only when `scales` is passed, `GeometryLayout`
+	 * renders nothing extra when `markers` is empty/unset. `children` renders
+	 * last, after `GeometryLayout`, so it draws on top without needing to be
+	 * its child. Every plot kind supplies its own `<Plot x y projection>`
+	 * scale config, either directly via `x`/`y` or by leaving them unset so
+	 * this component derives them from `scales`.
 	 */
 	let {
 		width,
@@ -58,7 +58,7 @@
 		scopedGroups = undefined,
 		geoAllFeatures = undefined,
 		containerEl = $bindable(undefined),
-		hoverController = undefined,
+		hoverController,
 		children
 	}: {
 		width: number;
@@ -122,8 +122,8 @@
 		geoAllFeatures?: (GeoFeature<Record<string, unknown>> & { __id: string })[];
 		/** The wrapper div's own element — bind for a nested layout that needs it for its own gesture handling (e.g. `CoordinatesLayout`'s zoom/rotate). */
 		containerEl?: HTMLDivElement;
-		/** An already-created hover controller, used instead of this component creating its own. */
-		hoverController?: PlotHover<TData>;
+		/** Every plot kind creates its own via `createPlotHover` and passes it here — this component never creates one itself. */
+		hoverController: PlotHover<TData>;
 		/**
 		 * `matchedPoints` carries the source `row` alongside the display fields,
 		 * so a template can resolve it straight off `row` instead of assuming
@@ -203,18 +203,8 @@
 	);
 
 	// ── Hover / tooltip ───────────────────────────────────────────────────────
-	// Not `$derived` — `createPlotHover` reads context and registers an `$effect`.
-	const ownHover =
-		hoverController ??
-		createPlotHover<TData>({
-			hover: () => hover,
-			getX: () => getX,
-			getY: () => getY,
-			width: () => width,
-			height: () => height
-		});
-	const hoverStore = $derived(ownHover.hoverStore);
-	const ctrl = ownHover.ctrl;
+	const hoverStore = $derived(hoverController.hoverStore);
+	const ctrl = hoverController.ctrl;
 
 	/** Declared intent, defaulted — see {@link HoverConfig.pointMatching}. */
 	const pointMatchingStrategy = $derived(hover.pointMatching ?? 'nearest');
@@ -279,17 +269,16 @@
 			{geoAllFeatures}
 			tooltipAnchorX={hover.tooltip?.anchorX}
 			tooltipAnchorY={hover.tooltip?.anchorY}
-		>
-			{@render children?.({
-				matchedPoints: ctrl.points,
-				activePoint: ctrl.activePoint,
-				impliesCrosshairX: ctrl.impliesCrosshairX,
-				impliesCrosshairY: ctrl.impliesCrosshairY,
-				numericMargins,
-				setHoverMatch: ctrl.onPointer,
-				clearHoverMatch: ctrl.onLeave
-			})}
-		</GeometryLayout>
+		/>
+		{@render children?.({
+			matchedPoints: ctrl.points,
+			activePoint: ctrl.activePoint,
+			impliesCrosshairX: ctrl.impliesCrosshairX,
+			impliesCrosshairY: ctrl.impliesCrosshairY,
+			numericMargins,
+			setHoverMatch: ctrl.onPointer,
+			clearHoverMatch: ctrl.onLeave
+		})}
 
 		{#if hover.active && pointMatchingStrategy === 'nearest'}
 			<Pointer

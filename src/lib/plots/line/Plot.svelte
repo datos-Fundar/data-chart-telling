@@ -17,6 +17,7 @@
 	import { buildMapping } from '$lib/plots/line/phases/mapping';
 	import { buildMarkers } from '$lib/plots/line/phases/markers';
 	import { runStages } from '$lib/layout/phases/runStages';
+	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
 	import ValueLabels from '$lib/plots/line/ValueLabels.svelte';
 	import {
@@ -145,6 +146,15 @@
 		tooltip
 	});
 
+	// Created once, not `$derived`.
+	const hoverController = createPlotHover<TData>({
+		hover: () => hover,
+		getX: () => xAcc,
+		getY: () => (d: TData) => Number(yAcc(d)),
+		width: () => width,
+		height: () => height
+	});
+
 	const lastPoints = $derived(
 		resolvedSeries
 			.map((s) => {
@@ -218,6 +228,7 @@
 	{scales}
 	{...labelMargin.plotProps}
 	xTickRotate={scales?.x?.tickRotate}
+	{hoverController}
 	markers={[...(plotState.markers ?? []), ...markers]}
 	seriesData={resolvedSeries}
 	{scopedGroups}

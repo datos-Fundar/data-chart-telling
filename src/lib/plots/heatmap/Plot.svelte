@@ -7,6 +7,7 @@
 	import { buildScales } from '$lib/plots/heatmap/phases/scales';
 	import { buildMarkers } from '$lib/plots/heatmap/phases/markers';
 	import { runStages } from '$lib/layout/phases/runStages';
+	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
 	import ValueLabels from '$lib/plots/heatmap/ValueLabels.svelte';
 	import {
@@ -132,6 +133,15 @@
 		sync: resolveHoverSync(tooltip?.sync, markers),
 		tooltip
 	});
+
+	// Created once, not `$derived`.
+	const hoverController = createPlotHover<TData>({
+		hover: () => hover,
+		getX: () => getX,
+		getY: () => getY,
+		width: () => width,
+		height: () => height
+	});
 </script>
 
 <BasePlotLayout
@@ -144,6 +154,7 @@
 	{hover}
 	scales={resolvedScales}
 	{margins}
+	{hoverController}
 	markers={[...(plotState.markers ?? []), ...markers]}
 	seriesData={resolvedSeries}
 >

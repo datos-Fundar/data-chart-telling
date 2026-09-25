@@ -18,6 +18,7 @@
 	import { buildScales } from '$lib/plots/pyramid/phases/scales';
 	import { buildMarkers } from '$lib/plots/pyramid/phases/markers';
 	import { runStages } from '$lib/layout/phases/runStages';
+	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
 	import ValueLabels from '$lib/plots/pyramid/ValueLabels.svelte';
 	import {
@@ -161,6 +162,15 @@
 		tooltip
 	});
 
+	// Created once, not `$derived`.
+	const hoverController = createPlotHover<PyramidTaggedRow<TData>>({
+		hover: () => hover,
+		getX: () => getX,
+		getY: () => getY,
+		width: () => width,
+		height: () => height
+	});
+
 	// Estimated overflow for an `'outside'`- or `'start'`-anchored value label
 	// (both anchor at the row's own full magnitude, pushed further outward —
 	// see `ValueLabels.svelte`'s `xFn`) at the most extreme value on each
@@ -225,6 +235,7 @@
 	scales={resolvedScales}
 	{...labelMargin.plotProps}
 	xTickRotate={resolvedScales?.x?.tickRotate}
+	{hoverController}
 	markers={[...(plotState.markers ?? []), ...markers]}
 	seriesData={resolvedSeries}
 	{scopedGroups}

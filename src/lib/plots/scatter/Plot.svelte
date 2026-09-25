@@ -15,6 +15,7 @@
 		createLabelMarginTracker,
 		halfDimensionOverflowCap
 	} from '$lib/plots/utils/labelOverflow.svelte';
+	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
 	import ValueLabels from '$lib/plots/scatter/ValueLabels.svelte';
 	import {
@@ -152,6 +153,15 @@
 		tooltip
 	});
 
+	// Created once, not `$derived`.
+	const hoverController = createPlotHover<TData>({
+		hover: () => hover,
+		getX: () => xAcc,
+		getY: () => (d: TData) => Number(yAcc(d)),
+		width: () => width,
+		height: () => height
+	});
+
 	// See `halfDimensionOverflowCap`'s own doc comment — relevant here mainly
 	// for a corner point with no room in any direction even after
 	// `resolveEdgeAwareAnchor`'s own flip.
@@ -182,6 +192,7 @@
 	{hover}
 	scales={resolvedScales}
 	{...labelMargin.plotProps}
+	{hoverController}
 	markers={[...(plotState.markers ?? []), ...markers]}
 	seriesData={resolvedSeries}
 	{scopedGroups}
