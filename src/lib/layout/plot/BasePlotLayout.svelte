@@ -204,7 +204,7 @@
 
 	// ── Hover / tooltip ───────────────────────────────────────────────────────
 	const hoverStore = $derived(hoverController.hoverStore);
-	const ctrl = hoverController.ctrl;
+	const ctrl = $derived(hoverController.ctrl);
 
 	/** Declared intent, defaulted — see {@link HoverConfig.pointMatching}. */
 	const pointMatchingStrategy = $derived(hover.pointMatching ?? 'nearest');
