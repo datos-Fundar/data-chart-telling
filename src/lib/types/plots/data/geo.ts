@@ -70,6 +70,8 @@ export type GeoDataProps<TProps extends Record<string, unknown> = Record<string,
 	 * key simply falls through to `segments.default`/the plot-level ramp.
 	 */
 	grouping?: (feature: GeoFeature<TProps>) => string | undefined;
+	/** Continuous or categorical opacity-value accessor — configure the ramp via `scales.opacity`. */
+	opacity?: (feature: GeoFeature<TProps>) => number | undefined;
 	/**
 	 * Excludes matching parts of a feature's geometry from the map's own
 	 * rendering and hover/click matching — e.g. so a separate `inset` marker

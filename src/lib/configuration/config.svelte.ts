@@ -127,7 +127,8 @@ export const DEFAULT_CONFIG: ChartConfig = {
 
 	margins: { top: 'auto', right: 'auto', bottom: 'auto', left: 'auto' },
 	palette: ['#4f46e5', '#e6580d', '#16a34a', '#dc2626', '#0891b2', '#9333ea', '#ca8a04', '#db2777'],
-	continuous: { min: '#e0e7ff', max: '#4f46e5', labelColor: '#111827' },
+	symbols: ['circle', 'square', 'triangle', 'diamond', 'star', 'cross'],
+	continuous: { min: '#e0e7ff', max: '#4f46e5', labelColor: '#111827', opacityRange: [0.2, 1] },
 	line: {
 		strokeWidth: 3,
 		dotRadius: 4,

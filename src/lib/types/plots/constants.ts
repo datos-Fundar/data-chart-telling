@@ -11,7 +11,18 @@
  */
 export type ValueAnchor = 'outside' | 'start' | 'middle' | 'end';
 
-export type SymbolType = 'circle' | 'square' | 'triangle' | 'line';
+/**
+ * Shared by two unrelated renderers: a `dot` mark's own point shape
+ * (delegated to svelteplot/d3-shape) and a discrete legend item's own icon
+ * (`DiscreteSymbolIcon.svelte`, hand-drawn SVG, independent of svelteplot).
+ * `'line'` is legend-only — it represents a Line series' own swatch there,
+ * but isn't a real d3-shape symbol name, so a `dot` mark (or the `symbol`
+ * channel) given `'line'` silently renders as `'circle'` instead (verified
+ * against svelteplot's own symbol set). `'diamond'`/`'star'`/`'cross'` are
+ * real d3-shape names, valid on a `dot` mark; the legend icon falls back to
+ * a plain square for these since it has no hand-drawn icon for them yet.
+ */
+export type SymbolType = 'circle' | 'square' | 'triangle' | 'line' | 'diamond' | 'star' | 'cross';
 export type LineStyle = 'solid' | 'dashed' | 'dotted' | 'dashdot';
 export type LineCap = 'butt' | 'round' | 'square';
 export type LineJoin = 'arcs' | 'bevel' | 'miter' | 'miter-clip' | 'round';

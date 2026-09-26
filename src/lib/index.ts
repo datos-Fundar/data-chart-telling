@@ -69,6 +69,8 @@ export {
 	contrastTextColor,
 	contrastRatio
 } from './utils/color';
+export { resolveOpacityScale } from './utils/opacity';
+export { resolveSymbolScale } from './utils/symbol';
 export { estimateCategoricalAxisMargin } from './plots/utils/categoricalAxisMargin';
 export { estimateLineValueLabelMargin } from './plots/line/valueLabelMargin';
 
@@ -79,6 +81,9 @@ export type {
 	AxisBasedScalesConfig,
 	ColorScaleConfig,
 	GroupingScaleConfig,
+	OpacityScaleConfig,
+	SymbolScaleConfig,
+	RScaleConfig,
 	ChannelName,
 	ChannelScaleConfig,
 	ChannelScalesConfig

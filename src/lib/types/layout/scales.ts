@@ -1,3 +1,5 @@
+import type { SymbolType } from '$lib/types/plots/constants';
+
 export type AxisValue = number | string | Date;
 
 /**
@@ -37,17 +39,73 @@ export type GroupingScaleConfig = {
 };
 
 /**
+ * A continuous or categorical opacity ramp — same resolution model as
+ * {@link ColorScaleConfig} (this package resolves its own `value => opacity`
+ * function per consumer), but maps to a numeric `[0,1]`-ish range instead of
+ * colors. Unlike `color`, svelteplot has no "already resolved, don't rescale
+ * me" escape hatch for a bare number (only a recognized CSS color string
+ * gets that treatment) — every consumer of a resolved opacity value applies
+ * it as a literal constant per mark instance rather than a per-row function,
+ * to avoid svelteplot re-deriving its own domain from whatever a function
+ * returns and silently re-normalizing it.
+ */
+export type OpacityScaleConfig = {
+	/** `[min, max]` for a continuous ramp, or the category list for a categorical one. Auto-computed from the data when omitted. */
+	domain?: [number, number] | string[];
+	/** `[minOpacity, maxOpacity]` for continuous, or a category → opacity map. Defaults to the theme's own `continuous.opacityRange`. */
+	range?: [number, number] | Record<string, number>;
+	/** Fallback opacity for a missing/unmapped value. Defaults to `1`. */
+	unknown?: number;
+};
+
+/**
+ * A categorical shape ramp — maps distinct values to marker shapes. Always
+ * discrete (there's no "shape between two shapes"), unlike every other
+ * channel here. Resolves to a plain shape-name string, which svelteplot
+ * recognizes as a literal (same escape hatch as a CSS color string for
+ * `color`), so — unlike `opacity` — a per-row accessor function works
+ * directly with no bucketing needed.
+ */
+export type SymbolScaleConfig = {
+	domain?: string[];
+	/** Shapes cycled through in `domain` order, or a category → shape map. Defaults to a built-in cycle. */
+	range?: SymbolType[] | Record<string, SymbolType>;
+	unknown?: SymbolType;
+};
+
+/**
  * Every secondary channel this package resolves — x/y stay kind-specific,
  * not part of this list. Add a channel here and to {@link ChannelScaleConfig}
  * and it's available in `scales.<channel>` on every axis-based plot kind,
- * and the same shape on a marker's own `scales`.
+ * and the same shape on a marker's own `scales`. `r` is deliberately not a
+ * member of this list — see {@link RScaleConfig}'s own doc comment for why.
  */
-export type ChannelName = 'color' | 'grouping';
+export type ChannelName = 'color' | 'grouping' | 'opacity' | 'symbol';
 
 /** Each {@link ChannelName}'s own scale-config shape. */
 export type ChannelScaleConfig = {
 	color: ColorScaleConfig;
 	grouping: GroupingScaleConfig;
+	opacity: OpacityScaleConfig;
+	symbol: SymbolScaleConfig;
+};
+
+/**
+ * `r` (radius/size) config — a plot-level-only setting, deliberately outside
+ * {@link ChannelScalesConfig}'s per-consumer-independent mechanism. Unlike
+ * `color`, svelteplot binds `r` to exactly one scale shared by every mark in
+ * the plot (configured once, at `<Plot r={...}>` — there is no per-mark
+ * equivalent), so a marker's own `scales.r` would still share the plot's own
+ * scale rather than getting an independent one. `domain`/`range` here get
+ * threaded straight into svelteplot's own `r` scale rather than resolved by
+ * a from-scratch function, since svelteplot's own sqrt (area-proportional)
+ * radius math is already correct — this only exposes author control over
+ * its domain/range, it doesn't replace it.
+ */
+export type RScaleConfig = {
+	domain?: [number, number];
+	/** Pixel radius range, e.g. `[2, 20]`. Defaults to svelteplot's own. */
+	range?: [number, number];
 };
 
 /** `scales.<channel>` for every channel in `TChannel` — the shared shape for both a plot's own `scales` prop and a marker's own. */
@@ -142,4 +200,6 @@ export type AxisScale<TData = Record<string, unknown>> = {
 export type AxisBasedScalesConfig<TData = Record<string, unknown>> = {
 	x?: AxisScale<TData>;
 	y?: AxisScale<TData>;
+	/** Plot-wide only — see {@link RScaleConfig}'s own doc comment for why this isn't part of {@link ChannelScalesConfig}. */
+	r?: RScaleConfig;
 } & ChannelScalesConfig;

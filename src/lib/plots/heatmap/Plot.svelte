@@ -51,6 +51,7 @@
 		x,
 		y,
 		color,
+		opacity,
 		styles = {},
 		segments = {},
 		scales = {},
@@ -95,7 +96,7 @@
 	const plotState = $derived(
 		runStages<HeatmapPlotState<TData>, HeatmapPlotCtx>(
 			stages,
-			{ series, data, x, y, color, segments, scales, width, height, margins },
+			{ series, data, x, y, color, opacity, segments, scales, width, height, margins },
 			ctx
 		)
 	);

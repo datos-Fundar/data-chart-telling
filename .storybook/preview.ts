@@ -103,7 +103,10 @@ const preview: Preview = {
 							'Marker Level',
 							['Dot', 'Cell', 'Bar'],
 							'Independent Ramps'
-						]
+						],
+						'Opacity',
+						'Symbol',
+						'R'
 					],
 					'Layout',
 					[

@@ -11,4 +11,6 @@ import type { Accessor, SeriesProps, DataProps } from '$lib/types/plots/data/com
  */
 export type ScatterDataProps<T extends Record<string, unknown>> = (SeriesProps<T> | DataProps<T>) & {
   r?: Accessor<T, number> | number;
+  /** Categorical shape-value accessor — configure the mapping via `scales.symbol`. ScatterPlot's own dots are the only default mark with a shape concept. */
+  symbol?: Accessor<T, unknown>;
 };

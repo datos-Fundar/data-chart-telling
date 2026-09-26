@@ -26,6 +26,8 @@ export type HeatmapPlotState<TData extends Record<string, unknown>> = {
 	y?: Accessor<TData, AxisValue>;
 	/** Color-value accessor — a pre-built `series` entry carries this as its own `.color` too (see `Series`). */
 	color?: Accessor<TData, unknown>;
+	/** Continuous or categorical opacity-value accessor — see `DataProps.opacity`. */
+	opacity?: Accessor<TData, unknown>;
 	segments: SegmentsConfig<CellSegmentStyle>;
 	scales: AxisBasedScalesConfig<TData>;
 	width: number;
@@ -41,10 +43,14 @@ export type HeatmapPlotState<TData extends Record<string, unknown>> = {
 		x: ResolvedChannel<TData>;
 		y: ResolvedChannel<TData>;
 		color: ResolvedChannel<TData, unknown>;
+		/** Row-level accessor resolved from `opacity`, when set. */
+		opacity?: ResolvedChannel<TData, unknown>;
 	};
 
 	/** "scales" phase output: each row's own resolved color, composed from `channels.color` and the color ramp. */
 	resolveColor?: (row: TData) => string;
+	/** "scales" phase output: each row's own resolved opacity, composed from `channels.opacity` and the opacity ramp — `undefined` when `opacity` itself is unset. */
+	resolveOpacity?: (row: TData) => number;
 
 	// "markers" phase output.
 	markers?: CellMarkerConfig[];

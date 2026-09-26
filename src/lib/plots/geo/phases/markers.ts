@@ -43,8 +43,9 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 	state: GeoPlotState<TProps>,
 	ctx: GeoPlotCtx<TProps>
 ): GeoPlotState<TProps> {
-	const { features, segments, authoredMarkers, color, grouping, resolveColor } = state;
+	const { features, segments, authoredMarkers, color, grouping, resolveColor, resolveOpacity } = state;
 	const { range, fill, fillOpacity, stroke, strokeWidth, cfg, onFeatureClick } = ctx;
+	const OPACITY_STEPS = 32;
 
 	function rangeFilteredStyle(base: GeoSegmentStyle, f: TaggedGeoFeature<TProps>): GeoSegmentStyle {
 		if (range == null || !color) return base;
@@ -63,10 +64,12 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 	const groups = new Map<string, GeoStyleGroup<TProps>>();
 	for (const f of features!) {
 		const style = getFeatureStyle(f);
-		const key = JSON.stringify(style);
+		const rawOpacity = resolveOpacity?.(f);
+		const opacity = rawOpacity != null ? Math.round(rawOpacity * OPACITY_STEPS) / OPACITY_STEPS : undefined;
+		const key = JSON.stringify({ style, opacity });
 		let group = groups.get(key);
 		if (!group) {
-			group = { style, data: [] };
+			group = { style, opacity, data: [] };
 			groups.set(key, group);
 		}
 		group.data.push(f);
@@ -81,7 +84,7 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 		type: 'geo',
 		data: group.data,
 		fill: (d) => group.style.fill ?? resolveBaseFill(d as TaggedGeoFeature<TProps>),
-		fillOpacity: group.style.fillOpacity ?? fillOpacity ?? 1,
+		fillOpacity: group.style.fillOpacity ?? group.opacity ?? fillOpacity ?? 1,
 		stroke: group.style.stroke ?? stroke ?? cfg.axis.color,
 		strokeWidth: group.style.strokeWidth ?? strokeWidth ?? 0.5,
 		onclick: onFeatureClick ? (e, d) => onFeatureClick(d as TaggedGeoFeature<TProps>, e) : undefined

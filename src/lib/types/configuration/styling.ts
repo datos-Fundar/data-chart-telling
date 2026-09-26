@@ -1,4 +1,5 @@
 import type { StrokeStyle, DotStyle, FontStyle, AreaStyle } from '$lib/types/plots/styling';
+import type { SymbolType } from '$lib/types/plots/constants';
 
 export type TextStyle = {
 	/** font-family */
@@ -140,8 +141,10 @@ export type ChartConfig = {
 	};
 	/** Discrete categorical palette (grouped series). */
 	palette: string[];
-	/** Continuous gradient endpoints + on-cell label colour. */
-	continuous: { min: string; max: string; labelColor: string };
+	/** Default shape cycle for the `symbol` channel, in order. */
+	symbols: SymbolType[];
+	/** Continuous gradient endpoints + on-cell label colour, plus the default opacity-channel range. */
+	continuous: { min: string; max: string; labelColor: string; opacityRange: [number, number] };
 	/** Default line geometry. */
 	line: {
 		strokeWidth: number;

@@ -60,6 +60,8 @@
 		grouping,
 		color,
 		r,
+		opacity,
+		symbol,
 		styles = {},
 		segments = {},
 		markers = [],
@@ -110,7 +112,7 @@
 	const plotState = $derived(
 		runStages<ScatterPlotState<TData>, ScatterPlotCtx>(
 			stages,
-			{ series, data, x, y, grouping, color, r, segments, scales, width, height, margins },
+			{ series, data, x, y, grouping, color, r, opacity, symbol, segments, scales, width, height, margins },
 			ctx
 		)
 	);

@@ -5,7 +5,7 @@ import type { ScatterPlotState } from '$lib/types/plots/scatter/state';
 export function buildMapping<TData extends Record<string, unknown>>(
 	state: ScatterPlotState<TData>
 ): ScatterPlotState<TData> {
-	const { resolvedSeries, r, grouping, color } = state;
+	const { resolvedSeries, r, grouping, color, opacity, symbol } = state;
 
 	const xAcc = resolveAccessor(resolvedSeries![0]?.x ?? ((d: TData) => d));
 	const yAcc = resolveAccessor(resolvedSeries![0]?.y ?? ((d: TData) => d));
@@ -19,7 +19,9 @@ export function buildMapping<TData extends Record<string, unknown>>(
 			y: { accessor: yAcc },
 			r: r === undefined || typeof r === 'number' ? r : { accessor: resolveAccessor(r) },
 			grouping: rowGrouping !== undefined ? { accessor: resolveAccessor<TData>(rowGrouping) } : undefined,
-			color: rowColor !== undefined ? { accessor: resolveAccessor<TData>(rowColor) } : undefined
+			color: rowColor !== undefined ? { accessor: resolveAccessor<TData>(rowColor) } : undefined,
+			opacity: opacity !== undefined ? { accessor: resolveAccessor<TData>(opacity) } : undefined,
+			symbol: symbol !== undefined ? { accessor: resolveAccessor<TData>(symbol) } : undefined
 		}
 	};
 }

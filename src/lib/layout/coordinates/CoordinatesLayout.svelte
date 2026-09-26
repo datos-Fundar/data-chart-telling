@@ -29,6 +29,7 @@
 		margin,
 		x,
 		y,
+		r = undefined,
 		coordinates = undefined,
 		locale = undefined,
 		data,
@@ -41,6 +42,8 @@
 		margin: SveltePlotProps['margin'];
 		x: SveltePlotProps['x'];
 		y: SveltePlotProps['y'];
+		/** Forwarded verbatim to svelteplot's own `<Plot r>` — the plot-wide radius/size scale (see `RScaleConfig`'s own doc comment for why this is plot-wide only). */
+		r?: SveltePlotProps['r'];
 		coordinates?: CoordinatesConfig;
 		/** Forwarded verbatim to svelteplot's own `<Plot locale>`. */
 		locale?: SveltePlotProps['locale'];
@@ -152,6 +155,7 @@
 		{margin}
 		{x}
 		{y}
+		{r}
 		{locale}
 		projection={finalProjection as SveltePlotProps['projection']}
 	>

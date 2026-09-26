@@ -133,6 +133,8 @@
 			r={typeof marker.r === 'number' || marker.r == null ? marker.r : resolveAccessor(marker.r)}
 			fill={marker.fill}
 			color={marker.color ? resolveAccessor(marker.color) : undefined}
+			opacity={marker.opacity ? resolveAccessor(marker.opacity) : undefined}
+			symbol={marker.symbol ? resolveAccessor(marker.symbol) : undefined}
 			scales={marker.scales ?? channelScales}
 			styles={marker.styles}
 		/>

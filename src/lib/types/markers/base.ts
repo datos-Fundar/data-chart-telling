@@ -11,6 +11,9 @@ export type ChannelMarkerStyle = {
 	/** Continuous value driving a per-mark color ramp — configure the ramp itself via `scales.color`. */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	color?: string | ((d: any) => unknown);
+	/** Continuous or categorical value driving a per-mark opacity ramp — configure it via `scales.opacity`. */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	opacity?: string | ((d: any) => unknown);
 	/** Per-marker channel-ramp overrides, same shape as a plot's own `scales` prop. */
 	scales?: ChannelScalesConfig;
 };
@@ -35,6 +38,9 @@ export type DotMarkerConfig = {
 	/** Per-row fill, overriding `styles.dotFill` — ignored when `color` is set. */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	fill?: (d: any) => string;
+	/** Categorical value driving a per-row shape — configure the mapping via `scales.symbol`. Overrides `styles.dotSymbol`. */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	symbol?: string | ((d: any) => unknown);
 	styles?: DotStyle;
 } & ChannelMarkerStyle;
 

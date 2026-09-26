@@ -1,4 +1,5 @@
 import { resolveColorScale } from '$lib/utils/color';
+import { resolveOpacityScale } from '$lib/utils/opacity';
 import { resolveFeatureScales } from '$lib/plots/utils/geoSegments';
 import type { GeoPlotState, GeoPlotCtx } from '$lib/types/plots/geo/state';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
@@ -15,7 +16,7 @@ export function buildScales<TProps extends Record<string, unknown>>(
 	state: GeoPlotState<TProps>,
 	ctx: GeoPlotCtx<TProps>
 ): GeoPlotState<TProps> {
-	const { scales, features, color, grouping, segments } = state;
+	const { scales, features, color, grouping, opacity, segments } = state;
 	const { range, cfg } = ctx;
 
 	const configDomain =
@@ -82,5 +83,22 @@ export function buildScales<TProps extends Record<string, unknown>>(
 			}
 		: undefined;
 
-	return { ...state, resolveColor };
+	// Plot-level only — no segment-scoped opacity ramp (unlike `resolveColor`
+	// above), since there's no concrete use case yet driving that complexity.
+	const opacityDomain: [number, number] | string[] | null = (() => {
+		if (!opacity) return null;
+		const vals = features!.map((f) => opacity(f)).filter((v): v is number => v != null);
+		return vals.length ? [Math.min(...vals), Math.max(...vals)] : null;
+	})();
+	const opacityScale = opacityDomain
+		? resolveOpacityScale(scales.opacity, opacityDomain, cfg.continuous.opacityRange)
+		: null;
+	const resolveOpacity = opacityScale
+		? (f: GeoFeature<TProps>) => {
+				const v = opacity?.(f);
+				return v != null ? opacityScale(v) : undefined;
+			}
+		: undefined;
+
+	return { ...state, resolveColor, resolveOpacity };
 }

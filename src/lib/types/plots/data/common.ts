@@ -32,6 +32,7 @@ export type SeriesProps<T extends Record<string, unknown>> = {
 	y?: never;
 	grouping?: never;
 	color?: never;
+	opacity?: never;
 };
 
 /**
@@ -55,4 +56,6 @@ export type DataProps<T extends Record<string, unknown>> = {
 	 * is unset — see `scales.color` to configure each series' own color.
 	 */
 	color?: Accessor<T, unknown>;
+	/** Continuous or categorical opacity-value accessor — configure the ramp via `scales.opacity`. Independent of `color`/`grouping`. */
+	opacity?: Accessor<T, unknown>;
 };

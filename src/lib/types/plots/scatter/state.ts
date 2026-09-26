@@ -20,6 +20,10 @@ export type ScatterPlotState<TData extends Record<string, unknown>> = {
 	grouping?: Accessor<TData, unknown>;
 	color?: Accessor<TData, unknown>;
 	r?: Accessor<TData, number> | number;
+	/** Continuous or categorical opacity-value accessor — see `DataProps.opacity`. */
+	opacity?: Accessor<TData, unknown>;
+	/** Categorical shape-value accessor — see `ScatterDataProps.symbol`. */
+	symbol?: Accessor<TData, unknown>;
 	segments: SegmentsConfig<ScatterSegmentStyle>;
 	scales: AxisBasedScalesConfig<TData>;
 	width: number;
@@ -43,6 +47,10 @@ export type ScatterPlotState<TData extends Record<string, unknown>> = {
 		grouping?: ResolvedChannel<TData, unknown>;
 		/** Row-level accessor resolved from `color`, when set — independent of `colorForSeries`'s per-name resolution. */
 		color?: ResolvedChannel<TData, unknown>;
+		/** Row-level accessor resolved from `opacity`, when set. */
+		opacity?: ResolvedChannel<TData, unknown>;
+		/** Row-level accessor resolved from `symbol`, when set. */
+		symbol?: ResolvedChannel<TData, unknown>;
 	};
 
 	// "markers" phase output.

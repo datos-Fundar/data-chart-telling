@@ -15,9 +15,10 @@ export type TaggedGeoFeature<TProps extends Record<string, unknown>> = GeoFeatur
 	__cy: number;
 };
 
-/** One resolved-style bucket of features. */
+/** One resolved-style bucket of features — `opacity` is a second bucketing dimension alongside `style`, quantized so the channel produces a bounded number of mark instances. */
 export type GeoStyleGroup<TProps extends Record<string, unknown>> = {
 	style: GeoSegmentStyle;
+	opacity: number | undefined;
 	data: TaggedGeoFeature<TProps>[];
 };
 
@@ -38,6 +39,8 @@ export type GeoPlotState<TProps extends Record<string, unknown>> = {
 	color?: (feature: GeoFeature<TProps>) => number | undefined;
 	/** Structural grouping-bucket accessor — see `GeoDataProps.grouping`. */
 	grouping?: (feature: GeoFeature<TProps>) => string | undefined;
+	/** Opacity-value accessor — see `GeoDataProps.opacity`. */
+	opacity?: (feature: GeoFeature<TProps>) => number | undefined;
 	excludeParts?: (
 		part: { centroid: [number, number]; geometry: GeoJSON.Geometry },
 		feature: TaggedGeoFeature<TProps>
@@ -56,6 +59,8 @@ export type GeoPlotState<TProps extends Record<string, unknown>> = {
 
 	/** "scales" phase output: each feature's own resolved color, composed from `color` and the color ramp — `undefined` where `color` itself is unset/returns nothing. */
 	resolveColor?: (feature: GeoFeature<TProps>) => string | undefined;
+	/** "scales" phase output: each feature's own resolved opacity, composed from `opacity` and the opacity ramp — `undefined` where `opacity` itself is unset/returns nothing. */
+	resolveOpacity?: (feature: GeoFeature<TProps>) => number | undefined;
 
 	// "markers" phase output — full draw-order merge with `authoredMarkers`,
 	// minus live hover pointer handlers on the base 'geo' marker(s); see

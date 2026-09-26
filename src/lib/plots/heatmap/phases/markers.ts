@@ -4,8 +4,10 @@ import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
 import type { CellMarkerConfig } from '$lib/types/markers/common';
 import type { HeatmapPlotState, HeatmapPlotCtx } from '$lib/types/plots/heatmap/state';
 
-/** One resolved-style bucket of cells. */
-type StyleGroup<TData> = { styles: CellSegmentStyle; data: TData[] };
+/** One resolved-style bucket of cells — `opacity` is a second bucketing dimension alongside `styles`, quantized so the channel produces a bounded number of mark instances. */
+type StyleGroup<TData> = { styles: CellSegmentStyle; opacity: number | undefined; data: TData[] };
+
+const OPACITY_STEPS = 32;
 
 /**
  * HeatmapPlot's "markers" phase: one `'cell'` marker per resolved-style
@@ -17,7 +19,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 	state: HeatmapPlotState<TData>,
 	ctx: HeatmapPlotCtx
 ): HeatmapPlotState<TData> {
-	const { segments, flat, channels, resolveColor } = state;
+	const { segments, flat, channels, resolveColor, resolveOpacity } = state;
 	const { range } = ctx;
 	const { x: xAcc, y: yAcc, color: colorAcc } = channels!;
 	const getX = xAcc.accessor;
@@ -86,10 +88,12 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 		const groups = new Map<string, StyleGroup<TData>>();
 		for (const d of flat!) {
 			const styles = getCellStyle(d);
-			const key = JSON.stringify(styles);
+			const rawOpacity = resolveOpacity?.(d);
+			const opacity = rawOpacity != null ? Math.round(rawOpacity * OPACITY_STEPS) / OPACITY_STEPS : undefined;
+			const key = JSON.stringify({ styles, opacity });
 			let group = groups.get(key);
 			if (!group) {
-				group = { styles, data: [] };
+				group = { styles, opacity, data: [] };
 				groups.set(key, group);
 			}
 			group.data.push(d);
@@ -104,7 +108,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 		y: getY,
 		fill: (d: TData) => group.styles.fill ?? resolveColor!(d),
 		styles: {
-			fillOpacity: group.styles.fillOpacity ?? 1,
+			fillOpacity: group.styles.fillOpacity ?? group.opacity ?? 1,
 			stroke: group.styles.stroke,
 			strokeWidth: group.styles.strokeWidth ?? 0,
 			strokeOpacity: group.styles.strokeOpacity,

@@ -1,4 +1,5 @@
 import { resolveColorScale } from '$lib/utils/color';
+import { resolveOpacityScale } from '$lib/utils/opacity';
 import type { AxisValue } from '$lib/types/layout/scales';
 import type { HeatmapPlotState, HeatmapPlotCtx } from '$lib/types/plots/heatmap/state';
 
@@ -39,6 +40,21 @@ export function buildScales<TData extends Record<string, unknown>>(
 	);
 	const resolveColor = (row: TData) => colorScale(Number(colorAcc.accessor(row)));
 
+	const opacityAcc = channels!.opacity;
+	const resolveOpacity = opacityAcc
+		? (() => {
+				const rawVals = flat!.map((d) => opacityAcc.accessor(d)).filter((v) => v != null);
+				const allNumeric = rawVals.every((v) => Number.isFinite(Number(v)));
+				const opacityDomain: [number, number] | string[] = allNumeric
+					? rawVals.length
+						? [Math.min(...rawVals.map(Number)), Math.max(...rawVals.map(Number))]
+						: [0, 1]
+					: [...new Set(rawVals.map(String))];
+				const opacityScale = resolveOpacityScale(scales.opacity, opacityDomain, cfg.continuous.opacityRange);
+				return (row: TData) => opacityScale(opacityAcc.accessor(row));
+			})()
+		: undefined;
+
 	return {
 		...state,
 		scales: {
@@ -46,6 +62,7 @@ export function buildScales<TData extends Record<string, unknown>>(
 			x: { type: 'band', labelAnchor: 'right', domain: xDomain, ...(scales.x ?? {}) },
 			y: { type: 'band', domain: yDomain, ...(scales.y ?? {}) }
 		},
-		resolveColor
+		resolveColor,
+		resolveOpacity
 	};
 }

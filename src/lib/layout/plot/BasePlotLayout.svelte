@@ -189,6 +189,8 @@
 	const resolvedY = $derived(
 		y !== undefined ? y : (buildScale(scales?.y, data, getY) as SveltePlotProps['y'])
 	);
+	/** Threaded straight into svelteplot's own `r` scale option — see `RScaleConfig`'s own doc comment for why this isn't independently resolved like `color`. */
+	const resolvedR = $derived(scales?.r as SveltePlotProps['r']);
 
 	/** Only ever meaningful for `GeoPlot`. `none` while any interactive gesture (`zoom`/`pan`/`rotate`) is on. */
 	const touchAction = $derived(
@@ -244,6 +246,7 @@
 		margin={computedMargins}
 		x={resolvedX}
 		y={resolvedY}
+		r={resolvedR}
 		{coordinates}
 		locale={cfg.axis.locale}
 		{data}
