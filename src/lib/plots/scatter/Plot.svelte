@@ -112,7 +112,22 @@
 	const plotState = $derived(
 		runStages<ScatterPlotState<TData>, ScatterPlotCtx>(
 			stages,
-			{ series, data, x, y, grouping, color, r, opacity, symbol, segments, scales, width, height, margins },
+			{
+				series,
+				data,
+				x,
+				y,
+				grouping,
+				color,
+				r,
+				opacity,
+				symbol,
+				segments,
+				scales,
+				width,
+				height,
+				margins
+			},
 			ctx
 		)
 	);
@@ -193,7 +208,6 @@
 	getY={(d) => Number(yAcc(d))}
 	{hover}
 	scales={resolvedScales}
-	channelScales={resolvedScales}
 	{...labelMargin.plotProps}
 	{hoverController}
 	markers={[...(plotState.markers ?? []), ...markers]}

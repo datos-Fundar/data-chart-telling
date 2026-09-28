@@ -153,7 +153,6 @@
 	{getY}
 	{hover}
 	scales={resolvedScales}
-	channelScales={resolvedScales}
 	{margins}
 	{hoverController}
 	markers={[...(plotState.markers ?? []), ...markers]}

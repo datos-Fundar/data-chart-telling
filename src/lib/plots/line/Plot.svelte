@@ -240,7 +240,6 @@
 	getY={(d) => Number(yAcc(d))}
 	{hover}
 	{scales}
-	channelScales={scales}
 	{...labelMargin.plotProps}
 	xTickRotate={scales?.x?.tickRotate}
 	{hoverController}

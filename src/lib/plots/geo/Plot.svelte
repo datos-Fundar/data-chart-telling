@@ -20,10 +20,6 @@
 	import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 	import type { GeoPlotState, GeoPlotCtx, TaggedGeoFeature } from '$lib/types/plots/geo/state';
 	import type { PhaseStage } from '$lib/types/layout/phases';
-	import type { ComponentProps } from 'svelte';
-	import { Plot as SveltePlot } from 'svelteplot';
-
-	type SveltePlotProps = ComponentProps<typeof SveltePlot>;
 
 	/**
 	 * A map, rendered from GeoJSON or TopoJSON. Unlike the other plot kinds
@@ -134,8 +130,19 @@
 	const legendInteraction = $derived(getLegendInteraction());
 	const range = $derived(legendInteraction?.continuousRange);
 
-	/** Threaded straight into svelteplot's own `length` scale — see `LengthScaleConfig`'s own doc comment for why this isn't independently resolved like `color`. */
-	const resolvedLength = $derived(scales.length as SveltePlotProps['length']);
+	/**
+	 * `scales`, plus the fixed lon/lat frame every projection renders against
+	 * — pinned here as an ordinary `x`/`y` domain, the same mechanism any
+	 * axis-based plot kind uses to pin an axis, rather than a separate
+	 * override prop. Used only for `BasePlotLayout`'s own `scales` prop —
+	 * `buildScales`'s own pipeline input (below) stays the raw, author-facing
+	 * `scales`, which has no use for a lon/lat frame.
+	 */
+	const layoutScales = $derived({
+		...scales,
+		x: { domain: [-180, 180] },
+		y: { domain: [90, -90] }
+	});
 
 	// The plot's own pipeline, run once via `runStages`. No "mapping" stage —
 	// feature-id resolution only ever feeds the "data" phase's own tagging, so
@@ -270,10 +277,12 @@
 </script>
 
 <!--
-  `x`/`y`: pins the plot's generic linear scales to the full lon/lat range.
-  Every geo-aware mark routes through the active projection instead, except
-  svelteplot's `Contour`, whose grid reads `plot.scales.x`/`y` directly —
-  this keeps a `contour` marker aligned with the map under it.
+  `layoutScales.x`/`.y`: pins the plot's generic linear scales to the full
+  lon/lat range. Every geo-aware mark routes through the active projection
+  instead, except svelteplot's `Contour`, whose grid reads `plot.scales.x`/`y`
+  directly — this keeps a `contour` marker aligned with the map under it.
+  `coordinates` being set is what tells `BasePlotLayout` to skip axis-tick
+  rendering regardless of what `scales` carries — see its own doc comment.
 -->
 <BasePlotLayout
 	{width}
@@ -282,14 +291,11 @@
 	getX={hoverGetX}
 	getY={hoverGetY}
 	{hover}
-	x={{ domain: [-180, 180] }}
-	y={{ domain: [90, -90] }}
-	length={resolvedLength}
+	scales={layoutScales}
 	coordinates={resolvedCoordinates}
 	{margins}
 	marginEstimate={GEO_MARGIN_ESTIMATE}
 	styles={resolvedStyles}
-	channelScales={scales}
 	{hoverController}
 	markers={geoMarkers}
 	geoAllFeatures={allFeatures}

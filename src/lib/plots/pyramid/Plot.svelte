@@ -247,7 +247,6 @@
 	{getY}
 	{hover}
 	scales={resolvedScales}
-	channelScales={resolvedScales}
 	{...labelMargin.plotProps}
 	xTickRotate={resolvedScales?.x?.tickRotate}
 	{hoverController}

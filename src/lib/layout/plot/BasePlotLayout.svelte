@@ -13,12 +13,8 @@
 	import StylesLayout from '$lib/layout/styles/StylesLayout.svelte';
 	import TooltipLayout from '$lib/layout/tooltip/TooltipLayout.svelte';
 	import type { PlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
-	import type {
-		AxisValue,
-		AxisBasedScalesConfig,
-		ChannelScalesConfig
-	} from '$lib/types/layout/scales';
-	import type { CoordinatesConfig } from '$lib/types/layout/coordinates';
+	import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
+	import type { CoordinatesConfig, GeoScalesConfig } from '$lib/types/layout/coordinates';
 	import type { StylesLayoutConfig } from '$lib/types/layout/styles';
 	import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
 	import type { HoverPoint } from '$lib/types/layout/tooltip';
@@ -34,12 +30,13 @@
 	 * pointer-event wrapper, the hover/tooltip state machine, and the floating
 	 * tooltip. `StylesLayout`/`ScalesLayout`/`GeometryLayout` render as
 	 * siblings inside `CoordinatesLayout` (which owns svelteplot's own
-	 * `<Plot>`) — `ScalesLayout` only when `scales` is passed, `GeometryLayout`
-	 * renders nothing extra when `markers` is empty/unset. `children` renders
-	 * last, after `GeometryLayout`, so it draws on top without needing to be
-	 * its child. Every plot kind supplies its own `<Plot x y projection>`
-	 * scale config, either directly via `x`/`y` or by leaving them unset so
-	 * this component derives them from `scales`.
+	 * `<Plot>`) — `ScalesLayout` only when `scales` is passed and this isn't
+	 * `GeoPlot` (see its own doc comment below), `GeometryLayout` renders
+	 * nothing extra when `markers` is empty/unset. `children` renders last,
+	 * after `GeometryLayout`, so it draws on top without needing to be its
+	 * child. `<Plot x y>` is always derived from `scales.x`/`scales.y` —
+	 * `GeoPlot`'s own fixed lon/lat frame rides in through `scales` too (see
+	 * `scales`'s own doc comment), rather than as separate override props.
 	 */
 	let {
 		width,
@@ -48,11 +45,7 @@
 		getX,
 		getY,
 		hover,
-		x = undefined,
-		y = undefined,
-		length = undefined,
 		scales = undefined,
-		channelScales = undefined,
 		coordinates = undefined,
 		margins,
 		marginEstimate = AUTO_MARGIN_ESTIMATE,
@@ -75,22 +68,23 @@
 		getY: (d: TData) => AxisValue;
 		/** Every hover/tooltip prop this component's own hover machinery reads — see {@link HoverConfig}. */
 		hover: HoverConfig<TData>;
-		/** Explicit `<Plot x>` override — bypasses `scales`-derived resolution (e.g. GeoPlot's fixed lon/lat domain). */
-		x?: SveltePlotProps['x'];
-		/** Explicit `<Plot y>` override — see `x`. */
-		y?: SveltePlotProps['y'];
-		/** Explicit `<Plot length>` override — `GeoPlot` only, its `scales.length` resolved by the caller (no `AxisBasedScalesConfig.length` — see `GeoScalesConfig`'s own doc comment). */
-		length?: SveltePlotProps['length'];
-		/** Scale config `x`/`y`/`r` are derived from when not given directly. */
-		scales?: AxisBasedScalesConfig<TData>;
 		/**
-		 * This plot kind's own `color`/`grouping` channel config — the fallback
-		 * a `GeometryLayout` marker's own `scales` inherits when it sets none of
-		 * its own. Distinct from `scales` above: `GeoPlot` has no axis ticks to
-		 * derive (never passes `scales`) but still has its own channel ramp for
-		 * markers to inherit.
+		 * `<Plot x y>` is always derived from `scales.x`/`scales.y` — and
+		 * `<Plot r>`/`<Plot length>` from `scales.r`/`scales.length` — plus the
+		 * fallback a `GeometryLayout` marker's own `scales` inherits when it
+		 * sets none of its own (every plot kind passes one value for both —
+		 * there's no case where a marker should inherit a different channel
+		 * ramp than the plot's own). `GeoPlot`'s own fixed lon/lat frame is
+		 * just `scales.x`/`scales.y` set to its lon/lat domain, same as any
+		 * other plot kind pinning an axis — `x`/`y` need no special-casing
+		 * here. Intersected with `GeoScalesConfig` so its own `length`
+		 * (`GeoPlot`'s `vector` magnitude scale) can ride along the same prop
+		 * too, without adding that Geo-only field to the author-facing
+		 * `AxisBasedScalesConfig` itself (no axis-based plot kind has a
+		 * `vector` marker) — and without hand-copying `GeoScalesConfig`'s own
+		 * shape here, so a future Geo-only field is picked up for free.
 		 */
-		channelScales?: ChannelScalesConfig;
+		scales?: AxisBasedScalesConfig<TData> & GeoScalesConfig;
 		/** This plot kind's coordinate system config — `GeoPlot` only (a projection + pan/zoom). */
 		coordinates?: CoordinatesConfig;
 		/** Partial margin override — merged on top of the theme. */
@@ -190,14 +184,16 @@
 	// Cast to svelteplot's own (narrower, axis-specific) scale option type:
 	// buildScale has already stripped the fields that don't exist there
 	// (grid, the vertical label config, BarPlot's series-layout knobs).
-	const resolvedX = $derived(
-		x !== undefined ? x : (buildScale(scales?.x, data, getX) as SveltePlotProps['x'])
-	);
-	const resolvedY = $derived(
-		y !== undefined ? y : (buildScale(scales?.y, data, getY) as SveltePlotProps['y'])
-	);
+	// `GeoPlot`'s own fixed lon/lat frame is just a pinned `domain` here —
+	// `buildScale` passes a pinned `domain` through unchanged (its `nice`
+	// default only kicks in when `domain` is unset), so no special-casing
+	// is needed for it.
+	const resolvedX = $derived(buildScale(scales?.x, data, getX) as SveltePlotProps['x']);
+	const resolvedY = $derived(buildScale(scales?.y, data, getY) as SveltePlotProps['y']);
 	/** Threaded straight into svelteplot's own `r` scale option — see `RScaleConfig`'s own doc comment for why this isn't independently resolved like `color`. */
 	const resolvedR = $derived(scales?.r as SveltePlotProps['r']);
+	/** Threaded straight into svelteplot's own `length` scale option — see `LengthScaleConfig`'s own doc comment. `GeoPlot`-only in practice (see `scales`'s own doc comment), same mechanism as `r`. */
+	const resolvedLength = $derived(scales?.length as SveltePlotProps['length']);
 
 	/** Only ever meaningful for `GeoPlot`. `none` while any interactive gesture (`zoom`/`pan`/`rotate`) is on. */
 	const touchAction = $derived(
@@ -254,7 +250,7 @@
 		x={resolvedX}
 		y={resolvedY}
 		r={resolvedR}
-		{length}
+		length={resolvedLength}
 		{coordinates}
 		locale={cfg.axis.locale}
 		{data}
@@ -262,14 +258,20 @@
 		remountKey={marginRemountKey}
 	>
 		<StylesLayout {styles} {width} {height} {numericMargins} />
-		{#if scales !== undefined}
+		<!--
+			`coordinates` is `GeoPlot`-only (see its own doc comment) — a map has
+			no x/y axis ticks to draw regardless of what `scales` carries, even
+			though `GeoPlot` now passes one (its fixed lon/lat frame plus
+			`length`), same as every axis-based kind.
+		-->
+		{#if scales !== undefined && coordinates === undefined}
 			<ScalesLayout {data} {getX} {getY} {width} {height} {numericMargins} {scales} />
 		{/if}
 		<GeometryLayout
 			markers={resolvedMarkers}
 			seriesData={seriesData ?? []}
 			scopedGroups={scopedGroups ?? []}
-			{channelScales}
+			channelScales={scales}
 			{ctrl}
 			{width}
 			{height}
