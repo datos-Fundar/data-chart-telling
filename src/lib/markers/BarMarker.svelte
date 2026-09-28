@@ -12,7 +12,8 @@
 	let { marker }: { marker: BarMarkerConfig } = $props();
 
 	const cfg = $derived(getConfiguration());
-	const channelFill = $derived(resolveChannelFill(marker.data, marker.color, marker.scales, cfg));
+	const data = $derived(marker.data ?? []);
+	const channelFill = $derived(resolveChannelFill(data, marker.color, marker.scales, cfg));
 
 	const plot = usePlot();
 	function categoryScaleFor(isHorizontal: boolean) {
@@ -47,7 +48,7 @@
 	{@const bandwidth = categoryScale?.type === 'band' ? categoryScale.fn.bandwidth() : 0}
 	{#if marker.isHorizontal}
 		<BarX
-			data={marker.data}
+			{data}
 			y={marker.y}
 			x1={marker.x1}
 			x2={marker.x2}
@@ -63,7 +64,7 @@
 		/>
 	{:else}
 		<BarY
-			data={marker.data}
+			{data}
 			x={marker.x}
 			y1={marker.y1}
 			y2={marker.y2}

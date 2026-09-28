@@ -11,6 +11,9 @@ import type { ChartConfig } from '$lib/types/configuration/styling';
  * fill/stroke). Shared by every marker kind that intersects `ChannelMarkerStyle`.
  * Safe as a live per-row function — svelteplot recognizes an already-resolved
  * CSS color string as a literal and never re-scales it (unlike `opacity`/`r`).
+ * Continuous (numeric) or categorical (string) values both work, same as a
+ * plot's own `color` channel — the theme's own 2-color ramp defaults a
+ * continuous value, its discrete `palette` a categorical one.
  */
 export function resolveChannelFill<TData>(
 	data: TData[],
@@ -18,13 +21,20 @@ export function resolveChannelFill<TData>(
 	scales: ChannelScalesConfig | undefined,
 	cfg: ChartConfig
 ): ((d: TData) => string) | undefined {
-	if (!color) return undefined;
-	const colorFn = typeof color === 'function' ? color : (d: TData) => (d as Record<string, unknown>)[color];
-	const vals = data.map((d) => Number(colorFn(d))).filter((v) => Number.isFinite(v));
-	if (!vals.length) return undefined;
-	const domain: [number, number] = [Math.min(...vals), Math.max(...vals)];
-	const colorScale = resolveColorScale(scales?.color, domain, [cfg.continuous.min, cfg.continuous.max]);
-	return (d: TData) => colorScale(Number(colorFn(d)));
+	if (!color || !data.length) return undefined;
+	const colorFn =
+		typeof color === 'function' ? color : (d: TData) => (d as Record<string, unknown>)[color];
+	const rawVals = data
+		.map((d) => colorFn(d))
+		.filter((v) => v != null && !(typeof v === 'number' && !Number.isFinite(v)));
+	if (!rawVals.length) return undefined;
+	const allNumeric = rawVals.every((v) => Number.isFinite(Number(v)));
+	const domain: [number, number] | string[] = allNumeric
+		? [Math.min(...rawVals.map(Number)), Math.max(...rawVals.map(Number))]
+		: [...new Set(rawVals.map(String))];
+	const defaultScheme = allNumeric ? [cfg.continuous.min, cfg.continuous.max] : cfg.palette;
+	const colorScale = resolveColorScale(scales?.color, domain, defaultScheme);
+	return (d: TData) => colorScale(colorFn(d));
 }
 
 /**
@@ -40,8 +50,16 @@ export function resolveChannelSymbol<TData>(
 	cfg: ChartConfig
 ): ((d: TData) => SymbolType) | undefined {
 	if (!symbol) return undefined;
-	const symbolFn = typeof symbol === 'function' ? symbol : (d: TData) => (d as Record<string, unknown>)[symbol];
-	const domain = [...new Set(data.map((d) => symbolFn(d)).filter((v) => v != null).map(String))];
+	const symbolFn =
+		typeof symbol === 'function' ? symbol : (d: TData) => (d as Record<string, unknown>)[symbol];
+	const domain = [
+		...new Set(
+			data
+				.map((d) => symbolFn(d))
+				.filter((v) => v != null)
+				.map(String)
+		)
+	];
 	if (!domain.length) return undefined;
 	const scale = resolveSymbolScale(scales?.symbol, domain, cfg.symbols);
 	return (d: TData) => scale(symbolFn(d));
@@ -74,7 +92,8 @@ export function resolveChannelOpacityBuckets<TData>(
 	steps = 32
 ): OpacityBucket<TData>[] | undefined {
 	if (!opacity || !data.length) return undefined;
-	const opacityFn = typeof opacity === 'function' ? opacity : (d: TData) => (d as Record<string, unknown>)[opacity];
+	const opacityFn =
+		typeof opacity === 'function' ? opacity : (d: TData) => (d as Record<string, unknown>)[opacity];
 
 	const rawVals = data.map((d) => opacityFn(d)).filter((v) => v != null);
 	if (!rawVals.length) return undefined;

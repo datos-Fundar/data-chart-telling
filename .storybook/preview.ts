@@ -106,7 +106,9 @@ const preview: Preview = {
 						],
 						'Opacity',
 						'Symbol',
-						'R'
+						'R',
+						'Length',
+						'X1X2Y1Y2'
 					],
 					'Layout',
 					[

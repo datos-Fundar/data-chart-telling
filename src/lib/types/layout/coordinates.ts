@@ -1,6 +1,6 @@
 import type { GeoProjection } from 'd3-geo';
 import type { GeoCameraConfig } from '$lib/types/plots/camera';
-import type { ChannelScalesConfig } from '$lib/types/layout/scales';
+import type { ChannelScalesConfig, LengthScaleConfig } from '$lib/types/layout/scales';
 
 /**
  * The projection names svelteplot's `<Plot projection>` accepts as a string
@@ -71,9 +71,13 @@ export type GeoProjectionConfig =
 /**
  * `scales` prop for GeoPlot — the geo analog of `AxisBasedScalesConfig`. A
  * map has no x/y axis pair (the coordinate system is `coordinates.projection`),
- * so this only carries the channels in {@link ChannelScalesConfig}.
+ * so this carries the channels in {@link ChannelScalesConfig} plus `length` —
+ * GeoPlot's own plot-wide-only channel (a `vector` marker's magnitude),
+ * the geo analog of `AxisBasedScalesConfig.r`.
  */
-export type GeoScalesConfig = ChannelScalesConfig;
+export type GeoScalesConfig = ChannelScalesConfig & {
+	length?: LengthScaleConfig;
+};
 
 /** Wheel/pinch scale gesture only — see `CoordinatesConfig.pan` for drag-to-translate, and `.rotate` for drag-to-spin-the-globe. */
 export type GeoZoomConfig = {

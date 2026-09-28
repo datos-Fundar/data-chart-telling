@@ -13,7 +13,11 @@
 	import StylesLayout from '$lib/layout/styles/StylesLayout.svelte';
 	import TooltipLayout from '$lib/layout/tooltip/TooltipLayout.svelte';
 	import type { PlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
-	import type { AxisValue, AxisBasedScalesConfig, ChannelScalesConfig } from '$lib/types/layout/scales';
+	import type {
+		AxisValue,
+		AxisBasedScalesConfig,
+		ChannelScalesConfig
+	} from '$lib/types/layout/scales';
 	import type { CoordinatesConfig } from '$lib/types/layout/coordinates';
 	import type { StylesLayoutConfig } from '$lib/types/layout/styles';
 	import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
@@ -46,6 +50,7 @@
 		hover,
 		x = undefined,
 		y = undefined,
+		length = undefined,
 		scales = undefined,
 		channelScales = undefined,
 		coordinates = undefined,
@@ -74,7 +79,9 @@
 		x?: SveltePlotProps['x'];
 		/** Explicit `<Plot y>` override — see `x`. */
 		y?: SveltePlotProps['y'];
-		/** Scale config `x`/`y` are derived from when not given directly. */
+		/** Explicit `<Plot length>` override — `GeoPlot` only, its `scales.length` resolved by the caller (no `AxisBasedScalesConfig.length` — see `GeoScalesConfig`'s own doc comment). */
+		length?: SveltePlotProps['length'];
+		/** Scale config `x`/`y`/`r` are derived from when not given directly. */
 		scales?: AxisBasedScalesConfig<TData>;
 		/**
 		 * This plot kind's own `color`/`grouping` channel config — the fallback
@@ -247,6 +254,7 @@
 		x={resolvedX}
 		y={resolvedY}
 		r={resolvedR}
+		{length}
 		{coordinates}
 		locale={cfg.axis.locale}
 		{data}

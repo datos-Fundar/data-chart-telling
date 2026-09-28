@@ -6,6 +6,7 @@
 	import BarMarker from '$lib/markers/BarMarker.svelte';
 	import LineMarker from '$lib/markers/LineMarker.svelte';
 	import CellMarker from '$lib/markers/CellMarker.svelte';
+	import RectMarker from '$lib/markers/RectMarker.svelte';
 	import DotMarker from '$lib/markers/DotMarker.svelte';
 	import TextMarker from '$lib/markers/TextMarker.svelte';
 	import RuleMarker from '$lib/markers/RuleMarker.svelte';
@@ -42,9 +43,11 @@
 	 * own data/color and resolved segments. `width`/`height`/`numericMargins`/
 	 * `geoAllFeatures` are `GeoPlot`-only context an `inset` marker needs
 	 * beyond its own config; `data` is `BasePlotLayout`'s own rows, forwarded
-	 * for `contour`'s clip and unscoped `geo-component`'s fallback data —
-	 * both reachable only through `GeoMarkersConfig`, so `data` is always
-	 * `GeoFeature`-shaped there despite the generic `TData` bound.
+	 * as the fallback every `ChannelMarkerStyle`-based marker's own (optional)
+	 * `data` falls back to when unset, plus `contour`'s clip and unscoped
+	 * `geo-component`'s fallback data — the latter two reachable only through
+	 * `GeoMarkersConfig`, so `data` is always `GeoFeature`-shaped there
+	 * despite the generic `TData` bound.
 	 */
 	let {
 		width,
@@ -120,16 +123,18 @@
 
 {#each geometryMarkers as marker, i (markerKey(marker, i))}
 	{#if marker.type === 'bar'}
-		<BarMarker {marker} />
+		<BarMarker marker={{ ...marker, data: marker.data ?? data }} />
 	{:else if marker.type === 'line'}
-		<LineMarker {marker} />
+		<LineMarker marker={{ ...marker, data: marker.data ?? data }} />
 	{:else if marker.type === 'cell'}
-		<CellMarker {marker} />
+		<CellMarker marker={{ ...marker, data: marker.data ?? data }} />
+	{:else if marker.type === 'rect'}
+		<RectMarker marker={{ ...marker, data: marker.data ?? data }} />
 	{:else if marker.type === 'dot'}
 		<DotMarker
-			data={marker.data}
-			x={resolveAccessor(marker.x)}
-			y={resolveAccessor(marker.y)}
+			data={marker.data ?? data}
+			x={marker.x != null ? resolveAccessor(marker.x) : undefined}
+			y={marker.y != null ? resolveAccessor(marker.y) : undefined}
 			r={typeof marker.r === 'number' || marker.r == null ? marker.r : resolveAccessor(marker.r)}
 			fill={marker.fill}
 			color={marker.color ? resolveAccessor(marker.color) : undefined}
@@ -140,9 +145,9 @@
 		/>
 	{:else if marker.type === 'text'}
 		<TextMarker
-			data={marker.data}
-			x={resolveAccessor(marker.x)}
-			y={resolveAccessor(marker.y)}
+			data={marker.data ?? data}
+			x={marker.x != null ? resolveAccessor(marker.x) : undefined}
+			y={marker.y != null ? resolveAccessor(marker.y) : undefined}
 			text={marker.text}
 			styles={marker.styles}
 		/>

@@ -30,6 +30,7 @@
 		x,
 		y,
 		r = undefined,
+		length = undefined,
 		coordinates = undefined,
 		locale = undefined,
 		data,
@@ -44,6 +45,8 @@
 		y: SveltePlotProps['y'];
 		/** Forwarded verbatim to svelteplot's own `<Plot r>` — the plot-wide radius/size scale (see `RScaleConfig`'s own doc comment for why this is plot-wide only). */
 		r?: SveltePlotProps['r'];
+		/** Forwarded verbatim to svelteplot's own `<Plot length>` — the plot-wide vector/spike magnitude scale (see `LengthScaleConfig`'s own doc comment). */
+		length?: SveltePlotProps['length'];
 		coordinates?: CoordinatesConfig;
 		/** Forwarded verbatim to svelteplot's own `<Plot locale>`. */
 		locale?: SveltePlotProps['locale'];
@@ -156,6 +159,7 @@
 		{x}
 		{y}
 		{r}
+		{length}
 		{locale}
 		projection={finalProjection as SveltePlotProps['projection']}
 	>

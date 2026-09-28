@@ -2,12 +2,26 @@ import type { AxisValue, ChannelScalesConfig } from '$lib/types/layout/scales';
 import type { DotStyle, FontStyle } from '$lib/types/plots/styling';
 
 /**
- * The per-marker color-ramp override every marker kind can opt into: a
- * `color` accessor plus the `scales` ramp that resolves it, mirroring a
- * plot's own `color`/`scales.color`. Intersect a marker config with this
- * instead of redeclaring the two fields on every kind.
+ * Fields shared by every "common" marker kind (`dot`, `text`, `line`, `bar`,
+ * `cell`, `rect`): position (`x`/`y`/`x1`/`x2`/`y1`/`y2`) and per-marker
+ * color/opacity ramps (`color`/`opacity`/`scales`). Not used by `rule`/
+ * `hover`/`component`.
  */
 export type ChannelMarkerStyle = {
+	/** Position accessor — field key or function, bound to the plot's shared x/y scale. */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	x?: string | ((d: any) => AxisValue);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	y?: string | ((d: any) => AxisValue);
+	/** Interval-position override for `bar`/`rect` — field key, literal number, or function. */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	x1?: string | number | ((d: any) => AxisValue);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	x2?: string | number | ((d: any) => AxisValue);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	y1?: string | number | ((d: any) => AxisValue);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	y2?: string | number | ((d: any) => AxisValue);
 	/** Continuous value driving a per-mark color ramp — configure the ramp itself via `scales.color`. */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	color?: string | ((d: any) => unknown);
@@ -20,18 +34,11 @@ export type ChannelMarkerStyle = {
 
 /**
  * A set of point marks (svelteplot's `Dot`) — usable on any plot kind, axis-based or geo.
- *
- * `x`/`y`/`r`/`color` accept a field key or an accessor function, like `Series.x`/`y`.
- * `GeometryLayout` resolves the shorthand before it reaches `DotMarker.svelte`, which only
- * ever sees functions.
+ * `data` is optional — omit it to reuse the host plot's own top-level rows.
  */
 export type DotMarkerConfig = {
 	type: 'dot';
-	data: Record<string, unknown>[];
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	x: string | ((d: any) => AxisValue);
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	y: string | ((d: any) => AxisValue);
+	data?: Record<string, unknown>[];
 	/** Per-row radius, or a constant — overrides `styles.dotRadius`. */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	r?: number | string | ((d: any) => number);
@@ -46,25 +53,15 @@ export type DotMarkerConfig = {
 
 /**
  * A text label per row (svelteplot's `Text`) — usable on any plot kind, axis-based or geo.
- *
- * `x`/`y` accept the same field-key-or-function shorthand as `DotMarkerConfig`. `text` is a
- * constant or a per-row accessor.
+ * `data` is optional — omit it to reuse the host plot's own top-level rows.
  */
 export type TextMarkerConfig = {
 	type: 'text';
-	data: Record<string, unknown>[];
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	x: string | ((d: any) => AxisValue);
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	y: string | ((d: any) => AxisValue);
+	data?: Record<string, unknown>[];
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	text: string | ((d: any) => string);
 	styles?: FontStyle;
-};
+} & ChannelMarkerStyle;
 
-/**
- * Every marker kind usable on any plot, axis-based or geo. `AxisBasedMarkersConfig`
- * (`types/markers/common.ts`) and `GeoMarkersConfig` (`types/markers/geo.ts`) both extend
- * this, so `MarkerConfig` (`types/markers/all.ts`) can union the two without a shape collision.
- */
+/** Every marker kind usable on any plot, axis-based or geo. */
 export type BaseMarkersConfig = DotMarkerConfig | TextMarkerConfig;

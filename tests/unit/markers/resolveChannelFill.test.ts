@@ -42,9 +42,33 @@ describe('resolveChannelFill', () => {
 
 	test('handles string field key accessor', () => {
 		const data = [{ value: 1 }, { value: 2 }];
-		const fill = resolveChannelFill(data, 'value', { color: { scheme: ['#f00', '#00f'] } }, testConfig as ChartConfig);
+		const fill = resolveChannelFill(
+			data,
+			'value',
+			{ color: { scheme: ['#f00', '#00f'] } },
+			testConfig as ChartConfig
+		);
 		expect(fill).toBeDefined();
 		const color = fill!(data[0]);
 		expect(color).toMatch(/^(rgb\(|#)/);
+	});
+
+	test('builds a categorical color scale from a string-returning accessor', () => {
+		const data = [
+			{ close: 10, open: 5 },
+			{ close: 5, open: 10 }
+		];
+		const fill = resolveChannelFill(
+			data,
+			(d) =>
+				(d as { close: number; open: number }).close >= (d as { open: number }).open
+					? 'up'
+					: 'down',
+			{ color: { domain: ['up', 'down'], scheme: { up: '#16a34a', down: '#dc2626' } } },
+			testConfig as ChartConfig
+		);
+		expect(fill).toBeDefined();
+		expect(fill!(data[0])).toBe('#16a34a');
+		expect(fill!(data[1])).toBe('#dc2626');
 	});
 });

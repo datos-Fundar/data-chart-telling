@@ -20,6 +20,10 @@
 	import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 	import type { GeoPlotState, GeoPlotCtx, TaggedGeoFeature } from '$lib/types/plots/geo/state';
 	import type { PhaseStage } from '$lib/types/layout/phases';
+	import type { ComponentProps } from 'svelte';
+	import { Plot as SveltePlot } from 'svelteplot';
+
+	type SveltePlotProps = ComponentProps<typeof SveltePlot>;
 
 	/**
 	 * A map, rendered from GeoJSON or TopoJSON. Unlike the other plot kinds
@@ -129,6 +133,9 @@
 	// ── Legend-driven range filter (mirrors HeatmapPlot's own) ────────────────
 	const legendInteraction = $derived(getLegendInteraction());
 	const range = $derived(legendInteraction?.continuousRange);
+
+	/** Threaded straight into svelteplot's own `length` scale — see `LengthScaleConfig`'s own doc comment for why this isn't independently resolved like `color`. */
+	const resolvedLength = $derived(scales.length as SveltePlotProps['length']);
 
 	// The plot's own pipeline, run once via `runStages`. No "mapping" stage —
 	// feature-id resolution only ever feeds the "data" phase's own tagging, so
@@ -277,6 +284,7 @@
 	{hover}
 	x={{ domain: [-180, 180] }}
 	y={{ domain: [90, -90] }}
+	length={resolvedLength}
 	coordinates={resolvedCoordinates}
 	{margins}
 	marginEstimate={GEO_MARGIN_ESTIMATE}

@@ -110,6 +110,6 @@ describe('buildMarkers – gap fills', () => {
 		const markers = build({ groupedSeries, gapFillMaps });
 		expect(markers).toHaveLength(1);
 		const x2 = markers[0].x2 as (d: unknown) => number;
-		expect(x2(markers[0].data[0])).toBe(-5);
+		expect(x2(markers[0].data![0])).toBe(-5);
 	});
 });

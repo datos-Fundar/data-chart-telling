@@ -2,12 +2,14 @@ import type { SymbolType } from '$lib/types/plots/constants';
 
 export type AxisValue = number | string | Date;
 
-/**
- * A continuous or categorical color ramp — this package resolves its own
- * (never svelteplot's shared `color` scale), so more than one ramp can
- * coexist in the same plot at different levels (`scales.color`, a `segments`
- * entry, a marker's own `scales`).
- */
+// ── Per-consumer independent channels ────────────────────────────────────────
+// Each of these resolves its own ramp, independently per consumer — a plot's
+// own `scales.color` and a marker's own `scales.color` can disagree on
+// purpose (see `Channels/Color/Independent Ramps`). `x`/`y`/`r`/`length` are
+// deliberately not members of this group — see their own section below for
+// why they need the opposite guarantee (exactly one shared scale).
+
+/** A continuous or categorical color ramp. */
 export type ColorScaleConfig = {
 	/** `[min, max]` for a continuous ramp, or the category list for a categorical one. Auto-computed from the data when omitted. */
 	domain?: [number, number] | string[];
@@ -25,9 +27,7 @@ export type ColorScaleConfig = {
 
 /**
  * How rows/series sharing the same `grouping`/`color` value are laid out
- * relative to each other — a pseudo-channel of this package's own (not one
- * of svelteplot's scale options), configured via `scales.grouping` alongside
- * every other channel. `reverse` flips which group sorts first (e.g.
+ * relative to each other. `reverse` flips which group sorts first (e.g.
  * PyramidPlot's left/right side order); `seriesLayout`/`seriesPadding`
  * control how BarPlot arranges multiple series sharing the same category
  * (overlapping, side-by-side, or stacked).
@@ -38,17 +38,7 @@ export type GroupingScaleConfig = {
 	seriesPadding?: number;
 };
 
-/**
- * A continuous or categorical opacity ramp — same resolution model as
- * {@link ColorScaleConfig} (this package resolves its own `value => opacity`
- * function per consumer), but maps to a numeric `[0,1]`-ish range instead of
- * colors. Unlike `color`, svelteplot has no "already resolved, don't rescale
- * me" escape hatch for a bare number (only a recognized CSS color string
- * gets that treatment) — every consumer of a resolved opacity value applies
- * it as a literal constant per mark instance rather than a per-row function,
- * to avoid svelteplot re-deriving its own domain from whatever a function
- * returns and silently re-normalizing it.
- */
+/** A continuous or categorical opacity ramp — maps a value to a numeric `[0,1]`-ish opacity instead of a color. */
 export type OpacityScaleConfig = {
 	/** `[min, max]` for a continuous ramp, or the category list for a categorical one. Auto-computed from the data when omitted. */
 	domain?: [number, number] | string[];
@@ -58,14 +48,7 @@ export type OpacityScaleConfig = {
 	unknown?: number;
 };
 
-/**
- * A categorical shape ramp — maps distinct values to marker shapes. Always
- * discrete (there's no "shape between two shapes"), unlike every other
- * channel here. Resolves to a plain shape-name string, which svelteplot
- * recognizes as a literal (same escape hatch as a CSS color string for
- * `color`), so — unlike `opacity` — a per-row accessor function works
- * directly with no bucketing needed.
- */
+/** A categorical shape ramp — maps distinct values to marker shapes. Always discrete. */
 export type SymbolScaleConfig = {
 	domain?: string[];
 	/** Shapes cycled through in `domain` order, or a category → shape map. Defaults to a built-in cycle. */
@@ -74,11 +57,10 @@ export type SymbolScaleConfig = {
 };
 
 /**
- * Every secondary channel this package resolves — x/y stay kind-specific,
- * not part of this list. Add a channel here and to {@link ChannelScaleConfig}
- * and it's available in `scales.<channel>` on every axis-based plot kind,
- * and the same shape on a marker's own `scales`. `r` is deliberately not a
- * member of this list — see {@link RScaleConfig}'s own doc comment for why.
+ * Every channel this package resolves independently per consumer. Add a
+ * channel here and to {@link ChannelScaleConfig} and it's available in
+ * `scales.<channel>` on every axis-based plot kind, and the same shape on a
+ * marker's own `scales`.
  */
 export type ChannelName = 'color' | 'grouping' | 'opacity' | 'symbol';
 
@@ -90,28 +72,40 @@ export type ChannelScaleConfig = {
 	symbol: SymbolScaleConfig;
 };
 
-/**
- * `r` (radius/size) config — a plot-level-only setting, deliberately outside
- * {@link ChannelScalesConfig}'s per-consumer-independent mechanism. Unlike
- * `color`, svelteplot binds `r` to exactly one scale shared by every mark in
- * the plot (configured once, at `<Plot r={...}>` — there is no per-mark
- * equivalent), so a marker's own `scales.r` would still share the plot's own
- * scale rather than getting an independent one. `domain`/`range` here get
- * threaded straight into svelteplot's own `r` scale rather than resolved by
- * a from-scratch function, since svelteplot's own sqrt (area-proportional)
- * radius math is already correct — this only exposes author control over
- * its domain/range, it doesn't replace it.
- */
+/** `scales.<channel>` for every channel in `TChannel` — the shared shape for both a plot's own `scales` prop and a marker's own. */
+export type ChannelScalesConfig<TChannel extends ChannelName = ChannelName> = {
+	[K in TChannel]?: ChannelScaleConfig[K];
+};
+
+// ── Plot-wide-only channels ──────────────────────────────────────────────────
+// Each bound to exactly one scale shared by every mark in the plot — svelteplot
+// has no per-mark override the way `color` does, so these stay outside
+// {@link ChannelScalesConfig} entirely. `domain`/`range` thread straight into
+// svelteplot's own scale rather than getting resolved by a from-scratch
+// function, since svelteplot's own scale math (sqrt-area for `r`, linear for
+// `length`) is already correct — this only exposes author control over its
+// domain/range, it doesn't replace it.
+
+/** `r` (radius/size) config — plot-level only, consumed via {@link AxisBasedScalesConfig.r}. */
 export type RScaleConfig = {
 	domain?: [number, number];
 	/** Pixel radius range, e.g. `[2, 20]`. Defaults to svelteplot's own. */
 	range?: [number, number];
 };
 
-/** `scales.<channel>` for every channel in `TChannel` — the shared shape for both a plot's own `scales` prop and a marker's own. */
-export type ChannelScalesConfig<TChannel extends ChannelName = ChannelName> = {
-	[K in TChannel]?: ChannelScaleConfig[K];
+/** `length` (vector/spike magnitude) config — plot-level only, consumed via `GeoScalesConfig.length`. */
+export type LengthScaleConfig = {
+	domain?: [number, number];
+	/** Pixel length range, e.g. `[0, 60]`. Defaults to svelteplot's own. */
+	range?: [number, number];
 };
+
+// ── Axis channels (x/y) ───────────────────────────────────────────────────────
+// `x`/`y` are channels in every sense that matters (a per-row accessor,
+// resolved into `channels.x`/`channels.y` in each plot kind's own mapping
+// phase), but need the same one-shared-scale guarantee as `r`/`length`
+// above — putting them in `ChannelScalesConfig` would misleadingly suggest a
+// marker's own `scales.x` could diverge from the plot's. It can't.
 
 /**
  * Author-facing scale overrides for a plot axis. Mirrors svelteplot's
@@ -190,16 +184,22 @@ export type AxisScale<TData = Record<string, unknown>> = {
 		| ((d: unknown, index: number, ticks: unknown[]) => string | string[]);
 };
 
+export type AxisChannelName = 'x' | 'y';
+
+/** Each {@link AxisChannelName}'s own scale-config shape — both use {@link AxisScale}. */
+export type AxisChannelScaleConfig<TData = Record<string, unknown>> = {
+	[K in AxisChannelName]?: AxisScale<TData>;
+};
+
+// ── Combined per-plot-kind scales config ─────────────────────────────────────
+
 /**
  * Per-axis scale overrides, passed as a single `scales` prop to every
  * axis-based plot kind (`GeoPlot` uses `GeoScalesConfig` instead — a map has
- * no x/y axis pair). `TData` threads through to {@link AxisScale.sort} on
- * each axis. Also carries every channel in {@link ChannelScalesConfig}
- * (`color`, `grouping`, and whatever else is added there later).
+ * no x/y axis pair, and its own plot-wide channel is `length`, not `r`).
+ * `TData` threads through to {@link AxisScale.sort} on each axis.
  */
-export type AxisBasedScalesConfig<TData = Record<string, unknown>> = {
-	x?: AxisScale<TData>;
-	y?: AxisScale<TData>;
-	/** Plot-wide only — see {@link RScaleConfig}'s own doc comment for why this isn't part of {@link ChannelScalesConfig}. */
-	r?: RScaleConfig;
-} & ChannelScalesConfig;
+export type AxisBasedScalesConfig<TData = Record<string, unknown>> =
+	AxisChannelScaleConfig<TData> & {
+		r?: RScaleConfig;
+	} & ChannelScalesConfig;
