@@ -8,7 +8,8 @@ import type { ResolvedChannel } from '$lib/types/layout/mapping';
 import type { LegendInteractionStore } from '$lib/types/layout/legend';
 import type { ChartConfig } from '$lib/types/configuration/styling';
 import type { DotStyle } from '$lib/types/plots/styling';
-import type { DotMarkerConfig } from '$lib/types/markers/common';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
+import type { StatisticConfig } from '$lib/types/layout/statistics';
 
 /** ScatterPlot's shared pipeline state — raw props plus every phase's own output. */
 export type ScatterPlotState<TData extends Record<string, unknown>> = {
@@ -29,6 +30,8 @@ export type ScatterPlotState<TData extends Record<string, unknown>> = {
 	width: number;
 	height: number;
 	margins?: MarginConfig;
+	authorMarkers?: AxisBasedMarkersConfig[];
+	statistics?: StatisticConfig[];
 
 	// "data" phase output.
 	resolvedSeries?: Series<TData>[];
@@ -53,8 +56,11 @@ export type ScatterPlotState<TData extends Record<string, unknown>> = {
 		symbol?: ResolvedChannel<TData, unknown>;
 	};
 
-	// "markers" phase output.
-	markers?: DotMarkerConfig[];
+	// Accumulates from "statistics" onward: `authorMarkers` (each one's own
+	// `.statistics` expanded in place) plus the top-level `statistics` prop
+	// resolved against every resolved series, then "markers" prepends its own
+	// dots in front.
+	markers?: AxisBasedMarkersConfig[];
 };
 
 /** The environment every ScatterPlot phase reads from, alongside the growing state. */

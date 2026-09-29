@@ -46,6 +46,8 @@ export { default as LineMarker } from './markers/LineMarker.svelte';
 export { default as PeakMarker } from './markers/PeakMarker.svelte';
 export { default as RuleMarker } from './markers/RuleMarker.svelte';
 export { default as TextMarker } from './markers/TextMarker.svelte';
+export { default as RegressionMarker } from './markers/RegressionMarker.svelte';
+export { default as BollingerMarker } from './markers/BollingerMarker.svelte';
 
 export {
 	setConfiguration,
@@ -71,6 +73,12 @@ export {
 } from './utils/color';
 export { resolveOpacityScale } from './utils/opacity';
 export { resolveSymbolScale } from './utils/symbol';
+export {
+	resolveMovingAverage,
+	resolveStatisticMarker,
+	resolvePlotStatistics,
+	expandMarkerStatistics
+} from './utils/statistics';
 export { estimateCategoricalAxisMargin } from './plots/utils/categoricalAxisMargin';
 export { estimateLineValueLabelMargin } from './plots/line/valueLabelMargin';
 
@@ -139,7 +147,20 @@ export type {
 	LineAnchor
 } from './types/plots/constants';
 export type { FontStyle, StrokeStyle, DotStyle, AreaStyle } from './types/plots/styling';
-export type { AxisBasedMarkersConfig } from './types/markers/common';
+export type {
+	AxisBasedMarkersConfig,
+	RegressionMarkerConfig,
+	BollingerMarkerConfig
+} from './types/markers/common';
+export type {
+	StatisticScope,
+	StatisticConfig,
+	RegressionType,
+	RegressionStatisticOptions,
+	BollingerStatisticOptions,
+	StatisticReducer,
+	MovingAverageStatisticOptions
+} from './types/layout/statistics';
 export type {
 	LineMarkersConfig,
 	DeltaMarkerConfig,

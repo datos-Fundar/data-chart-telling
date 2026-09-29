@@ -19,9 +19,8 @@ describe('runStages', () => {
 		const stages: PhaseStage<State, Ctx>[] = [
 			stage('facet', 'facet'),
 			stage('markers', 'markers'),
-			stage('statistics-plot', 'stats-plot'),
 			stage('scales', 'scales'),
-			stage('statistics-marker', 'stats-marker'),
+			stage('statistics', 'stats'),
 			stage('coordinates', 'coords'),
 			stage('mapping', 'mapping'),
 			stage('data', 'data')
@@ -30,8 +29,7 @@ describe('runStages', () => {
 		expect(result.log).toEqual([
 			'data:x',
 			'mapping:x',
-			'stats-marker:x',
-			'stats-plot:x',
+			'stats:x',
 			'scales:x',
 			'markers:x',
 			'coords:x',

@@ -1,13 +1,17 @@
 import type { AxisValue } from '$lib/types/layout/scales';
+import type {
+	RegressionStatisticOptions,
+	BollingerStatisticOptions
+} from '$lib/types/layout/statistics';
 import type { FontStyle, StrokeStyle, DotStyle, AreaStyle } from '$lib/types/plots/styling';
 import type { HoverStrategy, HoverDisplayPoint } from '$lib/types/layout/tooltip';
-import type { BaseMarkersConfig, ChannelMarkerStyle } from './base';
+import type { BaseMarkersConfig, CommonMarkerConfig } from './base';
 
-export type { DotMarkerConfig, ChannelMarkerStyle } from './base';
+export type { DotMarkerConfig, CommonMarkerConfig } from './base';
 
 /**
  * A single line-segment stroke. Endpoint dots are a separate `'dot'` marker rather than a field here.
- * `x`/`y` (from `ChannelMarkerStyle`) accept a field key or an accessor function.
+ * `x`/`y` (from `CommonMarkerConfig`) accept a field key or an accessor function.
  *
  * Note: `color` and `scales` are accepted for API consistency but currently unused — a single
  * `<Line>` stroke can't vary per point. Use a `'dot'` marker with its own color/scales
@@ -18,7 +22,7 @@ export type LineMarkerConfig = {
 	type: 'line';
 	data?: Record<string, unknown>[];
 	styles?: StrokeStyle;
-} & ChannelMarkerStyle;
+} & CommonMarkerConfig;
 
 /**
  * A single bar mark. `role: 'segment'` is a visible bar
@@ -30,7 +34,7 @@ export type LineMarkerConfig = {
  * opposite axis, sized to the category band's own width plus 2px (or a
  * single series' own slice, via `insetTop`/etc.).
  *
- * Author-facing: `x`/`x1`/`x2`/`y1`/`y2`/`y` (from `ChannelMarkerStyle`)
+ * Author-facing: `x`/`x1`/`x2`/`y1`/`y2`/`y` (from `CommonMarkerConfig`)
  * accept a field-key-or-accessor shorthand for a hand-authored `role:
  * 'segment'` bar — see `Channels/X1X2Y1Y2` for an example. `role:
  * 'hitArea'`/`'highlight'` stay build-only (`BarPlot`'s own hover machinery
@@ -50,10 +54,10 @@ export type BarMarkerConfig = {
 	category?: AxisValue;
 	onpointerenter?: () => void;
 	onpointerleave?: () => void;
-} & ChannelMarkerStyle;
+} & CommonMarkerConfig;
 
 /**
- * A single heatmap cell mark. `x`/`y` (from `ChannelMarkerStyle`) accept a field key or an
+ * A single heatmap cell mark. `x`/`y` (from `CommonMarkerConfig`) accept a field key or an
  * accessor function. `fill` stays a per-row accessor; the rest of the style is constant per
  * call. `data` is optional — omit it to reuse the host plot's own top-level rows.
  */
@@ -64,13 +68,13 @@ export type CellMarkerConfig = {
 	fill: (d: any) => string;
 	styles?: AreaStyle;
 	inset?: number;
-} & ChannelMarkerStyle;
+} & CommonMarkerConfig;
 
 /**
  * A single arbitrary rectangle (svelteplot's `Rect`) — author-facing from
  * the start, unlike `BarMarkerConfig` (which `BarPlot`'s own build phases
  * construct internally and only later gained author-facing `x1`/`x2`/`y1`/`y2`).
- * `x`/`y` (from `ChannelMarkerStyle`) are shorthand for `x1`+`x2`/`y1`+`y2`
+ * `x`/`y` (from `CommonMarkerConfig`) are shorthand for `x1`+`x2`/`y1`+`y2`
  * when paired with `interval` (mirrors svelteplot's own `Rect`); set
  * `x1`/`x2`/`y1`/`y2` directly instead for full control over each edge. `data` is optional —
  * omit it to reuse the host plot's own top-level rows.
@@ -81,7 +85,39 @@ export type RectMarkerConfig = {
 	/** Converts `x`/`y` into `x1`/`x2` or `y1`/`y2` ranges — see svelteplot's own `Rect` mark. */
 	interval?: number | string;
 	styles?: AreaStyle;
-} & ChannelMarkerStyle;
+} & CommonMarkerConfig;
+
+/**
+ * A fitted regression curve (svelteplot's `RegressionX`/`RegressionY`) —
+ * `regressionType`/`order`/`base`/`span`/`confidence` are the same fit
+ * options as a `type: 'regression'` entry in `statistics`/`.statistics` (see
+ * `RegressionStatisticOptions`'s own doc comment); this marker is what such
+ * an entry resolves to under the hood, also directly hand-authorable.
+ * `isHorizontal` swaps the dependent variable from `y` to `x` (`RegressionX`
+ * instead of `RegressionY`), same convention as `BarMarkerConfig`.
+ */
+export type RegressionMarkerConfig = {
+	type: 'regression';
+	data?: Record<string, unknown>[];
+	isHorizontal?: boolean;
+} & RegressionStatisticOptions &
+	CommonMarkerConfig;
+
+/**
+ * A moving-average band (svelteplot's `BollingerX`/`BollingerY`) — `n`/`k`
+ * are the same options as a `type: 'bollinger'` entry in
+ * `statistics`/`.statistics` (see `BollingerStatisticOptions`'s own doc
+ * comment); this marker is what such an entry resolves to under the hood,
+ * also directly hand-authorable. `isHorizontal` swaps the dependent variable
+ * from `y` to `x` (`BollingerX` instead of `BollingerY`), same convention as
+ * `BarMarkerConfig`.
+ */
+export type BollingerMarkerConfig = {
+	type: 'bollinger';
+	data?: Record<string, unknown>[];
+	isHorizontal?: boolean;
+} & BollingerStatisticOptions &
+	CommonMarkerConfig;
 
 export type RuleMarkerConfig = {
 	type: 'rule';
@@ -143,6 +179,8 @@ export type AxisBasedMarkersConfig =
 	| BarMarkerConfig
 	| CellMarkerConfig
 	| RectMarkerConfig
+	| RegressionMarkerConfig
+	| BollingerMarkerConfig
 	| RuleMarkerConfig
 	| HoverMarkerConfig
 	| CustomComponentMarkerConfig;

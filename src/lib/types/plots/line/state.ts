@@ -9,7 +9,8 @@ import type { ResolvedChannel } from '$lib/types/layout/mapping';
 import type { LegendInteractionStore } from '$lib/types/layout/legend';
 import type { ChartConfig } from '$lib/types/configuration/styling';
 import type { StrokeStyle, DotStyle } from '$lib/types/plots/styling';
-import type { LineMarkerConfig, DotMarkerConfig } from '$lib/types/markers/common';
+import type { LineMarkersConfig } from '$lib/types/markers/line';
+import type { StatisticConfig } from '$lib/types/layout/statistics';
 
 /** LinePlot's shared pipeline state — raw props plus every phase's own output. */
 export type LinePlotState<TData extends Record<string, unknown>> = {
@@ -26,6 +27,8 @@ export type LinePlotState<TData extends Record<string, unknown>> = {
 	width: number;
 	height: number;
 	margins?: MarginConfig;
+	authorMarkers?: LineMarkersConfig[];
+	statistics?: StatisticConfig[];
 
 	// "data" phase output.
 	resolvedSeries?: Series<TData>[];
@@ -44,9 +47,12 @@ export type LinePlotState<TData extends Record<string, unknown>> = {
 		color?: ResolvedChannel<TData, unknown>;
 	};
 
-	// "markers" phase output — real segments plus gap bridges. No "scales"
-	// phase — LinePlot forwards `scales` unresolved to `BasePlotLayout`.
-	markers?: (LineMarkerConfig | DotMarkerConfig)[];
+	// Accumulates from "statistics" onward: `authorMarkers` (each one's own
+	// `.statistics` expanded in place) plus the top-level `statistics` prop
+	// resolved against every resolved series, then "markers" prepends its own
+	// real segments plus gap bridges in front. No "scales" phase — LinePlot
+	// forwards `scales` unresolved to `BasePlotLayout`.
+	markers?: LineMarkersConfig[];
 };
 
 /** The environment every LinePlot phase reads from, alongside the growing state. */

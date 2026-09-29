@@ -16,6 +16,7 @@
 	import { buildData } from '$lib/plots/line/phases/data';
 	import { buildMapping } from '$lib/plots/line/phases/mapping';
 	import { buildMarkers } from '$lib/plots/line/phases/markers';
+	import { buildStatistics } from '$lib/plots/line/phases/statistics';
 	import { runStages } from '$lib/layout/phases/runStages';
 	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
@@ -61,7 +62,8 @@
 		markers = [],
 		scales = {},
 		margins = $bindable(),
-		tooltip = undefined
+		tooltip = undefined,
+		statistics = []
 	}: Props = $props();
 
 	$effect(() => {
@@ -96,6 +98,7 @@
 	const stages: PhaseStage<LinePlotState<TData>, LinePlotCtx>[] = [
 		{ phase: 'data', run: buildData },
 		{ phase: 'mapping', run: buildMapping },
+		{ phase: 'statistics', run: buildStatistics },
 		{ phase: 'markers', run: buildMarkers }
 	];
 	const ctx = $derived<LinePlotCtx>({
@@ -119,7 +122,9 @@
 				scales,
 				width,
 				height,
-				margins
+				margins,
+				authorMarkers: markers,
+				statistics
 			},
 			ctx
 		)
@@ -243,7 +248,7 @@
 	{...labelMargin.plotProps}
 	xTickRotate={scales?.x?.tickRotate}
 	{hoverController}
-	markers={[...(plotState.markers ?? []), ...markers]}
+	markers={plotState.markers ?? []}
 	seriesData={resolvedSeries}
 	{scopedGroups}
 >

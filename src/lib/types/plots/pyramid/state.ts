@@ -7,7 +7,8 @@ import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
 import type { DiscreteGapFill } from '$lib/plots/utils/gaps';
 import type { ChartConfig } from '$lib/types/configuration/styling';
-import type { BarMarkerConfig } from '$lib/types/markers/common';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
+import type { StatisticConfig } from '$lib/types/layout/statistics';
 
 export type PyramidSide = 'left' | 'right';
 
@@ -46,6 +47,8 @@ export type PyramidPlotState<TData extends Record<string, unknown>> = {
 	width: number;
 	height: number;
 	margins?: MarginConfig;
+	authorMarkers?: AxisBasedMarkersConfig[];
+	statistics?: StatisticConfig[];
 
 	// "data" phase output.
 	resolvedSeries?: PyramidSeries<TData>[];
@@ -57,8 +60,11 @@ export type PyramidPlotState<TData extends Record<string, unknown>> = {
 	// "mapping" phase output — tagged, hover-safe rows (gap rows already filtered out).
 	flat?: PyramidTaggedRow<TData>[];
 
-	// "markers" phase output.
-	markers?: BarMarkerConfig[];
+	// Accumulates from "statistics" onward: `authorMarkers` (each one's own
+	// `.statistics` expanded in place) plus the top-level `statistics` prop
+	// resolved against every resolved series, then "markers" prepends its own
+	// segment bars in front.
+	markers?: AxisBasedMarkersConfig[];
 };
 
 /**

@@ -11,7 +11,7 @@ const GAP_KINDS = ['start', 'middle', 'end'] as const;
 /** A gap-fill row tagged with its resolved value as a plain field. */
 type GapFillRow<TData> = TData & { __gapValue: number };
 
-/** BarPlot's "markers" phase: visible `role: 'segment'` bars — real data plus gap fills. */
+/** BarPlot's "markers" phase: visible `role: 'segment'` bars — real data plus gap fills — prepended onto whatever the "statistics" phase already put in `state.markers`. */
 export function buildMarkers<TData extends Record<string, unknown>>(
 	state: BarPlotState<TData>,
 	ctx: BarPlotCtx
@@ -112,5 +112,5 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 		}
 	});
 
-	return { ...state, markers: segmentMarkers };
+	return { ...state, markers: [...segmentMarkers, ...(state.markers ?? [])] };
 }

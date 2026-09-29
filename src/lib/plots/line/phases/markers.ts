@@ -212,7 +212,7 @@ export function buildGapMarkers<TData extends Record<string, unknown>>(args: {
 	return markers;
 }
 
-/** LinePlot's "markers" phase: real line/dot segments plus interpolated gap bridges. */
+/** LinePlot's "markers" phase: real line/dot segments plus interpolated gap bridges — prepended onto whatever the "statistics" phase already put in `state.markers`. */
 export function buildMarkers<TData extends Record<string, unknown>>(
 	state: LinePlotState<TData>,
 	ctx: LinePlotCtx
@@ -236,5 +236,5 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 		disabledDotsFor
 	});
 
-	return { ...state, markers: [...lineMarkers, ...gapMarkers] };
+	return { ...state, markers: [...lineMarkers, ...gapMarkers, ...(state.markers ?? [])] };
 }

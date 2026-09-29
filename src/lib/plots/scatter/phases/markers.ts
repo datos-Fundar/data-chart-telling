@@ -2,7 +2,7 @@ import { resolveAccessor } from '$lib/plots/utils/accessors';
 import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/scatter/state';
 import type { DotMarkerConfig } from '$lib/types/markers/common';
 
-/** ScatterPlot's "markers" phase: one `'dot'` marker per visual segment. */
+/** ScatterPlot's "markers" phase: one `'dot'` marker per visual segment — prepended onto whatever the "statistics" phase already put in `state.markers`. */
 export function buildMarkers<TData extends Record<string, unknown>>(
 	state: ScatterPlotState<TData>,
 	ctx: ScatterPlotCtx
@@ -88,5 +88,5 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 		}
 	});
 
-	return { ...state, markers };
+	return { ...state, markers: [...markers, ...(state.markers ?? [])] };
 }

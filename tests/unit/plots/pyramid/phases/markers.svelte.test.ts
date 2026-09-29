@@ -8,6 +8,7 @@ import type {
 } from '$lib/types/plots/pyramid/state';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { ChartConfig } from '$lib/types/configuration/styling';
+import type { BarMarkerConfig } from '$lib/types/markers/common';
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -44,7 +45,10 @@ function build(
 		colorForSeries: (name: string) => (name === 'Female' ? 'blue' : 'orange'),
 		...overrides
 	};
-	return buildMarkers(state, { ...CTX, ...ctxOverrides }).markers!;
+	// No `authorMarkers`/`statistics` given, so the real output is exactly
+	// this phase's own segment/gap-fill bars — narrowed back from the state's
+	// broader accumulating `markers` union.
+	return buildMarkers(state, { ...CTX, ...ctxOverrides }).markers as BarMarkerConfig[];
 }
 
 describe('buildMarkers – geometry', () => {

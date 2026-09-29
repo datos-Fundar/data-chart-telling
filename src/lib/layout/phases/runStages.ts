@@ -4,8 +4,7 @@ import type { PlotPhase, PhaseStage } from '$lib/types/layout/phases';
 export const PHASE_ORDER: readonly PlotPhase[] = [
 	'data',
 	'mapping',
-	'statistics-marker',
-	'statistics-plot',
+	'statistics',
 	'scales',
 	'markers',
 	'coordinates',

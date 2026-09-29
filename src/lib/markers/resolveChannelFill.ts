@@ -6,9 +6,9 @@ import type { SymbolType } from '$lib/types/plots/constants';
 import type { ChartConfig } from '$lib/types/configuration/styling';
 
 /**
- * Resolves a `ChannelMarkerStyle` pair into a per-row fill accessor, or
+ * Resolves a `CommonMarkerConfig` pair into a per-row fill accessor, or
  * `undefined` when `color` is unset (caller falls back to its own flat
- * fill/stroke). Shared by every marker kind that intersects `ChannelMarkerStyle`.
+ * fill/stroke). Shared by every marker kind that intersects `CommonMarkerConfig`.
  * Safe as a live per-row function — svelteplot recognizes an already-resolved
  * CSS color string as a literal and never re-scales it (unlike `opacity`/`r`).
  * Continuous (numeric) or categorical (string) values both work, same as a
@@ -38,7 +38,7 @@ export function resolveChannelFill<TData>(
 }
 
 /**
- * Resolves a `ChannelMarkerStyle`-style `symbol` pair into a per-row shape
+ * Resolves a `CommonMarkerConfig`-style `symbol` pair into a per-row shape
  * accessor, or `undefined` when unset. Safe as a live per-row function for
  * the same reason `resolveChannelFill` is — a resolved shape name is a
  * recognized literal, not re-scaled.
@@ -69,7 +69,7 @@ export function resolveChannelSymbol<TData>(
 export type OpacityBucket<TData> = { value: number; data: TData[] };
 
 /**
- * Resolves a `ChannelMarkerStyle`-style `opacity` pair into a list of
+ * Resolves a `CommonMarkerConfig`-style `opacity` pair into a list of
  * opacity buckets, or `undefined` when unset. Unlike `resolveChannelFill`,
  * this can NOT hand back a live per-row function — svelteplot treats
  * `fillOpacity`/`opacity` as bound to its own shared scale (there's no

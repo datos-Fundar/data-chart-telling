@@ -16,6 +16,7 @@
 	import { buildMapping } from '$lib/plots/pyramid/phases/mapping';
 	import { buildScales } from '$lib/plots/pyramid/phases/scales';
 	import { buildMarkers } from '$lib/plots/pyramid/phases/markers';
+	import { buildStatistics } from '$lib/plots/pyramid/phases/statistics';
 	import { runStages } from '$lib/layout/phases/runStages';
 	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
@@ -77,7 +78,8 @@
 		margins,
 		segments = {},
 		markers = [],
-		tooltip = undefined
+		tooltip = undefined,
+		statistics = []
 	}: Props = $props();
 
 	$effect(() => {
@@ -112,6 +114,7 @@
 	const stages: PhaseStage<PyramidPlotState<TData>, PyramidPlotCtx>[] = [
 		{ phase: 'data', run: buildData },
 		{ phase: 'mapping', run: buildMapping },
+		{ phase: 'statistics', run: buildStatistics },
 		{ phase: 'scales', run: buildScales },
 		{ phase: 'markers', run: buildMarkers }
 	];
@@ -135,7 +138,9 @@
 				scales,
 				width,
 				height,
-				margins
+				margins,
+				authorMarkers: markers,
+				statistics
 			},
 			ctx
 		)
@@ -250,7 +255,7 @@
 	{...labelMargin.plotProps}
 	xTickRotate={resolvedScales?.x?.tickRotate}
 	{hoverController}
-	markers={[...(plotState.markers ?? []), ...markers]}
+	markers={plotState.markers ?? []}
 	seriesData={resolvedSeries}
 	{scopedGroups}
 >

@@ -1,13 +1,14 @@
 import type { AxisValue, ChannelScalesConfig } from '$lib/types/layout/scales';
+import type { StatisticConfig } from '$lib/types/layout/statistics';
 import type { DotStyle, FontStyle } from '$lib/types/plots/styling';
 
 /**
  * Fields shared by every "common" marker kind (`dot`, `text`, `line`, `bar`,
- * `cell`, `rect`): position (`x`/`y`/`x1`/`x2`/`y1`/`y2`) and per-marker
- * color/opacity ramps (`color`/`opacity`/`scales`). Not used by `rule`/
- * `hover`/`component`.
+ * `cell`, `rect`): position (`x`/`y`/`x1`/`x2`/`y1`/`y2`), per-marker
+ * color/opacity ramps (`color`/`opacity`/`scales`), and derived statistics
+ * (`statistics`). Not used by `rule`/`hover`/`component`.
  */
-export type ChannelMarkerStyle = {
+export type CommonMarkerConfig = {
 	/** Position accessor — field key or function, bound to the plot's shared x/y scale. */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	x?: string | ((d: any) => AxisValue);
@@ -30,6 +31,8 @@ export type ChannelMarkerStyle = {
 	opacity?: string | ((d: any) => unknown);
 	/** Per-marker channel-ramp overrides, same shape as a plot's own `scales` prop. */
 	scales?: ChannelScalesConfig;
+	/** Derived statistics computed from this marker's own `data`/`x`/`y` — same shape as a plot's own top-level `statistics` prop. `series` scoping is ignored here (a marker has one source). */
+	statistics?: StatisticConfig[];
 };
 
 /**
@@ -49,7 +52,7 @@ export type DotMarkerConfig = {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	symbol?: string | ((d: any) => unknown);
 	styles?: DotStyle;
-} & ChannelMarkerStyle;
+} & CommonMarkerConfig;
 
 /**
  * A text label per row (svelteplot's `Text`) — usable on any plot kind, axis-based or geo.
@@ -61,7 +64,7 @@ export type TextMarkerConfig = {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	text: string | ((d: any) => string);
 	styles?: FontStyle;
-} & ChannelMarkerStyle;
+} & CommonMarkerConfig;
 
 /** Every marker kind usable on any plot, axis-based or geo. */
 export type BaseMarkersConfig = DotMarkerConfig | TextMarkerConfig;

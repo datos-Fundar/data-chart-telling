@@ -18,6 +18,7 @@
 	import { buildMapping } from '$lib/plots/bar/phases/mapping';
 	import { buildScales } from '$lib/plots/bar/phases/scales';
 	import { buildMarkers } from '$lib/plots/bar/phases/markers';
+	import { buildStatistics } from '$lib/plots/bar/phases/statistics';
 	import { runStages } from '$lib/layout/phases/runStages';
 	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import ValueLabels from '$lib/plots/bar/ValueLabels.svelte';
@@ -68,7 +69,8 @@
 		markers = [],
 		scales = {},
 		margins,
-		tooltip = undefined
+		tooltip = undefined,
+		statistics = []
 	}: Props = $props();
 
 	$effect(() => {
@@ -104,6 +106,7 @@
 	const stages: PhaseStage<BarPlotState<TData>, BarPlotCtx>[] = [
 		{ phase: 'data', run: buildData },
 		{ phase: 'mapping', run: buildMapping },
+		{ phase: 'statistics', run: buildStatistics },
 		{ phase: 'scales', run: buildScales },
 		{ phase: 'markers', run: buildMarkers }
 	];
@@ -127,7 +130,9 @@
 				scales,
 				width,
 				height,
-				margins
+				margins,
+				authorMarkers: markers,
+				statistics
 			},
 			ctx
 		)
@@ -197,7 +202,6 @@
 			clearHoverMatch: hoverController.ctrl.onLeave
 		})
 	);
-	const barMarkers = $derived([...(plotState.markers ?? []), ...hitAreaMarkers]);
 
 	// Estimated overflow for an `'outside'`-anchored value label at the most
 	// extreme value in the whole dataset — not just the current frame, so it
@@ -263,7 +267,7 @@
 	{...labelMargin.plotProps}
 	xTickRotate={resolvedScales?.x?.tickRotate}
 	{hoverController}
-	markers={[...barMarkers, ...markers]}
+	markers={[...(plotState.markers ?? []), ...hitAreaMarkers]}
 	seriesData={resolvedSeries}
 	{scopedGroups}
 >

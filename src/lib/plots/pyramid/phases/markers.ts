@@ -33,7 +33,8 @@ function signFor<TData extends Record<string, unknown>>(
 /**
  * PyramidPlot's "markers" phase: one `role: 'segment'` bar per visual
  * segment, always horizontal (category on y, signed magnitude on x) and with
- * no insets. Emits no `role: 'hitArea'` markers — PyramidPlot's hover
+ * no insets — prepended onto whatever the "statistics" phase already put in
+ * `state.markers`. Emits no `role: 'hitArea'` markers — PyramidPlot's hover
  * matches nearest points rather than hit-testing category bands.
  */
 export function buildMarkers<TData extends Record<string, unknown>>(
@@ -103,5 +104,5 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 		}
 	}
 
-	return { ...state, markers };
+	return { ...state, markers: [...markers, ...(state.markers ?? [])] };
 }

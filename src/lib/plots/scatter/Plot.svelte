@@ -10,6 +10,7 @@
 	import { buildMapping } from '$lib/plots/scatter/phases/mapping';
 	import { buildScales } from '$lib/plots/scatter/phases/scales';
 	import { buildMarkers } from '$lib/plots/scatter/phases/markers';
+	import { buildStatistics } from '$lib/plots/scatter/phases/statistics';
 	import { runStages } from '$lib/layout/phases/runStages';
 	import {
 		createLabelMarginTracker,
@@ -67,7 +68,8 @@
 		markers = [],
 		scales = {},
 		margins,
-		tooltip = undefined
+		tooltip = undefined,
+		statistics = []
 	}: Props = $props();
 
 	const cfg = $derived(getConfiguration());
@@ -101,6 +103,7 @@
 	const stages: PhaseStage<ScatterPlotState<TData>, ScatterPlotCtx>[] = [
 		{ phase: 'data', run: buildData },
 		{ phase: 'mapping', run: buildMapping },
+		{ phase: 'statistics', run: buildStatistics },
 		{ phase: 'scales', run: buildScales },
 		{ phase: 'markers', run: buildMarkers }
 	];
@@ -126,7 +129,9 @@
 				scales,
 				width,
 				height,
-				margins
+				margins,
+				authorMarkers: markers,
+				statistics
 			},
 			ctx
 		)
@@ -210,7 +215,7 @@
 	scales={resolvedScales}
 	{...labelMargin.plotProps}
 	{hoverController}
-	markers={[...(plotState.markers ?? []), ...markers]}
+	markers={plotState.markers ?? []}
 	seriesData={resolvedSeries}
 	{scopedGroups}
 >

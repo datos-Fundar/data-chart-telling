@@ -7,6 +7,8 @@
 	import LineMarker from '$lib/markers/LineMarker.svelte';
 	import CellMarker from '$lib/markers/CellMarker.svelte';
 	import RectMarker from '$lib/markers/RectMarker.svelte';
+	import RegressionMarker from '$lib/markers/RegressionMarker.svelte';
+	import BollingerMarker from '$lib/markers/BollingerMarker.svelte';
 	import DotMarker from '$lib/markers/DotMarker.svelte';
 	import TextMarker from '$lib/markers/TextMarker.svelte';
 	import RuleMarker from '$lib/markers/RuleMarker.svelte';
@@ -43,7 +45,7 @@
 	 * own data/color and resolved segments. `width`/`height`/`numericMargins`/
 	 * `geoAllFeatures` are `GeoPlot`-only context an `inset` marker needs
 	 * beyond its own config; `data` is `BasePlotLayout`'s own rows, forwarded
-	 * as the fallback every `ChannelMarkerStyle`-based marker's own (optional)
+	 * as the fallback every `CommonMarkerConfig`-based marker's own (optional)
 	 * `data` falls back to when unset, plus `contour`'s clip and unscoped
 	 * `geo-component`'s fallback data — the latter two reachable only through
 	 * `GeoMarkersConfig`, so `data` is always `GeoFeature`-shaped there
@@ -130,6 +132,10 @@
 		<CellMarker marker={{ ...marker, data: marker.data ?? data }} />
 	{:else if marker.type === 'rect'}
 		<RectMarker marker={{ ...marker, data: marker.data ?? data }} />
+	{:else if marker.type === 'regression'}
+		<RegressionMarker marker={{ ...marker, data: marker.data ?? data }} />
+	{:else if marker.type === 'bollinger'}
+		<BollingerMarker marker={{ ...marker, data: marker.data ?? data }} />
 	{:else if marker.type === 'dot'}
 		<DotMarker
 			data={marker.data ?? data}

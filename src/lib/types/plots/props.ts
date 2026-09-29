@@ -2,6 +2,7 @@ import type { HoverPoint, HoverStrategy, TooltipOptions } from '$lib/types/layou
 import type { Segment } from '$lib/types/plots/segments/config';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { GeoScalesConfig } from '$lib/types/layout/coordinates';
+import type { StatisticConfig } from '$lib/types/layout/statistics';
 
 /** The `styles` prop accepted by every plot kind — its own
  * styles shape ({@link AxisBasedStylesConfig}, `GeoStylesConfig`, …). */
@@ -100,4 +101,5 @@ export type BasePlotProps<
   coordinates?: TCoordinates;
   margins?: MarginConfig;
   tooltip?: TooltipConfig<TRow>;
+  statistics?: StatisticConfig[];
 };

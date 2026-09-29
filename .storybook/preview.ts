@@ -117,7 +117,8 @@ const preview: Preview = {
 						'Legend',
 						['Discrete', 'Continuous', 'Composition', 'Interactive', 'Paginated'],
 						'Tooltip',
-						['Basics', 'MultiSeries', 'Customization', 'FacetSync']
+						['Basics', 'MultiSeries', 'Customization', 'FacetSync'],
+						'Statistics'
 					],
 					'Configuration',
 					'Charts',

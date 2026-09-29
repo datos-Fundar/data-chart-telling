@@ -5,6 +5,7 @@ import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/scatter/
 import type { Series } from '$lib/types/plots/data/common';
 import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
 import type { ChartConfig } from '$lib/types/configuration/styling';
+import type { DotMarkerConfig } from '$lib/types/markers/common';
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -32,7 +33,10 @@ function build(
 		legendInteraction: undefined,
 		...ctxOverrides
 	};
-	return buildMarkers(state, ctx).markers!;
+	// No `authorMarkers`/`statistics` given, so the real output is exactly
+	// this phase's own dots — narrowed back from the state's broader
+	// accumulating `markers` union.
+	return buildMarkers(state, ctx).markers as DotMarkerConfig[];
 }
 
 describe('buildMarkers – radius channel', () => {
