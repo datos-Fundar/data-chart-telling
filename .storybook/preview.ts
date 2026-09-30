@@ -110,6 +110,19 @@ const preview: Preview = {
 						'Length',
 						'X1X2Y1Y2'
 					],
+					'Markers',
+					[
+						'Dot',
+						'Text',
+						'Line',
+						'Bar',
+						'Cell',
+						'Rect',
+						'Rule',
+						'Custom',
+						'Geo',
+						['Graticule', 'Sphere', 'Vector', 'Link', 'Contour', 'Inset', 'Hover', 'Custom']
+					],
 					'Layout',
 					[
 						'Facets',

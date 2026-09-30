@@ -117,7 +117,10 @@
 	});
 
 	function markerKey(marker: MarkerConfig, i: number): string {
-		if (marker.type === 'rule') return `rule-${marker.axis}-${marker.value}`;
+		if (marker.type === 'rule') {
+			const v = typeof marker.value === 'function' ? i : marker.value;
+			return `rule-${marker.axis}-${v}`;
+		}
 		if (marker.type === 'bar') return `bar-${marker.role}-${i}`;
 		return `${marker.type}-${i}`;
 	}
@@ -158,7 +161,21 @@
 			styles={marker.styles}
 		/>
 	{:else if marker.type === 'rule'}
-		<RuleMarker axis={marker.axis} value={marker.value} styles={marker.styles} />
+		<RuleMarker
+			axis={marker.axis}
+			data={marker.data}
+			value={marker.value}
+			x1={marker.x1}
+			x2={marker.x2}
+			y1={marker.y1}
+			y2={marker.y2}
+			inset={marker.inset}
+			insetTop={marker.insetTop}
+			insetBottom={marker.insetBottom}
+			insetLeft={marker.insetLeft}
+			insetRight={marker.insetRight}
+			styles={marker.styles}
+		/>
 	{:else if marker.type === 'geo'}
 		<GeoFeaturesMarker {marker} />
 	{:else if marker.type === 'graticule'}

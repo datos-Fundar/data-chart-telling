@@ -119,12 +119,38 @@ export type BollingerMarkerConfig = {
 } & BollingerStatisticOptions &
 	CommonMarkerConfig;
 
+/**
+ * A single vertical (`axis: 'x'`) or horizontal (`axis: 'y'`) reference line
+ * — or, with `data`, one line per row (svelteplot's own `RuleX`/`RuleY` are
+ * both data/channel marks, unlike a plain single-threshold line). `value` is
+ * the position along the rule's own axis: a literal `AxisValue` when `data`
+ * is omitted (the common single-line case — deliberately *not* falling back
+ * to the plot's own top-level rows the way every other "common" marker's
+ * `data` does, since a literal `value` isn't a field key), or a
+ * field-key-or-function accessor per row when `data` is given. `x1`/`x2`
+ * (`axis: 'y'`) or `y1`/`y2` (`axis: 'x'`) bound the line's own extent on the
+ * opposite axis — omitted, it spans the full plot, svelteplot's own default;
+ * reused straight from `CommonMarkerConfig` (same shape every other
+ * "common" marker's own `x1`/`x2`/`y1`/`y2` has) rather than `x`/`y` (whose
+ * meaning here — the rule's own axis position — doesn't match theirs) or
+ * `color`/`opacity`/`scales`/`statistics` (a rule stays outside the
+ * "common"/statable family, per `CommonMarkerConfig`'s own doc comment).
+ * `inset`/`insetTop`/`insetBottom`/`insetLeft`/`insetRight` mirror
+ * svelteplot's own inset shorthand, in pixels.
+ */
 export type RuleMarkerConfig = {
 	type: 'rule';
 	axis: 'x' | 'y';
-	value: AxisValue;
+	data?: Record<string, unknown>[];
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	value: AxisValue | string | ((d: any) => AxisValue);
+	inset?: number;
+	insetTop?: number;
+	insetBottom?: number;
+	insetLeft?: number;
+	insetRight?: number;
 	styles?: StrokeStyle;
-};
+} & Pick<CommonMarkerConfig, 'x1' | 'x2' | 'y1' | 'y2'>;
 
 /**
  * In-SVG hover highlight (crosshair + dot + label). Omitting `series`

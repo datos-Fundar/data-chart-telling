@@ -76,4 +76,22 @@ describe('BarPlot – markers.rules', () => {
     const svg = await waitForSvg(container);
     expect(svg).toBeTruthy();
   });
+
+  test('data + a field-key value renders one line per row, from a single marker', async () => {
+    const { container } = await render(BarPlot, {
+      width: 400,
+      height: 300,
+      series: [FEMALE],
+      markers: [
+        {
+          type: 'rule',
+          axis: 'x',
+          data: [{ province: 'Córdoba' }, { province: 'Tucumán' }],
+          value: 'province',
+        },
+      ] satisfies AxisBasedMarkersConfig[],
+    });
+    const svg = await waitForSvg(container);
+    expect(svg.querySelectorAll('g.rule-x line').length).toBe(2);
+  });
 });
