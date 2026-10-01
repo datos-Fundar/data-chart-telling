@@ -48,6 +48,23 @@ export { default as RuleMarker } from './markers/RuleMarker.svelte';
 export { default as TextMarker } from './markers/TextMarker.svelte';
 export { default as RegressionMarker } from './markers/RegressionMarker.svelte';
 export { default as BollingerMarker } from './markers/BollingerMarker.svelte';
+export { default as RectMarker } from './markers/RectMarker.svelte';
+export { default as AreaMarker } from './markers/AreaMarker.svelte';
+export { default as DensityMarker } from './markers/DensityMarker.svelte';
+export { default as BoxMarker } from './markers/BoxMarker.svelte';
+export { default as HullMarker } from './markers/HullMarker.svelte';
+export { default as DifferenceMarker } from './markers/DifferenceMarker.svelte';
+export { default as ArrowMarker } from './markers/ArrowMarker.svelte';
+export { default as BrushMarker } from './markers/BrushMarker.svelte';
+export { default as DelaunayLinkMarker } from './markers/DelaunayLinkMarker.svelte';
+export { default as DelaunayMeshMarker } from './markers/DelaunayMeshMarker.svelte';
+export { default as VoronoiMarker } from './markers/VoronoiMarker.svelte';
+export { default as VoronoiMeshMarker } from './markers/VoronoiMeshMarker.svelte';
+export { default as ImageMarker } from './markers/ImageMarker.svelte';
+export { default as RasterMarker } from './markers/RasterMarker.svelte';
+export { default as TickMarker } from './markers/TickMarker.svelte';
+export { default as TrailMarker } from './markers/TrailMarker.svelte';
+export { default as WaffleMarker } from './markers/WaffleMarker.svelte';
 
 export {
 	setConfiguration,
@@ -149,8 +166,27 @@ export type {
 export type { FontStyle, StrokeStyle, DotStyle, AreaStyle } from './types/plots/styling';
 export type {
 	AxisBasedMarkersConfig,
+	RectMarkerConfig,
 	RegressionMarkerConfig,
-	BollingerMarkerConfig
+	BollingerMarkerConfig,
+	AreaMarkerConfig,
+	DensityMarkerConfig,
+	BoxMarkerConfig,
+	HullMarkerConfig,
+	DifferenceMarkerConfig,
+	ArrowMarkerConfig,
+	BrushMarkerConfig,
+	BrushSelection,
+	DelaunayLinkMarkerConfig,
+	DelaunayMeshMarkerConfig,
+	VoronoiMarkerConfig,
+	VoronoiMeshMarkerConfig,
+	ImageMarkerConfig,
+	RasterMarkerConfig,
+	TickMarkerConfig,
+	TrailMarkerConfig,
+	WaffleMarkerConfig,
+	MarkerCurveName
 } from './types/markers/common';
 export type {
 	StatisticScope,

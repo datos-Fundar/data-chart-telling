@@ -82,9 +82,9 @@ describe('LinePlot – markers.hover', () => {
 			markers: [
 				{
 					type: 'hover',
-					dotStyle: { dotRadius: 6, dotFill: '#e11d48' },
-					fontStyle: { fontSize: 14 },
-					ruleStyle: { strokeDasharray: '2 2' }
+					dot: { dotRadius: 6, dotFill: '#e11d48' },
+					text: { fontSize: 14 },
+					rule: { strokeDasharray: '2 2' }
 				}
 			] satisfies LineMarkersConfig[]
 		});

@@ -38,6 +38,8 @@ export default defineConfig({
             instances: [{ browser: 'chromium', provider: playwright(), headless: true }],
           },
           include: ['src/**/*.svelte.test.ts', 'tests/**/*.svelte.test.ts'],
+          // Many parallel browser iframes intermittently lose their orchestrator connection.
+          maxWorkers: 1,
         },
       },
 

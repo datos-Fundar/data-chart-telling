@@ -16,7 +16,7 @@ const meta = {
 	title: 'Layout/Tooltip/FacetSync',
 	component: LineChart,
 	tags: ['autodocs'],
-	args: { width: 680, height: 440, data: TIME_SERIES, x: 'year', y: 'value' },
+	args: { width: 680, height: 400, data: TIME_SERIES, x: 'year', y: 'value' },
 	argTypes: {
 		width: { control: false },
 		height: { control: false },

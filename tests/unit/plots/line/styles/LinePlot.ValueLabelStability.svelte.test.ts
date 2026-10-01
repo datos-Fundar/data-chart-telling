@@ -12,24 +12,34 @@ const renderProps = {
 	width: 400,
 	height: 300,
 	styles: { values: { show: true }, frame: true } satisfies AxisBasedStylesConfig,
-	scales: { y: { domain: [0, 1_000_000] as [number, number] } },
+	scales: { y: { domain: [0, 1_000_000] as [number, number] } }
 };
 
 function seriesUpTo(year: number) {
 	const years = [2016, 2017, 2018, 2019, 2020].filter((y) => y <= year);
 	return [
-		{ name: 'a', x: 'year' as const, y: 'value' as const, data: years.map((y) => ({ year: y, value: y * 100 })) },
-		{ name: 'b', x: 'year' as const, y: 'value' as const, data: years.map((y) => ({ year: y, value: y * 50 })) },
+		{
+			name: 'a',
+			x: 'year' as const,
+			y: 'value' as const,
+			data: years.map((y) => ({ year: y, value: y * 100 }))
+		},
+		{
+			name: 'b',
+			x: 'year' as const,
+			y: 'value' as const,
+			data: years.map((y) => ({ year: y, value: y * 50 }))
+		}
 	];
 }
 
 describe('LinePlot – rightward value labels reserve room up front', () => {
-	test('the right margin already fits the pinned domain\'s widest label on the very first render', async () => {
+	test("the right margin already fits the pinned domain's widest label on the very first render", async () => {
 		const withLabels = await render(LinePlot, { ...renderProps, series: seriesUpTo(2016) });
 		const withoutLabels = await render(LinePlot, {
 			...renderProps,
 			series: seriesUpTo(2016),
-			styles: { frame: true } satisfies AxisBasedStylesConfig,
+			styles: { frame: true } satisfies AxisBasedStylesConfig
 		});
 		await waitForSvg(withLabels.container);
 		await waitForSvg(withoutLabels.container);
@@ -47,7 +57,10 @@ describe('LinePlot – rightward value labels reserve room up front', () => {
 		// against the pre-floor implementation) — this asserts the fix: at
 		// most one remount total across the whole scrub, and only in this
 		// first stretch.
-		const { container, rerender } = await render(LinePlot, { ...renderProps, series: seriesUpTo(2016) });
+		const { container, rerender } = await render(LinePlot, {
+			...renderProps,
+			series: seriesUpTo(2016)
+		});
 		await waitForSvg(container);
 		await new Promise((r) => setTimeout(r, 300));
 
@@ -90,13 +103,28 @@ describe('LinePlot – leftward value labels reserve room up front', () => {
 describe("LinePlot – a value label's own vertical reach reserves room up front", () => {
 	// A value pinned at the y domain's own top extreme.
 	function seriesAtTop() {
-		return [{ name: 'a', x: 'year' as const, y: 'value' as const, data: [{ year: 2016, value: 1_000_000 }] }];
+		return [
+			{
+				name: 'a',
+				x: 'year' as const,
+				y: 'value' as const,
+				data: [{ year: 2016, value: 1_000_000 }]
+			}
+		];
 	}
 
 	test('the top margin already fits the label on the very first render', async () => {
-		const withLabels = await render(LinePlot, { ...renderProps, series: seriesAtTop() });
+		// `label: false` isolates this test from the y-axis's own auto-title
+		// (a real string field name, 'value', now that it's forwarded raw —
+		// see the axis-title fix) — this test is about the value label's own
+		// margin reservation specifically, not about axis titles, and the
+		// title would otherwise already reserve some of the same top margin
+		// in both renders, shrinking the gap this assertion looks for.
+		const scales = { y: { domain: [0, 1_000_000] as [number, number], label: false as const } };
+		const withLabels = await render(LinePlot, { ...renderProps, scales, series: seriesAtTop() });
 		const withoutLabels = await render(LinePlot, {
 			...renderProps,
+			scales,
 			series: seriesAtTop(),
 			styles: { frame: true } satisfies AxisBasedStylesConfig
 		});

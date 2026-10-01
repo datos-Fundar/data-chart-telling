@@ -14,9 +14,12 @@ export type DeltaConfig = {
   from: DeltaTarget;
   to?: DeltaTarget;
   formatDiff?: (diff: number) => string;
-  strokeStyle?: StrokeStyle;
-  fontStyle?: FontStyle;
-  dotStyle?: DotStyle;
+  /** Style of the connecting line. */
+  line?: StrokeStyle;
+  /** Style of the difference label. */
+  text?: FontStyle;
+  /** Style of the endpoint dots. */
+  dot?: DotStyle;
 };
 
 /**

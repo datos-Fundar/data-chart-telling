@@ -48,8 +48,8 @@ describe('ScatterPlot – markers.hover', () => {
 			markers: [
 				{
 					type: 'hover',
-					dotStyle: { dotRadius: 10, dotFill: '#dc2626' },
-					fontStyle: { fontSize: 14 }
+					dot: { dotRadius: 10, dotFill: '#dc2626' },
+					text: { fontSize: 14 }
 				}
 			] satisfies AxisBasedMarkersConfig[]
 		});

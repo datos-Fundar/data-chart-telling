@@ -107,6 +107,36 @@ export type LengthScaleConfig = {
 // above — putting them in `ChannelScalesConfig` would misleadingly suggest a
 // marker's own `scales.x` could diverge from the plot's. It can't.
 
+/** Scale types that lay out distinct categories — an axis paired with one plays the "index" role, so the other is the plain magnitude/value axis. */
+export const DISCRETE_SCALE_TYPES = ['band', 'categorical', 'point', 'ordinal'] as const;
+export type DiscreteScaleType = (typeof DISCRETE_SCALE_TYPES)[number];
+
+/** Scale types that lay out a continuous time axis. */
+export const TEMPORAL_SCALE_TYPES = ['time', 'utc'] as const;
+export type TemporalScaleType = (typeof TEMPORAL_SCALE_TYPES)[number];
+
+/** Scale types that map a numeric domain continuously onto the range, differing only in the transform applied (identity, power, log, ...). */
+export const CONTINUOUS_SCALE_TYPES = ['linear', 'pow', 'sqrt', 'log', 'symlog'] as const;
+export type ContinuousScaleType = (typeof CONTINUOUS_SCALE_TYPES)[number];
+
+/** Scale types that interpolate continuously along a single ramp (one end to the other, or around a cycle). */
+export const SEQUENTIAL_SCALE_TYPES = ['sequential', 'cyclical', 'quantile-cont'] as const;
+export type SequentialScaleType = (typeof SEQUENTIAL_SCALE_TYPES)[number];
+
+/** Scale types that interpolate continuously along a ramp with a neutral midpoint, diverging to either side of it. */
+export const DIVERGING_SCALE_TYPES = [
+	'diverging',
+	'diverging-log',
+	'diverging-pow',
+	'diverging-sqrt',
+	'diverging-symlog'
+] as const;
+export type DivergingScaleType = (typeof DIVERGING_SCALE_TYPES)[number];
+
+/** Scale types that bucket a numeric domain into a fixed set of output values instead of interpolating. */
+export const BINNED_SCALE_TYPES = ['threshold', 'quantile', 'quantize'] as const;
+export type BinnedScaleType = (typeof BINNED_SCALE_TYPES)[number];
+
 /**
  * Author-facing scale overrides for a plot axis. Mirrors svelteplot's
  * `ScaleOptions` + `XScaleOptions` in full — `type`, `padding`, `domain`,
@@ -122,28 +152,12 @@ export type LengthScaleConfig = {
 export type AxisScale<TData = Record<string, unknown>> = {
 	type?:
 		| 'auto'
-		| 'linear'
-		| 'pow'
-		| 'sqrt'
-		| 'log'
-		| 'symlog'
-		| 'time'
-		| 'utc'
-		| 'point'
-		| 'ordinal'
-		| 'sequential'
-		| 'band'
-		| 'categorical'
-		| 'cyclical'
-		| 'threshold'
-		| 'quantile-cont'
-		| 'quantile'
-		| 'quantize'
-		| 'diverging'
-		| 'diverging-log'
-		| 'diverging-pow'
-		| 'diverging-sqrt'
-		| 'diverging-symlog';
+		| ContinuousScaleType
+		| TemporalScaleType
+		| DiscreteScaleType
+		| SequentialScaleType
+		| DivergingScaleType
+		| BinnedScaleType;
 	domain?: (number | string | boolean | Date | null)[];
 	range?: (number | string | boolean | Date | null)[];
 	reverse?: boolean;

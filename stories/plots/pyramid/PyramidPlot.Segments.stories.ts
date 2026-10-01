@@ -178,9 +178,19 @@ export const CustomColorHighlight: Story = {
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
 		segments: {
-			default: [
-				{ areas: areasFor(['80-84', '85+']), styles: { fill: '#d6336c', fillOpacity: 0.9 } },
-				{ styles: { fillOpacity: 0.2 } }
+			Female: [
+				{
+					areas: areasFor(['80-84', '85+']),
+					styles: {  fill: '#d6336c', fillOpacity: 1 }
+				},
+				{ styles: {fillOpacity: 0.25 } }
+			],
+			Male: [
+				{
+					areas: areasFor(['80-84', '85+']),
+					styles: { fill: '#3e33d6', fillOpacity: 1 }
+				},
+				{ styles: { fillOpacity: 0.25 } }
 			]
 		} satisfies SegmentsConfig<BarSegmentStyle>
 	}

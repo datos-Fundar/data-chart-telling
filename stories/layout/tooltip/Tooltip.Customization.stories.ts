@@ -8,7 +8,7 @@ const meta = {
 	title: 'Layout/Tooltip/Customization',
 	component: LineChart,
 	tags: ['autodocs'],
-	args: { width: 680, height: 440, data: TIME_SERIES, x: 'year', y: 'value' },
+	args: { width: 680, height: 400, data: TIME_SERIES, x: 'year', y: 'value' },
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 1000, step: 20 } },
 		height: { control: { type: 'range', min: 240, max: 700, step: 20 } },

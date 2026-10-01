@@ -2,6 +2,7 @@
   import { AxisX, AxisY, GridX, GridY, usePlot } from 'svelteplot';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { tickStep, ticksInRange, naturalTickCount } from '$lib/layout/scales/niceDomain';
+  import { DISCRETE_SCALE_TYPES } from '$lib/types/layout/scales';
   import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
 
   /**
@@ -57,8 +58,8 @@
     return hi > lo ? [lo, hi] : undefined;
   }
 
-  /** Resolved scale types with their own discrete tick semantics — an axis paired with one of these plays the "index" role for the pair, so *this* axis is the plain magnitude/value one (see `autoTickCount`, `edgeInclusiveTicks`). */
-  const DISCRETE_SCALE_TYPES = new Set(['band', 'categorical', 'point', 'ordinal']);
+  /** An axis paired with a discrete scale plays the "index" role for the pair, so *this* axis is the plain magnitude/value one (see `autoTickCount`, `edgeInclusiveTicks`). */
+  const isDiscreteType = (type: string) => (DISCRETE_SCALE_TYPES as readonly string[]).includes(type);
 
   /**
    * Caps tick count to the axis's distinct value count, never above what
@@ -80,7 +81,7 @@
     min: number
   ): number | undefined {
     if (scale?.ticks != null || scale?.tickSpacing != null || scale?.interval != null || scale?.domain != null) return undefined;
-    if (oppositeType != null && DISCRETE_SCALE_TYPES.has(oppositeType)) return undefined;
+    if (oppositeType != null && isDiscreteType(oppositeType)) return undefined;
     const uniqueCount = new Set(values.map(String)).size;
     const natural = naturalTickCount(span, spacing, min);
     return uniqueCount >= 2 && uniqueCount < natural ? uniqueCount : undefined;
@@ -141,7 +142,7 @@
     min: number
   ): number[] | undefined {
     if (scale?.ticks != null || scale?.tickSpacing != null || scale?.interval != null || scale?.domain != null) return undefined;
-    if (oppositeType != null && DISCRETE_SCALE_TYPES.has(oppositeType)) return undefined;
+    if (oppositeType != null && isDiscreteType(oppositeType)) return undefined;
     if (scale?.type != null && scale.type !== 'linear' && scale.type !== 'auto') return undefined;
     const extent = axisExtent(scale, values);
     if (!extent) return undefined;

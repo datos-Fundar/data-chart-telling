@@ -1,6 +1,6 @@
-import { resolveAccessor } from '$lib/plots/utils/accessors';
 import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/scatter/state';
 import type { DotMarkerConfig } from '$lib/types/markers/common';
+import type { AxisValue } from '$lib/types/layout/scales';
 
 /** ScatterPlot's "markers" phase: one `'dot'` marker per visual segment — prepended onto whatever the "statistics" phase already put in `state.markers`. */
 export function buildMarkers<TData extends Record<string, unknown>>(
@@ -60,16 +60,22 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 	groupedSeries!.forEach((group) => {
 		const defaultColor = colorForSeries!(group.series.name);
 		const disabledDots = disabledDotsFor?.(group.series.name);
-		const xFn = resolveAccessor(group.series.x);
-		const yFn = resolveAccessor(group.series.y);
 
 		for (const seg of group.visualSegments) {
 			const dotStyle = seg.styles;
 			markers.push({
 				type: 'dot',
 				data: seg.data,
-				x: xFn,
-				y: yFn,
+				// Forwarded raw (a field key or function, whatever `series.x`/`.y`
+				// is) rather than pre-resolved into a closure — `DotMarker.svelte`
+				// and svelteplot's own `resolve()` already handle a field-key
+				// string per row, and only a literal string (not a function)
+				// lets svelteplot's axis-title auto-inference see the field name.
+				// `keyof TData` is always a real string key in practice (every
+				// row is a plain field-keyed record), just not provably so to
+				// TypeScript here.
+				x: group.series.x as string | ((d: TData) => AxisValue),
+				y: group.series.y as string | ((d: TData) => AxisValue),
 				r: rFn,
 				opacity: opacityFn,
 				symbol: symbolFn,

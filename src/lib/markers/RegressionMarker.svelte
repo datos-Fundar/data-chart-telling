@@ -1,13 +1,14 @@
 <script lang="ts">
-	import { RegressionX, RegressionY } from 'svelteplot';
+	import { isHorizontalFor } from '$lib/markers/orientation';
+	import { RegressionX, RegressionY, usePlot } from 'svelteplot';
 	import type { RegressionMarkerConfig } from '$lib/types/markers/common';
 
 	/**
 	 * Renders one `'regression'` marker — a fitted curve (svelteplot's
 	 * `RegressionX`/`RegressionY`), with a confidence band shown by default
 	 * (svelteplot's own default `confidence` is `0.99`; set `confidence:
-	 * false` to omit it). `isHorizontal` picks `RegressionX` (x is the
-	 * dependent variable) over the default `RegressionY`.
+	 * false` to omit it). `RegressionX` or `RegressionY` is picked from the plot's
+	 * axis scale types (see `isHorizontalFor`).
 	 *
 	 * Confirmed empirically: the band always renders in the same color as
 	 * `stroke`, at a fixed low opacity — its own `fill` prop takes no
@@ -18,10 +19,13 @@
 	 */
 	let { marker }: { marker: RegressionMarkerConfig } = $props();
 
+	const plot = usePlot();
+	const isHorizontal = $derived(isHorizontalFor(plot.scales.x?.type, plot.scales.y?.type));
+
 	const data = $derived(marker.data ?? []);
 </script>
 
-{#if marker.isHorizontal}
+{#if isHorizontal}
 	<RegressionX
 		{data}
 		x={marker.x}

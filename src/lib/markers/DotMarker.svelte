@@ -6,48 +6,39 @@
 		resolveChannelOpacityBuckets
 	} from '$lib/markers/resolveChannelFill';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import type { MarkerProps } from '$lib/types/markers/props';
-	import type { AxisValue, ChannelScalesConfig } from '$lib/types/layout/scales';
-	import type { DotStyle } from '$lib/types/plots/styling';
+	import { resolveAccessor } from '$lib/plots/utils/accessors';
+	import type { DotMarkerConfig } from '$lib/types/markers/common';
 
-	interface Props extends MarkerProps<TData> {
-		x?: AxisValue | ((d: TData) => AxisValue);
-		y?: AxisValue | ((d: TData) => AxisValue);
-		/** Per-row radius, or a constant — overrides `styles.dotRadius` when set. */
-		r?: number | ((d: TData) => number);
-		/** Per-row fill, overriding `styles.dotFill` — ignored when `color` is set. */
-		fill?: (d: TData) => string;
-		/** Continuous value driving a per-dot color ramp — takes priority over `fill`/`styles.dotFill` when set. */
-		color?: (d: TData) => unknown;
-		/** Continuous or categorical value driving a per-dot opacity ramp — takes priority over `styles.dotFillOpacity` when set. */
-		opacity?: (d: TData) => unknown;
-		/** Categorical value driving a per-dot shape — takes priority over `styles.dotSymbol` when set. */
-		symbol?: (d: TData) => unknown;
-		/** The ramp itself — same shape as a plot's own `scales` prop. */
-		scales?: ChannelScalesConfig;
-		styles?: DotStyle;
-	}
+	/**
+	 * Renders one `'dot'` marker. `x`/`y` also accept a literal number/Date
+	 * (every row draws at that fixed position) — used by markers like
+	 * `DeltaMarker`/`PeakMarker` that place a dot at a computed point.
+	 */
+	const { marker }: { marker: DotMarkerConfig } = $props();
 
-	const {
-		data = [],
-		x,
-		y,
-		r: rProp,
-		fill: fillProp,
-		color,
-		opacity: opacityProp,
-		symbol: symbolProp,
-		scales,
-		styles
-	}: Props = $props();
+	const data = $derived((marker.data ?? []) as TData[]);
+	const x = $derived(marker.x);
+	const y = $derived(marker.y);
+	const rProp = $derived(marker.r);
+	const fillProp = $derived(marker.fill);
+	const color = $derived(marker.color ? resolveAccessor(marker.color) : undefined);
+	const opacityProp = $derived(marker.opacity ? resolveAccessor(marker.opacity) : undefined);
+	const symbolProp = $derived(marker.symbol ? resolveAccessor(marker.symbol) : undefined);
+	const scales = $derived(marker.scales);
+	const styles = $derived(marker.styles);
 
 	const cfg = $derived(getConfiguration());
 
-	const xAccessor = $derived(typeof x === 'function' ? x : () => x ?? 0);
-	const yAccessor = $derived(typeof y === 'function' ? y : () => y ?? 0);
-	/** A literal `x`/`y` draws one dot at a fixed point regardless of `data`; an accessor reads its position per row. */
+	/**
+	 * A per-row accessor (a field key string, now that it's forwarded raw, or
+	 * a function) reads its position per row and needs real `data` to do
+	 * that — an empty `data` legitimately means "nothing to plot", not "draw
+	 * one anyway". Only a true literal (a number/Date, or unset) draws one
+	 * dot at a fixed point regardless of `data`.
+	 */
+	const isAccessor = (v: unknown) => typeof v === 'function' || typeof v === 'string';
 	const displayData = $derived(
-		data.length > 0 || typeof x === 'function' || typeof y === 'function' ? data : [{} as TData]
+		data.length > 0 || isAccessor(x) || isAccessor(y) ? data : [{} as TData]
 	);
 
 	const resolvedFill = $derived(resolveChannelFill(displayData, color, scales, cfg));
@@ -78,8 +69,8 @@
 	{#each opacityBuckets as bucket (bucket.value)}
 		<Dot
 			data={bucket.data}
-			x={xAccessor}
-			y={yAccessor}
+			x={x ?? 0}
+			y={y ?? 0}
 			{r}
 			{fill}
 			fillOpacity={bucket.value}
@@ -93,8 +84,8 @@
 {:else}
 	<Dot
 		data={displayData}
-		x={xAccessor}
-		y={yAccessor}
+		x={x ?? 0}
+		y={y ?? 0}
 		{r}
 		{fill}
 		fillOpacity={flatFillOpacity}

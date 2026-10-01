@@ -64,8 +64,8 @@ export const WithCustomStyle: Story = {
 		markers: [
 			{
 				type: 'hover',
-				dotStyle: { dotFill: '#dc2626', dotRadius: 10, dotStrokeOpacity: 1, dotStroke: '#7f1d1d' },
-				fontStyle: { fill: '#7f1d1d', fontWeight: 'bold', fontSize: 14 }
+				dot: { dotFill: '#dc2626', dotRadius: 10, dotStrokeOpacity: 1, dotStroke: '#7f1d1d' },
+				text: { fill: '#7f1d1d', fontWeight: 'bold', fontSize: 14 }
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

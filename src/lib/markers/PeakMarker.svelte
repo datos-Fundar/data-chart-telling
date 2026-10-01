@@ -10,8 +10,8 @@
     xProp?: string;
     mode?: 'max' | 'min';
     label?: string;
-    dotStyle?: DotStyle;
-    textStyle?: FontStyle;
+    dot?: DotStyle;
+    text?: FontStyle;
   }
 
   const {
@@ -20,14 +20,14 @@
     xProp = 'x',
     mode = 'max',
     label,
-    dotStyle,
-    textStyle,
+    dot,
+    text,
     seriesColor,
   }: Props = $props();
 
-  const resolvedDotFill = $derived(dotStyle?.dotFill ?? seriesColor ?? 'currentColor');
-  const resolvedDotStroke = $derived(dotStyle?.dotStroke ?? seriesColor ?? 'currentColor');
-  const resolvedTextFill = $derived(textStyle?.fill ?? seriesColor ?? 'currentColor');
+  const resolvedDotFill = $derived(dot?.dotFill ?? seriesColor ?? 'currentColor');
+  const resolvedDotStroke = $derived(dot?.dotStroke ?? seriesColor ?? 'currentColor');
+  const resolvedTextFill = $derived(text?.fill ?? seriesColor ?? 'currentColor');
 
   const peakPoint = $derived.by(() => {
     if (data.length === 0) return null;
@@ -48,33 +48,33 @@
   const peakY = $derived(peakPoint ? peakPoint[yProp] : null);
 
   const resolvedDotStyle = $derived<DotStyle>({
-    ...dotStyle,
+    ...dot,
     dotFill: resolvedDotFill,
     dotStroke: resolvedDotStroke,
   });
 
   const resolvedTextStyle = $derived<FontStyle>({
-    ...textStyle,
+    ...text,
     fill: resolvedTextFill,
-    fontWeight: textStyle?.fontWeight ?? 'bold',
-    dy: textStyle?.dy ?? -15,
+    fontWeight: text?.fontWeight ?? 'bold',
+    dy: text?.dy ?? -15,
   });
 </script>
 
 {#if peakPoint}
   <DotMarker
-    data={[peakPoint]}
-    x={() => peakX}
-    y={() => peakY}
-    styles={resolvedDotStyle}
+    marker={{ type: 'dot', data: [peakPoint], x: () => peakX, y: () => peakY, styles: resolvedDotStyle }}
   />
   {#if label}
     <TextMarker
-      data={[peakPoint]}
-      x={() => peakX}
-      y={() => peakY}
-      text={label}
-      styles={resolvedTextStyle}
+      marker={{
+        type: 'text',
+        data: [peakPoint],
+        x: () => peakX,
+        y: () => peakY,
+        text: label,
+        styles: resolvedTextStyle,
+      }}
     />
   {/if}
 {/if}

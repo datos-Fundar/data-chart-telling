@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
 import PeakMarker from '$lib/markers/PeakMarker.svelte';
-import DotMarker from '$lib/markers/DotMarker.svelte';
-import TextMarker from '$lib/markers/TextMarker.svelte';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
 import type { LineMarkersConfig } from '$lib/types/markers/line';
@@ -62,13 +60,10 @@ export const WithDotMarker: Story = {
     ],
     markers: [
       {
-        type: 'component',
+        type: 'dot',
         series: 'female',
-        component: DotMarker,
-        props: {
-          x: (d: YearPoint) => d.year,
-          y: (d: YearPoint) => d.value,
-        },
+        x: (d: YearPoint) => d.year,
+        y: (d: YearPoint) => d.value,
       },
     ] satisfies LineMarkersConfig[],
   },
@@ -89,17 +84,14 @@ export const WithTextMarker: Story = {
     ],
     markers: [
       {
-        type: 'component',
+        type: 'text',
         series: 'female',
-        component: TextMarker,
-        props: {
-          x: (d: YearPoint) => d.year,
-          y: (d: YearPoint) => d.value,
-          text: (d: YearPoint) => String(d.value),
-          styles: {
-            dy: -10,
-          }
-        },
+        x: (d: YearPoint) => d.year,
+        y: (d: YearPoint) => d.value,
+        text: (d: YearPoint) => String(d.value),
+        styles: {
+          dy: -10,
+        }
       },
     ] satisfies LineMarkersConfig[],
   },

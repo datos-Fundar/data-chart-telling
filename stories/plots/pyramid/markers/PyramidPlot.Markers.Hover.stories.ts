@@ -119,7 +119,7 @@ export const WithBothAxis: Story = {
 };
 
 /**
- * Custom rule style — `ruleStyle` overrides the crosshair stroke. Here the
+ * Custom rule style — `rule` overrides the crosshair stroke. Here the
  * rule renders in red with a solid line and higher opacity.
  */
 export const WithCustomRuleStyle: Story = {
@@ -135,7 +135,7 @@ export const WithCustomRuleStyle: Story = {
 		markers: [
 			{
 				type: 'hover',
-				ruleStyle: {
+				rule: {
 					stroke: '#e63946',
 					strokeOpacity: 0.7,
 					strokeWidth: 2,
@@ -147,7 +147,7 @@ export const WithCustomRuleStyle: Story = {
 };
 
 /**
- * Label anchored outside the dot — `fontStyle.textAnchor: 'outside'` resolves
+ * Label anchored outside the dot — `text.textAnchor: 'outside'` resolves
  * per point from its signed magnitude: the female (negative x) label sits to
  * the left of its dot, the male (positive x) label sits to the right —
  * mirroring the value labels' own `anchor: 'outside'` convention.
@@ -165,7 +165,7 @@ export const LabelOutsideDot: Story = {
 		markers: [
 			{
 				type: 'hover',
-				fontStyle: {
+				text: {
 					textAnchor: 'outside'
 				}
 			}
@@ -191,7 +191,7 @@ export const SeriesScoped: Story = {
 			{
 				type: 'hover',
 				series: 'Female',
-				fontStyle: {
+				text: {
 					textAnchor: 'outside'
 				}
 			}
@@ -248,7 +248,7 @@ export const FromExplicitSeries: Story = {
 		markers: [
 			{
 				type: 'hover',
-				fontStyle: {
+				text: {
 					textAnchor: 'outside'
 				}
 			}

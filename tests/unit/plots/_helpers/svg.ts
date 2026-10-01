@@ -86,3 +86,88 @@ export function countRegressionMarks(svg: SVGElement): number {
 export function countBollingerMarks(svg: SVGElement): number {
 	return svg.querySelectorAll('g.bollinger').length;
 }
+
+// svelteplot's `AreaX`/`AreaY` put the `area` class directly on the rendered
+// `<path>`, not on a wrapping `<g>` (unlike most other mark kinds) — confirmed
+// empirically. `DifferenceY` reuses the same `Area` component internally, so
+// this also matches a `difference` marker's own paths; use
+// `countDifferencePaths` to scope to just those.
+export function countAreaPaths(svg: SVGElement): number {
+	return svg.querySelectorAll('path.area').length;
+}
+
+// svelteplot's `Density` puts no class of its own on its rendered group —
+// `DensityMarker.svelte` passes an explicit `class="density"` for the same
+// class-based scoping every other marker kind gets from svelteplot itself.
+export function countDensityPaths(svg: SVGElement): number {
+	return svg.querySelectorAll('g.density path').length;
+}
+
+// `BoxY`'s own wrapping class is `box-y`, `BoxX`'s is `box-x` — confirmed
+// empirically, matching `bar-x`/`bar-y`'s own convention.
+export function countBoxMarks(svg: SVGElement): number {
+	return svg.querySelectorAll('g.box-x, g.box-y').length;
+}
+
+export function countHullPaths(svg: SVGElement): number {
+	return svg.querySelectorAll('g.hull path').length;
+}
+
+// `DifferenceY` renders two groups per call — `g.positive.difference` and
+// `g.negative.difference` — each containing a clip-mask copy of `path.area`
+// nested inside its own `<clipPath>` (never rendered, just a mask definition)
+// plus the one actually-visible `path.area` as its own direct child;
+// `>` scopes to just the visible one.
+export function countDifferencePaths(svg: SVGElement): number {
+	return svg.querySelectorAll('g.difference > path.area').length;
+}
+
+export function countArrowMarks(svg: SVGElement): number {
+	return svg.querySelectorAll('g.arrow path').length;
+}
+
+// The class names below are svelteplot's own wrapping `<g>` per mark — confirmed
+// empirically, same as the other counters in this file.
+// Brush's pointer-capture layer is a `Frame` (`rect.frame`) — this matches the
+// plot's own `frame` style too, so callers must use it only with no `styles.frame`;
+// its drawn selection is `rect.brush-rect`, present only while `enabled`.
+export function countBrushSelections(svg: SVGElement): number {
+	return svg.querySelectorAll('rect.brush-rect').length;
+}
+
+export function countDelaunayLinkPaths(svg: SVGElement): number {
+	return svg.querySelectorAll('g.delaunay-link path').length;
+}
+
+export function countDelaunayMeshPaths(svg: SVGElement): number {
+	return svg.querySelectorAll('g.delaunay-mesh path').length;
+}
+
+export function countVoronoiPaths(svg: SVGElement): number {
+	return svg.querySelectorAll('g.voronoi path').length;
+}
+
+export function countVoronoiMeshPaths(svg: SVGElement): number {
+	return svg.querySelectorAll('g.voronoi-mesh path').length;
+}
+
+export function countImageMarks(svg: SVGElement): number {
+	return svg.querySelectorAll('image').length;
+}
+
+export function countRasterMarks(svg: SVGElement): number {
+	// svelteplot's `Raster` draws one bare `<image preserveAspectRatio="none">` (no wrapper class).
+	return svg.querySelectorAll('image[preserveAspectRatio="none"]').length;
+}
+
+export function countTickMarks(svg: SVGElement): number {
+	return svg.querySelectorAll('g.tick-x line, g.tick-y line').length;
+}
+
+export function countTrailPaths(svg: SVGElement): number {
+	return svg.querySelectorAll('g.trail path').length;
+}
+
+export function countWaffleMarks(svg: SVGElement): number {
+	return svg.querySelectorAll('g.waffle-x, g.waffle-y').length;
+}

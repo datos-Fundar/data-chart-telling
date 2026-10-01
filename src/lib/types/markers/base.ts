@@ -9,11 +9,13 @@ import type { DotStyle, FontStyle } from '$lib/types/plots/styling';
  * (`statistics`). Not used by `rule`/`hover`/`component`.
  */
 export type CommonMarkerConfig = {
-	/** Position accessor — field key or function, bound to the plot's shared x/y scale. */
+	/** Scopes the marker to one series: it renders only for that series, using that series' own rows as `data` when `data` is unset. Omit to apply to the plot as a whole. */
+	series?: string;
+	/** Position — field key or per-row function, bound to the plot's shared x/y scale; a literal number/Date places every row at that fixed position. */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	x?: string | ((d: any) => AxisValue);
+	x?: AxisValue | ((d: any) => AxisValue);
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	y?: string | ((d: any) => AxisValue);
+	y?: AxisValue | ((d: any) => AxisValue);
 	/** Interval-position override for `bar`/`rect` — field key, literal number, or function. */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	x1?: string | number | ((d: any) => AxisValue);

@@ -88,7 +88,7 @@ export function buildScale<TData>(
 	if (!sorted && !wantsNice) return sorted;
 	const out = { ...sorted };
 	delete out.grid;
-	if (scale?.labelOrientation === 'vertical') delete out.label;
+	if (scale?.labelOrientation === 'vertical') out.label = false;
 	if (wantsNice) out.nice = true;
 	return out;
 }

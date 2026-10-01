@@ -5,6 +5,7 @@ import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { BarMarkerConfig } from '$lib/types/markers/common';
 import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/bar/state';
 import type { DiscreteGapFill } from '$lib/plots/utils/gaps';
+import type { AxisValue } from '$lib/types/layout/scales';
 
 const GAP_KINDS = ['start', 'middle', 'end'] as const;
 
@@ -21,14 +22,30 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 
 	const segmentMarkers: BarMarkerConfig[] = [];
 	groupedSeries!.forEach((group, seriesIndex) => {
+		// Forwarded raw (a field key or function, whatever `series.x`/`.y` is)
+		// into the marker's own category/value prop — svelteplot's own
+		// `resolve()` already handles a field-key string per row, and only a
+		// literal string (not a function) lets its axis-title auto-inference
+		// see the field name. `keyof TData` is always a real string key in
+		// practice, just not provably so to TypeScript here.
+		const category = group.series.x as string | ((d: TData) => AxisValue);
+		const rawValue = group.series.y as string | ((d: TData) => AxisValue);
+		// Resolved (callable) copies for this phase's own internal math — gap
+		// detection and the stacked layout's running baseline — neither of
+		// which ever becomes a marker's own x/y-scale prop, so staying a
+		// function here doesn't affect axis titles either way.
 		const xFn = resolveAccessor(group.series.x);
 		const yFn = resolveAccessor(group.series.y);
 		const defaultColor = colorForSeries!(group.series.name);
 		const disabledFill = ctx.disabledFillFor?.(group.series.name);
 
 		// Builds one series' visible bar geometry (real or gap-fill data).
+		// `value` is what's forwarded into the marker's own x2/y2 prop for the
+		// simple/grouped layout (raw, for title inference); `valueFn` is the
+		// callable form the stacked layout's running baseline needs to add to.
 		function makeMarker(
 			data: TData[],
+			value: number | string | ((d: TData) => AxisValue),
 			valueFn: (d: TData) => number,
 			styles: BarSegmentStyle
 		): BarMarkerConfig | null {
@@ -44,23 +61,23 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 				const baselineFn = (d: TData) => barLayout!.stackedBaseline(xFn(d), seriesIndex);
 				const topFn = (d: TData) => baselineFn(d) + valueFn(d);
 				if (isHorizontal) {
-					marker.y = xFn;
+					marker.y = category;
 					marker.x1 = baselineFn;
 					marker.x2 = topFn;
 				} else {
-					marker.x = xFn;
+					marker.x = category;
 					marker.y1 = baselineFn;
 					marker.y2 = topFn;
 				}
 			} else {
 				if (isHorizontal) {
-					marker.y = xFn;
+					marker.y = category;
 					marker.x1 = barLayout!.valueBaseline;
-					marker.x2 = valueFn;
+					marker.x2 = value;
 				} else {
-					marker.x = xFn;
+					marker.x = category;
 					marker.y1 = barLayout!.valueBaseline;
-					marker.y2 = valueFn;
+					marker.y2 = value;
 				}
 				if (barLayout!.layout === 'grouped') {
 					const { start, end } = barLayout!.groupInsetFraction(seriesIndex);
@@ -83,7 +100,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 				fillOpacity: disabledFill?.fillOpacity ?? seg.styles.fillOpacity ?? 1
 			};
 			const valueFn = barLayout!.layout === 'stacked' ? (d: TData) => Number(yFn(d)) : yFn;
-			const marker = makeMarker(realData, valueFn, styles);
+			const marker = makeMarker(realData, rawValue, valueFn, styles);
 			if (marker) segmentMarkers.push(marker);
 		}
 
@@ -107,7 +124,12 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 				...d,
 				__gapValue: fillMap.get(d)!.value
 			}));
-			const marker = makeMarker(taggedData, (d) => (d as GapFillRow<TData>).__gapValue, gapStyle);
+			// `__gapValue` is a synthetic field this phase invented, not a real
+			// author-facing one — no field name worth surfacing as a title
+			// either way, so the same resolved accessor covers both `value`
+			// and `valueFn` here.
+			const gapValueFn = (d: TData) => (d as GapFillRow<TData>).__gapValue;
+			const marker = makeMarker(taggedData, gapValueFn, gapValueFn, gapStyle);
 			if (marker) segmentMarkers.push(marker);
 		}
 	});

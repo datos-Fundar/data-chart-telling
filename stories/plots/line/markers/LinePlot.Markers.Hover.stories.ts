@@ -137,7 +137,7 @@ export const WithBothAxis: Story = {
 };
 
 /**
- * Custom rule style — `ruleStyle` overrides the crosshair stroke individually.
+ * Custom rule style — `rule` overrides the crosshair stroke individually.
  * Here the rule is rendered in red with a solid line and higher opacity.
  */
 export const WithCustomRuleStyle: Story = {
@@ -153,7 +153,7 @@ export const WithCustomRuleStyle: Story = {
 		markers: [
 			{
 				type: 'hover',
-				ruleStyle: {
+				rule: {
 					stroke: '#e63946',
 					strokeOpacity: 0.7,
 					strokeWidth: 2,

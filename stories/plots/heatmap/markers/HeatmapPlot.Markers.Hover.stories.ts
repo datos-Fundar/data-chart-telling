@@ -132,7 +132,7 @@ export const ColumnRuleOnly: Story = {
 };
 
 /**
- * Custom rule style — `ruleStyle` overrides the crosshair stroke. Here the
+ * Custom rule style — `rule` overrides the crosshair stroke. Here the
  * rules render in red with a solid line and higher opacity.
  */
 export const WithCustomRuleStyle: Story = {
@@ -142,13 +142,13 @@ export const WithCustomRuleStyle: Story = {
 			{
 				type: 'hover',
 				showLabels: false,
-				ruleStyle: {
+				rule: {
 					stroke: '#e63946',
 					strokeOpacity: 0.3,
 					strokeWidth: 2,
 					strokeDasharray: '6 3'
 				},
-				dotStyle: {
+				dot: {
 					dotFill: '#e63946',
 					dotFillOpacity: 0.2,
 					dotStrokeOpacity: 1,

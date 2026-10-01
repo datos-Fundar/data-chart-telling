@@ -38,7 +38,7 @@ describe('PyramidPlot – markers.hover areaX/areaY', () => {
 			height: 520,
 			...DATA_PROPS,
 			markers: [
-				{ type: 'hover', areaX: true, areaY: true, areaStyle: { fill: '#e11d48' } }
+				{ type: 'hover', areaX: true, areaY: true, area: { fill: '#e11d48' } }
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);

@@ -102,9 +102,9 @@ describe('BarPlot – markers.hover', () => {
 			markers: [
 				{
 					type: 'hover',
-					dotStyle: { dotRadius: 6, dotFill: '#e11d48' },
-					fontStyle: { fontSize: 14 },
-					ruleStyle: { strokeDasharray: '2 2' }
+					dot: { dotRadius: 6, dotFill: '#e11d48' },
+					text: { fontSize: 14 },
+					rule: { strokeDasharray: '2 2' }
 				}
 			] satisfies AxisBasedMarkersConfig[]
 		});
@@ -261,7 +261,7 @@ describe('BarPlot – markers.hover areaX/areaY', () => {
 		});
 	});
 
-	test('renders with the neutral gray default fill when no areaStyle is given', async () => {
+	test('renders with the neutral gray default fill when no area is given', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,
@@ -278,13 +278,13 @@ describe('BarPlot – markers.hover areaX/areaY', () => {
 		expect(area.getAttribute('fill-opacity')).toBe('0.25');
 	});
 
-	test('an areaStyle override changes the rendered fill', async () => {
+	test('an area override changes the rendered fill', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,
 			series: [FEMALE],
 			markers: [
-				{ type: 'hover', areaX: true, areaStyle: { fill: '#e11d48', fillOpacity: 0.5 } }
+				{ type: 'hover', areaX: true, area: { fill: '#e11d48', fillOpacity: 0.5 } }
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
@@ -297,7 +297,7 @@ describe('BarPlot – markers.hover areaX/areaY', () => {
 		expect(area.getAttribute('fill-opacity')).toBe('0.5');
 	});
 
-	test('a theme-level hover.area override applies without a per-marker areaStyle', async () => {
+	test('a theme-level hover.area override applies without a per-marker area', async () => {
 		setConfiguration({ hover: { area: { fill: '#16a34a', fillOpacity: 0.4 } } });
 		const { container } = await render(BarPlot, {
 			width: 400,

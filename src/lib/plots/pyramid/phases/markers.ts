@@ -9,6 +9,7 @@ import type {
 	PyramidPlotCtx,
 	PyramidSeries
 } from '$lib/types/plots/pyramid/state';
+import type { AxisValue } from '$lib/types/layout/scales';
 
 const GAP_KINDS = ['start', 'middle', 'end'] as const;
 
@@ -46,7 +47,13 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 
 	const markers: BarMarkerConfig[] = [];
 	for (const group of groupedSeries!) {
-		const getCategory = resolveAccessor(group.series.x);
+		// Forwarded raw (a field key or function, whatever `series.x` is)
+		// rather than pre-resolved into a closure — svelteplot's own
+		// `resolve()` already handles a field-key string per row, and only a
+		// literal string (not a function) lets its axis-title auto-inference
+		// see the field name. `keyof TData` is always a real string key in
+		// practice, just not provably so to TypeScript here.
+		const category = group.series.x as string | ((d: TData) => AxisValue);
 		const getMagnitude = resolveAccessor(group.series.y);
 		const defaultColor = state.colorForSeries!(group.series.name);
 		const disabledFill = ctx.disabledFillFor?.(group.series.name);
@@ -59,7 +66,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 				role: 'segment',
 				isHorizontal: true,
 				data: realData,
-				y: getCategory,
+				y: category,
 				x1: 0,
 				x2: (d: TData) => valueFor(group.series, d),
 				styles: {
@@ -92,7 +99,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 				role: 'segment',
 				isHorizontal: true,
 				data: taggedData,
-				y: getCategory,
+				y: category,
 				x1: 0,
 				x2: (d: TData) => (d as GapFillRow<TData>).__gapValue,
 				styles: {

@@ -1,7 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import DotMarker from '$lib/markers/DotMarker.svelte';
-import TextMarker from '$lib/markers/TextMarker.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, WEATHER_STATIONS, type WeatherStation } from '../data';
 
@@ -44,14 +42,11 @@ export const WithDotMarker: Story = {
   args: {
     markers: [
       {
-        type: 'geo-component',
-        component: DotMarker,
+        type: 'dot',
         data: WEATHER_STATIONS,
-        props: {
-          x: (d: WeatherStation) => d.lon,
-          y: (d: WeatherStation) => d.lat,
-          styles: { dotFill: '#0891b2', dotRadius: 6 },
-        },
+        x: (d: WeatherStation) => d.lon,
+        y: (d: WeatherStation) => d.lat,
+        styles: { dotFill: '#0891b2', dotRadius: 6 },
       },
     ] satisfies GeoMarkersConfig[],
   },
@@ -62,25 +57,19 @@ export const WithTextMarker: Story = {
   args: {
     markers: [
       {
-        type: 'geo-component',
-        component: DotMarker,
+        type: 'dot',
         data: WEATHER_STATIONS,
-        props: {
-          x: (d: WeatherStation) => d.lon,
-          y: (d: WeatherStation) => d.lat,
-          styles: { dotFill: '#0891b2', dotRadius: 4 },
-        },
+        x: (d: WeatherStation) => d.lon,
+        y: (d: WeatherStation) => d.lat,
+        styles: { dotFill: '#0891b2', dotRadius: 4 },
       },
       {
-        type: 'geo-component',
-        component: TextMarker,
+        type: 'text',
         data: WEATHER_STATIONS,
-        props: {
-          x: (d: WeatherStation) => d.lon,
-          y: (d: WeatherStation) => d.lat,
-          text: (d: WeatherStation) => d.city,
-          styles: { dy: -10, fontWeight: 'bold' },
-        },
+        x: (d: WeatherStation) => d.lon,
+        y: (d: WeatherStation) => d.lat,
+        text: (d: WeatherStation) => d.city,
+        styles: { dy: -10, fontWeight: 'bold' },
       },
     ] satisfies GeoMarkersConfig[],
   },

@@ -158,11 +158,15 @@ export function expandMarkerStatistics<
 	return markers.flatMap((marker) => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const statable = marker as unknown as Extract<AxisBasedMarkersConfig, { statistics?: any }>;
-		if (!statable.statistics?.length || statable.x == null || statable.y == null) return [marker];
+		const { x, y } = statable;
+		// A literal position (number/Date) has no per-row values to derive statistics from.
+		const isAccessor = (v: unknown): v is string | ((d: unknown) => unknown) =>
+			typeof v === 'string' || typeof v === 'function';
+		if (!statable.statistics?.length || !isAccessor(x) || !isAccessor(y)) return [marker];
 		const source: StatisticSource = {
 			data: (statable.data as Record<string, unknown>[] | undefined) ?? fallbackData,
-			x: statable.x,
-			y: statable.y
+			x: x as StatisticSource['x'],
+			y: y as StatisticSource['y']
 		};
 		const derived = statable.statistics.map((stat) => resolveStatisticMarker(source, stat));
 		return [marker, ...derived];

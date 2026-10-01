@@ -1,8 +1,6 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import DotMarker from '$lib/markers/DotMarker.svelte';
-import TextMarker from '$lib/markers/TextMarker.svelte';
 import PeakMarker from '$lib/markers/PeakMarker.svelte';
 import type { LineMarkersConfig } from '$lib/types/markers/line';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
@@ -22,10 +20,10 @@ describe('LinePlot – markers.custom (component)', () => {
       series: [FEMALE],
       markers: [
         {
-          type: 'component',
+          type: 'dot',
           series: 'female',
-          component: DotMarker,
-          props: { x: (d: YearPoint) => d.year, y: (d: YearPoint) => d.value },
+          x: (d: YearPoint) => d.year,
+          y: (d: YearPoint) => d.value
         },
       ] satisfies LineMarkersConfig[],
     });
@@ -40,14 +38,11 @@ describe('LinePlot – markers.custom (component)', () => {
       series: [FEMALE],
       markers: [
         {
-          type: 'component',
+          type: 'text',
           series: 'female',
-          component: TextMarker,
-          props: {
-            x: (d: YearPoint) => d.year,
-            y: (d: YearPoint) => d.value,
-            text: (d: YearPoint) => String(d.value),
-          },
+          x: (d: YearPoint) => d.year,
+          y: (d: YearPoint) => d.value,
+          text: (d: YearPoint) => String(d.value),
         },
       ] satisfies LineMarkersConfig[],
     });
@@ -62,10 +57,10 @@ describe('LinePlot – markers.custom (component)', () => {
       series: [FEMALE, MALE],
       markers: [
         {
-          type: 'component',
+          type: 'dot',
           series: 'female',
-          component: DotMarker,
-          props: { x: (d: YearPoint) => d.year, y: (d: YearPoint) => d.value },
+          x: (d: YearPoint) => d.year,
+          y: (d: YearPoint) => d.value
         },
       ] satisfies LineMarkersConfig[],
     });

@@ -32,13 +32,13 @@ describe('HeatmapPlot – markers.hover areaX/areaY', () => {
 		expect(countHoverAreas(svg)).toBe(0);
 	});
 
-	test('does not crash with an explicit areaStyle', async () => {
+	test('does not crash with an explicit area', async () => {
 		const { container } = await render(HeatmapPlot, {
 			width: 400,
 			height: 300,
 			...DATA_PROPS,
 			markers: [
-				{ type: 'hover', areaX: true, areaY: true, areaStyle: { fill: '#e11d48' } }
+				{ type: 'hover', areaX: true, areaY: true, area: { fill: '#e11d48' } }
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);

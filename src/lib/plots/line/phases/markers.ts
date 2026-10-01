@@ -1,4 +1,3 @@
-import { resolveAccessor } from '$lib/plots/utils/accessors';
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { resolveGapRuns, resolveGapsForSeries } from '$lib/plots/utils/gaps';
 import type { GapPoint } from '$lib/plots/utils/gaps';
@@ -9,6 +8,7 @@ import type { VisualGroup } from '$lib/types/plots/segments/config';
 import type { StrokeStyle, DotStyle } from '$lib/types/plots/styling';
 import type { LineMarkerConfig, DotMarkerConfig } from '$lib/types/markers/common';
 import type { LinePlotState, LinePlotCtx } from '$lib/types/plots/line/state';
+import type { AxisValue } from '$lib/types/layout/scales';
 
 /**
  * Every `'line'` (+ `'dot'`, where a segment's style asks for them) marker
@@ -29,8 +29,14 @@ export function buildLineMarkers<TData extends Record<string, unknown>>(args: {
 		const defaultColor = colorFor(group.series.name);
 		const disabledStroke = disabledStrokeFor(group.series.name);
 		const disabledDots = disabledDotsFor(group.series.name);
-		const xFn = resolveAccessor(group.series.x);
-		const yFn = resolveAccessor(group.series.y);
+		// Forwarded raw (a field key or function, whatever `series.x`/`.y` is)
+		// rather than pre-resolved into a closure — svelteplot's own
+		// `resolve()` already handles a field-key string per row, and only a
+		// literal string (not a function) lets its axis-title auto-inference
+		// see the field name. `keyof TData` is always a real string key in
+		// practice, just not provably so to TypeScript here.
+		const x = group.series.x as string | ((d: TData) => AxisValue);
+		const y = group.series.y as string | ((d: TData) => AxisValue);
 
 		for (const seg of group.visualSegments) {
 			const strokeStyle = seg.styles.stroke;
@@ -38,8 +44,8 @@ export function buildLineMarkers<TData extends Record<string, unknown>>(args: {
 			markers.push({
 				type: 'line',
 				data: seg.data,
-				x: xFn,
-				y: yFn,
+				x,
+				y,
 				styles: {
 					stroke: disabledStroke?.stroke ?? strokeStyle?.stroke ?? defaultColor,
 					strokeWidth:
@@ -55,8 +61,8 @@ export function buildLineMarkers<TData extends Record<string, unknown>>(args: {
 			markers.push({
 				type: 'dot',
 				data: seg.data,
-				x: xFn,
-				y: yFn,
+				x,
+				y,
 				styles: {
 					dotRadius: disabledDots?.dotRadius ?? dotStyle.dotRadius ?? cfg.line.dotRadius,
 					dotFill: disabledDots?.dotFill ?? dotStyle.dotFill ?? strokeStyle?.stroke ?? defaultColor,

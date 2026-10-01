@@ -35,7 +35,7 @@
     /** Narrowed to just the fields this component reads — `HoverMarkerConfig` also carries routing/scoping fields (`series`/`scope`/`strategy`/`sync`) it has no use for. */
     marker: Pick<
       HoverMarkerConfig,
-      'ruleX' | 'ruleY' | 'areaX' | 'areaY' | 'showLabels' | 'format' | 'ruleStyle' | 'areaStyle' | 'dotStyle' | 'fontStyle'
+      'ruleX' | 'ruleY' | 'areaX' | 'areaY' | 'showLabels' | 'format' | 'rule' | 'area' | 'dot' | 'text'
     >;
     activePoint?: HoverDisplayPoint | null;
     impliesCrosshairX?: boolean;
@@ -90,10 +90,10 @@
   const areaY = $derived(marker.areaY === true ? (activePoint?.y ?? null) : null);
   const showLabels = $derived(marker.showLabels ?? true);
   const format = $derived(marker.format);
-  const ruleStyle = $derived(marker.ruleStyle);
-  const areaStyle = $derived({ ...cfg.hover.area, ...marker.areaStyle });
-  const dotStyle = $derived(marker.dotStyle);
-  const fontStyle = $derived(marker.fontStyle);
+  const ruleStyle = $derived(marker.rule);
+  const areaStyle = $derived({ ...cfg.hover.area, ...marker.area });
+  const dotStyle = $derived(marker.dot);
+  const fontStyle = $derived(marker.text);
 
   /** Explicit style wins; otherwise fall back to the series color, then the point's own resolved color. */
   const resolveColor = (explicit: string | undefined, point: HoverDisplayPoint) =>
@@ -104,14 +104,14 @@
   const dotRadius = $derived(dotStyle?.dotRadius ?? cfg.hover.dot.dotRadius ?? 5);
 
   /**
-   * Resolves `fontStyle.textAnchor: 'outside'` into a per-point anchor +
+   * Resolves `text.textAnchor: 'outside'` into a per-point anchor +
    * offset, mirroring the value-label `'outside'` anchor's own left/right
    * split (see pyramid/bar's own `ValueAnchor` handling): a positive `x`
    * anchors `'start'` and nudges right, a negative `x` anchors `'end'` and
    * nudges left — so a diverging mark's label sits on the side of the dot
    * away from zero, on whichever side that dot itself landed. Only
    * meaningful when the point's `x` is numeric (e.g. pyramid's magnitude
-   * axis); anything else falls through to the plain `fontStyle` unchanged.
+   * axis); anything else falls through to the plain `text` style unchanged.
    *
    * Also overrides `cfg.hover.font`'s default `dy: -18` (meant for a label
    * floating *above* the dot) back to vertically centered, and clears the
@@ -168,13 +168,27 @@
 
 {#if ruleX != null}
   <g transform="translate({activePoint?.dx ?? 0}, {activePoint?.dy ?? 0})">
-    <RuleMarker axis="x" value={ruleX} styles={{ ...cfg.hover.rule, ...ruleStyle }} />
+    <RuleMarker
+      marker={{
+        type: 'rule',
+        axis: 'x',
+        value: ruleX,
+        styles: { ...cfg.hover.rule, ...ruleStyle }
+      }}
+    />
   </g>
 {/if}
 
 {#if ruleY != null}
   <g transform="translate({activePoint?.dx ?? 0}, {activePoint?.dy ?? 0})">
-    <RuleMarker axis="y" value={ruleY} styles={{ ...cfg.hover.rule, ...ruleStyle }} />
+    <RuleMarker
+      marker={{
+        type: 'rule',
+        axis: 'y',
+        value: ruleY,
+        styles: { ...cfg.hover.rule, ...ruleStyle }
+      }}
+    />
   </g>
 {/if}
 
@@ -184,14 +198,17 @@
          by x/y alone (e.g. BarPlot's 'grouped' layout) — see HoverDisplayPoint.dx/dy. -->
     <g transform="translate({point.dx ?? 0}, {point.dy ?? 0})">
       <DotMarker
-        data={[point]}
-        x={(d) => d.x}
-        y={(d) => d.y}
-        styles={{
-          ...cfg.hover.dot,
-          ...dotStyle,
-          dotFill: resolveColor(dotStyle?.dotFill, point),
-          dotStroke: resolveColor(dotStyle?.dotStroke, point),
+        marker={{
+          type: 'dot',
+          data: [point],
+          x: (d) => d.x,
+          y: (d) => d.y,
+          styles: {
+            ...cfg.hover.dot,
+            ...dotStyle,
+            dotFill: resolveColor(dotStyle?.dotFill, point),
+            dotStroke: resolveColor(dotStyle?.dotStroke, point),
+          },
         }}
       />
     </g>
@@ -200,11 +217,14 @@
     {#each data as point (`${point.series ?? ''}_${point.x}_${point.y}`)}
       <g transform="translate({point.dx ?? 0}, {point.dy ?? 0})">
         <TextMarker
-          data={[point]}
-          x={(d) => d.x}
-          y={(d) => d.y}
-          text={(d) => format ? format(d) : (d.label ?? '')}
-          styles={resolveFontStyle(point)}
+          marker={{
+            type: 'text',
+            data: [point],
+            x: (d: HoverDisplayPoint) => d.x,
+            y: (d: HoverDisplayPoint) => d.y,
+            text: (d: HoverDisplayPoint) => (format ? format(d) : (d.label ?? '')),
+            styles: resolveFontStyle(point),
+          }}
         />
       </g>
     {/each}

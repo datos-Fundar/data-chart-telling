@@ -9,6 +9,22 @@
 	import RectMarker from '$lib/markers/RectMarker.svelte';
 	import RegressionMarker from '$lib/markers/RegressionMarker.svelte';
 	import BollingerMarker from '$lib/markers/BollingerMarker.svelte';
+	import AreaMarker from '$lib/markers/AreaMarker.svelte';
+	import DensityMarker from '$lib/markers/DensityMarker.svelte';
+	import BoxMarker from '$lib/markers/BoxMarker.svelte';
+	import HullMarker from '$lib/markers/HullMarker.svelte';
+	import DifferenceMarker from '$lib/markers/DifferenceMarker.svelte';
+	import ArrowMarker from '$lib/markers/ArrowMarker.svelte';
+	import BrushMarker from '$lib/markers/BrushMarker.svelte';
+	import DelaunayLinkMarker from '$lib/markers/DelaunayLinkMarker.svelte';
+	import DelaunayMeshMarker from '$lib/markers/DelaunayMeshMarker.svelte';
+	import VoronoiMarker from '$lib/markers/VoronoiMarker.svelte';
+	import VoronoiMeshMarker from '$lib/markers/VoronoiMeshMarker.svelte';
+	import ImageMarker from '$lib/markers/ImageMarker.svelte';
+	import RasterMarker from '$lib/markers/RasterMarker.svelte';
+	import TickMarker from '$lib/markers/TickMarker.svelte';
+	import TrailMarker from '$lib/markers/TrailMarker.svelte';
+	import WaffleMarker from '$lib/markers/WaffleMarker.svelte';
 	import DotMarker from '$lib/markers/DotMarker.svelte';
 	import TextMarker from '$lib/markers/TextMarker.svelte';
 	import RuleMarker from '$lib/markers/RuleMarker.svelte';
@@ -24,9 +40,7 @@
 	import ContourClipMarker from '$lib/markers/ContourClipMarker.svelte';
 	import InsetMarker from '$lib/markers/inset/InsetMarker.svelte';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import { resolveAccessor } from '$lib/plots/utils/accessors';
 	import type { Series } from '$lib/types/plots/data/common';
-	import type { HoverMarkerConfig, CustomComponentMarkerConfig } from '$lib/types/markers/common';
 	import type { MarkerConfig } from '$lib/types/markers/all';
 	import type { TooltipAnchorX, TooltipAnchorY } from '$lib/types/layout/tooltip';
 	import type { HoverController } from '$lib/layout/tooltip/controller.svelte';
@@ -90,28 +104,20 @@
 
 	const cfg = $derived(getConfiguration());
 
-	const geometryMarkers = $derived(
-		markers.filter(
-			(marker) =>
-				!(
-					(marker.type === 'hover' || marker.type === 'component') &&
-					'series' in marker &&
-					marker.series
-				)
-		)
-	);
+	const scopedSeriesOf = (marker: MarkerConfig): string | undefined =>
+		'series' in marker && typeof marker.series === 'string' && marker.series
+			? marker.series
+			: undefined;
+
+	const geometryMarkers = $derived(markers.filter((marker) => !scopedSeriesOf(marker)));
 
 	const scopedMarkersByName = $derived.by(() => {
-		const map = new SvelteMap<string, (HoverMarkerConfig | CustomComponentMarkerConfig)[]>();
+		const map = new SvelteMap<string, MarkerConfig[]>();
 		for (const marker of markers) {
-			if (
-				(marker.type === 'hover' || marker.type === 'component') &&
-				'series' in marker &&
-				marker.series
-			) {
-				if (!map.has(marker.series)) map.set(marker.series, []);
-				map.get(marker.series)!.push(marker);
-			}
+			const name = scopedSeriesOf(marker);
+			if (!name) continue;
+			if (!map.has(name)) map.set(name, []);
+			map.get(name)!.push(marker);
 		}
 		return map;
 	});
@@ -126,56 +132,57 @@
 	}
 </script>
 
-{#each geometryMarkers as marker, i (markerKey(marker, i))}
+{#snippet renderMarker(marker: MarkerConfig, rows: TData[] | TSeries[])}
 	{#if marker.type === 'bar'}
-		<BarMarker marker={{ ...marker, data: marker.data ?? data }} />
+		<BarMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'line'}
-		<LineMarker marker={{ ...marker, data: marker.data ?? data }} />
+		<LineMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'cell'}
-		<CellMarker marker={{ ...marker, data: marker.data ?? data }} />
+		<CellMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'rect'}
-		<RectMarker marker={{ ...marker, data: marker.data ?? data }} />
+		<RectMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'regression'}
-		<RegressionMarker marker={{ ...marker, data: marker.data ?? data }} />
+		<RegressionMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'bollinger'}
-		<BollingerMarker marker={{ ...marker, data: marker.data ?? data }} />
+		<BollingerMarker marker={{ ...marker, data: marker.data ?? rows }} />
+	{:else if marker.type === 'area'}
+		<AreaMarker marker={{ ...marker, data: marker.data ?? rows }} />
+	{:else if marker.type === 'density'}
+		<DensityMarker marker={{ ...marker, data: marker.data ?? rows }} />
+	{:else if marker.type === 'box'}
+		<BoxMarker marker={{ ...marker, data: marker.data ?? rows }} />
+	{:else if marker.type === 'hull'}
+		<HullMarker marker={{ ...marker, data: marker.data ?? rows }} />
+	{:else if marker.type === 'difference'}
+		<DifferenceMarker marker={{ ...marker, data: marker.data ?? rows }} />
+	{:else if marker.type === 'arrow'}
+		<ArrowMarker marker={{ ...marker, data: marker.data ?? rows }} />
+	{:else if marker.type === 'brush'}
+		<BrushMarker {marker} />
+	{:else if marker.type === 'delaunayLink'}
+		<DelaunayLinkMarker marker={{ ...marker, data: marker.data ?? rows }} />
+	{:else if marker.type === 'delaunayMesh'}
+		<DelaunayMeshMarker marker={{ ...marker, data: marker.data ?? rows }} />
+	{:else if marker.type === 'voronoi'}
+		<VoronoiMarker marker={{ ...marker, data: marker.data ?? rows }} />
+	{:else if marker.type === 'voronoiMesh'}
+		<VoronoiMeshMarker marker={{ ...marker, data: marker.data ?? rows }} />
+	{:else if marker.type === 'image'}
+		<ImageMarker marker={{ ...marker, data: marker.data ?? rows }} />
+	{:else if marker.type === 'raster'}
+		<RasterMarker marker={{ ...marker, data: marker.data ?? rows }} />
+	{:else if marker.type === 'tick'}
+		<TickMarker marker={{ ...marker, data: marker.data ?? rows }} />
+	{:else if marker.type === 'trail'}
+		<TrailMarker marker={{ ...marker, data: marker.data ?? rows }} />
+	{:else if marker.type === 'waffle'}
+		<WaffleMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'dot'}
-		<DotMarker
-			data={marker.data ?? data}
-			x={marker.x != null ? resolveAccessor(marker.x) : undefined}
-			y={marker.y != null ? resolveAccessor(marker.y) : undefined}
-			r={typeof marker.r === 'number' || marker.r == null ? marker.r : resolveAccessor(marker.r)}
-			fill={marker.fill}
-			color={marker.color ? resolveAccessor(marker.color) : undefined}
-			opacity={marker.opacity ? resolveAccessor(marker.opacity) : undefined}
-			symbol={marker.symbol ? resolveAccessor(marker.symbol) : undefined}
-			scales={marker.scales ?? channelScales}
-			styles={marker.styles}
-		/>
+		<DotMarker marker={{ ...marker, data: marker.data ?? rows, scales: marker.scales ?? channelScales }} />
 	{:else if marker.type === 'text'}
-		<TextMarker
-			data={marker.data ?? data}
-			x={marker.x != null ? resolveAccessor(marker.x) : undefined}
-			y={marker.y != null ? resolveAccessor(marker.y) : undefined}
-			text={marker.text}
-			styles={marker.styles}
-		/>
+		<TextMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'rule'}
-		<RuleMarker
-			axis={marker.axis}
-			data={marker.data}
-			value={marker.value}
-			x1={marker.x1}
-			x2={marker.x2}
-			y1={marker.y1}
-			y2={marker.y2}
-			inset={marker.inset}
-			insetTop={marker.insetTop}
-			insetBottom={marker.insetBottom}
-			insetLeft={marker.insetLeft}
-			insetRight={marker.insetRight}
-			styles={marker.styles}
-		/>
+		<RuleMarker {marker} />
 	{:else if marker.type === 'geo'}
 		<GeoFeaturesMarker {marker} />
 	{:else if marker.type === 'graticule'}
@@ -212,7 +219,7 @@
 	{:else if marker.type === 'component'}
 		<marker.component {...marker.props} data={marker.data ?? seriesData} />
 	{:else if marker.type === 'geo-component'}
-		<marker.component {...marker.props} data={marker.data ?? data} />
+		<marker.component {...marker.props} data={marker.data ?? rows} />
 	{:else if marker.type === 'hover'}
 		<HoverMarker
 			{marker}
@@ -227,6 +234,10 @@
 	{:else if marker.type === 'delta'}
 		<DeltaMarker {marker} data={seriesData} />
 	{/if}
+{/snippet}
+
+{#each geometryMarkers as marker, i (markerKey(marker, i))}
+	{@render renderMarker(marker, data)}
 {/each}
 
 {#each scopedGroups as group (group.name)}
@@ -279,6 +290,8 @@
 					seriesColor={group.segments[0]?.color ?? group.color}
 				/>
 			{/if}
+		{:else}
+			{@render renderMarker(marker, group.data)}
 		{/if}
 	{/each}
 {/each}

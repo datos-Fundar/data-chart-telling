@@ -141,7 +141,7 @@ export const WithBothAxis: Story = {
 };
 
 /**
- * Custom rule style — `ruleStyle` overrides the crosshair stroke individually.
+ * Custom rule style — `rule` overrides the crosshair stroke individually.
  * Here the rule is rendered in red with a solid line and higher opacity.
  */
 export const WithCustomRuleStyle: Story = {
@@ -157,7 +157,7 @@ export const WithCustomRuleStyle: Story = {
 		markers: [
 			{
 				type: 'hover',
-				ruleStyle: {
+				rule: {
 					stroke: '#e63946',
 					strokeOpacity: 0.7,
 					strokeWidth: 2,
@@ -191,7 +191,7 @@ export const TwoSeries: Story = {
 		markers: [
 			{
 				type: 'hover',
-				fontStyle: {
+				text: {
 					dy: -10
 				}
 			}
@@ -244,7 +244,7 @@ export const FromGroupedData: Story = {
 		markers: [
 			{
 				type: 'hover',
-				fontStyle: {
+				text: {
 					dy: -10
 				}
 			}
@@ -367,7 +367,7 @@ export const StackedSeries: Story = {
  * own row (its band width plus 2px), spanning the full plot width,
  * replacing the thin crosshair rule with a highlight closer to how a
  * hovered row often reads in a horizontal bar chart. Defaults to a neutral
- * gray, overridable via `areaStyle` (see `WithCustomHighlightArea`) or the
+ * gray, overridable via `area` (see `WithCustomHighlightArea`) or the
  * `hover.area` theme config.
  */
 export const WithHighlightArea: Story = {
@@ -393,7 +393,7 @@ export const WithHighlightArea: Story = {
 };
 
 /**
- * `areaStyle` overrides the highlight area's color/opacity; its thickness is
+ * `area` overrides the highlight area's color/opacity; its thickness is
  * always sized to the hovered bar's own width plus 2px. `areaX`/`areaY` and
  * the crosshair rule are independent and can be combined; here the rule is
  * turned off so the area is the only highlight.
@@ -413,7 +413,7 @@ export const WithCustomHighlightArea: Story = {
 				type: 'hover',
 				areaX: true,
 				ruleX: false,
-				areaStyle: {
+				area: {
 					fill: '#0891b2',
 					fillOpacity: 0.18
 				}
