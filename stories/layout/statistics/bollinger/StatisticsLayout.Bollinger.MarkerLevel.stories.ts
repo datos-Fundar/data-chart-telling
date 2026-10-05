@@ -44,16 +44,17 @@ type Story = StoryObj<typeof meta>;
 /** The plot's own top-level `statistics` bands the *close* line (default color); a hand-authored `dot` marker, in red, tracks the daily *open* price and derives its own separate band from that data. */
 export const MarkerLevel: Story = {
 	args: {
-		statistics: [{
-			type: 'bollinger',
-			n: 5,
-			k: 2,
-			styles: { stroke: '#4f46e5', bandFill: '#4f46e5' }
-		}],
+		statistics: [
+			{
+				type: 'bollinger',
+				n: 5,
+				k: 2,
+				styles: { stroke: '#4f46e5', bandFill: '#4f46e5' }
+			}
+		],
 		markers: [
 			{
 				type: 'dot',
-				data: stockData,
 				x: 'day',
 				y: 'open',
 				r: 2.5,

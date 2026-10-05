@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { LineMarkersConfig } from '$lib/types/markers/line';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { FEMALE_LIFE_EXPECTANCY } from '../../../../../stories/plots/line/data';
 import { waitForSvg } from '../../_helpers/svg';
 
@@ -13,7 +13,7 @@ describe('LinePlot – markers.rules', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'rule', axis: 'x', value: 2016 }] satisfies LineMarkersConfig[],
+      markers: [{ type: 'rule', axis: 'x', value: 2016 }] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-x line').length).toBe(1);
@@ -24,7 +24,7 @@ describe('LinePlot – markers.rules', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'rule', axis: 'y', value: 80 }] satisfies LineMarkersConfig[],
+      markers: [{ type: 'rule', axis: 'y', value: 80 }] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-y line').length).toBe(1);
@@ -38,7 +38,7 @@ describe('LinePlot – markers.rules', () => {
       markers: [
         { type: 'rule', axis: 'x', value: 2010 },
         { type: 'rule', axis: 'x', value: 2018 },
-      ] satisfies LineMarkersConfig[],
+      ] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-x line').length).toBe(2);
@@ -52,7 +52,7 @@ describe('LinePlot – markers.rules', () => {
       markers: [
         { type: 'rule', axis: 'x', value: 2016 },
         { type: 'rule', axis: 'y', value: 80 },
-      ] satisfies LineMarkersConfig[],
+      ] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-x line').length).toBe(1);
@@ -64,7 +64,7 @@ describe('LinePlot – markers.rules', () => {
       width: 400,
       height: 300,
       series: [FEMALE],
-      markers: [{ type: 'rule', axis: 'x', value: 2016, styles: { stroke: '#e11d48' } }] satisfies LineMarkersConfig[],
+      markers: [{ type: 'rule', axis: 'x', value: 2016, styles: { stroke: '#e11d48' } }] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     const line = svg.querySelector('g.rule-x line');
@@ -84,7 +84,7 @@ describe('LinePlot – markers.rules', () => {
       series: [FEMALE],
       markers: [
         { type: 'rule', axis: 'x', data: [{ yr: 2010 }, { yr: 2014 }, { yr: 2018 }], value: 'yr' },
-      ] satisfies LineMarkersConfig[],
+      ] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     expect(svg.querySelectorAll('g.rule-x line').length).toBe(3);
@@ -96,7 +96,7 @@ describe('LinePlot – markers.rules', () => {
         width: 400,
         height: 300,
         series: [FEMALE],
-        markers: [{ type: 'rule', axis: 'x', value: 2016 }] satisfies LineMarkersConfig[],
+        markers: [{ type: 'rule', axis: 'x', value: 2016 }] satisfies AxisBasedMarkersConfig[],
       })
     ).container;
     const bounded = (
@@ -106,7 +106,7 @@ describe('LinePlot – markers.rules', () => {
         series: [FEMALE],
         markers: [
           { type: 'rule', axis: 'x', value: 2016, y1: 76, y2: 78 },
-        ] satisfies LineMarkersConfig[],
+        ] satisfies AxisBasedMarkersConfig[],
       })
     ).container;
     const fullLine = (await waitForSvg(full)).querySelector('g.rule-x line')!;
@@ -122,7 +122,7 @@ describe('LinePlot – markers.rules', () => {
         width: 400,
         height: 300,
         series: [FEMALE],
-        markers: [{ type: 'rule', axis: 'y', value: 80 }] satisfies LineMarkersConfig[],
+        markers: [{ type: 'rule', axis: 'y', value: 80 }] satisfies AxisBasedMarkersConfig[],
       })
     ).container;
     const inset = (
@@ -130,7 +130,7 @@ describe('LinePlot – markers.rules', () => {
         width: 400,
         height: 300,
         series: [FEMALE],
-        markers: [{ type: 'rule', axis: 'y', value: 80, inset: 60 }] satisfies LineMarkersConfig[],
+        markers: [{ type: 'rule', axis: 'y', value: 80, inset: 60 }] satisfies AxisBasedMarkersConfig[],
       })
     ).container;
     const fullLine = (await waitForSvg(full)).querySelector('g.rule-y line')!;

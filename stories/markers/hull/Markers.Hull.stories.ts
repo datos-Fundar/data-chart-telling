@@ -35,7 +35,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** A single hull wrapping one cluster of points — here, scoped to the `Americas` series (one per `color: 'region'`) so it reuses the plot's own data. */
+/** A single hull wrapping one cluster of points, scoped to the `Americas` series. Its fill and stroke take that series' color. */
 export const Basic: Story = {
 	args: {
 		markers: [
@@ -44,17 +44,16 @@ export const Basic: Story = {
 				series: 'Americas',
 				x: 'gdpPerCapita',
 				y: 'lifeExpectancy',
-				styles: { fill: '#4f46e5', fillOpacity: 0.12, stroke: '#4f46e5' }
+				styles: { fillOpacity: 0.12 }
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
 /**
- * Grouping by `grouping` (here, `region`) draws one hull per group instead
- * of a single hull over every point. `color: 'region'` matches each hull's
- * fill/stroke to the same `region` colors the scatter points above already
- * use — the theme's shared `cfg.palette`, not a separate default scheme.
+ * The plot's `color: 'region'` splits the hull per region: each hull inherits
+ * that grouping and takes its region's palette color for fill and stroke, the
+ * same colors the scatter points use. No setting on the marker itself.
  */
 export const GroupedByRegion: Story = {
 	args: {
@@ -63,8 +62,6 @@ export const GroupedByRegion: Story = {
 				type: 'hull',
 				x: 'gdpPerCapita',
 				y: 'lifeExpectancy',
-				grouping: 'region',
-				color: 'region',
 				styles: { fillOpacity: 0.1 }
 			}
 		] satisfies AxisBasedMarkersConfig[]

@@ -53,7 +53,6 @@ export const Default: Story = {
 		markers: [
 			{
 				type: 'cell',
-				data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
 				x: (d) => (d as ProvinceSexCell).province,
 				y: (d) => (d as ProvinceSexCell).sex,
 				fill: () => '#e5e7eb',
@@ -70,7 +69,6 @@ export const CustomScheme: Story = {
 		markers: [
 			{
 				type: 'cell',
-				data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
 				x: (d) => (d as ProvinceSexCell).province,
 				y: (d) => (d as ProvinceSexCell).sex,
 				fill: () => '#e5e7eb',

@@ -144,7 +144,6 @@ export const Faceted: Story = {
 	args: {
 		title: 'GDP vs. Employment by region',
 		subtitle: 'Faceted by region',
-		data: TIME_SERIES,
 		color: 'metric' as keyof SeriesPoint,
 		legend: [
 			{

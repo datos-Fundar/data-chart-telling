@@ -4,7 +4,7 @@
 	import TextMarker from './TextMarker.svelte';
 	import { resolveXDeltas, resolveYDeltas } from '$lib/utils/delta';
 	import type { Series } from '$lib/types/plots/data/common';
-	import type { DeltaMarkerConfig } from '$lib/types/markers/line';
+	import type { DeltaMarkerConfig } from '$lib/types/markers/axis/delta';
 
 	let { marker, data = [] }: { marker: DeltaMarkerConfig; data?: Series<TData>[] } = $props();
 

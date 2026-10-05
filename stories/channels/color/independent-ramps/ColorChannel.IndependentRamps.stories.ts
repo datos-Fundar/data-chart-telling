@@ -3,7 +3,7 @@ import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
 import { renderSource } from '../../../common/docsSource';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import type { DotMarkerConfig } from '$lib/types/markers/base';
+import type { DotMarkerConfig } from '$lib/types/markers/basic';
 import { WORLD_COUNTRIES, WEATHER_STATIONS, type WorldCountryProps } from '../../../plots/geo/data';
 import { COUNTRIES } from '../../../plots/scatter/data';
 

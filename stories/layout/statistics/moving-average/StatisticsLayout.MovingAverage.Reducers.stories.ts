@@ -37,7 +37,7 @@ type Story = StoryObj<typeof meta>;
 /** `reduce: 'median'` — more robust to single-day spikes than the default `'mean'`. */
 export const Median: Story = {
 	args: {
-		statistics: [{ type: 'movingAverage', k: 5, reduce: 'median', styles: { stroke: '#7c3aed' } }]
+		statistics: [{ type: 'movingAverage', k: 5, reduce: 'median' }]
 	}
 };
 

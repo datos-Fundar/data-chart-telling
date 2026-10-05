@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { LineMarkersConfig } from '$lib/types/markers/line';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { FEMALE_LIFE_EXPECTANCY, MALE_LIFE_EXPECTANCY, LIFE_EXPECTANCY } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -61,7 +61,7 @@ export const Basic: Story = {
 			{
 				type: 'hover'
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -84,7 +84,7 @@ export const WithoutLabels: Story = {
 				type: 'hover',
 				showLabels: false
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -107,7 +107,7 @@ export const WithoutRule: Story = {
 				type: 'hover',
 				ruleX: false
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -132,7 +132,7 @@ export const WithBothAxis: Story = {
 				ruleX: true,
 				ruleY: true
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -160,7 +160,7 @@ export const WithCustomRuleStyle: Story = {
 					strokeDasharray: '6 3'
 				}
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -188,7 +188,7 @@ export const TwoSeries: Story = {
 			{
 				type: 'hover'
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -220,7 +220,7 @@ export const SeriesScoped: Story = {
 				type: 'hover',
 				series: 'female'
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -238,7 +238,7 @@ export const FromGroupedData: Story = {
 			{
 				type: 'hover'
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -257,6 +257,6 @@ export const GroupedSeriesScoped: Story = {
 				type: 'hover',
 				series: 'female'
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };

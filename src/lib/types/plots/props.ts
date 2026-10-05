@@ -3,6 +3,7 @@ import type { Segment } from '$lib/types/plots/segments/config';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { GeoScalesConfig } from '$lib/types/layout/coordinates';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
+import type { MarkerTransform } from '$lib/types/transforms';
 
 /** The `styles` prop accepted by every plot kind — its own
  * styles shape ({@link AxisBasedStylesConfig}, `GeoStylesConfig`, …). */
@@ -25,10 +26,10 @@ export type SegmentsConfig<TStyle> = Record<string, Segment<TStyle>[]>;
  * number pins it exactly.
  */
 export type MarginConfig = Partial<{
-  top: number | 'auto';
-  right: number | 'auto';
-  bottom: number | 'auto';
-  left: number | 'auto'
+	top: number | 'auto';
+	right: number | 'auto';
+	bottom: number | 'auto';
+	left: number | 'auto';
 }>;
 
 /**
@@ -37,10 +38,13 @@ export type MarginConfig = Partial<{
  * `facetId` identifies the originating facet (`''` when not faceted).
  * Presence of this object is what turns hovering on.
  */
-export type TooltipConfig<TRow extends Record<string, unknown>> = Omit<TooltipOptions<TRow>, 'format' | 'sync'> & {
-  format: (row: TRow) => string;
-  sync: boolean;
-  facetId: string;
+export type TooltipConfig<TRow extends Record<string, unknown>> = Omit<
+	TooltipOptions<TRow>,
+	'format' | 'sync'
+> & {
+	format: (row: TRow) => string;
+	sync: boolean;
+	facetId: string;
 };
 
 /** How a pointer event resolves to a candidate point: `'nearest'` (closest within a distance threshold) or `'contains'` (whichever candidate's own rendered shape contains the cursor). */
@@ -48,23 +52,23 @@ export type PointMatchingStrategy = 'nearest' | 'contains';
 
 /** `BasePlotLayout`'s single `hover` prop — every plot kind's own resolved hover/tooltip wiring. */
 export type HoverConfig<TRow extends Record<string, unknown>> = {
-  /** Whether the pointer/hover/tooltip machinery should mount at all. */
-  active: boolean;
-  /** Candidate points hover matching searches against. */
-  points: HoverPoint<TRow>[];
-  /** Short label drawn next to the highlight dot (e.g. the value). */
-  label: (row: TRow) => string;
-  /** Resolved hover strategy for the *local* hover store (ignored once a shared store is in scope). */
-  strategy?: HoverStrategy;
-  /** Resolved sync flag for the *local* hover store (ignored once a shared store is in scope). */
-  sync?: boolean;
-  tooltip?: TooltipConfig<TRow>;
-  /** When it returns `true`, that pointer event is treated as a leave instead of a move — lets a nested layout opt part of the plot out of hover matching. */
-  exclude?: (e: PointerEvent) => boolean;
-  /** How to resolve a pointer event to a candidate point — see {@link PointMatchingStrategy}. Defaults to `'nearest'`. */
-  pointMatching?: PointMatchingStrategy;
-  /** Forces the crosshair rule(s) a `hover` marker draws off entirely, overriding whatever `strategy` implies. */
-  crosshair?: boolean;
+	/** Whether the pointer/hover/tooltip machinery should mount at all. */
+	active: boolean;
+	/** Candidate points hover matching searches against. */
+	points: HoverPoint<TRow>[];
+	/** Short label drawn next to the highlight dot (e.g. the value). */
+	label: (row: TRow) => string;
+	/** Resolved hover strategy for the *local* hover store (ignored once a shared store is in scope). */
+	strategy?: HoverStrategy;
+	/** Resolved sync flag for the *local* hover store (ignored once a shared store is in scope). */
+	sync?: boolean;
+	tooltip?: TooltipConfig<TRow>;
+	/** When it returns `true`, that pointer event is treated as a leave instead of a move — lets a nested layout opt part of the plot out of hover matching. */
+	exclude?: (e: PointerEvent) => boolean;
+	/** How to resolve a pointer event to a candidate point — see {@link PointMatchingStrategy}. Defaults to `'nearest'`. */
+	pointMatching?: PointMatchingStrategy;
+	/** Forces the crosshair rule(s) a `hover` marker draws off entirely, overriding whatever `strategy` implies. */
+	crosshair?: boolean;
 };
 
 /**
@@ -73,8 +77,8 @@ export type HoverConfig<TRow extends Record<string, unknown>> = {
  * `BasePlotProps`'s `TScales` to exactly the one that applies to it.
  */
 export type ScalesConfig<TData = Record<string, unknown>> =
-  | AxisBasedScalesConfig<TData>
-  | GeoScalesConfig;
+	| AxisBasedScalesConfig<TData>
+	| GeoScalesConfig;
 
 /**
  * The shared prop bag every plot component accepts, parameterized over
@@ -84,22 +88,23 @@ export type ScalesConfig<TData = Record<string, unknown>> =
  * defaults to `undefined` — only `GeoPlot` instantiates it.
  */
 export type BasePlotProps<
-  TDataContract,
-  TRow extends Record<string, unknown>,
-  TStyles extends object,
-  TSegmentStyle extends object,
-  TMarker,
-  TScales extends ScalesConfig<TRow>,
-  TCoordinates = undefined,
+	TDataContract,
+	TRow extends Record<string, unknown>,
+	TStyles extends object,
+	TSegmentStyle extends object,
+	TMarker,
+	TScales extends ScalesConfig<TRow>,
+	TCoordinates = undefined
 > = TDataContract & {
-  width: number;
-  height: number;
-  styles?: StylesConfig<TStyles>;
-  segments?: SegmentsConfig<TSegmentStyle>;
-  markers?: MarkersConfig<TMarker>;
-  scales?: TScales;
-  coordinates?: TCoordinates;
-  margins?: MarginConfig;
-  tooltip?: TooltipConfig<TRow>;
-  statistics?: StatisticConfig[];
+	width: number;
+	height: number;
+	styles?: StylesConfig<TStyles>;
+	segments?: SegmentsConfig<TSegmentStyle>;
+	markers?: MarkersConfig<TMarker>;
+	scales?: TScales;
+	coordinates?: TCoordinates;
+	margins?: MarginConfig;
+	tooltip?: TooltipConfig<TRow>;
+	statistics?: StatisticConfig[];
+	transforms?: MarkerTransform[];
 };

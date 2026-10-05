@@ -4,6 +4,11 @@ import { THEMES } from '$lib/configuration/themes';
 import { renderSource } from '../stories/common/docsSource';
 
 const preview: Preview = {
+	// Storybook's object control always expands `data` in full, with no option
+	// to collapse it, so the control is hidden for every story instead.
+	argTypes: {
+		data: { control: false }
+	},
 	beforeEach: () => {
 		// `DEFAULT_CONFIG` is an intentional no-op theme; apply the Default
 		// preset so every story shows an opinionated look out of the box. Runs
@@ -64,6 +69,8 @@ const preview: Preview = {
 							['Rules', 'Deltas', 'Custom'],
 							'Tooltip'
 						],
+						'AreaPlot',
+						['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
 						'BarPlot',
 						['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip'],
 						'HeatmapPlot',

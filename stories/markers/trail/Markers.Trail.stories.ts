@@ -63,7 +63,7 @@ export const Basic: Story = {
 	}
 };
 
-/** `grouping` draws one trail per id, `color` tints them, and `curve` smooths the paths. */
+/** The trail's own rows are grouped by `grouping: 'id'` (one trail per id), `color` tints each trail, and `curve` smooths the paths. */
 export const GroupedAndSmoothed: Story = {
 	args: {
 		markers: [

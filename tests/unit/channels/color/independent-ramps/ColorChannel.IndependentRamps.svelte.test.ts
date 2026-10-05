@@ -4,7 +4,7 @@ import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
 import { resolveColorScale } from '$lib/utils/color';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import type { DotMarkerConfig } from '$lib/types/markers/base';
+import type { DotMarkerConfig } from '$lib/types/markers/basic';
 import type { ArgentinaProvinceProps, WorldCountryProps } from '../../../../../stories/plots/geo/data';
 import { ARGENTINA_PROVINCES, WORLD_COUNTRIES, WEATHER_STATIONS } from '../../../../../stories/plots/geo/data';
 import { COUNTRIES } from '../../../../../stories/plots/scatter/data';

@@ -42,22 +42,21 @@ type Story = StoryObj<typeof meta>;
 /** The plot's own top-level `statistics` smooths the *close* line (default color); a hand-authored `dot` marker, in red, tracks the daily *open* price and derives its own separate moving average from that data. Both dashed. */
 export const MarkerLevel: Story = {
 	args: {
-		statistics: [{
-			type: 'movingAverage',
-			k: 5,
-			styles: { stroke: '#4f46e5', strokeDasharray: '4 2' }
-		}],
+		statistics: [
+			{
+				type: 'movingAverage',
+				k: 5,
+				styles: { strokeDasharray: '4 2' }
+			}
+		],
 		markers: [
 			{
 				type: 'dot',
-				data: stockData,
 				x: 'day',
 				y: 'open',
 				r: 2.5,
 				styles: { dotFill: '#dc2626', dotStroke: '#dc2626' },
-				statistics: [
-					{ type: 'movingAverage', k: 5, styles: { stroke: '#dc2626', strokeDasharray: '4 2' } }
-				]
+				statistics: [{ type: 'movingAverage', k: 5, styles: { strokeDasharray: '4 2' } }]
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

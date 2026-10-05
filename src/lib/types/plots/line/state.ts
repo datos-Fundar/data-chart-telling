@@ -9,7 +9,7 @@ import type { ResolvedChannel } from '$lib/types/layout/mapping';
 import type { LegendInteractionStore } from '$lib/types/layout/legend';
 import type { ChartConfig } from '$lib/types/configuration/styling';
 import type { StrokeStyle, DotStyle } from '$lib/types/plots/styling';
-import type { LineMarkersConfig } from '$lib/types/markers/line';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
 
 /** LinePlot's shared pipeline state — raw props plus every phase's own output. */
@@ -27,7 +27,7 @@ export type LinePlotState<TData extends Record<string, unknown>> = {
 	width: number;
 	height: number;
 	margins?: MarginConfig;
-	authorMarkers?: LineMarkersConfig[];
+	authorMarkers?: AxisBasedMarkersConfig[];
 	statistics?: StatisticConfig[];
 
 	// "data" phase output.
@@ -52,7 +52,7 @@ export type LinePlotState<TData extends Record<string, unknown>> = {
 	// resolved against every resolved series, then "markers" prepends its own
 	// real segments plus gap bridges in front. No "scales" phase — LinePlot
 	// forwards `scales` unresolved to `BasePlotLayout`.
-	markers?: LineMarkersConfig[];
+	markers?: AxisBasedMarkersConfig[];
 };
 
 /** The environment every LinePlot phase reads from, alongside the growing state. */

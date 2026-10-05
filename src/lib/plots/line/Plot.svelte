@@ -32,7 +32,7 @@
 	import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
 	import type { GapsAwarePlotStylesConfig } from '$lib/types/layout/styles';
 	import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
-	import type { LineMarkersConfig } from '$lib/types/markers/line';
+	import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 	import type { LegendDisabledStyle } from '$lib/types/layout/legend';
 	import type { ValueAnchor } from '$lib/types/plots/constants';
 	import type { MarginOverflow } from '$lib/plots/utils/labelOverflow.svelte';
@@ -44,7 +44,7 @@
 		TData,
 		GapsAwarePlotStylesConfig<LineSegmentStyle>,
 		LineSegmentStyle,
-		LineMarkersConfig,
+		AxisBasedMarkersConfig,
 		AxisBasedScalesConfig<TData>
 	>;
 

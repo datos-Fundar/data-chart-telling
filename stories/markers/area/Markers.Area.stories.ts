@@ -50,7 +50,7 @@ export const Basic: Story = {
 				type: 'area',
 				x: 'year',
 				y: 'value',
-				styles: { fill: '#7c3aed', fillOpacity: 0.35 }
+				styles: { fillOpacity: 0.35 }
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
@@ -61,13 +61,24 @@ export const Band: Story = {
 	args: {
 		data: CONFIDENCE_BAND,
 		y: 'high',
+		scales: { y: { label: '↑ Male-Female Life Expectancy' } },
+		segments: {
+			default: [
+				{
+					areas: [],
+					styles: {
+						stroke: { stroke: 'red'}
+					}
+				}
+			]
+		},
 		markers: [
 			{
 				type: 'area',
 				x: 'year',
 				y1: 'low',
 				y2: 'high',
-				styles: { fill: '#7c3aed', fillOpacity: 0.25 }
+				styles: { fillOpacity: 0.25 }
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

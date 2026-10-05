@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { LineMarkersConfig } from '$lib/types/markers/line';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { FEMALE_LIFE_EXPECTANCY, MALE_LIFE_EXPECTANCY } from '../../../../../stories/plots/line/data';
 import { waitForSvg, countLinePaths, countDotMarks, countTextLabels } from '../../_helpers/svg';
 
@@ -22,7 +22,7 @@ describe('LinePlot – markers.deltas', () => {
           from: { type: 'series', series: 'female' },
           to: { type: 'series', series: 'male' },
         },
-      ] satisfies LineMarkersConfig[],
+      ] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     // 2 line paths (female + male) + 1 delta connector.
@@ -44,7 +44,7 @@ describe('LinePlot – markers.deltas', () => {
           from: { type: 'series', series: 'female' },
           to: { type: 'series', series: 'male' },
         },
-      ] satisfies LineMarkersConfig[],
+      ] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     const female2020 = FEMALE_LIFE_EXPECTANCY.find((d) => d.year === 2020)!.value;
@@ -67,7 +67,7 @@ describe('LinePlot – markers.deltas', () => {
           to: { type: 'series', series: 'male' },
           formatDiff: (diff: number) => `${Math.abs(diff).toFixed(0)} yr`,
         },
-      ] satisfies LineMarkersConfig[],
+      ] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     const female2020 = FEMALE_LIFE_EXPECTANCY.find((d) => d.year === 2020)!.value;
@@ -88,7 +88,7 @@ describe('LinePlot – markers.deltas', () => {
           at: 2020,
           from: { type: 'series', series: 'female' },
         },
-      ] satisfies LineMarkersConfig[],
+      ] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
     const female2020 = FEMALE_LIFE_EXPECTANCY.find((d) => d.year === 2020)!.value;

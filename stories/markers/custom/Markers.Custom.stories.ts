@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import type { LineMarkersConfig } from '$lib/types/markers/line';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { FEMALE_LIFE_EXPECTANCY, type YearPoint } from '../../plots/line/data';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, WEATHER_STATIONS, type WeatherStation } from '../../plots/geo/data';
@@ -13,7 +13,7 @@ import GeoPlot from '$lib/plots/geo/Plot.svelte';
 // Three marker kinds that need real series data (or real pointer
 // interaction) to mean anything, so they don't fit the empty-canvas pattern
 // the rest of `Markers/*` uses. `delta` is LinePlot's own kind-specific
-// marker (`LineMarkersConfig` only) — see `Markers/Delta`
+// marker (`AxisBasedMarkersConfig` only) — see `Markers/Delta`
 // for every axis/target combination. `peak` is a hand-authored `component`
 // marker (`PeakMarker.svelte`) — see `PeakWithModeControl` below for it
 // alongside `DotMarker`/`TextMarker` and segment-scoped examples. `hover`
@@ -68,7 +68,7 @@ export const Delta: LinePlotStory = {
 				to: { type: 'axis', value: 80 },
 				text: { dx: 16, lineAnchor: 'middle' }
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -84,7 +84,7 @@ export const Peak: LinePlotStory = {
 				component: PeakMarker,
 				props: { xProp: 'year', yProp: 'value', mode: 'max', label: 'Max' }
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -93,7 +93,7 @@ export const Hover: LinePlotStory = {
 	render: renderLinePlot,
 	args: {
 		...LINE_PLOT_ARGS,
-		markers: [{ type: 'hover' }] satisfies LineMarkersConfig[]
+		markers: [{ type: 'hover' }] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -182,7 +182,7 @@ export const DotPerDataPoint: LinePlotStory = {
 				x: (d: YearPoint) => d.year,
 				y: (d: YearPoint) => d.value
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -212,7 +212,7 @@ export const TextPerDataPoint: LinePlotStory = {
 					dy: -10
 				}
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -259,7 +259,7 @@ export const PeakWithModeControl: any = {
 						label: mode === 'max' ? 'Max' : 'Min'
 					}
 				}
-			] satisfies LineMarkersConfig[]
+			] satisfies AxisBasedMarkersConfig[]
 		}
 	})
 };
@@ -365,6 +365,6 @@ export const WithMarkerStrategies: LinePlotStory = {
 					label: 'Max'
 				}
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };

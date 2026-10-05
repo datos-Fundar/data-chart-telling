@@ -1,6 +1,5 @@
 import type { AxisBasedMarkersConfig } from './common';
 import type { GeoMarkersConfig, GeoFeaturesMarkerConfig } from './geo';
-import type { LineMarkersConfig } from './line';
 
 /**
  * Every marker kind `GeometryLayout`/`BasePlotLayout` can route to — the
@@ -9,8 +8,4 @@ import type { LineMarkersConfig } from './line';
  * used as any `Plot.svelte`'s own `TMarker` — see each kind's own precise
  * type instead.
  */
-export type MarkerConfig =
-  | AxisBasedMarkersConfig
-  | LineMarkersConfig
-  | GeoMarkersConfig
-  | GeoFeaturesMarkerConfig;
+export type MarkerConfig = AxisBasedMarkersConfig | GeoMarkersConfig | GeoFeaturesMarkerConfig;

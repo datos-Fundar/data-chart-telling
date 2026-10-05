@@ -197,13 +197,7 @@ export type {
 	StatisticReducer,
 	MovingAverageStatisticOptions
 } from './types/layout/statistics';
-export type {
-	LineMarkersConfig,
-	DeltaMarkerConfig,
-	DeltaConfig,
-	DeltaTarget
-} from './types/markers/line';
-export type { MarkerProps } from './types/markers/props';
+export type { DeltaMarkerConfig, DeltaConfig, DeltaTarget } from './types/markers/axis/delta';
 export type { GeoFeature, GeoJsonInput, GeoDataProps, Topology } from './types/plots/data/geo';
 export type { ScatterDataProps } from './types/plots/data/scatter';
 export type {

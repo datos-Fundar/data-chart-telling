@@ -1,80 +1,85 @@
 <script lang="ts">
-  import DotMarker from './DotMarker.svelte';
-  import TextMarker from './TextMarker.svelte';
-  import type { MarkerProps } from '$lib/types/markers/props';
-  import type { DotStyle, FontStyle } from '$lib/types/plots/styling';
+	import DotMarker from './DotMarker.svelte';
+	import TextMarker from './TextMarker.svelte';
+	import type { DotStyle, FontStyle } from '$lib/types/plots/styling';
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  interface Props extends MarkerProps<Record<string, any>> {
-    yProp?: string;
-    xProp?: string;
-    mode?: 'max' | 'min';
-    label?: string;
-    dot?: DotStyle;
-    text?: FontStyle;
-  }
+	interface Props {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		data?: Record<string, any>[];
+		yProp?: string;
+		xProp?: string;
+		mode?: 'max' | 'min';
+		label?: string;
+		dot?: DotStyle;
+		text?: FontStyle;
+	}
 
-  const {
-    data = [],
-    yProp = 'value',
-    xProp = 'x',
-    mode = 'max',
-    label,
-    dot,
-    text,
-    seriesColor,
-  }: Props = $props();
+	const {
+		data = [],
+		yProp = 'value',
+		xProp = 'x',
+		mode = 'max',
+		label,
+		dot,
+		text
+	}: Props = $props();
 
-  const resolvedDotFill = $derived(dot?.dotFill ?? seriesColor ?? 'currentColor');
-  const resolvedDotStroke = $derived(dot?.dotStroke ?? seriesColor ?? 'currentColor');
-  const resolvedTextFill = $derived(text?.fill ?? seriesColor ?? 'currentColor');
+	const resolvedDotFill = $derived(dot?.dotFill ?? 'currentColor');
+	const resolvedDotStroke = $derived(dot?.dotStroke ?? 'currentColor');
+	const resolvedTextFill = $derived(text?.fill ?? 'currentColor');
 
-  const peakPoint = $derived.by(() => {
-    if (data.length === 0) return null;
+	const peakPoint = $derived.by(() => {
+		if (data.length === 0) return null;
 
-    return data.reduce((peak, current) => {
-      const currentY = current[yProp];
-      const peakY = peak[yProp];
+		return data.reduce((peak, current) => {
+			const currentY = current[yProp];
+			const peakY = peak[yProp];
 
-      if (mode === 'max') {
-        return currentY > peakY ? current : peak;
-      } else {
-        return currentY < peakY ? current : peak;
-      }
-    });
-  });
+			if (mode === 'max') {
+				return currentY > peakY ? current : peak;
+			} else {
+				return currentY < peakY ? current : peak;
+			}
+		});
+	});
 
-  const peakX = $derived(peakPoint ? peakPoint[xProp] : null);
-  const peakY = $derived(peakPoint ? peakPoint[yProp] : null);
+	const peakX = $derived(peakPoint ? peakPoint[xProp] : null);
+	const peakY = $derived(peakPoint ? peakPoint[yProp] : null);
 
-  const resolvedDotStyle = $derived<DotStyle>({
-    ...dot,
-    dotFill: resolvedDotFill,
-    dotStroke: resolvedDotStroke,
-  });
+	const resolvedDotStyle = $derived<DotStyle>({
+		...dot,
+		dotFill: resolvedDotFill,
+		dotStroke: resolvedDotStroke
+	});
 
-  const resolvedTextStyle = $derived<FontStyle>({
-    ...text,
-    fill: resolvedTextFill,
-    fontWeight: text?.fontWeight ?? 'bold',
-    dy: text?.dy ?? -15,
-  });
+	const resolvedTextStyle = $derived<FontStyle>({
+		...text,
+		fill: resolvedTextFill,
+		fontWeight: text?.fontWeight ?? 'bold',
+		dy: text?.dy ?? -15
+	});
 </script>
 
 {#if peakPoint}
-  <DotMarker
-    marker={{ type: 'dot', data: [peakPoint], x: () => peakX, y: () => peakY, styles: resolvedDotStyle }}
-  />
-  {#if label}
-    <TextMarker
-      marker={{
-        type: 'text',
-        data: [peakPoint],
-        x: () => peakX,
-        y: () => peakY,
-        text: label,
-        styles: resolvedTextStyle,
-      }}
-    />
-  {/if}
+	<DotMarker
+		marker={{
+			type: 'dot',
+			data: [peakPoint],
+			x: () => peakX,
+			y: () => peakY,
+			styles: resolvedDotStyle
+		}}
+	/>
+	{#if label}
+		<TextMarker
+			marker={{
+				type: 'text',
+				data: [peakPoint],
+				x: () => peakX,
+				y: () => peakY,
+				text: label,
+				styles: resolvedTextStyle
+			}}
+		/>
+	{/if}
 {/if}

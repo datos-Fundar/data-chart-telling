@@ -40,7 +40,10 @@ async function waitForSvg(container: Element): Promise<SVGElement> {
 
 function barRects(svg: SVGElement): SVGRectElement[] {
 	const all = svg.querySelectorAll('g:not(.axis-x):not(.axis-y) rect');
-	return Array.from(all).slice(1) as SVGRectElement[];
+	// Skip the plot's clip-path rect, which is a `<clipPath>` child, not a bar.
+	return Array.from(all)
+		.filter((r) => !r.closest('clipPath'))
+		.slice(1) as SVGRectElement[];
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────

@@ -189,6 +189,11 @@ export type ChartConfig = {
 		/** Default gap-fill styling (`PyramidPlot`'s `styles.gaps`) — the fallback merged under whatever a gap zone's own `style` sets. */
 		gap: AreaStyle;
 	};
+	/** Default area-plot styling. */
+	area: {
+		/** Fill opacity of every area marker that sets none of its own. */
+		fillOpacity: number;
+	};
 	/** Default scatter point geometry. */
 	scatter: { dotRadius: number };
 	/** Timeline gutter styling. */

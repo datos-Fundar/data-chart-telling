@@ -39,6 +39,7 @@
 	import ContourMarker from '$lib/markers/ContourMarker.svelte';
 	import ContourClipMarker from '$lib/markers/ContourClipMarker.svelte';
 	import InsetMarker from '$lib/markers/inset/InsetMarker.svelte';
+	import FrameClip from '$lib/layout/geometry/FrameClip.svelte';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import type { Series } from '$lib/types/plots/data/common';
 	import type { MarkerConfig } from '$lib/types/markers/all';
@@ -47,6 +48,7 @@
 	import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
 	import type { GeoFeature } from '$lib/types/plots/data/geo';
 	import type { ChannelScalesConfig } from '$lib/types/layout/scales';
+	import { withHoverSeriesColor, withSeriesColor } from '$lib/utils/markerGrouping';
 
 	/**
 	 * Renders every marker in `markers`, in array order, each delegated to the
@@ -178,7 +180,9 @@
 	{:else if marker.type === 'waffle'}
 		<WaffleMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'dot'}
-		<DotMarker marker={{ ...marker, data: marker.data ?? rows, scales: marker.scales ?? channelScales }} />
+		<DotMarker
+			marker={{ ...marker, data: marker.data ?? rows, scales: marker.scales ?? channelScales }}
+		/>
 	{:else if marker.type === 'text'}
 		<TextMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'rule'}
@@ -236,62 +240,52 @@
 	{/if}
 {/snippet}
 
-{#each geometryMarkers as marker, i (markerKey(marker, i))}
-	{@render renderMarker(marker, data)}
-{/each}
-
-{#each scopedGroups as group (group.name)}
-	{#each scopedMarkersByName.get(group.name) ?? [] as marker, i (`${group.name}-${marker.type}-${i}`)}
-		{#if marker.type === 'hover'}
-			{@const seriesPoints = ctrl.points.filter((p) => p.series === group.name)}
-			{#if marker.scope === 'segment'}
-				{#each group.segments as seg, segIdx (`${group.name}-hover-segment-${segIdx}`)}
-					<!-- p.row (TData) is always a superset of TSeries in practice, not provable across two independent generics. -->
-					{@const segPoints = seriesPoints.filter((p) => seg.match(p.row as unknown as TSeries))}
-					{#if segPoints.length > 0}
-						<HoverMarker
-							{marker}
-							data={segPoints}
-							activePoint={segPoints[0] ?? null}
-							impliesCrosshairX={ctrl.impliesCrosshairX}
-							impliesCrosshairY={ctrl.impliesCrosshairY}
-							seriesColor={seg.color}
-						/>
-					{/if}
-				{/each}
-			{:else}
-				<HoverMarker
-					{marker}
-					data={seriesPoints}
-					activePoint={seriesPoints[0] ?? null}
-					impliesCrosshairX={ctrl.impliesCrosshairX}
-					impliesCrosshairY={ctrl.impliesCrosshairY}
-					seriesColor={group.segments[0]?.color ?? group.color}
-				/>
-			{/if}
-		{:else if marker.type === 'component'}
-			{#if marker.scope === 'segment'}
-				{#each group.segments as seg, segIdx (`${group.name}-component-segment-${segIdx}`)}
-					{@const segmentData = group.data.filter((row) => seg.match(row))}
-					{#if segmentData.length > 0}
-						<marker.component
-							{...marker.props}
-							series={group.name}
-							data={segmentData}
-							seriesColor={seg.color}
-						/>
-					{/if}
-				{/each}
-			{:else}
-				<marker.component
-					{...marker.props}
-					series={group.name}
-					data={group.data}
-					seriesColor={group.segments[0]?.color ?? group.color}
-				/>
-			{/if}
-		{:else}
-			{@render renderMarker(marker, group.data)}
-		{/if}
+<FrameClip>
+	{#each geometryMarkers as marker, i (markerKey(marker, i))}
+		{@render renderMarker(marker, data)}
 	{/each}
-{/each}
+
+	{#each scopedGroups as group (group.name)}
+		{#each scopedMarkersByName.get(group.name) ?? [] as marker, i (`${group.name}-${marker.type}-${i}`)}
+			{#if marker.type === 'hover'}
+				{@const seriesPoints = ctrl.points.filter((p) => p.series === group.name)}
+				{#if marker.scope === 'segment'}
+					{#each group.segments as seg, segIdx (`${group.name}-hover-segment-${segIdx}`)}
+						<!-- p.row (TData) is always a superset of TSeries in practice, not provable across two independent generics. -->
+						{@const segPoints = seriesPoints.filter((p) => seg.match(p.row as unknown as TSeries))}
+						{#if segPoints.length > 0}
+							<HoverMarker
+								marker={withHoverSeriesColor(marker, seg.color)}
+								data={segPoints}
+								activePoint={segPoints[0] ?? null}
+								impliesCrosshairX={ctrl.impliesCrosshairX}
+								impliesCrosshairY={ctrl.impliesCrosshairY}
+							/>
+						{/if}
+					{/each}
+				{:else}
+					<HoverMarker
+						marker={withHoverSeriesColor(marker, group.segments[0]?.color ?? group.color)}
+						data={seriesPoints}
+						activePoint={seriesPoints[0] ?? null}
+						impliesCrosshairX={ctrl.impliesCrosshairX}
+						impliesCrosshairY={ctrl.impliesCrosshairY}
+					/>
+				{/if}
+			{:else if marker.type === 'component'}
+				{#if marker.scope === 'segment'}
+					{#each group.segments as seg, segIdx (`${group.name}-component-segment-${segIdx}`)}
+						{@const segmentData = group.data.filter((row) => seg.match(row))}
+						{#if segmentData.length > 0}
+							<marker.component {...marker.props} series={group.name} data={segmentData} />
+						{/if}
+					{/each}
+				{:else}
+					<marker.component {...marker.props} series={group.name} data={group.data} />
+				{/if}
+			{:else}
+				{@render renderMarker(withSeriesColor(marker, group.color), group.data)}
+			{/if}
+		{/each}
+	{/each}
+</FrameClip>

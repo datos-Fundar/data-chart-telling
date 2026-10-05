@@ -49,18 +49,18 @@ export const Basic: Story = {
 	}
 };
 
-/** Grouping by `grouping` (here, `region`) estimates and draws a separate density surface per group. */
+/** The plot's `color: 'region'` estimates and draws a separate density surface per region, each in its region's color. */
 export const GroupedByRegion: Story = {
 	args: {
+		color: 'region',
 		markers: [
 			{
 				type: 'density',
 				x: 'gdpPerCapita',
 				y: 'lifeExpectancy',
-				grouping: 'region',
 				bandwidth: 24,
 				thresholds: 4,
-				styles: { fill: 'none', stroke: 'currentColor', strokeOpacity: 0.6 }
+				styles: { fill: 'none', strokeOpacity: 0.6 }
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

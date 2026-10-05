@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { LineMarkersConfig } from '$lib/types/markers/line';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { FEMALE_LIFE_EXPECTANCY, LIFE_EXPECTANCY } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -74,7 +74,7 @@ export const WithRuleXMarkers: Story = {
 					strokeOpacity: 0.7
 				}
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -110,7 +110,7 @@ export const WithRuleYMarkers: Story = {
 					strokeOpacity: 0.5
 				}
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -142,6 +142,6 @@ export const WithMixedMarkers: Story = {
 					strokeOpacity: 0.5
 				}
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };

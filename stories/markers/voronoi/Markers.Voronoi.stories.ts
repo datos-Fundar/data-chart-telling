@@ -6,8 +6,8 @@ import { COUNTRIES } from '../../plots/scatter/data';
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `voronoi` (one polygon per point) and `voronoiMesh` (the whole diagram as a
 // single path) — svelteplot's own `Voronoi` / `VoronoiMesh`. Both take
-// `x`/`y` and an optional `grouping` (one diagram per group); `color`
-// resolves through this package's own `cfg.palette` into `stroke`.
+// `x`/`y`. A plot grouped by `color` draws one diagram per group and tints it
+// with the group's palette color, without any setting on the marker itself.
 
 const meta = {
 	title: 'Markers/Voronoi',
@@ -38,7 +38,12 @@ type Story = StoryObj<typeof meta>;
 export const Cells: Story = {
 	args: {
 		markers: [
-			{ type: 'voronoi', x: 'gdpPerCapita', y: 'lifeExpectancy', styles: { strokeOpacity: 0.5 } }
+			{
+				type: 'voronoi',
+				x: 'gdpPerCapita',
+				y: 'lifeExpectancy',
+				styles: { fillOpacity: 0.1 }
+			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };

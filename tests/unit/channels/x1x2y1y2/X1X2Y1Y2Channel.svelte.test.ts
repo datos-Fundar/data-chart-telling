@@ -38,7 +38,10 @@ describe('x1/x2/y1/y2 channel – bar marker with field-key shorthand', () => {
 
 describe('x1/x2/y1/y2 channel – rect marker', () => {
 	test('a rect marker with literal x1/x2/y1/y2 renders a rectangle', async () => {
-		const data = [{ year: 2008, value: 75 }, { year: 2020, value: 80 }];
+		const data = [
+			{ year: 2008, value: 75 },
+			{ year: 2020, value: 80 }
+		];
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
@@ -59,9 +62,10 @@ describe('x1/x2/y1/y2 channel – rect marker', () => {
 		});
 		const svg = await waitForSvg(container);
 		// svelteplot's `Rect` mark renders a bare `<rect>`, not scoped to its own
-		// class — filter out the plot's own transparent pointer-capture rect.
+		// class — filter out the plot's own transparent pointer-capture rect, and
+		// the frame's clip-path rect, which is a `<clipPath>` child, not a mark.
 		const rects = Array.from(svg.querySelectorAll('rect')).filter(
-			(r) => r.getAttribute('fill') !== 'transparent'
+			(r) => r.getAttribute('fill') !== 'transparent' && !r.closest('clipPath')
 		);
 		expect(rects).toHaveLength(1);
 		expect(rects[0].getAttribute('style')).toContain('rgb(253, 230, 138)');

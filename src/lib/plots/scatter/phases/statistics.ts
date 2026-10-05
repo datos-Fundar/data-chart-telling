@@ -1,3 +1,4 @@
+import { prepareAuthorMarkers } from '$lib/utils/authorMarkers';
 import { resolvePlotStatistics, expandMarkerStatistics } from '$lib/utils/statistics';
 import type { ScatterPlotState } from '$lib/types/plots/scatter/state';
 
@@ -19,7 +20,15 @@ export function buildStatistics<TData extends Record<string, unknown>>(
 				statistics: state.statistics,
 				colorFor: state.colorForSeries
 			}),
-			...expandMarkerStatistics(state.authorMarkers ?? [], state.flat ?? [])
+			...expandMarkerStatistics(
+				prepareAuthorMarkers(state.authorMarkers ?? [], {
+					...state,
+					flat: state.flat ?? [],
+					defaultColor:
+						state.resolvedSeries?.[0] && state.colorForSeries?.(state.resolvedSeries[0].name)
+				}),
+				state.flat ?? []
+			)
 		]
 	};
 }

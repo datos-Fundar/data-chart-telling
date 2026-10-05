@@ -28,9 +28,7 @@ describe('LinePlot – markers.box', () => {
 			x: 'gdpPerCapita',
 			y: 'region',
 			scales: { y: { type: 'band' } },
-			markers: [
-				{ type: 'box', x: 'gdpPerCapita', y: 'region' }
-			] satisfies AxisBasedMarkersConfig[]
+			markers: [{ type: 'box', x: 'gdpPerCapita', y: 'region' }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
 		expect(svg.querySelectorAll('g.box-x rect').length).toBe(4);
@@ -133,7 +131,8 @@ describe('LinePlot – markers.box', () => {
 		const rectFill = rect?.getAttribute('style');
 		expect(rectFill).toMatch(/fill: rgb\(/);
 		const medianLine = svg.querySelector('g.box-y g.tick-y line');
-		expect(medianLine?.getAttribute('style')).toContain('rgb(255, 255, 255)');
+		// The default palette's first color (teal) is light enough that black out-contrasts white.
+		expect(medianLine?.getAttribute('style')).toContain('rgb(0, 0, 0)');
 	});
 
 	test('the median tick auto-contrasts against bar.fill', async () => {

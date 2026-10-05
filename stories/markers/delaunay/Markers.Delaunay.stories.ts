@@ -6,9 +6,9 @@ import { COUNTRIES } from '../../plots/scatter/data';
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `delaunayLink` (one line per triangulation edge) and `delaunayMesh` (the
 // whole triangulation as a single path) — svelteplot's own `DelaunayLink` /
-// `DelaunayMesh`. Both take `x`/`y` and an optional `grouping` (one
-// triangulation per group); `color` resolves through this package's own
-// `cfg.palette` into `stroke`.
+// `DelaunayMesh`. Both take `x`/`y`. A plot grouped by `color` triangulates
+// each group separately and tints it with the group's palette color, without
+// any setting on the marker itself.
 
 const meta = {
 	title: 'Markers/Delaunay',
@@ -63,7 +63,7 @@ export const Mesh: Story = {
 	}
 };
 
-/** `grouping` triangulates each region separately; `color` tints each mesh with its region's palette color. */
+/** The plot's `color: 'region'` triangulates each region separately, and the mesh inherits that grouping and tints each one with its region's palette color. */
 export const GroupedByRegion: Story = {
 	args: {
 		color: 'region',
@@ -71,9 +71,7 @@ export const GroupedByRegion: Story = {
 			{
 				type: 'delaunayMesh',
 				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
-				grouping: 'region',
-				color: 'region'
+				y: 'lifeExpectancy'
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

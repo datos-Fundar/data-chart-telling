@@ -45,8 +45,6 @@ export const Default: Story = {
 /** `styles` recolors and redashes the derived `line` marker, same as any hand-authored one. */
 export const CustomStyle: Story = {
 	args: {
-		statistics: [
-			{ type: 'movingAverage', k: 5, styles: { stroke: '#7c3aed', strokeDasharray: '4 2' } }
-		]
+		statistics: [{ type: 'movingAverage', k: 5, styles: { strokeDasharray: '4 2' } }]
 	}
 };

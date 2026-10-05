@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import type { LineMarkersConfig } from '$lib/types/markers/line';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { FEMALE_LIFE_EXPECTANCY, LIFE_EXPECTANCY } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -66,7 +66,7 @@ export const XDeltaBetweenTwoSeries: Story = {
 				formatDiff: (d) => d.toFixed(0),
 				text: { dx: 12, lineAnchor: 'middle' }
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -93,7 +93,7 @@ export const XDeltaToBaseline: Story = {
 				from: { type: 'series', series: 'female' },
 				text: { dx: 20, lineAnchor: 'middle' }
 			}
-		] satisfies LineMarkersConfig[],
+		] satisfies AxisBasedMarkersConfig[],
 		scales: { y: { domain: [78, 85] } }
 	}
 };
@@ -120,7 +120,7 @@ export const XDeltaToAxisValue: Story = {
 				to: { type: 'axis', value: 80 },
 				text: { dx: 20, lineAnchor: 'middle' }
 			}
-		] satisfies LineMarkersConfig[],
+		] satisfies AxisBasedMarkersConfig[],
 		scales: { y: { domain: [78, 85] } }
 	}
 };
@@ -153,7 +153,7 @@ export const MultipleXDeltas: Story = {
 				formatDiff: (d) => d.toFixed(0),
 				text: { dx: 12, lineAnchor: 'middle' }
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -179,7 +179,7 @@ export const YDeltaBetweenTwoSeries: Story = {
 				formatDiff: (d) => `${d} yr`,
 				text: { dy: -10, lineAnchor: 'middle' }
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -209,7 +209,7 @@ export const YDeltaToBaseline: Story = {
 				formatDiff: (d) => `${d.toFixed(0)} yr`,
 				text: { dy: -10, lineAnchor: 'middle' }
 			}
-		] satisfies LineMarkersConfig[],
+		] satisfies AxisBasedMarkersConfig[],
 		scales: { x: { domain: [2008, 2020] } }
 	}
 };
@@ -239,7 +239,7 @@ export const YDeltaToAxisValue: Story = {
 				formatDiff: (d) => `${d} yr`,
 				text: { dy: -10, lineAnchor: 'middle' }
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -271,6 +271,6 @@ export const MultipleYDeltas: Story = {
 				formatDiff: (d) => `${d} yr`,
 				text: { dy: -10, lineAnchor: 'middle' }
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };

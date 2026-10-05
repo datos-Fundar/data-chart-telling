@@ -110,9 +110,15 @@
 		...ruleDefault,
 		...(typeof marker.rule === 'object' ? marker.rule : {})
 	});
-	const dot = $derived({
-		...dotDefault,
-		...(typeof marker.dot === 'object' ? marker.dot : {})
+	/**
+	 * `dot.fill: true` is svelteplot's own `currentColor` shorthand, which would
+	 * paint the outliers in the text color. Here it means the box's own fill,
+	 * so outliers take the series color like the box does.
+	 */
+	const dot = $derived.by(() => {
+		const own = typeof marker.dot === 'object' ? marker.dot : {};
+		const fill = own.fill === true ? barFill : 'fill' in own ? own.fill : dotDefault.fill;
+		return { ...dotDefault, ...own, fill };
 	});
 
 	/**
@@ -131,19 +137,7 @@
 </script>
 
 {#if isHorizontal}
-	<BoxX
-		{data}
-		x={marker.x}
-		y={marker.y}
-		sort={marker.sort}
-		{...passthrough}
-	/>
+	<BoxX {data} x={marker.x} y={marker.y} sort={marker.sort} {...passthrough} />
 {:else}
-	<BoxY
-		{data}
-		x={marker.x}
-		y={marker.y}
-		sort={marker.sort}
-		{...passthrough}
-	/>
+	<BoxY {data} x={marker.x} y={marker.y} sort={marker.sort} {...passthrough} />
 {/if}

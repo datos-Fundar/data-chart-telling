@@ -12,6 +12,7 @@
 	{data}
 	x={marker.x}
 	y={marker.y}
+	z={marker.grouping}
 	stroke={marker.styles?.stroke}
 	strokeWidth={marker.styles?.strokeWidth}
 	strokeOpacity={marker.styles?.strokeOpacity}

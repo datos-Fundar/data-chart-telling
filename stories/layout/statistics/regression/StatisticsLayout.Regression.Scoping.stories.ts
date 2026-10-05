@@ -35,31 +35,33 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Plot level, pooled: no `color`, so the whole dataset is one series — `statistics` (no `series` scope) fits a single curve across every country. */
+/** Plot level, one series: no `color`, so the whole dataset is a single series and `statistics` fits one curve across every country. */
 export const Pooled: Story = {
 	args: {
 		statistics: [{ type: 'regression', confidence: false }]
 	}
 };
 
-/** Plot level, grouped by series: `color: 'region'` splits the data into one series per continent; listing every region name in `series` fits one regression per continent. */
+/** Plot level, grouped by series: `color: 'region'` splits the data into one series per continent, and with no `series` scope the statistic fits one regression per continent in that continent's color. */
 export const GroupedByContinent: Story = {
 	args: {
 		color: 'region',
-		statistics: [
-			{
-				type: 'regression',
-				confidence: false,
-				series: ['Americas', 'Europe', 'Asia', 'Africa']
-			}
-		]
+		statistics: [{ type: 'regression', confidence: false }]
 	}
 };
 
-/** Scoped to a single series: same `color`-split series as above, but `series: ['Americas']` fits a regression for just that one continent — every country still renders, only Americas gets a line. */
+/** `pooled: true` opts out of the per-series default: `color: 'region'` still splits the data, but one regression fits every continent combined. */
+export const PooledAcrossSeries: Story = {
+	args: {
+		color: 'region',
+		statistics: [{ type: 'regression', confidence: false, pooled: true }]
+	}
+};
+
+/** Scoped to a single series: same `color`-split series as above, but `series: ['Europe']` fits a regression for just that one continent — every country still renders, only Europe gets a line. */
 export const SingleSeriesScoped: Story = {
 	args: {
 		color: 'region',
-		statistics: [{ type: 'regression', confidence: false, series: ['Americas'] }]
+		statistics: [{ type: 'regression', confidence: false, series: ['Europe'] }]
 	}
 };

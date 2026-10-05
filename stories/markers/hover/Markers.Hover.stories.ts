@@ -6,7 +6,7 @@ import {
 	type ArgentinaProvinceProps
 } from '../../plots/geo/data';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
-import type { LineMarkersConfig } from '$lib/types/markers/line';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import {
 	FEMALE_LIFE_EXPECTANCY,
 	MALE_LIFE_EXPECTANCY,
@@ -129,7 +129,7 @@ export const TimeSeries: LinePlotStory = {
 			{
 				type: 'hover'
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -154,7 +154,7 @@ export const WithoutLabels: LinePlotStory = {
 				type: 'hover',
 				showLabels: false
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -179,7 +179,7 @@ export const WithoutRule: LinePlotStory = {
 				type: 'hover',
 				ruleX: false
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -206,7 +206,7 @@ export const WithBothAxis: LinePlotStory = {
 				ruleX: true,
 				ruleY: true
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -236,7 +236,7 @@ export const WithCustomRuleStyle: LinePlotStory = {
 					strokeDasharray: '6 3'
 				}
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -266,7 +266,7 @@ export const TwoSeries: LinePlotStory = {
 			{
 				type: 'hover'
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -300,7 +300,7 @@ export const SeriesScoped: LinePlotStory = {
 				type: 'hover',
 				series: 'female'
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -320,7 +320,7 @@ export const FromGroupedData: LinePlotStory = {
 			{
 				type: 'hover'
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -341,6 +341,6 @@ export const GroupedSeriesScoped: LinePlotStory = {
 				type: 'hover',
 				series: 'female'
 			}
-		] satisfies LineMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[]
 	}
 };

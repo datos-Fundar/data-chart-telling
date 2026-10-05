@@ -95,10 +95,18 @@ describe('resolvePlotStatistics', () => {
 		expect(resolvePlotStatistics({ series, statistics: undefined })).toEqual([]);
 	});
 
-	test('an entry with no series scope pools every series into one source', () => {
+	test('an entry with no series scope derives one statistic per series by default', () => {
 		const markers = resolvePlotStatistics({
 			series,
 			statistics: [{ type: 'movingAverage', k: 1 }]
+		});
+		expect(markers).toHaveLength(series.length);
+	});
+
+	test('pooled: true derives one statistic over every series combined', () => {
+		const markers = resolvePlotStatistics({
+			series,
+			statistics: [{ type: 'movingAverage', k: 1, pooled: true }]
 		});
 		expect(markers).toHaveLength(1);
 		expect(markers[0].type).toBe('line');
@@ -165,5 +173,109 @@ describe('expandMarkerStatistics', () => {
 	test('a non-statable marker kind (e.g. rule) is left untouched even if it happened to carry the field', () => {
 		const markers = [{ type: 'rule', axis: 'x', value: 0 }] satisfies AxisBasedMarkersConfig[];
 		expect(expandMarkerStatistics(markers, [])).toEqual(markers);
+	});
+});
+
+describe('density and box statistics', () => {
+	const data = Array.from({ length: 20 }, (_, i) => ({ x: i % 5, y: i }));
+
+	test('type: density resolves to an area marker over svelteplot’s densityX output', () => {
+		const marker = resolveStatisticMarker(
+			{ data, x: 'x', y: 'y', color: '#ff0000' },
+			{ type: 'density', bandwidth: 1 }
+		);
+		expect(marker.type).toBe('area');
+		expect((marker as { data?: unknown[] }).data!.length).toBeGreaterThan(0);
+		expect((marker as { styles?: { fill?: string } }).styles?.fill).toBe('#ff0000');
+	});
+
+	test('type: density2d resolves to a density marker with the same bandwidth', () => {
+		const marker = resolveStatisticMarker(
+			{ data, x: 'x', y: 'y' },
+			{ type: 'density2d', bandwidth: 15 }
+		);
+		expect(marker.type).toBe('density');
+		expect((marker as { bandwidth?: number }).bandwidth).toBe(15);
+	});
+
+	test('type: box resolves to a box marker, bar filled with the source color by default', () => {
+		const marker = resolveStatisticMarker(
+			{ data, x: 'x', y: 'y', color: '#00ff00' },
+			{ type: 'box', tickMedian: false }
+		);
+		expect(marker.type).toBe('box');
+		expect((marker as { bar?: { fill?: string } }).bar?.fill).toBe('#00ff00');
+		expect((marker as { tickMedian?: boolean }).tickMedian).toBe(false);
+	});
+
+	test('type: box does not leak the plot-level series scope into the marker', () => {
+		const marker = resolveStatisticMarker({ data, x: 'x', y: 'y' }, { type: 'box', series: ['A'] });
+		expect(marker).not.toHaveProperty('series');
+	});
+});
+
+describe('statistic color inheritance', () => {
+	const data = Array.from({ length: 6 }, (_, i) => ({ x: i, y: i * 2, g: i % 2 ? 'A' : 'B' }));
+
+	test('a plot-level statistic inherits its series color', () => {
+		const markers = resolvePlotStatistics({
+			series: [{ name: 'A', data, x: 'x', y: 'y' } as never],
+			statistics: [{ type: 'movingAverage', k: 2 }],
+			colorFor: () => '#123456'
+		});
+		expect((markers[0] as { styles?: { stroke?: string } }).styles?.stroke).toBe('#123456');
+	});
+
+	test('a pooled plot-level statistic inherits the default series color', () => {
+		const markers = resolvePlotStatistics({
+			series: [
+				{ name: 'A', data, x: 'x', y: 'y' } as never,
+				{ name: 'B', data, x: 'x', y: 'y' } as never
+			],
+			statistics: [{ type: 'movingAverage', k: 2, pooled: true }],
+			colorFor: () => '#123456'
+		});
+		expect(markers).toHaveLength(1);
+		expect((markers[0] as { styles?: { stroke?: string } }).styles?.stroke).toBe('#123456');
+	});
+
+	test('a marker-level statistic inherits the marker’s own flat color', () => {
+		const expanded = expandMarkerStatistics(
+			[
+				{
+					type: 'dot',
+					x: 'x',
+					y: 'y',
+					styles: { dotFill: '#dc2626', dotStroke: '#dc2626' },
+					statistics: [{ type: 'movingAverage', k: 2 }]
+				}
+			] as never,
+			data
+		);
+		expect((expanded[1] as { styles?: { stroke?: string } }).styles?.stroke).toBe('#dc2626');
+	});
+
+	test('a grouped marker derives one statistic per group, each in its group’s color', () => {
+		const expanded = expandMarkerStatistics(
+			[
+				{
+					type: 'dot',
+					x: 'x',
+					y: 'y',
+					color: 'g',
+					statistics: [{ type: 'movingAverage', k: 2 }]
+				}
+			] as never,
+			data
+		);
+		const derived = expanded.slice(1) as { styles?: { stroke?: string } }[];
+		expect(derived).toHaveLength(2);
+		expect(derived.every((m) => typeof m.styles?.stroke === 'string')).toBe(true);
+		expect(derived[0].styles?.stroke).not.toBe(derived[1].styles?.stroke);
+	});
+
+	test('with no color anywhere, a statistic falls back to black', () => {
+		const marker = resolveStatisticMarker({ data, x: 'x', y: 'y' }, { type: 'regression' });
+		expect((marker as { styles?: { stroke?: string } }).styles?.stroke).toBe('#000000');
 	});
 });

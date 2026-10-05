@@ -126,9 +126,10 @@ export const DEFAULT_CONFIG: ChartConfig = {
 	},
 
 	margins: { top: 'auto', right: 'auto', bottom: 'auto', left: 'auto' },
-	palette: ['#4f46e5', '#e6580d', '#16a34a', '#dc2626', '#0891b2', '#9333ea', '#ca8a04', '#db2777'],
+	// ColorBrewer Dark2 — qualitative, harmonious, and dark enough to read on white.
+	palette: ['#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02', '#a6761d', '#666666'],
 	symbols: ['circle', 'square', 'triangle', 'diamond', 'star', 'cross'],
-	continuous: { min: '#e0e7ff', max: '#4f46e5', labelColor: '#111827', opacityRange: [0.2, 1] },
+	continuous: { min: '#f7fcfd', max: '#1b9e77', labelColor: '#111827', opacityRange: [0.2, 1] },
 	line: {
 		strokeWidth: 3,
 		dotRadius: 4,
@@ -151,6 +152,7 @@ export const DEFAULT_CONFIG: ChartConfig = {
 		paddingOuter: 0.15
 	},
 	pyramid: { gap: { fillOpacity: 0.5 } },
+	area: { fillOpacity: 0.6 },
 	scatter: { dotRadius: 5 },
 	timeline: { axisColor: 'currentColor', activeColor: '#e6580d', thickness: 60 },
 	hover: {

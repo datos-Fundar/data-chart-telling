@@ -47,7 +47,7 @@ describe('statistics – plot level (Scatter), named series scope', () => {
 });
 
 describe('statistics – plot level (Line), movingAverage', () => {
-	test('renders one extra smoothed line alongside the plot’s own series lines', async () => {
+	test('by default renders one smoothed line per series, in that series’ grouping', async () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
@@ -58,7 +58,22 @@ describe('statistics – plot level (Line), movingAverage', () => {
 			statistics: [{ type: 'movingAverage', k: 3 }]
 		});
 		const svg = await waitForSvg(container);
-		// 2 series lines (A, B) + 1 derived moving-average line.
+		// 2 series lines (A, B) + 2 derived moving-average lines (one per series).
+		expect(countLinePaths(svg)).toBe(4);
+	});
+
+	test('pooled: true renders one smoothed line over every series combined', async () => {
+		const { container } = render(LinePlot, {
+			width: 400,
+			height: 300,
+			data: scatterData,
+			x: 'x',
+			y: 'y',
+			color: 'group',
+			statistics: [{ type: 'movingAverage', k: 3, pooled: true }]
+		});
+		const svg = await waitForSvg(container);
+		// 2 series lines (A, B) + 1 pooled moving-average line.
 		expect(countLinePaths(svg)).toBe(3);
 	});
 });
