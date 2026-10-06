@@ -29,6 +29,10 @@
 			y1={marker.y1}
 			y2={marker.y2}
 			interval={marker.interval}
+			insetLeft={marker.insetLeft}
+			insetRight={marker.insetRight}
+			insetTop={marker.insetTop}
+			insetBottom={marker.insetBottom}
 			fill={channelFill ?? marker.styles?.fill}
 			fillOpacity={bucket.value}
 			stroke={marker.styles?.stroke}
@@ -47,6 +51,10 @@
 		y1={marker.y1}
 		y2={marker.y2}
 		interval={marker.interval}
+		insetLeft={marker.insetLeft}
+		insetRight={marker.insetRight}
+		insetTop={marker.insetTop}
+		insetBottom={marker.insetBottom}
 		fill={channelFill ?? marker.styles?.fill}
 		fillOpacity={marker.styles?.fillOpacity ?? 1}
 		stroke={marker.styles?.stroke}

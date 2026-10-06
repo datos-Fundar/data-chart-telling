@@ -7,6 +7,11 @@ import type { CommonMarkerConfigWithInterval } from '$lib/types/markers/channels
 export type RectMarkerConfig = {
 	type: 'rect';
 	interval?: number | string;
+	/** Pixels taken off each side of every rectangle; a bin's default `0.5` on each side leaves a hairline gap. */
+	insetLeft?: number;
+	insetRight?: number;
+	insetTop?: number;
+	insetBottom?: number;
 	styles?: AreaStyle;
 } & CommonMarkerConfigWithArea &
 	CommonMarkerConfigWithColor &

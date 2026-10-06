@@ -11,10 +11,10 @@ import { COMPACT_THEME } from './compact';
  * are the actual visual identities consumers can opt into.
  */
 export const THEMES = {
-  Default: DEFAULT_THEME,
-  Editorial: EDITORIAL_THEME,
-  Dark: DARK_THEME,
-  Compact: COMPACT_THEME,
+	Default: DEFAULT_THEME,
+	Editorial: EDITORIAL_THEME,
+	Dark: DARK_THEME,
+	Compact: COMPACT_THEME
 } satisfies Record<string, ChartConfigInput>;
 
 export type ThemeName = keyof typeof THEMES;

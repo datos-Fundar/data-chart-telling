@@ -153,6 +153,7 @@ export const DEFAULT_CONFIG: ChartConfig = {
 	},
 	pyramid: { gap: { fillOpacity: 0.5 } },
 	area: { fillOpacity: 0.6 },
+	histogram: { inset: 1, fillOpacity: 1 },
 	scatter: { dotRadius: 5 },
 	timeline: { axisColor: 'currentColor', activeColor: '#e6580d', thickness: 60 },
 	hover: {

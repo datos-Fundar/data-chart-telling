@@ -1,6 +1,7 @@
 // ── Plots ───────────────────────────────────────────────────────────────────
 // Low-level graphics: one specific mark family each, drawn into a given box.
 export { default as BarPlot } from './plots/bar/Plot.svelte';
+export { default as HistogramPlot } from './plots/histogram/Plot.svelte';
 export { default as HeatmapPlot } from './plots/heatmap/Plot.svelte';
 export { default as LinePlot } from './plots/line/Plot.svelte';
 export { default as PyramidPlot } from './plots/pyramid/Plot.svelte';

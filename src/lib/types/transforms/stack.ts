@@ -1,7 +1,7 @@
 import type { TransformChannel } from '$lib/types/transforms/common';
 
 /** Channels both stack transforms read, by svelteplot's own names. */
-type StackChannels = {
+export type StackChannels = {
 	data?: Record<string, unknown>[];
 	x?: TransformChannel;
 	y?: TransformChannel;
@@ -12,6 +12,23 @@ type StackChannels = {
 	z?: TransformChannel;
 	fill?: TransformChannel;
 	stroke?: TransformChannel;
+};
+
+/**
+ * The keys of {@link StackChannels}, at runtime. Typed as a record over the
+ * type's own keys, so a key added to or removed from the type fails to compile here.
+ */
+export const STACK_CHANNEL_KEYS: Record<keyof StackChannels, true> = {
+	data: true,
+	x: true,
+	y: true,
+	x1: true,
+	x2: true,
+	y1: true,
+	y2: true,
+	z: true,
+	fill: true,
+	stroke: true
 };
 
 /** Options both stack transforms take, flat next to the channels — same names as svelteplot's. */

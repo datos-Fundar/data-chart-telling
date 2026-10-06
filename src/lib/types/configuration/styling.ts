@@ -194,6 +194,13 @@ export type ChartConfig = {
 		/** Fill opacity of every area marker that sets none of its own. */
 		fillOpacity: number;
 	};
+	/** Default histogram styling. */
+	histogram: {
+		/** Pixels taken off each side of every bar, so neighbouring bars leave a gap of twice this. */
+		inset: number;
+		/** Fill opacity of every bar, so a grouped histogram's bars behind another group's still show. */
+		fillOpacity: number;
+	};
 	/** Default scatter point geometry. */
 	scatter: { dotRadius: number };
 	/** Timeline gutter styling. */
