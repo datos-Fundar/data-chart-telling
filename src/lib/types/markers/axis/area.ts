@@ -3,7 +3,6 @@ import type { CommonMarkerConfigWithArea } from '$lib/types/markers/channels/com
 import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/commonMarkerConfigWithColor';
 import type { CommonMarkerConfigWithInterval } from '$lib/types/markers/channels/commonMarkerConfigWithInterval';
 import type { MarkerCurveName } from './curveName';
-import type { ClipAwareMarkerConfig } from '$lib/types/markers/channels/clipMarkerConfig';
 
 /** A filled area under a curve, or a band between two curves (svelteplot's `AreaX`/`AreaY`). */
 export type AreaMarkerConfig = {
@@ -13,5 +12,4 @@ export type AreaMarkerConfig = {
 	styles?: AreaStyle;
 } & CommonMarkerConfigWithArea &
 	CommonMarkerConfigWithColor &
-	CommonMarkerConfigWithInterval &
-	ClipAwareMarkerConfig;
+	CommonMarkerConfigWithInterval;

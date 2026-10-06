@@ -21,8 +21,7 @@ const meta = {
 		height: 460,
 		data: [],
 		x: 'x',
-		y: 'y',
-		scales: { x: { domain: [15, 55] }, y: { domain: [0, 60] } }
+		y: 'y'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -41,7 +40,6 @@ type Story = StoryObj<typeof meta>;
 /** The `mean` of each bin's `weight`, binned by `value`: a function reducer over the bin's rows. */
 export const MeanWeight: Story = {
 	args: {
-		scales: { x: { domain: [15, 55] }, y: { domain: [0, 80] } },
 		markers: [
 			{
 				type: 'rect',
@@ -63,7 +61,6 @@ export const MeanWeight: Story = {
 /** `cumulative: 1` adds each bin to the ones before it, so the bars climb to the total number of rows. */
 export const Cumulative: Story = {
 	args: {
-		scales: { x: { domain: [15, 55] }, y: { domain: [0, 300] } },
 		markers: [
 			{
 				type: 'rect',

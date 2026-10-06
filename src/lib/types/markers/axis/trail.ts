@@ -2,7 +2,6 @@ import type { AreaStyle } from '$lib/types/plots/styling';
 import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/commonMarkerConfigWithColor';
 import type { CommonMarkerConfigWithRadius } from '$lib/types/markers/channels/commonMarkerConfigWithRadius';
 import type { MarkerCurveName } from './curveName';
-import type { ClipAwareMarkerConfig } from '$lib/types/markers/channels/clipMarkerConfig';
 
 /** A variable-width ribbon following a path (svelteplot's `Trail`), its width set by `r`. */
 export type TrailMarkerConfig = {
@@ -14,5 +13,4 @@ export type TrailMarkerConfig = {
 	/** A trail is filled only; svelteplot's `Trail` has no stroke. */
 	styles?: Pick<AreaStyle, 'fill' | 'fillOpacity'>;
 } & CommonMarkerConfigWithRadius &
-	CommonMarkerConfigWithColor &
-	ClipAwareMarkerConfig;
+	CommonMarkerConfigWithColor;

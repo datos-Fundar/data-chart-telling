@@ -1,4 +1,4 @@
-import { prepareAuthorMarkers } from '$lib/utils/authorMarkers';
+import { prepareAuthorMarkers, withProcessedRows } from '$lib/utils/authorMarkers';
 import { resolvePlotStatistics, expandMarkerStatistics } from '$lib/utils/statistics';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { StatisticsStageOptions, StatisticsStageState } from '$lib/types/layout/phases';
@@ -10,7 +10,9 @@ const POSITIONED_KINDS = new Set(['line', 'area', 'dot']);
  * The "statistics" stage every axis-based plot shares: seeds `state.markers`
  * with the plot-level `statistics` resolved against every series, followed by
  * the author's own markers, each one inheriting the plot's grouping and color,
- * running its own `transforms`, and expanding its own `.statistics` in place.
+ * drawing the plot's processed rows when it has none of its own (see
+ * `withProcessedRows`), running its own `transforms`, and expanding its own
+ * `.statistics` in place.
  * Authored markers render on top of the plot-level ones. Later phases build
  * onto `state.markers`.
  */
@@ -31,8 +33,11 @@ export function buildStatistics<TState extends StatisticsStageState>(
 			? options.defaultColor(state)
 			: resolvedSeries[0] && colorForSeries?.(resolvedSeries[0].name);
 
+		const onProcessed = authorMarkers.map((marker) =>
+			withProcessedRows(marker, state.processedData)
+		);
 		const positioned = inheritPositions
-			? authorMarkers.map((marker) => {
+			? onProcessed.map((marker) => {
 					if (!POSITIONED_KINDS.has(marker.type)) return marker;
 					const own = marker as AxisBasedMarkersConfig & { x?: unknown; y?: unknown };
 					return {
@@ -41,7 +46,7 @@ export function buildStatistics<TState extends StatisticsStageState>(
 						y: own.y ?? resolvedSeries[0]?.y ?? state.y
 					} as AxisBasedMarkersConfig;
 				})
-			: authorMarkers;
+			: onProcessed;
 
 		const markers: AxisBasedMarkersConfig[] = [
 			...resolvePlotStatistics({ series: resolvedSeries, statistics, colorFor: colorForSeries }),

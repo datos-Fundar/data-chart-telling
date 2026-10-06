@@ -21,6 +21,7 @@ const COLOR_KINDS = new Set([
 	'delaunayMesh',
 	'dot',
 	'hull',
+	'line',
 	'rect',
 	'tick',
 	'trail',
@@ -74,7 +75,8 @@ export function withSeriesColor<TMarker extends MarkerLike>(
 				? ['stroke']
 				: ['fill', 'stroke'];
 	const styles: Record<string, unknown> = { ...(marker.styles ?? {}) };
-	for (const key of keys) styles[key] = color;
+	// A `'none'` the marker sets doesn't block the inherited color, but stays itself.
+	for (const key of keys) styles[key] ??= color;
 	return { ...marker, styles };
 }
 

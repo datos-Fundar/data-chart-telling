@@ -56,10 +56,16 @@
 	);
 
 	const r = $derived(rProp ?? styles?.dotRadius ?? 5);
-	const fill = $derived(resolvedFill ?? fillProp ?? styles?.dotFill ?? 'currentColor');
+	/**
+	 * svelteplot reads a literal `'none'` as a value for its color scale (it
+	 * isn't a CSS color to it) and paints it with the scale's first color, so
+	 * `'none'` is handed over as unset, which svelteplot draws as no paint.
+	 */
+	const paint = <T,>(value: T): T | undefined => (value === 'none' ? undefined : value);
+	const fill = $derived(paint(resolvedFill ?? fillProp ?? styles?.dotFill ?? 'currentColor'));
 	const flatFillOpacity = $derived(styles?.dotFillOpacity ?? 1);
 	const symbol = $derived(resolvedSymbolFn ?? styles?.dotSymbol ?? 'circle');
-	const stroke = $derived(styles?.dotStroke ?? 'currentColor');
+	const stroke = $derived(paint(styles?.dotStroke ?? 'currentColor'));
 	const strokeWidth = $derived(styles?.dotStrokeWidth ?? 1);
 	const strokeOpacity = $derived(styles?.dotStrokeOpacity ?? 1);
 	const strokeDasharray = $derived(styles?.dotStrokeDasharray);

@@ -1,6 +1,5 @@
 import type { StrokeStyle } from '$lib/types/plots/styling';
 import type { CommonMarkerConfig } from '$lib/types/markers/channels/commonMarkerConfig';
-import type { ClipUnawareMarkerConfig } from '$lib/types/markers/channels/clipMarkerConfig';
 
 /** Live selection rectangle of a brush marker, the same shape as svelteplot's `Brush` state. */
 export type BrushSelection = {
@@ -22,5 +21,4 @@ export type BrushMarkerConfig = {
 	onbrush?: (event: MouseEvent & { brush: BrushSelection }) => void;
 	onbrushend?: (event: MouseEvent & { brush: BrushSelection }) => void;
 	styles?: StrokeStyle;
-} & Pick<CommonMarkerConfig, 'series'> &
-	ClipUnawareMarkerConfig;
+} & Pick<CommonMarkerConfig, 'series'>;

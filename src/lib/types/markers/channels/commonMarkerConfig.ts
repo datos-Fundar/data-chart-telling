@@ -16,4 +16,6 @@ export type CommonMarkerConfig = {
 	scales?: ChannelScalesConfig;
 	statistics?: StatisticConfig[];
 	transforms?: MarkerTransform[];
+	/** Clips the marker to the plot's frame. Unset, its kind's default applies. */
+	clip?: boolean;
 };

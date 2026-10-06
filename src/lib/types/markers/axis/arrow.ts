@@ -1,6 +1,5 @@
 import type { StrokeStyle } from '$lib/types/plots/styling';
 import type { CommonMarkerConfigWithInterval } from '$lib/types/markers/channels/commonMarkerConfigWithInterval';
-import type { ClipUnawareMarkerConfig } from '$lib/types/markers/channels/clipMarkerConfig';
 
 /** A point-to-point arrow (svelteplot's `Arrow`), from `x1`/`y1` to `x2`/`y2`. */
 export type ArrowMarkerConfig = {
@@ -14,5 +13,4 @@ export type ArrowMarkerConfig = {
 	insetEnd?: number;
 	sweep?: 1 | 0 | -1 | '+x' | '-x' | '+y' | '-y';
 	styles?: StrokeStyle;
-} & CommonMarkerConfigWithInterval &
-	ClipUnawareMarkerConfig;
+} & CommonMarkerConfigWithInterval;

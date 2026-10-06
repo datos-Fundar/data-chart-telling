@@ -2,6 +2,7 @@ import type { Accessor, Series } from '$lib/types/plots/data/common';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
+import type { ProcessedData } from './transforms';
 
 /**
  * What the shared "statistics" stage reads from and writes to a plot's state.
@@ -18,6 +19,8 @@ export type StatisticsStageState = {
 	resolvedSeries?: Series<any>[];
 	flat?: any[];
 	colorForSeries?: (name: string) => string;
+	/** The plot's rows after its own transforms, which an author marker without rows of its own draws. */
+	processedData?: ProcessedData;
 	markers?: AxisBasedMarkersConfig[];
 };
 /* eslint-enable @typescript-eslint/no-explicit-any */

@@ -1,10 +1,15 @@
-import { buildProcessedGroups } from '$lib/layout/phases/transforms';
+import { buildProcessedRuns } from '$lib/layout/phases/transforms';
 import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/scatter/state';
 import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
 import type { DotMarkerConfig } from '$lib/types/markers/common';
 import type { AxisValue } from '$lib/types/layout/mapping';
 
-/** ScatterPlot's "markers" phase: one `'dot'` marker per visual segment of the rows the "transforms" phase left — prepended onto whatever the "statistics" phase already put in `state.markers`. */
+/**
+ * ScatterPlot's "markers" phase: one `'dot'` marker per visual segment of the
+ * rows the "transforms" phase left, in their own order, so a reordering
+ * transform decides which dots paint on top — prepended onto whatever the
+ * "statistics" phase already put in `state.markers`.
+ */
 export function buildMarkers<TData extends Record<string, unknown>>(
 	state: ScatterPlotState<TData>,
 	ctx: ScatterPlotCtx
@@ -59,7 +64,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 			: undefined;
 
 	const markers: DotMarkerConfig[] = [];
-	buildProcessedGroups<ScatterSegmentStyle>(state, false).forEach((group) => {
+	buildProcessedRuns<ScatterSegmentStyle>(state).forEach((group) => {
 		const defaultColor = colorForSeries!(group.series.name);
 		const disabledDots = disabledDotsFor?.(group.series.name);
 

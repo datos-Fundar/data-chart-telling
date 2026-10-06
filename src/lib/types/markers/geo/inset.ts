@@ -3,7 +3,6 @@ import type { GeoFeature, GeoJsonInput } from '$lib/types/plots/data/geo';
 import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
 import type { GeoProjectionName } from '$lib/types/layout/coordinates';
 import type { TooltipAnchorX, TooltipAnchorY } from '$lib/types/layout/tooltip';
-import type { ClipUnawareMarkerConfig } from '$lib/types/markers/channels/clipMarkerConfig';
 
 /** Which frame edge an inset is anchored to, and where along it. */
 export type GeoInsetLocation =
@@ -69,4 +68,4 @@ export type GeoInsetMarkerConfig<TProps extends Record<string, unknown> = Record
 		margin?: number;
 		styles?: GeoSegmentStyle;
 		tooltip?: GeoInsetTooltipConfig;
-	} & ClipUnawareMarkerConfig;
+	};

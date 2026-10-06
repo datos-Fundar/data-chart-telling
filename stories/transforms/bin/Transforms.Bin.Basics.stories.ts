@@ -7,8 +7,8 @@ import { MEASUREMENTS } from '../../data/measurements';
 // A `binX` transform on a `rect` marker: the marker's rows are grouped into bins
 // along `x`, and each bin is reduced to one rect. The default reducer is `count`,
 // so the bar's height is how many rows fall in the bin. `binY` is the same on the
-// other axis. Demoed on an empty `LinePlot` canvas with the domains pinned, so
-// only the bins are on screen — see `Plots/HistogramPlot` for bins on real charts.
+// other axis. Demoed on an empty `LinePlot` canvas, which fits its domains to the
+// bins, so only the bins are on screen — see `Plots/HistogramPlot` for bins on real charts.
 
 const meta = {
 	title: 'Transforms/Bin/Basics',
@@ -19,8 +19,7 @@ const meta = {
 		height: 460,
 		data: [],
 		x: 'x',
-		y: 'y',
-		scales: { x: { domain: [15, 55] }, y: { domain: [0, 60] } }
+		y: 'y'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -56,7 +55,6 @@ export const Count: Story = {
 /** `binY` bins along `y` instead, so the bars run horizontally: the reducer goes to `x`, the bar's length. */
 export const BinY: Story = {
 	args: {
-		scales: { x: { domain: [0, 60] }, y: { domain: [15, 55] } },
 		markers: [
 			{
 				type: 'rect',

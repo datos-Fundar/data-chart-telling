@@ -64,7 +64,6 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 			markers.push({
 				type: 'bar',
 				role: 'segment',
-				clip: true,
 				isHorizontal: true,
 				data: realData,
 				y: processedCategory,
@@ -98,7 +97,6 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 			markers.push({
 				type: 'bar',
 				role: 'segment',
-				clip: true,
 				isHorizontal: true,
 				data: taggedData,
 				y: category,

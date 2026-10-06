@@ -43,7 +43,6 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 			finishTransforms(
 				{
 					type: 'area',
-					clip: true,
 					series: group.series.name,
 					data: seg.data,
 					...channels,

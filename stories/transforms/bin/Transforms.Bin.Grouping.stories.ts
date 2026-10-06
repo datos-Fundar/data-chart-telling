@@ -18,8 +18,7 @@ const meta = {
 		height: 460,
 		data: [],
 		x: 'x',
-		y: 'y',
-		scales: { x: { domain: [15, 55] }, y: { domain: [0, 60] } }
+		y: 'y'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },

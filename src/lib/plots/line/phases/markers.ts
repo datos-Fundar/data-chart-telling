@@ -44,7 +44,6 @@ export function buildLineMarkers<TData extends Record<string, unknown>>(args: {
 			const dotStyle = seg.styles.dots;
 			markers.push({
 				type: 'line',
-				clip: true,
 				data: seg.data,
 				x,
 				y,
@@ -136,7 +135,6 @@ export function buildGapMarkers<TData extends Record<string, unknown>>(args: {
 
 			markers.push({
 				type: 'line',
-				clip: true,
 				data: run.points,
 				x: gx,
 				y: gy,

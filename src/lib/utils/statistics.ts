@@ -1,4 +1,4 @@
-import { densityX, windowY } from 'svelteplot';
+import { runTransform } from '$lib/utils/transforms';
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { resolveChannelFill } from '$lib/markers/resolveChannelFill';
 import type { AxisValue } from '$lib/types/layout/mapping';
@@ -50,28 +50,28 @@ function asStatisticAccessor<T extends Record<string, unknown>>(
 export const STATISTIC_FALLBACK_COLOR = '#000000';
 
 /**
- * Sliding-window reducer (mean/median/sum/…) via svelteplot's own `windowY`
- * transform — svelteplot has no dedicated mark for this (unlike
- * `regression`/`bollinger`), so the result is wrapped into our own `line`
- * marker. `windowY` keeps one output row per input row (unlike
- * `bollinger`/`regression`, which resample), so `x`/`y` pass straight
- * through as the same field-key-or-function shorthand `source` carries.
+ * Sliding-window reducer (mean/median/sum/…): the `windowY` transform, wrapped
+ * into our own `line` marker — svelteplot has no dedicated mark for this
+ * (unlike `regression`/`bollinger`). `windowY` keeps one output row per input
+ * row, so `x` passes straight through.
  */
 export function resolveMovingAverage<T extends Record<string, unknown>>(
 	source: StatisticSource<T>,
 	config: MovingAverageStatisticOptions
 ): LineMarkerConfig {
-	const result = windowY(
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		{ data: source.data, x: source.x, y: source.y } as any,
-		{ k: config.k, reduce: config.reduce ?? 'mean' }
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	) as any;
+	const result = runTransform({
+		type: 'windowY',
+		data: source.data,
+		x: source.x,
+		y: source.y,
+		k: config.k,
+		reduce: config.reduce ?? 'mean'
+	});
 	return {
 		type: 'line',
-		data: result.data,
-		x: result.x,
-		y: result.y,
+		data: result.data as Record<string, unknown>[],
+		x: result.x as LineMarkerConfig['x'],
+		y: result.y as LineMarkerConfig['y'],
 		styles: {
 			...config.styles,
 			stroke: config.styles?.stroke ?? source.color ?? STATISTIC_FALLBACK_COLOR
@@ -80,49 +80,28 @@ export function resolveMovingAverage<T extends Record<string, unknown>>(
 }
 
 /**
- * Silverman's rule-of-thumb bandwidth. svelteplot's own `densityX` has no
- * default bandwidth (an unset one yields NaN estimates, so nothing draws), so
- * this supplies one. Receives the sorted values, as svelteplot passes them.
- */
-function silvermanBandwidth(sorted: number[]): number {
-	const n = sorted.length;
-	if (n < 2) return 1;
-	const mean = sorted.reduce((a, b) => a + b, 0) / n;
-	const sd = Math.sqrt(sorted.reduce((a, b) => a + (b - mean) ** 2, 0) / (n - 1));
-	const q = (p: number) => sorted[Math.floor(p * (n - 1))];
-	const iqr = (q(0.75) - q(0.25)) / 1.34;
-	const spread = Math.min(sd, iqr) || sd || 1;
-	return 0.9 * spread * n ** -0.2;
-}
-
-/**
- * 1D kernel density over the source's `x` values via svelteplot's own
- * `densityX` transform, wrapped into an `area` marker — the curve's own `x`
- * is the value and `y` the density, so it draws on the plot's axes as-is.
- * Like `resolveMovingAverage`, the transform's output is one derived row per
- * estimate point rather than one per input row, so the result doesn't reuse
- * the source's own rows. Fill falls back to the source color, then to
- * {@link STATISTIC_FALLBACK_COLOR}.
+ * 1D kernel density over the source's `x` values: the `densityX` transform,
+ * wrapped into an `area` marker — the curve's own `x` is the value and `y` the
+ * density, so it draws on the plot's axes as-is. Like `resolveMovingAverage`,
+ * the output is one derived row per estimate point rather than one per input
+ * row. Fill falls back to the source color, then to {@link STATISTIC_FALLBACK_COLOR}.
  */
 export function resolveDensityStatistic<T extends Record<string, unknown>>(
 	source: StatisticSource<T>,
 	config: DensityStatisticOptions
 ): AreaMarkerConfig {
-	const result = densityX(
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		{ data: source.data, x: source.x } as any,
-		{
-			channel: 'y',
-			kernel: config.kernel,
-			bandwidth: config.bandwidth ?? silvermanBandwidth
-		}
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	) as any;
+	const result = runTransform({
+		type: 'densityX',
+		data: source.data,
+		x: source.x,
+		kernel: config.kernel,
+		bandwidth: config.bandwidth
+	});
 	return {
 		type: 'area',
-		data: result.data,
-		x: result.x,
-		y: result.y,
+		data: result.data as Record<string, unknown>[],
+		x: result.x as AreaMarkerConfig['x'],
+		y: result.y as AreaMarkerConfig['y'],
 		styles: {
 			...config.styles,
 			fill: config.styles?.fill ?? source.color ?? STATISTIC_FALLBACK_COLOR

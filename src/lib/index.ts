@@ -204,6 +204,7 @@ export type {
 	StatisticReducer,
 	MovingAverageStatisticOptions
 } from './types/layout/statistics';
+export type * from './types/transforms';
 export type { DeltaMarkerConfig, DeltaConfig, DeltaTarget } from './types/markers/axis/delta';
 export type { GeoFeature, GeoJsonInput, GeoDataProps, Topology } from './types/plots/data/geo';
 export type {

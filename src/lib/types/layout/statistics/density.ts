@@ -1,23 +1,17 @@
 import type { AreaStyle } from '$lib/types/plots/styling';
+import type { DensityKernel } from '$lib/types/transforms/density';
 
-/** Kernel shapes svelteplot's own `densityX` transform supports. */
-export type DensityKernel =
-	| 'uniform'
-	| 'triangular'
-	| 'epanechnikov'
-	| 'quartic'
-	| 'triweight'
-	| 'gaussian'
-	| 'cosine';
+export type { DensityKernel } from '$lib/types/transforms/density';
 
 /**
  * Options for `type: 'density'` — a 1D kernel density estimate over the
- * `x` values, drawn as a filled area. Mirrors svelteplot's own `densityX`
- * transform (same option names); the curve's own `y` is the density.
+ * `x` values, drawn as a filled area. Runs the `densityX` transform (same
+ * option names); the curve's own `y` is the density. To run the estimate on a
+ * marker of your own, or on a plot's own rows, use that transform directly.
  */
 export type DensityStatisticOptions = {
 	kernel?: DensityKernel;
-	/** Kernel bandwidth in data units; svelteplot picks one from the data when unset. */
+	/** Kernel bandwidth in data units; Silverman's rule picks one from the data when unset. */
 	bandwidth?: number;
 	styles?: AreaStyle;
 };

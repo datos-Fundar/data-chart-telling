@@ -111,7 +111,6 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 
 	const markers: CellMarkerConfig[] = styleGroups.map((group) => ({
 		type: 'cell',
-		clip: true,
 		data: group.data,
 		x: getX,
 		y: getY,

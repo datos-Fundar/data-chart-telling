@@ -19,7 +19,7 @@ export const SERIES_KEY = '__series';
 const CHANNEL_NAMES: readonly ProcessedChannelName[] = ['x', 'y', 'x1', 'x2', 'y1', 'y2'];
 
 /** Props of a transform's output that are neither a channel nor an option for the mark. */
-const NOT_OPTIONS = new Set(['data', 'z', 'grouping', 'transforms']);
+const NOT_OPTIONS = new Set(['data', 'z', 'grouping', 'transforms', 'sort', 'filter']);
 
 /**
  * One series accessor shared by every series as-is, so a field key keeps
@@ -84,21 +84,61 @@ export function buildTransforms<TState extends TransformsStageState, TCtx = unkn
 /**
  * The processed rows split back into one group per visible series, each cut
  * into its styled visual segments by `segments`, matched on the processed `x`.
- * With no transforms, each series keeps its own `x`/`y`; otherwise every
- * series reads the transforms' channels (a stack's top, `y2`, as its `y`).
+ * Each series reads its rows as {@link processedSeries} does.
  */
 export function buildProcessedGroups<TStyle>(
 	state: TransformsStageState & { segments?: SegmentsConfig<TStyle> },
 	connect = true
 ): VisualGroup<Series<ProcessedRow>, TStyle>[] {
-	const { data, channels, transforms } = state.processedData!;
-	const series: Series<ProcessedRow>[] = (state.resolvedSeries ?? []).map((s) => ({
-		name: s.name,
-		x: (transforms.length ? (channels.x ?? channels.x1) : s.x) as Series<ProcessedRow>['x'],
-		y: (transforms.length ? (channels.y ?? channels.y2) : s.y) as Series<ProcessedRow>['y'],
-		data: data.filter((row) => row[SERIES_KEY] === s.name)
-	}));
+	const { data } = state.processedData!;
+	const series = (state.resolvedSeries ?? []).map((s) =>
+		processedSeries(
+			state,
+			s,
+			data.filter((row) => row[SERIES_KEY] === s.name)
+		)
+	);
 	return buildGroupedSeries<Series<ProcessedRow>, TStyle>(series, state.segments, connect);
+}
+
+/**
+ * The processed rows in their own order, split into runs of consecutive rows
+ * from the same visible series, each cut into its styled visual segments like
+ * {@link buildProcessedGroups}. Drawn in turn, the runs keep the rows' order
+ * across series, so a transform that reorders rows (`sort`, `reverse`,
+ * `shuffle`) decides which rows paint on top. Unreordered, each series is one run.
+ */
+export function buildProcessedRuns<TStyle>(
+	state: TransformsStageState & { segments?: SegmentsConfig<TStyle> }
+): VisualGroup<Series<ProcessedRow>, TStyle>[] {
+	const byName = new Map((state.resolvedSeries ?? []).map((s) => [s.name, s]));
+	const runs: Series<ProcessedRow>[] = [];
+	for (const row of state.processedData!.data) {
+		const source = byName.get(row[SERIES_KEY] as string);
+		if (!source) continue;
+		const last = runs.at(-1);
+		if (last?.name === source.name) last.data.push(row);
+		else runs.push(processedSeries(state, source, [row]));
+	}
+	return buildGroupedSeries<Series<ProcessedRow>, TStyle>(runs, state.segments, false);
+}
+
+/**
+ * One series over some of its processed rows. With no transforms it keeps its
+ * own `x`/`y`; otherwise it reads the transforms' channels (a stack's top, `y2`, as its `y`).
+ */
+function processedSeries(
+	state: TransformsStageState,
+	source: Series,
+	data: ProcessedRow[]
+): Series<ProcessedRow> {
+	const { channels, transforms } = state.processedData!;
+	return {
+		name: source.name,
+		x: (transforms.length ? (channels.x ?? channels.x1) : source.x) as Series<ProcessedRow>['x'],
+		y: (transforms.length ? (channels.y ?? channels.y2) : source.y) as Series<ProcessedRow>['y'],
+		data
+	};
 }
 
 /** Where a processed row sits: its `x` (or the middle of `x1`–`x2`) and the top of its `y` (`y2`, or `y`). */

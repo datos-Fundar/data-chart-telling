@@ -1,7 +1,6 @@
 import type { AreaStyle } from '$lib/types/plots/styling';
 import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/commonMarkerConfigWithColor';
 import type { CommonMarkerConfigWithWeight } from '$lib/types/markers/channels/commonMarkerConfigWithWeight';
-import type { ClipAwareMarkerConfig } from '$lib/types/markers/channels/clipMarkerConfig';
 
 /** Two-dimensional kernel density estimation drawn as contour bands (svelteplot's `Density`). */
 export type DensityMarkerConfig = {
@@ -12,5 +11,4 @@ export type DensityMarkerConfig = {
 	thresholds?: number | number[];
 	styles?: AreaStyle;
 } & CommonMarkerConfigWithColor &
-	CommonMarkerConfigWithWeight &
-	ClipAwareMarkerConfig;
+	CommonMarkerConfigWithWeight;

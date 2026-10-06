@@ -49,6 +49,7 @@
 	import type { GeoFeature } from '$lib/types/plots/data/geo';
 	import type { ChannelScalesConfig } from '$lib/types/layout/scales';
 	import { withHoverSeriesColor, withSeriesColor } from '$lib/utils/markerGrouping';
+	import { isFrameClipped } from '$lib/utils/frameClip';
 
 	/**
 	 * Renders every marker in `markers`, in array order, each delegated to the
@@ -241,7 +242,7 @@
 {/snippet}
 
 {#each geometryMarkers as marker, i (markerKey(marker, i))}
-	<FrameClip clip={marker.clip === true}>
+	<FrameClip clip={isFrameClipped(marker)}>
 		{@render renderMarker(marker, data)}
 	</FrameClip>
 {/each}
@@ -285,7 +286,7 @@
 				<marker.component {...marker.props} series={group.name} data={group.data} />
 			{/if}
 		{:else}
-			<FrameClip clip={marker.clip === true}>
+			<FrameClip clip={isFrameClipped(marker)}>
 				{@render renderMarker(withSeriesColor(marker, group.color), group.data)}
 			</FrameClip>
 		{/if}

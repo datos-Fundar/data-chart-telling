@@ -52,7 +52,6 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 			const marker: BarMarkerConfig = {
 				type: 'bar',
 				role: 'segment',
-				clip: true,
 				isHorizontal: isHorizontal!,
 				data,
 				styles

@@ -22,7 +22,6 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 			finishTransforms(
 				{
 					type: 'rect',
-					clip: true,
 					series: group.series.name,
 					data: seg.data,
 					...channels,

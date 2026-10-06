@@ -1,11 +1,6 @@
-import type { TransformChannel } from '$lib/types/transforms/common';
+import type { TransformChannel, TransformReducer } from '$lib/types/transforms/common';
 
-/**
- * A reducer a bin transform runs over each bin's rows: svelteplot's own name
- * (`count`, `sum`, `mean`, …) or a function of the rows.
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type BinReducer = string | ((group: any[]) => unknown);
+type BinReducer = TransformReducer;
 
 /** Channels both bin transforms read besides their binned one; `z` splits each bin by a group. */
 type SharedBinChannels = {
@@ -46,6 +41,15 @@ export const BIN_Y_CHANNEL_KEYS: Record<keyof BinYChannels, true> = {
 	insetRight: true,
 	insetTop: true,
 	insetBottom: true
+};
+
+/** Channels the 2D `bin` reads: both binned axes, plus the shared ones. */
+export type Bin2DChannels = SharedBinChannels & { x?: TransformChannel; y?: TransformChannel };
+
+/** The keys of {@link Bin2DChannels}, at runtime — see {@link BIN_X_CHANNEL_KEYS}. */
+export const BIN_2D_CHANNEL_KEYS: Record<keyof Bin2DChannels, true> = {
+	...BIN_X_CHANNEL_KEYS,
+	y: true
 };
 
 /** Options both bin transforms take, flat next to the channels — same names as svelteplot's. */
@@ -93,3 +97,11 @@ export type BinYTransform = {
 	x?: BinReducer;
 } & BinYChannels &
 	BinOptions;
+
+/**
+ * `bin` as a marker transform: bins on `x` and `y` at once, so each output row
+ * is one cell of a 2D grid with its `x1`/`x2`/`y1`/`y2` edges. Its value goes to
+ * one of the other channels — `fill: 'count'` colors each cell by its row count,
+ * `r: 'count'` sizes a dot by it.
+ */
+export type Bin2DTransform = { type: 'bin' } & Bin2DChannels & BinOptions;
