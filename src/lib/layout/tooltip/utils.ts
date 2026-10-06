@@ -1,4 +1,4 @@
-import type { AxisValue } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 import type {
   HoverStore,
   HoverStrategy,

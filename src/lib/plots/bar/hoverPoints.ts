@@ -1,6 +1,6 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
 import { isGapValue } from '$lib/plots/utils/gaps';
-import type { AxisValue } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 import type { Series } from '$lib/types/plots/data/common';
 import type { HoverPoint } from '$lib/types/layout/tooltip';
 import type { BarLayout } from '$lib/types/plots/bar/layout';
@@ -12,14 +12,14 @@ import type { BarLayout } from '$lib/types/plots/bar/layout';
  * every series at the same category still matches together under the 'x'
  * strategy; `dx`/`dy` only nudge where the matched point is *drawn* — see
  * {@link import('$lib/types/layout/tooltip').HoverDisplayPoint}. For
- * 'stacked' layout, `value` itself is adjusted to the series' cumulative
- * height instead of `dx`/`dy`, since that offset is representable as a
- * regular data value (unlike 'grouped''s pixel-only slice offset).
+ * 'stacked' layout, `value` itself is the top the stack gave the bar instead
+ * of `dx`/`dy`, since that offset is representable as a regular data value
+ * (unlike 'grouped''s pixel-only slice offset).
  */
 export function buildHoverPoints<TData extends Record<string, unknown>>(
 	resolvedSeries: Series<TData>[],
 	isHorizontal: boolean,
-	geometry: Pick<BarLayout, 'layout' | 'stackedBaseline' | 'groupOffset' | 'groupInsetFraction'>,
+	geometry: Pick<BarLayout, 'layout' | 'stackedSpan' | 'groupOffset' | 'groupInsetFraction'>,
 	colorFor: (seriesName: string) => string
 ): HoverPoint<TData>[] {
 	return resolvedSeries.flatMap((s, idx) => {
@@ -33,7 +33,7 @@ export function buildHoverPoints<TData extends Record<string, unknown>>(
 				const rawValue = Number(sy(d));
 				const value =
 					geometry.layout === 'stacked'
-						? geometry.stackedBaseline(category, idx) + rawValue
+						? (geometry.stackedSpan(category, idx)?.[1] ?? rawValue)
 						: rawValue;
 				const { dx, dy } = geometry.groupOffset(idx);
 				return {

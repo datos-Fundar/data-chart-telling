@@ -1,4 +1,5 @@
 import type { CommonMarkerConfigWithInterval } from '$lib/types/markers/channels/commonMarkerConfigWithInterval';
+import type { ClipAwareMarkerConfig } from '$lib/types/markers/channels/clipMarkerConfig';
 
 /** A raster image of a field over a rectangle, drawn to a canvas (svelteplot's `Raster`). */
 export type RasterMarkerConfig = {
@@ -18,4 +19,5 @@ export type RasterMarkerConfig = {
 	x2?: number;
 	y1?: number;
 	y2?: number;
-} & CommonMarkerConfigWithInterval;
+} & CommonMarkerConfigWithInterval &
+	ClipAwareMarkerConfig;

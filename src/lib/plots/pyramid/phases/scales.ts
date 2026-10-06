@@ -1,6 +1,6 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
 import { isGapValue } from '$lib/plots/utils/gaps';
-import type { AxisValue } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 import type { PyramidPlotState, PyramidPlotCtx } from '$lib/types/plots/pyramid/state';
 
 /** PyramidPlot's "scales" phase: diverging x domain sized to the largest magnitude, band y domain over every category. */

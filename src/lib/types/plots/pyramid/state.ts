@@ -1,14 +1,9 @@
-import type { Series, Accessor } from '$lib/types/plots/data/common';
-import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import type { SegmentsConfig, MarginConfig } from '$lib/types/plots/props';
+import type { Series } from '$lib/types/plots/data/common';
+import type { AxisValue } from '$lib/types/layout/mapping';
 import type { GapZonesConfig } from '$lib/types/plots/gaps';
-import type { VisualGroup } from '$lib/types/plots/segments/config';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
-import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
 import type { DiscreteGapFill } from '$lib/plots/utils/gaps';
-import type { ChartConfig } from '$lib/types/configuration/styling';
-import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import type { StatisticConfig } from '$lib/types/layout/statistics';
+import type { AxisPlotState, AxisPlotCtx } from '$lib/types/layout/phases';
 
 export type PyramidSide = 'left' | 'right';
 
@@ -30,51 +25,25 @@ export type PyramidTaggedRow<TData extends Record<string, unknown>> = TData & {
 	__series: string;
 };
 
-/** PyramidPlot's shared pipeline state — raw props plus every phase's own output. */
-export type PyramidPlotState<TData extends Record<string, unknown>> = {
-	series?: Series<TData>[];
-	data?: TData[];
-	/** Magnitude accessor (the plot's `x` prop). */
-	x?: Accessor<TData, AxisValue>;
-	/** Category accessor (the plot's `y` prop). */
-	y?: Accessor<TData, AxisValue>;
-	/** Side-grouping accessor — defaults to `color` when unset (see `DataProps.grouping`). */
-	grouping?: Accessor<TData, unknown>;
-	color?: Accessor<TData, unknown>;
-	segments: SegmentsConfig<BarSegmentStyle>;
-	gaps: Record<string, GapZonesConfig<BarSegmentStyle>>;
-	scales: AxisBasedScalesConfig<TData>;
-	width: number;
-	height: number;
-	margins?: MarginConfig;
-	authorMarkers?: AxisBasedMarkersConfig[];
-	statistics?: StatisticConfig[];
+/**
+ * PyramidPlot's pipeline state: the shared axis-based state with its own series
+ * and row shapes. `x` is the magnitude accessor and `y` the category one; the
+ * "mapping" phase leaves `flat` as tagged, hover-safe rows (gap rows filtered out).
+ */
+export type PyramidPlotState<TData extends Record<string, unknown>> = AxisPlotState<
+	TData,
+	BarSegmentStyle,
+	PyramidSeries<TData>,
+	PyramidTaggedRow<TData>
+> & {
+	gaps?: Record<string, GapZonesConfig<BarSegmentStyle>>;
 
 	// "data" phase output.
-	resolvedSeries?: PyramidSeries<TData>[];
-	groupedSeries?: VisualGroup<PyramidSeries<TData>, BarSegmentStyle>[];
 	gapFillMaps?: Map<string, Map<TData, DiscreteGapFill<BarSegmentStyle>>>;
-	scopedGroups?: ScopedMarkerGroup<TData>[];
-	colorForSeries?: (name: string) => string;
-
-	// "mapping" phase output — tagged, hover-safe rows (gap rows already filtered out).
-	flat?: PyramidTaggedRow<TData>[];
-
-	// Accumulates from "statistics" onward: `authorMarkers` (each one's own
-	// `.statistics` expanded in place) plus the top-level `statistics` prop
-	// resolved against every resolved series, then "markers" prepends its own
-	// segment bars in front.
-	markers?: AxisBasedMarkersConfig[];
 };
 
-/**
- * The environment every PyramidPlot phase reads from, alongside the growing
- * state. No `legendInteraction` here — unlike Bar/Scatter, a pyramid never
- * omits a disabled series (that would break its left/right symmetry); legend
- * dimming stays a `Plot.svelte`-local concern instead.
- */
-export type PyramidPlotCtx = {
-	cfg: ChartConfig;
+/** The environment every PyramidPlot phase reads from, alongside the growing state. */
+export type PyramidPlotCtx = AxisPlotCtx & {
 	formatValue: (value: number, seriesName: string) => string;
 	disabledFillFor?: (name: string) => { fill?: string; fillOpacity?: number } | undefined;
 };

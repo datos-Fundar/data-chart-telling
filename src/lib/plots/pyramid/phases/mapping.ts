@@ -1,14 +1,14 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
 import { isGapValue } from '$lib/plots/utils/gaps';
-import type { AxisValue } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 import type {
 	PyramidPlotState,
 	PyramidPlotCtx,
 	PyramidTaggedRow
 } from '$lib/types/plots/pyramid/state';
 
-/** PyramidPlot's "mapping" phase: tags every real (non-gap) row with its resolved side/signed-magnitude/category/label. */
-export function buildMapping<TData extends Record<string, unknown>>(
+/** PyramidPlot's own "mapping" output: every real (non-gap) row tagged with its resolved side/signed-magnitude/category/label, as `flat`. */
+export function buildTaggedRows<TData extends Record<string, unknown>>(
 	state: PyramidPlotState<TData>,
 	ctx: PyramidPlotCtx
 ): PyramidPlotState<TData> {

@@ -281,9 +281,6 @@ export const GroupedSeries: Story = {
 		x: 'province',
 		y: 'value',
 		color: 'sex',
-		scales: {
-			grouping: { seriesLayout: 'grouped', seriesPadding: 0.2 }
-		},
 		markers: [
 			{
 				type: 'hover'
@@ -302,9 +299,6 @@ export const GroupedSeriesWithHighlightArea: Story = {
 		x: 'province',
 		y: 'value',
 		color: 'sex',
-		scales: {
-			grouping: { seriesLayout: 'grouped', seriesPadding: 0.2 }
-		},
 		markers: [
 			{
 				type: 'hover',
@@ -327,8 +321,7 @@ export const GroupedSeriesWithHighlightAreaHorizontal: Story = {
 		y: 'value',
 		color: 'sex',
 		scales: {
-			y: { type: 'categorical' },
-			grouping: { seriesLayout: 'grouped', seriesPadding: 0.2 }
+			y: { type: 'categorical' }
 		},
 		markers: [
 			{
@@ -351,9 +344,7 @@ export const StackedSeries: Story = {
 		x: 'province',
 		y: 'value',
 		color: 'sex',
-		scales: {
-			grouping: { seriesLayout: 'stacked' }
-		},
+		transforms: [{ type: 'stackY' as const }],
 		markers: [
 			{
 				type: 'hover'

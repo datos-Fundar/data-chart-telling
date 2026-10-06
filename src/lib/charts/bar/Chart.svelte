@@ -37,9 +37,11 @@
 		margins,
 		segments,
 		markers = [],
+		transforms,
 		facet,
 		timeline,
-		tooltip
+		tooltip,
+		...channels
 	}: GapsAwareChartProps<TRow, BarSegmentStyle> = $props();
 
 	const tip = $derived(resolveTooltip(tooltip, 'x'));
@@ -87,6 +89,7 @@
 >
 	{#snippet plot({ data: rows, width: w, height: h, facetValue })}
 		<BarPlot
+			{...channels}
 			width={w}
 			height={h}
 			data={rows}
@@ -99,6 +102,7 @@
 			{margins}
 			{segments}
 			{markers}
+			{transforms}
 			tooltip={tip.enabled
 				? {
 						format: tip.format ?? defaultFormat,

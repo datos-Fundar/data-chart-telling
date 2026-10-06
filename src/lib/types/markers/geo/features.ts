@@ -1,3 +1,5 @@
+import type { ClipUnawareMarkerConfig } from '$lib/types/markers/channels/clipMarkerConfig';
+
 /** The base choropleth mark, one per resolved feature style. Built internally, never authored. */
 export type GeoFeaturesMarkerConfig = {
 	type: 'geo';
@@ -12,4 +14,4 @@ export type GeoFeaturesMarkerConfig = {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	onpointerenter?: (e: Event, d: any) => void;
 	onpointerleave?: (e: Event) => void;
-};
+} & ClipUnawareMarkerConfig;

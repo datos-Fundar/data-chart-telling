@@ -13,22 +13,18 @@
 		halfDimensionOverflowCap
 	} from '$lib/plots/utils/labelOverflow.svelte';
 	import { estimateLineValueLabelMargin } from '$lib/plots/line/valueLabelMargin';
-	import { buildData } from '$lib/plots/line/phases/data';
-	import { buildMapping } from '$lib/plots/line/phases/mapping';
-	import { buildMarkers } from '$lib/plots/line/phases/markers';
-	import { buildStatistics } from '$lib/plots/line/phases/statistics';
+	import { processedPosition } from '$lib/layout/phases/transforms';
 	import { runStages } from '$lib/layout/phases/runStages';
+	import { buildAxisStages } from '$lib/layout/phases/axisStages';
+	import { buildHover, buildProcessedHoverPoints } from '$lib/layout/tooltip/buildHover';
+	import { buildLineKind } from '$lib/plots/line/kind';
 	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
 	import ValueLabels from '$lib/plots/line/ValueLabels.svelte';
-	import {
-		hasHoverMarker,
-		resolveHoverStrategy,
-		resolveHoverSync
-	} from '$lib/layout/tooltip/utils';
 	import { validateSegments } from '$lib/plots/utils/segments';
 	import type { BasePlotProps, MarginConfig } from '$lib/types/plots/props';
-	import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
+	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
+	import type { AxisValue } from '$lib/types/layout/mapping';
 	import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
 	import type { GapsAwarePlotStylesConfig } from '$lib/types/layout/styles';
 	import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
@@ -37,7 +33,6 @@
 	import type { ValueAnchor } from '$lib/types/plots/constants';
 	import type { MarginOverflow } from '$lib/plots/utils/labelOverflow.svelte';
 	import type { LinePlotState, LinePlotCtx } from '$lib/types/plots/line/state';
-	import type { PhaseStage } from '$lib/types/layout/phases';
 
 	type Props = BasePlotProps<
 		SeriesProps<TData> | DataProps<TData>,
@@ -63,7 +58,8 @@
 		scales = {},
 		margins = $bindable(),
 		tooltip = undefined,
-		statistics = []
+		statistics = [],
+		transforms = []
 	}: Props = $props();
 
 	$effect(() => {
@@ -93,14 +89,8 @@
 		);
 	}
 
-	// The plot's own pipeline, run once via `runStages`. No "scales" stage —
-	// LinePlot forwards `scales` unresolved to `BasePlotLayout`.
-	const stages: PhaseStage<LinePlotState<TData>, LinePlotCtx>[] = [
-		{ phase: 'data', run: buildData },
-		{ phase: 'mapping', run: buildMapping },
-		{ phase: 'statistics', run: buildStatistics },
-		{ phase: 'markers', run: buildMarkers }
-	];
+	// The plot's own pipeline (see `buildLineKind`), run once via `runStages`.
+	const stages = buildAxisStages(buildLineKind<TData>());
 	const ctx = $derived<LinePlotCtx>({
 		cfg,
 		legendInteraction,
@@ -118,13 +108,14 @@
 				grouping,
 				color,
 				segments,
-				gaps: styles.gaps ?? {},
+				gaps: styles.gaps,
 				scales,
 				width,
 				height,
 				margins,
 				authorMarkers: markers,
-				statistics
+				statistics,
+				transforms
 			},
 			ctx
 		)
@@ -133,43 +124,40 @@
 	const resolvedSeries = $derived(plotState.resolvedSeries!);
 	const scopedGroups = $derived(plotState.scopedGroups!);
 	const colorForSeries = $derived(plotState.colorForSeries!);
-	const flat = $derived(plotState.flat!);
-	const xAcc = $derived(plotState.channels!.x.accessor);
 	const yAcc = $derived(plotState.channels!.y.accessor);
+	const processed = $derived(plotState.processedData!);
+
+	// A row sits at its `x`, as tall as its top: a stacked row's `y2`, or its `y`.
+	const position = $derived(processedPosition(processed));
+	const getX = $derived((d: TData) => position.x(d) as AxisValue);
+	const getY = $derived((d: TData) => Number(position.y(d)));
 
 	// Legend-disabled series and gap rows are excluded from hover candidates.
 	const hoverPoints = $derived(
-		resolvedSeries.flatMap((s) => {
-			if (legendInteraction?.disabledSeries.has(s.name)) return [];
-			const sx = resolveAccessor(s.x);
-			const sy = resolveAccessor(s.y);
-			return s.data
-				.filter((d) => !isGapValue(sy(d)))
-				.map((d) => ({
-					x: sx(d) as AxisValue,
-					y: Number(sy(d)),
-					row: d,
-					label: String(sy(d)),
-					series: s.name,
-					color: colorForSeries(s.name)
-				}));
+		buildProcessedHoverPoints<TData>({
+			processed,
+			colorFor: colorForSeries,
+			legendInteraction,
+			label: (row) => String(yAcc(row)),
+			include: (row) => !isGapValue(position.y(row))
 		})
 	);
 
-	const hover = $derived({
-		active: tooltip != null || hasHoverMarker(markers),
-		points: hoverPoints,
-		label: (r: TData) => String(yAcc(r)),
-		strategy: resolveHoverStrategy(tooltip?.strategy, markers, 'x'),
-		sync: resolveHoverSync(tooltip?.sync, markers),
-		tooltip
-	});
+	const hover = $derived(
+		buildHover({
+			tooltip,
+			markers,
+			points: hoverPoints,
+			label: (r: TData) => String(yAcc(r)),
+			defaultStrategy: 'x'
+		})
+	);
 
 	// Created once, not `$derived`.
 	const hoverController = createPlotHover<TData>({
 		hover: () => hover,
-		getX: () => xAcc,
-		getY: () => (d: TData) => Number(yAcc(d)),
+		getX: () => getX,
+		getY: () => getY,
 		width: () => width,
 		height: () => height
 	});
@@ -197,7 +185,7 @@
 			valAnchor,
 			fontStyle: styles.values?.fontStyle,
 			formatValue,
-			yDomain: scales.y?.domain
+			yDomain: plotState.scales.y?.domain
 		});
 	});
 
@@ -240,11 +228,11 @@
 	{width}
 	{height}
 	{styles}
-	data={flat}
-	getX={xAcc}
-	getY={(d) => Number(yAcc(d))}
+	data={processed.data as TData[]}
+	{getX}
+	{getY}
 	{hover}
-	{scales}
+	scales={plotState.scales}
 	{...labelMargin.plotProps}
 	xTickRotate={scales?.x?.tickRotate}
 	{hoverController}

@@ -1,28 +1,21 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import { resolveAccessor } from '$lib/plots/utils/accessors';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
-	import { buildData } from '$lib/plots/area/phases/data';
-	import { buildMapping } from '$lib/plots/area/phases/mapping';
-	import { buildStatistics } from '$lib/plots/area/phases/statistics';
-	import { buildScales } from '$lib/plots/area/phases/scales';
-	import { buildMarkers } from '$lib/plots/area/phases/markers';
+	import { processedPosition } from '$lib/layout/phases/transforms';
 	import { runStages } from '$lib/layout/phases/runStages';
+	import { buildAxisStages } from '$lib/layout/phases/axisStages';
+	import { buildHover, buildProcessedHoverPoints } from '$lib/layout/tooltip/buildHover';
+	import { buildAreaKind } from '$lib/plots/area/kind';
 	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
-	import {
-		hasHoverMarker,
-		resolveHoverStrategy,
-		resolveHoverSync
-	} from '$lib/layout/tooltip/utils';
 	import type { BasePlotProps } from '$lib/types/plots/props';
-	import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
+	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
+	import type { AxisValue } from '$lib/types/layout/mapping';
 	import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 	import type { SeriesProps, DataProps } from '$lib/types/plots/data/common';
 	import type { AreaStyle } from '$lib/types/plots/styling';
 	import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 	import type { AreaPlotState, AreaPlotCtx } from '$lib/types/plots/area/state';
-	import type { PhaseStage } from '$lib/types/layout/phases';
 
 	/**
 	 * An area per series, filled from its own baseline. Takes the same data as
@@ -60,15 +53,8 @@
 	const cfg = $derived(getConfiguration());
 	const legendInteraction = $derived(getLegendInteraction());
 
-	// The plot's own pipeline, run once via `runStages`. "scales" only pads an
-	// unpinned `x` domain; the rest is forwarded unresolved to `BasePlotLayout`.
-	const stages: PhaseStage<AreaPlotState<TData>, AreaPlotCtx>[] = [
-		{ phase: 'data', run: buildData },
-		{ phase: 'mapping', run: buildMapping },
-		{ phase: 'statistics', run: buildStatistics },
-		{ phase: 'scales', run: buildScales },
-		{ phase: 'markers', run: buildMarkers }
-	];
+	// The plot's own pipeline (see `buildAreaKind`), run once via `runStages`.
+	const stages = buildAxisStages(buildAreaKind<TData>());
 	const ctx = $derived<AreaPlotCtx>({ cfg, legendInteraction });
 	const plotState = $derived(
 		runStages<AreaPlotState<TData>, AreaPlotCtx>(
@@ -81,6 +67,9 @@
 				grouping,
 				color,
 				scales,
+				width,
+				height,
+				margins,
 				statistics,
 				segments,
 				transforms,
@@ -93,41 +82,39 @@
 	const resolvedSeries = $derived(plotState.resolvedSeries!);
 	const scopedGroups = $derived(plotState.scopedGroups!);
 	const colorForSeries = $derived(plotState.colorForSeries!);
-	const flat = $derived(plotState.flat!);
 	const resolvedScales = $derived(plotState.scales);
-	const xAcc = $derived(plotState.channels!.x.accessor);
 	const yAcc = $derived(plotState.channels!.y.accessor);
+	const processed = $derived(plotState.processedData!);
+
+	// A row sits at its `x`, as tall as its top: a stacked row's `y2`, or its `y`.
+	const position = $derived(processedPosition(processed));
+	const getX = $derived((d: TData) => position.x(d) as AxisValue);
+	const getY = $derived((d: TData) => Number(position.y(d)));
 
 	const hoverPoints = $derived(
-		resolvedSeries.flatMap((s) => {
-			if (legendInteraction?.disabledSeries.has(s.name)) return [];
-			const sx = resolveAccessor(s.x);
-			const sy = resolveAccessor(s.y);
-			return s.data.map((d) => ({
-				x: sx(d) as AxisValue,
-				y: Number(sy(d)),
-				row: d,
-				label: String(sy(d)),
-				series: s.name,
-				color: colorForSeries(s.name)
-			}));
+		buildProcessedHoverPoints<TData>({
+			processed,
+			colorFor: colorForSeries,
+			legendInteraction,
+			label: (row) => String(yAcc(row))
 		})
 	);
 
-	const hover = $derived({
-		active: tooltip != null || hasHoverMarker(markers),
-		points: hoverPoints,
-		label: (r: TData) => String(yAcc(r)),
-		strategy: resolveHoverStrategy(tooltip?.strategy, markers, 'x'),
-		sync: resolveHoverSync(tooltip?.sync, markers),
-		tooltip
-	});
+	const hover = $derived(
+		buildHover({
+			tooltip,
+			markers,
+			points: hoverPoints,
+			label: (r: TData) => String(yAcc(r)),
+			defaultStrategy: 'x'
+		})
+	);
 
 	// Created once, not `$derived`.
 	const hoverController = createPlotHover<TData>({
 		hover: () => hover,
-		getX: () => xAcc,
-		getY: () => (d: TData) => Number(yAcc(d)),
+		getX: () => getX,
+		getY: () => getY,
 		width: () => width,
 		height: () => height
 	});
@@ -136,9 +123,9 @@
 <BasePlotLayout
 	{width}
 	{height}
-	data={flat}
-	getX={xAcc}
-	getY={(d) => Number(yAcc(d))}
+	data={processed.data as TData[]}
+	{getX}
+	{getY}
 	{hover}
 	scales={resolvedScales}
 	{styles}

@@ -1,13 +1,11 @@
 import type { SymbolType } from '$lib/types/plots/constants';
-
-export type AxisValue = number | string | Date;
+import type { AxisChannelName, IndependentChannelName } from '$lib/types/layout/mapping';
 
 // ── Per-consumer independent channels ────────────────────────────────────────
-// Each of these resolves its own ramp, independently per consumer — a plot's
-// own `scales.color` and a marker's own `scales.color` can disagree on
-// purpose (see `Channels/Color/Independent Ramps`). `x`/`y`/`r`/`length` are
-// deliberately not members of this group — see their own section below for
-// why they need the opposite guarantee (exactly one shared scale).
+// Each `IndependentChannelName` resolves its own ramp, independently per
+// consumer (see `Channels/Color/Independent Ramps`). `x`/`y`/`r`/`length`
+// need the opposite guarantee (exactly one shared scale) — see their own
+// sections below.
 
 /** A continuous or categorical color ramp. */
 export type ColorScaleConfig = {
@@ -25,17 +23,9 @@ export type ColorScaleConfig = {
 	unknown?: string;
 };
 
-/**
- * How rows/series sharing the same `grouping`/`color` value are laid out
- * relative to each other. `reverse` flips which group sorts first (e.g.
- * PyramidPlot's left/right side order); `seriesLayout`/`seriesPadding`
- * control how BarPlot arranges multiple series sharing the same category
- * (overlapping, side-by-side, or stacked).
- */
+/** How groups sharing the same `grouping`/`color` value are ordered: `reverse` flips which sorts first (e.g. PyramidPlot's left/right sides). */
 export type GroupingScaleConfig = {
 	reverse?: boolean;
-	seriesLayout?: 'overlap' | 'grouped' | 'stacked';
-	seriesPadding?: number;
 };
 
 /** A continuous or categorical opacity ramp — maps a value to a numeric `[0,1]`-ish opacity instead of a color. */
@@ -57,14 +47,10 @@ export type SymbolScaleConfig = {
 };
 
 /**
- * Every channel this package resolves independently per consumer. Add a
- * channel here and to {@link ChannelScaleConfig} and it's available in
+ * Each `IndependentChannelName`'s own scale-config shape — available in
  * `scales.<channel>` on every axis-based plot kind, and the same shape on a
  * marker's own `scales`.
  */
-export type ChannelName = 'color' | 'grouping' | 'opacity' | 'symbol';
-
-/** Each {@link ChannelName}'s own scale-config shape. */
 export type ChannelScaleConfig = {
 	color: ColorScaleConfig;
 	grouping: GroupingScaleConfig;
@@ -73,9 +59,10 @@ export type ChannelScaleConfig = {
 };
 
 /** `scales.<channel>` for every channel in `TChannel` — the shared shape for both a plot's own `scales` prop and a marker's own. */
-export type ChannelScalesConfig<TChannel extends ChannelName = ChannelName> = {
-	[K in TChannel]?: ChannelScaleConfig[K];
-};
+export type ChannelScalesConfig<TChannel extends IndependentChannelName = IndependentChannelName> =
+	{
+		[K in TChannel]?: ChannelScaleConfig[K];
+	};
 
 // ── Plot-wide-only channels ──────────────────────────────────────────────────
 // Each bound to exactly one scale shared by every mark in the plot — svelteplot
@@ -93,7 +80,7 @@ export type RScaleConfig = {
 	range?: [number, number];
 };
 
-/** `length` (vector/spike magnitude) config — plot-level only, consumed via `GeoScalesConfig.length`. */
+/** `length` (vector/spike magnitude) config — plot-level only. */
 export type LengthScaleConfig = {
 	domain?: [number, number];
 	/** Pixel length range, e.g. `[0, 60]`. Defaults to svelteplot's own. */
@@ -198,8 +185,6 @@ export type AxisScale<TData = Record<string, unknown>> = {
 		| ((d: unknown, index: number, ticks: unknown[]) => string | string[]);
 };
 
-export type AxisChannelName = 'x' | 'y';
-
 /** Each {@link AxisChannelName}'s own scale-config shape — both use {@link AxisScale}. */
 export type AxisChannelScaleConfig<TData = Record<string, unknown>> = {
 	[K in AxisChannelName]?: AxisScale<TData>;
@@ -210,10 +195,11 @@ export type AxisChannelScaleConfig<TData = Record<string, unknown>> = {
 /**
  * Per-axis scale overrides, passed as a single `scales` prop to every
  * axis-based plot kind (`GeoPlot` uses `GeoScalesConfig` instead — a map has
- * no x/y axis pair, and its own plot-wide channel is `length`, not `r`).
+ * no x/y axis pair).
  * `TData` threads through to {@link AxisScale.sort} on each axis.
  */
 export type AxisBasedScalesConfig<TData = Record<string, unknown>> =
 	AxisChannelScaleConfig<TData> & {
 		r?: RScaleConfig;
+		length?: LengthScaleConfig;
 	} & ChannelScalesConfig;

@@ -93,7 +93,10 @@
 
 	const valueTextFn = $derived(
 		barLayout.layout === 'stacked'
-			? (d: TData) => barLayout.stackedBaseline(xFn(d), seriesIndex) + Number(yFn(d)) / 2
+			? (d: TData) => {
+					const [bottom, top] = barLayout.stackedSpan(xFn(d), seriesIndex) ?? [0, Number(yFn(d))];
+					return (bottom + top) / 2;
+				}
 			: valAnchor === 'middle' && !isHorizontal
 				? (d: TData) => Number(yFn(d)) / 2
 				: valAnchor === 'end'

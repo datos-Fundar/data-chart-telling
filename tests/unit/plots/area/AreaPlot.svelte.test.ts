@@ -58,4 +58,23 @@ describe('AreaPlot', () => {
 		const svg = (await waitForSvg(container)) as unknown as SVGSVGElement;
 		expect(areaPaths(svg)).toHaveLength(2);
 	});
+
+	test('a plot-level stackY stacks series-based areas across series', async () => {
+		const A = [1, 2, 3].map((x) => ({ x, y: 2 }));
+		const B = [1, 2, 3].map((x) => ({ x, y: 3 }));
+		const { container } = render(AreaPlot, {
+			width: 400,
+			height: 300,
+			series: [
+				{ name: 'A', data: A, x: 'x', y: 'y' },
+				{ name: 'B', data: B, x: 'x', y: 'y' }
+			],
+			transforms: [{ type: 'stackY' as const }]
+		});
+		const svg = (await waitForSvg(container)) as unknown as SVGSVGElement;
+		const ticks = Array.from(svg.querySelectorAll('g.axis-y text')).map((t) =>
+			Number(t.textContent)
+		);
+		expect(Math.max(...ticks)).toBeGreaterThanOrEqual(5);
+	});
 });

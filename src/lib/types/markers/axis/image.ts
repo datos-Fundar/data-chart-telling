@@ -1,4 +1,5 @@
 import type { CommonMarkerConfigWithRadius } from '$lib/types/markers/channels/commonMarkerConfigWithRadius';
+import type { ClipUnawareMarkerConfig } from '$lib/types/markers/channels/clipMarkerConfig';
 
 /** An image per row, centered on `x`/`y` (svelteplot's `Image`). */
 export type ImageMarkerConfig = {
@@ -14,4 +15,5 @@ export type ImageMarkerConfig = {
 	preserveAspectRatio?: string;
 	/** A constant opacity; the shared `opacity` channel is a color ramp, not this. */
 	opacity?: number;
-} & Omit<CommonMarkerConfigWithRadius, 'opacity'>;
+} & Omit<CommonMarkerConfigWithRadius, 'opacity'> &
+	ClipUnawareMarkerConfig;

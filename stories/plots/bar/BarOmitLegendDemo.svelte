@@ -4,7 +4,7 @@
 	import { provideLegendInteraction } from '$lib/layout/legend/interaction.svelte';
 	import { FEMALE_LIFE_EXPECTANCY_BY_PROVINCE, MALE_LIFE_EXPECTANCY_BY_PROVINCE } from './data';
 
-	// `disabled: { mode: 'omit' }` with `scales.grouping.seriesLayout: 'grouped'`.
+	// `disabled: { mode: 'omit' }` with side-by-side series.
 	provideLegendInteraction();
 </script>
 
@@ -29,7 +29,6 @@
 			{ name: 'female', x: 'province', y: 'value', data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE },
 			{ name: 'male', x: 'province', y: 'value', data: MALE_LIFE_EXPECTANCY_BY_PROVINCE }
 		]}
-		scales={{ grouping: { seriesLayout: 'grouped' } }}
 	/>
 </div>
 

@@ -6,7 +6,7 @@ import {
 	filterBySeries
 } from '$lib/layout/tooltip/utils';
 import type { HoverStore, HoverPoint } from '$lib/types/layout/tooltip';
-import type { AxisValue } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 
 /** Return type of {@link createHoverController}. */
 export type HoverController<T extends Record<string, unknown>> = ReturnType<typeof createHoverController<T>>;

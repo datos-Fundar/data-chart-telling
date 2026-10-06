@@ -36,8 +36,8 @@ export function runTransform(transform: MarkerTransform): Row {
  *
  * A transform only inherits the channels it reads (its adapter's `channelKeys`),
  * so a bin's reducer slot is never filled from the marker: a marker's `y` is not
- * read as `binX`'s `'count'` reducer. Once every transform has run, each type's
- * `finish` fix is applied to the marker, once per type used.
+ * read as `binX`'s `'count'` reducer. Once every transform has run,
+ * {@link finishTransforms} applies each type's fix to the marker.
  */
 export function resolveTransforms<T extends object>(marker: T, fallbackData: Row[]): T {
 	const own = marker as T & {
@@ -65,9 +65,18 @@ export function resolveTransforms<T extends object>(marker: T, fallbackData: Row
 		} as MarkerTransform;
 		resolved = { ...resolved, ...runTransform(withDefaults) };
 	}
-	const used = new Set(own.transforms.map((t) => ADAPTERS[t.type]));
-	for (const adapter of used) {
-		if (adapter.finish) resolved = adapter.finish(resolved);
+	return finishTransforms(resolved, own.transforms) as T;
+}
+
+/**
+ * Applies each transform type's `finish` fix to a marker drawing rows those
+ * transforms produced, once per type used — for a marker built from rows that
+ * were transformed before it existed (a plot's own processed data).
+ */
+export function finishTransforms<T extends object>(marker: T, transforms: MarkerTransform[]): T {
+	let finished = marker as Row;
+	for (const adapter of new Set(transforms.map((t) => ADAPTERS[t.type]))) {
+		if (adapter.finish) finished = adapter.finish(finished);
 	}
-	return resolved as T;
+	return finished as T;
 }

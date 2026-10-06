@@ -1,4 +1,5 @@
-import type { AxisValue, ChannelScalesConfig } from '$lib/types/layout/scales';
+import type { ChannelScalesConfig } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
 import type { MarkerTransform } from '$lib/types/transforms';
 

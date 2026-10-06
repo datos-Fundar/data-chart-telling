@@ -1,5 +1,7 @@
 import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
-import type { AxisValue } from '$lib/types/layout/scales';
+import { resolveAccessor } from '$lib/plots/utils/accessors';
+import type { ProcessedChannel } from '$lib/types/layout/phases';
+import type { AxisValue } from '$lib/types/layout/mapping';
 import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
 import type { CellMarkerConfig } from '$lib/types/markers/common';
 import type { HeatmapPlotState, HeatmapPlotCtx } from '$lib/types/plots/heatmap/state';
@@ -19,12 +21,17 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 	state: HeatmapPlotState<TData>,
 	ctx: HeatmapPlotCtx
 ): HeatmapPlotState<TData> {
-	const { segments, flat, channels, resolveColor, resolveOpacity } = state;
+	const { segments, channels, resolveColor, resolveOpacity } = state;
 	const { range } = ctx;
-	const { x: xAcc, y: yAcc, color: colorAcc } = channels!;
-	const getX = xAcc.accessor;
-	const getY = yAcc.accessor;
-	const getColor = colorAcc.accessor;
+	const getColor = channels!.color.accessor;
+
+	// The cells are the rows the "transforms" phase left, placed by its channels.
+	const processed = state.processedData!;
+	const rows = processed.data as TData[];
+	const read = (channel: ProcessedChannel | undefined) =>
+		resolveAccessor(channel as never) as (d: TData) => AxisValue;
+	const getX = read(processed.channels.x);
+	const getY = read(processed.channels.y);
 
 	/**
 	 * A catch-all (no `areas`) always matches, so evaluating segments in plain
@@ -38,13 +45,13 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 	 * catch-all/area-specific priority every other plot kind's segments
 	 * already follow (see `resolveSeriesSegments` in `utils/segments.ts`).
 	 */
-	const segList = segments.default ?? [];
+	const segList = segments?.default ?? [];
 	const segStyleMap = (() => {
 		const map = new Map<string, CellSegmentStyle>();
 		if (!segList.length) return map;
 		const catchAll = segList.find((s) => !s.areas || s.areas.length === 0);
 		const areaSegs = segList.filter((s) => s.areas && s.areas.length > 0);
-		for (const d of flat!) {
+		for (const d of rows) {
 			const cx = getX(d) as AxisValue;
 			const cy = getY(d) as AxisValue;
 			const key = `${String(cx)}::${String(cy)}`;
@@ -86,10 +93,11 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 
 	const styleGroups = (() => {
 		const groups = new Map<string, StyleGroup<TData>>();
-		for (const d of flat!) {
+		for (const d of rows) {
 			const styles = getCellStyle(d);
 			const rawOpacity = resolveOpacity?.(d);
-			const opacity = rawOpacity != null ? Math.round(rawOpacity * OPACITY_STEPS) / OPACITY_STEPS : undefined;
+			const opacity =
+				rawOpacity != null ? Math.round(rawOpacity * OPACITY_STEPS) / OPACITY_STEPS : undefined;
 			const key = JSON.stringify({ styles, opacity });
 			let group = groups.get(key);
 			if (!group) {
@@ -103,6 +111,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 
 	const markers: CellMarkerConfig[] = styleGroups.map((group) => ({
 		type: 'cell',
+		clip: true,
 		data: group.data,
 		x: getX,
 		y: getY,
@@ -118,5 +127,5 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 		inset: 0.5
 	}));
 
-	return { ...state, markers };
+	return { ...state, markers: [...markers, ...(state.markers ?? [])] };
 }

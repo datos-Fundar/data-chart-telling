@@ -87,7 +87,7 @@ export const LegendDisabledDimsLabels: StoryObj = {
 	}
 };
 
-/** `interactive.disabled: { mode: 'omit' }` with `scales.grouping.seriesLayout: 'grouped'` — omitted series' bars reflow the group. See `BarOmitLegendDemo.svelte`. */
+/** `interactive.disabled: { mode: 'omit' }` with side-by-side series — omitted series' bars reflow the group. See `BarOmitLegendDemo.svelte`. */
 export const LegendOmitReflowsGroups: StoryObj = {
 	render: () => ({ Component: BarOmitLegendDemo }),
 	parameters: {
@@ -96,15 +96,14 @@ export const LegendOmitReflowsGroups: StoryObj = {
 				code: renderSource('BarPlot', {
 					width: 950,
 					height: 500,
-					series: [FEMALE, MALE],
-					scales: { grouping: { seriesLayout: 'grouped' } }
+					series: [FEMALE, MALE]
 				})
 			}
 		}
 	}
 };
 
-/** Same `interactive.disabled: { mode: 'omit' }` idea, with `scales.grouping.seriesLayout: 'stacked'`. See `BarOmitStackedLegendDemo.svelte`. */
+/** Same `interactive.disabled: { mode: 'omit' }` idea, with series stacked by a plot-level `stackY`. See `BarOmitStackedLegendDemo.svelte`. */
 export const LegendOmitReflowsStack: StoryObj = {
 	render: () => ({ Component: BarOmitStackedLegendDemo }),
 	parameters: {
@@ -114,7 +113,7 @@ export const LegendOmitReflowsStack: StoryObj = {
 					width: 950,
 					height: 500,
 					series: [FEMALE, MALE],
-					scales: { grouping: { seriesLayout: 'stacked' } }
+					transforms: [{ type: 'stackY' as const }]
 				})
 			}
 		}

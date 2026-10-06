@@ -1,4 +1,5 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { buildProcessedGroups } from '$lib/layout/phases/transforms';
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { isGapValue, resolveGapAreaStyle } from '$lib/plots/utils/gaps';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
@@ -9,20 +10,12 @@ import type {
 	PyramidPlotCtx,
 	PyramidSeries
 } from '$lib/types/plots/pyramid/state';
-import type { AxisValue } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 
 const GAP_KINDS = ['start', 'middle', 'end'] as const;
 
 /** A gap-fill row tagged with its resolved signed value as a plain field — see the note on `taggedData` below. */
 type GapFillRow<TData> = TData & { __gapValue: number };
-
-function valueFor<TData extends Record<string, unknown>>(
-	s: PyramidSeries<TData>,
-	d: TData
-): number {
-	const v = Math.abs(Number(resolveAccessor(s.y)(d)));
-	return s.side === 'left' ? -v : v;
-}
 
 function signFor<TData extends Record<string, unknown>>(
 	s: PyramidSeries<TData>,
@@ -44,6 +37,10 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 ): PyramidPlotState<TData> {
 	const { groupedSeries, gapFillMaps } = state;
 	const gapDefaults = getConfiguration().pyramid.gap;
+	// The real bars draw the rows the "transforms" phase left, read through its channels.
+	const processedGroups = new Map(
+		buildProcessedGroups<BarSegmentStyle>(state, false).map((g) => [g.series.name, g])
+	);
 
 	const markers: BarMarkerConfig[] = [];
 	for (const group of groupedSeries!) {
@@ -54,21 +51,25 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 		// see the field name. `keyof TData` is always a real string key in
 		// practice, just not provably so to TypeScript here.
 		const category = group.series.x as string | ((d: TData) => AxisValue);
-		const getMagnitude = resolveAccessor(group.series.y);
 		const defaultColor = state.colorForSeries!(group.series.name);
 		const disabledFill = ctx.disabledFillFor?.(group.series.name);
+		const processed = processedGroups.get(group.series.name);
+		const processedCategory = processed?.series.x as string | ((d: TData) => AxisValue);
+		const getMagnitude = resolveAccessor((processed?.series.y ?? group.series.y) as keyof TData);
+		const signed = (d: TData) => signFor(group.series, Math.abs(Number(getMagnitude(d))));
 
-		for (const seg of group.visualSegments) {
-			const realData = seg.data.filter((d) => !isGapValue(getMagnitude(d)));
+		for (const seg of processed?.visualSegments ?? []) {
+			const realData = (seg.data as TData[]).filter((d) => !isGapValue(getMagnitude(d)));
 			if (realData.length === 0) continue;
 			markers.push({
 				type: 'bar',
 				role: 'segment',
+				clip: true,
 				isHorizontal: true,
 				data: realData,
-				y: category,
+				y: processedCategory,
 				x1: 0,
-				x2: (d: TData) => valueFor(group.series, d),
+				x2: signed,
 				styles: {
 					fill: disabledFill?.fill ?? seg.styles.fill ?? defaultColor,
 					fillOpacity: disabledFill?.fillOpacity ?? seg.styles.fillOpacity ?? 1
@@ -97,6 +98,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 			markers.push({
 				type: 'bar',
 				role: 'segment',
+				clip: true,
 				isHorizontal: true,
 				data: taggedData,
 				y: category,

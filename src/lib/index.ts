@@ -103,9 +103,16 @@ export { estimateLineValueLabelMargin } from './plots/line/valueLabelMargin';
 // ── Types ─────────────────────────────────────────────────────────────────────
 export type {
 	AxisValue,
+	ChannelValue,
+	ChannelName,
+	AxisChannelName,
+	IndependentChannelName,
+	SizeChannelName,
+	ChannelAccessors
+} from './types/layout/mapping';
+export type {
 	AxisScale,
 	AxisBasedScalesConfig,
-	AxisChannelName,
 	AxisChannelScaleConfig,
 	ColorScaleConfig,
 	GroupingScaleConfig,
@@ -113,7 +120,6 @@ export type {
 	SymbolScaleConfig,
 	RScaleConfig,
 	LengthScaleConfig,
-	ChannelName,
 	ChannelScaleConfig,
 	ChannelScalesConfig
 } from './types/layout/scales';
@@ -200,7 +206,6 @@ export type {
 } from './types/layout/statistics';
 export type { DeltaMarkerConfig, DeltaConfig, DeltaTarget } from './types/markers/axis/delta';
 export type { GeoFeature, GeoJsonInput, GeoDataProps, Topology } from './types/plots/data/geo';
-export type { ScatterDataProps } from './types/plots/data/scatter';
 export type {
 	GeoProjectionName,
 	GeoProjectionConfig,

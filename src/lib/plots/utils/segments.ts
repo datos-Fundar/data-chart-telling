@@ -1,5 +1,5 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
-import type { AxisValue } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 import type { Series } from '$lib/types/plots/data/common';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { Area, Segment, VisualGroup, VisualSegment } from '$lib/types/plots/segments/config';
@@ -221,7 +221,7 @@ export function buildGroupedSeries<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   S extends Series<any>,
   TStyle = LineSegmentStyle,
->(seriesList: S[], segments: SegmentsConfig<TStyle>, connect = true): VisualGroup<S, TStyle>[] {
+>(seriesList: S[], segments: SegmentsConfig<TStyle> = {}, connect = true): VisualGroup<S, TStyle>[] {
   return seriesList.map((s) => ({
     series: s,
     visualSegments: resolveSeriesSegments<S, TStyle>(
@@ -248,11 +248,11 @@ export function buildScopedMarkerGroups<
   TStyle,
 >(args: {
   groupedSeries: VisualGroup<S, TStyle>[];
-  segments: SegmentsConfig<TStyle>;
+  segments?: SegmentsConfig<TStyle>;
   colorFor: (series: S, seriesIndex: number) => string;
   segmentColorFor: (styles: TStyle | undefined, defaultColor: string) => string;
 }): ScopedMarkerGroup<TData>[] {
-  const { groupedSeries, segments, colorFor, segmentColorFor } = args;
+  const { groupedSeries, segments = {}, colorFor, segmentColorFor } = args;
   return groupedSeries.map((group, seriesIndex) => {
     const defaultColor = colorFor(group.series, seriesIndex);
     const xFor = resolveAccessor(group.series.x);

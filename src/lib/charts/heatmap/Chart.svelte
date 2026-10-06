@@ -38,9 +38,11 @@
 		scales = {},
 		margins,
 		markers = [],
+		transforms,
 		facet,
 		timeline,
-		tooltip
+		tooltip,
+		...channels
 	}: ChartProps<TRow, CellSegmentStyle> & { color: Accessor<TRow, number> } = $props();
 
 	const getX = $derived(resolveAccessor<TRow>(x));
@@ -88,6 +90,7 @@
 >
 	{#snippet plot({ data: rows, width: w, height: h, facetValue })}
 		<HeatmapPlot
+			{...channels}
 			width={w}
 			height={h}
 			data={rows}
@@ -99,6 +102,7 @@
 			scales={mergedScales}
 			{margins}
 			{markers}
+			{transforms}
 			tooltip={tip.enabled
 				? {
 						format: tip.format ?? defaultFormat,

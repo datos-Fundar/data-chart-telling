@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { buildMapping } from '$lib/plots/pyramid/phases/mapping';
+import { buildTaggedRows } from '$lib/plots/pyramid/phases/mapping';
 import type {
 	PyramidPlotState,
 	PyramidPlotCtx,
@@ -13,7 +13,8 @@ type Row = { ageGroup: string; pct: number | null };
 
 const CTX: PyramidPlotCtx = {
 	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as ChartConfig,
-	formatValue: (v, name) => `${name}:${v}`
+	formatValue: (v, name) => `${name}:${v}`,
+	legendInteraction: null
 };
 
 function series(name: string, side: 'left' | 'right', data: Row[]): PyramidSeries<Row> {
@@ -29,7 +30,7 @@ function build(resolvedSeries: PyramidSeries<Row>[]) {
 		height: 300,
 		resolvedSeries
 	};
-	return buildMapping(state, CTX).flat!;
+	return buildTaggedRows(state, CTX).flat!;
 }
 
 describe('buildMapping – tagged rows', () => {

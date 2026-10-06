@@ -37,11 +37,13 @@
 		styles = {},
 		segments,
 		markers = [],
+		transforms,
 		scales = {},
 		margins,
 		facet,
 		timeline,
-		tooltip
+		tooltip,
+		...channels
 	}: GapsAwareChartProps<TRow, LineSegmentStyle> = $props();
 
 	const getGrouping = $derived(
@@ -95,6 +97,7 @@
 >
 	{#snippet plot({ data: rows, width: w, height: h, facetValue })}
 		<LinePlot
+			{...channels}
 			width={w}
 			height={h}
 			data={rows}
@@ -105,6 +108,7 @@
 			{styles}
 			{segments}
 			{markers}
+			{transforms}
 			{scales}
 			{margins}
 			tooltip={tip.enabled

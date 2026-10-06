@@ -277,8 +277,7 @@ export const HorizontalStackedTooltip: Story = {
 		y: 'value',
 		color: 'bracket',
 		scales: {
-			y: { type: 'categorical', sort: provinceSort },
-			grouping: { seriesLayout: 'stacked' }
+			y: { type: 'categorical', sort: provinceSort }
 		} satisfies AxisBasedScalesConfig,
 		tooltip: {
 			facetId: '',
@@ -288,6 +287,7 @@ export const HorizontalStackedTooltip: Story = {
 				return `${province} / ${bracket}: ${value}`;
 			}
 		},
+		transforms: [{ type: 'stackY' as const }],
 		markers: [{ type: 'hover', showLabels: false }]
 	}
 };

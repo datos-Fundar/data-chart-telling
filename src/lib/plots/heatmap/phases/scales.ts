@@ -1,6 +1,6 @@
 import { resolveColorScale } from '$lib/utils/color';
 import { resolveOpacityScale } from '$lib/utils/opacity';
-import type { AxisValue } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 import type { HeatmapPlotState, HeatmapPlotCtx } from '$lib/types/plots/heatmap/state';
 
 /** HeatmapPlot's "scales" phase: band x/y domains over every distinct category, and each row's own resolved color. */

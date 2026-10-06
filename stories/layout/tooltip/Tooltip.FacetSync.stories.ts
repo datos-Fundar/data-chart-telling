@@ -121,7 +121,7 @@ export const FacetSyncBarBySeries: StoryObj = {
 					x: 'region',
 					y: 'value',
 					color: 'sector',
-					scales: { grouping: { seriesLayout: 'stacked' } },
+					transforms: [{ type: 'stackY' as const }],
 					facet: { by: 'region', columns: 2 },
 					tooltip: {
 						strategy: 'series',

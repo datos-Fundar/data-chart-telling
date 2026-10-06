@@ -63,4 +63,20 @@ describe('HistogramPlot', () => {
 		const svg = (await waitForSvg(container)) as unknown as SVGSVGElement;
 		expect(bars(svg)).toHaveLength(4);
 	});
+
+	test('the x axis reaches the far edge of the last bin', async () => {
+		// An interval of 7 snaps the bins to [0, 21]; the raw values alone only reach 18.
+		const { container } = render(HistogramPlot, {
+			width: 400,
+			height: 300,
+			data: rows,
+			x: 'v',
+			transforms: [{ type: 'binX' as const, interval: 7 }]
+		});
+		const svg = (await waitForSvg(container)) as unknown as SVGSVGElement;
+		const ticks = Array.from(svg.querySelectorAll('g.axis-x text')).map((t) =>
+			Number(t.textContent)
+		);
+		expect(Math.max(...ticks)).toBeGreaterThanOrEqual(21);
+	});
 });

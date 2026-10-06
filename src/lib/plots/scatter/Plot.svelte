@@ -1,17 +1,15 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import { resolveAccessor } from '$lib/plots/utils/accessors';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
 	import {
 		disabledDotsOverride,
 		resolveEffectiveDisabledStyle
 	} from '$lib/plots/utils/legendDisabled';
-	import { buildData } from '$lib/plots/scatter/phases/data';
-	import { buildMapping } from '$lib/plots/scatter/phases/mapping';
-	import { buildScales } from '$lib/plots/scatter/phases/scales';
-	import { buildMarkers } from '$lib/plots/scatter/phases/markers';
-	import { buildStatistics } from '$lib/plots/scatter/phases/statistics';
+	import { processedPosition } from '$lib/layout/phases/transforms';
 	import { runStages } from '$lib/layout/phases/runStages';
+	import { buildAxisStages } from '$lib/layout/phases/axisStages';
+	import { buildHover, buildProcessedHoverPoints } from '$lib/layout/tooltip/buildHover';
+	import { buildScatterKind } from '$lib/plots/scatter/kind';
 	import {
 		createLabelMarginTracker,
 		halfDimensionOverflowCap
@@ -19,31 +17,26 @@
 	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
 	import ValueLabels from '$lib/plots/scatter/ValueLabels.svelte';
-	import {
-		hasHoverMarker,
-		resolveHoverStrategy,
-		resolveHoverSync
-	} from '$lib/layout/tooltip/utils';
 	import { validateSegments } from '$lib/plots/utils/segments';
 	import type { BasePlotProps } from '$lib/types/plots/props';
-	import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
-	import type { ScatterDataProps } from '$lib/types/plots/data/scatter';
+	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
+	import type { AxisValue } from '$lib/types/layout/mapping';
+	import type { SeriesProps, DataProps } from '$lib/types/plots/data/common';
 	import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 	import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
 	import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 	import type { LegendDisabledStyle } from '$lib/types/layout/legend';
 	import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/scatter/state';
-	import type { PhaseStage } from '$lib/types/layout/phases';
 
 	/**
 	 * A point cloud on continuous x/y axes. Accepts either a pre-built `series`
 	 * array or flat `data/x/y/color` props — mirrors the line/bar plot contract
 	 * so the chart-level container/timeline/facet/legend wrap it unchanged. `r`
 	 * gives every dot a per-row radius (bubble sizing), independent of `color`
-	 * grouping — see {@link ScatterDataProps} for its auto-scaling behavior.
+	 * grouping — see `ChannelValue.r` for its auto-scaling behavior.
 	 */
 	type Props = BasePlotProps<
-		ScatterDataProps<TData>,
+		SeriesProps<TData> | DataProps<TData>,
 		TData,
 		AxisBasedStylesConfig,
 		ScatterSegmentStyle,
@@ -69,7 +62,8 @@
 		scales = {},
 		margins,
 		tooltip = undefined,
-		statistics = []
+		statistics = [],
+		transforms = []
 	}: Props = $props();
 
 	const cfg = $derived(getConfiguration());
@@ -99,14 +93,8 @@
 		);
 	}
 
-	// The plot's own pipeline, run once via `runStages`.
-	const stages: PhaseStage<ScatterPlotState<TData>, ScatterPlotCtx>[] = [
-		{ phase: 'data', run: buildData },
-		{ phase: 'mapping', run: buildMapping },
-		{ phase: 'statistics', run: buildStatistics },
-		{ phase: 'scales', run: buildScales },
-		{ phase: 'markers', run: buildMarkers }
-	];
+	// The plot's own pipeline (see `buildScatterKind`), run once via `runStages`.
+	const stages = buildAxisStages(buildScatterKind<TData>());
 	const ctx = $derived<ScatterPlotCtx>({
 		cfg,
 		legendInteraction,
@@ -131,7 +119,8 @@
 				height,
 				margins,
 				authorMarkers: markers,
-				statistics
+				statistics,
+				transforms
 			},
 			ctx
 		)
@@ -139,47 +128,45 @@
 
 	const resolvedSeries = $derived(plotState.resolvedSeries!);
 	const groupedSeries = $derived(plotState.groupedSeries!);
-	const flat = $derived(plotState.flat!);
 	const scopedGroups = $derived(plotState.scopedGroups!);
 	const colorForSeries = $derived(plotState.colorForSeries!);
 	const xAcc = $derived(plotState.channels!.x.accessor);
 	const yAcc = $derived(plotState.channels!.y.accessor);
 	const resolvedScales = $derived(plotState.scales);
 
+	const processed = $derived(plotState.processedData!);
+	const position = $derived(processedPosition(processed));
+	const getX = $derived((d: TData) => position.x(d) as AxisValue);
+	const getY = $derived((d: TData) => Number(position.y(d)));
+
 	// A legend-disabled series is dimmed on the mark itself, but never surfaces
 	// in hover/tooltip — its points are simply absent from the candidate list.
 	const hoverPoints = $derived(
-		resolvedSeries.flatMap((s) => {
-			if (legendInteraction?.disabledSeries.has(s.name)) return [];
-			const sx = resolveAccessor(s.x);
-			const sy = resolveAccessor(s.y);
-			return s.data.map((d) => ({
-				x: sx(d) as AxisValue,
-				y: Number(sy(d)),
-				row: d,
-				label: `${sx(d)}, ${sy(d)}`,
-				series: s.name,
-				color: colorForSeries(s.name)
-			}));
+		buildProcessedHoverPoints<TData>({
+			processed,
+			colorFor: colorForSeries,
+			legendInteraction,
+			label: (row) => `${xAcc(row)}, ${yAcc(row)}`
 		})
 	);
 
 	// Points scatter freely across x/y rather than sharing discrete x values —
 	// 'punctual' matches the single nearest point, not a whole column.
-	const hover = $derived({
-		active: tooltip != null || hasHoverMarker(markers),
-		points: hoverPoints,
-		label: (row: TData) => `${xAcc(row)}, ${yAcc(row)}`,
-		strategy: resolveHoverStrategy(tooltip?.strategy, markers, 'punctual'),
-		sync: resolveHoverSync(tooltip?.sync, markers),
-		tooltip
-	});
+	const hover = $derived(
+		buildHover({
+			tooltip,
+			markers,
+			points: hoverPoints,
+			label: (row: TData) => `${xAcc(row)}, ${yAcc(row)}`,
+			defaultStrategy: 'punctual'
+		})
+	);
 
 	// Created once, not `$derived`.
 	const hoverController = createPlotHover<TData>({
 		hover: () => hover,
-		getX: () => xAcc,
-		getY: () => (d: TData) => Number(yAcc(d)),
+		getX: () => getX,
+		getY: () => getY,
 		width: () => width,
 		height: () => height
 	});
@@ -208,9 +195,9 @@
 	{width}
 	{height}
 	{styles}
-	data={flat}
-	getX={xAcc}
-	getY={(d) => Number(yAcc(d))}
+	data={processed.data as TData[]}
+	{getX}
+	{getY}
 	{hover}
 	scales={resolvedScales}
 	{...labelMargin.plotProps}

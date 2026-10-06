@@ -180,7 +180,6 @@ describe('BarPlot – gaps (grouped layout)', () => {
 			width: 400,
 			height: 300,
 			series: [SERIES, OTHER_SERIES],
-			scales: { grouping: { seriesLayout: 'grouped' } },
 			styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
 		});
 		const svg = await waitForSvg(container);
@@ -218,7 +217,7 @@ describe('BarPlot – gaps (stacked layout)', () => {
 			width: 400,
 			height: 300,
 			series: [STACKED_SERIES_A, STACKED_SERIES_B],
-			scales: { grouping: { seriesLayout: 'stacked' } },
+			transforms: [{ type: 'stackY' as const }],
 			styles: { gaps } satisfies { gaps: GapsConfig<BarSegmentStyle> }
 		});
 		const svg = await waitForSvg(container);

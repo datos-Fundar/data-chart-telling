@@ -1,13 +1,15 @@
+import { buildProcessedGroups } from '$lib/layout/phases/transforms';
 import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/scatter/state';
+import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
 import type { DotMarkerConfig } from '$lib/types/markers/common';
-import type { AxisValue } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 
-/** ScatterPlot's "markers" phase: one `'dot'` marker per visual segment — prepended onto whatever the "statistics" phase already put in `state.markers`. */
+/** ScatterPlot's "markers" phase: one `'dot'` marker per visual segment of the rows the "transforms" phase left — prepended onto whatever the "statistics" phase already put in `state.markers`. */
 export function buildMarkers<TData extends Record<string, unknown>>(
 	state: ScatterPlotState<TData>,
 	ctx: ScatterPlotCtx
 ): ScatterPlotState<TData> {
-	const { groupedSeries, channels, colorForSeries, scales, flat } = state;
+	const { channels, colorForSeries, scales, flat } = state;
 	const { cfg, disabledDotsFor } = ctx;
 	const r = channels!.r;
 	const rFn = r === undefined || typeof r === 'number' ? r : r.accessor;
@@ -57,7 +59,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 			: undefined;
 
 	const markers: DotMarkerConfig[] = [];
-	groupedSeries!.forEach((group) => {
+	buildProcessedGroups<ScatterSegmentStyle>(state, false).forEach((group) => {
 		const defaultColor = colorForSeries!(group.series.name);
 		const disabledDots = disabledDotsFor?.(group.series.name);
 

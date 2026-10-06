@@ -1,6 +1,6 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
 import { isGapValue } from '$lib/plots/utils/gaps';
-import type { AxisValue } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 import type { Series } from '$lib/types/plots/data/common';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { VisualGroup } from '$lib/types/plots/segments/config';
@@ -45,8 +45,10 @@ export function buildHitAreaMarkers<TData extends Record<string, unknown>>(args:
 				category: xFn(d) as AxisValue
 			};
 			if (barLayout.layout === 'stacked') {
-				const baseline = barLayout.stackedBaseline(xFn(d), seriesIndex);
-				const top = baseline + valueFn(d);
+				const [baseline, top] = barLayout.stackedSpan(xFn(d), seriesIndex) ?? [
+					barLayout.valueBaseline,
+					barLayout.valueBaseline
+				];
 				if (isHorizontal) {
 					marker.x1 = baseline;
 					marker.x2 = top;
@@ -78,7 +80,7 @@ export function buildHitAreaMarkers<TData extends Record<string, unknown>>(args:
 
 		for (const seg of group.visualSegments) {
 			const realData = seg.data.filter((d) => !isGapValue(yFn(d)));
-			const valueFn = barLayout.layout === 'stacked' ? (d: TData) => Number(yFn(d)) : yFn;
+			const valueFn = (d: TData) => Number(yFn(d));
 			for (const d of realData) {
 				const hitMarker = makeHitAreaMarker(d, valueFn);
 				hitMarker.onpointerenter = active ? () => setHoverMatch([d]) : undefined;

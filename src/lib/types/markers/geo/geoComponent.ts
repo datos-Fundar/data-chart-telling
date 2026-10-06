@@ -1,3 +1,5 @@
+import type { ClipUnawareMarkerConfig } from '$lib/types/markers/channels/clipMarkerConfig';
+
 /** Mounts an arbitrary Svelte component as a geo mark. */
 export type GeoCustomComponentMarkerConfig = {
 	type: 'geo-component';
@@ -6,4 +8,4 @@ export type GeoCustomComponentMarkerConfig = {
 	props?: Record<string, unknown>;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	data?: any[];
-};
+} & ClipUnawareMarkerConfig;

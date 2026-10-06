@@ -40,9 +40,9 @@
 		y="value"
 		color={'sector' as keyof RegionSector}
 		scales={{
-			y: orientation === 'horizontal' ? { type: 'categorical' } : undefined,
-			grouping: { seriesLayout: layout }
+			y: orientation === 'horizontal' ? { type: 'categorical' } : undefined
 		}}
+		transforms={layout === 'stacked' ? [{ type: 'stackY' }] : []}
 		facet={{ by: 'region' as keyof RegionSector, columns: 2 }}
 		tooltip={{
 			strategy: 'series',

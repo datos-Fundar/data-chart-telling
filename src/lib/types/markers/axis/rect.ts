@@ -2,6 +2,7 @@ import type { AreaStyle } from '$lib/types/plots/styling';
 import type { CommonMarkerConfigWithArea } from '$lib/types/markers/channels/commonMarkerConfigWithArea';
 import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/commonMarkerConfigWithColor';
 import type { CommonMarkerConfigWithInterval } from '$lib/types/markers/channels/commonMarkerConfigWithInterval';
+import type { ClipAwareMarkerConfig } from '$lib/types/markers/channels/clipMarkerConfig';
 
 /** An arbitrary rectangle (svelteplot's `Rect`); `interval` turns `x`/`y` into ranges. */
 export type RectMarkerConfig = {
@@ -15,4 +16,5 @@ export type RectMarkerConfig = {
 	styles?: AreaStyle;
 } & CommonMarkerConfigWithArea &
 	CommonMarkerConfigWithColor &
-	CommonMarkerConfigWithInterval;
+	CommonMarkerConfigWithInterval &
+	ClipAwareMarkerConfig;

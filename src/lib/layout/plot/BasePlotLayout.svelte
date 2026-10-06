@@ -13,7 +13,8 @@
 	import StylesLayout from '$lib/layout/styles/StylesLayout.svelte';
 	import TooltipLayout from '$lib/layout/tooltip/TooltipLayout.svelte';
 	import type { PlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
-	import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
+	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
+	import type { AxisValue } from '$lib/types/layout/mapping';
 	import type { CoordinatesConfig, GeoScalesConfig } from '$lib/types/layout/coordinates';
 	import type { StylesLayoutConfig } from '$lib/types/layout/styles';
 	import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';

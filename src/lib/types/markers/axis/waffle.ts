@@ -1,6 +1,7 @@
 import type { AreaStyle } from '$lib/types/plots/styling';
 import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/commonMarkerConfigWithColor';
 import type { CommonMarkerConfigWithInterval } from '$lib/types/markers/channels/commonMarkerConfigWithInterval';
+import type { ClipAwareMarkerConfig } from '$lib/types/markers/channels/clipMarkerConfig';
 
 /** A waffle chart bar: the value as a grid of unit squares (svelteplot's `WaffleX`/`WaffleY`). */
 export type WaffleMarkerConfig = {
@@ -12,4 +13,5 @@ export type WaffleMarkerConfig = {
 	round?: boolean;
 	styles?: AreaStyle;
 } & CommonMarkerConfigWithColor &
-	CommonMarkerConfigWithInterval;
+	CommonMarkerConfigWithInterval &
+	ClipAwareMarkerConfig;

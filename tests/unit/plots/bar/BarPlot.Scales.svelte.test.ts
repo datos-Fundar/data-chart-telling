@@ -1,6 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
+import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import {
 	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
@@ -111,16 +112,15 @@ describe('BarPlot – scales', () => {
 	});
 });
 
-describe('BarPlot – scales.grouping.seriesLayout', () => {
-	test('grouped: each series gets its own slice of the band (no shared x position)', async () => {
+describe('BarPlot – series layout', () => {
+	test('by default, each series gets its own slice of the band (no shared x position)', async () => {
 		const { container } = await render(BarPlot, {
 			width: 600,
 			height: 400,
 			data: LIFE_EXPECTANCY_BY_PROVINCE,
 			x: 'province',
 			y: 'value',
-			color: 'sex',
-			scales: { grouping: { seriesLayout: 'grouped' } } satisfies AxisBasedScalesConfig
+			color: 'sex'
 		});
 		const svg = await waitForSvg(container);
 		const xs = Array.from(svg.querySelectorAll('g.bar-y rect')).map(
@@ -129,7 +129,7 @@ describe('BarPlot – scales.grouping.seriesLayout', () => {
 		expect(new Set(xs).size).toBe(xs.length); // no two bars share the same x position
 	});
 
-	test('stacked: series combine into one bar per category, cumulative height', async () => {
+	test('a plot-level stackY combines series into one bar per category, cumulative height', async () => {
 		const { container } = await render(BarPlot, {
 			width: 600,
 			height: 400,
@@ -137,7 +137,7 @@ describe('BarPlot – scales.grouping.seriesLayout', () => {
 			x: 'province',
 			y: 'value',
 			color: 'sex',
-			scales: { grouping: { seriesLayout: 'stacked' } } satisfies AxisBasedScalesConfig
+			transforms: [{ type: 'stackY' as const }]
 		});
 		const svg = await waitForSvg(container);
 		const rects = Array.from(svg.querySelectorAll('g.bar-y rect'));
@@ -148,21 +148,23 @@ describe('BarPlot – scales.grouping.seriesLayout', () => {
 		expect(Math.min(...tops)).toBeGreaterThanOrEqual(0);
 	});
 
-	test('seriesPadding widens the gap between series bars within a group', async () => {
+	test("the theme's bar.seriesPadding widens the gap between series bars within a group", async () => {
 		async function firstBarWidth(seriesPadding: number) {
-			const { container } = await render(BarPlot, {
-				width: 600,
-				height: 400,
-				data: LIFE_EXPECTANCY_BY_PROVINCE,
-				x: 'province',
-				y: 'value',
-				color: 'sex',
-				scales: {
-					grouping: { seriesLayout: 'grouped', seriesPadding }
-				} satisfies AxisBasedScalesConfig
-			});
-			const svg = await waitForSvg(container);
-			return Number(svg.querySelector('g.bar-y rect')?.getAttribute('width'));
+			setConfiguration({ bar: { seriesPadding } });
+			try {
+				const { container } = await render(BarPlot, {
+					width: 600,
+					height: 400,
+					data: LIFE_EXPECTANCY_BY_PROVINCE,
+					x: 'province',
+					y: 'value',
+					color: 'sex'
+				});
+				const svg = await waitForSvg(container);
+				return Number(svg.querySelector('g.bar-y rect')?.getAttribute('width'));
+			} finally {
+				resetConfiguration();
+			}
 		}
 		const noPadding = await firstBarWidth(0);
 		const padded = await firstBarWidth(0.5);

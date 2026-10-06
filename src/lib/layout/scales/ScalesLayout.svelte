@@ -3,7 +3,8 @@
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { tickStep, ticksInRange, naturalTickCount } from '$lib/layout/scales/niceDomain';
   import { DISCRETE_SCALE_TYPES } from '$lib/types/layout/scales';
-  import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
+  import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
+  import type { AxisValue } from '$lib/types/layout/mapping';
 
   /**
    * Axis ticks/titles and grid lines for plot kinds with an x/y axis pair

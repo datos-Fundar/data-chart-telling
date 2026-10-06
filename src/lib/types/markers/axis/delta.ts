@@ -1,5 +1,6 @@
-import type { AxisValue } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 import type { DotStyle, FontStyle, StrokeStyle } from '$lib/types/plots/styling';
+import type { ClipUnawareMarkerConfig } from '$lib/types/markers/channels/clipMarkerConfig';
 
 /** Which endpoint a delta measures from or to: a named series, or a fixed axis value. */
 export type DeltaTarget = { type: 'series'; series: string } | { type: 'axis'; value?: number };
@@ -21,4 +22,5 @@ export type DeltaMarkerConfig = {
 	type: 'delta';
 	xDomain?: (number | string | Date)[];
 	yDomain?: (number | string | Date)[];
-} & DeltaConfig;
+} & DeltaConfig &
+	ClipUnawareMarkerConfig;

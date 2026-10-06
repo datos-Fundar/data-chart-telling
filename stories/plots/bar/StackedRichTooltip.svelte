@@ -41,9 +41,9 @@
 		y="value"
 		color="bracket"
 		scales={{
-			y: { type: 'categorical', sort: provinceSort },
-			grouping: { seriesLayout: 'stacked' }
+			y: { type: 'categorical', sort: provinceSort }
 		} satisfies AxisBasedScalesConfig}
+		transforms={[{ type: 'stackY' }]}
 		markers={[{ type: 'hover', showLabels: false }]}
 		tooltip={{
 			facetId: '',

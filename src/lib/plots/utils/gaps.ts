@@ -15,7 +15,7 @@ const DEFAULT_KEY = 'default';
  * no list to concatenate, just three independent slots.
  */
 export function resolveGapsForSeries<TStyle>(
-  gaps: Record<string, GapZonesConfig<TStyle>>,
+  gaps: Record<string, GapZonesConfig<TStyle>> = {},
   seriesName: string,
 ): GapZonesConfig<TStyle> {
   const specific = gaps[seriesName];
@@ -193,4 +193,17 @@ export function resolveGapAreaStyle(zoneStyle: AreaStyle | undefined, defaultCol
     strokeDasharray: zoneStyle?.strokeDasharray ?? gapDefaults.strokeDasharray,
     borderRadius: zoneStyle?.borderRadius ?? gapDefaults.borderRadius,
   };
+}
+
+/**
+ * Each series' gap fills, keyed by series name — the interpolated value a
+ * `styles.gaps` zone gives each missing row, resolved per series like `segments`.
+ */
+export function buildGapFillMaps<TData extends Record<string, unknown>, TStyle>(
+  seriesList: Series<TData>[],
+  gaps: Record<string, GapZonesConfig<TStyle>> | undefined,
+): Map<string, Map<TData, DiscreteGapFill<TStyle>>> {
+  return new Map(
+    seriesList.map((s) => [s.name, resolveDiscreteGapFills(s, resolveGapsForSeries(gaps, s.name))]),
+  );
 }

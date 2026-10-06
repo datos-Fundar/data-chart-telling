@@ -59,33 +59,23 @@ const preview: Preview = {
 				order: [
 					'Plots',
 					[
-						'LinePlot',
+						'AreaPlot',
 						[
 							'Series',
 							'Scales',
 							'Styles',
 							'Segments',
 							'Markers',
-							['Rules', 'Deltas', 'Custom'],
 							'Tooltip'
 						],
-						'AreaPlot',
-						['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
 						'BarPlot',
-						['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip'],
-						'HeatmapPlot',
-						['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip'],
-						'PyramidPlot',
-						['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules'], 'Tooltip'],
-						'ScatterPlot',
 						[
 							'Series',
 							'Scales',
 							'Styles',
 							'Segments',
-							'Bubble',
 							'Markers',
-							['Rules', 'Hover', 'Custom'],
+							['Rules', 'Hover'],
 							'Tooltip'
 						],
 						'GeoPlot',
@@ -99,23 +89,74 @@ const preview: Preview = {
 							'Markers',
 							['Graticule', 'Dot', 'Vector', 'Link', 'Contour', 'Inset', 'Hover', 'Custom'],
 							'Tooltip'
-						]
+						],
+						'HeatmapPlot',
+						[
+							'Series',
+							'Scales',
+							'Styles',
+							'Segments',
+							'Markers',
+							['Rules', 'Hover'],
+							'Tooltip'
+						],
+						'HistogramPlot',
+						[
+							'Series',
+							'Scales',
+							'Tooltip',
+							'Transforms',
+						],
+						'LinePlot',
+						[
+							'Series',
+							'Scales',
+							'Styles',
+							'Segments',
+							'Markers',
+							['Rules', 'Deltas', 'Custom'],
+							'Tooltip'
+						],
+						'PyramidPlot',
+						[
+							'Series',
+							'Scales',
+							'Styles',
+							'Segments',
+							'Markers',
+							['Rules'],
+							'Tooltip'
+						],
+						'ScatterPlot',
+						[
+							'Series',
+							'Scales',
+							'Styles',
+							'Segments',
+							'Bubble',
+							'Markers',
+							['Rules', 'Hover', 'Custom'],
+							'Tooltip'
+						],
 					],
 					'Channels',
 					[
 						'Color',
 						[
 							'Plot Level',
-							['Heatmap', 'Geo'],
 							'Marker Level',
-							['Dot', 'Cell', 'Bar'],
 							'Independent Ramps'
 						],
-						'Opacity',
-						'Symbol',
-						'R',
 						'Length',
+						'Opacity',
+						'R',
+						'Symbol',
 						'X1X2Y1Y2'
+					],
+					'Transforms',
+					[
+						'Bin',
+						'Stack',
 					],
 					'Markers',
 					[

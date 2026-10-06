@@ -60,8 +60,7 @@ describe('BarPlot – omitting a series in grouped/stacked layout', () => {
 		const { container: refContainer } = await render(BarPlot, {
 			width: 950,
 			height: 500,
-			series: [{ name: 'male', x: 'province', y: 'value', data: MALE_LIFE_EXPECTANCY_BY_PROVINCE }],
-			scales: { grouping: { seriesLayout: 'grouped' } }
+			series: [{ name: 'male', x: 'province', y: 'value', data: MALE_LIFE_EXPECTANCY_BY_PROVINCE }]
 		});
 		const refSvg = await waitForSvg(refContainer);
 
@@ -83,7 +82,7 @@ describe('BarPlot – omitting a series in grouped/stacked layout', () => {
 			width: 950,
 			height: 500,
 			series: [{ name: 'male', x: 'province', y: 'value', data: MALE_LIFE_EXPECTANCY_BY_PROVINCE }],
-			scales: { grouping: { seriesLayout: 'stacked' } }
+			transforms: [{ type: 'stackY' as const }]
 		});
 		const refSvg = await waitForSvg(refContainer);
 

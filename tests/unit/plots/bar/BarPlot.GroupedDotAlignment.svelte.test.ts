@@ -20,9 +20,7 @@ describe.each([['vertical', false] as const, ['horizontal', true] as const])(
 				x: 'cat',
 				y: 'value',
 				color: 'series',
-				scales: horizontal
-					? { y: { type: 'categorical' }, grouping: { seriesLayout: 'grouped' } }
-					: { grouping: { seriesLayout: 'grouped' } },
+				scales: horizontal ? { y: { type: 'categorical' } } : {},
 				tooltip: {
 					facetId: '',
 					sync: false,

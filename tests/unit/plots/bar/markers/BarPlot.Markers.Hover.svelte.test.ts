@@ -323,7 +323,6 @@ describe('BarPlot – markers.hover areaX/areaY', () => {
 			x: 'province',
 			y: 'value',
 			color: 'sex',
-			scales: { grouping: { seriesLayout: 'grouped' } },
 			markers: [{ type: 'hover', areaX: true }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);

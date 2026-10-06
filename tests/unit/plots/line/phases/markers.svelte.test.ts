@@ -1,5 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { buildLineMarkers, buildMarkers } from '$lib/plots/line/phases/markers';
+import { buildTransforms } from '$lib/layout/phases/transforms';
 import { buildGroupedSeries } from '$lib/plots/utils/segments';
 import type { LinePlotState, LinePlotCtx } from '$lib/types/plots/line/state';
 import type { Series } from '$lib/types/plots/data/common';
@@ -81,7 +82,7 @@ function buildPhase(overrides: Partial<LinePlotState<{ x: number; y: number | nu
 		colorForSeries: () => 'blue',
 		...overrides
 	};
-	return buildMarkers(state, CTX).markers!;
+	return buildMarkers(buildTransforms<typeof state>()(state, CTX), CTX).markers!;
 }
 
 describe('buildMarkers – combines line and gap markers', () => {

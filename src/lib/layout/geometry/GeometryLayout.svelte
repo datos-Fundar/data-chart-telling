@@ -240,52 +240,54 @@
 	{/if}
 {/snippet}
 
-<FrameClip>
-	{#each geometryMarkers as marker, i (markerKey(marker, i))}
+{#each geometryMarkers as marker, i (markerKey(marker, i))}
+	<FrameClip clip={marker.clip === true}>
 		{@render renderMarker(marker, data)}
-	{/each}
+	</FrameClip>
+{/each}
 
-	{#each scopedGroups as group (group.name)}
-		{#each scopedMarkersByName.get(group.name) ?? [] as marker, i (`${group.name}-${marker.type}-${i}`)}
-			{#if marker.type === 'hover'}
-				{@const seriesPoints = ctrl.points.filter((p) => p.series === group.name)}
-				{#if marker.scope === 'segment'}
-					{#each group.segments as seg, segIdx (`${group.name}-hover-segment-${segIdx}`)}
-						<!-- p.row (TData) is always a superset of TSeries in practice, not provable across two independent generics. -->
-						{@const segPoints = seriesPoints.filter((p) => seg.match(p.row as unknown as TSeries))}
-						{#if segPoints.length > 0}
-							<HoverMarker
-								marker={withHoverSeriesColor(marker, seg.color)}
-								data={segPoints}
-								activePoint={segPoints[0] ?? null}
-								impliesCrosshairX={ctrl.impliesCrosshairX}
-								impliesCrosshairY={ctrl.impliesCrosshairY}
-							/>
-						{/if}
-					{/each}
-				{:else}
-					<HoverMarker
-						marker={withHoverSeriesColor(marker, group.segments[0]?.color ?? group.color)}
-						data={seriesPoints}
-						activePoint={seriesPoints[0] ?? null}
-						impliesCrosshairX={ctrl.impliesCrosshairX}
-						impliesCrosshairY={ctrl.impliesCrosshairY}
-					/>
-				{/if}
-			{:else if marker.type === 'component'}
-				{#if marker.scope === 'segment'}
-					{#each group.segments as seg, segIdx (`${group.name}-component-segment-${segIdx}`)}
-						{@const segmentData = group.data.filter((row) => seg.match(row))}
-						{#if segmentData.length > 0}
-							<marker.component {...marker.props} series={group.name} data={segmentData} />
-						{/if}
-					{/each}
-				{:else}
-					<marker.component {...marker.props} series={group.name} data={group.data} />
-				{/if}
+{#each scopedGroups as group (group.name)}
+	{#each scopedMarkersByName.get(group.name) ?? [] as marker, i (`${group.name}-${marker.type}-${i}`)}
+		{#if marker.type === 'hover'}
+			{@const seriesPoints = ctrl.points.filter((p) => p.series === group.name)}
+			{#if marker.scope === 'segment'}
+				{#each group.segments as seg, segIdx (`${group.name}-hover-segment-${segIdx}`)}
+					<!-- p.row (TData) is always a superset of TSeries in practice, not provable across two independent generics. -->
+					{@const segPoints = seriesPoints.filter((p) => seg.match(p.row as unknown as TSeries))}
+					{#if segPoints.length > 0}
+						<HoverMarker
+							marker={withHoverSeriesColor(marker, seg.color)}
+							data={segPoints}
+							activePoint={segPoints[0] ?? null}
+							impliesCrosshairX={ctrl.impliesCrosshairX}
+							impliesCrosshairY={ctrl.impliesCrosshairY}
+						/>
+					{/if}
+				{/each}
 			{:else}
-				{@render renderMarker(withSeriesColor(marker, group.color), group.data)}
+				<HoverMarker
+					marker={withHoverSeriesColor(marker, group.segments[0]?.color ?? group.color)}
+					data={seriesPoints}
+					activePoint={seriesPoints[0] ?? null}
+					impliesCrosshairX={ctrl.impliesCrosshairX}
+					impliesCrosshairY={ctrl.impliesCrosshairY}
+				/>
 			{/if}
-		{/each}
+		{:else if marker.type === 'component'}
+			{#if marker.scope === 'segment'}
+				{#each group.segments as seg, segIdx (`${group.name}-component-segment-${segIdx}`)}
+					{@const segmentData = group.data.filter((row) => seg.match(row))}
+					{#if segmentData.length > 0}
+						<marker.component {...marker.props} series={group.name} data={segmentData} />
+					{/if}
+				{/each}
+			{:else}
+				<marker.component {...marker.props} series={group.name} data={group.data} />
+			{/if}
+		{:else}
+			<FrameClip clip={marker.clip === true}>
+				{@render renderMarker(withSeriesColor(marker, group.color), group.data)}
+			</FrameClip>
+		{/if}
 	{/each}
-</FrameClip>
+{/each}

@@ -1,7 +1,7 @@
 import { getHover, createHover } from '$lib/layout/tooltip/hover.svelte';
 import { createHoverController } from '$lib/layout/tooltip/controller.svelte';
 import type { HoverConfig } from '$lib/types/plots/props';
-import type { AxisValue } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 
 /** This facet's resolved hover store (shared across synced facets, else local) plus its hover controller. */
 export function createPlotHover<TData extends Record<string, unknown>>(args: {

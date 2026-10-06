@@ -5,7 +5,7 @@ import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { BarMarkerConfig } from '$lib/types/markers/common';
 import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/bar/state';
 import type { DiscreteGapFill } from '$lib/plots/utils/gaps';
-import type { AxisValue } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 
 const GAP_KINDS = ['start', 'middle', 'end'] as const;
 
@@ -31,9 +31,9 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 		const category = group.series.x as string | ((d: TData) => AxisValue);
 		const rawValue = group.series.y as string | ((d: TData) => AxisValue);
 		// Resolved (callable) copies for this phase's own internal math — gap
-		// detection and the stacked layout's running baseline — neither of
-		// which ever becomes a marker's own x/y-scale prop, so staying a
-		// function here doesn't affect axis titles either way.
+		// detection and the stacked span lookup — neither of which ever
+		// becomes a marker's own x/y-scale prop, so staying a function here
+		// doesn't affect axis titles either way.
 		const xFn = resolveAccessor(group.series.x);
 		const yFn = resolveAccessor(group.series.y);
 		const defaultColor = colorForSeries!(group.series.name);
@@ -41,25 +41,27 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 
 		// Builds one series' visible bar geometry (real or gap-fill data).
 		// `value` is what's forwarded into the marker's own x2/y2 prop for the
-		// simple/grouped layout (raw, for title inference); `valueFn` is the
-		// callable form the stacked layout's running baseline needs to add to.
+		// grouped layout (raw, for title inference); a stacked bar reads its
+		// span off the plot-level stack instead.
 		function makeMarker(
 			data: TData[],
 			value: number | string | ((d: TData) => AxisValue),
-			valueFn: (d: TData) => number,
 			styles: BarSegmentStyle
 		): BarMarkerConfig | null {
 			if (data.length === 0) return null;
 			const marker: BarMarkerConfig = {
 				type: 'bar',
 				role: 'segment',
+				clip: true,
 				isHorizontal: isHorizontal!,
 				data,
 				styles
 			};
 			if (barLayout!.layout === 'stacked') {
-				const baselineFn = (d: TData) => barLayout!.stackedBaseline(xFn(d), seriesIndex);
-				const topFn = (d: TData) => baselineFn(d) + valueFn(d);
+				// Where the plot-level stack placed this row's bar.
+				const span = (d: TData) => barLayout!.stackedSpan(xFn(d), seriesIndex);
+				const baselineFn = (d: TData) => span(d)?.[0] ?? barLayout!.valueBaseline;
+				const topFn = (d: TData) => span(d)?.[1] ?? barLayout!.valueBaseline;
 				if (isHorizontal) {
 					marker.y = category;
 					marker.x1 = baselineFn;
@@ -99,8 +101,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 				fill: disabledFill?.fill ?? seg.styles.fill ?? defaultColor,
 				fillOpacity: disabledFill?.fillOpacity ?? seg.styles.fillOpacity ?? 1
 			};
-			const valueFn = barLayout!.layout === 'stacked' ? (d: TData) => Number(yFn(d)) : yFn;
-			const marker = makeMarker(realData, rawValue, valueFn, styles);
+			const marker = makeMarker(realData, rawValue, styles);
 			if (marker) segmentMarkers.push(marker);
 		}
 
@@ -126,10 +127,9 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 			}));
 			// `__gapValue` is a synthetic field this phase invented, not a real
 			// author-facing one — no field name worth surfacing as a title
-			// either way, so the same resolved accessor covers both `value`
-			// and `valueFn` here.
+			// either way, so a resolved accessor is forwarded as the `value`.
 			const gapValueFn = (d: TData) => (d as GapFillRow<TData>).__gapValue;
-			const marker = makeMarker(taggedData, gapValueFn, gapValueFn, gapStyle);
+			const marker = makeMarker(taggedData, gapValueFn, gapStyle);
 			if (marker) segmentMarkers.push(marker);
 		}
 	});

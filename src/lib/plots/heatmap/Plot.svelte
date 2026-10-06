@@ -2,27 +2,21 @@
 	import { validateSegments } from '$lib/plots/utils/segments';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
-	import { buildData } from '$lib/plots/heatmap/phases/data';
-	import { buildMapping } from '$lib/plots/heatmap/phases/mapping';
-	import { buildScales } from '$lib/plots/heatmap/phases/scales';
-	import { buildMarkers } from '$lib/plots/heatmap/phases/markers';
 	import { runStages } from '$lib/layout/phases/runStages';
+	import { buildAxisStages } from '$lib/layout/phases/axisStages';
+	import { buildHover } from '$lib/layout/tooltip/buildHover';
+	import { buildHeatmapKind } from '$lib/plots/heatmap/kind';
 	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
 	import ValueLabels from '$lib/plots/heatmap/ValueLabels.svelte';
-	import {
-		hasHoverMarker,
-		resolveHoverStrategy,
-		resolveHoverSync
-	} from '$lib/layout/tooltip/utils';
 	import type { BasePlotProps } from '$lib/types/plots/props';
-	import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
+	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
+	import type { AxisValue } from '$lib/types/layout/mapping';
 	import type { SeriesProps, DataProps } from '$lib/types/plots/data/common';
 	import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 	import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
 	import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 	import type { HeatmapPlotState, HeatmapPlotCtx } from '$lib/types/plots/heatmap/state';
-	import type { PhaseStage } from '$lib/types/layout/phases';
 
 	/**
 	 * A categorical grid of value-coloured cells. Accepts either a pre-built
@@ -57,7 +51,9 @@
 		scales = {},
 		margins,
 		markers = [],
-		tooltip = undefined
+		tooltip = undefined,
+		statistics = [],
+		transforms = []
 	}: Props = $props();
 
 	$effect(() => {
@@ -85,18 +81,28 @@
 	const legendInteraction = $derived(getLegendInteraction());
 	const range = $derived(legendInteraction?.continuousRange);
 
-	// The plot's own pipeline, run once via `runStages`.
-	const stages: PhaseStage<HeatmapPlotState<TData>, HeatmapPlotCtx>[] = [
-		{ phase: 'data', run: buildData },
-		{ phase: 'mapping', run: buildMapping },
-		{ phase: 'scales', run: buildScales },
-		{ phase: 'markers', run: buildMarkers }
-	];
-	const ctx = $derived<HeatmapPlotCtx>({ cfg, range });
+	// The plot's own pipeline (see `buildHeatmapKind`), run once via `runStages`.
+	const stages = buildAxisStages(buildHeatmapKind<TData>());
+	const ctx = $derived<HeatmapPlotCtx>({ cfg, legendInteraction, range });
 	const plotState = $derived(
 		runStages<HeatmapPlotState<TData>, HeatmapPlotCtx>(
 			stages,
-			{ series, data, x, y, color, opacity, segments, scales, width, height, margins },
+			{
+				series,
+				data,
+				x,
+				y,
+				color,
+				opacity,
+				segments,
+				scales,
+				width,
+				height,
+				margins,
+				statistics,
+				transforms,
+				authorMarkers: markers
+			},
 			ctx
 		)
 	);
@@ -125,14 +131,15 @@
 			}))
 	);
 
-	const hover = $derived({
-		active: tooltip != null || hasHoverMarker(markers),
-		points: hoverPoints,
-		label: (d: TData) => formatValue(Number(getColor(d)), ''),
-		strategy: resolveHoverStrategy(tooltip?.strategy, markers, 'punctual'),
-		sync: resolveHoverSync(tooltip?.sync, markers),
-		tooltip
-	});
+	const hover = $derived(
+		buildHover({
+			tooltip,
+			markers,
+			points: hoverPoints,
+			label: (d: TData) => formatValue(Number(getColor(d)), ''),
+			defaultStrategy: 'punctual'
+		})
+	);
 
 	// Created once, not `$derived`.
 	const hoverController = createPlotHover<TData>({
@@ -155,7 +162,7 @@
 	scales={resolvedScales}
 	{margins}
 	{hoverController}
-	markers={[...(plotState.markers ?? []), ...markers]}
+	markers={plotState.markers ?? []}
 	seriesData={resolvedSeries}
 >
 	{#if showVals}

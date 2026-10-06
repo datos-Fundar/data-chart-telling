@@ -1,4 +1,5 @@
 import { getConfiguration } from '$lib/configuration/config.svelte';
+import { buildProcessedGroups } from '$lib/layout/phases/transforms';
 import { resolveGapRuns, resolveGapsForSeries } from '$lib/plots/utils/gaps';
 import type { GapPoint } from '$lib/plots/utils/gaps';
 import type { Series } from '$lib/types/plots/data/common';
@@ -8,7 +9,7 @@ import type { VisualGroup } from '$lib/types/plots/segments/config';
 import type { StrokeStyle, DotStyle } from '$lib/types/plots/styling';
 import type { LineMarkerConfig, DotMarkerConfig } from '$lib/types/markers/common';
 import type { LinePlotState, LinePlotCtx } from '$lib/types/plots/line/state';
-import type { AxisValue } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 
 /**
  * Every `'line'` (+ `'dot'`, where a segment's style asks for them) marker
@@ -43,6 +44,7 @@ export function buildLineMarkers<TData extends Record<string, unknown>>(args: {
 			const dotStyle = seg.styles.dots;
 			markers.push({
 				type: 'line',
+				clip: true,
 				data: seg.data,
 				x,
 				y,
@@ -110,7 +112,7 @@ const gy = (p: GapPoint) => p.y;
  */
 export function buildGapMarkers<TData extends Record<string, unknown>>(args: {
 	seriesList: Series<TData>[];
-	gaps: GapsConfig<LineSegmentStyle>;
+	gaps?: GapsConfig<LineSegmentStyle>;
 	colorFor: (seriesIndex: number) => string;
 	disabledStrokeFor: (seriesName: string) => StrokeStyle | undefined;
 	disabledDotsFor: (seriesName: string) => DotStyle | undefined;
@@ -134,6 +136,7 @@ export function buildGapMarkers<TData extends Record<string, unknown>>(args: {
 
 			markers.push({
 				type: 'line',
+				clip: true,
 				data: run.points,
 				x: gx,
 				y: gy,
@@ -218,26 +221,31 @@ export function buildGapMarkers<TData extends Record<string, unknown>>(args: {
 	return markers;
 }
 
-/** LinePlot's "markers" phase: real line/dot segments plus interpolated gap bridges — prepended onto whatever the "statistics" phase already put in `state.markers`. */
+/**
+ * LinePlot's "markers" phase: real line/dot segments plus interpolated gap
+ * bridges, drawing the rows the "transforms" phase left — prepended onto
+ * whatever the "statistics" phase already put in `state.markers`.
+ */
 export function buildMarkers<TData extends Record<string, unknown>>(
 	state: LinePlotState<TData>,
 	ctx: LinePlotCtx
 ): LinePlotState<TData> {
-	const { groupedSeries, resolvedSeries, colorForSeries, gaps } = state;
+	const { colorForSeries, gaps } = state;
 	const disabledStrokeFor = (name: string) => ctx.disabledStrokeFor?.(name);
 	const disabledDotsFor = (name: string) => ctx.disabledDotsFor?.(name);
+	const groups = buildProcessedGroups<LineSegmentStyle>(state);
 
 	const lineMarkers = buildLineMarkers({
-		groupedSeries: groupedSeries!,
+		groupedSeries: groups,
 		colorFor: colorForSeries!,
 		disabledStrokeFor,
 		disabledDotsFor
 	});
 
 	const gapMarkers = buildGapMarkers({
-		seriesList: resolvedSeries!,
+		seriesList: groups.map((g) => g.series),
 		gaps,
-		colorFor: (seriesIndex) => colorForSeries!(resolvedSeries![seriesIndex].name),
+		colorFor: (seriesIndex) => colorForSeries!(groups[seriesIndex].series.name),
 		disabledStrokeFor,
 		disabledDotsFor
 	});

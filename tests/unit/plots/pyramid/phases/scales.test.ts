@@ -13,7 +13,8 @@ type Row = { ageGroup: string; pct: number | null };
 
 const CTX: PyramidPlotCtx = {
 	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as ChartConfig,
-	formatValue: (v) => `${v}%`
+	formatValue: (v) => `${v}%`,
+	legendInteraction: null
 };
 
 function series(name: string, side: 'left' | 'right', data: Row[]): PyramidSeries<Row> {

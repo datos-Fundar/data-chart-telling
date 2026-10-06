@@ -1,4 +1,4 @@
-import type { AxisValue } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 import type { CommonMarkerConfig } from './commonMarkerConfig';
 
 /** Common props plus the interval channels `x1`/`x2`/`y1`/`y2`. */

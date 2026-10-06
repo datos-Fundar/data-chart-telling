@@ -1,18 +1,32 @@
 import { describe, test, expect } from 'vitest';
-import { buildTransforms, buildMarkers, defaultBin } from '$lib/plots/histogram/phases/markers';
+import { mergeBin, defaultBin } from '$lib/plots/histogram/phases/transforms';
+import { buildHistogramKind } from '$lib/plots/histogram/kind';
+import { stageOf } from '../../_helpers/stages';
+import { buildMarkers } from '$lib/plots/histogram/phases/markers';
 import {
 	DEFAULT_CONFIG,
 	setConfiguration,
 	resetConfiguration
 } from '$lib/configuration/config.svelte';
-import { buildScales } from '$lib/plots/histogram/phases/scales';
-import { buildData } from '$lib/plots/histogram/phases/data';
-import type { HistogramPlotState } from '$lib/types/plots/histogram/state';
+import { SERIES_KEY } from '$lib/layout/phases/transforms';
+import type { HistogramPlotState, HistogramPlotCtx } from '$lib/types/plots/histogram/state';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 type Row = Record<string, unknown>;
 
-const CTX = { cfg: DEFAULT_CONFIG } as never;
+const buildData = stageOf(buildHistogramKind<Row>(), 'data');
+const buildTransforms = stageOf(buildHistogramKind<Row>(), 'transforms');
+const buildScales = stageOf(buildHistogramKind<Row>(), 'scales');
+type Rect = {
+	type: 'rect';
+	series: string;
+	data: Row[];
+	y1: number;
+	y2: string;
+	styles: { fillOpacity: number };
+};
+
+const CTX = { cfg: DEFAULT_CONFIG, legendInteraction: null } as HistogramPlotCtx;
 
 const rows: Row[] = [
 	{ v: 1, g: 'A' },
@@ -29,6 +43,8 @@ function flatState(overrides: Partial<HistogramPlotState<Row>> = {}): HistogramP
 		x: 'v',
 		grouping: 'g',
 		scales: {},
+		width: 400,
+		height: 300,
 		transforms: [],
 		authorMarkers: [],
 		resolvedSeries: [
@@ -41,119 +57,125 @@ function flatState(overrides: Partial<HistogramPlotState<Row>> = {}): HistogramP
 	};
 }
 
-describe('buildTransforms', () => {
+/** Runs "transforms" → "scales" → "markers", the phases after "data". */
+function run(state: HistogramPlotState<Row>, ctx: HistogramPlotCtx = CTX) {
+	return buildMarkers(buildScales(buildTransforms(state, ctx)), ctx);
+}
+
+const rects = (state: HistogramPlotState<Row>) =>
+	(state.markers ?? []).filter((m) => m.type === 'rect') as unknown as Rect[];
+
+describe('mergeBin', () => {
 	test('with no transforms of its own, a histogram runs the default count bin', () => {
-		expect(buildTransforms([], DEFAULT_CONFIG)).toEqual([defaultBin(DEFAULT_CONFIG)]);
+		expect(mergeBin([], DEFAULT_CONFIG)).toEqual([defaultBin(DEFAULT_CONFIG)]);
 	});
 
 	test('the plot’s own binX merges over the default one, its props winning', () => {
-		const [bin] = buildTransforms([{ type: 'binX', thresholds: [0, 10, 20] }], DEFAULT_CONFIG);
+		const [bin] = mergeBin([{ type: 'binX', thresholds: [0, 10, 20] }], DEFAULT_CONFIG);
 		expect(bin).toMatchObject({ type: 'binX', y: 'count', thresholds: [0, 10, 20] });
 	});
 
 	test('a plot’s own binX can override the default count', () => {
-		const [bin] = buildTransforms([{ type: 'binX', y: 'sum' }], DEFAULT_CONFIG);
+		const [bin] = mergeBin([{ type: 'binX', y: 'sum' }], DEFAULT_CONFIG);
 		expect(bin).toMatchObject({ type: 'binX', y: 'sum' });
 	});
 
 	test('other transforms stay after the bin, in order', () => {
-		const out = buildTransforms(
-			[{ type: 'stackY' }, { type: 'binX', interval: 5 }],
-			DEFAULT_CONFIG
-		);
+		const out = mergeBin([{ type: 'stackY' }, { type: 'binX', interval: 5 }], DEFAULT_CONFIG);
 		expect(out.map((t) => t.type)).toEqual(['binX', 'stackY']);
 	});
 
 	test('the default bin’s inset comes from the configuration, on both sides', () => {
-		const [bin] = buildTransforms([], {
-			...DEFAULT_CONFIG,
-			histogram: { inset: 3, fillOpacity: 1 }
-		});
+		const [bin] = mergeBin([], { ...DEFAULT_CONFIG, histogram: { inset: 3, fillOpacity: 1 } });
 		expect(bin).toMatchObject({ insetLeft: 3, insetRight: 3 });
 	});
 });
 
-describe('buildMarkers', () => {
-	test('a series-based histogram bins each series on its own rect marker', () => {
-		const state = buildMarkers(
-			flatState({
-				series: [{ name: 'A', x: 'v', y: 'v', data: rows }] as never,
-				resolvedSeries: [{ name: 'A', x: 'v', y: 'v', data: rows }]
-			}),
+describe('buildTransforms', () => {
+	test('bins every series in one pass, each bin keeping its series', () => {
+		const state = buildTransforms(
+			flatState({ transforms: [{ type: 'binX', thresholds: [0, 10, 20] }] }),
 			CTX
 		);
-		expect(state.binMarkers).toHaveLength(1);
-		expect(state.binMarkers![0]).toMatchObject({ type: 'rect', series: 'A' });
+		const series = state.processedData!.data.map((r) => r[SERIES_KEY]).sort();
+		// A: [0,10) and [10,20); B: [0,10) and [10,20)
+		expect(series).toEqual(['A', 'A', 'B', 'B']);
 	});
+});
 
-	test('flat data gets one unscoped rect that bins per group', () => {
-		const state = buildMarkers(flatState(), CTX);
-		expect(state.binMarkers).toHaveLength(1);
-		const bar = state.binMarkers![0] as AxisBasedMarkersConfig & { series?: string; data: Row[] };
-		expect(bar.series).toBeUndefined();
-		// two groups, two bins with rows: the bin rows come from both groups
-		expect(bar.data.length).toBeGreaterThan(2);
+describe('buildMarkers', () => {
+	test('each series gets its own scoped rect', () => {
+		expect(rects(run(flatState())).map((r) => r.series)).toEqual(['A', 'B']);
 	});
 
 	test('each bar goes from zero up to its count', () => {
-		const state = buildMarkers(flatState(), CTX);
-		const bar = state.binMarkers![0] as unknown as { y1: number; y2: string };
+		const [bar] = rects(run(flatState()));
 		expect(bar.y1).toBe(0);
 		expect(bar.y2).toBe('__y');
 	});
 
-	test('the author’s markers come after the default bins', () => {
+	test('the markers the statistics phase left come after the default bins', () => {
 		const rule = { type: 'rule', y: 3 } as unknown as AxisBasedMarkersConfig;
-		const state = buildMarkers(flatState({ authorMarkers: [rule] }), CTX);
+		const state = run(flatState({ markers: [rule] }));
 		expect(state.markers!.at(-1)).toBe(rule);
-		expect(state.markers!.length).toBe(state.binMarkers!.length + 1);
+		expect(state.markers!.length).toBe(rects(state).length + 1);
 	});
 });
 
 describe('buildScales', () => {
-	test('an unpinned y runs from zero up to the tallest bin', () => {
-		// with explicit thresholds [0,10) and [10,20), each group's tallest bin holds two rows
-		const withMarkers = buildMarkers(
-			flatState({ transforms: [{ type: 'binX', thresholds: [0, 10, 20] }] }),
-			CTX
+	test("the bins' edges set x; y, a plain count, is left to svelteplot's own bars", () => {
+		const state = buildScales(
+			buildTransforms(flatState({ transforms: [{ type: 'binX', thresholds: [0, 10, 20] }] }), CTX)
 		);
-		const state = buildScales({ ...withMarkers, scales: {} } as HistogramPlotState<Row>);
-		expect(state.scales.y?.domain).toEqual([0, 2]);
+		const [xLo, xHi] = state.scales.x?.domain as [number, number];
+		expect(xLo).toBeLessThanOrEqual(1);
+		expect(xHi).toBeGreaterThanOrEqual(18);
+		expect(state.scales.y?.domain).toBeUndefined();
 	});
 
-	test('an unpinned x covers every bin edge, not just the raw values', () => {
-		const withMarkers = buildMarkers(flatState({ transforms: [] }), CTX);
-		const state = buildScales({ ...withMarkers, scales: {} } as HistogramPlotState<Row>);
-		const [lo, hi] = state.scales.x?.domain as [number, number];
-		expect(lo).toBeLessThanOrEqual(1);
-		expect(hi).toBeGreaterThanOrEqual(18);
+	test('a marker with its own rows grows the axes to cover it, y still from zero', () => {
+		const rule = {
+			type: 'line',
+			data: [
+				{ a: 30, b: 4 },
+				{ a: 40, b: 6 }
+			],
+			x: 'a',
+			y: 'b'
+		} as unknown as AxisBasedMarkersConfig;
+		const state = buildScales(buildTransforms(flatState({ markers: [rule] }), CTX));
+		const [xLo, xHi] = state.scales.x?.domain as [number, number];
+		const [yLo, yHi] = state.scales.y?.domain as [number, number];
+		expect(xLo).toBeLessThanOrEqual(1);
+		expect(xHi).toBeGreaterThanOrEqual(40);
+		expect(yLo).toBe(0);
+		expect(yHi).toBeGreaterThanOrEqual(6);
 	});
 
 	test('a pinned domain is left alone', () => {
-		const withMarkers = buildMarkers(flatState(), CTX);
-		const state = buildScales({
-			...withMarkers,
-			scales: { y: { domain: [0, 10] } }
-		} as HistogramPlotState<Row>);
+		const line = {
+			type: 'line',
+			data: [{ a: 1, b: 50 }],
+			x: 'a',
+			y: 'b'
+		} as unknown as AxisBasedMarkersConfig;
+		const state = buildScales(
+			buildTransforms(flatState({ markers: [line], scales: { y: { domain: [0, 10] } } }), CTX)
+		);
 		expect(state.scales.y?.domain).toEqual([0, 10]);
 	});
 });
 
 describe('histogram bars from the configuration', () => {
 	test('bars take the configured fill opacity, and the default is opaque', () => {
-		const bar = buildMarkers(flatState(), CTX).binMarkers![0] as unknown as {
-			styles: { fillOpacity: number };
-		};
-		expect(bar.styles.fillOpacity).toBe(1);
+		expect(rects(run(flatState()))[0].styles.fillOpacity).toBe(1);
 	});
 
 	test('a configured fill opacity reaches the bars', () => {
 		setConfiguration({ histogram: { fillOpacity: 0.4 } });
 		try {
 			const cfg = { ...DEFAULT_CONFIG, histogram: { inset: 1, fillOpacity: 0.4 } };
-			const bar = buildMarkers(flatState(), { cfg } as never).binMarkers![0] as unknown as {
-				styles: { fillOpacity: number };
-			};
+			const [bar] = rects(run(flatState(), { cfg, legendInteraction: null }));
 			expect(bar.styles.fillOpacity).toBe(0.4);
 		} finally {
 			resetConfiguration();
@@ -162,37 +184,28 @@ describe('histogram bars from the configuration', () => {
 });
 
 describe('histogram segments', () => {
+	const input = (overrides: Partial<HistogramPlotState<Row>> = {}): HistogramPlotState<Row> => ({
+		data: rows,
+		x: 'v',
+		grouping: 'g',
+		scales: {},
+		width: 400,
+		height: 300,
+		...overrides
+	});
+
 	test('a segment’s fillOpacity styles the bars of every series it covers', () => {
-		const data = buildData(
-			{
-				data: rows,
-				x: 'v',
-				grouping: 'g',
-				scales: {},
-				transforms: [],
-				authorMarkers: [],
-				segments: { default: [{ styles: { fillOpacity: 0.4 } }] }
-			},
-			CTX
+		const state = run(
+			buildData(input({ segments: { default: [{ styles: { fillOpacity: 0.4 } }] } }), CTX)
 		);
-		const state = buildMarkers(data, CTX);
-		const bars = state.binMarkers as unknown as {
-			series: string;
-			styles: { fillOpacity: number };
-		}[];
+		const bars = rects(state);
 		expect(bars.map((b) => b.series).sort()).toEqual(['A', 'B']);
 		expect(bars.every((b) => b.styles.fillOpacity === 0.4)).toBe(true);
 	});
 
 	test('without segments, bars keep the configured opacity', () => {
-		const data = buildData(
-			{ data: rows, x: 'v', grouping: 'g', scales: {}, transforms: [], authorMarkers: [] },
-			CTX
-		);
-		const bars = buildMarkers(data, CTX).binMarkers as unknown as {
-			styles: { fillOpacity: number };
-		}[];
-		expect(bars).toHaveLength(1);
-		expect(bars[0].styles.fillOpacity).toBe(1);
+		const bars = rects(run(buildData(input(), CTX)));
+		expect(bars).toHaveLength(2);
+		expect(bars.every((b) => b.styles.fillOpacity === 1)).toBe(true);
 	});
 });

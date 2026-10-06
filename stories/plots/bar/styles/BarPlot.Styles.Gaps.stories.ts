@@ -145,12 +145,11 @@ export const GapsOnOneSeriesOnly: Story = {
 };
 
 // ── Series layout ─────────────────────────────────────────────────────────────
-// `scales.grouping.seriesLayout` is BarPlot's own territory — a gap-fill bar picks
-// up exactly the same grouped inset / stacked baseline a real bar for that
-// row would.
+// A gap-fill bar picks up exactly the same side-by-side slice / stacked span a
+// real bar for that row would.
 
 /**
- * `seriesLayout: 'grouped'` gives each series its own slice of the
+ * Side by side (the default): each series gets its own slice of the
  * category band — a filled gap bar lands in the same slice its series
  * would occupy anywhere else.
  */
@@ -158,28 +157,25 @@ export const GroupedLayout: Story = {
 	args: {
 		series: TWO_READINGS,
 		scales: {
-			x: { sort: byMonth },
-			grouping: { seriesLayout: 'grouped' }
+			x: { sort: byMonth }
 		} satisfies AxisBasedScalesConfig,
 		styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
 	}
 };
 
 /**
- * `seriesLayout: 'stacked'` stacks series cumulatively within each
- * category's band — a series stacked *above* a gap-owning one keeps a
- * correct baseline whether that gap is filled (contributes its
- * interpolated value to the stack) or left unfilled (contributes 0,
- * instead of the broken/`NaN` contribution a raw missing value would
- * otherwise poison the stack with).
+ * A plot-level `stackY` stacks series cumulatively within each category's
+ * band — a series stacked *above* a gap-owning one keeps a correct baseline
+ * whether that gap is filled (contributes its interpolated value to the
+ * stack) or left unfilled (contributes nothing).
  */
 export const StackedLayout: Story = {
 	args: {
 		series: TWO_READINGS,
 		scales: {
-			x: { sort: byMonth },
-			grouping: { seriesLayout: 'stacked' }
+			x: { sort: byMonth }
 		} satisfies AxisBasedScalesConfig,
+		transforms: [{ type: 'stackY' as const }],
 		styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
 	}
 };

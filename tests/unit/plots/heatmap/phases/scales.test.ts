@@ -15,7 +15,8 @@ const FLAT: Row[] = [
 
 const CTX: HeatmapPlotCtx = {
 	cfg: { continuous: { min: '#000000', max: '#ffffff' } } as ChartConfig,
-	range: undefined
+	range: undefined,
+	legendInteraction: null
 };
 
 function build(

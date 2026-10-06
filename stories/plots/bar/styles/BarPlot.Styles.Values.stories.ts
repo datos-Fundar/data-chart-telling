@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import {
 	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
@@ -244,10 +243,7 @@ export const TwoSeriesGroupedLabelsMiddle: Story = {
 				anchor: 'middle',
 				format: (v: number, name: string) => `${name}\n(${v.toFixed(1)} yr)`
 			}
-		} satisfies AxisBasedStylesConfig,
-		scales: {
-			grouping: { seriesLayout: 'grouped', seriesPadding: 0.2 }
-		} satisfies AxisBasedScalesConfig
+		} satisfies AxisBasedStylesConfig
 	}
 };
 
@@ -265,9 +261,7 @@ export const TwoSeriesStackedLabelsMiddle: Story = {
 				format: (v: number, name: string) => `${name}\n(${v.toFixed(1)} yr)`
 			}
 		} satisfies AxisBasedStylesConfig,
-		scales: {
-			grouping: { seriesLayout: 'stacked' }
-		} satisfies AxisBasedScalesConfig
+		transforms: [{ type: 'stackY' as const }]
 	}
 };
 

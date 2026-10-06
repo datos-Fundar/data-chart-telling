@@ -1,4 +1,5 @@
 import type { CommonMarkerConfig } from '$lib/types/markers/channels/commonMarkerConfig';
+import type { ClipAwareMarkerConfig } from '$lib/types/markers/channels/clipMarkerConfig';
 
 /**
  * A box plot (svelteplot's `BoxX`/`BoxY`). Styled per sub-mark through `bar`,
@@ -12,4 +13,5 @@ export type BoxMarkerConfig = {
 	dot?: Record<string, unknown>;
 	tickMedian?: boolean | Record<string, unknown>;
 	tickMinMax?: boolean | Record<string, unknown>;
-} & CommonMarkerConfig;
+} & CommonMarkerConfig &
+	ClipAwareMarkerConfig;

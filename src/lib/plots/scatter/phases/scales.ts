@@ -1,3 +1,4 @@
+import { processedPosition } from '$lib/layout/phases/transforms';
 import { numericMargin } from '$lib/layout/plot/margins';
 import { markerAxisValues } from '$lib/utils/markerAxisValues';
 import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/scatter/state';
@@ -45,8 +46,15 @@ export function buildScales<TData extends Record<string, unknown>>(
 	state: ScatterPlotState<TData>,
 	ctx: ScatterPlotCtx
 ): ScatterPlotState<TData> {
-	const { scales, flat, channels, groupedSeries, width, height, margins } = state;
+	const { scales, channels, groupedSeries, width, height, margins } = state;
 	const { cfg } = ctx;
+
+	// Where each dot sits: the rows the "transforms" phase left, read at their
+	// position (a stacked row's top, not its raw value).
+	const processed = state.processedData!;
+	const position = processedPosition(processed);
+	const xValues = processed.data.map((d) => Number(position.x(d)));
+	const yValues = processed.data.map((d) => Number(position.y(d)));
 
 	// Values derived markers draw beyond the raw rows (a density curve's peak,
 	// a regression band), so the domain covers them too.
@@ -72,12 +80,8 @@ export function buildScales<TData extends Record<string, unknown>>(
 					);
 	if (maxDotRadius <= 0) {
 		if (!extraX.length && !extraY.length) return { ...state, scales };
-		const x = scales.x?.domain
-			? undefined
-			: extentOf([...flat!.map((d) => Number(channels!.x.accessor(d))), ...extraX]);
-		const y = scales.y?.domain
-			? undefined
-			: extentOf([...flat!.map((d) => Number(channels!.y.accessor(d))), ...extraY]);
+		const x = scales.x?.domain ? undefined : extentOf([...xValues, ...extraX]);
+		const y = scales.y?.domain ? undefined : extentOf([...yValues, ...extraY]);
 		return {
 			...state,
 			scales: {
@@ -99,10 +103,6 @@ export function buildScales<TData extends Record<string, unknown>>(
 		numericMargin('top', estimatedMargins.top) -
 		numericMargin('bottom', estimatedMargins.bottom);
 
-	const xAcc = channels!.x.accessor;
-	const yAcc = channels!.y.accessor;
-	const xValues = flat!.map((d) => Number(xAcc(d)));
-	const yValues = flat!.map((d) => Number(yAcc(d)));
 	const paddedX = scales.x?.domain
 		? undefined
 		: resolveRadiusPaddedDomain([...xValues, ...extraX], maxDotRadius, estimatedInnerWidth);

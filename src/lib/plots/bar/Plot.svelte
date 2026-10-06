@@ -14,20 +14,13 @@
 	import { estimateValueLabelMargin } from '$lib/plots/utils/valueLabelMargin';
 	import { buildHoverPoints } from '$lib/plots/bar/hoverPoints';
 	import { buildHitAreaMarkers } from '$lib/plots/bar/buildHitAreaMarkers';
-	import { buildData } from '$lib/plots/bar/phases/data';
-	import { buildMapping } from '$lib/plots/bar/phases/mapping';
-	import { buildScales } from '$lib/plots/bar/phases/scales';
-	import { buildMarkers } from '$lib/plots/bar/phases/markers';
-	import { buildStatistics } from '$lib/plots/bar/phases/statistics';
 	import { runStages } from '$lib/layout/phases/runStages';
+	import { buildAxisStages } from '$lib/layout/phases/axisStages';
+	import { buildHover } from '$lib/layout/tooltip/buildHover';
+	import { buildBarKind } from '$lib/plots/bar/kind';
 	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import ValueLabels from '$lib/plots/bar/ValueLabels.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
-	import {
-		hasHoverMarker,
-		resolveHoverStrategy,
-		resolveHoverSync
-	} from '$lib/layout/tooltip/utils';
 	import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 	import type { BasePlotProps } from '$lib/types/plots/props';
 	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
@@ -38,7 +31,6 @@
 	import type { LegendDisabledStyle } from '$lib/types/layout/legend';
 	import type { MarginOverflow } from '$lib/plots/utils/labelOverflow.svelte';
 	import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/bar/state';
-	import type { PhaseStage } from '$lib/types/layout/phases';
 
 	/**
 	 * A bar chart, vertical by default. Accepts either a pre-built `series`
@@ -70,7 +62,8 @@
 		scales = {},
 		margins,
 		tooltip = undefined,
-		statistics = []
+		statistics = [],
+		transforms = []
 	}: Props = $props();
 
 	$effect(() => {
@@ -101,15 +94,9 @@
 		);
 	}
 
-	// The plot's own pipeline, run once via `runStages`. Hit-area markers stay
-	// outside it, below.
-	const stages: PhaseStage<BarPlotState<TData>, BarPlotCtx>[] = [
-		{ phase: 'data', run: buildData },
-		{ phase: 'mapping', run: buildMapping },
-		{ phase: 'statistics', run: buildStatistics },
-		{ phase: 'scales', run: buildScales },
-		{ phase: 'markers', run: buildMarkers }
-	];
+	// The plot's own pipeline (see `buildBarKind`), run once via `runStages`.
+	// Hit-area markers stay outside it, below.
+	const stages = buildAxisStages(buildBarKind<TData>());
 	const ctx = $derived<BarPlotCtx>({
 		cfg,
 		legendInteraction,
@@ -126,13 +113,14 @@
 				grouping,
 				color,
 				segments,
-				gaps: styles.gaps ?? {},
+				gaps: styles.gaps,
 				scales,
 				width,
 				height,
 				margins,
 				authorMarkers: markers,
-				statistics
+				statistics,
+				transforms
 			},
 			ctx
 		)
@@ -164,22 +152,23 @@
 		)
 	);
 
-	const hover = $derived({
-		active: tooltip != null || hasHoverMarker(markers),
-		points: hoverPoints,
-		label: (r: TData) => String(yAcc(r)),
-		strategy: resolveHoverStrategy(tooltip?.strategy, markers, categoricalAxis),
-		sync: resolveHoverSync(tooltip?.sync, markers),
-		tooltip,
-		// The category axis is a band scale — `<Pointer>`'s nearest-point-by-
-		// distance match (svelteplot's own projection of each candidate's band
-		// centre) can disagree by a couple of pixels with where `<BarX>`/`<BarY>`
-		// (via svelteplot's `RectPath`) actually render that band, which is
-		// enough to mismatch the neighbouring category once bands get thin
-		// (many categories). `buildHitAreaMarkers` hit-tests each series' own
-		// segment directly instead — see its own doc comment.
-		pointMatching: 'contains' as const
-	});
+	// The category axis is a band scale — `<Pointer>`'s nearest-point-by-
+	// distance match (svelteplot's own projection of each candidate's band
+	// centre) can disagree by a couple of pixels with where `<BarX>`/`<BarY>`
+	// (via svelteplot's `RectPath`) actually render that band, which is
+	// enough to mismatch the neighbouring category once bands get thin
+	// (many categories). `buildHitAreaMarkers` hit-tests each series' own
+	// segment directly instead — see its own doc comment.
+	const hover = $derived(
+		buildHover({
+			tooltip,
+			markers,
+			points: hoverPoints,
+			label: (r: TData) => String(yAcc(r)),
+			defaultStrategy: categoricalAxis,
+			pointMatching: 'contains'
+		})
+	);
 
 	// Created once, not `$derived`.
 	const hoverController = createPlotHover<TData>({

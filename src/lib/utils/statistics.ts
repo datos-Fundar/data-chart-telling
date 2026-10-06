@@ -1,7 +1,7 @@
 import { densityX, windowY } from 'svelteplot';
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { resolveChannelFill } from '$lib/markers/resolveChannelFill';
-import type { AxisValue } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 import type { Series } from '$lib/types/plots/data/common';
 import type {
 	StatisticConfig,
@@ -212,7 +212,7 @@ export function resolveStatisticMarker<T extends Record<string, unknown>>(
  * series, using that series' own data/accessors/color, so a plot grouped by
  * `color` gets its statistics grouped the same way. `pooled: true`: one
  * statistic over every series combined (using the first series' own `x`/`y`,
- * same convention each kind's own "mapping" phase already uses for a shared
+ * same convention the shared "mapping" stage uses for a shared
  * accessor). Named `series`: one statistic per listed series.
  */
 export function resolvePlotStatistics<T extends Record<string, unknown>>(args: {

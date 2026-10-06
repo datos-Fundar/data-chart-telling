@@ -8,7 +8,6 @@
 		hasHoverMarker
 	} from '$lib/layout/tooltip/utils';
 	import { resolveAccessor } from '$lib/plots/utils/accessors';
-	import type { Accessor } from '$lib/types/plots/data/common';
 	import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
 	import type { ChartProps } from '$lib/types/charts/props';
 
@@ -32,16 +31,17 @@
 		y,
 		grouping,
 		color,
-		r,
 		styles = {},
 		segments,
 		markers = [],
+		transforms,
 		scales = {},
 		margins,
 		facet,
 		timeline,
-		tooltip
-	}: ChartProps<TRow, ScatterSegmentStyle> & { r?: Accessor<TRow, number> | number } = $props();
+		tooltip,
+		...channels
+	}: ChartProps<TRow, ScatterSegmentStyle> = $props();
 
 	const tip = $derived(resolveTooltip(tooltip, 'punctual'));
 	const hoverEnabled = $derived(tip.enabled || hasHoverMarker(markers));
@@ -70,6 +70,7 @@
 >
 	{#snippet plot({ data: rows, width: w, height: h, facetValue })}
 		<ScatterPlot
+			{...channels}
 			width={w}
 			height={h}
 			data={rows}
@@ -77,10 +78,10 @@
 			{y}
 			{grouping}
 			{color}
-			{r}
 			{styles}
 			{segments}
 			{markers}
+			{transforms}
 			{scales}
 			{margins}
 			tooltip={tip.enabled

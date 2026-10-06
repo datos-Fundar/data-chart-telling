@@ -1,71 +1,14 @@
-import type { Series, Accessor } from '$lib/types/plots/data/common';
-import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import type { SegmentsConfig, MarginConfig } from '$lib/types/plots/props';
-import type { VisualGroup } from '$lib/types/plots/segments/config';
 import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
-import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
-import type { ResolvedChannel } from '$lib/types/layout/mapping';
-import type { LegendInteractionStore } from '$lib/types/layout/legend';
-import type { ChartConfig } from '$lib/types/configuration/styling';
 import type { DotStyle } from '$lib/types/plots/styling';
-import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import type { StatisticConfig } from '$lib/types/layout/statistics';
+import type { AxisPlotState, AxisPlotCtx } from '$lib/types/layout/phases';
 
-/** ScatterPlot's shared pipeline state — raw props plus every phase's own output. */
-export type ScatterPlotState<TData extends Record<string, unknown>> = {
-	series?: Series<TData>[];
-	data?: TData[];
-	x?: Accessor<TData, AxisValue>;
-	y?: Accessor<TData, AxisValue>;
-	/** Structural grouping key — defaults to `color` when unset (see `DataProps.grouping`). */
-	grouping?: Accessor<TData, unknown>;
-	color?: Accessor<TData, unknown>;
-	r?: Accessor<TData, number> | number;
-	/** Continuous or categorical opacity-value accessor — see `DataProps.opacity`. */
-	opacity?: Accessor<TData, unknown>;
-	/** Categorical shape-value accessor — see `ScatterDataProps.symbol`. */
-	symbol?: Accessor<TData, unknown>;
-	segments: SegmentsConfig<ScatterSegmentStyle>;
-	scales: AxisBasedScalesConfig<TData>;
-	width: number;
-	height: number;
-	margins?: MarginConfig;
-	authorMarkers?: AxisBasedMarkersConfig[];
-	statistics?: StatisticConfig[];
-
-	// "data" phase output.
-	resolvedSeries?: Series<TData>[];
-	groupedSeries?: VisualGroup<Series<TData>, ScatterSegmentStyle>[];
-	flat?: TData[];
-	scopedGroups?: ScopedMarkerGroup<TData>[];
-	colorForSeries?: (name: string) => string;
-
-	// "mapping" phase output.
-	channels?: {
-		x: ResolvedChannel<TData>;
-		y: ResolvedChannel<TData>;
-		/** Absent when `r` isn't given; a literal pixel radius when `r` is a plain number (not scaled); a resolved per-row channel otherwise. */
-		r?: ResolvedChannel<TData, number> | number;
-		/** Row-level accessor resolved from `grouping ?? color` — the same accessor `buildSeries` already split series by. */
-		grouping?: ResolvedChannel<TData, unknown>;
-		/** Row-level accessor resolved from `color`, when set — independent of `colorForSeries`'s per-name resolution. */
-		color?: ResolvedChannel<TData, unknown>;
-		/** Row-level accessor resolved from `opacity`, when set. */
-		opacity?: ResolvedChannel<TData, unknown>;
-		/** Row-level accessor resolved from `symbol`, when set. */
-		symbol?: ResolvedChannel<TData, unknown>;
-	};
-
-	// Accumulates from "statistics" onward: `authorMarkers` (each one's own
-	// `.statistics` expanded in place) plus the top-level `statistics` prop
-	// resolved against every resolved series, then "markers" prepends its own
-	// dots in front.
-	markers?: AxisBasedMarkersConfig[];
-};
+/** ScatterPlot's pipeline state: the shared axis-based state, with no extras of its own. */
+export type ScatterPlotState<TData extends Record<string, unknown>> = AxisPlotState<
+	TData,
+	ScatterSegmentStyle
+>;
 
 /** The environment every ScatterPlot phase reads from, alongside the growing state. */
-export type ScatterPlotCtx = {
-	cfg: ChartConfig;
-	legendInteraction: LegendInteractionStore | null | undefined;
+export type ScatterPlotCtx = AxisPlotCtx & {
 	disabledDotsFor?: (name: string) => DotStyle | undefined;
 };

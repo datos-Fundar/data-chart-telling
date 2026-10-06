@@ -252,17 +252,18 @@ export const CombinedOverrides: Story = {
 };
 
 // ── Series layout (multiple series sharing a category) ────────────────────────
-// `scales.grouping.seriesLayout` controls how series that share the same X
-// category are arranged — `grouping` is its own channel (like `color`), not
-// part of the category (`x`) axis itself.
+// Series that share a category sit side by side by default; a plot-level
+// `stackY` transform stacks them instead.
 
 /**
- * Default layout when omitted — every series draws at the same X position,
- * full band width. The taller bar is fully covered by the shorter one drawn
- * after it, so only its top sliver peeks out above. Compare with `Grouped`
- * and `Stacked` below.
+ * Default layout — each series gets its own slice of the category band, side
+ * by side. The slice width is only an estimate (derived from this plot's own
+ * width/margins, not svelteplot's actual measured scale), so it can be
+ * slightly off when an `'auto'` margin ends up wider than expected. The gap
+ * between bars within a group comes from the theme's `bar.seriesPadding`
+ * (0.2 by default).
  */
-export const OverlappingSeries: Story = {
+export const GroupedSeries: Story = {
 	args: {
 		data: LIFE_EXPECTANCY_BY_PROVINCE,
 		x: 'province',
@@ -272,10 +273,9 @@ export const OverlappingSeries: Story = {
 };
 
 /**
- * `seriesLayout: 'stacked'` stacks series cumulatively within each category's
- * band instead of placing them side by side. Each series keeps its single
- * resolved colour; per-area `segments` style overrides aren't applied in
- * stacked mode.
+ * A plot-level `stackY` transform stacks series cumulatively within each
+ * category's band instead of placing them side by side. `y` is always the
+ * value, even on horizontal bars, so a stack is always `stackY`.
  */
 export const StackedSeries: Story = {
 	args: {
@@ -283,56 +283,13 @@ export const StackedSeries: Story = {
 		x: 'province',
 		y: 'value',
 		color: 'sex',
-		scales: {
-			grouping: { seriesLayout: 'stacked' }
-		} satisfies AxisBasedScalesConfig
-	}
-};
-
-/**
- * `seriesLayout: 'grouped'` gives each series its own slice of the category
- * band, side by side — the classic grouped-bar-chart look. The slice width
- * is only an estimate (derived from this plot's own width/margins, not
- * svelteplot's actual measured scale), so it can be slightly off when an
- * `'auto'` margin ends up wider than expected. The gap between bars within a
- * group comes from the theme's `bar.seriesPadding` (0.2 by default) — see
- * `GroupedWithSeriesPadding` below to override it per-plot.
- */
-export const GroupedSeries: Story = {
-	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
-		x: 'province',
-		y: 'value',
-		color: 'sex',
-		scales: {
-			grouping: { seriesLayout: 'grouped' }
-		} satisfies AxisBasedScalesConfig
-	}
-};
-
-/**
- * `scales.grouping.seriesPadding` (0–1) reserves a fraction of each series' own
- * slice as a gap on either side, separating bars within the same group —
- * this overrides the theme's default (0.2, see `GroupedSeries` above) with a
- * narrower gap. Pass `0` to opt back out to touching bars. Space *between*
- * groups is controlled separately, by the category axis's own
- * `paddingInner`/`paddingOuter` (see `WideGroupSpacing` below).
- */
-export const GroupedWithSeriesPadding: Story = {
-	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
-		x: 'province',
-		y: 'value',
-		color: 'sex',
-		scales: {
-			grouping: { seriesLayout: 'grouped', seriesPadding: 0.1 }
-		} satisfies AxisBasedScalesConfig
+		transforms: [{ type: 'stackY' as const }]
 	}
 };
 
 /**
  * `scales.x.paddingInner` widens the gap *between* categories (provinces),
- * which — since 'grouped' estimates its slice width off the same band-scale
+ * which — since side-by-side series estimate their slice width off the same band-scale
  * formula — also narrows every series' own bars accordingly.
  */
 export const WideGroupSpacing: Story = {
@@ -342,8 +299,7 @@ export const WideGroupSpacing: Story = {
 		y: 'value',
 		color: 'sex',
 		scales: {
-			x: { paddingInner: 0.4 },
-			grouping: { seriesLayout: 'grouped' }
+			x: { paddingInner: 0.4 }
 		} satisfies AxisBasedScalesConfig
 	}
 };
@@ -377,9 +333,8 @@ export const HorizontalBars: Story = {
 };
 
 /**
- * Horizontal bars combined with 'grouped' series layout — the two series
- * sit side by side within each category's row instead of one on top of the
- * other.
+ * Horizontal bars with several series — the two series sit side by side
+ * within each category's row, as they do vertically by default.
  */
 export const HorizontalGroupedSeries: Story = {
 	args: {
@@ -388,8 +343,19 @@ export const HorizontalGroupedSeries: Story = {
 		y: 'value',
 		color: 'sex',
 		scales: {
-			y: { type: 'categorical' },
-			grouping: { seriesLayout: 'grouped' }
+			y: { type: 'categorical' }
 		} satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * `HorizontalGroupedSeries` with a plot-level `stackY` — the two series stack
+ * end to end along each category's row. It's still `stackY`, not `stackX`:
+ * `y` is the value even when the bars run horizontally.
+ */
+export const HorizontalStackedSeries: Story = {
+	args: {
+		...HorizontalGroupedSeries.args,
+		transforms: [{ type: 'stackY' as const }]
 	}
 };

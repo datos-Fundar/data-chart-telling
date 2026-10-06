@@ -9,7 +9,7 @@
 	} from '$lib/layout/tooltip/utils';
 	import { resolveAccessor } from '$lib/plots/utils/accessors';
 	import { resolveTimelineInterpolation } from '$lib/utils/interpolate';
-	import type { AxisValue } from '$lib/types/layout/scales';
+	import type { AxisValue } from '$lib/types/layout/mapping';
 	import type { Accessor } from '$lib/types/plots/data/common';
 	import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 	import type { GapsAwareChartProps } from '$lib/types/charts/props';
@@ -42,9 +42,11 @@
 		margins,
 		segments,
 		markers = [],
+		transforms,
 		facet,
 		timeline,
-		tooltip
+		tooltip,
+		...channels
 	}: GapsAwareChartProps<TRow, BarSegmentStyle> & {
 		x: Accessor<TRow, number>;
 		color: Accessor<TRow, unknown>;
@@ -115,6 +117,7 @@
 >
 	{#snippet plot({ data: rows, width: w, height: h, facetValue })}
 		<PyramidPlot
+			{...channels}
 			width={w}
 			height={h}
 			data={rows}
@@ -127,6 +130,7 @@
 			{margins}
 			{segments}
 			{markers}
+			{transforms}
 			tooltip={tip.enabled
 				? {
 						format: tip.format ?? defaultFormat,

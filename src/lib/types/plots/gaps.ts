@@ -1,5 +1,5 @@
 import type { EasingName } from '$lib/types/charts/interpolate';
-import type { AxisValue } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 
 /**
  * How one gap zone bridges its hole: `interpolate` eases the synthetic

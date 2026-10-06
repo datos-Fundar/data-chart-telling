@@ -1,6 +1,7 @@
 import type { Snippet } from 'svelte';
-import type { AxisValue, AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import type { Accessor } from '$lib/types/plots/data/common';
+import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
+import type { AxisChannelName, ChannelAccessors } from '$lib/types/layout/mapping';
+import type { MarkerTransform } from '$lib/types/transforms';
 import type { AxisBasedStylesConfig, GapsAwarePlotStylesConfig } from '$lib/types/layout/styles';
 import type { SegmentsConfig, MarginConfig } from '$lib/types/plots/props';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
@@ -31,20 +32,18 @@ export type ChartProps<
 	footer?: Snippet;
 	legend?: LegendSection[];
 	data: TRow[];
-	x: Accessor<TRow, AxisValue>;
-	y: Accessor<TRow, AxisValue>;
-	/** Structural grouping key — defaults to `color` when unset (see `DataProps.grouping`). */
-	grouping?: Accessor<TRow, unknown>;
-	color?: Accessor<TRow, unknown>;
 	styles?: AxisBasedStylesConfig;
 	segments?: SegmentsConfig<TSegmentStyle>;
 	markers?: AxisBasedMarkersConfig[];
 	scales?: AxisBasedScalesConfig<TRow>;
+	/** Plot-level transforms (e.g. `stackY`), run over every series before the marks draw. */
+	transforms?: MarkerTransform[];
 	margins?: MarginConfig;
 	facet?: FacetConfig<TRow>;
 	timeline?: TimelineConfig<TRow>;
 	tooltip?: TooltipProp<TRow>;
-};
+} & ChannelAccessors<TRow> &
+	Required<Pick<ChannelAccessors<TRow>, AxisChannelName>>;
 
 /**
  * `ChartProps` for the chart kinds with gap-fill (`BarChart`/`LineChart`/

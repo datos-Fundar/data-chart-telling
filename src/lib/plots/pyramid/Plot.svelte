@@ -12,20 +12,13 @@
 	import { estimateValueLabelMargin } from '$lib/plots/utils/valueLabelMargin';
 	import { resolveAccessor } from '$lib/plots/utils/accessors';
 	import { validateSegments } from '$lib/plots/utils/segments';
-	import { buildData } from '$lib/plots/pyramid/phases/data';
-	import { buildMapping } from '$lib/plots/pyramid/phases/mapping';
-	import { buildScales } from '$lib/plots/pyramid/phases/scales';
-	import { buildMarkers } from '$lib/plots/pyramid/phases/markers';
-	import { buildStatistics } from '$lib/plots/pyramid/phases/statistics';
 	import { runStages } from '$lib/layout/phases/runStages';
+	import { buildAxisStages } from '$lib/layout/phases/axisStages';
+	import { buildHover } from '$lib/layout/tooltip/buildHover';
+	import { buildPyramidKind } from '$lib/plots/pyramid/kind';
 	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
 	import ValueLabels from '$lib/plots/pyramid/ValueLabels.svelte';
-	import {
-		hasHoverMarker,
-		resolveHoverStrategy,
-		resolveHoverSync
-	} from '$lib/layout/tooltip/utils';
 	import type { BasePlotProps } from '$lib/types/plots/props';
 	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 	import type { SeriesProps, DataProps } from '$lib/types/plots/data/common';
@@ -40,7 +33,6 @@
 		PyramidPlotCtx,
 		PyramidTaggedRow
 	} from '$lib/types/plots/pyramid/state';
-	import type { PhaseStage } from '$lib/types/layout/phases';
 
 	/**
 	 * A population-pyramid-style diverging bar chart: each series is mirrored
@@ -79,7 +71,8 @@
 		segments = {},
 		markers = [],
 		tooltip = undefined,
-		statistics = []
+		statistics = [],
+		transforms = []
 	}: Props = $props();
 
 	$effect(() => {
@@ -110,16 +103,11 @@
 	const formatValue = $derived(styles.values?.format ?? ((v: number) => `${v}`));
 	const valAnchor = $derived<ValueAnchor>(styles.values?.anchor ?? 'outside');
 
-	// The plot's own pipeline, run once via `runStages`.
-	const stages: PhaseStage<PyramidPlotState<TData>, PyramidPlotCtx>[] = [
-		{ phase: 'data', run: buildData },
-		{ phase: 'mapping', run: buildMapping },
-		{ phase: 'statistics', run: buildStatistics },
-		{ phase: 'scales', run: buildScales },
-		{ phase: 'markers', run: buildMarkers }
-	];
+	// The plot's own pipeline (see `buildPyramidKind`), run once via `runStages`.
+	const stages = buildAxisStages(buildPyramidKind<TData>());
 	const ctx = $derived<PyramidPlotCtx>({
 		cfg,
+		legendInteraction,
 		formatValue,
 		disabledFillFor: (name) => disabledFillOverride(effectiveDisabledFor(name))
 	});
@@ -134,13 +122,14 @@
 				grouping,
 				color,
 				segments,
-				gaps: styles.gaps ?? {},
+				gaps: styles.gaps,
 				scales,
 				width,
 				height,
 				margins,
 				authorMarkers: markers,
-				statistics
+				statistics,
+				transforms
 			},
 			ctx
 		)
@@ -172,14 +161,15 @@
 			}))
 	);
 
-	const hover = $derived({
-		active: tooltip != null || hasHoverMarker(markers),
-		points: hoverPoints,
-		label: labelFor,
-		strategy: resolveHoverStrategy(tooltip?.strategy, markers, 'y'),
-		sync: resolveHoverSync(tooltip?.sync, markers),
-		tooltip
-	});
+	const hover = $derived(
+		buildHover({
+			tooltip,
+			markers,
+			points: hoverPoints,
+			label: labelFor,
+			defaultStrategy: 'y'
+		})
+	);
 
 	// Created once, not `$derived`.
 	const hoverController = createPlotHover<PyramidTaggedRow<TData>>({

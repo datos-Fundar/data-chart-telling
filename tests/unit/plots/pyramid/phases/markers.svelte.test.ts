@@ -1,5 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { buildMarkers } from '$lib/plots/pyramid/phases/markers';
+import { buildTransforms } from '$lib/layout/phases/transforms';
 import { buildGroupedSeries } from '$lib/plots/utils/segments';
 import type {
 	PyramidPlotState,
@@ -16,7 +17,8 @@ type Row = { ageGroup: string; pct: number | null };
 
 const CTX: PyramidPlotCtx = {
 	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as ChartConfig,
-	formatValue: (v) => `${v}`
+	formatValue: (v) => `${v}`,
+	legendInteraction: null
 };
 
 function series(name: string, side: 'left' | 'right', data: Row[]): PyramidSeries<Row> {
@@ -41,6 +43,7 @@ function build(
 		width: 400,
 		height: 300,
 		groupedSeries,
+		resolvedSeries: groupedSeries.map((g) => g.series),
 		gapFillMaps: new Map(),
 		colorForSeries: (name: string) => (name === 'Female' ? 'blue' : 'orange'),
 		...overrides
@@ -48,7 +51,9 @@ function build(
 	// No `authorMarkers`/`statistics` given, so the real output is exactly
 	// this phase's own segment/gap-fill bars — narrowed back from the state's
 	// broader accumulating `markers` union.
-	return buildMarkers(state, { ...CTX, ...ctxOverrides }).markers as BarMarkerConfig[];
+	const ctx = { ...CTX, ...ctxOverrides };
+	return buildMarkers(buildTransforms<typeof state>()(state, ctx), ctx)
+		.markers as BarMarkerConfig[];
 }
 
 describe('buildMarkers – geometry', () => {

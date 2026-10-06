@@ -1,5 +1,6 @@
 import { SvelteSet } from 'svelte/reactivity';
-import type { AxisValue, AxisScale } from '$lib/types/layout/scales';
+import type { AxisScale } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 
 /** One representative row per unique axis value (first occurrence in `rows`). */
 function uniqueRows<TData>(rows: TData[], getAxisValue: (d: TData) => AxisValue): TData[] {

@@ -1,5 +1,6 @@
 import type { AreaStyle, DotStyle, FontStyle, StrokeStyle } from '$lib/types/plots/styling';
 import type { HoverDisplayPoint, HoverStrategy } from '$lib/types/layout/tooltip';
+import type { ClipUnawareMarkerConfig } from '$lib/types/markers/channels/clipMarkerConfig';
 
 /** In-SVG hover highlight: crosshair, dot and label. */
 export type HoverMarkerConfig = {
@@ -19,4 +20,4 @@ export type HoverMarkerConfig = {
 	area?: AreaStyle;
 	dot?: DotStyle;
 	text?: FontStyle;
-};
+} & ClipUnawareMarkerConfig;

@@ -2,16 +2,46 @@ import { resolveAccessor } from '$lib/plots/utils/accessors';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import { niceDomain, naturalTickCount } from '$lib/layout/scales/niceDomain';
 import { AUTO_MARGIN_ESTIMATE, numericMargin } from '$lib/layout/plot/margins';
-import type { AxisValue, AxisScale, AxisBasedScalesConfig } from '$lib/types/layout/scales';
+import type { AxisScale, AxisBasedScalesConfig } from '$lib/types/layout/scales';
+import type { AxisValue } from '$lib/types/layout/mapping';
 import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/bar/state';
 import type { BarLayout, BarSeriesLayout } from '$lib/types/plots/bar/layout';
-import type { Series } from '$lib/types/plots/data/common';
-import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
-import type { VisualGroup } from '$lib/types/plots/segments/config';
+import type { ProcessedChannel, ProcessedData, ProcessedRow } from '$lib/types/layout/phases';
+import { SERIES_KEY } from '$lib/layout/phases/transforms';
 import type { MarginConfig } from '$lib/types/plots/props';
-import type { DiscreteGapFill } from '$lib/plots/utils/gaps';
 
-/** BarPlot's series-layout geometry: grouped/stacked offsets, band-width estimate, value baseline. */
+/** A category as a map key — a `Date` by its time, so two equal dates match. */
+function categoryKey(category: unknown): unknown {
+	return category instanceof Date ? category.getTime() : category;
+}
+
+/**
+ * Each stacked bar's `[bottom, top]`, keyed by series and category, read off
+ * the rows a plot-level `stackY` produced. Empty when the plot doesn't stack.
+ */
+function buildStackedSpans(
+	processed: ProcessedData | undefined
+): Map<string, Map<unknown, [number, number]>> {
+	const spans = new Map<string, Map<unknown, [number, number]>>();
+	const { channels, data = [] } = processed ?? {};
+	if (channels?.y1 === undefined || channels.y2 === undefined || channels.x === undefined) {
+		return spans;
+	}
+	const read = (channel: ProcessedChannel) =>
+		resolveAccessor(channel as never) as (row: ProcessedRow) => unknown;
+	const [xOf, y1Of, y2Of] = [read(channels.x), read(channels.y1), read(channels.y2)];
+	for (const row of data) {
+		const lo = Number(y1Of(row));
+		const hi = Number(y2Of(row));
+		if (!Number.isFinite(lo) || !Number.isFinite(hi)) continue;
+		const name = row[SERIES_KEY] as string;
+		if (!spans.has(name)) spans.set(name, new Map());
+		spans.get(name)!.set(categoryKey(xOf(row)), [lo, hi]);
+	}
+	return spans;
+}
+
+/** BarPlot's series-layout geometry: grouped offsets, stacked spans, band-width estimate, value baseline. */
 export function buildBarLayout<TData extends Record<string, unknown>>(args: {
 	scales: AxisBasedScalesConfig<TData>;
 	isHorizontal: boolean;
@@ -20,10 +50,10 @@ export function buildBarLayout<TData extends Record<string, unknown>>(args: {
 	margins: MarginConfig | undefined;
 	flat: TData[];
 	xAcc: (d: TData) => AxisValue;
-	groupedSeries: VisualGroup<Series<TData>, BarSegmentStyle>[];
-	gapFillMaps: Map<string, Map<TData, DiscreteGapFill<BarSegmentStyle>>>;
+	seriesNames: string[];
+	processedData: ProcessedData | undefined;
 	themeMargins: Record<'top' | 'right' | 'bottom' | 'left', number | 'auto'>;
-	seriesPaddingDefault: number;
+	seriesPadding: number;
 }): BarLayout {
 	const {
 		scales,
@@ -33,13 +63,14 @@ export function buildBarLayout<TData extends Record<string, unknown>>(args: {
 		margins,
 		flat,
 		xAcc,
-		groupedSeries,
-		gapFillMaps,
+		seriesNames,
+		processedData,
 		themeMargins,
-		seriesPaddingDefault
+		seriesPadding
 	} = args;
 
-	const layout: BarSeriesLayout = scales.grouping?.seriesLayout ?? 'overlap';
+	const spans = buildStackedSpans(processedData);
+	const layout: BarSeriesLayout = spans.size > 0 ? 'stacked' : 'grouped';
 	const categoricalScale = isHorizontal ? scales.y : scales.x;
 	const valueScale = isHorizontal ? scales.x : scales.y;
 
@@ -79,46 +110,25 @@ export function buildBarLayout<TData extends Record<string, unknown>>(args: {
 		return step * (1 - paddingInner);
 	})();
 
-	const seriesCount = groupedSeries.length;
-	const seriesGapFraction = Math.max(
-		0,
-		Math.min(1, scales.grouping?.seriesPadding ?? seriesPaddingDefault)
-	);
+	const seriesCount = seriesNames.length;
+	// A lone series, or a stack, fills its whole band: there's nothing to set side by side.
+	const sideBySide = layout === 'grouped' && seriesCount > 1;
+	const seriesGapFraction = Math.max(0, Math.min(1, seriesPadding));
 	const seriesStep = seriesCount > 0 ? estimatedBandwidth / seriesCount : 0;
 	const seriesGap = seriesGapFraction * seriesStep;
 
-	const stackedPrefixSums = new Map<AxisValue, number[]>();
-	if (layout === 'stacked') {
-		for (const category of new Set(flat.map((d) => xAcc(d)))) {
-			let running = 0;
-			const prefix: number[] = [];
-			for (const group of groupedSeries) {
-				prefix.push(running);
-				const seriesXFn = resolveAccessor(group.series.x);
-				const seriesYFn = resolveAccessor(group.series.y);
-				const row = group.series.data.find((d) => seriesXFn(d) === category);
-				if (row) {
-					const raw = seriesYFn(row);
-					const fill = gapFillMaps.get(group.series.name)?.get(row);
-					running += fill ? fill.value : isGapValue(raw) ? 0 : Number(raw);
-				}
-			}
-			stackedPrefixSums.set(category, prefix);
-		}
-	}
-
-	function stackedBaseline(category: AxisValue, seriesIndex: number): number {
-		return stackedPrefixSums.get(category)?.[seriesIndex] ?? 0;
+	function stackedSpan(category: AxisValue, seriesIndex: number): [number, number] | undefined {
+		return spans.get(seriesNames[seriesIndex])?.get(categoryKey(category));
 	}
 
 	function groupOffset(seriesIndex: number): { dx: number; dy: number } {
-		if (layout !== 'grouped') return { dx: 0, dy: 0 };
+		if (!sideBySide) return { dx: 0, dy: 0 };
 		const offset = -(estimatedBandwidth / 2) + seriesIndex * seriesStep + seriesStep / 2;
 		return isHorizontal ? { dx: 0, dy: -offset } : { dx: offset, dy: 0 };
 	}
 
 	function groupInsetFraction(seriesIndex: number): { start: number; end: number } {
-		if (layout !== 'grouped' || seriesCount === 0) return { start: 0, end: 0 };
+		if (!sideBySide) return { start: 0, end: 0 };
 		const sliceFraction = 1 / seriesCount;
 		const gapFraction = (seriesGapFraction * sliceFraction) / 2;
 		return {
@@ -134,7 +144,7 @@ export function buildBarLayout<TData extends Record<string, unknown>>(args: {
 		seriesCount,
 		seriesStep,
 		seriesGap,
-		stackedBaseline,
+		stackedSpan,
 		groupOffset,
 		groupInsetFraction
 	};
@@ -163,26 +173,17 @@ export function buildScales<TData extends Record<string, unknown>>(
 		};
 	}
 
-	const seriesLayout = scales.grouping?.seriesLayout ?? 'overlap';
+	const stackedSpans = buildStackedSpans(state.processedData);
 
 	const valueExtent = ((): [number, number] | undefined => {
 		let lo = 0;
 		let hi = 0;
-		if (seriesLayout === 'stacked') {
-			const totals = new Map<AxisValue, number>();
-			for (const s of resolvedSeries!) {
-				const sx = resolveAccessor(s.x);
-				const sy = resolveAccessor(s.y);
-				for (const row of s.data) {
-					const raw = sy(row);
-					if (isGapValue(raw)) continue;
-					const cat = sx(row);
-					totals.set(cat, (totals.get(cat) ?? 0) + Number(raw));
+		if (stackedSpans.size > 0) {
+			for (const byCategory of stackedSpans.values()) {
+				for (const [bottom, top] of byCategory.values()) {
+					lo = Math.min(lo, bottom, top);
+					hi = Math.max(hi, bottom, top);
 				}
-			}
-			for (const total of totals.values()) {
-				lo = Math.min(lo, total);
-				hi = Math.max(hi, total);
 			}
 		} else {
 			for (const s of resolvedSeries!) {
@@ -230,10 +231,10 @@ export function buildScales<TData extends Record<string, unknown>>(
 		margins: state.margins,
 		flat: state.flat!,
 		xAcc: state.channels!.x.accessor,
-		groupedSeries: state.groupedSeries!,
-		gapFillMaps: state.gapFillMaps!,
+		seriesNames: (state.groupedSeries ?? []).map((g) => g.series.name),
+		processedData: state.processedData,
 		themeMargins: ctx.cfg.margins,
-		seriesPaddingDefault: ctx.cfg.bar.seriesPadding
+		seriesPadding: ctx.cfg.bar.seriesPadding
 	});
 
 	return { ...state, scales: resolvedScales, barLayout };

@@ -1,5 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { buildMarkers } from '$lib/plots/scatter/phases/markers';
+import { buildTransforms } from '$lib/layout/phases/transforms';
 import { buildGroupedSeries } from '$lib/plots/utils/segments';
 import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/scatter/state';
 import type { Series } from '$lib/types/plots/data/common';
@@ -23,6 +24,7 @@ function build(
 		scales: {},
 		width: 400,
 		height: 300,
+		resolvedSeries: [SERIES],
 		groupedSeries: buildGroupedSeries<Series<Row>, ScatterSegmentStyle>([SERIES], {}, false),
 		channels: { x: { accessor: (d) => d.x }, y: { accessor: (d) => d.y } },
 		colorForSeries: () => 'blue',
@@ -36,7 +38,8 @@ function build(
 	// No `authorMarkers`/`statistics` given, so the real output is exactly
 	// this phase's own dots — narrowed back from the state's broader
 	// accumulating `markers` union.
-	return buildMarkers(state, ctx).markers as DotMarkerConfig[];
+	return buildMarkers(buildTransforms<typeof state>()(state, ctx), ctx)
+		.markers as DotMarkerConfig[];
 }
 
 describe('buildMarkers – radius channel', () => {

@@ -1,4 +1,5 @@
 import type { StrokeStyle } from '$lib/types/plots/styling';
+import type { ClipUnawareMarkerConfig } from '$lib/types/markers/channels/clipMarkerConfig';
 
 /** Longitude and latitude gridlines (svelteplot's `Graticule`). */
 export type GeoGraticuleMarkerConfig = {
@@ -9,4 +10,4 @@ export type GeoGraticuleMarkerConfig = {
 	styles?: StrokeStyle;
 	/** Draws behind the base map instead of over it. */
 	behind?: boolean;
-};
+} & ClipUnawareMarkerConfig;
