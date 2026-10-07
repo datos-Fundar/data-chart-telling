@@ -1,6 +1,7 @@
 import { buildProcessedGroups } from '$lib/layout/phases/transforms';
 import { finishTransforms } from '$lib/utils/transforms';
 import { resolveEffectiveDisabledStyle } from '$lib/plots/utils/legendDisabled';
+import { buildEndValueLabels } from '$lib/plots/utils/valueLabels';
 import type { AreaPlotState, AreaPlotCtx } from '$lib/types/plots/area/state';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { AreaStyle } from '$lib/types/plots/styling';
@@ -9,9 +10,11 @@ import type { AreaStyle } from '$lib/types/plots/styling';
  * AreaPlot's "markers" phase: one `area` per visual segment of each series,
  * drawing the rows the "transforms" phase left (stacked, when the plot
  * stacks). The markers the "statistics" phase already put in `state.markers`
- * come after, so they render on top.
+ * come after, so they render on top, and its value labels last — one at the
+ * end of each series, like LinePlot's.
  *
- * A series toggled off in the legend (style mode) dims its own areas' fill to
+ * A series toggled off in the legend (style mode), or dimmed by hovering
+ * another series' value label, dims its own areas' fill to
  * `legend.disabledOpacity`, in place, so a stack keeps its full extent.
  */
 export function buildMarkers<TData extends Record<string, unknown>>(
@@ -24,8 +27,16 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 
 	// A fill opacity per series name, for the dim: a legend-off series fades to
 	// the legend's disabled opacity, every other one keeps the area default.
-	const offStyleOf = (name: string) =>
-		resolveEffectiveDisabledStyle(name, legendInteraction, cfg.legend.disabledOpacity, false, null);
+	const offStyleOf =
+		ctx.disabledFor ??
+		((name: string) =>
+			resolveEffectiveDisabledStyle(
+				name,
+				legendInteraction,
+				cfg.legend.disabledOpacity,
+				false,
+				null
+			));
 	const fillOpacityOf = (name: string) => {
 		const off = offStyleOf(name);
 		return off ? (off.opacity ?? cfg.legend.disabledOpacity) : cfg.area.fillOpacity;
@@ -55,5 +66,8 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 		)
 	) as unknown as AxisBasedMarkersConfig[];
 
-	return { ...state, markers: [...areas, ...(state.markers ?? [])] };
+	return {
+		...state,
+		markers: [...areas, ...(state.markers ?? []), ...buildEndValueLabels(state, ctx)]
+	};
 }

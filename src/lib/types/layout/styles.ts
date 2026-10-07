@@ -4,19 +4,27 @@ import type { GeoFeature } from '$lib/types/plots/data/geo';
 import type { GapsConfig } from '$lib/types/plots/gaps';
 
 /**
- * Controls if and how value labels are rendered on a plot. The high-level
- * `anchor` sets sensible defaults for placement; `fontStyle` (`dx`, `dy`,
- * `textAnchor`, `lineAnchor`, `lineHeight`, `rotate`, `class`, `textClass`,
- * `fill`, …) overrides those defaults field-by-field when provided — mirrors
- * {@link DeltaConfig}'s `fontStyle`/`strokeStyle` split, so label text and
- * connector-line styling never mix into one flat bag of props.
+ * Controls if and how value labels are rendered on a plot, drawn as a `text`
+ * marker over the rows the plot itself draws (after its own `transforms`):
+ * one at the end of each series on a line or area plot, one per bar on a bar,
+ * pyramid or histogram plot, one per point on a scatter plot and one per cell
+ * on a heatmap. The high-level `anchor` sets sensible defaults for placement;
+ * `fontStyle` (`dx`, `dy`, `textAnchor`, `lineAnchor`, `lineHeight`, `rotate`,
+ * `class`, `textClass`, `fill`, …) overrides those defaults field-by-field when
+ * provided — mirrors {@link DeltaConfig}'s `fontStyle`/`strokeStyle` split, so
+ * label text and connector-line styling never mix into one flat bag of props.
  */
 export type ValuesStyle = {
+	/** Whether the labels are drawn. Off by default, except on a heatmap. */
 	show?: boolean;
+	/** Where each label sits on its mark — see {@link ValueAnchor}. */
 	anchor?: ValueAnchor;
+	/** A label's text, from its row's own value (a histogram bin's count) and its series. */
 	format?: (value: number, seriesName: string) => string;
+	/** Hovering a label dims every other series, like toggling them off in the legend. */
 	hoverIsolate?: boolean;
 	fontStyle?: FontStyle;
+	/** The connectors a line or area plot routes back from labels that had to move apart. */
 	strokeStyle?: StrokeStyle;
 };
 

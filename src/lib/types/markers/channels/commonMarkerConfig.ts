@@ -9,6 +9,12 @@ export type CommonMarkerConfig = {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	grouping?: string | ((d: any) => unknown);
 	series?: string;
+	/**
+	 * With `series` set, whether the marker draws once over the whole series
+	 * (the default) or once per segment, over that segment's rows and in its
+	 * color — so a `selectMaxY` marks each segment's own peak.
+	 */
+	scope?: 'series' | 'segment';
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	x?: AxisValue | ((d: any) => AxisValue);
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,6 +1,7 @@
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { buildProcessedGroups } from '$lib/layout/phases/transforms';
 import { resolveGapRuns, resolveGapsForSeries } from '$lib/plots/utils/gaps';
+import { buildEndValueLabels } from '$lib/plots/utils/valueLabels';
 import type { GapPoint } from '$lib/plots/utils/gaps';
 import type { Series } from '$lib/types/plots/data/common';
 import type { GapsConfig } from '$lib/types/plots/gaps';
@@ -222,7 +223,8 @@ export function buildGapMarkers<TData extends Record<string, unknown>>(args: {
 /**
  * LinePlot's "markers" phase: real line/dot segments plus interpolated gap
  * bridges, drawing the rows the "transforms" phase left — prepended onto
- * whatever the "statistics" phase already put in `state.markers`.
+ * whatever the "statistics" phase already put in `state.markers` — and its
+ * value labels on top of everything.
  */
 export function buildMarkers<TData extends Record<string, unknown>>(
 	state: LinePlotState<TData>,
@@ -248,5 +250,13 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 		disabledDotsFor
 	});
 
-	return { ...state, markers: [...lineMarkers, ...gapMarkers, ...(state.markers ?? [])] };
+	return {
+		...state,
+		markers: [
+			...lineMarkers,
+			...gapMarkers,
+			...(state.markers ?? []),
+			...buildEndValueLabels(state, ctx)
+		]
+	};
 }

@@ -8,12 +8,15 @@ import type {
 } from '$lib/types/layout/phases';
 
 /** The field a gap-filled row carries its interpolated value under, for the transforms to read. */
-const GAP_VALUE = '__gapValue';
+export const GAP_VALUE = '__gapValue';
+
+/** The field a gap-filled row carries its gap kind under, so a processed copy of it keeps its fill style. */
+export const GAP_KIND = '__gapKind';
 
 /**
  * BarPlot's options for the shared "transforms" stage: every gap `styles.gaps`
  * fills is read at its interpolated value — so a filled gap takes its place
- * in a stack, the way a real value would.
+ * in a stack, the way a real value would — and keeps its gap kind.
  */
 export function buildBarTransformsOptions<
 	TData extends Record<string, unknown>
@@ -21,7 +24,7 @@ export function buildBarTransformsOptions<
 	return {
 		tagRow: (row, series, state) => {
 			const fill = state.gapFillMaps?.get(series.name)?.get(row);
-			return fill ? { [GAP_VALUE]: fill.value } : {};
+			return fill ? { [GAP_VALUE]: fill.value, [GAP_KIND]: fill.kind } : {};
 		},
 		y: (y: ProcessedChannel, state) => {
 			const hasFills = [...(state.gapFillMaps?.values() ?? [])].some((fills) => fills.size > 0);

@@ -3,6 +3,7 @@
 	import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
 	import {
 		disabledDotsOverride,
+		disabledFillOverride,
 		resolveEffectiveDisabledStyle
 	} from '$lib/plots/utils/legendDisabled';
 	import { processedPosition } from '$lib/layout/phases/transforms';
@@ -16,7 +17,6 @@
 	} from '$lib/plots/utils/labelOverflow.svelte';
 	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
-	import ValueLabels from '$lib/plots/scatter/ValueLabels.svelte';
 	import { validateSegments } from '$lib/plots/utils/segments';
 	import type { BasePlotProps } from '$lib/types/plots/props';
 	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
@@ -73,8 +73,6 @@
 		validateSegments(segments);
 	});
 
-	const showVals = $derived(styles.values?.show ?? false);
-	const formatValue = $derived(styles.values?.format ?? ((v: number) => `${v}`));
 	const hoverIsolate = $derived(styles.values?.hoverIsolate ?? false);
 
 	// A value label hovered while `styles.values.hoverIsolate` is on dims
@@ -98,7 +96,12 @@
 	const ctx = $derived<ScatterPlotCtx>({
 		cfg,
 		legendInteraction,
-		disabledDotsFor: (name) => disabledDotsOverride(effectiveDisabledFor(name))
+		disabledDotsFor: (name) => disabledDotsOverride(effectiveDisabledFor(name)),
+		disabledFillFor: (name) => disabledFillOverride(effectiveDisabledFor(name)),
+		onValueLabelOverflow: (overflow) => labelMargin.report(overflow),
+		onValueLabelHover: (name) => {
+			hoverIsolatedSeries = name;
+		}
 	});
 	const plotState = $derived(
 		runStages<ScatterPlotState<TData>, ScatterPlotCtx>(
@@ -114,6 +117,7 @@
 				opacity,
 				symbol,
 				segments,
+				values: styles.values,
 				scales,
 				width,
 				height,
@@ -127,7 +131,6 @@
 	);
 
 	const resolvedSeries = $derived(plotState.resolvedSeries!);
-	const groupedSeries = $derived(plotState.groupedSeries!);
 	const scopedGroups = $derived(plotState.scopedGroups!);
 	const colorForSeries = $derived(plotState.colorForSeries!);
 	const xAcc = $derived(plotState.channels!.x.accessor);
@@ -205,32 +208,4 @@
 	markers={plotState.markers ?? []}
 	seriesData={resolvedSeries}
 	{scopedGroups}
->
-	{#snippet children({ numericMargins })}
-		{#if showVals}
-			{#each groupedSeries as group (group.series.name)}
-				<ValueLabels
-					{group}
-					{formatValue}
-					values={styles.values}
-					defaultColor={cfg.axis.color}
-					disabled={effectiveDisabledFor(group.series.name)}
-					{width}
-					{height}
-					{numericMargins}
-					onHoverSeries={hoverIsolate
-						? () => {
-								hoverIsolatedSeries = group.series.name;
-							}
-						: undefined}
-					onHoverEnd={hoverIsolate
-						? () => {
-								hoverIsolatedSeries = null;
-							}
-						: undefined}
-					onOverflow={labelMargin.report}
-				/>
-			{/each}
-		{/if}
-	{/snippet}
-</BasePlotLayout>
+/>

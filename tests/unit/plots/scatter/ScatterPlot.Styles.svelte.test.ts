@@ -41,4 +41,28 @@ describe('ScatterPlot – styles.values', () => {
     const labels = Array.from(svg.querySelectorAll('g.text text')).map((t) => t.textContent);
     expect(labels).toEqual(expect.arrayContaining(AMERICAS.map((d) => `${d.lifeExpectancy.toFixed(1)} yr`)));
   });
+
+  test('a label that would cross the right edge flips to the left of its point', async () => {
+    const rows = [
+      { x: 0, y: 0 },
+      { x: 10, y: 10 },
+    ];
+    const { container } = await render(ScatterPlot, {
+      width: 400,
+      height: 300,
+      data: rows,
+      x: 'x',
+      y: 'y',
+      margins: { right: 10 },
+      styles: { values: { show: true, format: (v: number) => `value ${v}` } } satisfies AxisBasedStylesConfig,
+    });
+    const svg = await waitForSvg(container);
+    const anchorOf = (text: string) =>
+      Array.from(svg.querySelectorAll('g.text text'))
+        .find((t) => t.textContent === text)
+        ?.getAttribute('style');
+    // The left point keeps its preferred side; the right one, pinned at the edge, flips.
+    expect(anchorOf('value 0')).toContain('text-anchor: start');
+    expect(anchorOf('value 10')).toContain('text-anchor: end');
+  });
 });

@@ -6,39 +6,39 @@ import type { AxisScale, AxisBasedScalesConfig } from '$lib/types/layout/scales'
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/bar/state';
 import type { BarLayout, BarSeriesLayout } from '$lib/types/plots/bar/layout';
-import type { ProcessedChannel, ProcessedData, ProcessedRow } from '$lib/types/layout/phases';
-import { SERIES_KEY } from '$lib/layout/phases/transforms';
+import type { ProcessedData, ProcessedRow } from '$lib/types/layout/phases';
+import { processedPosition } from '$lib/layout/phases/transforms';
 import type { MarginConfig } from '$lib/types/plots/props';
 
-/** A category as a map key — a `Date` by its time, so two equal dates match. */
-function categoryKey(category: unknown): unknown {
-	return category instanceof Date ? category.getTime() : category;
-}
-
 /**
- * Each stacked bar's `[bottom, top]`, keyed by series and category, read off
- * the rows a plot-level `stackY` produced. Empty when the plot doesn't stack.
+ * Where each processed row's bar sits: its category, and its span along the
+ * value axis — from the row's own `y1` when a plot-level `stackY` produced
+ * one, from `valueBaseline` otherwise, up to its top (`y2`, or `y`).
  */
-function buildStackedSpans(
-	processed: ProcessedData | undefined
-): Map<string, Map<unknown, [number, number]>> {
-	const spans = new Map<string, Map<unknown, [number, number]>>();
-	const { channels, data = [] } = processed ?? {};
-	if (channels?.y1 === undefined || channels.y2 === undefined || channels.x === undefined) {
-		return spans;
+function buildRowGeometry(
+	processed: ProcessedData | undefined,
+	valueBaseline: number
+): Pick<BarLayout, 'categoryOf' | 'spanOf'> & { stacked: boolean } {
+	if (!processed) {
+		return { stacked: false, categoryOf: () => undefined as never, spanOf: () => undefined };
 	}
-	const read = (channel: ProcessedChannel) =>
-		resolveAccessor(channel as never) as (row: ProcessedRow) => unknown;
-	const [xOf, y1Of, y2Of] = [read(channels.x), read(channels.y1), read(channels.y2)];
-	for (const row of data) {
-		const lo = Number(y1Of(row));
-		const hi = Number(y2Of(row));
-		if (!Number.isFinite(lo) || !Number.isFinite(hi)) continue;
-		const name = row[SERIES_KEY] as string;
-		if (!spans.has(name)) spans.set(name, new Map());
-		spans.get(name)!.set(categoryKey(xOf(row)), [lo, hi]);
-	}
-	return spans;
+	const position = processedPosition(processed);
+	const { y1 } = processed.channels;
+	const stacked = y1 !== undefined && processed.channels.y2 !== undefined;
+	const bottomOf = stacked
+		? (resolveAccessor(y1 as never) as (row: ProcessedRow) => unknown)
+		: () => valueBaseline;
+	return {
+		stacked,
+		categoryOf: (row) => position.x(row) as AxisValue,
+		spanOf: (row) => {
+			const top = position.y(row);
+			const bottom = bottomOf(row);
+			if (isGapValue(top) || isGapValue(bottom)) return undefined;
+			const span: [number, number] = [Number(bottom), Number(top)];
+			return Number.isFinite(span[0]) && Number.isFinite(span[1]) ? span : undefined;
+		}
+	};
 }
 
 /** BarPlot's series-layout geometry: grouped offsets, stacked spans, band-width estimate, value baseline. */
@@ -48,8 +48,6 @@ export function buildBarLayout<TData extends Record<string, unknown>>(args: {
 	width: number;
 	height: number;
 	margins: MarginConfig | undefined;
-	flat: TData[];
-	xAcc: (d: TData) => AxisValue;
 	seriesNames: string[];
 	processedData: ProcessedData | undefined;
 	themeMargins: Record<'top' | 'right' | 'bottom' | 'left', number | 'auto'>;
@@ -61,16 +59,12 @@ export function buildBarLayout<TData extends Record<string, unknown>>(args: {
 		width,
 		height,
 		margins,
-		flat,
-		xAcc,
 		seriesNames,
 		processedData,
 		themeMargins,
 		seriesPadding
 	} = args;
 
-	const spans = buildStackedSpans(processedData);
-	const layout: BarSeriesLayout = spans.size > 0 ? 'stacked' : 'grouped';
 	const categoricalScale = isHorizontal ? scales.y : scales.x;
 	const valueScale = isHorizontal ? scales.x : scales.y;
 
@@ -87,8 +81,11 @@ export function buildBarLayout<TData extends Record<string, unknown>>(args: {
 		return 0;
 	})();
 
+	const { stacked, categoryOf, spanOf } = buildRowGeometry(processedData, valueBaseline);
+	const layout: BarSeriesLayout = stacked ? 'stacked' : 'grouped';
+
 	const estimatedBandwidth = (() => {
-		const categoryCount = new Set(flat.map((d) => xAcc(d))).size;
+		const categoryCount = new Set((processedData?.data ?? []).map(categoryOf)).size;
 		if (categoryCount === 0) return 0;
 		const baseMargins = { ...themeMargins, ...margins };
 		const innerSize = isHorizontal
@@ -117,10 +114,6 @@ export function buildBarLayout<TData extends Record<string, unknown>>(args: {
 	const seriesStep = seriesCount > 0 ? estimatedBandwidth / seriesCount : 0;
 	const seriesGap = seriesGapFraction * seriesStep;
 
-	function stackedSpan(category: AxisValue, seriesIndex: number): [number, number] | undefined {
-		return spans.get(seriesNames[seriesIndex])?.get(categoryKey(category));
-	}
-
 	function groupOffset(seriesIndex: number): { dx: number; dy: number } {
 		if (!sideBySide) return { dx: 0, dy: 0 };
 		const offset = -(estimatedBandwidth / 2) + seriesIndex * seriesStep + seriesStep / 2;
@@ -144,7 +137,9 @@ export function buildBarLayout<TData extends Record<string, unknown>>(args: {
 		seriesCount,
 		seriesStep,
 		seriesGap,
-		stackedSpan,
+		categoryOf,
+		spanOf,
+		seriesIndexOf: (name) => seriesNames.indexOf(name),
 		groupOffset,
 		groupInsetFraction
 	};
@@ -155,7 +150,7 @@ export function buildScales<TData extends Record<string, unknown>>(
 	state: BarPlotState<TData>,
 	ctx: BarPlotCtx
 ): BarPlotState<TData> {
-	const { scales, resolvedSeries, categoricalAxis, isHorizontal, width, height } = state;
+	const { scales, categoricalAxis, isHorizontal, width, height } = state;
 	const padding = { inner: ctx.cfg.bar.paddingInner, outer: ctx.cfg.bar.paddingOuter };
 
 	function stripCategoricalType(scale?: AxisScale<TData>): AxisScale<TData> | undefined {
@@ -173,29 +168,17 @@ export function buildScales<TData extends Record<string, unknown>>(
 		};
 	}
 
-	const stackedSpans = buildStackedSpans(state.processedData);
-
+	// Every bar's span, as the "transforms" phase left it — its baseline is
+	// unknown until the domain is, so a plain bar reads as reaching from zero.
 	const valueExtent = ((): [number, number] | undefined => {
+		const { spanOf } = buildRowGeometry(state.processedData, 0);
 		let lo = 0;
 		let hi = 0;
-		if (stackedSpans.size > 0) {
-			for (const byCategory of stackedSpans.values()) {
-				for (const [bottom, top] of byCategory.values()) {
-					lo = Math.min(lo, bottom, top);
-					hi = Math.max(hi, bottom, top);
-				}
-			}
-		} else {
-			for (const s of resolvedSeries!) {
-				const sy = resolveAccessor(s.y);
-				for (const row of s.data) {
-					const raw = sy(row);
-					if (isGapValue(raw)) continue;
-					const v = Number(raw);
-					lo = Math.min(lo, v);
-					hi = Math.max(hi, v);
-				}
-			}
+		for (const row of state.processedData?.data ?? []) {
+			const span = spanOf(row);
+			if (!span) continue;
+			lo = Math.min(lo, ...span);
+			hi = Math.max(hi, ...span);
 		}
 		return hi > lo ? [lo, hi] : undefined;
 	})();
@@ -229,8 +212,6 @@ export function buildScales<TData extends Record<string, unknown>>(
 		width,
 		height,
 		margins: state.margins,
-		flat: state.flat!,
-		xAcc: state.channels!.x.accessor,
 		seriesNames: (state.groupedSeries ?? []).map((g) => g.series.name),
 		processedData: state.processedData,
 		themeMargins: ctx.cfg.margins,

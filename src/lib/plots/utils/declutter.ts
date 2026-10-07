@@ -200,7 +200,7 @@ function fitRunsWithinBounds(positions: number[], connected: boolean[], [lo, hi]
  * from one continuous line touching the next label down. A run of `n`
  * members uses exactly `n` lanes; letting the lane count grow is the price
  * of a fan that never has two leader lines touching *or* crossing, and
- * `ValueLabels`' own auto-margin measurement (see its doc comment) already
+ * a decluttered text marker's own auto-margin measurement (`onOverflow`) already
  * grows `margins.right` to fit however many lanes that turns out to be, so
  * nothing has to be guessed up front.
  *
@@ -259,4 +259,72 @@ export function laneAssignment(
     i = j + 1;
   }
   return out;
+}
+
+/** Where one decluttered label goes — see {@link buildLabelLanes}. */
+export type LabelLane = {
+  /** Vertical shift (px) clearing its neighbours and the content box's edges. */
+  extraDy: number;
+  /** Whether every label reaches out to the shared column (some labels clustered). */
+  aligned: boolean;
+  /** Horizontal reach (px) of the shared column. */
+  reach: number;
+  /** Horizontal reach (px) of this label's own lane, where its connector bends. */
+  laneReach: number;
+  /** Side the labels fan toward: `1` right, `-1` left. */
+  dir: number;
+};
+
+/**
+ * Lays out point labels that would overlap: spreads their pixel `y` apart
+ * (`declutter1D`), gives each moved label its own lane (`laneAssignment`), and
+ * lines every label up on one shared column once any of them clusters. A
+ * leftward fan with no room before the content box's left edge (the Y axis's
+ * tick labels sit there) flips right instead. Keyed by each item's `key`;
+ * fewer than two items need no layout.
+ */
+export function buildLabelLanes<K>(args: {
+  items: { key: K; px?: number; py: number }[];
+  /** The labels' own horizontal offset (px); its sign is the side they fan toward. */
+  dx: number;
+  fontSize: number;
+  geometry: { elbowGap: number; laneStep: number; labelGap: number };
+  /** The content box's left/top/bottom edges (px). */
+  bounds: { left: number; top: number; bottom: number };
+}): Map<K, LabelLane> {
+  const { items, dx, fontSize, geometry, bounds } = args;
+  const lanes = new Map<K, LabelLane>();
+  if (items.length < 2) return lanes;
+  const dir = Math.sign(dx) || 1;
+  const minGap = Math.max(16, fontSize * 1.4);
+  const withPos = items.map((item) => ({ ...item, pos: item.py }));
+  const sorted = [...withPos].sort((a, b) => a.pos - b.pos);
+  const { positions: spread, connected } = declutter1D(withPos, minGap, [bounds.top, bounds.bottom]);
+  const spreadByKey = new Map(spread.map((d) => [d.key, d.pos]));
+  const originals = sorted.map((item) => item.pos);
+  const finals = sorted.map((item) => spreadByKey.get(item.key) ?? item.pos);
+  const ranks = laneAssignment(originals, finals, connected);
+
+  const aligned = ranks.some((r) => r.runSize > 1);
+  const lanesUsed = aligned ? Math.max(...ranks.map((r) => r.lanesUsed)) : 1;
+  const reach = geometry.elbowGap + (lanesUsed - 1) * geometry.laneStep + geometry.labelGap;
+
+  let effectiveDir = dir;
+  if (aligned && dir === -1) {
+    // Unknown room (no x position yet) counts as none: flipping right is never wrong.
+    const rooms = sorted.filter((item) => item.px != null).map((item) => item.px! - bounds.left);
+    const room = rooms.length > 0 ? Math.min(...rooms) : -Infinity;
+    if (room < reach) effectiveDir = 1;
+  }
+
+  sorted.forEach((item, i) => {
+    lanes.set(item.key, {
+      extraDy: finals[i] - originals[i],
+      aligned,
+      reach,
+      laneReach: geometry.elbowGap + ranks[i].rank * geometry.laneStep,
+      dir: effectiveDir,
+    });
+  });
+  return lanes;
 }

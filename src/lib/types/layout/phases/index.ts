@@ -1,5 +1,5 @@
 export type { PlotPhase, PhaseStage } from './stage';
-export type { AxisPlotState, AxisPlotCtx } from './state';
+export type { AxisPlotState, AxisPlotCtx, ValueLabelsCtx } from './state';
 export type { AxisPlotKind } from './kind';
 export type { DataStageOptions } from './data';
 export type { MappingStageOptions } from './mapping';

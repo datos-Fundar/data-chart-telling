@@ -44,7 +44,6 @@ export { default as DeltaMarker } from './markers/DeltaMarker.svelte';
 export { default as DotMarker } from './markers/DotMarker.svelte';
 export { default as HoverMarker } from './markers/HoverMarker.svelte';
 export { default as LineMarker } from './markers/LineMarker.svelte';
-export { default as PeakMarker } from './markers/PeakMarker.svelte';
 export { default as RuleMarker } from './markers/RuleMarker.svelte';
 export { default as TextMarker } from './markers/TextMarker.svelte';
 export { default as RegressionMarker } from './markers/RegressionMarker.svelte';

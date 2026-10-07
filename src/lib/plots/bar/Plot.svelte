@@ -19,7 +19,6 @@
 	import { buildHover } from '$lib/layout/tooltip/buildHover';
 	import { buildBarKind } from '$lib/plots/bar/kind';
 	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
-	import ValueLabels from '$lib/plots/bar/ValueLabels.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
 	import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 	import type { BasePlotProps } from '$lib/types/plots/props';
@@ -100,7 +99,11 @@
 	const ctx = $derived<BarPlotCtx>({
 		cfg,
 		legendInteraction,
-		disabledFillFor: (name) => disabledFillOverride(effectiveDisabledFor(name))
+		disabledFillFor: (name) => disabledFillOverride(effectiveDisabledFor(name)),
+		onValueLabelOverflow: (overflow) => labelMargin.report(overflow),
+		onValueLabelHover: (name) => {
+			hoverIsolatedSeries = name;
+		}
 	});
 	const plotState = $derived(
 		runStages<BarPlotState<TData>, BarPlotCtx>(
@@ -114,6 +117,7 @@
 				color,
 				segments,
 				gaps: styles.gaps,
+				values: styles.values,
 				scales,
 				width,
 				height,
@@ -127,29 +131,33 @@
 	);
 
 	const resolvedSeries = $derived(plotState.resolvedSeries!);
-	const groupedSeries = $derived(plotState.groupedSeries!);
 	const scopedGroups = $derived(plotState.scopedGroups!);
 	const colorForSeries = $derived(plotState.colorForSeries!);
 	const categoricalAxis = $derived(plotState.categoricalAxis!);
 	const isHorizontal = $derived(plotState.isHorizontal!);
-	const xAcc = $derived(plotState.channels!.x.accessor);
 	const yAcc = $derived(plotState.channels!.y.accessor);
 	const resolvedScales = $derived(plotState.scales);
 	const barLayout = $derived(plotState.barLayout!);
 
-	const flat = $derived(plotState.flat!);
+	const processed = $derived(plotState.processedData!);
 
-	// The accessor feeding each *visual* channel — swapped from the
-	// data-semantic xAcc/yAcc when the category is drawn on Y.
-	const plotGetX = $derived(isHorizontal ? (d: TData) => Number(yAcc(d)) : xAcc);
-	const plotGetY = $derived(isHorizontal ? xAcc : (d: TData) => Number(yAcc(d)));
+	// Each processed row's category and the top of its bar, on whichever
+	// visual channel carries each — swapped when the category is drawn on Y.
+	const categoryOf = $derived((d: TData) => barLayout.categoryOf(d));
+	const topOf = $derived((d: TData) => barLayout.spanOf(d)?.[1] ?? NaN);
+	const plotGetX = $derived(isHorizontal ? topOf : categoryOf);
+	const plotGetY = $derived(isHorizontal ? categoryOf : topOf);
 
 	// A legend-disabled series is dimmed on the bar itself, but never surfaces
 	// in hover/tooltip — its points are simply absent from the candidate list.
 	const hoverPoints = $derived(
-		buildHoverPoints(resolvedSeries, isHorizontal, barLayout, colorForSeries).filter(
-			(p) => !legendInteraction?.disabledSeries.has(p.series!)
-		)
+		buildHoverPoints<TData>({
+			processed,
+			isHorizontal,
+			geometry: barLayout,
+			label: (r) => String(yAcc(r)),
+			colorFor: colorForSeries
+		}).filter((p) => !legendInteraction?.disabledSeries.has(p.series!))
 	);
 
 	// The category axis is a band scale — `<Pointer>`'s nearest-point-by-
@@ -182,7 +190,6 @@
 	// Bar's own extra step, outside the phase system — see `buildHitAreaMarkers`.
 	const hitAreaMarkers = $derived(
 		buildHitAreaMarkers({
-			groupedSeries,
 			barLayout,
 			isHorizontal,
 			hoverPoints,
@@ -234,8 +241,8 @@
 	// A bar's value label can grow past the plot's own content box (e.g. a
 	// tall bar's `anchor: 'outside'` label pushing past the top margin) —
 	// `valueLabelFloor` covers the common case up front; each label's own
-	// rendered overflow still feeds `labelMargin.report` for whatever that
-	// estimate doesn't cover. See `labelOverflow.svelte.ts`.
+	// rendered overflow still feeds `labelMargin.report` (through `ctx`) for
+	// whatever that estimate doesn't cover. See `labelOverflow.svelte.ts`.
 	const labelMargin = createLabelMarginTracker(
 		() => margins,
 		() => resolvedSeries,
@@ -248,7 +255,7 @@
 	{width}
 	{height}
 	{styles}
-	data={flat}
+	data={processed.data as TData[]}
 	getX={plotGetX}
 	getY={plotGetY}
 	{hover}
@@ -259,36 +266,4 @@
 	markers={[...(plotState.markers ?? []), ...hitAreaMarkers]}
 	seriesData={resolvedSeries}
 	{scopedGroups}
->
-	{#snippet children({ numericMargins })}
-		{#if showVals}
-			{#each groupedSeries as group, seriesIndex (group.series.name)}
-				<ValueLabels
-					{group}
-					{seriesIndex}
-					{barLayout}
-					{isHorizontal}
-					{valAnchor}
-					{formatValue}
-					values={styles.values}
-					axisColor={cfg.axis.color}
-					disabled={effectiveDisabledFor(group.series.name)}
-					{width}
-					{height}
-					{numericMargins}
-					onHoverSeries={hoverIsolate
-						? () => {
-								hoverIsolatedSeries = group.series.name;
-							}
-						: undefined}
-					onHoverEnd={hoverIsolate
-						? () => {
-								hoverIsolatedSeries = null;
-							}
-						: undefined}
-					onOverflow={labelMargin.report}
-				/>
-			{/each}
-		{/if}
-	{/snippet}
-</BasePlotLayout>
+/>

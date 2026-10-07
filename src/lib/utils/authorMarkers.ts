@@ -1,17 +1,21 @@
 import { resolveTransforms } from '$lib/utils/transforms';
-import { inheritPlotGrouping } from '$lib/utils/markerGrouping';
-import { withComponentSeriesColor } from '$lib/utils/componentSeriesColor';
+import { inheritPlotGrouping, withSeriesColor } from '$lib/utils/markerGrouping';
 import { SERIES_KEY } from '$lib/layout/phases/transforms';
 import type { ProcessedData } from '$lib/types/layout/phases';
 import type { MarkerConfig } from '$lib/types/markers/all';
+import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
 
 type Row = Record<string, unknown>;
+
+/** Kinds that handle `scope: 'segment'` themselves, at render time. */
+const RENDER_SCOPED_KINDS = new Set(['component', 'hover']);
 
 /**
  * Prepares a plot's own author markers for the rest of its pipeline: inherits
  * the plot's grouping and default color first (a transform's `z` defaults to
- * the grouping), then runs each marker's own transforms over its rows — its
- * series' rows when it's scoped to one, the plot's rows otherwise.
+ * the grouping), splits a segment-scoped marker into one marker per segment of
+ * its series, then runs each marker's own transforms over its rows — its
+ * segment's or series' rows when it's scoped to one, the plot's rows otherwise.
  */
 export function prepareAuthorMarkers<
 	T extends { type: string; component?: unknown; props?: unknown }
@@ -21,23 +25,41 @@ export function prepareAuthorMarkers<
 		grouping?: unknown;
 		color?: unknown;
 		defaultColor?: string;
-		colorForSeries?: (name: string) => string;
 		flat: Row[];
 		resolvedSeries?: { name: string; data: Row[] }[];
+		scopedGroups?: ScopedMarkerGroup<Row>[];
 	}
 ): T[] {
-	return inheritPlotGrouping(markers, plot).map((marker) => {
+	return inheritPlotGrouping(markers, plot).flatMap((marker) => {
 		const scope = (marker as { series?: unknown }).series;
 		const seriesRows =
 			typeof scope === 'string'
 				? plot.resolvedSeries?.find((s) => s.name === scope)?.data
 				: undefined;
-		const colored =
-			marker.type === 'component' && typeof scope === 'string'
-				? withComponentSeriesColor(marker, plot.colorForSeries?.(scope))
-				: marker;
-		return resolveTransforms(colored, seriesRows ?? plot.flat);
+		const rows = seriesRows ?? plot.flat;
+		return splitBySegment(marker, rows, plot.scopedGroups).map((own) =>
+			resolveTransforms(own, rows)
+		);
 	});
+}
+
+/**
+ * One marker per segment of a `scope: 'segment'` marker's series, each over
+ * that segment's rows and in its color. Any other marker is kept whole.
+ */
+function splitBySegment<T extends { type: string }>(
+	marker: T,
+	rows: Row[],
+	scopedGroups: ScopedMarkerGroup<Row>[] = []
+): T[] {
+	const own = marker as T & { series?: unknown; scope?: unknown; data?: Row[] };
+	if (own.scope !== 'segment' || RENDER_SCOPED_KINDS.has(own.type)) return [marker];
+	const group = scopedGroups.find((g) => g.name === own.series);
+	if (!group || group.segments.length === 0) return [marker];
+	return group.segments
+		.map((seg) => ({ seg, data: (own.data ?? rows).filter((row) => seg.match(row)) }))
+		.filter(({ data }) => data.length > 0)
+		.map(({ seg, data }) => withSeriesColor({ ...own, data }, seg.color) as T);
 }
 
 /**

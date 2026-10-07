@@ -1,15 +1,57 @@
 import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
 import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { ownTextAnchor } from '$lib/plots/utils/valueLabels';
 import type { ProcessedChannel } from '$lib/types/layout/phases';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
-import type { CellMarkerConfig } from '$lib/types/markers/common';
+import type { CellMarkerConfig, TextMarkerConfig } from '$lib/types/markers/common';
 import type { HeatmapPlotState, HeatmapPlotCtx } from '$lib/types/plots/heatmap/state';
+
+/** A processed channel as a per-row function. */
+function readChannel<TData>(channel: ProcessedChannel | undefined) {
+	return resolveAccessor(channel as never) as (d: TData) => AxisValue;
+}
 
 /** One resolved-style bucket of cells — `opacity` is a second bucketing dimension alongside `styles`, quantized so the channel produces a bounded number of mark instances. */
 type StyleGroup<TData> = { styles: CellSegmentStyle; opacity: number | undefined; data: TData[] };
 
 const OPACITY_STEPS = 32;
+
+/**
+ * HeatmapPlot's `styles.values` as one `'text'` marker over the same cells
+ * the plot draws, each labelled with its own value and centred on it. Shown
+ * unless `values.show` is `false`.
+ */
+export function buildValueLabelMarkers<TData extends Record<string, unknown>>(
+	state: HeatmapPlotState<TData>,
+	ctx: HeatmapPlotCtx
+): TextMarkerConfig[] {
+	const { values, processedData } = state;
+	if (values?.show === false || !processedData?.data.length) return [];
+	const font = values?.fontStyle;
+	const format = values?.format ?? ((v: number) => `${v}`);
+	const getColor = state.channels!.color.accessor;
+	return [
+		{
+			type: 'text',
+			data: processedData.data,
+			// Read like the cells read them, so the labels add no axis title the cells don't.
+			x: readChannel<TData>(processedData.channels.x),
+			y: readChannel<TData>(processedData.channels.y),
+			text: (d: TData) => format(Number(getColor(d)), ''),
+			styles: {
+				...font,
+				fill: font?.fill ?? ctx.cfg.continuous.labelColor,
+				fontSize: font?.fontSize ?? 12,
+				fontWeight: font?.fontWeight ?? 600,
+				dx: font?.dx ?? 0,
+				dy: font?.dy ?? 0,
+				textAnchor: ownTextAnchor(font) ?? 'middle',
+				lineAnchor: font?.lineAnchor ?? 'middle'
+			}
+		}
+	];
+}
 
 /**
  * HeatmapPlot's "markers" phase: one `'cell'` marker per resolved-style
@@ -28,10 +70,8 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 	// The cells are the rows the "transforms" phase left, placed by its channels.
 	const processed = state.processedData!;
 	const rows = processed.data as TData[];
-	const read = (channel: ProcessedChannel | undefined) =>
-		resolveAccessor(channel as never) as (d: TData) => AxisValue;
-	const getX = read(processed.channels.x);
-	const getY = read(processed.channels.y);
+	const getX = readChannel<TData>(processed.channels.x);
+	const getY = readChannel<TData>(processed.channels.y);
 
 	/**
 	 * A catch-all (no `areas`) always matches, so evaluating segments in plain
@@ -126,5 +166,8 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 		inset: 0.5
 	}));
 
-	return { ...state, markers: [...markers, ...(state.markers ?? [])] };
+	return {
+		...state,
+		markers: [...markers, ...(state.markers ?? []), ...buildValueLabelMarkers(state, ctx)]
+	};
 }

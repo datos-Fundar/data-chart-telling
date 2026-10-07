@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
-import PeakMarker from '$lib/markers/PeakMarker.svelte';
+import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
+import type { MarkerTransform } from '$lib/types/transforms';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { FEMALE_LIFE_EXPECTANCY, type YearPoint } from '../data';
 
@@ -42,6 +43,27 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+/**
+ * A dot and a label on a series' peak: a `selectMaxY` (or `selectMinY`)
+ * transform keeps one row per series — or per segment, with `scope: 'segment'`.
+ */
+function peakMarkers(
+	where: { series: string; scope?: 'series' | 'segment' },
+	mode: 'max' | 'min' = 'max'
+): AxisBasedMarkersConfig[] {
+	const transforms: MarkerTransform[] = [{ type: mode === 'max' ? 'selectMaxY' : 'selectMinY' }];
+	const common = { ...where, x: 'year', y: 'value', transforms };
+	return [
+		{ type: 'dot', ...common },
+		{
+			type: 'text',
+			...common,
+			text: mode === 'max' ? 'Max' : 'Min',
+			styles: { fontWeight: 'bold', dy: -15 }
+		}
+	];
+}
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
@@ -98,8 +120,9 @@ export const WithTextMarker: Story = {
 };
 
 /**
- * PeakMarker highlights the max or min value of the series — use the `mode`
- * control to switch between peak detection strategies.
+ * A `selectMaxY`/`selectMinY` transform on a `dot` and a `text` marker
+ * highlights the max or min value of the series — use the `mode` control to
+ * switch between them.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const WithPeakMarker: any = {
@@ -128,19 +151,7 @@ export const WithPeakMarker: any = {
 		Component: LinePlot,
 		props: {
 			...args,
-			markers: [
-				{
-					type: 'component',
-					series: 'female',
-					component: PeakMarker,
-					props: {
-						yProp: 'value',
-						xProp: 'year',
-						mode,
-						label: mode === 'max' ? 'Max' : 'Min'
-					}
-				}
-			] satisfies AxisBasedMarkersConfig[]
+			markers: peakMarkers({ series: 'female' }, mode)
 		}
 	})
 };
@@ -192,13 +203,9 @@ const STRATEGIES_SEGMENTS: SegmentsConfig<LineSegmentStyle> = {
 	]
 };
 
-/**
- * Marker strategies: series-level and segment-level peak detection.
- * - 🔵 series1: No peak marker
- * - 🟠 series2: Peak marker for entire series
- * - 🟢 series3: Peak marker per segment (strategy: `'segment'`)
- * - 🔴 series4: Peak marker for entire series despite multiple segments
- */
+/** A bullet in the palette's `i`-th color, matching the series drawn in it. */
+const swatch = (i: number) => `<span style="color: ${DEFAULT_CONFIG.palette[i]}">●</span>`;
+
 export const WithMarkerStrategies: Story = {
 	args: {
 		series: [
@@ -209,41 +216,23 @@ export const WithMarkerStrategies: Story = {
 		],
 		segments: STRATEGIES_SEGMENTS,
 		markers: [
-			{
-				type: 'component',
-				series: 'series2',
-				component: PeakMarker,
-				props: {
-					yProp: 'value',
-					xProp: 'year',
-					mode: 'max',
-					label: 'Max'
-				}
-			},
-			{
-				type: 'component',
-				series: 'series3',
-				component: PeakMarker,
-				scope: 'segment',
-				props: {
-					yProp: 'value',
-					xProp: 'year',
-					mode: 'max',
-					label: 'Max'
-				}
-			},
-			{
-				type: 'component',
-				series: 'series4',
-				component: PeakMarker,
-				scope: 'series',
-				props: {
-					yProp: 'value',
-					xProp: 'year',
-					mode: 'max',
-					label: 'Max'
-				}
+			...peakMarkers({ series: 'series2' }),
+			...peakMarkers({ series: 'series3', scope: 'segment' }),
+			...peakMarkers({ series: 'series4', scope: 'series' })
+		]
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: [
+					'Marker strategies: series-level and segment-level peak detection.',
+					'',
+					`- ${swatch(0)} series1: No peak marker`,
+					`- ${swatch(1)} series2: Peak marker for entire series`,
+					`- ${swatch(2)} series3: Peak marker per segment (\`scope: 'segment'\`)`,
+					`- ${swatch(3)} series4: Peak marker for entire series despite multiple segments`
+				].join('\n')
 			}
-		] satisfies AxisBasedMarkersConfig[]
+		}
 	}
 };

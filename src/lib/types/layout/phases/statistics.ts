@@ -1,3 +1,4 @@
+import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
 import type { Accessor, Series } from '$lib/types/plots/data/common';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
@@ -19,6 +20,8 @@ export type StatisticsStageState = {
 	resolvedSeries?: Series<any>[];
 	flat?: any[];
 	colorForSeries?: (name: string) => string;
+	/** Each series' segments, which a `scope: 'segment'` author marker splits by. */
+	scopedGroups?: ScopedMarkerGroup<any>[];
 	/** The plot's rows after its own transforms, which an author marker without rows of its own draws. */
 	processedData?: ProcessedData;
 	markers?: AxisBasedMarkersConfig[];

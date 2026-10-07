@@ -136,13 +136,14 @@ export const DEFAULT_CONFIG: ChartConfig = {
 		gap: {
 			stroke: { strokeOpacity: 0.6, strokeDasharray: '4 4' },
 			dots: {}
-		},
-		valueLabels: {
+		}
+	},
+	text: {
+		declutter: {
 			elbowGap: 10,
 			laneStep: 7,
 			labelGap: 6,
-			connectorColor: '#94a3b8',
-			connectorWidth: 0.5
+			connector: { stroke: '#94a3b8', strokeWidth: 0.5 }
 		}
 	},
 	bar: {

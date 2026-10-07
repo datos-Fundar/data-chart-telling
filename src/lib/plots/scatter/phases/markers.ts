@@ -1,14 +1,57 @@
-import { buildProcessedRuns } from '$lib/layout/phases/transforms';
+import { SERIES_KEY, buildProcessedRuns, processedPosition } from '$lib/layout/phases/transforms';
+import { ownTextAnchor, seriesValueOf, valueLabelHooks } from '$lib/plots/utils/valueLabels';
 import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/scatter/state';
 import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
-import type { DotMarkerConfig } from '$lib/types/markers/common';
+import type { DotMarkerConfig, TextMarkerConfig } from '$lib/types/markers/common';
+import type { ProcessedRow } from '$lib/types/layout/phases';
 import type { AxisValue } from '$lib/types/layout/mapping';
+
+/**
+ * ScatterPlot's `styles.values` as one `'text'` marker over the same
+ * processed rows its dots draw, each labelled with its own `y` value. A label
+ * sits beside its point and flips to the other side where its text would
+ * cross the plot's edge (`edgeAware`).
+ */
+export function buildValueLabelMarkers<TData extends Record<string, unknown>>(
+	state: ScatterPlotState<TData>,
+	ctx: ScatterPlotCtx
+): TextMarkerConfig[] {
+	const { values, processedData } = state;
+	if (!values?.show || !processedData?.data.length) return [];
+	const font = values.fontStyle;
+	const format = values.format ?? ((v: number) => `${v}`);
+	const position = processedPosition(processedData);
+	const nameOf = (d: ProcessedRow) => String(d[SERIES_KEY]);
+	const valueOf = seriesValueOf(state);
+	return [
+		{
+			type: 'text',
+			data: processedData.data,
+			x: position.x as TextMarkerConfig['x'],
+			y: position.y as TextMarkerConfig['y'],
+			text: (d: ProcessedRow) => format(Number(valueOf(d)), nameOf(d)),
+			styles: {
+				...font,
+				fill: font?.fill ?? ctx.cfg.axis.color,
+				fontSize: font?.fontSize ?? 11,
+				fontWeight: font?.fontWeight ?? 500,
+				dx: font?.dx ?? 8,
+				dy: font?.dy ?? 0,
+				textAnchor: ownTextAnchor(font) ?? 'start',
+				lineAnchor: font?.lineAnchor ?? 'middle'
+			},
+			edgeAware: true,
+			...valueLabelHooks(values, ctx, nameOf)
+		}
+	];
+}
 
 /**
  * ScatterPlot's "markers" phase: one `'dot'` marker per visual segment of the
  * rows the "transforms" phase left, in their own order, so a reordering
  * transform decides which dots paint on top — prepended onto whatever the
- * "statistics" phase already put in `state.markers`.
+ * "statistics" phase already put in `state.markers` — and its value labels on
+ * top of everything.
  */
 export function buildMarkers<TData extends Record<string, unknown>>(
 	state: ScatterPlotState<TData>,
@@ -101,5 +144,8 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 		}
 	});
 
-	return { ...state, markers: [...markers, ...(state.markers ?? [])] };
+	return {
+		...state,
+		markers: [...markers, ...(state.markers ?? []), ...buildValueLabelMarkers(state, ctx)]
+	};
 }

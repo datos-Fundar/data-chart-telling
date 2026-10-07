@@ -57,8 +57,9 @@ function hasFlatColor(marker: MarkerLike): boolean {
 /**
  * Gives a marker one flat color (its `styles`, or a box's `bar.fill`) when it
  * sets none of its own: a series color, the plot's default series color.
- * Dots take `dotFill`/`dotStroke`, line-only kinds take `stroke`, filled kinds
- * take both so their outline matches their fill.
+ * Dots take `dotFill`/`dotStroke`, line-only kinds take `stroke`, text takes
+ * `fill` (a stroke would outline its glyphs), filled kinds take both so their
+ * outline matches their fill.
  */
 export function withSeriesColor<TMarker extends MarkerLike>(
 	marker: TMarker,
@@ -73,7 +74,9 @@ export function withSeriesColor<TMarker extends MarkerLike>(
 			? ['dotFill', 'dotStroke']
 			: LINE_KINDS.has(marker.type)
 				? ['stroke']
-				: ['fill', 'stroke'];
+				: marker.type === 'text'
+					? ['fill']
+					: ['fill', 'stroke'];
 	const styles: Record<string, unknown> = { ...(marker.styles ?? {}) };
 	// A `'none'` the marker sets doesn't block the inherited color, but stays itself.
 	for (const key of keys) styles[key] ??= color;

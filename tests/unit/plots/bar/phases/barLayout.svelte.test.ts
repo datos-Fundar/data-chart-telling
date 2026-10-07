@@ -30,21 +30,25 @@ const series = (name: string, data: Row[]): Series<Row> => ({
 	data
 });
 
-/** The rows a plot-level `stackY` leaves for these series, through BarPlot's own "transforms" phase. */
-function stacked(
+/** The rows BarPlot's own "transforms" phase leaves for these series — stacked by default. */
+function processed(
 	list: Series<Row>[],
-	gapFillMaps = new Map<string, Map<Row, DiscreteGapFill<BarSegmentStyle>>>()
+	gapFillMaps = new Map<string, Map<Row, DiscreteGapFill<BarSegmentStyle>>>(),
+	transforms: BarPlotState<Row>['transforms'] = [{ type: 'stackY' }]
 ) {
 	const state = {
 		resolvedSeries: list,
 		gapFillMaps,
-		transforms: [{ type: 'stackY' }],
+		transforms,
 		scales: {},
 		width: 400,
 		height: 300
 	} as BarPlotState<Row>;
 	return buildTransforms(state, CTX).processedData;
 }
+
+/** One series' rows through the "transforms" phase, with no transforms of its own. */
+const unstacked = (rows: Row[]) => processed([series('a', rows)], undefined, []);
 
 function build(overrides: Partial<Parameters<typeof buildBarLayout<Row>>[0]> = {}) {
 	return buildBarLayout<Row>({
@@ -53,10 +57,8 @@ function build(overrides: Partial<Parameters<typeof buildBarLayout<Row>>[0]> = {
 		width: 400,
 		height: 300,
 		margins: undefined,
-		flat: [A, B],
-		xAcc: (d) => d.category,
 		seriesNames: ['a'],
-		processedData: undefined,
+		processedData: unstacked([A, B]),
 		themeMargins: THEME_MARGINS,
 		seriesPadding: 0.1,
 		...overrides
@@ -69,7 +71,7 @@ describe('buildBarLayout – layout mode', () => {
 	});
 
 	test('a plot-level stackY stacks them', () => {
-		const processedData = stacked([series('a', [A]), series('b', [A])]);
+		const processedData = processed([series('a', [A]), series('b', [A])]);
 		expect(build({ seriesNames: ['a', 'b'], processedData }).layout).toBe('stacked');
 	});
 });
@@ -97,12 +99,12 @@ describe('buildBarLayout – valueBaseline', () => {
 
 describe('buildBarLayout – estimatedBandwidth', () => {
 	test('is 0 when there is no data', () => {
-		expect(build({ flat: [] }).estimatedBandwidth).toBe(0);
+		expect(build({ processedData: unstacked([]) }).estimatedBandwidth).toBe(0);
 	});
 
 	test('grows the inner size shrinks with fewer categories', () => {
-		const twoCategories = build({ flat: [A, B] }).estimatedBandwidth;
-		const oneCategory = build({ flat: [A] }).estimatedBandwidth;
+		const twoCategories = build({ processedData: unstacked([A, B]) }).estimatedBandwidth;
+		const oneCategory = build({ processedData: unstacked([A]) }).estimatedBandwidth;
 		expect(oneCategory).toBeGreaterThan(twoCategories);
 	});
 });
@@ -115,7 +117,7 @@ describe('buildBarLayout – side-by-side geometry', () => {
 	});
 
 	test('a stack fills the whole band too', () => {
-		const processedData = stacked([series('a', [A]), series('b', [A])]);
+		const processedData = processed([series('a', [A]), series('b', [A])]);
 		const result = build({ seriesNames: ['a', 'b'], processedData });
 		expect(result.groupInsetFraction(1)).toEqual({ start: 0, end: 0 });
 	});
@@ -134,12 +136,14 @@ describe('buildBarLayout – side-by-side geometry', () => {
 	});
 });
 
-describe('buildBarLayout – stacked geometry', () => {
-	test('each series spans from where the prior one ends', () => {
-		const processedData = stacked([series('a', [A]), series('b', [A])]);
-		const result = build({ seriesNames: ['a', 'b'], processedData, flat: [A] });
-		expect(result.stackedSpan('A', 0)).toEqual([0, 10]);
-		expect(result.stackedSpan('A', 1)).toEqual([10, 20]);
+describe('buildBarLayout – row geometry', () => {
+	test('a stacked series spans from where the prior one ends', () => {
+		const processedData = processed([series('a', [A]), series('b', [A])]);
+		const layout = build({ seriesNames: ['a', 'b'], processedData });
+		expect(processedData!.data.map((row) => layout.spanOf(row))).toEqual([
+			[0, 10],
+			[10, 20]
+		]);
 	});
 
 	test('a gap-filled row takes its place in the stack at its filled value', () => {
@@ -147,13 +151,25 @@ describe('buildBarLayout – stacked geometry', () => {
 		const gapFillMaps = new Map([
 			['a', new Map([[gapRow, { value: 7, kind: 'middle' as const, style: {} }]])]
 		]);
-		const processedData = stacked([series('a', [gapRow]), series('b', [A])], gapFillMaps);
-		const result = build({ seriesNames: ['a', 'b'], processedData, flat: [gapRow] });
-		expect(result.stackedSpan('A', 1)).toEqual([7, 17]);
+		const processedData = processed([series('a', [gapRow]), series('b', [A])], gapFillMaps);
+		const layout = build({ seriesNames: ['a', 'b'], processedData });
+		expect(layout.spanOf(processedData!.data[1])).toEqual([7, 17]);
 	});
 
-	test('an unknown category has no span', () => {
-		const processedData = stacked([series('a', [A])]);
-		expect(build({ processedData }).stackedSpan('nope', 0)).toBeUndefined();
+	test('a grouped bar spans from the value baseline to its value', () => {
+		const processedData = unstacked([A]);
+		const layout = build({ processedData, scales: { y: { domain: [5, 30] } } });
+		expect(layout.spanOf(processedData!.data[0])).toEqual([5, 10]);
+	});
+
+	test('a row without a value has no span', () => {
+		const processedData = unstacked([{ category: 'C', value: null }]);
+		expect(build({ processedData }).spanOf(processedData!.data[0])).toBeUndefined();
+	});
+
+	test("reads each row's category", () => {
+		const processedData = unstacked([A, B]);
+		const layout = build({ processedData });
+		expect(processedData!.data.map(layout.categoryOf)).toEqual(['A', 'B']);
 	});
 });

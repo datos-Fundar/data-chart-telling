@@ -1,6 +1,15 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
+	import {
+		disabledFillOverride,
+		resolveEffectiveDisabledStyle
+	} from '$lib/plots/utils/legendDisabled';
+	import {
+		createLabelMarginTracker,
+		halfDimensionOverflowCap
+	} from '$lib/plots/utils/labelOverflow.svelte';
+	import { estimateLineValueLabelMargin } from '$lib/plots/line/valueLabelMargin';
 	import { processedPosition } from '$lib/layout/phases/transforms';
 	import { runStages } from '$lib/layout/phases/runStages';
 	import { buildAxisStages } from '$lib/layout/phases/axisStages';
@@ -16,6 +25,8 @@
 	import type { AreaStyle } from '$lib/types/plots/styling';
 	import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 	import type { AreaPlotState, AreaPlotCtx } from '$lib/types/plots/area/state';
+	import type { LegendDisabledStyle } from '$lib/types/layout/legend';
+	import type { MarginOverflow } from '$lib/plots/utils/labelOverflow.svelte';
 
 	/**
 	 * An area per series, filled from its own baseline. Takes the same data as
@@ -52,10 +63,34 @@
 
 	const cfg = $derived(getConfiguration());
 	const legendInteraction = $derived(getLegendInteraction());
+	const hoverIsolate = $derived(styles.values?.hoverIsolate ?? false);
+
+	// Dims every other series like a legend toggle when a value label is
+	// hovered, local to this `<Plot>` instance.
+	let hoverIsolatedSeries = $state<string | null>(null);
+
+	function effectiveDisabledFor(name: string): LegendDisabledStyle | undefined {
+		return resolveEffectiveDisabledStyle(
+			name,
+			legendInteraction,
+			cfg.legend.disabledOpacity,
+			hoverIsolate,
+			hoverIsolatedSeries
+		);
+	}
 
 	// The plot's own pipeline (see `buildAreaKind`), run once via `runStages`.
 	const stages = buildAxisStages(buildAreaKind<TData>());
-	const ctx = $derived<AreaPlotCtx>({ cfg, legendInteraction });
+	const ctx = $derived<AreaPlotCtx>({
+		cfg,
+		legendInteraction,
+		disabledFor: effectiveDisabledFor,
+		disabledFillFor: (name) => disabledFillOverride(effectiveDisabledFor(name)),
+		onValueLabelOverflow: (overflow) => labelMargin.report(overflow),
+		onValueLabelHover: (name) => {
+			hoverIsolatedSeries = name;
+		}
+	});
 	const plotState = $derived(
 		runStages<AreaPlotState<TData>, AreaPlotCtx>(
 			stages,
@@ -72,6 +107,7 @@
 				margins,
 				statistics,
 				segments,
+				values: styles.values,
 				transforms,
 				authorMarkers: markers
 			} as AreaPlotState<TData>,
@@ -118,6 +154,27 @@
 		width: () => width,
 		height: () => height
 	});
+
+	// End-of-series labels sit like LinePlot's, so their margin is estimated the same way.
+	const valueLabelFloor = $derived.by((): MarginOverflow | undefined => {
+		if (!styles.values?.show) return undefined;
+		return estimateLineValueLabelMargin(resolvedSeries, {
+			valAnchor: styles.values.anchor,
+			fontStyle: styles.values.fontStyle,
+			formatValue: styles.values.format,
+			yDomain: resolvedScales.y?.domain
+		});
+	});
+
+	// Grows the plot's margin to fit value labels that overflow the content
+	// box: `valueLabelFloor` up front, then whatever the value-label marker's
+	// own rendered overflow reports (through `ctx`). See `labelOverflow.svelte.ts`.
+	const labelMargin = createLabelMarginTracker(
+		() => margins,
+		() => resolvedSeries,
+		() => valueLabelFloor ?? { left: 0, right: 0, top: 0, bottom: 0 },
+		() => halfDimensionOverflowCap(width, height)
+	);
 </script>
 
 <BasePlotLayout
@@ -129,7 +186,7 @@
 	{hover}
 	scales={resolvedScales}
 	{styles}
-	{margins}
+	{...labelMargin.plotProps}
 	markers={plotState.markers ?? []}
 	seriesData={resolvedSeries}
 	{scopedGroups}

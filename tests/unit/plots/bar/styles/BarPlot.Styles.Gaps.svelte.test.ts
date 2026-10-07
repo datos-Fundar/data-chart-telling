@@ -43,6 +43,19 @@ describe('BarPlot – gaps (middle)', () => {
 	});
 });
 
+describe('BarPlot – gaps (axis title)', () => {
+	test('filling a gap keeps the value axis titled by its field', async () => {
+		const { container } = await render(BarPlot, {
+			width: 400,
+			height: 300,
+			series: [SERIES],
+			styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
+		});
+		const svg = await waitForSvg(container);
+		expect(svg.querySelector('.axis-y-title')?.textContent).toContain('value');
+	});
+});
+
 describe('BarPlot – gaps (start/end, opt-in)', () => {
 	test('a start zone only fills once an explicit `x` target is given', async () => {
 		const { container } = await render(BarPlot, {

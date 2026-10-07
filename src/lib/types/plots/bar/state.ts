@@ -1,7 +1,7 @@
 import type { GapZonesConfig } from '$lib/types/plots/gaps';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { DiscreteGapFill } from '$lib/plots/utils/gaps';
-import type { AxisPlotState, AxisPlotCtx } from '$lib/types/layout/phases';
+import type { AxisPlotState, AxisPlotCtx, ValueLabelsCtx } from '$lib/types/layout/phases';
 import type { BarLayout } from './layout';
 
 /** BarPlot's pipeline state: the shared axis-based state plus its gap fills and bar layout. */
@@ -23,6 +23,4 @@ export type BarPlotState<TData extends Record<string, unknown>> = AxisPlotState<
 };
 
 /** The environment every BarPlot phase reads from, alongside the growing state. */
-export type BarPlotCtx = AxisPlotCtx & {
-	disabledFillFor?: (name: string) => { fill?: string; fillOpacity?: number } | undefined;
-};
+export type BarPlotCtx = AxisPlotCtx & ValueLabelsCtx;

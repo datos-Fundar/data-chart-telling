@@ -10,6 +10,8 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
 import type { MarkerTransform } from '$lib/types/transforms';
 import type { ProcessedData } from '$lib/types/layout/phases/transforms';
+import type { ValuesStyle } from '$lib/types/layout/styles';
+import type { MarginOverflow } from '$lib/plots/utils/labelOverflow.svelte';
 
 /**
  * The pipeline state every axis-based plot shares — raw props plus every
@@ -33,6 +35,8 @@ export type AxisPlotState<
 	width: number;
 	height: number;
 	margins?: MarginConfig;
+	/** The plot's `styles.values`, which its "markers" phase turns into a value-label `text` marker. */
+	values?: ValuesStyle;
 
 	// "data" phase output.
 	resolvedSeries?: TSeries[];
@@ -60,4 +64,14 @@ export type AxisPlotState<
 export type AxisPlotCtx = {
 	cfg: ChartConfig;
 	legendInteraction: LegendInteractionStore | null | undefined;
+};
+
+/** The hooks a plot's value-label `text` marker reports through, back to its own `Plot.svelte`. */
+export type ValueLabelsCtx = {
+	/** A series' legend or hover-isolate dimming, if any. */
+	disabledFillFor?: (name: string) => { fill?: string; fillOpacity?: number } | undefined;
+	/** Reports how far the value labels reach past the content box, so the plot grows its margin. */
+	onValueLabelOverflow?: (overflow: MarginOverflow) => void;
+	/** The series whose value label the pointer is over, or `null` once it leaves. */
+	onValueLabelHover?: (name: string | null) => void;
 };

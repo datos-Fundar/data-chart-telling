@@ -55,9 +55,9 @@ export function buildStatistics<TState extends StatisticsStageState>(
 					grouping: inheritGrouping ? state.grouping : undefined,
 					color: inheritGrouping ? state.color : undefined,
 					defaultColor,
-					colorForSeries,
 					flat,
-					resolvedSeries
+					resolvedSeries,
+					scopedGroups: state.scopedGroups
 				}),
 				flat
 			)

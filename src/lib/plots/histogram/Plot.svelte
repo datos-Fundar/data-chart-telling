@@ -1,6 +1,14 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
+	import {
+		disabledFillOverride,
+		resolveEffectiveDisabledStyle
+	} from '$lib/plots/utils/legendDisabled';
+	import {
+		createLabelMarginTracker,
+		halfDimensionOverflowCap
+	} from '$lib/plots/utils/labelOverflow.svelte';
 	import { processedPosition, SERIES_KEY } from '$lib/layout/phases/transforms';
 	import { resolveAccessor } from '$lib/plots/utils/accessors';
 	import { runStages } from '$lib/layout/phases/runStages';
@@ -18,6 +26,8 @@
 	import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 	import type { HistogramPlotState, HistogramPlotCtx } from '$lib/types/plots/histogram/state';
 	import type { ProcessedChannel, ProcessedRow } from '$lib/types/layout/phases';
+	import type { LegendDisabledStyle } from '$lib/types/layout/legend';
+	import type { MarginOverflow } from '$lib/plots/utils/labelOverflow.svelte';
 
 	/** Flat rows binned on `x`. `y` is optional: a bin's count is its height. */
 	type HistogramDataProps<TRow extends Record<string, unknown>> = Omit<DataProps<TRow>, 'y'> &
@@ -58,10 +68,33 @@
 
 	const cfg = $derived(getConfiguration());
 	const legendInteraction = $derived(getLegendInteraction());
+	const hoverIsolate = $derived(styles.values?.hoverIsolate ?? false);
+
+	// Dims every other series like a legend toggle when a value label is
+	// hovered, local to this `<Plot>` instance.
+	let hoverIsolatedSeries = $state<string | null>(null);
+
+	function effectiveDisabledFor(name: string): LegendDisabledStyle | undefined {
+		return resolveEffectiveDisabledStyle(
+			name,
+			legendInteraction,
+			cfg.legend.disabledOpacity,
+			hoverIsolate,
+			hoverIsolatedSeries
+		);
+	}
 
 	// The plot's own pipeline (see `buildHistogramKind`), run once via `runStages`.
 	const stages = buildAxisStages(buildHistogramKind<TData>());
-	const ctx = $derived<HistogramPlotCtx>({ cfg, legendInteraction });
+	const ctx = $derived<HistogramPlotCtx>({
+		cfg,
+		legendInteraction,
+		disabledFillFor: (name) => disabledFillOverride(effectiveDisabledFor(name)),
+		onValueLabelOverflow: (overflow) => labelMargin.report(overflow),
+		onValueLabelHover: (name) => {
+			hoverIsolatedSeries = name;
+		}
+	});
 	const plotState = $derived(
 		runStages<HistogramPlotState<TData>, HistogramPlotCtx>(
 			stages,
@@ -78,6 +111,7 @@
 				transforms,
 				statistics,
 				segments,
+				values: styles.values,
 				authorMarkers: markers
 			} as HistogramPlotState<TData>,
 			ctx
@@ -137,6 +171,26 @@
 		width: () => width,
 		height: () => height
 	});
+
+	// An `'outside'` label sits above the tallest bin, so its line of text is
+	// reserved up front above the content box; the others sit inside the bar.
+	const valueLabelFloor = $derived.by((): MarginOverflow | undefined => {
+		const values = styles.values;
+		if (!values?.show || (values.anchor ?? 'outside') !== 'outside') return undefined;
+		const fontSize = values.fontStyle?.fontSize ?? 12;
+		const offset = Math.abs(values.fontStyle?.dy ?? 6);
+		return { left: 0, right: 0, top: Math.ceil(offset + fontSize * 1.2), bottom: 0 };
+	});
+
+	// Grows the plot's margin to fit value labels that overflow the content
+	// box: `valueLabelFloor` up front, then whatever the value-label marker's
+	// own rendered overflow reports (through `ctx`). See `labelOverflow.svelte.ts`.
+	const labelMargin = createLabelMarginTracker(
+		() => margins,
+		() => plotState.resolvedSeries,
+		() => valueLabelFloor ?? { left: 0, right: 0, top: 0, bottom: 0 },
+		() => halfDimensionOverflowCap(width, height)
+	);
 </script>
 
 <BasePlotLayout
@@ -148,7 +202,7 @@
 	{hover}
 	scales={resolvedScales}
 	{styles}
-	{margins}
+	{...labelMargin.plotProps}
 	markers={plotState.markers ?? []}
 	seriesData={plotState.resolvedSeries}
 	{scopedGroups}

@@ -2,7 +2,6 @@
 	lang="ts"
 	generics="TData extends Record<string, unknown>, TSeries extends Record<string, unknown> = TData"
 >
-	import { SvelteMap } from 'svelte/reactivity';
 	import BarMarker from '$lib/markers/BarMarker.svelte';
 	import LineMarker from '$lib/markers/LineMarker.svelte';
 	import CellMarker from '$lib/markers/CellMarker.svelte';
@@ -57,9 +56,9 @@
 	 * marker kind needs beyond its own config (hover-controller state for
 	 * `hover`; per-series data/color for a `series`-scoped `hover`/`component`).
 	 *
-	 * A marker scoped to one `series` renders once per matching entry in
-	 * `scopedGroups` instead of the plain loop, since it needs that series'
-	 * own data/color and resolved segments. `width`/`height`/`numericMargins`/
+	 * A marker scoped to one `series` renders against its entry in
+	 * `scopedGroups`, since it needs that series' own data/color and resolved
+	 * segments; one whose series has no entry renders nothing. `width`/`height`/`numericMargins`/
 	 * `geoAllFeatures` are `GeoPlot`-only context an `inset` marker needs
 	 * beyond its own config; `data` is `BasePlotLayout`'s own rows, forwarded
 	 * as the fallback every `CommonMarkerConfig`-based marker's own (optional)
@@ -82,7 +81,7 @@
 		tooltipAnchorX,
 		tooltipAnchorY
 	}: {
-		/** The plot's own outer width/height — `inset` marker only, to size its content box. */
+		/** The plot's own outer width/height — sizes the content box an `inset` or `text` marker needs. */
 		width?: number;
 		height?: number;
 		markers?: MarkerConfig[];
@@ -94,7 +93,7 @@
 		channelScales?: ChannelScalesConfig;
 		/** `BasePlotLayout`'s own hover controller. */
 		ctrl: HoverController<TData>;
-		/** The plot's own resolved margins — `inset` marker only, to place its content box. */
+		/** The plot's own resolved margins — places the content box an `inset` or `text` marker needs. */
 		numericMargins?: { top: number; right: number; bottom: number; left: number };
 		/** `BasePlotLayout`'s own rows — `contour` (clip) and unscoped `geo-component` fallback data. */
 		data?: TData[];
@@ -107,25 +106,28 @@
 
 	const cfg = $derived(getConfiguration());
 
+	/** The plot's content box in pixels, when its size and margins are known. */
+	const contentBox = $derived(
+		width !== undefined && height !== undefined && numericMargins
+			? {
+					left: numericMargins.left,
+					right: width - numericMargins.right,
+					top: numericMargins.top,
+					bottom: height - numericMargins.bottom
+				}
+			: undefined
+	);
+
 	const scopedSeriesOf = (marker: MarkerConfig): string | undefined =>
 		'series' in marker && typeof marker.series === 'string' && marker.series
 			? marker.series
 			: undefined;
 
-	const geometryMarkers = $derived(markers.filter((marker) => !scopedSeriesOf(marker)));
-
-	const scopedMarkersByName = $derived.by(() => {
-		const map = new SvelteMap<string, MarkerConfig[]>();
-		for (const marker of markers) {
-			const name = scopedSeriesOf(marker);
-			if (!name) continue;
-			if (!map.has(name)) map.set(name, []);
-			map.get(name)!.push(marker);
-		}
-		return map;
-	});
+	const groupByName = $derived(new Map(scopedGroups.map((group) => [group.name, group])));
 
 	function markerKey(marker: MarkerConfig, i: number): string {
+		const scope = scopedSeriesOf(marker);
+		if (scope) return `${scope}-${marker.type}-${i}`;
 		if (marker.type === 'rule') {
 			const v = typeof marker.value === 'function' ? i : marker.value;
 			return `rule-${marker.axis}-${v}`;
@@ -185,7 +187,7 @@
 			marker={{ ...marker, data: marker.data ?? rows, scales: marker.scales ?? channelScales }}
 		/>
 	{:else if marker.type === 'text'}
-		<TextMarker marker={{ ...marker, data: marker.data ?? rows }} />
+		<TextMarker marker={{ ...marker, data: marker.data ?? rows }} bounds={contentBox} />
 	{:else if marker.type === 'rule'}
 		<RuleMarker {marker} />
 	{:else if marker.type === 'geo'}
@@ -241,54 +243,58 @@
 	{/if}
 {/snippet}
 
-{#each geometryMarkers as marker, i (markerKey(marker, i))}
-	<FrameClip clip={isFrameClipped(marker)}>
-		{@render renderMarker(marker, data)}
-	</FrameClip>
-{/each}
-
-{#each scopedGroups as group (group.name)}
-	{#each scopedMarkersByName.get(group.name) ?? [] as marker, i (`${group.name}-${marker.type}-${i}`)}
-		{#if marker.type === 'hover'}
-			{@const seriesPoints = ctrl.points.filter((p) => p.series === group.name)}
-			{#if marker.scope === 'segment'}
-				{#each group.segments as seg, segIdx (`${group.name}-hover-segment-${segIdx}`)}
-					<!-- p.row (TData) is always a superset of TSeries in practice, not provable across two independent generics. -->
-					{@const segPoints = seriesPoints.filter((p) => seg.match(p.row as unknown as TSeries))}
-					{#if segPoints.length > 0}
-						<HoverMarker
-							marker={withHoverSeriesColor(marker, seg.color)}
-							data={segPoints}
-							activePoint={segPoints[0] ?? null}
-							impliesCrosshairX={ctrl.impliesCrosshairX}
-							impliesCrosshairY={ctrl.impliesCrosshairY}
-						/>
-					{/if}
-				{/each}
-			{:else}
-				<HoverMarker
-					marker={withHoverSeriesColor(marker, group.segments[0]?.color ?? group.color)}
-					data={seriesPoints}
-					activePoint={seriesPoints[0] ?? null}
-					impliesCrosshairX={ctrl.impliesCrosshairX}
-					impliesCrosshairY={ctrl.impliesCrosshairY}
-				/>
-			{/if}
-		{:else if marker.type === 'component'}
-			{#if marker.scope === 'segment'}
-				{#each group.segments as seg, segIdx (`${group.name}-component-segment-${segIdx}`)}
-					{@const segmentData = group.data.filter((row) => seg.match(row))}
-					{#if segmentData.length > 0}
-						<marker.component {...marker.props} series={group.name} data={segmentData} />
-					{/if}
-				{/each}
-			{:else}
-				<marker.component {...marker.props} series={group.name} data={group.data} />
-			{/if}
+{#snippet renderScoped(marker: MarkerConfig, group: ScopedMarkerGroup<TSeries>)}
+	{#if marker.type === 'hover'}
+		{@const seriesPoints = ctrl.points.filter((p) => p.series === group.name)}
+		{#if marker.scope === 'segment'}
+			{#each group.segments as seg, segIdx (`${group.name}-hover-segment-${segIdx}`)}
+				<!-- p.row (TData) is always a superset of TSeries in practice, not provable across two independent generics. -->
+				{@const segPoints = seriesPoints.filter((p) => seg.match(p.row as unknown as TSeries))}
+				{#if segPoints.length > 0}
+					<HoverMarker
+						marker={withHoverSeriesColor(marker, seg.color)}
+						data={segPoints}
+						activePoint={segPoints[0] ?? null}
+						impliesCrosshairX={ctrl.impliesCrosshairX}
+						impliesCrosshairY={ctrl.impliesCrosshairY}
+					/>
+				{/if}
+			{/each}
 		{:else}
-			<FrameClip clip={isFrameClipped(marker)}>
-				{@render renderMarker(withSeriesColor(marker, group.color), group.data)}
-			</FrameClip>
+			<HoverMarker
+				marker={withHoverSeriesColor(marker, group.segments[0]?.color ?? group.color)}
+				data={seriesPoints}
+				activePoint={seriesPoints[0] ?? null}
+				impliesCrosshairX={ctrl.impliesCrosshairX}
+				impliesCrosshairY={ctrl.impliesCrosshairY}
+			/>
 		{/if}
-	{/each}
+	{:else if marker.type === 'component'}
+		{#if marker.scope === 'segment'}
+			{#each group.segments as seg, segIdx (`${group.name}-component-segment-${segIdx}`)}
+				{@const segmentData = group.data.filter((row) => seg.match(row))}
+				{#if segmentData.length > 0}
+					<marker.component {...marker.props} series={group.name} data={segmentData} />
+				{/if}
+			{/each}
+		{:else}
+			<marker.component {...marker.props} series={group.name} data={group.data} />
+		{/if}
+	{:else}
+		<FrameClip clip={isFrameClipped(marker)}>
+			{@render renderMarker(withSeriesColor(marker, group.color), group.data)}
+		</FrameClip>
+	{/if}
+{/snippet}
+
+<!-- Every marker in array order, so a later one always draws on top. -->
+{#each markers as marker, i (markerKey(marker, i))}
+	{@const scope = scopedSeriesOf(marker)}
+	{#if scope === undefined}
+		<FrameClip clip={isFrameClipped(marker)}>
+			{@render renderMarker(marker, data)}
+		</FrameClip>
+	{:else if groupByName.has(scope)}
+		{@render renderScoped(marker, groupByName.get(scope)!)}
+	{/if}
 {/each}

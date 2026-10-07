@@ -3,7 +3,7 @@ import { buildMarkers } from '$lib/plots/heatmap/phases/markers';
 import { buildTransforms } from '$lib/layout/phases/transforms';
 import type { HeatmapPlotState, HeatmapPlotCtx } from '$lib/types/plots/heatmap/state';
 import type { ChartConfig } from '$lib/types/configuration/styling';
-import type { CellMarkerConfig } from '$lib/types/markers/common';
+import type { CellMarkerConfig, TextMarkerConfig } from '$lib/types/markers/common';
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -20,7 +20,7 @@ const CTX: HeatmapPlotCtx = {
 	legendInteraction: null
 };
 
-function build(
+function buildAll(
 	overrides: Partial<HeatmapPlotState<Row>> = {},
 	ctxOverrides: Partial<HeatmapPlotCtx> = {}
 ) {
@@ -40,8 +40,12 @@ function build(
 		...overrides
 	};
 	const ctx = { ...CTX, ...ctxOverrides };
-	return buildMarkers(buildTransforms<typeof state>()(state, ctx), ctx)
-		.markers as CellMarkerConfig[];
+	return buildMarkers(buildTransforms<typeof state>()(state, ctx), ctx).markers ?? [];
+}
+
+/** The cells the phase draws, without its value labels. */
+function build(...args: Parameters<typeof buildAll>) {
+	return buildAll(...args).filter((m) => m.type === 'cell') as CellMarkerConfig[];
 }
 
 describe('buildMarkers – style grouping', () => {
@@ -103,5 +107,29 @@ describe('buildMarkers – fill', () => {
 		const fill = marker.fill as (d: Row) => string;
 		expect(fill({ row: 'X', col: 'A', value: 10 })).toBe('cold');
 		expect(fill({ row: 'Y', col: 'B', value: 20 })).toBe('hot');
+	});
+});
+
+describe('buildMarkers – value labels', () => {
+	const labels = (markers: ReturnType<typeof buildAll>) =>
+		markers.filter((m) => m.type === 'text') as TextMarkerConfig[];
+
+	test('every cell is labelled with its own value by default, on top of the cells', () => {
+		const markers = buildAll();
+		const [label] = labels(markers);
+		expect(markers.at(-1)).toBe(label);
+		expect(label.data).toHaveLength(FLAT.length);
+		const text = label.text as (d: Row) => string;
+		expect(label.data!.map((d) => text(d as Row))).toEqual(['10', '20']);
+	});
+
+	test('`values.show: false` hides them', () => {
+		expect(labels(buildAll({ values: { show: false } }))).toHaveLength(0);
+	});
+
+	test('`values.format` formats each value', () => {
+		const [label] = labels(buildAll({ values: { format: (v) => `${v}%` } }));
+		const text = label.text as (d: Row) => string;
+		expect(text(FLAT[0])).toBe('10%');
 	});
 });

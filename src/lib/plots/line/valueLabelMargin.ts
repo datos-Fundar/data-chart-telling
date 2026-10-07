@@ -46,7 +46,7 @@ export function estimateLineValueLabelMargin<TData extends Record<string, unknow
 	const canvasFont = `${fontSize}px ${cfg.font === 'inherit' ? 'sans-serif' : cfg.font}`;
 	const seriesCount = series.length;
 	const reach =
-		seriesCount > 1 ? laneReachUpperBound(seriesCount, cfg.line.valueLabels) : Math.abs(baseDx);
+		seriesCount > 1 ? laneReachUpperBound(seriesCount, cfg.text.declutter) : Math.abs(baseDx);
 
 	const texts: string[] = [];
 	if (options.yDomain && options.yDomain.length >= 2) {

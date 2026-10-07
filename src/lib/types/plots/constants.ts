@@ -27,8 +27,8 @@ export type LineStyle = 'solid' | 'dashed' | 'dotted' | 'dashdot';
 export type LineCap = 'butt' | 'round' | 'square';
 export type LineJoin = 'arcs' | 'bevel' | 'miter' | 'miter-clip' | 'round';
 
-/** `font-weight` keyword accepted by any text styling. */
-export type FontWeight = 'normal' | 'bold';
+/** `font-weight` accepted by any text styling: a keyword, or a numeric weight (100–900). */
+export type FontWeight = 'normal' | 'bold' | number;
 
 /** `font-style` keyword accepted by any text styling. */
 export type FontStyleKeyword = 'normal' | 'italic';

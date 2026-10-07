@@ -18,7 +18,6 @@
 	import { buildPyramidKind } from '$lib/plots/pyramid/kind';
 	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
-	import ValueLabels from '$lib/plots/pyramid/ValueLabels.svelte';
 	import type { BasePlotProps } from '$lib/types/plots/props';
 	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 	import type { SeriesProps, DataProps } from '$lib/types/plots/data/common';
@@ -109,7 +108,11 @@
 		cfg,
 		legendInteraction,
 		formatValue,
-		disabledFillFor: (name) => disabledFillOverride(effectiveDisabledFor(name))
+		disabledFillFor: (name) => disabledFillOverride(effectiveDisabledFor(name)),
+		onValueLabelOverflow: (overflow) => labelMargin.report(overflow),
+		onValueLabelHover: (name) => {
+			hoverIsolatedSeries = name;
+		}
 	});
 	const plotState = $derived(
 		runStages<PyramidPlotState<TData>, PyramidPlotCtx>(
@@ -123,6 +126,7 @@
 				color,
 				segments,
 				gaps: styles.gaps,
+				values: styles.values,
 				scales,
 				width,
 				height,
@@ -136,7 +140,6 @@
 	);
 
 	const resolvedSeries = $derived(plotState.resolvedSeries!);
-	const groupedSeries = $derived(plotState.groupedSeries!);
 	const scopedGroups = $derived(plotState.scopedGroups!);
 	const flat = $derived(plotState.flat!);
 	const resolvedScales = $derived(plotState.scales);
@@ -182,7 +185,7 @@
 
 	// Estimated overflow for an `'outside'`- or `'start'`-anchored value label
 	// (both anchor at the row's own full magnitude, pushed further outward —
-	// see `ValueLabels.svelte`'s `xFn`) at the most extreme value on each
+	// see `buildValueLabelMarkers`) at the most extreme value on each
 	// side of the whole dataset, not just the current frame, so it stays
 	// stable across a timeline scrubber instead of resetting to zero and
 	// regrowing on every tick. `'middle'`/`'end'` anchor inside the bar,
@@ -223,8 +226,8 @@
 
 	// A pyramid bar's value label can grow past the plot's own content box —
 	// `valueLabelFloor` covers the common case up front; each label's own
-	// rendered overflow still feeds `labelMargin.report` for whatever that
-	// estimate doesn't cover. See `labelOverflow.svelte.ts`.
+	// rendered overflow still feeds `labelMargin.report` (through `ctx`) for
+	// whatever that estimate doesn't cover. See `labelOverflow.svelte.ts`.
 	const labelMargin = createLabelMarginTracker(
 		() => margins,
 		() => resolvedSeries,
@@ -248,33 +251,4 @@
 	markers={plotState.markers ?? []}
 	seriesData={resolvedSeries}
 	{scopedGroups}
->
-	{#snippet children({ numericMargins })}
-		{#if showVals}
-			{#each groupedSeries as group (group.series.name)}
-				<ValueLabels
-					{group}
-					{valAnchor}
-					{formatValue}
-					values={styles.values}
-					axisColor={cfg.axis.color}
-					disabled={effectiveDisabledFor(group.series.name)}
-					{width}
-					{height}
-					{numericMargins}
-					onHoverSeries={hoverIsolate
-						? () => {
-								hoverIsolatedSeries = group.series.name;
-							}
-						: undefined}
-					onHoverEnd={hoverIsolate
-						? () => {
-								hoverIsolatedSeries = null;
-							}
-						: undefined}
-					onOverflow={labelMargin.report}
-				/>
-			{/each}
-		{/if}
-	{/snippet}
-</BasePlotLayout>
+/>

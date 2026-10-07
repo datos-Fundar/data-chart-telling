@@ -12,7 +12,7 @@
 	/**
 	 * Renders one `'dot'` marker. `x`/`y` also accept a literal number/Date
 	 * (every row draws at that fixed position) — used by markers like
-	 * `DeltaMarker`/`PeakMarker` that place a dot at a computed point.
+	 * `DeltaMarker` that place a dot at a computed point.
 	 */
 	const { marker }: { marker: DotMarkerConfig } = $props();
 

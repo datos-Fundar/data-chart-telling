@@ -35,6 +35,48 @@ describe('prepareAuthorMarkers', () => {
 	});
 });
 
+describe('prepareAuthorMarkers – scope', () => {
+	const series = [{ name: 'A', data: rows.filter((r) => r.g === 'A') }];
+	const scopedGroups = [
+		{
+			name: 'A',
+			data: series[0].data,
+			color: '#000',
+			segments: [
+				{ match: (r: Record<string, unknown>) => Number(r.x) <= 1, color: '#111' },
+				{ match: (r: Record<string, unknown>) => Number(r.x) >= 2, color: '#222' }
+			]
+		}
+	];
+
+	test('a segment-scoped marker draws once per segment, over its rows and in its color', () => {
+		const markers = prepareAuthorMarkers(
+			[
+				{
+					type: 'dot',
+					series: 'A',
+					scope: 'segment',
+					x: 'x',
+					y: 'y',
+					transforms: [{ type: 'selectMaxY' }]
+				}
+			],
+			{ flat: rows, resolvedSeries: series, scopedGroups }
+		) as unknown as { data: { x: number }[]; styles: { dotFill: string } }[];
+		expect(markers.map((m) => m.data.map((r) => r.x))).toEqual([[1], [2]]);
+		expect(markers.map((m) => m.styles.dotFill)).toEqual(['#111', '#222']);
+	});
+
+	test('a series-scoped marker stays whole despite the series having segments', () => {
+		const markers = prepareAuthorMarkers(
+			[{ type: 'dot', series: 'A', x: 'x', y: 'y', transforms: [{ type: 'selectMaxY' }] }],
+			{ flat: rows, resolvedSeries: series, scopedGroups }
+		) as unknown as { data: { y: number }[] }[];
+		expect(markers).toHaveLength(1);
+		expect(markers[0].data.map((r) => r.y)).toEqual([4]);
+	});
+});
+
 describe('withProcessedRows', () => {
 	const processed: ProcessedData = {
 		data: [

@@ -3,7 +3,7 @@ import type { AxisValue } from '$lib/types/layout/mapping';
 import type { GapZonesConfig } from '$lib/types/plots/gaps';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { DiscreteGapFill } from '$lib/plots/utils/gaps';
-import type { AxisPlotState, AxisPlotCtx } from '$lib/types/layout/phases';
+import type { AxisPlotState, AxisPlotCtx, ValueLabelsCtx } from '$lib/types/layout/phases';
 
 export type PyramidSide = 'left' | 'right';
 
@@ -43,7 +43,7 @@ export type PyramidPlotState<TData extends Record<string, unknown>> = AxisPlotSt
 };
 
 /** The environment every PyramidPlot phase reads from, alongside the growing state. */
-export type PyramidPlotCtx = AxisPlotCtx & {
-	formatValue: (value: number, seriesName: string) => string;
-	disabledFillFor?: (name: string) => { fill?: string; fillOpacity?: number } | undefined;
-};
+export type PyramidPlotCtx = AxisPlotCtx &
+	ValueLabelsCtx & {
+		formatValue: (value: number, seriesName: string) => string;
+	};

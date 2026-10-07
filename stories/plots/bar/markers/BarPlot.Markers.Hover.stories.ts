@@ -232,48 +232,10 @@ export const SeriesScoped: Story = {
 };
 
 /**
- * Two series from grouped data — `data / x / y / color` auto-creates one
- * series per unique `color` value. The unscoped hover marker responds to both.
- */
-export const FromGroupedData: Story = {
-	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
-		x: 'province',
-		y: 'value',
-		color: 'sex',
-		markers: [
-			{
-				type: 'hover',
-				text: {
-					dy: -10
-				}
-			}
-		] satisfies AxisBasedMarkersConfig[]
-	}
-};
-
-/**
- * Overlaped-data series-scoped — even though both series are rendered, the
- * hover marker only responds to female data points.
- */
-export const OverlapedSeriesScoped: Story = {
-	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
-		x: 'province',
-		y: 'value',
-		color: 'sex',
-		markers: [
-			{
-				type: 'hover',
-				series: 'female'
-			}
-		] satisfies AxisBasedMarkersConfig[]
-	}
-};
-
-/**
- * Hover marker on `'grouped'` series — the dot, label, and crosshair rule
- * land on each series' own bar slice, not the shared category center.
+ * Hover marker on `'grouped'` series — `data / x / y / color` auto-creates one
+ * series per unique `color` value, and the unscoped hover marker responds to
+ * all of them. The dot, label, and crosshair rule land on each series' own
+ * bar slice, not the shared category center.
  */
 export const GroupedSeries: Story = {
 	args: {

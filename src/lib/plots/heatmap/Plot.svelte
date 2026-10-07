@@ -8,7 +8,6 @@
 	import { buildHeatmapKind } from '$lib/plots/heatmap/kind';
 	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
-	import ValueLabels from '$lib/plots/heatmap/ValueLabels.svelte';
 	import type { BasePlotProps } from '$lib/types/plots/props';
 	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 	import type { AxisValue } from '$lib/types/layout/mapping';
@@ -75,7 +74,6 @@
 	});
 
 	const cfg = $derived(getConfiguration());
-	const showVals = $derived(styles.values?.show ?? true);
 	const formatValue = $derived(styles.values?.format ?? ((v: number) => `${v}`));
 
 	const legendInteraction = $derived(getLegendInteraction());
@@ -95,6 +93,7 @@
 				color,
 				opacity,
 				segments,
+				values: styles.values,
 				scales,
 				width,
 				height,
@@ -164,16 +163,4 @@
 	{hoverController}
 	markers={plotState.markers ?? []}
 	seriesData={resolvedSeries}
->
-	{#if showVals}
-		<ValueLabels
-			data={flat}
-			{getX}
-			{getY}
-			{getColor}
-			{formatValue}
-			values={styles.values}
-			defaultColor={cfg.continuous.labelColor}
-		/>
-	{/if}
-</BasePlotLayout>
+/>

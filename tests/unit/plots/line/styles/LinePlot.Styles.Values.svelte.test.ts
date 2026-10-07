@@ -252,4 +252,32 @@ describe('LinePlot – styles.values', () => {
 			expect.arrayContaining([`female (${lastFemale})`, `male (${lastMale})`])
 		);
 	});
+
+	test('labels that would overlap fan out, each routed back to its point by a connector', async () => {
+		const close = (name: string, value: number) => ({
+			name,
+			x: 'year' as const,
+			y: 'value' as const,
+			data: [
+				{ year: 2016, value: 1 },
+				{ year: 2017, value }
+			]
+		});
+		const { container } = await render(LinePlot, {
+			width: 400,
+			height: 300,
+			series: [close('a', 10), close('b', 10.1), close('c', 1)],
+			styles: { values: { show: true } } satisfies AxisBasedStylesConfig,
+			scales: { y: { domain: [0, 20] as [number, number] } }
+		});
+		const svg = await waitForSvg(container);
+		expect(countTextLabels(svg)).toBe(3);
+		// Every label lines up on one shared column once any of them clusters.
+		const xs = Array.from(svg.querySelectorAll('g.text text')).map(
+			(t) => t.getAttribute('transform')?.match(/translate\(([^,]+),/)?.[1]
+		);
+		expect(new Set(xs).size).toBe(1);
+		const connectors = svg.querySelectorAll('path[fill="none"][d^="M"][d*="H"][d*="V"]');
+		expect(connectors.length).toBe(3);
+	});
 });

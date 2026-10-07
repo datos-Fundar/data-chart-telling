@@ -1,9 +1,11 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
-import { buildProcessedGroups } from '$lib/layout/phases/transforms';
+import { SERIES_KEY, buildProcessedGroups } from '$lib/layout/phases/transforms';
+import { ownTextAnchor, valueLabelHooks } from '$lib/plots/utils/valueLabels';
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { isGapValue, resolveGapAreaStyle } from '$lib/plots/utils/gaps';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
-import type { BarMarkerConfig } from '$lib/types/markers/common';
+import type { BarMarkerConfig, TextMarkerConfig } from '$lib/types/markers/common';
+import type { ProcessedRow } from '$lib/types/layout/phases';
 import type { DiscreteGapFill } from '$lib/plots/utils/gaps';
 import type {
 	PyramidPlotState,
@@ -22,6 +24,65 @@ function signFor<TData extends Record<string, unknown>>(
 	magnitude: number
 ): number {
 	return s.side === 'left' ? -magnitude : magnitude;
+}
+
+/**
+ * PyramidPlot's `styles.values` as one `'text'` marker per series, over the
+ * same processed rows its bars draw (gap rows never get a label), mirrored to
+ * its own side of the shared zero baseline. `anchor` places each label along
+ * its bar: past its end (`'outside'`/`'start'`), at the baseline (`'end'`),
+ * or centred (`'middle'`).
+ */
+export function buildValueLabelMarkers<TData extends Record<string, unknown>>(
+	state: PyramidPlotState<TData>,
+	ctx: PyramidPlotCtx
+): TextMarkerConfig[] {
+	const { values, processedData } = state;
+	if (!values?.show || !processedData) return [];
+	const font = values.fontStyle;
+	const anchor = values.anchor ?? 'outside';
+	const format = values.format ?? ((v: number) => `${v}`);
+	const hooks = valueLabelHooks(values, ctx, (d: ProcessedRow) => String(d[SERIES_KEY]));
+
+	return buildProcessedGroups<BarSegmentStyle>(state, false).flatMap(
+		({ series }): TextMarkerConfig[] => {
+			const side = state.resolvedSeries!.find((s) => s.name === series.name)!.side;
+			const isLeft = side === 'left';
+			const getMagnitude = resolveAccessor(series.y);
+			const magnitude = (d: ProcessedRow) => Math.abs(Number(getMagnitude(d)));
+			const signed = (d: ProcessedRow) => (isLeft ? -magnitude(d) : magnitude(d));
+			const data = processedData.data.filter(
+				(d) => d[SERIES_KEY] === series.name && !isGapValue(getMagnitude(d))
+			);
+			if (data.length === 0) return [];
+			const outward = isLeft ? -1 : 1;
+			return [
+				{
+					type: 'text',
+					data,
+					x:
+						anchor === 'middle'
+							? (d: ProcessedRow) => signed(d) / 2
+							: anchor === 'end'
+								? 0
+								: signed,
+					y: series.x as TextMarkerConfig['y'],
+					text: (d: ProcessedRow) => format(magnitude(d), series.name),
+					styles: {
+						...font,
+						fill: font?.fill ?? ctx.cfg.axis.color,
+						fontSize: font?.fontSize ?? 12,
+						dx: font?.dx ?? (anchor === 'middle' ? 0 : outward * (anchor === 'end' ? 4 : 6)),
+						dy: font?.dy ?? 0,
+						textAnchor:
+							ownTextAnchor(font) ?? (anchor === 'middle' ? 'middle' : isLeft ? 'end' : 'start'),
+						lineAnchor: font?.lineAnchor ?? 'middle'
+					},
+					...hooks
+				}
+			];
+		}
+	);
 }
 
 /**
@@ -111,5 +172,8 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 		}
 	}
 
-	return { ...state, markers: [...markers, ...(state.markers ?? [])] };
+	return {
+		...state,
+		markers: [...markers, ...(state.markers ?? []), ...buildValueLabelMarkers(state, ctx)]
+	};
 }

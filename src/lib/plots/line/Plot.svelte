@@ -1,10 +1,10 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import { resolveAccessor } from '$lib/plots/utils/accessors';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { getLegendInteraction } from '$lib/layout/legend/interaction.svelte';
 	import {
 		disabledStrokeOverride,
 		disabledDotsOverride,
+		disabledFillOverride,
 		resolveEffectiveDisabledStyle
 	} from '$lib/plots/utils/legendDisabled';
 	import { isGapValue } from '$lib/plots/utils/gaps';
@@ -20,12 +20,11 @@
 	import { buildLineKind } from '$lib/plots/line/kind';
 	import { createPlotHover } from '$lib/layout/tooltip/createPlotHover.svelte';
 	import BasePlotLayout from '$lib/layout/plot/BasePlotLayout.svelte';
-	import ValueLabels from '$lib/plots/line/ValueLabels.svelte';
 	import { validateSegments } from '$lib/plots/utils/segments';
 	import type { BasePlotProps, MarginConfig } from '$lib/types/plots/props';
 	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 	import type { AxisValue } from '$lib/types/layout/mapping';
-	import type { Series, SeriesProps, DataProps } from '$lib/types/plots/data/common';
+	import type { SeriesProps, DataProps } from '$lib/types/plots/data/common';
 	import type { GapsAwarePlotStylesConfig } from '$lib/types/layout/styles';
 	import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 	import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
@@ -95,7 +94,12 @@
 		cfg,
 		legendInteraction,
 		disabledStrokeFor: (name) => disabledStrokeOverride(effectiveDisabledFor(name)),
-		disabledDotsFor: (name) => disabledDotsOverride(effectiveDisabledFor(name))
+		disabledDotsFor: (name) => disabledDotsOverride(effectiveDisabledFor(name)),
+		disabledFillFor: (name) => disabledFillOverride(effectiveDisabledFor(name)),
+		onValueLabelOverflow: (overflow) => labelMargin.report(overflow),
+		onValueLabelHover: (name) => {
+			hoverIsolatedSeries = name;
+		}
 	});
 	const plotState = $derived(
 		runStages<LinePlotState<TData>, LinePlotCtx>(
@@ -109,6 +113,7 @@
 				color,
 				segments,
 				gaps: styles.gaps,
+				values: styles.values,
 				scales,
 				width,
 				height,
@@ -162,21 +167,6 @@
 		height: () => height
 	});
 
-	const lastPoints = $derived(
-		resolvedSeries
-			.map((s) => {
-				const sy = resolveAccessor(s.y);
-				const lastRow = [...s.data].reverse().find((d) => !isGapValue(sy(d)));
-				if (lastRow === undefined) return undefined;
-				const group = scopedGroups.find((g) => g.name === s.name);
-				const matchedSeg = group?.segments.find((seg) => seg.match(lastRow));
-				const color =
-					matchedSeg?.color ?? group?.segments[0]?.color ?? group?.color ?? colorForSeries(s.name);
-				return { series: s, lastRow, color };
-			})
-			.filter((p): p is { series: Series<TData>; lastRow: TData; color: string } => p !== undefined)
-	);
-
 	// Estimated overflow for the end-of-line label fan and its own vertical
 	// reach — see `estimateLineValueLabelMargin`'s own doc comment.
 	const valueLabelFloor = $derived.by((): MarginOverflow | undefined => {
@@ -193,9 +183,10 @@
 	const maxLabelOverflow = $derived(halfDimensionOverflowCap(width, height));
 
 	// Grows the plot's margin to fit value labels that overflow the content
-	// box. `valueLabelFloor` covers the common rightward case up front; each
-	// label's own rendered overflow still feeds `labelMargin.report` for
-	// whatever that estimate doesn't cover. See `labelOverflow.svelte.ts`.
+	// box. `valueLabelFloor` covers the common rightward case up front; the
+	// value-label marker's own rendered overflow still feeds `labelMargin.report`
+	// (through `ctx`) for whatever that estimate doesn't cover. See
+	// `labelOverflow.svelte.ts`.
 	const labelMargin = createLabelMarginTracker(
 		() => margins,
 		() => resolvedSeries,
@@ -239,28 +230,4 @@
 	markers={plotState.markers ?? []}
 	seriesData={resolvedSeries}
 	{scopedGroups}
->
-	{#snippet children({ numericMargins })}
-		{#if showVals}
-			<ValueLabels
-				{lastPoints}
-				values={styles.values}
-				{width}
-				{height}
-				{numericMargins}
-				onOverflow={labelMargin.report}
-				disabledFor={effectiveDisabledFor}
-				onHoverSeries={hoverIsolate
-					? (name) => {
-							hoverIsolatedSeries = name;
-						}
-					: undefined}
-				onHoverEnd={hoverIsolate
-					? () => {
-							hoverIsolatedSeries = null;
-						}
-					: undefined}
-			/>
-		{/if}
-	{/snippet}
-</BasePlotLayout>
+/>
