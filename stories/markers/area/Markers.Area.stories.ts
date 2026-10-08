@@ -4,10 +4,10 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { FEMALE_LIFE_EXPECTANCY, MALE_LIFE_EXPECTANCY } from '../../plots/line/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// An `area` marker (svelteplot's own `AreaX`/`AreaY`) — a filled area under a
+// An `area` marker (svelteplot's own `AreaX`/`AreaY`) - a filled area under a
 // curve, or a band between two curves. Orientation is automatic: `AreaX` when
 // `x` is the quantitative axis and `y` a categorical/temporal one (here a
-// time scale), `AreaY` otherwise — the config never names "X" or "Y" itself. Hosted on a `LinePlot` with its own
+// time scale), `AreaY` otherwise - the config never names "X" or "Y" itself. Hosted on a `LinePlot` with its own
 // real series, so the underlying line and the area marker share one scale.
 
 const CONFIDENCE_BAND = FEMALE_LIFE_EXPECTANCY.map((d, i) => ({
@@ -42,7 +42,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Default orientation (`AreaY`) — a simple area-under-curve from a single `y` value, implicitly stacked against a zero baseline, filled under the plot's own line. */
+/** Default orientation (`AreaY`) - a simple area-under-curve from a single `y` value, implicitly stacked against a zero baseline, filled under the plot's own line. */
 export const Basic: Story = {
 	args: {
 		markers: [
@@ -56,7 +56,7 @@ export const Basic: Story = {
 	}
 };
 
-/** Explicit `y1`/`y2` draws a band between two curves instead of a curve-to-baseline fill — here, the male–female life-expectancy gap over time. */
+/** Explicit `y1`/`y2` draws a band between two curves instead of a curve-to-baseline fill - here, the male-female life-expectancy gap over time. */
 export const Band: Story = {
 	args: {
 		data: CONFIDENCE_BAND,
@@ -84,7 +84,7 @@ export const Band: Story = {
 	}
 };
 
-/** A quantitative `x` with a temporal `y` picks `AreaX` — the same data, filled along the horizontal axis instead. */
+/** A quantitative `x` with a temporal `y` picks `AreaX` - the same data, filled along the horizontal axis instead. */
 export const Horizontal: Story = {
 	args: {
 		data: FEMALE_LIFE_EXPECTANCY.map((d) => ({ ...d, year: new Date(d.year, 0, 1) })),

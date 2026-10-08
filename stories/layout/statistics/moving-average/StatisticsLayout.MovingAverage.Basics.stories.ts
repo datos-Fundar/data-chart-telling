@@ -3,7 +3,7 @@ import LinePlot from '$lib/plots/line/Plot.svelte';
 import { GOOGL_AUGUST_2026 } from '../../../data/stockPrices';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// `statistics: [{ type: 'movingAverage' }]` has no dedicated svelteplot mark —
+// `statistics: [{ type: 'movingAverage' }]` has no dedicated svelteplot mark -
 // it calls svelteplot's own `windowY` transform and wraps the smoothed result
 // into a `line` marker, so `styles` is a plain `StrokeStyle`, same as any
 // hand-authored `line`.

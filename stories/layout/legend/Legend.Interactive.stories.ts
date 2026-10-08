@@ -20,7 +20,7 @@ type Story = StoryObj<typeof meta>;
 /**
  * `interactive: { enabled: true }` makes each item clickable: click to dim
  * it (and, inside a real chart, its series) via `interactive.disabled: {
- * mode: 'style', style }`, click again to restore it. Omitting `style` falls
+ * mode: 'dim', style }`, click again to restore it. Omitting `style` falls
  * back to the package's default dim opacity (`cfg.legend.disabledOpacity`).
  *
  * The default `interactive.legendStyle: 'badge'` draws each item as a pill
@@ -34,7 +34,7 @@ export const InteractiveDiscrete: Story = {
 			{
 				type: 'discrete',
 				title: 'Indicator (click to hide)',
-				interactive: { enabled: true, disabled: { mode: 'style', style: { opacity: 0.15 } } },
+				interactive: { enabled: true, disabled: { mode: 'dim', style: { opacity: 0.15 } } },
 				items: [
 					{ name: 'GDP', label: 'GDP', color: '#4f46e5', symbol: 'line' },
 					{ name: 'Employment', label: 'Employment', color: '#e6580d', symbol: 'line' }
@@ -54,7 +54,7 @@ export const InteractiveDiscreteBasic: Story = {
 				interactive: {
 					enabled: true,
 					legendStyle: 'basic',
-					disabled: { mode: 'style', style: { opacity: 0.15 } }
+					disabled: { mode: 'dim', style: { opacity: 0.15 } }
 				},
 				items: [
 					{ name: 'GDP', label: 'GDP', color: '#4f46e5', symbol: 'line' },
@@ -75,7 +75,7 @@ export const InteractiveDiscreteNoIcon: Story = {
 				interactive: {
 					enabled: true,
 					showIcon: false,
-					disabled: { mode: 'style', style: { opacity: 0.15 } }
+					disabled: { mode: 'dim', style: { opacity: 0.15 } }
 				},
 				items: [
 					{ name: 'GDP', label: 'GDP', color: '#4f46e5', symbol: 'line' },
@@ -87,7 +87,7 @@ export const InteractiveDiscreteNoIcon: Story = {
 };
 
 /**
- * `.dct-discrete__badge` needs no dedicated config prop to restyle — it's a
+ * `.dct-discrete__badge` needs no dedicated config prop to restyle - it's a
  * plain CSS class on the pill, so shadow/border/hover (or anything else) is
  * just a `:global(.dct-discrete__badge) { ... }` rule in a consumer
  * stylesheet, same as targeting any other element you don't own the markup
@@ -103,7 +103,7 @@ export const InteractiveDiscreteBadgeCustomCss: StoryObj = {
 						{
 							type: 'discrete',
 							title: 'Indicator (click to hide)',
-							interactive: { enabled: true, disabled: { mode: 'style', style: { opacity: 0.15 } } },
+							interactive: { enabled: true, disabled: { mode: 'dim', style: { opacity: 0.15 } } },
 							items: [
 								{ name: 'GDP', label: 'GDP', color: '#4f46e5', symbol: 'line' },
 								{ name: 'Employment', label: 'Employment', color: '#e6580d', symbol: 'line' },
@@ -120,7 +120,7 @@ export const InteractiveDiscreteBadgeCustomCss: StoryObj = {
 /**
  * `interactive: { enabled: true }` on a continuous section adds drag handles
  * at each edge. `mode: 'filter'` (the default) keeps the gradient's original
- * min/max — narrowing the range only excludes values, it never recolors
+ * min/max - narrowing the range only excludes values, it never recolors
  * what's left.
  */
 export const InteractiveContinuousFilter: Story = {

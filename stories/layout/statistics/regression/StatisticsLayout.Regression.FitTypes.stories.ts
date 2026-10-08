@@ -3,10 +3,10 @@ import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
 import { COUNTRIES } from '../../../plots/scatter/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// `regressionType` picks the fit model — same names as svelteplot's own
+// `regressionType` picks the fit model - same names as svelteplot's own
 // `RegressionOptions.type`. GDP per capita vs. life expectancy is a classic
 // diminishing-returns relationship: each extra dollar of income buys less
-// extra life expectancy the richer a country already is — a curve a straight
+// extra life expectancy the richer a country already is - a curve a straight
 // line can only approximate, while `'log'` tracks it closely.
 
 const meta = {
@@ -35,14 +35,14 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** `regressionType: 'linear'` (the default) — a straight line undershoots the low end and overshoots the middle. */
+/** `regressionType: 'linear'` (the default) - a straight line undershoots the low end and overshoots the middle. */
 export const Linear: Story = {
 	args: {
 		statistics: [{ type: 'regression', regressionType: 'linear', confidence: false }]
 	}
 };
 
-/** `regressionType: 'log'` — a logarithmic fit tracks the real diminishing-returns curve much more closely. */
+/** `regressionType: 'log'` - a logarithmic fit tracks the real diminishing-returns curve much more closely. */
 export const Logarithmic: Story = {
 	args: {
 		statistics: [

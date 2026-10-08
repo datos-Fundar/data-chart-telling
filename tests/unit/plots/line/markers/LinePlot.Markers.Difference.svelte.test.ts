@@ -14,7 +14,7 @@ const COMPARISON = FEMALE_LIFE_EXPECTANCY.map((d, i) => ({
 	male: MALE_LIFE_EXPECTANCY[i].value
 }));
 
-describe('LinePlot – markers.difference', () => {
+describe('LinePlot - markers.difference', () => {
 	test('renders positive and negative shaded bands', async () => {
 		const { container } = render(LinePlot, {
 			width: 400,

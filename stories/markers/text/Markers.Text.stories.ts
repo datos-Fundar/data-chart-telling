@@ -3,9 +3,9 @@ import LinePlot from '$lib/plots/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `text` marker (svelteplot's own `Text`) — one label per row of its own
+// A `text` marker (svelteplot's own `Text`) - one label per row of its own
 // `data`. Demoed on an empty `LinePlot` canvas so only the marker itself is
-// on screen — see `Plots/*/Markers` for markers used alongside real chart
+// on screen - see `Plots/*/Markers` for markers used alongside real chart
 // data.
 
 const meta = {
@@ -40,7 +40,7 @@ const POINTS = [
 	{ x: 8, y: 4, label: 'C' }
 ];
 
-/** `text` is a field key here — one label per row, read straight from `data`. */
+/** `text` is a field key here - one label per row, read straight from `data`. */
 export const Basic: Story = {
 	args: {
 		markers: [

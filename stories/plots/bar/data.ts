@@ -38,7 +38,7 @@ export const LIFE_EXPECTANCY_BY_PROVINCE: ProvinceLifeExpectancy[] = PROVINCES.f
 
 export type AgeBracketPoint = { province: string; bracket: string; value: number; year: number };
 
-// All 24 provinces (unlike the curated 6 above) — deliberately large so the
+// All 24 provinces (unlike the curated 6 above) - deliberately large so the
 // stories using it exercise many thin, stacked, horizontal bands at once.
 const ALL_PROVINCES = [
 	'Buenos Aires',
@@ -100,11 +100,11 @@ export function provinceSort(a: Record<string, unknown>, b: Record<string, unkno
 export type CategoryReading = { category: string; value: number | null };
 
 // Unlike the province datasets above (no inherent order), months have a
-// natural ascending order — the same reason `FEMALE_LIFE_EXPECTANCY_WITH_GAPS`
+// natural ascending order - the same reason `FEMALE_LIFE_EXPECTANCY_WITH_GAPS`
 // (LinePlot) reads well as an interpolation demo: a trend, not an arbitrary
 // bag of categories. Three kinds of holes, all `value: null`: no reading for
-// Jan–Feb (start), an outage at Jun–Jul (middle), and nothing yet for
-// Nov–Dec (end).
+// Jan-Feb (start), an outage at Jun-Jul (middle), and nothing yet for
+// Nov-Dec (end).
 export const READINGS_WITH_GAPS: CategoryReading[] = [
 	{ category: 'Jan', value: null },
 	{ category: 'Feb', value: null },
@@ -120,7 +120,7 @@ export const READINGS_WITH_GAPS: CategoryReading[] = [
 	{ category: 'Dec', value: null }
 ];
 
-// Fully real across the same categories — pairs with `READINGS_WITH_GAPS`
+// Fully real across the same categories - pairs with `READINGS_WITH_GAPS`
 // for series-aware ('default' vs. named-entry) and stacked/grouped coverage.
 export const OTHER_READINGS_NO_GAPS: CategoryReading[] = READINGS_WITH_GAPS.map((d, i) => ({
 	category: d.category,

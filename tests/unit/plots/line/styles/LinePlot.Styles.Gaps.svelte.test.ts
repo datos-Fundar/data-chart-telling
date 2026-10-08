@@ -12,7 +12,7 @@ const FEMALE = { name: 'female', x: 'year' as const, y: 'value' as const, data: 
 // A second series whose gap sits in a different place, for series-aware tests.
 const MALE = { name: 'male', x: 'year' as const, y: 'value' as const, data: MALE_LIFE_EXPECTANCY_WITH_GAPS };
 
-describe('LinePlot – gaps (no config)', () => {
+describe('LinePlot - gaps (no config)', () => {
   test('renders a single path, even though the data has null-value holes', async () => {
     const { container } = await render(LinePlot, {
       width: 400,
@@ -21,14 +21,14 @@ describe('LinePlot – gaps (no config)', () => {
     });
     const svg = await waitForSvg(container);
     // svelteplot's own Line mark already breaks visually at null values via
-    // d3's `.defined()` — without `gaps`, that's still a single Line marker
+    // d3's `.defined()` - without `gaps`, that's still a single Line marker
     // (one <path> with several disjoint subpaths), not extra paths.
     expect(countLinePaths(svg)).toBe(1);
     expect(countDotMarks(svg)).toBe(0);
   });
 });
 
-describe('LinePlot – gaps (middle)', () => {
+describe('LinePlot - gaps (middle)', () => {
   test('adds one bridge path for the internal gap when `middle` is configured', async () => {
     const { container } = await render(LinePlot, {
       width: 400,
@@ -48,12 +48,12 @@ describe('LinePlot – gaps (middle)', () => {
       styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<LineSegmentStyle> },
     });
     const svg = await waitForSvg(container);
-    // 1 base line + 1 middle bridge only — no start/end bridge without an explicit target.
+    // 1 base line + 1 middle bridge only - no start/end bridge without an explicit target.
     expect(countLinePaths(svg)).toBe(2);
   });
 });
 
-describe('LinePlot – gaps (start/end, opt-in)', () => {
+describe('LinePlot - gaps (start/end, opt-in)', () => {
   test('adds a start bridge only once an explicit `x` target is given', async () => {
     const { container } = await render(LinePlot, {
       width: 400,
@@ -92,7 +92,7 @@ describe('LinePlot – gaps (start/end, opt-in)', () => {
   });
 });
 
-describe('LinePlot – gaps (styling)', () => {
+describe('LinePlot - gaps (styling)', () => {
   test('draws no dots at the bridge endpoints unless the zone style requests them', async () => {
     const { container } = await render(LinePlot, {
       width: 400,
@@ -147,7 +147,7 @@ describe('LinePlot – gaps (styling)', () => {
         styles: { gaps: { default: { middle: zone } } satisfies GapsConfig<LineSegmentStyle> },
       });
       const svg = await waitForSvg(container);
-      // The base series path is unaffected by `interpolate` — only the
+      // The base series path is unaffected by `interpolate` - only the
       // bridge path's `d` changes, so comparing the full set catches it
       // without needing to single out which path is the bridge.
       return Array.from(svg.querySelectorAll('g.lines path')).map((p) => p.getAttribute('d')).sort();
@@ -160,7 +160,7 @@ describe('LinePlot – gaps (styling)', () => {
 
 // ── Series-aware ──────────────────────────────────────────────────────────────
 
-describe('LinePlot – gaps (series-aware)', () => {
+describe('LinePlot - gaps (series-aware)', () => {
   test('a named entry (keyed by series name) fills only that series', async () => {
     const { container } = await render(LinePlot, {
       width: 400,
@@ -212,7 +212,7 @@ describe('LinePlot – gaps (series-aware)', () => {
 
 // ── Global configuration ──────────────────────────────────────────────────────
 
-describe('LinePlot – gaps (cfg.line.gap)', () => {
+describe('LinePlot - gaps (cfg.line.gap)', () => {
   afterEach(() => resetConfiguration());
 
   test('a zone with no `style` falls back to `cfg.line.gap`, not a hardcoded default', async () => {
@@ -263,7 +263,7 @@ describe('LinePlot – gaps (cfg.line.gap)', () => {
 
 // ── Legend / hover-isolate dimming ──────────────────────────────────────────
 // A gap bridge is drawn by its own, separate `'line'`/`'dot'` marker (see
-// `buildGapMarkers.ts`) — it must dim the same way the real line does when
+// `buildGapMarkers.ts`) - it must dim the same way the real line does when
 // its series is disabled, whether via a legend click or `styles.values.
 // hoverIsolate`. The legend-click path is covered end-to-end in
 // `tests/unit/plots/line/legend/LinePlot.Legend.GapsDisable.svelte.test.ts`;
@@ -272,9 +272,9 @@ describe('LinePlot – gaps (cfg.line.gap)', () => {
 // function, in `buildGapMarkers.svelte.test.ts`. This covers the other
 // repro path: `styles.values.hoverIsolate`.
 
-// The interpolated bridge samples `BRIDGE_STEPS + 1` (25) points — far more
-// `L` commands than the 1–2-point-per-subpath real line ever produces for
-// these small fixtures — which is what tells a bridge path apart from a real
+// The interpolated bridge samples `BRIDGE_STEPS + 1` (25) points - far more
+// `L` commands than the 1-2-point-per-subpath real line ever produces for
+// these small fixtures - which is what tells a bridge path apart from a real
 // one purely from its rendered `d`.
 function bridgePaths(svg: SVGElement): SVGPathElement[] {
   return Array.from(svg.querySelectorAll<SVGPathElement>('g.lines path')).filter(
@@ -282,7 +282,7 @@ function bridgePaths(svg: SVGElement): SVGPathElement[] {
   );
 }
 
-describe('LinePlot – gaps (hover-isolate dimming)', () => {
+describe('LinePlot - gaps (hover-isolate dimming)', () => {
   test('hovering one series\' value label dims the OTHER series\' gap bridge, not its own', async () => {
     const { container } = await render(LinePlot, {
       width: 400,
@@ -308,7 +308,7 @@ describe('LinePlot – gaps (hover-isolate dimming)', () => {
     const bridges = bridgePaths(svg);
     expect(bridges).toHaveLength(2);
     const opacities = bridges.map((p) => p.getAttribute('style') ?? '');
-    // male — isolated out by hovering female's label — dims to the shared
+    // male - isolated out by hovering female's label - dims to the shared
     // legend `disabledOpacity` (0.12), same as its real line would.
     expect(opacities.some((s) => s.includes('stroke-opacity: 0.12'))).toBe(true);
     // female's own bridge is untouched: still the plain gap default (0.6).
@@ -317,7 +317,7 @@ describe('LinePlot – gaps (hover-isolate dimming)', () => {
 
   // No "leaving the label undims it again" counterpart here: a synthetic
   // `pointerleave` dispatch never clears `hoverIsolatedSeries` in this
-  // browser test setup — reproducible with `styles.gaps` entirely absent,
+  // browser test setup - reproducible with `styles.gaps` entirely absent,
   // on the *real* line's own dimming, so it's unrelated to this fix (and
   // untested territory already, not a regression this change introduces).
 });

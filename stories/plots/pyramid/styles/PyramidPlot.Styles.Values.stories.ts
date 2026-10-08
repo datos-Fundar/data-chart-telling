@@ -31,7 +31,7 @@ const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Value labels enabled — displays the population percentage at each bar.
+ * Value labels enabled - displays the population percentage at each bar.
  * `styles.values.show: true` renders the numeric value at the end of each bar.
  */
 export const WithValueLabels: Story = {
@@ -51,7 +51,7 @@ export const WithValueLabels: Story = {
 };
 
 /**
- * Value labels with custom format — shows percentages with one decimal place
+ * Value labels with custom format - shows percentages with one decimal place
  * and the % symbol for clarity.
  */
 export const CustomValueFormat: Story = {
@@ -71,7 +71,7 @@ export const CustomValueFormat: Story = {
 };
 
 /**
- * Value labels anchored inside — displays values at the end of bars but
+ * Value labels anchored inside - displays values at the end of bars but
  * positioned inside rather than outside, useful for dense pyramids.
  */
 export const LabelsInside: Story = {
@@ -93,7 +93,7 @@ export const LabelsInside: Story = {
 };
 
 /**
- * Labels with custom offset — uses `dy` to nudge labels vertically away from
+ * Labels with custom offset - uses `dy` to nudge labels vertically away from
  * the bars for better readability.
  */
 export const LabelsWithOffset: Story = {

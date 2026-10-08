@@ -44,7 +44,7 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Single series with no segments — the whole line is drawn in the configured
+ * Single series with no segments - the whole line is drawn in the configured
  * palette colour for its series index (first colour, by default).
  */
 export const Default: Story = {

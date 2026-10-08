@@ -9,7 +9,7 @@ import {
 } from '../../../../../stories/plots/geo/data';
 import { waitForSvg, countDotMarks } from '../../_helpers/svg';
 
-describe('GeoPlot – dot marker', () => {
+describe('GeoPlot - dot marker', () => {
 	test('renders one dot per row', async () => {
 		const { container } = render(GeoPlot, {
 			width: 400,

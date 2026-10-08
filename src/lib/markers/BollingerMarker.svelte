@@ -4,10 +4,10 @@
 	import type { BollingerMarkerConfig } from '$lib/types/markers/common';
 
 	/**
-	 * Renders one `'bollinger'` marker — a moving-average band (svelteplot's
-	 * `BollingerX`/`BollingerY`, picked from the plot's axis scale types — see
+	 * Renders one `'bollinger'` marker - a moving-average band (svelteplot's
+	 * `BollingerX`/`BollingerY`, picked from the plot's axis scale types - see
 	 * `isHorizontalFor`). A `stroke`-independent `fill`-style option
-	 * is deliberately not offered — confirmed empirically to have no visible
+	 * is deliberately not offered - confirmed empirically to have no visible
 	 * effect on svelteplot's own line (see `BollingerStatisticOptions`'s own
 	 * doc comment).
 	 */

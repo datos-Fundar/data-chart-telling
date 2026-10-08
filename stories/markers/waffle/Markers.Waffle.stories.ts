@@ -3,14 +3,14 @@ import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `waffle` marker (svelteplot's own `WaffleX`/`WaffleY`) — a bar drawn as a
+// A `waffle` marker (svelteplot's own `WaffleX`/`WaffleY`) - a bar drawn as a
 // grid of unit squares. Orientation is automatic like `bar`: `WaffleY` when `y`
-// is quantitative and `x` a band, `WaffleX` otherwise — the category axis must
+// is quantitative and `x` a band, `WaffleX` otherwise - the category axis must
 // be a band scale. `unit` is the quantity per square, `multiple` the squares
 // per row, `gap` the pixel spacing, `round` avoids partial squares. Cells are
 // only square when a bar spans many units (svelteplot derives the cell size
 // from pixels-per-unit and picks `multiple` itself), so the demo values are in
-// the hundreds — with a handful of units per bar the cells stretch into big
+// the hundreds - with a handful of units per bar the cells stretch into big
 // rectangles. Likewise, an explicit `multiple` that doesn't match the plot's
 // pixels per unit stretches the cells along the value axis instead of
 // shrinking them to fit, so leave it unset and tune `unit` (vertical form
@@ -27,7 +27,7 @@ const COUNTS = [
 const YEARS = ['2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'];
 const REGIONS = ['Americas', 'Europe', 'Asia', 'Africa'];
 
-/** Countries counted per region and year — a bell-shaped total peaking around 2019–2020, like a histogram. */
+/** Countries counted per region and year - a bell-shaped total peaking around 2019-2020, like a histogram. */
 const COUNTS_BY_YEAR = YEARS.flatMap((year, i) =>
 	REGIONS.map((region, j) => ({
 		year,
@@ -157,7 +157,7 @@ export const StackedHistogram: Story = {
 	}
 };
 
-/** The horizontal counterpart — the same stack laid out along `x`, one waffle per year (`WaffleX`). */
+/** The horizontal counterpart - the same stack laid out along `x`, one waffle per year (`WaffleX`). */
 export const StackedHorizontal: Story = {
 	args: {
 		height: 560,

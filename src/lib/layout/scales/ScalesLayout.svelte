@@ -1,4 +1,6 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
+  import { getContext, untrack } from 'svelte';
+  import type { Writable } from 'svelte/store';
   import { AxisX, AxisY, GridX, GridY, usePlot } from 'svelteplot';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { tickStep, ticksInRange, naturalTickCount } from '$lib/layout/scales/niceDomain';
@@ -6,12 +8,7 @@
   import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
   import type { AxisValue } from '$lib/types/layout/mapping';
 
-  /**
-   * Axis ticks/titles and grid lines for plot kinds with an x/y axis pair
-   * (line/bar/heatmap/pyramid). Not used by `GeoPlot` (a map has no x/y axis
-   * pair). The scale itself is resolved by `buildScale` and applied via
-   * `BasePlotLayout`'s `<Plot x y>` — this only renders the cosmetics.
-   */
+  /** Axis ticks, titles and grid lines for the plot kinds with an x/y axis pair. */
   let {
     data,
     getX,
@@ -36,20 +33,7 @@
   const xValues = $derived(data.map(getX));
   const yValues = $derived(data.map(getY));
 
-  /**
-   * `[min, max]` of a pinned `scale.domain` (if numeric), else the extent of
-   * `values`. Deliberately *not* the live, fully-resolved scale off
-   * `usePlot()` (e.g. `plot.scales.x.domain`), even though that would be
-   * more accurate for a bar's implicit zero baseline or a stacked series'
-   * cumulative total: reading it reactively here — inside a `$derived` that
-   * itself feeds back into `<AxisX>`'s rendered tick content, which
-   * `BasePlotLayout`'s own auto-margin sizing measures — closes a
-   * live-scale ⇄ rendered-axis feedback loop that was observed to perturb
-   * margin *settling* (a captured-and-frozen `bind:margins` value gained a
-   * stray extra `left` entry it wasn't tracking before). `edgeInclusiveTicks`
-   * instead sidesteps needing this axis's own real extent at all, by only
-   * running when the *opposite* axis's resolved type says it's safe to.
-   */
+  /** `[min, max]` of a numeric pinned `scale.domain`, else of `values`. */
   function axisExtent(scale: AxisBasedScalesConfig<TData>['x'], values: AxisValue[]): [number, number] | undefined {
     const domainNumbers = scale?.domain?.filter((d): d is number => typeof d === 'number');
     const source = domainNumbers && domainNumbers.length >= 2 ? domainNumbers : values.filter((v): v is number => typeof v === 'number');
@@ -63,15 +47,8 @@
   const isDiscreteType = (type: string) => (DISCRETE_SCALE_TYPES as readonly string[]).includes(type);
 
   /**
-   * Caps tick count to the axis's distinct value count, never above what
-   * fits the pixel span — meaningful for an index-like axis (don't show more
-   * ticks than there are actual data points), but not for a magnitude/value
-   * one, where "how many bars there are" has nothing to do with how many
-   * round numbers should label the axis (and can otherwise stop tick
-   * generation short of `nice`'s own widened domain edge — the same
-   * "opposite axis is discrete ⇒ this one's a value axis" signal
-   * `edgeInclusiveTicks` uses). Skipped once the caller sets tick density
-   * directly, or pins the domain.
+   * Tick count for an index-like axis: its distinct values, at most what fits
+   * the pixel span. Unset when the caller sets tick density or the domain.
    */
   function autoTickCount(
     oppositeType: string | undefined,
@@ -115,24 +92,10 @@
   const yTickInterval = $derived(integerTickInterval(scales?.y, yValues, ySpan, 50, 2));
 
   /**
-   * An axis's own natural "nice" ticks, plus the domain's exact endpoints
-   * whenever a natural tick doesn't already land on them — so the axis
-   * always labels the actual start/end of its real range, not just
-   * whichever round numbers happen to fall inside it (which, per
-   * `axisExtent`, may extend past the raw data — e.g. a bar's implicit zero
-   * baseline).
-   *
-   * Only meaningful for an axis that plays the "series ran from here to
-   * here" role — a time series' x, say — which is exactly the case where the
-   * *opposite* axis is itself continuous (both this codebase's line/scatter
-   * charts). When the opposite axis is discrete instead (a bar/pyramid's
-   * category axis), *this* axis is really the plain magnitude/value one —
-   * `84` isn't meaningfully "where the series ends" the way a last year is,
-   * so forcing it onto the axis just crowds a round `80`/`90` tick for no
-   * benefit. Skipped once the caller sets tick density/domain directly, same
-   * guard as `autoTickCount`, or the axis isn't a plain continuous numeric
-   * one (`integerTickInterval`'s domain check covers the same ground
-   * `axisExtent` needs here).
+   * A continuous axis' nice ticks plus its domain's endpoints, when the
+   * opposite axis is continuous too - at least a whole unit apart when every
+   * value is a whole number. Unset when the caller sets tick density
+   * or the domain.
    */
   function edgeInclusiveTicks(
     oppositeType: string | undefined,
@@ -149,7 +112,9 @@
     if (!extent) return undefined;
     const [lo, hi] = extent;
     const count = naturalTickCount(span, spacing, min);
-    const step = tickStep(lo, hi, count);
+    // Whole-number values (years, counts) never get ticks between them.
+    const integers = values.every((v) => typeof v !== 'number' || Number.isInteger(v));
+    const step = integers ? Math.max(1, tickStep(lo, hi, count)) : tickStep(lo, hi, count);
     const base = ticksInRange(lo, hi, step);
     const eps = step * 1e-6;
     const withLo = base.length === 0 || base[0] - lo > eps ? [lo, ...base] : base;
@@ -158,42 +123,87 @@
 
   const xTicksExplicit = $derived(edgeInclusiveTicks(plot.scales.y.type, scales?.x, xValues, xSpan, 80, 3));
 
-  /** Vertical Y-axis title placement, when `scales.y.labelOrientation === 'vertical'`. */
+  const yTitleFontSize = $derived(scales?.y?.titleFontSize ?? cfg.axis.titleFontSize);
+
+  /**
+   * Vertical Y-axis title placement, when `scales.y.labelOrientation === 'vertical'`:
+   * `scales.y.label`, else the channel name svelteplot would title the axis with.
+   */
   const verticalYLabel = $derived.by(() => {
-    if (!scales?.y?.label || scales.y.labelOrientation !== 'vertical') return null;
+    if (scales?.y?.labelOrientation !== 'vertical' || scales.y.label === false) return null;
+    const text = scales.y.label || plot.scales.y.autoTitle;
+    if (!text) return null;
     const position = scales.y.labelPosition ?? 'middle';
-    const x = 14;
+    const x = yTitleFontSize;
     const top = numericMargins.top;
     const bottom = height - numericMargins.bottom;
     const y = position === 'top' ? top : (top + bottom) / 2;
-    return { text: scales.y.label, x, y, anchor: position === 'top' ? ('end' as const) : ('middle' as const) };
+    return { text, x, y, anchor: position === 'top' ? ('end' as const) : ('middle' as const) };
+  });
+
+  // svelteplot sizes an `'auto'` left margin to the widest need its marks
+  // register here; a vertical title asks for the y axis' own plus its line.
+  const { autoMarginLeft } = getContext<{ autoMarginLeft: Writable<Map<string, number>> }>(
+    'svelteplot/autoMargins'
+  );
+  const marginId = `dct-vertical-y-label-${Math.random().toString(36).slice(2)}`;
+  const VERTICAL_LABEL_GAP = 6;
+  const axisMarginLeft = $derived(
+    Math.max(0, ...[...$autoMarginLeft].filter(([id]) => id !== marginId).map(([, v]) => v))
+  );
+  $effect(() => {
+    const wanted =
+      verticalYLabel && (scales?.y?.axisDisplay ?? 'visible') === 'visible'
+        ? axisMarginLeft + Math.ceil(yTitleFontSize * 1.25) + VERTICAL_LABEL_GAP
+        : undefined;
+    untrack(() => {
+      if (wanted === undefined) $autoMarginLeft.delete(marginId);
+      else if ($autoMarginLeft.get(marginId) !== wanted) $autoMarginLeft.set(marginId, wanted);
+    });
+  });
+  $effect(() => () => {
+    $autoMarginLeft.delete(marginId);
   });
 </script>
 
-<AxisX
-  ticks={xTicksExplicit}
-  tickCount={xTickCount}
-  interval={xTickInterval}
-  tickSize={scales?.x?.tickSize ?? cfg.axis.xTickSize}
-  tickPadding={scales?.x?.tickPadding ?? cfg.axis.xTickPadding}
-  tickFontSize={cfg.axis.fontSize}
-  titleFontSize={scales?.x?.titleFontSize ?? cfg.axis.titleFontSize}
-/>
-<AxisY
-  tickCount={yTickCount}
-  interval={yTickInterval}
-  tickSize={scales?.y?.tickSize ?? cfg.axis.yTickSize}
-  tickPadding={scales?.y?.tickPadding ?? cfg.axis.yTickPadding}
-  tickFontSize={cfg.axis.fontSize}
-  titleFontSize={scales?.y?.titleFontSize ?? cfg.axis.titleFontSize}
-/>
-{#if verticalYLabel}
+{#snippet axisX()}
+  <AxisX
+    ticks={xTicksExplicit}
+    tickCount={xTickCount}
+    interval={xTickInterval}
+    tickSize={scales?.x?.tickSize ?? cfg.axis.xTickSize}
+    tickPadding={scales?.x?.tickPadding ?? cfg.axis.xTickPadding}
+    tickFontSize={cfg.axis.fontSize}
+    titleFontSize={scales?.x?.titleFontSize ?? cfg.axis.titleFontSize}
+  />
+{/snippet}
+{#if scales?.x?.axisDisplay === 'hidden'}
+  <g style:visibility="hidden">{@render axisX()}</g>
+{:else if scales?.x?.axisDisplay !== 'none'}
+  {@render axisX()}
+{/if}
+{#snippet axisY()}
+  <AxisY
+    tickCount={yTickCount}
+    interval={yTickInterval}
+    tickSize={scales?.y?.tickSize ?? cfg.axis.yTickSize}
+    tickPadding={scales?.y?.tickPadding ?? cfg.axis.yTickPadding}
+    tickFontSize={cfg.axis.fontSize}
+    titleFontSize={scales?.y?.titleFontSize ?? cfg.axis.titleFontSize}
+  />
+{/snippet}
+{#if scales?.y?.axisDisplay === 'hidden'}
+  <g style:visibility="hidden">{@render axisY()}</g>
+{:else if scales?.y?.axisDisplay !== 'none'}
+  {@render axisY()}
+{/if}
+{#if verticalYLabel && (scales?.y?.axisDisplay ?? 'visible') === 'visible'}
   <text
     x={verticalYLabel.x}
     y={verticalYLabel.y}
     transform="rotate(-90, {verticalYLabel.x}, {verticalYLabel.y})"
     text-anchor={verticalYLabel.anchor}
-    font-size={scales?.y?.titleFontSize ?? cfg.axis.titleFontSize}
+    font-size={yTitleFontSize}
     fill={cfg.axis.color}
     opacity="0.8"
   >{verticalYLabel.text}</text>

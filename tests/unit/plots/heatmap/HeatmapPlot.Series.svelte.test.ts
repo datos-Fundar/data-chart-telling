@@ -8,7 +8,7 @@ import {
 } from '../../../../stories/plots/heatmap/data';
 import { waitForSvg, countCells } from '../_helpers/svg';
 
-describe('HeatmapPlot – series prop', () => {
+describe('HeatmapPlot - series prop', () => {
 	test('renders an SVG', async () => {
 		const { container } = await render(HeatmapPlot, {
 			width: 400,
@@ -59,7 +59,7 @@ describe('HeatmapPlot – series prop', () => {
 	});
 });
 
-describe('HeatmapPlot – data/x/y/color shorthand', () => {
+describe('HeatmapPlot - data/x/y/color shorthand', () => {
 	test('renders the same cells as the explicit series form', async () => {
 		const { container } = await render(HeatmapPlot, {
 			width: 400,

@@ -9,10 +9,10 @@ import { LIFE_EXPECTANCY } from '../../../../../stories/plots/line/data';
 import { waitForSvg } from '../../../plots/_helpers/svg';
 
 // Plots using categorical color channels (discrete series grouping) can be
-// tested the same way as heatmap/geo — verify that setting a color accessor
+// tested the same way as heatmap/geo - verify that setting a color accessor
 // and scales.color.scheme produces multiple distinct fills/strokes.
 
-describe('color channel – axis-based plots', () => {
+describe('color channel - axis-based plots', () => {
 	test('BarPlot: a categorical color accessor produces multi-colored bars', async () => {
 		const { container } = render(BarPlot, {
 			width: 600,

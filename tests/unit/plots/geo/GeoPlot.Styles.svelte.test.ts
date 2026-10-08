@@ -10,7 +10,7 @@ function fillsOf(svg: SVGElement): string[] {
 	);
 }
 
-describe('GeoPlot – base fill/stroke', () => {
+describe('GeoPlot - base fill/stroke', () => {
 	test('a custom styles.fill applies to every feature not otherwise styled', async () => {
 		const { container } = render(GeoPlot, {
 			width: 400,
@@ -25,7 +25,7 @@ describe('GeoPlot – base fill/stroke', () => {
 	});
 });
 
-describe('GeoPlot – choropleth color ramp', () => {
+describe('GeoPlot - choropleth color ramp', () => {
 	test('a continuous value maps through scales.color into distinct fills', async () => {
 		const { container } = render(GeoPlot, {
 			width: 400,
@@ -42,7 +42,7 @@ describe('GeoPlot – choropleth color ramp', () => {
 	});
 });
 
-describe('GeoPlot – zoom', () => {
+describe('GeoPlot - zoom', () => {
 	test('coordinates.zoom: true renders without crashing', async () => {
 		const { container } = render(GeoPlot, {
 			width: 400,
@@ -66,7 +66,7 @@ describe('GeoPlot – zoom', () => {
 	});
 });
 
-describe('GeoPlot – tile layer', () => {
+describe('GeoPlot - tile layer', () => {
 	test('defaults the projection to mercator when tileLayer is set and no projection is given', async () => {
 		const { container } = render(GeoPlot, {
 			width: 400,
@@ -112,7 +112,7 @@ describe('GeoPlot – tile layer', () => {
 	});
 });
 
-describe('GeoPlot – onFeatureClick', () => {
+describe('GeoPlot - onFeatureClick', () => {
 	test('fires with the clicked feature when a base-map path is clicked', async () => {
 		const onClick = vi.fn();
 		const { container } = render(GeoPlot, {
@@ -139,7 +139,7 @@ describe('GeoPlot – onFeatureClick', () => {
 	});
 });
 
-describe('GeoPlot – styles.frame', () => {
+describe('GeoPlot - styles.frame', () => {
 	test('no frame by default', async () => {
 		const { container } = render(GeoPlot, { width: 400, height: 300, data: ARGENTINA_PROVINCES });
 		const svg = await waitForSvg(container);

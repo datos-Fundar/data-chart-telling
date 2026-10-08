@@ -10,7 +10,7 @@
 
   /**
    * A small, independently-projected map panel anchored to a corner/edge of
-   * the plot — see `GeoInsetMarkerConfig`'s doc comment. Renders raw `<path>`s via
+   * the plot - see `GeoInsetMarkerConfig`'s doc comment. Renders raw `<path>`s via
    * its own `d3-geo` `geoPath`, deliberately not svelteplot's `<Geo>` mark:
    * that mark is bound to the plot's *shared* projection scale, but an inset
    * needs its own, independently fit to just what it's showing.
@@ -29,17 +29,17 @@
     marker: GeoInsetMarkerConfig<TProps>;
     /**
      * The plot's own already-tagged features (`__id` set), with full,
-     * unreduced geometry regardless of the plot's own `excludeParts` — used
+     * unreduced geometry regardless of the plot's own `excludeParts` - used
      * when `marker.data` is omitted, so an inset can show a part the main
      * map excludes without needing a separate dataset.
      */
     features: (GeoFeature<TProps> & { __id: string })[];
     /**
-     * The plot's own *content* width/height — i.e. already net of margins,
+     * The plot's own *content* width/height - i.e. already net of margins,
      * matching the frame the map itself is actually drawn into (svelteplot
      * bakes margins into the projection's scale/translate rather than
      * wrapping marks in a translating `<g>`, so this needs to match, not the
-     * plot's raw outer width/height) — `location`'s edge and `margin`'s gap
+     * plot's raw outer width/height) - `location`'s edge and `margin`'s gap
      * are both measured against this box, not the full canvas.
      */
     width: number;
@@ -48,7 +48,7 @@
     left?: number;
     top?: number;
     defaultFill: string;
-    /** The plot's own top-level `tooltip.anchorX`/`anchorY` — the fallback this inset's own tooltip inherits when its own is unset, before the system default. */
+    /** The plot's own top-level `tooltip.anchorX`/`anchorY` - the fallback this inset's own tooltip inherits when its own is unset, before the system default. */
     tooltipAnchorX?: TooltipAnchorX;
     tooltipAnchorY?: TooltipAnchorY;
   } = $props();
@@ -93,7 +93,7 @@
   let hovered = $state<{ feature: GeoFeature<Record<string, unknown>>; x: number; y: number } | null>(null);
 
   /**
-   * Purely a coordinate reference (`pointer-events: none` — never itself a
+   * Purely a coordinate reference (`pointer-events: none` - never itself a
    * hover target) sized exactly to the inset's own box, so `onInsetPointer*`
    * below can convert a screen-space pointer event into the same box-local
    * `x`/`y` space `TooltipLayout`'s `bounds` expects, the same way
@@ -103,7 +103,7 @@
 
   /**
    * Which exact feature `<path>` the browser's own SVG hit-testing resolved
-   * the event to — mirrors the main map's own `<Geo onpointerenter>` (see
+   * the event to - mirrors the main map's own `<Geo onpointerenter>` (see
    * `Plot.svelte`) rather than approximating it by nearest centroid
    * distance, which used to make hover pick the wrong (if geometrically
    * nearer-by-centroid) neighboring feature, exactly the bug that fix

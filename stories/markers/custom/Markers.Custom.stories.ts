@@ -10,8 +10,8 @@ import GeoPlot from '$lib/plots/geo/Plot.svelte';
 // Marker kinds that need real series data (or real pointer interaction) to
 // mean anything, so they don't fit the empty-canvas pattern the rest of
 // `Markers/*` uses. `delta` is LinePlot's own kind-specific marker
-// (`AxisBasedMarkersConfig` only) — see `Markers/Delta` for every axis/target
-// combination. `hover` needs real points to crosshair over — see
+// (`AxisBasedMarkersConfig` only) - see `Markers/Delta` for every axis/target
+// combination. `hover` needs real points to crosshair over - see
 // `Plots/*/Markers/Hover` for every plot kind's own flavor (dot+label, area
 // highlight, etc.).
 
@@ -67,7 +67,7 @@ export const Delta: LinePlotStory = {
 	}
 };
 
-/** A `hover` marker draws an in-SVG dot, value label, and crosshair rule at the nearest point as the cursor moves — no floating HTML tooltip involved. */
+/** A `hover` marker draws an in-SVG dot, value label, and crosshair rule at the nearest point as the cursor moves - no floating HTML tooltip involved. */
 export const Hover: LinePlotStory = {
 	render: renderLinePlot,
 	args: {
@@ -76,7 +76,7 @@ export const Hover: LinePlotStory = {
 	}
 };
 
-/** `DotMarker` (the same component `Markers/Dot` uses) places a dot at every row's lon/lat — an alternative to the built-in `dot` marker type. */
+/** `DotMarker` (the same component `Markers/Dot` uses) places a dot at every row's lon/lat - an alternative to the built-in `dot` marker type. */
 export const ComponentOnMap: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {
@@ -95,7 +95,7 @@ export const ComponentOnMap: GeoPlotStory = {
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** `DotMarker` places a dot at every row's lon/lat — an alternative to the built-in `dot` marker type when you want the exact same component other plot kinds use. */
+/** `DotMarker` places a dot at every row's lon/lat - an alternative to the built-in `dot` marker type when you want the exact same component other plot kinds use. */
 export const DotPerLocation: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {
@@ -112,7 +112,7 @@ export const DotPerLocation: GeoPlotStory = {
 	}
 };
 
-/** `TextMarker` renders a label at every row's lon/lat — here, each station's city name above its position. */
+/** `TextMarker` renders a label at every row's lon/lat - here, each station's city name above its position. */
 export const TextPerLocation: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {

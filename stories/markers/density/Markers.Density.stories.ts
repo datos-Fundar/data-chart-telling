@@ -4,7 +4,7 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { COUNTRIES } from '../../plots/scatter/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `density` marker (svelteplot's own `Density`) — 2D kernel density
+// A `density` marker (svelteplot's own `Density`) - 2D kernel density
 // estimation drawn as filled/stroked contour bands. Symmetric in x/y, so
 // there's no `isHorizontal` to pick between (unlike `area`/`box`). Demoed
 // alongside the scatter points it's estimated from.

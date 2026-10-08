@@ -7,7 +7,7 @@ const DEFAULT_KEY = 'default';
 /**
  * Feature-specific segments listed after 'default' so they override it on
  * merge (see `resolveFeatureStyle`). When the feature has a resolved
- * `grouping` bucket, that bucket's own entries are listed in between —
+ * `grouping` bucket, that bucket's own entries are listed in between -
  * `default` < grouping bucket < feature-specific, most specific last.
  */
 export function resolveSegmentsForFeature<TStyle>(
@@ -23,11 +23,11 @@ export function resolveSegmentsForFeature<TStyle>(
 }
 
 /**
- * A geo feature is atomic — `Segment.areas` (x/y range restriction) doesn't
+ * A geo feature is atomic - `Segment.areas` (x/y range restriction) doesn't
  * apply, so every entry under a key is treated as a flat style patch applied
  * in order: `'default'` entries apply first, then the grouping bucket's (if
  * any), then feature-specific entries. This intentionally does NOT reuse
- * `segments.ts`'s `validateSegments` — its "only the first catch-all wins"
+ * `segments.ts`'s `validateSegments` - its "only the first catch-all wins"
  * warning assumes area-based semantics that don't hold here, since every geo
  * segment entry merges rather than being dropped.
  */
@@ -44,7 +44,7 @@ export function resolveFeatureStyle<TStyle extends object>(
 
 /**
  * A feature's own effective `scales` override, if any of its matching
- * segments (`default`, its grouping bucket, or itself) set one — the last
+ * segments (`default`, its grouping bucket, or itself) set one - the last
  * (most specific) entry that defines `scales` wins outright, unlike
  * `resolveFeatureStyle`'s field-by-field merge, since a ramp config isn't
  * sensibly mergeable key-by-key (a `domain` from one entry and a `scheme`

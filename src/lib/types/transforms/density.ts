@@ -33,7 +33,7 @@ export const DENSITY_CHANNEL_KEYS: Record<keyof DensityChannels, true> = {
 	weight: true
 };
 
-/** Options both density transforms take, flat next to the channels — same names as svelteplot's. */
+/** Options both density transforms take, flat next to the channels - same names as svelteplot's. */
 type DensityOptions = {
 	/** The kernel's shape, or a kernel function of `u`; defaults to `epanechnikov`. */
 	kernel?: DensityKernel | ((u: number) => number);
@@ -59,7 +59,7 @@ export type DensityXTransform = {
 } & DensityChannels &
 	DensityOptions;
 
-/** `densityY` — see {@link DensityXTransform}, estimating over `y` with the density on `x`. */
+/** `densityY` - see {@link DensityXTransform}, estimating over `y` with the density on `x`. */
 export type DensityYTransform = {
 	type: 'densityY';
 	/** The channel the density goes to. */

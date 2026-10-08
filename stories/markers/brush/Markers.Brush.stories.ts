@@ -4,11 +4,11 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { COUNTRIES } from '../../plots/scatter/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `brush` marker (svelteplot's own `Brush`) — an interactive drag-to-select
+// A `brush` marker (svelteplot's own `Brush`) - an interactive drag-to-select
 // rectangle drawn over the plot. The marker owns the live selection; `brush`
 // only seeds the initial one, and `onbrushstart`/`onbrush`/`onbrushend` report
 // every change (each event carries the current selection as `event.brush`).
-// It does not dim or filter anything on its own — wire the callbacks to
+// It does not dim or filter anything on its own - wire the callbacks to
 // whatever should react to the selection.
 
 const meta = {

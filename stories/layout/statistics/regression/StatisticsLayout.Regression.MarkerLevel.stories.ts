@@ -36,7 +36,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** A hand-authored `dot` marker highlights just the Americas subset and derives its own regression from that same `data` — the rest of the dataset renders plainly, with no top-level `statistics` at all. */
+/** A hand-authored `dot` marker highlights just the Americas subset and derives its own regression from that same `data` - the rest of the dataset renders plainly, with no top-level `statistics` at all. */
 export const MarkerLevel: Story = {
 	args: {
 		markers: [

@@ -14,7 +14,7 @@ const RENDER_SCOPED_KINDS = new Set(['component', 'hover']);
  * Prepares a plot's own author markers for the rest of its pipeline: inherits
  * the plot's grouping and default color first (a transform's `z` defaults to
  * the grouping), splits a segment-scoped marker into one marker per segment of
- * its series, then runs each marker's own transforms over its rows — its
+ * its series, then runs each marker's own transforms over its rows - its
  * segment's or series' rows when it's scoped to one, the plot's rows otherwise.
  */
 export function prepareAuthorMarkers<
@@ -64,7 +64,7 @@ function splitBySegment<T extends { type: string }>(
 
 /**
  * Whether each marker kind draws the plot's rows when it has no `data` of its
- * own — the kinds `GeometryLayout` hands `marker.data ?? rows`. Typed over
+ * own - the kinds `GeometryLayout` hands `marker.data ?? rows`. Typed over
  * every kind, so a new kind can't be added without choosing its value.
  */
 const DRAWS_ROWS_DEFAULTS = {
@@ -115,7 +115,7 @@ function drawsRows(type: string): boolean {
 /**
  * A marker that draws the plot's rows (it sets no `data`) draws them as the
  * plot does, after the plot's own transforms: it starts from the plot's
- * processed rows — its series' rows when scoped to one — and takes the
+ * processed rows - its series' rows when scoped to one - and takes the
  * processed channels for any position it leaves unset. A position it sets
  * itself reads that field of the processed rows (every source field is kept).
  * Its `grouping` defaults to the plot's series, so it splits, and its own

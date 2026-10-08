@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import LineChart from '$lib/charts/line/Chart.svelte';
-	import HeatmapChart from '$lib/charts/heatmap/Chart.svelte';
+	import LinePlot from '$lib/plots/line/Plot.svelte';
+	import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
 	import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 	import { THEMES, type ThemeName } from '$lib/configuration/themes';
 	import { TIME_SERIES, type SeriesPoint } from '../data/time-series';
@@ -11,7 +11,7 @@
 
 	// Apply the active theme. We track ONLY `active`; the config read/write is
 	// untracked, otherwise `setConfiguration` (which reads `current` to merge and
-	// then writes it) would make this effect depend on the very state it sets —
+	// then writes it) would make this effect depend on the very state it sets -
 	// an infinite loop. Cleanup restores defaults (the config is a global
 	// singleton) before each re-run and on unmount.
 	$effect(() => {
@@ -39,12 +39,12 @@
 	</div>
 
 	<p class="demo__hint">
-		One call — <code>setConfiguration(theme)</code> — restyles font, colours, palette, axis, spacing,
+		One call - <code>setConfiguration(theme)</code> - restyles font, colours, palette, axis, spacing,
 		legend and timeline across every chart at once.
 	</p>
 
 	<div class="demo__grid">
-		<LineChart
+		<LinePlot
 			width={460}
 			height={360}
 			title="GDP vs. Employment"
@@ -66,7 +66,7 @@
 				}
 			]}
 		/>
-		<HeatmapChart
+		<HeatmapPlot
 			width={460}
 			height={360}
 			title="Households by rooms"

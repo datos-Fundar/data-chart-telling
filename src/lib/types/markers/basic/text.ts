@@ -30,7 +30,7 @@ export type TextMarkerConfig = {
 	/** Per-row fill opacity. */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	fillOpacity?: number | ((d: any) => number | undefined);
-	/** Spreads overlapping labels apart — see {@link TextDeclutterConfig}. `true` takes every default. */
+	/** Spreads overlapping labels apart - see {@link TextDeclutterConfig}. `true` takes every default. */
 	declutter?: boolean | TextDeclutterConfig;
 	/**
 	 * Flips each label to the other side of its point (or nudges a centred one

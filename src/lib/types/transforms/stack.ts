@@ -10,7 +10,7 @@ export type StackChannels = PositionChannels;
 /** The keys of {@link StackChannels}, at runtime. */
 export const STACK_CHANNEL_KEYS = POSITION_CHANNEL_KEYS;
 
-/** Options both stack transforms take, flat next to the channels — same names as svelteplot's. */
+/** Options both stack transforms take, flat next to the channels - same names as svelteplot's. */
 type StackOptions = {
 	/** Offset method; unset keeps svelteplot's zero baseline. */
 	offset?: 'none' | 'wiggle' | 'center' | 'normalize' | 'diverging' | null;
@@ -27,7 +27,7 @@ type StackOptions = {
  */
 export type StackYTransform = { type: 'stackY' } & StackChannels & StackOptions;
 
-/** `stackX` as a marker transform — see {@link StackYTransform}. */
+/** `stackX` as a marker transform - see {@link StackYTransform}. */
 export type StackXTransform = { type: 'stackX' } & StackChannels & StackOptions;
 
 /**
@@ -44,7 +44,7 @@ export type StackMosaicChannels = {
 	stroke?: TransformChannel;
 };
 
-/** The keys of {@link StackMosaicChannels}, at runtime — see {@link POSITION_CHANNEL_KEYS}. */
+/** The keys of {@link StackMosaicChannels}, at runtime - see {@link POSITION_CHANNEL_KEYS}. */
 export const STACK_MOSAIC_CHANNEL_KEYS: Record<keyof StackMosaicChannels, true> = {
 	data: true,
 	x: true,
@@ -59,9 +59,9 @@ export const STACK_MOSAIC_CHANNEL_KEYS: Record<keyof StackMosaicChannels, true> 
  * which would clash with the flat `x`/`y` channels, so they're flattened here.
  */
 type StackMosaicOptions = {
-	/** Puts `x` in fractions of the whole (0–1) instead of the values' own sums. */
+	/** Puts `x` in fractions of the whole (0-1) instead of the values' own sums. */
 	percentX?: boolean;
-	/** Puts `y` in fractions of the whole (0–1) instead of the values' own sums. */
+	/** Puts `y` in fractions of the whole (0-1) instead of the values' own sums. */
 	percentY?: boolean;
 };
 
@@ -73,6 +73,6 @@ type StackMosaicOptions = {
 export type StackMosaicXTransform = { type: 'stackMosaicX' } & StackMosaicChannels &
 	StackMosaicOptions;
 
-/** `stackMosaicY` — see {@link StackMosaicXTransform}, with the outer categories along `y`. */
+/** `stackMosaicY` - see {@link StackMosaicXTransform}, with the outer categories along `y`. */
 export type StackMosaicYTransform = { type: 'stackMosaicY' } & StackMosaicChannels &
 	StackMosaicOptions;

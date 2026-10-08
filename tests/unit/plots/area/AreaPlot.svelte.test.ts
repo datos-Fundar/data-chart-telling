@@ -12,7 +12,7 @@ const rows = [
 	{ x: 3, y: 2, g: 'B' }
 ];
 
-/** Filled area paths in the rendered plot — svelteplot writes fill into the `style` attribute, so read the computed fill. */
+/** Filled area paths in the rendered plot - svelteplot writes fill into the `style` attribute, so read the computed fill. */
 function areaPaths(svg: SVGSVGElement): SVGPathElement[] {
 	return Array.from(svg.querySelectorAll('path')).filter((p) => {
 		const fill = getComputedStyle(p).fill;

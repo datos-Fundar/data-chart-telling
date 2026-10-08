@@ -11,7 +11,7 @@ function cellSize(container: Element): { width: number; height: number } {
 	};
 }
 
-describe('FacetLayout – paginated mode sizes cells off the current page, not the total entry count', () => {
+describe('FacetLayout - paginated mode sizes cells off the current page, not the total entry count', () => {
 	test('pageSize: 1 out of 9 entries fills the chart area instead of being sized as 1 of 3 rows', async () => {
 		const { container } = await render(FacetSizeProbe, {
 			groupCount: 9,
@@ -56,7 +56,7 @@ describe('FacetLayout – paginated mode sizes cells off the current page, not t
 		});
 
 		const { height } = cellSize(container);
-		// Default pageSize = 3x3 = 9, i.e. one page holds every entry — same
+		// Default pageSize = 3x3 = 9, i.e. one page holds every entry - same
 		// geometry as plain 'grid' mode, so this must match its sizing exactly.
 		const grid = await render(FacetSizeProbe, {
 			groupCount: 9,
@@ -69,7 +69,7 @@ describe('FacetLayout – paginated mode sizes cells off the current page, not t
 	});
 });
 
-describe('FacetLayout – navLayout', () => {
+describe('FacetLayout - navLayout', () => {
 	test('default (overlay) renders nav buttons and indicator absolutely positioned over the grid', async () => {
 		const { container } = await render(FacetSizeProbe, {
 			groupCount: 4,

@@ -40,7 +40,7 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * Survey answers as bubbles sized by the respondent's age (above 15, so the
- * sizes spread), jittered into tight clouds — size has nothing to do with
+ * sizes spread), jittered into tight clouds - size has nothing to do with
  * position, so big and small bubbles overlap, and the draw order decides which
  * stay visible. `transforms` run after the jitter.
  */
@@ -51,8 +51,8 @@ const bubbles = (transforms: MarkerTransform[]): Story['args'] => ({
 	color: 'product',
 	r: (d: Record<string, unknown>) => (d.age as number) - 15,
 	scales: {
-		x: { ticks: [1, 2, 3, 4, 5], label: 'Rating (1–5)' },
-		y: { label: 'Would recommend (0–10)' }
+		x: { ticks: [1, 2, 3, 4, 5], label: 'Rating (1-5)' },
+		y: { label: 'Would recommend (0-10)' }
 	},
 	segments: { default: [{ styles: { dotStroke: 'white', dotStrokeWidth: 1 } }] },
 	transforms: [{ type: 'jitterX', width: 0.2 }, { type: 'jitterY', width: 0.25 }, ...transforms]
@@ -60,7 +60,7 @@ const bubbles = (transforms: MarkerTransform[]): Story['args'] => ({
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** No transform: every row of group A, then every row of group B — so B covers A wherever they overlap. */
+/** No transform: every row of group A, then every row of group B - so B covers A wherever they overlap. */
 export const DataOrder: Story = {};
 
 /** `reverse`: B's rows come first now, so A covers B in the overlap. */

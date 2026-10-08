@@ -19,7 +19,7 @@ function noTooltipDom(container: Element) {
 	return container.querySelector('.dct-tooltip, [class*="tooltip"]');
 }
 
-describe('HeatmapPlot – tooltip', () => {
+describe('HeatmapPlot - tooltip', () => {
 	test('no floating tooltip appears without a tooltip config', async () => {
 		const { container } = await render(HeatmapPlot, { width: 400, height: 300, ...DATA_PROPS });
 		await waitForSvg(container);
@@ -32,7 +32,6 @@ describe('HeatmapPlot – tooltip', () => {
 			height: 300,
 			...DATA_PROPS,
 			tooltip: {
-				facetId: '',
 				sync: false,
 				format: (row) => {
 					const { province, sex, value } = row as ProvinceSexCell;
@@ -50,7 +49,6 @@ describe('HeatmapPlot – tooltip', () => {
 			height: 300,
 			...DATA_PROPS,
 			tooltip: {
-				facetId: '',
 				sync: false,
 				format: (row) => {
 					const { province, sex, value } = row as ProvinceSexCell;
@@ -76,7 +74,6 @@ describe('HeatmapPlot – tooltip', () => {
 				} satisfies Series<ProvinceSexCell>
 			],
 			tooltip: {
-				facetId: '',
 				sync: false,
 				format: (row) => {
 					const { province, value } = row as ProvinceSexCell;

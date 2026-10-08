@@ -4,7 +4,7 @@ type Horizontal = 'left' | 'middle' | 'right';
 type Vertical = 'top' | 'middle' | 'bottom';
 
 /**
- * Parses a `side-anchor` position string (either word order accepted — see
+ * Parses a `side-anchor` position string (either word order accepted - see
  * `GeoInsetLocation`) into independent horizontal/vertical placement
  * keywords.
  */

@@ -8,7 +8,7 @@ import { waitForSvg, countTextLabels } from '../../_helpers/svg';
 const FEMALE = { name: 'female', x: 'province' as const, y: 'value' as const, data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE };
 const MALE = { name: 'male', x: 'province' as const, y: 'value' as const, data: MALE_LIFE_EXPECTANCY_BY_PROVINCE };
 
-describe('BarPlot – styles.values', () => {
+describe('BarPlot - styles.values', () => {
   test('no value label by default', async () => {
     const { container } = await render(BarPlot, { width: 400, height: 300, series: [FEMALE] });
     const svg = await waitForSvg(container);

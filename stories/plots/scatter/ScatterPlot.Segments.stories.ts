@@ -35,7 +35,7 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * `default` targets every series — an area covering the high-GDP tail
+ * `default` targets every series - an area covering the high-GDP tail
  * (x ≥ 40) gets a distinct symbol and a stroke ring, regardless of region.
  */
 export const AreaAcrossAllSeries: Story = {
@@ -53,7 +53,7 @@ export const AreaAcrossAllSeries: Story = {
 
 /**
  * Per-series catch-alls set each region's baseline color explicitly instead
- * of relying on the default palette — useful when a color needs to carry
+ * of relying on the default palette - useful when a color needs to carry
  * meaning across multiple charts (e.g. a fixed region palette).
  */
 export const PerSeriesColor: Story = {
@@ -69,7 +69,7 @@ export const PerSeriesColor: Story = {
 
 /**
  * Two Y-constrained areas flag life-expectancy outliers directly: below 65
- * in red, above 82 in green — independent of each series' own color.
+ * in red, above 82 in green - independent of each series' own color.
  *
  * `default` keeps this cross-cutting rule on every region at once, rather
  * than repeating it per series.
@@ -86,7 +86,7 @@ export const OutlierBands: Story = {
 };
 
 /**
- * Catch-all as a muted baseline that an area-specific segment overrides —
+ * Catch-all as a muted baseline that an area-specific segment overrides -
  * every point starts semi-transparent; the high-income, long-life quadrant
  * (x ≥ 30 AND y ≥ 80) is highlighted at full opacity with a larger radius.
  * The area segment inherits `dotFill` from the catch-all automatically,

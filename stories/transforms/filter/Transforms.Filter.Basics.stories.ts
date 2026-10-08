@@ -8,7 +8,7 @@ import { MEASUREMENTS, type Measurement } from '../../data/measurements';
 // A `filter` transform keeps only the rows its `filter` holds for: a per-row
 // test, or a field whose value is truthy. Filtering the marker's `data` does the
 // same before anything else runs; as a transform, it can run between the others
-// — and where it runs changes the result.
+// - and where it runs changes the result.
 
 const meta = {
 	title: 'Transforms/Filter/Basics',
@@ -67,7 +67,7 @@ export const Predicate: Story = {
 	}
 };
 
-/** A field key: `filter: 'rain'` keeps the rows whose `rain` is truthy — the days it rained at all. */
+/** A field key: `filter: 'rain'` keeps the rows whose `rain` is truthy - the days it rained at all. */
 export const FieldKey: Story = {
 	args: {
 		markers: [

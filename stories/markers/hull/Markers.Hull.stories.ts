@@ -4,7 +4,7 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { COUNTRIES } from '../../plots/scatter/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `hull` marker (svelteplot's own `Hull`) — the convex hull around a
+// A `hull` marker (svelteplot's own `Hull`) - the convex hull around a
 // cluster of points. Symmetric in x/y, so there's no `isHorizontal` to pick
 // between (unlike `area`/`box`). Demoed alongside the scatter points it
 // wraps.

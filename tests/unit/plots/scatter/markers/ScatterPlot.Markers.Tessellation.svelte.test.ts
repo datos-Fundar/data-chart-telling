@@ -20,7 +20,7 @@ const base = {
 };
 const channels = { x: 'gdpPerCapita', y: 'lifeExpectancy' };
 
-describe('ScatterPlot – markers.delaunay / voronoi', () => {
+describe('ScatterPlot - markers.delaunay / voronoi', () => {
 	test('delaunayLink draws one path per triangulation edge', async () => {
 		const { container } = render(ScatterPlot, {
 			...base,

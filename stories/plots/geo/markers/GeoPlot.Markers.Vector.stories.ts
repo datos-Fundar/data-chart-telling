@@ -4,7 +4,7 @@ import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, POPULATION_SHIFT } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// `vector` places arrow/spike shapes at points — mirrors svelteplot's
+// `vector` places arrow/spike shapes at points - mirrors svelteplot's
 // `vector/shift-map` example: one arrow per capital, sized by magnitude and
 // oriented by direction.
 
@@ -35,7 +35,7 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** Basic arrows — no `shape` set, so each defaults to `'arrow-filled'`. `length`/`rotate` accessors size/orient each arrow from the row's own magnitude/direction fields. */
+/** Basic arrows - no `shape` set, so each defaults to `'arrow-filled'`. `length`/`rotate` accessors size/orient each arrow from the row's own magnitude/direction fields. */
 export const Basic: Story = {
 	args: {
 		markers: [
@@ -51,7 +51,7 @@ export const Basic: Story = {
 	}
 };
 
-/** Open arrow — `shape: 'arrow'` draws a thin stroked shaft with an open arrowhead, instead of the default filled triangle. */
+/** Open arrow - `shape: 'arrow'` draws a thin stroked shaft with an open arrowhead, instead of the default filled triangle. */
 export const OpenArrow: Story = {
 	args: {
 		markers: [
@@ -68,7 +68,7 @@ export const OpenArrow: Story = {
 	}
 };
 
-/** Spike shape — `shape: 'spike'` draws a thin triangular spike instead of an arrowhead, anchored at its base. */
+/** Spike shape - `shape: 'spike'` draws a thin triangular spike instead of an arrowhead, anchored at its base. */
 export const SpikeShape: Story = {
 	args: {
 		markers: [
@@ -87,7 +87,7 @@ export const SpikeShape: Story = {
 	}
 };
 
-/** Filled arrow, custom color — `shape: 'arrow-filled'` (the default) with a custom fill/stroke instead of the theme's own. */
+/** Filled arrow, custom color - `shape: 'arrow-filled'` (the default) with a custom fill/stroke instead of the theme's own. */
 export const CustomFilledArrow: Story = {
 	args: {
 		markers: [

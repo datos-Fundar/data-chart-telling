@@ -29,7 +29,7 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * No scale overrides — both axes are auto-fitted to the data extent.
+ * No scale overrides - both axes are auto-fitted to the data extent.
  */
 export const Default: Story = {
 	args: {
@@ -41,7 +41,7 @@ export const Default: Story = {
 };
 
 /**
- * Explicit age group domain — ensures age groups appear in the desired order
+ * Explicit age group domain - ensures age groups appear in the desired order
  * (from youngest at bottom to oldest at top). The `domain` array pins the
  * exact order and set of values shown.
  */
@@ -56,7 +56,7 @@ export const WithAgeGroupDomain: Story = {
 };
 
 /**
- * Axis labels — human-readable strings appear alongside each axis,
+ * Axis labels - human-readable strings appear alongside each axis,
  * making the pyramid more interpretable.
  */
 export const WithAxisLabels: Story = {
@@ -73,7 +73,7 @@ export const WithAxisLabels: Story = {
 };
 
 /**
- * Custom X domain — constrains the diverging axis (X) to a tighter range.
+ * Custom X domain - constrains the diverging axis (X) to a tighter range.
  * Useful when one side dominates and you want to zoom in on the variation.
  */
 export const CustomXDomain: Story = {
@@ -90,7 +90,7 @@ export const CustomXDomain: Story = {
 };
 
 /**
- * Custom tick formatter on X — the function receives the raw tick value and
+ * Custom tick formatter on X - the function receives the raw tick value and
  * returns the display string. Here percentages are shown with the % symbol.
  */
 export const CustomXTickFormat: Story = {
@@ -110,7 +110,7 @@ export const CustomXTickFormat: Story = {
 };
 
 /**
- * Grid on X axis — adds vertical reference lines at each tick, making it
+ * Grid on X axis - adds vertical reference lines at each tick, making it
  * easier to compare population percentages across age groups.
  */
 export const WithXGrid: Story = {
@@ -127,7 +127,7 @@ export const WithXGrid: Story = {
 };
 
 /**
- * Combined overrides — labelled axes with custom domain, custom tick format
+ * Combined overrides - labelled axes with custom domain, custom tick format
  * and grid on X.
  */
 export const CombinedOverrides: Story = {
@@ -149,7 +149,7 @@ export const CombinedOverrides: Story = {
 };
 
 /**
- * `scales.grouping.reverse` flips which series goes left vs. right — series
+ * `scales.grouping.reverse` flips which series goes left vs. right - series
  * names are still sorted alphabetically, but the first now renders on the
  * *right* instead of the left. Unrelated to `scales.color`: reversing order
  * does not change which color a series gets (color is tied to name, not side).

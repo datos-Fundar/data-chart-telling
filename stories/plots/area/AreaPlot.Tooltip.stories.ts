@@ -34,22 +34,14 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** No tooltip — hovering produces no floating label, the default when `tooltip` is omitted. */
-export const NoTooltip: Story = {
-	args: {
-		tooltip: undefined
-	}
-};
-
 /** The `format` callback gets the nearest hovered row and returns its label. */
 export const BasicTooltip: Story = {
 	args: {
 		tooltip: {
-			facetId: '',
 			sync: false,
 			format: (row) => {
 				const { height, density } = row as HeightDensity;
-				return `${height} cm — ${density.toFixed(2)}%`;
+				return `${height} cm - ${density.toFixed(2)}%`;
 			}
 		}
 	}

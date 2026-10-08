@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LineChart from '$lib/charts/line/Chart.svelte';
+import LinePlot from '$lib/plots/line/Plot.svelte';
 import TooltipSyncDemo, { heatData, pyramidData } from './TooltipSyncDemo.svelte';
 import FacetSyncBarBySeriesDemo from './FacetSyncBarBySeriesDemo.svelte';
 import FacetSyncBarUnrelatedOrderDemo, {
@@ -14,7 +14,7 @@ import { AGE_GROUPS } from '../../data/population-pyramid';
 /** `tooltip.sync: true` broadcasts the hover to every faceted panel with a match. */
 const meta = {
 	title: 'Layout/Tooltip/FacetSync',
-	component: LineChart,
+	component: LinePlot,
 	tags: ['autodocs'],
 	args: { width: 680, height: 400, data: TIME_SERIES, x: 'year', y: 'value' },
 	argTypes: {
@@ -28,9 +28,9 @@ const meta = {
 		tooltip: { control: false }
 	},
 	parameters: {
-		docs: { source: { name: 'LineChart' } }
+		docs: { source: { name: 'LinePlot' } }
 	}
-} satisfies Meta<typeof LineChart>;
+} satisfies Meta<typeof LinePlot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -43,7 +43,7 @@ type Story = StoryObj<typeof meta>;
 export const MultiFacetBroadcast: Story = {
 	args: {
 		title: 'Tooltip on every synced facet',
-		subtitle: 'Hover over one region — the other also shows its tooltip',
+		subtitle: 'Hover over one region - the other also shows its tooltip',
 		color: 'metric' as keyof SeriesPoint,
 		facet: { by: 'region' as keyof SeriesPoint, columns: 2 },
 		tooltip: { strategy: 'x', sync: true },
@@ -51,13 +51,13 @@ export const MultiFacetBroadcast: Story = {
 	}
 };
 
-/** Faceted line chart — switch strategy and sync, hover across panels. */
+/** Faceted line chart - switch strategy and sync, hover across panels. */
 export const FacetSyncLine: StoryObj = {
 	render: () => ({ Component: TooltipSyncDemo, props: { kind: 'line' } }),
 	parameters: {
 		docs: {
 			source: {
-				code: renderSource('LineChart', {
+				code: renderSource('LinePlot', {
 					title: 'GDP vs. Employment by region',
 					subtitle: 'Strategy: x · Sync: on',
 					data: TIME_SERIES,
@@ -84,13 +84,13 @@ export const FacetSyncLine: StoryObj = {
 	}
 };
 
-/** Faceted bar chart — `x` strategy highlights the same region across years. */
+/** Faceted bar chart - `x` strategy highlights the same region across years. */
 export const FacetSyncBar: StoryObj = {
 	render: () => ({ Component: TooltipSyncDemo, props: { kind: 'bar' } }),
 	parameters: {
 		docs: {
 			source: {
-				code: renderSource('BarChart', {
+				code: renderSource('BarPlot', {
 					title: 'Value by region and year',
 					subtitle: 'Strategy: x · Sync: on',
 					data: REGION_BARS,
@@ -106,7 +106,7 @@ export const FacetSyncBar: StoryObj = {
 };
 
 /**
- * Faceted by the bar's own category — `'series'` syncs by sector instead of
+ * Faceted by the bar's own category - `'series'` syncs by sector instead of
  * x/y. Toggle layout (stacked/grouped) and orientation to try every combo.
  */
 export const FacetSyncBarBySeries: StoryObj = {
@@ -114,7 +114,7 @@ export const FacetSyncBarBySeries: StoryObj = {
 	parameters: {
 		docs: {
 			source: {
-				code: renderSource('BarChart', {
+				code: renderSource('BarPlot', {
 					title: 'Value by sector, faceted by region',
 					subtitle: 'Strategy: series · Sync: on',
 					data: REGION_SECTOR_BARS,
@@ -135,13 +135,13 @@ export const FacetSyncBarBySeries: StoryObj = {
 	}
 };
 
-/** Faceted heatmap — `punctual` strategy highlights the same cell in every scenario. */
+/** Faceted heatmap - `punctual` strategy highlights the same cell in every scenario. */
 export const FacetSyncHeatmap: StoryObj = {
 	render: () => ({ Component: TooltipSyncDemo, props: { kind: 'heatmap' } }),
 	parameters: {
 		docs: {
 			source: {
-				code: renderSource('HeatmapChart', {
+				code: renderSource('HeatmapPlot', {
 					title: 'Households by rooms (2022)',
 					subtitle: 'Strategy: punctual · Sync: on',
 					data: heatData,
@@ -169,9 +169,9 @@ export const FacetSyncBarUnrelatedOrder: StoryObj = {
 	parameters: {
 		docs: {
 			source: {
-				code: renderSource('BarChart', {
+				code: renderSource('BarPlot', {
 					title: 'Value by category, two unrelated groups',
-					subtitle: 'Strategy: y · Sync: on — each facet sorted by its own value',
+					subtitle: 'Strategy: y · Sync: on - each facet sorted by its own value',
 					data: UNRELATED_SORT_DATA,
 					x: 'category',
 					y: 'value',
@@ -191,13 +191,13 @@ export const FacetSyncBarUnrelatedOrder: StoryObj = {
 	}
 };
 
-/** Faceted pyramid — `y` strategy highlights the same age group across years. */
+/** Faceted pyramid - `y` strategy highlights the same age group across years. */
 export const FacetSyncPyramid: StoryObj = {
 	render: () => ({ Component: TooltipSyncDemo, props: { kind: 'pyramid' } }),
 	parameters: {
 		docs: {
 			source: {
-				code: renderSource('PyramidChart', {
+				code: renderSource('PyramidPlot', {
 					title: 'Population pyramid by year',
 					subtitle: 'Strategy: y · Sync: on',
 					data: pyramidData,

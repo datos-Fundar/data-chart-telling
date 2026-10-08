@@ -2,23 +2,26 @@ import { buildGapFillMaps } from '$lib/plots/utils/gaps';
 import { buildTaggedRows } from '$lib/plots/pyramid/phases/mapping';
 import { buildScales } from '$lib/plots/pyramid/phases/scales';
 import { buildMarkers } from '$lib/plots/pyramid/phases/markers';
+import { formatValue } from '$lib/layout/tooltip/format';
 import type { AxisPlotKind } from '$lib/types/layout/phases';
 import type { Series } from '$lib/types/plots/data/common';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type {
 	PyramidPlotState,
 	PyramidPlotCtx,
-	PyramidSeries
+	PyramidSeries,
+	PyramidTaggedRow
 } from '$lib/types/plots/pyramid/state';
 
 const byName = <S extends { name: string }>(a: S, b: S) => a.name.localeCompare(b.name);
 
 /**
  * PyramidPlot on the shared pipeline. A pyramid's `x` prop is the magnitude
- * and its `y` the category, so each series is built with them swapped — every
+ * and its `y` the category, so each series is built with them swapped - every
  * series' `x` is its category and `y` its magnitude. Series take sides by the
  * alphabetical order of their names (first left), flipped by
- * `scales.grouping.reverse`, and colors follow that same order.
+ * `scales.grouping.reverse`, and colors follow that same order. A bar's
+ * tooltip reads its side, then its category and magnitude.
  */
 export function buildPyramidKind<TData extends Record<string, unknown>>(): AxisPlotKind<
 	PyramidPlotState<TData>,
@@ -45,6 +48,12 @@ export function buildPyramidKind<TData extends Record<string, unknown>>(): AxisP
 		},
 		mapping: { extend: buildTaggedRows },
 		scales: { override: buildScales },
-		markers: buildMarkers
+		markers: buildMarkers,
+		tooltip: {
+			format: () => (row) => {
+				const bar = row as PyramidTaggedRow<TData>;
+				return `${bar.__series}\n${formatValue(bar.__y)}: ${bar.__label}`;
+			}
+		}
 	};
 }

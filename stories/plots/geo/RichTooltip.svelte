@@ -46,7 +46,6 @@
 		scales={{ color: { domain: VALUE_DOMAIN } }}
 		coordinates={{ projection: { type: argentinaBicontinental } }}
 		tooltip={{
-			facetId: '',
 			sync: false,
 			format: (f) => `${f.properties!.nombre}: ${f.properties!.population.toLocaleString()}`,
 			content

@@ -5,7 +5,7 @@ import type { VisualGroup } from '$lib/types/plots/segments/config';
 import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
 import type { ChannelAccessors, ResolvedChannels } from '$lib/types/layout/mapping';
 import type { LegendInteractionStore } from '$lib/types/layout/legend';
-import type { ChartConfig } from '$lib/types/configuration/styling';
+import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
 import type { MarkerTransform } from '$lib/types/transforms';
@@ -14,7 +14,7 @@ import type { ValuesStyle } from '$lib/types/layout/styles';
 import type { MarginOverflow } from '$lib/plots/utils/labelOverflow.svelte';
 
 /**
- * The pipeline state every axis-based plot shares — raw props plus every
+ * The pipeline state every axis-based plot shares - raw props plus every
  * phase's own output. A plot kind extends it with what only it has.
  * `TSeries` is the series shape the "data" phase resolves, and `TRow` what
  * `flat` holds, for a kind that tags its own rows.
@@ -58,11 +58,14 @@ export type AxisPlotState<
 	// resolved against every resolved series, then "markers" prepends the
 	// plot's own marks in front.
 	markers?: AxisBasedMarkersConfig[];
+
+	// "tooltip" phase output: how a hovered row reads, unless `tooltip.format` says otherwise.
+	tooltipFormat?: (row: Record<string, unknown>) => string;
 };
 
 /** The environment every axis-based plot's phases read from, alongside the growing state. */
 export type AxisPlotCtx = {
-	cfg: ChartConfig;
+	cfg: PlotStylesConfig;
 	legendInteraction: LegendInteractionStore | null | undefined;
 };
 

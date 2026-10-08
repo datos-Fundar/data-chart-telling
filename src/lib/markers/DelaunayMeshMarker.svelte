@@ -4,7 +4,7 @@
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import type { DelaunayMeshMarkerConfig } from '$lib/types/markers/common';
 
-	/** Renders one `'delaunayMesh'` marker as `<DelaunayMesh>` — the Delaunay triangulation as a single mesh. */
+	/** Renders one `'delaunayMesh'` marker as `<DelaunayMesh>` - the Delaunay triangulation as a single mesh. */
 	let { marker }: { marker: DelaunayMeshMarkerConfig } = $props();
 
 	const cfg = $derived(getConfiguration());

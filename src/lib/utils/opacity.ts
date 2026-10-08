@@ -2,11 +2,11 @@ import { normalize } from '$lib/utils/color';
 import type { OpacityScaleConfig } from '$lib/types/layout/scales';
 
 /**
- * Resolves an {@link OpacityScaleConfig} into a `value => opacity` function —
+ * Resolves an {@link OpacityScaleConfig} into a `value => opacity` function -
  * mirrors `resolveColorScale`'s shape, but the output is always a number in
  * roughly `[0,1]` instead of a CSS color string. Callers must apply the
  * result as a literal constant per mark instance (never a per-row function
- * handed straight to svelteplot) — see the type's own doc comment for why.
+ * handed straight to svelteplot) - see the type's own doc comment for why.
  */
 export function resolveOpacityScale(
 	config: OpacityScaleConfig | undefined,

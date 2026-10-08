@@ -4,7 +4,7 @@ import type { LegendDisabledStyle } from '$lib/types/layout/legend';
 import type { AxisPlotState, AxisPlotCtx } from '$lib/types/layout/phases';
 
 /**
- * The active continuous-legend range filter, if any — narrows which cells
+ * The active continuous-legend range filter, if any - narrows which cells
  * render at full opacity, and in `'rescale'` mode, the color domain itself.
  */
 export type HeatmapRangeFilter = {
@@ -27,7 +27,7 @@ export type HeatmapPlotState<TData extends Record<string, unknown>> = AxisPlotSt
 
 	/** "scales" phase output: each row's own resolved color, composed from `channels.color` and the color ramp. */
 	resolveColor?: (row: TData) => string;
-	/** "scales" phase output: each row's own resolved opacity, composed from `channels.opacity` and the opacity ramp — `undefined` when `opacity` itself is unset. */
+	/** "scales" phase output: each row's own resolved opacity, composed from `channels.opacity` and the opacity ramp - `undefined` when `opacity` itself is unset. */
 	resolveOpacity?: (row: TData) => number;
 };
 

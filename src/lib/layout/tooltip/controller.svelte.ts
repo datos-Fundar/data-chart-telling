@@ -15,7 +15,7 @@ export type HoverController<T extends Record<string, unknown>> = ReturnType<type
  * The plot-agnostic hover state machine shared by every plot. Given reactive
  * accessors for the current hover store, this facet's id, and the local points,
  * it produces everything a plot needs to render: the highlight points, the
- * crosshair rule positions, and the floating-tooltip state — plus the event
+ * crosshair rule positions, and the floating-tooltip state - plus the event
  * handlers that feed (and broadcast to) the shared store.
  *
  * Kept generic so line / bar / heatmap reuse it unchanged; only the points and
@@ -34,14 +34,14 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
 	/** This facet's own box, used to convert the cursor to/from a sync-broadcast fraction. */
 	width: () => number;
 	height: () => number;
-	/** Forces the crosshair rule(s) off entirely — see {@link import('$lib/types/plots/props').HoverConfig.crosshair}. */
+	/** Forces the crosshair rule(s) off entirely - see {@link import('$lib/types/plots/props').HoverConfig.crosshair}. */
 	crosshair?: () => boolean | undefined;
 }) {
 	let cursor = $state<{ x: number; y: number } | null>(null);
 	// This facet's own `activePoint`, as a pixel position reported by `HoverMarker`.
 	let activePointPixel = $state<{ x: number; y: number } | null>(null);
 
-	// Finds the matching hoverPoint for a hit row — by identity first, then
+	// Finds the matching hoverPoint for a hit row - by identity first, then
 	// by x/y value (for svelteplot's `Pointer`, which hands back clones).
 	const pointForRow = (row: T): HoverPoint<T> | undefined => {
 		const byIdentity = args.points().find((p) => p.row === row);
@@ -62,10 +62,10 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
 
 	const matchedRows = $derived(filterBySeries(matched, args.seriesFilter?.()));
 
-	// Points highlighted in THIS facet for the in-SVG marker — no series
+	// Points highlighted in THIS facet for the in-SVG marker - no series
 	// filtering, since that's the tooltip text's concern, not the marker's.
 	// Keeps `row` (not just the display fields) so plot-kind templates can
-	// resolve a semantic value off the source row directly — e.g. a bar
+	// resolve a semantic value off the source row directly - e.g. a bar
 	// plot's category, regardless of which visual axis it's drawn on.
 	const highlight = $derived(
 		matched.map(({ x, y, label, series, color, dx, dy, row }) => ({
@@ -81,11 +81,11 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
 	);
 
 	/**
-	 * The specific matched point that was actually hovered — found by the
+	 * The specific matched point that was actually hovered - found by the
 	 * shared store's `activeSeries` (set from whichever row was hit), falling
 	 * back to the first match when there's no series concept (punctual
 	 * matches) or nothing tags a series. Consumers read `.x`/`.y` off this
-	 * for the crosshair rule position — every point in `matched` already
+	 * for the crosshair rule position - every point in `matched` already
 	 * shares the "implied" axis's value by construction of `matchByStrategy`,
 	 * and picking the actively-hovered one is what makes forcing a rule on
 	 * the *other* axis (e.g. `ruleY: true` under an `'x'`-strategy chart)
@@ -94,7 +94,7 @@ export function createHoverController<T extends Record<string, unknown>>(args: {
 	 * `impliesCrosshairX`/`Y` + the marker's own `ruleX`/`ruleY` props.
 	 *
 	 * `activeSeries` alone can't disambiguate two matched rows that share the
-	 * same (or absent) series tag — e.g. an ungrouped bar/line chart where two
+	 * same (or absent) series tag - e.g. an ungrouped bar/line chart where two
 	 * categories tie on the matched axis value. `onPointer` sets `activeX`/
 	 * `activeY` straight from the hit row, so when more than one series-tied
 	 * candidate remains, narrowing to the one whose own x/y equals the hit

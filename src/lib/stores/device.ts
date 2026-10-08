@@ -1,5 +1,5 @@
 import { derived, readable } from 'svelte/store';
-import type { Viewport } from '$lib/types/viewport';
+import type { Viewport } from '$lib/types/misc/viewport';
 
 export const isBrowser = typeof window !== 'undefined';
 

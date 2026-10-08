@@ -11,7 +11,7 @@ import { waitForSvg, countLinePaths } from '../_helpers/svg';
 
 // ── Explicit series[] ─────────────────────────────────────────────────────────
 
-describe('LinePlot – series prop', () => {
+describe('LinePlot - series prop', () => {
 	test('renders an SVG', async () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
@@ -56,7 +56,7 @@ describe('LinePlot – series prop', () => {
 
 // ── data / x / y / color grouping ───────────────────────────────────────────────
 
-describe('LinePlot – grouped data (data/x/y/color)', () => {
+describe('LinePlot - grouped data (data/x/y/color)', () => {
 	test('creates one series per unique color value', async () => {
 		const { container } = await render(LinePlot, {
 			width: 400,

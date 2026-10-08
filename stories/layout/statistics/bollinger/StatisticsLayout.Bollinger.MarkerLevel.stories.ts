@@ -5,13 +5,13 @@ import { GOOGL_AUGUST_2026 } from '../../../data/stockPrices';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A marker's own `.statistics` fits against that marker's own `data`,
-// independent of the plot's top-level `statistics` — both are set here so the
+// independent of the plot's top-level `statistics` - both are set here so the
 // two bands are visibly distinct: the top-level one (default color) bands the
 // plot's own *close* series, the marker-level one (red) bands the
 // hand-authored dot's own *open* data. Unlike `movingAverage`'s derived
 // `line` marker, `BollingerStatisticOptions.styles` has no `strokeDasharray`
-// — only `stroke`/`strokeOpacity`/`bandFill` route through to svelteplot's
-// own `BollingerX`/`Y` (see its own doc comment) — so color is what
+// - only `stroke`/`strokeOpacity`/`bandFill` route through to svelteplot's
+// own `BollingerX`/`Y` (see its own doc comment) - so color is what
 // distinguishes them here, not dash pattern.
 
 const stockData = GOOGL_AUGUST_2026.map((d, i) => ({ ...d, day: i + 1 }));

@@ -2,7 +2,7 @@
   import type { Snippet } from 'svelte';
 
   /**
-   * Tiny demo helper: a 0–1 range input that mimics the scroll `progress` a
+   * Tiny demo helper: a 0-1 range input that mimics the scroll `progress` a
    * scrolly-telling host would feed the timeline. Renders its child with the
    * current value so stories can show a genuinely interactive timeline.
    */

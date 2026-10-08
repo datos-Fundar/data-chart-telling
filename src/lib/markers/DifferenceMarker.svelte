@@ -3,10 +3,10 @@
 	import type { DifferenceMarkerConfig } from '$lib/types/markers/common';
 
 	/**
-	 * Renders one `'difference'` marker as `<DifferenceY>` — no horizontal
+	 * Renders one `'difference'` marker as `<DifferenceY>` - no horizontal
 	 * counterpart exists in svelteplot, so this always renders vertically.
 	 * svelteplot spreads its props over its defaults, so an explicit `undefined`
-	 * would erase them — each default is restated here instead.
+	 * would erase them - each default is restated here instead.
 	 */
 	let { marker }: { marker: DifferenceMarkerConfig } = $props();
 

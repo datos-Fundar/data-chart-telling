@@ -38,9 +38,9 @@ export const MALE_LIFE_EXPECTANCY: YearPoint[] = LIFE_EXPECTANCY
 export type YearPointWithGaps = { year: number; value: number | null };
 
 /**
- * `FEMALE_LIFE_EXPECTANCY` with three holes — the first year (start), one
+ * `FEMALE_LIFE_EXPECTANCY` with three holes - the first year (start), one
  * internal year bounded by real data on both sides (middle), and the last
- * year (end) — used to demonstrate `LinePlot`'s `styles.gaps` fill on the
+ * year (end) - used to demonstrate `LinePlot`'s `styles.gaps` fill on the
  * same series every other LinePlot story already uses.
  */
 export const FEMALE_LIFE_EXPECTANCY_WITH_GAPS: YearPointWithGaps[] = FEMALE_LIFE_EXPECTANCY.map((d, i) =>
@@ -49,7 +49,7 @@ export const FEMALE_LIFE_EXPECTANCY_WITH_GAPS: YearPointWithGaps[] = FEMALE_LIFE
 
 /**
  * `MALE_LIFE_EXPECTANCY` with a single hole in a different place than
- * `FEMALE_LIFE_EXPECTANCY_WITH_GAPS` — for series-aware `styles.gaps` demos
+ * `FEMALE_LIFE_EXPECTANCY_WITH_GAPS` - for series-aware `styles.gaps` demos
  * (a named entry vs. `'default'`).
  */
 export const MALE_LIFE_EXPECTANCY_WITH_GAPS: YearPointWithGaps[] = MALE_LIFE_EXPECTANCY.map((d, i) =>

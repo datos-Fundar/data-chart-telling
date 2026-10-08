@@ -33,7 +33,7 @@ const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
 // Age group labels are 5-year bins ('0-4', '5-9', … '85+') whose bucket-start
 // numbers don't sort correctly as plain strings (e.g. '5-9' > '20-24'
 // lexicographically). A `from`/`to` *range* area would silently mismatch, so
-// each matching bucket is listed as its own single-point area instead —
+// each matching bucket is listed as its own single-point area instead -
 // equality-only matching, immune to that ordering quirk.
 function areasFor(ageGroups: string[]): Area[] {
 	return ageGroups.map((ageGroup) => ({ x: { from: ageGroup, to: ageGroup } }));
@@ -66,7 +66,7 @@ export const HighlightedSegments: Story = {
 };
 
 /**
- * Highlight working age population — dims all age groups except those
+ * Highlight working age population - dims all age groups except those
  * typically in the labour force (18-64), highlighting the economically active population.
  */
 export const WorkingAgeHighlight: Story = {
@@ -89,7 +89,7 @@ export const WorkingAgeHighlight: Story = {
 };
 
 /**
- * Highlight youth and elderly — dims middle age groups, highlighting both
+ * Highlight youth and elderly - dims middle age groups, highlighting both
  * young (0-24) and elderly (65+) populations.
  */
 export const YouthAndElderlyHighlight: Story = {
@@ -112,7 +112,7 @@ export const YouthAndElderlyHighlight: Story = {
 };
 
 /**
- * Highlight by decade — every other decade (0s, 20s, 40s, 60s+) gets a
+ * Highlight by decade - every other decade (0s, 20s, 40s, 60s+) gets a
  * higher opacity than the rest, creating a visual pattern. Every age group
  * falls into exactly one of the two segments, so no catch-all is needed.
  */
@@ -139,7 +139,7 @@ export const ByDecadePattern: Story = {
 };
 
 /**
- * Asymmetric highlighting — female side highlights elderly (80+), male side
+ * Asymmetric highlighting - female side highlights elderly (80+), male side
  * highlights working age (25-54), showing two different demographic interests.
  * Segments keyed by series name apply only to that series.
  */
@@ -167,7 +167,7 @@ export const AsymmetricHighlight: Story = {
 };
 
 /**
- * Custom fill color on the highlighted area — combines a distinct color
+ * Custom fill color on the highlighted area - combines a distinct color
  * with a dimmed catch-all for the rest, on the `default` key.
  */
 export const CustomColorHighlight: Story = {

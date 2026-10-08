@@ -9,14 +9,14 @@ export type Accessor<TRow extends Record<string, unknown>, V> = keyof TRow | ((d
 
 /**
  * A plot series: a name, x/y accessors and the rows it draws. Shared as-is by
- * every mark (line, bar, …) — none of them need anything beyond this shape;
+ * every mark (line, bar, …) - none of them need anything beyond this shape;
  * visual styling lives separately in `segments`.
  */
 export type Series<T extends Record<string, unknown> = Record<string, unknown>> = {
 	name: string;
 	x: Accessor<T, AxisValue>;
 	y: Accessor<T, AxisValue>;
-	/** The `color` channel's own accessor — a pre-built series is already one group, so this is purely the color value (per-name for most plot kinds; per-cell for HeatmapPlot). */
+	/** The `color` channel's own accessor - a pre-built series is already one group, so this is purely the color value (per-name for most plot kinds; per-cell for HeatmapPlot). */
 	color?: Accessor<T, unknown>;
 	data: T[];
 };
@@ -25,7 +25,7 @@ export type Series<T extends Record<string, unknown> = Record<string, unknown>> 
 type SeriesChannelName = AxisChannelName | 'color' | 'grouping';
 
 /**
- * Pre-built series. Mutually exclusive with {@link DataProps} — takes
+ * Pre-built series. Mutually exclusive with {@link DataProps} - takes
  * precedence when both could apply. Any channel a series doesn't carry
  * itself is still a plot-level prop.
  */

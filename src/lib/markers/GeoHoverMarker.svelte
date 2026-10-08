@@ -4,7 +4,7 @@
   import type { GeoHoverMarkerConfig } from '$lib/types/markers/geo';
   import type { HoverPoint } from '$lib/types/layout/tooltip';
 
-  /** Renders the hovered feature restyled in place — no dot, no label. `pointer-events: none` so it never steals hover from the base map underneath it. */
+  /** Renders the hovered feature restyled in place - no dot, no label. `pointer-events: none` so it never steals hover from the base map underneath it. */
   let { marker, data }: { marker: GeoHoverMarkerConfig; data: HoverPoint<Record<string, unknown>>[] } = $props();
 
   const cfg = $derived(getConfiguration());

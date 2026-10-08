@@ -8,7 +8,7 @@ import { waitForSvg, countLinePaths, countDotMarks, countTextLabels } from '../.
 const FEMALE = { name: 'female', x: 'year' as const, y: 'value' as const, data: FEMALE_LIFE_EXPECTANCY };
 const MALE = { name: 'male', x: 'year' as const, y: 'value' as const, data: MALE_LIFE_EXPECTANCY };
 
-describe('LinePlot – markers.deltas', () => {
+describe('LinePlot - markers.deltas', () => {
   test('a delta between two series renders a connector line, two dots and a label', async () => {
     const { container } = await render(LinePlot, {
       width: 400,

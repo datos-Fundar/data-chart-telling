@@ -3,10 +3,10 @@
 	import type { GeoVectorMarkerConfig } from '$lib/types/markers/geo';
 
 	/**
-	 * Renders one `'vector'` marker — arrows/spikes at points. `'arrow'`/`'spike'`
-	 * draw an open (stroked) path — svelteplot itself resolves their default
+	 * Renders one `'vector'` marker - arrows/spikes at points. `'arrow'`/`'spike'`
+	 * draw an open (stroked) path - svelteplot itself resolves their default
 	 * color via `stroke`, not `fill` (only `'arrow-filled'` is a closed, filled
-	 * shape) — so the default color applies to whichever channel the active
+	 * shape) - so the default color applies to whichever channel the active
 	 * shape actually draws with, matching svelteplot's own convention.
 	 */
 	let { marker }: { marker: GeoVectorMarkerConfig } = $props();

@@ -17,10 +17,10 @@ const DATA_PROPS = {
 // crosshair-shaped pair of highlight areas around the hovered cell.
 // svelteplot's <Pointer> matches heatmap cells by nearest-point distance
 // rather than a dedicated per-category hit area (see BarPlot's own hover
-// test for why that makes simulating a real hover here impractical) — these
+// test for why that makes simulating a real hover here impractical) - these
 // tests exercise the marker's static (no-hover) baseline and its
 // configuration surface only.
-describe('HeatmapPlot – markers.hover areaX/areaY', () => {
+describe('HeatmapPlot - markers.hover areaX/areaY', () => {
 	test('renders with areaX/areaY configured and shows no highlight before any hover', async () => {
 		const { container } = await render(HeatmapPlot, {
 			width: 400,

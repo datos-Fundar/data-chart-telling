@@ -8,15 +8,15 @@ import { WORLD_COUNTRIES, WEATHER_STATIONS } from '../../plots/geo/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `opacity` channel: a plot-level `opacity` accessor plus `scales.opacity`
-// dims every default mark independently of `color` — here, HeatmapPlot's own
+// dims every default mark independently of `color` - here, HeatmapPlot's own
 // cells. Unlike `color`, an opacity value can't be handed to svelteplot as a
 // live per-row function (it has no "already resolved, don't rescale me"
-// escape hatch for a bare number) — cells sharing the same resolved,
+// escape hatch for a bare number) - cells sharing the same resolved,
 // quantized opacity are grouped into their own mark instance, each with a
 // literal constant `fillOpacity`.
 //
 // `MarkerLevelDot` is the same mechanism scoped to a single `dot` marker
-// instead of the plot's own channel — a hand-authored marker's own
+// instead of the plot's own channel - a hand-authored marker's own
 // `opacity`/`scales.opacity`, independent of whatever the host plot does.
 // Renders through a custom `render` since this file's own `meta.component`
 // is `HeatmapPlot`; its own `parameters.docs.source.code` (via
@@ -59,7 +59,7 @@ export const Default: Story = {
 	}
 };
 
-/** `scales.opacity.range` narrows the dimming — cells never drop below 0.5 opacity here, instead of the theme's own default floor. */
+/** `scales.opacity.range` narrows the dimming - cells never drop below 0.5 opacity here, instead of the theme's own default floor. */
 export const CustomRange: Story = {
 	args: {
 		opacity: 'value',
@@ -90,7 +90,7 @@ const markerLevelProps = {
 	] satisfies GeoMarkersConfig[]
 };
 
-/** Weather-station dots dimmed by their own temperature — the base map carries no opacity channel of its own. */
+/** Weather-station dots dimmed by their own temperature - the base map carries no opacity channel of its own. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const MarkerLevelDot: any = {
 	parameters: {

@@ -5,7 +5,7 @@
 	/**
 	 * The series' symbol/line-style icon, shared by both discrete item looks
 	 * (`DiscreteSwatchItem` and `DiscreteBadgeItem`) so the two stay in sync.
-	 * `color` is caller-supplied rather than read off `item` — the swatch look
+	 * `color` is caller-supplied rather than read off `item` - the swatch look
 	 * fills it with the series color, the badge look with its own label color.
 	 */
 	let { item, color }: { item: LegendItem; color: string } = $props();

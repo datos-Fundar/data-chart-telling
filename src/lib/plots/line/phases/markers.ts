@@ -32,7 +32,7 @@ export function buildLineMarkers<TData extends Record<string, unknown>>(args: {
 		const disabledStroke = disabledStrokeFor(group.series.name);
 		const disabledDots = disabledDotsFor(group.series.name);
 		// Forwarded raw (a field key or function, whatever `series.x`/`.y` is)
-		// rather than pre-resolved into a closure — svelteplot's own
+		// rather than pre-resolved into a closure - svelteplot's own
 		// `resolve()` already handles a field-key string per row, and only a
 		// literal string (not a function) lets its axis-title auto-inference
 		// see the field name. `keyof TData` is always a real string key in
@@ -96,16 +96,16 @@ const gy = (p: GapPoint) => p.y;
 
 /**
  * One `'line'` (+ `'dot'`, when its zone sets `style.dots`) marker per
- * detected, configured gap run across every series — the interpolated
+ * detected, configured gap run across every series - the interpolated
  * bridge drawn over a missing-data hole. `gaps` is resolved per series the
  * same way `segments` is (a named entry, falling back to `'default'` at
- * zone granularity — see `resolveGapsForSeries`). Defaults to the series'
+ * zone granularity - see `resolveGapsForSeries`). Defaults to the series'
  * own colour with `cfg.line.gap`'s stroke/dot styling (dashed and slightly
  * muted out of the box), so a gap-fill reads as estimated rather than real
  * data unless a zone or the global configuration overrides it. Dots (when
  * requested) are drawn only at a run's two endpoints, not along every
  * sampled bridge point. `disabledStrokeFor`/`disabledDotsFor` mirror
- * `buildLineMarkers`'s own params — a legend-disabled (or hover-isolated)
+ * `buildLineMarkers`'s own params - a legend-disabled (or hover-isolated)
  * series must dim its gap bridge exactly like it dims the real line it's
  * bridging, so both take the same precedence: disabled override, then the
  * gap zone's own style, then the shared gap default.
@@ -222,8 +222,8 @@ export function buildGapMarkers<TData extends Record<string, unknown>>(args: {
 
 /**
  * LinePlot's "markers" phase: real line/dot segments plus interpolated gap
- * bridges, drawing the rows the "transforms" phase left — prepended onto
- * whatever the "statistics" phase already put in `state.markers` — and its
+ * bridges, drawing the rows the "transforms" phase left - prepended onto
+ * whatever the "statistics" phase already put in `state.markers` - and its
  * value labels on top of everything.
  */
 export function buildMarkers<TData extends Record<string, unknown>>(

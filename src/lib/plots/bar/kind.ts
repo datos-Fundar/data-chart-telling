@@ -2,25 +2,29 @@ import { buildGapFillMaps } from '$lib/plots/utils/gaps';
 import { buildBarTransformsOptions } from '$lib/plots/bar/phases/transforms';
 import { buildScales } from '$lib/plots/bar/phases/scales';
 import { buildMarkers } from '$lib/plots/bar/phases/markers';
+import { buildChannelTooltipFormat } from '$lib/layout/tooltip/format';
 import type { AxisPlotKind } from '$lib/types/layout/phases';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
+import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/bar/state';
 
-/** Which axis carries the categories: `x` unless `scales.y` is marked categorical. */
+/** Which axis carries the categories: `x` unless only `scales.y` is marked categorical. */
+export function categoricalAxisOf(scales: AxisBasedScalesConfig<never> | undefined): 'x' | 'y' {
+	const xCategorical = scales?.x?.type === 'categorical';
+	return scales?.y?.type === 'categorical' && !xCategorical ? 'y' : 'x';
+}
+
+/** The category axis, as the "mapping" phase's own output. */
 function withCategoricalAxis<TData extends Record<string, unknown>>(
 	state: BarPlotState<TData>
 ): BarPlotState<TData> {
-	const xCategorical = state.scales.x?.type === 'categorical';
-	const yCategorical = state.scales.y?.type === 'categorical';
-	let categoricalAxis: 'x' | 'y' = 'x';
-	if (xCategorical && yCategorical) {
+	if (state.scales.x?.type === 'categorical' && state.scales.y?.type === 'categorical') {
 		console.warn(
-			"BarPlot: scales.x.type and scales.y.type can't both be 'categorical' — " +
+			"BarPlot: scales.x.type and scales.y.type can't both be 'categorical' - " +
 				'mark only one axis as the category axis. Defaulting to x.'
 		);
-	} else if (yCategorical) {
-		categoricalAxis = 'y';
 	}
+	const categoricalAxis = categoricalAxisOf(state.scales as AxisBasedScalesConfig<never>);
 	return { ...state, categoricalAxis, isHorizontal: categoricalAxis === 'y' };
 }
 
@@ -44,6 +48,7 @@ export function buildBarKind<TData extends Record<string, unknown>>(): AxisPlotK
 		mapping: { extend: withCategoricalAxis },
 		transforms: buildBarTransformsOptions<TData>(),
 		scales: { override: buildScales },
-		markers: buildMarkers
+		markers: buildMarkers,
+		tooltip: { format: (state) => buildChannelTooltipFormat(state, { series: false }) }
 	};
 }

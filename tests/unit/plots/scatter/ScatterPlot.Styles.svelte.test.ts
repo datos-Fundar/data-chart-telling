@@ -7,7 +7,7 @@ import { waitForSvg, countDotMarks, countTextLabels } from '../_helpers/svg';
 
 const DATA_PROPS = { data: AMERICAS, x: 'gdpPerCapita' as const, y: 'lifeExpectancy' as const };
 
-describe('ScatterPlot – styles.values', () => {
+describe('ScatterPlot - styles.values', () => {
   test('no value labels by default', async () => {
     const { container } = await render(ScatterPlot, { width: 400, height: 300, ...DATA_PROPS });
     const svg = await waitForSvg(container);

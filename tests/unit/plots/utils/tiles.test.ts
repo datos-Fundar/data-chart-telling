@@ -10,7 +10,7 @@ import {
 } from '$lib/plots/utils/tiles';
 
 // A simple linear (equirectangular-like) mock projection: screen pixel
-// (px, py) <-> lon/lat via a configurable pixels-per-degree scale — enough
+// (px, py) <-> lon/lat via a configurable pixels-per-degree scale - enough
 // to exercise `visibleTiles`/`tileScreenBounds`'s math without depending on
 // a real `d3-geo` projection.
 function makeMockProjection(pixelsPerDegree: number, width: number, height: number): ProjectionLike {
@@ -115,11 +115,11 @@ describe('buildMercatorFit', () => {
 
   test('returns a usable fit for a real, tightly-fitted mercator projection', () => {
     // Fits to a bbox well away from the poles (a plain rectangle, not
-    // `{type:'Sphere'}` — mercator can't represent latitude ±90° at all,
+    // `{type:'Sphere'}` - mercator can't represent latitude ±90° at all,
     // the same degenerate case `buildMercatorFit` exists to route around).
     const bounds = { left: 40, top: 20, width: 890, height: 450 };
     // Counter-clockwise winding (RFC 7946's right-hand rule for exterior
-    // rings) — d3-geo reads a clockwise ring as covering its complement
+    // rings) - d3-geo reads a clockwise ring as covering its complement
     // instead of this small rectangle.
     const domain: GeoJSON.Polygon = {
       type: 'Polygon',
@@ -149,9 +149,9 @@ describe('buildMercatorFit', () => {
   });
 });
 
-describe('buildMercatorFit / visibleTiles — a tall/narrow domain letterboxed into a wide/short box', () => {
+describe('buildMercatorFit / visibleTiles - a tall/narrow domain letterboxed into a wide/short box', () => {
   // A tall, narrow country (Argentina's rough bbox) fit into cells of a
-  // facet grid at increasing row counts — a fixed panel width split across
+  // facet grid at increasing row counts - a fixed panel width split across
   // more rows leaves each cell much shorter relative to its width, which is
   // exactly the "1x3 looks fine, 2x2/3x2 look broken" symptom reported: the
   // fit's scale is pinned to the constraining (height) axis, so the
@@ -194,7 +194,7 @@ describe('buildMercatorFit / visibleTiles — a tall/narrow domain letterboxed i
 
   // Note: a real slippy-map tile grid *always* has partial tiles hanging past
   // the exact requested viewport edge (tile boundaries rarely land exactly
-  // on it) — even the already-fine 1-row case above overshoots its own
+  // on it) - even the already-fine 1-row case above overshoots its own
   // bounds by tens of pixels per side. So "some overshoot" isn't the bug;
   // what actually broke was `pxPerTileX`/`pxPerTileY` going *negative* (the
   // corners' inverted longitude order got reversed by the antimeridian
@@ -225,12 +225,12 @@ describe('buildMercatorFit / visibleTiles — a tall/narrow domain letterboxed i
   // Regression: an aspect ratio extreme enough to actually engage
   // `clampBoundsToWorld`'s cap (unlike the more modest cells above, whose
   // letterboxed margin never gets close to it) must still stop *well* short
-  // of Argentina's own antipode — Australia — rather than filling the whole
+  // of Argentina's own antipode - Australia - rather than filling the whole
   // box with tiles up to a full world-width, whose two edges would meet
   // exactly there.
   test('an extremely wide/short cell fills with tiles but never reaches the data\'s own antipodal region', () => {
     // Large enough (at a fine enough zoom level) that tile quantization
-    // doesn't itself dominate the measured span — see the zoom-level math in
+    // doesn't itself dominate the measured span - see the zoom-level math in
     // `estimateZoomLevel`'s doc comment for why a *tiny* box like the other
     // cases in this file stays pinned to a very coarse (low-`z`) tile grid.
     const bounds = { left: 0, top: 0, width: 60000, height: 1000 };
@@ -249,19 +249,19 @@ describe('buildMercatorFit / visibleTiles — a tall/narrow domain letterboxed i
     const tileXToLon = (x: number) => (x / 2 ** z) * 360 - 180;
     const lonSpan = tileXToLon(maxTileX + 1) - tileXToLon(minTileX);
 
-    // Comfortably under a full world (360°) — the old cap this replaces —
+    // Comfortably under a full world (360°) - the old cap this replaces -
     // and under even the new 180° cap plus a tile's worth of edge overshoot.
     expect(lonSpan).toBeLessThan(220);
 
     // Argentina's own longitude sits around -63°; its antipode (~117°E) is
-    // deep inside Australia's own span (113°E–153°E). No tile should reach
+    // deep inside Australia's own span (113°E-153°E). No tile should reach
     // that far around the globe in either direction.
     const australiaTileX = ((117 + 180) / 360) * 2 ** z;
     expect(maxTileX).toBeLessThan(australiaTileX);
   });
 });
 
-describe('buildMercatorFit / visibleTiles — dataLonLatBounds caps the tile-layer context', () => {
+describe('buildMercatorFit / visibleTiles - dataLonLatBounds caps the tile-layer context', () => {
   // Same rough Argentina bbox as the describe block above, expressed the way
   // `Plot.svelte`'s `dataLonLatBounds` hands it to `TileLayer`.
   const argentinaBbox: GeoJSON.Polygon = {
@@ -292,7 +292,7 @@ describe('buildMercatorFit / visibleTiles — dataLonLatBounds caps the tile-lay
 
   // Regression for the follow-up bug: a *small* facet cell (not just a wide
   // one) naturally estimates a very low zoom, where a single 90°+-wide tile
-  // still renders in full even past `clampBoundsToWorld`'s half-world cap —
+  // still renders in full even past `clampBoundsToWorld`'s half-world cap -
   // dragging in all of Africa (confirmed via the `GeoPlot/Facet` Storybook
   // stories' `Rows2Cols2` at real-world facet-cell sizes). `dataLonLatBounds`
   // must keep the shown context inside the Atlantic gap regardless.
@@ -309,9 +309,9 @@ describe('buildMercatorFit / visibleTiles — dataLonLatBounds caps the tile-lay
     const west = tileXToLon(minTileX);
     const east = tileXToLon(maxTileX + 1);
 
-    // West Africa's coast sits around -17°E — comfortably clear of it.
+    // West Africa's coast sits around -17°E - comfortably clear of it.
     expect(east).toBeLessThan(-17);
-    // Deep in open Pacific on the other side — nowhere near land.
+    // Deep in open Pacific on the other side - nowhere near land.
     expect(west).toBeGreaterThan(-140);
   });
 
@@ -332,9 +332,9 @@ describe('buildMercatorFit / visibleTiles — dataLonLatBounds caps the tile-lay
 });
 
 describe('tileScreenBounds', () => {
-  test('returns a positive-size box for every tile a fit was built for — the whole point of `buildMercatorFit` is that this never nulls out mid-grid tiles the way forward-projecting each corner individually used to', () => {
+  test('returns a positive-size box for every tile a fit was built for - the whole point of `buildMercatorFit` is that this never nulls out mid-grid tiles the way forward-projecting each corner individually used to', () => {
     // A projection whose fitted scale/translate differ sharply from a real
-    // d3-geo mercator's own construction-time defaults — the scenario that
+    // d3-geo mercator's own construction-time defaults - the scenario that
     // broke the old corner-forward-projection approach (see
     // `buildMercatorFit`'s doc comment).
     const projection = makeMockProjection(4, 400, 300);

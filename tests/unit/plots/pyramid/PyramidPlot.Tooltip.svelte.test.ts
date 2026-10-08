@@ -21,7 +21,7 @@ function noTooltipDom(container: Element) {
 	return container.querySelector('.dct-tooltip, [class*="tooltip"]');
 }
 
-describe('PyramidPlot – tooltip', () => {
+describe('PyramidPlot - tooltip', () => {
 	test('no floating tooltip appears without a tooltip config', async () => {
 		const { container } = await render(PyramidPlot, { width: 560, height: 520, ...DATA_PROPS });
 		await waitForSvg(container);
@@ -34,7 +34,6 @@ describe('PyramidPlot – tooltip', () => {
 			height: 520,
 			...DATA_PROPS,
 			tooltip: {
-				facetId: '',
 				sync: false,
 				format: (row) => {
 					const { ageGroup, sex, pct } = row as PopulationRow;
@@ -53,7 +52,6 @@ describe('PyramidPlot – tooltip', () => {
 			...DATA_PROPS,
 			scales: { y: { domain: AGE_GROUPS } },
 			tooltip: {
-				facetId: '',
 				sync: false,
 				format: (row) => {
 					const { ageGroup, sex, pct } = row as PopulationRow;
@@ -72,7 +70,6 @@ describe('PyramidPlot – tooltip', () => {
 			...DATA_PROPS,
 			scales: { y: { domain: AGE_GROUPS } },
 			tooltip: {
-				facetId: '',
 				sync: false,
 				series: ['Female'],
 				format: (row) => `Female: ${(row as PopulationRow).pct.toFixed(1)}%`
@@ -102,7 +99,6 @@ describe('PyramidPlot – tooltip', () => {
 			],
 			scales: { y: { domain: AGE_GROUPS } },
 			tooltip: {
-				facetId: '',
 				sync: false,
 				format: (row) => `${(row as PopulationRow).ageGroup}: ${(row as PopulationRow).pct}%`
 			}
@@ -112,7 +108,7 @@ describe('PyramidPlot – tooltip', () => {
 	});
 });
 
-describe('PyramidPlot – hover matches by row (y), not by bar magnitude (x)', () => {
+describe('PyramidPlot - hover matches by row (y), not by bar magnitude (x)', () => {
 	test('hovering near the zero baseline at a long-bar row still matches that row', async () => {
 		const { container } = await render(PyramidPlot, {
 			width: 940,
@@ -120,7 +116,6 @@ describe('PyramidPlot – hover matches by row (y), not by bar magnitude (x)', (
 			...DATA_PROPS,
 			scales: { y: { domain: AGE_GROUPS } },
 			tooltip: {
-				facetId: '',
 				sync: false,
 				format: (row) => {
 					const { ageGroup, sex, pct } = row as PopulationRow;
@@ -133,7 +128,7 @@ describe('PyramidPlot – hover matches by row (y), not by bar magnitude (x)', (
 		// "25-29" is a long-bar row (~5.2/5.3%): its bar tips sit far from the
 		// zero baseline. A pointer's nearest-neighbor search that (incorrectly)
 		// includes the x axis would instead match whichever row's bar magnitude
-		// happens to be closest to x=0 — a short-bar row like "80-84" — since
+		// happens to be closest to x=0 - a short-bar row like "80-84" - since
 		// pyramid's default hover strategy is `'y'` and should ignore x entirely.
 		const tick = Array.from(svg.querySelectorAll('g.axis-y g.tick')).find(
 			(t) => t.querySelector('text')?.textContent === '25-29'

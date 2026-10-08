@@ -63,7 +63,7 @@
 	 * beyond its own config; `data` is `BasePlotLayout`'s own rows, forwarded
 	 * as the fallback every `CommonMarkerConfig`-based marker's own (optional)
 	 * `data` falls back to when unset, plus `contour`'s clip and unscoped
-	 * `geo-component`'s fallback data — the latter two reachable only through
+	 * `geo-component`'s fallback data - the latter two reachable only through
 	 * `GeoMarkersConfig`, so `data` is always `GeoFeature`-shaped there
 	 * despite the generic `TData` bound.
 	 */
@@ -81,7 +81,7 @@
 		tooltipAnchorX,
 		tooltipAnchorY
 	}: {
-		/** The plot's own outer width/height — sizes the content box an `inset` or `text` marker needs. */
+		/** The plot's own outer width/height - sizes the content box an `inset` or `text` marker needs. */
 		width?: number;
 		height?: number;
 		markers?: MarkerConfig[];
@@ -89,17 +89,17 @@
 		seriesData?: Series<TSeries>[];
 		/** One entry per series that can own a `series`-scoped marker. Same `TSeries` as `seriesData`. */
 		scopedGroups?: ScopedMarkerGroup<TSeries>[];
-		/** This plot kind's own `color`/`grouping` channel config — the fallback a marker's own `scales` inherits when it sets none of its own. */
+		/** This plot kind's own `color`/`grouping` channel config - the fallback a marker's own `scales` inherits when it sets none of its own. */
 		channelScales?: ChannelScalesConfig;
 		/** `BasePlotLayout`'s own hover controller. */
 		ctrl: HoverController<TData>;
-		/** The plot's own resolved margins — places the content box an `inset` or `text` marker needs. */
+		/** The plot's own resolved margins - places the content box an `inset` or `text` marker needs. */
 		numericMargins?: { top: number; right: number; bottom: number; left: number };
-		/** `BasePlotLayout`'s own rows — `contour` (clip) and unscoped `geo-component` fallback data. */
+		/** `BasePlotLayout`'s own rows - `contour` (clip) and unscoped `geo-component` fallback data. */
 		data?: TData[];
-		/** `GeoPlot`'s own untouched, tagged features — `inset` marker only (shows a part the main map may exclude). */
+		/** `GeoPlot`'s own untouched, tagged features - `inset` marker only (shows a part the main map may exclude). */
 		geoAllFeatures?: (GeoFeature<Record<string, unknown>> & { __id: string })[];
-		/** The plot's own top-level `tooltip.anchorX`/`anchorY` — `inset` marker only, as the fallback its own tooltip inherits when unset. */
+		/** The plot's own top-level `tooltip.anchorX`/`anchorY` - `inset` marker only, as the fallback its own tooltip inherits when unset. */
 		tooltipAnchorX?: TooltipAnchorX;
 		tooltipAnchorY?: TooltipAnchorY;
 	} = $props();

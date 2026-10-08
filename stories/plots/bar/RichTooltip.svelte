@@ -12,7 +12,7 @@
   const cfg = getConfiguration();
 
   // Series order matches the `series` array below, which is what drives
-  // colour assignment inside BarPlot — kept in lockstep here since `content`
+  // colour assignment inside BarPlot - kept in lockstep here since `content`
   // only gets the raw rows back, not their series name/colour.
   const SERIES_LABELS = ['Female', 'Male'];
   const SERIES_COLORS = [paletteColor(0, cfg.palette), paletteColor(1, cfg.palette)];
@@ -40,7 +40,6 @@
       { name: 'male', x: 'province', y: 'value', data: MALE_LIFE_EXPECTANCY_BY_PROVINCE },
     ]}
     tooltip={{
-      facetId: '',
       sync: false,
       format: (row) => {
         const { province, value } = row as ProvincePoint;

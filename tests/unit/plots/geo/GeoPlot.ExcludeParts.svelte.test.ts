@@ -15,7 +15,7 @@ const TIERRA_DEL_FUEGO = 'Tierra del Fuego, Antártida e Islas del Atlántico Su
 const isAntarcticPart = (part: { centroid: [number, number] }, feature: { __id: string }) =>
   feature.__id === TIERRA_DEL_FUEGO && (part.centroid[1] < -60 || part.centroid[0] > -50);
 
-describe('GeoPlot – excludeParts', () => {
+describe('GeoPlot - excludeParts', () => {
   test('excluding every part of a feature drops it entirely', async () => {
     const { container } = render(GeoPlot, {
       width: 400,
@@ -36,7 +36,7 @@ describe('GeoPlot – excludeParts', () => {
         feature.__id === 'Tierra del Fuego, Antártida e Islas del Atlántico Sur' && part.centroid[1] < -60,
     });
     const svg = await waitForSvg(container);
-    // Every feature still renders — Tierra del Fuego just has fewer parts.
+    // Every feature still renders - Tierra del Fuego just has fewer parts.
     expect(countGeoPaths(svg)).toBe(ARGENTINA_PROVINCES.length);
   });
 
@@ -63,7 +63,7 @@ describe('GeoPlot – excludeParts', () => {
     });
     const svg = await waitForSvg(container);
     // Every province still renders on the main map (Tierra del Fuego just
-    // has fewer parts) — and the inset draws a path for the excluded parts.
+    // has fewer parts) - and the inset draws a path for the excluded parts.
     expect(countGeoPaths(svg)).toBe(ARGENTINA_PROVINCES.length);
     expect(svg.querySelectorAll('g.dct-geo-inset path').length).toBe(1);
   });

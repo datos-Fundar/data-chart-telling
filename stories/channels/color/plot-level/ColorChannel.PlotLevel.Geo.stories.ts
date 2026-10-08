@@ -4,7 +4,7 @@ import { argentinaBicontinental } from '$lib/layout/coordinates/projections/arge
 import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '../../../plots/geo/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// Same channel, different plot kind — GeoPlot has no x/y axis pair, but
+// Same channel, different plot kind - GeoPlot has no x/y axis pair, but
 // `color` + `scales.color` drive its default choropleth fill exactly the same
 // way they drive HeatmapPlot's cells. See `Plots/GeoPlot/Styles` for the full
 // set of ramp options.
@@ -35,7 +35,7 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * `color` feeds each feature's population into the plot's own `scales.color`
- * ramp — no marker config needed, since GeoPlot's default `'geo'` marker
+ * ramp - no marker config needed, since GeoPlot's default `'geo'` marker
  * reads the plot-level channel automatically.
  */
 export const Default: Story = {

@@ -4,17 +4,14 @@
 	import { buildLabelLanes } from '$lib/plots/utils/declutter';
 	import { watchLabelOverflow } from '$lib/plots/utils/labelOverflow.svelte';
 	import { resolveEdgeAwareAnchor } from '$lib/utils/edgeAwareAnchor';
-	import { measureTextWidth } from '$lib/layout/plot/measureText';
+	import { measureTextWidth } from '$lib/layout/base/measureText';
 	import type { TextMarkerConfig } from '$lib/types/markers/common';
 	import type { TextAnchor } from '$lib/types/plots/constants';
 
 	/**
-	 * Renders one `'text'` marker. `x`/`y` also accept a literal number/Date
-	 * (every row draws at that fixed position). A marker that declutters, flips
-	 * at the edges or listens to the pointer draws one label per row, so each
-	 * row can move and carry its own connector and handlers. `bounds` is the
-	 * plot's content box, which `declutter` keeps labels inside and
-	 * `onOverflow` measures against.
+	 * Renders one `'text'` marker. `x`/`y` also accept a literal number or Date.
+	 * A marker that declutters, flips at the edges or listens to the pointer
+	 * draws one label per row; `bounds` is the plot's content box.
 	 */
 	const {
 		marker,
@@ -34,9 +31,7 @@
 	const styles = $derived(marker.styles);
 
 	const displayData = $derived(data.length > 0 ? data : [{} as TData]);
-	// Per-row accessors are literal values, not data for svelteplot's color/opacity
-	// scales, and one that comes back empty takes the flat default — svelteplot
-	// drops a row whose channel reads undefined.
+	// Per-row accessors give literal values; an empty one takes the flat default.
 	const flatFill = $derived(styles?.fill ?? 'currentColor');
 	const fill = $derived.by(() => {
 		const own = marker.fill;
@@ -50,9 +45,7 @@
 	const fontSize = $derived(styles?.fontSize ?? 12);
 	const fontWeight = $derived(styles?.fontWeight ?? 'normal');
 	const fontStyleProp = $derived(styles?.fontStyle ?? 'normal');
-	// 'outside' is meant to be resolved per-point by the caller (see
-	// HoverMarker, which knows each point's signed x); a caller that passes it
-	// through unresolved falls back to 'start' rather than an invalid svelteplot value.
+	// An unresolved `'outside'` falls back to `'start'`.
 	const textAnchor = $derived<Exclude<TextAnchor, 'outside'>>(
 		styles?.textAnchor === 'outside' ? 'start' : (styles?.textAnchor ?? 'middle')
 	);
@@ -118,12 +111,7 @@
 			: undefined
 	);
 
-	/**
-	 * Each row's anchor and offset, flipped to the other side of its point
-	 * where its text would cross the content box's edge. A scale's pixel output
-	 * is in the plot's own coordinates, margins included, so each point is
-	 * shifted into the content box's before the check.
-	 */
+	/** Each row's anchor and offset, flipped where its text would cross the content box's edge. */
 	const placements = $derived.by(() => {
 		if (!marker.edgeAware || !points) return undefined;
 		const canvasFont = `${fontSize}px ${cfg.font === 'inherit' ? 'sans-serif' : cfg.font}`;
@@ -151,7 +139,7 @@
 	watchLabelOverflow({
 		el: () => (marker.onOverflow ? groupEl : undefined),
 		bounds: () => {
-			// getBBox() isn't tracked reactively — depend on the layout so a new one re-measures.
+			// getBBox() isn't tracked reactively - depend on the layout so a new one re-measures.
 			void marker;
 			void points;
 			return bounds;
@@ -195,9 +183,7 @@
 	{#if !perRow}
 		{@render label(displayData, dx, dy, textAnchor, lineAnchor)}
 	{:else if (!declutter && !marker.edgeAware) || points}
-		<!-- A decluttered or edge-aware label waits for both scales: placed early,
-		     it can sit past the edge long enough for `onOverflow` to lock in a
-		     margin it never needs. -->
+		<!-- A decluttered or edge-aware label waits for both scales. -->
 		{#each displayData as d, i (i)}
 			{@const lane = lanes?.get(i)}
 			{@const placement = placements?.[i]}

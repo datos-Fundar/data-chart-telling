@@ -5,7 +5,7 @@ import type { GeoProjectionName } from '$lib/types/layout/coordinates';
 import { WORLD_COUNTRIES } from '../../../../stories/plots/geo/data';
 import { waitForSvg, countGeoPaths } from '../_helpers/svg';
 
-describe('GeoPlot – projections', () => {
+describe('GeoPlot - projections', () => {
 	test('renders with no projection set (defaults to equal-earth)', async () => {
 		const { container } = render(GeoPlot, { width: 400, height: 300, data: WORLD_COUNTRIES });
 		const svg = await waitForSvg(container);
@@ -57,7 +57,7 @@ describe('GeoPlot – projections', () => {
 	});
 });
 
-describe('GeoPlot – color scale domain', () => {
+describe('GeoPlot - color scale domain', () => {
 	test('an explicit scales.color.domain is honored for the choropleth ramp', async () => {
 		const { container } = render(GeoPlot, {
 			width: 400,

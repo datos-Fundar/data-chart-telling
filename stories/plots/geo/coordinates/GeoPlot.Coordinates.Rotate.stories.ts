@@ -32,7 +32,7 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** `coordinates.rotate: true` — drag-to-spin-the-globe on `orthographic`. Only meaningful there. */
+/** `coordinates.rotate: true` - drag-to-spin-the-globe on `orthographic`. Only meaningful there. */
 export const RotateEnabled: Story = {
 	args: {
 		coordinates: {

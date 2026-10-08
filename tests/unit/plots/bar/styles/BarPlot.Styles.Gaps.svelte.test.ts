@@ -22,7 +22,7 @@ const OTHER_SERIES = {
 };
 const REAL_COUNT = READINGS_WITH_GAPS.filter((d) => d.value != null).length;
 
-describe('BarPlot – gaps (no config)', () => {
+describe('BarPlot - gaps (no config)', () => {
 	test('a missing value renders no bar, not a fake-zero one', async () => {
 		const { container } = await render(BarPlot, { width: 400, height: 300, series: [SERIES] });
 		const svg = await waitForSvg(container);
@@ -30,7 +30,7 @@ describe('BarPlot – gaps (no config)', () => {
 	});
 });
 
-describe('BarPlot – gaps (middle)', () => {
+describe('BarPlot - gaps (middle)', () => {
 	test('fills the internal gap with two additional bars', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
@@ -43,7 +43,7 @@ describe('BarPlot – gaps (middle)', () => {
 	});
 });
 
-describe('BarPlot – gaps (axis title)', () => {
+describe('BarPlot - gaps (axis title)', () => {
 	test('filling a gap keeps the value axis titled by its field', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
@@ -56,7 +56,7 @@ describe('BarPlot – gaps (axis title)', () => {
 	});
 });
 
-describe('BarPlot – gaps (start/end, opt-in)', () => {
+describe('BarPlot - gaps (start/end, opt-in)', () => {
 	test('a start zone only fills once an explicit `x` target is given', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
@@ -95,7 +95,7 @@ describe('BarPlot – gaps (start/end, opt-in)', () => {
 	});
 });
 
-describe('BarPlot – gaps (styling)', () => {
+describe('BarPlot - gaps (styling)', () => {
 	afterEach(() => resetConfiguration());
 
 	test('a zone with no `style` falls back to `cfg.bar.gap`, not a hardcoded default', async () => {
@@ -134,7 +134,7 @@ describe('BarPlot – gaps (styling)', () => {
 	});
 });
 
-describe('BarPlot – gaps (series-aware)', () => {
+describe('BarPlot - gaps (series-aware)', () => {
 	test('a named entry (keyed by series name) fills only that series', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
@@ -159,7 +159,7 @@ describe('BarPlot – gaps (series-aware)', () => {
 	});
 });
 
-describe('BarPlot – gaps (value labels)', () => {
+describe('BarPlot - gaps (value labels)', () => {
 	test('a gap row never gets a value label, filled or not', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
@@ -175,19 +175,19 @@ describe('BarPlot – gaps (value labels)', () => {
 	});
 });
 
-describe('BarPlot – gaps (hover)', () => {
+describe('BarPlot - gaps (hover)', () => {
 	test('a category whose only row is an unfilled gap gets no hit area', async () => {
 		const { container } = await render(BarPlot, { width: 400, height: 300, series: [SERIES] });
 		const svg = await waitForSvg(container);
 		// `:not([pointer-events])` excludes the plot's own background hit-rect
-		// (which sets `pointer-events="all"`) — only a bar `role: 'hitArea'`
+		// (which sets `pointer-events="all"`) - only a bar `role: 'hitArea'`
 		// marker's `<rect>` is transparent without it.
 		const hitAreas = svg.querySelectorAll('rect[fill="transparent"]:not([pointer-events])');
 		expect(hitAreas.length).toBe(REAL_COUNT);
 	});
 });
 
-describe('BarPlot – gaps (grouped layout)', () => {
+describe('BarPlot - gaps (grouped layout)', () => {
 	test('a filled gap bar renders alongside a grouped series without dropping either', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
@@ -200,8 +200,8 @@ describe('BarPlot – gaps (grouped layout)', () => {
 	});
 });
 
-describe('BarPlot – gaps (stacked layout)', () => {
-	// A minimal, self-contained fixture (not a story dataset) — three round
+describe('BarPlot - gaps (stacked layout)', () => {
+	// A minimal, self-contained fixture (not a story dataset) - three round
 	// numbers chosen so the interpolation arithmetic below is easy to verify
 	// by hand, independent of any narrative dataset.
 	const STACKED_SERIES_A = {
@@ -235,7 +235,7 @@ describe('BarPlot – gaps (stacked layout)', () => {
 		});
 		const svg = await waitForSvg(container);
 		// `b`'s real segment is pushed last (after `a`'s real + any gap-fill
-		// marker), and covers all 3 categories in data order — its own <g> is
+		// marker), and covers all 3 categories in data order - its own <g> is
 		// therefore the last `g.bar-y` group, and its 2nd rect is Cat2.
 		const groups = svg.querySelectorAll('g.bar-y');
 		const bGroup = groups[groups.length - 1];
@@ -256,7 +256,7 @@ describe('BarPlot – gaps (stacked layout)', () => {
 		const unfilledY = await bTopYAtCat2({});
 		const filledY = await bTopYAtCat2({ default: { middle: {} } });
 		// A's Cat2 fill (linear ease between 10 and 20 = 15) is taller than the
-		// implicit 0 contribution an unfilled gap leaves — b's bar, stacked on
+		// implicit 0 contribution an unfilled gap leaves - b's bar, stacked on
 		// top, should sit higher (smaller SVG y = higher on screen) once filled.
 		expect(filledY).toBeLessThan(unfilledY);
 	});
@@ -264,14 +264,14 @@ describe('BarPlot – gaps (stacked layout)', () => {
 
 // ── Legend / hover-isolate dimming ──────────────────────────────────────────
 // Unlike LinePlot's gap bridge (a separate marker `buildGapMarkers.ts` never
-// wired to the disabled override — see the LinePlot legend/gaps tests), this
+// wired to the disabled override - see the LinePlot legend/gaps tests), this
 // file's `buildBarMarkers.ts` already threads the same `disabledFillFor`
 // through its gap-fill loop as its real-segment loop (see `style:` in both
-// the real-segment and gap-fill loops there) — so bar gap fills were never
+// the real-segment and gap-fill loops there) - so bar gap fills were never
 // affected by that bug. This is a regression test confirming that stays
 // true, not a bugfix.
 
-describe('BarPlot – gaps (hover-isolate dimming)', () => {
+describe('BarPlot - gaps (hover-isolate dimming)', () => {
 	test('isolating one series dims its gap-fill bars exactly like its real ones', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
@@ -279,7 +279,7 @@ describe('BarPlot – gaps (hover-isolate dimming)', () => {
 			series: [SERIES, OTHER_SERIES],
 			styles: {
 				// The default bar `values.format` omits the series name (unlike
-				// Line/Pyramid) — supply one so the right label group is findable
+				// Line/Pyramid) - supply one so the right label group is findable
 				// below.
 				values: {
 					show: true,
@@ -306,8 +306,8 @@ describe('BarPlot – gaps (hover-isolate dimming)', () => {
 
 		const rects = Array.from(svg.querySelectorAll('g.bar-y rect'));
 		const dimmed = rects.filter((r) => r.getAttribute('style')?.includes('fill-opacity: 0.12'));
-		// Every one of `reading`'s bars — its `REAL_COUNT` real ones plus the 2
-		// gap-fill bars the middle zone adds — dims, not just the real ones.
+		// Every one of `reading`'s bars - its `REAL_COUNT` real ones plus the 2
+		// gap-fill bars the middle zone adds - dims, not just the real ones.
 		expect(dimmed).toHaveLength(REAL_COUNT + 2);
 	});
 });

@@ -4,7 +4,7 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { COUNTRIES } from '../../plots/scatter/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// An `image` marker (svelteplot's own `Image`) — one image centered on each
+// An `image` marker (svelteplot's own `Image`) - one image centered on each
 // row's `x`/`y`. `src` is a URL or a per-row function; `width`/`height` are
 // pixels (default 20), `r` a per-row circular clip radius that overrides both.
 // The demo art is generated inline as data URIs so the story needs no network.
@@ -77,7 +77,7 @@ export const SizedWithTitle: Story = {
 	}
 };
 
-/** `r` clips each image to a circle and sets its size from the row — here, scaled by svelteplot's own `r` scale from population. */
+/** `r` clips each image to a circle and sets its size from the row - here, scaled by svelteplot's own `r` scale from population. */
 export const ClippedByRadius: Story = {
 	args: {
 		markers: [

@@ -5,7 +5,7 @@
 	import type { LineMarkerConfig } from '$lib/types/markers/common';
 
 	/**
-	 * Renders one `'line'` marker as a `<Line>` call — just the stroke. Endpoint
+	 * Renders one `'line'` marker as a `<Line>` call - just the stroke. Endpoint
 	 * dots are a separate `'dot'` marker. A `color` channel strokes each row by
 	 * its color, so each `grouping`'s line takes its group's color.
 	 */

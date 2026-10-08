@@ -6,13 +6,13 @@
 
 	/**
 	 * Exercises `FacetLayout` + `GeoPlot`'s tile-layer basemap together across
-	 * every row/column combination — the exact interaction that broke
+	 * every row/column combination - the exact interaction that broke
 	 * repeatedly (see `clampBoundsToWorld` in `$lib/plots/utils/tiles`): a
 	 * facet cell's *aspect ratio*, not just its raw size, determines how far
 	 * the letterboxed margin around a tall/narrow country like Argentina
 	 * reaches once inverted back to lon/lat. Every cell renders the *same*
 	 * province choropleth + IGN grayscale basemap the real consuming app
-	 * (`interno-cfi`'s `GeoPlot.svelte`) uses — matches `GeoPlot.Styles`
+	 * (`interno-cfi`'s `GeoPlot.svelte`) uses - matches `GeoPlot.Styles`
 	 * stories' `TileLayerIgnArgenmapGris` exactly; only the grid shape
 	 * (`groupCount` + `columns`) varies per story.
 	 */
@@ -46,7 +46,7 @@
 		GROUP_NAMES.slice(0, groupCount).map((group) => ({ group }))
 	);
 
-	// Same predicate `GeoPlot.Styles.stories.ts`'s tile-layer stories use —
+	// Same predicate `GeoPlot.Styles.stories.ts`'s tile-layer stories use -
 	// Mercator can't represent the Antarctic sector / South Atlantic islands
 	// wedge of "Tierra del Fuego, Antártida e Islas del Atlántico Sur", so it's
 	// dropped from what's drawn (and, in turn, from `domain: 'data'`'s fit).

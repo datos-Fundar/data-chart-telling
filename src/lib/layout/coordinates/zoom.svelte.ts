@@ -21,7 +21,7 @@ export function createGeoZoom(args: {
 	zoomEnabled: () => boolean;
 	config: () => GeoZoomConfig | undefined;
 	node: () => HTMLElement | null;
-	/** When true, drag/touch is left for something else (e.g. `createGeoRotate`) — only wheel/pinch scaling stays wired here. */
+	/** When true, drag/touch is left for something else (e.g. `createGeoRotate`) - only wheel/pinch scaling stays wired here. */
 	disableDrag?: () => boolean;
 }) {
 	let transform = $state<GeoZoomTransform>({ x: 0, y: 0, k: 1 });

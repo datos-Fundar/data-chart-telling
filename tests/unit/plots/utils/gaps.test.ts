@@ -8,7 +8,7 @@ import type { GapZonesConfig } from '$lib/types/plots/gaps';
 
 type P = { x: number; y: number | null };
 
-// Leading gap (x 1–2), one internal gap (x 5), trailing gap (x 8).
+// Leading gap (x 1-2), one internal gap (x 5), trailing gap (x 8).
 const DATA: P[] = [
   { x: 1, y: null },
   { x: 2, y: null },
@@ -43,7 +43,7 @@ describe('isGapValue', () => {
 
 // ── No config ─────────────────────────────────────────────────────────────────
 
-describe('resolveGapRuns – no config', () => {
+describe('resolveGapRuns - no config', () => {
   test('returns nothing when no zone is configured', () => {
     expect(resolveGapRuns<P, Style>(SERIES, {})).toEqual([]);
   });
@@ -56,7 +56,7 @@ describe('resolveGapRuns – no config', () => {
 
 // ── Middle gaps ───────────────────────────────────────────────────────────────
 
-describe('resolveGapRuns – middle', () => {
+describe('resolveGapRuns - middle', () => {
   test('bridges the internal run between its two real boundary points', () => {
     const runs = resolveGapRuns<P, Style>(SERIES, { middle: {} });
     expect(runs).toHaveLength(1);
@@ -105,7 +105,7 @@ describe('resolveGapRuns – middle', () => {
 
 // ── Start (leading) gaps ────────────────────────────────────────────────────────
 
-describe('resolveGapRuns – start', () => {
+describe('resolveGapRuns - start', () => {
   test('is a no-op without an explicit `x`, even with a leading gap', () => {
     expect(resolveGapRuns<P, Style>(SERIES, {})).toHaveLength(0);
   });
@@ -142,7 +142,7 @@ describe('resolveGapRuns – start', () => {
 
 // ── End (trailing) gaps ──────────────────────────────────────────────────────────
 
-describe('resolveGapRuns – end', () => {
+describe('resolveGapRuns - end', () => {
   test('is a no-op without an explicit `x`, even with a trailing gap', () => {
     expect(resolveGapRuns<P, Style>(SERIES, {})).toHaveLength(0);
   });
@@ -164,7 +164,7 @@ describe('resolveGapRuns – end', () => {
 
 // ── All three zones together ─────────────────────────────────────────────────────
 
-describe('resolveGapRuns – start, middle and end together', () => {
+describe('resolveGapRuns - start, middle and end together', () => {
   test('resolves one run per zone, in start → middle → end order', () => {
     const gaps: GapZonesConfig<Style> = { start: { x: 0 }, middle: {}, end: { x: 10 } };
     const runs = resolveGapRuns<P, Style>(SERIES, gaps);
@@ -189,7 +189,7 @@ describe('resolveGapsForSeries', () => {
     expect(resolveGapsForSeries<Style>(gaps, 'female')).toBe(gaps.default);
   });
 
-  test('a named entry is scoped to that series only — an unrelated series gets nothing', () => {
+  test('a named entry is scoped to that series only - an unrelated series gets nothing', () => {
     const gaps = { female: { middle: {} } };
     expect(resolveGapsForSeries<Style>(gaps, 'male')).toEqual({});
   });

@@ -5,7 +5,7 @@ import { WORLD_COUNTRIES, EARTHQUAKES } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `graticule` (lon/lat gridlines) and `sphere` (the outer globe outline) are
-// the simplest GeoPlot markers — mirrors svelteplot's `geo/earthquakes`
+// the simplest GeoPlot markers - mirrors svelteplot's `geo/earthquakes`
 // example, which combines both with raw lon/lat point data.
 
 const meta = {
@@ -32,7 +32,7 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** Basic graticule — default 10° step lon/lat gridlines drawn over the base map. */
+/** Basic graticule - default 10° step lon/lat gridlines drawn over the base map. */
 export const Basic: Story = {
 	args: {
 		data: WORLD_COUNTRIES,
@@ -40,7 +40,7 @@ export const Basic: Story = {
 	}
 };
 
-/** Custom step + style — a coarser 20° grid in a lighter, dashed stroke. */
+/** Custom step + style - a coarser 20° grid in a lighter, dashed stroke. */
 export const CustomStepAndStyle: Story = {
 	args: {
 		data: WORLD_COUNTRIES,
@@ -56,15 +56,15 @@ export const CustomStepAndStyle: Story = {
 };
 
 /**
- * Sphere + graticule on an orthographic globe — the `sphere` marker draws
+ * Sphere + graticule on an orthographic globe - the `sphere` marker draws
  * the outer outline of the whole earth, which only reads clearly on a
  * hemisphere-style projection like `orthographic`. `behind: true` is what
  * makes the fill work as ocean-colored background here rather than an
- * opaque layer painted over every country on top of it — markers otherwise
+ * opaque layer painted over every country on top of it - markers otherwise
  * always draw over the base map regardless of their position in `markers`.
  * `coordinates.rotate: true` enables drag-to-rotate on an orthographic
  * projection (independent of `zoom`, which only covers wheel/pinch scale
- * here) — drag the globe below to spin it.
+ * here) - drag the globe below to spin it.
  */
 export const SphereOutline: Story = {
 	args: {
@@ -86,7 +86,7 @@ export const SphereOutline: Story = {
 };
 
 /**
- * Graticule + sphere + raw lon/lat dots — mirrors svelteplot's
+ * Graticule + sphere + raw lon/lat dots - mirrors svelteplot's
  * `geo/earthquakes` example: point data (earthquake epicenters) fed
  * straight in as a `dot` marker over the globe's graticule/sphere.
  */

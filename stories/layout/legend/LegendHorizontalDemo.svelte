@@ -38,7 +38,7 @@
 		'#db2777'
 	];
 
-	/** The `items` this component feeds `<LegendLayout>` — exported for the story's docs source override, see `stories/common/docsSource.ts`. */
+	/** The `items` this component feeds `<LegendLayout>` - exported for the story's docs source override, see `stories/common/docsSource.ts`. */
 	export function jurisdictionItems(count: number): LegendItem[] {
 		return JURISDICCIONES.slice(0, count).map((name, i) => ({
 			name,
@@ -58,14 +58,14 @@
 
 	/**
 	 * `layout: { type: 'horizontal', maxRows }` can't be exercised meaningfully
-	 * from a plain `sections` args array — wrapping/pagination only kicks in
+	 * from a plain `sections` args array - wrapping/pagination only kicks in
 	 * once the section is narrower than its items need, so this wrapper adds
 	 * the one thing a story arg object can't express: a fixed-width container
 	 * to wrap against. `customNavButton` exercises the other override path, a
 	 * `navButton` snippet replacing the section's default arrow buttons.
 	 *
-	 * `LegendLayout` is used bare here (no `BaseChart`/`ChartContainer` around
-	 * it), so — same as `FacetDemo` for facets — stamp the `--dct-*` vars
+	 * `LegendLayout` is used bare here (no `PlotShell`/`PlotContainer` around
+	 * it), so - same as `FacetDemo` for facets - stamp the `--dct-*` vars
 	 * ourselves; without them, `setConfiguration` changes the live config but
 	 * nothing on screen ever reads it back out.
 	 */

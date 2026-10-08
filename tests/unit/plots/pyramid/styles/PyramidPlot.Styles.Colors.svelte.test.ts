@@ -18,7 +18,7 @@ function barFills(svg: SVGElement): string[] {
 	return Array.from(svg.querySelectorAll('g.bar-x rect')).map((r) => getComputedStyle(r).fill);
 }
 
-describe('PyramidPlot – color', () => {
+describe('PyramidPlot - color', () => {
 	test('left and right series get different colors by default', async () => {
 		const { container } = await render(PyramidPlot, { width: 560, height: 520, ...DATA_PROPS });
 		const svg = await waitForSvg(container);

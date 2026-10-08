@@ -31,25 +31,10 @@ const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * No tooltip — hovering over the bars produces no floating label.
- * This is the default behaviour when `tooltip` is omitted.
- */
-export const NoTooltip: Story = {
-	args: {
-		data: DATA,
-		x: 'pct',
-		y: 'ageGroup',
-		color: 'sex',
-		scales: { y: { domain: AGE_GROUPS } }
-	}
-};
-
-/**
- * Basic tooltip — the `format` callback receives the hovered bar's row and
+ * Basic tooltip - the `format` callback receives the hovered bar's row and
  * returns the string shown in the floating box.
  *
- * Hover over any bar to activate. A standalone `PyramidPlot` uses
- * `facetId: ''` and `sync: false`.
+ * Hover over any bar to activate.
  */
 export const BasicTooltip: Story = {
 	args: {
@@ -59,7 +44,6 @@ export const BasicTooltip: Story = {
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
 		tooltip: {
-			facetId: '',
 			sync: false,
 			format: (row) => {
 				const { ageGroup, sex, pct } = row as PopulationRow;
@@ -70,7 +54,7 @@ export const BasicTooltip: Story = {
 };
 
 /**
- * Rich multi-line format — `\n` splits the tooltip string across lines.
+ * Rich multi-line format - `\n` splits the tooltip string across lines.
  * The first line becomes the heading, the rest the body text.
  */
 export const RichFormat: Story = {
@@ -81,7 +65,6 @@ export const RichFormat: Story = {
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
 		tooltip: {
-			facetId: '',
 			sync: false,
 			format: (row) => {
 				const { ageGroup, sex, pct } = row as PopulationRow;
@@ -92,7 +75,7 @@ export const RichFormat: Story = {
 };
 
 /**
- * Computed tooltip — the format function can derive any string from the row.
+ * Computed tooltip - the format function can derive any string from the row.
  * Here it shows the population as a fraction and relative to a base cohort size.
  */
 export const ComputedFormat: Story = {
@@ -103,7 +86,6 @@ export const ComputedFormat: Story = {
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
 		tooltip: {
-			facetId: '',
 			sync: false,
 			format: (row) => {
 				const { ageGroup, sex, pct } = row as PopulationRow;
@@ -116,7 +98,7 @@ export const ComputedFormat: Story = {
 };
 
 /**
- * Series-filtered tooltip — `series: ['Female']` restricts hover matching
+ * Series-filtered tooltip - `series: ['Female']` restricts hover matching
  * to bars that belong to the female side only. Hovering over male bars shows
  * no tooltip.
  */
@@ -128,7 +110,6 @@ export const FemaleOnly: Story = {
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
 		tooltip: {
-			facetId: '',
 			sync: false,
 			series: ['Female'],
 			format: (row) => {
@@ -140,7 +121,7 @@ export const FemaleOnly: Story = {
 };
 
 /**
- * Series-filtered to males — same as FemaleOnly but for the male side.
+ * Series-filtered to males - same as FemaleOnly but for the male side.
  */
 export const MaleOnly: Story = {
 	args: {
@@ -150,7 +131,6 @@ export const MaleOnly: Story = {
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
 		tooltip: {
-			facetId: '',
 			sync: false,
 			series: ['Male'],
 			format: (row) => {
@@ -162,7 +142,7 @@ export const MaleOnly: Story = {
 };
 
 /**
- * Both sides with sex-aware formatting — the tooltip responds to both female
+ * Both sides with sex-aware formatting - the tooltip responds to both female
  * and male bars and includes the sex in a clear format.
  */
 export const BothSidesFormatted: Story = {
@@ -173,7 +153,6 @@ export const BothSidesFormatted: Story = {
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
 		tooltip: {
-			facetId: '',
 			sync: false,
 			format: (row) => {
 				const { sex, ageGroup, pct } = row as PopulationRow;
@@ -185,7 +164,7 @@ export const BothSidesFormatted: Story = {
 };
 
 /**
- * Percentage of total by cohort — shows what percentage of the population
+ * Percentage of total by cohort - shows what percentage of the population
  * that age-sex cohort represents.
  */
 export const CohortPercentage: Story = {
@@ -196,7 +175,6 @@ export const CohortPercentage: Story = {
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
 		tooltip: {
-			facetId: '',
 			sync: false,
 			format: (row) => {
 				const { sex, ageGroup, pct } = row as PopulationRow;
@@ -207,14 +185,14 @@ export const CohortPercentage: Story = {
 };
 
 /**
- * Fully custom tooltip markup via `content` — replaces the default floating
+ * Fully custom tooltip markup via `content` - replaces the default floating
  * label entirely with an arbitrary snippet: a bold header (the hovered age
  * group), a colour-coded list of both sexes' shares sorted by value, and a
  * footnote. `format` is still required by the type but is ignored once
  * `content` is set.
  *
  * Because pyramid's default hover strategy matches by row (`'y'`), `content`
- * receives both the female and male rows for the hovered age group at once —
+ * receives both the female and male rows for the hovered age group at once -
  * see `RichTooltip.svelte` for the markup. The library automatically drops
  * its default dark tooltip box (background/padding/border) whenever
  * `content` is set, so the custom card fully owns the look.
@@ -225,7 +203,7 @@ export const CustomContent: StoryObj = {
 
 /**
  * `anchorX`/`anchorY` override the system default (`'right'`/`'bottom'`).
- * Here it's pinned above-and-to-the-left of the cursor instead — still
+ * Here it's pinned above-and-to-the-left of the cursor instead - still
  * falls back toward the opposite side (via the centered position) if the
  * cursor gets close enough to an edge that the preferred side would
  * overflow.
@@ -238,7 +216,6 @@ export const CustomAnchor: Story = {
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
 		tooltip: {
-			facetId: '',
 			sync: false,
 			anchorX: 'left',
 			anchorY: 'top',

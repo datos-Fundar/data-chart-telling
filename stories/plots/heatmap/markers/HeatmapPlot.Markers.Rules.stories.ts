@@ -71,7 +71,7 @@ export const WithRuleXMarkers: Story = {
 
 /**
  * Horizontal rule markers (ruleY) to highlight specific rows on the
- * categorical y axis — here, both sexes get their own dashed rule.
+ * categorical y axis - here, both sexes get their own dashed rule.
  */
 export const WithRuleYMarkers: Story = {
 	args: {

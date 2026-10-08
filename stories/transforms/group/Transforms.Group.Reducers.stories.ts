@@ -92,7 +92,7 @@ export const FunctionReducer: Story = {
 	}
 };
 
-/** `sum` of each month's `rain` as `rect`s, one month wide, per city — `grouping` keeps the cities' months apart, and a `stackY` puts one on the other. */
+/** `sum` of each month's `rain` as `rect`s, one month wide, per city - `grouping` keeps the cities' months apart, and a `stackY` puts one on the other. */
 export const MonthlySum: Story = {
 	args: {
 		scales: {

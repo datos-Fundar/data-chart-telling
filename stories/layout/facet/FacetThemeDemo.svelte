@@ -2,17 +2,17 @@
   import { untrack } from 'svelte';
   import FacetDemo from './FacetDemo.svelte';
   import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
-  import type { ChartConfigInput } from '$lib/types/configuration/styling';
+  import type { PlotStylesConfigInput } from '$lib/types/configuration/styling';
 
   // Calling $props() (even unused) keeps this component's inferred prop type
-  // permissive — without it, Storybook's bare `render: () => ({ Component })`
+  // permissive - without it, Storybook's bare `render: () => ({ Component })`
   // typing rejects a zero-prop-plus-runes component.
   const props = $props();
   void props;
 
   type FacetThemeName = 'Default' | 'Purple' | 'Green';
 
-  const FACET_THEMES: Record<FacetThemeName, ChartConfigInput> = {
+  const FACET_THEMES: Record<FacetThemeName, PlotStylesConfigInput> = {
     Default: {},
     Purple: {
       facet: {
@@ -32,7 +32,7 @@
 
   // Same untrack/cleanup pattern as ConfigDemo: `setConfiguration` reads
   // `current` to merge and then writes it, so tracking it inside this effect
-  // would make the effect depend on the very state it sets — an infinite
+  // would make the effect depend on the very state it sets - an infinite
   // loop. Cleanup restores defaults (the config is a global singleton)
   // before each re-run and on unmount.
   $effect(() => {
@@ -56,7 +56,7 @@
   </div>
 
   <p class="demo__hint">
-    Restyles the indicator badge and pagination buttons — same global config
+    Restyles the indicator badge and pagination buttons - same global config
     that themes the rest of the package.
   </p>
 

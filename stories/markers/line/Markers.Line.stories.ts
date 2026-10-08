@@ -3,10 +3,10 @@ import LinePlot from '$lib/plots/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `line` marker (svelteplot's own `Line`) — a single stroke through its own
+// A `line` marker (svelteplot's own `Line`) - a single stroke through its own
 // `data`, independent of any plot series (unlike the plot's own default
 // series line). Demoed on an empty `LinePlot` canvas so only the marker
-// itself is on screen — see `Plots/*/Markers` for markers used alongside
+// itself is on screen - see `Plots/*/Markers` for markers used alongside
 // real chart data.
 
 const meta = {

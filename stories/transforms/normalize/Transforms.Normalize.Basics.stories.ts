@@ -65,7 +65,7 @@ export const IndexToFirst: Story = {
 	}
 };
 
-/** `basis: 'mean'`: each stock relative to its own monthly average — above 1, a better-than-average day. */
+/** `basis: 'mean'`: each stock relative to its own monthly average - above 1, a better-than-average day. */
 export const Mean: Story = {
 	args: {
 		transforms: [{ type: 'normalizeY', basis: 'mean' }],

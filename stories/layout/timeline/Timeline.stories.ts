@@ -6,7 +6,7 @@ import TimelineLayoutInterpolatedDemo from './TimelineLayoutInterpolatedDemo.sve
 /**
  * `Timeline` is the purely visual scrubber strip: a baseline rule plus the
  * ordered step labels, with the current one emphasised. It has no notion of
- * data — `TimelineLayout` is the layer that couples it to a `progress` value
+ * data - `TimelineLayout` is the layer that couples it to a `progress` value
  * and slices a dataset down to the selected step for whatever plot you give it.
  */
 const meta = {
@@ -22,12 +22,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** A vertical gutter — the default for charts that are wider than tall. */
+/** A vertical gutter - the default for charts that are wider than tall. */
 export const Vertical: Story = {
   args: { orientation: 'vertical', width: 60, height: 360 },
 };
 
-/** A horizontal strip — typical below a chart on narrow/mobile layouts. */
+/** A horizontal strip - typical below a chart on narrow/mobile layouts. */
 export const Horizontal: Story = {
   args: { orientation: 'horizontal', width: 600, height: 60 },
 };
@@ -45,7 +45,7 @@ export const InteractiveHorizontal: StoryObj = {
 /**
  * `interpolate` tweens each category's bar between its real values at the
  * two years bracketing the scrub position, instead of snapping straight from
- * one snapshot to the next — the data here skips 2019/2021 on purpose, so
+ * one snapshot to the next - the data here skips 2019/2021 on purpose, so
  * the tween visibly bridges years that don't exist in the dataset.
  */
 export const Interpolated: StoryObj = {

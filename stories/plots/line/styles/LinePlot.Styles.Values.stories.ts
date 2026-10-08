@@ -281,7 +281,7 @@ export const AnchorMiddle: Story = {
 };
 
 /**
- * Anchor `'end'` — text appears to the **left** of the last data point,
+ * Anchor `'end'` - text appears to the **left** of the last data point,
  * toward the chart's zero side. Mirror image of the default `'start'`.
  */
 export const AnchorEnd: Story = {
@@ -418,8 +418,8 @@ const NEAR_MISS_SERIES = {
  * the default plot height, each pileup's labels would otherwise land closer
  * together than a label's own height; instead they spread apart just enough
  * to clear one another, each reconnected to its real end point with a thin
- * leader line. Every label — including the isolated series, which needs no
- * decluttering of its own — reaches out to the same shared column, so the
+ * leader line. Every label - including the isolated series, which needs no
+ * decluttering of its own - reaches out to the same shared column, so the
  * whole set lines up on one horizontal line rather than each pileup settling
  * at its own, differently-sized fan.
  */
@@ -439,7 +439,7 @@ export const DeclutteredLabels: Story = {
  * Custom label and connector styling. `values.fontStyle` restyles the label
  * text (`fontWeight`, or `stroke`/`strokeWidth` for a text outline, …),
  * while `values.strokeStyle` is a completely separate style for the leader
- * line drawn between a displaced label and its data point — independent of
+ * line drawn between a displaced label and its data point - independent of
  * the label, and independent of the neutral grey/thin/solid default. Here
  * labels are bold with a subtle white outline for legibility over the
  * lines, and every connector renders as a dashed, dark slate line rather
@@ -472,7 +472,7 @@ export const DeclutteredLabelsCustomStyle: Story = {
  * Stress-tests a case the other stories don't otherwise exercise: a series
  * that starts out clear of a cluster, but ends up in collision range only
  * once that cluster's own labels have spread out. `Formosa · M` (see
- * `NEAR_MISS_SERIES` above) sits ~1.3 units below Tucumán · M's real value —
+ * `NEAR_MISS_SERIES` above) sits ~1.3 units below Tucumán · M's real value -
  * too far to be grouped with cluster A going in, but Tucumán · M's
  * decluttered label lands almost exactly where Formosa · M's already is.
  * Formosa · M correctly gets pulled into the same run, with its own leader
@@ -513,7 +513,7 @@ const BOUNDS_DEMO_SERIES = ALL_PROVINCES.flatMap((province, i) => [
 
 /**
  * Twelve series compressed toward a single value, close enough together
- * that the plot's own top edge — not just neighbouring labels — constrains
+ * that the plot's own top edge - not just neighbouring labels - constrains
  * how they can spread. Exercises `bounds`-aware clamping in `declutter1D`:
  * labels stay inside the plot's content box instead of spilling past it,
  * while a run's leader lines still fan out cleanly.
@@ -521,7 +521,7 @@ const BOUNDS_DEMO_SERIES = ALL_PROVINCES.flatMap((province, i) => [
  * 400px, not the package default, deliberately: twelve labels need at least
  * `11 * minGap` (~185px) of clearance to legibly separate at all, so a
  * shorter plot wouldn't be testing bounds-clamping so much as asking for
- * more vertical space than exists at any spacing — a real constraint, but a
+ * more vertical space than exists at any spacing - a real constraint, but a
  * different one than this story means to demonstrate.
  */
 export const DeclutteredLabelsBoundedByPlot: Story = {
@@ -538,7 +538,7 @@ export const DeclutteredLabelsBoundedByPlot: Story = {
 };
 
 // Real INDEC poverty-rate series (% of population below the poverty line,
-// by province, 2016–2025) — the exact dataset and provinces that surfaced
+// by province, 2016-2025) - the exact dataset and provinces that surfaced
 // both bugs below in a consuming app: `GENERAL_10` from the reporting API
 // this package is embedded in.
 const POVERTY_RATE_BY_PROVINCE: Record<string, YearPoint[]> = {
@@ -571,8 +571,8 @@ const POVERTY_RATE_SERIES = Object.entries(POVERTY_RATE_BY_PROVINCE).map(([name,
 }));
 
 /**
- * `Chubut`'s 2017 rate (19.68) has no neighbouring label to collide with —
- * San Juan/Jujuy/Formosa/Buenos Aires cluster well above it — but the
+ * `Chubut`'s 2017 rate (19.68) has no neighbouring label to collide with -
+ * San Juan/Jujuy/Formosa/Buenos Aires cluster well above it - but the
  * y-domain is pinned to a floor of 20, just above that real value, so the
  * scale places its point (and label) past the plot's own bottom edge.
  * Bounds-clamping only ran for multi-label runs; a lone label like this one

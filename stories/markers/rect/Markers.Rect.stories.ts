@@ -3,12 +3,12 @@ import LinePlot from '$lib/plots/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `rect` marker (svelteplot's own `Rect`) — an arbitrary rectangle from
+// A `rect` marker (svelteplot's own `Rect`) - an arbitrary rectangle from
 // literal `x1`/`x2`/`y1`/`y2` bounds, unlike `bar` (which is built for one
 // mark per data row on a categorical axis). `data: [{}]` is a one-row
-// placeholder — nothing in it is actually read when every bound is a literal
+// placeholder - nothing in it is actually read when every bound is a literal
 // number. Demoed on an empty `LinePlot` canvas so only the marker itself is
-// on screen — see `Channels/X1X2Y1Y2` for `x1`/`x2`/`y1`/`y2` on real data.
+// on screen - see `Channels/X1X2Y1Y2` for `x1`/`x2`/`y1`/`y2` on real data.
 
 const meta = {
 	title: 'Markers/Rect',
@@ -36,7 +36,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** `x1`/`x2`/`y1`/`y2` as literal numbers — an arbitrary highlighted region, independent of any row data. */
+/** `x1`/`x2`/`y1`/`y2` as literal numbers - an arbitrary highlighted region, independent of any row data. */
 export const Basic: Story = {
 	args: {
 		markers: [

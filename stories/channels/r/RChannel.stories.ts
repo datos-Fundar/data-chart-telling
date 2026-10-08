@@ -3,11 +3,11 @@ import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
 import { COUNTRIES } from '../../plots/scatter/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// `r` sizes every dot by a per-row value — see `Plots/ScatterPlot/Bubble` for
+// `r` sizes every dot by a per-row value - see `Plots/ScatterPlot/Bubble` for
 // the channel itself. This page is specifically about `scales.r`: unlike
 // `color`, svelteplot binds `r` to exactly one scale shared by every mark in
 // the plot (there's no per-mark equivalent), so `scales.r` is plot-level
-// only — `domain`/`range` are threaded straight into svelteplot's own `r`
+// only - `domain`/`range` are threaded straight into svelteplot's own `r`
 // scale rather than resolved independently.
 
 const meta = {
@@ -36,7 +36,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** No `scales.r` — svelteplot's own auto-fit pixel range, sized to the plot's own bounds. */
+/** No `scales.r` - svelteplot's own auto-fit pixel range, sized to the plot's own bounds. */
 export const Default: Story = {};
 
 /** `scales.r.range` sets an explicit `[min, max]` pixel radius instead of svelteplot's auto-fit. */
@@ -48,7 +48,7 @@ export const CustomRange: Story = {
 	}
 };
 
-/** `scales.r.domain` clamps the input range — countries below/above it render at the domain's own min/max radius instead of their real, more extreme population. */
+/** `scales.r.domain` clamps the input range - countries below/above it render at the domain's own min/max radius instead of their real, more extreme population. */
 export const CustomDomain: Story = {
 	args: {
 		scales: {

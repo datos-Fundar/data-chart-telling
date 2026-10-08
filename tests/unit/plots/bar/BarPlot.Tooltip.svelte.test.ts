@@ -26,7 +26,7 @@ function noTooltipDom(container: Element) {
 	return container.querySelector('.dct-tooltip, [class*="tooltip"]');
 }
 
-describe('BarPlot – tooltip', () => {
+describe('BarPlot - tooltip', () => {
 	test('no floating tooltip appears without a tooltip config', async () => {
 		const { container } = await render(BarPlot, { width: 400, height: 300, series: [FEMALE] });
 		await waitForSvg(container);
@@ -39,7 +39,6 @@ describe('BarPlot – tooltip', () => {
 			height: 300,
 			series: [FEMALE],
 			tooltip: {
-				facetId: '',
 				sync: false,
 				format: (row) => `${(row as ProvincePoint).province}: ${(row as ProvincePoint).value} yr`
 			}
@@ -54,7 +53,6 @@ describe('BarPlot – tooltip', () => {
 			height: 300,
 			series: [FEMALE, MALE],
 			tooltip: {
-				facetId: '',
 				sync: false,
 				format: (row) =>
 					`${(row as ProvincePoint).province}: ${(row as ProvincePoint).value.toFixed(1)} yr`
@@ -70,7 +68,6 @@ describe('BarPlot – tooltip', () => {
 			height: 300,
 			series: [FEMALE, MALE],
 			tooltip: {
-				facetId: '',
 				sync: false,
 				series: ['female'],
 				format: (row) => `Female: ${(row as ProvincePoint).value.toFixed(1)} yr`
@@ -89,7 +86,6 @@ describe('BarPlot – tooltip', () => {
 			y: 'value',
 			color: 'sex',
 			tooltip: {
-				facetId: '',
 				sync: false,
 				format: (row) => `${row.sex} (${row.province}): ${row.value} yr`
 			}

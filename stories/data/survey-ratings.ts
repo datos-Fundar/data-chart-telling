@@ -25,7 +25,7 @@ const PRODUCTS = [
 	{ product: 'Kiosk', bias: 2.5 }
 ];
 
-/** 80 answers per product: a 1–5 rating, and a 0–10 "would recommend" that follows it loosely. */
+/** 80 answers per product: a 1-5 rating, and a 0-10 "would recommend" that follows it loosely. */
 export const SURVEY_ANSWERS: SurveyAnswer[] = PRODUCTS.flatMap(({ product, bias }) =>
 	Array.from({ length: 80 }, () => {
 		const rating = clamp(Math.round(bias + (random() - 0.5) * 3), 1, 5);

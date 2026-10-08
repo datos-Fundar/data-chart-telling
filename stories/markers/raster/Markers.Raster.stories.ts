@@ -4,12 +4,12 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { COUNTRIES } from '../../plots/scatter/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `raster` marker (svelteplot's own `Raster`) — a field painted over a
+// A `raster` marker (svelteplot's own `Raster`) - a field painted over a
 // rectangle onto a canvas. Three modes, picked by what is set: scattered
 // rows (`x`/`y`/`fill`, interpolated per `interpolate`), or a sampler
 // (`data: []` with `fill` as an `(x, y) => value` function and `x1`/`x2`/
 // `y1`/`y2` bounding the rectangle). Colors come from svelteplot's own color
-// scale, forwarded as-is — configure it via the plot's `scales.color`.
+// scale, forwarded as-is - configure it via the plot's `scales.color`.
 
 const meta = {
 	title: 'Markers/Raster',

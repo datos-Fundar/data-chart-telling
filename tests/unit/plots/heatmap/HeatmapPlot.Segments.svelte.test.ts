@@ -17,7 +17,7 @@ function styleAttrs(svg: SVGElement): string[] {
 	return Array.from(svg.querySelectorAll('g.cell rect')).map((r) => r.getAttribute('style') ?? '');
 }
 
-describe('HeatmapPlot – segments (areas, "default" key)', () => {
+describe('HeatmapPlot - segments (areas, "default" key)', () => {
 	test('an area segment and the catch-all each apply their own fillOpacity', async () => {
 		const xFrom = 'Buenos Aires';
 		const xTo = 'Formosa';
@@ -86,7 +86,7 @@ describe('HeatmapPlot – segments (areas, "default" key)', () => {
 	});
 });
 
-describe('HeatmapPlot – segments (catch-all + area merging)', () => {
+describe('HeatmapPlot - segments (catch-all + area merging)', () => {
 	test('an area segment inherits fill color from the catch-all', async () => {
 		const { container } = await render(HeatmapPlot, {
 			width: 400,

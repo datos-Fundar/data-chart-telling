@@ -4,7 +4,7 @@
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import type { VoronoiMeshMarkerConfig } from '$lib/types/markers/common';
 
-	/** Renders one `'voronoiMesh'` marker as `<VoronoiMesh>` — the Voronoi diagram as a single mesh. */
+	/** Renders one `'voronoiMesh'` marker as `<VoronoiMesh>` - the Voronoi diagram as a single mesh. */
 	let { marker }: { marker: VoronoiMeshMarkerConfig } = $props();
 
 	const cfg = $derived(getConfiguration());

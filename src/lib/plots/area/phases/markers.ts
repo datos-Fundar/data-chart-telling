@@ -10,7 +10,7 @@ import type { AreaStyle } from '$lib/types/plots/styling';
  * AreaPlot's "markers" phase: one `area` per visual segment of each series,
  * drawing the rows the "transforms" phase left (stacked, when the plot
  * stacks). The markers the "statistics" phase already put in `state.markers`
- * come after, so they render on top, and its value labels last — one at the
+ * come after, so they render on top, and its value labels last - one at the
  * end of each series, like LinePlot's.
  *
  * A series toggled off in the legend (style mode), or dimmed by hovering

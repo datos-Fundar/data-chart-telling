@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest';
 import { buildMarkers } from '$lib/plots/heatmap/phases/markers';
 import { buildTransforms } from '$lib/layout/phases/transforms';
 import type { HeatmapPlotState, HeatmapPlotCtx } from '$lib/types/plots/heatmap/state';
-import type { ChartConfig } from '$lib/types/configuration/styling';
+import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { CellMarkerConfig, TextMarkerConfig } from '$lib/types/markers/common';
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
@@ -15,7 +15,7 @@ const FLAT: Row[] = [
 ];
 
 const CTX: HeatmapPlotCtx = {
-	cfg: { continuous: { min: '#000000', max: '#ffffff' } } as ChartConfig,
+	cfg: { continuous: { min: '#000000', max: '#ffffff' } } as PlotStylesConfig,
 	range: undefined,
 	legendInteraction: null
 };
@@ -48,7 +48,7 @@ function build(...args: Parameters<typeof buildAll>) {
 	return buildAll(...args).filter((m) => m.type === 'cell') as CellMarkerConfig[];
 }
 
-describe('buildMarkers – style grouping', () => {
+describe('buildMarkers - style grouping', () => {
 	test('one marker per distinct resolved style bucket', () => {
 		const markers = build();
 		expect(markers).toHaveLength(1);
@@ -65,7 +65,7 @@ describe('buildMarkers – style grouping', () => {
 	});
 });
 
-describe('buildMarkers – segment catch-all vs area-specific priority', () => {
+describe('buildMarkers - segment catch-all vs area-specific priority', () => {
 	test('an area-specific segment overrides the catch-all regardless of list order', () => {
 		const markers = build({
 			segments: {
@@ -81,7 +81,7 @@ describe('buildMarkers – segment catch-all vs area-specific priority', () => {
 	});
 });
 
-describe('buildMarkers – legend range dimming', () => {
+describe('buildMarkers - legend range dimming', () => {
 	test('a cell outside the active range gets the disabled-style override', () => {
 		const markers = build(
 			{},
@@ -101,7 +101,7 @@ describe('buildMarkers – legend range dimming', () => {
 	});
 });
 
-describe('buildMarkers – fill', () => {
+describe('buildMarkers - fill', () => {
 	test('falls back to resolveColor(row) when the segment sets no literal fill', () => {
 		const [marker] = build();
 		const fill = marker.fill as (d: Row) => string;
@@ -110,7 +110,7 @@ describe('buildMarkers – fill', () => {
 	});
 });
 
-describe('buildMarkers – value labels', () => {
+describe('buildMarkers - value labels', () => {
 	const labels = (markers: ReturnType<typeof buildAll>) =>
 		markers.filter((m) => m.type === 'text') as TextMarkerConfig[];
 

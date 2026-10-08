@@ -15,7 +15,7 @@ function barFills(svg: SVGElement): string[] {
 	return Array.from(svg.querySelectorAll('g.bar-x rect')).map((r) => getComputedStyle(r).fill);
 }
 
-describe('PyramidPlot – data/x/y/color shorthand', () => {
+describe('PyramidPlot - data/x/y/color shorthand', () => {
 	test('renders an SVG', async () => {
 		const { container } = await render(PyramidPlot, {
 			width: 560,
@@ -57,7 +57,7 @@ describe('PyramidPlot – data/x/y/color shorthand', () => {
 	});
 });
 
-describe('PyramidPlot – explicit series prop', () => {
+describe('PyramidPlot - explicit series prop', () => {
 	test('renders the same bar count as the data/x/y/color shorthand', async () => {
 		const { container } = await render(PyramidPlot, {
 			width: 560,

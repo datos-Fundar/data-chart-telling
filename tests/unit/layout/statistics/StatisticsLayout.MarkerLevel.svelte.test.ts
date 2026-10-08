@@ -6,7 +6,7 @@ import { waitForSvg, countBollingerMarks, countRegressionMarks } from '../../plo
 
 const data = Array.from({ length: 20 }, (_, i) => ({ x: i, y: i * 2 + Math.sin(i) * 3 }));
 
-describe('statistics – marker level (Scatter dot)', () => {
+describe('statistics - marker level (Scatter dot)', () => {
 	test('a hand-authored dot marker’s own .statistics derives a bollinger band from its own data', async () => {
 		const { container } = render(ScatterPlot, {
 			width: 400,
@@ -48,7 +48,7 @@ describe('statistics – marker level (Scatter dot)', () => {
 		expect(countRegressionMarks(svg)).toBe(1);
 	});
 
-	test('a marker with no x/y set is left alone — no derived marker, no crash', async () => {
+	test('a marker with no x/y set is left alone - no derived marker, no crash', async () => {
 		const { container } = render(ScatterPlot, {
 			width: 400,
 			height: 300,

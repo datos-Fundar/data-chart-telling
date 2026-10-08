@@ -5,14 +5,14 @@ import type {
 	PyramidPlotCtx,
 	PyramidSeries
 } from '$lib/types/plots/pyramid/state';
-import type { ChartConfig } from '$lib/types/configuration/styling';
+import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
 type Row = { ageGroup: string; pct: number | null };
 
 const CTX: PyramidPlotCtx = {
-	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as ChartConfig,
+	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as PlotStylesConfig,
 	formatValue: (v) => `${v}%`,
 	legendInteraction: null
 };
@@ -45,7 +45,7 @@ function build(overrides: Partial<PyramidPlotState<Row>> = {}) {
 	return buildScales(state, CTX).scales;
 }
 
-describe('buildScales – x (diverging magnitude) domain', () => {
+describe('buildScales - x (diverging magnitude) domain', () => {
 	test('spans [-maxMagnitude, maxMagnitude] over every series', () => {
 		const result = build();
 		expect(result.x?.domain).toEqual([-12, 12]);
@@ -73,7 +73,7 @@ describe('buildScales – x (diverging magnitude) domain', () => {
 	});
 });
 
-describe('buildScales – y (category) domain', () => {
+describe('buildScales - y (category) domain', () => {
 	test('is a band scale over every distinct category, in first-seen order', () => {
 		const result = build();
 		expect(result.y?.type).toBe('band');

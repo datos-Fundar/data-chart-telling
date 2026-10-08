@@ -6,7 +6,7 @@ import { GOOGL_AUGUST_2026 } from '../../../data/stockPrices';
 // `statistics: [{ type: 'bollinger' }]` resolves straight to svelteplot's own
 // `BollingerX`/`BollingerY` mark: a moving-average line (`n`) plus a band at
 // `±k` standard deviations. Of `StrokeStyle`'s full field set, only
-// `stroke`/`strokeOpacity` actually reach the line — `bandFill` is the band's
+// `stroke`/`strokeOpacity` actually reach the line - `bandFill` is the band's
 // own separate style channel.
 
 const stockData = GOOGL_AUGUST_2026.map((d, i) => ({ ...d, day: i + 1 }));
@@ -43,7 +43,7 @@ export const Default: Story = {
 	}
 };
 
-/** `styles.stroke` recolors the moving-average line, `styles.bandFill` the ±k·σ band — the two channels that actually route through. */
+/** `styles.stroke` recolors the moving-average line, `styles.bandFill` the ±k·σ band - the two channels that actually route through. */
 export const CustomStyle: Story = {
 	args: {
 		statistics: [

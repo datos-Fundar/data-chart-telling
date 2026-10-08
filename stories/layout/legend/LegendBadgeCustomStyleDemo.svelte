@@ -3,14 +3,14 @@
 	import type { LegendSection } from '$lib/types/layout/legend';
 
 	// Calling $props() (even unused) keeps this component's inferred prop type
-	// permissive — without it, Storybook's bare `render: () => ({ Component })`
+	// permissive - without it, Storybook's bare `render: () => ({ Component })`
 	// typing rejects a zero-prop-plus-runes component.
 	const props = $props();
 	void props;
 
 	/**
 	 * `.dct-discrete__badge` isn't a themeable config knob (unlike
-	 * `--dct-legend-*` custom properties) — it's a plain, stable CSS class on
+	 * `--dct-legend-*` custom properties) - it's a plain, stable CSS class on
 	 * the pill, restyled here from a consumer stylesheet with an ordinary
 	 * `:global(...)` selector. No package prop needed for shadow, border, or
 	 * hover; this toggle just swaps a wrapper class to compare before/after.
@@ -21,7 +21,7 @@
 		{
 			type: 'discrete',
 			title: 'Indicator (click to hide)',
-			interactive: { enabled: true, disabled: { mode: 'style', style: { opacity: 0.15 } } },
+			interactive: { enabled: true, disabled: { mode: 'dim', style: { opacity: 0.15 } } },
 			items: [
 				{ name: 'GDP', label: 'GDP', color: '#4f46e5', symbol: 'line' },
 				{ name: 'Employment', label: 'Employment', color: '#e6580d', symbol: 'line' },
@@ -79,7 +79,7 @@
 
 	/* Everything below targets the package's own `.dct-discrete__badge` /
 	   `.dct-discrete__item--interactive` classes exactly as a consumer app
-	   would from its own global stylesheet — scoped here to `.demo__stage
+	   would from its own global stylesheet - scoped here to `.demo__stage
 	   --custom` only so the "Default" toggle state stays untouched. */
 	:global(.demo__stage--custom .dct-discrete__badge) {
 		border: 1px solid color-mix(in srgb, currentColor 20%, transparent);

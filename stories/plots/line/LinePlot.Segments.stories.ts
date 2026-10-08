@@ -47,8 +47,8 @@ type Story = StoryObj<typeof meta>;
 /**
  * Simplest `default` key: one Segment with one Area.
  *
- * The area covers x ∈ [2016, 2020]. Data points outside the area (2008–2014)
- * are rendered with the default palette style — no explicit catch-all needed.
+ * The area covers x ∈ [2016, 2020]. Data points outside the area (2008-2014)
+ * are rendered with the default palette style - no explicit catch-all needed.
  * The engine inserts a bridge point at 2016 so the lines connect without a gap.
  *
  * Use the **Stroke** controls in the panel to explore all StrokeStyle
@@ -65,7 +65,7 @@ export const DashedSegmentInRange: any = {
 				data: FEMALE_LIFE_EXPECTANCY
 			}
 		],
-		// Extra args wired through render — not LinePlot props
+		// Extra args wired through render - not LinePlot props
 		stroke: 'currentColor',
 		strokeWidth: 2,
 		strokeOpacity: 0.8,
@@ -155,7 +155,7 @@ export const MultipleAreasOneSegment: Story = {
 };
 
 /**
- * One Segment, two Areas — the second area adds a Y constraint.
+ * One Segment, two Areas - the second area adds a Y constraint.
  *
  * The first area matches x ∈ [2010, 2012] (any Y).
  * The second matches x ∈ [2015, 2020] AND y ∈ [83.5, 84], which in this
@@ -190,8 +190,8 @@ export const MultipleAreasWithYConstraint: Story = {
 /**
  * Two Segments with different styles, each targeting a different Area.
  *
- * - Segment 1: x ∈ [2010, 2012] — dashed with reduced opacity.
- * - Segment 2: x ∈ [2015, 2020] AND y ∈ [83.5, 84] — a different color and tighter dash.
+ * - Segment 1: x ∈ [2010, 2012] - dashed with reduced opacity.
+ * - Segment 2: x ∈ [2015, 2020] AND y ∈ [83.5, 84] - a different color and tighter dash.
  *
  * Segments are drawn in list order; later ones render on top of earlier ones.
  */
@@ -224,9 +224,9 @@ export const TwoSegmentsDifferentStyles: Story = {
  * Same two-segment structure, now with two series (female and male).
  *
  * `default` segments apply identically to every series in the plot.
- * Segment 1 (x range only) visibly styles both lines at 2010–2012.
+ * Segment 1 (x range only) visibly styles both lines at 2010-2012.
  * Segment 2 (x AND y ∈ [83.5, 84]) only matches female's values at that range
- * (83.7, 83.9); male's values there are 78–79 and fall outside the Y bound —
+ * (83.7, 83.9); male's values there are 78-79 and fall outside the Y bound -
  * so the tomato style naturally appears only on the female line, even though
  * the segment is global.
  */
@@ -258,7 +258,7 @@ export const TwoSegmentsOnAllSeries: Story = {
  * Segments keyed by series name apply only to the named series.
  *
  * Here, the same two segments from the previous story are scoped explicitly
- * to `'female'`. The male line is unaffected regardless of its Y values —
+ * to `'female'`. The male line is unaffected regardless of its Y values -
  * the record key is the deciding factor, not data filtering.
  */
 export const SegmentsOnOneSeriesOnly: Story = {
@@ -405,12 +405,12 @@ export const CustomDotsWithStroke: Story = {
 
 // ── Catch-all as default baseline ─────────────────────────────────────────────
 // A catch-all segment (no `areas`) placed anywhere in the list is evaluated
-// last — area-specific segments always win, regardless of their position.
+// last - area-specific segments always win, regardless of their position.
 
 /**
  * Catch-all as a baseline that area-specific segments fully override.
  *
- * A segment without `areas` is a catch-all — it matches every data point but
+ * A segment without `areas` is a catch-all - it matches every data point but
  * is evaluated **last**, so area-specific segments always win regardless of
  * list position. Here the catch-all sets a muted baseline color (yellow /
  * lightblue) and area-specific segments replace both the stroke color and add
@@ -459,7 +459,7 @@ export const CatchAllAsDefaultStyle: Story = {
 // Use named keys for series colours and `default` for shared period dots.
 
 /**
- * Series colour with shared dot placement — separation of concerns in one record.
+ * Series colour with shared dot placement - separation of concerns in one record.
  *
  * - Per-series catch-alls (`female`, `male`) set the baseline stroke colour.
  * - The `default` key adds dots for **all** series in two specific time ranges,
@@ -469,7 +469,7 @@ export const CatchAllAsDefaultStyle: Story = {
  * any style key absent from the area segment's own style is filled in from
  * the catch-all. Here the `default` dot segments carry no `stroke`, so they
  * inherit the per-series catch-all stroke (yellow / lightblue). The line
- * stays the series colour throughout — no need to repeat the stroke on every
+ * stays the series colour throughout - no need to repeat the stroke on every
  * area segment.
  */
 export const SeparationOfConcerns: Story = {
@@ -504,7 +504,7 @@ export const SeparationOfConcerns: Story = {
  *
  * One record holds everything: per-series catch-alls supply each line's colour,
  * and a `default` key maps three successive time ranges to different dot
- * symbols — all without repeating the stroke colour on any area segment.
+ * symbols - all without repeating the stroke colour on any area segment.
  *
  * The catch-all merge fills in the missing stroke on each `default` area
  * segment, so every dot inherits the correct series colour automatically.

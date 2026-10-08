@@ -1,11 +1,11 @@
 <script lang="ts">
-	import BarChart from '$lib/charts/bar/Chart.svelte';
+	import BarPlot from '$lib/plots/bar/Plot.svelte';
 	import { REGION_SECTOR_BARS, type RegionSector } from '../../data/region-bars';
 	import type { BarSeriesLayout } from '$lib/types/plots/bar/layout';
 
 	type Orientation = 'vertical' | 'horizontal';
 
-	// Zero-prop marker — keeps Storybook's render typing happy.
+	// Zero-prop marker - keeps Storybook's render typing happy.
 	const props = $props();
 	void props;
 
@@ -27,10 +27,10 @@
 		{#each ORIENTATIONS as o (o)}
 			<button class:active={orientation === o} onclick={() => (orientation = o)}>{o}</button>
 		{/each}
-		<span class="demo__hint">hover a segment — the same sector highlights in every region</span>
+		<span class="demo__hint">hover a segment - the same sector highlights in every region</span>
 	</div>
 
-	<BarChart
+	<BarPlot
 		width={760}
 		height={420}
 		title="Value by sector, faceted by region"

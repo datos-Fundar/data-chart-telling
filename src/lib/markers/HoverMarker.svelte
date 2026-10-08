@@ -11,28 +11,28 @@
 	/**
 	 * In-SVG hover highlight, rendered *inside* a `<Plot>`. Because it positions
 	 * itself through the host plot's scales, it places the same coordinate
-	 * correctly in every facet — that is what makes cross-facet sync work without
+	 * correctly in every facet - that is what makes cross-facet sync work without
 	 * any pixel math. Draws optional x/y crosshair rules plus a dot + value label
 	 * for each matched point.
 	 *
 	 * Takes the raw `marker` config plus the couple of things it can't know on
-	 * its own — `activePoint` (the specific matched point actually under the
+	 * its own - `activePoint` (the specific matched point actually under the
 	 * cursor, for the crosshair position; see `controller.svelte.ts`'s own doc
 	 * comment) and whether the active hover strategy implies a crosshair on
-	 * each axis by default — the same "component owns its own rendering"
+	 * each axis by default - the same "component owns its own rendering"
 	 * pattern `BarMarker`/`RuleMarker` follow. `activePoint`/
 	 * `impliesCrosshairX`/`impliesCrosshairY` are all optional and default to
 	 * "no crosshair".
 	 *
 	 * `areaX`/`areaY` are a separate, always-explicit opt-in (no implied
-	 * default) for a thickened area highlight in place of the thin crosshair —
+	 * default) for a thickened area highlight in place of the thin crosshair -
 	 * see `HoverMarkerConfig`'s own doc comment. Rendered via `BarMarker`'s
 	 * `role: 'highlight'`, so it renders nothing on an axis without a band
 	 * scale (e.g. a line/scatter plot's continuous axis).
 	 */
 	interface Props {
 		data?: HoverDisplayPoint[];
-		/** Narrowed to just the fields this component reads — `HoverMarkerConfig` also carries routing/scoping fields (`series`/`scope`/`strategy`/`sync`) it has no use for. */
+		/** Narrowed to just the fields this component reads - `HoverMarkerConfig` also carries routing/scoping fields (`series`/`scope`/`strategy`/`sync`) it has no use for. */
 		marker: Pick<
 			HoverMarkerConfig,
 			| 'ruleX'
@@ -100,7 +100,7 @@
 	);
 	const ruleX = $derived(showCrosshairX ? (activePoint?.x ?? null) : null);
 	const ruleY = $derived(showCrosshairY ? (activePoint?.y ?? null) : null);
-	// areaX/areaY have no implied default — always off unless explicitly set.
+	// areaX/areaY have no implied default - always off unless explicitly set.
 	const areaX = $derived(marker.areaX === true ? (activePoint?.x ?? null) : null);
 	const areaY = $derived(marker.areaY === true ? (activePoint?.y ?? null) : null);
 	const showLabels = $derived(marker.showLabels ?? true);
@@ -114,7 +114,7 @@
 	const resolveColor = (explicit: string | undefined, point: HoverDisplayPoint) =>
 		explicit ?? point.color;
 
-	// Horizontal gap between the dot's edge and an 'outside'-anchored label —
+	// Horizontal gap between the dot's edge and an 'outside'-anchored label -
 	// scales with the dot's own resolved radius so the label clears it.
 	const dotRadius = $derived(dotStyle?.dotRadius ?? cfg.hover.dot.dotRadius ?? 5);
 
@@ -123,7 +123,7 @@
 	 * offset, mirroring the value-label `'outside'` anchor's own left/right
 	 * split (see pyramid/bar's own `ValueAnchor` handling): a positive `x`
 	 * anchors `'start'` and nudges right, a negative `x` anchors `'end'` and
-	 * nudges left — so a diverging mark's label sits on the side of the dot
+	 * nudges left - so a diverging mark's label sits on the side of the dot
 	 * away from zero, on whichever side that dot itself landed. Only
 	 * meaningful when the point's `x` is numeric (e.g. pyramid's magnitude
 	 * axis); anything else falls through to the plain `text` style unchanged.
@@ -210,7 +210,7 @@
 {#if data.length > 0}
 	{#each data as point (`${point.series ?? ''}_${point.x}_${point.y}`)}
 		<!-- Pixel nudge for plot kinds whose series position isn't fully captured
-         by x/y alone (e.g. BarPlot's 'grouped' layout) — see HoverDisplayPoint.dx/dy. -->
+         by x/y alone (e.g. BarPlot's 'grouped' layout) - see HoverDisplayPoint.dx/dy. -->
 		<g transform="translate({point.dx ?? 0}, {point.dy ?? 0})">
 			<DotMarker
 				marker={{

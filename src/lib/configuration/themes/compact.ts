@@ -1,6 +1,6 @@
-import type { ChartConfigInput } from '$lib/types/configuration/styling';
+import type { PlotStylesConfigInput } from '$lib/types/configuration/styling';
 
-export const COMPACT_THEME: ChartConfigInput = {
+export const COMPACT_THEME: PlotStylesConfigInput = {
 	title: { size: '1.1rem', weight: 600 },
 	subtitle: { size: '0.85rem' },
 	legend: { size: '0.75rem', swatchSize: '0.9rem', gap: '0.25rem 1rem' },

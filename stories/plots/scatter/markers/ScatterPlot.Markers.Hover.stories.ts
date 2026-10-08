@@ -33,7 +33,7 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Basic hover marker — an in-SVG dot and value label appear at the nearest
+ * Basic hover marker - an in-SVG dot and value label appear at the nearest
  * point as the cursor moves over the plot. No crosshair rule is drawn by
  * default: scatter's `'punctual'` strategy matches a single point, not a
  * shared x/y value, so a rule has nothing meaningful to line up against.
@@ -58,7 +58,7 @@ export const WithCrosshair: Story = {
 	}
 };
 
-/** Custom dot/font style — overrides the highlight dot's fill/radius and the label's font. */
+/** Custom dot/font style - overrides the highlight dot's fill/radius and the label's font. */
 export const WithCustomStyle: Story = {
 	args: {
 		markers: [
@@ -71,7 +71,7 @@ export const WithCustomStyle: Story = {
 	}
 };
 
-/** Two regions — the unscoped hover marker responds to whichever cloud's point is nearest the cursor. */
+/** Two regions - the unscoped hover marker responds to whichever cloud's point is nearest the cursor. */
 export const GroupedByRegion: Story = {
 	args: {
 		data: COUNTRIES,
@@ -81,7 +81,7 @@ export const GroupedByRegion: Story = {
 };
 
 /**
- * Series-scoped marker — `series: 'Americas'` restricts the hover highlight
+ * Series-scoped marker - `series: 'Americas'` restricts the hover highlight
  * to points in that region only. Hovering the other regions produces no
  * dot or label even though every region is rendered.
  */

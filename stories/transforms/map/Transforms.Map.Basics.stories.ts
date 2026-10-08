@@ -5,7 +5,7 @@ import { DAILY_TEMPERATURE, BUENOS_AIRES_TEMPERATURE } from '../../data/daily-te
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `mapY` transform replaces each group's `y` values with a function of the
-// whole group at once — something a per-row accessor can't do, since it sees one
+// whole group at once - something a per-row accessor can't do, since it sees one
 // row at a time. Built in: `cumsum` (a running total), `rank` and `quantile`.
 // Any `(index, values) => values` function works too. `mapX` maps `x`.
 
@@ -39,7 +39,7 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** The daily rainfall as is: spikes on rainy days, zero in between — hard to compare the two cities. */
+/** The daily rainfall as is: spikes on rainy days, zero in between - hard to compare the two cities. */
 export const DailyRain: Story = {
 	args: { scales: { y: { label: 'Rain (mm)' } } }
 };
@@ -54,7 +54,7 @@ export const Cumsum: Story = {
 
 /**
  * `map: 'quantile'` on a marker: with the temperatures as `x` and `y`, `mapY`
- * replaces each `y` by its rank among the city's days, from 0 to 1 — an
+ * replaces each `y` by its rank among the city's days, from 0 to 1 - an
  * empirical cumulative distribution, drawn as dots.
  */
 export const Quantile: Story = {
@@ -79,7 +79,7 @@ export const Quantile: Story = {
 	}
 };
 
-/** `map: 'rank'`: each day's rank among the year, the coldest day at 0 — the daily noise becomes a steady ranking. */
+/** `map: 'rank'`: each day's rank among the year, the coldest day at 0 - the daily noise becomes a steady ranking. */
 export const Rank: Story = {
 	args: {
 		data: BUENOS_AIRES_TEMPERATURE,
@@ -90,7 +90,7 @@ export const Rank: Story = {
 	}
 };
 
-/** A function of the whole group: each day's temperature minus its city's yearly mean — the anomaly, centered on zero. */
+/** A function of the whole group: each day's temperature minus its city's yearly mean - the anomaly, centered on zero. */
 export const CustomMap: Story = {
 	args: {
 		y: 'temp',

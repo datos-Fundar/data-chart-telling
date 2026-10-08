@@ -1,27 +1,13 @@
-import type { ChartConfig, ChartConfigInput, TextStyle } from '$lib/types/configuration/styling';
+import type { PlotStylesConfig, PlotStylesConfigInput, TextStyle } from '$lib/types/configuration/styling';
 
 /**
- * Global, reactive styling configuration for the whole package.
- *
- * One source of truth feeds two consumers:
- *   1. HTML chrome (container, legend, caption, tooltip) reads it as **CSS
- *      custom properties** — {@link configToCssVars} flattens the config and
- *      {@link ChartContainer} stamps the variables on its root so the scoped
- *      `<style>` blocks resolve them.
- *   2. Plots read it as **plain JS values** for the props svelteplot needs as
- *      numbers/strings (margins, tick font sizes, palette, gradient endpoints).
- *
- * Because the store is a module-level Svelte `$state`, calling
- * {@link setConfiguration} re-renders every chart on screen.
+ * Global, reactive styling configuration. Chrome reads it as CSS custom
+ * properties ({@link configToCssVars}); plots read it as plain values.
+ * {@link setConfiguration} re-renders every plot.
  */
 
 // ── Defaults ────────────────────────────────────────────────────────────────
-// Mirror the values the components shipped with, so adopting the config system
-// is visually a no-op until something is overridden — except `axis.locale`,
-// which defaults to `es-AR` instead of svelteplot's own `en-US`, and
-// `axis.compactDisplay`, which defaults to `long` instead of svelteplot's
-// own `short` (Spanish's short form is inconsistent about letter case —
-// `'1 K'` vs `'10 k'` for the same unit — while its long form isn't).
+// `axis.locale` defaults to `es-AR` and `axis.compactDisplay` to `long`.
 
 const text = (over: Partial<TextStyle>): TextStyle => ({
 	font: 'inherit',
@@ -33,17 +19,23 @@ const text = (over: Partial<TextStyle>): TextStyle => ({
 	...over
 });
 
-export const DEFAULT_CONFIG: ChartConfig = {
+export const DEFAULT_CONFIG: PlotStylesConfig = {
 	font: 'inherit',
 	color: 'currentColor',
 	background: 'transparent',
-	border: 'color-mix(in srgb, currentColor 15%, transparent)',
 
 	spacing: {
-		headerPadding: '0.75rem 0 1rem',
-		legendPadding: '0.75rem 0',
+		headerPadding: '0.5rem 0',
+		legendPadding: '0.5rem 0',
 		captionPadding: '0.5rem 0',
 		bleed: '12px'
+	},
+
+	divider: {
+		color: 'color-mix(in srgb, currentColor 15%, transparent)',
+		width: '1px',
+		style: 'solid',
+		margin: '0.5rem 0px'
 	},
 
 	title: text({ size: '1.5rem', weight: 500, leading: '1.2' }),
@@ -62,7 +54,7 @@ export const DEFAULT_CONFIG: ChartConfig = {
 		titleSize: '0.875rem',
 		titleWeight: 500,
 		gap: '0.5rem 2rem',
-		swatchSize: '1.25rem',
+		swatchSize: '0.9rem',
 		disabledOpacity: 0.12,
 		navButton: {
 			background: 'transparent',
@@ -126,7 +118,7 @@ export const DEFAULT_CONFIG: ChartConfig = {
 	},
 
 	margins: { top: 'auto', right: 'auto', bottom: 'auto', left: 'auto' },
-	// ColorBrewer Dark2 — qualitative, harmonious, and dark enough to read on white.
+	// ColorBrewer Dark2 - qualitative, harmonious, and dark enough to read on white.
 	palette: ['#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02', '#a6761d', '#666666'],
 	symbols: ['circle', 'square', 'triangle', 'diamond', 'star', 'cross'],
 	continuous: { min: '#f7fcfd', max: '#1b9e77', labelColor: '#111827', opacityRange: [0.2, 1] },
@@ -156,7 +148,7 @@ export const DEFAULT_CONFIG: ChartConfig = {
 	area: { fillOpacity: 0.6 },
 	histogram: { inset: 1, fillOpacity: 1 },
 	scatter: { dotRadius: 5 },
-	timeline: { axisColor: 'currentColor', activeColor: '#e6580d', thickness: 60 },
+	timeline: { axisColor: 'currentColor', activeColor: '#e6580d', thickness: 60, gap: '12px' },
 	hover: {
 		rule: { stroke: '#e6580d', strokeOpacity: 0.35, strokeWidth: 1.5, strokeDasharray: '4 4' },
 		dot: { dotRadius: 5, dotFill: 'currentColor' },
@@ -200,15 +192,15 @@ function merge<T>(base: T, patch: Record<string, unknown>): T {
 
 // ── Reactive store ──────────────────────────────────────────────────────────
 
-let current = $state<ChartConfig>(structuredClone(DEFAULT_CONFIG));
+let current = $state<PlotStylesConfig>(structuredClone(DEFAULT_CONFIG));
 
 /** Read the live, reactive configuration. */
-export function getConfiguration(): ChartConfig {
+export function getConfiguration(): PlotStylesConfig {
 	return current;
 }
 
 /** Deep-merge a partial override into the global configuration. Reactive. */
-export function setConfiguration(patch: ChartConfigInput): ChartConfig {
+export function setConfiguration(patch: PlotStylesConfigInput): PlotStylesConfig {
 	current = merge(current, patch);
 	return current;
 }
@@ -221,7 +213,7 @@ export function resetConfiguration(): void {
 // ── CSS variable bridge ───────────────────────────────────────────────────────
 
 /** Flatten a config into the `--dct-*` custom properties used by the styles. */
-export function configToCssVars(c: ChartConfig): Record<string, string> {
+export function configToCssVars(c: PlotStylesConfig): Record<string, string> {
 	const t = (prefix: string, s: TextStyle): Record<string, string> => ({
 		[`--dct-${prefix}-font`]: s.font,
 		[`--dct-${prefix}-size`]: s.size,
@@ -235,12 +227,16 @@ export function configToCssVars(c: ChartConfig): Record<string, string> {
 		'--dct-font': c.font,
 		'--dct-fg': c.color,
 		'--dct-bg': c.background,
-		'--dct-border': c.border,
 
 		'--dct-header-pad': c.spacing.headerPadding,
 		'--dct-legend-pad': c.spacing.legendPadding,
 		'--dct-caption-pad': c.spacing.captionPadding,
 		'--dct-bleed': c.spacing.bleed,
+
+		'--dct-divider-color': c.divider.color,
+		'--dct-divider-width': c.divider.width,
+		'--dct-divider-style': c.divider.style,
+		'--dct-divider-margin': c.divider.margin,
 
 		...t('title', c.title),
 		...t('subtitle', c.subtitle),
@@ -286,6 +282,7 @@ export function configToCssVars(c: ChartConfig): Record<string, string> {
 
 		'--dct-timeline-axis': c.timeline.axisColor,
 		'--dct-timeline-active': c.timeline.activeColor,
+		'--dct-timeline-gap': c.timeline.gap,
 
 		'--dct-heat-min': c.continuous.min,
 		'--dct-heat-max': c.continuous.max,

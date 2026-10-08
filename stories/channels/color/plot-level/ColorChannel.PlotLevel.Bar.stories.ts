@@ -4,7 +4,7 @@ import { LIFE_EXPECTANCY_BY_PROVINCE } from '../../../plots/bar/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `color` channel: a plot-level `color` accessor plus `scales.color`
-// drives every default mark's fill — here, BarPlot's own bars. This is the
+// drives every default mark's fill - here, BarPlot's own bars. This is the
 // discrete categorical case: `color` groups series by name, and `scales.color`
 // maps those category names to specific colors via a `scheme` record.
 
@@ -34,7 +34,7 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * `color: 'sex'` groups the data by sex (male/female) and feeds each series
- * name into the plot's own `scales.color` ramp — the default palette cycles
+ * name into the plot's own `scales.color` ramp - the default palette cycles
  * through colors automatically for each series.
  */
 export const Default: Story = {

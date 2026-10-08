@@ -26,7 +26,7 @@ function build(overrides: Partial<HeatmapPlotState<Row>> = {}) {
 	return buildData(state);
 }
 
-describe('buildData – series resolution', () => {
+describe('buildData - series resolution', () => {
 	test('passes through an explicit series array', () => {
 		const result = build({ series: [series('a', [{ row: 'X', col: 'A', value: 1 }])] });
 		expect(result.resolvedSeries).toHaveLength(1);

@@ -5,7 +5,7 @@ import { WORLD_COUNTRIES, WEATHER_STATIONS, type WorldCountryProps } from '../..
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `dot` marker's own `color` + `scales.color` is independent of the plot's
-// own channel (see `Channels/Color/Plot Level`) — it reads its own accessor
+// own channel (see `Channels/Color/Plot Level`) - it reads its own accessor
 // and, when it sets no `scales` of its own, falls back to the plot's own
 // ramp (see `Channels/Color/Independent Ramps`' `Default` story). Here the
 // base map carries no color channel at all; only the weather-station dot
@@ -38,7 +38,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * The `dot` marker's own `color: 'tempC'` accessor drives its fill — the
+ * The `dot` marker's own `color: 'tempC'` accessor drives its fill - the
  * default palette's own continuous ramp, since the marker sets no `scales`
  * of its own.
  */

@@ -9,7 +9,7 @@
    * prop. Composed by `BasePlotLayout` for every plot kind, nested inside
    * `CoordinatesLayout` so embellishments pan/zoom together with whatever
    * they're placed alongside: the raster basemap `tileLayer` (`GeoPlot`
-   * only — other kinds' `styles` simply don't declare it) and the `frame`
+   * only - other kinds' `styles` simply don't declare it) and the `frame`
    * border, available on every plot kind.
    */
   let {
@@ -27,7 +27,7 @@
   const frame = $derived(styles?.frame);
   const frameStyle = $derived(typeof frame === 'object' ? frame : undefined);
 
-  /** Auto-fits `TileLayer` to the tile-layer feature set `GeoPlot` tacks onto `styles.tileLayer.features` — see `StylesLayoutConfig`'s own doc comment. */
+  /** Auto-fits `TileLayer` to the tile-layer feature set `GeoPlot` tacks onto `styles.tileLayer.features` - see `StylesLayoutConfig`'s own doc comment. */
   const dataLonLatBounds = $derived.by((): [number, number, number, number] | null => {
     const features = styles?.tileLayer?.features;
     if (!features?.length) return null;

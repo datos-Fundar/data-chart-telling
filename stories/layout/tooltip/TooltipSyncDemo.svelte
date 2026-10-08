@@ -10,10 +10,10 @@
 </script>
 
 <script lang="ts">
-	import LineChart from '$lib/charts/line/Chart.svelte';
-	import BarChart from '$lib/charts/bar/Chart.svelte';
-	import HeatmapChart from '$lib/charts/heatmap/Chart.svelte';
-	import PyramidChart from '$lib/charts/pyramid/Chart.svelte';
+	import LinePlot from '$lib/plots/line/Plot.svelte';
+	import BarPlot from '$lib/plots/bar/Plot.svelte';
+	import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
+	import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
 	import type { HoverStrategy } from '$lib/types/layout/tooltip';
 	import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
 	import type { HeatCell } from '../../data/heat-cells';
@@ -41,11 +41,11 @@
 		<span class="demo__sep">|</span>
 		<span class="demo__label">sync:</span>
 		<button class:active={sync} onclick={() => (sync = !sync)}>{sync ? 'on' : 'off'}</button>
-		<span class="demo__hint">hover a facet — the match is mirrored in the others</span>
+		<span class="demo__hint">hover a facet - the match is mirrored in the others</span>
 	</div>
 
 	{#if kind === 'heatmap'}
-		<HeatmapChart
+		<HeatmapPlot
 			width={760}
 			height={460}
 			title="Households by rooms (2022)"
@@ -61,7 +61,7 @@
 			markers={[{ type: 'hover' }]}
 		/>
 	{:else if kind === 'bar'}
-		<BarChart
+		<BarPlot
 			width={760}
 			height={420}
 			title="Value by region and year"
@@ -74,7 +74,7 @@
 			markers={[{ type: 'hover' }]}
 		/>
 	{:else if kind === 'pyramid'}
-		<PyramidChart
+		<PyramidPlot
 			width={760}
 			height={520}
 			title="Population pyramid by year"
@@ -95,7 +95,7 @@
 			markers={[{ type: 'hover' }]}
 		/>
 	{:else}
-		<LineChart
+		<LinePlot
 			width={760}
 			height={440}
 			title="GDP vs. Employment by region"

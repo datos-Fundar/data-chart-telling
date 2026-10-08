@@ -5,7 +5,7 @@ import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, FLIGHT_ROUTES } from '../../../../../stories/plots/geo/data';
 import { waitForSvg, countLinkPaths } from '../../_helpers/svg';
 
-describe('GeoPlot – link marker', () => {
+describe('GeoPlot - link marker', () => {
   test('renders one path per route', async () => {
     const { container } = render(GeoPlot, {
       width: 400,

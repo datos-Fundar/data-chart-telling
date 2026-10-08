@@ -17,7 +17,10 @@ const POSITION_CHANNELS = {
 } as const;
 
 /** Every value the plot's own processed rows sit at on one axis. */
-function processedValues(processed: ProcessedData | undefined, axis: AxisChannelName): unknown[] {
+export function processedValues(
+	processed: ProcessedData | undefined,
+	axis: AxisChannelName
+): unknown[] {
 	if (!processed) return [];
 	return POSITION_CHANNELS[axis].flatMap((name) => {
 		const channel = processed.channels[name];
@@ -35,12 +38,8 @@ function numeric(values: unknown[]): number[] | undefined {
 }
 
 /**
- * The "scales" stage every axis-based plot shares unless it resolves its own:
- * grows an unpinned numeric axis to cover what svelteplot's own domain doesn't
- * read — the marks derived from the plot (a density curve's tails, a
- * regression band, an author marker with its own rows), and the ranges the
- * transforms gave the plot's own rows (a bin's edges, a stack's top). An axis
- * with neither, a pinned domain, or a non-numeric axis is left alone.
+ * The shared "scales" stage: grows an unpinned numeric axis to cover derived
+ * markers and the ranges the transforms gave the rows.
  */
 export function buildScales<TState extends AnyAxisState, TCtx extends AxisPlotCtx>(
 	options: ScalesStageOptions<TState, TCtx> = {}

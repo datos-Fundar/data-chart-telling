@@ -1,6 +1,6 @@
 // d3-array-compatible "nice" tick step/generation, reimplemented locally to
 // avoid depending on internals svelteplot itself pulls in (not one of our
-// declared dependencies) — see https://d3js.org/d3-array/ticks.
+// declared dependencies) - see https://d3js.org/d3-array/ticks.
 
 /** Step between "nice" (1/2/5×10ⁿ) tick values for an approximate `count` over `[start, stop]`. */
 export function tickStep(start: number, stop: number, count: number): number {
@@ -26,13 +26,13 @@ export function ticksInRange(start: number, stop: number, step: number): number[
   return out;
 }
 
-/** Ticks-per-axis heuristic — used by `ScalesLayout` to pick a target count from an axis's actual pixel span. */
+/** Ticks-per-axis heuristic - used by `ScalesLayout` to pick a target count from an axis's actual pixel span. */
 export function naturalTickCount(span: number, spacing: number, min: number): number {
   return Math.max(min, Math.round(span / spacing));
 }
 
 /**
- * Widens `[lo, hi]` outward to the nearest `count`-ish "nice" step —
+ * Widens `[lo, hi]` outward to the nearest `count`-ish "nice" step -
  * equivalent to d3's own `scale.nice(count)`, except a value within
  * `epsilonFraction × step` of a step boundary is treated as already sitting
  * on it, rather than needing a full extra step to clear it.
@@ -44,7 +44,7 @@ export function naturalTickCount(span: number, spacing: number, min: number): nu
  * to a whole" data, e.g. percentages of a total) still fails `hi <= step*N`
  * and gets rounded up a full step further than the data actually warrants
  * (`100` → `110`, not just a hair past `100`). `epsilonFraction` defaults to
- * 1% of the step — small enough to only catch rounding/summation noise, not
+ * 1% of the step - small enough to only catch rounding/summation noise, not
  * data that's genuinely meaningfully past the boundary.
  */
 export function niceDomain(lo: number, hi: number, count = 5, epsilonFraction = 0.01): [number, number] {

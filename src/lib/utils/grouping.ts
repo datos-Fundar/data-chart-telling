@@ -25,7 +25,7 @@ export function groupBy<TRow extends Record<string, unknown>>(
 /**
  * Adapts flat rows into the `Series[]` shape the plot expects.
  * When `grouping` is given, one series is produced per group (series `name`
- * = group value), which is exactly how the plot's `segments` map is keyed —
+ * = group value), which is exactly how the plot's `segments` map is keyed -
  * so the caller styles/colors each group by its own value (see
  * `scales.color`). Callers pass `grouping ?? color` so a lone `color`
  * accessor groups *and* colors series exactly as it always has.

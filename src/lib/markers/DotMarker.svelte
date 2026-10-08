@@ -11,7 +11,7 @@
 
 	/**
 	 * Renders one `'dot'` marker. `x`/`y` also accept a literal number/Date
-	 * (every row draws at that fixed position) — used by markers like
+	 * (every row draws at that fixed position) - used by markers like
 	 * `DeltaMarker` that place a dot at a computed point.
 	 */
 	const { marker }: { marker: DotMarkerConfig } = $props();
@@ -32,7 +32,7 @@
 	/**
 	 * A per-row accessor (a field key string, now that it's forwarded raw, or
 	 * a function) reads its position per row and needs real `data` to do
-	 * that — an empty `data` legitimately means "nothing to plot", not "draw
+	 * that - an empty `data` legitimately means "nothing to plot", not "draw
 	 * one anyway". Only a true literal (a number/Date, or unset) draws one
 	 * dot at a fixed point regardless of `data`.
 	 */
@@ -44,10 +44,10 @@
 	const resolvedFill = $derived(resolveChannelFill(displayData, color, scales, cfg));
 	const resolvedSymbolFn = $derived(resolveChannelSymbol(displayData, symbolProp, scales, cfg));
 	/**
-	 * `opacity` can't be a live per-row function the way `color`/`symbol` are —
+	 * `opacity` can't be a live per-row function the way `color`/`symbol` are -
 	 * svelteplot re-derives its own domain from whatever a `fillOpacity`
 	 * accessor returns and re-normalizes it (no "already resolved" escape
-	 * hatch for a bare number, unlike a recognized CSS color/shape string) —
+	 * hatch for a bare number, unlike a recognized CSS color/shape string) -
 	 * so an active `opacity` channel splits `displayData` into buckets,
 	 * each rendered as its own `<Dot>` call with one literal opacity value.
 	 */

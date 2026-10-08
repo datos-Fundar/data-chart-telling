@@ -4,7 +4,7 @@
 
   /**
    * Purely visual time axis: a baseline rule plus the ordered step labels with
-   * the current step emphasised. It has no notion of data — it just draws the
+   * the current step emphasised. It has no notion of data - it just draws the
    * `values` it is handed and highlights `currentValue`. Colours come from CSS
    * variables so a host app can theme it.
    */

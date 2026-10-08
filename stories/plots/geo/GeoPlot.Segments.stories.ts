@@ -7,7 +7,7 @@ import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // GeoPlot's `segments` uses the same `Segments`/`Segment` types every other
-// plot kind does, but keyed by *feature id* instead of series name — e.g.
+// plot kind does, but keyed by *feature id* instead of series name - e.g.
 // `segments['Buenos Aires']` styles just that one feature, the same way
 // `segments.female` styles a whole series elsewhere. A feature is atomic (no
 // x/y sub-ranges), so every `segments` entry here is a flat style patch, not
@@ -42,7 +42,7 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Highlight one feature by id — `segments['Buenos Aires']` styles just that
+ * Highlight one feature by id - `segments['Buenos Aires']` styles just that
  * province; `default` sets the baseline every other feature falls back to.
  */
 export const HighlightOneProvince: Story = {
@@ -54,7 +54,7 @@ export const HighlightOneProvince: Story = {
   },
 };
 
-/** Highlight several features — one entry per feature id, each with its own style. */
+/** Highlight several features - one entry per feature id, each with its own style. */
 export const HighlightSeveralProvinces: Story = {
   args: {
     segments: {
@@ -67,7 +67,7 @@ export const HighlightSeveralProvinces: Story = {
 };
 
 /**
- * `default` merges with a feature-specific entry — the feature-specific
+ * `default` merges with a feature-specific entry - the feature-specific
  * style only needs to override what differs (here just `fillOpacity`); the
  * stroke set on `default` still applies.
  */
@@ -80,7 +80,7 @@ export const DefaultMergesWithFeatureStyle: Story = {
   },
 };
 
-/** Border emphasis — a feature-specific `stroke`/`strokeWidth` draws attention to one province's outline without changing its fill. */
+/** Border emphasis - a feature-specific `stroke`/`strokeWidth` draws attention to one province's outline without changing its fill. */
 export const HighlightWithStroke: Story = {
   args: {
     segments: {

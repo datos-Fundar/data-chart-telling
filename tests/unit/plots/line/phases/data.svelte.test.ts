@@ -5,7 +5,7 @@ import { buildLineKind } from '$lib/plots/line/kind';
 import type { LinePlotState, LinePlotCtx } from '$lib/types/plots/line/state';
 import type { Series } from '$lib/types/plots/data/common';
 import type { LegendInteractionStore } from '$lib/types/layout/legend';
-import type { ChartConfig } from '$lib/types/configuration/styling';
+import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 
 const buildData = stageOf(buildLineKind<Row>(), 'data');
 
@@ -14,7 +14,7 @@ const buildData = stageOf(buildLineKind<Row>(), 'data');
 type Row = { x: number; y: number | null };
 
 const PALETTE = ['red', 'green', 'blue'];
-const FAKE_CFG = { palette: PALETTE } as ChartConfig;
+const FAKE_CFG = { palette: PALETTE } as PlotStylesConfig;
 
 function series(name: string, data: Row[]): Series<Row> {
 	return { name, x: 'x', y: 'y', data };
@@ -43,7 +43,7 @@ function build(
 	return buildData(state, ctx);
 }
 
-describe('buildData – series resolution', () => {
+describe('buildData - series resolution', () => {
 	test('passes through an explicit series array', () => {
 		const result = build({ series: [series('a', []), series('b', [])] });
 		expect(result.resolvedSeries!.map((s) => s.name)).toEqual(['a', 'b']);
@@ -84,7 +84,7 @@ describe('buildData – series resolution', () => {
 	});
 });
 
-describe('buildData – legend filtering', () => {
+describe('buildData - legend filtering', () => {
 	test('drops a series disabled with mode: omit', () => {
 		const result = build({ series: [series('a', []), series('b', [])] }, legendDisabling('b'));
 		expect(result.resolvedSeries!.map((s) => s.name)).toEqual(['a']);
@@ -97,7 +97,7 @@ describe('buildData – legend filtering', () => {
 	});
 });
 
-describe('buildData – colorForSeries', () => {
+describe('buildData - colorForSeries', () => {
 	test('assigns palette colors by series declaration order', () => {
 		const result = build({ series: [series('a', []), series('b', []), series('c', [])] });
 		expect(result.colorForSeries!('a')).toBe(PALETTE[0]);
@@ -106,7 +106,7 @@ describe('buildData – colorForSeries', () => {
 	});
 });
 
-describe('buildData – groupedSeries / scopedGroups', () => {
+describe('buildData - groupedSeries / scopedGroups', () => {
 	test('one group per resolved series, covering all of its data by default', () => {
 		const data = [
 			{ x: 1, y: 1 },

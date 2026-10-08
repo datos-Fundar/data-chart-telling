@@ -11,7 +11,7 @@ const COUNTS = [
 	{ region: 'Africa', count: 60 }
 ];
 
-describe('ScatterPlot – markers.waffle', () => {
+describe('ScatterPlot - markers.waffle', () => {
 	test('a band x with a quantitative y renders one WaffleY cell group per row', async () => {
 		const { container } = render(ScatterPlot, {
 			width: 400,

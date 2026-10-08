@@ -5,7 +5,7 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { COUNTRIES } from '../../../../../stories/plots/scatter/data';
 import { waitForSvg, countRasterMarks } from '../../_helpers/svg';
 
-describe('ScatterPlot – markers.raster', () => {
+describe('ScatterPlot - markers.raster', () => {
 	test('function-sampling mode (empty data) renders one raster', async () => {
 		const { container } = render(ScatterPlot, {
 			width: 400,

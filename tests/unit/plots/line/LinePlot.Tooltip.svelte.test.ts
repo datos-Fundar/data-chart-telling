@@ -43,7 +43,7 @@ async function hoverCenterAndReadTooltip(
 	};
 }
 
-describe('LinePlot – tooltip', () => {
+describe('LinePlot - tooltip', () => {
 	test('no floating tooltip appears without a tooltip config', async () => {
 		const { container } = await render(LinePlot, { width: 400, height: 300, series: [FEMALE] });
 		await waitForSvg(container);
@@ -56,7 +56,6 @@ describe('LinePlot – tooltip', () => {
 			height: 300,
 			series: [FEMALE],
 			tooltip: {
-				facetId: '',
 				sync: false,
 				format: (row) => `${(row as YearPoint).year}: ${(row as YearPoint).value} yr`
 			}
@@ -71,7 +70,6 @@ describe('LinePlot – tooltip', () => {
 			height: 300,
 			series: [FEMALE, MALE],
 			tooltip: {
-				facetId: '',
 				sync: false,
 				format: (row) => `${(row as YearPoint).year}: ${(row as YearPoint).value.toFixed(1)} yr`
 			}
@@ -86,7 +84,6 @@ describe('LinePlot – tooltip', () => {
 			height: 300,
 			series: [FEMALE, MALE],
 			tooltip: {
-				facetId: '',
 				sync: false,
 				series: ['female'],
 				format: (row) => `Female: ${(row as YearPoint).value.toFixed(1)} yr`
@@ -105,7 +102,6 @@ describe('LinePlot – tooltip', () => {
 			y: 'value',
 			color: 'sex',
 			tooltip: {
-				facetId: '',
 				sync: false,
 				format: (row) => `${row.sex} (${row.year}): ${row.value} yr`
 			}
@@ -115,14 +111,13 @@ describe('LinePlot – tooltip', () => {
 	});
 });
 
-describe('LinePlot – tooltip anchor placement', () => {
+describe('LinePlot - tooltip anchor placement', () => {
 	test('by default, the tooltip sits to the right of and below the cursor (system default anchorX: "right", anchorY: "bottom")', async () => {
 		const { container } = await render(LinePlot, {
 			width: 900,
 			height: 500,
 			series: [FEMALE, MALE],
 			tooltip: {
-				facetId: '',
 				sync: false,
 				format: (row) => `${(row as YearPoint).year}: ${(row as YearPoint).value.toFixed(1)} yr`
 			}
@@ -138,7 +133,6 @@ describe('LinePlot – tooltip anchor placement', () => {
 			height: 500,
 			series: [FEMALE, MALE],
 			tooltip: {
-				facetId: '',
 				sync: false,
 				anchorX: 'left',
 				format: (row) => `${(row as YearPoint).year}: ${(row as YearPoint).value.toFixed(1)} yr`
@@ -154,7 +148,6 @@ describe('LinePlot – tooltip anchor placement', () => {
 			height: 500,
 			series: [FEMALE, MALE],
 			tooltip: {
-				facetId: '',
 				sync: false,
 				anchorY: 'top',
 				format: (row) => `${(row as YearPoint).year}: ${(row as YearPoint).value.toFixed(1)} yr`
@@ -170,7 +163,6 @@ describe('LinePlot – tooltip anchor placement', () => {
 			height: 500,
 			series: [FEMALE, MALE],
 			tooltip: {
-				facetId: '',
 				sync: false,
 				anchorY: 'bottom',
 				format: (row) => `${(row as YearPoint).year}: ${(row as YearPoint).value.toFixed(1)} yr`

@@ -31,7 +31,7 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * No scale overrides — both X and Y axes are auto-fitted to the data extent.
+ * No scale overrides - both X and Y axes are auto-fitted to the data extent.
  */
 export const Default: Story = {
 	args: {
@@ -48,7 +48,7 @@ export const Default: Story = {
 };
 
 /**
- * With axis labels — human-readable strings appear alongside each axis,
+ * With axis labels - human-readable strings appear alongside each axis,
  * making the heatmap more interpretable.
  */
 export const WithAxisLabels: Story = {
@@ -70,7 +70,7 @@ export const WithAxisLabels: Story = {
 };
 
 /**
- * Explicit domain ordering for X axis — ensures provinces appear in the
+ * Explicit domain ordering for X axis - ensures provinces appear in the
  * desired order rather than alphabetically. The `domain` array pins the
  * exact order and set of values shown.
  */
@@ -93,7 +93,7 @@ export const ExplicitXDomain: Story = {
 };
 
 /**
- * Explicit color domain — pins the colour scale to a fixed `[70, 85]` range
+ * Explicit color domain - pins the colour scale to a fixed `[70, 85]` range
  * instead of auto-fitting to the visible data's min/max. Spreads the colour
  * ramp across the full plausible life-expectancy range, making it easier to
  * read the gradient at a glance rather than always stretching to whichever
@@ -117,7 +117,7 @@ export const ExplicitColorDomain: Story = {
 };
 
 /**
- * Reversed Y axis — sexes appear bottom-to-top instead of top-to-bottom.
+ * Reversed Y axis - sexes appear bottom-to-top instead of top-to-bottom.
  * Useful for matching reading direction or presentation conventions.
  */
 export const ReversedY: Story = {
@@ -139,7 +139,7 @@ export const ReversedY: Story = {
 };
 
 /**
- * Rotated X tick labels — makes province labels more readable when they
+ * Rotated X tick labels - makes province labels more readable when they
  * might otherwise overlap on narrow charts.
  */
 export const RotatedXTicks: Story = {
@@ -161,7 +161,7 @@ export const RotatedXTicks: Story = {
 };
 
 /**
- * Combined overrides — labelled axes and explicit domain ordering for both axes.
+ * Combined overrides - labelled axes and explicit domain ordering for both axes.
  */
 export const CombinedOverrides: Story = {
 	args: {

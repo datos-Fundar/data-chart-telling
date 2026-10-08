@@ -21,8 +21,8 @@ function hover(overrides: Partial<HoverStore>): HoverStore {
 	};
 }
 
-describe('matchByStrategy — series', () => {
-	// Same category, different x/y — only the series ties them together.
+describe('matchByStrategy - series', () => {
+	// Same category, different x/y - only the series ties them together.
 	const points = [point('Buenos Aires', 10, 'Varón'), point('Buenos Aires', 8, 'Mujer')];
 
 	test('matches every point sharing the active series, regardless of x/y', () => {

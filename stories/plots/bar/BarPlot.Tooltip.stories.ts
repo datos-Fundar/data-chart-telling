@@ -68,28 +68,15 @@ const MALE = {
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * No tooltip — hovering over the plot produces no floating label.
- * This is the default behaviour when `tooltip` is omitted.
- */
-export const NoTooltip: Story = {
-	args: {
-		series: [FEMALE]
-	}
-};
-
-/**
- * Basic tooltip — the `format` callback receives the nearest hovered row and
+ * Basic tooltip - the `format` callback receives the nearest hovered row and
  * returns the string shown in the floating box.
  *
- * Hover over any bar to activate. A standalone `BarPlot` (not inside a
- * `<Chart>`) uses `facetId: ''` and `sync: false` — no cross-facet
- * broadcasting applies.
+ * Hover over any bar to activate.
  */
 export const BasicTooltip: Story = {
 	args: {
 		series: [FEMALE],
 		tooltip: {
-			facetId: '',
 			sync: false,
 			format: (row) => {
 				const { province, value } = row as ProvincePoint;
@@ -100,7 +87,7 @@ export const BasicTooltip: Story = {
 };
 
 /**
- * Rich multi-line format — `\n` splits the tooltip string across lines.
+ * Rich multi-line format - `\n` splits the tooltip string across lines.
  * The portion before the first break is used as the heading; the rest is
  * the body text.
  */
@@ -108,7 +95,6 @@ export const RichFormat: Story = {
 	args: {
 		series: [FEMALE],
 		tooltip: {
-			facetId: '',
 			sync: false,
 			format: (row) => {
 				const { province, value } = row as ProvincePoint;
@@ -119,14 +105,13 @@ export const RichFormat: Story = {
 };
 
 /**
- * Computed tooltip text — the format function can derive any string from the
+ * Computed tooltip text - the format function can derive any string from the
  * row. Here it shows the difference relative to an 82-year threshold.
  */
 export const ComputedFormat: Story = {
 	args: {
 		series: [FEMALE],
 		tooltip: {
-			facetId: '',
 			sync: false,
 			format: (row) => {
 				const { province, value } = row as ProvincePoint;
@@ -139,7 +124,7 @@ export const ComputedFormat: Story = {
 };
 
 /**
- * Two-series chart — the tooltip fires for whichever series' bar is nearest
+ * Two-series chart - the tooltip fires for whichever series' bar is nearest
  * to the cursor. Move the cursor between female and male bars to see each respond
  * independently.
  */
@@ -147,7 +132,6 @@ export const TwoSeries: Story = {
 	args: {
 		series: [FEMALE, MALE],
 		tooltip: {
-			facetId: '',
 			sync: false,
 			format: (row) => {
 				const { province, value } = row as ProvincePoint;
@@ -158,7 +142,7 @@ export const TwoSeries: Story = {
 };
 
 /**
- * Series-filtered tooltip — `series: ['female']` restricts hover matching
+ * Series-filtered tooltip - `series: ['female']` restricts hover matching
  * to bars that belong to the named series only. Hovering over male bars shows
  * no tooltip even though both series are rendered.
  *
@@ -168,7 +152,6 @@ export const SeriesFiltered: Story = {
 	args: {
 		series: [FEMALE, MALE],
 		tooltip: {
-			facetId: '',
 			sync: false,
 			series: ['female'],
 			format: (row) => {
@@ -180,7 +163,7 @@ export const SeriesFiltered: Story = {
 };
 
 /**
- * Two series from grouped data — `data / x / y / color` auto-creates one
+ * Two series from grouped data - `data / x / y / color` auto-creates one
  * series per unique `color` value. The row type is `ProvinceLifeExpectancy`,
  * which carries the `sex` field so the format can include it directly.
  */
@@ -191,7 +174,6 @@ export const TwoSeriesFromGroupedData: Story = {
 		y: 'value',
 		color: 'sex',
 		tooltip: {
-			facetId: '',
 			sync: false,
 			format: (row) => {
 				const { sex, province, value } = row as ProvinceLifeExpectancy;
@@ -202,7 +184,7 @@ export const TwoSeriesFromGroupedData: Story = {
 };
 
 /**
- * Grouped-data tooltip filtered to one sex — even though both series are
+ * Grouped-data tooltip filtered to one sex - even though both series are
  * rendered, the tooltip only responds to female data points.
  */
 export const GroupedDataSeriesFiltered: Story = {
@@ -212,7 +194,6 @@ export const GroupedDataSeriesFiltered: Story = {
 		y: 'value',
 		color: 'sex',
 		tooltip: {
-			facetId: '',
 			sync: false,
 			series: ['female'],
 			format: (row) => {
@@ -224,12 +205,12 @@ export const GroupedDataSeriesFiltered: Story = {
 };
 
 /**
- * Fully custom tooltip markup via `content` — replaces the default floating
+ * Fully custom tooltip markup via `content` - replaces the default floating
  * label entirely with an arbitrary snippet: a bold header, a colour-coded
  * per-series list sorted by value, and a footnote. `format` is still required
  * by the type but is ignored once `content` is set.
  *
- * See `RichTooltip.svelte` for the markup — the library automatically drops
+ * See `RichTooltip.svelte` for the markup - the library automatically drops
  * its default dark tooltip box (background/padding/border) whenever
  * `content` is set, so the custom card fully owns the look.
  */
@@ -239,7 +220,7 @@ export const CustomContent: StoryObj = {
 
 /**
  * `anchorX`/`anchorY` override the system default (`'right'`/`'bottom'`).
- * Here it's pinned above-and-to-the-left of the cursor instead — still
+ * Here it's pinned above-and-to-the-left of the cursor instead - still
  * falls back toward the opposite side (via the centered position) if the
  * cursor gets close enough to an edge that the preferred side would
  * overflow.
@@ -248,7 +229,6 @@ export const CustomAnchor: Story = {
 	args: {
 		series: [FEMALE],
 		tooltip: {
-			facetId: '',
 			sync: false,
 			anchorX: 'left',
 			anchorY: 'top',
@@ -263,7 +243,7 @@ export const CustomAnchor: Story = {
 // ── Horizontal, many categories ─────────────────────────────────────────────
 
 /**
- * Horizontal, stacked, many categories — province on the y-axis (24 of
+ * Horizontal, stacked, many categories - province on the y-axis (24 of
  * them, so long labels don't need to rotate), age-bracket series stacked to
  * 100% per province. Exercises the same hover-hit-area path as the stories
  * above, just with a much larger, thinner-banded category count.
@@ -280,7 +260,6 @@ export const HorizontalStackedTooltip: Story = {
 			y: { type: 'categorical', sort: provinceSort }
 		} satisfies AxisBasedScalesConfig,
 		tooltip: {
-			facetId: '',
 			sync: false,
 			format: (row) => {
 				const { province, bracket, value } = row as AgeBracketPoint;
@@ -293,7 +272,7 @@ export const HorizontalStackedTooltip: Story = {
 };
 
 /**
- * Same horizontal, many-category layout as above, but a single bracket —
+ * Same horizontal, many-category layout as above, but a single bracket -
  * no stacking, no `color`/`grouping`.
  */
 export const HorizontalSingleSeriesTooltip: Story = {
@@ -307,7 +286,6 @@ export const HorizontalSingleSeriesTooltip: Story = {
 			y: { type: 'categorical', sort: provinceSort }
 		} satisfies AxisBasedScalesConfig,
 		tooltip: {
-			facetId: '',
 			sync: false,
 			format: (row) => {
 				const { province, value } = row as AgeBracketPoint;
@@ -319,7 +297,7 @@ export const HorizontalSingleSeriesTooltip: Story = {
 
 /**
  * `HorizontalStackedTooltip`'s data/layout with a fully custom `content`
- * card instead of the default tooltip box — see `CustomContent` above for
+ * card instead of the default tooltip box - see `CustomContent` above for
  * the two-series version and `StackedRichTooltip.svelte` for the markup.
  */
 export const HorizontalStackedCustomTooltip: StoryObj = {

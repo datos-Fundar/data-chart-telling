@@ -16,7 +16,7 @@ function styleAttrs(svg: SVGElement): string[] {
   return Array.from(svg.querySelectorAll('g.geo path, path.geo')).map((p) => p.getAttribute('style') ?? '');
 }
 
-describe('GeoPlot – segments (keyed by feature id)', () => {
+describe('GeoPlot - segments (keyed by feature id)', () => {
   test('one feature is styled by its id; the rest fall back to default', async () => {
     const { container } = render(GeoPlot, {
       width: 400,

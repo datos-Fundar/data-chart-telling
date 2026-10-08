@@ -23,7 +23,7 @@ const meta = {
 		segments: {
 			default: [{ styles: { dotRadius: 3, dotFillOpacity: 0.7, dotStroke: 'none' } }]
 		},
-		scales: { x: { label: 'Rating (1–5)' }, y: { label: 'Would recommend (0–10)' } }
+		scales: { x: { label: 'Rating (1-5)' }, y: { label: 'Would recommend (0-10)' } }
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -70,7 +70,7 @@ export const Normal: Story = {
 	}
 };
 
-/** A different `seed` draws a different, equally stable set of offsets — compare with `BothAxes`. */
+/** A different `seed` draws a different, equally stable set of offsets - compare with `BothAxes`. */
 export const Seed: Story = {
 	args: {
 		transforms: [
@@ -85,7 +85,7 @@ export const StripPlot: Story = {
 	args: {
 		x: 'age',
 		y: 'rating',
-		scales: { x: { label: 'Age' }, y: { label: 'Rating (1–5)' } },
+		scales: { x: { label: 'Age' }, y: { label: 'Rating (1-5)' } },
 		transforms: [{ type: 'jitterY', width: 0.25 }]
 	}
 };

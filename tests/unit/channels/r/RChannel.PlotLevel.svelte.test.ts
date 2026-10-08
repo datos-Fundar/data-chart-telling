@@ -21,7 +21,7 @@ async function maxDotWidth(range: [number, number]): Promise<number> {
 	return Math.max(...widths);
 }
 
-describe('r channel – plot level (Scatter), scales.r.range', () => {
+describe('r channel - plot level (Scatter), scales.r.range', () => {
 	test('a wider configured range renders visibly larger dots than a narrow one', async () => {
 		const narrow = await maxDotWidth([2, 4]);
 		const wide = await maxDotWidth([20, 40]);

@@ -4,9 +4,9 @@ import { COUNTRIES } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `r` sizes every dot by a per-row value, independent of the `color`-driven
-// series color — the classic Gapminder-style bubble chart. A field key or
+// series color - the classic Gapminder-style bubble chart. A field key or
 // accessor function is bound to its own auto sqrt scale (mirroring `x`/`y`'s
-// own scales) — bubble *area*, not radius, ends up proportional to the
+// own scales) - bubble *area*, not radius, ends up proportional to the
 // value, so it's already the perceptually-correct mapping with no manual
 // math needed. Only a literal number bypasses scaling (a fixed pixel
 // radius, same as the default dot size).
@@ -39,14 +39,14 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** `r` as a field key — population (millions) drives each bubble's radius through its own auto sqrt scale. */
+/** `r` as a field key - population (millions) drives each bubble's radius through its own auto sqrt scale. */
 export const BubblesByPopulation: Story = {
 	args: {
 		r: 'population'
 	}
 };
 
-/** `r` combines with `segments` — the outlier bands from the Segments stories still apply on top of population-sized bubbles. */
+/** `r` combines with `segments` - the outlier bands from the Segments stories still apply on top of population-sized bubbles. */
 export const BubbleWithSegments: Story = {
 	args: {
 		r: 'population',

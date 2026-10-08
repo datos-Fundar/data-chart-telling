@@ -12,7 +12,7 @@ import { waitForSvg, countDotMarks, countTextLabels } from '../../_helpers/svg';
 const FEMALE = { name: 'female', x: 'year' as const, y: 'value' as const, data: FEMALE_LIFE_EXPECTANCY };
 const MALE = { name: 'male', x: 'year' as const, y: 'value' as const, data: MALE_LIFE_EXPECTANCY };
 
-/** A dot and a label on the series' peak — what a `selectMaxY`/`selectMinY` transform picks. */
+/** A dot and a label on the series' peak - what a `selectMaxY`/`selectMinY` transform picks. */
 function peakMarkers(
   scope: Partial<Pick<AxisBasedMarkersConfig & { type: 'dot' }, 'series' | 'scope'>>,
   select: 'selectMaxY' | 'selectMinY' = 'selectMaxY'
@@ -32,7 +32,7 @@ const TWO_SEGMENTS: SegmentsConfig<LineSegmentStyle> = {
   ],
 };
 
-describe('LinePlot – markers.custom (component)', () => {
+describe('LinePlot - markers.custom (component)', () => {
   test('DotMarker places one dot per data point on the target series', async () => {
     const { container } = await render(LinePlot, {
       width: 400,
@@ -85,7 +85,7 @@ describe('LinePlot – markers.custom (component)', () => {
       ] satisfies AxisBasedMarkersConfig[],
     });
     const svg = await waitForSvg(container);
-    // Only female's points get dots — male has none.
+    // Only female's points get dots - male has none.
     expect(countDotMarks(svg)).toBe(FEMALE_LIFE_EXPECTANCY.length);
   });
 

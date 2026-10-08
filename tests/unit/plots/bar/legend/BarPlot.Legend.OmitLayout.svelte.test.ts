@@ -1,12 +1,32 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import BarPlot from '$lib/plots/bar/Plot.svelte';
-import BarOmitLegendDemo from '../../../../../stories/plots/bar/BarOmitLegendDemo.svelte';
-import BarOmitStackedLegendDemo from '../../../../../stories/plots/bar/BarOmitStackedLegendDemo.svelte';
-import { MALE_LIFE_EXPECTANCY_BY_PROVINCE } from '../../../../../stories/plots/bar/data';
+import {
+	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+	MALE_LIFE_EXPECTANCY_BY_PROVINCE
+} from '../../../../../stories/plots/bar/data';
+import type { LegendSection } from '$lib/types/layout/legend';
 
 // Omitting a series via the legend must reflow grouped/stacked bars exactly
 // like a plain single-series render.
+
+const LEGEND: LegendSection[] = [
+	{
+		type: 'discrete',
+		title: 'Sex',
+		interactive: { enabled: true, disabled: { mode: 'omit' } },
+		items: [
+			{ name: 'female', label: 'Female', symbol: 'square' },
+			{ name: 'male', label: 'Male', symbol: 'square' }
+		]
+	}
+];
+
+const MALE = { name: 'male', x: 'province', y: 'value', data: MALE_LIFE_EXPECTANCY_BY_PROVINCE };
+const BOTH = [
+	{ name: 'female', x: 'province', y: 'value', data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE },
+	MALE
+];
 
 async function waitForSvg(container: Element): Promise<SVGElement> {
 	let svg: SVGElement | undefined;
@@ -40,9 +60,14 @@ function femaleLegendItem(container: Element): HTMLElement {
 	return item;
 }
 
-describe('BarPlot – omitting a series in grouped/stacked layout', () => {
+describe('BarPlot - omitting a series in grouped/stacked layout', () => {
 	test('grouped: bars are actually grouped, and omitting "Female" reflows "Male" exactly like a plain single-series render', async () => {
-		const { container } = await render(BarOmitLegendDemo);
+		const { container } = await render(BarPlot, {
+			width: 950,
+			height: 500,
+			series: BOTH,
+			legend: LEGEND
+		});
 		const svg = await waitForSvg(container);
 
 		const beforeXs = Array.from(svg.querySelectorAll('g.bar-y rect')).map(
@@ -60,7 +85,8 @@ describe('BarPlot – omitting a series in grouped/stacked layout', () => {
 		const { container: refContainer } = await render(BarPlot, {
 			width: 950,
 			height: 500,
-			series: [{ name: 'male', x: 'province', y: 'value', data: MALE_LIFE_EXPECTANCY_BY_PROVINCE }]
+			series: [MALE],
+			legend: LEGEND
 		});
 		const refSvg = await waitForSvg(refContainer);
 
@@ -68,7 +94,13 @@ describe('BarPlot – omitting a series in grouped/stacked layout', () => {
 	});
 
 	test('stacked: omitting "Female" reflows "Male" exactly like a plain single-series render, not a gap left in its old segment', async () => {
-		const { container } = await render(BarOmitStackedLegendDemo);
+		const { container } = await render(BarPlot, {
+			width: 950,
+			height: 500,
+			series: BOTH,
+			legend: LEGEND,
+			transforms: [{ type: 'stackY' as const }]
+		});
 		const svg = await waitForSvg(container);
 
 		femaleLegendItem(container).click();
@@ -81,7 +113,8 @@ describe('BarPlot – omitting a series in grouped/stacked layout', () => {
 		const { container: refContainer } = await render(BarPlot, {
 			width: 950,
 			height: 500,
-			series: [{ name: 'male', x: 'province', y: 'value', data: MALE_LIFE_EXPECTANCY_BY_PROVINCE }],
+			series: [MALE],
+			legend: LEGEND,
 			transforms: [{ type: 'stackY' as const }]
 		});
 		const refSvg = await waitForSvg(refContainer);

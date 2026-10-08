@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LegendLayout from '$lib/layout/legend/LegendLayout.svelte';
 import type { LegendSection } from '$lib/types/layout/legend';
 
-/** Multiple sections rendered side by side — discrete, continuous, or a mix. */
+/** Multiple sections rendered side by side - discrete, continuous, or a mix. */
 const meta = {
 	title: 'Layout/Legend/Composition',
 	component: LegendLayout,
@@ -15,7 +15,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Two discrete sections side by side — e.g. one per encoding dimension. Defaults to `layout: { type: 'vertical' }` per section. */
+/** Two discrete sections side by side - e.g. one per encoding dimension. Defaults to `layout: { type: 'vertical' }` per section. */
 export const MultipleDiscrete: Story = {
 	args: {
 		sections: [

@@ -28,5 +28,5 @@ type JitterOptions = {
  */
 export type JitterXTransform = { type: 'jitterX' } & PositionChannels & JitterOptions;
 
-/** `jitterY` — see {@link JitterXTransform}, on `y`. */
+/** `jitterY` - see {@link JitterXTransform}, on `y`. */
 export type JitterYTransform = { type: 'jitterY' } & PositionChannels & JitterOptions;

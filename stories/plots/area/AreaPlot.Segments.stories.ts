@@ -36,7 +36,7 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** Men's tail above 185 cm in a stronger fill — the part of the curve past that height. */
+/** Men's tail above 185 cm in a stronger fill - the part of the curve past that height. */
 export const TailHighlight: Story = {
 	args: {
 		segments: {

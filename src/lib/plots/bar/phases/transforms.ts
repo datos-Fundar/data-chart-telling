@@ -15,8 +15,8 @@ export const GAP_KIND = '__gapKind';
 
 /**
  * BarPlot's options for the shared "transforms" stage: every gap `styles.gaps`
- * fills is read at its interpolated value — so a filled gap takes its place
- * in a stack, the way a real value would — and keeps its gap kind.
+ * fills is read at its interpolated value - so a filled gap takes its place
+ * in a stack, the way a real value would - and keeps its gap kind.
  */
 export function buildBarTransformsOptions<
 	TData extends Record<string, unknown>

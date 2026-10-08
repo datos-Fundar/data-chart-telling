@@ -68,7 +68,7 @@ export const Raw: Story = {
 	}
 };
 
-/** `basis: 'extent'`: every metric spans 0–1 between its own lowest and highest model, so the lines cross where models trade off. */
+/** `basis: 'extent'`: every metric spans 0-1 between its own lowest and highest model, so the lines cross where models trade off. */
 export const Extent: Story = {
 	args: {
 		markers: parallel([{ type: 'normalizeParallelY', basis: 'extent' }]),
@@ -76,7 +76,7 @@ export const Extent: Story = {
 	}
 };
 
-/** `basis: 'deviation'`: every metric in standard deviations from its own mean — how unusual each model is, metric by metric. */
+/** `basis: 'deviation'`: every metric in standard deviations from its own mean - how unusual each model is, metric by metric. */
 export const Deviation: Story = {
 	args: {
 		markers: parallel([{ type: 'normalizeParallelY', basis: 'deviation' }]),

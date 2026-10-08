@@ -7,7 +7,7 @@
 	 * selection, so this wrapper owns that state (seeded once from
 	 * `marker.brush`) and surfaces changes through the `onbrush*` callbacks.
 	 * svelteplot's `Brush` spreads its props over its defaults, so an explicit
-	 * `undefined` would erase them — each default is restated here instead.
+	 * `undefined` would erase them - each default is restated here instead.
 	 */
 	let { marker }: { marker: BrushMarkerConfig } = $props();
 

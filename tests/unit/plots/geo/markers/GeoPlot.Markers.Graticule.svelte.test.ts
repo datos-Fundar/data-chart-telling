@@ -5,7 +5,7 @@ import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES } from '../../../../../stories/plots/geo/data';
 import { waitForSvg, countGeoPaths } from '../../_helpers/svg';
 
-describe('GeoPlot – graticule marker', () => {
+describe('GeoPlot - graticule marker', () => {
   test('adds a path over the base map', async () => {
     const { container } = render(GeoPlot, {
       width: 400,
@@ -32,7 +32,7 @@ describe('GeoPlot – graticule marker', () => {
   });
 });
 
-describe('GeoPlot – sphere marker', () => {
+describe('GeoPlot - sphere marker', () => {
   test('adds a path for the outer globe outline', async () => {
     const { container } = render(GeoPlot, {
       width: 400,
@@ -58,7 +58,7 @@ describe('GeoPlot – sphere marker', () => {
   });
 });
 
-describe('GeoPlot – markers empty array', () => {
+describe('GeoPlot - markers empty array', () => {
   test('does not crash with an empty markers array', async () => {
     const { container } = render(GeoPlot, { width: 400, height: 300, data: WORLD_COUNTRIES, markers: [] });
     const svg = await waitForSvg(container);

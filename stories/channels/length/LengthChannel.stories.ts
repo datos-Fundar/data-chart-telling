@@ -4,11 +4,11 @@ import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, POPULATION_SHIFT } from '../../plots/geo/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// `length` sizes every vector by a per-row magnitude — see
+// `length` sizes every vector by a per-row magnitude - see
 // `Plots/GeoPlot/Markers/Vector` for the channel itself. This page is
 // specifically about `scales.length`: unlike `color`, svelteplot binds
 // `length` to exactly one scale shared by every mark in the plot (there's no
-// per-mark equivalent), so `scales.length` is plot-level only — `domain`/
+// per-mark equivalent), so `scales.length` is plot-level only - `domain`/
 // `range` are threaded straight into svelteplot's own `length` scale rather
 // than resolved independently.
 
@@ -47,7 +47,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** No `scales.length` — svelteplot's own auto-fit pixel range, sized to the plot's own bounds. */
+/** No `scales.length` - svelteplot's own auto-fit pixel range, sized to the plot's own bounds. */
 export const Default: Story = {};
 
 /** `scales.length.range` sets an explicit `[min, max]` pixel length instead of svelteplot's auto-fit. */
@@ -59,7 +59,7 @@ export const CustomRange: Story = {
 	}
 };
 
-/** `scales.length.domain` clamps the input range — rows below/above it render at the domain's own min/max length instead of their real, more extreme magnitude. */
+/** `scales.length.domain` clamps the input range - rows below/above it render at the domain's own min/max length instead of their real, more extreme magnitude. */
 export const CustomDomain: Story = {
 	args: {
 		scales: {

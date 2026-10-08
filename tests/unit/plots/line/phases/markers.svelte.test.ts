@@ -6,7 +6,7 @@ import type { LinePlotState, LinePlotCtx } from '$lib/types/plots/line/state';
 import type { Series } from '$lib/types/plots/data/common';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { LineMarkerConfig } from '$lib/types/markers/common';
-import type { ChartConfig } from '$lib/types/configuration/styling';
+import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 
 // ── buildLineMarkers ───────────────────────────────────────────────────────────
 
@@ -25,7 +25,7 @@ function buildLine(overrides: Partial<Parameters<typeof buildLineMarkers<Row>>[0
 	});
 }
 
-describe('buildLineMarkers – geometry', () => {
+describe('buildLineMarkers - geometry', () => {
 	test('emits one line marker per visual segment', () => {
 		const markers = buildLine();
 		expect(markers).toHaveLength(1);
@@ -47,7 +47,7 @@ describe('buildLineMarkers – geometry', () => {
 	});
 });
 
-describe('buildLineMarkers – style resolution', () => {
+describe('buildLineMarkers - style resolution', () => {
 	test('falls back to the default color when a segment has no stroke of its own', () => {
 		const [marker] = buildLine({ colorFor: () => 'green' }) as [LineMarkerConfig];
 		expect(marker.styles?.stroke).toBe('green');
@@ -64,7 +64,7 @@ describe('buildLineMarkers – style resolution', () => {
 
 // ── buildMarkers (the real phase, combining line + gap markers) ──────────────
 
-const CTX: LinePlotCtx = { cfg: { line: {} } as ChartConfig, legendInteraction: undefined };
+const CTX: LinePlotCtx = { cfg: { line: {} } as PlotStylesConfig, legendInteraction: undefined };
 
 function buildPhase(overrides: Partial<LinePlotState<{ x: number; y: number | null }>> = {}) {
 	const groupedSeries = buildGroupedSeries<
@@ -85,7 +85,7 @@ function buildPhase(overrides: Partial<LinePlotState<{ x: number; y: number | nu
 	return buildMarkers(buildTransforms<typeof state>()(state, CTX), CTX).markers!;
 }
 
-describe('buildMarkers – combines line and gap markers', () => {
+describe('buildMarkers - combines line and gap markers', () => {
 	test('with no gaps, returns only the real line marker(s)', () => {
 		const markers = buildPhase();
 		expect(markers).toHaveLength(1);

@@ -33,13 +33,13 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** No scale overrides — both axes are auto-fitted to the data extent. */
+/** No scale overrides - both axes are auto-fitted to the data extent. */
 export const Default: Story = {
 	args: {}
 };
 
 /**
- * Log-scaled X axis — GDP per capita spans two orders of magnitude (Ethiopia
+ * Log-scaled X axis - GDP per capita spans two orders of magnitude (Ethiopia
  * at $0.9k, Norway at $106k), so a linear axis crushes most countries into
  * the left edge. `type: 'log'` spreads them out evenly instead, the
  * conventional choice for this kind of wealth/income scatter.
@@ -50,7 +50,7 @@ export const LogScaleX: Story = {
 	}
 };
 
-/** Constrained Y domain — tightens the visible range instead of auto-fitting to the full data extent. */
+/** Constrained Y domain - tightens the visible range instead of auto-fitting to the full data extent. */
 export const CustomYDomain: Story = {
 	args: {
 		data: AMERICAS,
@@ -59,14 +59,14 @@ export const CustomYDomain: Story = {
 	}
 };
 
-/** Zero-anchored Y axis — `zero: true` forces the domain to include 0 even though every life-expectancy value sits far above it, keeping relative magnitudes honest at the cost of compressing the visible spread. */
+/** Zero-anchored Y axis - `zero: true` forces the domain to include 0 even though every life-expectancy value sits far above it, keeping relative magnitudes honest at the cost of compressing the visible spread. */
 export const ZeroAnchoredY: Story = {
 	args: {
 		scales: { y: { zero: true } } satisfies AxisBasedScalesConfig
 	}
 };
 
-/** Axis labels — a human-readable string appears alongside each axis, overriding the field-name label svelteplot infers by default. */
+/** Axis labels - a human-readable string appears alongside each axis, overriding the field-name label svelteplot infers by default. */
 export const WithAxisLabels: Story = {
 	args: {
 		scales: {
@@ -76,14 +76,14 @@ export const WithAxisLabels: Story = {
 	}
 };
 
-/** Grid lines on the Y axis — horizontal reference lines at every tick make it easier to read off individual values. */
+/** Grid lines on the Y axis - horizontal reference lines at every tick make it easier to read off individual values. */
 export const WithGrid: Story = {
 	args: {
 		scales: { y: { grid: true } } satisfies AxisBasedScalesConfig
 	}
 };
 
-/** Custom tick formatter — the function receives the raw tick value and returns the display string; here it appends `"k"` to every X tick. */
+/** Custom tick formatter - the function receives the raw tick value and returns the display string; here it appends `"k"` to every X tick. */
 export const CustomTickFormat: Story = {
 	args: {
 		scales: {
@@ -92,7 +92,7 @@ export const CustomTickFormat: Story = {
 	}
 };
 
-/** Both domains combined with labelled axes and a Y grid — the same overrides layered together on one plot. */
+/** Both domains combined with labelled axes and a Y grid - the same overrides layered together on one plot. */
 export const CombinedOverrides: Story = {
 	args: {
 		scales: {

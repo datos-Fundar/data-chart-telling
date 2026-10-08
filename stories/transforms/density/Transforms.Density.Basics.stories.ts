@@ -93,7 +93,7 @@ export const ByGroup: Story = {
 	}
 };
 
-/** `densityY` estimates over `y` instead, so the curve runs up the plot, its density on `x` — one `line` per `grouping`, colored by `color`. */
+/** `densityY` estimates over `y` instead, so the curve runs up the plot, its density on `x` - one `line` per `grouping`, colored by `color`. */
 export const DensityY: Story = {
 	args: {
 		scales: { x: { label: 'Density' } },

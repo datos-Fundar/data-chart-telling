@@ -44,7 +44,7 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Single series with categorical x axis (provinces) — the bars are drawn in
+ * Single series with categorical x axis (provinces) - the bars are drawn in
  * the configured palette colour for the series (first colour, by default).
  */
 export const Default: Story = {

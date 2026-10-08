@@ -7,7 +7,7 @@ import { waitForSvg } from '../../_helpers/svg';
 
 const FEMALE = { name: 'female', x: 'province' as const, y: 'value' as const, data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE };
 
-describe('BarPlot – markers.rules', () => {
+describe('BarPlot - markers.rules', () => {
   test('ruleX renders a vertical rule line at a named category', async () => {
     const { container } = await render(BarPlot, {
       width: 400,

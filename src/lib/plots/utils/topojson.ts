@@ -7,7 +7,7 @@ export function isTopology(data: unknown): data is Topology {
 /**
  * Converts a TopoJSON `Topology` to GeoJSON via `topojson-client`'s
  * `feature()`, loaded with a dynamic import so the package works perfectly
- * for consumers who never install `topojson-client` — it's an optional peer
+ * for consumers who never install `topojson-client` - it's an optional peer
  * dependency (see package.json), never statically imported.
  */
 export async function topologyToGeoJson<TProps extends Record<string, unknown>>(
@@ -21,7 +21,7 @@ export async function topologyToGeoJson<TProps extends Record<string, unknown>>(
 
   let mod: unknown;
   try {
-    // @ts-expect-error — topojson-client is an optional peer dependency; its
+    // @ts-expect-error - topojson-client is an optional peer dependency; its
     // type declarations are intentionally not resolved by our own build
     // (`Topology` above is typed structurally instead), so this import is
     // resolved purely at runtime.

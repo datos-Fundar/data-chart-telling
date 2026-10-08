@@ -17,8 +17,8 @@ const FEMALE = {
 // The hover marker's dot/label/rules only appear once svelteplot's <Pointer>
 // reports a match, which requires a real cursor position over the rendered
 // marks. These tests exercise the marker's static (no-hover) baseline and
-// its configuration surface — not the interactive matching itself.
-describe('LinePlot – markers.hover', () => {
+// its configuration surface - not the interactive matching itself.
+describe('LinePlot - markers.hover', () => {
 	test('renders with a basic hover marker and shows nothing before any hover', async () => {
 		const { container } = await render(LinePlot, {
 			width: 400,

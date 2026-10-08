@@ -102,7 +102,7 @@ const stockPriceProps = {
 };
 
 /**
- * A `bar` marker (`role: 'segment'`) using `y1`/`y2` as plain field keys —
+ * A `bar` marker (`role: 'segment'`) using `y1`/`y2` as plain field keys -
  * two bars per category, each drawn from a different field pair.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

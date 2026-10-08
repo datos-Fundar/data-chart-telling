@@ -3,7 +3,7 @@ import { buildScales } from '$lib/plots/bar/phases/scales';
 import { buildTransforms } from '$lib/plots/bar/phases/transforms';
 import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/bar/state';
 import type { Series } from '$lib/types/plots/data/common';
-import type { ChartConfig } from '$lib/types/configuration/styling';
+import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -14,7 +14,7 @@ const CTX: BarPlotCtx = {
 	cfg: {
 		bar: { paddingInner: PADDING.inner, paddingOuter: PADDING.outer, seriesPadding: 0.1 },
 		margins: { top: 20, right: 20, bottom: 30, left: 40 }
-	} as ChartConfig,
+	} as PlotStylesConfig,
 	legendInteraction: undefined
 };
 
@@ -29,7 +29,7 @@ const ROWS = [
 const GROUPED_SERIES: Series<Row>[] = [series(ROWS)];
 
 // `buildScales` now also resolves `barLayout`, which needs data/mapping-phase
-// output these tests don't otherwise care about — filled with defaults
+// output these tests don't otherwise care about - filled with defaults
 // consistent with `GROUPED_SERIES` so it has something valid to compute over.
 function build(overrides: Partial<BarPlotState<Row>> = {}) {
 	const state: BarPlotState<Row> = {
@@ -55,16 +55,20 @@ function build(overrides: Partial<BarPlotState<Row>> = {}) {
 
 // ── Categorical sentinel ──────────────────────────────────────────────────────
 
-describe('buildScales – categorical sentinel', () => {
-	test('strips the categorical sentinel from the returned scale', () => {
+describe('buildScales - categorical sentinel', () => {
+	test('resolves the categorical sentinel to a band scale', () => {
 		const result = build({ scales: { x: { type: 'categorical' } } });
-		expect(result.x?.type).toBeUndefined();
+		expect(result.x?.type).toBe('band');
+	});
+
+	test('the category axis is a band scale even when unmarked', () => {
+		expect(build().x?.type).toBe('band');
 	});
 });
 
 // ── Category axis padding ────────────────────────────────────────────────────
 
-describe('buildScales – category axis padding', () => {
+describe('buildScales - category axis padding', () => {
 	test('backs paddingInner/paddingOuter with the given defaults when unset', () => {
 		const result = build();
 		expect(result.x?.paddingInner).toBe(PADDING.inner);
@@ -94,7 +98,7 @@ describe('buildScales – category axis padding', () => {
 
 // ── Value axis domain ─────────────────────────────────────────────────────────
 
-describe('buildScales – value axis domain', () => {
+describe('buildScales - value axis domain', () => {
 	test('nice-widens the value axis from the raw per-row min/max', () => {
 		const result = build();
 		const [lo, hi] = result.y!.domain as [number, number];

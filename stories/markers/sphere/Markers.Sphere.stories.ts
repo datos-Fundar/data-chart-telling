@@ -4,11 +4,11 @@ import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES } from '../../plots/geo/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `sphere` marker (svelteplot's own `Sphere`) — the outer globe outline,
+// A `sphere` marker (svelteplot's own `Sphere`) - the outer globe outline,
 // which only reads clearly on a hemisphere-style projection like
 // `orthographic` (on `mercator` it's just the frame's own rectangle).
 // `behind: true` is what lets its `fill` read as ocean-colored background
-// rather than an opaque layer painted over every country — see
+// rather than an opaque layer painted over every country - see
 // `Markers/Graticule`'s `SphereOutline` story for `behind`'s
 // own doc comment.
 
@@ -40,7 +40,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** `behind: true` draws the sphere's fill under the countries — otherwise it'd paint over every one of them. Drag the globe to rotate it. */
+/** `behind: true` draws the sphere's fill under the countries - otherwise it'd paint over every one of them. Drag the globe to rotate it. */
 export const Basic: Story = {
 	args: {
 		markers: [

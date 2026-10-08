@@ -40,12 +40,12 @@ const SERIES = [
 ];
 
 // ── Stories ───────────────────────────────────────────────────────────────────
-// Heatmap segments use the `'default'` key — heatmaps have no named series.
+// Heatmap segments use the `'default'` key - heatmaps have no named series.
 // `from`/`to` compare category values lexicographically, so provinces fall in
 // alphabetical order: Buenos Aires, Córdoba, Formosa, La Rioja, Santa Fe, Tucumán.
 
 /**
- * Highlight a region — dims all cells except the female row for a range of
+ * Highlight a region - dims all cells except the female row for a range of
  * provinces. Useful for focusing on a particular demographic slice.
  */
 export const HighlightRegion: Story = {
@@ -71,7 +71,7 @@ export const HighlightRegion: Story = {
 };
 
 /**
- * Highlight a row (sex) — every female cell is highlighted with full opacity;
+ * Highlight a row (sex) - every female cell is highlighted with full opacity;
  * the male row is dimmed.
  */
 export const HighlightSex: Story = {
@@ -92,7 +92,7 @@ export const HighlightSex: Story = {
 };
 
 /**
- * Highlight columns (provinces) — all cells in specific provinces are shown
+ * Highlight columns (provinces) - all cells in specific provinces are shown
  * at full brightness; others are faded.
  */
 export const HighlightProvinces: Story = {
@@ -116,7 +116,7 @@ export const HighlightProvinces: Story = {
 };
 
 /**
- * Multiple highlight areas with different opacities — creates a visual
+ * Multiple highlight areas with different opacities - creates a visual
  * hierarchy by dimming some regions more than others.
  */
 export const LayeredOpacity: Story = {
@@ -151,7 +151,7 @@ export const LayeredOpacity: Story = {
 };
 
 /**
- * Highlight with custom stroke — draws attention to a region with both
+ * Highlight with custom stroke - draws attention to a region with both
  * opacity and a visible border.
  */
 export const HighlightWithStroke: Story = {

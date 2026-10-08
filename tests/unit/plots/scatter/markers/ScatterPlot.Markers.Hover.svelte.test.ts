@@ -6,9 +6,9 @@ import { AMERICAS, COUNTRIES } from '../../../../../stories/plots/scatter/data';
 import { waitForSvg, countDotMarks, countTextLabels } from '../../_helpers/svg';
 
 // The hover marker's own dot/label only render on an actual cursor match,
-// which needs real pointer events — these tests exercise the static
+// which needs real pointer events - these tests exercise the static
 // (no-hover) baseline and the marker's configuration surface.
-describe('ScatterPlot – markers.hover', () => {
+describe('ScatterPlot - markers.hover', () => {
 	test('adds no extra dot/label before any hover', async () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
@@ -19,7 +19,7 @@ describe('ScatterPlot – markers.hover', () => {
 			markers: [{ type: 'hover' }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
-		// Only the base scatter dots — the hover marker itself renders nothing yet.
+		// Only the base scatter dots - the hover marker itself renders nothing yet.
 		expect(countDotMarks(svg)).toBe(AMERICAS.length);
 		expect(countTextLabels(svg)).toBe(0);
 	});

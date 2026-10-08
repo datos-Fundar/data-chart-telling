@@ -5,7 +5,7 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { COUNTRIES } from '../../../../../stories/plots/scatter/data';
 import { waitForSvg, countBoxMarks } from '../../_helpers/svg';
 
-describe('LinePlot – markers.box', () => {
+describe('LinePlot - markers.box', () => {
 	test('default orientation (BoxY) renders one box per category', async () => {
 		const { container } = render(LinePlot, {
 			width: 400,
@@ -364,7 +364,7 @@ describe('LinePlot – markers.box', () => {
 		expect(dot?.getAttribute('style')).toContain('rgb(249, 115, 22)');
 	});
 
-	test('dot: { fill: null } renders hollow outlier markers — the string "none" is a known svelteplot gotcha, not a literal', async () => {
+	test('dot: { fill: null } renders hollow outlier markers - the string "none" is a known svelteplot gotcha, not a literal', async () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
@@ -440,7 +440,7 @@ describe('LinePlot – markers.box', () => {
 				] satisfies AxisBasedMarkersConfig[]
 			})
 		).container;
-		// Only the x position (left-right band placement) matters here — the y
+		// Only the x position (left-right band placement) matters here - the y
 		// position can drift by sub-pixel amounts between separate `render()`
 		// calls from margin auto-measurement timing, unrelated to `sort`.
 		const xOrderOf = (svg: SVGElement) =>

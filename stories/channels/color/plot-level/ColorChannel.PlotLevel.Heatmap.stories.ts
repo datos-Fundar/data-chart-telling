@@ -4,7 +4,7 @@ import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from '../../../plots/heatmap/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `color` channel: a plot-level `color` accessor plus `scales.color`
-// drives every default mark's fill — here, HeatmapPlot's own cells. See
+// drives every default mark's fill - here, HeatmapPlot's own cells. See
 // `Plots/HeatmapPlot/Styles` for the full set of ramp options; this page
 // exists to show the channel concept itself, independent of any one plot kind.
 
@@ -34,7 +34,7 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * `color: 'value'` feeds each cell's life-expectancy value into the plot's
- * own `scales.color` ramp — no marker config needed, since every plot kind's
+ * own `scales.color` ramp - no marker config needed, since every plot kind's
  * default marks read the plot-level channel automatically.
  */
 export const Default: Story = {

@@ -22,7 +22,7 @@ const MIXED_LABELS = [
   { group: 'c', label: 'C' },
 ];
 
-describe('FacetLayout – marginsForFacet (left)', () => {
+describe('FacetLayout - marginsForFacet (left)', () => {
   test('every cell gets the same left margin', async () => {
     const { container } = await render(FacetMarginsProbe, { rows: MIXED_LABELS });
     const lefts = cells(container).map((c) => c.left);
@@ -36,14 +36,14 @@ describe('FacetLayout – marginsForFacet (left)', () => {
     expect(cells(mixed.container)[0].left).toBeGreaterThan(cells(short.container)[0].left);
   });
 
-  test('the margin is present on the very first render — no settling or remount needed', async () => {
+  test('the margin is present on the very first render - no settling or remount needed', async () => {
     const { container } = await render(FacetMarginsProbe, { rows: MIXED_LABELS });
     const lefts = cells(container).map((c) => c.left);
     expect(lefts.every((l) => l > 0)).toBe(true);
   });
 });
 
-describe('FacetLayout – marginsForFacet (right, combined with left)', () => {
+describe('FacetLayout - marginsForFacet (right, combined with left)', () => {
   test('every cell gets the same right margin', async () => {
     const { container } = await render(FacetMarginsProbe, {
       rows: MIXED_LABELS,

@@ -47,7 +47,7 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Basic hover marker — an in-SVG dot and value label appear at the nearest
+ * Basic hover marker - an in-SVG dot and value label appear at the nearest
  * bar as the cursor moves over the plot. A dashed vertical rule (ruleX) is
  * drawn by default. No floating HTML tooltip is involved.
  */
@@ -70,7 +70,7 @@ export const Basic: Story = {
 };
 
 /**
- * Dot only — `showLabels: false` suppresses the value label next to the dot,
+ * Dot only - `showLabels: false` suppresses the value label next to the dot,
  * leaving just the position indicator and the crosshair rule.
  */
 export const WithoutLabels: Story = {
@@ -93,7 +93,7 @@ export const WithoutLabels: Story = {
 };
 
 /**
- * Dot and label only — `ruleX: false` hides the vertical crosshair rule, so
+ * Dot and label only - `ruleX: false` hides the vertical crosshair rule, so
  * only the dot and its label are drawn on hover.
  */
 export const WithoutRule: Story = {
@@ -116,7 +116,7 @@ export const WithoutRule: Story = {
 };
 
 /**
- * Both crosshair rules — `ruleX: true` (default) and `ruleY: true` together
+ * Both crosshair rules - `ruleX: true` (default) and `ruleY: true` together
  * draw a full crosshair: a vertical rule at the hovered province and a
  * horizontal rule at the hovered value.
  */
@@ -141,7 +141,7 @@ export const WithBothAxis: Story = {
 };
 
 /**
- * Custom rule style — `rule` overrides the crosshair stroke individually.
+ * Custom rule style - `rule` overrides the crosshair stroke individually.
  * Here the rule is rendered in red with a solid line and higher opacity.
  */
 export const WithCustomRuleStyle: Story = {
@@ -169,7 +169,7 @@ export const WithCustomRuleStyle: Story = {
 };
 
 /**
- * Two series — the unscoped hover marker responds to whichever series' bar
+ * Two series - the unscoped hover marker responds to whichever series' bar
  * is nearest the cursor.
  */
 export const TwoSeries: Story = {
@@ -200,7 +200,7 @@ export const TwoSeries: Story = {
 };
 
 /**
- * Series-scoped marker — `series: 'female'` restricts the hover highlight to
+ * Series-scoped marker - `series: 'female'` restricts the hover highlight to
  * bars that belong to the female series only. Hovering over the male bars
  * produces no dot or label even though both are rendered.
  *
@@ -232,7 +232,7 @@ export const SeriesScoped: Story = {
 };
 
 /**
- * Hover marker on `'grouped'` series — `data / x / y / color` auto-creates one
+ * Hover marker on `'grouped'` series - `data / x / y / color` auto-creates one
  * series per unique `color` value, and the unscoped hover marker responds to
  * all of them. The dot, label, and crosshair rule land on each series' own
  * bar slice, not the shared category center.
@@ -252,7 +252,7 @@ export const GroupedSeries: Story = {
 };
 
 /**
- * `areaX: true` on `'grouped'` series — the highlight narrows to the
+ * `areaX: true` on `'grouped'` series - the highlight narrows to the
  * hovered series' own bar, not the whole two-bar group.
  */
 export const GroupedSeriesWithHighlightArea: Story = {
@@ -272,7 +272,7 @@ export const GroupedSeriesWithHighlightArea: Story = {
 };
 
 /**
- * `areaY: true` on `'grouped'` series, horizontal orientation — the
+ * `areaY: true` on `'grouped'` series, horizontal orientation - the
  * highlight narrows to the hovered series' own bar, same as
  * `GroupedSeriesWithHighlightArea` but on the other axis.
  */
@@ -296,7 +296,7 @@ export const GroupedSeriesWithHighlightAreaHorizontal: Story = {
 };
 
 /**
- * Hover marker on `'stacked'` series — the dot and label land at each
+ * Hover marker on `'stacked'` series - the dot and label land at each
  * series' cumulative height (its own segment's top), not at its raw value
  * from a zero baseline, so they sit on the correct segment of the stack.
  */
@@ -316,7 +316,7 @@ export const StackedSeries: Story = {
 };
 
 /**
- * `areaY: true` — a translucent area the height of the hovered province's
+ * `areaY: true` - a translucent area the height of the hovered province's
  * own row (its band width plus 2px), spanning the full plot width,
  * replacing the thin crosshair rule with a highlight closer to how a
  * hovered row often reads in a horizontal bar chart. Defaults to a neutral

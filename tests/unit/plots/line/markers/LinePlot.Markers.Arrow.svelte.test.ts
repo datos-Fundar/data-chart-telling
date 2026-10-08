@@ -4,7 +4,7 @@ import LinePlot from '$lib/plots/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { waitForSvg, countArrowMarks } from '../../_helpers/svg';
 
-describe('LinePlot – markers.arrow', () => {
+describe('LinePlot - markers.arrow', () => {
 	test('renders one arrow from a literal point to another', async () => {
 		const { container } = render(LinePlot, {
 			width: 400,

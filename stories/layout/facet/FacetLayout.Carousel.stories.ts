@@ -4,7 +4,7 @@ import { renderSource } from '../../common/docsSource';
 
 // `FacetDemo` renders through a wrapper, so `parameters.docs.source.code`
 // overrides the "show code" panel with the real `<FacetLayout>` call via
-// `renderSource` — see `stories/common/docsSource.ts`.
+// `renderSource` - see `stories/common/docsSource.ts`.
 function carouselSource(visible: number) {
   return renderSource('FacetLayout', {
     data: dataForGroupCount(6),
@@ -15,7 +15,7 @@ function carouselSource(visible: number) {
   });
 }
 
-/** `mode: 'carousel'` — `visible` facets show at a time; swipe/drag to browse the rest. */
+/** `mode: 'carousel'` - `visible` facets show at a time; swipe/drag to browse the rest. */
 const meta = {
   title: 'Layout/Facets/Carousel',
   component: FacetDemo,

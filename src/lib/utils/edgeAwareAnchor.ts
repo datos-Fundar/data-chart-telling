@@ -10,9 +10,9 @@ export type AnchorPlacement = {
 
 /**
  * Flips (or nudges) a label's anchor/offset when its default placement
- * would push it past a pixel box — e.g. the plot's own inner content box.
+ * would push it past a pixel box - e.g. the plot's own inner content box.
  * `extent` should be measured off-DOM (see `measureTextWidth`) rather than
- * via `getBBox()` on the rendered label — feeding a `getBBox()` reading back
+ * via `getBBox()` on the rendered label - feeding a `getBBox()` reading back
  * into anything reactive to the plot's own layout (like svelteplot's shared
  * margin-auto-sizing context) risks a feedback loop between this
  * component's own effect and svelteplot's.
@@ -21,12 +21,12 @@ export function resolveEdgeAwareAnchor(args: {
 	/** Pixel position of the anchored point. */
 	px: number;
 	py: number;
-	/** Size of the box the label must stay within — typically the plot's own inner content box. */
+	/** Size of the box the label must stay within - typically the plot's own inner content box. */
 	width: number;
 	height: number;
 	textAnchor: HorizontalAnchor;
 	lineAnchor: VerticalAnchor;
-	/** Desired distance from the point, in pixels — sign is resolved from the (possibly flipped) anchor. */
+	/** Desired distance from the point, in pixels - sign is resolved from the (possibly flipped) anchor. */
 	gapX: number;
 	gapY: number;
 	extent: { width: number; height: number };

@@ -4,7 +4,7 @@ import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, FLIGHT_ROUTES } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// `link` draws connections between point pairs — mirrors svelteplot's
+// `link` draws connections between point pairs - mirrors svelteplot's
 // `link/spherical-link` example: `curve: 'auto'` traces a great-circle
 // (geodesic) arc on a geographic projection instead of a straight line,
 // which reads clearly on a global, non-Mercator projection.
@@ -36,7 +36,7 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Spherical (geodesic) links on `equal-earth` — `curve: 'auto'` (the
+ * Spherical (geodesic) links on `equal-earth` - `curve: 'auto'` (the
  * default) traces each route as a great-circle arc, visibly curved rather
  * than a straight line between the two endpoints.
  */
@@ -58,7 +58,7 @@ export const SphericalLinks: Story = {
 };
 
 /**
- * Linear links — `curve: 'linear'` forces a straight planar line between
+ * Linear links - `curve: 'linear'` forces a straight planar line between
  * endpoints instead of the geodesic arc. Compare with `SphericalLinks` on
  * the same projection to see the difference.
  */
@@ -81,11 +81,11 @@ export const LinearLinks: Story = {
 };
 
 /**
- * Spherical links on an orthographic globe — the geodesic curvature is most
+ * Spherical links on an orthographic globe - the geodesic curvature is most
  * visually obvious on a hemisphere view. `coordinates.zoom: true` also enables
  * drag-to-rotate here (orthographic-specific: dragging spins the globe
  * instead of panning it, since panning a globe within its own frame isn't
- * useful) — drag the canvas below to see a route's great-circle arc land
+ * useful) - drag the canvas below to see a route's great-circle arc land
  * correctly wherever the globe is currently facing.
  */
 export const OnOrthographicGlobe: Story = {

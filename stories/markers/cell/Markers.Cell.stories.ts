@@ -3,11 +3,11 @@ import LinePlot from '$lib/plots/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `cell` marker (svelteplot's own `Cell`) — one rectangle per row of its
+// A `cell` marker (svelteplot's own `Cell`) - one rectangle per row of its
 // own `data`, positioned on a categorical `x`/`y` band each, like a heatmap's
 // own cells. `fill` is required and always a function (per-row), unlike
 // `bar`'s `styles.fill`. Demoed on an empty `LinePlot` canvas with two
-// categorical axes so the grid has real bands to sit in — see
+// categorical axes so the grid has real bands to sit in - see
 // `Plots/HeatmapPlot` for a whole plot built from this same mark.
 
 const meta = {
@@ -47,7 +47,7 @@ const CELLS = [
 
 const colorFor = (value: number) => (value > 5 ? '#7c3aed' : '#ddd6fe');
 
-/** `fill` reads each row's own `value` and returns a color — no plot-level color channel involved. */
+/** `fill` reads each row's own `value` and returns a color - no plot-level color channel involved. */
 export const Basic: Story = {
 	args: {
 		markers: [

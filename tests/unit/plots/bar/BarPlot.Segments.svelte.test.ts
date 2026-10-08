@@ -13,7 +13,7 @@ function styleAttrs(svg: SVGElement): string[] {
 	return Array.from(svg.querySelectorAll('g.bar-y rect')).map((r) => r.getAttribute('style') ?? '');
 }
 
-describe('BarPlot – segments (areas)', () => {
+describe('BarPlot - segments (areas)', () => {
 	test('an area segment and the catch-all each apply their own fillOpacity', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
@@ -75,7 +75,7 @@ describe('BarPlot – segments (areas)', () => {
 	});
 });
 
-describe('BarPlot – segments (catch-all + area merging)', () => {
+describe('BarPlot - segments (catch-all + area merging)', () => {
 	test('an area segment inherits fill color from the series catch-all', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,

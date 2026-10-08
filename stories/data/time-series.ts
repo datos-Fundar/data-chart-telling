@@ -1,5 +1,5 @@
-// Flat time-series rows — one row per (region, metric, year) observation —
-// used by the line/bar/tooltip/configuration/orchestration stories that show
+// Flat time-series rows - one row per (region, metric, year) observation -
+// used by the line/bar/tooltip/configuration/composition stories that show
 // grouped or faceted series over time.
 
 export type SeriesPoint = {

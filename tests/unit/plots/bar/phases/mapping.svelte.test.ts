@@ -37,7 +37,7 @@ function build(overrides: Partial<BarPlotState<Row>> = {}) {
 
 afterEach(() => vi.restoreAllMocks());
 
-describe('buildMapping – category axis', () => {
+describe('buildMapping - category axis', () => {
 	test('defaults to x when neither axis is marked categorical', () => {
 		const result = build();
 		expect(result.categoricalAxis).toBe('x');
@@ -58,7 +58,7 @@ describe('buildMapping – category axis', () => {
 	});
 });
 
-describe('buildMapping – channels', () => {
+describe('buildMapping - channels', () => {
 	test('resolves each channel to the first series own x/y accessor', () => {
 		const result = build();
 		expect(result.channels!.x.accessor(SERIES[0].data[0])).toBe('A');

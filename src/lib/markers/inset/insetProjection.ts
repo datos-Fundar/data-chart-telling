@@ -36,7 +36,7 @@ const NAMED_PROJECTIONS: Record<GeoInsetProjectionName, () => GeoProjection> = {
 
 /**
  * Builds a fresh, configured (but not yet fit) d3-geo projection instance
- * for an `inset` marker — the caller still needs to `.fitExtent()` it to
+ * for an `inset` marker - the caller still needs to `.fitExtent()` it to
  * whatever the inset ends up showing.
  */
 export function buildInsetProjection(config: GeoInsetProjectionConfig = 'mercator'): GeoProjection {

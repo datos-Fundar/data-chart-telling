@@ -14,13 +14,13 @@ const DATA_PROPS = {
 };
 
 // A pyramid's category axis (age group) is always drawn on y, so only
-// `areaY` has a band scale to size itself against — `areaX` (the diverging
+// `areaY` has a band scale to size itself against - `areaX` (the diverging
 // magnitude axis) is a no-op, same as it would be on a vertical bar chart's
 // value axis. svelteplot's <Pointer> matches by nearest-point distance here
-// (no dedicated hit area), so — as with BarPlot's own hover test note —
+// (no dedicated hit area), so - as with BarPlot's own hover test note -
 // these stay static (no-hover) baseline checks rather than simulating a
 // real hover.
-describe('PyramidPlot – markers.hover areaX/areaY', () => {
+describe('PyramidPlot - markers.hover areaX/areaY', () => {
 	test('renders with areaY configured and shows no highlight before any hover', async () => {
 		const { container } = await render(PyramidPlot, {
 			width: 560,

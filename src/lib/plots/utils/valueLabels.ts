@@ -32,7 +32,7 @@ export function valueLabelHooks(
 }
 
 /**
- * A processed row's own value, read through its series' own `y` — what a
+ * A processed row's own value, read through its series' own `y` - what a
  * label shows, even where a transform moved the row (a stacked row's top is
  * the running total, not its own value).
  */

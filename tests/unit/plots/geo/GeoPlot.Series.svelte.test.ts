@@ -5,7 +5,7 @@ import type { Topology } from '$lib/types/plots/data/geo';
 import { ARGENTINA_PROVINCES } from '../../../../stories/plots/geo/data';
 import { waitForSvg, countGeoPaths } from '../_helpers/svg';
 
-describe('GeoPlot – data formats', () => {
+describe('GeoPlot - data formats', () => {
   test('renders from a plain feature array', async () => {
     const { container } = render(GeoPlot, { width: 400, height: 300, data: ARGENTINA_PROVINCES });
     const svg = await waitForSvg(container);
@@ -29,13 +29,13 @@ describe('GeoPlot – data formats', () => {
   });
 });
 
-describe('GeoPlot – featureId', () => {
+describe('GeoPlot - featureId', () => {
   test('default featureId resolves from properties.id (used by segments)', async () => {
     const { container } = render(GeoPlot, {
       width: 400,
       height: 300,
       data: ARGENTINA_PROVINCES,
-      // '06' is Buenos Aires' own `properties.id` — the default featureId
+      // '06' is Buenos Aires' own `properties.id` - the default featureId
       // chain (`feature.id ?? properties.id ?? properties.name`) picks this
       // up before falling through to any name field.
       segments: { '06': [{ styles: { fill: 'tomato' } }] },
@@ -63,7 +63,7 @@ describe('GeoPlot – featureId', () => {
   });
 });
 
-describe('GeoPlot – TopoJSON input', () => {
+describe('GeoPlot - TopoJSON input', () => {
   const TOPOLOGY: Topology = {
     type: 'Topology',
     objects: {

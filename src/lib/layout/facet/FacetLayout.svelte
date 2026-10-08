@@ -2,6 +2,10 @@
   import { isMobile } from '$lib/stores/device';
   import { groupBy } from '$lib/utils/grouping';
   import FacetIndicator from '$lib/layout/facet/FacetIndicator.svelte';
+  import FacetCellFrame from '$lib/layout/facet/FacetCellFrame.svelte';
+  import { buildAlignedCells } from '$lib/layout/facet/alignment';
+  import { createMarginReports } from '$lib/layout/facet/marginReports.svelte';
+  import { buildSharedMargins, wrapEdges } from '$lib/layout/facet/margins';
   import type {
     FacetColumns,
     FacetMode,
@@ -16,22 +20,9 @@
   import type { MarginConfig } from '$lib/types/plots/props';
 
   /**
-   * Small-multiples layout. It splits the data by `by` and hands each group to
-   * the `cell` snippet with its own measured box. Like the other primitives it
-   * never draws the plot itself — any plot that accepts `{ data, width, height }`
-   * can be faceted.
-   *
-   * `mode` picks how the groups are arranged: `'grid'` (default) lays them all
-   * out at once; `'paginated'` pages through the same grid in fixed chunks;
-   * `'carousel'` shows `visible` groups at a time with touch-drag/snap.
-   *
-   * `marginsForFacet`, if given, sizes one shared margin (any/all sides)
-   * across every facet — pass it through `cell`'s own `margins` to a
-   * faceted plot's `margins` prop so they all share the same content box,
-   * instead of each facet growing its own margin independently off what its
-   * own content happens to need (which drifts out of alignment facet to
-   * facet, and — for a facet cramped enough that its content can never fully
-   * fit — can grow without bound).
+   * Small multiples: splits `data` by `by` and gives each group to the `cell`
+   * snippet with its own box. `mode` is `'grid'` (default), `'paginated'` or
+   * `'carousel'`; `marginsForFacet` sizes one margin shared by every facet.
    */
   let {
     data,
@@ -50,6 +41,7 @@
     height,
     cell,
     marginsForFacet,
+    align = false,
   }: {
     data: TRow[];
     by: Accessor<TRow, unknown>;
@@ -67,6 +59,8 @@
     height: number;
     cell: FacetCellSnippet<TRow>;
     marginsForFacet?: (rows: TRow[]) => MarginConfig;
+    /** Sizes rows and columns so every panel gets the same box, whatever axes each facet draws (grid and paginated modes) - see `buildAlignedCells`. */
+    align?: boolean;
   } = $props();
 
   function resolveResponsive<T>(value: Responsive<T>, mobile: boolean): T {
@@ -85,35 +79,14 @@
       .map((v) => [v, groups.get(v)!] as [string, TRow[]]);
   });
 
-  // One shared margin, sized to whatever each facet's own `marginsForFacet`
-  // reports it naturally needs — componentwise `max` per side across every
-  // facet. `FacetLayout` itself measures nothing here (no font, no axis
-  // config, no plot-specific knowledge at all) — that's each plot type's
-  // own concern, expressed however it estimates its own margin (see e.g.
-  // `estimateLineValueLabelMargin`); this just compares already-resolved
-  // numbers. `undefined` when `marginsForFacet` isn't given; any side no
-  // facet reports (or reports as `'auto'`, which isn't comparable) stays
-  // unset, falling back to the plot's own default ('auto') sizing.
-  const MARGIN_SIDES = ['left', 'right', 'top', 'bottom'] as const;
-  const cellMargins = $derived.by((): MarginConfig | undefined => {
-    if (!marginsForFacet) return undefined;
-    const perFacet = entries.map(([, rows]) => marginsForFacet(rows));
-    const out: MarginConfig = {};
-    for (const side of MARGIN_SIDES) {
-      let max: number | undefined;
-      for (const margin of perFacet) {
-        const value = margin[side];
-        if (typeof value !== 'number') continue;
-        max = max === undefined ? value : Math.max(max, value);
-      }
-      if (max !== undefined) out[side] = max;
-    }
-    return out;
-  });
+  // One shared margin across every facet - see `marginsForFacet`.
+  const cellMargins = $derived(
+    marginsForFacet ? buildSharedMargins(entries.map(([, rows]) => rows), marginsForFacet) : undefined,
+  );
 
   const resolvedMode = $derived(resolveResponsive(mode, $isMobile));
 
-  // Columns/rows for a "full" grid of every entry — used for plain grid-mode
+  // Columns/rows for a "full" grid of every entry - used for plain grid-mode
   // layout, and as the default `pageSize` (one page = one full screen).
   const gridCols = $derived.by(() => {
     const desired = resolveResponsive(columns, $isMobile);
@@ -143,23 +116,14 @@
   const showNav = $derived(resolvedMode === 'paginated' && totalPages > 1);
   const NAV_BELOW_H = 44;
 
-  // Columns/rows actually used to size each rendered cell. `grid` mode always
-  // renders every entry, so it sizes off `gridCols`/`gridRows` as before. In
-  // `paginated` mode only `pageEntries` (at most `pageSize`, possibly fewer
-  // on the last page) are ever on screen at once — sizing off the *total*
-  // entry count instead (as `gridCols`/`gridRows` do) left a page with fewer
-  // entries than a full grid mostly blank, e.g. `pageSize: 1` still reserved
-  // room for every other page's rows instead of filling the chart area with
-  // its one cell.
+  // Columns and rows sized to what's on screen: the current page when paginated.
   const cols = $derived(
     resolvedMode === 'paginated' ? Math.max(1, Math.min(gridCols, pageEntries.length || 1)) : gridCols,
   );
   const rows = $derived(
     resolvedMode === 'paginated' ? Math.ceil((pageEntries.length || 1) / cols) : gridRows,
   );
-  // In `navLayout: 'below'`, the nav row sits in normal flow beneath the
-  // grid rather than floating over it, so the cells must be measured against
-  // the height left over after reserving space for that row.
+  // Height left for the cells once a `'below'` nav row is reserved.
   const contentHeight = $derived(
     resolvedMode === 'paginated' && navLayout === 'below' && showNav
       ? Math.max(0, height - NAV_BELOW_H)
@@ -171,7 +135,29 @@
     Math.max(0, Math.floor((contentHeight - (rows - 1) * gap) / rows) - TITLE_H),
   );
 
+  // ── aligned panels ───────────────────────────────────────────────────────
+  const reports = createMarginReports();
+  function alignedFor(gridEntries: [string, TRow[]][]) {
+    if (!align) return undefined;
+    return buildAlignedCells({
+      columns: cols,
+      rows,
+      width,
+      height: contentHeight,
+      gap,
+      rowReserve: TITLE_H,
+      margins: Array.from({ length: rows }, (_, r) =>
+        Array.from({ length: cols }, (_, c) => {
+          const entry = gridEntries[r * cols + c];
+          return entry ? reports.settled[entry[0]] : null;
+        }),
+      ),
+    });
+  }
+
   // ── carousel ─────────────────────────────────────────────────────────────
+  // A carousel cell slides past every other, so each one draws all its axes.
+  const CAROUSEL_EDGES = { top: true, right: true, bottom: true, left: true };
   const visibleCount = $derived(Math.max(1, Math.min(visible, entries.length || 1)));
   const carouselCellWidth = $derived(
     Math.max(0, Math.floor((width - (visibleCount - 1) * gap) / visibleCount)),
@@ -252,12 +238,36 @@
 {/snippet}
 
 {#snippet grid(gridEntries: [string, TRow[]][])}
-  <div class="dct-facet" style:grid-template-columns="repeat({cols}, 1fr)" style:gap="{gap}px">
-    {#each gridEntries as [facetValue, rowsForCell] (facetValue)}
+  {@const aligned = alignedFor(gridEntries)}
+  <div
+    class="dct-facet"
+    style:grid-template-columns={aligned ? aligned.colWidths.map((w) => `${w}px`).join(' ') : `repeat(${cols}, 1fr)`}
+    style:grid-template-rows={aligned ? aligned.rowHeights.map((h) => `${h}px`).join(' ') : undefined}
+    style:gap="{gap}px"
+  >
+    {#each gridEntries as [facetValue, rowsForCell], i (facetValue)}
+      {@const box = aligned?.cells[Math.floor(i / cols)]?.[i % cols]}
+      {@const place = {
+        facetValue,
+        data: rowsForCell,
+        width: box?.width ?? cellWidth,
+        height: box?.height ?? cellHeight,
+        margins: box ? { ...cellMargins, ...box.margins } : cellMargins,
+        edges: wrapEdges(i, gridEntries.length, cols),
+      }}
       <div class="dct-facet__cell">
         <div class="dct-facet__title">{facetValue}</div>
         {#if cellWidth > 0 && cellHeight > 0}
-          {@render cell({ facetValue, data: rowsForCell, width: cellWidth, height: cellHeight, margins: cellMargins })}
+          {#if align}
+            <FacetCellFrame
+              pinned={box?.margins}
+              onMargins={(m) => reports.report(facetValue, m)}
+            >
+              {@render cell(place)}
+            </FacetCellFrame>
+          {:else}
+            {@render cell(place)}
+          {/if}
         {/if}
       </div>
     {/each}
@@ -310,6 +320,7 @@
               width: carouselCellWidth,
               height: carouselCellHeight,
               margins: cellMargins,
+              edges: CAROUSEL_EDGES,
             })}
           {/if}
         </div>
@@ -328,12 +339,7 @@
     display: grid;
     width: 100%;
     height: 100%;
-    /* Only takes effect when `.dct-facet` is itself a flex item (inside
-       `.dct-facet-paginated`): lets it shrink to the space left over after
-       a `flex: 0 0 auto` sibling (the below-layout nav row) claims its
-       fixed height, instead of overflowing past the fixed-height parent
-       the way a bare `height: 100%` would. No-op outside a flex parent
-       (e.g. plain `grid` mode), where `width/height: 100%` alone applies. */
+    /* Lets the grid shrink beside a fixed-height nav row in a flex parent. */
     flex: 1 1 auto;
     min-height: 0;
   }

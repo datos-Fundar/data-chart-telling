@@ -5,7 +5,7 @@ import LinePlot from '$lib/plots/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { waitForSvg, countBarRects } from '../../plots/_helpers/svg';
 
-describe('x1/x2/y1/y2 channel – bar marker with field-key shorthand', () => {
+describe('x1/x2/y1/y2 channel - bar marker with field-key shorthand', () => {
 	test('a hand-authored bar marker using y1/y2 as field keys renders one extra rect per row', async () => {
 		const data = [
 			{ province: 'Buenos Aires', lo: 79.8, hi: 84.2 },
@@ -36,7 +36,7 @@ describe('x1/x2/y1/y2 channel – bar marker with field-key shorthand', () => {
 	});
 });
 
-describe('x1/x2/y1/y2 channel – rect marker', () => {
+describe('x1/x2/y1/y2 channel - rect marker', () => {
 	test('a rect marker with literal x1/x2/y1/y2 renders a rectangle', async () => {
 		const data = [
 			{ year: 2008, value: 75 },
@@ -62,7 +62,7 @@ describe('x1/x2/y1/y2 channel – rect marker', () => {
 		});
 		const svg = await waitForSvg(container);
 		// svelteplot's `Rect` mark renders a bare `<rect>`, not scoped to its own
-		// class — filter out the plot's own transparent pointer-capture rect, and
+		// class - filter out the plot's own transparent pointer-capture rect, and
 		// the frame's clip-path rect, which is a `<clipPath>` child, not a mark.
 		const rects = Array.from(svg.querySelectorAll('rect')).filter(
 			(r) => r.getAttribute('fill') !== 'transparent' && !r.closest('clipPath')

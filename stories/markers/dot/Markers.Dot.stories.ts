@@ -6,10 +6,10 @@ import LinePlot from '$lib/plots/line/Plot.svelte';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `dot` marker (svelteplot's own `Dot`) — one point mark per row of its own
+// A `dot` marker (svelteplot's own `Dot`) - one point mark per row of its own
 // `data`, independent of any plot series. Demoed on an empty `LinePlot`
 // canvas (no data of its own, just an explicit `scales` domain) so only the
-// marker itself is on screen — see `Plots/*/Markers` for markers used
+// marker itself is on screen - see `Plots/*/Markers` for markers used
 // alongside real chart data.
 
 const meta = {
@@ -108,7 +108,7 @@ export const CustomStyle: LinePlotStory = {
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** Basic dots — one fixed-size, fixed-color dot per weather station. */
+/** Basic dots - one fixed-size, fixed-color dot per weather station. */
 export const OnMap: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {
@@ -120,7 +120,7 @@ export const OnMap: GeoPlotStory = {
 	}
 };
 
-/** Sized by value — `r` maps each station's temperature to the dot's radius, so hotter cities draw a bigger circle. */
+/** Sized by value - `r` maps each station's temperature to the dot's radius, so hotter cities draw a bigger circle. */
 export const SizedByTemperature: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {
@@ -140,8 +140,8 @@ export const SizedByTemperature: GeoPlotStory = {
 };
 
 /**
- * Colored by value — the marker's own `color` channel drives a ramp
- * (`scales.color`, its own independent ramp — not shared with the base
+ * Colored by value - the marker's own `color` channel drives a ramp
+ * (`scales.color`, its own independent ramp - not shared with the base
  * map's choropleth) so each dot's fill reflects its station's temperature,
  * mirroring `dot/weather`'s color-by-temperature encoding.
  */

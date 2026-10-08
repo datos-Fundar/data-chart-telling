@@ -5,11 +5,11 @@ import { GOOGL_AUGUST_2026 } from '../../../data/stockPrices';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A marker's own `.statistics` fits against that marker's own `data`,
-// independent of the plot's top-level `statistics` — both are set here so the
+// independent of the plot's top-level `statistics` - both are set here so the
 // two derived lines are visibly distinct: the top-level one (default color)
 // smooths the plot's own *close* series, the marker-level one (red) smooths
 // the hand-authored dot's own *open* data. Both use the same dashed
-// `strokeDasharray` — `movingAverage` wraps into a plain `line` marker, so
+// `strokeDasharray` - `movingAverage` wraps into a plain `line` marker, so
 // its `styles` is a full `StrokeStyle`, unlike `bollinger`'s narrower one.
 
 const stockData = GOOGL_AUGUST_2026.map((d, i) => ({ ...d, day: i + 1 }));

@@ -5,7 +5,7 @@ import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, POPULATION_SHIFT } from '../../../../../stories/plots/geo/data';
 import { waitForSvg, countVectorMarks } from '../../_helpers/svg';
 
-describe('GeoPlot – vector marker', () => {
+describe('GeoPlot - vector marker', () => {
   test('renders one arrow per row', async () => {
     const { container } = render(GeoPlot, {
       width: 400,

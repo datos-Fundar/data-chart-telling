@@ -5,7 +5,7 @@
   /**
    * Plain wrapper that gives `Timeline` an explicitly CSS-sized box to render
    * into. svelteplot's `Plot` measures its own `<figure>`'s `clientWidth` for
-   * the SVG `viewBox` even when an explicit `width` prop is set — without a
+   * the SVG `viewBox` even when an explicit `width` prop is set - without a
    * matching CSS box, the figure picks up the ambient container width instead
    * (here, the full Storybook canvas) and the chart renders squeezed into a
    * tiny corner. Every real usage in this library (`TimelineLayout`, the

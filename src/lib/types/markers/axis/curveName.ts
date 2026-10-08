@@ -1,4 +1,4 @@
-/** Curve interpolation for an area, difference or trail marker — svelteplot's own `CurveName`. */
+/** Curve interpolation for an area, difference or trail marker - svelteplot's own `CurveName`. */
 export type MarkerCurveName =
 	| 'basis'
 	| 'basis-closed'

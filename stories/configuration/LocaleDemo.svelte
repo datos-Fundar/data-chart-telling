@@ -15,7 +15,7 @@
     data: Point[];
     /** Pins the Y axis to exactly these values, instead of letting it pick its own. */
     ticks?: number[];
-    /** Fixed for this story — `axis.compactDisplay` only applies at mount time, so it can't be switched live like `axis.locale` can. */
+    /** Fixed for this story - `axis.compactDisplay` only applies at mount time, so it can't be switched live like `axis.locale` can. */
     compactDisplay?: 'short' | 'long';
   } = $props();
 
@@ -34,7 +34,7 @@
   let active = $state<(typeof LOCALES)[number]['key']>('es-AR');
 
   // Plain (non-effect) statement, so it runs synchronously during this
-  // component's own init — *before* its `<BarPlot>` child mounts and takes
+  // component's own init - *before* its `<BarPlot>` child mounts and takes
   // its own one-time read of `axis.compactDisplay` (see `BasePlotLayout`).
   // An `$effect` here would fire only after that child has already mounted,
   // leaving `compactDisplay` stuck on whatever config was left over from
@@ -42,7 +42,7 @@
   resetConfiguration();
   setConfiguration({ axis: { locale: active, compactDisplay } });
 
-  // Only `locale` needs to react to the button after that initial mount —
+  // Only `locale` needs to react to the button after that initial mount -
   // `setConfiguration` itself reads+writes the global config, so it must
   // stay out of this effect's own dependency tracking or every call would
   // re-trigger itself.

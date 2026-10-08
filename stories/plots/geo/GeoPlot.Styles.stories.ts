@@ -8,7 +8,7 @@ import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from './data';
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Defaults to the `argentinaBicontinental` projection (see the `Scales`
 // stories) so the mainland and Antarctic sector both show up. Tile-layer
-// basemaps are the one exception — raster tiles only line up under a
+// basemaps are the one exception - raster tiles only line up under a
 // Mercator-family projection, so every tile story below overrides
 // `coordinates.projection` back to `'mercator'`.
 
@@ -42,7 +42,7 @@ const POPULATION_DOMAIN: [number, number] = [190_000, 17_600_000];
 
 // "Tierra del Fuego, Antártida e Islas del Atlántico Sur"'s `MultiPolygon`
 // includes a pie-slice reaching the South Pole plus the far-flung South
-// Georgia/South Sandwich Islands — Mercator can't represent latitudes near
+// Georgia/South Sandwich Islands - Mercator can't represent latitudes near
 // ±90° (it projects them to +/-Infinity), so feeding that wedge through a
 // mercator projection degenerates into a giant filled rectangle covering the
 // whole frame instead of clipping away cleanly. `excludeParts` drops those
@@ -57,12 +57,12 @@ const isAntarcticPart = (part: { centroid: [number, number] }, feature: { __id: 
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** No style overrides — the base map uses the theme's default palette color and a plain outline. */
+/** No style overrides - the base map uses the theme's default palette color and a plain outline. */
 export const Default: Story = {
 	args: {}
 };
 
-/** Custom fill/stroke — `styles.fill`/`styles.stroke`/`styles.strokeWidth` set the base map's default appearance for every feature not otherwise styled by `segments`. */
+/** Custom fill/stroke - `styles.fill`/`styles.stroke`/`styles.strokeWidth` set the base map's default appearance for every feature not otherwise styled by `segments`. */
 export const CustomFillStroke: Story = {
 	args: {
 		styles: {
@@ -74,16 +74,16 @@ export const CustomFillStroke: Story = {
 };
 
 /**
- * Choropleth color ramp — with a continuous `color` accessor (see `Series`
+ * Choropleth color ramp - with a continuous `color` accessor (see `Series`
  * stories), `scales.color.scheme` sets the ramp's colors. Each province's
- * approximate population is used as the value here — compare with
+ * approximate population is used as the value here - compare with
  * `us-choropleth`-style examples that color regions by a numeric metric
  * instead of by fixed per-feature `segments`.
  */
 export const ChoroplethColorRamp: Story = {
 	args: {
 		color: (f) => (f.properties as ArgentinaProvinceProps).population,
-		// `coordinates` is set here too, not just `scales.color` — Storybook merges
+		// `coordinates` is set here too, not just `scales.color` - Storybook merges
 		// `args` shallowly, so a story-level `coordinates` object replaces the
 		// meta's `coordinates: { projection: … }` entirely rather than merging
 		// into it; omitting `projection` here would silently fall back to `equal-earth`.
@@ -96,11 +96,11 @@ export const ChoroplethColorRamp: Story = {
 	}
 };
 
-/** Inverted color ramp — swaps the scheme's colors so higher-population provinces appear in the lighter tone instead of the darker one. */
+/** Inverted color ramp - swaps the scheme's colors so higher-population provinces appear in the lighter tone instead of the darker one. */
 export const InvertedColorRamp: Story = {
 	args: {
 		color: (f) => (f.properties as ArgentinaProvinceProps).population,
-		// `coordinates` is set here too, not just `scales.color` — Storybook merges
+		// `coordinates` is set here too, not just `scales.color` - Storybook merges
 		// `args` shallowly, so a story-level `coordinates` object replaces the
 		// meta's `coordinates: { projection: … }` entirely rather than merging
 		// into it; omitting `projection` here would silently fall back to `equal-earth`.
@@ -110,12 +110,12 @@ export const InvertedColorRamp: Story = {
 };
 
 /**
- * Raster tile basemap — `styles.tileLayer` draws OpenStreetMap tiles under
+ * Raster tile basemap - `styles.tileLayer` draws OpenStreetMap tiles under
  * the vector geometry. Only correct for Mercator-family projections, so
  * `coordinates.projection` is set back to `'mercator'` here, overriding this
  * file's `argentinaBicontinental` default (`coordinates.projection` also
  * defaults to `'mercator'` automatically when a tile layer is set and no
- * projection is given at all — the explicit override here is only needed
+ * projection is given at all - the explicit override here is only needed
  * because this file's meta sets one).
  */
 export const TileLayerBasemap: Story = {
@@ -135,16 +135,16 @@ export const TileLayerBasemap: Story = {
 	}
 };
 
-// IGN (Instituto Geográfico Nacional) basemaps — Argentina's national
+// IGN (Instituto Geográfico Nacional) basemaps - Argentina's national
 // mapping agency's own tile services:
 // https://www.ign.gob.ar/NuestrasActividades/InformacionGeoespacial/ServiciosOGC
 // These use the TMS tile scheme (`{-y}`, row 0 at the south) rather than the
-// XYZ scheme OSM uses above (`{y}`, row 0 at the north) — see `tileUrl` in
+// XYZ scheme OSM uses above (`{y}`, row 0 at the north) - see `tileUrl` in
 // `$lib/plots/utils/tiles`.
 
 const IGN_ATTRIBUTION = '© Instituto Geográfico Nacional (IGN)';
 
-/** IGN's default "Argenmap" basemap — the standard full-color street map. */
+/** IGN's default "Argenmap" basemap - the standard full-color street map. */
 export const TileLayerIgnArgenmap: Story = {
 	args: {
 		coordinates: { projection: { type: 'mercator', domain: 'data' } },
@@ -162,7 +162,7 @@ export const TileLayerIgnArgenmap: Story = {
 	}
 };
 
-/** IGN's "Argenmap gris" basemap — a muted grayscale variant, useful under a strong choropleth. */
+/** IGN's "Argenmap gris" basemap - a muted grayscale variant, useful under a strong choropleth. */
 export const TileLayerIgnArgenmapGris: Story = {
 	args: {
 		coordinates: { projection: { type: 'mercator', domain: 'data' } },
@@ -180,7 +180,7 @@ export const TileLayerIgnArgenmapGris: Story = {
 	}
 };
 
-/** IGN's "Argenmap topográfico" basemap — shows terrain/elevation shading and contour detail. */
+/** IGN's "Argenmap topográfico" basemap - shows terrain/elevation shading and contour detail. */
 export const TileLayerIgnArgenmapTopografico: Story = {
 	args: {
 		coordinates: { projection: { type: 'mercator', domain: 'data' } },
@@ -198,7 +198,7 @@ export const TileLayerIgnArgenmapTopografico: Story = {
 	}
 };
 
-/** IGN's "Argenmap oscuro" basemap — a dark-themed variant, pairs well with a light-colored choropleth ramp. */
+/** IGN's "Argenmap oscuro" basemap - a dark-themed variant, pairs well with a light-colored choropleth ramp. */
 export const TileLayerIgnArgenmapOscuro: Story = {
 	args: {
 		coordinates: { projection: { type: 'mercator', domain: 'data' } },
@@ -216,7 +216,7 @@ export const TileLayerIgnArgenmapOscuro: Story = {
 	}
 };
 
-/** IGN's "Argenmap híbrido" basemap — satellite imagery with street/label overlays. */
+/** IGN's "Argenmap híbrido" basemap - satellite imagery with street/label overlays. */
 export const TileLayerIgnArgenmapHibrido: Story = {
 	args: {
 		coordinates: { projection: { type: 'mercator', domain: 'data' } },
@@ -235,7 +235,7 @@ export const TileLayerIgnArgenmapHibrido: Story = {
 };
 
 /**
- * Click handling — `styles.onFeatureClick` fires with the clicked feature
+ * Click handling - `styles.onFeatureClick` fires with the clicked feature
  * and the DOM event. Click a province to see it.
  */
 export const OnFeatureClick: Story = {
@@ -250,7 +250,7 @@ export const OnFeatureClick: Story = {
 };
 
 /**
- * `styles.frame` — same purely decorative border as every other plot kind
+ * `styles.frame` - same purely decorative border as every other plot kind
  * (see `Plots/LinePlot/Styles`'s `FrameDefault`/`FrameCustomStyle`), just as
  * available here since it's rendered by the shared `StylesLayout`, not
  * anything geo-specific.

@@ -65,14 +65,14 @@ const MALE = {
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * No style overrides — the plot uses the configured theme defaults.
+ * No style overrides - the plot uses the configured theme defaults.
  */
 export const Default: Story = {
 	args: { series: [FEMALE] }
 };
 
 /**
- * Value labels enabled with default settings — `styles.values.show: true`
+ * Value labels enabled with default settings - `styles.values.show: true`
  * renders the numeric Y value above (or anchored to) the top of each bar.
  *
  * The default format is `"${seriesName} - ${value}"` and the default anchor
@@ -88,7 +88,7 @@ export const ShowValues: Story = {
 };
 
 /**
- * Anchor `'outside'` (explicit) — text appears above the bar, centered on it.
+ * Anchor `'outside'` (explicit) - text appears above the bar, centered on it.
  * This is the default when `anchor` is omitted for bar charts.
  */
 export const AnchorOutside: Story = {
@@ -105,7 +105,7 @@ export const AnchorOutside: Story = {
 };
 
 /**
- * Anchor `'end'` — the label appears at the end of the bar (top),
+ * Anchor `'end'` - the label appears at the end of the bar (top),
  * useful when labels need to be directly on the bar.
  */
 export const AnchorEnd: Story = {
@@ -123,7 +123,7 @@ export const AnchorEnd: Story = {
 };
 
 /**
- * Anchor `'middle'` — the label is placed in the middle of the bar.
+ * Anchor `'middle'` - the label is placed in the middle of the bar.
  * Works best for taller bars with good contrast.
  */
 export const AnchorMiddle: Story = {
@@ -140,7 +140,7 @@ export const AnchorMiddle: Story = {
 };
 
 /**
- * Anchor `'start'` — text appears at the start of the bar (bottom),
+ * Anchor `'start'` - text appears at the start of the bar (bottom),
  * useful for showing baseline values.
  */
 export const AnchorStart: Story = {
@@ -158,7 +158,7 @@ export const AnchorStart: Story = {
 };
 
 /**
- * Custom format — the `format(value, seriesName)` callback receives the
+ * Custom format - the `format(value, seriesName)` callback receives the
  * numeric Y value and the series name. Return any string to override the
  * default `"${seriesName} - ${value}"` label.
  */
@@ -175,7 +175,7 @@ export const CustomFormat: Story = {
 };
 
 /**
- * Custom offsets — `dx` and `dy` fine-tune the label position in pixels,
+ * Custom offsets - `dx` and `dy` fine-tune the label position in pixels,
  * overriding the defaults computed from `anchor`. Useful for nudging a label
  * away from another bar or legend.
  *
@@ -197,7 +197,7 @@ export const CustomOffsets: Story = {
 };
 
 /**
- * Two series with default labels — each series' bars get their own labels,
+ * Two series with default labels - each series' bars get their own labels,
  * filled with the palette colour for that series. The default `anchor: 'outside'`
  * places both label sets above their respective bars.
  */
@@ -214,7 +214,7 @@ export const TwoSeriesWithLabels: Story = {
 };
 
 /**
- * Two series with `anchor: 'middle'` labels — labels appear inside the bars.
+ * Two series with `anchor: 'middle'` labels - labels appear inside the bars.
  * Works best when bars are tall enough to accommodate text.
  */
 export const TwoSeriesLabelsMiddle: Story = {
@@ -266,7 +266,7 @@ export const TwoSeriesStackedLabelsMiddle: Story = {
 };
 
 /**
- * Custom text anchor and line anchor — bypasses the `anchor` shorthand and
+ * Custom text anchor and line anchor - bypasses the `anchor` shorthand and
  * sets svelteplot's low-level `textAnchor` / `lineAnchor` directly. The label
  * is right-aligned (`textAnchor: 'end'`) and sits above the bar
  * (`lineAnchor: 'bottom'`), with a nudge via `dy`.

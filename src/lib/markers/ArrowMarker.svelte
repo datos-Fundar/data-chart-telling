@@ -2,7 +2,7 @@
 	import { Arrow } from 'svelteplot';
 	import type { ArrowMarkerConfig } from '$lib/types/markers/common';
 
-	/** Renders one `'arrow'` marker as `<Arrow>` — a point-to-point annotation. Restates svelteplot's own defaults, which an explicit `undefined` would otherwise erase. */
+	/** Renders one `'arrow'` marker as `<Arrow>` - a point-to-point annotation. Restates svelteplot's own defaults, which an explicit `undefined` would otherwise erase. */
 	let { marker }: { marker: ArrowMarkerConfig } = $props();
 
 	const data = $derived(marker.data ?? []);

@@ -32,7 +32,7 @@ export const BIN_X_CHANNEL_KEYS: Record<keyof BinXChannels, true> = {
 	insetBottom: true
 };
 
-/** The keys of {@link BinYChannels}, at runtime — see {@link BIN_X_CHANNEL_KEYS}. */
+/** The keys of {@link BinYChannels}, at runtime - see {@link BIN_X_CHANNEL_KEYS}. */
 export const BIN_Y_CHANNEL_KEYS: Record<keyof BinYChannels, true> = {
 	data: true,
 	y: true,
@@ -46,13 +46,13 @@ export const BIN_Y_CHANNEL_KEYS: Record<keyof BinYChannels, true> = {
 /** Channels the 2D `bin` reads: both binned axes, plus the shared ones. */
 export type Bin2DChannels = SharedBinChannels & { x?: TransformChannel; y?: TransformChannel };
 
-/** The keys of {@link Bin2DChannels}, at runtime — see {@link BIN_X_CHANNEL_KEYS}. */
+/** The keys of {@link Bin2DChannels}, at runtime - see {@link BIN_X_CHANNEL_KEYS}. */
 export const BIN_2D_CHANNEL_KEYS: Record<keyof Bin2DChannels, true> = {
 	...BIN_X_CHANNEL_KEYS,
 	y: true
 };
 
-/** Options both bin transforms take, flat next to the channels — same names as svelteplot's. */
+/** Options both bin transforms take, flat next to the channels - same names as svelteplot's. */
 type BinOptions = {
 	/** Explicit thresholds, a count, or a named generator (`auto`, `scott`, `sturges`, `freedman-diaconis`). */
 	thresholds?: 'auto' | 'scott' | 'sturges' | 'freedman-diaconis' | number | number[];
@@ -77,23 +77,23 @@ type BinOptions = {
  * `binX` as a marker transform: its own props, flat, exactly as svelteplot's
  * `binX` takes them. Svelteplot names the binned channel `x` and its value
  * output `y` (a reducer such as `'count'`). Both live in one flat object, so
- * here `x` is the input and `y` is always the reducer — grouping goes through
+ * here `x` is the input and `y` is always the reducer - grouping goes through
  * `z`, which a marker fills from its `grouping`.
  */
 export type BinXTransform = {
 	type: 'binX';
-	/** The bins' value — a reducer such as `'count'`. */
+	/** The bins' value - a reducer such as `'count'`. */
 	y?: BinReducer;
 } & BinXChannels &
 	BinOptions;
 
 /**
- * `binY` as a marker transform — see {@link BinXTransform}; here `y` is the
+ * `binY` as a marker transform - see {@link BinXTransform}; here `y` is the
  * binned input and `x` is the reducer.
  */
 export type BinYTransform = {
 	type: 'binY';
-	/** The bins' value — a reducer such as `'count'`. */
+	/** The bins' value - a reducer such as `'count'`. */
 	x?: BinReducer;
 } & BinYChannels &
 	BinOptions;
@@ -101,7 +101,7 @@ export type BinYTransform = {
 /**
  * `bin` as a marker transform: bins on `x` and `y` at once, so each output row
  * is one cell of a 2D grid with its `x1`/`x2`/`y1`/`y2` edges. Its value goes to
- * one of the other channels — `fill: 'count'` colors each cell by its row count,
+ * one of the other channels - `fill: 'count'` colors each cell by its row count,
  * `r: 'count'` sizes a dot by it.
  */
 export type Bin2DTransform = { type: 'bin' } & Bin2DChannels & BinOptions;

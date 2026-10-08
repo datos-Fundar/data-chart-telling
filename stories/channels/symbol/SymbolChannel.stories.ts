@@ -6,7 +6,7 @@ import { COUNTRIES } from '../../plots/scatter/data';
 // The `symbol` channel: a categorical shape mapping, independent of `color`.
 // Unlike `opacity`/`r`, a resolved shape name is a recognized literal (same
 // escape hatch a resolved CSS color string gets), so it works as a live
-// per-row accessor with no bucketing — ScatterPlot's own dots are the only
+// per-row accessor with no bucketing - ScatterPlot's own dots are the only
 // default mark with a shape concept.
 
 const meta = {
@@ -37,7 +37,7 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * `symbol: 'region'` gives every region its own shape, on top of `color`
- * already grouping by the same field — shape becomes a second, redundant-but-
+ * already grouping by the same field - shape becomes a second, redundant-but-
  * legible encoding of the same category (useful for grayscale/print, or
  * alongside a colorblind-unfriendly palette).
  */
@@ -48,9 +48,9 @@ export const Default: Story = {
 };
 
 /**
- * `scales.symbol.range` picks a different set of shapes entirely — `diamond`/
+ * `scales.symbol.range` picks a different set of shapes entirely - `diamond`/
  * `star`/`cross`, instead of `Default`'s implicit `circle`/`square`/`triangle`
- * cycle — genuinely distinct shapes.
+ * cycle - genuinely distinct shapes.
  */
 export const CustomShapes: Story = {
 	args: {

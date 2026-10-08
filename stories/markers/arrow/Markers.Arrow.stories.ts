@@ -3,7 +3,7 @@ import LinePlot from '$lib/plots/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// An `arrow` marker (svelteplot's own `Arrow`) — a point-to-point annotation,
+// An `arrow` marker (svelteplot's own `Arrow`) - a point-to-point annotation,
 // unlike `vector` (a point plus a length/rotation, geo-only). `x1`/`y1` →
 // `x2`/`y2` already fully describe the direction, so there's no
 // `isHorizontal` to pick between. Demoed on an empty `LinePlot` canvas so

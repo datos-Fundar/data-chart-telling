@@ -2,7 +2,7 @@
 	import { Image } from 'svelteplot';
 	import type { ImageMarkerConfig } from '$lib/types/markers/common';
 
-	/** Renders one `'image'` marker as `<Image>` — an image centered on each row's `x`/`y`. */
+	/** Renders one `'image'` marker as `<Image>` - an image centered on each row's `x`/`y`. */
 	let { marker }: { marker: ImageMarkerConfig } = $props();
 
 	const data = $derived(marker.data ?? []);

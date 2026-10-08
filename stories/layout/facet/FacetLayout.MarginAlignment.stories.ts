@@ -5,7 +5,7 @@ import { estimateCategoricalAxisMargin } from '$lib/plots/utils/categoricalAxisM
 
 // `FacetMarginAlignmentDemo` renders through a wrapper, so
 // `parameters.docs.source.code` overrides the "show code" panel with the
-// real `<FacetLayout>` call via `renderSource` — see `stories/common/docsSource.ts`.
+// real `<FacetLayout>` call via `renderSource` - see `stories/common/docsSource.ts`.
 function barSource(aligned: boolean) {
   return renderSource('FacetLayout', {
     data: barData,
@@ -38,7 +38,7 @@ function lineSource(aligned: boolean) {
 
 /**
  * Each facet auto-sizes its own left margin to its own axis's widest label
- * — different labels across facets, different margins, content starting at
+ * - different labels across facets, different margins, content starting at
  * different x. `marginsForFacet` measures every facet's candidate labels
  * (off-DOM, via canvas) and feeds back one shared `margins.left`.
  */
@@ -58,13 +58,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Categorical Y axis, one province per facet — long and short names side by side. */
+/** Categorical Y axis, one province per facet - long and short names side by side. */
 export const BarMisaligned: Story = {
   args: { kind: 'bar', aligned: false },
   parameters: { docs: { source: { code: barSource(false) } } },
 };
 
-/** Same data, aligned — every bar starts at the same x. */
+/** Same data, aligned - every bar starts at the same x. */
 export const BarAligned: Story = {
   args: { kind: 'bar', aligned: true },
   parameters: { docs: { source: { code: barSource(true) } } },
@@ -76,7 +76,7 @@ export const LineMisaligned: Story = {
   parameters: { docs: { source: { code: lineSource(false) } } },
 };
 
-/** Same data, aligned — every facet's content box starts at the same x. */
+/** Same data, aligned - every facet's content box starts at the same x. */
 export const LineAligned: Story = {
   args: { kind: 'line', aligned: true },
   parameters: { docs: { source: { code: lineSource(true) } } },

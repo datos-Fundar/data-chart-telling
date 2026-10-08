@@ -5,14 +5,14 @@ import type {
 	PyramidPlotCtx,
 	PyramidSeries
 } from '$lib/types/plots/pyramid/state';
-import type { ChartConfig } from '$lib/types/configuration/styling';
+import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
 type Row = { ageGroup: string; pct: number | null };
 
 const CTX: PyramidPlotCtx = {
-	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as ChartConfig,
+	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as PlotStylesConfig,
 	formatValue: (v, name) => `${name}:${v}`,
 	legendInteraction: null
 };
@@ -33,7 +33,7 @@ function build(resolvedSeries: PyramidSeries<Row>[]) {
 	return buildTaggedRows(state, CTX).flat!;
 }
 
-describe('buildMapping – tagged rows', () => {
+describe('buildMapping - tagged rows', () => {
 	test('signs the magnitude negative for left, positive for right', () => {
 		const flat = build([
 			series('Female', 'left', [{ ageGroup: '0-4', pct: 10 }]),

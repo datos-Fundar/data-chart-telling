@@ -13,7 +13,7 @@ const SOURCES = [
 
 const YEARS = Array.from({ length: 21 }, (_, i) => 2000 + i);
 
-/** Each year's source shares, normalized to sum to 100 — a whole split into parts. */
+/** Each year's source shares, normalized to sum to 100 - a whole split into parts. */
 export const ENERGY_MIX: EnergyShare[] = YEARS.flatMap((year) => {
 	const t = (year - 2000) / 20;
 	const raw = SOURCES.map((s) => ({

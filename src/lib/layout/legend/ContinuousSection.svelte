@@ -54,29 +54,15 @@
 	// ── Drag-to-narrow-margins ────────────────────────────────────────────────
 	const interaction = getLegendInteraction() ?? createLegendInteraction();
 
-	// Seeded once from the section's own bounds (deliberately untracked — see
-	// the tracking/clamping effect below for how later prop changes are
-	// handled instead).
+	// Seeded once from the section's bounds.
 	let lo = $state(untrack(() => section.min));
 	let hi = $state(untrack(() => section.max));
 
-	// Whether the user has actually dragged *that* handle off its default
-	// position — tracked per handle, not as one combined flag, so dragging one
-	// doesn't freeze the other: until the other is touched, it must keep
-	// tracking `section.min`/`max` exactly, since a consumer's domain routinely
-	// changes with no interaction at all (e.g. a different year picked on its
-	// own timeline), and with nothing to protect there the legend should
-	// always read the true current extent rather than some earlier domain's
-	// stale numbers.
+	// Whether each handle was dragged; an untouched one follows the section's bounds.
 	let loAdjusted = $state(false);
 	let hiAdjusted = $state(false);
 
-	// Once a handle *has* been dragged, a later domain change (same scenario as
-	// above, but now with a selection to protect) instead re-clamps it to stay
-	// valid: the lower handle only moves up to meet a risen min, the upper
-	// handle only moves down to meet a fallen max. Clamping against *both* of
-	// the new min/max first (not just its own side) keeps a handle from
-	// crossing the other if the domain shifts entirely past its old position.
+	// A dragged handle is re-clamped into the new bounds.
 	$effect(() => {
 		lo = loAdjusted ? Math.min(Math.max(lo, section.min), section.max) : section.min;
 		hi = hiAdjusted ? Math.max(Math.min(hi, section.max), section.min) : section.max;
@@ -345,12 +331,7 @@
 		white-space: nowrap;
 		transform: translateX(-50%) rotate(var(--dct-continuous-label-rotate, 0deg));
 	}
-	/*
-   * Anchored outward (not centered, unlike a plain tick) so the label always
-   * grows into the bar instead of over its own edge — a centered label at
-   * lo=min or hi=max would overflow past `.dct-chart`'s `overflow: hidden`
-   * and get clipped, exactly like the old fixed min/max edge labels never did.
-   */
+	/* Anchored outward so the label grows into the bar. */
 	.dct-continuous__tick--handle-lo,
 	.dct-continuous__tick--handle-hi {
 		font-weight: var(--dct-continuous-label-weight, 600);
@@ -362,24 +343,14 @@
 		transform: translateX(-100%) rotate(var(--dct-continuous-label-rotate, 0deg));
 	}
 	/* Invisible, always-horizontal twin used only to measure a handle label's
-     natural width (see `labelsOverlap` above) — never rendered. */
+     natural width (see `labelsOverlap` above) - never rendered. */
 	.dct-continuous__tick-measure {
 		position: absolute;
 		visibility: hidden;
 		white-space: nowrap;
 		font-weight: var(--dct-continuous-label-weight, 600);
 	}
-	/*
-   * Once the two handle labels would otherwise collide, both read
-   * top-to-bottom instead of left-to-right — the *same* rotation and the
-   * *same* pivot corner for lo and hi, so the two read identically instead
-   * of one appearing mirrored against the other. Pivoting on the label's
-   * own bottom-left corner (exactly where `left: <anchor>px` already
-   * places it) means the rotation doesn't shift the label off its anchor
-   * at all — it grows right-and-down from the point it was already
-   * sitting at, the same "grow into the bar, not off the container's edge"
-   * reasoning as the horizontal anchoring above.
-   */
+	/* Handle labels that would collide read top to bottom, pivoting on their anchor. */
 	.dct-continuous__tick--handle-lo.dct-continuous__tick--vertical,
 	.dct-continuous__tick--handle-hi.dct-continuous__tick--vertical {
 		transform-origin: left bottom;

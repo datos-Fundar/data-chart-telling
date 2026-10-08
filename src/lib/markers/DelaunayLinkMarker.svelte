@@ -4,7 +4,7 @@
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import type { DelaunayLinkMarkerConfig } from '$lib/types/markers/common';
 
-	/** Renders one `'delaunayLink'` marker as `<DelaunayLink>` — one line per Delaunay triangulation edge. */
+	/** Renders one `'delaunayLink'` marker as `<DelaunayLink>` - one line per Delaunay triangulation edge. */
 	let { marker }: { marker: DelaunayLinkMarkerConfig } = $props();
 
 	const cfg = $derived(getConfiguration());

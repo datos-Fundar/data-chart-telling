@@ -3,7 +3,7 @@ import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import { WORLD_COUNTRIES, WORLD_TOPOLOGY, type WorldCountryProps } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// GeoPlot has no x/y series concept — "data" is the map itself. These
+// GeoPlot has no x/y series concept - "data" is the map itself. These
 // stories cover the shapes `data` accepts (a GeoJSON feature array, a
 // FeatureCollection, or an optional TopoJSON Topology) and the `featureId`/
 // `value` accessors read off each feature.
@@ -32,7 +32,7 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * `data` as a plain array of GeoJSON features — the simplest form. Real
+ * `data` as a plain array of GeoJSON features - the simplest form. Real
  * boundaries for the world's countries (Natural Earth, 110m). Each
  * feature's `properties.id` is used as its id by default (see the
  * `Segments` stories for styling one of them by that id).
@@ -44,7 +44,7 @@ export const FeatureArray: Story = {
 };
 
 /**
- * `data` as a GeoJSON `FeatureCollection` — equivalent to `FeatureArray`,
+ * `data` as a GeoJSON `FeatureCollection` - equivalent to `FeatureArray`,
  * just wrapped the way most real-world GeoJSON sources hand it back.
  */
 export const FeatureCollection: Story = {
@@ -54,7 +54,7 @@ export const FeatureCollection: Story = {
 };
 
 /**
- * Explicit `featureId` accessor — instead of relying on the default
+ * Explicit `featureId` accessor - instead of relying on the default
  * (`feature.id ?? properties.id ?? properties.name`), a function picks the
  * id explicitly. Useful when the natural key lives under a different
  * property name, or needs normalizing. Here it's each country's own `name`
@@ -68,7 +68,7 @@ export const ExplicitFeatureId: Story = {
 };
 
 /**
- * Continuous `color` accessor — feeds each feature's numeric value into the
+ * Continuous `color` accessor - feeds each feature's numeric value into the
  * choropleth color ramp (see the `Styles`/`Scales` stories for controlling
  * that ramp's domain and colors). Here it's each country's estimated
  * population.
@@ -81,12 +81,12 @@ export const ContinuousColor: Story = {
 };
 
 /**
- * TopoJSON input — `data` is a TopoJSON `Topology` plus the `object` key to
+ * TopoJSON input - `data` is a TopoJSON `Topology` plus the `object` key to
  * extract. Converted to GeoJSON at render time via `topojson-client`, an
  * *optional* peer dependency: install it yourself to use this form; GeoPlot
  * works perfectly with plain GeoJSON (see `FeatureArray`) if you never do.
  *
- * `WORLD_TOPOLOGY` is world-atlas's real `countries-110m.json` — the same
+ * `WORLD_TOPOLOGY` is world-atlas's real `countries-110m.json` - the same
  * Natural Earth boundaries as the other stories on this page, but with
  * shared borders stored once as arcs instead of duplicated per polygon (the
  * whole reason TopoJSON exists). `object: 'countries'` is the key to

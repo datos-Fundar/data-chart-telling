@@ -33,7 +33,7 @@ const COLOR_KINDS = new Set([
 /** Kinds that draw only a line, so their flat color is `stroke` alone. */
 const LINE_KINDS = new Set(['line', 'regression', 'bollinger', 'delta']);
 
-/** Flat color style keys — when a marker sets one, it keeps that color instead of inheriting one. */
+/** Flat color style keys - when a marker sets one, it keeps that color instead of inheriting one. */
 const FLAT_COLOR_KEYS = ['fill', 'stroke', 'dotFill', 'dotStroke'];
 
 /** A style value that paints nothing isn't a color choice, so it doesn't block inheritance. */

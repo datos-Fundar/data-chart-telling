@@ -4,7 +4,7 @@ import { COUNTRIES } from '../../../plots/scatter/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `color` channel: a plot-level `color` accessor plus `scales.color`
-// drives every default mark's fill — here, ScatterPlot's own dots. This is the
+// drives every default mark's fill - here, ScatterPlot's own dots. This is the
 // discrete categorical case: `color` groups series by name (region), and
 // `scales.color` maps those category names to specific colors.
 
@@ -35,7 +35,7 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * `color: 'region'` groups the data by region (Americas, Europe, Asia, Africa)
- * and feeds each series name into the plot's own `scales.color` ramp — the
+ * and feeds each series name into the plot's own `scales.color` ramp - the
  * default palette cycles through colors automatically for each region.
  */
 export const Default: Story = {

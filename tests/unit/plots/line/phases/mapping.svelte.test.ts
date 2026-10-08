@@ -25,7 +25,7 @@ function build(overrides: Partial<LinePlotState<Row>> = {}) {
 	return buildMapping(state);
 }
 
-describe('buildMapping – x/y channels', () => {
+describe('buildMapping - x/y channels', () => {
 	test('resolves x/y to the first series own accessors', () => {
 		const result = build();
 		expect(result.channels!.x.accessor(SERIES[0].data[0])).toBe(1);

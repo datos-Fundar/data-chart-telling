@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest';
 import { buildBarLayout } from '$lib/plots/bar/phases/scales';
 import { buildTransforms } from '$lib/plots/bar/phases/transforms';
 import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/bar/state';
-import type { ChartConfig } from '$lib/types/configuration/styling';
+import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { Series } from '$lib/types/plots/data/common';
 import type { DiscreteGapFill } from '$lib/plots/utils/gaps';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
@@ -18,7 +18,7 @@ const THEME_MARGINS = {
 	left: 40 as const
 };
 
-const CTX = { cfg: {} as ChartConfig, legendInteraction: null } as BarPlotCtx;
+const CTX = { cfg: {} as PlotStylesConfig, legendInteraction: null } as BarPlotCtx;
 
 const A = { category: 'A', value: 10 };
 const B = { category: 'B', value: 20 };
@@ -30,7 +30,7 @@ const series = (name: string, data: Row[]): Series<Row> => ({
 	data
 });
 
-/** The rows BarPlot's own "transforms" phase leaves for these series — stacked by default. */
+/** The rows BarPlot's own "transforms" phase leaves for these series - stacked by default. */
 function processed(
 	list: Series<Row>[],
 	gapFillMaps = new Map<string, Map<Row, DiscreteGapFill<BarSegmentStyle>>>(),
@@ -65,7 +65,7 @@ function build(overrides: Partial<Parameters<typeof buildBarLayout<Row>>[0]> = {
 	});
 }
 
-describe('buildBarLayout – layout mode', () => {
+describe('buildBarLayout - layout mode', () => {
 	test('series sit side by side when the plot has no stack', () => {
 		expect(build().layout).toBe('grouped');
 	});
@@ -76,7 +76,7 @@ describe('buildBarLayout – layout mode', () => {
 	});
 });
 
-describe('buildBarLayout – valueBaseline', () => {
+describe('buildBarLayout - valueBaseline', () => {
 	test('is 0 when the value axis has no explicit domain', () => {
 		expect(build().valueBaseline).toBe(0);
 	});
@@ -97,7 +97,7 @@ describe('buildBarLayout – valueBaseline', () => {
 	});
 });
 
-describe('buildBarLayout – estimatedBandwidth', () => {
+describe('buildBarLayout - estimatedBandwidth', () => {
 	test('is 0 when there is no data', () => {
 		expect(build({ processedData: unstacked([]) }).estimatedBandwidth).toBe(0);
 	});
@@ -109,7 +109,7 @@ describe('buildBarLayout – estimatedBandwidth', () => {
 	});
 });
 
-describe('buildBarLayout – side-by-side geometry', () => {
+describe('buildBarLayout - side-by-side geometry', () => {
 	test('a lone series fills its whole band', () => {
 		const result = build();
 		expect(result.groupOffset(0)).toEqual({ dx: 0, dy: 0 });
@@ -136,7 +136,7 @@ describe('buildBarLayout – side-by-side geometry', () => {
 	});
 });
 
-describe('buildBarLayout – row geometry', () => {
+describe('buildBarLayout - row geometry', () => {
 	test('a stacked series spans from where the prior one ends', () => {
 		const processedData = processed([series('a', [A]), series('b', [A])]);
 		const layout = build({ seriesNames: ['a', 'b'], processedData });

@@ -1,0 +1,213 @@
+<script lang="ts">
+  import type { Snippet } from 'svelte';
+  import type { PlotBoxSnippet } from '$lib/types/plots/presentation';
+  import { DEFAULT_CHROME_ORDER } from '$lib/types/plots/props';
+  import type { PlotChromeItem } from '$lib/types/plots/props';
+  import { getConfiguration, configToCssVars, cssVarsStyle } from '$lib/configuration/config.svelte';
+
+  /**
+   * The outermost chart frame. It owns the fixed footprint (`width`/`height`),
+   * lays out the header, optional legend and caption, and measures whatever
+   * space is left for the plot. The actual drawing is delegated to the `plot`
+   * snippet, which receives that measured box - so this component knows nothing
+   * about what kind of plot it wraps. `order` sets the blocks top to bottom;
+   * a `header` replaces `title`/`subtitle` and a `footer` replaces `caption`,
+   * and a `divider` draws only between two drawn blocks.
+   */
+  let {
+    width,
+    height,
+    title,
+    subtitle,
+    caption,
+    legend,
+    header,
+    footer,
+    order = DEFAULT_CHROME_ORDER,
+    plot,
+  }: {
+    width: number;
+    height: number;
+    title?: string;
+    subtitle?: string;
+    caption?: string;
+    legend?: Snippet;
+    header?: Snippet;
+    footer?: Snippet;
+    order?: readonly PlotChromeItem[];
+    plot: PlotBoxSnippet;
+  } = $props();
+
+  type Block =
+    | { type: 'heading'; key: string; items: ('title' | 'subtitle')[] }
+    | { type: Exclude<PlotChromeItem, 'title' | 'subtitle'>; key: string };
+
+  type DrawnItem = Exclude<PlotChromeItem, 'divider'>;
+
+  /** Whether an item has anything to draw: `header` and `footer` win over the text they replace. */
+  function drawn(item: DrawnItem): boolean {
+    switch (item) {
+      case 'title':
+        return !header && !!title;
+      case 'subtitle':
+        return !header && !!subtitle;
+      case 'header':
+        return !!header;
+      case 'legend':
+        return !!legend;
+      case 'caption':
+        return !footer && !!caption;
+      case 'footer':
+        return !!footer;
+      case 'plot':
+        return true;
+    }
+  }
+
+  /**
+   * `order`'s drawn blocks, once each, `plot` last when left out. Adjacent
+   * title and subtitle share one heading; a run of dividers draws one line,
+   * and only between two drawn blocks.
+   */
+  const blocks = $derived.by(() => {
+    const seen: DrawnItem[] = [];
+    const items: PlotChromeItem[] = [];
+    for (const item of order) {
+      if (item !== 'divider' && (seen.includes(item) || !drawn(item))) continue;
+      if (item !== 'divider') seen.push(item);
+      items.push(item);
+    }
+    if (!seen.includes('plot')) items.push('plot');
+
+    const out: Block[] = [];
+    let divided = false;
+    for (const item of items) {
+      if (item === 'divider') {
+        divided = out.length > 0;
+        continue;
+      }
+      if (divided) out.push({ type: 'divider', key: `divider-${out.length}` });
+      divided = false;
+      const last = out.at(-1);
+      if (item !== 'title' && item !== 'subtitle') out.push({ type: item, key: item });
+      else if (last?.type === 'heading') last.items.push(item);
+      else out.push({ type: 'heading', key: item, items: [item] });
+    }
+    return out;
+  });
+
+  let bodyWidth = $state(0);
+  let bodyHeight = $state(0);
+
+  // Stamp every `--dct-*` custom property on the root so the scoped styles below
+  // (and any nested plot/legend/timeline) resolve them from the live config.
+  const themeStyle = $derived(cssVarsStyle(configToCssVars(getConfiguration())));
+</script>
+
+<div class="dct-plot-container" style={themeStyle} style:width="{width}px" style:height="{height}px">
+  {#each blocks as block (block.key)}
+    {#if block.type === 'heading'}
+      <div class="dct-plot-container__header">
+        {#each block.items as item (item)}
+          {#if item === 'title'}
+            <h3 class="dct-plot-container__title">{title}</h3>
+          {:else}
+            <span class="dct-plot-container__subtitle">{subtitle}</span>
+          {/if}
+        {/each}
+      </div>
+    {:else if block.type === 'header'}
+      <div class="dct-plot-container__header">{@render header?.()}</div>
+    {:else if block.type === 'legend'}
+      <div class="dct-plot-container__legend">{@render legend?.()}</div>
+    {:else if block.type === 'divider'}
+      <hr class="dct-plot-container__divider" />
+    {:else if block.type === 'plot'}
+      <div
+        class="dct-plot-container__body"
+        bind:clientWidth={bodyWidth}
+        bind:clientHeight={bodyHeight}
+      >
+        {#if bodyWidth > 0 && bodyHeight > 0}
+          {@render plot({ width: bodyWidth, height: bodyHeight })}
+        {/if}
+      </div>
+    {:else if block.type === 'footer'}
+      <div class="dct-plot-container__caption">{@render footer?.()}</div>
+    {:else}
+      <div class="dct-plot-container__caption">
+        <span>{caption}</span>
+      </div>
+    {/if}
+  {/each}
+</div>
+
+<style>
+  .dct-plot-container {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    max-width: 100%;
+    max-height: 100%;
+    padding: var(--dct-bleed, 12px);
+    overflow: hidden;
+    color: var(--dct-fg, currentColor);
+    background: var(--dct-bg, transparent);
+    font-family: var(--dct-font, inherit);
+  }
+
+  .dct-plot-container__header {
+    flex: 0 0 auto;
+    padding: var(--dct-header-pad, 0.75rem 0 1rem);
+  }
+
+  .dct-plot-container__divider {
+    flex: 0 0 auto;
+    margin: var(--dct-divider-margin, 0);
+    border: none;
+    border-top: var(--dct-divider-width, 1px) var(--dct-divider-style, solid)
+      var(--dct-divider-color, color-mix(in srgb, currentColor 15%, transparent));
+  }
+
+  .dct-plot-container__title {
+    margin: 0 0 0.4rem;
+    font-family: var(--dct-title-font, inherit);
+    font-size: var(--dct-title-size, 1.5rem);
+    font-weight: var(--dct-title-weight, 500);
+    line-height: var(--dct-title-leading, 1.2);
+    letter-spacing: var(--dct-title-spacing, normal);
+    color: var(--dct-title-color, inherit);
+  }
+
+  .dct-plot-container__subtitle {
+    font-family: var(--dct-subtitle-font, inherit);
+    font-size: var(--dct-subtitle-size, 1rem);
+    font-weight: var(--dct-subtitle-weight, 400);
+    line-height: var(--dct-subtitle-leading, 1.3);
+    letter-spacing: var(--dct-subtitle-spacing, normal);
+    color: var(--dct-subtitle-color, inherit);
+  }
+
+  .dct-plot-container__legend {
+    flex: 0 0 auto;
+    padding: var(--dct-legend-pad, 0.75rem 0);
+  }
+
+  .dct-plot-container__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+  }
+
+  .dct-plot-container__caption {
+    flex: 0 0 auto;
+    padding: var(--dct-caption-pad, 0.5rem 0);
+    font-family: var(--dct-caption-font, inherit);
+    font-size: var(--dct-caption-size, 0.75rem);
+    font-weight: var(--dct-caption-weight, 400);
+    line-height: var(--dct-caption-leading, 1.3);
+    letter-spacing: var(--dct-caption-spacing, normal);
+    color: var(--dct-caption-color, inherit);
+    white-space: pre-line;
+  }
+</style>

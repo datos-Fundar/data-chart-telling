@@ -36,9 +36,9 @@ const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Basic hover marker — dots appear on both the female and male bars at the
+ * Basic hover marker - dots appear on both the female and male bars at the
  * hovered age group, along with a dashed horizontal rule (`ruleY` is implied
- * by default, since pyramid's default hover strategy is `'y'` — it matches
+ * by default, since pyramid's default hover strategy is `'y'` - it matches
  * by row, not by side). No floating HTML tooltip is involved.
  */
 export const Basic: Story = {
@@ -57,7 +57,7 @@ export const Basic: Story = {
 };
 
 /**
- * Dots only — `showLabels: false` suppresses the value labels next to each
+ * Dots only - `showLabels: false` suppresses the value labels next to each
  * dot, leaving just the position indicators and the crosshair rule.
  */
 export const WithoutLabels: Story = {
@@ -77,7 +77,7 @@ export const WithoutLabels: Story = {
 };
 
 /**
- * Dots and labels only — `ruleY: false` hides the horizontal crosshair rule
+ * Dots and labels only - `ruleY: false` hides the horizontal crosshair rule
  * that's implied by default, so only the dots and their labels are drawn.
  */
 export const WithoutRule: Story = {
@@ -97,7 +97,7 @@ export const WithoutRule: Story = {
 };
 
 /**
- * Both crosshair rules — `ruleX: true` adds a vertical rule at each bar's
+ * Both crosshair rules - `ruleX: true` adds a vertical rule at each bar's
  * magnitude on top of the default `ruleY: true` row rule, drawing a full
  * crosshair per side.
  */
@@ -119,7 +119,7 @@ export const WithBothAxis: Story = {
 };
 
 /**
- * Custom rule style — `rule` overrides the crosshair stroke. Here the
+ * Custom rule style - `rule` overrides the crosshair stroke. Here the
  * rule renders in red with a solid line and higher opacity.
  */
 export const WithCustomRuleStyle: Story = {
@@ -147,9 +147,9 @@ export const WithCustomRuleStyle: Story = {
 };
 
 /**
- * Label anchored outside the dot — `text.textAnchor: 'outside'` resolves
+ * Label anchored outside the dot - `text.textAnchor: 'outside'` resolves
  * per point from its signed magnitude: the female (negative x) label sits to
- * the left of its dot, the male (positive x) label sits to the right —
+ * the left of its dot, the male (positive x) label sits to the right -
  * mirroring the value labels' own `anchor: 'outside'` convention.
  */
 export const LabelOutsideDot: Story = {
@@ -174,7 +174,7 @@ export const LabelOutsideDot: Story = {
 };
 
 /**
- * Series-scoped marker — `series: 'Female'` restricts the hover dot to the
+ * Series-scoped marker - `series: 'Female'` restricts the hover dot to the
  * female (left) side only. Hovering over the male bars produces no dot even
  * though both sides are rendered.
  *
@@ -200,7 +200,7 @@ export const SeriesScoped: Story = {
 };
 
 /**
- * `areaY: true` — a translucent area across the hovered age group's full
+ * `areaY: true` - a translucent area across the hovered age group's full
  * row, spanning both sides of the pyramid, in place of (or alongside) the
  * thin `ruleY` crosshair. Defaults to a neutral gray sized to the row's own
  * band width plus 2px; `areaX` has no effect here since pyramid's diverging
@@ -223,7 +223,7 @@ export const WithHighlightArea: Story = {
 };
 
 /**
- * Hover marker on explicit series — the same unscoped hover marker behaves
+ * Hover marker on explicit series - the same unscoped hover marker behaves
  * identically whether the pyramid is built from the data/x/y/color shorthand
  * (see `Basic`) or, as here, an explicit two-series array (see `ExplicitSeries`
  * in the Series stories).

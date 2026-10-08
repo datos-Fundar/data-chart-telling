@@ -17,7 +17,7 @@ function mulberry32(seed: number) {
 
 const random = mulberry32(42);
 
-/** One normal draw, by the Box–Muller transform. */
+/** One normal draw, by the Box-Muller transform. */
 const normal = (mean: number, sd: number) => {
 	const u = 1 - random();
 	const v = random();

@@ -4,7 +4,7 @@ import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
 import { AMERICAS, COUNTRIES } from '../../../../stories/plots/scatter/data';
 import { waitForSvg, countDotMarks } from '../_helpers/svg';
 
-describe('ScatterPlot – series', () => {
+describe('ScatterPlot - series', () => {
 	test('renders one dot per row for a single series', async () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,

@@ -4,7 +4,7 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { COUNTRIES } from '../../plots/scatter/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `tick` marker (svelteplot's own `TickX`/`TickY`) — a short line per row
+// A `tick` marker (svelteplot's own `TickX`/`TickY`) - a short line per row
 // along one axis, a strip plot. Orientation is automatic: `TickX` when `x` is
 // the quantitative axis and `y` a band one, `TickY` otherwise. Demoed on an
 // empty host with a band category axis (same convention as `Markers/Box`) so
@@ -39,7 +39,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** GDP per capita strip by region — `TickX`, since `x` is quantitative and `y` a band. */
+/** GDP per capita strip by region - `TickX`, since `x` is quantitative and `y` a band. */
 export const Horizontal: Story = {
 	args: {
 		markers: [

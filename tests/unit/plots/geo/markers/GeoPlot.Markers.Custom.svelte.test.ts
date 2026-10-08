@@ -5,7 +5,7 @@ import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, WEATHER_STATIONS, type WeatherStation } from '../../../../../stories/plots/geo/data';
 import { waitForSvg, countDotMarks, countTextLabels } from '../../_helpers/svg';
 
-describe('GeoPlot – custom component marker', () => {
+describe('GeoPlot - custom component marker', () => {
   test('mounts DotMarker with lon/lat accessors', async () => {
     const { container } = render(GeoPlot, {
       width: 400,

@@ -16,7 +16,7 @@ export type WindowReducer =
 	| 'sum'
 	| 'variance';
 
-/** Options both window transforms take, flat next to the channels — same names as svelteplot's. */
+/** Options both window transforms take, flat next to the channels - same names as svelteplot's. */
 type WindowOptions = {
 	/** The window's size, in rows (or in `interval`s, when one is set). */
 	k: number;
@@ -33,10 +33,10 @@ type WindowOptions = {
 
 /**
  * `windowY` as a marker transform: replaces each row's `y` (and `y1`/`y2`) with
- * a reduction of the `k` rows around it — a moving average by default. Runs
+ * a reduction of the `k` rows around it - a moving average by default. Runs
  * per `z` group, in row order.
  */
 export type WindowYTransform = { type: 'windowY' } & PositionChannels & WindowOptions;
 
-/** `windowX` — see {@link WindowYTransform}, on the `x` channels. */
+/** `windowX` - see {@link WindowYTransform}, on the `x` channels. */
 export type WindowXTransform = { type: 'windowX' } & PositionChannels & WindowOptions;

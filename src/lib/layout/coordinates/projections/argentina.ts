@@ -2,7 +2,7 @@ import { geoAzimuthalEquidistant } from 'd3-geo';
 import type { GeoCustomProjection, GeoCustomProjectionFactory } from '$lib/types/layout/coordinates';
 import { pointsToFitFeature } from './fit';
 
-// Representative extremity points — not real border geometry (which stays
+// Representative extremity points - not real border geometry (which stays
 // out of `src/lib`, see stories/plots/geo/data.ts), just enough for
 // `fitSize` to frame Argentina's full territorial claim sensibly. These are
 // plain real-world coordinates, not derived from any particular dataset, so

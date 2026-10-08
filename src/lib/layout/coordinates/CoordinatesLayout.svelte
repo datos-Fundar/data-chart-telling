@@ -43,9 +43,9 @@
 		margin: SveltePlotProps['margin'];
 		x: SveltePlotProps['x'];
 		y: SveltePlotProps['y'];
-		/** Forwarded verbatim to svelteplot's own `<Plot r>` — the plot-wide radius/size scale (see `RScaleConfig`'s own doc comment for why this is plot-wide only). */
+		/** Forwarded verbatim to svelteplot's own `<Plot r>` - the plot-wide radius/size scale (see `RScaleConfig`'s own doc comment for why this is plot-wide only). */
 		r?: SveltePlotProps['r'];
-		/** Forwarded verbatim to svelteplot's own `<Plot length>` — the plot-wide vector/spike magnitude scale (see `LengthScaleConfig`'s own doc comment). */
+		/** Forwarded verbatim to svelteplot's own `<Plot length>` - the plot-wide vector/spike magnitude scale (see `LengthScaleConfig`'s own doc comment). */
 		length?: SveltePlotProps['length'];
 		coordinates?: CoordinatesConfig;
 		/** Forwarded verbatim to svelteplot's own `<Plot locale>`. */
@@ -53,7 +53,7 @@
 		/** Fed to `resolveProjection`'s `domain: 'data'` sentinel and to `coordinates.camera`'s `{features}` target resolution. */
 		data: TData[];
 		containerEl?: HTMLDivElement;
-		/** See `BasePlotLayout`'s own `remountKey` doc comment — forwarded verbatim to key svelteplot's `<Plot>` itself. */
+		/** See `BasePlotLayout`'s own `remountKey` doc comment - forwarded verbatim to key svelteplot's `<Plot>` itself. */
 		remountKey?: string | number;
 		children: Snippet;
 	} = $props();
@@ -107,7 +107,7 @@
 	);
 	const cameraActive = $derived(resolvedCameraTarget != null);
 
-	/** `[-lon, -lat, gamma]` faces the target toward the viewer — only applied on `orthographic`, see `activeRotate`. */
+	/** `[-lon, -lat, gamma]` faces the target toward the viewer - only applied on `orthographic`, see `activeRotate`. */
 	const cameraRotateTarget = $derived.by((): GeoRotate | undefined => {
 		if (!resolvedCameraTarget) return undefined;
 		if (resolvedCameraTarget.kind === 'point') {
@@ -122,7 +122,7 @@
 		transition: () => cameraConfig?.transition
 	});
 
-	/** `camera` claims `rotate` outright on `orthographic` (only one `rotate` value exists at a time) — interactive `rotate` takes back over once `camera` is unset. */
+	/** `camera` claims `rotate` outright on `orthographic` (only one `rotate` value exists at a time) - interactive `rotate` takes back over once `camera` is unset. */
 	const cameraOrthoRotate = $derived(
 		cameraActive && projectionType === 'orthographic' ? cameraRotateTween.current : undefined
 	);

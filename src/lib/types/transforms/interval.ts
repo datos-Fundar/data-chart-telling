@@ -8,12 +8,12 @@ type IntervalOptions = {
 
 /**
  * `intervalX` as a marker transform: widens each row's `x` into the interval
- * around it, floored to the interval — `x1` at its start, `x2` at the next
+ * around it, floored to the interval - `x1` at its start, `x2` at the next
  * one's. A `rect` then spans each interval, like a bar on a continuous axis.
  */
 export type IntervalXTransform = { type: 'intervalX' } & PositionChannels & IntervalOptions;
 
-/** `intervalY` — see {@link IntervalXTransform}, producing `y1`/`y2`. */
+/** `intervalY` - see {@link IntervalXTransform}, producing `y1`/`y2`. */
 export type IntervalYTransform = { type: 'intervalY' } & PositionChannels & IntervalOptions;
 
 /** The keys the interval transforms read: every position channel, and `interval`, which svelteplot reads next to them. */

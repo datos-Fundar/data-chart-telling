@@ -18,7 +18,7 @@ const PLOT = { width: 400, height: 300, data: rows, x: 'v', transforms: BIN };
 const labels = (svg: Element) =>
 	Array.from(svg.querySelectorAll('g.text text')).map((t) => t.textContent);
 
-describe('HistogramPlot – styles.frame', () => {
+describe('HistogramPlot - styles.frame', () => {
 	test('frame: true draws a border around the content box', async () => {
 		const { container } = await render(HistogramPlot, {
 			...PLOT,
@@ -29,7 +29,7 @@ describe('HistogramPlot – styles.frame', () => {
 	});
 });
 
-describe('HistogramPlot – styles.values', () => {
+describe('HistogramPlot - styles.values', () => {
 	test('no value label by default', async () => {
 		const { container } = await render(HistogramPlot, PLOT);
 		const svg = await waitForSvg(container);

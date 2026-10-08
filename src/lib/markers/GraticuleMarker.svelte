@@ -2,7 +2,7 @@
   import { Graticule } from 'svelteplot';
   import type { GeoGraticuleMarkerConfig } from '$lib/types/markers/geo';
 
-  /** Renders one `'graticule'` marker — longitude/latitude gridlines. */
+  /** Renders one `'graticule'` marker - longitude/latitude gridlines. */
   let { marker }: { marker: GeoGraticuleMarkerConfig } = $props();
 </script>
 

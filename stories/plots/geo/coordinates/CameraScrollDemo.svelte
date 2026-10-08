@@ -7,7 +7,7 @@
 	export const TRANSITION_START = 0.1;
 	export const TRANSITION_END = 0.9;
 
-	/** The `coordinates` this component feeds `<GeoPlot>` for a raw scroll fraction — exported for the story's docs source override. */
+	/** The `coordinates` this component feeds `<GeoPlot>` for a raw scroll fraction - exported for the story's docs source override. */
 	export function coordinatesForScroll(raw: number): CoordinatesConfig {
 		const inTransition = raw >= TRANSITION_START && raw < TRANSITION_END;
 		const settledOnB = raw >= TRANSITION_END;
@@ -35,7 +35,7 @@
 	let trackEl = $state<HTMLDivElement>();
 	let raw = $state(0);
 
-	/** Polled via `requestAnimationFrame` — native `scroll` events fire too unevenly for a smooth `progress`. */
+	/** Polled via `requestAnimationFrame` - native `scroll` events fire too unevenly for a smooth `progress`. */
 	$effect(() => {
 		const el = trackEl;
 		if (!el) return;
@@ -61,7 +61,7 @@
 		<div style="position: sticky; top: 0;">
 			<GeoPlot {width} {height} data={WORLD_COUNTRIES} {coordinates} />
 			<p style="padding: 8px 16px; color: #475569;">
-				Scroll this panel — settled on the Southern Cone, then a scrubbed move to Japan, then
+				Scroll this panel - settled on the Southern Cone, then a scrubbed move to Japan, then
 				settled there.
 			</p>
 		</div>

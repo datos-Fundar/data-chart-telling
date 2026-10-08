@@ -93,7 +93,7 @@ export const Deviation: Story = {
 /**
  * `anchor` sets where each row sits in its window: `start` (blue) averages the
  * 60 days after it, so it runs ahead of the data; `end` (red) the 60 days
- * before, so it lags — a trailing average. `middle` (black) is centered.
+ * before, so it lags - a trailing average. `middle` (black) is centered.
  */
 export const Anchor: Story = {
 	args: {

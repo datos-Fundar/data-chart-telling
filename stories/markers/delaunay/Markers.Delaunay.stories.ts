@@ -5,7 +5,7 @@ import { COUNTRIES } from '../../plots/scatter/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `delaunayLink` (one line per triangulation edge) and `delaunayMesh` (the
-// whole triangulation as a single path) — svelteplot's own `DelaunayLink` /
+// whole triangulation as a single path) - svelteplot's own `DelaunayLink` /
 // `DelaunayMesh`. Both take `x`/`y`. A plot grouped by `color` triangulates
 // each group separately and tints it with the group's palette color, without
 // any setting on the marker itself.

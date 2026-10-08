@@ -8,7 +8,7 @@ import { waitForSvg, countImageMarks } from '../../_helpers/svg';
 const PIXEL = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"/>';
 const base = { width: 400, height: 300, data: COUNTRIES, x: 'gdpPerCapita', y: 'lifeExpectancy' };
 
-describe('ScatterPlot – markers.image', () => {
+describe('ScatterPlot - markers.image', () => {
 	test('renders one image per row, at the resolved `src`', async () => {
 		const { container } = render(ScatterPlot, {
 			...base,

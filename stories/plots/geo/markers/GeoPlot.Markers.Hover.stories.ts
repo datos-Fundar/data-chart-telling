@@ -8,7 +8,7 @@ import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '../data';
 // Defaults to `argentinaBicontinental` (see the `Scales`/`Styles` stories)
 // like every other `ARGENTINA_PROVINCES`-based story file, instead of the
 // bare `equal-earth` default a plot gets with no `coordinates.projection` at
-// all — `equal-earth`'s whole-world extent leaves far more empty frame
+// all - `equal-earth`'s whole-world extent leaves far more empty frame
 // around the mainland than the bicontinental projection's tight fit.
 
 const meta = {
@@ -38,14 +38,14 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** Basic hover marker — the feature under the cursor gets a neutral translucent fill (the shared `hover.area` theme default). Matching follows the browser's own SVG hit-testing, not distance to a centroid. */
+/** Basic hover marker - the feature under the cursor gets a neutral translucent fill (the shared `hover.area` theme default). Matching follows the browser's own SVG hit-testing, not distance to a centroid. */
 export const Basic: Story = {
   args: {
     markers: [{ type: 'geo-hover' }] satisfies GeoMarkersConfig[],
   },
 };
 
-/** Custom style — overrides the hovered feature's stroke. */
+/** Custom style - overrides the hovered feature's stroke. */
 export const CustomStyle: Story = {
   args: {
     markers: [
@@ -54,7 +54,7 @@ export const CustomStyle: Story = {
   },
 };
 
-/** Filled highlight — a semi-transparent fill on top of the feature's own choropleth color. */
+/** Filled highlight - a semi-transparent fill on top of the feature's own choropleth color. */
 export const FilledHighlight: Story = {
   args: {
     markers: [

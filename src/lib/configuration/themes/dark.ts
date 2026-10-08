@@ -1,10 +1,10 @@
-import type { ChartConfigInput } from '$lib/types/configuration/styling';
+import type { PlotStylesConfigInput } from '$lib/types/configuration/styling';
 
-export const DARK_THEME: ChartConfigInput = {
+export const DARK_THEME: PlotStylesConfigInput = {
 	font: 'ui-sans-serif, system-ui, sans-serif',
 	color: '#e5e7eb',
 	background: '#0f172a',
-	border: 'color-mix(in srgb, #e5e7eb 18%, transparent)',
+	divider: { color: 'color-mix(in srgb, #e5e7eb 18%, transparent)' },
 	title: { size: '1.6rem', weight: 600 },
 	subtitle: { color: '#94a3b8' },
 	caption: { color: '#94a3b8' },

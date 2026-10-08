@@ -13,10 +13,10 @@
   /**
    * Renders an XYZ raster tile basemap under the vector geometry. Mounted as
    * a child of svelteplot's `<Plot>` so `usePlot()` resolves its already-fit
-   * projection — this module never depends on `d3-geo` directly.
+   * projection - this module never depends on `d3-geo` directly.
    *
    * v1 limitation: the visible tile grid is computed once for the initial
-   * view, not re-fetched as the pan/zoom `<g>` transform changes — tiles pan
+   * view, not re-fetched as the pan/zoom `<g>` transform changes - tiles pan
    * and scale visually with the map, but don't reveal new coverage when
    * panned far, and pixelate past their native resolution when zoomed in.
    */
@@ -33,7 +33,7 @@
     top: number;
     width: number;
     height: number;
-    /** Forwarded to `visibleTiles`/`buildMercatorFit` — see `Plot.svelte`'s `dataLonLatBounds`. */
+    /** Forwarded to `visibleTiles`/`buildMercatorFit` - see `Plot.svelte`'s `dataLonLatBounds`. */
     dataLonLatBounds?: [number, number, number, number] | null;
   } = $props();
 
@@ -59,7 +59,7 @@
     );
   });
 
-  // One affine fit per zoom level, shared across every tile in `tiles` — see
+  // One affine fit per zoom level, shared across every tile in `tiles` - see
   // `buildMercatorFit`'s doc comment for why this replaces forward-projecting
   // each tile's own corners individually.
   const fit = $derived.by(() => {

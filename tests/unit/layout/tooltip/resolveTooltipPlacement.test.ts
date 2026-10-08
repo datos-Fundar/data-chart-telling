@@ -26,7 +26,7 @@ describe('resolveTooltipPlacement', () => {
     const midFallback = resolveTooltipPlacement({ x: 340, y: 100, ...BOX, bounds: BOUNDS, anchorX: 'right', anchorY: 'middle' });
     expect(midFallback.left).toBe(300); // x - boxWidth / 2
 
-    // Neither right-offset nor centered fits — falls all the way to the left side.
+    // Neither right-offset nor centered fits - falls all the way to the left side.
     const leftFallback = resolveTooltipPlacement({ x: 398, y: 100, ...BOX, bounds: BOUNDS, anchorX: 'right', anchorY: 'middle' });
     expect(leftFallback.left).toBe(308); // x - GAP - boxWidth
   });
@@ -41,7 +41,7 @@ describe('resolveTooltipPlacement', () => {
     expect(rightFallback.left).toBe(12); // x + GAP
   });
 
-  test('anchorX "middle" only ever centers/clamps — no directional cascade', () => {
+  test('anchorX "middle" only ever centers/clamps - no directional cascade', () => {
     expect(resolveTooltipPlacement({ x: 200, y: 100, ...BOX, bounds: BOUNDS, anchorX: 'middle', anchorY: 'middle' }).left).toBe(160);
     // Clamped to the edge margin near the boundary, not offset to a side.
     expect(resolveTooltipPlacement({ x: 2, y: 100, ...BOX, bounds: BOUNDS, anchorX: 'middle', anchorY: 'middle' }).left).toBe(6);
@@ -83,7 +83,7 @@ describe('resolveTooltipPlacement', () => {
     expect(Number.isFinite(top)).toBe(true);
   });
 
-  test('no bounds means no far-edge clamping — only the near (0-based) edge margin and the anchor cascade apply', () => {
+  test('no bounds means no far-edge clamping - only the near (0-based) edge margin and the anchor cascade apply', () => {
     const { left, top } = resolveTooltipPlacement({ x: 100, y: 100, ...BOX, anchorX: 'left', anchorY: 'top' });
     expect(left).toBe(10); // x - GAP - boxWidth
     expect(top).toBe(60); // y - GAP - boxHeight

@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 import type { GeoFeature, Topology } from '$lib';
 // Loaded with Vite's `?raw` import so TypeScript never structurally infers a
-// type from the literal JSON content (these fixtures are ~600KB–1MB — doing
+// type from the literal JSON content (these fixtures are ~600KB-1MB - doing
 // so would be slow and produce an unusably large inferred type). Parsed and
 // cast to a hand-written, trimmed properties type below instead.
 import argentinaProvincesRaw from './data/argentina-provinces.json?raw';
@@ -12,8 +12,8 @@ import cabaComunasRaw from './data/caba-comunas.json?raw';
 import ambaPartidosRaw from './data/amba-partidos.json?raw';
 
 // ── Argentina provinces ──────────────────────────────────────────────────────
-// Real boundaries (IGN — Instituto Geográfico Nacional), the 23 provinces +
-// CABA. ~600KB — lives only under `stories/`, never bundled into the
+// Real boundaries (IGN - Instituto Geográfico Nacional), the 23 provinces +
+// CABA. ~600KB - lives only under `stories/`, never bundled into the
 // published npm package (`svelte-package` only processes `src/lib`).
 
 export type ArgentinaProvinceProps = {
@@ -25,7 +25,7 @@ export type ArgentinaProvinceProps = {
   centroide: { lon: number; lat: number };
   iso_id: string;
   iso_nombre: string;
-  /** Approximate 2022 census (INDEC) population — illustrative for the choropleth/value examples, not guaranteed exact. */
+  /** Approximate 2022 census (INDEC) population - illustrative for the choropleth/value examples, not guaranteed exact. */
   population: number;
 };
 
@@ -73,7 +73,7 @@ export const ARGENTINA_PROVINCES: GeoFeature<ArgentinaProvinceProps>[] = (
 export const ARGENTINA_PROVINCE_NAMES = ARGENTINA_PROVINCES.map((f) => f.properties!.nombre);
 
 // ── World countries ───────────────────────────────────────────────────────────
-// Natural Earth admin-0 countries (110m resolution), real boundaries. ~1MB —
+// Natural Earth admin-0 countries (110m resolution), real boundaries. ~1MB -
 // same story-only scoping as the provinces fixture above.
 
 export type WorldCountryProps = {
@@ -100,7 +100,7 @@ export const WORLD_COUNTRY_NAMES = WORLD_COUNTRIES.map((f) => f.properties!.name
 
 // ── World countries, as TopoJSON ─────────────────────────────────────────────
 // The same Natural Earth 110m countries, pre-converted to TopoJSON (world-atlas's
-// `countries-110m.json`) — shared borders stored once as arcs instead of
+// `countries-110m.json`) - shared borders stored once as arcs instead of
 // duplicated per polygon. `objects.countries` is the object key to extract;
 // each geometry's `properties.name` is the country name (no other fields).
 
@@ -110,7 +110,7 @@ export const WORLD_TOPOLOGY: Topology = JSON.parse(worldCountriesTopoRaw) as Top
 // Same Natural Earth schema as `WORLD_COUNTRIES`, but containing only the US
 // (mainland + Alaska + Hawaii, as one MultiPolygon). `albers-usa` assigns
 // Alaska/Hawaii to their inset boxes using a coordinate-range heuristic, not
-// real country identity — feeding it *other* countries' geometry (e.g.
+// real country identity - feeding it *other* countries' geometry (e.g.
 // Mexico, from `WORLD_COUNTRIES`) can fall into that heuristic and render in
 // the wrong place. Keeping this fixture USA-only avoids that entirely.
 
@@ -119,7 +119,7 @@ export const USA_COUNTRY: GeoFeature<WorldCountryProps>[] = (
 ).features as GeoFeature<WorldCountryProps>[];
 
 // ── CABA comunas ──────────────────────────────────────────────────────────────
-// The 15 comunas (communes) making up the Ciudad Autónoma de Buenos Aires —
+// The 15 comunas (communes) making up the Ciudad Autónoma de Buenos Aires -
 // real boundaries, finer-grained than the single CABA feature inside
 // `ARGENTINA_PROVINCES`. Used as an `inset` marker's `data` (see the
 // `Markers/Inset` stories) to show comuna-level detail in a small panel.
@@ -138,7 +138,7 @@ export const CABA_COMUNAS: GeoFeature<CabaComunaProps>[] = (
 ).features as GeoFeature<CabaComunaProps>[];
 
 // ── AMBA partidos ─────────────────────────────────────────────────────────────
-// The Área Metropolitana de Buenos Aires — CABA's own comunas plus the
+// The Área Metropolitana de Buenos Aires - CABA's own comunas plus the
 // surrounding Buenos Aires Province partidos (municipalities) making up
 // Greater Buenos Aires. Same use as `CABA_COMUNAS`, but for the wider
 // CABA-plus-conurbano extent.
@@ -156,7 +156,7 @@ export type AmbaPartidoProps = {
 
 // The source file's every ring winds the opposite way from RFC 7946's
 // right-hand rule (confirmed via `d3.geoArea()`: every feature reports
-// ~100% of the sphere instead of its real, tiny share) — reversing every
+// ~100% of the sphere instead of its real, tiny share) - reversing every
 // ring uniformly flips the whole dataset's convention without disturbing
 // exterior/hole relationships, the general fix for "authored backwards"
 // data (as opposed to one bad ring in an otherwise-correct dataset, see
@@ -188,7 +188,7 @@ export type WeatherStation = {
   tempC: number;
 };
 
-/** Real capitals with a made-up temperature reading — mirrors svelteplot's `dot/weather` and `contour/weather` examples. */
+/** Real capitals with a made-up temperature reading - mirrors svelteplot's `dot/weather` and `contour/weather` examples. */
 export const WEATHER_STATIONS: WeatherStation[] = [
   { city: 'Buenos Aires', lon: -58.4, lat: -34.6, tempC: 28 },
   { city: 'Santiago', lon: -70.6, lat: -33.4, tempC: 24 },
@@ -203,13 +203,13 @@ export const WEATHER_STATIONS: WeatherStation[] = [
 export type WorldTemperaturePoint = { lon: number; lat: number; tempC: number };
 
 /**
- * A simulated global temperature field — a coarse lon/lat grid (not real
+ * A simulated global temperature field - a coarse lon/lat grid (not real
  * station readings) run through a deterministic model: colder toward the
  * poles, a longitudinal wave standing in for continental/oceanic banding,
  * so the field has enough texture for marching squares to trace something
  * more legible than a flat gradient. Deterministic (no `Math.random()`) so
  * Storybook snapshots stay stable. Mirrors svelteplot's `contour/weather`
- * example in spirit — interpolating a scatter of readings — scaled up to
+ * example in spirit - interpolating a scatter of readings - scaled up to
  * the whole world instead of a single country's real weather stations (see
  * `WEATHER_STATIONS`, whose small South-America-only cluster reads as an
  * unlabeled blob at world scale).
@@ -234,7 +234,7 @@ export type ShiftVector = {
   direction: number;
 };
 
-/** A made-up "population shift" per capital (magnitude in km, direction in degrees) — mirrors svelteplot's `vector/shift-map` example. */
+/** A made-up "population shift" per capital (magnitude in km, direction in degrees) - mirrors svelteplot's `vector/shift-map` example. */
 export const POPULATION_SHIFT: ShiftVector[] = [
   { city: 'Buenos Aires', lon: -58.4, lat: -34.6, magnitude: 28, direction: 200 },
   { city: 'Santiago', lon: -70.6, lat: -33.4, magnitude: 14, direction: 95 },
@@ -252,12 +252,12 @@ export type FlightRoute = {
   toLat: number;
 };
 
-/** Long-haul routes chosen to make the geodesic ("spherical") curve visually obvious — mirrors svelteplot's `link/spherical-link` example. */
+/** Long-haul routes chosen to make the geodesic ("spherical") curve visually obvious - mirrors svelteplot's `link/spherical-link` example. */
 export const FLIGHT_ROUTES: FlightRoute[] = [
-  { route: 'Buenos Aires – Tokyo', fromLon: -58.4, fromLat: -34.6, toLon: 139.7, toLat: 35.7 },
-  { route: 'Buenos Aires – London', fromLon: -58.4, fromLat: -34.6, toLon: -0.1, toLat: 51.5 },
-  { route: 'Santiago – Sydney', fromLon: -70.6, fromLat: -33.4, toLon: 151.2, toLat: -33.9 },
-  { route: 'São Paulo – Cairo', fromLon: -46.6, fromLat: -23.5, toLon: 31.2, toLat: 30.0 },
+  { route: 'Buenos Aires - Tokyo', fromLon: -58.4, fromLat: -34.6, toLon: 139.7, toLat: 35.7 },
+  { route: 'Buenos Aires - London', fromLon: -58.4, fromLat: -34.6, toLon: -0.1, toLat: 51.5 },
+  { route: 'Santiago - Sydney', fromLon: -70.6, fromLat: -33.4, toLon: 151.2, toLat: -33.9 },
+  { route: 'São Paulo - Cairo', fromLon: -46.6, fromLat: -23.5, toLon: 31.2, toLat: 30.0 },
 ];
 
 export type Earthquake = {
@@ -266,7 +266,7 @@ export type Earthquake = {
   magnitude: number;
 };
 
-/** Points loosely tracing the Andes — mirrors svelteplot's `geo/earthquakes` example (graticule + sphere + dots from raw lon/lat rows). */
+/** Points loosely tracing the Andes - mirrors svelteplot's `geo/earthquakes` example (graticule + sphere + dots from raw lon/lat rows). */
 export const EARTHQUAKES: Earthquake[] = [
   { lon: -72.0, lat: 4.5, magnitude: 4.2 },
   { lon: -71.5, lat: -2.0, magnitude: 5.6 },

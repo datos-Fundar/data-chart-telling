@@ -11,7 +11,7 @@ import type { BarLayout } from '$lib/types/plots/bar/layout';
  * `x`/`y` (the values matching is keyed off) are the row's category and the
  * top of its bar, so every series at the same category still matches together
  * under the 'x' strategy; `dx`/`dy` only nudge where the matched point is
- * *drawn* — see {@link import('$lib/types/layout/tooltip').HoverDisplayPoint} —
+ * *drawn* - see {@link import('$lib/types/layout/tooltip').HoverDisplayPoint} -
  * by a grouped bar's own pixel-only slice offset.
  */
 export function buildHoverPoints<TData extends Record<string, unknown>>(args: {

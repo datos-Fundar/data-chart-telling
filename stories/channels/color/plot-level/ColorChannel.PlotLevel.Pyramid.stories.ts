@@ -4,7 +4,7 @@ import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../data/population-pyramid
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `color` channel: a plot-level `color` accessor plus `scales.color`
-// drives every default mark's fill — here, PyramidPlot's own bars. This is the
+// drives every default mark's fill - here, PyramidPlot's own bars. This is the
 // discrete categorical case: `color` groups series by name, and `scales.color`
 // maps those category names to specific colors via a `scheme` record.
 
@@ -34,7 +34,7 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * `color: 'sex'` groups the data by sex (female/male) and feeds each series
- * name into the plot's own `scales.color` ramp — the default palette cycles
+ * name into the plot's own `scales.color` ramp - the default palette cycles
  * through colors automatically for each series.
  */
 export const Default: Story = {

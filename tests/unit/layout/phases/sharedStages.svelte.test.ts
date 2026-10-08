@@ -4,8 +4,7 @@ import { buildData } from '$lib/layout/phases/data';
 import { buildMapping } from '$lib/layout/phases/mapping';
 import { buildScales } from '$lib/layout/phases/scales';
 import { buildTransforms } from '$lib/layout/phases/transforms';
-import { buildAxisStages } from '$lib/layout/phases/axisStages';
-import { runStages } from '$lib/layout/phases/runStages';
+import { buildAxisStages, runStages } from '$lib/layout/phases/stages';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
 import type { AxisPlotState, AxisPlotCtx } from '$lib/types/layout/phases';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
@@ -185,7 +184,7 @@ describe('buildScales', () => {
 describe('buildAxisStages', () => {
 	afterEach(() => vi.restoreAllMocks());
 
-	test('every phase, in order, the kind’s own markers last', () => {
+	test('every phase, in order: the kind’s own markers, then the tooltip', () => {
 		const markers = (s: State) => s;
 		const stages = buildAxisStages<State, AxisPlotCtx>({ markers });
 		expect(stages.map((s) => s.phase)).toEqual([
@@ -194,9 +193,30 @@ describe('buildAxisStages', () => {
 			'transforms',
 			'statistics',
 			'scales',
-			'markers'
+			'markers',
+			'tooltip'
 		]);
-		expect(stages.at(-1)!.run).toBe(markers);
+		expect(stages.at(-2)!.run).toBe(markers);
+	});
+
+	test('the "tooltip" phase leaves a format: the processed channels’, or the kind’s own', () => {
+		const shared = runStages(
+			buildAxisStages<State, AxisPlotCtx>({ markers: (s) => s }),
+			state({ grouping: 'g' }),
+			CTX
+		);
+		const row = shared.processedData!.data[0];
+		expect(shared.tooltipFormat!(row)).toBe(`${String(row.g)}\n${row.x}: ${row.y}`);
+
+		const own = runStages(
+			buildAxisStages<State, AxisPlotCtx>({
+				markers: (s) => s,
+				tooltip: { format: () => () => 'own' }
+			}),
+			state(),
+			CTX
+		);
+		expect(own.tooltipFormat!(row)).toBe('own');
 	});
 
 	test('runStages warns when stages are declared out of phase order', () => {

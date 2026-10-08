@@ -4,7 +4,7 @@
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import type { TrailMarkerConfig } from '$lib/types/markers/common';
 
-	/** Renders one `'trail'` marker as `<Trail>` — a ribbon whose width follows `r`. */
+	/** Renders one `'trail'` marker as `<Trail>` - a ribbon whose width follows `r`. */
 	let { marker }: { marker: TrailMarkerConfig } = $props();
 
 	const cfg = $derived(getConfiguration());

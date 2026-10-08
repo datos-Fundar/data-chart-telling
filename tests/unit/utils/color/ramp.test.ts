@@ -3,7 +3,7 @@ import { resolveColorScale } from '$lib/utils/color';
 
 describe('resolveColorScale', () => {
 	// d3-interpolate's rgb interpolator returns `rgb(r, g, b)` strings, even
-	// at the exact endpoints — not the hex the config was given in.
+	// at the exact endpoints - not the hex the config was given in.
 	test('with no config, falls back to the default 2-color scheme over the computed domain', () => {
 		const scale = resolveColorScale(undefined, [0, 100], ['#000000', '#ffffff']);
 		expect(scale(0)).toBe('rgb(0, 0, 0)');

@@ -44,11 +44,11 @@ const SERIES = [
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Basic hover marker — a dot appears on the hovered cell as the cursor moves
+ * Basic hover marker - a dot appears on the hovered cell as the cursor moves
  * over the plot, along with a full crosshair (both `ruleX` and `ruleY` are
  * implied by the heatmap's `'punctual'` hover strategy) and a value label,
  * on by default like every other plot kind. Since heatmap cells already show
- * their value permanently, the label next to the hover dot duplicates it —
+ * their value permanently, the label next to the hover dot duplicates it -
  * see `WithoutLabels` to turn it off. No floating HTML tooltip is involved.
  */
 export const Basic: Story = {
@@ -63,7 +63,7 @@ export const Basic: Story = {
 };
 
 /**
- * Without labels — `showLabels: false` turns off the hover marker's own
+ * Without labels - `showLabels: false` turns off the hover marker's own
  * value label, the recommended setting for heatmaps specifically: each
  * cell already shows its value permanently, so the hover dot's own label
  * would just duplicate it right next to it.
@@ -81,7 +81,7 @@ export const WithoutLabels: Story = {
 };
 
 /**
- * No crosshair — `ruleX: false` and `ruleY: false` suppress both rules the
+ * No crosshair - `ruleX: false` and `ruleY: false` suppress both rules the
  * `'punctual'` strategy implies by default, leaving just the hover dot.
  */
 export const WithoutRules: Story = {
@@ -98,7 +98,7 @@ export const WithoutRules: Story = {
 };
 
 /**
- * Row rule only — `ruleX: false` keeps just the horizontal (`ruleY`) rule,
+ * Row rule only - `ruleX: false` keeps just the horizontal (`ruleY`) rule,
  * highlighting the hovered cell's sex row without the vertical province rule.
  */
 export const RowRuleOnly: Story = {
@@ -115,7 +115,7 @@ export const RowRuleOnly: Story = {
 };
 
 /**
- * Column rule only — `ruleY: false` keeps just the vertical (`ruleX`) rule,
+ * Column rule only - `ruleY: false` keeps just the vertical (`ruleX`) rule,
  * highlighting the hovered cell's sex column without the horizontal sex rule.
  */
 export const ColumnRuleOnly: Story = {
@@ -132,7 +132,7 @@ export const ColumnRuleOnly: Story = {
 };
 
 /**
- * Custom rule style — `rule` overrides the crosshair stroke. Here the
+ * Custom rule style - `rule` overrides the crosshair stroke. Here the
  * rules render in red with a solid line and higher opacity.
  */
 export const WithCustomRuleStyle: Story = {
@@ -160,7 +160,7 @@ export const WithCustomRuleStyle: Story = {
 };
 
 /**
- * `areaX`/`areaY` together — since both of a heatmap's axes are band scales,
+ * `areaX`/`areaY` together - since both of a heatmap's axes are band scales,
  * the two translucent highlight areas cross exactly at the hovered cell,
  * highlighting its full row and column at once. Each defaults to a neutral
  * gray sized to the cell's own width/height plus 2px.
@@ -179,7 +179,7 @@ export const WithHighlightCross: Story = {
 };
 
 /**
- * Two series from separate per-sex arrays — the unscoped hover marker
+ * Two series from separate per-sex arrays - the unscoped hover marker
  * responds identically whether the grid comes from one combined series or,
  * as here, two merged per-sex series (see `TwoSeriesBySex` in the Series
  * stories).
@@ -211,7 +211,7 @@ export const TwoSeriesBySex: Story = {
 };
 
 /**
- * Using the data/x/y/color shorthand — equivalent to `Basic`, built without an
+ * Using the data/x/y/color shorthand - equivalent to `Basic`, built without an
  * explicit series array.
  */
 export const FromGroupedData: Story = {

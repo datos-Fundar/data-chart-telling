@@ -6,8 +6,8 @@ import { LIFE_EXPECTANCY_BY_PROVINCE_SEX, type ProvinceSexCell } from '../../../
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `cell` marker's own `color` + `scales.color` is independent of the
 // plot's own channel (see `Channels/Color/Plot Level/Heatmap`). `CellMarkerConfig`
-// is normally built internally by HeatmapPlot's own "markers" phase — every
-// cell you'd normally see is already one — but it's a regular entry in the
+// is normally built internally by HeatmapPlot's own "markers" phase - every
+// cell you'd normally see is already one - but it's a regular entry in the
 // `markers` prop like any other marker, so a hand-authored one works the same
 // way. Here the plot's own cells render flat (no color channel); the
 // hand-authored `cell` marker overlays the same grid at the same size
@@ -24,7 +24,7 @@ const meta = {
 		x: 'province',
 		y: 'sex',
 		// The base cells carry no `color` of their own here, so their default
-		// value-label formatter has nothing to read — hidden to avoid a
+		// value-label formatter has nothing to read - hidden to avoid a
 		// confusing "NaN" under the marker's own colored overlay.
 		styles: { values: { show: false } }
 	},
@@ -43,7 +43,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * The `cell` marker's own `color: 'value'` accessor drives its fill — the
+ * The `cell` marker's own `color: 'value'` accessor drives its fill - the
  * default palette's own continuous ramp, since the marker sets no `scales`
  * of its own. `fill` is still required by `CellMarkerConfig`'s own shape,
  * but `color` takes priority over it whenever it resolves to a value.

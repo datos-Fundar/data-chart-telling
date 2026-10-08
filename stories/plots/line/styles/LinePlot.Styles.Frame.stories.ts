@@ -43,7 +43,7 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * `styles.frame: true` draws a plain border around the plot's own content
- * box — purely decorative, svelteplot's `Frame` mark. `true` uses its own
+ * box - purely decorative, svelteplot's `Frame` mark. `true` uses its own
  * defaults (a thin `currentColor` stroke, no fill). Available on every plot
  * kind via `styles.frame`, not just `LinePlot`.
  */
@@ -64,7 +64,7 @@ export const FrameDefault: Story = {
 };
 
 /**
- * `styles.frame` as an object overrides the border's look field-by-field —
+ * `styles.frame` as an object overrides the border's look field-by-field -
  * same style fields as a segment/cell's own fill+stroke bag, plus `inset*`
  * to pull the frame in from the content box's own edges.
  */

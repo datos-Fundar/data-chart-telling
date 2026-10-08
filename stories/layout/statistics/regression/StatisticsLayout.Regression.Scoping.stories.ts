@@ -7,7 +7,7 @@ import { COUNTRIES } from '../../../plots/scatter/data';
 // omitted, it pools every resolved series into one combined source; named,
 // it fits once per listed series, using that series' own data/color. Series
 // themselves come from `color` (or an explicit `grouping`) splitting the data
-// by region — the same three stories below, at three different scopes.
+// by region - the same three stories below, at three different scopes.
 
 const meta = {
 	title: 'Layout/Statistics/Regression/Scoping',
@@ -58,7 +58,7 @@ export const PooledAcrossSeries: Story = {
 	}
 };
 
-/** Scoped to a single series: same `color`-split series as above, but `series: ['Europe']` fits a regression for just that one continent — every country still renders, only Europe gets a line. */
+/** Scoped to a single series: same `color`-split series as above, but `series: ['Europe']` fits a regression for just that one continent - every country still renders, only Europe gets a line. */
 export const SingleSeriesScoped: Story = {
 	args: {
 		color: 'region',

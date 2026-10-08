@@ -5,7 +5,7 @@
 	import type { Orientation } from '$lib/types/layout/timeline';
 
 	/**
-	 * `Timeline` on its own is purely visual — it just draws the steps you hand
+	 * `Timeline` on its own is purely visual - it just draws the steps you hand
 	 * it. `TimelineLayout` is the layer that actually couples it to data: it
 	 * picks the step from `progress`, slices the data down to it, and hands the
 	 * plot its measured box. This wrapper exists only because that coupling

@@ -6,7 +6,7 @@ import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { LineMarkerConfig, DotMarkerConfig } from '$lib/types/markers/common';
 
 // `buildGapMarkers` pulls `getConfiguration()` from `config.svelte.ts` (a
-// module-level `$state`), which needs the Svelte compiler — hence this file's
+// module-level `$state`), which needs the Svelte compiler - hence this file's
 // `.svelte.test.ts` suffix (routes it into the browser project) even though
 // it never renders a component. See the "vitest *.svelte.test.ts suffix" note.
 
@@ -33,7 +33,7 @@ function build(disabledStroke?: object, disabledDots?: object) {
 	});
 }
 
-describe('buildGapMarkers – disabled overrides (legend/hover-isolate dimming)', () => {
+describe('buildGapMarkers - disabled overrides (legend/hover-isolate dimming)', () => {
 	test('with no override, the bridge line uses the series color and the gap default opacity', () => {
 		const markers = build();
 		const line = markers.find((m) => m.type === 'line') as LineMarkerConfig;
@@ -46,7 +46,7 @@ describe('buildGapMarkers – disabled overrides (legend/hover-isolate dimming)'
 		const markers = build({ strokeOpacity: 0.12 });
 		const line = markers.find((m) => m.type === 'line') as LineMarkerConfig;
 		expect(line.styles?.strokeOpacity).toBe(0.12);
-		// Only opacity was overridden — color still falls through to the series default.
+		// Only opacity was overridden - color still falls through to the series default.
 		expect(line.styles?.stroke).toBe('#111111');
 	});
 

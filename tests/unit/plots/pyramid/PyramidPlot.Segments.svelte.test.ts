@@ -26,7 +26,7 @@ function barStyles(svg: SVGElement): string[] {
 	return Array.from(svg.querySelectorAll('g.bar-x rect')).map((r) => r.getAttribute('style') ?? '');
 }
 
-describe('PyramidPlot – segments ("default" key applies to every series)', () => {
+describe('PyramidPlot - segments ("default" key applies to every series)', () => {
 	test('an area segment and the catch-all each apply their own fillOpacity', async () => {
 		const highlighted = ['80-84', '85+'];
 		const { container } = await render(PyramidPlot, {
@@ -89,7 +89,7 @@ describe('PyramidPlot – segments ("default" key applies to every series)', () 
 	});
 });
 
-describe('PyramidPlot – segments keyed by series name', () => {
+describe('PyramidPlot - segments keyed by series name', () => {
 	test('a segment keyed by series name only affects that series', async () => {
 		const { container } = await render(PyramidPlot, {
 			width: 560,

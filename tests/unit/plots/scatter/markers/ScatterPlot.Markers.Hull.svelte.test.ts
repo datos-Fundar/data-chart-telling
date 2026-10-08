@@ -5,7 +5,7 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { COUNTRIES, AMERICAS } from '../../../../../stories/plots/scatter/data';
 import { waitForSvg, countHullPaths } from '../../_helpers/svg';
 
-describe('ScatterPlot – markers.hull', () => {
+describe('ScatterPlot - markers.hull', () => {
 	test('renders one hull around a cluster of points', async () => {
 		const { container } = render(ScatterPlot, {
 			width: 400,

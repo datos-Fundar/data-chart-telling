@@ -14,7 +14,7 @@ const DATA_PROPS = {
 	color: 'sex' as const
 };
 
-describe('PyramidPlot – styles.values', () => {
+describe('PyramidPlot - styles.values', () => {
 	test('no value labels by default', async () => {
 		const { container } = await render(PyramidPlot, { width: 560, height: 520, ...DATA_PROPS });
 		const svg = await waitForSvg(container);

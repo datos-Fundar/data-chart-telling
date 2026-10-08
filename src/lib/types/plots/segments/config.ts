@@ -25,7 +25,7 @@ export type Area = {
 /**
  * One styled rule for a plot. A data point (or cell) is styled when it falls
  * inside **any** of the listed `areas`. Omitting `areas` (or passing an empty
- * array) makes the segment a catch-all that matches every data point — useful
+ * array) makes the segment a catch-all that matches every data point - useful
  * as a baseline style. `TStyle` is the per-mark shape ({@link LineSegmentStyle},
  * {@link BarSegmentStyle}, {@link CellSegmentStyle}, …).
  *
@@ -39,7 +39,7 @@ export type Segment<TStyle> = {
   styles?: TStyle;
 };
 
-/** One contiguous, styled slice of a series' data — ready to draw as its own mark. */
+/** One contiguous, styled slice of a series' data - ready to draw as its own mark. */
 export type VisualSegment<T extends Record<string, unknown>, TStyle = LineSegmentStyle> = {
   data: T[];
   scales?: ChannelScalesConfig;
@@ -48,7 +48,7 @@ export type VisualSegment<T extends Record<string, unknown>, TStyle = LineSegmen
 
 /**
  * A series split into its styled visual segments. `S` is the full series
- * type Series<T> — its row type is read off `S['data']`
+ * type Series<T> - its row type is read off `S['data']`
  * rather than taken as a separate parameter, since TypeScript can't reliably
  * infer a type parameter that only appears inside another parameter's
  * constraint.

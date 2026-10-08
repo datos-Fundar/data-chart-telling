@@ -7,10 +7,10 @@
 
 	/**
 	 * Renders one `'box'` marker as `<BoxX>` or `<BoxY>`, picked from the
-	 * plot's own axis scale types (see `isHorizontalFor`) — `marker.x`/`marker.y`
+	 * plot's own axis scale types (see `isHorizontalFor`) - `marker.x`/`marker.y`
 	 * map straight onto the plot's axes either way.
 	 * `bar`/`rule`/`dot`/`tickMedian`/`tickMinMax` forward straight through to
-	 * svelteplot's own same-named options — see `BoxMarkerConfig`'s own doc
+	 * svelteplot's own same-named options - see `BoxMarkerConfig`'s own doc
 	 * comment for the default styling this wrapper adds on top, inherited
 	 * from `bar`.
 	 */
@@ -25,7 +25,7 @@
 	const cfg = $derived(getConfiguration());
 
 	/**
-	 * The bar's own fully-resolved options — the author's own `bar`, with
+	 * The bar's own fully-resolved options - the author's own `bar`, with
 	 * `fill` defaulted to this package's own `cfg.palette[0]` when unset
 	 * (svelteplot's own bare default, `currentColor`, can't be resolved to a
 	 * real color at this layer). Every other sub-mark's own default styling
@@ -43,7 +43,7 @@
 	});
 	const barFill = $derived(bar.fill as string);
 
-	/** `bar.insetLeft`/`insetRight` averaged into one symmetric value — a tick's own `inset` is a single number/percentage, not independent left/right. */
+	/** `bar.insetLeft`/`insetRight` averaged into one symmetric value - a tick's own `inset` is a single number/percentage, not independent left/right. */
 	const tickInset = $derived.by(() => {
 		const l = typeof bar.insetLeft === 'number' ? bar.insetLeft : undefined;
 		const r = typeof bar.insetRight === 'number' ? bar.insetRight : undefined;
@@ -53,7 +53,7 @@
 
 	/**
 	 * The style fields a line-shaped sub-mark (`rule`, `tickMedian`,
-	 * `tickMinMax` — stroke, no fill) inherits from `bar` by default, besides
+	 * `tickMinMax` - stroke, no fill) inherits from `bar` by default, besides
 	 * its own `stroke` color (passed in separately: contrasting for
 	 * `tickMedian`, matching for `rule`/`tickMinMax`).
 	 */
@@ -90,7 +90,7 @@
 
 	/**
 	 * Resolves a `tickMedian`/`tickMinMax` value against this package's own
-	 * default (enabled, with `defaultStyle`) — `false` hides it; `true` or
+	 * default (enabled, with `defaultStyle`) - `false` hides it; `true` or
 	 * unset shows it at just the default style; an options object shows it
 	 * with the default style as a base, overridden by whatever the object
 	 * itself sets.

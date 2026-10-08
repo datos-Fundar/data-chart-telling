@@ -6,7 +6,7 @@ import { COUNTRIES } from '../../../plots/scatter/data';
 // `statistics: [{ type: 'density' }]` is a 1D kernel density over the plot's
 // `x` values (svelteplot's own `densityX` transform), drawn as an `area`
 // marker: the curve's `x` is the value, its `y` the density. The density axis
-// shares the plot's `y` scale, so the host here plots every row at `y = 0` —
+// shares the plot's `y` scale, so the host here plots every row at `y = 0` -
 // a rug along the baseline that the density curve rises above.
 
 const rugData = COUNTRIES.map((d) => ({ ...d, rug: 0 }));

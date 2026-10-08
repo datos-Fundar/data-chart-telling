@@ -3,6 +3,7 @@ import type { MappingStageOptions } from './mapping';
 import type { TransformsStageOptions, TransformsStageState } from './transforms';
 import type { StatisticsStageOptions, StatisticsStageState } from './statistics';
 import type { ScalesStageOptions } from './scales';
+import type { TooltipStageOptions } from './tooltip';
 
 /**
  * What one axis-based plot kind adds to the shared pipeline: options for each
@@ -15,4 +16,5 @@ export type AxisPlotKind<TState extends TransformsStageState & StatisticsStageSt
 	statistics?: StatisticsStageOptions<TState>;
 	scales?: ScalesStageOptions<TState, TCtx>;
 	markers: (state: TState, ctx: TCtx) => TState;
+	tooltip?: TooltipStageOptions<TState, TCtx>;
 };

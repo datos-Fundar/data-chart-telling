@@ -7,7 +7,7 @@ import { FEMALE_LIFE_EXPECTANCY_BY_PROVINCE, type ProvincePoint } from '../../..
 // A `bar` marker's own `color` + `scales.color` is independent of the plot's
 // own channel (see `Channels/Color/Plot Level/Bar`). `BarMarkerConfig`
 // (`role: 'segment'`) is normally built internally by BarPlot's own "markers"
-// phase — every real bar you'd see is already one — this is the first
+// phase - every real bar you'd see is already one - this is the first
 // hand-authored use of it in this codebase, so `y1`/`y2` are raw data-domain
 // values (not pixels), same as the real bars: `<BarY>` scales them itself.
 // The plot's own bars render flat (no color channel); the hand-authored
@@ -40,7 +40,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * The `bar` marker's own `color: 'value'` accessor drives its fill — the
+ * The `bar` marker's own `color: 'value'` accessor drives its fill - the
  * default palette's own continuous ramp, since the marker sets no `scales`
  * of its own.
  */

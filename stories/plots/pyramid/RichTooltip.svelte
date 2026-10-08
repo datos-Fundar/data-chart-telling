@@ -13,7 +13,7 @@
 	const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
 
 	// Series are sorted alphabetically inside PyramidPlot ('Female' < 'Male'),
-	// which is also what drives left/right placement and colour assignment —
+	// which is also what drives left/right placement and colour assignment -
 	// kept in lockstep here since `content` only gets the raw rows back, not
 	// their resolved side/colour.
 	const SERIES_COLORS: Record<string, string> = {
@@ -45,7 +45,6 @@
 		color="sex"
 		scales={{ y: { domain: AGE_GROUPS } }}
 		tooltip={{
-			facetId: '',
 			sync: false,
 			format: (row) => {
 				const { sex, ageGroup, pct } = row as PopulationRow;

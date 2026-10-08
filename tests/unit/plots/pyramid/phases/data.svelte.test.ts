@@ -3,19 +3,19 @@ import { stageOf } from '../../_helpers/stages';
 import { buildPyramidKind } from '$lib/plots/pyramid/kind';
 import type { PyramidPlotState, PyramidPlotCtx } from '$lib/types/plots/pyramid/state';
 import type { Series } from '$lib/types/plots/data/common';
-import type { ChartConfig } from '$lib/types/configuration/styling';
+import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 
 const buildData = stageOf(buildPyramidKind<Row>(), 'data');
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
-// Series.x/.y hold the category/magnitude accessors respectively — see
+// Series.x/.y hold the category/magnitude accessors respectively - see
 // phases/data.ts's own comment on why they're swapped from the top-level
 // x (magnitude)/y (category) prop names.
 type Row = { ageGroup: string; pct: number | null };
 
 const CTX: PyramidPlotCtx = {
-	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as ChartConfig,
+	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as PlotStylesConfig,
 	formatValue: (v) => `${v}`,
 	legendInteraction: null
 };
@@ -39,7 +39,7 @@ function build(overrides: Partial<PyramidPlotState<Row>> = {}) {
 
 // ── Side assignment ───────────────────────────────────────────────────────────
 
-describe('buildData – side assignment', () => {
+describe('buildData - side assignment', () => {
 	test('assigns sides by alphabetical order: first left, second right', () => {
 		const result = build({
 			series: [series('Male', []), series('Female', [])]
@@ -60,7 +60,7 @@ describe('buildData – side assignment', () => {
 
 // ── Series resolution ─────────────────────────────────────────────────────────
 
-describe('buildData – series resolution', () => {
+describe('buildData - series resolution', () => {
 	test('builds series from flat data/x/y/color when series is not given', () => {
 		type GroupedRow = { ageGroup: string; pct: number; sex: string };
 		const data: GroupedRow[] = [
@@ -85,7 +85,7 @@ describe('buildData – series resolution', () => {
 
 // ── Grouped series ────────────────────────────────────────────────────────────
 
-describe('buildData – groupedSeries', () => {
+describe('buildData - groupedSeries', () => {
 	test('one group per resolved series, covering all of its data by default', () => {
 		const data = [
 			{ ageGroup: '0-4', pct: 10 },
@@ -99,7 +99,7 @@ describe('buildData – groupedSeries', () => {
 
 // ── Gap fills ─────────────────────────────────────────────────────────────────
 
-describe('buildData – gapFillMaps', () => {
+describe('buildData - gapFillMaps', () => {
 	test('has no entries when no gap zones are configured', () => {
 		const result = build({
 			series: [series('Female', [{ ageGroup: '0-4', pct: null }])],
@@ -126,7 +126,7 @@ describe('buildData – gapFillMaps', () => {
 
 // ── Scoped groups ─────────────────────────────────────────────────────────────
 
-describe('buildData – scopedGroups', () => {
+describe('buildData - scopedGroups', () => {
 	test('one scoped group per resolved series, colored by default palette', () => {
 		const result = build({
 			series: [series('Male', []), series('Female', [])]

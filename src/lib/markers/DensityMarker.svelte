@@ -6,7 +6,7 @@
 	import type { DensityMarkerConfig } from '$lib/types/markers/common';
 
 	/**
-	 * Renders one `'density'` marker as one `<Density>` per group — 2D KDE
+	 * Renders one `'density'` marker as one `<Density>` per group - 2D KDE
 	 * contour bands. A grouped marker (its `color`, or its `grouping`, which
 	 * a plot's own grouping is inherited into) is split here, not through
 	 * svelteplot's own `z`: svelteplot would color an accessor stroke with its

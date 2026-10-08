@@ -31,7 +31,7 @@ function build(overrides: Partial<ScatterPlotState<Row>> = {}) {
 	return buildMapping(state);
 }
 
-describe('buildMapping – x/y channels', () => {
+describe('buildMapping - x/y channels', () => {
 	test('resolves x/y to the first series own accessors', () => {
 		const result = build();
 		expect(result.channels!.x.accessor(SERIES[0].data[0])).toBe(1);
@@ -39,7 +39,7 @@ describe('buildMapping – x/y channels', () => {
 	});
 });
 
-describe('buildMapping – optional r channel', () => {
+describe('buildMapping - optional r channel', () => {
 	test('is undefined when r is not given', () => {
 		const result = build({ r: undefined });
 		expect(result.channels!.r).toBeUndefined();

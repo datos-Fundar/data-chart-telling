@@ -48,7 +48,7 @@ export const SingleDiscreteVertical: Story = {
 	}
 };
 
-/** Same lone section as `SingleDiscrete`, with `layout: { type: 'flex' }` — flows left to right and wraps onto as many rows as it takes, with no pagination. */
+/** Same lone section as `SingleDiscrete`, with `layout: { type: 'flex' }` - flows left to right and wraps onto as many rows as it takes, with no pagination. */
 export const SingleDiscreteFlex: Story = {
 	args: {
 		sections: [

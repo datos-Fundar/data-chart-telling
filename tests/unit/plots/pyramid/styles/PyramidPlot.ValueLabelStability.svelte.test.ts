@@ -25,7 +25,7 @@ function frameX(container: Element): number {
 	);
 }
 
-describe('PyramidPlot – outside-anchored value labels reserve room up front', () => {
+describe('PyramidPlot - outside-anchored value labels reserve room up front', () => {
 	test('the left margin already fits the widest label on the very first render', async () => {
 		const withLabels = await render(PyramidPlot, {
 			width: 500,

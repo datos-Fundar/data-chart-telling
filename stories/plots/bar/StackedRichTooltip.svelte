@@ -14,7 +14,7 @@
 	const cfg = getConfiguration();
 
 	// Colour order matches AGE_BRACKETS, which is what drives colour assignment
-	// inside BarPlot when series are auto-created from `color` — kept in
+	// inside BarPlot when series are auto-created from `color` - kept in
 	// lockstep here since `content` only gets the raw rows back, not their colour.
 	const BRACKET_COLORS = AGE_BRACKETS.map((_, i) => paletteColor(i, cfg.palette));
 </script>
@@ -46,7 +46,6 @@
 		transforms={[{ type: 'stackY' }]}
 		markers={[{ type: 'hover', showLabels: false }]}
 		tooltip={{
-			facetId: '',
 			sync: false,
 			format: (row) => {
 				const { province, bracket, value } = row as AgeBracketPoint;

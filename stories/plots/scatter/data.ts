@@ -6,7 +6,7 @@ export type CountryPoint = {
   population: number;
 };
 
-/** Synthetic 2022-ish snapshot — GDP per capita (USD thousands) vs. life expectancy (years), sized by population (millions). */
+/** Synthetic 2022-ish snapshot - GDP per capita (USD thousands) vs. life expectancy (years), sized by population (millions). */
 export const COUNTRIES: CountryPoint[] = [
   { country: 'Argentina', region: 'Americas', gdpPerCapita: 13.7, lifeExpectancy: 75.4, population: 46 },
   { country: 'Brazil', region: 'Americas', gdpPerCapita: 8.9, lifeExpectancy: 72.8, population: 215 },

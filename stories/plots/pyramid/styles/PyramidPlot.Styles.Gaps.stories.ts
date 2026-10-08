@@ -6,10 +6,10 @@ import { AGE_GROUPS, POPULATION_PYRAMID, FEMALE_2022_WITH_GAPS } from '../../../
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
-// `FEMALE_2022_WITH_GAPS` — the same 2022 slice every other PyramidPlot
-// story already uses — has three holes, all `pct: null`: the first two age
+// `FEMALE_2022_WITH_GAPS` - the same 2022 slice every other PyramidPlot
+// story already uses - has three holes, all `pct: null`: the first two age
 // groups (start), an internal pair (middle), and the last two (end).
-// Without `styles.gaps`, a missing value renders no bar at all —
+// Without `styles.gaps`, a missing value renders no bar at all -
 // `styles.gaps` fills it with a distinctly-styled bar at an interpolated
 // magnitude instead, on whichever side ('Female'/'Male') that series
 // already renders.
@@ -69,7 +69,7 @@ export const MiddleGapFilled: Story = {
 };
 
 /**
- * `start`/`end` gaps are opt-in — an explicit `x` (its presence, not its
+ * `start`/`end` gaps are opt-in - an explicit `x` (its presence, not its
  * value, since the category axis isn't continuous) is required before a
  * leading/trailing hole gets filled.
  */
@@ -94,7 +94,7 @@ const FEMALE_AND_MALE_2022 = [
 ];
 
 /**
- * A gap entry keyed by series name applies only to that series — here only
+ * A gap entry keyed by series name applies only to that series - here only
  * `Female` (left side) gets its middle gap filled; `Male` (right side,
  * no missing readings of its own) is unaffected either way.
  */
@@ -108,7 +108,7 @@ export const GapsOnOneSeriesOnly: Story = {
 // ── Global configuration ──────────────────────────────────────────────────────
 
 /**
- * A zone with no `style` of its own falls back to `cfg.pyramid.gap` — set
+ * A zone with no `style` of its own falls back to `cfg.pyramid.gap` - set
  * via `setConfiguration`, mirroring `cfg.bar.gap`/`cfg.line.gap`.
  */
 export const GlobalConfigDefault: Story = {

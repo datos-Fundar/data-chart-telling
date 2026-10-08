@@ -7,7 +7,7 @@ import { waitForSvg, countBrushSelections } from '../../_helpers/svg';
 
 const base = { width: 400, height: 300, data: COUNTRIES, x: 'gdpPerCapita', y: 'lifeExpectancy' };
 
-describe('ScatterPlot – markers.brush', () => {
+describe('ScatterPlot - markers.brush', () => {
 	test('with no initial selection it draws nothing until the user drags', async () => {
 		const { container } = render(ScatterPlot, {
 			...base,

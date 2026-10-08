@@ -18,7 +18,7 @@ const PLOT = { width: 400, height: 300, data: rows, x: 'x', y: 'y', color: 'g' }
 const labels = (svg: Element) =>
 	Array.from(svg.querySelectorAll('g.text text')).map((t) => t.textContent);
 
-describe('AreaPlot – styles.values', () => {
+describe('AreaPlot - styles.values', () => {
 	test('no value label by default', async () => {
 		const { container } = await render(AreaPlot, PLOT);
 		const svg = await waitForSvg(container);

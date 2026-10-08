@@ -3,7 +3,11 @@ import { resolveOpacityScale } from '$lib/utils/opacity';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { HeatmapPlotState, HeatmapPlotCtx } from '$lib/types/plots/heatmap/state';
 
-/** HeatmapPlot's "scales" phase: band x/y domains over every distinct category, and each row's own resolved color. */
+/**
+ * HeatmapPlot's "scales" phase: band x/y domains over every distinct category,
+ * the color domain over every cell's value (when `color` is set), and each
+ * row's own resolved color.
+ */
 export function buildScales<TData extends Record<string, unknown>>(
 	state: HeatmapPlotState<TData>,
 	ctx: HeatmapPlotCtx
@@ -28,7 +32,7 @@ export function buildScales<TData extends Record<string, unknown>>(
 	})();
 
 	// 'rescale' reprojects the ramp onto the narrowed range; 'filter' (and no
-	// active range) keeps the original domain — only which cells are hidden
+	// active range) keeps the original domain - only which cells are hidden
 	// changes (resolved in the "markers" phase).
 	const effectiveDomain: [number, number] =
 		range && range.mode === 'rescale' ? [range.min, range.max] : valueDomain;
@@ -60,7 +64,10 @@ export function buildScales<TData extends Record<string, unknown>>(
 		scales: {
 			...scales,
 			x: { type: 'band', labelAnchor: 'right', domain: xDomain, ...(scales.x ?? {}) },
-			y: { type: 'band', domain: yDomain, ...(scales.y ?? {}) }
+			y: { type: 'band', domain: yDomain, ...(scales.y ?? {}) },
+			...(colorAcc.source !== undefined
+				? { color: { ...scales.color, domain: valueDomain } }
+				: {})
 		},
 		resolveColor,
 		resolveOpacity

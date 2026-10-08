@@ -11,13 +11,13 @@ import type { GapsConfig } from '$lib/types/plots/gaps';
  * on a heatmap. The high-level `anchor` sets sensible defaults for placement;
  * `fontStyle` (`dx`, `dy`, `textAnchor`, `lineAnchor`, `lineHeight`, `rotate`,
  * `class`, `textClass`, `fill`, …) overrides those defaults field-by-field when
- * provided — mirrors {@link DeltaConfig}'s `fontStyle`/`strokeStyle` split, so
+ * provided - mirrors {@link DeltaConfig}'s `fontStyle`/`strokeStyle` split, so
  * label text and connector-line styling never mix into one flat bag of props.
  */
 export type ValuesStyle = {
 	/** Whether the labels are drawn. Off by default, except on a heatmap. */
 	show?: boolean;
-	/** Where each label sits on its mark — see {@link ValueAnchor}. */
+	/** Where each label sits on its mark - see {@link ValueAnchor}. */
 	anchor?: ValueAnchor;
 	/** A label's text, from its row's own value (a histogram bin's count) and its series. */
 	format?: (value: number, seriesName: string) => string;
@@ -29,7 +29,7 @@ export type ValuesStyle = {
 };
 
 /**
- * Decorative border around the plot's own content box — svelteplot's
+ * Decorative border around the plot's own content box - svelteplot's
  * `Frame` mark, purely cosmetic (drawn from the box geometry, never from
  * data). `true` enables it with svelteplot's own defaults; an object
  * enables it and overrides its look field-by-field. Insets pull the frame
@@ -43,15 +43,15 @@ export type FrameStyle = AreaStyle & {
 	insetLeft?: number;
 };
 
-/** Author-facing `styles.frame` prop — see {@link FrameStyle}. */
+/** Author-facing `styles.frame` prop - see {@link FrameStyle}. */
 export type FrameProp = boolean | FrameStyle;
 
 /**
- * The fields every plot kind's own `styles` shape shares — the common parent
+ * The fields every plot kind's own `styles` shape shares - the common parent
  * of {@link AxisBasedStylesConfig} and {@link GeoStylesConfig}.
  */
 export type BasePlotStylesConfig = {
-	/** Decorative border around the plot's content box — see {@link FrameStyle}. Available on every plot kind. */
+	/** Decorative border around the plot's content box - see {@link FrameStyle}. Available on every plot kind. */
 	frame?: FrameProp;
 };
 
@@ -65,10 +65,10 @@ export type AxisBasedStylesConfig = BasePlotStylesConfig & {
 };
 
 /**
- * `AxisBasedStylesConfig` extended with `gaps` — the interpolated
+ * `AxisBasedStylesConfig` extended with `gaps` - the interpolated
  * missing-data bridge fill available to plot kinds with an inherent
  * category/sequence ordering (`LinePlot`, `BarPlot`, `PyramidPlot`).
- * Resolved per series like `segments`, at zone granularity — see
+ * Resolved per series like `segments`, at zone granularity - see
  * {@link GapsConfig}.
  */
 export type GapsAwarePlotStylesConfig<TSegmentStyle extends object> = AxisBasedStylesConfig & {
@@ -87,7 +87,7 @@ export type GeoTileLayerConfig = {
 };
 
 /**
- * `styles` prop for GeoPlot — the geo analog of `AxisBasedStylesConfig`,
+ * `styles` prop for GeoPlot - the geo analog of `AxisBasedStylesConfig`,
  * sharing only {@link BasePlotStylesConfig}'s common ground with it. Unlike
  * the other plot kinds, GeoPlot's styling needs (base map, choropleth ramp,
  * tile background, click handling) are unlike anything x/y plots need, so
@@ -107,7 +107,7 @@ export type GeoStylesConfig<TProps extends Record<string, unknown> = Record<stri
 	};
 
 /**
- * `GeoTileLayerConfig`, plus `features` — never author-facing (the public
+ * `GeoTileLayerConfig`, plus `features` - never author-facing (the public
  * `styles.tileLayer` shape, {@link GeoTileLayerConfig}, doesn't declare it).
  * `GeoPlot` tacks it onto its own internal copy of `styles` so `StylesLayout`
  * can compute the tile layer's auto-fit bounds without needing raw geometry
@@ -118,7 +118,7 @@ type GeoTileLayerConfigWithFeatures = GeoTileLayerConfig & {
 };
 
 /**
- * The minimal slice of a plot kind's own `styles` prop `StylesLayout` reads —
+ * The minimal slice of a plot kind's own `styles` prop `StylesLayout` reads -
  * every concrete `styles` type ({@link AxisBasedStylesConfig},
  * {@link GeoStylesConfig}) structurally satisfies this whether or not it
  * declares `tileLayer` at all (a missing optional field type-checks fine).

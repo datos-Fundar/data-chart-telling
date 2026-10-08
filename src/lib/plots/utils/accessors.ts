@@ -1,6 +1,6 @@
 /**
  * Converts a field key or a function into a data accessor function.
- * Svelteplot marks expect `(d: T) => value` — this bridges the
+ * Svelteplot marks expect `(d: T) => value` - this bridges the
  * shorthand key notation used in series definitions.
  */
 export function resolveAccessor<T extends Record<string, unknown>>(

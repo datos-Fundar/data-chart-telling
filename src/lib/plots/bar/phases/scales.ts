@@ -1,7 +1,7 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import { niceDomain, naturalTickCount } from '$lib/layout/scales/niceDomain';
-import { AUTO_MARGIN_ESTIMATE, numericMargin } from '$lib/layout/plot/margins';
+import { AUTO_MARGIN_ESTIMATE, numericMargin } from '$lib/layout/base/margins';
 import type { AxisScale, AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/bar/state';
@@ -10,11 +10,7 @@ import type { ProcessedData, ProcessedRow } from '$lib/types/layout/phases';
 import { processedPosition } from '$lib/layout/phases/transforms';
 import type { MarginConfig } from '$lib/types/plots/props';
 
-/**
- * Where each processed row's bar sits: its category, and its span along the
- * value axis — from the row's own `y1` when a plot-level `stackY` produced
- * one, from `valueBaseline` otherwise, up to its top (`y2`, or `y`).
- */
+/** Each processed row's category and its span along the value axis. */
 function buildRowGeometry(
 	processed: ProcessedData | undefined,
 	valueBaseline: number
@@ -153,7 +149,16 @@ export function buildScales<TData extends Record<string, unknown>>(
 	const { scales, categoricalAxis, isHorizontal, width, height } = state;
 	const padding = { inner: ctx.cfg.bar.paddingInner, outer: ctx.cfg.bar.paddingOuter };
 
-	function stripCategoricalType(scale?: AxisScale<TData>): AxisScale<TData> | undefined {
+	/** The category axis is always a band scale - even for numeric categories like years, which svelteplot would otherwise lay out as a continuous axis with no band for a bar to stand in. */
+	function asBand(scale?: AxisScale<TData>): AxisScale<TData> {
+		const type = scale?.type;
+		return type === undefined || type === 'categorical' || type === 'auto'
+			? { ...scale, type: 'band' }
+			: scale!;
+	}
+
+	/** A value axis wrongly marked categorical (both axes were) drops the mark - see `withCategoricalAxis`. */
+	function withoutCategoricalType(scale?: AxisScale<TData>): AxisScale<TData> | undefined {
 		if (scale?.type !== 'categorical') return scale;
 		const rest = { ...scale };
 		delete rest.type;
@@ -168,7 +173,7 @@ export function buildScales<TData extends Record<string, unknown>>(
 		};
 	}
 
-	// Every bar's span, as the "transforms" phase left it — its baseline is
+	// Every bar's span, as the "transforms" phase left it - its baseline is
 	// unknown until the domain is, so a plain bar reads as reaching from zero.
 	const valueExtent = ((): [number, number] | undefined => {
 		const { spanOf } = buildRowGeometry(state.processedData, 0);
@@ -198,12 +203,8 @@ export function buildScales<TData extends Record<string, unknown>>(
 
 	const resolvedScales = {
 		...scales,
-		x: stripCategoricalType(
-			categoricalAxis === 'x' ? withDefaultPadding(scales.x) : withValueDomain(scales.x)
-		),
-		y: stripCategoricalType(
-			categoricalAxis === 'y' ? withDefaultPadding(scales.y) : withValueDomain(scales.y)
-		)
+		x: categoricalAxis === 'x' ? asBand(withDefaultPadding(scales.x)) : withValueDomain(withoutCategoricalType(scales.x)),
+		y: categoricalAxis === 'y' ? asBand(withDefaultPadding(scales.y)) : withValueDomain(withoutCategoricalType(scales.y))
 	};
 
 	const barLayout = buildBarLayout<TData>({

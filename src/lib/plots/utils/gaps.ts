@@ -11,7 +11,7 @@ const DEFAULT_KEY = 'default';
  * named entry (keyed by the series' own `name`) applies only to that
  * series; `'default'` fills in whichever zone the named entry itself leaves
  * unset. Unlike `segments`' own specific/default resolution (which
- * concatenates two rule lists), this merges at zone granularity — there's
+ * concatenates two rule lists), this merges at zone granularity - there's
  * no list to concatenate, just three independent slots.
  */
 export function resolveGapsForSeries<TStyle>(
@@ -62,7 +62,7 @@ function buildBridge(from: GapPoint, to: GapPoint, zone: GapZoneConfig<unknown>)
  * configured, builds the eased bridge points that visually fill it. Rows
  * are sorted by `x` first, so an out-of-order series is handled the same as
  * a sorted one. A series with no valid (non-missing) rows at all produces
- * no runs — there's nothing to bridge from or to.
+ * no runs - there's nothing to bridge from or to.
  */
 export function resolveGapRuns<T extends Record<string, unknown>, TStyle>(
   series: Series<T>,
@@ -113,7 +113,7 @@ export function resolveGapRuns<T extends Record<string, unknown>, TStyle>(
   return runs;
 }
 
-/** One gap row's resolved fill — the interpolated value to render instead of the missing one, and which zone produced it. */
+/** One gap row's resolved fill - the interpolated value to render instead of the missing one, and which zone produced it. */
 export type DiscreteGapFill<TStyle> = {
   value: number;
   kind: 'start' | 'middle' | 'end';
@@ -124,10 +124,10 @@ export type DiscreteGapFill<TStyle> = {
  * Bar/pyramid analog of `resolveGapRuns`: a category axis has no continuous
  * bridge to sample, so this returns one interpolated value per *individual*
  * gap row instead. Runs are detected by `series.data`'s own array order
- * (not a numeric `x` sort like `resolveGapRuns` — a category axis is often
+ * (not a numeric `x` sort like `resolveGapRuns` - a category axis is often
  * nominal, so there's no meaningful numeric ordering to sort by). Keyed by
  * row object reference rather than category, since a series' `y` accessor
- * may be an arbitrary function — there's no general way to write the
+ * may be an arbitrary function - there's no general way to write the
  * interpolated value back onto a row, so callers look it up here instead.
  */
 export function resolveDiscreteGapFills<T extends Record<string, unknown>, TStyle>(
@@ -182,7 +182,7 @@ export function resolveDiscreteGapFills<T extends Record<string, unknown>, TStyl
   return result;
 }
 
-/** Field-by-field style fallback for a discrete gap-fill marker — mirrors how `buildGapMarkers.ts` merges a line gap zone's style under `cfg.line.gap`. */
+/** Field-by-field style fallback for a discrete gap-fill marker - mirrors how `buildGapMarkers.ts` merges a line gap zone's style under `cfg.line.gap`. */
 export function resolveGapAreaStyle(zoneStyle: AreaStyle | undefined, defaultColor: string, gapDefaults: AreaStyle): AreaStyle {
   return {
     fill: zoneStyle?.fill ?? gapDefaults.fill ?? defaultColor,
@@ -196,7 +196,7 @@ export function resolveGapAreaStyle(zoneStyle: AreaStyle | undefined, defaultCol
 }
 
 /**
- * Each series' gap fills, keyed by series name — the interpolated value a
+ * Each series' gap fills, keyed by series name - the interpolated value a
  * `styles.gaps` zone gives each missing row, resolved per series like `segments`.
  */
 export function buildGapFillMaps<TData extends Record<string, unknown>, TStyle>(

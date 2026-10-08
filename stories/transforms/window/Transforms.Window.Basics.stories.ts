@@ -5,7 +5,7 @@ import { DAILY_TEMPERATURE, BUENOS_AIRES_TEMPERATURE } from '../../data/daily-te
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `windowY` transform slides a window of `k` rows along a marker's rows and
-// replaces each row's `y` with a reduction of the rows in its window — a moving
+// replaces each row's `y` with a reduction of the rows in its window - a moving
 // average, by default. The rows stay one per input row, in order, so a `line`
 // draws the smoothed curve where the raw one was. `windowX` does the same on `x`.
 // Demoed on an empty `LinePlot` canvas so only the markers are on screen.

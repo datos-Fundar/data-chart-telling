@@ -16,12 +16,14 @@ export type TextStyle = {
 	spacing: string;
 };
 
-export type ChartConfig = {
+/** How a chrome divider's line is drawn, as a CSS border style. */
+export type DividerLineStyle = 'solid' | 'dashed' | 'dotted' | 'double';
+
+export type PlotStylesConfig = {
 	// ── Base ──────────────────────────────────────────────────────────────────
 	font: string;
 	color: string;
 	background: string;
-	border: string;
 
 	// ── Spacing / padding ───────────────────────────────────────────────────────
 	spacing: {
@@ -29,6 +31,17 @@ export type ChartConfig = {
 		legendPadding: string;
 		captionPadding: string;
 		bleed: string;
+	};
+
+	// ── Divider ─────────────────────────────────────────────────────────────────
+	/** The line every `'divider'` in a plot's chrome `order` draws. */
+	divider: {
+		color: string;
+		/** Line thickness, e.g. `'1px'`. */
+		width: string;
+		style: DividerLineStyle;
+		/** Space around the line, as a CSS `margin`. */
+		margin: string;
 	};
 
 	// ── Text blocks ─────────────────────────────────────────────────────────────
@@ -94,7 +107,7 @@ export type ChartConfig = {
 					enabled: boolean;
 					/** How many px of horizontal slack the two labels need between them before they're considered overlapping (and flipped). */
 					margin: number;
-					/** Rotation magnitude applied once overlapping — lo rotates by this amount, hi by its negation, so both still grow inward toward the bar instead of off its edges. */
+					/** Rotation magnitude applied once overlapping - lo rotates by this amount, hi by its negation, so both still grow inward toward the bar instead of off its edges. */
 					rotate: string;
 				};
 			};
@@ -129,8 +142,8 @@ export type ChartConfig = {
 	// ── Plot geometry / colour ──────────────────────────────────────────────────
 	/**
 	 * Per-side plot margin. `'auto'` (the default) lets svelteplot size that
-	 * side to fit whatever it actually renders there — tick labels, an axis
-	 * title, rotated ticks — instead of clipping content or leaving unused
+	 * side to fit whatever it actually renders there - tick labels, an axis
+	 * title, rotated ticks - instead of clipping content or leaving unused
 	 * space. A number pins that side exactly, opting out of auto-sizing.
 	 */
 	margins: {
@@ -150,7 +163,7 @@ export type ChartConfig = {
 		strokeWidth: number;
 		dotRadius: number;
 		/**
-		 * Default gap-fill bridge styling (`LinePlot`'s `styles.gaps`) — the
+		 * Default gap-fill bridge styling (`LinePlot`'s `styles.gaps`) - the
 		 * fallback merged under whatever a gap zone's own `style` sets, the
 		 * same way `hover.rule`/`hover.dot` back every hover marker's style.
 		 */
@@ -158,7 +171,7 @@ export type ChartConfig = {
 	};
 	/** Default text-marker behavior. */
 	text: {
-		/** Geometry and connector of a decluttered text marker (`declutter`) — e.g. LinePlot's end-of-line value labels. */
+		/** Geometry and connector of a decluttered text marker (`declutter`) - e.g. LinePlot's end-of-line value labels. */
 		declutter: {
 			/** Shortest lane's distance (px) from the point before a connector bends. */
 			elbowGap: number;
@@ -172,18 +185,18 @@ export type ChartConfig = {
 	};
 	/** Default bar-mark styling. */
 	bar: {
-		/** Default gap-fill styling (`BarPlot`'s `styles.gaps`) — the fallback merged under whatever a gap zone's own `style` sets. */
+		/** Default gap-fill styling (`BarPlot`'s `styles.gaps`) - the fallback merged under whatever a gap zone's own `style` sets. */
 		gap: AreaStyle;
-		/** Gap (0–1) between the bars of side-by-side series within one category, as a fraction of each bar's slice. */
+		/** Gap (0-1) between the bars of side-by-side series within one category, as a fraction of each bar's slice. */
 		seriesPadding: number;
-		/** Fallback gap (0–1) *between* category groups on BarPlot's own category axis, when a plot doesn't set its own `scales.x/y.paddingInner`. */
+		/** Fallback gap (0-1) *between* category groups on BarPlot's own category axis, when a plot doesn't set its own `scales.x/y.paddingInner`. */
 		paddingInner: number;
-		/** Fallback gap (0–1) before the first and after the last category group on BarPlot's own category axis, when a plot doesn't set its own `scales.x/y.paddingOuter`. */
+		/** Fallback gap (0-1) before the first and after the last category group on BarPlot's own category axis, when a plot doesn't set its own `scales.x/y.paddingOuter`. */
 		paddingOuter: number;
 	};
 	/** Default pyramid-bar styling. */
 	pyramid: {
-		/** Default gap-fill styling (`PyramidPlot`'s `styles.gaps`) — the fallback merged under whatever a gap zone's own `style` sets. */
+		/** Default gap-fill styling (`PyramidPlot`'s `styles.gaps`) - the fallback merged under whatever a gap zone's own `style` sets. */
 		gap: AreaStyle;
 	};
 	/** Default area-plot styling. */
@@ -201,10 +214,16 @@ export type ChartConfig = {
 	/** Default scatter point geometry. */
 	scatter: { dotRadius: number };
 	/** Timeline gutter styling. */
-	timeline: { axisColor: string; activeColor: string; thickness: number };
+	timeline: {
+		axisColor: string;
+		activeColor: string;
+		thickness: number;
+		/** Space between a plot (or a composition's panels) and its timeline, as a CSS length. */
+		gap: string;
+	};
 	/**
 	 * In-SVG hover highlight: crosshair rule, dot + value label, and the area
-	 * highlight — a restyled feature on `GeoPlot`, or an `areaX`/`areaY` band
+	 * highlight - a restyled feature on `GeoPlot`, or an `areaX`/`areaY` band
 	 * on an axis-based plot's band scale.
 	 */
 	hover: { rule: StrokeStyle; dot: DotStyle; font: FontStyle; area: AreaStyle };
@@ -232,7 +251,7 @@ export type ChartConfig = {
 };
 
 /** Deep-partial input accepted by `setConfiguration`. */
-export type ChartConfigInput = DeepPartial<ChartConfig>;
+export type PlotStylesConfigInput = DeepPartial<PlotStylesConfig>;
 
 type DeepPartial<T> = {
 	[K in keyof T]?: T[K] extends (infer U)[] ? U[] : T[K] extends object ? DeepPartial<T[K]> : T[K];

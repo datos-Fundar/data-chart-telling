@@ -14,7 +14,7 @@ const rows = [
 /** The `stroke` a mark's path is painted with, from its inline style. */
 const strokeOf = (path: Element) => (path as SVGElement).style.stroke;
 
-describe('LinePlot – marker colors', () => {
+describe('LinePlot - marker colors', () => {
 	test('a line marker’s color channel strokes each grouping’s line in its own color', async () => {
 		const { container } = render(LinePlot, {
 			width: 400,

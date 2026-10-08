@@ -4,14 +4,14 @@ import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, WORLD_TEMPERATURE } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// `contour` draws marching-squares contour lines/bands from a scalar field —
+// `contour` draws marching-squares contour lines/bands from a scalar field -
 // mirrors svelteplot's `contour/weather` example: temperature readings at a
 // scatter of stations, spatially interpolated into smooth bands. `equirectangular`
 // (not `mercator`) here, deliberately: svelteplot's `Contour` mark always
 // interpolates over the plot's plain linear x/y scales (see
 // `GeoPlot`'s own `Plot.svelte`, where its `<PlotLayout x y>` call pins
 // them to the world lon/lat range), never through the active
-// projection the way every other geo-aware mark does — `equirectangular`'s x/y
+// projection the way every other geo-aware mark does - `equirectangular`'s x/y
 // truly are linear in lon/lat, so it's the one projection where that
 // mismatch doesn't produce a visible misalignment between the contour and
 // the coastlines under it.
@@ -44,8 +44,8 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Scatter-interpolation mode — `data` is a scatter of `x`/`y`/`value` rows
- * (here, a simulated world temperature grid — see `WORLD_TEMPERATURE`); the
+ * Scatter-interpolation mode - `data` is a scatter of `x`/`y`/`value` rows
+ * (here, a simulated world temperature grid - see `WORLD_TEMPERATURE`); the
  * mark spatially interpolates over a grid before running marching squares.
  * `stroke: 'value'` maps each contour level through the plot's color scale.
  */
@@ -67,12 +67,12 @@ export const TemperatureBands: Story = {
 };
 
 /**
- * Filled bands, drawn *behind* the base map — `fill: 'value'` shades each
+ * Filled bands, drawn *behind* the base map - `fill: 'value'` shades each
  * band (with `blur` smoothing the interpolated field), and `behind: true`
  * puts the whole contour under the base map's own stroke-only coastlines
  * instead of over them, so the borders stay crisp on top of the coloring
  * rather than the fill covering them (markers otherwise always draw over
- * the base map, regardless of position in `markers` — see `GeoSphereMarkerConfig.
+ * the base map, regardless of position in `markers` - see `GeoSphereMarkerConfig.
  * behind`'s doc comment for the same mechanism).
  */
 export const FilledBands: Story = {
@@ -94,7 +94,7 @@ export const FilledBands: Story = {
   },
 };
 
-/** Explicit thresholds — instead of a level count, an explicit array pins the exact temperature bands drawn. */
+/** Explicit thresholds - instead of a level count, an explicit array pins the exact temperature bands drawn. */
 export const ExplicitThresholds: Story = {
   args: {
     markers: [
@@ -114,13 +114,13 @@ export const ExplicitThresholds: Story = {
 
 /**
  * `clip: 'land'` masks the filled contour to just the base map's own
- * landmass, leaving the ocean bare — useful when the field only makes sense
+ * landmass, leaving the ocean bare - useful when the field only makes sense
  * over land (or the reverse, see `ClippedToOcean`). `behind: true` again
  * keeps the coastlines readable on top of the fill.
  */
 export const ClippedToLand: Story = {
   args: {
-    // No opaque base-map `fill` here, deliberately — the land-clipped
+    // No opaque base-map `fill` here, deliberately - the land-clipped
     // contour sits directly behind these coastlines, occupying the exact
     // same land shape, so an opaque fill on top of it would just paint
     // over it entirely.

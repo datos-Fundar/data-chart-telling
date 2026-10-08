@@ -3,7 +3,7 @@ import type { GeoFeaturesMarkerConfig } from '$lib/types/markers/geo';
 
 /**
  * Attaches GeoPlot's live hover pointer handlers onto the base `'geo'`
- * marker(s) built by the "markers" phase — the one piece that needs
+ * marker(s) built by the "markers" phase - the one piece that needs
  * `BasePlotLayout`'s own hover controller callbacks, so it can't be a phase.
  */
 export function attachFeatureHover<TRow extends Record<string, unknown> & { __id: string }>(

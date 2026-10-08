@@ -4,14 +4,14 @@
 	import type { RegressionMarkerConfig } from '$lib/types/markers/common';
 
 	/**
-	 * Renders one `'regression'` marker — a fitted curve (svelteplot's
+	 * Renders one `'regression'` marker - a fitted curve (svelteplot's
 	 * `RegressionX`/`RegressionY`), with a confidence band shown by default
 	 * (svelteplot's own default `confidence` is `0.99`; set `confidence:
 	 * false` to omit it). `RegressionX` or `RegressionY` is picked from the plot's
 	 * axis scale types (see `isHorizontalFor`).
 	 *
 	 * Confirmed empirically: the band always renders in the same color as
-	 * `stroke`, at a fixed low opacity — its own `fill` prop takes no
+	 * `stroke`, at a fixed low opacity - its own `fill` prop takes no
 	 * author-supplied value (any literal or per-row function alike renders
 	 * identically); passing it at all is only what turns the band on, so
 	 * it's set here as a fixed placeholder gated on `confidence` being

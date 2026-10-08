@@ -17,7 +17,7 @@ function opacitiesOf(svg: SVGElement, selector: string): number[] {
 	});
 }
 
-describe('opacity channel – plot level (Heatmap)', () => {
+describe('opacity channel - plot level (Heatmap)', () => {
 	const DATA = [
 		{ x: 'a', y: 'row', v: 0 },
 		{ x: 'b', y: 'row', v: 50 },
@@ -39,7 +39,7 @@ describe('opacity channel – plot level (Heatmap)', () => {
 
 		const scale = resolveOpacityScale({ domain: [0, 100], range: [0, 1] }, [0, 100], [0.2, 1]);
 		const opacities = opacitiesOf(svg, 'g.cell rect');
-		// Bucketed + quantized to 1/32 steps — compare rounded to avoid flakiness.
+		// Bucketed + quantized to 1/32 steps - compare rounded to avoid flakiness.
 		expect(opacities.map((o) => Math.round(o * 32) / 32)).toEqual(
 			DATA.map((d) => Math.round(scale(d.v) * 32) / 32)
 		);
@@ -58,7 +58,7 @@ describe('opacity channel – plot level (Heatmap)', () => {
 	});
 });
 
-describe('opacity channel – plot level (Geo)', () => {
+describe('opacity channel - plot level (Geo)', () => {
 	function nameOf(f: { properties: unknown }): string {
 		return (f.properties as ArgentinaProvinceProps).nombre;
 	}
@@ -84,7 +84,7 @@ describe('opacity channel – plot level (Geo)', () => {
 	});
 });
 
-describe('opacity channel – plot level (Scatter)', () => {
+describe('opacity channel - plot level (Scatter)', () => {
 	function dotOpacitiesOf(svg: SVGElement): number[] {
 		return Array.from(svg.querySelectorAll('g.dot path')).map((el) => {
 			const style = el.getAttribute('style') ?? '';
@@ -94,7 +94,7 @@ describe('opacity channel – plot level (Scatter)', () => {
 	}
 
 	/**
-	 * Regression: same class of bug as `SymbolChannel.PlotLevel`'s own —
+	 * Regression: same class of bug as `SymbolChannel.PlotLevel`'s own -
 	 * `color` splits data into one series per region, so `opacity`'s domain
 	 * must be computed once, globally, across every series' combined rows,
 	 * not per marker call (each of which only sees one series' own slice).

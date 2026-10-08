@@ -1,9 +1,9 @@
-import type { ChartConfigInput } from '$lib/types/configuration/styling';
+import type { PlotStylesConfigInput } from '$lib/types/configuration/styling';
 
-export const EDITORIAL_THEME: ChartConfigInput = {
+export const EDITORIAL_THEME: PlotStylesConfigInput = {
 	font: 'Georgia, "Times New Roman", serif',
 	color: '#2b2118',
-	border: 'color-mix(in srgb, #2b2118 20%, transparent)',
+	divider: { color: 'color-mix(in srgb, #2b2118 20%, transparent)' },
 	title: { size: '1.9rem', weight: 700, leading: '1.1', spacing: '-0.01em' },
 	subtitle: { color: '#8a6d3b', size: '1.05rem' },
 	caption: { color: '#8a6d3b' },

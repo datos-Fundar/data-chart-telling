@@ -3,14 +3,14 @@ import LinePlot from '$lib/plots/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `difference` marker (svelteplot's own `DifferenceY`) — shaded area
+// A `difference` marker (svelteplot's own `DifferenceY`) - shaded area
 // between two series, colored by which one is on top at each point. No
 // `isHorizontal`: svelteplot ships only `DifferenceY`, so this always
 // compares two `y` series over a shared `x`. Hosted on a `LinePlot` with the
 // same rows as its own series, so the host and the marker share one scale.
 // The demo series cross twice, so both bands (and the switch between them) show.
 
-/** Actual vs. target output per year — actual starts below target, overtakes it, then falls back under. */
+/** Actual vs. target output per year - actual starts below target, overtakes it, then falls back under. */
 const COMPARISON = [
 	{ year: 2008, actual: 72.0, target: 74.0 },
 	{ year: 2009, actual: 73.2, target: 74.6 },
@@ -53,7 +53,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Actual (`y1`) vs. target (`y2`) — red where actual is above target, blue where it falls below; the two bands meet where the series cross. */
+/** Actual (`y1`) vs. target (`y2`) - red where actual is above target, blue where it falls below; the two bands meet where the series cross. */
 export const Basic: Story = {
 	args: {
 		markers: [

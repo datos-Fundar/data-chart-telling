@@ -35,7 +35,7 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Single series with explicit series object — data is grouped into one series
+ * Single series with explicit series object - data is grouped into one series
  * with x, y, color dimensions mapping to 'province', 'sex', and 'value' fields.
  *
  * The heatmap displays life expectancy across provinces and sex.
@@ -55,7 +55,7 @@ export const Default: Story = {
 };
 
 /**
- * Alternative data structure — the same grid built from two separate
+ * Alternative data structure - the same grid built from two separate
  * per-sex series instead of one combined array. Each series only carries
  * its own row of cells; `HeatmapPlot` merges every series' data onto the
  * same x/y/color accessors before drawing.
@@ -82,7 +82,7 @@ export const TwoSeriesBySex: Story = {
 };
 
 /**
- * Using data + x + y + color shorthand — alternative to passing a series array.
+ * Using data + x + y + color shorthand - alternative to passing a series array.
  * Equivalent to the Default story but with less boilerplate.
  */
 export const UsingDataShorthand: Story = {

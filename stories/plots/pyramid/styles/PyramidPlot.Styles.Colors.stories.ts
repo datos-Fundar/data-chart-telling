@@ -31,7 +31,7 @@ const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * No style overrides — the plot uses the configured theme defaults.
+ * No style overrides - the plot uses the configured theme defaults.
  * The palette chooses colors for left/right (female/male) automatically.
  */
 export const Default: Story = {
@@ -45,7 +45,7 @@ export const Default: Story = {
 };
 
 /**
- * Custom colors via `scales.color` — a `Record<string, string>` scheme maps
+ * Custom colors via `scales.color` - a `Record<string, string>` scheme maps
  * each series *name* directly to a color, overriding the default palette
  * cycling. Works regardless of which side a name lands on, and however many
  * series exist (not limited to exactly two).
@@ -64,7 +64,7 @@ export const CustomColorsViaScalesColor: Story = {
 };
 
 /**
- * Custom colors via `segments` — keying a segment group by series name and
+ * Custom colors via `segments` - keying a segment group by series name and
  * setting its own `style.fill` overrides that one series' color directly,
  * the same mechanism used for per-series styling everywhere else in this
  * package (see `Plots/PyramidPlot/Segments`).

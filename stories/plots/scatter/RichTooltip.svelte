@@ -8,7 +8,7 @@
 	const cfg = getConfiguration();
 
 	// Region order matches `color`'s first-appearance order in COUNTRIES, which
-	// is what drives colour assignment inside ScatterPlot — kept in lockstep here
+	// is what drives colour assignment inside ScatterPlot - kept in lockstep here
 	// since `content` only gets the raw row back, not its resolved colour.
 	const REGIONS = ['Americas', 'Europe', 'Asia', 'Africa'] as const;
 	const REGION_COLORS = REGIONS.map((_, i) => paletteColor(i, cfg.palette));
@@ -50,7 +50,6 @@
 		y="lifeExpectancy"
 		color="region"
 		tooltip={{
-			facetId: '',
 			sync: false,
 			format: (row) => {
 				const { country, gdpPerCapita, lifeExpectancy } = row as CountryPoint;

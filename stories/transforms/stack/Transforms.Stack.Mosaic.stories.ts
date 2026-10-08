@@ -38,7 +38,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** The mosaic's cells, colored by sales channel, each labelled with its sales — short enough to fit even the narrowest cell. */
+/** The mosaic's cells, colored by sales channel, each labelled with its sales - short enough to fit even the narrowest cell. */
 const mosaic = (transform: MarkerTransform): AxisBasedMarkersConfig[] => [
 	{
 		type: 'rect',
@@ -63,12 +63,12 @@ const mosaic = (transform: MarkerTransform): AxisBasedMarkersConfig[] => [
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** Columns by region — Pampas, Cuyo, Patagonia, Northwest, left to right — each as wide as its sales; within each one, the channels' shares. */
+/** Columns by region - Pampas, Cuyo, Patagonia, Northwest, left to right - each as wide as its sales; within each one, the channels' shares. */
 export const MosaicX: Story = {
 	args: { markers: mosaic({ type: 'stackMosaicX', value: 'sales' }) }
 };
 
-/** `percentX` and `percentY`: both axes as fractions of the whole — region shares along `x`, channel shares within each region along `y`. */
+/** `percentX` and `percentY`: both axes as fractions of the whole - region shares along `x`, channel shares within each region along `y`. */
 export const Percent: Story = {
 	args: {
 		scales: {
@@ -79,7 +79,7 @@ export const Percent: Story = {
 	}
 };
 
-/** `stackMosaicY`: rows by region instead — Pampas at the bottom, Northwest at the top — each as tall as its sales, split along `x` by channel. */
+/** `stackMosaicY`: rows by region instead - Pampas at the bottom, Northwest at the top - each as tall as its sales, split along `x` by channel. */
 export const MosaicY: Story = {
 	args: {
 		scales: { x: { label: 'Sales, by channel' }, y: { label: 'Sales, by region' } },

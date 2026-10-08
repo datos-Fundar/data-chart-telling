@@ -16,7 +16,7 @@ import type { AxisValue } from '$lib/types/layout/mapping';
 
 const GAP_KINDS = ['start', 'middle', 'end'] as const;
 
-/** A gap-fill row tagged with its resolved signed value as a plain field — see the note on `taggedData` below. */
+/** A gap-fill row tagged with its resolved signed value as a plain field - see the note on `taggedData` below. */
 type GapFillRow<TData> = TData & { __gapValue: number };
 
 function signFor<TData extends Record<string, unknown>>(
@@ -88,8 +88,8 @@ export function buildValueLabelMarkers<TData extends Record<string, unknown>>(
 /**
  * PyramidPlot's "markers" phase: one `role: 'segment'` bar per visual
  * segment, always horizontal (category on y, signed magnitude on x) and with
- * no insets — prepended onto whatever the "statistics" phase already put in
- * `state.markers`. Emits no `role: 'hitArea'` markers — PyramidPlot's hover
+ * no insets - prepended onto whatever the "statistics" phase already put in
+ * `state.markers`. Emits no `role: 'hitArea'` markers - PyramidPlot's hover
  * matches nearest points rather than hit-testing category bands.
  */
 export function buildMarkers<TData extends Record<string, unknown>>(
@@ -106,7 +106,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 	const markers: BarMarkerConfig[] = [];
 	for (const group of groupedSeries!) {
 		// Forwarded raw (a field key or function, whatever `series.x` is)
-		// rather than pre-resolved into a closure — svelteplot's own
+		// rather than pre-resolved into a closure - svelteplot's own
 		// `resolve()` already handles a field-key string per row, and only a
 		// literal string (not a function) lets its axis-title auto-inference
 		// see the field name. `keyof TData` is always a real string key in
@@ -149,7 +149,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 			);
 			// svelteplot shallow-clones each row before invoking a mark's own
 			// geometry accessors, so a `fillMap.get(d)` lookup inside `x2` would
-			// see a clone, not the original key — tag the resolved value onto the
+			// see a clone, not the original key - tag the resolved value onto the
 			// row as a plain field instead, which survives that clone.
 			const taggedData: GapFillRow<TData>[] = filledRows.map((d) => ({
 				...d,

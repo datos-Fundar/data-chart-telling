@@ -1,5 +1,6 @@
 import { getHover, createHover } from '$lib/layout/tooltip/hover.svelte';
 import { createHoverController } from '$lib/layout/tooltip/controller.svelte';
+import { getHoverScope } from '$lib/layout/tooltip/hoverScope';
 import type { HoverConfig } from '$lib/types/plots/props';
 import type { AxisValue } from '$lib/types/layout/mapping';
 
@@ -12,6 +13,7 @@ export function createPlotHover<TData extends Record<string, unknown>>(args: {
 	height: () => number;
 }) {
 	const sharedHover = getHover();
+	const scope = getHoverScope();
 	const localHover = createHover();
 	const hoverStore = $derived(sharedHover ?? localHover);
 
@@ -23,7 +25,7 @@ export function createPlotHover<TData extends Record<string, unknown>>(args: {
 
 	const ctrl = createHoverController<TData>({
 		hover: () => hoverStore,
-		facetId: () => args.hover().tooltip?.facetId ?? '',
+		facetId: scope,
 		points: () => args.hover().points,
 		getX: args.getX,
 		getY: args.getY,

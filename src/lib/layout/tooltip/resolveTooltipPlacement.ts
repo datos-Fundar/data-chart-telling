@@ -5,7 +5,7 @@ const EDGE_MARGIN = 6;
 
 type AxisAnchor = 'before' | 'middle' | 'after';
 
-/** Anchors tried in order for a given preference — the opposite side is always the last resort. */
+/** Anchors tried in order for a given preference - the opposite side is always the last resort. */
 function candidateOrder(anchor: AxisAnchor): AxisAnchor[] {
   if (anchor === 'before') return ['before', 'middle', 'after'];
   if (anchor === 'after') return ['after', 'middle', 'before'];
@@ -39,14 +39,14 @@ function resolveAxis(pos: number, size: number, boundsSize: number, anchor: Axis
  * point, honoring a preferred anchor per axis and falling back toward the
  * opposite side (via the centered position) when the preferred side would
  * push it past `bounds`. Used by `Tooltip.svelte` for both the default box
- * and any custom `content` snippet — both go through the same placement.
+ * and any custom `content` snippet - both go through the same placement.
  */
 export function resolveTooltipPlacement(args: {
   x: number;
   y: number;
   boxWidth: number;
   boxHeight: number;
-  /** Box the tooltip must stay within — usually the hosting plot's width/height. */
+  /** Box the tooltip must stay within - usually the hosting plot's width/height. */
   bounds?: { width: number; height: number };
   anchorX: TooltipAnchorX;
   anchorY: TooltipAnchorY;

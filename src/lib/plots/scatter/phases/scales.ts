@@ -1,19 +1,12 @@
 import { processedPosition } from '$lib/layout/phases/transforms';
-import { numericMargin } from '$lib/layout/plot/margins';
+import { numericMargin } from '$lib/layout/base/margins';
 import { markerAxisValues } from '$lib/utils/markerAxisValues';
 import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/scatter/state';
 
 /** Stand-in max render radius for a channel-bound `r` (svelteplot's own auto sqrt scale). */
 const AUTO_SCALED_RADIUS_ESTIMATE = 20;
 
-/**
- * Extends a `[min, max]` data domain so the largest rendered dot radius
- * doesn't get clipped by the plot's own frame — svelteplot's own `'auto'`
- * margin only measures axis chrome (tick labels), never mark geometry.
- * `innerSizePx` is an estimate (the real pixel range isn't known until the
- * scale itself is built from this domain), so this errs generous rather
- * than exact.
- */
+/** Extends a data domain so the largest dot radius isn't clipped by the frame; `innerSizePx` is an estimate. */
 export function resolveRadiusPaddedDomain(
 	values: number[],
 	maxRadiusPx: number,
@@ -24,7 +17,7 @@ export function resolveRadiusPaddedDomain(
 	const min = Math.min(...finite);
 	const max = Math.max(...finite);
 	if (min === max) {
-		// A degenerate single-value domain has no data-per-pixel ratio to pad by — fall back to a fixed unit either side.
+		// A degenerate single-value domain has no data-per-pixel ratio to pad by - fall back to a fixed unit either side.
 		return [min - 1, max + 1];
 	}
 	const dataPerPixel = (max - min) / innerSizePx;
@@ -61,9 +54,7 @@ export function buildScales<TData extends Record<string, unknown>>(
 	const extraX = markerAxisValues(state.markers ?? [], 'x');
 	const extraY = markerAxisValues(state.markers ?? [], 'y');
 
-	// The largest radius any dot will actually render at — estimated from the
-	// resolved `r` channel and each segment's own style, not from built
-	// markers (this phase runs before "markers").
+	// The largest radius a dot renders at, estimated from the `r` channel and segment styles.
 	const r = channels!.r;
 	const maxDotRadius =
 		typeof r === 'number'

@@ -4,7 +4,7 @@ import { COUNTRIES } from '../../../plots/scatter/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `statistics: [{ type: 'density2d' }]` resolves straight to svelteplot's own
-// `Density` mark — 2D kernel density contour bands over the plot's `x`/`y`,
+// `Density` mark - 2D kernel density contour bands over the plot's `x`/`y`,
 // the same mark a `density` marker draws. Same options as that marker:
 // `bandwidth` in pixels, `thresholds` for the band count or explicit levels.
 

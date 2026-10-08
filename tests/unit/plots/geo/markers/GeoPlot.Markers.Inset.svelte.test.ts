@@ -11,7 +11,7 @@ function countInsetPaths(svg: SVGElement): number {
 
 const featureId = (f: { properties: unknown }) => (f.properties as ArgentinaProvinceProps).nombre;
 
-describe('GeoPlot – inset marker', () => {
+describe('GeoPlot - inset marker', () => {
   test('filters the plot\'s own data by feature name', async () => {
     const { container } = render(GeoPlot, {
       width: 400,
@@ -145,7 +145,7 @@ describe('GeoPlot – inset marker', () => {
     const filteredCount = countInsetPaths(filteredSvg);
 
     // A single <path> per feature either way (the inset renders one <path>
-    // per matched feature, not per part) — but the filtered geometry should
+    // per matched feature, not per part) - but the filtered geometry should
     // differ from the unfiltered one, so the rendered `d` attribute changes.
     expect(unfilteredCount).toBe(1);
     expect(filteredCount).toBe(1);

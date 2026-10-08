@@ -7,6 +7,7 @@ import {
 	LIFE_EXPECTANCY_BY_PROVINCE,
 	type ProvincePoint
 } from './data';
+import { TIME_SERIES } from '../../data/time-series';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -47,7 +48,7 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * No scale overrides — both axes are auto-fitted to the data extent.
+ * No scale overrides - both axes are auto-fitted to the data extent.
  */
 export const Default: Story = {
 	args: {
@@ -63,7 +64,7 @@ export const Default: Story = {
 };
 
 /**
- * Constrained Y domain — tightens the visible range to [75, 88], which makes
+ * Constrained Y domain - tightens the visible range to [75, 88], which makes
  * the variation in life expectancy more visible. Compare with `Default` to see
  * how the bars appear more spread out when the Y range is reduced.
  */
@@ -84,7 +85,7 @@ export const CustomYDomain: Story = {
 };
 
 /**
- * Axis labels — a human-readable string appears alongside each axis.
+ * Axis labels - a human-readable string appears alongside each axis.
  * Passing `false` to `label` suppresses the label svelteplot would infer
  * from the field name.
  */
@@ -106,7 +107,7 @@ export const WithAxisLabels: Story = {
 };
 
 /**
- * Reversed Y axis — values increase downward instead of upward.
+ * Reversed Y axis - values increase downward instead of upward.
  * Useful for rankings where lower numbers are better.
  */
 export const ReversedY: Story = {
@@ -126,7 +127,7 @@ export const ReversedY: Story = {
 };
 
 /**
- * Grid lines on the Y axis — adds horizontal reference lines at every tick,
+ * Grid lines on the Y axis - adds horizontal reference lines at every tick,
  * making it easier to read off individual values without a ruler.
  */
 export const WithGrid: Story = {
@@ -146,7 +147,7 @@ export const WithGrid: Story = {
 };
 
 /**
- * Custom tick formatter on Y — the function receives the raw tick value and
+ * Custom tick formatter on Y - the function receives the raw tick value and
  * returns the display string. Here it appends " yr" to every label.
  */
 export const CustomTickFormat: Story = {
@@ -190,7 +191,7 @@ export const RotatedXTicks: Story = {
 };
 
 /**
- * Zero-anchored Y axis — `zero: true` forces the Y domain to include 0
+ * Zero-anchored Y axis - `zero: true` forces the Y domain to include 0
  * even when all data values are far above it. Makes relative magnitudes
  * honest but compresses the visible trend significantly.
  */
@@ -213,7 +214,7 @@ export const ZeroAnchoredY: Story = {
 /**
  * Bars ordered by their own Y value (descending) instead of the default
  * alphabetical order of the X category. `scales.x.sort` receives the full
- * row on each side — not just the X value — so the comparator can read
+ * row on each side - not just the X value - so the comparator can read
  * `value` (or any other field) to decide the order.
  */
 export const SortXByYDescending: Story = {
@@ -256,7 +257,7 @@ export const CombinedOverrides: Story = {
 // `stackY` transform stacks them instead.
 
 /**
- * Default layout — each series gets its own slice of the category band, side
+ * Default layout - each series gets its own slice of the category band, side
  * by side. The slice width is only an estimate (derived from this plot's own
  * width/margins, not svelteplot's actual measured scale), so it can be
  * slightly off when an `'auto'` margin ends up wider than expected. The gap
@@ -289,8 +290,8 @@ export const StackedSeries: Story = {
 
 /**
  * `scales.x.paddingInner` widens the gap *between* categories (provinces),
- * which — since side-by-side series estimate their slice width off the same band-scale
- * formula — also narrows every series' own bars accordingly.
+ * which - since side-by-side series estimate their slice width off the same band-scale
+ * formula - also narrows every series' own bars accordingly.
  */
 export const WideGroupSpacing: Story = {
 	args: {
@@ -306,14 +307,14 @@ export const WideGroupSpacing: Story = {
 
 // ── Orientation (horizontal bars) ──────────────────────────────────────────────
 // `scales.x`/`scales.y` always describe *that visual axis*, regardless of
-// which data field ends up there — marking `scales.y.type: 'categorical'`
+// which data field ends up there - marking `scales.y.type: 'categorical'`
 // says "the category is drawn on Y this time", swapping BarPlot from its
 // default `BarY` (vertical) to `BarX` (horizontal). `x` is categorical by
-// default; marking both (or presumably relying on neither) is ambiguous —
+// default; marking both (or presumably relying on neither) is ambiguous -
 // BarPlot warns and falls back to vertical.
 
 /**
- * Horizontal bars — `scales.y.type: 'categorical'` puts the province names
+ * Horizontal bars - `scales.y.type: 'categorical'` puts the province names
  * on the Y axis and life expectancy (the value) on X.
  */
 export const HorizontalBars: Story = {
@@ -333,7 +334,7 @@ export const HorizontalBars: Story = {
 };
 
 /**
- * Horizontal bars with several series — the two series sit side by side
+ * Horizontal bars with several series - the two series sit side by side
  * within each category's row, as they do vertically by default.
  */
 export const HorizontalGroupedSeries: Story = {
@@ -349,7 +350,7 @@ export const HorizontalGroupedSeries: Story = {
 };
 
 /**
- * `HorizontalGroupedSeries` with a plot-level `stackY` — the two series stack
+ * `HorizontalGroupedSeries` with a plot-level `stackY` - the two series stack
  * end to end along each category's row. It's still `stackY`, not `stackX`:
  * `y` is the value even when the bars run horizontally.
  */
@@ -357,5 +358,41 @@ export const HorizontalStackedSeries: Story = {
 	args: {
 		...HorizontalGroupedSeries.args,
 		transforms: [{ type: 'stackY' as const }]
+	}
+};
+
+const YEARLY_VALUES = TIME_SERIES.filter((d) => d.region === 'South');
+
+/**
+ * Numeric categories, like years. With both `x` and `y` numeric, nothing in
+ * the data says which one holds the categories - and a bar on a continuous
+ * axis has no band to stand in, so it used to draw nothing at all. A bar
+ * plot's category axis (`x`, unless `scales.y.type` says otherwise) is
+ * therefore always a band scale: each year gets its own band. Writing
+ * `scales: { x: { type: 'categorical' } }` says the same thing explicitly.
+ */
+export const NumericCategories: Story = {
+	args: {
+		data: YEARLY_VALUES,
+		x: 'year',
+		y: 'value',
+		color: 'metric',
+		scales: { x: { type: 'categorical' } }
+	}
+};
+
+/**
+ * The same years drawn as horizontal bars: `x` still names the categories,
+ * and `scales.y.type: 'categorical'` moves them onto the vertical axis.
+ * With numeric categories this flag is the only way to say which way the
+ * bars should run - the values alone can't tell.
+ */
+export const NumericCategoriesHorizontal: Story = {
+	args: {
+		data: YEARLY_VALUES,
+		x: 'year',
+		y: 'value',
+		color: 'metric',
+		scales: { y: { type: 'categorical' } }
 	}
 };

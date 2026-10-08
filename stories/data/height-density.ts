@@ -6,7 +6,7 @@ export type HeightDensity = { height: number; sex: 'male' | 'female'; density: n
 const normal = (x: number, mean: number, sd: number) =>
 	Math.exp(-((x - mean) ** 2) / (2 * sd * sd)) / (sd * Math.sqrt(2 * Math.PI));
 
-/** Height density per centimetre, as a percent — one normal curve per sex. */
+/** Height density per centimetre, as a percent - one normal curve per sex. */
 export const HEIGHT_DENSITY: HeightDensity[] = Array.from(
 	{ length: 61 },
 	(_, i) => 140 + i

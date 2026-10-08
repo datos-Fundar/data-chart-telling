@@ -8,7 +8,7 @@ import {
 } from '../../../../stories/plots/bar/data';
 import { waitForSvg, countBarRects } from '../_helpers/svg';
 
-describe('BarPlot – series prop', () => {
+describe('BarPlot - series prop', () => {
 	test('renders an SVG', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
@@ -55,7 +55,7 @@ describe('BarPlot – series prop', () => {
 	});
 });
 
-describe('BarPlot – grouped data (data/x/y/color)', () => {
+describe('BarPlot - grouped data (data/x/y/color)', () => {
 	test('creates one set of bars per unique color value', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,

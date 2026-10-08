@@ -5,7 +5,7 @@ import { buildGroupedSeries } from '$lib/plots/utils/segments';
 import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/scatter/state';
 import type { Series } from '$lib/types/plots/data/common';
 import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
-import type { ChartConfig } from '$lib/types/configuration/styling';
+import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { DotMarkerConfig } from '$lib/types/markers/common';
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
@@ -31,18 +31,18 @@ function build(
 		...overrides
 	};
 	const ctx: ScatterPlotCtx = {
-		cfg: { scatter: { dotRadius: 4 } } as ChartConfig,
+		cfg: { scatter: { dotRadius: 4 } } as PlotStylesConfig,
 		legendInteraction: undefined,
 		...ctxOverrides
 	};
 	// No `authorMarkers`/`statistics` given, so the real output is exactly
-	// this phase's own dots — narrowed back from the state's broader
+	// this phase's own dots - narrowed back from the state's broader
 	// accumulating `markers` union.
 	return buildMarkers(buildTransforms<typeof state>()(state, ctx), ctx)
 		.markers as DotMarkerConfig[];
 }
 
-describe('buildMarkers – radius channel', () => {
+describe('buildMarkers - radius channel', () => {
 	test('leaves r undefined when no radius was given', () => {
 		const [marker] = build();
 		expect(marker.r).toBeUndefined();
@@ -68,7 +68,7 @@ describe('buildMarkers – radius channel', () => {
 	});
 });
 
-describe('buildMarkers – style resolution', () => {
+describe('buildMarkers - style resolution', () => {
 	test('falls back to the default color when a segment has none of its own', () => {
 		const [marker] = build({ colorForSeries: () => 'green' });
 		expect(marker.styles?.dotFill).toBe('green');

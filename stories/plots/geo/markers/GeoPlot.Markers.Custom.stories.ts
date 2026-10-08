@@ -4,7 +4,7 @@ import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, WEATHER_STATIONS, type WeatherStation } from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// `component` mounts an arbitrary Svelte component as a mark — the same
+// `component` mounts an arbitrary Svelte component as a mark - the same
 // generic mark components other plot kinds already use (`DotMarker`,
 // `TextMarker`) work here too: their `x`/`y` accessors just receive
 // longitude/latitude instead of a linear axis value, since GeoPlot's `<Plot
@@ -37,7 +37,7 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** `DotMarker` places a dot at every row's lon/lat — an alternative to the built-in `dot` marker type when you want the exact same component other plot kinds use. */
+/** `DotMarker` places a dot at every row's lon/lat - an alternative to the built-in `dot` marker type when you want the exact same component other plot kinds use. */
 export const WithDotMarker: Story = {
   args: {
     markers: [
@@ -52,7 +52,7 @@ export const WithDotMarker: Story = {
   },
 };
 
-/** `TextMarker` renders a label at every row's lon/lat — here, each station's city name above its position. */
+/** `TextMarker` renders a label at every row's lon/lat - here, each station's city name above its position. */
 export const WithTextMarker: Story = {
   args: {
     markers: [

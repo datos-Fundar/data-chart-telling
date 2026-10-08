@@ -5,7 +5,7 @@ import { buildBarKind } from '$lib/plots/bar/kind';
 import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/bar/state';
 import type { Series } from '$lib/types/plots/data/common';
 import type { LegendInteractionStore } from '$lib/types/layout/legend';
-import type { ChartConfig } from '$lib/types/configuration/styling';
+import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 
 const buildData = stageOf(buildBarKind<Row>(), 'data');
 
@@ -14,7 +14,7 @@ const buildData = stageOf(buildBarKind<Row>(), 'data');
 type Row = { category: string; value: number | null };
 
 const PALETTE = ['red', 'green', 'blue'];
-const FAKE_CFG = { palette: PALETTE } as ChartConfig;
+const FAKE_CFG = { palette: PALETTE } as PlotStylesConfig;
 
 function series(name: string, data: Row[]): Series<Row> {
 	return { name, x: 'category', y: 'value', data };
@@ -52,7 +52,7 @@ function build(
 
 // ── Series resolution ─────────────────────────────────────────────────────────
 
-describe('buildData – series resolution', () => {
+describe('buildData - series resolution', () => {
 	test('passes through an explicit series array', () => {
 		const result = build({ series: [series('a', []), series('b', [])] });
 		expect(result.resolvedSeries.map((s) => s.name)).toEqual(['a', 'b']);
@@ -98,7 +98,7 @@ describe('buildData – series resolution', () => {
 
 // ── Legend filtering ──────────────────────────────────────────────────────────
 
-describe('buildData – legend filtering', () => {
+describe('buildData - legend filtering', () => {
 	test('drops a series disabled with mode: omit', () => {
 		const result = build({ series: [series('a', []), series('b', [])] }, legendDisabling('b'));
 		expect(result.resolvedSeries.map((s) => s.name)).toEqual(['a']);
@@ -107,7 +107,7 @@ describe('buildData – legend filtering', () => {
 	test('color index is stable by the full (pre-filter) series list, not the filtered one', () => {
 		const withoutFilter = build({ series: [series('a', []), series('b', [])] });
 		const withFilter = build({ series: [series('a', []), series('b', [])] }, legendDisabling('a'));
-		// "b" is index 1 in the full list either way — omitting "a" must not
+		// "b" is index 1 in the full list either way - omitting "a" must not
 		// renumber "b" down to index 0 and shift its color.
 		expect(withFilter.colorForSeries('b')).toBe(withoutFilter.colorForSeries('b'));
 	});
@@ -115,7 +115,7 @@ describe('buildData – legend filtering', () => {
 
 // ── Color ─────────────────────────────────────────────────────────────────────
 
-describe('buildData – colorForSeries', () => {
+describe('buildData - colorForSeries', () => {
 	test('assigns palette colors by series declaration order', () => {
 		const result = build({ series: [series('a', []), series('b', []), series('c', [])] });
 		expect(result.colorForSeries('a')).toBe(PALETTE[0]);
@@ -126,7 +126,7 @@ describe('buildData – colorForSeries', () => {
 
 // ── Grouped series (segments) ─────────────────────────────────────────────────
 
-describe('buildData – groupedSeries', () => {
+describe('buildData - groupedSeries', () => {
 	test('one group per resolved series, covering all of its data by default', () => {
 		const data = [
 			{ category: 'X', value: 1 },
@@ -141,7 +141,7 @@ describe('buildData – groupedSeries', () => {
 
 // ── Gap fills ─────────────────────────────────────────────────────────────────
 
-describe('buildData – gapFillMaps', () => {
+describe('buildData - gapFillMaps', () => {
 	test('has no entries when no gap zones are configured', () => {
 		const result = build({
 			series: [series('a', [{ category: 'X', value: null }])],
@@ -168,7 +168,7 @@ describe('buildData – gapFillMaps', () => {
 
 // ── Scoped groups ─────────────────────────────────────────────────────────────
 
-describe('buildData – scopedGroups', () => {
+describe('buildData - scopedGroups', () => {
 	test('one scoped group per resolved series, carrying its own name/color/data', () => {
 		const result = build({ series: [series('a', [{ category: 'X', value: 1 }])] });
 		expect(result.scopedGroups).toHaveLength(1);

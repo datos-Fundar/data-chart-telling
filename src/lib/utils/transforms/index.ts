@@ -83,7 +83,7 @@ const ADAPTERS: Record<MarkerTransform['type'], TransformAdapter> = {
 const INHERITED_CHANNELS = ['x', 'y', 'x1', 'x2', 'y1', 'y2'] as const;
 
 /**
- * Runs one transform through svelteplot and returns what it produces — the
+ * Runs one transform through svelteplot and returns what it produces - the
  * transform's own output, ready to spread into the marker's props. A marker
  * transform is one flat object, so its props are split once: the ones the
  * transform reads as channels go first, and the rest (a stack's `offset`, a
@@ -146,7 +146,7 @@ export function resolveTransforms<T extends object>(marker: T, fallbackData: Row
 
 /**
  * Applies each transform type's `finish` fix to a marker drawing rows those
- * transforms produced, once per type used — for a marker built from rows that
+ * transforms produced, once per type used - for a marker built from rows that
  * were transformed before it existed (a plot's own processed data).
  */
 export function finishTransforms<T extends object>(marker: T, transforms: MarkerTransform[]): T {

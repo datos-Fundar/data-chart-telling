@@ -4,7 +4,7 @@ import LinePlot from '$lib/plots/line/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import { waitForSvg } from '../../_helpers/svg';
 
-// A pinned `scales.y.domain` (the shape a timeline-scrubbing caller uses —
+// A pinned `scales.y.domain` (the shape a timeline-scrubbing caller uses -
 // see `LinePlot.Plot.svelte`'s own `valueLabelFloor` doc comment) is what
 // lets the floor stay stable across `data` revealing more of the same
 // range, tick by tick, instead of tracking whatever's currently visible.
@@ -33,7 +33,7 @@ function seriesUpTo(year: number) {
 	];
 }
 
-describe('LinePlot – rightward value labels reserve room up front', () => {
+describe('LinePlot - rightward value labels reserve room up front', () => {
 	test("the right margin already fits the pinned domain's widest label on the very first render", async () => {
 		const withLabels = await render(LinePlot, { ...renderProps, series: seriesUpTo(2016) });
 		const withoutLabels = await render(LinePlot, {
@@ -49,12 +49,12 @@ describe('LinePlot – rightward value labels reserve room up front', () => {
 
 	test('settles onto a stable margin within the first tick of a timeline scrubber, not one per tick', async () => {
 		// The precomputed floor gets the plot within ~1-2px on mount and on
-		// every subsequent tick — close enough that the residual DOM-measured
+		// every subsequent tick - close enough that the residual DOM-measured
 		// fallback (see `labelOverflow.svelte.ts`) needs at most one more
 		// correction, on whichever render first has real declutter/connector
 		// geometry to measure, not one on every tick thereafter. Before the
 		// floor existed, *every* tick below remounted (verified by diffing
-		// against the pre-floor implementation) — this asserts the fix: at
+		// against the pre-floor implementation) - this asserts the fix: at
 		// most one remount total across the whole scrub, and only in this
 		// first stretch.
 		const { container, rerender } = await render(LinePlot, {
@@ -78,7 +78,7 @@ describe('LinePlot – rightward value labels reserve room up front', () => {
 	});
 });
 
-describe('LinePlot – leftward value labels reserve room up front', () => {
+describe('LinePlot - leftward value labels reserve room up front', () => {
 	test("the left margin already fits the pinned domain's widest label on the very first render", async () => {
 		const props = {
 			...renderProps,
@@ -100,7 +100,7 @@ describe('LinePlot – leftward value labels reserve room up front', () => {
 	});
 });
 
-describe("LinePlot – a value label's own vertical reach reserves room up front", () => {
+describe("LinePlot - a value label's own vertical reach reserves room up front", () => {
 	// A value pinned at the y domain's own top extreme.
 	function seriesAtTop() {
 		return [
@@ -115,8 +115,8 @@ describe("LinePlot – a value label's own vertical reach reserves room up front
 
 	test('the top margin already fits the label on the very first render', async () => {
 		// `label: false` isolates this test from the y-axis's own auto-title
-		// (a real string field name, 'value', now that it's forwarded raw —
-		// see the axis-title fix) — this test is about the value label's own
+		// (a real string field name, 'value', now that it's forwarded raw -
+		// see the axis-title fix) - this test is about the value label's own
 		// margin reservation specifically, not about axis titles, and the
 		// title would otherwise already reserve some of the same top margin
 		// in both renders, shrinking the gap this assertion looks for.

@@ -4,7 +4,7 @@
 	const CATEGORIES = ['A', 'B', 'C', 'D'];
 	const GROUP_NAMES = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
 
-	/** `data` for `groupCount` groups — exported for the story's docs source override, see `stories/common/docsSource.ts`. */
+	/** `data` for `groupCount` groups - exported for the story's docs source override, see `stories/common/docsSource.ts`. */
 	export function dataForGroupCount(groupCount: number): FacetDemoRow[] {
 		const names = GROUP_NAMES.slice(0, groupCount);
 		return names.flatMap((group, gi) =>
@@ -36,11 +36,11 @@
 	 * `FacetLayout` is data/plot-agnostic: it just splits rows by `by`, hands
 	 * each group its measured box via the `cell` snippet, and arranges them per
 	 * `mode`. This wrapper exists only because that snippet can't be expressed
-	 * in a plain `.stories.ts` args object — the shape itself (`groupCount` +
+	 * in a plain `.stories.ts` args object - the shape itself (`groupCount` +
 	 * `columns`/`mode`/`visible`/`pageSize`) is fully controlled by story args.
 	 *
 	 * Always renders from the live global configuration (see `themeStyle`
-	 * below) — a story that wants a themed variant calls `setConfiguration`
+	 * below) - a story that wants a themed variant calls `setConfiguration`
 	 * itself rather than this component branching on a flag.
 	 * `customIndicator`/`customNavButton` exercise the other two ways to
 	 * restyle the indicator badge and pagination buttons: a custom `indicator`
@@ -72,8 +72,8 @@
 
 	const data = $derived(dataForGroupCount(groupCount));
 
-	// FacetLayout is used bare here (no BaseChart/ChartContainer around it), so
-	// stamp the `--dct-*` vars ourselves — normally ChartContainer does this.
+	// FacetLayout is used bare here (no PlotShell/PlotContainer around it), so
+	// stamp the `--dct-*` vars ourselves - normally PlotContainer does this.
 	const themeStyle = $derived(cssVarsStyle(configToCssVars(getConfiguration())));
 </script>
 

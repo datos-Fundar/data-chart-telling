@@ -24,7 +24,7 @@ export function estimateLineValueLabelMargin<TData extends Record<string, unknow
 		valAnchor?: ValueAnchor;
 		fontStyle?: FontStyle;
 		formatValue?: (value: number, name: string) => string;
-		/** A pinned y domain (e.g. `scales.y.domain`), covering the whole range a timeline scrubber might reveal — see this function's own stability note above. Falls back to `series`'s own current values when omitted. */
+		/** A pinned y domain (e.g. `scales.y.domain`), covering the whole range a timeline scrubber might reveal - see this function's own stability note above. Falls back to `series`'s own current values when omitted. */
 		yDomain?: readonly (number | string | boolean | Date | null)[];
 	} = {}
 ): MarginOverflow {
@@ -66,7 +66,7 @@ export function estimateLineValueLabelMargin<TData extends Record<string, unknow
 		}
 	}
 	// +2px: canvas text measurement and svelteplot's own rendered SVG text
-	// can disagree by a pixel or so (different rendering engines) — a small
+	// can disagree by a pixel or so (different rendering engines) - a small
 	// buffer that narrows, but doesn't eliminate, the gap noted above.
 	const horizontal =
 		estimateValueLabelMargin(texts, { canvasFont, textFraction: outwardFraction, reach }) + 2;

@@ -4,7 +4,7 @@
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import type { HullMarkerConfig } from '$lib/types/markers/common';
 
-	/** Renders one `'hull'` marker as `<Hull>` — the convex hull around a cluster of points. */
+	/** Renders one `'hull'` marker as `<Hull>` - the convex hull around a cluster of points. */
 	let { marker }: { marker: HullMarkerConfig } = $props();
 
 	const cfg = $derived(getConfiguration());

@@ -99,8 +99,8 @@ export function buildValueLabelMarkers<TData extends Record<string, unknown>>(
 }
 
 /**
- * BarPlot's "markers" phase: visible `role: 'segment'` bars — real data plus
- * gap fills — drawing the rows the "transforms" phase left, prepended onto
+ * BarPlot's "markers" phase: visible `role: 'segment'` bars - real data plus
+ * gap fills - drawing the rows the "transforms" phase left, prepended onto
  * whatever the "statistics" phase already put in `state.markers`, and its
  * value labels on top of everything.
  */

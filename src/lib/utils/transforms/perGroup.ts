@@ -5,8 +5,8 @@ const GROUP_KEY = '__group_z';
 
 /**
  * Runs a transform that ignores `z` once per `z` group, then joins the groups'
- * output rows back together. Each output row is tagged with its group — under
- * `z`'s own field, or {@link GROUP_KEY} for a function — since such a transform
+ * output rows back together. Each output row is tagged with its group - under
+ * `z`'s own field, or {@link GROUP_KEY} for a function - since such a transform
  * may build its rows from scratch, without the source row's fields.
  */
 export function perGroup(run: TransformAdapter['run']): TransformAdapter['run'] {

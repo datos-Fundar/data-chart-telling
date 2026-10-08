@@ -54,7 +54,7 @@
   const progressEasingFn = $derived(resolveEasing(interpolate?.progressEasing));
   const segmentEasingFn = $derived(resolveEasing(interpolate?.segmentEasing));
 
-  /** Continuous scrub position across the full step domain — only meaningful when `interpolate` is set. */
+  /** Continuous scrub position across the full step domain - only meaningful when `interpolate` is set. */
   const currentTime = $derived.by(() => {
     if (!steps.length) return 0;
     const t0 = steps[0];
@@ -80,7 +80,7 @@
     const valueField = interpolate?.value;
     if (typeof accessor !== 'string' || typeof valueField !== 'string') {
       console.warn(
-        'TimelineLayout: cannot auto-build an interpolated row when `accessor` or `interpolate.value` is a function — pass `interpolate.create` explicitly.',
+        'TimelineLayout: cannot auto-build an interpolated row when `accessor` or `interpolate.value` is a function - pass `interpolate.create` explicitly.',
       );
       return upper;
     }
@@ -95,7 +95,7 @@
 
     if (!interpolate) return discrete();
     if (!interpolate.value) {
-      console.warn('TimelineLayout: `interpolate.value` is required to tween — falling back to discrete filtering.');
+      console.warn('TimelineLayout: `interpolate.value` is required to tween - falling back to discrete filtering.');
       return discrete();
     }
 
@@ -128,35 +128,35 @@
   });
 
   const isVertical = $derived(orientation === 'vertical');
-  const gap = $derived(show ? 12 : 0);
-  const effectiveThickness = $derived(show ? thickness : 0);
-  const innerWidth = $derived(
-    Math.max(0, isVertical ? width - effectiveThickness - gap : width),
-  );
-  const innerHeight = $derived(
-    Math.max(0, isVertical ? height : height - effectiveThickness - gap),
-  );
+
+  // The plot's box: whatever the gutter and `--dct-timeline-gap` leave.
+  let innerWidth = $state(0);
+  let innerHeight = $state(0);
 </script>
 
-{#if isVertical}
-  <div class="dct-timeline dct-timeline--vertical" style:width="{width}px" style:height="{height}px" style:gap="{gap}px">
-    <div class="dct-timeline__plot">
+{#snippet plotBox()}
+  <div class="dct-timeline__plot" bind:clientWidth={innerWidth} bind:clientHeight={innerHeight}>
+    {#if innerWidth > 0 && innerHeight > 0}
       {@render child({ selectedValue, data: filtered, width: innerWidth, height: innerHeight })}
-    </div>
+    {/if}
+  </div>
+{/snippet}
+
+{#if isVertical}
+  <div class="dct-timeline dct-timeline--vertical" style:width="{width}px" style:height="{height}px">
+    {@render plotBox()}
     {#if show}
       <div class="dct-timeline__gutter" style:width="{thickness}px">
-        <Timeline currentValue={selectedValue} values={steps} orientation="vertical" width={thickness} height={innerHeight} />
+        <Timeline currentValue={selectedValue} values={steps} orientation="vertical" width={thickness} {height} />
       </div>
     {/if}
   </div>
 {:else}
-  <div class="dct-timeline dct-timeline--horizontal" style:width="{width}px" style:height="{height}px" style:gap="{gap}px">
-    <div class="dct-timeline__plot">
-      {@render child({ selectedValue, data: filtered, width: innerWidth, height: innerHeight })}
-    </div>
+  <div class="dct-timeline dct-timeline--horizontal" style:width="{width}px" style:height="{height}px">
+    {@render plotBox()}
     {#if show}
       <div class="dct-timeline__gutter" style:height="{thickness}px">
-        <Timeline currentValue={selectedValue} values={steps} orientation="horizontal" width={innerWidth} height={thickness} />
+        <Timeline currentValue={selectedValue} values={steps} orientation="horizontal" {width} height={thickness} />
       </div>
     {/if}
   </div>
@@ -165,6 +165,7 @@
 <style>
   .dct-timeline {
     display: flex;
+    gap: var(--dct-timeline-gap, 12px);
   }
   .dct-timeline--vertical {
     flex-direction: row;
@@ -173,7 +174,7 @@
     flex-direction: column;
   }
   .dct-timeline__plot {
-    flex: 1 1 auto;
+    flex: 1 1 0;
     min-width: 0;
     min-height: 0;
   }

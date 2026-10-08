@@ -9,7 +9,7 @@ function shapesOf(svg: SVGElement): string[] {
 	return Array.from(svg.querySelectorAll('g.dot path')).map((el) => el.getAttribute('d') ?? '');
 }
 
-describe('symbol channel – plot level (Scatter)', () => {
+describe('symbol channel - plot level (Scatter)', () => {
 	test('a symbol accessor maps each category to its own distinct shape', async () => {
 		const { container } = render(ScatterPlot, {
 			width: 600,
@@ -57,7 +57,7 @@ describe('symbol channel – plot level (Scatter)', () => {
 	/**
 	 * Regression: `color`/`grouping` splits the plot's own data into one
 	 * series per category, so `symbol`'s domain can't be computed from just
-	 * one marker call's own (single-category) slice — it collapsed to
+	 * one marker call's own (single-category) slice - it collapsed to
 	 * whichever shape sits at index 0 for every series until
 	 * `scatter/phases/markers.ts` started computing it once, globally, from
 	 * `state.flat`, and passing it down as an explicit `scales.symbol.domain`.
@@ -78,7 +78,7 @@ describe('symbol channel – plot level (Scatter)', () => {
 	});
 });
 
-describe('symbol channel – default shape cycle (cfg.symbols)', () => {
+describe('symbol channel - default shape cycle (cfg.symbols)', () => {
 	afterEach(() => resetConfiguration());
 
 	const SIX_KINDS = ['a', 'b', 'c', 'd', 'e', 'f'].map((kind, i) => ({ x: i, y: i, kind }));

@@ -7,7 +7,7 @@ import { SURVEY_ANSWERS, type SurveyAnswer } from '../../data/survey-ratings';
 // The group transforms collapse a marker's rows into one row per group and
 // reduce each group's values: `groupX` groups by `x` and reduces to `y`,
 // `groupY` the other way round, `groupZ` by `z` alone (the marker's
-// `grouping`), and `group` by each `x`–`y` pair. The reducer is set on the
+// `grouping`), and `group` by each `x`-`y` pair. The reducer is set on the
 // transform (`y: 'count'`, `y: 'mean'`), and reads the marker's own channel of
 // the same name. Unlike a bin, the groups are the distinct values themselves.
 
@@ -21,7 +21,7 @@ const meta = {
 		data: [],
 		x: 'x',
 		y: 'y',
-		scales: { x: { label: 'Rating (1–5)' }, y: { label: 'Answers' } }
+		scales: { x: { label: 'Rating (1-5)' }, y: { label: 'Answers' } }
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -93,7 +93,7 @@ export const CountPerValue: Story = {
 /** `groupX` with `y: 'mean'` reduces the marker's own `y`: the average "would recommend" score at each rating, over every answer. */
 export const MeanPerValue: Story = {
 	args: {
-		scales: { x: { label: 'Rating (1–5)' }, y: { label: 'Would recommend (0–10)' } },
+		scales: { x: { label: 'Rating (1-5)' }, y: { label: 'Would recommend (0-10)' } },
 		markers: [
 			answerCloud,
 			{
@@ -114,7 +114,7 @@ export const MeanPerValue: Story = {
 /** `groupY` groups by a category on `y` and reduces to `x`: each product's mean rating, a big dot over its answers. */
 export const GroupY: Story = {
 	args: {
-		scales: { x: { label: 'Rating (1–5)' }, y: { label: false } },
+		scales: { x: { label: 'Rating (1-5)' }, y: { label: false } },
 		markers: [
 			{
 				type: 'dot',
@@ -141,7 +141,7 @@ export const GroupY: Story = {
 /** `groupZ` reduces each `grouping` to one row, both channels at once: `x: 'mean', y: 'mean'` is each product's centroid. */
 export const GroupZ: Story = {
 	args: {
-		scales: { x: { label: 'Rating (1–5)' }, y: { label: 'Would recommend (0–10)' } },
+		scales: { x: { label: 'Rating (1-5)' }, y: { label: 'Would recommend (0-10)' } },
 		markers: [
 			answerCloud,
 			{
@@ -158,10 +158,10 @@ export const GroupZ: Story = {
 	}
 };
 
-/** `group` with `r: 'count'`: one bubble per rating–score pair, sized by how many answers share it. */
+/** `group` with `r: 'count'`: one bubble per rating-score pair, sized by how many answers share it. */
 export const Bubbles: Story = {
 	args: {
-		scales: { x: { label: 'Rating (1–5)' }, y: { label: 'Would recommend (0–10)' } },
+		scales: { x: { label: 'Rating (1-5)' }, y: { label: 'Would recommend (0-10)' } },
 		markers: [
 			{
 				type: 'dot',
@@ -175,10 +175,10 @@ export const Bubbles: Story = {
 	}
 };
 
-/** `group` with `fill: 'count'` colors each pair by its count instead — the reducer becomes the marker's `color`. */
+/** `group` with `fill: 'count'` colors each pair by its count instead - the reducer becomes the marker's `color`. */
 export const ColoredByCount: Story = {
 	args: {
-		scales: { x: { label: 'Rating (1–5)' }, y: { label: 'Would recommend (0–10)' } },
+		scales: { x: { label: 'Rating (1-5)' }, y: { label: 'Would recommend (0-10)' } },
 		markers: [
 			{
 				type: 'dot',

@@ -30,7 +30,7 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Two mirrored series from grouped data — women on the left, men on the right.
+ * Two mirrored series from grouped data - women on the left, men on the right.
  *
  * PyramidPlot automatically creates one series per unique `color` value (sex: 'Female' | 'Male'),
  * using the sex's name from the grouping column. Series are sorted alphabetically,
@@ -52,7 +52,7 @@ export const Default: Story = {
  *
  * The series order determines visual placement: first series goes left, second goes right.
  * A series' `x` is the category accessor (age group) and `y` is the magnitude
- * (population %) — the same convention `buildSeries` uses internally for the
+ * (population %) - the same convention `buildSeries` uses internally for the
  * `data`/`x`/`y`/`color` shorthand above.
  */
 export const ExplicitSeries: Story = {
@@ -76,7 +76,7 @@ export const ExplicitSeries: Story = {
 };
 
 /**
- * Different year snapshot — shows the population pyramid for 1991, allowing
+ * Different year snapshot - shows the population pyramid for 1991, allowing
  * time-series comparison with the Default (2022) story.
  *
  * The age structure is distinctly different: younger age groups are proportionally larger
@@ -93,7 +93,7 @@ export const YearlySnapshot1991: Story = {
 };
 
 /**
- * Alternate year (2010) — shows an intermediate state between the first and most recent snapshots.
+ * Alternate year (2010) - shows an intermediate state between the first and most recent snapshots.
  */
 export const YearlySnapshot2010: Story = {
 	args: {

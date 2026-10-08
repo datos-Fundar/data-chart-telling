@@ -14,7 +14,7 @@ export type TransformAdapter = {
 	/**
 	 * Keys that, set on the transform, are reducers (options), while the
 	 * marker's own channel of the same name is still read as the reducer's input
-	 * — a `groupX`'s `y: 'sum'` sums the marker's `y`.
+	 * - a `groupX`'s `y: 'sum'` sums the marker's `y`.
 	 */
 	outputKeys?: Record<string, true>;
 	/** svelteplot's own function for this type, taking channels first and options second. */

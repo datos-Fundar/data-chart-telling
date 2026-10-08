@@ -12,7 +12,7 @@ const DATA_PROPS = {
 	color: 'sex' as const
 };
 
-describe('PyramidPlot – scales', () => {
+describe('PyramidPlot - scales', () => {
 	test('renders with no scale overrides (auto domain)', async () => {
 		const { container } = await render(PyramidPlot, { width: 560, height: 520, ...DATA_PROPS });
 		const svg = await waitForSvg(container);

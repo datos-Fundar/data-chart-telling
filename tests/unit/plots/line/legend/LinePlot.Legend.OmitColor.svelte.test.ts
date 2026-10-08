@@ -1,8 +1,25 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
-import LineOmitLegendDemo from '../../../../../stories/plots/line/LineOmitLegendDemo.svelte';
+import LinePlot from '$lib/plots/line/Plot.svelte';
+import {
+	FEMALE_LIFE_EXPECTANCY,
+	MALE_LIFE_EXPECTANCY
+} from '../../../../../stories/plots/line/data';
+import type { LegendSection } from '$lib/types/layout/legend';
 
 // Omitting one series via the legend must not recolor the remaining series.
+
+const LEGEND: LegendSection[] = [
+	{
+		type: 'discrete',
+		title: 'Sex',
+		interactive: { enabled: true, disabled: { mode: 'omit' } },
+		items: [
+			{ name: 'female', label: 'Female', symbol: 'line' },
+			{ name: 'male', label: 'Male', symbol: 'line' }
+		]
+	}
+];
 
 function waitForPlotSvg(container: Element): Promise<SVGElement> {
 	let svg: SVGElement | undefined;
@@ -29,9 +46,17 @@ function strokeColors(svg: SVGElement): (string | undefined)[] {
 	);
 }
 
-describe("LinePlot – omitting a series keeps the remaining one's color stable", () => {
+describe("LinePlot - omitting a series keeps the remaining one's color stable", () => {
 	test('omitting "Female" does not recolor "Male"\' line', async () => {
-		const { container } = await render(LineOmitLegendDemo);
+		const { container } = await render(LinePlot, {
+			width: 950,
+			height: 400,
+			series: [
+				{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY },
+				{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY }
+			],
+			legend: LEGEND
+		});
 		const svg = await waitForPlotSvg(container);
 
 		const before = strokeColors(svg);

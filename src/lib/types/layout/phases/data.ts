@@ -4,7 +4,7 @@ import type { AxisValue } from '$lib/types/layout/mapping';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /** What differs between plots in the shared "data" stage. */
 export type DataStageOptions<TState, TCtx> = {
-	/** Whether adjacent visual segments share their boundary row — a continuous mark (line, area) does. Defaults to `true`. */
+	/** Whether adjacent visual segments share their boundary row - a continuous mark (line, area) does. Defaults to `true`. */
 	connect?: boolean;
 	/** The color a segment's own style sets, if any, for the markers scoped to its series. */
 	segmentColor?: (style: any) => string | undefined;

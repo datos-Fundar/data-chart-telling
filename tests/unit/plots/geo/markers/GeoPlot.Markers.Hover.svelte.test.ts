@@ -12,12 +12,12 @@ const DATA_PROPS = {
 };
 
 // The hover marker only restyles a feature on an actual cursor match via
-// SVG hit-testing, which needs real pointer events — these tests only assert
+// SVG hit-testing, which needs real pointer events - these tests only assert
 // the static/no-hover baseline (no extra overlay path) and that varied
 // configs don't crash, mirroring the same boundary BarPlot's/HeatmapPlot's
 // hover marker tests already draw.
 
-describe('GeoPlot – hover marker (static baseline)', () => {
+describe('GeoPlot - hover marker (static baseline)', () => {
   test('no overlay path before any hover', async () => {
     const { container } = render(GeoPlot, {
       width: 400,

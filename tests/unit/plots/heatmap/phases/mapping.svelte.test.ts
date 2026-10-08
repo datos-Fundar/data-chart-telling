@@ -26,7 +26,7 @@ function build(overrides: Partial<HeatmapPlotState<Row>> = {}) {
 	return buildMapping(state);
 }
 
-describe('buildMapping – channels', () => {
+describe('buildMapping - channels', () => {
 	test('resolves x/y/color to the first series own accessors', () => {
 		const result = build();
 		const row = SERIES[0].data[0];

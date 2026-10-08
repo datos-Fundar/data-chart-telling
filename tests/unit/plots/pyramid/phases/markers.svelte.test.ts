@@ -8,7 +8,7 @@ import type {
 	PyramidSeries
 } from '$lib/types/plots/pyramid/state';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
-import type { ChartConfig } from '$lib/types/configuration/styling';
+import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { BarMarkerConfig } from '$lib/types/markers/common';
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
@@ -16,7 +16,7 @@ import type { BarMarkerConfig } from '$lib/types/markers/common';
 type Row = { ageGroup: string; pct: number | null };
 
 const CTX: PyramidPlotCtx = {
-	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as ChartConfig,
+	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as PlotStylesConfig,
 	formatValue: (v) => `${v}`,
 	legendInteraction: null
 };
@@ -49,14 +49,14 @@ function build(
 		...overrides
 	};
 	// No `authorMarkers`/`statistics` given, so the real output is exactly
-	// this phase's own segment/gap-fill bars — narrowed back from the state's
+	// this phase's own segment/gap-fill bars - narrowed back from the state's
 	// broader accumulating `markers` union.
 	const ctx = { ...CTX, ...ctxOverrides };
 	return buildMarkers(buildTransforms<typeof state>()(state, ctx), ctx)
 		.markers as BarMarkerConfig[];
 }
 
-describe('buildMarkers – geometry', () => {
+describe('buildMarkers - geometry', () => {
 	test('is always horizontal, category on y, baseline x1 at zero', () => {
 		const [marker] = build();
 		expect(marker.isHorizontal).toBe(true);
@@ -92,7 +92,7 @@ describe('buildMarkers – geometry', () => {
 	});
 });
 
-describe('buildMarkers – style resolution', () => {
+describe('buildMarkers - style resolution', () => {
 	test('uses the series color when a segment has none of its own', () => {
 		const [marker] = build();
 		expect(marker.styles?.fill).toBe('blue');
@@ -105,7 +105,7 @@ describe('buildMarkers – style resolution', () => {
 	});
 });
 
-describe('buildMarkers – gap fills', () => {
+describe('buildMarkers - gap fills', () => {
 	test('adds one extra marker per gap-fill kind present, at the interpolated signed value', () => {
 		const female = series('Female', 'left', [{ ageGroup: '0-4', pct: null }]);
 		const groupedSeries = buildGroupedSeries<PyramidSeries<Row>, BarSegmentStyle>(

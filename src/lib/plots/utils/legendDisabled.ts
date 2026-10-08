@@ -7,13 +7,13 @@ import type {
 import type { StrokeStyle, DotStyle } from '$lib/types/plots/styling';
 import type { ColorScaleConfig } from '$lib/types/layout/scales';
 
-/** Resolves a {@link LegendDisabledAction} into the style a mark should render with — `'omit'` resolves to fully transparent. */
+/** Resolves a {@link LegendDisabledAction} into the style a mark should render with - `'hide'` and `'omit'` resolve to fully transparent. */
 export function resolveDisabledStyle(
 	action: LegendDisabledAction | undefined,
 	fallbackOpacity: number
 ): LegendDisabledStyle | undefined {
 	if (!action) return undefined;
-	if (action.mode === 'omit') return { opacity: 0 };
+	if (action.mode !== 'dim') return { opacity: 0 };
 	return action.style ?? { opacity: fallbackOpacity };
 }
 
@@ -27,7 +27,7 @@ export function omitDisabledSeries<S extends { name: string }>(
 }
 
 /**
- * Resolves each series' own default color, keyed by name — the `color`
+ * Resolves each series' own default color, keyed by name - the `color`
  * channel's per-series-identity case (domain = every series name, in order).
  * `scales.color` (scheme/domain/unknown) overrides the theme's own palette
  * cycling when set; computed from the full series list, before
@@ -64,7 +64,7 @@ export function resolveEffectiveDisabledStyle(
  * derived once from a {@link LegendDisabledStyle}. Each is `undefined` when
  * there's no active override, so call sites can slot the result in as just
  * one more `??` layer ahead of their existing segment-style/default-color
- * chain — no branching needed at the call site.
+ * chain - no branching needed at the call site.
  */
 
 export function disabledStrokeOverride(

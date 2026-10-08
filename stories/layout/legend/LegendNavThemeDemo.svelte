@@ -2,17 +2,17 @@
 	import { untrack } from 'svelte';
 	import LegendHorizontalDemo from './LegendHorizontalDemo.svelte';
 	import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
-	import type { ChartConfigInput } from '$lib/types/configuration/styling';
+	import type { PlotStylesConfigInput } from '$lib/types/configuration/styling';
 
 	// Calling $props() (even unused) keeps this component's inferred prop type
-	// permissive — without it, Storybook's bare `render: () => ({ Component })`
+	// permissive - without it, Storybook's bare `render: () => ({ Component })`
 	// typing rejects a zero-prop-plus-runes component.
 	const props = $props();
 	void props;
 
 	type NavThemeName = 'Default' | 'Purple' | 'Green';
 
-	const NAV_THEMES: Record<NavThemeName, ChartConfigInput> = {
+	const NAV_THEMES: Record<NavThemeName, PlotStylesConfigInput> = {
 		Default: {},
 		Purple: {
 			legend: {
@@ -30,7 +30,7 @@
 
 	// Same untrack/cleanup pattern as ConfigDemo/FacetThemeDemo: `setConfiguration`
 	// reads `current` to merge and then writes it, so tracking it inside this
-	// effect would make the effect depend on the very state it sets — an
+	// effect would make the effect depend on the very state it sets - an
 	// infinite loop. Cleanup restores defaults (the config is a global
 	// singleton) before each re-run and on unmount.
 	$effect(() => {
@@ -54,7 +54,7 @@
 	</div>
 
 	<p class="demo__hint">
-		Restyles the prev/next pagination arrows — same global config that themes the rest of the
+		Restyles the prev/next pagination arrows - same global config that themes the rest of the
 		package (compare with the facet pagination buttons).
 	</p>
 

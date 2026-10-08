@@ -46,7 +46,7 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * A dot and a label on a series' peak: a `selectMaxY` (or `selectMinY`)
- * transform keeps one row per series — or per segment, with `scope: 'segment'`.
+ * transform keeps one row per series - or per segment, with `scope: 'segment'`.
  */
 function peakMarkers(
 	where: { series: string; scope?: 'series' | 'segment' },
@@ -121,7 +121,7 @@ export const WithTextMarker: Story = {
 
 /**
  * A `selectMaxY`/`selectMinY` transform on a `dot` and a `text` marker
- * highlights the max or min value of the series — use the `mode` control to
+ * highlights the max or min value of the series - use the `mode` control to
  * switch between them.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -141,7 +141,7 @@ export const WithPeakMarker: any = {
 	},
 	argTypes: {
 		mode: {
-			description: 'Peak detection mode — finds the maximum or minimum value.',
+			description: 'Peak detection mode - finds the maximum or minimum value.',
 			control: { type: 'inline-radio' },
 			options: ['max', 'min']
 		}

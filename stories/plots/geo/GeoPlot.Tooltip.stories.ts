@@ -36,25 +36,13 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * No tooltip — hovering over the map produces no floating label. The
- * default when `tooltip` is omitted.
- */
-export const NoTooltip: Story = {
-  args: {},
-};
-
-/**
- * Basic tooltip — `format` receives the nearest hovered feature. Hover
+ * Basic tooltip - `format` receives the nearest hovered feature. Hover
  * matching is always 2-D/punctual (nearest feature centroid) for GeoPlot,
  * since a map has no x-only/y-only axis to match along.
- *
- * A standalone `GeoPlot` (not inside a `<Chart>`) uses `facetId: ''` and
- * `sync: false` — no cross-facet broadcasting applies.
  */
 export const BasicTooltip: Story = {
   args: {
     tooltip: {
-      facetId: '',
       sync: false,
       format: (f) => (f.properties as ArgentinaProvinceProps).nombre,
     },
@@ -62,13 +50,12 @@ export const BasicTooltip: Story = {
 };
 
 /**
- * Rich multi-line format — `\n` splits the tooltip string across lines,
+ * Rich multi-line format - `\n` splits the tooltip string across lines,
  * with the portion before the first break used as the heading.
  */
 export const RichFormat: Story = {
   args: {
     tooltip: {
-      facetId: '',
       sync: false,
       format: (f) => {
         const { nombre, population } = f.properties as ArgentinaProvinceProps;
@@ -78,11 +65,10 @@ export const RichFormat: Story = {
   },
 };
 
-/** Computed tooltip text — `format` can derive any string from the feature, here a share of the total population across the fixture. */
+/** Computed tooltip text - `format` can derive any string from the feature, here a share of the total population across the fixture. */
 export const ComputedFormat: Story = {
   args: {
     tooltip: {
-      facetId: '',
       sync: false,
       format: (f) => {
         const { nombre, population } = f.properties as ArgentinaProvinceProps;
@@ -98,12 +84,12 @@ export const ComputedFormat: Story = {
 };
 
 /**
- * Fully custom tooltip markup via `content` — replaces the default floating
+ * Fully custom tooltip markup via `content` - replaces the default floating
  * label entirely with an arbitrary snippet: a header, a colour swatch tied
  * to the choropleth ramp, and a footnote. `format` is still required by the
  * type but is ignored once `content` is set.
  *
- * See `RichTooltip.svelte` for the markup — the library automatically drops
+ * See `RichTooltip.svelte` for the markup - the library automatically drops
  * its default dark tooltip box whenever `content` is set.
  */
 export const CustomContent: StoryObj = {
@@ -112,7 +98,7 @@ export const CustomContent: StoryObj = {
 
 /**
  * `anchorX`/`anchorY` override the system default (`'right'`/`'bottom'`).
- * Here it's pinned above-and-to-the-left of the cursor instead — still
+ * Here it's pinned above-and-to-the-left of the cursor instead - still
  * falls back toward the opposite side (via the centered position) if the
  * cursor gets close enough to an edge that the preferred side would
  * overflow.
@@ -120,7 +106,6 @@ export const CustomContent: StoryObj = {
 export const CustomAnchor: Story = {
   args: {
     tooltip: {
-      facetId: '',
       sync: false,
       anchorX: 'left',
       anchorY: 'top',
@@ -137,18 +122,18 @@ const isAntarcticPart = (part: { centroid: [number, number] }, feature: { __id: 
 
 /**
  * An `inset` marker can carry its own `tooltip`, independent of the plot's
- * own — scoped to just what that inset draws, matched against its own
+ * own - scoped to just what that inset draws, matched against its own
  * local mini-projection instead of the main map's. This matters because the
  * main map's hover (`Pointer`, driving every other story in this file) only
  * ever matches the main projection's own feature positions: it has no way
  * to reach content an inset renders elsewhere, at its own scale, so without
- * this an inset would either show no tooltip or (worse) the wrong one — the
+ * this an inset would either show no tooltip or (worse) the wrong one - the
  * nearest *main-map* feature to that screen corner, not whatever the inset
  * itself is actually displaying there.
  *
- * Same two-inset layout as `Markers/Inset`'s `CombinedInsets` — CABA's own
+ * Same two-inset layout as `Markers/Inset`'s `CombinedInsets` - CABA's own
  * comunas (a separate, finer-grained dataset than the single CABA feature in
- * `ARGENTINA_PROVINCES`) and the Antarctic/South Atlantic sector — but each
+ * `ARGENTINA_PROVINCES`) and the Antarctic/South Atlantic sector - but each
  * panel now floats its own tooltip on hover, in addition to the main map's.
  */
 export const TooltipOnInsets: Story = {
@@ -156,7 +141,6 @@ export const TooltipOnInsets: Story = {
     coordinates: { projection: { type: 'mercator', domain: 'data' } },
     excludeParts: isAntarcticPart,
     tooltip: {
-      facetId: '',
       sync: false,
       format: (f) => (f.properties as ArgentinaProvinceProps).nombre,
     },
@@ -189,14 +173,14 @@ export const TooltipOnInsets: Story = {
 
 /**
  * An inset's own `tooltip.anchorX`/`anchorY` fall back to the plot's own
- * top-level `tooltip.anchorX`/`anchorY` when unset — only reaching the
+ * top-level `tooltip.anchorX`/`anchorY` when unset - only reaching the
  * system default (`'right'`/`'bottom'`) if *neither* sets one. Here the
  * top-level tooltip explicitly sets `anchorX: 'left', anchorY: 'top'`:
  *
  * - The CABA comunas inset (top-right corner) sets no anchor of its own, so
  *   it inherits the top-level's `left`/`top`.
  * - The Antarctic inset (bottom-right corner) sets its own `anchorX: 'right'`
- *   explicitly, which wins over the inherited `'left'` — its `anchorY` is
+ *   explicitly, which wins over the inherited `'left'` - its `anchorY` is
  *   still unset, so it inherits the top-level's `'top'`.
  *
  * Hover each panel (and the main map) to compare.
@@ -206,7 +190,6 @@ export const TooltipOnInsetsWithAnchorInheritance: Story = {
     coordinates: { projection: { type: 'mercator', domain: 'data' } },
     excludeParts: isAntarcticPart,
     tooltip: {
-      facetId: '',
       sync: false,
       anchorX: 'left',
       anchorY: 'top',
@@ -219,7 +202,7 @@ export const TooltipOnInsetsWithAnchorInheritance: Story = {
         data: CABA_COMUNAS,
         styles: { stroke: '#dc2626', strokeWidth: 1 },
         tooltip: {
-          // No anchorX/anchorY here — inherits the top-level's 'left'/'top'.
+          // No anchorX/anchorY here - inherits the top-level's 'left'/'top'.
           format: (f) => {
             const { comuna, barrios } = f.properties as CabaComunaProps;
             return `Comuna ${comuna}\n${barrios}`;
@@ -233,7 +216,7 @@ export const TooltipOnInsetsWithAnchorInheritance: Story = {
         featurePartsFilter: isAntarcticPart,
         projection: { type: 'azimuthal-equidistant', rotate: [49.5, 90] },
         tooltip: {
-          anchorX: 'right', // Own override — wins over the inherited 'left'.
+          anchorX: 'right', // Own override - wins over the inherited 'left'.
           format: () => 'Antártida e Islas del Atlántico Sur',
         },
       },

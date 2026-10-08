@@ -8,7 +8,7 @@ import { MEASUREMENTS } from '../../data/measurements';
 // along `x`, and each bin is reduced to one rect. The default reducer is `count`,
 // so the bar's height is how many rows fall in the bin. `binY` is the same on the
 // other axis. Demoed on an empty `LinePlot` canvas, which fits its domains to the
-// bins, so only the bins are on screen — see `Plots/HistogramPlot` for bins on real charts.
+// bins, so only the bins are on screen - see `Plots/HistogramPlot` for bins on real charts.
 
 const meta = {
 	title: 'Transforms/Bin/Basics',

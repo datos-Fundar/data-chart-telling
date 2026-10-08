@@ -3,7 +3,7 @@ import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `trail` marker (svelteplot's own `Trail`) — a ribbon along a path whose
+// A `trail` marker (svelteplot's own `Trail`) - a ribbon along a path whose
 // thickness follows `r` (scaled by svelteplot's own `r` scale). `grouping`
 // draws one trail per group; `curve`/`tension` smooth the path and `cap` shapes
 // the ends. A trail is filled only (no stroke); `color` resolves through this

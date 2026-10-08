@@ -2,7 +2,7 @@ import type { HoverPoint } from '$lib/types/layout/tooltip';
 import type { BarMarkerConfig } from '$lib/types/markers/common';
 import type { BarLayout } from '$lib/types/plots/bar/layout';
 
-/** BarPlot's invisible `role: 'hitArea'` markers — one per hover candidate, covering its own bar. */
+/** BarPlot's invisible `role: 'hitArea'` markers - one per hover candidate, covering its own bar. */
 export function buildHitAreaMarkers<TData extends Record<string, unknown>>(args: {
 	barLayout: BarLayout;
 	isHorizontal: boolean;

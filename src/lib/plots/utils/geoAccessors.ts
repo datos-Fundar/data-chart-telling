@@ -44,10 +44,10 @@ function boundsCenter(coords: [number, number][]): [number, number] {
 }
 
 /**
- * Bounding-box center of a geometry's flattened coordinates — a cheap
+ * Bounding-box center of a geometry's flattened coordinates - a cheap
  * approximation used for default label placement, not a true
  * geographic/area centroid (no polygon-hole or geodesic-area weighting).
- * For hover-matching specifically, see `geometryPartCentroids` instead —
+ * For hover-matching specifically, see `geometryPartCentroids` instead -
  * this single combined point can land far from every actual part of a
  * multi-part geometry whose pieces are geographically spread out.
  */
@@ -81,10 +81,10 @@ export function splitGeometryParts(geometry: GeoJSON.Geometry): GeoJSON.Geometry
 /**
  * Like `geometryCentroid`, but returns one point per disjoint part instead
  * of a single bounding-box center across all of them. A `MultiPolygon`
- * whose parts are geographically far apart — e.g. Argentina's "Tierra del
+ * whose parts are geographically far apart - e.g. Argentina's "Tierra del
  * Fuego, Antártida e Islas del Atlántico Sur" province, whose `MultiPolygon`
  * spans the mainland island, the Antarctic sector, and the South Atlantic
- * islands in one feature — would otherwise get a single hover point
+ * islands in one feature - would otherwise get a single hover point
  * stranded somewhere between all of them, matching hovers over *none* of
  * the actually-rendered shapes. Multiple points attributed to the same
  * feature is fine for hover-matching (nearest point wins, whichever part
@@ -98,7 +98,7 @@ export function geometryPartCentroids(geometry: GeoJSON.Geometry): [number, numb
 /**
  * Keeps or drops each disjoint part of a geometry (see `splitGeometryParts`)
  * based on a per-part predicate, reassembling a geometry of the same type
- * from whatever survives — `null` if nothing does. Used to let a single
+ * from whatever survives - `null` if nothing does. Used to let a single
  * feature's geometry be split between the main map and an `inset` marker
  * (see `GeoDataProps.excludeParts`/`GeoInsetMarkerConfig.featurePartsFilter`)
  * without preprocessing the source data: e.g. a province whose `MultiPolygon`
@@ -136,7 +136,7 @@ export function defaultFeatureId<TProps extends Record<string, unknown>>(f: GeoF
 }
 
 /**
- * `[minLon, minLat, maxLon, maxLat]` across every coordinate of a geometry —
+ * `[minLon, minLat, maxLon, maxLat]` across every coordinate of a geometry -
  * `null` for one with none (an empty `GeometryCollection`). Used by
  * `Plot.svelte`'s `dataLonLatBounds` to cap how far a tile layer's
  * letterboxed margin reaches (see `clampBoundsToDataPadding` in
@@ -169,14 +169,14 @@ function toDeg(rad: number): number {
 
 /**
  * Densifies a great-circle arc between two lon/lat points into `steps + 1`
- * points via spherical linear interpolation (slerp) — used to draw a `link`
+ * points via spherical linear interpolation (slerp) - used to draw a `link`
  * marker's geodesic curve through the `Geo` mark (see `Plot.svelte`).
  *
  * Not delegated to svelteplot's own `Link` mark: its 0.14.2 projection
  * integration (`Mark.svelte`'s paired-channel handling) reads a single
  * `row.x`/`row.y` pair regardless of channel suffix, so a mark bound to
  * `x1`/`y1`/`x2`/`y2` (never plain `x`/`y`) resolves every point as invalid
- * whenever the plot has an active `projection` scale — which GeoPlot always
+ * whenever the plot has an active `projection` scale - which GeoPlot always
  * does. `Geo` has no such limitation (geo marks are explicitly excluded from
  * that code path), so a manually-interpolated `LineString` feature sidesteps
  * the bug entirely while still producing the same geodesic visual.

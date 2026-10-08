@@ -13,3 +13,4 @@ export type {
 } from './transforms';
 export type { StatisticsStageState, StatisticsStageOptions } from './statistics';
 export type { ScalesStageOptions } from './scales';
+export type { TooltipStageOptions } from './tooltip';

@@ -18,7 +18,7 @@ import LocaleDemo from './LocaleDemo.svelte';
  * own per-axis call, based on that axis's value range.
  *
  * Each story below switches `locale` live with a button, but fixes its own
- * `compactDisplay` — unlike `locale`, it's read once when a chart mounts,
+ * `compactDisplay` - unlike `locale`, it's read once when a chart mounts,
  * so it can't be switched on an already-rendered one.
  */
 const meta = {

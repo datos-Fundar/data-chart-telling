@@ -13,7 +13,7 @@ const DATA_PROPS = {
 	scales: { y: { domain: AGE_GROUPS } }
 };
 
-describe('PyramidPlot – markers.rules', () => {
+describe('PyramidPlot - markers.rules', () => {
 	test('ruleX renders a vertical rule line at a magnitude threshold', async () => {
 		const { container } = await render(PyramidPlot, {
 			width: 560,

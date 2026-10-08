@@ -7,7 +7,7 @@ import { READINGS_WITH_GAPS, OTHER_READINGS_NO_GAPS } from '../data';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-/** Orders month-abbreviation rows by calendar position, not alphabetically — see `LinePlot.Scales`' own `byMonth`. */
+/** Orders month-abbreviation rows by calendar position, not alphabetically - see `LinePlot.Scales`' own `byMonth`. */
 function byMonth(a: Record<string, unknown>, b: Record<string, unknown>): number {
 	return MONTHS.indexOf(a.category as string) - MONTHS.indexOf(b.category as string);
 }
@@ -16,11 +16,11 @@ function byMonth(a: Record<string, unknown>, b: Record<string, unknown>): number
 
 // Unlike BarPlot's province datasets (no inherent order), months have a
 // natural ascending order, which is what makes `styles.gaps`' interpolation
-// worth looking at here — a trend being bridged, not an arbitrary category
+// worth looking at here - a trend being bridged, not an arbitrary category
 // filled in. `READINGS_WITH_GAPS` has three kinds of holes, all `value:
-// null`: no reading for Jan–Feb (start), an outage at Jun–Jul (middle), and
-// nothing yet for Nov–Dec (end). Without `styles.gaps`, a missing value
-// renders no bar at all — `styles.gaps` fills it with a distinctly-styled
+// null`: no reading for Jan-Feb (start), an outage at Jun-Jul (middle), and
+// nothing yet for Nov-Dec (end). Without `styles.gaps`, a missing value
+// renders no bar at all - `styles.gaps` fills it with a distinctly-styled
 // bar at an interpolated value instead, configured independently per zone.
 // Like `segments`, it's keyed by series name (`'default'` for every series
 // with no named entry of its own).
@@ -66,7 +66,7 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * Without `styles.gaps`, a missing reading simply renders no bar for that
- * category — not the fake zero-height bar a raw `null`/`undefined` value
+ * category - not the fake zero-height bar a raw `null`/`undefined` value
  * would otherwise produce.
  */
 export const NoGapsConfigured: Story = {
@@ -78,8 +78,8 @@ export const NoGapsConfigured: Story = {
 // ── Default key: gaps that apply to every series ─────────────────────────────
 
 /**
- * `middle` fills the internal outage (Jun–Jul) with a bar interpolated
- * between its two real neighbours. No target needs to be configured — both
+ * `middle` fills the internal outage (Jun-Jul) with a bar interpolated
+ * between its two real neighbours. No target needs to be configured - both
  * ends of an internal gap are real data, so the fill is fully determined by
  * the data itself. Default style: the series' own colour, faded.
  */
@@ -94,7 +94,7 @@ export const MiddleGapFilled: Story = {
  * `start`/`end` gaps have only one real boundary, so filling them is
  * opt-in: without an explicit `x` target, extrapolating past the real data
  * would imply a measurement that doesn't exist. Here both ends hold the
- * nearest real value flat (no `y` given) — `x`'s value itself isn't used
+ * nearest real value flat (no `y` given) - `x`'s value itself isn't used
  * for a category axis, only its presence opts the zone in.
  */
 export const LeadingAndTrailingGapsOptIn: Story = {
@@ -133,7 +133,7 @@ const TWO_READINGS = [
 ];
 
 /**
- * A gap entry keyed by series name applies only to that series — `other`
+ * A gap entry keyed by series name applies only to that series - `other`
  * has no missing readings, so it's unaffected either way.
  */
 export const GapsOnOneSeriesOnly: Story = {
@@ -150,7 +150,7 @@ export const GapsOnOneSeriesOnly: Story = {
 
 /**
  * Side by side (the default): each series gets its own slice of the
- * category band — a filled gap bar lands in the same slice its series
+ * category band - a filled gap bar lands in the same slice its series
  * would occupy anywhere else.
  */
 export const GroupedLayout: Story = {
@@ -165,7 +165,7 @@ export const GroupedLayout: Story = {
 
 /**
  * A plot-level `stackY` stacks series cumulatively within each category's
- * band — a series stacked *above* a gap-owning one keeps a correct baseline
+ * band - a series stacked *above* a gap-owning one keeps a correct baseline
  * whether that gap is filled (contributes its interpolated value to the
  * stack) or left unfilled (contributes nothing).
  */
@@ -183,7 +183,7 @@ export const StackedLayout: Story = {
 // ── Global configuration ──────────────────────────────────────────────────────
 
 /**
- * A zone with no `style` of its own falls back to `cfg.bar.gap` — set via
+ * A zone with no `style` of its own falls back to `cfg.bar.gap` - set via
  * `setConfiguration`, the same way `cfg.line.gap` backs `LinePlot`'s own
  * gap-fill default.
  */

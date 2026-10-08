@@ -34,7 +34,7 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** `DotMarker` overlays a second, independently-styled dot layer — here, a ring around every country above 82 years of life expectancy, on top of the plot's own dots. */
+/** `DotMarker` overlays a second, independently-styled dot layer - here, a ring around every country above 82 years of life expectancy, on top of the plot's own dots. */
 export const WithDotMarker: Story = {
 	args: {
 		markers: [
@@ -54,7 +54,7 @@ export const WithDotMarker: Story = {
 	}
 };
 
-/** `TextMarker` labels a handful of points directly on the plot — here, every country above 82 years of life expectancy. */
+/** `TextMarker` labels a handful of points directly on the plot - here, every country above 82 years of life expectancy. */
 export const WithTextMarker: Story = {
 	args: {
 		markers: [

@@ -1,5 +1,7 @@
 // ── Plots ───────────────────────────────────────────────────────────────────
-// Low-level graphics: one specific mark family each, drawn into a given box.
+// One mark family each, with optional chrome (title, legend, caption),
+// timeline and facets around it.
+export { default as AreaPlot } from './plots/area/Plot.svelte';
 export { default as BarPlot } from './plots/bar/Plot.svelte';
 export { default as HistogramPlot } from './plots/histogram/Plot.svelte';
 export { default as HeatmapPlot } from './plots/heatmap/Plot.svelte';
@@ -8,26 +10,25 @@ export { default as PyramidPlot } from './plots/pyramid/Plot.svelte';
 export { default as ScatterPlot } from './plots/scatter/Plot.svelte';
 export { default as GeoPlot } from './plots/geo/Plot.svelte';
 
-// ── Charts ──────────────────────────────────────────────────────────────────
-// High-level, plot-agnostic chrome plus ready-made chart kinds.
-export { default as BaseChart } from './charts/BaseChart.svelte';
-export { default as BarChart } from './charts/bar/Chart.svelte';
-export { default as HeatmapChart } from './charts/heatmap/Chart.svelte';
-export { default as LineChart } from './charts/line/Chart.svelte';
-export { default as PyramidChart } from './charts/pyramid/Chart.svelte';
-export { default as ScatterChart } from './charts/scatter/Chart.svelte';
+// ── Composition ─────────────────────────────────────────────────────────────
+// Separate plots combined into one figure, with chrome of its own.
+export { default as PlotComposer } from './layout/composer/PlotComposer.svelte';
+export { default as PlotPanel } from './layout/composer/PlotPanel.svelte';
 
-// Interchangeable layout primitives (compose your own chart kinds with these).
-export { default as ChartContainer } from './charts/container/ChartContainer.svelte';
-export { default as BasePlotLayout } from './layout/plot/BasePlotLayout.svelte';
+// Interchangeable layout primitives (compose your own plot kinds with these).
+export { default as PlotShell } from './layout/shell/PlotShell.svelte';
+export { default as PlotContainer } from './layout/shell/PlotContainer.svelte';
+export { DEFAULT_CHROME_ORDER } from './types/plots/props';
+export { default as BasePlotLayout } from './layout/base/BasePlotLayout.svelte';
 export { default as CoordinatesLayout } from './layout/coordinates/CoordinatesLayout.svelte';
 export { default as TileLayer } from './layout/styles/TileLayer.svelte';
 
-// Custom geo projections — usable as `scales.projection.type`.
+// Custom geo projections - usable as `scales.projection.type`.
 export { argentinaBicontinental } from './layout/coordinates/projections/argentina';
 export { default as Timeline } from './layout/timeline/Timeline.svelte';
 export { default as TimelineLayout } from './layout/timeline/TimelineLayout.svelte';
 export { default as FacetLayout } from './layout/facet/FacetLayout.svelte';
+export { default as FacetGridLayout } from './layout/facet/FacetGridLayout.svelte';
 export { default as FacetIndicator } from './layout/facet/FacetIndicator.svelte';
 export { default as LegendLayout } from './layout/legend/LegendLayout.svelte';
 export { default as Tooltip } from './layout/tooltip/Tooltip.svelte';
@@ -125,6 +126,10 @@ export type {
 export type { Accessor, Series, SeriesProps, DataProps } from './types/plots/data/common';
 export type {
 	BasePlotProps,
+	PlotCoreProps,
+	PlotChromeProps,
+	PlotChrome,
+	PlotChromeItem,
 	StylesConfig,
 	MarkersConfig,
 	SegmentsConfig,
@@ -224,14 +229,36 @@ export type {
 	GeoInsetProjectionName,
 	GeoInsetProjectionConfig
 } from './types/markers/geo';
-export type { ChartPlotContext, ChartPlotSnippet } from './types/charts/common';
+export type {
+	PlotPresentation,
+	FacetAxisValues,
+	PlotCellContext,
+	PlotCellSnippet,
+	PlotBoxContext,
+	PlotBoxSnippet
+} from './types/plots/presentation';
 export type { TimeValue, Orientation, TimelineConfig } from './types/layout/timeline';
+export type {
+	ComposerLayout,
+	ComposerTags,
+	ComposerTimelineConfig,
+	ComposerHoverConfig,
+	PanelContext,
+	PanelSnippet,
+	PanelInset
+} from './types/layout/composer';
 export type {
 	Responsive,
 	FacetColumns,
 	FacetMode,
 	FacetNavLayout,
 	FacetConfig,
+	FacetWrapConfig,
+	FacetGridConfig,
+	FacetScales,
+	FacetAxes,
+	FacetEdges,
+	FacetCellContext,
 	FacetIndicatorContext,
 	FacetIndicatorSnippet,
 	FacetNavDirection,
@@ -252,8 +279,7 @@ export type {
 	LegendNavDirection,
 	LegendNavContext,
 	LegendNavSnippet,
-	LegendInteractionStore,
-	LegendPlotContext
+	LegendInteractionStore
 } from './types/layout/legend';
 export type {
 	HoverStrategy,
@@ -262,5 +288,9 @@ export type {
 	TooltipAnchorX,
 	TooltipAnchorY
 } from './types/layout/tooltip';
-export type { ChartConfig, ChartConfigInput, TextStyle } from './types/configuration/styling';
-export type { ChartProps, GapsAwareChartProps } from './types/charts/props';
+export type {
+	PlotStylesConfig,
+	PlotStylesConfigInput,
+	DividerLineStyle,
+	TextStyle
+} from './types/configuration/styling';

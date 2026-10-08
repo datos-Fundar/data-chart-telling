@@ -7,7 +7,7 @@
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import type { RectMarkerConfig } from '$lib/types/markers/common';
 
-	/** Renders one `'rect'` marker as a `<Rect>` call — an arbitrary rectangle, unlike `BarMarker`'s category-band-anchored bar. */
+	/** Renders one `'rect'` marker as a `<Rect>` call - an arbitrary rectangle, unlike `BarMarker`'s category-band-anchored bar. */
 	let { marker }: { marker: RectMarkerConfig } = $props();
 
 	const cfg = $derived(getConfiguration());

@@ -19,7 +19,7 @@ import type {
 
 /**
  * `graticule`/`sphere`/`contour` opt into drawing underneath the base map's
- * own fill/stroke instead of on top of it — see each config's own `behind`
+ * own fill/stroke instead of on top of it - see each config's own `behind`
  * doc comment.
  */
 function isBehindMarker(
@@ -33,10 +33,10 @@ function isBehindMarker(
 
 /**
  * GeoPlot's "markers" phase: per-feature style resolution/grouping, the base
- * `'geo'` marker(s), and the full draw order — any authored marker with
+ * `'geo'` marker(s), and the full draw order - any authored marker with
  * `behind: true`, then the base map, then the rest of the authored markers,
  * with any `hover` marker moved last. No hover pointer handlers yet on the
- * base marker(s) — those need `BasePlotLayout`'s live callbacks, so they're
+ * base marker(s) - those need `BasePlotLayout`'s live callbacks, so they're
  * attached separately by `attachFeatureHover`, outside the pipeline.
  */
 export function buildMarkers<TProps extends Record<string, unknown>>(

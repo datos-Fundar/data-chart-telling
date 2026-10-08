@@ -43,7 +43,7 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Basic hover marker — an in-SVG dot and value label appear at the nearest
+ * Basic hover marker - an in-SVG dot and value label appear at the nearest
  * point as the cursor moves over the line. A dashed vertical rule (ruleX)
  * is drawn by default. No floating HTML tooltip is involved.
  */
@@ -66,7 +66,7 @@ export const Basic: Story = {
 };
 
 /**
- * Dot only — `showLabels: false` suppresses the value label next to the dot,
+ * Dot only - `showLabels: false` suppresses the value label next to the dot,
  * leaving just the position indicator and the crosshair rule.
  */
 export const WithoutLabels: Story = {
@@ -89,7 +89,7 @@ export const WithoutLabels: Story = {
 };
 
 /**
- * Dot and label only — `ruleX: false` hides the vertical crosshair rule,
+ * Dot and label only - `ruleX: false` hides the vertical crosshair rule,
  * so only the dot and its label are drawn on hover.
  */
 export const WithoutRule: Story = {
@@ -112,7 +112,7 @@ export const WithoutRule: Story = {
 };
 
 /**
- * Both crosshair rules — `ruleX: true` (default) and `ruleY: true` together
+ * Both crosshair rules - `ruleX: true` (default) and `ruleY: true` together
  * draw a full crosshair: a vertical rule at the hovered x and a horizontal
  * rule at the hovered y. Omitting `ruleY` leaves only the vertical rule.
  */
@@ -137,7 +137,7 @@ export const WithBothAxis: Story = {
 };
 
 /**
- * Custom rule style — `rule` overrides the crosshair stroke individually.
+ * Custom rule style - `rule` overrides the crosshair stroke individually.
  * Here the rule is rendered in red with a solid line and higher opacity.
  */
 export const WithCustomRuleStyle: Story = {
@@ -165,7 +165,7 @@ export const WithCustomRuleStyle: Story = {
 };
 
 /**
- * Two series — the unscoped hover marker responds to whichever line's point
+ * Two series - the unscoped hover marker responds to whichever line's point
  * is nearest the cursor. Move between the two lines to see each respond.
  */
 export const TwoSeries: Story = {
@@ -193,7 +193,7 @@ export const TwoSeries: Story = {
 };
 
 /**
- * Series-scoped marker — `series: 'female'` restricts the hover highlight to
+ * Series-scoped marker - `series: 'female'` restricts the hover highlight to
  * points that belong to the female line only. Hovering over the male line
  * produces no dot or label even though both lines are rendered.
  *
@@ -225,7 +225,7 @@ export const SeriesScoped: Story = {
 };
 
 /**
- * Two series from grouped data — `data / x / y / color` auto-creates one
+ * Two series from grouped data - `data / x / y / color` auto-creates one
  * series per unique `color` value. The unscoped hover marker responds to both.
  */
 export const FromGroupedData: Story = {
@@ -243,7 +243,7 @@ export const FromGroupedData: Story = {
 };
 
 /**
- * Grouped-data series-scoped — even though both series are rendered, the
+ * Grouped-data series-scoped - even though both series are rendered, the
  * hover marker only responds to female data points.
  */
 export const GroupedSeriesScoped: Story = {

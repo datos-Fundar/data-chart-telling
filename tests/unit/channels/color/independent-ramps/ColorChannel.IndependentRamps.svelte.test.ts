@@ -16,7 +16,7 @@ function fillsOf(svg: SVGElement, selector: string): string[] {
 	);
 }
 
-// A feature's own name identifies it across the segment-ramp tests below —
+// A feature's own name identifies it across the segment-ramp tests below -
 // real province geometry, synthetic `color`/`grouping` values so each
 // scenario's domain math is fully controlled rather than depending on real
 // population figures.
@@ -46,8 +46,8 @@ function dotMarker(scheme: [string, string]): GeoMarkersConfig[] {
 // Guards the core "Camino B" design guarantee: this package resolves a
 // separate color ramp per consumer instead of routing every mark through one
 // shared scale, so a plot's own channel and a marker's own channel never
-// share domain/scheme — even in the same plot.
-describe('color channel – independent ramps', () => {
+// share domain/scheme - even in the same plot.
+describe('color channel - independent ramps', () => {
 	test('the base map and the dot marker each resolve their own varying fills', async () => {
 		const { container } = render(GeoPlot, {
 			width: 400,
@@ -133,7 +133,7 @@ describe('color channel – independent ramps', () => {
 	});
 });
 
-describe('color channel – independent ramps: segment-scoped (GeoPlot)', () => {
+describe('color channel - independent ramps: segment-scoped (GeoPlot)', () => {
 	test('a segment with its own scales.color overrides the plot-level ramp for its features', async () => {
 		const { container } = render(GeoPlot, {
 			width: 400,
@@ -149,7 +149,7 @@ describe('color channel – independent ramps: segment-scoped (GeoPlot)', () => 
 		const svg = await waitForSvg(container);
 		expect(countGeoPaths(svg)).toBe(ARGENTINA_PROVINCES.length);
 
-		// Both start of their own ramp (t=0) — Córdoba (in the segment) reads
+		// Both start of their own ramp (t=0) - Córdoba (in the segment) reads
 		// the segment's green→yellow ramp; Mendoza (not in the segment) reads
 		// the plot-level red→blue ramp, despite sharing the same `color` value.
 		expect(fillOf(svg, 'Córdoba')).toContain(resolveColorScale({ scheme: ['#00ff00', '#ffff00'] }, [0, 10], [])(0));
@@ -170,7 +170,7 @@ describe('color channel – independent ramps: segment-scoped (GeoPlot)', () => 
 				return 500_000;
 			},
 			grouping: (f) => (['Córdoba', 'Mendoza'].includes(nameOf(f)) ? 'test_segment' : undefined),
-			// No explicit domain anywhere — both ramps auto-compute from their own features.
+			// No explicit domain anywhere - both ramps auto-compute from their own features.
 			scales: { color: { scheme: ['#000000', '#ffffff'] } },
 			segments: { test_segment: [{ scales: { color: { scheme: ['#000000', '#ffffff'] } } }] }
 		});
@@ -178,7 +178,7 @@ describe('color channel – independent ramps: segment-scoped (GeoPlot)', () => 
 
 		// Córdoba (value 100) is the segment's own min → t=0 → pure black. This
 		// is only exactly true if the domain used was [100, 200] (the segment's
-		// own two features) — under the whole dataset's domain ([0, 1e6], via
+		// own two features) - under the whole dataset's domain ([0, 1e6], via
 		// Buenos Aires/Santa Fe) it would land at t≈0.0001, nowhere near pure
 		// black or white, so both endpoint checks together pin the domain down.
 		const segmentDomainColor = resolveColorScale({ scheme: ['#000000', '#ffffff'] }, [100, 200], [])(100);
@@ -208,7 +208,7 @@ describe('color channel – independent ramps: segment-scoped (GeoPlot)', () => 
 	});
 });
 
-describe('color channel – independent ramps: marker inherits the plot ramp when unset', () => {
+describe('color channel - independent ramps: marker inherits the plot ramp when unset', () => {
 	function dotFillOf(svg: SVGElement): string {
 		return svg.querySelector('g.dot path')?.getAttribute('style') ?? '';
 	}

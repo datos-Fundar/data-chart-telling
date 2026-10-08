@@ -19,7 +19,7 @@ export default meta;
 /**
  * A `layout: { type: 'horizontal' }` section narrower than its items need.
  * `maxRows` defaults to 1, so as soon as items would wrap to a second row the
- * section paginates instead — one jurisdiction visible per page, prev/next
+ * section paginates instead - one jurisdiction visible per page, prev/next
  * arrows to browse the rest.
  */
 export const HorizontalPaginatedDefaultMaxRows: StoryObj = {
@@ -46,7 +46,7 @@ export const HorizontalPaginatedDefaultMaxRows: StoryObj = {
 };
 
 /**
- * `maxRows: 2` — the section grows to two wrapped rows before it paginates,
+ * `maxRows: 2` - the section grows to two wrapped rows before it paginates,
  * so each page holds two rows' worth of items (the last page may hold fewer,
  * however many rows are left over). This is the exact case reported: a full
  * discrete legend whose items wrap into several rows, capped to a page height
@@ -129,7 +129,7 @@ export const HorizontalPaginatedCustomNavButton: StoryObj = {
 
 /**
  * Same `setConfiguration({ legend: { navButton: {...} } })` theming mechanism
- * as the rest of the package — switch themes to see the pagination arrows
+ * as the rest of the package - switch themes to see the pagination arrows
  * restyle (compare with `Layout/Facets`' `PaginatedThemeSwitcher`, which
  * themes the equivalent facet buttons).
  */

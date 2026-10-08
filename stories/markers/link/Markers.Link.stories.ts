@@ -4,10 +4,10 @@ import { WORLD_COUNTRIES, FLIGHT_ROUTES } from '../../plots/geo/data';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `link` marker (svelteplot's own `Link`) — a connection between two
+// A `link` marker (svelteplot's own `Link`) - a connection between two
 // points, `curve: 'auto'` (the default) tracing a great-circle arc on a
 // geographic projection instead of a straight line. Geo-only, so `GeoPlot`
-// stands in for the empty canvas the rest of `Markers/*` uses — see
+// stands in for the empty canvas the rest of `Markers/*` uses - see
 // the other stories in this file for the `'linear'` curve and an orthographic
 // globe comparison.
 
@@ -38,7 +38,7 @@ const GEO_PLOT_ARGS = {
 	styles: { fill: '#e2e8f0', stroke: '#94a3b8' }
 } satisfies GeoPlotStory['args'];
 
-/** `x1`/`y1`/`x2`/`y2` are each route's own endpoint fields — the geodesic arc curvature comes from `curve: 'auto'`, the default. */
+/** `x1`/`y1`/`x2`/`y2` are each route's own endpoint fields - the geodesic arc curvature comes from `curve: 'auto'`, the default. */
 export const Basic: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {
@@ -60,7 +60,7 @@ export const Basic: GeoPlotStory = {
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Spherical (geodesic) links on `equal-earth` — `curve: 'auto'` (the
+ * Spherical (geodesic) links on `equal-earth` - `curve: 'auto'` (the
  * default) traces each route as a great-circle arc, visibly curved rather
  * than a straight line between the two endpoints.
  */
@@ -84,7 +84,7 @@ export const SphericalLinks: GeoPlotStory = {
 };
 
 /**
- * Linear links — `curve: 'linear'` forces a straight planar line between
+ * Linear links - `curve: 'linear'` forces a straight planar line between
  * endpoints instead of the geodesic arc. Compare with `SphericalLinks` on
  * the same projection to see the difference.
  */
@@ -109,11 +109,11 @@ export const LinearLinks: GeoPlotStory = {
 };
 
 /**
- * Spherical links on an orthographic globe — the geodesic curvature is most
+ * Spherical links on an orthographic globe - the geodesic curvature is most
  * visually obvious on a hemisphere view. `coordinates.zoom: true` also enables
  * drag-to-rotate here (orthographic-specific: dragging spins the globe
  * instead of panning it, since panning a globe within its own frame isn't
- * useful) — drag the canvas below to see a route's great-circle arc land
+ * useful) - drag the canvas below to see a route's great-circle arc land
  * correctly wherever the globe is currently facing.
  */
 export const OnOrthographicGlobe: GeoPlotStory = {

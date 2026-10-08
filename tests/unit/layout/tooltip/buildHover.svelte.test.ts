@@ -8,20 +8,20 @@ import type { LegendInteractionStore } from '$lib/types/layout/legend';
 type Row = Record<string, unknown>;
 
 describe('buildHover', () => {
-	const base = { points: [], label: () => '', defaultStrategy: 'x' as const };
+	const base = { points: [], label: () => '', format: () => '', defaultStrategy: 'x' as const };
 
 	test('is active with a tooltip or a hover marker, and only then', () => {
 		expect(buildHover<Row>({ ...base, tooltip: undefined, markers: [] }).active).toBe(false);
 		expect(
 			buildHover<Row>({ ...base, tooltip: undefined, markers: [{ type: 'hover' }] }).active
 		).toBe(true);
-		const tooltip = { format: () => '', facetId: '', sync: false };
+		const tooltip = { format: () => '', sync: false };
 		expect(buildHover<Row>({ ...base, tooltip, markers: [] }).active).toBe(true);
 	});
 
 	test("falls back to the plot kind's own strategy, and the tooltip's wins over it", () => {
 		expect(buildHover<Row>({ ...base, tooltip: undefined, markers: [] }).strategy).toBe('x');
-		const tooltip = { format: () => '', facetId: '', sync: false, strategy: 'series' as const };
+		const tooltip = { format: () => '', sync: false, strategy: 'series' as const };
 		expect(buildHover<Row>({ ...base, tooltip, markers: [] }).strategy).toBe('series');
 	});
 
@@ -67,7 +67,7 @@ describe('buildProcessedHoverPoints', () => {
 
 	test('leaves out a series the legend turned off, and rows `include` rejects', () => {
 		const legendInteraction = {
-			disabledSeries: new SvelteMap([['A', { mode: 'style' }]])
+			disabledSeries: new SvelteMap([['A', { mode: 'dim' }]])
 		} as unknown as LegendInteractionStore;
 		const off = buildProcessedHoverPoints<Row>({
 			processed,

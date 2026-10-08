@@ -18,7 +18,7 @@ const FEMALE = {
 	data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
 };
 
-/** Dispatches a centered `pointerenter` on the first per-category hit area — see the tie-break test below for why this selector picks it out from other transparent rects. */
+/** Dispatches a centered `pointerenter` on the first per-category hit area - see the tie-break test below for why this selector picks it out from other transparent rects. */
 function hoverFirstCategory(svg: SVGElement) {
 	const hitAreas = svg.querySelectorAll('rect[fill="transparent"]:not([pointer-events])');
 	const target = hitAreas[0] as SVGRectElement;
@@ -32,11 +32,8 @@ function hoverFirstCategory(svg: SVGElement) {
 	);
 }
 
-// The hover marker's dot/label/rules only appear once svelteplot's <Pointer>
-// reports a match, which requires a real cursor position over the rendered
-// marks. These tests exercise the marker's static (no-hover) baseline and
-// its configuration surface — not the interactive matching itself.
-describe('BarPlot – markers.hover', () => {
+// The static baseline and configuration of the hover marker; matching needs a real cursor.
+describe('BarPlot - markers.hover', () => {
 	test('renders with a basic hover marker and shows nothing before any hover', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
@@ -128,13 +125,7 @@ describe('BarPlot – markers.hover', () => {
 		expect(svg).toBeTruthy();
 	});
 
-	// Regression: two categories tied on the same value, matched with
-	// `strategy: 'x'` on a horizontal (ungrouped, single-series) bar chart —
-	// both rows fall back to the same default series name, so `matched` ends
-	// up with two same-series points. HoverMarker's `{#each}` used to key
-	// purely by `point.series ?? \`${x}_${y}\``, which only fell back to x/y
-	// when series was nullish; here series is the truthy default 'series' for
-	// both points, so the key collided and Svelte threw a duplicate-key error.
+	// Two categories tied under `strategy: 'x'` share a series name and must not collide as keys.
 	test('does not crash when two categories tie under strategy: "x" (hover.activePoint tie-break)', async () => {
 		const data = [
 			{ province: 'Buenos Aires', value: 1.38 },
@@ -149,7 +140,6 @@ describe('BarPlot – markers.hover', () => {
 			y: 'value',
 			scales: { y: { type: 'categorical' } },
 			tooltip: {
-				facetId: '',
 				sync: false,
 				strategy: 'x',
 				format: (row) => `${(row as { province: string }).province}`
@@ -157,9 +147,7 @@ describe('BarPlot – markers.hover', () => {
 			markers: [{ type: 'hover' }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
-		// Per-category hit areas — distinct from the plot's own full-box
-		// pointer-catcher rect, which also renders `fill="transparent"` but
-		// carries `pointer-events="all"`.
+		// Per-category hit areas, not the plot's full-box pointer catcher.
 		const hitAreas = svg.querySelectorAll('rect[fill="transparent"]:not([pointer-events])');
 		expect(hitAreas.length).toBe(3);
 		const target = hitAreas[0] as SVGRectElement;
@@ -171,7 +159,7 @@ describe('BarPlot – markers.hover', () => {
 				clientY: rect.top + rect.height / 2
 			})
 		);
-		// Both tied rows (Buenos Aires and Mendoza) should highlight — proving
+		// Both tied rows (Buenos Aires and Mendoza) should highlight - proving
 		// the render survived without crashing on the duplicate key.
 		await vi.waitFor(() => {
 			expect(countDotMarks(svg)).toBe(2);
@@ -179,10 +167,10 @@ describe('BarPlot – markers.hover', () => {
 	});
 });
 
-describe('BarPlot – markers.hover areaX/areaY', () => {
+describe('BarPlot - markers.hover areaX/areaY', () => {
 	afterEach(() => resetConfiguration());
 
-	test('off by default — no highlight area even once a category is hovered', async () => {
+	test('off by default - no highlight area even once a category is hovered', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,
@@ -242,12 +230,8 @@ describe('BarPlot – markers.hover areaX/areaY', () => {
 		expect(Number(area.getAttribute('width'))).toBeGreaterThan(0);
 	});
 
-	// Only the axis actually holding a band scale renders a highlight — a
-	// plain bar chart has exactly one (its category axis), so setting both
-	// `areaX` and `areaY` still draws a single area here (the "cross" shape
-	// needs a chart with a band scale on *both* axes, e.g. a heatmap — see
-	// HeatmapPlot's own markers.hover test).
-	test('areaY on a vertical bar chart is a no-op — its value axis has no band scale', async () => {
+	// Only the band axis gets a highlight, so `areaX` and `areaY` draw one area here.
+	test('areaY on a vertical bar chart is a no-op - its value axis has no band scale', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,

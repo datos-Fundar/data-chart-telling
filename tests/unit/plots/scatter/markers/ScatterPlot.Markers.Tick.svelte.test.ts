@@ -5,7 +5,7 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { COUNTRIES } from '../../../../../stories/plots/scatter/data';
 import { waitForSvg, countTickMarks } from '../../_helpers/svg';
 
-describe('ScatterPlot – markers.tick', () => {
+describe('ScatterPlot - markers.tick', () => {
 	test('a quantitative x with a band y renders one TickX per row', async () => {
 		const { container } = render(ScatterPlot, {
 			width: 400,

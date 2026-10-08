@@ -27,7 +27,7 @@ const preview: Preview = {
 		docs: {
 			source: {
 				type: 'dynamic',
-				// Overridable per-story via `parameters.docs.source.code` — see `renderSource`.
+				// Overridable per-story via `parameters.docs.source.code` - see `renderSource`.
 				transform: (_src: string, ctx: any) => {
 					const c = ctx.component as any;
 					const name =
@@ -50,11 +50,7 @@ const preview: Preview = {
 		},
 
 		options: {
-			// Sidebar order: a learning path from the low-level primitives (Plots,
-			// then the layout building blocks — legend/timeline/facets/tooltip) up
-			// through styling, the ready-made Charts, and finally Orchestration,
-			// which shows them all composed together. Unlisted stories fall back
-			// to alphabetical order.
+			// Unlisted stories fall back to alphabetical order.
 			storySort: {
 				order: [
 					'Plots',
@@ -203,8 +199,8 @@ const preview: Preview = {
 						'Statistics'
 					],
 					'Configuration',
-					'Charts',
-					'Orchestration'
+					'Composition',
+					['Chrome', 'PlotShell', 'PlotComposer']
 				]
 			}
 		}

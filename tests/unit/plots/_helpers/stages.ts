@@ -1,9 +1,9 @@
-import { buildAxisStages } from '$lib/layout/phases/axisStages';
+import { buildAxisStages } from '$lib/layout/phases/stages';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
 import type { AxisPlotState, AxisPlotCtx, AxisPlotKind, PlotPhase } from '$lib/types/layout/phases';
 
 /**
- * One phase of a plot kind's pipeline, as `buildAxisStages` sets it up — so a
+ * One phase of a plot kind's pipeline, as `buildAxisStages` sets it up - so a
  * test can run a single shared stage with that kind's own options. `ctx`
  * defaults to the default configuration with no legend.
  */

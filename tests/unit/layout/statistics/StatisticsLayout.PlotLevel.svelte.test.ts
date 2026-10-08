@@ -15,7 +15,7 @@ const scatterData = Array.from({ length: 20 }, (_, i) => ({
 	group: i % 2 === 0 ? 'A' : 'B'
 }));
 
-describe('statistics – plot level (Scatter), pooled scope', () => {
+describe('statistics - plot level (Scatter), pooled scope', () => {
 	test('a regression entry with no series scope pools every point into one fitted curve', async () => {
 		const { container } = render(ScatterPlot, {
 			width: 400,
@@ -30,7 +30,7 @@ describe('statistics – plot level (Scatter), pooled scope', () => {
 	});
 });
 
-describe('statistics – plot level (Scatter), named series scope', () => {
+describe('statistics - plot level (Scatter), named series scope', () => {
 	test('one derived marker per listed series', async () => {
 		const { container } = render(ScatterPlot, {
 			width: 400,
@@ -46,7 +46,7 @@ describe('statistics – plot level (Scatter), named series scope', () => {
 	});
 });
 
-describe('statistics – plot level (Line), movingAverage', () => {
+describe('statistics - plot level (Line), movingAverage', () => {
 	test('by default renders one smoothed line per series, in that series’ grouping', async () => {
 		const { container } = render(LinePlot, {
 			width: 400,

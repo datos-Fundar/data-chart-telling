@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LineChart from '$lib/charts/line/Chart.svelte';
+import LinePlot from '$lib/plots/line/Plot.svelte';
 import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
 
 /** Matching and scoping across multiple series sharing the hovered x. */
 const meta = {
 	title: 'Layout/Tooltip/MultiSeries',
-	component: LineChart,
+	component: LinePlot,
 	tags: ['autodocs'],
 	args: { width: 680, height: 400, data: TIME_SERIES, x: 'year', y: 'value' },
 	argTypes: {
@@ -18,9 +18,9 @@ const meta = {
 		tooltip: { control: false }
 	},
 	parameters: {
-		docs: { source: { name: 'LineChart' } }
+		docs: { source: { name: 'LinePlot' } }
 	}
-} satisfies Meta<typeof LineChart>;
+} satisfies Meta<typeof LinePlot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

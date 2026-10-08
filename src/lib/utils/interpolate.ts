@@ -1,4 +1,4 @@
-import type { EasingName, EasingFn } from '$lib/types/charts/interpolate';
+import type { EasingName, EasingFn } from '$lib/types/misc/easing';
 import type { TimeValue, TimelineInterpolation } from '$lib/types/layout/timeline';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { Accessor } from '$lib/types/plots/data/common';
@@ -21,12 +21,8 @@ export function resolveEasing(easing?: EasingName | EasingFn): EasingFn {
 }
 
 /**
- * Brackets a continuous target position `x` within one key-group's sorted
- * rows and tweens between the two real rows it falls between — the leading
- * edge moves continuously instead of snapping between steps. Returns every
- * already-passed real row plus the synthetic tween row (or just the clamped
- * first/last row when `x` is outside the group's range). A caller that wants
- * a single replacing "frame" (e.g. a bar snapshot) takes just the last entry.
+ * Tweens one key-group's sorted rows at a continuous position `x`: every
+ * passed row plus the synthetic row between the two surrounding ones.
  */
 export function interpolateSeries<TRow>({
 	rows,
@@ -79,13 +75,7 @@ export function interpolateSeries<TRow>({
 	return result;
 }
 
-/**
- * Resolves `TimelineConfig.interpolate` (`true` | a partial config | unset)
- * into a fully-populated {@link TimelineInterpolation}, falling back to the
- * chart-supplied `value`/`key` defaults — used by `LineChart`/`BarChart` so
- * consumers can write `interpolate: true` instead of repeating their own
- * `y`/`grouping` (or `color`, when `grouping` is unset).
- */
+/** `TimelineConfig.interpolate` as a full {@link TimelineInterpolation}, with the plot's `value`/`key` as defaults. */
 export function resolveTimelineInterpolation<TRow extends Record<string, unknown>>(
 	interpolate: boolean | TimelineInterpolation<TRow> | undefined,
 	defaults: { value: Accessor<TRow, AxisValue>; key?: Accessor<TRow, unknown> }

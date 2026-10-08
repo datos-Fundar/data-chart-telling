@@ -1,5 +1,5 @@
-// Flat heatmap cells over time, with a scenario facet dimension — used by the
-// HeatmapChart/tooltip/configuration/orchestration stories.
+// Flat heatmap cells over time, with a scenario facet dimension - used by the
+// HeatmapPlot/tooltip/configuration/composition stories.
 
 export type HeatCell = {
   year: number;

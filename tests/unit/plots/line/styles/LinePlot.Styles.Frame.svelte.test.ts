@@ -7,7 +7,7 @@ import { waitForSvg } from '../../_helpers/svg';
 
 const FEMALE = { name: 'female', x: 'year' as const, y: 'value' as const, data: FEMALE_LIFE_EXPECTANCY };
 
-describe('LinePlot – styles.frame', () => {
+describe('LinePlot - styles.frame', () => {
   test('no frame by default', async () => {
     const { container } = await render(LinePlot, { width: 400, height: 300, series: [FEMALE] });
     const svg = await waitForSvg(container);

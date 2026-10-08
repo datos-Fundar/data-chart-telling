@@ -14,10 +14,10 @@ function fillsOf(svg: SVGElement, selector: string): string[] {
 }
 
 // A plot-level `color` accessor + `scales.color` is the same contract across
-// every plot kind — these tests exercise it directly against two very
+// every plot kind - these tests exercise it directly against two very
 // different kinds (a categorical grid vs. a map) to guard the shared channel
 // behavior, independent of either kind's own Styles/Scales test suite.
-describe('color channel – plot level', () => {
+describe('color channel - plot level', () => {
 	test('HeatmapPlot: a color accessor resolves each cell to its own fill', async () => {
 		const { container } = render(HeatmapPlot, {
 			width: 400,

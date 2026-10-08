@@ -5,7 +5,7 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { COUNTRIES } from '../../../../../stories/plots/scatter/data';
 import { waitForSvg, countDensityPaths } from '../../_helpers/svg';
 
-describe('ScatterPlot – markers.density', () => {
+describe('ScatterPlot - markers.density', () => {
 	test('renders filled contour bands', async () => {
 		const { container } = render(ScatterPlot, {
 			width: 400,

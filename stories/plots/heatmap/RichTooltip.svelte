@@ -20,7 +20,7 @@
 	{@const row = rows[0]}
 	{#if row}
 		<TooltipCard
-			heading="{row.province} — {row.sex}"
+			heading="{row.province} - {row.sex}"
 			entries={[
 				{
 					label: 'Life expectancy',
@@ -49,11 +49,10 @@
 		]}
 		scales={{ color: { domain: COLOR_DOMAIN } }}
 		tooltip={{
-			facetId: '',
 			sync: false,
 			format: (row) => {
 				const { province, sex, value } = row as ProvinceSexCell;
-				return `${province} — ${sex}: ${value.toFixed(1)} yr`;
+				return `${province} - ${sex}: ${value.toFixed(1)} yr`;
 			},
 			content
 		}}

@@ -9,24 +9,26 @@ import type { ProcessedData, ProcessedRow } from '$lib/types/layout/phases';
 /**
  * A plot's `hover` config for `BasePlotLayout`: active whenever there's a
  * tooltip or a hover marker, with the strategy and sync those two resolve to
- * (the plot kind's own `defaultStrategy` when neither sets one).
+ * (the plot kind's own `defaultStrategy` when neither sets one). The tooltip
+ * reads as `format` unless it sets its own.
  */
 export function buildHover<TRow extends Record<string, unknown>>(args: {
 	tooltip: TooltipConfig<TRow> | undefined;
+	format: (row: TRow) => string;
 	markers: { type: string }[];
 	points: HoverPoint<TRow>[];
 	label: (row: TRow) => string;
 	defaultStrategy: HoverStrategy;
 	pointMatching?: PointMatchingStrategy;
 }): HoverConfig<TRow> {
-	const { tooltip, markers, points, label, defaultStrategy, pointMatching } = args;
+	const { tooltip, format, markers, points, label, defaultStrategy, pointMatching } = args;
 	return {
 		active: tooltip != null || hasHoverMarker(markers),
 		points,
 		label,
 		strategy: resolveHoverStrategy(tooltip?.strategy, markers, defaultStrategy),
 		sync: resolveHoverSync(tooltip?.sync, markers),
-		tooltip,
+		tooltip: tooltip && { ...tooltip, format: tooltip.format ?? format },
 		...(pointMatching ? { pointMatching } : {})
 	};
 }

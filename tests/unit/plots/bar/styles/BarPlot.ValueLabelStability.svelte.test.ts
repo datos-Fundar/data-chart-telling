@@ -12,7 +12,7 @@ function frameY(container: Element): number {
   return Number(container.querySelector('rect.frame')?.getAttribute('transform')?.match(/,([\d.]+)\)/)?.[1]);
 }
 
-describe('BarPlot – outside-anchored value labels reserve room up front', () => {
+describe('BarPlot - outside-anchored value labels reserve room up front', () => {
   test('the top margin already fits the tallest label on the very first render', async () => {
     const withLabels = await render(BarPlot, {
       width: 400,

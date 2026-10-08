@@ -16,11 +16,11 @@ import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import LinePlot from '$lib/plots/line/Plot.svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `geo-hover` marker — the in-map hover highlight, restyling whichever
+// A `geo-hover` marker - the in-map hover highlight, restyling whichever
 // feature is under the cursor. Its own `type: 'geo-hover'` tag (rather than
 // the axis-based plots' `'hover'`) keeps the two config shapes unambiguous.
 // Needs real distinct features to hover between, which `WORLD_COUNTRIES`
-// already provides — see the other stories in this file for more style
+// already provides - see the other stories in this file for more style
 // variants.
 
 const meta = {
@@ -61,7 +61,7 @@ const LINE_PLOT_ARGS = {
 	height: 400
 } satisfies LinePlotStory['args'];
 
-/** Hover a country — it gets a neutral translucent fill (the shared `hover.area` theme default). Matching follows the browser's own SVG hit-testing. */
+/** Hover a country - it gets a neutral translucent fill (the shared `hover.area` theme default). Matching follows the browser's own SVG hit-testing. */
 export const Basic: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {
@@ -72,7 +72,7 @@ export const Basic: GeoPlotStory = {
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** Basic hover marker — the feature under the cursor gets a neutral translucent fill (the shared `hover.area` theme default). Matching follows the browser's own SVG hit-testing, not distance to a centroid. */
+/** Basic hover marker - the feature under the cursor gets a neutral translucent fill (the shared `hover.area` theme default). Matching follows the browser's own SVG hit-testing, not distance to a centroid. */
 export const ProvinceHighlight: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {
@@ -81,7 +81,7 @@ export const ProvinceHighlight: GeoPlotStory = {
 	}
 };
 
-/** Custom style — overrides the hovered feature's stroke. */
+/** Custom style - overrides the hovered feature's stroke. */
 export const CustomStyle: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {
@@ -92,7 +92,7 @@ export const CustomStyle: GeoPlotStory = {
 	}
 };
 
-/** Filled highlight — a semi-transparent fill on top of the feature's own choropleth color. */
+/** Filled highlight - a semi-transparent fill on top of the feature's own choropleth color. */
 export const FilledHighlight: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {
@@ -109,7 +109,7 @@ export const FilledHighlight: GeoPlotStory = {
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Basic hover marker — an in-SVG dot and value label appear at the nearest
+ * Basic hover marker - an in-SVG dot and value label appear at the nearest
  * point as the cursor moves over the line. A dashed vertical rule (ruleX)
  * is drawn by default. No floating HTML tooltip is involved.
  */
@@ -134,7 +134,7 @@ export const TimeSeries: LinePlotStory = {
 };
 
 /**
- * Dot only — `showLabels: false` suppresses the value label next to the dot,
+ * Dot only - `showLabels: false` suppresses the value label next to the dot,
  * leaving just the position indicator and the crosshair rule.
  */
 export const WithoutLabels: LinePlotStory = {
@@ -159,7 +159,7 @@ export const WithoutLabels: LinePlotStory = {
 };
 
 /**
- * Dot and label only — `ruleX: false` hides the vertical crosshair rule,
+ * Dot and label only - `ruleX: false` hides the vertical crosshair rule,
  * so only the dot and its label are drawn on hover.
  */
 export const WithoutRule: LinePlotStory = {
@@ -184,7 +184,7 @@ export const WithoutRule: LinePlotStory = {
 };
 
 /**
- * Both crosshair rules — `ruleX: true` (default) and `ruleY: true` together
+ * Both crosshair rules - `ruleX: true` (default) and `ruleY: true` together
  * draw a full crosshair: a vertical rule at the hovered x and a horizontal
  * rule at the hovered y. Omitting `ruleY` leaves only the vertical rule.
  */
@@ -211,7 +211,7 @@ export const WithBothAxis: LinePlotStory = {
 };
 
 /**
- * Custom rule style — `rule` overrides the crosshair stroke individually.
+ * Custom rule style - `rule` overrides the crosshair stroke individually.
  * Here the rule is rendered in red with a solid line and higher opacity.
  */
 export const WithCustomRuleStyle: LinePlotStory = {
@@ -241,7 +241,7 @@ export const WithCustomRuleStyle: LinePlotStory = {
 };
 
 /**
- * Two series — the unscoped hover marker responds to whichever line's point
+ * Two series - the unscoped hover marker responds to whichever line's point
  * is nearest the cursor. Move between the two lines to see each respond.
  */
 export const TwoSeries: LinePlotStory = {
@@ -271,7 +271,7 @@ export const TwoSeries: LinePlotStory = {
 };
 
 /**
- * Series-scoped marker — `series: 'female'` restricts the hover highlight to
+ * Series-scoped marker - `series: 'female'` restricts the hover highlight to
  * points that belong to the female line only. Hovering over the male line
  * produces no dot or label even though both lines are rendered.
  *
@@ -305,7 +305,7 @@ export const SeriesScoped: LinePlotStory = {
 };
 
 /**
- * Two series from grouped data — `data / x / y / color` auto-creates one
+ * Two series from grouped data - `data / x / y / color` auto-creates one
  * series per unique `color` value. The unscoped hover marker responds to both.
  */
 export const FromGroupedData: LinePlotStory = {
@@ -325,7 +325,7 @@ export const FromGroupedData: LinePlotStory = {
 };
 
 /**
- * Grouped-data series-scoped — even though both series are rendered, the
+ * Grouped-data series-scoped - even though both series are rendered, the
  * hover marker only responds to female data points.
  */
 export const GroupedSeriesScoped: LinePlotStory = {

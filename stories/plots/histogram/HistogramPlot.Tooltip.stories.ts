@@ -42,7 +42,6 @@ type Story = StoryObj<typeof meta>;
 
 /** The bin's edges and count, and its group when the histogram is grouped. */
 const TOOLTIP = {
-	facetId: '',
 	sync: false,
 	format: (row: Record<string, unknown>) => {
 		const range = `${Number(row.from).toFixed(1)} to ${Number(row.to).toFixed(1)}`;

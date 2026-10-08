@@ -22,7 +22,7 @@ const base = {
 	scales: { x: { domain: [0, 5] }, y: { domain: [0, 5] } }
 };
 
-describe('ScatterPlot – markers.trail', () => {
+describe('ScatterPlot - markers.trail', () => {
 	test('renders a single trail path', async () => {
 		const { container } = render(ScatterPlot, {
 			...base,

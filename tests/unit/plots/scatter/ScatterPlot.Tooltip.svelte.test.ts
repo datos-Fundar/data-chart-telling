@@ -9,7 +9,7 @@ function noTooltipDom(container: Element) {
 	return container.querySelector('.dct-tooltip, [class*="tooltip"]');
 }
 
-describe('ScatterPlot – tooltip', () => {
+describe('ScatterPlot - tooltip', () => {
 	test('no floating tooltip appears without a tooltip config', async () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
@@ -30,7 +30,6 @@ describe('ScatterPlot – tooltip', () => {
 			x: 'gdpPerCapita',
 			y: 'lifeExpectancy',
 			tooltip: {
-				facetId: '',
 				sync: false,
 				format: (row) => `${(row as CountryPoint).country}`
 			}
@@ -48,7 +47,6 @@ describe('ScatterPlot – tooltip', () => {
 			y: 'lifeExpectancy',
 			color: 'region',
 			tooltip: {
-				facetId: '',
 				sync: false,
 				format: (row) =>
 					`${(row as CountryPoint).country}: ${(row as CountryPoint).lifeExpectancy} yr`
@@ -67,7 +65,6 @@ describe('ScatterPlot – tooltip', () => {
 			y: 'lifeExpectancy',
 			color: 'region',
 			tooltip: {
-				facetId: '',
 				sync: false,
 				series: ['Americas'],
 				format: (row) => `${(row as CountryPoint).country}`

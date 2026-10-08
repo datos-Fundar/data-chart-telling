@@ -5,7 +5,7 @@
   /**
    * Renders one `'contour'` marker's `<Contour>` mark. `marker.clip` is
    * handled by the caller (`GeometryLayout` wraps this in `ContourClipMarker`)
-   * — this component only draws the contour itself.
+   * - this component only draws the contour itself.
    */
   let { marker }: { marker: GeoContourMarkerConfig } = $props();
 </script>

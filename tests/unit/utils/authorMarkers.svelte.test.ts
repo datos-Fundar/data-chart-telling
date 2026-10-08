@@ -35,7 +35,7 @@ describe('prepareAuthorMarkers', () => {
 	});
 });
 
-describe('prepareAuthorMarkers – scope', () => {
+describe('prepareAuthorMarkers - scope', () => {
 	const series = [{ name: 'A', data: rows.filter((r) => r.g === 'A') }];
 	const scopedGroups = [
 		{

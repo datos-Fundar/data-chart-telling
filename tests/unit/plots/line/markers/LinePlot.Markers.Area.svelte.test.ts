@@ -8,7 +8,7 @@ import {
 } from '../../../../../stories/plots/line/data';
 import { waitForSvg, countAreaPaths } from '../../_helpers/svg';
 
-describe('LinePlot – markers.area', () => {
+describe('LinePlot - markers.area', () => {
 	test('default orientation (AreaY) renders one area path', async () => {
 		const { container } = render(LinePlot, {
 			width: 400,

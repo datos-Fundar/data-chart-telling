@@ -5,7 +5,7 @@ import { COUNTRIES } from '../../plots/scatter/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `voronoi` (one polygon per point) and `voronoiMesh` (the whole diagram as a
-// single path) — svelteplot's own `Voronoi` / `VoronoiMesh`. Both take
+// single path) - svelteplot's own `Voronoi` / `VoronoiMesh`. Both take
 // `x`/`y`. A plot grouped by `color` draws one diagram per group and tints it
 // with the group's palette color, without any setting on the marker itself.
 
@@ -48,7 +48,7 @@ export const Cells: Story = {
 	}
 };
 
-/** Cells filled by region — `styles.fill` is left to the author, `color` only drives the stroke. */
+/** Cells filled by region - `styles.fill` is left to the author, `color` only drives the stroke. */
 export const FilledByRegion: Story = {
 	args: {
 		color: 'region',

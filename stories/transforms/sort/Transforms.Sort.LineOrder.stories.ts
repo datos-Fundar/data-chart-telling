@@ -60,7 +60,7 @@ export const SortByField: Story = {
 	args: { markers: path([{ type: 'sort', sort: 'open' }]) }
 };
 
-/** `sort: { channel: 'y' }` sorts by another channel's value — here the close, so the path climbs from the bottom up. */
+/** `sort: { channel: 'y' }` sorts by another channel's value - here the close, so the path climbs from the bottom up. */
 export const SortByChannel: Story = {
 	args: { markers: path([{ type: 'sort', sort: { channel: 'y' } }]) }
 };

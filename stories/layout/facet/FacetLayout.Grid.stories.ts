@@ -4,13 +4,13 @@ import { renderSource } from '../../common/docsSource';
 
 // `FacetDemo` renders through a wrapper, so `parameters.docs.source.code`
 // overrides the "show code" panel with the real `<FacetLayout>` call via
-// `renderSource` — see `stories/common/docsSource.ts`.
+// `renderSource` - see `stories/common/docsSource.ts`.
 function gridSource(groupCount: number, columns: number) {
   return renderSource('FacetLayout', { data: dataForGroupCount(groupCount), by: 'group', columns });
 }
 
 /**
- * `mode: 'grid'` (the default) — every facet renders at once, arranged in a
+ * `mode: 'grid'` (the default) - every facet renders at once, arranged in a
  * `columns`-wide responsive grid.
  */
 const meta = {
@@ -29,13 +29,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Two groups, two columns — side by side. */
+/** Two groups, two columns - side by side. */
 export const TwoSideBySide: Story = {
   args: { groupCount: 2, columns: 2 },
   parameters: { docs: { source: { code: gridSource(2, 2) } } },
 };
 
-/** Two groups, one column — stacked vertically. */
+/** Two groups, one column - stacked vertically. */
 export const TwoStacked: Story = {
   args: { groupCount: 2, columns: 1 },
   parameters: { docs: { source: { code: gridSource(2, 1) } } },

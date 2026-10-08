@@ -60,7 +60,7 @@ function build(overrides: Partial<GeoPlotState<Props>> = {}) {
 	return buildData(state);
 }
 
-describe('buildData – feature id', () => {
+describe('buildData - feature id', () => {
 	test('defaults to feature.id', () => {
 		const result = build();
 		expect(result.allFeatures![0].__id).toBe('a');
@@ -72,7 +72,7 @@ describe('buildData – feature id', () => {
 	});
 });
 
-describe('buildData – centroid tagging', () => {
+describe('buildData - centroid tagging', () => {
 	test('tags a Point feature with its own coordinates as the centroid', () => {
 		const result = build();
 		expect(result.allFeatures![0].__cx).toBe(10);
@@ -80,7 +80,7 @@ describe('buildData – centroid tagging', () => {
 	});
 });
 
-describe('buildData – excludeParts', () => {
+describe('buildData - excludeParts', () => {
 	test('allFeatures is unaffected by excludeParts', () => {
 		const result = build({
 			rawFeatures: [multiPoly('a', 'Alpha')],
@@ -95,7 +95,7 @@ describe('buildData – excludeParts', () => {
 			excludeParts: (part) => part.centroid[0] > 5
 		});
 		// Still a MultiPolygon (filterGeometryParts only collapses to the bare
-		// part type when exactly one part existed to begin with) — but its
+		// part type when exactly one part existed to begin with) - but its
 		// coordinates now hold only the kept polygon, and the centroid re-fits.
 		expect(result.features![0].geometry.type).toBe('MultiPolygon');
 		expect(result.features![0].__cx).toBe(1);

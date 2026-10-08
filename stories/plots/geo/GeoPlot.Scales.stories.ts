@@ -4,7 +4,7 @@ import type { GeoScalesConfig, CoordinatesConfig } from '$lib/types/layout/coord
 import { WORLD_COUNTRIES, type WorldCountryProps } from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// `scales.color` configures the choropleth colour domain — the only scale a
+// `scales.color` configures the choropleth colour domain - the only scale a
 // map has, since there's no x/y axis pair (see Coordinates for the
 // projection stories, which used to live here before the coordinate system
 // was split out into its own `coordinates` prop).
@@ -35,7 +35,7 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Continuous color domain — `scales.color.domain` pins the choropleth ramp
+ * Continuous color domain - `scales.color.domain` pins the choropleth ramp
  * to a fixed `[min, max]` range instead of auto-fitting to the visible
  * data's min/max (mirrors HeatmapPlot's `scales.color.domain`). Paired with a
  * `color` accessor (see the `Series` stories) so every country's estimated

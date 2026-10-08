@@ -23,7 +23,7 @@ afterEach(() => vi.restoreAllMocks());
 
 // ── No segments ───────────────────────────────────────────────────────────────
 
-describe('buildGroupedSeries – no segments', () => {
+describe('buildGroupedSeries - no segments', () => {
   test('returns one group per series', () => {
     const groups = buildGroupedSeries([SERIES], {});
     expect(groups).toHaveLength(1);
@@ -49,7 +49,7 @@ describe('buildGroupedSeries – no segments', () => {
 
 // ── Area filtering ─────────────────────────────────────────────────────────────
 
-describe('buildGroupedSeries – area filtering', () => {
+describe('buildGroupedSeries - area filtering', () => {
   // Find the user-segment (area match) that contains a given x value.
   const userSegWith = (
     groups: ReturnType<typeof buildGroupedSeries<Series<P>>>,
@@ -91,7 +91,7 @@ describe('buildGroupedSeries – area filtering', () => {
 
 // ── Segment continuity ─────────────────────────────────────────────────────────
 
-describe('buildGroupedSeries – segment continuity', () => {
+describe('buildGroupedSeries - segment continuity', () => {
   test('adjacent area segments have a 2-point connector that bridges the gap', () => {
     const segments: SegmentsConfig<LineSegmentStyle> = {
       a: [
@@ -110,7 +110,7 @@ describe('buildGroupedSeries – segment continuity', () => {
 
 // ── Style pass-through ─────────────────────────────────────────────────────────
 
-describe('buildGroupedSeries – style pass-through', () => {
+describe('buildGroupedSeries - style pass-through', () => {
   test('area segment style is passed through to the visual segment', () => {
     const style: LineSegmentStyle = { stroke: { stroke: '#ff0000', strokeWidth: 3 } };
     const groups = buildGroupedSeries([SERIES], { a: [{ areas: [{ x: { from: 1, to: 5 } }], styles: style }] });
@@ -139,7 +139,7 @@ describe('buildGroupedSeries – style pass-through', () => {
 
 // ── Multiple series ────────────────────────────────────────────────────────────
 
-describe('buildGroupedSeries – multiple series', () => {
+describe('buildGroupedSeries - multiple series', () => {
   test('returns one group per series in the same order', () => {
     const groups = buildGroupedSeries([SERIES, SERIES_B], {});
     expect(groups[0].series.name).toBe('a');
@@ -158,7 +158,7 @@ describe('buildGroupedSeries – multiple series', () => {
 
 // ── Function accessor ──────────────────────────────────────────────────────────
 
-describe('buildGroupedSeries – function accessor', () => {
+describe('buildGroupedSeries - function accessor', () => {
   test('function accessor for x is supported', () => {
     const s: Series<P> = { name: 'fn', x: (d) => d.x, y: (d) => d.y, data: DATA };
     const groups = buildGroupedSeries([s], { fn: [{ areas: [{ x: { from: 3 } }] }] });
@@ -169,7 +169,7 @@ describe('buildGroupedSeries – function accessor', () => {
 
 // ── Catch-all style merging ────────────────────────────────────────────────────
 
-describe('buildGroupedSeries – catch-all style merging', () => {
+describe('buildGroupedSeries - catch-all style merging', () => {
   test('area segment with dots-only inherits stroke from catch-all', () => {
     const segments: SegmentsConfig<LineSegmentStyle> = {
       a: [

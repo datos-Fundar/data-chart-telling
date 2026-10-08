@@ -4,7 +4,7 @@
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import type { VoronoiMarkerConfig } from '$lib/types/markers/common';
 
-	/** Renders one `'voronoi'` marker as `<Voronoi>` — one Voronoi cell per point. */
+	/** Renders one `'voronoi'` marker as `<Voronoi>` - one Voronoi cell per point. */
 	let { marker }: { marker: VoronoiMarkerConfig } = $props();
 
 	const cfg = $derived(getConfiguration());

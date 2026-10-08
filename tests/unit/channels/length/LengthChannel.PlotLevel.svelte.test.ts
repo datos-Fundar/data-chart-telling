@@ -30,7 +30,7 @@ async function maxVectorDiagonal(range: [number, number]): Promise<number> {
 	return Math.max(...boxes.map((b) => Math.sqrt(b.width ** 2 + b.height ** 2)));
 }
 
-describe('length channel – plot level (Geo), scales.length.range', () => {
+describe('length channel - plot level (Geo), scales.length.range', () => {
 	test('a wider configured range renders visibly longer vectors than a narrow one', async () => {
 		const narrow = await maxVectorDiagonal([0, 10]);
 		const wide = await maxVectorDiagonal([0, 100]);

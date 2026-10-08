@@ -5,7 +5,7 @@ import { waitForSvg } from '../_helpers/svg';
 
 type Row = { cat: string; series: string; value: number };
 
-// Both rows share the same category — one segment each, stacked or grouped.
+// Both rows share the same category - one segment each, stacked or grouped.
 const DATA: Row[] = [
 	{ cat: 'A', series: 'female', value: 10 },
 	{ cat: 'A', series: 'male', value: 20 }
@@ -20,7 +20,7 @@ function hitAreaRects(svg: SVGElement): SVGRectElement[] {
 }
 
 describe.each([['stacked'], ['grouped']] as const)(
-	'BarPlot – segment hover (%s)',
+	'BarPlot - segment hover (%s)',
 	(seriesLayout) => {
 		test('hovering each segment reports its own series, not a fixed one', async () => {
 			const { container } = await render(BarPlot, {
@@ -32,7 +32,6 @@ describe.each([['stacked'], ['grouped']] as const)(
 				color: 'series',
 				transforms: seriesLayout === 'stacked' ? [{ type: 'stackY' }] : [],
 				tooltip: {
-					facetId: '',
 					sync: false,
 					strategy: 'series',
 					format: (row) => `${(row as Row).series}:${(row as Row).value}`

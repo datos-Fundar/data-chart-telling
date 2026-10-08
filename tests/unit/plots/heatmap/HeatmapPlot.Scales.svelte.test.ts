@@ -16,7 +16,7 @@ const DATA_PROPS = {
 	color: 'value' as const
 };
 
-describe('HeatmapPlot – scales', () => {
+describe('HeatmapPlot - scales', () => {
 	test('renders with no scale overrides (auto domain)', async () => {
 		const { container } = await render(HeatmapPlot, { width: 400, height: 300, ...DATA_PROPS });
 		const svg = await waitForSvg(container);

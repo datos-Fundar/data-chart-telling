@@ -3,7 +3,7 @@ export type Declutter1DResult<T> = {
   positions: T[];
   /**
    * `connected[i]` is true when `positions[i]` and `positions[i + 1]` were
-   * actually pushed apart by the algorithm — either the down-pass pushed
+   * actually pushed apart by the algorithm - either the down-pass pushed
    * `i + 1` down because of `i`, or the up-pass pulled `i` up because of
    * `i + 1`. `length === positions.length - 1`.
    */
@@ -14,9 +14,9 @@ export type Declutter1DResult<T> = {
  * Spreads a set of pixel-space positions apart along one axis so that no two
  * end up closer than `minGap`, while keeping the overall block centered on
  * the original positions. Computes two independent, individually-valid
- * arrangements — a forward pass that only ever pushes items *down* to clear
+ * arrangements - a forward pass that only ever pushes items *down* to clear
  * the one above it, and a backward pass that only ever pushes items *up* to
- * clear the one below — then averages them index-by-index.
+ * clear the one below - then averages them index-by-index.
  *
  * A pass chained directly onto the other's output (push down, *then* pull up
  * on the already-pushed result) is a no-op: by the time the down-pass
@@ -27,30 +27,30 @@ export type Declutter1DResult<T> = {
  * already >= minGap and the average of two such gaps is too.
  *
  * Also records, per adjacent pair, whether either pass actually had to push
- * — the ground truth for "did these two really interact," which
+ * - the ground truth for "did these two really interact," which
  * `laneAssignment` needs and can't reliably reconstruct from positions alone
  * after the fact (see its own doc comment).
  *
  * `bounds`, if given, keeps every *run* (a maximal stretch of connected
- * items — lone, unconnected items are left at their true position
+ * items - lone, unconnected items are left at their true position
  * regardless) inside `[lo, hi]`: nothing pushed apart by this function is
  * ever allowed to end up off the edge of whatever pixel range the caller
  * considers in-bounds (typically the plot's own content box). A run that
  * already fits is only shifted, never resized; a run too big to fit even
  * at its natural spacing is shrunk just enough to fit, uniformly, so it's
- * still evenly spaced — just tighter than `minGap` calls for. See
+ * still evenly spaced - just tighter than `minGap` calls for. See
  * `fitRunsWithinBounds` for the actual shift/shrink math.
  *
  * `bounds` also biases *which* pass a run's average leans on, via
  * {@link runBiasWeights}: a run sitting close to one edge has little slack on
  * that side, so a plain 50/50 blend would still ask the up-pass and
  * down-pass to pull the block symmetrically toward *both* edges before
- * `fitRunsWithinBounds` shifts/shrinks it back — the up-pass reaching for
+ * `fitRunsWithinBounds` shifts/shrinks it back - the up-pass reaching for
  * room that was never really there, needlessly widening how far members end
  * up travelling from their original positions (`laneAssignment`'s own lane
- * count grows with exactly that travel distance — see its doc comment) — so
+ * count grows with exactly that travel distance - see its doc comment) - so
  * a run near an edge leans toward whichever pass already grows away from it
- * instead — the block still expands to clear `minGap` everywhere, just
+ * instead - the block still expands to clear `minGap` everywhere, just
  * mostly in the one direction that was actually available, the way a person
  * sliding books apart on a shelf pinned against one wall would.
  */
@@ -91,11 +91,11 @@ export function declutter1D<T extends { pos: number }>(
 /**
  * Per-run blend weight (applied to the down-pass; `1 - weight` goes to the
  * up-pass) favouring whichever pass already grows away from the nearer edge
- * — see {@link declutter1D}'s doc comment for why. `0.5` (the down/up
+ * - see {@link declutter1D}'s doc comment for why. `0.5` (the down/up
  * midpoint, i.e. no bias) when a run's naturally-centred span has roughly
  * equal room on both sides; sliding toward `1` (all down-pass) as room above
  * vanishes, toward `0` (all up-pass) as room below vanishes. Every member of
- * a run gets the *same* weight — the point is the block moving as one
+ * a run gets the *same* weight - the point is the block moving as one
  * (mostly) one-directional piece, not each member picking its own bias.
  */
 function runBiasWeights(down: number[], up: number[], connected: boolean[], [lo, hi]: readonly [number, number]): number[] {
@@ -123,7 +123,7 @@ function runBiasWeights(down: number[], up: number[], connected: boolean[], [lo,
  * preserved as-is (just translated) whenever it already fits in `hi - lo`;
  * only a run wider than the available space gets uniformly scaled down
  * around its centre first. A lone, unconnected position is simply clamped
- * to the nearer bound instead — its own value never needed decluttering,
+ * to the nearer bound instead - its own value never needed decluttering,
  * but it can still sit close enough to the scale's own edge to overflow on
  * its own.
  */
@@ -158,7 +158,7 @@ function fitRunsWithinBounds(positions: number[], connected: boolean[], [lo, hi]
 /**
  * Groups `declutter1D`'s own `connected` flags into runs (maximal stretches
  * of consecutive connected pairs), then gives every run member its own,
- * unique lane — no two members ever share one, deliberately (see below) —
+ * unique lane - no two members ever share one, deliberately (see below) -
  * ordered so that a leader line drawn through lane `rank` never crosses, or
  * even draws visually flush against, one drawn through any other lane of
  * the same run.
@@ -170,33 +170,33 @@ function fitRunsWithinBounds(positions: number[], connected: boolean[], [lo, hi]
  * `j` (further out), are safe from crossing *specifically* when neither of
  * these can happen:
  * - `j`'s own stub (at `j`'s original height) reaches out past `i`'s lane
- *   while `i`'s vertical run passes through that height — `j`'s stub would
+ *   while `i`'s vertical run passes through that height - `j`'s stub would
  *   cut across `i`'s vertical segment.
  * - `i`'s final run (at `i`'s label height) reaches past `i`'s own lane out
  *   to the shared column, and in doing so crosses `j`'s lane while `j`'s
- *   vertical run passes through *that* height — `i`'s own final segment
+ *   vertical run passes through *that* height - `i`'s own final segment
  *   would cut across `j`'s vertical segment.
  *
  * Whether `i` can safely take the tighter lane depends on both members'
- * *actual* pixel geometry — not simply on which one moved further — so each
+ * *actual* pixel geometry - not simply on which one moved further - so each
  * pair is checked directly per {@link saferNearer} rather than inferred from
  * a single sort key. A pair with a clean, provable answer either way (the
  * overwhelmingly common case for `declutter1D`'s own output) is ordered by
  * that answer; a pair with no clean answer (both directions equally
  * "unsafe," or, symmetrically, both fine) falls back to the same *travel
- * distance* heuristic used before this per-pair check existed — furthest
- * `|final - original|` first — which is what decides ties and keeps the
+ * distance* heuristic used before this per-pair check existed - furthest
+ * `|final - original|` first - which is what decides ties and keeps the
  * "furthest traveller gets the tightest lane, so it starts bending
  * immediately rather than reaching across everyone else's leader lines
  * first" intent for every pair the geometry itself doesn't already settle.
  *
  * No sharing, ever, is the other half of this: two members can only have
  * non-overlapping travel spans (and so pass the old, now-removed,
- * share-a-lane check) by sitting far apart along the axis — but "far apart"
+ * share-a-lane check) by sitting far apart along the axis - but "far apart"
  * is exactly the case with the most room to spare, so it never needed the
  * lane it would save by sharing, while any pair close enough to actually be
  * short on room has spans close enough together that sharing draws their
- * two leader lines only a couple pixels apart — visually indistinguishable
+ * two leader lines only a couple pixels apart - visually indistinguishable
  * from one continuous line touching the next label down. A run of `n`
  * members uses exactly `n` lanes; letting the lane count grow is the price
  * of a fan that never has two leader lines touching *or* crossing, and
@@ -207,8 +207,8 @@ function fitRunsWithinBounds(positions: number[], connected: boolean[], [lo, hi]
  * `rank` is the lane index (0-indexed) to drive a leader line's routing:
  * `rank` 0 bends right off the data point (a short first stub); higher
  * ranks travel further before bending (right up to the shared label
- * column). `lanesUsed` is the run's own total lane count — always equal to
- * `runSize` — shared by every member; `runSize` is the run's member count,
+ * column). `lanesUsed` is the run's own total lane count - always equal to
+ * `runSize` - shared by every member; `runSize` is the run's member count,
  * for callers that just need to know whether a given member belongs to a
  * real run at all.
  */
@@ -226,7 +226,7 @@ export function laneAssignment(
   };
   const distance = (k: number) => Math.abs(finals[k] - originals[k]);
 
-  /** Whether lane-`i`-nearer-than-`j` is provably crossing-free — see this function's doc comment. */
+  /** Whether lane-`i`-nearer-than-`j` is provably crossing-free - see this function's doc comment. */
   function saferNearer(i: number, j: number): boolean {
     const [loI, hiI] = span(i);
     const [loJ, hiJ] = span(j);
@@ -243,7 +243,7 @@ export function laneAssignment(
     if (runSize > 1) {
       // Members of this run, ordered so each is provably safe to place
       // nearer than the next whenever that's decidable, furthest-travelled
-      // first otherwise (ties keep their original — i.e. top-to-bottom —
+      // first otherwise (ties keep their original - i.e. top-to-bottom -
       // order, since `sort` is stable). Position in this order *is* the
       // rank: no sharing.
       const order = Array.from({ length: runSize }, (_, k) => i + k).sort((a, b) => {
@@ -261,7 +261,7 @@ export function laneAssignment(
   return out;
 }
 
-/** Where one decluttered label goes — see {@link buildLabelLanes}. */
+/** Where one decluttered label goes - see {@link buildLabelLanes}. */
 export type LabelLane = {
   /** Vertical shift (px) clearing its neighbours and the content box's edges. */
   extraDy: number;

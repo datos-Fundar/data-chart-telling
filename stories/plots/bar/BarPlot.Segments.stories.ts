@@ -48,7 +48,7 @@ type Story = StoryObj<typeof meta>;
  * `default` catch-all styles everything else.
  *
  * The series key (`'female_life_expectancy'`) highlights Tucumán only; every
- * other province — including the Buenos Aires–Santa Fe range — isn't matched
+ * other province - including the Buenos Aires-Santa Fe range - isn't matched
  * by anything series-specific, so it falls through to the `default` catch-all's
  * dimmed style.
  */
@@ -90,7 +90,7 @@ export const HighlightedProvincesSegment: Story = {
 };
 
 /**
- * Multiple bars with different opacity — highlights the highest and lowest
+ * Multiple bars with different opacity - highlights the highest and lowest
  * provinces with higher opacity while dimming the rest.
  */
 export const MultipleAreasOneSegment: Story = {
@@ -123,8 +123,8 @@ export const MultipleAreasOneSegment: Story = {
 /**
  * Two Segments with different colors targeting different provinces.
  *
- * - Segment 1: Buenos Aires to Santa Fe — high opacity.
- * - Segment 2: Rest — reduced opacity.
+ * - Segment 1: Buenos Aires to Santa Fe - high opacity.
+ * - Segment 2: Rest - reduced opacity.
  */
 export const TwoSegmentsDifferentStyles: Story = {
 	args: {
@@ -181,7 +181,7 @@ export const TwoSegmentsOnAllSeries: Story = {
  * Segments keyed by series name apply only to the named series.
  *
  * Here, highlighting is scoped explicitly to `'female'`. The male bars are
- * unaffected — the record key is the deciding factor.
+ * unaffected - the record key is the deciding factor.
  */
 export const SegmentsOnOneSeriesOnly: Story = {
 	args: {
@@ -204,7 +204,7 @@ export const SegmentsOnOneSeriesOnly: Story = {
 };
 
 /**
- * Custom fills for different series — female bars are highlighted with a
+ * Custom fills for different series - female bars are highlighted with a
  * range-specific opacity, male bars get a custom color.
  */
 export const CustomFillsPerSeries: Story = {

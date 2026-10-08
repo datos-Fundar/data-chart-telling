@@ -4,10 +4,10 @@ import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, WEATHER_STATIONS, type WeatherStation } from '../data';
 
 // `x`/`y`/`value` below use the field-key shorthand (`'lon'` instead of
-// `(d) => (d as WeatherStation).lon`) — see `DotMarkerConfig`'s own doc.
+// `(d) => (d as WeatherStation).lon`) - see `DotMarkerConfig`'s own doc.
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// `dot` places point markers by longitude/latitude — mirrors svelteplot's
+// `dot` places point markers by longitude/latitude - mirrors svelteplot's
 // `dot/weather` example: one dot per weather station, sized/colored by
 // temperature.
 
@@ -37,7 +37,7 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** Basic dots — one fixed-size, fixed-color dot per weather station. */
+/** Basic dots - one fixed-size, fixed-color dot per weather station. */
 export const Basic: Story = {
 	args: {
 		styles: { fill: '#e2e8f0', stroke: '#94a3b8' },
@@ -47,7 +47,7 @@ export const Basic: Story = {
 	}
 };
 
-/** Sized by value — `r` maps each station's temperature to the dot's radius, so hotter cities draw a bigger circle. */
+/** Sized by value - `r` maps each station's temperature to the dot's radius, so hotter cities draw a bigger circle. */
 export const SizedByTemperature: Story = {
 	args: {
 		styles: { fill: '#e2e8f0', stroke: '#94a3b8' },
@@ -65,8 +65,8 @@ export const SizedByTemperature: Story = {
 };
 
 /**
- * Colored by value — the marker's own `color` channel drives a ramp
- * (`scales.color`, its own independent ramp — not shared with the base
+ * Colored by value - the marker's own `color` channel drives a ramp
+ * (`scales.color`, its own independent ramp - not shared with the base
  * map's choropleth) so each dot's fill reflects its station's temperature,
  * mirroring `dot/weather`'s color-by-temperature encoding.
  */

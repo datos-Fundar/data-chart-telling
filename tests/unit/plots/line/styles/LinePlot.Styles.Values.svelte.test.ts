@@ -16,7 +16,7 @@ const FEMALE = {
 };
 const MALE = { name: 'male', x: 'year' as const, y: 'value' as const, data: MALE_LIFE_EXPECTANCY };
 
-describe('LinePlot – styles.values', () => {
+describe('LinePlot - styles.values', () => {
 	test('no value label by default', async () => {
 		const { container } = await render(LinePlot, { width: 400, height: 300, series: [FEMALE] });
 		const svg = await waitForSvg(container);
@@ -59,7 +59,7 @@ describe('LinePlot – styles.values', () => {
 		// (the default `anchor: 'start'` overlaps content above the last data
 		// point) used to grow that margin via `createLabelMarginTracker`, which
 		// fed straight back into svelteplot's `<Plot margin>` as a live
-		// post-mount prop change — sending its own auto-margin sizing into a
+		// post-mount prop change - sending its own auto-margin sizing into a
 		// permanent one-pixel oscillation that kept re-triggering the overflow
 		// watcher forever, tripping Svelte's `effect_update_depth_exceeded`
 		// guard (see `BasePlotLayout`'s `marginRemountKey` doc comment for the
@@ -79,7 +79,7 @@ describe('LinePlot – styles.values', () => {
 				margins: { right: 80 }
 			});
 			// The loop (when present) fires across several animation frames, not
-			// within the same microtask — give it room to show up.
+			// within the same microtask - give it room to show up.
 			await new Promise((r) => setTimeout(r, 500));
 		} finally {
 			spy.mockRestore();
@@ -92,12 +92,12 @@ describe('LinePlot – styles.values', () => {
 		// Regression test: when every series is currently empty (e.g. a
 		// timeline scrubbed before any series' earliest data point), `lastPoints`
 		// is `[]` and the value-labels `<g>` renders with nothing in it.
-		// `getBBox()` on that empty group reports `(0,0,0,0)` — the SVG origin,
-		// not "no content" — which `watchLabelOverflow` used to read as the
+		// `getBBox()` on that empty group reports `(0,0,0,0)` - the SVG origin,
+		// not "no content" - which `watchLabelOverflow` used to read as the
 		// group overflowing the plot's top/left margins by exactly those
 		// margins' own current size. Growing the margin to "fix" that only
 		// shifted the content box outward, so the next, still-empty measurement
-		// reported the same shape of overflow again — an unbounded loop, never
+		// reported the same shape of overflow again - an unbounded loop, never
 		// an `effect_update_depth_exceeded` throw (each growth is a fresh
 		// `marginRemountKey` render, not a same-tick effect cycle) but visible as
 		// the plot's scales never settling.
@@ -113,7 +113,7 @@ describe('LinePlot – styles.values', () => {
 				series: [{ name: 'female', x: 'year', y: 'value', data: [] }],
 				// `frame: true` gives a `rect.frame` drawn exactly at the resolved
 				// content box, the same way `LinePlot.Styles.Frame` tests read
-				// resolved margins elsewhere — a runaway loop keeps shrinking that
+				// resolved margins elsewhere - a runaway loop keeps shrinking that
 				// rect (margins growing) on every remount instead of settling.
 				styles: { frame: true, values: { show: true } } satisfies AxisBasedStylesConfig
 			}));
@@ -143,13 +143,13 @@ describe('LinePlot – styles.values', () => {
 
 	test('overflow measured against an earlier, differently-shaped frame does not linger after the data changes', async () => {
 		// Regression test: `createLabelMarginTracker`'s margin growth is
-		// monotonic *within* a stable dataset (see its own doc comment) — but
+		// monotonic *within* a stable dataset (see its own doc comment) - but
 		// `LinePlot`'s `data`/`series` prop changes on every tick of a timeline
 		// scrubber, revealing a different slice of rows each time. Before
 		// `resolvedSeries` was wired in as a reset key, an overflow measured
 		// against one frame's clustered end-point labels (needing several
 		// declutter lanes, reaching well past the content box) stuck around
-		// forever — even once the scrubber moved on to a frame simple enough to
+		// forever - even once the scrubber moved on to a frame simple enough to
 		// need no extra margin at all, permanently narrowing the plot from
 		// whichever side that one frame happened to overflow.
 		const clustered = [
@@ -199,7 +199,7 @@ describe('LinePlot – styles.values', () => {
 				]
 			}
 		];
-		// Widely spaced, single point per series — nothing to declutter, no
+		// Widely spaced, single point per series - nothing to declutter, no
 		// lane reach, nothing that should ever need extra margin.
 		const settled = [
 			{ name: 'a', x: 'year' as const, y: 'value' as const, data: [{ year: 2016, value: 1 }] },

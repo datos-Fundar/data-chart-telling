@@ -4,9 +4,9 @@ import { FEMALE_LIFE_EXPECTANCY, LIFE_EXPECTANCY } from '../../plots/line/data';
 import LinePlot from '$lib/plots/line/Plot.svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `rule` marker (svelteplot's own `RuleX`/`RuleY`) — a vertical/horizontal
+// A `rule` marker (svelteplot's own `RuleX`/`RuleY`) - a vertical/horizontal
 // reference line at `value`, or one per row with `data`. Demoed on an empty
-// `LinePlot` canvas so only the marker itself is on screen — see
+// `LinePlot` canvas so only the marker itself is on screen - see
 // `Plots/*/Markers/Rules` for markers used alongside real chart data.
 
 const meta = {
@@ -41,7 +41,7 @@ const LINE_PLOT_ARGS_2 = {
 	height: 400
 } satisfies LinePlotStory['args'];
 
-/** `axis: 'x'`, a literal `value` — one vertical line, spanning the full plot by default. */
+/** `axis: 'x'`, a literal `value` - one vertical line, spanning the full plot by default. */
 export const Basic: LinePlotStory = {
 	render: renderLinePlot,
 	args: {
@@ -50,7 +50,7 @@ export const Basic: LinePlotStory = {
 	}
 };
 
-/** `data` + a field-key `value` — one horizontal line per row, from a single marker. */
+/** `data` + a field-key `value` - one horizontal line per row, from a single marker. */
 export const MultipleFromData: LinePlotStory = {
 	render: renderLinePlot,
 	args: {

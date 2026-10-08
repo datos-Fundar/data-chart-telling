@@ -7,7 +7,7 @@ import type { GeoFeature } from '$lib/types/plots/data/geo';
 /**
  * GeoPlot's "scales" phase: each feature's own resolved color (mirrors
  * HeatmapPlot's own), with a per-feature override for whichever segment
- * (its `grouping` bucket, or itself by id) sets its own `scales.color` —
+ * (its `grouping` bucket, or itself by id) sets its own `scales.color` -
  * see `resolveFeatureScales`. A segment ramp's domain is built from just
  * the features that share its own key, so e.g. two grouping buckets each
  * get a ramp scaled to their own value range, not the whole dataset's.
@@ -44,7 +44,7 @@ export function buildScales<TProps extends Record<string, unknown>>(
 			])
 		: null;
 
-	// Per-segment-key ramp cache — built lazily, once per distinct grouping
+	// Per-segment-key ramp cache - built lazily, once per distinct grouping
 	// value/feature id that actually has its own `scales.color`.
 	const segmentScaleCache = new Map<string, ((v: number) => string) | null>();
 
@@ -83,7 +83,7 @@ export function buildScales<TProps extends Record<string, unknown>>(
 			}
 		: undefined;
 
-	// Plot-level only — no segment-scoped opacity ramp (unlike `resolveColor`
+	// Plot-level only - no segment-scoped opacity ramp (unlike `resolveColor`
 	// above), since there's no concrete use case yet driving that complexity.
 	const opacityDomain: [number, number] | string[] | null = (() => {
 		if (!opacity) return null;

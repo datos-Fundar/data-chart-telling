@@ -14,7 +14,7 @@ export type PyramidSeries<TData extends Record<string, unknown>> = Series<TData>
 
 /**
  * One row tagged with its resolved side/signed-magnitude/category/label as
- * plain fields — svelteplot shallow-clones each row before invoking a mark's
+ * plain fields - svelteplot shallow-clones each row before invoking a mark's
  * geometry accessors, so this is what survives that clone for hover matching.
  */
 export type PyramidTaggedRow<TData extends Record<string, unknown>> = TData & {

@@ -43,7 +43,7 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * No scale overrides — both axes are auto-fitted to the data extent.
+ * No scale overrides - both axes are auto-fitted to the data extent.
  */
 export const Default: Story = {
 	args: {
@@ -59,7 +59,7 @@ export const Default: Story = {
 };
 
 /**
- * Constrained Y domain — tightens the visible range to [78, 85], which is
+ * Constrained Y domain - tightens the visible range to [78, 85], which is
  * narrower than the auto-fitted range (the 2008 value sits at 77.9 so
  * auto-fit adds space below it). All data points lie within [78, 85], so
  * no line is clipped at the frame boundary.
@@ -84,8 +84,8 @@ export const CustomYDomain: Story = {
 };
 
 /**
- * Constrained X domain — restricts both the visible range and the series
- * data to 2010–2020. The data is filtered to match the domain so the line
+ * Constrained X domain - restricts both the visible range and the series
+ * data to 2010-2020. The data is filtered to match the domain so the line
  * starts cleanly at the first in-range point (2010) rather than entering
  * the frame at an interpolated position from an earlier out-of-range point.
  */
@@ -106,7 +106,7 @@ export const CustomXDomain: Story = {
 };
 
 /**
- * Axis labels — a human-readable string appears alongside each axis.
+ * Axis labels - a human-readable string appears alongside each axis.
  * Passing `false` to `label` suppresses the label svelteplot would infer
  * from the field name.
  */
@@ -128,7 +128,7 @@ export const WithAxisLabels: Story = {
 };
 
 /**
- * Reversed Y axis — values increase downward instead of upward.
+ * Reversed Y axis - values increase downward instead of upward.
  * Useful for rankings, depth measurements, or other conventions where
  * a lower number means "better" or "further".
  */
@@ -149,7 +149,7 @@ export const ReversedY: Story = {
 };
 
 /**
- * Grid lines on the Y axis — adds horizontal reference lines at every
+ * Grid lines on the Y axis - adds horizontal reference lines at every
  * tick, making it easier to read off individual values without a ruler.
  */
 export const WithGrid: Story = {
@@ -169,7 +169,7 @@ export const WithGrid: Story = {
 };
 
 /**
- * Explicit tick values — `ticks` pins exactly which values appear on the
+ * Explicit tick values - `ticks` pins exactly which values appear on the
  * X axis instead of the auto-computed interval. Useful to highlight
  * specific dates such as policy changes or census rounds.
  */
@@ -190,7 +190,7 @@ export const CustomTicks: Story = {
 };
 
 /**
- * Custom tick formatter on Y — the function receives the raw tick value and
+ * Custom tick formatter on Y - the function receives the raw tick value and
  * returns the display string. Here it appends " yr" to every label.
  */
 export const CustomTickFormat: Story = {
@@ -234,7 +234,7 @@ export const RotatedXTicks: Story = {
 };
 
 /**
- * Zero-anchored Y axis — `zero: true` forces the Y domain to include 0
+ * Zero-anchored Y axis - `zero: true` forces the Y domain to include 0
  * even when all data values are far above it. Makes relative magnitudes
  * honest but compresses the visible trend significantly.
  */
@@ -293,7 +293,7 @@ const DATE_OBJECT_DATA: DatePoint[] = [
 ];
 
 /**
- * `Date` objects on the X axis — svelteplot infers a `time` scale, which
+ * `Date` objects on the X axis - svelteplot infers a `time` scale, which
  * sorts and ticks chronologically by construction. Nine yearly points spread
  * across a wide plot also exercise the tick-count fix: without it, a
  * pixel-width-based tick request on such a narrow domain could ask for more
@@ -324,7 +324,7 @@ const ISO_DATE_DATA: IsoDatePoint[] = [
 ];
 
 /**
- * Dates as `'YYYY-MM-DD'` strings — svelteplot infers a `point` (ordinal)
+ * Dates as `'YYYY-MM-DD'` strings - svelteplot infers a `point` (ordinal)
  * scale for string X values, no `scales.x.sort` needed here: the default
  * ascending sort is lexicographic, and ISO dates happen to sort
  * lexicographically in chronological order too.
@@ -365,11 +365,11 @@ function byMonth(a: Record<string, unknown>, b: Record<string, unknown>): number
 }
 
 /**
- * Month-name strings within a single year — a plain ordinal scale would sort
+ * Month-name strings within a single year - a plain ordinal scale would sort
  * these alphabetically (Apr, Aug, Dec, Jan, …), scrambling the seasonal
  * shape entirely. `scales.x.sort` supplies calendar order instead. The
  * comparator receives the full row (not just the X value), which is what
- * makes it possible to sort by any field on the row — see `SortXByYDesc`
+ * makes it possible to sort by any field on the row - see `SortXByYDesc`
  * below for sorting by Y instead of X.
  */
 export const MonthNamesSameYear: Story = {
@@ -407,7 +407,7 @@ function byMonthYear(a: Record<string, unknown>, b: Record<string, unknown>): nu
 }
 
 /**
- * `'Mmm-YYYY'` strings crossing a year boundary — alphabetical order would
+ * `'Mmm-YYYY'` strings crossing a year boundary - alphabetical order would
  * place `Apr-2026` before `Dec-2025`. `scales.x.sort` parses month + year
  * out of each label so the axis (and the line) stay chronological.
  */
@@ -430,7 +430,7 @@ export const MonthYearAcrossYears: Story = {
 // ── Custom axis chrome ───────────────────────────────────────────────────────
 
 /**
- * Vertical Y-axis title, anchored at the top — `labelOrientation: 'vertical'`
+ * Vertical Y-axis title, anchored at the top - `labelOrientation: 'vertical'`
  * rotates the title 90° and draws it beside the ticks instead of
  * svelteplot's default horizontal title above the plot; `labelPosition: 'top'`
  * anchors it near the axis's highest tick, reading downward.
@@ -456,7 +456,7 @@ export const VerticalYLabelTop: Story = {
 };
 
 /**
- * Vertical Y-axis title, centered — `labelPosition` defaults to `'middle'`,
+ * Vertical Y-axis title, centered - `labelPosition` defaults to `'middle'`,
  * spanning the full axis height instead of sitting at the top.
  *
  * Compare with `VerticalYLabelTop`.
@@ -479,7 +479,7 @@ export const VerticalYLabelMiddle: Story = {
 };
 
 /**
- * Grid without an axis line — svelteplot doesn't draw a continuous axis
+ * Grid without an axis line - svelteplot doesn't draw a continuous axis
  * spine at all; the only line an axis draws is the small perpendicular tick
  * mark at each value, controlled by `tickSize`. Setting it to `0` hides
  * those marks while `grid: true` keeps the horizontal reference lines,
@@ -502,7 +502,7 @@ export const GridOnlyNoTickMarks: Story = {
 };
 
 /**
- * Styled grid — `grid` accepts a style object (`stroke`, `strokeWidth`,
+ * Styled grid - `grid` accepts a style object (`stroke`, `strokeWidth`,
  * `strokeOpacity`, `strokeDasharray`) instead of just `true`, here producing
  * a light dotted grid rather than solid lines.
  */

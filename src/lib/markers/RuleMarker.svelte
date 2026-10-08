@@ -5,11 +5,11 @@
 
 	/**
 	 * A single vertical (`axis: 'x'`) or horizontal (`axis: 'y'`) reference
-	 * line — or, with `data`, one line per row. Shared by author-configured
+	 * line - or, with `data`, one line per row. Shared by author-configured
 	 * `'rule'` markers and `HoverMarker`'s crosshair (which always calls it
 	 * with a literal `value` and no `data`). Falls back to `'currentColor'`/`1`
 	 * when the caller supplies no style. See `RuleMarkerConfig`'s own doc
-	 * comment for `value`/`x1`/`x2`/`y1`/`y2`/inset semantics — forwarded here
+	 * comment for `value`/`x1`/`x2`/`y1`/`y2`/inset semantics - forwarded here
 	 * straight through to svelteplot's own `RuleX`/`RuleY`.
 	 */
 	const { marker }: { marker: RuleMarkerConfig } = $props();
@@ -24,7 +24,7 @@
 	/**
 	 * With `data`, `value` is forwarded raw (a field key resolves per row via
 	 * svelteplot's own `resolve()`, same as every other mark, and lets its
-	 * axis-title auto-inference see the field name — a pre-resolved closure
+	 * axis-title auto-inference see the field name - a pre-resolved closure
 	 * would defeat both). Without `data`, `value` is a literal against the
 	 * single synthetic `{v: value}` row.
 	 */

@@ -15,7 +15,7 @@ const SERIES = [{ name: 'a', x: 'category' as const, y: 'value' as const, data: 
 const heights = (svg: SVGElement) =>
 	Array.from(svg.querySelectorAll('g.bar-y rect')).map((r) => Number(r.getAttribute('height')));
 
-describe('BarPlot – plot-level transforms', () => {
+describe('BarPlot - plot-level transforms', () => {
 	test('a filter drops the bars it rejects', async () => {
 		const transforms: MarkerTransform[] = [
 			{ type: 'filter', filter: (d: { value: number }) => d.value > 15 }

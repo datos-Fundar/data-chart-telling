@@ -16,7 +16,7 @@ function cellFills(svg: SVGElement): string[] {
 	return Array.from(svg.querySelectorAll('g.cell rect')).map((r) => r.getAttribute('style') ?? '');
 }
 
-describe('HeatmapPlot – styles.values', () => {
+describe('HeatmapPlot - styles.values', () => {
 	test('value labels render by default, one per cell, showing the raw value', async () => {
 		const { container } = await render(HeatmapPlot, { width: 400, height: 300, ...DATA_PROPS });
 		const svg = await waitForSvg(container);
@@ -56,7 +56,7 @@ describe('HeatmapPlot – styles.values', () => {
 	});
 });
 
-describe('HeatmapPlot – scales.color', () => {
+describe('HeatmapPlot - scales.color', () => {
 	test('a custom color ramp changes the rendered cell fill colors', async () => {
 		const defaultRender = await render(HeatmapPlot, { width: 400, height: 300, ...DATA_PROPS });
 		const defaultSvg = await waitForSvg(defaultRender.container);

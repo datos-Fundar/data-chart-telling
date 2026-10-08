@@ -33,7 +33,7 @@ function valueOf(container: Element, label: string): Promise<number> {
 	});
 }
 
-describe('ContinuousSection – tracking the domain until the user actually drags', () => {
+describe('ContinuousSection - tracking the domain until the user actually drags', () => {
 	test('with no interaction yet, lo/hi fully track a changing domain in both directions', async () => {
 		const section: ContinuousLegendSection = {
 			type: 'continuous',
@@ -47,12 +47,12 @@ describe('ContinuousSection – tracking the domain until the user actually drag
 		expect(await valueOf(container, 'Lower bound')).toBe(10);
 		expect(await valueOf(container, 'Upper bound')).toBe(90);
 
-		// Domain narrows — untouched lo/hi must follow it inward, not stay put.
+		// Domain narrows - untouched lo/hi must follow it inward, not stay put.
 		await rerender({ section: { ...section, min: 30, max: 70 } });
 		expect(await valueOf(container, 'Lower bound')).toBe(30);
 		expect(await valueOf(container, 'Upper bound')).toBe(70);
 
-		// Domain then widens back out past the *original* bounds — untouched
+		// Domain then widens back out past the *original* bounds - untouched
 		// lo/hi must follow it back out too, not stay clamped at 30/70. This is
 		// the actual reported bug: a legend whose numbers no longer matched any
 		// value in the data at all after the underlying domain changed once,
@@ -85,7 +85,7 @@ describe('ContinuousSection – tracking the domain until the user actually drag
 	});
 });
 
-describe('ContinuousSection – re-clamping an active range when the domain shifts', () => {
+describe('ContinuousSection - re-clamping an active range when the domain shifts', () => {
 	test('a dragged lo/hi that falls outside a later min/max is pulled back in, not reset', async () => {
 		const section: ContinuousLegendSection = {
 			type: 'continuous',
@@ -157,7 +157,7 @@ describe('ContinuousSection – re-clamping an active range when the domain shif
 	});
 });
 
-describe('ContinuousSection – syncing with an externally-set range', () => {
+describe('ContinuousSection - syncing with an externally-set range', () => {
 	test('setting interaction.continuousRange from outside moves the handles to match, and clearing it resets them', async () => {
 		const section: ContinuousLegendSection = {
 			type: 'continuous',

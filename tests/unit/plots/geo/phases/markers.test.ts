@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { buildMarkers } from '$lib/plots/geo/phases/markers';
 import type { GeoPlotState, GeoPlotCtx, TaggedGeoFeature } from '$lib/types/plots/geo/state';
-import type { ChartConfig } from '$lib/types/configuration/styling';
+import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { GeoFeaturesMarkerConfig } from '$lib/types/markers/geo';
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
@@ -21,7 +21,7 @@ function feature(id: string, pop: number): TaggedGeoFeature<Props> {
 }
 
 const CTX: GeoPlotCtx<Props> = {
-	cfg: { palette: ['red'], axis: { color: '#333' } } as unknown as ChartConfig,
+	cfg: { palette: ['red'], axis: { color: '#333' } } as unknown as PlotStylesConfig,
 	range: undefined
 };
 
@@ -42,7 +42,7 @@ function build(
 	return buildMarkers(state, { ...CTX, ...ctxOverrides });
 }
 
-describe('buildMarkers – style grouping', () => {
+describe('buildMarkers - style grouping', () => {
 	test('one base geo marker for the whole set when no segment splits it', () => {
 		const { markers } = build();
 		const geoMarkers = markers!.filter((m) => m.type === 'geo');
@@ -60,7 +60,7 @@ describe('buildMarkers – style grouping', () => {
 	});
 });
 
-describe('buildMarkers – base fill resolution', () => {
+describe('buildMarkers - base fill resolution', () => {
 	test('uses resolveColor(f) when set', () => {
 		const { markers } = build({ resolveColor: () => 'color-10' });
 		const [marker] = markers!.filter((m) => m.type === 'geo') as GeoFeaturesMarkerConfig[];
@@ -74,7 +74,7 @@ describe('buildMarkers – base fill resolution', () => {
 	});
 });
 
-describe('buildMarkers – legend range dimming', () => {
+describe('buildMarkers - legend range dimming', () => {
 	test('a feature outside the active range gets the disabled-style override', () => {
 		const { markers } = build(
 			{ color: (f) => (f.properties as Props).pop },
@@ -85,7 +85,7 @@ describe('buildMarkers – legend range dimming', () => {
 	});
 });
 
-describe('buildMarkers – draw order', () => {
+describe('buildMarkers - draw order', () => {
 	test('a behind marker sorts before the base map, front markers after, hover last', () => {
 		const { markers } = build({
 			authoredMarkers: [

@@ -4,7 +4,7 @@ import { LIFE_EXPECTANCY } from '../../../plots/line/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `color` channel: a plot-level `color` accessor plus `scales.color`
-// drives every default mark's stroke — here, LinePlot's own line segments. This
+// drives every default mark's stroke - here, LinePlot's own line segments. This
 // is the discrete categorical case: `color` groups series by name (sex), and
 // `scales.color` maps those category names to specific colors.
 
@@ -34,7 +34,7 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * `color: 'sex'` groups the data by sex (male/female) and feeds each series
- * name into the plot's own `scales.color` ramp — the default palette cycles
+ * name into the plot's own `scales.color` ramp - the default palette cycles
  * through colors automatically for each series.
  */
 export const Default: Story = {

@@ -56,7 +56,7 @@ export function validateSegments<TStyle>(segments: SegmentsConfig<TStyle>): void
     const catchAlls = segs.filter((s) => !s.areas || s.areas.length === 0).length;
     if (catchAlls > 1) {
       console.warn(
-        `segments ${label}: ${catchAlls} entries have no areas — ` +
+        `segments ${label}: ${catchAlls} entries have no areas - ` +
           `only the first catch-all's style will be used.`,
       );
     }
@@ -73,7 +73,7 @@ function isPlainObject(v: unknown): v is Record<string, unknown> {
 /**
  * Merges two style objects one level deep: for any key where both base and
  * override hold plain objects (e.g. `stroke`, `dots`), their fields are
- * merged — override wins on conflict. Primitive fields are overridden directly.
+ * merged - override wins on conflict. Primitive fields are overridden directly.
  */
 function mergeStyles<TStyle>(base: TStyle, override: TStyle): TStyle {
   const result: Record<string, unknown> = { ...(base as Record<string, unknown>) };
@@ -161,7 +161,7 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
     if (run.segIdx === -1) {
       // Unmatched run: for a continuous mark (line), insert bridge points so
       // it connects to adjacent user segments without a visual gap. Discrete
-      // marks (bar, pyramid) have no such gap to bridge — bridging would just
+      // marks (bar, pyramid) have no such gap to bridge - bridging would just
       // duplicate the neighboring runs' boundary rows as an extra, wrongly
       // styled mark at that same category.
       const bridged: DataPoint[] = [...run.data];
@@ -186,7 +186,7 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
       // insert a line-only connector so the lines join without a gap. Using a
       // separate mark (rather than appending a bridge point to the current run)
       // avoids rendering an extra dot at the shared boundary point. Skipped
-      // entirely for discrete marks (see above) — it would duplicate both
+      // entirely for discrete marks (see above) - it would duplicate both
       // runs' boundary rows as an extra mark.
       const nextRun = runs[r + 1];
       if (connect && nextRun && nextRun.segIdx !== -1) {
@@ -207,12 +207,12 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
 }
 
 /**
- * Builds the full list of visual groups — one per series — ready to render.
+ * Builds the full list of visual groups - one per series - ready to render.
  * Each group's `visualSegments` is derived by resolving the flat segment list
  * for that series from all groups in `segments`.
  *
  * `connect` bridges adjacent visual segments so a *continuous* mark (line)
- * has no visual gap at their boundary — the default, since `buildGroupedSeries`
+ * has no visual gap at their boundary - the default, since `buildGroupedSeries`
  * itself defaults `TStyle` to {@link LineSegmentStyle}. Discrete marks (bar,
  * pyramid) have no gap to bridge; pass `connect: false` so boundary rows
  * aren't duplicated as an extra, separately-styled mark.
@@ -234,7 +234,7 @@ export function buildGroupedSeries<
 
 /**
  * Builds the `ScopedMarkerGroup[]` a `Plot.svelte` hands to `GeometryLayout`
- * for rendering `series`-scoped `hover`/`component` markers — one group per
+ * for rendering `series`-scoped `hover`/`component` markers - one group per
  * series, carrying its resolved segments' match predicates and colors.
  * `colorFor` resolves a series' own default color; `segmentColorFor` reads
  * whichever field counts as "color" out of that plot kind's segment style

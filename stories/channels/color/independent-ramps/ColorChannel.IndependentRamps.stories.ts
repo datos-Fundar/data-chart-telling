@@ -9,17 +9,17 @@ import { COUNTRIES } from '../../../plots/scatter/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // This package resolves its own color ramp per consumer instead of routing
-// every mark through one shared scale (svelteplot's own `color`) — so a
+// every mark through one shared scale (svelteplot's own `color`) - so a
 // plot's own channel and another consumer's own channel never fight over
 // domain or scheme, even in the same plot. Four variants:
 //
 // - `Default`: a `dot` marker with a `color` accessor but no `scales` of its
-//   own — it inherits the plot's own `scales.color` (same ramp, same domain).
+//   own - it inherits the plot's own `scales.color` (same ramp, same domain).
 // - `IndependentRamp`: identical to `Default`, but the marker sets its own
-//   `scales.color` — now it draws from a completely independent ramp instead
+//   `scales.color` - now it draws from a completely independent ramp instead
 //   of inheriting the plot's.
 // - `SegmentRamp`: a `segments` entry's own `scales`, overriding the plot's
-//   own ramp for just the features that fall in that segment — same idea as
+//   own ramp for just the features that fall in that segment - same idea as
 //   `IndependentRamp`, scoped by feature/grouping-bucket membership instead
 //   of by marker.
 // - `MarkerRampScatter`: the same marker-ramp mechanism as `IndependentRamp`,
@@ -28,13 +28,13 @@ import { COUNTRIES } from '../../../plots/scatter/data';
 //   `parameters.docs.source.code` (via `renderSource`) overrides the
 //   auto-generated code panel, which would otherwise show a `GeoPlot` call.
 //
-// Plain Mercator + WORLD_COUNTRIES, not an Argentina-fit projection — the
+// Plain Mercator + WORLD_COUNTRIES, not an Argentina-fit projection - the
 // weather stations in `Default`/`IndependentRamp` span from Bogotá down to
 // Buenos Aires, well beyond any projection tightly fit to one country's own
 // extremity points (see `Plots/GeoPlot/Markers/Dot`, which pairs the same
 // WORLD_COUNTRIES + WEATHER_STATIONS combo under plain Mercator).
 
-// A simplified, illustrative Global South/North split by continent — not a
+// A simplified, illustrative Global South/North split by continent - not a
 // rigorous geopolitical classification, just enough categories for
 // `SegmentRamp` to demonstrate a segment ramp against a real,
 // unevenly-distributed value (GDP).
@@ -72,7 +72,7 @@ type Story = StoryObj<typeof meta>;
  * The plot's own `color`/`scales.color` colors countries by population (a
  * blue ramp). The `dot` marker reads its own `color` accessor (station
  * temperature) but sets no `scales` of its own, so it falls back to and
- * inherits the plot's own ramp — same domain, same scheme, applied to a
+ * inherits the plot's own ramp - same domain, same scheme, applied to a
  * different value.
  */
 export const Default: Story = {
@@ -96,7 +96,7 @@ export const Default: Story = {
 
 /**
  * Identical to `Default`, except the `dot` marker now sets its own
- * `scales.color` — an independent ramp (inferno), unrelated to the plot's
+ * `scales.color` - an independent ramp (inferno), unrelated to the plot's
  * own blue one, neither aware of the other's domain or scheme.
  */
 export const IndependentRamp: Story = {
@@ -122,7 +122,7 @@ export const IndependentRamp: Story = {
 /**
  * Every country's `color` reads the same `gdp_md` value, but `global_south`
  * countries are ramped through `reds` while the rest fall back to the
- * plot-level `blues` ramp — each ramp's own domain is built from just the
+ * plot-level `blues` ramp - each ramp's own domain is built from just the
  * features in its own bucket, so neither hemisphere's range is skewed by
  * the other's outliers (e.g. the US/China GDP figures don't flatten the
  * Global South ramp).
@@ -176,7 +176,7 @@ const scatterProps = {
  * `ScatterPlot`'s own `color`/`scales.color` colors points by region (a
  * discrete scheme); the `dot` marker's own `color`/`scales.color` colors a
  * highlighted subset of high-GDP countries by life expectancy (a continuous
- * red ramp) — same "marker sets its own ramp" mechanism as `IndependentRamp`,
+ * red ramp) - same "marker sets its own ramp" mechanism as `IndependentRamp`,
  * on a different plot kind.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

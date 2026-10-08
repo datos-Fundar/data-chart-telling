@@ -13,7 +13,7 @@ import type {
 	TransformsStageState
 } from '$lib/types/layout/phases';
 
-/** The field each processed row carries its series name under — the transforms' `z`, so a stack or bin keeps series apart. */
+/** The field each processed row carries its series name under - the transforms' `z`, so a stack or bin keeps series apart. */
 export const SERIES_KEY = '__series';
 
 const CHANNEL_NAMES: readonly ProcessedChannelName[] = ['x', 'y', 'x1', 'x2', 'y1', 'y2'];
@@ -141,7 +141,7 @@ function processedSeries(
 	};
 }
 
-/** Where a processed row sits: its `x` (or the middle of `x1`–`x2`) and the top of its `y` (`y2`, or `y`). */
+/** Where a processed row sits: its `x` (or the middle of `x1`-`x2`) and the top of its `y` (`y2`, or `y`). */
 export function processedPosition(processed: ProcessedData): {
 	x: (row: ProcessedRow) => unknown;
 	y: (row: ProcessedRow) => unknown;

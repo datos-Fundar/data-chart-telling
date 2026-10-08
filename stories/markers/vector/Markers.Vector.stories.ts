@@ -4,9 +4,9 @@ import { WORLD_COUNTRIES, POPULATION_SHIFT } from '../../plots/geo/data';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `vector` marker (svelteplot's own `Vector`) — an arrow/spike per row,
+// A `vector` marker (svelteplot's own `Vector`) - an arrow/spike per row,
 // sized by `length` and oriented by `rotate`. Geo-only, so `GeoPlot` stands
-// in for the empty canvas the rest of `Markers/*` uses — see
+// in for the empty canvas the rest of `Markers/*` uses - see
 // the other stories in this file for every `shape` variant.
 
 const meta = {
@@ -56,7 +56,7 @@ export const Basic: GeoPlotStory = {
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** Basic arrows — no `shape` set, so each defaults to `'arrow-filled'`. `length`/`rotate` accessors size/orient each arrow from the row's own magnitude/direction fields. */
+/** Basic arrows - no `shape` set, so each defaults to `'arrow-filled'`. `length`/`rotate` accessors size/orient each arrow from the row's own magnitude/direction fields. */
 export const DefaultFilledArrows: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {
@@ -74,7 +74,7 @@ export const DefaultFilledArrows: GeoPlotStory = {
 	}
 };
 
-/** Open arrow — `shape: 'arrow'` draws a thin stroked shaft with an open arrowhead, instead of the default filled triangle. */
+/** Open arrow - `shape: 'arrow'` draws a thin stroked shaft with an open arrowhead, instead of the default filled triangle. */
 export const OpenArrow: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {
@@ -93,7 +93,7 @@ export const OpenArrow: GeoPlotStory = {
 	}
 };
 
-/** Spike shape — `shape: 'spike'` draws a thin triangular spike instead of an arrowhead, anchored at its base. */
+/** Spike shape - `shape: 'spike'` draws a thin triangular spike instead of an arrowhead, anchored at its base. */
 export const SpikeShape: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {
@@ -114,7 +114,7 @@ export const SpikeShape: GeoPlotStory = {
 	}
 };
 
-/** Filled arrow, custom color — `shape: 'arrow-filled'` (the default) with a custom fill/stroke instead of the theme's own. */
+/** Filled arrow, custom color - `shape: 'arrow-filled'` (the default) with a custom fill/stroke instead of the theme's own. */
 export const CustomFilledArrow: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {

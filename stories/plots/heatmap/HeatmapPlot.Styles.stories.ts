@@ -30,7 +30,7 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * No style overrides — the plot uses the configured theme defaults.
+ * No style overrides - the plot uses the configured theme defaults.
  * Cell values are displayed and color ramp is auto-selected.
  */
 export const Default: Story = {
@@ -43,7 +43,7 @@ export const Default: Story = {
 };
 
 /**
- * Hide cell value labels — `styles.values.show: false` removes the numeric
+ * Hide cell value labels - `styles.values.show: false` removes the numeric
  * labels from each cell, useful when cells are small or data density is high.
  */
 export const NoValueLabels: Story = {
@@ -62,7 +62,7 @@ export const NoValueLabels: Story = {
 };
 
 /**
- * Custom value format — the `format(value)` callback controls how cell values
+ * Custom value format - the `format(value)` callback controls how cell values
  * are displayed. Here life expectancy is shown in years with one decimal place.
  */
 export const CustomValueFormat: Story = {
@@ -81,7 +81,7 @@ export const CustomValueFormat: Story = {
 };
 
 /**
- * Warm color ramp — overrides the default colour scheme to a warm palette
+ * Warm color ramp - overrides the default colour scheme to a warm palette
  * (dark blue to light blue) instead of the default viridis-like ramp.
  */
 export const WarmColorRamp: Story = {
@@ -100,7 +100,7 @@ export const WarmColorRamp: Story = {
 };
 
 /**
- * Custom color ramp — full control over the color gradient from min to max.
+ * Custom color ramp - full control over the color gradient from min to max.
  * Here a red-to-green ramp emphasizes low and high life expectancy.
  */
 export const CustomColorRamp: Story = {
@@ -119,7 +119,7 @@ export const CustomColorRamp: Story = {
 };
 
 /**
- * Inverted color ramp — swaps min/max colors so that higher values appear
+ * Inverted color ramp - swaps min/max colors so that higher values appear
  * in darker tones, reversing the typical visual weight.
  */
 export const InvertedColorRamp: Story = {

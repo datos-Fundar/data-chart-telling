@@ -19,7 +19,7 @@ const SERIES = [
 	}
 ];
 
-describe('BarPlot – scales', () => {
+describe('BarPlot - scales', () => {
 	test('renders with no scale overrides (auto domain)', async () => {
 		const { container } = await render(BarPlot, { width: 400, height: 300, series: SERIES });
 		const svg = await waitForSvg(container);
@@ -39,7 +39,7 @@ describe('BarPlot – scales', () => {
 		);
 		expect(heights.length).toBe(FEMALE_LIFE_EXPECTANCY_BY_PROVINCE.length);
 		// With the domain floor (75) as the clamped baseline, no bar can be taller
-		// than the plot's own drawable area — before the fix, a literal 0
+		// than the plot's own drawable area - before the fix, a literal 0
 		// baseline (well outside [75, 85]) produced heights in the thousands.
 		heights.forEach((h) => expect(h).toBeLessThan(300));
 	});
@@ -112,7 +112,7 @@ describe('BarPlot – scales', () => {
 	});
 });
 
-describe('BarPlot – series layout', () => {
+describe('BarPlot - series layout', () => {
 	test('by default, each series gets its own slice of the band (no shared x position)', async () => {
 		const { container } = await render(BarPlot, {
 			width: 600,
@@ -143,7 +143,7 @@ describe('BarPlot – series layout', () => {
 		const rects = Array.from(svg.querySelectorAll('g.bar-y rect'));
 		expect(rects.length).toBe(LIFE_EXPECTANCY_BY_PROVINCE.length);
 		// Every category's female + male segments should reach the same total
-		// (top-most) pixel across the stack — spot-check via the topmost y.
+		// (top-most) pixel across the stack - spot-check via the topmost y.
 		const tops = rects.map((r) => Number(r.getAttribute('transform')?.match(/,([\d.]+)\)/)?.[1]));
 		expect(Math.min(...tops)).toBeGreaterThanOrEqual(0);
 	});
@@ -172,7 +172,7 @@ describe('BarPlot – series layout', () => {
 	});
 });
 
-describe('BarPlot – orientation (scales.x/y.type: "categorical")', () => {
+describe('BarPlot - orientation (scales.x/y.type: "categorical")', () => {
 	test('marking scales.y as categorical renders horizontal bars (BarX)', async () => {
 		const { container } = await render(BarPlot, {
 			width: 600,

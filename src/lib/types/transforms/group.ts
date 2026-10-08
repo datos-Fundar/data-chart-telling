@@ -54,7 +54,7 @@ export type GroupXTransform = {
 	GroupStyleOutputs &
 	GroupOptions;
 
-/** `groupY` — see {@link GroupXTransform}, grouping on `y` and reducing to `x`. */
+/** `groupY` - see {@link GroupXTransform}, grouping on `y` and reducing to `x`. */
 export type GroupYTransform = {
 	type: 'groupY';
 	x?: TransformReducer;
@@ -66,7 +66,7 @@ export type GroupYTransform = {
 	GroupStyleOutputs &
 	GroupOptions;
 
-/** `groupZ` — one row per `z` group, every channel a reducer: `x: 'mean', y: 'mean'` is each group's centroid. */
+/** `groupZ` - one row per `z` group, every channel a reducer: `x: 'mean', y: 'mean'` is each group's centroid. */
 export type GroupZTransform = {
 	type: 'groupZ';
 	x?: TransformReducer;
@@ -80,8 +80,8 @@ export type GroupZTransform = {
 	GroupOptions;
 
 /**
- * `group` as a marker transform: one row per distinct `x`–`y` pair — a grid of
- * categories — reduced to `fill`, `r` or another style output. `r: 'count'` on
+ * `group` as a marker transform: one row per distinct `x`-`y` pair - a grid of
+ * categories - reduced to `fill`, `r` or another style output. `r: 'count'` on
  * a `dot` draws a bubble per pair, sized by how many rows share it.
  */
 export type Group2DTransform = { type: 'group' } & GroupChannels &

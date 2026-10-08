@@ -3,23 +3,23 @@ import { resolveOpacityScale } from '$lib/utils/opacity';
 import { resolveSymbolScale } from '$lib/utils/symbol';
 import type { ChannelScalesConfig } from '$lib/types/layout/scales';
 import type { SymbolType } from '$lib/types/plots/constants';
-import type { ChartConfig } from '$lib/types/configuration/styling';
+import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 
 /**
  * Resolves a `CommonMarkerConfig` pair into a per-row fill accessor, or
  * `undefined` when `color` is unset (caller falls back to its own flat
  * fill/stroke). Shared by every marker kind that intersects `CommonMarkerConfig`.
- * Safe as a live per-row function — svelteplot recognizes an already-resolved
+ * Safe as a live per-row function - svelteplot recognizes an already-resolved
  * CSS color string as a literal and never re-scales it (unlike `opacity`/`r`).
  * Continuous (numeric) or categorical (string) values both work, same as a
- * plot's own `color` channel — the theme's own 2-color ramp defaults a
+ * plot's own `color` channel - the theme's own 2-color ramp defaults a
  * continuous value, its discrete `palette` a categorical one.
  */
 export function resolveChannelFill<TData>(
 	data: TData[],
 	color: string | ((d: TData) => unknown) | undefined,
 	scales: ChannelScalesConfig | undefined,
-	cfg: ChartConfig
+	cfg: PlotStylesConfig
 ): ((d: TData) => string) | undefined {
 	if (!color || !data.length) return undefined;
 	const colorFn =
@@ -40,14 +40,14 @@ export function resolveChannelFill<TData>(
 /**
  * Resolves a `CommonMarkerConfig`-style `symbol` pair into a per-row shape
  * accessor, or `undefined` when unset. Safe as a live per-row function for
- * the same reason `resolveChannelFill` is — a resolved shape name is a
+ * the same reason `resolveChannelFill` is - a resolved shape name is a
  * recognized literal, not re-scaled.
  */
 export function resolveChannelSymbol<TData>(
 	data: TData[],
 	symbol: string | ((d: TData) => unknown) | undefined,
 	scales: ChannelScalesConfig | undefined,
-	cfg: ChartConfig
+	cfg: PlotStylesConfig
 ): ((d: TData) => SymbolType) | undefined {
 	if (!symbol) return undefined;
 	const symbolFn =
@@ -71,7 +71,7 @@ export type OpacityBucket<TData> = { value: number; data: TData[] };
 /**
  * Resolves a `CommonMarkerConfig`-style `opacity` pair into a list of
  * opacity buckets, or `undefined` when unset. Unlike `resolveChannelFill`,
- * this can NOT hand back a live per-row function — svelteplot treats
+ * this can NOT hand back a live per-row function - svelteplot treats
  * `fillOpacity`/`opacity` as bound to its own shared scale (there's no
  * "this number is already resolved, don't touch it" escape hatch the way a
  * recognized CSS color string gets), so any function handed a per-row
@@ -79,16 +79,16 @@ export type OpacityBucket<TData> = { value: number; data: TData[] };
  * svelteplot itself (verified empirically, not assumed). Bucketing rows by
  * a quantized opacity value and rendering one mark instance per bucket
  * (each with `value` as a literal constant) is the only way to land an
- * exact, independently-resolved value — same technique `fillOpacity`/gap
+ * exact, independently-resolved value - same technique `fillOpacity`/gap
  * dimming already use elsewhere in this codebase (e.g. `heatmap/phases/markers.ts`).
  * `steps` bounds how many buckets (mark instances) a continuous value can
- * produce — a visually-smooth compromise, not true infinite precision.
+ * produce - a visually-smooth compromise, not true infinite precision.
  */
 export function resolveChannelOpacityBuckets<TData>(
 	data: TData[],
 	opacity: string | ((d: TData) => unknown) | undefined,
 	scales: ChannelScalesConfig | undefined,
-	cfg: ChartConfig,
+	cfg: PlotStylesConfig,
 	steps = 32
 ): OpacityBucket<TData>[] | undefined {
 	if (!opacity || !data.length) return undefined;

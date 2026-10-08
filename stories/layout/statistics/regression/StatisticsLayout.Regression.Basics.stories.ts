@@ -4,7 +4,7 @@ import { COUNTRIES } from '../../../plots/scatter/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `statistics: [{ type: 'regression' }]` fits svelteplot's own `RegressionX`/
-// `RegressionY` mark against a plot's resolved series — with no `series`
+// `RegressionY` mark against a plot's resolved series - with no `series`
 // scope, every series pools into one combined source (here, the whole
 // dataset, since `color` is unset). `styles` follows the same `StrokeStyle`
 // shape as a hand-authored `line` marker; the confidence band always shares

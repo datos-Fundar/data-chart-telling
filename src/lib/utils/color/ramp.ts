@@ -10,7 +10,7 @@ export function normalize(v: number, min: number, max: number): number {
 	return Math.max(0, Math.min(1, (v - min) / denom));
 }
 
-/** Cycles through a discrete palette by series index — the default colour for an unstyled series. */
+/** Cycles through a discrete palette by series index - the default colour for an unstyled series. */
 export function paletteColor(index: number, palette: string[]): string {
 	if (palette.length === 0) return 'currentColor';
 	return palette[index % palette.length];
@@ -48,11 +48,11 @@ const NAMED_SCHEMES: Record<string, (t: number) => string> = Object.fromEntries(
 );
 
 /**
- * Resolves a {@link ColorScaleConfig} into a `value => color` function — the
+ * Resolves a {@link ColorScaleConfig} into a `value => color` function - the
  * one shared implementation for every level the config can appear at
  * (`scales.color`, a `segments` entry, a marker's own `scales`).
  * `computedDomain` is the fallback when `config.domain` is unset;
- * `defaultScheme` is used when `config.scheme` is unset — the theme's own
+ * `defaultScheme` is used when `config.scheme` is unset - the theme's own
  * 2-color continuous ramp, or a discrete palette for a categorical domain
  * (e.g. per-series identity colors).
  */

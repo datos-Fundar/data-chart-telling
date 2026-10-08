@@ -9,7 +9,7 @@ const SERIES = [
 	{ name: 'female', x: 'year' as const, y: 'value' as const, data: FEMALE_LIFE_EXPECTANCY }
 ];
 
-describe('LinePlot – scales', () => {
+describe('LinePlot - scales', () => {
 	test('renders with no scale overrides (auto domain)', async () => {
 		const { container } = await render(LinePlot, { width: 400, height: 300, series: SERIES });
 		const svg = await waitForSvg(container);
@@ -125,5 +125,19 @@ describe('LinePlot – scales', () => {
 			(t) => t.textContent === 'Life expectancy (years)'
 		);
 		expect(customLabel).toBeTruthy();
+	});
+
+	test('a whole-number x axis (years) never ticks between two values, however wide the plot', async () => {
+		const data = [2018, 2019, 2020, 2021, 2022].map((year, i) => ({ year, value: 60 + i }));
+		const { container } = await render(LinePlot, {
+			width: 680,
+			height: 300,
+			data,
+			x: 'year',
+			y: 'value'
+		});
+		const svg = await waitForSvg(container);
+		const ticks = Array.from(svg.querySelectorAll('g.axis-x text')).map((t) => t.textContent);
+		expect(ticks).toEqual(['2018', '2019', '2020', '2021', '2022']);
 	});
 });

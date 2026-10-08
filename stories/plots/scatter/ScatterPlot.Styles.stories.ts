@@ -32,12 +32,12 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** No style overrides — the plot uses the configured theme defaults. */
+/** No style overrides - the plot uses the configured theme defaults. */
 export const Default: Story = {
 	args: {}
 };
 
-/** Value labels enabled — `styles.values.show: true` labels every point with its raw Y value, positioned to the right of the dot by default. */
+/** Value labels enabled - `styles.values.show: true` labels every point with its raw Y value, positioned to the right of the dot by default. */
 export const ShowValues: Story = {
 	args: {
 		styles: {
@@ -46,7 +46,7 @@ export const ShowValues: Story = {
 	}
 };
 
-/** Custom format — `format(value, seriesName)` receives the Y value (and the series name, empty here since labels aren't grouped) and returns any string. */
+/** Custom format - `format(value, seriesName)` receives the Y value (and the series name, empty here since labels aren't grouped) and returns any string. */
 export const CustomFormat: Story = {
 	args: {
 		styles: {
@@ -58,7 +58,7 @@ export const CustomFormat: Story = {
 	}
 };
 
-/** Grouped data with labels — every region's points get a label; `dotFillOpacity` on the plot's own dots isn't touched, only the text styling changes. */
+/** Grouped data with labels - every region's points get a label; `dotFillOpacity` on the plot's own dots isn't touched, only the text styling changes. */
 export const GroupedWithLabels: Story = {
 	args: {
 		data: COUNTRIES,
@@ -72,7 +72,7 @@ export const GroupedWithLabels: Story = {
 	}
 };
 
-/** Custom font style — `fontStyle` overrides fill/size/weight directly, bypassing the theme defaults. */
+/** Custom font style - `fontStyle` overrides fill/size/weight directly, bypassing the theme defaults. */
 export const CustomFontStyle: Story = {
 	args: {
 		styles: {
@@ -85,7 +85,7 @@ export const CustomFontStyle: Story = {
 	}
 };
 
-/** Centered labels — `fontStyle.textAnchor`/`lineAnchor` bypass the default right-of-dot placement to center the text directly on each point instead. */
+/** Centered labels - `fontStyle.textAnchor`/`lineAnchor` bypass the default right-of-dot placement to center the text directly on each point instead. */
 export const CenteredOnPoint: Story = {
 	args: {
 		r: 12,

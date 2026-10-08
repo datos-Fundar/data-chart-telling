@@ -1,7 +1,7 @@
 import type { Snippet } from 'svelte';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { Accessor } from '$lib/types/plots/data/common';
-import type { EasingName, EasingFn } from '$lib/types/charts/interpolate';
+import type { EasingName, EasingFn } from '$lib/types/misc/easing';
 
 export type TimeValue = number;
 export type Orientation = 'horizontal' | 'vertical';
@@ -26,11 +26,14 @@ export type TimelineInterpolation<TRow extends Record<string, unknown>> = {
 
 export type TimelineConfig<TRow extends Record<string, unknown>> = {
   accessor: Accessor<TRow, TimeValue>;
-  progress: number;
+  /** The scrubber's position, `0`-`1`. Inside a `PlotComposer` with its own `timeline`, the composer's wins and no scrubber draws here. */
+  progress?: number;
   values?: TimeValue[];
   orientation?: Orientation;
   show?: boolean;
   thickness?: number;
   filterMode?: 'exact' | 'upTo';
   interpolate?: boolean | TimelineInterpolation<TRow>;
+  /** `'shared'` (default): x and y span every step's rows, so the axes hold still while scrubbing; `'free'` refits them to each step. */
+  scales?: 'shared' | 'free';
 };

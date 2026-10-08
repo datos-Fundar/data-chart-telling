@@ -1,15 +1,15 @@
 import { describe, test, expect } from 'vitest';
 import { resolveChannelFill } from '$lib/markers/resolveChannelFill';
-import type { ChartConfig } from '$lib/types/configuration/styling';
+import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 
 const testConfig = {
 	continuous: { min: 0, max: 1 }
-} as unknown as ChartConfig;
+} as unknown as PlotStylesConfig;
 
 describe('resolveChannelFill', () => {
 	test('returns undefined when color is unset', () => {
 		const data = [{ x: 1, y: 2 }];
-		const result = resolveChannelFill(data, undefined, undefined, testConfig as ChartConfig);
+		const result = resolveChannelFill(data, undefined, undefined, testConfig as PlotStylesConfig);
 		expect(result).toBeUndefined();
 	});
 
@@ -19,7 +19,7 @@ describe('resolveChannelFill', () => {
 			data,
 			(d) => (d as Record<string, unknown>).x,
 			undefined,
-			testConfig as ChartConfig
+			testConfig as PlotStylesConfig
 		);
 		expect(result).toBeUndefined();
 	});
@@ -30,7 +30,7 @@ describe('resolveChannelFill', () => {
 			data,
 			(d) => (d as Record<string, unknown>).val,
 			{ color: { scheme: ['#ffffff', '#000000'] } },
-			testConfig as ChartConfig
+			testConfig as PlotStylesConfig
 		);
 		expect(fill).toBeDefined();
 		// Should produce valid CSS color strings (can be hex or rgb format)
@@ -46,7 +46,7 @@ describe('resolveChannelFill', () => {
 			data,
 			'value',
 			{ color: { scheme: ['#f00', '#00f'] } },
-			testConfig as ChartConfig
+			testConfig as PlotStylesConfig
 		);
 		expect(fill).toBeDefined();
 		const color = fill!(data[0]);
@@ -65,7 +65,7 @@ describe('resolveChannelFill', () => {
 					? 'up'
 					: 'down',
 			{ color: { domain: ['up', 'down'], scheme: { up: '#16a34a', down: '#dc2626' } } },
-			testConfig as ChartConfig
+			testConfig as PlotStylesConfig
 		);
 		expect(fill).toBeDefined();
 		expect(fill!(data[0])).toBe('#16a34a');

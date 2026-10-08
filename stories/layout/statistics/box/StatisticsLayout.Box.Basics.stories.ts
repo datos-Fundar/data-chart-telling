@@ -6,7 +6,7 @@ import { COUNTRIES } from '../../../plots/scatter/data';
 // `statistics: [{ type: 'box' }]` resolves straight to a `box` marker
 // (svelteplot's own `BoxX`/`BoxY`), summarizing the plot's rows per category:
 // one box per `x` value here. Its styling options are the same as the `box`
-// marker's — `bar`/`rule`/`dot`/`tickMedian`/`tickMinMax` — and `bar.fill`
+// marker's - `bar`/`rule`/`dot`/`tickMedian`/`tickMinMax` - and `bar.fill`
 // falls back to the source series' own color, then to the theme's first
 // palette color.
 

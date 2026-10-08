@@ -51,7 +51,7 @@ export const WithRuleYMarker: Story = {
 };
 
 /**
- * Quadrant dividers — one `ruleX` and one `ruleY` at the median GDP/life
+ * Quadrant dividers - one `ruleX` and one `ruleY` at the median GDP/life
  * expectancy split the plot into four quadrants (low/high GDP × low/high
  * life expectancy), a common scatter-chart annotation. No scatter-specific
  * marker is needed: `rule` is already a shared axis-based marker kind.

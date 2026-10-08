@@ -1,7 +1,7 @@
 /// <reference types="geojson" />
 import type { GeoCameraTarget } from '$lib/types/plots/camera';
 
-/** `GeoCameraTarget` resolved to actual geometry — `features` looked up by `__id` and unioned into one `FeatureCollection`; `undefined` if none match. */
+/** `GeoCameraTarget` resolved to actual geometry - `features` looked up by `__id` and unioned into one `FeatureCollection`; `undefined` if none match. */
 export type ResolvedGeoCameraTarget =
 	| { kind: 'point'; lon: number; lat: number }
 	| { kind: 'bounds'; geometry: GeoJSON.GeoJsonObject };

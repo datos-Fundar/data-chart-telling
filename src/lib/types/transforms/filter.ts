@@ -1,7 +1,7 @@
 import type { PositionChannels, TransformChannel } from '$lib/types/transforms/common';
 
 /**
- * `filter` as a marker transform: keeps only the rows `filter` holds for —
+ * `filter` as a marker transform: keeps only the rows `filter` holds for -
  * a per-row test, or a field key whose value is truthy. Unlike filtering the
  * marker's `data` beforehand, it composes with the transforms around it.
  */

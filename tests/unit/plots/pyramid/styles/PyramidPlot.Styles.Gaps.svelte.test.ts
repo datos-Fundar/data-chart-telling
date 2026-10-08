@@ -9,7 +9,7 @@ import { POPULATION_PYRAMID, FEMALE_2022_WITH_GAPS } from '../../../../../storie
 import { waitForSvg, countBarRects, countTextLabels } from '../../_helpers/svg';
 
 // PyramidPlot's `Series.x`/`.y` are category/magnitude (not the top-level
-// `x`/`y` prop names, which mean magnitude/category) — see Plot.svelte's
+// `x`/`y` prop names, which mean magnitude/category) - see Plot.svelte's
 // own `flat`/`signedValue`, which read `s.x` as category and `s.y` as value.
 const FEMALE = { name: 'Female', x: 'ageGroup' as const, y: 'pct' as const, data: FEMALE_2022_WITH_GAPS };
 const MALE = {
@@ -20,7 +20,7 @@ const MALE = {
 };
 const REAL_COUNT = FEMALE_2022_WITH_GAPS.filter((d) => d.pct != null).length;
 
-describe('PyramidPlot – gaps (no config)', () => {
+describe('PyramidPlot - gaps (no config)', () => {
   test('a missing value renders no bar, not a fake-zero one', async () => {
     const { container } = await render(PyramidPlot, { width: 500, height: 400, series: [FEMALE] });
     const svg = await waitForSvg(container);
@@ -29,7 +29,7 @@ describe('PyramidPlot – gaps (no config)', () => {
 
   test('an unfilled gap does not break the shared magnitude domain', async () => {
     // Before the fix, an `undefined` (NaN) magnitude poisoned `maxMagnitude`
-    // for the whole plot — every bar (including the real ones) would render
+    // for the whole plot - every bar (including the real ones) would render
     // with NaN geometry. Real bars should still render fine here.
     const { container } = await render(PyramidPlot, { width: 500, height: 400, series: [FEMALE, MALE] });
     const svg = await waitForSvg(container);
@@ -39,7 +39,7 @@ describe('PyramidPlot – gaps (no config)', () => {
   });
 });
 
-describe('PyramidPlot – gaps (middle)', () => {
+describe('PyramidPlot - gaps (middle)', () => {
   test('fills the internal gap with two additional bars', async () => {
     const { container } = await render(PyramidPlot, {
       width: 500,
@@ -52,7 +52,7 @@ describe('PyramidPlot – gaps (middle)', () => {
   });
 });
 
-describe('PyramidPlot – gaps (start/end, opt-in)', () => {
+describe('PyramidPlot - gaps (start/end, opt-in)', () => {
   test('all three zones together fill every gap row', async () => {
     const { container } = await render(PyramidPlot, {
       width: 500,
@@ -67,7 +67,7 @@ describe('PyramidPlot – gaps (start/end, opt-in)', () => {
   });
 });
 
-describe('PyramidPlot – gaps (sign correctness)', () => {
+describe('PyramidPlot - gaps (sign correctness)', () => {
   test('a series on the left keeps its filled bars negative; a series on the right keeps them positive', async () => {
     // 'Female' < 'Male' alphabetically, so 'Female' renders on the left
     // (negative x) and 'Male' on the right (positive x).
@@ -84,13 +84,13 @@ describe('PyramidPlot – gaps (sign correctness)', () => {
     const femaleGapRect = groups[1].querySelector('rect')!;
     const femaleX = Number(femaleGapRect.getAttribute('transform')?.match(/translate\(([^,]+),/)?.[1]);
     const maleX = Number(groups[2].querySelector('rect')!.getAttribute('transform')?.match(/translate\(([^,]+),/)?.[1]);
-    // The diverging baseline sits at the plot's horizontal midpoint —
+    // The diverging baseline sits at the plot's horizontal midpoint -
     // Female's bar should extend left of it (smaller x), Male's right.
     expect(femaleX).toBeLessThan(maleX);
   });
 });
 
-describe('PyramidPlot – gaps (styling)', () => {
+describe('PyramidPlot - gaps (styling)', () => {
   afterEach(() => resetConfiguration());
 
   test('a zone with no `style` falls back to `cfg.pyramid.gap`, not a hardcoded default', async () => {
@@ -123,7 +123,7 @@ describe('PyramidPlot – gaps (styling)', () => {
   });
 });
 
-describe('PyramidPlot – gaps (series-aware)', () => {
+describe('PyramidPlot - gaps (series-aware)', () => {
   test('a named entry (keyed by series name) fills only that series', async () => {
     const { container } = await render(PyramidPlot, {
       width: 500,
@@ -136,7 +136,7 @@ describe('PyramidPlot – gaps (series-aware)', () => {
   });
 });
 
-describe('PyramidPlot – gaps (value labels)', () => {
+describe('PyramidPlot - gaps (value labels)', () => {
   test('a gap row never gets a value label, filled or not', async () => {
     const { container } = await render(PyramidPlot, {
       width: 500,
@@ -154,12 +154,12 @@ describe('PyramidPlot – gaps (value labels)', () => {
 
 // ── Legend / hover-isolate dimming ──────────────────────────────────────────
 // Unlike LinePlot's gap bridge (a separate marker `buildGapMarkers.ts` never
-// wired to the disabled override — see the LinePlot legend/gaps tests for
+// wired to the disabled override - see the LinePlot legend/gaps tests for
 // that bug), `buildPyramidBarMarkers.ts` already threads the same
 // `disabledFillFor` through its gap-fill loop as its real-segment loop.
 // These are regression tests confirming that stays true, not a bugfix.
 
-describe('PyramidPlot – gaps (hover-isolate dimming)', () => {
+describe('PyramidPlot - gaps (hover-isolate dimming)', () => {
   test('isolating one series dims its gap-fill bars exactly like its real ones', async () => {
     const { container } = await render(PyramidPlot, {
       width: 500,
@@ -187,8 +187,8 @@ describe('PyramidPlot – gaps (hover-isolate dimming)', () => {
 
     const rects = Array.from(svg.querySelectorAll('g.bar-x rect'));
     const dimmed = rects.filter((r) => r.getAttribute('style')?.includes('fill-opacity: 0.12'));
-    // Every one of Female's bars — its `REAL_COUNT` real ones plus the 2
-    // gap-fill bars the middle zone adds — dims, not just the real ones.
+    // Every one of Female's bars - its `REAL_COUNT` real ones plus the 2
+    // gap-fill bars the middle zone adds - dims, not just the real ones.
     expect(dimmed).toHaveLength(REAL_COUNT + 2);
   });
 });

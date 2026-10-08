@@ -2,7 +2,7 @@ import type { GeoProjectionConfig } from '$lib/types/layout/coordinates';
 
 /**
  * Resolves a `GeoScalesConfig['projection']` into what svelteplot's own
- * `<Plot projection>` expects — kept separate from `GeoPlot`'s own
+ * `<Plot projection>` expects - kept separate from `GeoPlot`'s own
  * `Plot.svelte` so adding more projection-level behavior (like the
  * `domain: 'data'` sentinel below) doesn't grow that component itself.
  */

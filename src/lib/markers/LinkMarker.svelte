@@ -4,7 +4,7 @@
   import { greatCircleInterpolate } from '$lib/plots/utils/geoAccessors';
   import type { GeoLinkMarkerConfig } from '$lib/types/markers/geo';
 
-  /** Renders one `'link'` marker — geodesic-aware lines between point pairs, as a synthetic `LineString` fed through `<Geo>`. */
+  /** Renders one `'link'` marker - geodesic-aware lines between point pairs, as a synthetic `LineString` fed through `<Geo>`. */
   let { marker }: { marker: GeoLinkMarkerConfig } = $props();
 
   const getX1 = $derived(resolveAccessor(marker.x1));

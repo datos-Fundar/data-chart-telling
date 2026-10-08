@@ -49,8 +49,8 @@ export function buildValueLabelMarkers<TData extends Record<string, unknown>>(
 /**
  * ScatterPlot's "markers" phase: one `'dot'` marker per visual segment of the
  * rows the "transforms" phase left, in their own order, so a reordering
- * transform decides which dots paint on top — prepended onto whatever the
- * "statistics" phase already put in `state.markers` — and its value labels on
+ * transform decides which dots paint on top - prepended onto whatever the
+ * "statistics" phase already put in `state.markers` - and its value labels on
  * top of everything.
  */
 export function buildMarkers<TData extends Record<string, unknown>>(
@@ -66,7 +66,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 
 	/**
 	 * `color`/`grouping` splits `flat` into one series per category, so each
-	 * marker call below only ever sees one series' own rows — computing a
+	 * marker call below only ever sees one series' own rows - computing a
 	 * channel's domain from just that slice would collapse a categorical
 	 * domain to a single value (every row in a series shares the same
 	 * category by construction) and skew a continuous one to that series'
@@ -117,7 +117,7 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 				type: 'dot',
 				data: seg.data,
 				// Forwarded raw (a field key or function, whatever `series.x`/`.y`
-				// is) rather than pre-resolved into a closure — `DotMarker.svelte`
+				// is) rather than pre-resolved into a closure - `DotMarker.svelte`
 				// and svelteplot's own `resolve()` already handle a field-key
 				// string per row, and only a literal string (not a function)
 				// lets svelteplot's axis-title auto-inference see the field name.

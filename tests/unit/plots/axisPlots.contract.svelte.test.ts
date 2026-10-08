@@ -104,7 +104,7 @@ async function draw(kind: Kind, extra: Record<string, unknown> = {}): Promise<SV
 /** Lines drawn: svelteplot's `Line` wraps each one in `g.lines`, drawn or not (a line over a band scale has no path). */
 const countLines = (svg: SVGElement) => svg.querySelectorAll('g.lines').length;
 
-/** Filled rects only — the plot's own background rects are transparent or black. */
+/** Filled rects only - the plot's own background rects are transparent or black. */
 const countRects = (svg: SVGElement) =>
 	Array.from(svg.querySelectorAll('rect')).filter((r) => {
 		const fill = getComputedStyle(r).fill;

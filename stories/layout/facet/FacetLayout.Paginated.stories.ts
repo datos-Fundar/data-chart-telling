@@ -5,7 +5,7 @@ import { renderSource } from '../../common/docsSource';
 
 // `FacetDemo` renders through a wrapper, so `parameters.docs.source.code`
 // overrides the "show code" panel with the real `<FacetLayout>` call via
-// `renderSource` — see `stories/common/docsSource.ts`.
+// `renderSource` - see `stories/common/docsSource.ts`.
 function paginatedSource(columns: number, pageSize: number, navLayout?: 'below') {
   return renderSource('FacetLayout', {
     data: dataForGroupCount(9),
@@ -17,7 +17,7 @@ function paginatedSource(columns: number, pageSize: number, navLayout?: 'below')
   });
 }
 
-/** `mode: 'paginated'` — pages through the grid in fixed-size chunks with prev/next controls. */
+/** `mode: 'paginated'` - pages through the grid in fixed-size chunks with prev/next controls. */
 const meta = {
   title: 'Layout/Facets/Paginated',
   component: FacetDemo,
@@ -44,7 +44,7 @@ export const Default: Story = {
 };
 
 /**
- * `pageSize: 1` out of 9 total facets — the single cell per page fills the
+ * `pageSize: 1` out of 9 total facets - the single cell per page fills the
  * whole chart area rather than being sized as if it were one of a 5-row
  * grid (the total-entries-based sizing bug this exercises).
  */
@@ -54,7 +54,7 @@ export const SingleFacet: Story = {
 };
 
 /**
- * `navLayout: 'below'` — prev/next buttons and the page indicator sit in a
+ * `navLayout: 'below'` - prev/next buttons and the page indicator sit in a
  * row beneath the chart instead of overlaid on top of it.
  */
 export const NavBelow: Story = {
@@ -64,7 +64,7 @@ export const NavBelow: Story = {
 
 /**
  * Same `setConfiguration({ facet: {...} })` theming mechanism as the rest of
- * the package — switch themes to see the indicator badge and pagination
+ * the package - switch themes to see the indicator badge and pagination
  * buttons restyle.
  */
 export const ThemeSwitcher: StoryObj = {

@@ -248,9 +248,9 @@ export const POPULATION_PYRAMID: PopulationRow[] = [
 ];
 
 /**
- * `POPULATION_PYRAMID`'s 2022 'Female' series with three holes — the first
+ * `POPULATION_PYRAMID`'s 2022 'Female' series with three holes - the first
  * two age groups (start), an internal pair bounded by real data on both
- * sides (middle), and the last two (end) — used to demonstrate
+ * sides (middle), and the last two (end) - used to demonstrate
  * `PyramidPlot`'s `styles.gaps` fill on the same series every other
  * PyramidPlot story already uses.
  */

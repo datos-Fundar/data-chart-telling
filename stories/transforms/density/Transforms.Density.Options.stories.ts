@@ -73,7 +73,7 @@ export const Bandwidth: Story = {
 	}
 };
 
-/** With no `bandwidth`, one is picked from the data by Silverman's rule — a sensible default for one bell-shaped group. */
+/** With no `bandwidth`, one is picked from the data by Silverman's rule - a sensible default for one bell-shaped group. */
 export const DefaultBandwidth: Story = {
 	args: {
 		markers: [
@@ -104,7 +104,7 @@ export const Trim: Story = {
 	}
 };
 
-/** `cumulative: 1` turns each estimate into a CDF: the share of the group at or below each value, climbing from 0 to 1 — one per `grouping`, colored by `color`. */
+/** `cumulative: 1` turns each estimate into a CDF: the share of the group at or below each value, climbing from 0 to 1 - one per `grouping`, colored by `color`. */
 export const Cumulative: Story = {
 	args: {
 		scales: { y: { domain: [0, 1], label: 'Share at or below' } },

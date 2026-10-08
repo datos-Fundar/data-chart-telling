@@ -34,7 +34,7 @@ async function hoverInsetAndReadTooltip(container: Element): Promise<{ cursorX: 
   };
 }
 
-describe('GeoPlot – tooltip', () => {
+describe('GeoPlot - tooltip', () => {
   test('no floating tooltip appears without a tooltip config', async () => {
     const { container } = render(GeoPlot, { width: 400, height: 300, ...DATA_PROPS });
     await waitForSvg(container);
@@ -47,7 +47,6 @@ describe('GeoPlot – tooltip', () => {
       height: 300,
       ...DATA_PROPS,
       tooltip: {
-        facetId: '',
         sync: false,
         format: (f) => (f.properties as { nombre: string }).nombre,
       },
@@ -62,7 +61,6 @@ describe('GeoPlot – tooltip', () => {
       height: 300,
       ...DATA_PROPS,
       tooltip: {
-        facetId: '',
         sync: false,
         format: (f) => {
           const { nombre, population } = f.properties as { nombre: string; population: number };
@@ -80,11 +78,10 @@ describe('GeoPlot – tooltip', () => {
       height: 300,
       ...DATA_PROPS,
       tooltip: {
-        facetId: '',
         sync: false,
         format: (f) => (f.properties as { nombre: string }).nombre,
         // A tooltip's `content` snippet can't be constructed inline from a
-        // plain .ts test file (it needs Svelte's snippet compilation) — the
+        // plain .ts test file (it needs Svelte's snippet compilation) - the
         // custom-content path is instead covered visually via
         // `stories/plots/geo/RichTooltip.svelte`. This just confirms the
         // plot still renders correctly when `content` is omitted but the
@@ -96,14 +93,13 @@ describe('GeoPlot – tooltip', () => {
   });
 });
 
-describe('GeoPlot – inset tooltip anchor inheritance', () => {
+describe('GeoPlot - inset tooltip anchor inheritance', () => {
   test('an inset tooltip with no anchor of its own inherits the top-level tooltip.anchorX/anchorY', async () => {
     const { container } = render(GeoPlot, {
       width: 800,
       height: 700,
       ...DATA_PROPS,
       tooltip: {
-        facetId: '',
         sync: false,
         anchorX: 'left',
         anchorY: 'top',
@@ -117,7 +113,7 @@ describe('GeoPlot – inset tooltip anchor inheritance', () => {
           width: 0.6,
           height: 0.6,
           tooltip: {
-            // No anchorX/anchorY here — should inherit the top-level's 'left'/'top'.
+            // No anchorX/anchorY here - should inherit the top-level's 'left'/'top'.
             format: (f) => (f.properties as { nombre: string }).nombre,
           },
         },
@@ -134,7 +130,6 @@ describe('GeoPlot – inset tooltip anchor inheritance', () => {
       height: 700,
       ...DATA_PROPS,
       tooltip: {
-        facetId: '',
         sync: false,
         anchorX: 'left',
         anchorY: 'top',
@@ -166,7 +161,6 @@ describe('GeoPlot – inset tooltip anchor inheritance', () => {
       height: 700,
       ...DATA_PROPS,
       tooltip: {
-        facetId: '',
         sync: false,
         format: (f) => (f.properties as { nombre: string }).nombre,
       },

@@ -58,7 +58,7 @@ export const WithRuleXMarker: Story = {
 };
 
 /**
- * Multiple threshold markers — shows two reference lines, useful for
+ * Multiple threshold markers - shows two reference lines, useful for
  * comparing against multiple benchmarks or targets.
  */
 export const MultipleThresholdMarkers: Story = {
@@ -94,7 +94,7 @@ export const MultipleThresholdMarkers: Story = {
 };
 
 /**
- * Symmetric threshold markers — shows equal-magnitude reference lines on
+ * Symmetric threshold markers - shows equal-magnitude reference lines on
  * both sides (±2%), useful for visualizing symmetry or balance around
  * a central point.
  */
@@ -131,7 +131,7 @@ export const SymmetricMarkers: Story = {
 };
 
 /**
- * Average-based marker — a single rule at 3% representing the average cohort
+ * Average-based marker - a single rule at 3% representing the average cohort
  * size, helping identify which age groups are above or below average.
  */
 export const AverageMarker: Story = {
@@ -158,7 +158,7 @@ export const AverageMarker: Story = {
 };
 
 /**
- * Policy threshold marker — a prominent red rule indicating a critical
+ * Policy threshold marker - a prominent red rule indicating a critical
  * population percentage threshold, useful for policy discussions or targets.
  */
 export const PolicyThresholdMarker: Story = {

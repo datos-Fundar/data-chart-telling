@@ -2,7 +2,7 @@
   import { Sphere } from 'svelteplot';
   import type { GeoSphereMarkerConfig } from '$lib/types/markers/geo';
 
-  /** Renders one `'sphere'` marker — the outer globe outline. */
+  /** Renders one `'sphere'` marker - the outer globe outline. */
   let { marker }: { marker: GeoSphereMarkerConfig } = $props();
 </script>
 

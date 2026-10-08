@@ -12,7 +12,7 @@ function readChannel<TData>(channel: ProcessedChannel | undefined) {
 	return resolveAccessor(channel as never) as (d: TData) => AxisValue;
 }
 
-/** One resolved-style bucket of cells — `opacity` is a second bucketing dimension alongside `styles`, quantized so the channel produces a bounded number of mark instances. */
+/** One resolved-style bucket of cells - `opacity` is a second bucketing dimension alongside `styles`, quantized so the channel produces a bounded number of mark instances. */
 type StyleGroup<TData> = { styles: CellSegmentStyle; opacity: number | undefined; data: TData[] };
 
 const OPACITY_STEPS = 32;
@@ -55,7 +55,7 @@ export function buildValueLabelMarkers<TData extends Record<string, unknown>>(
 
 /**
  * HeatmapPlot's "markers" phase: one `'cell'` marker per resolved-style
- * bucket — svelteplot's opacity/numeric scale machinery requires
+ * bucket - svelteplot's opacity/numeric scale machinery requires
  * `fillOpacity`/`strokeWidth` to be constant per mark instance, unlike
  * `fill`, which stays a per-row accessor.
  */
@@ -75,11 +75,11 @@ export function buildMarkers<TData extends Record<string, unknown>>(
 
 	/**
 	 * A catch-all (no `areas`) always matches, so evaluating segments in plain
-	 * array order and merging every match — as this used to do — makes a
+	 * array order and merging every match - as this used to do - makes a
 	 * catch-all listed *after* an area-specific one (the documented, and only
 	 * demonstrated, convention: baseline first, highlight second) overwrite it
 	 * on every cell, since it's applied last unconditionally. Area-specific
-	 * segments must always win over the catch-all regardless of list order —
+	 * segments must always win over the catch-all regardless of list order -
 	 * so the catch-all is applied once as the baseline, and only
 	 * area-specific segments can override it on top, mirroring the same
 	 * catch-all/area-specific priority every other plot kind's segments

@@ -2,7 +2,7 @@ import type { PositionChannels } from '$lib/types/transforms/common';
 
 /**
  * An amount to shift by: a number in data units, or a duration on a time axis
- * — `'1 month'`, `'-2 weeks'`, `'+1 day'`.
+ * - `'1 month'`, `'-2 weeks'`, `'+1 day'`.
  */
 export type ShiftAmount = number | string;
 
@@ -16,7 +16,7 @@ export type ShiftXTransform = {
 	by: ShiftAmount | Partial<Record<'x' | 'x1' | 'x2', ShiftAmount>>;
 } & PositionChannels;
 
-/** `shiftY` — see {@link ShiftXTransform}, on the `y` channels. */
+/** `shiftY` - see {@link ShiftXTransform}, on the `y` channels. */
 export type ShiftYTransform = {
 	type: 'shiftY';
 	by: ShiftAmount | Partial<Record<'y' | 'y1' | 'y2', ShiftAmount>>;

@@ -8,7 +8,7 @@
   const cfg = getConfiguration();
 
   // Series order matches the `series` array below, which is what drives
-  // colour assignment inside LinePlot — kept in lockstep here since `content`
+  // colour assignment inside LinePlot - kept in lockstep here since `content`
   // only gets the raw rows back, not their series name/colour.
   const SERIES_LABELS = ['Female', 'Male'];
   const SERIES_COLORS = [paletteColor(0, cfg.palette), paletteColor(1, cfg.palette)];
@@ -36,7 +36,6 @@
       { name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY },
     ]}
     tooltip={{
-      facetId: '',
       sync: false,
       format: (row) => {
         const { year, value } = row as YearPoint;

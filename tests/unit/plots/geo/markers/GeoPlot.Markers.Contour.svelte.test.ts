@@ -5,7 +5,7 @@ import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, WEATHER_STATIONS } from '../../../../../stories/plots/geo/data';
 import { waitForSvg, countContourPaths } from '../../_helpers/svg';
 
-describe('GeoPlot – contour marker', () => {
+describe('GeoPlot - contour marker', () => {
   test('scatter-interpolation mode renders contour paths without crashing', async () => {
     const { container } = render(GeoPlot, {
       width: 400,

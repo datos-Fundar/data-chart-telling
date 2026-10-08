@@ -14,7 +14,7 @@ function dotOpacitiesOf(svg: SVGElement): number[] {
 	});
 }
 
-describe('opacity channel – marker level (dot)', () => {
+describe('opacity channel - marker level (dot)', () => {
 	test('a dot marker with its own opacity channel renders multiple exact buckets, independent of the plot', async () => {
 		const { container } = render(GeoPlot, {
 			width: 400,
@@ -43,7 +43,7 @@ describe('opacity channel – marker level (dot)', () => {
 		);
 		const rendered = new Set(opacities.map((o) => Math.round(o * 32) / 32));
 		expect(rendered).toEqual(expected);
-		// More than one bucket — proves it isn't silently collapsing to one flat opacity.
+		// More than one bucket - proves it isn't silently collapsing to one flat opacity.
 		expect(rendered.size).toBeGreaterThan(1);
 	});
 });

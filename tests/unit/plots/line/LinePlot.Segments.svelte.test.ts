@@ -8,7 +8,7 @@ import { waitForSvg, countLinePaths, countDotMarks } from '../_helpers/svg';
 
 // ── Areas: matching and continuity ────────────────────────────────────────────
 
-describe('LinePlot – segments (areas)', () => {
+describe('LinePlot - segments (areas)', () => {
 	test('renders one path per visual segment', async () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
@@ -64,7 +64,7 @@ describe('LinePlot – segments (areas)', () => {
 
 // ── Dots ──────────────────────────────────────────────────────────────────────
 
-describe('LinePlot – segments (dots)', () => {
+describe('LinePlot - segments (dots)', () => {
 	test('does not render dots when the style has no `dots` key', async () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
@@ -147,7 +147,7 @@ describe('LinePlot – segments (dots)', () => {
 
 // ── Catch-all merging ─────────────────────────────────────────────────────────
 
-describe('LinePlot – segments (catch-all + area merging)', () => {
+describe('LinePlot - segments (catch-all + area merging)', () => {
 	test('an area segment inherits stroke from the series catch-all', async () => {
 		const { container } = await render(LinePlot, {
 			width: 400,

@@ -4,9 +4,9 @@ import { WORLD_COUNTRIES, EARTHQUAKES } from '../../plots/geo/data';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// A `graticule` marker (svelteplot's own `Graticule`) — lon/lat gridlines
+// A `graticule` marker (svelteplot's own `Graticule`) - lon/lat gridlines
 // drawn over the base map. Geo-only, so `GeoPlot` + `WORLD_COUNTRIES` stand
-// in for the empty canvas the rest of `Markers/*` uses — see
+// in for the empty canvas the rest of `Markers/*` uses - see
 // the other stories in this file for it paired with `sphere` on an
 // orthographic globe.
 
@@ -65,7 +65,7 @@ export const CustomStyle: GeoPlotStory = {
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** Basic graticule — default 10° step lon/lat gridlines drawn over the base map. */
+/** Basic graticule - default 10° step lon/lat gridlines drawn over the base map. */
 export const GraticuleOnly: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {
@@ -75,7 +75,7 @@ export const GraticuleOnly: GeoPlotStory = {
 	}
 };
 
-/** Custom step + style — a coarser 20° grid in a lighter, dashed stroke. */
+/** Custom step + style - a coarser 20° grid in a lighter, dashed stroke. */
 export const CustomStepAndStyle: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {
@@ -93,15 +93,15 @@ export const CustomStepAndStyle: GeoPlotStory = {
 };
 
 /**
- * Sphere + graticule on an orthographic globe — the `sphere` marker draws
+ * Sphere + graticule on an orthographic globe - the `sphere` marker draws
  * the outer outline of the whole earth, which only reads clearly on a
  * hemisphere-style projection like `orthographic`. `behind: true` is what
  * makes the fill work as ocean-colored background here rather than an
- * opaque layer painted over every country on top of it — markers otherwise
+ * opaque layer painted over every country on top of it - markers otherwise
  * always draw over the base map regardless of their position in `markers`.
  * `coordinates.rotate: true` enables drag-to-rotate on an orthographic
  * projection (independent of `zoom`, which only covers wheel/pinch scale
- * here) — drag the globe below to spin it.
+ * here) - drag the globe below to spin it.
  */
 export const SphereOutline: GeoPlotStory = {
 	render: renderGeoPlot,
@@ -125,7 +125,7 @@ export const SphereOutline: GeoPlotStory = {
 };
 
 /**
- * Graticule + sphere + raw lon/lat dots — mirrors svelteplot's
+ * Graticule + sphere + raw lon/lat dots - mirrors svelteplot's
  * `geo/earthquakes` example: point data (earthquake epicenters) fed
  * straight in as a `dot` marker over the globe's graticule/sphere.
  */

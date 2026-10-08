@@ -3,7 +3,7 @@ import LinePlot from '$lib/plots/line/Plot.svelte';
 import { GOOGL_AUGUST_2026 } from '../../../data/stockPrices';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// `reduce` picks the window's own reducer — svelteplot's own `windowY`
+// `reduce` picks the window's own reducer - svelteplot's own `windowY`
 // options, defaulting to `'mean'`. `statistics` is a list, so multiple
 // `movingAverage` entries stack independently over the same data.
 
@@ -34,7 +34,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** `reduce: 'median'` — more robust to single-day spikes than the default `'mean'`. */
+/** `reduce: 'median'` - more robust to single-day spikes than the default `'mean'`. */
 export const Median: Story = {
 	args: {
 		statistics: [{ type: 'movingAverage', k: 5, reduce: 'median' }]

@@ -31,7 +31,7 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** `coordinates.zoom: true` — scroll/pinch-to-zoom only, no drag. See `Pan/PanEnabled`/`Pan/PanAndZoomEnabled`. */
+/** `coordinates.zoom: true` - scroll/pinch-to-zoom only, no drag. See `Pan/PanEnabled`/`Pan/PanAndZoomEnabled`. */
 export const ZoomEnabled: Story = {
 	args: {
 		coordinates: {
@@ -40,7 +40,7 @@ export const ZoomEnabled: Story = {
 	}
 };
 
-/** Zoom with limits — `coordinates.zoom.min`/`max` clamp how far in/out the scroll wheel can go. */
+/** Zoom with limits - `coordinates.zoom.min`/`max` clamp how far in/out the scroll wheel can go. */
 export const ZoomWithLimits: Story = {
 	args: {
 		coordinates: {

@@ -6,7 +6,7 @@ import type { SegmentsConfig } from '$lib/types/plots/props';
 import { AMERICAS, COUNTRIES } from '../../../../stories/plots/scatter/data';
 import { waitForSvg, countDotMarks } from '../_helpers/svg';
 
-describe('ScatterPlot – segments', () => {
+describe('ScatterPlot - segments', () => {
 	test('an area segment overrides fill only for the matched points', async () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,

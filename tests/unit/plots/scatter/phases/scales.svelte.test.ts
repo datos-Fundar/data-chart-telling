@@ -5,7 +5,7 @@ import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/scatter/
 import type { Series } from '$lib/types/plots/data/common';
 import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
 import type { VisualGroup } from '$lib/types/plots/segments/config';
-import type { ChartConfig } from '$lib/types/configuration/styling';
+import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -36,20 +36,20 @@ function build(overrides: Partial<ScatterPlotState<Row>> = {}, dotRadiusDefault 
 		...overrides
 	};
 	const ctx: ScatterPlotCtx = {
-		cfg: { margins: THEME_MARGINS, scatter: { dotRadius: dotRadiusDefault } } as ChartConfig,
+		cfg: { margins: THEME_MARGINS, scatter: { dotRadius: dotRadiusDefault } } as PlotStylesConfig,
 		legendInteraction: undefined
 	};
 	return buildScales(buildTransforms<typeof state>()(state, ctx), ctx).scales;
 }
 
-describe('buildScales – no padding needed', () => {
+describe('buildScales - no padding needed', () => {
 	test('returns scales unchanged when every dot renders at radius 0', () => {
 		const result = build({ groupedSeries: [group(0)] }, 0);
 		expect(result).toEqual({});
 	});
 });
 
-describe('buildScales – domain padding', () => {
+describe('buildScales - domain padding', () => {
 	test('pads both axes using a literal constant radius', () => {
 		const result = build({
 			channels: { x: { accessor: (d) => d.x }, y: { accessor: (d) => d.y }, r: 20 }

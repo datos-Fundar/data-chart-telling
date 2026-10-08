@@ -25,22 +25,22 @@ type NormalizeOptions = {
 
 /**
  * `normalizeY` as a marker transform: divides each `z` group's `y` values by
- * the group's own `basis`, so groups on different scales share one axis —
+ * the group's own `basis`, so groups on different scales share one axis -
  * `first` indexes every series to its starting value.
  */
 export type NormalizeYTransform = { type: 'normalizeY' } & PositionChannels & NormalizeOptions;
 
-/** `normalizeX` — see {@link NormalizeYTransform}, on `x`. */
+/** `normalizeX` - see {@link NormalizeYTransform}, on `x`. */
 export type NormalizeXTransform = { type: 'normalizeX' } & PositionChannels & NormalizeOptions;
 
 /**
  * `normalizeParallelY` as a marker transform, for parallel coordinates: each
  * `x` category (an axis) is normalized on its own, while `z` still keeps one
- * line per record. With `basis: 'extent'`, every axis spans 0–1.
+ * line per record. With `basis: 'extent'`, every axis spans 0-1.
  */
 export type NormalizeParallelYTransform = { type: 'normalizeParallelY' } & PositionChannels &
 	NormalizeOptions;
 
-/** `normalizeParallelX` — see {@link NormalizeParallelYTransform}, with the axes along `y`. */
+/** `normalizeParallelX` - see {@link NormalizeParallelYTransform}, with the axes along `y`. */
 export type NormalizeParallelXTransform = { type: 'normalizeParallelX' } & PositionChannels &
 	NormalizeOptions;

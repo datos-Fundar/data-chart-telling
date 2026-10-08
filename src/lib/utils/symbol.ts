@@ -2,13 +2,13 @@ import type { SymbolScaleConfig } from '$lib/types/layout/scales';
 import type { SymbolType } from '$lib/types/plots/constants';
 
 /**
- * Resolves a {@link SymbolScaleConfig} into a `value => shape` function —
+ * Resolves a {@link SymbolScaleConfig} into a `value => shape` function -
  * always a discrete category lookup, unlike every other channel here (there's
  * no continuous case for a shape). Resolves to a plain shape-name string,
- * which svelteplot recognizes as a literal and renders as-is — safe to hand
+ * which svelteplot recognizes as a literal and renders as-is - safe to hand
  * straight to a per-row accessor, unlike `resolveOpacityScale`'s output.
  * `defaultRange` mirrors `resolveOpacityScale`'s own required (not defaulted)
- * parameter — callers pass the theme's own `cfg.symbols` rather than this
+ * parameter - callers pass the theme's own `cfg.symbols` rather than this
  * module hardcoding a second copy of the default cycle.
  */
 export function resolveSymbolScale(

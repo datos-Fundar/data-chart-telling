@@ -2,7 +2,7 @@
   import { Geo } from 'svelteplot';
   import type { GeoFeaturesMarkerConfig } from '$lib/types/markers/geo';
 
-  /** Renders one `'geo'` marker — one resolved-style bucket of the base map's own features, as a single `<Geo>` call. */
+  /** Renders one `'geo'` marker - one resolved-style bucket of the base map's own features, as a single `<Geo>` call. */
   let { marker }: { marker: GeoFeaturesMarkerConfig } = $props();
 </script>
 

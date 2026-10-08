@@ -5,7 +5,7 @@ import type { CountryPoint } from '../../../../stories/plots/scatter/data';
 import { AMERICAS } from '../../../../stories/plots/scatter/data';
 import { waitForSvg, countDotMarks } from '../_helpers/svg';
 
-describe('ScatterPlot – bubble sizing (r)', () => {
+describe('ScatterPlot - bubble sizing (r)', () => {
   test('a constant r does not crash and keeps one dot per row', async () => {
     const { container } = await render(ScatterPlot, {
       width: 400,

@@ -35,7 +35,7 @@
 	);
 	const showIcon = $derived(section.interactive?.showIcon ?? true);
 	const disabledAction = $derived<LegendDisabledAction>(
-		section.interactive?.disabled ?? { mode: 'style' }
+		section.interactive?.disabled ?? { mode: 'dim' }
 	);
 	const interaction = getLegendInteraction() ?? createLegendInteraction();
 
@@ -67,12 +67,12 @@
 
 	// ── Horizontal pagination ──────────────────────────────────────────────
 	// Row breaks are found by measuring each item's `offsetTop` on a full,
-	// hidden copy of the list kept in normal document flow — not
-	// `position: absolute` — alongside the visible, paginated one.
+	// hidden copy of the list kept in normal document flow - not
+	// `position: absolute` - alongside the visible, paginated one.
 	// (In-flow is required: an absolutely-positioned measurer doesn't count
 	// toward its shrink-to-fit ancestors' width, so the container would
 	// collapse to the narrow visible page and each remeasurement would then
-	// wrap even fewer items than the last — a runaway shrink.)
+	// wrap even fewer items than the last - a runaway shrink.)
 	let measurerEl: HTMLDivElement | undefined = $state();
 	// Resize trigger for the measurement effect; the value itself is unused.
 	let containerWidth = $state(0);
@@ -113,7 +113,7 @@
 		measuredKey = key;
 	});
 
-	// Whether `rows` was measured against the current item list — before it
+	// Whether `rows` was measured against the current item list - before it
 	// is, this reads as unpaginated, same as an empty `rows`.
 	const rowsCurrent = $derived(measuredKey === currentKey);
 
@@ -152,7 +152,7 @@
 {#snippet discreteItem(item: LegendItem, i: number)}
 	{@const action = interaction.disabledSeries.get(item.name)}
 	{@const isDisabled = action != null}
-	{@const omitMode = disabledAction.mode === 'omit'}
+	{@const omitMode = disabledAction.mode !== 'dim'}
 	{@const disabledStyle = isDisabled
 		? omitMode
 			? { opacity: cfg.legend.disabledOpacity }
@@ -260,7 +260,7 @@
 		flex-wrap: wrap;
 	}
 	/* Items keep their natural width and wrap to a new row instead of
-     shrinking — matches the grid variant's `max-content` columns, and
+     shrinking - matches the grid variant's `max-content` columns, and
      overrides flex's default `flex-shrink: 1`, which would otherwise cram
      every item onto one line before wrapping. */
 	.dct-discrete--horizontal .dct-discrete__item {
@@ -279,7 +279,7 @@
 		min-width: 0;
 	}
 	/* Full, untruncated copy of the list, used only to measure row breaks
-     (kept in normal flow — see the pagination comment above). Collapsed to
+     (kept in normal flow - see the pagination comment above). Collapsed to
      zero height and clipped so it adds no visible space; `overflow: hidden`
      only clips painted content, so `offsetTop` on its children still
      reports real layout position. */
