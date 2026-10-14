@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { buildGeoSlicing } from '$lib/plots/geo/slices';
-import { buildSliceFilter } from '$lib/layout/shell/slice';
+import { Slice } from '$lib/layout/plot/Slice';
 import { resolveAccessor } from '$lib/plots/utils/accessors';
 
 const feature = (name: string, year?: number) => ({
@@ -24,7 +24,12 @@ describe('buildGeoSlicing', () => {
 	});
 
 	test("its accessor reads a feature's properties and a marker row's own fields", () => {
-		const keep = buildSliceFilter({ timeline: slicing.timeline, place: { time: 2021 } });
+		const keep = new Slice({
+			rows: [],
+			timeline: slicing.timeline,
+			facet: undefined,
+			filterMode: undefined
+		}).keep({ time: 2021 });
 		expect(
 			rows.filter(keep).map((r) => ('properties' in r ? r.properties.name : 'marker'))
 		).toEqual(['a', 'base']);

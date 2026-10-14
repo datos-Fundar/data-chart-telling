@@ -1,13 +1,13 @@
 import { describe, test, expect } from 'vitest';
-import { SvelteMap } from 'svelte/reactivity';
 import { stageOf } from '../../_helpers/stages';
-import { buildScatterKind } from '$lib/plots/scatter/kind';
+import { buildScatterDefaults } from '$lib/plots/scatter/defaults';
 import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/scatter/state';
 import type { Series } from '$lib/types/plots/data/common';
-import type { LegendInteractionStore } from '$lib/types/layout/legend';
+import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
+import { PlotInteraction } from '$lib/layout/interaction/PlotInteraction.svelte';
 
-const buildData = stageOf(buildScatterKind<Row>(), 'data');
+const buildData = stageOf(buildScatterDefaults<Row>(), 'data');
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -20,10 +20,10 @@ function series(name: string, data: Row[]): Series<Row> {
 	return { name, x: 'x', y: 'y', data };
 }
 
-function legendDisabling(...names: string[]): LegendInteractionStore {
-	const disabledSeries = new SvelteMap<string, { mode: 'omit' }>();
-	for (const name of names) disabledSeries.set(name, { mode: 'omit' });
-	return { disabledSeries } as LegendInteractionStore;
+function legendDisabling(...names: string[]): LegendState {
+	const legend = new LegendState();
+	for (const name of names) legend.turnOff(name, { mode: 'omit' });
+	return legend;
 }
 
 type ResolvedData = Required<
@@ -35,7 +35,7 @@ type ResolvedData = Required<
 
 function build(
 	overrides: Partial<ScatterPlotState<Row>> = {},
-	legendInteraction?: LegendInteractionStore
+	legendInteraction?: LegendState
 ): ResolvedData {
 	const state: ScatterPlotState<Row> = {
 		series: [series('a', [{ x: 1, y: 10 }])],
@@ -45,7 +45,7 @@ function build(
 		height: 300,
 		...overrides
 	};
-	const ctx: ScatterPlotCtx = { cfg: FAKE_CFG, legendInteraction };
+	const ctx: ScatterPlotCtx = { cfg: FAKE_CFG, interaction: new PlotInteraction(() => FAKE_CFG, { legend: legendInteraction }) };
 	return buildData(state, ctx) as ResolvedData;
 }
 
@@ -73,9 +73,8 @@ describe('buildData - series resolution', () => {
 			width: 400,
 			height: 300
 		};
-		const result = stageOf(buildScatterKind<GroupedRow>(), 'data')(state, {
-			cfg: FAKE_CFG,
-			legendInteraction: undefined
+		const result = stageOf(buildScatterDefaults<GroupedRow>(), 'data')(state, {
+			cfg: FAKE_CFG
 		});
 		expect(result.resolvedSeries!.map((s) => s.name).sort()).toEqual(['g1', 'g2']);
 	});

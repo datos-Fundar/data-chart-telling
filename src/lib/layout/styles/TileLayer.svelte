@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { usePlot } from 'svelteplot';
+  import { usePlot } from '$lib/layout/plot/usePlot';
   import {
     visibleTiles,
     buildMercatorFit,
@@ -37,7 +37,7 @@
     dataLonLatBounds?: [number, number, number, number] | null;
   } = $props();
 
-  const plot = usePlot();
+  const plot = usePlot().svelteplot;
 
   const tileSize = $derived(config.tileSize ?? 256);
 

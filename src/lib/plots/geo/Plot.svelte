@@ -1,17 +1,16 @@
 <script lang="ts" generics="TProps extends Record<string, unknown>">
 	import Core from '$lib/plots/geo/Core.svelte';
-	import PlotShell from '$lib/layout/shell/PlotShell.svelte';
-	import { mergeScales } from '$lib/layout/shell/shell';
-	import { buildGeoPresentation } from '$lib/plots/geo/presentation';
+	import Plot from '$lib/layout/plot/Plot.svelte';
+	import { merge } from '$lib/utils/merge';
+	import { buildGeoDefaults } from '$lib/plots/geo/defaults';
 	import { buildGeoSlicing } from '$lib/plots/geo/slices';
 	import { createGeoFeatures } from '$lib/plots/geo/features.svelte';
 	import type { GeoPlotProps, GeoPlotCoreProps } from '$lib/types/plots/geo/props';
 	import type { GeoFeature } from '$lib/types/plots/data/geo';
 	import type { GeoScalesConfig } from '$lib/types/layout/coordinates';
-	import type { PlotCellContext, PlotPresentation } from '$lib/types/plots/presentation';
+	import type { PlotCellContext } from '$lib/types/layout/plot';
 	import type { TooltipConfig } from '$lib/types/plots/props';
 	import type { TooltipProp } from '$lib/types/layout/tooltip';
-	import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 
 	type Row = Record<string, unknown>;
 
@@ -39,11 +38,6 @@
 		...core
 	}: GeoPlotProps<TProps> = $props();
 
-	// Built per feature, but the shell slices stand-in rows.
-	const presentation = buildGeoPresentation as unknown as (
-		core: GeoPlotCoreProps<TProps>,
-		cfg: PlotStylesConfig
-	) => PlotPresentation<Row>;
 
 	const sliced = $derived(timeline != null || facet != null);
 	// Only resolved here when slicing; otherwise the core resolves `data` itself.
@@ -87,15 +81,16 @@
 			width: slice.width,
 			height: slice.height,
 			margins: slice.margins ?? margins,
-			scales: mergeScales(sharedColor, core.scales),
+			scales: merge(sharedColor, core.scales),
 			tooltip: tip
 		} as GeoPlotCoreProps<TProps>;
 	}
 </script>
 
-<PlotShell
+<Plot
 	{Core}
 	core={core as GeoPlotCoreProps<TProps>}
+	defaults={buildGeoDefaults}
 	slice={sliceProps}
 	bind:margins
 	{title}
@@ -109,5 +104,4 @@
 	facet={slicing.facet}
 	data={slicing.rows}
 	tooltip={tooltip as TooltipProp<Row> | undefined}
-	{presentation}
 />

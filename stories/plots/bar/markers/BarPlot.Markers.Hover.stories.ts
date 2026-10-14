@@ -279,12 +279,9 @@ export const GroupedSeriesWithHighlightArea: Story = {
 export const GroupedSeriesWithHighlightAreaHorizontal: Story = {
 	args: {
 		data: LIFE_EXPECTANCY_BY_PROVINCE,
-		x: 'province',
-		y: 'value',
+		x: 'value',
+		y: 'province',
 		color: 'sex',
-		scales: {
-			y: { type: 'categorical' }
-		},
 		markers: [
 			{
 				type: 'hover',
@@ -328,14 +325,11 @@ export const WithHighlightArea: Story = {
 		series: [
 			{
 				name: 'female',
-				x: 'province',
-				y: 'value',
+				x: 'value',
+				y: 'province',
 				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
 			}
 		],
-		scales: {
-			y: { type: 'categorical' }
-		},
 		markers: [
 			{
 				type: 'hover',

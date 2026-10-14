@@ -1,12 +1,17 @@
 import { describe, test, expect } from 'vitest';
-import { buildLineMarkers, buildMarkers } from '$lib/plots/line/phases/markers';
-import { buildTransforms } from '$lib/layout/phases/transforms';
+import { buildLineMarkers } from '$lib/plots/line/markers';
+import { TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
 import { buildGroupedSeries } from '$lib/plots/utils/segments';
 import type { LinePlotState, LinePlotCtx } from '$lib/types/plots/line/state';
 import type { Series } from '$lib/types/plots/data/common';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { LineMarkerConfig } from '$lib/types/markers/common';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
+import { stageOf } from '../../_helpers/stages';
+import { buildLineDefaults } from '$lib/plots/line/defaults';
+
+/** The kind's "markers" stage: its own marks, the state's markers, then its value labels. */
+const buildMarkers = stageOf(buildLineDefaults<{ x: number; y: number | null }>(), 'markers');
 
 // ── buildLineMarkers ───────────────────────────────────────────────────────────
 
@@ -64,7 +69,7 @@ describe('buildLineMarkers - style resolution', () => {
 
 // ── buildMarkers (the real phase, combining line + gap markers) ──────────────
 
-const CTX: LinePlotCtx = { cfg: { line: {} } as PlotStylesConfig, legendInteraction: undefined };
+const CTX: LinePlotCtx = { cfg: { line: {} } as PlotStylesConfig };
 
 function buildPhase(overrides: Partial<LinePlotState<{ x: number; y: number | null }>> = {}) {
 	const groupedSeries = buildGroupedSeries<
@@ -82,7 +87,7 @@ function buildPhase(overrides: Partial<LinePlotState<{ x: number; y: number | nu
 		colorForSeries: () => 'blue',
 		...overrides
 	};
-	return buildMarkers(buildTransforms<typeof state>()(state, CTX), CTX).markers!;
+	return buildMarkers(new TransformsPhase<typeof state>().run(state, CTX), CTX).markers!;
 }
 
 describe('buildMarkers - combines line and gap markers', () => {

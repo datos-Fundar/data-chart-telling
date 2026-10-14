@@ -14,7 +14,7 @@ export type BarMarkerConfig = {
 	insetRight?: number;
 	styles?: AreaStyle;
 	category?: AxisValue;
-	onpointerenter?: () => void;
-	onpointerleave?: () => void;
+	/** A `'hitArea'` that matches `data` as the plot's hover while the pointer is over it. */
+	hover?: boolean;
 } & CommonMarkerConfigWithColor &
 	CommonMarkerConfigWithInterval;

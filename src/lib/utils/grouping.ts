@@ -27,23 +27,35 @@ export function groupBy<TRow extends Record<string, unknown>>(
  * When `grouping` is given, one series is produced per group (series `name`
  * = group value), which is exactly how the plot's `segments` map is keyed -
  * so the caller styles/colors each group by its own value (see
- * `scales.color`). Callers pass `grouping ?? color` so a lone `color`
- * accessor groups *and* colors series exactly as it always has.
+ * `scales.color`). A position channel the author left out stays unset on
+ * every series.
  */
 export function buildSeries<TRow extends Record<string, unknown>>(
 	data: TRow[],
-	x: Accessor<TRow, AxisValue>,
-	y: Accessor<TRow, AxisValue>,
+	x: Accessor<TRow, AxisValue> | undefined,
+	y: Accessor<TRow, AxisValue> | undefined,
 	grouping: Accessor<TRow, unknown> | undefined,
 	defaultName = 'series'
 ): Series<TRow>[] {
 	if (grouping === undefined) {
-		return [{ name: defaultName, x, y, data }];
+		return [{ name: defaultName, ...channels(x, y), data }];
 	}
 	return [...groupBy(data, grouping).entries()].map(([name, rows]) => ({
 		name,
-		x,
-		y,
+		...channels(x, y),
 		data: rows
 	}));
+}
+
+/** The position channels a series carries: only the ones set. */
+function channels<TRow extends Record<string, unknown>>(
+	x: Accessor<TRow, AxisValue> | undefined,
+	y: Accessor<TRow, AxisValue> | undefined
+): Pick<Series<TRow>, 'x' | 'y'> {
+	return { ...(x !== undefined ? { x } : {}), ...(y !== undefined ? { y } : {}) };
+}
+
+/** A series' id: its own `id`, or its `name`. */
+export function seriesIdOf(series: Pick<Series, 'name' | 'id'>): string {
+	return series.id ?? series.name;
 }

@@ -1,10 +1,10 @@
 import { describe, test, expect } from 'vitest';
 import { stageOf } from '../../_helpers/stages';
-import { buildScatterKind } from '$lib/plots/scatter/kind';
+import { buildScatterDefaults } from '$lib/plots/scatter/defaults';
 import type { ScatterPlotState } from '$lib/types/plots/scatter/state';
 import type { Series } from '$lib/types/plots/data/common';
 
-const buildMapping = stageOf(buildScatterKind<Row>(), 'mapping');
+const buildMapping = stageOf(buildScatterDefaults<Row>(), 'mapping');
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 

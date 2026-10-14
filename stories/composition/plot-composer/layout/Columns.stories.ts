@@ -68,7 +68,7 @@ export const OtherTags: Story = story({ layout: { columns: 2 }, panels: flow(4),
 
 /**
  * A single grid can't make rows with different numbers of columns, but a
- * `PlotComposer` can sit inside a `PlotPanel`: a one-column composer stacks a
+ * `PlotComposer` can sit inside another: a one-column composer stacks a
  * full-width panel over a nested two-column composer.`.
  */
 export const Nested: StoryObj = {

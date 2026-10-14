@@ -1,6 +1,7 @@
 <script lang="ts">
   import { untrack } from 'svelte';
-  import FacetDemo from './FacetDemo.svelte';
+  import BarPlot from '$lib/plots/bar/Plot.svelte';
+  import { facetGroups } from '../../data/facet-groups';
   import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
   import type { PlotStylesConfigInput } from '$lib/types/configuration/styling';
 
@@ -60,7 +61,14 @@
     that themes the rest of the package.
   </p>
 
-  <FacetDemo groupCount={9} columns={2} mode="paginated" pageSize={4} width={720} height={480} />
+  <BarPlot
+    width={720}
+    height={480}
+    data={facetGroups(9)}
+    x="category"
+    y="value"
+    facet={{ by: 'group', columns: 2, mode: 'paginated', pageSize: 4 }}
+  />
 </div>
 
 <style>

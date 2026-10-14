@@ -2,6 +2,7 @@ import type { ChannelScalesConfig } from '$lib/types/layout/scales';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
 import type { MarkerTransform } from '$lib/types/transforms';
+import type { MarkLegend } from '$lib/types/layout/legend';
 
 /** Props every marker kind shares: rows, grouping, series scope, position, statistics, transforms. */
 export type CommonMarkerConfig = {
@@ -24,4 +25,6 @@ export type CommonMarkerConfig = {
 	transforms?: MarkerTransform[];
 	/** Clips the marker to the plot's frame. Unset, its kind's default applies. */
 	clip?: boolean;
+	/** Names the marker on its plot's automatic legend - see {@link MarkLegend}. */
+	legend?: MarkLegend;
 };

@@ -2,6 +2,7 @@ import type { ChannelScalesConfig } from '$lib/types/layout/scales';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { Series } from '$lib/types/plots/data/common';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
+import type { MarkLegend } from '$lib/types/layout/legend';
 
 /** A half-open interval on one axis. Both bounds are inclusive; omit either to leave that end open. */
 export type Range = {
@@ -37,6 +38,8 @@ export type Segment<TStyle> = {
   areas?: Area[];
   scales?: ChannelScalesConfig;
   styles?: TStyle;
+  /** Names the segment on its plot's automatic legend - see {@link MarkLegend}. */
+  legend?: MarkLegend;
 };
 
 /** One contiguous, styled slice of a series' data - ready to draw as its own mark. */

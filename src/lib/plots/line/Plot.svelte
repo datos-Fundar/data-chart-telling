@@ -1,7 +1,6 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import Core from '$lib/plots/line/Core.svelte';
-	import PlotShell from '$lib/layout/shell/PlotShell.svelte';
-	import { buildLinePresentation } from '$lib/plots/line/presentation';
+	import Plot from '$lib/layout/plot/Plot.svelte';
+	import { buildLineDefaults } from '$lib/plots/line/defaults';
 	import type { LinePlotProps, LinePlotCoreProps } from '$lib/types/plots/line/props';
 
 	/**
@@ -24,11 +23,12 @@
 		margins = $bindable(),
 		...core
 	}: LinePlotProps<TData> = $props();
+
 </script>
 
-<PlotShell
-	{Core}
+<Plot
 	core={core as LinePlotCoreProps<TData>}
+	defaults={buildLineDefaults}
 	bind:margins
 	{title}
 	{subtitle}
@@ -40,5 +40,4 @@
 	{timeline}
 	{facet}
 	{tooltip}
-	presentation={buildLinePresentation<TData>}
 />

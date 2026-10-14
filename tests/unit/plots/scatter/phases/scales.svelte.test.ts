@@ -1,11 +1,14 @@
 import { describe, test, expect } from 'vitest';
-import { buildScales } from '$lib/plots/scatter/phases/scales';
-import { buildTransforms } from '$lib/layout/phases/transforms';
+import { buildScatterDefaults } from '$lib/plots/scatter/defaults';
+import { TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
+import { stageOf } from '../../_helpers/stages';
 import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/scatter/state';
 import type { Series } from '$lib/types/plots/data/common';
 import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
 import type { VisualGroup } from '$lib/types/plots/segments/config';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
+
+const buildScales = stageOf(buildScatterDefaults<Row>(), 'scales');
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -36,10 +39,9 @@ function build(overrides: Partial<ScatterPlotState<Row>> = {}, dotRadiusDefault 
 		...overrides
 	};
 	const ctx: ScatterPlotCtx = {
-		cfg: { margins: THEME_MARGINS, scatter: { dotRadius: dotRadiusDefault } } as PlotStylesConfig,
-		legendInteraction: undefined
+		cfg: { margins: THEME_MARGINS, scatter: { dotRadius: dotRadiusDefault } } as PlotStylesConfig
 	};
-	return buildScales(buildTransforms<typeof state>()(state, ctx), ctx).scales;
+	return buildScales(new TransformsPhase<typeof state>().run(state, ctx), ctx).scales;
 }
 
 describe('buildScales - no padding needed', () => {

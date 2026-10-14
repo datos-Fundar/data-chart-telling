@@ -1,7 +1,6 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import Core from '$lib/plots/heatmap/Core.svelte';
-	import PlotShell from '$lib/layout/shell/PlotShell.svelte';
-	import { buildHeatmapPresentation } from '$lib/plots/heatmap/presentation';
+	import Plot from '$lib/layout/plot/Plot.svelte';
+	import { buildHeatmapDefaults } from '$lib/plots/heatmap/defaults';
 	import type { HeatmapPlotProps, HeatmapPlotCoreProps } from '$lib/types/plots/heatmap/props';
 
 	/**
@@ -23,11 +22,29 @@
 		margins = $bindable(),
 		...core
 	}: HeatmapPlotProps<TData> = $props();
+
+	$effect(() => {
+		const scoped = (core.markers ?? []).filter(
+			(m) => (m.type === 'hover' || m.type === 'component') && (m as { series?: unknown }).series
+		);
+		if (scoped.length > 0) {
+			console.warn(
+				'HeatmapPlot: markers scoped to a `series` are ignored - heatmaps have no series concept.'
+			);
+		}
+		const seriesKeys = Object.keys(core.segments ?? {}).filter((k) => k !== 'default');
+		if (seriesKeys.length > 0) {
+			console.warn(
+				`HeatmapPlot: segment groups have series-specific keys (${seriesKeys.join(', ')}) - heatmaps have no named series. Use the 'default' key instead.`
+			);
+		}
+	});
+
 </script>
 
-<PlotShell
-	{Core}
+<Plot
 	core={core as HeatmapPlotCoreProps<TData>}
+	defaults={buildHeatmapDefaults}
 	bind:margins
 	{title}
 	{subtitle}
@@ -39,5 +56,4 @@
 	{timeline}
 	{facet}
 	{tooltip}
-	presentation={buildHeatmapPresentation<TData>}
 />

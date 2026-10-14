@@ -30,7 +30,7 @@ async function waitForSvg(container: Element): Promise<SVGElement> {
 	let svg: SVGElement | null = null;
 	await vi.waitFor(
 		() => {
-			svg = container.querySelector('svg');
+			svg = container.querySelector('.dct-plot svg');
 			if (!svg) throw new Error('SVG not yet rendered');
 		},
 		{ timeout: 3000, interval: 50 }

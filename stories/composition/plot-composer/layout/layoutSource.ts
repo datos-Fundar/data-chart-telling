@@ -27,11 +27,7 @@ export function layoutSource({ layout, panels, tags, width = 720, height = 320 }
 	const body = panels
 		.map(
 			(area) =>
-				`  <PlotPanel${area ? ` area="${area}"` : ''}>\n` +
-				`    {#snippet children({ width, height })}\n` +
-				`      <!-- any plot: <LinePlot {width} {height} … /> -->\n` +
-				`    {/snippet}\n` +
-				`  </PlotPanel>`
+				`  <!-- any plot -->\n` + `  <LinePlot${area ? ` area="${area}"` : ''} … />`
 		)
 		.join('\n');
 	return {

@@ -1,7 +1,8 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
   import { getContext, untrack } from 'svelte';
   import type { Writable } from 'svelte/store';
-  import { AxisX, AxisY, GridX, GridY, usePlot } from 'svelteplot';
+  import { AxisX, AxisY, GridX, GridY } from 'svelteplot';
+  import { usePlot } from '$lib/layout/plot/usePlot';
   import { getConfiguration } from '$lib/configuration/config.svelte';
   import { tickStep, ticksInRange, naturalTickCount } from '$lib/layout/scales/niceDomain';
   import { DISCRETE_SCALE_TYPES } from '$lib/types/layout/scales';
@@ -28,7 +29,7 @@
   } = $props();
 
   const cfg = $derived(getConfiguration());
-  const plot = usePlot();
+  const plot = usePlot().svelteplot;
 
   const xValues = $derived(data.map(getX));
   const yValues = $derived(data.map(getY));

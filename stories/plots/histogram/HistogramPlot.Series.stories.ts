@@ -5,7 +5,7 @@ import { MEASUREMENTS, type Measurement } from '../../data/measurements';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A histogram bins the rows of each series on `x`, one bar per bin, its height the
-// bin's count. Flat `data` is one histogram; `grouping` (or `color`) splits it into
+// bin's count - or on `y`, when that's the only channel given, for horizontal bars. Flat `data` is one histogram; `grouping` (or `color`) splits it into
 // one histogram per group, drawn in each group's color. A pre-built `series` array
 // does the same without grouping.
 
@@ -52,6 +52,14 @@ export const Default: Story = {
 	args: {
 		data: MEASUREMENTS,
 		x: 'value'
+	}
+};
+
+/** Only `y`, no `x`: the plot bins along `y` (a `binY`) and draws horizontal bars, each as long as its bin's count. */
+export const Horizontal: Story = {
+	args: {
+		data: MEASUREMENTS,
+		y: 'value'
 	}
 };
 

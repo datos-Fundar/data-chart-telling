@@ -1,5 +1,6 @@
 import { resolveColorScale } from '$lib/utils/color';
 import { resolveOpacityScale } from '$lib/utils/opacity';
+import { ContinuousDomain } from '$lib/utils/ContinuousDomain';
 import { resolveFeatureScales } from '$lib/plots/utils/geoSegments';
 import type { GeoPlotState, GeoPlotCtx } from '$lib/types/plots/geo/state';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
@@ -19,23 +20,11 @@ export function buildScales<TProps extends Record<string, unknown>>(
 	const { scales, features, color, grouping, opacity, segments } = state;
 	const { range, cfg } = ctx;
 
-	const configDomain =
-		scales.color?.domain && typeof scales.color.domain[0] === 'number'
-			? (scales.color.domain as [number, number])
-			: undefined;
-
-	const valueDomain: [number, number] | null = (() => {
-		if (configDomain) return configDomain;
-		if (!color) return null;
-		const vals = features!.map((f) => color(f)).filter((v): v is number => v != null);
-		return vals.length ? [Math.min(...vals), Math.max(...vals)] : null;
-	})();
-
-	const effectiveDomain: [number, number] | null = !valueDomain
-		? null
-		: range && range.mode === 'rescale'
-			? [range.min, range.max]
-			: valueDomain;
+	const colorValues = color
+		? features!.map((f) => color(f)).filter((v): v is number => v != null)
+		: [];
+	const valueDomain = ContinuousDomain.build(scales.color?.domain, colorValues);
+	const effectiveDomain = valueDomain ? ContinuousDomain.ramp(valueDomain, range) : null;
 
 	const colorScale = effectiveDomain
 		? resolveColorScale({ ...scales.color, domain: effectiveDomain }, effectiveDomain, [

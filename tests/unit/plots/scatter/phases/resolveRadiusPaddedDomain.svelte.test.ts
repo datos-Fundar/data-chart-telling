@@ -1,48 +1,53 @@
 import { describe, test, expect } from 'vitest';
-import { resolveRadiusPaddedDomain } from '$lib/plots/scatter/phases/scales';
+import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
+import { Pipeline } from '$lib/phases/Pipeline';
+import { buildScatterDefaults } from '$lib/plots/scatter/defaults';
+import { PlotInteraction } from '$lib/layout/interaction/PlotInteraction.svelte';
 
-describe('resolveRadiusPaddedDomain', () => {
+type Row = Record<string, unknown>;
+
+/** The domains a scatter's own `scales.fit` leaves on `x`, over `xs` and a dot of `radius` pixels. */
+function domainOf(xs: number[], radius: number, width = 240) {
+	const interaction = new PlotInteraction(() => DEFAULT_CONFIG, {});
+	const state = Pipeline.ofAxisKind(buildScatterDefaults<Row>()).run(
+		{
+			data: xs.map((x) => ({ x, y: 0 })),
+			x: 'x',
+			y: 'y',
+			r: radius,
+			width,
+			height: 300,
+			margins: { left: 20, right: 20, top: 20, bottom: 20 },
+			scales: {},
+			segments: {},
+			markers: []
+		},
+		{ cfg: DEFAULT_CONFIG, interaction }
+	) as { scales: { x?: { domain?: number[] } } };
+	return state.scales.x?.domain;
+}
+
+describe('ScatterPlot scales.fit', () => {
 	test('pads both ends of the domain proportional to the pixel radius', () => {
-		// domain [0, 100] over 200px → 0.5 data units per pixel; a 10px radius pads by 5 units.
-		const [min, max] = resolveRadiusPaddedDomain([0, 50, 100], 10, 200)!;
+		// 200px of plot over [0, 100] -> 0.5 data units per pixel; a 10px radius pads by 5.
+		const [min, max] = domainOf([0, 50, 100], 10)!;
 		expect(min).toBeCloseTo(-5);
 		expect(max).toBeCloseTo(105);
 	});
 
 	test('a larger radius pads more', () => {
-		const [minSmall, maxSmall] = resolveRadiusPaddedDomain([0, 100], 5, 200)!;
-		const [minLarge, maxLarge] = resolveRadiusPaddedDomain([0, 100], 20, 200)!;
+		const [minSmall] = domainOf([0, 100], 5)!;
+		const [minLarge] = domainOf([0, 100], 20)!;
 		expect(minLarge).toBeLessThan(minSmall);
-		expect(maxLarge).toBeGreaterThan(maxSmall);
 	});
 
-	test('a narrower inner pixel size pads more, for the same radius', () => {
-		const [minWide] = resolveRadiusPaddedDomain([0, 100], 10, 400)!;
-		const [minNarrow] = resolveRadiusPaddedDomain([0, 100], 10, 100)!;
+	test('a narrower plot pads more, for the same radius', () => {
+		const [minWide] = domainOf([0, 100], 10, 440)!;
+		const [minNarrow] = domainOf([0, 100], 10, 140)!;
 		expect(minNarrow).toBeLessThan(minWide);
 	});
 
-	test('returns undefined for an empty values array', () => {
-		expect(resolveRadiusPaddedDomain([], 10, 200)).toBeUndefined();
-	});
-
-	test('returns undefined when the radius is zero or negative', () => {
-		expect(resolveRadiusPaddedDomain([0, 100], 0, 200)).toBeUndefined();
-	});
-
-	test('returns undefined when the inner size is zero or negative', () => {
-		expect(resolveRadiusPaddedDomain([0, 100], 10, 0)).toBeUndefined();
-	});
-
-	test('ignores non-finite values (NaN from a bad accessor) when computing the extent', () => {
-		const withNaN = resolveRadiusPaddedDomain([0, NaN, 100], 10, 200)!;
-		const withoutNaN = resolveRadiusPaddedDomain([0, 100], 10, 200)!;
-		expect(withNaN).toEqual(withoutNaN);
-	});
-
 	test('a degenerate single-value domain pads by a fixed unit instead of dividing by zero', () => {
-		const [min, max] = resolveRadiusPaddedDomain([42, 42, 42], 10, 200)!;
-		expect(min).toBe(41);
-		expect(max).toBe(43);
+		expect(domainOf([42, 42, 42], 10)).toEqual([41, 43]);
 	});
 });

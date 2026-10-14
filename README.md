@@ -84,11 +84,11 @@ pnpm build-storybook
 | Component       | Import path                       | Description                                                                                             |
 | --------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `AreaPlot`      | `$lib/plots/area/Plot.svelte`      | Filled area on continuous x/y axes. Supports multiple series and per-series range segments.             |
-| `BarPlot`       | `$lib/plots/bar/Plot.svelte`       | Vertical bar chart. Supports multiple series and per-series range segments.                             |
+| `BarPlot`       | `$lib/plots/bar/Plot.svelte`       | Bar chart, vertical or horizontal depending on which axis holds the categories. Supports multiple series and per-series range segments. |
 | `HeatmapPlot`   | `$lib/plots/heatmap/Plot.svelte`   | Grid of colour-coded cells. Colour domain is computed over the full dataset for cross-facet comparability. |
-| `HistogramPlot` | `$lib/plots/histogram/Plot.svelte` | Distribution of a numeric field, binned along x.                                                        |
+| `HistogramPlot` | `$lib/plots/histogram/Plot.svelte` | Distribution of a numeric field, binned along x (or along y alone, for horizontal bars).                |
 | `LinePlot`      | `$lib/plots/line/Plot.svelte`      | Line chart. Supports multiple series and per-series range segments. Default timeline mode is `upTo` (cumulative reveal). |
-| `PyramidPlot`   | `$lib/plots/pyramid/Plot.svelte`   | Diverging horizontal bar chart; each series is mirrored left or right of a shared zero baseline.        |
+| `PyramidPlot`   | `$lib/plots/pyramid/Plot.svelte`   | Diverging bar chart; each series is mirrored on either side of a shared zero baseline. Horizontal with categories on y, vertical with them on x. |
 | `ScatterPlot`   | `$lib/plots/scatter/Plot.svelte`   | Point cloud on continuous x/y axes; `r` sizes each dot.                                                 |
 | `GeoPlot`       | `$lib/plots/geo/Plot.svelte`       | Geographic map rendered from GeoJSON/TopoJSON with optional choropleth styling and interactive markers. |
 
@@ -382,6 +382,99 @@ Omitting `segments` (or passing `{}`) renders every mark in its default palette 
 
 ---
 
+## Architecture: plots, shell, chrome, facets and composer
+
+A figure is built from a few layers, each knowing only the one below it. A public **plot** (`BarPlot`, `LinePlot`, ...) hands its kind-specific **core** and **presentation** to the **shell**; the shell frames everything in a **chrome frame** and slices the data by **timeline** and **facet**. A **composer** reuses the same chrome frame and the same **panel grid** facets lay out on, so both share one implementation of the frame (title, legend, caption, theme variables, shared hover and legend toggles), of the grid (pixel tracks, labels, margin alignment) and of the cells.
+
+### How a plot is built
+
+Solid arrows are "renders"; the plot's `presentation` is handed to `Plot` alongside its core.
+
+```mermaid
+%%{init: {"themeVariables": {"lineColor": "#8a8f98"}}}%%
+flowchart TD
+    Kind["<b>Plot.svelte</b><br/>BarPlot, LinePlot, ..."]
+    Defaults["<b>defaults.ts</b><br/>phase options, hover, timeline"]
+    Plot["<b>Plot</b><br/>frame run, shared domains, one core per slice"]
+    Figure["<b>Figure</b><br/>box or grid cell, hover store, legend toggles"]
+    Chrome["<b>FigureChrome</b><br/>title, legend, caption"]
+    Timeline["<b>TimelineLayout</b>"]
+    PanelRun["<b>PanelRun</b><br/>data phases once, every panel"]
+    Facet["<b>FacetLayout</b>"]
+    Core["<b>Core</b><br/>its panel phases, or every phase"]
+    Base["<b>BasePlotLayout</b><br/>svelteplot Plot, axes, markers"]
+
+    Kind -->|core + defaults| Plot
+    Kind -.- Defaults
+    Plot --> Figure
+    Figure -->|with chrome| Chrome
+    Figure -->|with a timeline| Timeline
+    Figure -->|without one| Facet
+    Timeline -->|with a facet| PanelRun --> Facet
+    Timeline --> Facet
+    Facet -->|one per slice| Core
+    Core --> Base
+
+    classDef public stroke-width:3px
+    class Kind,Plot public
+    linkStyle default stroke:#8a8f98,stroke-width:2px
+```
+
+### Facets and the composer share one grid
+
+The dotted arrow is "reads from": each plot reports its margins to its cell and reads back the pinned ones.
+
+```mermaid
+%%{init: {"themeVariables": {"lineColor": "#8a8f98"}}}%%
+flowchart TD
+    Facet["<b>FacetLayout</b><br/>by or rows x cols"]
+    Composer["<b>PlotComposer</b><br/>layout, tags, align"]
+    Figure["<b>Figure</b><br/>its box, or a cell of the grid above"]
+    TimelineFrame["<b>TimelineFrame</b><br/>timeline gutter"]
+    Grid["<b>Grid</b><br/>pixel tracks, labels, margin alignment"]
+    Cell["<b>GridCell</b><br/>slot or inset, label above its box"]
+    Core["<b>Core</b> of each facet"]
+    Any["any plot, or a nested PlotComposer"]
+    Base["<b>BasePlotLayout</b>"]
+
+    Facet -->|grid and paginated modes| Grid
+    Composer --> Figure --> Grid
+    Figure -->|with a timeline| TimelineFrame --> Grid
+    Composer -->|children| Any
+    Any -->|its own Figure takes| Cell
+    Grid -->|places| Cell
+    Cell -->|facet| Core
+    Core --> Base
+    Base -.->|reports margins, reads pinned ones| Cell
+
+    classDef public stroke-width:3px
+    class Composer public
+    linkStyle default stroke:#8a8f98,stroke-width:2px
+```
+
+Every other dependency between layers goes through Svelte context, so a layer never imports the one that provides what it reads:
+
+| Context         | Provided by                                               | Read by                                             |
+| --------------- | --------------------------------------------------------- | --------------------------------------------------- |
+| Hover store     | `Figure` (the outermost one; nested figures share it) | every core's tooltip and hover sync                 |
+| Legend toggles  | `Figure` (a figure with its own `legend` scopes them) | legends and every core below                        |
+| Shared timeline | `PlotComposer` with a `timeline`                          | `Plot`, which then draws no scrubber            |
+| Hover scope     | `GridCell` in a composer's grid, and `HoverScope` around each facet | hover sync, to tell panels and facets apart |
+| Grid            | `Grid`                                               | `GridCell` (registers, gets its box and tag), `Figure` (takes a cell) |
+| Cell alignment  | `GridCell`                                                | `BasePlotLayout` (pinned margins), `MarginReporter` |
+
+How a plot is assembled:
+
+1. Each kind's `Plot.svelte` splits its props into chrome (`title`, `legend`, ...), `timeline`, `facet` and the core props, and renders the shared `Plot` with its kind's `Core` and the presentation its `defaults.ts` builds.
+2. `Plot` renders a `Figure` - the plot's box (or its cell in a composer's grid), its hover and legend stores, and its chrome if it has any - whose body is the `TimelineLayout`, wrapping the `FacetLayout`, wrapping one `Core` per slice; without a timeline or a facet, its one cell is the whole plot. Each facet's cell gets its scales (shared or free, per `facet.scales`) and whether its axes draw (per `facet.axes` and its edges in the grid).
+   - The phases that work on the rows (`facet`, `data`, `mapping`, `transforms`, `statistics`) run once for every facet panel: the kind's `presentation.dataRun`. `Plot` runs it over every row without the legend (the frame), which gives the shared axes their domains; `PanelRun` reuses the frame, or runs it again for a timeline step or a legend that omits a series.
+   - Each cell gets its panel's part of that run (`buildPanelState`), and its `Core` runs only the phases that depend on its own box and interaction: `scales`, `markers` and `tooltip`. A plot without a facet runs every phase in its `Core`.
+3. `FacetLayout` turns the rows into facets: one per `by` value, flowed into `columns` (all at once, a page at a time, or as a carousel), or one per `rows` x `cols` combination. It places them on a `Grid`, one `GridCell` each. The grid always aligns facets: every plot reports the margins it settled on, and once all have, each column and row pins its widest ones, so every plot area lines up.
+
+How a composition is assembled: `PlotComposer` renders a `Figure` around a `Grid` (inside a `TimelineFrame` when it has a `timeline`, the same gutter `TimelineLayout` draws) laid out by `layout` (`columns` or named `areas`, `widths`/`heights` weights, `gap`). Every plot drawn straight in it - or another `PlotComposer` - takes a cell of its own through `Figure`: its `area`, an `inset` over it, or the next free one, with the composer's tag above it, drawn at the cell's size (`width`/`height` aren't needed there). Anything that isn't a plot goes in a `GridCell`. A `GridCell` marks what it draws as placed, so a plot inside one takes no other cell. `layout.align` turns on the same margin alignment facets use; it assumes the panels' plots draw no chrome of their own, since the grid only sees each plot's own margins.
+
+---
+
 ## Theming & configuration
 
 The whole package reads its default styling - fonts, colours, spacing, legend/tooltip/axis chrome, plot geometry - from one global, reactive config store (`src/lib/configuration/config.svelte.ts`). Overriding it re-themes every plot on screen; nothing needs to be passed prop-by-prop to each component.
@@ -406,7 +499,7 @@ resetConfiguration(); // restore shipped defaults
 
 The config feeds two different consumers, and a field is **one or the other**, never both:
 
-1. **CSS custom properties** - `configToCssVars` flattens the relevant fields into `--dct-*` variables, which `PlotContainer` stamps on its own root element; every component's scoped `<style>` block reads them with a hardcoded fallback (e.g. `font-size: var(--dct-continuous-label-size, 0.875rem)`). These are the fields listed with a **CSS variable** below - you can also override them directly with plain CSS on a wrapping element instead of going through `setConfiguration`, if you only need a one-off, non-reactive tweak.
+1. **CSS custom properties** - `configToCssVars` flattens the relevant fields into `--dct-*` variables, which every `Figure` stamps on its root element (its `FigureChrome`, or a plain box without chrome); every component's scoped `<style>` block reads them with a hardcoded fallback (e.g. `font-size: var(--dct-continuous-label-size, 0.875rem)`). These are the fields listed with a **CSS variable** below - you can also override them directly with plain CSS on a wrapping element instead of going through `setConfiguration`, if you only need a one-off, non-reactive tweak.
 2. **Plain JS values** - read directly by plot components as props svelteplot needs (numeric tick sizes, the categorical `palette` array, margins, gradient endpoints, hover geometry, per-mark defaults). These have **no** CSS variable - `setConfiguration` (or editing `DEFAULT_CONFIG`) is the only way to change them.
 
 ### Reference
@@ -519,9 +612,9 @@ Consumed as plain numeric/boolean props by the underlying svelteplot axes - only
 | `axis.yTickPadding`   | `number`            | `10`             | -                        |
 | `axis.grid`           | `boolean`           | `false`          | -                        |
 | `axis.locale`         | `string`            | `'es-AR'`        | -                        |
-| `axis.compactDisplay` | `'short' \| 'long'` | `'long'`         | - (`'1 mil'` vs `'1 K'`) |
+| `axis.compactDisplay` | `'short' \| 'long'` | `'short'`        | - (`'1 M'` vs `'1 millón'`) |
 
-`axis.locale`/`axis.compactDisplay` feed svelteplot's own automatic tick formatter - the one it falls back to on any axis without its own explicit `scales.x`/`scales.y.tickFormat`. Whether a given axis abbreviates at all (vs. spelling every digit out) stays svelteplot's own per-axis call, based on that axis's value range; these two only change the _wording_ once it decides to. `axis.locale` updates a plot already on screen; `axis.compactDisplay` is read once when a plot mounts (it goes through svelteplot's own `setPlotDefaults` context hook, not a per-instance prop) and needs a remount to pick up a later change.
+`axis.locale`/`axis.compactDisplay` feed svelteplot's own automatic tick formatter - the one it falls back to on any axis without its own explicit `scales.x`/`scales.y.tickFormat`. Whether a given axis abbreviates at all (vs. spelling every digit out) stays svelteplot's own per-axis call, based on that axis's value range; these two only change the _wording_ once it decides to. A legend's size section writes its values the same way. `axis.locale` updates a plot already on screen; `axis.compactDisplay` is read once when a plot mounts (it goes through svelteplot's own `setPlotDefaults` context hook, not a per-instance prop) and needs a remount to pick up a later change.
 
 #### Tooltip
 
@@ -594,3 +687,61 @@ import {
   ...
 } from '@fundar/data-chart-telling';
 ```
+
+### Reading a plot's state: `usePlot` and `useFigure`
+
+A plot's state - its hover, legend, margins, scales, rows and size - can be read from anything drawn with it, like svelteplot's own `usePlot`, which stays reachable as `svelteplot`.
+
+`usePlot()` works inside the plot. A `component` marker is a component the plot mounts in its SVG, so it can read the plot it is in:
+
+```svelte
+<!-- HoverReadout.svelte -->
+<script lang="ts">
+  import { usePlot } from '@fundar/data-chart-telling';
+
+  const plot = usePlot();
+  // plot.hover      strategy, activeX/activeY/activeSeries, points, activePoint, tooltip
+  // plot.legend     entries, off, isOff(series), and turnOff / turnOn / toggle
+  // plot.margins, plot.scales, plot.data, plot.width, plot.height
+  // plot.svelteplot svelteplot's own plot state
+  const point = $derived(plot.hover.activePoint);
+</script>
+
+<text x={plot.margins.left + 8} y={plot.margins.top + 16}>
+  {point ? `${point.series} at ${point.x}: ${point.label}` : 'Hover the plot'}
+</text>
+```
+
+```svelte
+<LinePlot
+  data={rows} x="year" y="value" color="sex" tooltip
+  markers={[{ type: 'hover' }, { type: 'component', component: HoverReadout }]}
+/>
+```
+
+`useFigure()` works anywhere inside the figure, its `header` and `footer` included, and gives its `hover` and `legend`. Here a footer turns series off through the legend:
+
+```svelte
+<!-- FigureReadout.svelte -->
+<script lang="ts">
+  import { useFigure } from '@fundar/data-chart-telling';
+
+  const figure = useFigure();
+  const series = $derived(
+    (figure.legend?.entries ?? []).flatMap((e) => (e.type === 'series' ? [e] : []))
+  );
+</script>
+
+{#each series as entry (entry.name)}
+  <button onclick={() => figure.legend?.toggle(entry.name, { mode: 'omit' })}>
+    {figure.legend?.isOff(entry.name) ? 'Show' : 'Hide'} {entry.name}
+  </button>
+{/each}
+```
+
+```svelte
+{#snippet footer()}<FigureReadout />{/snippet}
+<LinePlot data={rows} x="year" y="value" color="sex" tooltip {footer} />
+```
+
+Both are read-only, but for the legend, whose series can be turned on and off. Call them while the component initializes; outside a plot or a figure they throw. Both examples run in Storybook under *Configuration / State*.

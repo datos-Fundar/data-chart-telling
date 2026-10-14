@@ -57,12 +57,12 @@ describe('LinePlot - styles.values', () => {
 	test('measuring label overflow into the margin never triggers a runaway effect loop', async () => {
 		// Regression test: end-point labels overflowing the plot's top margin
 		// (the default `anchor: 'start'` overlaps content above the last data
-		// point) used to grow that margin via `createLabelMarginTracker`, which
+		// point) used to grow that margin via `PlotMargins`, which
 		// fed straight back into svelteplot's `<Plot margin>` as a live
 		// post-mount prop change - sending its own auto-margin sizing into a
 		// permanent one-pixel oscillation that kept re-triggering the overflow
 		// watcher forever, tripping Svelte's `effect_update_depth_exceeded`
-		// guard (see `BasePlotLayout`'s `marginRemountKey` doc comment for the
+		// guard (see `PlotMargins.remountKey` doc comment for the
 		// actual fix). Only reproduced with an *explicit* margin already set on
 		// another side (here `right`) alongside the auto-grown one; a bare
 		// `values.show` alone didn't trigger it.
@@ -93,13 +93,13 @@ describe('LinePlot - styles.values', () => {
 		// timeline scrubbed before any series' earliest data point), `lastPoints`
 		// is `[]` and the value-labels `<g>` renders with nothing in it.
 		// `getBBox()` on that empty group reports `(0,0,0,0)` - the SVG origin,
-		// not "no content" - which `watchLabelOverflow` used to read as the
+		// not "no content" - which `PlotMargins.watch` used to read as the
 		// group overflowing the plot's top/left margins by exactly those
 		// margins' own current size. Growing the margin to "fix" that only
 		// shifted the content box outward, so the next, still-empty measurement
 		// reported the same shape of overflow again - an unbounded loop, never
 		// an `effect_update_depth_exceeded` throw (each growth is a fresh
-		// `marginRemountKey` render, not a same-tick effect cycle) but visible as
+		// `PlotMargins.remountKey` render, not a same-tick effect cycle) but visible as
 		// the plot's scales never settling.
 		const errors: unknown[][] = [];
 		const spy = vi.spyOn(console, 'error').mockImplementation((...args) => {
@@ -127,7 +127,7 @@ describe('LinePlot - styles.values', () => {
 
 		// Re-queries `container` (not a cached `svg`/`rect` reference) on every
 		// call: a margin-growth loop remounts the whole `<svg>` via
-		// `BasePlotLayout`'s `{#key marginRemountKey}`, so a reference captured
+		// svelteplot's remount on `PlotMargins.remountKey`, so a reference captured
 		// once would go stale and silently stop reflecting later remounts.
 		const frameWidth = () => Number(container.querySelector('rect.frame')?.getAttribute('width'));
 		const readings: number[] = [];
@@ -142,7 +142,7 @@ describe('LinePlot - styles.values', () => {
 	});
 
 	test('overflow measured against an earlier, differently-shaped frame does not linger after the data changes', async () => {
-		// Regression test: `createLabelMarginTracker`'s margin growth is
+		// Regression test: `PlotMargins`'s margin growth is
 		// monotonic *within* a stable dataset (see its own doc comment) - but
 		// `LinePlot`'s `data`/`series` prop changes on every tick of a timeline
 		// scrubber, revealing a different slice of rows each time. Before

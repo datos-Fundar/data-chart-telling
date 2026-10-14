@@ -3,29 +3,35 @@ import LocaleDemo from './LocaleDemo.svelte';
 
 /**
  * `axis.locale` and `axis.compactDisplay` control every axis's automatic
- * (no explicit `scales.x`/`scales.y` `tickFormat`) tick label. Set once,
+ * (no explicit `scales.x`/`scales.y` `tickFormat`) tick label, and the values
+ * of a legend's size section. Set once,
  * globally, through the same `setConfiguration` used for styling:
  *
  * ```ts
  * import { setConfiguration } from '@fundar/data-chart-telling';
  *
- * setConfiguration({ axis: { locale: 'es-AR', compactDisplay: 'long' } });
+ * setConfiguration({ axis: { locale: 'es-AR', compactDisplay: 'short' } });
  * ```
  *
- * `locale` defaults to `'es-AR'`. `compactDisplay` defaults to `'long'`
- * (spelled out, e.g. `'1 mil'`) rather than `'short'` (a single letter,
- * e.g. `'1 K'`). Whether a given axis abbreviates at all stays svelteplot's
+ * `locale` defaults to `'es-AR'`. `compactDisplay` defaults to `'short'`
+ * (abbreviated, e.g. `'1 M'`) rather than `'long'` (spelled out, e.g.
+ * `'1 millón'`). Whether a given axis abbreviates at all stays svelteplot's
  * own per-axis call, based on that axis's value range.
  *
  * Each story below switches `locale` live with a button, but fixes its own
  * `compactDisplay` - unlike `locale`, it's read once when a chart mounts,
- * so it can't be switched on an already-rendered one.
+ * so it can't be switched on an already-rendered one. The configuration is
+ * global, so each story renders in a frame of its own here: on one shared
+ * page, the last story to load would set it for all of them.
  */
 const meta = {
   title: 'Configuration/Locale',
   component: LocaleDemo,
   tags: ['autodocs'],
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: { story: { inline: false, height: '600px' } },
+  },
 } satisfies Meta<typeof LocaleDemo>;
 
 export default meta;

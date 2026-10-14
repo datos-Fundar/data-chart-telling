@@ -173,10 +173,10 @@ export const FacetSyncBarUnrelatedOrder: StoryObj = {
 					title: 'Value by category, two unrelated groups',
 					subtitle: 'Strategy: y · Sync: on - each facet sorted by its own value',
 					data: UNRELATED_SORT_DATA,
-					x: 'category',
-					y: 'value',
+					x: 'value',
+					y: 'category',
 					scales: {
-						y: { type: 'categorical', sort: (a: GroupValue, b: GroupValue) => a.value - b.value }
+						y: { sort: (a: GroupValue, b: GroupValue) => a.value - b.value }
 					},
 					facet: { by: 'group', columns: 2 },
 					tooltip: {

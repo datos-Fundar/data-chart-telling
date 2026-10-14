@@ -1,9 +1,8 @@
 import type { Snippet } from 'svelte';
-import type { SvelteMap } from 'svelte/reactivity';
 import type { SymbolType, LineStyle } from '$lib/types/plots/constants';
 import type { StrokeStyle, DotStyle } from '$lib/types/plots/styling';
 
-export type LegendSectionType = 'discrete' | 'continuous';
+export type LegendSectionType = 'discrete' | 'continuous' | 'size' | 'symbol';
 
 /**
  * Style for whatever a legend has turned off: a toggled-off series, or a row
@@ -34,6 +33,8 @@ export type LegendItem = {
 	label?: string;
 	color?: string;
 	symbol?: SymbolType;
+	/** Whether the symbol is filled, or drawn as an outline. Defaults to `true`. */
+	filled?: boolean;
 	opacity?: number;
 	lineStyle?: LineStyle;
 	/** Initial toggled-off state (uncontrolled - the user can still click it back on). */
@@ -124,17 +125,124 @@ export type ContinuousLegendSection = {
 	interactive?: ContinuousInteractiveConfig;
 };
 
-export type LegendSection = DiscreteLegendSection | ContinuousLegendSection;
+/**
+ * A continuous size scale - the `r` channel of a plot's dots: a few dots of
+ * the radius each value draws at, its value under each. `domain` maps to
+ * `range` (px) on a square-root scale, so a dot's area follows its value.
+ */
+export type SizeLegendSection = {
+	type: 'size';
+	title?: string;
+	columns?: number;
+	domain: [number, number];
+	range: [number, number];
+	/** The values shown, one dot each. Defaults to a few round values across `domain`. */
+	values?: number[];
+	/** The dots' color. Defaults to the text color. */
+	color?: string;
+	/** Whether the dots are filled, or drawn as rings. Defaults to `true`. */
+	filled?: boolean;
+	/** The dots' shape. Defaults to `'circle'`. */
+	symbol?: SymbolType;
+	/** How each value reads. Defaults to the axes' own format (`axis.locale`, `axis.compactDisplay`). */
+	format?: (v: number) => string;
+};
 
-/** Legend state shared by every plot and legend under one provider: what is turned off. */
-export type LegendInteractionStore = {
-	/** Legend item name → action to apply. Presence in the map means "disabled". */
-	disabledSeries: SvelteMap<string, LegendDisabledAction>;
-	/** The narrowed range of the first interactive continuous section, or `null`. */
-	continuousRange: {
-		min: number;
-		max: number;
-		mode: 'rescale' | 'filter';
-		disabledStyle: LegendDisabledStyle;
-	} | null;
+/**
+ * A categorical shape scale - the `symbol` channel of a plot's dots: each
+ * category next to the shape it draws as. Unlike a discrete section, its
+ * items name categories, not series, so they never toggle.
+ */
+export type SymbolLegendSection = {
+	type: 'symbol';
+	title?: string;
+	columns?: number;
+	/** Item flow direction, as in a discrete section. */
+	layout?: LegendItemsLayout;
+	items: { name: string; label?: string; symbol: SymbolType }[];
+	/** The shapes' color. Defaults to the text color. */
+	color?: string;
+	/** Whether the shapes are filled, or drawn as outlines. Defaults to `true`. */
+	filled?: boolean;
+};
+
+export type LegendSection =
+	| DiscreteLegendSection
+	| ContinuousLegendSection
+	| SizeLegendSection
+	| SymbolLegendSection;
+
+/** The narrowed range of an interactive continuous section: rows outside it dim, or the ramp refits to it. */
+export type LegendRange = {
+	min: number;
+	max: number;
+	mode: 'rescale' | 'filter';
+	disabledStyle: LegendDisabledStyle;
+};
+
+/** How a series draws, as a legend shows it: the plot's own mark for it. */
+export type LegendMark = 'line' | 'dot' | 'area' | 'bar' | 'cell' | 'rect' | 'geo';
+
+/**
+ * What a plot draws that a legend can show - registered on the figure's
+ * `LegendState` as the plot resolves: a series (its name, color and how it
+ * draws), a segment or marker that names itself on the legend (`'mark'`), a
+ * continuous color scale (the domain its colors span), the size scale its
+ * dots' `r` channel draws with, or the shapes its dots' `symbol` channel
+ * draws each category as.
+ */
+export type LegendEntry =
+	| {
+			type: 'series' | 'mark';
+			name: string;
+			label?: string;
+			color?: string;
+			mark?: LegendMark;
+			symbol?: SymbolType;
+			filled?: boolean;
+			lineStyle?: LineStyle;
+	  }
+	| {
+			type: 'size';
+			channel: 'r';
+			title?: string;
+			domain: [number, number];
+			range: [number, number];
+			color?: string;
+			filled: boolean;
+			symbol?: SymbolType;
+	  }
+	| {
+			type: 'symbol';
+			channel: 'symbol';
+			title?: string;
+			items: { name: string; symbol: SymbolType }[];
+			color?: string;
+			filled: boolean;
+	  }
+	| {
+			type: 'scale';
+			channel: 'color';
+			title?: string;
+			min: number;
+			max: number;
+			colorMin?: string;
+			colorMax?: string;
+	  };
+
+/**
+ * How a segment or marker shows on its plot's automatic legend: its label, or
+ * the item itself. What the item leaves out - its color, its symbol, its line
+ * style - comes from how the segment or marker draws.
+ */
+export type MarkLegend = string | (Omit<LegendItem, 'name' | 'disabled'> & { label: string });
+
+/**
+ * What a figure adds to its automatic legend, keeping what its plots read
+ * as: `items` after the plots' own series, in the same section, and
+ * `sections` after the automatic ones.
+ */
+export type LegendExtension = {
+	items?: LegendItem[];
+	sections?: LegendSection[];
 };

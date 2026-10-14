@@ -13,59 +13,22 @@ export { default as GeoPlot } from './plots/geo/Plot.svelte';
 // ── Composition ─────────────────────────────────────────────────────────────
 // Separate plots combined into one figure, with chrome of its own.
 export { default as PlotComposer } from './layout/composer/PlotComposer.svelte';
-export { default as PlotPanel } from './layout/composer/PlotPanel.svelte';
+export { default as GridCell } from './layout/grid/GridCell.svelte';
 
-// Interchangeable layout primitives (compose your own plot kinds with these).
-export { default as PlotShell } from './layout/shell/PlotShell.svelte';
-export { default as PlotContainer } from './layout/shell/PlotContainer.svelte';
-export { DEFAULT_CHROME_ORDER } from './types/plots/props';
+// The generic plot, to build your own plot kind: wrap it with your kind's core and defaults.
+export { default as Plot } from './layout/plot/Plot.svelte';
 export { default as BasePlotLayout } from './layout/base/BasePlotLayout.svelte';
-export { default as CoordinatesLayout } from './layout/coordinates/CoordinatesLayout.svelte';
-export { default as TileLayer } from './layout/styles/TileLayer.svelte';
+export { usePlot, useFigure } from './layout/plot/usePlot';
+export type {
+	PublicPlotContext,
+	PublicFigureContext,
+	PublicHover,
+	PublicPlotHover,
+	PublicLegend
+} from './layout/plot/PublicPlotContext';
 
 // Custom geo projections - usable as `scales.projection.type`.
 export { argentinaBicontinental } from './layout/coordinates/projections/argentina';
-export { default as Timeline } from './layout/timeline/Timeline.svelte';
-export { default as TimelineLayout } from './layout/timeline/TimelineLayout.svelte';
-export { default as FacetLayout } from './layout/facet/FacetLayout.svelte';
-export { default as FacetGridLayout } from './layout/facet/FacetGridLayout.svelte';
-export { default as FacetIndicator } from './layout/facet/FacetIndicator.svelte';
-export { default as LegendLayout } from './layout/legend/LegendLayout.svelte';
-export { default as Tooltip } from './layout/tooltip/Tooltip.svelte';
-export {
-	getLegendInteraction,
-	provideLegendInteraction,
-	createLegendInteraction
-} from './layout/legend/interaction.svelte';
-
-// Markers
-export { default as BarMarker } from './markers/BarMarker.svelte';
-export { default as CellMarker } from './markers/CellMarker.svelte';
-export { default as DeltaMarker } from './markers/DeltaMarker.svelte';
-export { default as DotMarker } from './markers/DotMarker.svelte';
-export { default as HoverMarker } from './markers/HoverMarker.svelte';
-export { default as LineMarker } from './markers/LineMarker.svelte';
-export { default as RuleMarker } from './markers/RuleMarker.svelte';
-export { default as TextMarker } from './markers/TextMarker.svelte';
-export { default as RegressionMarker } from './markers/RegressionMarker.svelte';
-export { default as BollingerMarker } from './markers/BollingerMarker.svelte';
-export { default as RectMarker } from './markers/RectMarker.svelte';
-export { default as AreaMarker } from './markers/AreaMarker.svelte';
-export { default as DensityMarker } from './markers/DensityMarker.svelte';
-export { default as BoxMarker } from './markers/BoxMarker.svelte';
-export { default as HullMarker } from './markers/HullMarker.svelte';
-export { default as DifferenceMarker } from './markers/DifferenceMarker.svelte';
-export { default as ArrowMarker } from './markers/ArrowMarker.svelte';
-export { default as BrushMarker } from './markers/BrushMarker.svelte';
-export { default as DelaunayLinkMarker } from './markers/DelaunayLinkMarker.svelte';
-export { default as DelaunayMeshMarker } from './markers/DelaunayMeshMarker.svelte';
-export { default as VoronoiMarker } from './markers/VoronoiMarker.svelte';
-export { default as VoronoiMeshMarker } from './markers/VoronoiMeshMarker.svelte';
-export { default as ImageMarker } from './markers/ImageMarker.svelte';
-export { default as RasterMarker } from './markers/RasterMarker.svelte';
-export { default as TickMarker } from './markers/TickMarker.svelte';
-export { default as TrailMarker } from './markers/TrailMarker.svelte';
-export { default as WaffleMarker } from './markers/WaffleMarker.svelte';
 
 export {
 	setConfiguration,
@@ -76,7 +39,9 @@ export {
 	DEFAULT_CONFIG
 } from './configuration/config.svelte';
 export { THEMES } from './configuration/themes';
-export type { ThemeName } from './configuration/themes';
+export type {
+	ThemeName
+} from './configuration/themes';
 
 // ── Utils ─────────────────────────────────────────────────────────────────────
 export { groupBy, buildSeries } from './utils/grouping';
@@ -89,16 +54,10 @@ export {
 	contrastTextColor,
 	contrastRatio
 } from './utils/color';
+export { Margins } from './layout/margins/Margins';
 export { resolveOpacityScale } from './utils/opacity';
 export { resolveSymbolScale } from './utils/symbol';
-export {
-	resolveMovingAverage,
-	resolveStatisticMarker,
-	resolvePlotStatistics,
-	expandMarkerStatistics
-} from './utils/statistics';
-export { estimateCategoricalAxisMargin } from './plots/utils/categoricalAxisMargin';
-export { estimateLineValueLabelMargin } from './plots/line/valueLabelMargin';
+export { Statistics } from './phases/statistics/Statistics';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export type {
@@ -113,47 +72,33 @@ export type {
 export type {
 	AxisScale,
 	AxisBasedScalesConfig,
-	AxisChannelScaleConfig,
-	ColorScaleConfig,
-	GroupingScaleConfig,
-	OpacityScaleConfig,
-	SymbolScaleConfig,
-	RScaleConfig,
-	LengthScaleConfig,
-	ChannelScaleConfig,
 	ChannelScalesConfig
 } from './types/layout/scales';
-export type { Accessor, Series, SeriesProps, DataProps } from './types/plots/data/common';
+export type {
+	Accessor,
+	Series,
+	SeriesProps,
+	DataProps
+} from './types/plots/data/common';
 export type {
 	BasePlotProps,
 	PlotCoreProps,
 	PlotChromeProps,
-	PlotChrome,
-	PlotChromeItem,
-	StylesConfig,
-	MarkersConfig,
+	FigureBoxProps,
 	SegmentsConfig,
 	ScalesConfig,
 	MarginConfig,
 	TooltipConfig,
-	HoverConfig,
-	PointMatchingStrategy
+	HoverConfig
 } from './types/plots/props';
 export type {
-	ValuesStyle,
-	FrameStyle,
-	FrameProp,
-	BasePlotStylesConfig,
 	AxisBasedStylesConfig,
 	GapsAwarePlotStylesConfig,
 	GeoStylesConfig,
 	GeoTileLayerConfig
 } from './types/layout/styles';
 export type {
-	GapsConfig,
-	GapZonesConfig,
-	GapZoneConfig,
-	OpenGapZoneConfig
+	GapsConfig
 } from './types/plots/gaps';
 export type {
 	LineSegmentStyle,
@@ -162,102 +107,70 @@ export type {
 	GeoSegmentStyle,
 	ScatterSegmentStyle
 } from './types/plots/segments/common';
-export type { Range, Area, Segment } from './types/plots/segments/config';
 export type {
-	ValueAnchor,
-	SymbolType,
-	LineStyle,
-	LineCap,
-	LineJoin,
-	FontWeight,
-	FontStyleKeyword,
-	TextAnchor,
-	LineAnchor
+	Range,
+	Area,
+	Segment
+} from './types/plots/segments/config';
+export type {
+	SymbolType
 } from './types/plots/constants';
-export type { FontStyle, StrokeStyle, DotStyle, AreaStyle } from './types/plots/styling';
+export type {
+	FontStyle,
+	StrokeStyle,
+	DotStyle,
+	AreaStyle
+} from './types/plots/styling';
 export type {
 	AxisBasedMarkersConfig,
-	RectMarkerConfig,
-	RegressionMarkerConfig,
-	BollingerMarkerConfig,
-	AreaMarkerConfig,
-	DensityMarkerConfig,
-	BoxMarkerConfig,
-	HullMarkerConfig,
-	DifferenceMarkerConfig,
-	ArrowMarkerConfig,
-	BrushMarkerConfig,
 	BrushSelection,
-	DelaunayLinkMarkerConfig,
-	DelaunayMeshMarkerConfig,
-	VoronoiMarkerConfig,
-	VoronoiMeshMarkerConfig,
-	ImageMarkerConfig,
-	RasterMarkerConfig,
-	TickMarkerConfig,
-	TrailMarkerConfig,
-	WaffleMarkerConfig,
 	MarkerCurveName
 } from './types/markers/common';
 export type {
-	StatisticScope,
-	StatisticConfig,
-	RegressionType,
-	RegressionStatisticOptions,
-	BollingerStatisticOptions,
-	StatisticReducer,
-	MovingAverageStatisticOptions
+	StatisticConfig
 } from './types/layout/statistics';
 export type * from './types/transforms';
-export type { DeltaMarkerConfig, DeltaConfig, DeltaTarget } from './types/markers/axis/delta';
-export type { GeoFeature, GeoJsonInput, GeoDataProps, Topology } from './types/plots/data/geo';
 export type {
-	GeoProjectionName,
-	GeoProjectionConfig,
+	GeoFeature,
+	GeoJsonInput,
+	GeoDataProps,
+	Topology
+} from './types/plots/data/geo';
+export type {
 	GeoCustomProjection,
 	GeoCustomProjectionFactory,
 	GeoScalesConfig,
-	GeoZoomConfig,
 	CoordinatesConfig
 } from './types/layout/coordinates';
-export type { GeoCameraTarget, GeoCameraConfig, GeoCameraTransition } from './types/plots/camera';
 export type {
-	GeoMarkersConfig,
-	GeoInsetMarkerConfig,
-	GeoInsetTooltipConfig,
-	GeoInsetLocation,
-	GeoInsetProjectionName,
-	GeoInsetProjectionConfig
+	GeoCameraConfig
+} from './types/plots/camera';
+export type {
+	GeoMarkersConfig
 } from './types/markers/geo';
 export type {
-	PlotPresentation,
-	FacetAxisValues,
-	PlotCellContext,
-	PlotCellSnippet,
-	PlotBoxContext,
-	PlotBoxSnippet
-} from './types/plots/presentation';
-export type { TimeValue, Orientation, TimelineConfig } from './types/layout/timeline';
+	SharedAxisValues
+} from './types/phases';
+export type {
+	TimeValue,
+	Orientation,
+	TimelineConfig
+} from './types/layout/timeline';
 export type {
 	ComposerLayout,
 	ComposerTags,
 	ComposerTimelineConfig,
-	ComposerHoverConfig,
-	PanelContext,
-	PanelSnippet,
-	PanelInset
+	ComposerHoverConfig
 } from './types/layout/composer';
 export type {
+	GridPlacement,
+	GridInset,
+	GridCellContext,
+	GridCellSnippet
+} from './types/layout/grid';
+export type {
 	Responsive,
-	FacetColumns,
-	FacetMode,
-	FacetNavLayout,
 	FacetConfig,
-	FacetWrapConfig,
-	FacetGridConfig,
-	FacetScales,
-	FacetAxes,
-	FacetEdges,
 	FacetCellContext,
 	FacetIndicatorContext,
 	FacetIndicatorSnippet,
@@ -270,24 +183,18 @@ export type {
 	DiscreteLegendSection,
 	ContinuousLegendSection,
 	LegendItem,
-	LegendDisabledStyle,
-	LegendDisabledAction,
-	LegendItemsLayout,
-	LegendInteractiveStyle,
-	DiscreteInteractiveConfig,
-	ContinuousInteractiveConfig,
 	LegendNavDirection,
 	LegendNavContext,
 	LegendNavSnippet,
-	LegendInteractionStore
+	LegendEntry,
+	LegendMark,
+	LegendRange
 } from './types/layout/legend';
 export type {
 	HoverStrategy,
-	TooltipOptions,
-	TooltipProp,
-	TooltipAnchorX,
-	TooltipAnchorY
-} from './types/layout/tooltip';
+	HoverPoint,
+	HoverDisplayPoint
+} from './types/layout/hover';
 export type {
 	PlotStylesConfig,
 	PlotStylesConfigInput,

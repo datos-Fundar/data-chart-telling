@@ -8,7 +8,7 @@ import ComposerInsetLegendSource from './ComposerInsetLegend.svelte?raw';
 import { demoSource } from '../../../common/docsSource';
 
 /**
- * A `PlotPanel` with `inset` floats over another instead of taking a cell of
+ * A plot with `inset` floats over another instead of taking a cell of
  * the grid - patchwork's `inset_element`. The box is given as fractions of the
  * composition, from its left and bottom edges.
  */

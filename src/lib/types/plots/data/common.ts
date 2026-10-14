@@ -14,8 +14,14 @@ export type Accessor<TRow extends Record<string, unknown>, V> = keyof TRow | ((d
  */
 export type Series<T extends Record<string, unknown> = Record<string, unknown>> = {
 	name: string;
-	x: Accessor<T, AxisValue>;
-	y: Accessor<T, AxisValue>;
+	/** Tells apart series that share a `name`, such as one per facet panel. Defaults to `name`. */
+	id?: string;
+	/** The facet panel the series belongs to, once the "facet" phase splits it. */
+	panel?: string;
+	/** Horizontal position. A plot reading one position channel only (a histogram) takes either alone. */
+	x?: Accessor<T, AxisValue>;
+	/** Vertical position. */
+	y?: Accessor<T, AxisValue>;
 	/** The `color` channel's own accessor - a pre-built series is already one group, so this is purely the color value (per-name for most plot kinds; per-cell for HeatmapPlot). */
 	color?: Accessor<T, unknown>;
 	data: T[];

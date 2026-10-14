@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { geoBounds, type GeoPermissibleObjects } from 'd3-geo';
-	import { usePlot } from 'svelteplot';
+	import { usePlot } from '$lib/layout/plot/usePlot';
 	import {
 		toProjectionLike,
 		type StreamingProjection,
@@ -35,7 +35,7 @@
 		onFit: (fit: GeoZoomTransform) => void;
 	} = $props();
 
-	const plot = usePlot();
+	const plot = usePlot().svelteplot;
 
 	// Runtime shape verified against svelteplot's own projection helper - see TileLayer.svelte.
 	const rawProjection = $derived(

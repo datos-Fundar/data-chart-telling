@@ -3,7 +3,7 @@ import { describe, test, expect, vi } from 'vitest';
 import ContinuousSection from '$lib/layout/legend/ContinuousSection.svelte';
 import ExternalSyncHarness from './_ExternalSyncHarness.svelte';
 import type { ContinuousLegendSection } from '$lib/types/layout/legend';
-import type { LegendInteractionStore } from '$lib/types/layout/legend';
+import type { LegendState } from '$lib/layout/legend/LegendState.svelte';
 
 async function dragBy(el: Element, dx: number): Promise<void> {
 	const rect = el.getBoundingClientRect();
@@ -158,7 +158,7 @@ describe('ContinuousSection - re-clamping an active range when the domain shifts
 });
 
 describe('ContinuousSection - syncing with an externally-set range', () => {
-	test('setting interaction.continuousRange from outside moves the handles to match, and clearing it resets them', async () => {
+	test('setting interaction.range from outside moves the handles to match, and clearing it resets them', async () => {
 		const section: ContinuousLegendSection = {
 			type: 'continuous',
 			min: 0,
@@ -166,7 +166,7 @@ describe('ContinuousSection - syncing with an externally-set range', () => {
 			width: 200,
 			interactive: { enabled: true, mode: 'rescale' }
 		};
-		let interaction: LegendInteractionStore | undefined;
+		let interaction: LegendState | undefined;
 		const { container } = await render(ExternalSyncHarness, {
 			section,
 			onReady: (store) => {
@@ -183,7 +183,7 @@ describe('ContinuousSection - syncing with an externally-set range', () => {
 		// section's own drag handles. The sync effect only flushes on a later
 		// tick, so poll (like `valueOf` already does for "not yet rendered")
 		// instead of asserting immediately.
-		interaction.continuousRange = { min: 20, max: 60, mode: 'rescale', disabledStyle: {} };
+		interaction.range = { min: 20, max: 60, mode: 'rescale', disabledStyle: {} };
 		await vi.waitFor(async () => {
 			expect(await valueOf(container, 'Lower bound')).toBe(20);
 			expect(await valueOf(container, 'Upper bound')).toBe(60);
@@ -191,7 +191,7 @@ describe('ContinuousSection - syncing with an externally-set range', () => {
 
 		// Clearing it externally (full range again) resets the handles back
 		// out to the section's own min/max, exactly like a manual reset would.
-		interaction.continuousRange = null;
+		interaction.range = null;
 		await vi.waitFor(async () => {
 			expect(await valueOf(container, 'Lower bound')).toBe(0);
 			expect(await valueOf(container, 'Upper bound')).toBe(100);

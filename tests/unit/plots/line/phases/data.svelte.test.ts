@@ -1,13 +1,13 @@
 import { describe, test, expect } from 'vitest';
-import { SvelteMap } from 'svelte/reactivity';
 import { stageOf } from '../../_helpers/stages';
-import { buildLineKind } from '$lib/plots/line/kind';
+import { buildLineDefaults } from '$lib/plots/line/defaults';
 import type { LinePlotState, LinePlotCtx } from '$lib/types/plots/line/state';
 import type { Series } from '$lib/types/plots/data/common';
-import type { LegendInteractionStore } from '$lib/types/layout/legend';
+import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
+import { PlotInteraction } from '$lib/layout/interaction/PlotInteraction.svelte';
 
-const buildData = stageOf(buildLineKind<Row>(), 'data');
+const buildData = stageOf(buildLineDefaults<Row>(), 'data');
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -20,15 +20,15 @@ function series(name: string, data: Row[]): Series<Row> {
 	return { name, x: 'x', y: 'y', data };
 }
 
-function legendDisabling(...names: string[]): LegendInteractionStore {
-	const disabledSeries = new SvelteMap<string, { mode: 'omit' }>();
-	for (const name of names) disabledSeries.set(name, { mode: 'omit' });
-	return { disabledSeries } as LegendInteractionStore;
+function legendDisabling(...names: string[]): LegendState {
+	const legend = new LegendState();
+	for (const name of names) legend.turnOff(name, { mode: 'omit' });
+	return legend;
 }
 
 function build(
 	overrides: Partial<LinePlotState<Row>> = {},
-	legendInteraction?: LegendInteractionStore
+	legendInteraction?: LegendState
 ) {
 	const state: LinePlotState<Row> = {
 		series: [series('a', [{ x: 1, y: 10 }])],
@@ -39,7 +39,7 @@ function build(
 		height: 300,
 		...overrides
 	};
-	const ctx: LinePlotCtx = { cfg: FAKE_CFG, legendInteraction };
+	const ctx: LinePlotCtx = { cfg: FAKE_CFG, interaction: new PlotInteraction(() => FAKE_CFG, { legend: legendInteraction }) };
 	return buildData(state, ctx);
 }
 
@@ -66,9 +66,8 @@ describe('buildData - series resolution', () => {
 			width: 400,
 			height: 300
 		};
-		const result = stageOf(buildLineKind<GroupedRow>(), 'data')(state, {
-			cfg: FAKE_CFG,
-			legendInteraction: undefined
+		const result = stageOf(buildLineDefaults<GroupedRow>(), 'data')(state, {
+			cfg: FAKE_CFG
 		});
 		expect(result.resolvedSeries!.map((s) => s.name).sort()).toEqual(['g1', 'g2']);
 	});

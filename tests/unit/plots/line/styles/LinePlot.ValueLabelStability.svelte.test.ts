@@ -5,7 +5,7 @@ import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import { waitForSvg } from '../../_helpers/svg';
 
 // A pinned `scales.y.domain` (the shape a timeline-scrubbing caller uses -
-// see `LinePlot.Plot.svelte`'s own `valueLabelFloor` doc comment) is what
+// see `ValueLabels.reachAtSeriesEnds`) is what
 // lets the floor stay stable across `data` revealing more of the same
 // range, tick by tick, instead of tracking whatever's currently visible.
 const renderProps = {
@@ -50,7 +50,7 @@ describe('LinePlot - rightward value labels reserve room up front', () => {
 	test('settles onto a stable margin within the first tick of a timeline scrubber, not one per tick', async () => {
 		// The precomputed floor gets the plot within ~1-2px on mount and on
 		// every subsequent tick - close enough that the residual DOM-measured
-		// fallback (see `labelOverflow.svelte.ts`) needs at most one more
+		// fallback (see `PlotMargins.watch`) needs at most one more
 		// correction, on whichever render first has real declutter/connector
 		// geometry to measure, not one on every tick thereafter. Before the
 		// floor existed, *every* tick below remounted (verified by diffing
@@ -66,7 +66,7 @@ describe('LinePlot - rightward value labels reserve room up front', () => {
 
 		await rerender({ series: seriesUpTo(2017) });
 		await new Promise((r) => setTimeout(r, 300));
-		const svg = container.querySelector('svg')!;
+		const svg = container.querySelector('.dct-plot svg')!;
 
 		for (const year of [2018, 2019, 2020]) {
 			await rerender({ series: seriesUpTo(year) });
@@ -74,7 +74,7 @@ describe('LinePlot - rightward value labels reserve room up front', () => {
 		}
 
 		expect(svg.isConnected).toBe(true);
-		expect(container.querySelector('svg')).toBe(svg);
+		expect(container.querySelector('.dct-plot svg')).toBe(svg);
 	});
 });
 
@@ -155,7 +155,7 @@ describe("LinePlot - a value label's own vertical reach reserves room up front",
 
 		await rerender({ series: seriesUpToAtTop(2017) });
 		await new Promise((r) => setTimeout(r, 300));
-		const svg = container.querySelector('svg')!;
+		const svg = container.querySelector('.dct-plot svg')!;
 
 		for (const year of [2018, 2019, 2020]) {
 			await rerender({ series: seriesUpToAtTop(year) });
@@ -163,6 +163,6 @@ describe("LinePlot - a value label's own vertical reach reserves room up front",
 		}
 
 		expect(svg.isConnected).toBe(true);
-		expect(container.querySelector('svg')).toBe(svg);
+		expect(container.querySelector('.dct-plot svg')).toBe(svg);
 	});
 });

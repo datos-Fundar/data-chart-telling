@@ -1,8 +1,15 @@
+import { seriesIdOf } from '$lib/utils/grouping';
 import { resolveAccessor } from './accessors';
-import { resolveEasing } from '$lib/utils/interpolate';
+import { Interpolation } from '$lib/utils/Interpolation';
 import type { Series } from '$lib/types/plots/data/common';
-import type { GapZonesConfig, GapZoneConfig } from '$lib/types/plots/gaps';
+import type {
+  DiscreteGapFill,
+  GapPoint,
+  GapZonesConfig,
+  GapZoneConfig
+} from '$lib/types/plots/gaps';
 import type { AreaStyle } from '$lib/types/plots/styling';
+import type { AxisChannelName } from '$lib/types/layout/mapping';
 
 const DEFAULT_KEY = 'default';
 
@@ -29,9 +36,6 @@ export function resolveGapsForSeries<TStyle>(
   };
 }
 
-/** A point sampled along a gap-fill bridge, already resolved to plot data-space numbers. */
-export type GapPoint = { x: number; y: number };
-
 export type GapRun<TStyle> = {
   kind: 'start' | 'middle' | 'end';
   zone: GapZoneConfig<TStyle>;
@@ -47,7 +51,7 @@ export function isGapValue(v: unknown): boolean {
 
 /** Samples `BRIDGE_STEPS + 1` points between two endpoints, x moving linearly and y eased by the zone's `interpolate`. */
 function buildBridge(from: GapPoint, to: GapPoint, zone: GapZoneConfig<unknown>): GapPoint[] {
-  const ease = resolveEasing(zone.interpolate);
+  const ease = Interpolation.buildEasing(zone.interpolate);
   const points: GapPoint[] = [];
   for (let i = 0; i <= BRIDGE_STEPS; i++) {
     const t = i / BRIDGE_STEPS;
@@ -68,7 +72,7 @@ export function resolveGapRuns<T extends Record<string, unknown>, TStyle>(
   series: Series<T>,
   gaps: GapZonesConfig<TStyle>,
 ): GapRun<TStyle>[] {
-  if (!gaps.start && !gaps.middle && !gaps.end) return [];
+  if ((!gaps.start && !gaps.middle && !gaps.end) || series.x === undefined || series.y === undefined) return [];
 
   const xFn = resolveAccessor(series.x);
   const yFn = resolveAccessor(series.y);
@@ -113,13 +117,6 @@ export function resolveGapRuns<T extends Record<string, unknown>, TStyle>(
   return runs;
 }
 
-/** One gap row's resolved fill - the interpolated value to render instead of the missing one, and which zone produced it. */
-export type DiscreteGapFill<TStyle> = {
-  value: number;
-  kind: 'start' | 'middle' | 'end';
-  style?: TStyle;
-};
-
 /**
  * Bar/pyramid analog of `resolveGapRuns`: a category axis has no continuous
  * bridge to sample, so this returns one interpolated value per *individual*
@@ -133,11 +130,13 @@ export type DiscreteGapFill<TStyle> = {
 export function resolveDiscreteGapFills<T extends Record<string, unknown>, TStyle>(
   series: Series<T>,
   gaps: GapZonesConfig<TStyle>,
+  valueAxis: AxisChannelName = 'y',
 ): Map<T, DiscreteGapFill<TStyle>> {
   const result = new Map<T, DiscreteGapFill<TStyle>>();
-  if (!gaps.start && !gaps.middle && !gaps.end) return result;
+  const accessor = series[valueAxis];
+  if ((!gaps.start && !gaps.middle && !gaps.end) || accessor === undefined) return result;
 
-  const yFn = resolveAccessor(series.y);
+  const yFn = resolveAccessor(accessor);
   const rows = series.data;
   const valueAt = (i: number) => Number(yFn(rows[i]));
   const validIdx = rows.reduce<number[]>((acc, row, i) => {
@@ -147,7 +146,7 @@ export function resolveDiscreteGapFills<T extends Record<string, unknown>, TStyl
   if (validIdx.length === 0) return result;
 
   function fillRun(indices: number[], from: number, to: number, zone: GapZoneConfig<TStyle>, kind: DiscreteGapFill<TStyle>['kind']) {
-    const ease = resolveEasing(zone.interpolate);
+    const ease = Interpolation.buildEasing(zone.interpolate);
     const span = indices.length + 1;
     indices.forEach((idx, i) => {
       const t = (i + 1) / span;
@@ -196,14 +195,15 @@ export function resolveGapAreaStyle(zoneStyle: AreaStyle | undefined, defaultCol
 }
 
 /**
- * Each series' gap fills, keyed by series name - the interpolated value a
- * `styles.gaps` zone gives each missing row, resolved per series like `segments`.
+ * Each series' gap fills, keyed by series id - the interpolated value a
+ * `styles.gaps` zone gives each missing row along `valueAxis`, resolved per series like `segments`.
  */
 export function buildGapFillMaps<TData extends Record<string, unknown>, TStyle>(
   seriesList: Series<TData>[],
   gaps: Record<string, GapZonesConfig<TStyle>> | undefined,
+  valueAxis: AxisChannelName = 'y',
 ): Map<string, Map<TData, DiscreteGapFill<TStyle>>> {
   return new Map(
-    seriesList.map((s) => [s.name, resolveDiscreteGapFills(s, resolveGapsForSeries(gaps, s.name))]),
+    seriesList.map((s) => [seriesIdOf(s), resolveDiscreteGapFills(s, resolveGapsForSeries(gaps, s.name), valueAxis)]),
   );
 }

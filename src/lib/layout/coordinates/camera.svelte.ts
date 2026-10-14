@@ -1,5 +1,5 @@
 import type { GeoCameraTransition } from '$lib/types/plots/camera';
-import { resolveEasing } from '$lib/utils/interpolate';
+import { Interpolation } from '$lib/utils/Interpolation';
 import type { GeoRotate } from './rotate.svelte';
 import type { GeoZoomTransform } from './zoom.svelte';
 
@@ -57,14 +57,14 @@ function tweenState<T>(args: {
 
 		if (progress != null) {
 			setCurrent(
-				args.lerp(from!, to!, resolveEasing(transition?.easing)(clamp01(progress)), direction)
+				args.lerp(from!, to!, Interpolation.buildEasing(transition?.easing)(clamp01(progress)), direction)
 			);
 			return;
 		}
 
 		if (!changed) return;
 		const duration = Math.max(0, transition?.duration ?? 750);
-		const easing = resolveEasing(transition?.easing);
+		const easing = Interpolation.buildEasing(transition?.easing);
 		const startFrom = from!;
 		const endTo = to!;
 		const start = performance.now();

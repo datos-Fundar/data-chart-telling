@@ -1,6 +1,5 @@
 <script lang="ts">
 	import PlotComposer from '$lib/layout/composer/PlotComposer.svelte';
-	import PlotPanel from '$lib/layout/composer/PlotPanel.svelte';
 	import LinePlot from '$lib/plots/line/Plot.svelte';
 	import type { LegendSection } from '$lib/types/layout/legend';
 	import type { ComposerLayout, ComposerTags } from '$lib/types/layout/composer';
@@ -46,20 +45,14 @@
 	timeline={progress === undefined ? undefined : { progress, values: [2018, 2019, 2020] }}
 >
 	{#each ['North', 'South'] as region (region)}
-		<PlotPanel area={layout.areas ? region.toLowerCase() : undefined}>
-			{#snippet children({ width, height })}
-				<LinePlot
-					{width}
-					{height}
-					title={titled ? region : undefined}
-					data={DATA.filter((d) => d.region === region)}
-					x="year"
-					y="value"
-					color="metric"
-					tooltip
-					timeline={progress === undefined ? undefined : { accessor: 'year', filterMode: 'exact' }}
-				/>
-			{/snippet}
-		</PlotPanel>
+		<LinePlot area={layout.areas ? region.toLowerCase() : undefined}
+			title={titled ? region : undefined}
+			data={DATA.filter((d) => d.region === region)}
+			x="year"
+			y="value"
+			color="metric"
+			tooltip
+			timeline={progress === undefined ? undefined : { accessor: 'year', filterMode: 'exact' }}
+		/>
 	{/each}
 </PlotComposer>

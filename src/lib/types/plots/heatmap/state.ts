@@ -1,18 +1,13 @@
 import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
 import type { ResolvedChannel, ResolvedChannels } from '$lib/types/layout/mapping';
-import type { LegendDisabledStyle } from '$lib/types/layout/legend';
-import type { AxisPlotState, AxisPlotCtx } from '$lib/types/layout/phases';
+import type { LegendRange } from '$lib/types/layout/legend';
+import type { AxisPlotState, AxisPlotCtx } from '$lib/types/phases';
 
 /**
  * The active continuous-legend range filter, if any - narrows which cells
  * render at full opacity, and in `'rescale'` mode, the color domain itself.
  */
-export type HeatmapRangeFilter = {
-	min: number;
-	max: number;
-	mode: 'rescale' | 'filter';
-	disabledStyle: LegendDisabledStyle;
-};
+export type HeatmapRangeFilter = LegendRange;
 
 /**
  * HeatmapPlot's pipeline state: the shared axis-based state, where `color` is

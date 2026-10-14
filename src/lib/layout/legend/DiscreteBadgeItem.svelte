@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { contrastTextColor } from '$lib/utils/color';
+	import { getConfiguration } from '$lib/configuration/config.svelte';
+	import { LegendText } from '$lib/layout/legend/LegendText';
 	import DiscreteSymbolIcon from '$lib/layout/legend/DiscreteSymbolIcon.svelte';
 	import type { LegendItem } from '$lib/types/layout/legend';
 
 	/**
 	 * The `interactive.legendStyle: 'badge'` item look: a pill with the series
 	 * color, symbol icon, label, and a toggle icon - an eye (crossed out when
-	 * `disabled`) for `'dim'` mode, or a plus/cross pair for `'hide'`/`'omit'`.
+	 * `disabled`) for `'dim'` and `'hide'`, or a plus/cross pair for `'omit'`.
 	 */
 	let {
 		item,
@@ -21,6 +23,7 @@
 		showIcon?: boolean;
 		omitMode?: boolean;
 	} = $props();
+	const cfg = $derived(getConfiguration());
 	const textColor = $derived(contrastTextColor(color));
 </script>
 
@@ -28,7 +31,7 @@
 	{#if showIcon}
 		<DiscreteSymbolIcon {item} color={textColor} />
 	{/if}
-	<span class="dct-discrete__label">{item.label || item.name}</span>
+	<span class="dct-discrete__label">{item.label || LegendText.of(item.name, cfg)}</span>
 	<svg class="dct-discrete__eye" viewBox="0 0 24 24" aria-hidden="true">
 		{#if omitMode}
 			{#if disabled}

@@ -18,7 +18,7 @@ function readField(field: Field, row: Row): unknown {
 }
 
 /**
- * What a GeoPlot hands its shell to slice by: one stand-in row per value
+ * What a GeoPlot hands `Plot` to slice by: one stand-in row per value
  * combination found in the features and markers' rows, and timeline/facet
  * accessors that read a stand-in or a real row.
  */

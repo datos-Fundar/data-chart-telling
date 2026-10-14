@@ -1,7 +1,6 @@
 <script lang="ts">
 	import BarPlot from '$lib/plots/bar/Plot.svelte';
 	import { REGION_SECTOR_BARS, type RegionSector } from '../../data/region-bars';
-	import type { BarSeriesLayout } from '$lib/types/plots/bar/layout';
 
 	type Orientation = 'vertical' | 'horizontal';
 
@@ -9,11 +8,12 @@
 	const props = $props();
 	void props;
 
-	let layout = $state<BarSeriesLayout>('stacked');
+	let layout = $state<'stacked' | 'grouped'>('stacked');
 	let orientation = $state<Orientation>('vertical');
 
-	const LAYOUTS: BarSeriesLayout[] = ['stacked', 'grouped'];
+	const LAYOUTS: ('stacked' | 'grouped')[] = ['stacked', 'grouped'];
 	const ORIENTATIONS: Orientation[] = ['vertical', 'horizontal'];
+	const horizontal = $derived(orientation === 'horizontal');
 </script>
 
 <div class="demo">
@@ -36,13 +36,10 @@
 		title="Value by sector, faceted by region"
 		subtitle="Layout: {layout} · Orientation: {orientation} · Strategy: series · Sync: on"
 		data={REGION_SECTOR_BARS}
-		x={'region' as keyof RegionSector}
-		y="value"
+		x={horizontal ? 'value' : ('region' as keyof RegionSector)}
+		y={horizontal ? ('region' as keyof RegionSector) : 'value'}
 		color={'sector' as keyof RegionSector}
-		scales={{
-			y: orientation === 'horizontal' ? { type: 'categorical' } : undefined
-		}}
-		transforms={layout === 'stacked' ? [{ type: 'stackY' }] : []}
+		transforms={layout === 'stacked' ? [{ type: horizontal ? 'stackX' : 'stackY' }] : []}
 		facet={{ by: 'region' as keyof RegionSector, columns: 2 }}
 		tooltip={{
 			strategy: 'series',

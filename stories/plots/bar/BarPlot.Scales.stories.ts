@@ -306,30 +306,25 @@ export const WideGroupSpacing: Story = {
 };
 
 // ── Orientation (horizontal bars) ──────────────────────────────────────────────
-// `scales.x`/`scales.y` always describe *that visual axis*, regardless of
-// which data field ends up there - marking `scales.y.type: 'categorical'`
-// says "the category is drawn on Y this time", swapping BarPlot from its
-// default `BarY` (vertical) to `BarX` (horizontal). `x` is categorical by
-// default; marking both (or presumably relying on neither) is ambiguous -
-// BarPlot warns and falls back to vertical.
+// `x` and `y` are always the visual axes, as in svelteplot's `BarX`/`BarY`:
+// the plot reads which one holds the categories off the values themselves.
+// Categories on `x` draw vertical bars (`BarY`); categories on `y` draw
+// horizontal ones (`BarX`), with the value along `x`.
 
 /**
- * Horizontal bars - `scales.y.type: 'categorical'` puts the province names
- * on the Y axis and life expectancy (the value) on X.
+ * Horizontal bars - the province names are strings, so the plot puts them on
+ * the Y axis it was given them on, and life expectancy (the value) on X.
  */
 export const HorizontalBars: Story = {
 	args: {
 		series: [
 			{
 				name: 'female_life_expectancy',
-				x: 'province',
-				y: 'value',
+				x: 'value',
+				y: 'province',
 				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
 			} satisfies Series<ProvincePoint>
-		],
-		scales: {
-			y: { type: 'categorical' }
-		} satisfies AxisBasedScalesConfig
+		]
 	}
 };
 
@@ -340,24 +335,20 @@ export const HorizontalBars: Story = {
 export const HorizontalGroupedSeries: Story = {
 	args: {
 		data: LIFE_EXPECTANCY_BY_PROVINCE,
-		x: 'province',
-		y: 'value',
-		color: 'sex',
-		scales: {
-			y: { type: 'categorical' }
-		} satisfies AxisBasedScalesConfig
+		x: 'value',
+		y: 'province',
+		color: 'sex'
 	}
 };
 
 /**
- * `HorizontalGroupedSeries` with a plot-level `stackY` - the two series stack
- * end to end along each category's row. It's still `stackY`, not `stackX`:
- * `y` is the value even when the bars run horizontally.
+ * `HorizontalGroupedSeries` with a plot-level `stackX` - the two series stack
+ * end to end along each category's row, on the value axis, `x`.
  */
 export const HorizontalStackedSeries: Story = {
 	args: {
 		...HorizontalGroupedSeries.args,
-		transforms: [{ type: 'stackY' as const }]
+		transforms: [{ type: 'stackX' as const }]
 	}
 };
 
@@ -366,33 +357,30 @@ const YEARLY_VALUES = TIME_SERIES.filter((d) => d.region === 'South');
 /**
  * Numeric categories, like years. With both `x` and `y` numeric, nothing in
  * the data says which one holds the categories - and a bar on a continuous
- * axis has no band to stand in, so it used to draw nothing at all. A bar
- * plot's category axis (`x`, unless `scales.y.type` says otherwise) is
- * therefore always a band scale: each year gets its own band. Writing
- * `scales: { x: { type: 'categorical' } }` says the same thing explicitly.
+ * axis has no band to stand in. A bar plot needs one category axis, so it
+ * takes `x` as one: each year gets its own band. Writing
+ * `scales: { x: { type: 'band' } }` says the same thing explicitly.
  */
 export const NumericCategories: Story = {
 	args: {
 		data: YEARLY_VALUES,
 		x: 'year',
 		y: 'value',
-		color: 'metric',
-		scales: { x: { type: 'categorical' } }
+		color: 'metric'
 	}
 };
 
 /**
- * The same years drawn as horizontal bars: `x` still names the categories,
- * and `scales.y.type: 'categorical'` moves them onto the vertical axis.
- * With numeric categories this flag is the only way to say which way the
- * bars should run - the values alone can't tell.
+ * The same years drawn as horizontal bars. With numeric categories the values
+ * alone can't tell which way the bars run, so `scales.y.type: 'band'` says the
+ * years on `y` are the categories.
  */
 export const NumericCategoriesHorizontal: Story = {
 	args: {
 		data: YEARLY_VALUES,
-		x: 'year',
-		y: 'value',
+		x: 'value',
+		y: 'year',
 		color: 'metric',
-		scales: { y: { type: 'categorical' } }
+		scales: { y: { type: 'band' } }
 	}
 };

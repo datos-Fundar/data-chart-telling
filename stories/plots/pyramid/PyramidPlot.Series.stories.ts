@@ -47,27 +47,41 @@ export const Default: Story = {
 };
 
 /**
+ * The same rows with the axes swapped: the age groups on `x` make a vertical
+ * pyramid, female below the baseline and male above it.
+ */
+export const Vertical: Story = {
+	args: {
+		data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
+		x: 'ageGroup',
+		y: 'pct',
+		color: 'sex',
+		scales: { x: { label: 'Age group', domain: AGE_GROUPS } }
+	}
+};
+
+/**
  * Alternative approach: pass explicit series for female and male populations.
  * Both series share the same y axis (age groups) and plot as a diverging bar chart.
  *
  * The series order determines visual placement: first series goes left, second goes right.
- * A series' `x` is the category accessor (age group) and `y` is the magnitude
- * (population %) - the same convention `buildSeries` uses internally for the
- * `data`/`x`/`y`/`color` shorthand above.
+ * A series' `x`/`y` are the visual axes, like the `data`/`x`/`y`/`color`
+ * shorthand above: `x` is the magnitude (population %) and `y` the category
+ * (age group).
  */
 export const ExplicitSeries: Story = {
 	args: {
 		series: [
 			{
 				name: 'Female',
-				x: 'ageGroup',
-				y: 'pct',
+				x: 'pct',
+				y: 'ageGroup',
 				data: POPULATION_PYRAMID.filter((d) => d.year === 2022 && d.sex === 'Female')
 			} satisfies Series<PopulationRow>,
 			{
 				name: 'Male',
-				x: 'ageGroup',
-				y: 'pct',
+				x: 'pct',
+				y: 'ageGroup',
 				data: POPULATION_PYRAMID.filter((d) => d.year === 2022 && d.sex === 'Male')
 			} satisfies Series<PopulationRow>
 		],

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Plot, RuleX, RuleY, Text } from 'svelteplot';
+  import { TimelineSteps } from '$lib/layout/timeline/TimelineSteps';
   import type { Orientation, TimeValue } from '$lib/types/layout/timeline';
 
   /**
@@ -25,10 +26,7 @@
   const isHorizontal = $derived(orientation === 'horizontal');
   const crossKey = $derived(isHorizontal ? 'y' : 'x');
 
-  const domain = $derived.by(() => {
-    const sorted = [...values].sort((a, b) => a - b);
-    return [sorted[0], sorted[sorted.length - 1]];
-  });
+  const domain = $derived(new TimelineSteps(values).domain);
 
   const baseValues = $derived(values.filter((v) => v !== currentValue));
   const identity = (d: TimeValue) => d;

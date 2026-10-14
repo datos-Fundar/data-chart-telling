@@ -1,4 +1,5 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { merge } from '$lib/utils/merge';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { Series } from '$lib/types/plots/data/common';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
@@ -66,28 +67,6 @@ export function validateSegments<TStyle>(segments: SegmentsConfig<TStyle>): void
   }
 }
 
-function isPlainObject(v: unknown): v is Record<string, unknown> {
-  return v !== null && typeof v === 'object' && !Array.isArray(v);
-}
-
-/**
- * Merges two style objects one level deep: for any key where both base and
- * override hold plain objects (e.g. `stroke`, `dots`), their fields are
- * merged - override wins on conflict. Primitive fields are overridden directly.
- */
-function mergeStyles<TStyle>(base: TStyle, override: TStyle): TStyle {
-  const result: Record<string, unknown> = { ...(base as Record<string, unknown>) };
-  for (const [key, val] of Object.entries(override as Record<string, unknown>)) {
-    const baseVal = result[key];
-    if (isPlainObject(val) && isPlainObject(baseVal)) {
-      result[key] = { ...baseVal, ...val };
-    } else {
-      result[key] = val;
-    }
-  }
-  return result as TStyle;
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function resolveSeriesSegments<S extends Series<any>, TStyle>(
   series: S,
@@ -98,8 +77,8 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
     return [{ data: series.data, styles: {} as TStyle, scales: undefined }];
   }
 
-  const getX = resolveAccessor(series.x);
-  const getY = resolveAccessor(series.y);
+  const getX = readChannel(series.x);
+  const getY = readChannel(series.y);
 
   type DataPoint = S['data'][number];
 
@@ -148,7 +127,8 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
   const catchAll = segs.find((s) => !s.areas || s.areas.length === 0);
   const connectorStyle: TStyle = (() => {
     if (!catchAll?.styles) return {} as TStyle;
-    const { dots: _, ...rest } = catchAll.styles as Record<string, unknown>;
+    const rest = { ...(catchAll.styles as Record<string, unknown>) };
+    delete rest.dots;
     return rest as TStyle;
   })();
 
@@ -178,7 +158,7 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
       const isAreaSpecific = seg.areas != null && seg.areas.length > 0;
       const resolvedStyle: TStyle =
         isAreaSpecific && catchAll?.styles
-          ? mergeStyles(catchAll.styles as TStyle, segStyle)
+          ? merge(catchAll.styles as object, segStyle as object) as TStyle
           : segStyle;
       const resolvedScales = seg.scales ?? (isAreaSpecific && catchAll?.scales ? catchAll.scales : undefined);
       userVisual.push({ data: run.data, styles: resolvedStyle, scales: resolvedScales });
@@ -217,6 +197,12 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
  * pyramid) have no gap to bridge; pass `connect: false` so boundary rows
  * aren't duplicated as an extra, separately-styled mark.
  */
+/** A position channel's accessor, reading nothing when the series doesn't set it. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function readChannel(accessor: Series<any>['x']): (row: any) => unknown {
+  return accessor === undefined ? () => undefined : resolveAccessor(accessor);
+}
+
 export function buildGroupedSeries<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   S extends Series<any>,
@@ -255,14 +241,16 @@ export function buildScopedMarkerGroups<
   const { groupedSeries, segments = {}, colorFor, segmentColorFor } = args;
   return groupedSeries.map((group, seriesIndex) => {
     const defaultColor = colorFor(group.series, seriesIndex);
-    const xFor = resolveAccessor(group.series.x);
+    const xFor = readChannel(group.series.x);
     const segs = resolveSegmentsForSeries(segments, group.series.name);
     return {
       name: group.series.name,
+      ...(group.series.id !== undefined ? { id: group.series.id } : {}),
+      ...(group.series.panel !== undefined ? { panel: group.series.panel } : {}),
       data: group.series.data as TData[],
       color: defaultColor,
       segments: segs.map((seg) => ({
-        match: (row: TData) => matchesSegmentX(xFor(row), seg),
+        match: (row: TData) => matchesSegmentX(xFor(row) as AxisValue, seg),
         color: segmentColorFor(seg.styles, defaultColor),
       })),
     };

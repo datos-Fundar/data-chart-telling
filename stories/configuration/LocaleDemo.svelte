@@ -10,7 +10,7 @@
   let {
     data,
     ticks = undefined,
-    compactDisplay = 'long',
+    compactDisplay = 'short',
   }: {
     data: Point[];
     /** Pins the Y axis to exactly these values, instead of letting it pick its own. */

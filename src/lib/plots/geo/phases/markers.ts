@@ -1,5 +1,6 @@
+import { HoverPhase } from '$lib/phases/hover/HoverPhase';
 import { resolveFeatureStyle } from '$lib/plots/utils/geoSegments';
-import { disabledFillOverride } from '$lib/plots/utils/legendDisabled';
+import { DisabledStyle } from '$lib/layout/legend/DisabledStyle';
 import type { MarkerConfig } from '$lib/types/markers/all';
 import type {
 	GeoMarkersConfig,
@@ -35,9 +36,8 @@ function isBehindMarker(
  * GeoPlot's "markers" phase: per-feature style resolution/grouping, the base
  * `'geo'` marker(s), and the full draw order - any authored marker with
  * `behind: true`, then the base map, then the rest of the authored markers,
- * with any `hover` marker moved last. No hover pointer handlers yet on the
- * base marker(s) - those need `BasePlotLayout`'s live callbacks, so they're
- * attached separately by `attachFeatureHover`, outside the pipeline.
+ * with any `hover` marker moved last. The base marker(s) match the pointer
+ * themselves, over the features inside the legend's range.
  */
 export function buildMarkers<TProps extends Record<string, unknown>>(
 	state: GeoPlotState<TProps>,
@@ -51,7 +51,7 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 		if (range == null || !color) return base;
 		const v = color(f);
 		if (v == null || (v >= range.min && v <= range.max)) return base;
-		return { ...base, ...disabledFillOverride(range.disabledStyle) };
+		return { ...base, ...DisabledStyle.fill(range.disabledStyle) };
 	}
 
 	function getFeatureStyle(f: TaggedGeoFeature<TProps>): GeoSegmentStyle {
@@ -80,6 +80,12 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 		return resolveColor?.(f) ?? fill ?? cfg.palette[0];
 	}
 
+	// What the pointer can match: the features inside the legend's range, by id.
+	const hoverable = new Map(
+		features!
+			.filter((f) => !range || !color || HoverPhase.inRange(color(f), range))
+			.map((f) => [f.__id, f as unknown as Record<string, unknown>])
+	);
 	const featureMarkers: GeoFeaturesMarkerConfig[] = styleGroups.map((group) => ({
 		type: 'geo',
 		data: group.data,
@@ -87,6 +93,7 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 		fillOpacity: group.style.fillOpacity ?? group.opacity ?? fillOpacity ?? 1,
 		stroke: group.style.stroke ?? stroke ?? cfg.axis.color,
 		strokeWidth: group.style.strokeWidth ?? strokeWidth ?? 0.5,
+		hover: hoverable,
 		onclick: onFeatureClick ? (e, d) => onFeatureClick(d as TaggedGeoFeature<TProps>, e) : undefined
 	}));
 

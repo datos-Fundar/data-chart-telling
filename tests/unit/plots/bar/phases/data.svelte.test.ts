@@ -1,13 +1,13 @@
 import { describe, test, expect } from 'vitest';
-import { SvelteMap } from 'svelte/reactivity';
 import { stageOf } from '../../_helpers/stages';
-import { buildBarKind } from '$lib/plots/bar/kind';
+import { buildBarDefaults } from '$lib/plots/bar/defaults';
 import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/bar/state';
 import type { Series } from '$lib/types/plots/data/common';
-import type { LegendInteractionStore } from '$lib/types/layout/legend';
+import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
+import { PlotInteraction } from '$lib/layout/interaction/PlotInteraction.svelte';
 
-const buildData = stageOf(buildBarKind<Row>(), 'data');
+const buildData = stageOf(buildBarDefaults<Row>(), 'data');
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -20,10 +20,10 @@ function series(name: string, data: Row[]): Series<Row> {
 	return { name, x: 'category', y: 'value', data };
 }
 
-function legendDisabling(...names: string[]): LegendInteractionStore {
-	const disabledSeries = new SvelteMap<string, { mode: 'omit' }>();
-	for (const name of names) disabledSeries.set(name, { mode: 'omit' });
-	return { disabledSeries } as LegendInteractionStore;
+function legendDisabling(...names: string[]): LegendState {
+	const legend = new LegendState();
+	for (const name of names) legend.turnOff(name, { mode: 'omit' });
+	return legend;
 }
 
 type ResolvedData = Required<
@@ -35,7 +35,7 @@ type ResolvedData = Required<
 
 function build(
 	overrides: Partial<BarPlotState<Row>> = {},
-	legendInteraction?: LegendInteractionStore
+	legendInteraction?: LegendState
 ): ResolvedData {
 	const state: BarPlotState<Row> = {
 		series: [series('a', [{ category: 'X', value: 10 }])],
@@ -46,7 +46,7 @@ function build(
 		height: 300,
 		...overrides
 	};
-	const ctx: BarPlotCtx = { cfg: FAKE_CFG, legendInteraction };
+	const ctx: BarPlotCtx = { cfg: FAKE_CFG, interaction: new PlotInteraction(() => FAKE_CFG, { legend: legendInteraction }) };
 	return buildData(state, ctx) as ResolvedData;
 }
 
@@ -75,9 +75,8 @@ describe('buildData - series resolution', () => {
 			width: 400,
 			height: 300
 		};
-		const result = stageOf(buildBarKind<GroupedRow>(), 'data')(state, {
-			cfg: FAKE_CFG,
-			legendInteraction: undefined
+		const result = stageOf(buildBarDefaults<GroupedRow>(), 'data')(state, {
+			cfg: FAKE_CFG
 		});
 		expect(result.resolvedSeries!.map((s) => s.name).sort()).toEqual(['g1', 'g2']);
 	});

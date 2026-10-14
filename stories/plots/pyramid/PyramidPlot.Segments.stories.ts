@@ -36,7 +36,7 @@ const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
 // each matching bucket is listed as its own single-point area instead -
 // equality-only matching, immune to that ordering quirk.
 function areasFor(ageGroups: string[]): Area[] {
-	return ageGroups.map((ageGroup) => ({ x: { from: ageGroup, to: ageGroup } }));
+	return ageGroups.map((ageGroup) => ({ y: { from: ageGroup, to: ageGroup } }));
 }
 
 function bucketStart(ageGroup: string): number {

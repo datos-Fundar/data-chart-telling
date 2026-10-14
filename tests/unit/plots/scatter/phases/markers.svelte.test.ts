@@ -1,12 +1,17 @@
 import { describe, test, expect } from 'vitest';
-import { buildMarkers } from '$lib/plots/scatter/phases/markers';
-import { buildTransforms } from '$lib/layout/phases/transforms';
+import { TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
 import { buildGroupedSeries } from '$lib/plots/utils/segments';
 import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/scatter/state';
 import type { Series } from '$lib/types/plots/data/common';
 import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { DotMarkerConfig } from '$lib/types/markers/common';
+import type { PlotInteraction } from '$lib/layout/interaction/PlotInteraction.svelte';
+import { stageOf } from '../../_helpers/stages';
+import { buildScatterDefaults } from '$lib/plots/scatter/defaults';
+
+/** The kind's "markers" stage: its own marks, the state's markers, then its value labels. */
+const buildMarkers = stageOf(buildScatterDefaults<Row>(), 'markers');
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -32,13 +37,12 @@ function build(
 	};
 	const ctx: ScatterPlotCtx = {
 		cfg: { scatter: { dotRadius: 4 } } as PlotStylesConfig,
-		legendInteraction: undefined,
 		...ctxOverrides
 	};
 	// No `authorMarkers`/`statistics` given, so the real output is exactly
 	// this phase's own dots - narrowed back from the state's broader
 	// accumulating `markers` union.
-	return buildMarkers(buildTransforms<typeof state>()(state, ctx), ctx)
+	return buildMarkers(new TransformsPhase<typeof state>().run(state, ctx), ctx)
 		.markers as DotMarkerConfig[];
 }
 
@@ -77,7 +81,11 @@ describe('buildMarkers - style resolution', () => {
 	test('a disabled-dots override wins over the segment/default color', () => {
 		const [marker] = build(
 			{ colorForSeries: () => 'green' },
-			{ disabledDotsFor: () => ({ dotFill: 'gray', dotFillOpacity: 0.3 }) }
+			{
+				interaction: {
+					dotsFor: () => ({ dotFill: 'gray', dotFillOpacity: 0.3 })
+				} as unknown as PlotInteraction
+			}
 		);
 		expect(marker.styles?.dotFill).toBe('gray');
 		expect(marker.styles?.dotFillOpacity).toBe(0.3);

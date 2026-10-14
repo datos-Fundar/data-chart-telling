@@ -2,11 +2,8 @@
 	import { SvelteSet } from 'svelte/reactivity';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { paletteColor } from '$lib/utils/color';
-	import {
-		getLegendInteraction,
-		createLegendInteraction
-	} from '$lib/layout/legend/interaction.svelte';
-	import { resolveDisabledStyle } from '$lib/plots/utils/legendDisabled';
+	import { LegendState } from '$lib/layout/legend/LegendState.svelte';
+	import { DisabledStyle } from '$lib/layout/legend/DisabledStyle';
 	import DiscreteBadgeItem from '$lib/layout/legend/DiscreteBadgeItem.svelte';
 	import DiscreteSwatchItem from '$lib/layout/legend/DiscreteSwatchItem.svelte';
 	import type {
@@ -28,7 +25,19 @@
 	const isHorizontal = $derived(layout.type === 'horizontal');
 	const isFlex = $derived(layout.type === 'flex');
 	const maxRows = $derived(layout.type === 'horizontal' ? Math.max(1, layout.maxRows ?? 1) : 1);
-	const columns = $derived(section.columns ?? 1);
+	/**
+	 * Without its own `columns` or `layout`, a vertical section spreads its
+	 * items across columns, favoring rows: up to two items side by side, then
+	 * half as many columns as items, at most four.
+	 */
+	const columns = $derived(
+		section.columns ??
+			(section.layout
+				? 1
+				: section.items.length <= 2
+					? Math.max(1, section.items.length)
+					: Math.min(4, Math.ceil(section.items.length / 2)))
+	);
 	const isInteractive = $derived(section.interactive?.enabled ?? false);
 	const useBadge = $derived(
 		isInteractive && (section.interactive?.legendStyle ?? 'badge') === 'badge'
@@ -37,7 +46,7 @@
 	const disabledAction = $derived<LegendDisabledAction>(
 		section.interactive?.disabled ?? { mode: 'dim' }
 	);
-	const interaction = getLegendInteraction() ?? createLegendInteraction();
+	const interaction = LegendState.ensure();
 
 	const seeded = new SvelteSet<string>();
 	$effect(() => {
@@ -45,17 +54,17 @@
 			if (seeded.has(item.name)) continue;
 			seeded.add(item.name);
 			if (item.disabled) {
-				interaction.disabledSeries.set(item.name, disabledAction);
+				interaction.turnOff(item.name, disabledAction);
 			}
 		}
 	});
 
 	function toggle(item: LegendItem): void {
 		if (!isInteractive) return;
-		if (interaction.disabledSeries.has(item.name)) {
-			interaction.disabledSeries.delete(item.name);
+		if (interaction.isOff(item.name)) {
+			interaction.turnOn(item.name);
 		} else {
-			interaction.disabledSeries.set(item.name, disabledAction);
+			interaction.turnOff(item.name, disabledAction);
 		}
 	}
 
@@ -150,14 +159,10 @@
 </script>
 
 {#snippet discreteItem(item: LegendItem, i: number)}
-	{@const action = interaction.disabledSeries.get(item.name)}
+	{@const action = interaction.actionOf(item.name)}
 	{@const isDisabled = action != null}
-	{@const omitMode = disabledAction.mode !== 'dim'}
-	{@const disabledStyle = isDisabled
-		? omitMode
-			? { opacity: cfg.legend.disabledOpacity }
-			: resolveDisabledStyle(action, cfg.legend.disabledOpacity)
-		: undefined}
+	{@const omitMode = (action ?? disabledAction).mode === 'omit'}
+	{@const disabledStyle = DisabledStyle.ofItem(action, cfg.legend.disabledOpacity)}
 	{@const color =
 		disabledStyle?.fill ??
 		disabledStyle?.stroke?.stroke ??

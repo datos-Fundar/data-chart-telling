@@ -136,9 +136,8 @@ describe('BarPlot - markers.hover', () => {
 			width: 400,
 			height: 300,
 			data,
-			x: 'province',
-			y: 'value',
-			scales: { y: { type: 'categorical' } },
+			x: 'value',
+			y: 'province',
 			tooltip: {
 				sync: false,
 				strategy: 'x',
@@ -214,9 +213,8 @@ describe('BarPlot - markers.hover areaX/areaY', () => {
 			width: 400,
 			height: 300,
 			data,
-			x: 'province',
-			y: 'value',
-			scales: { y: { type: 'categorical' } },
+			x: 'value',
+			y: 'province',
 			markers: [{ type: 'hover', areaY: true }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);

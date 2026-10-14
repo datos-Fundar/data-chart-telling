@@ -1,6 +1,22 @@
 import { describe, test, expect } from 'vitest';
-import { buildScales } from '$lib/plots/bar/phases/scales';
-import { buildTransforms } from '$lib/plots/bar/phases/transforms';
+import { buildBarDefaults } from '$lib/plots/bar/defaults';
+import { PlotAxes } from '$lib/phases/data/PlotAxes';
+import { stageOf } from '../../_helpers/stages';
+
+const buildTransforms = stageOf(buildBarDefaults<Row>(), 'transforms');
+const buildScales = stageOf(buildBarDefaults<Row>(), 'scales');
+const VERTICAL = new PlotAxes({
+	category: 'x',
+	value: 'y',
+	orientation: 'vertical',
+	bands: ['x']
+});
+const HORIZONTAL = new PlotAxes({
+	category: 'y',
+	value: 'x',
+	orientation: 'horizontal',
+	bands: ['y']
+});
 import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/bar/state';
 import type { Series } from '$lib/types/plots/data/common';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
@@ -14,8 +30,7 @@ const CTX: BarPlotCtx = {
 	cfg: {
 		bar: { paddingInner: PADDING.inner, paddingOuter: PADDING.outer, seriesPadding: 0.1 },
 		margins: { top: 20, right: 20, bottom: 30, left: 40 }
-	} as PlotStylesConfig,
-	legendInteraction: undefined
+	} as PlotStylesConfig
 };
 
 function series(data: Row[], name = 'a'): Series<Row> {
@@ -28,17 +43,15 @@ const ROWS = [
 ];
 const GROUPED_SERIES: Series<Row>[] = [series(ROWS)];
 
-// `buildScales` now also resolves `barLayout`, which needs data/mapping-phase
-// output these tests don't otherwise care about - filled with defaults
-// consistent with `GROUPED_SERIES` so it has something valid to compute over.
+// The scales phase reads data/mapping-phase output these tests don't otherwise
+// care about - filled with defaults consistent with `GROUPED_SERIES`.
 function build(overrides: Partial<BarPlotState<Row>> = {}) {
 	const state: BarPlotState<Row> = {
 		segments: {},
 		gaps: {},
 		scales: {},
 		resolvedSeries: GROUPED_SERIES,
-		categoricalAxis: 'x',
-		isHorizontal: false,
+		axes: VERTICAL,
 		width: 400,
 		height: 300,
 		flat: ROWS,
@@ -90,7 +103,7 @@ describe('buildScales - category axis padding', () => {
 	});
 
 	test('applies padding to y instead when it is the categorical axis', () => {
-		const result = build({ categoricalAxis: 'y', isHorizontal: true });
+		const result = build({ axes: HORIZONTAL });
 		expect(result.y?.paddingInner).toBe(PADDING.inner);
 		expect(result.x?.paddingInner).toBeUndefined();
 	});

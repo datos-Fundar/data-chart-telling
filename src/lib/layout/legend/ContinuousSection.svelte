@@ -3,10 +3,7 @@
 	import type { ContinuousLegendSection } from '$lib/types/layout/legend';
 	import { makeColorScale } from '$lib/utils/color';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import {
-		getLegendInteraction,
-		createLegendInteraction
-	} from '$lib/layout/legend/interaction.svelte';
+	import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 
 	let { section }: { section: ContinuousLegendSection } = $props();
 
@@ -52,7 +49,7 @@
 	);
 
 	// ── Drag-to-narrow-margins ────────────────────────────────────────────────
-	const interaction = getLegendInteraction() ?? createLegendInteraction();
+	const interaction = LegendState.ensure();
 
 	// Seeded once from the section's bounds.
 	let lo = $state(untrack(() => section.min));
@@ -98,7 +95,7 @@
 
 	$effect(() => {
 		if (!isInteractive) return;
-		interaction.continuousRange =
+		interaction.range =
 			lo <= section.min && hi >= section.max
 				? null
 				: {
@@ -111,10 +108,10 @@
 					};
 	});
 
-	// Mirrors an externally-set `interaction.continuousRange` into lo/hi.
+	// Mirrors an externally-set `interaction.range` into lo/hi.
 	$effect(() => {
 		if (!isInteractive) return;
-		const range = interaction.continuousRange;
+		const range = interaction.range;
 		if (range === null) {
 			if (untrack(() => loAdjusted || hiAdjusted)) {
 				loAdjusted = false;

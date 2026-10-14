@@ -17,10 +17,8 @@ describe.each([['vertical', false] as const, ['horizontal', true] as const])(
 				width: 400,
 				height: 300,
 				data: DATA,
-				x: 'cat',
-				y: 'value',
+				...(horizontal ? { x: 'value', y: 'cat' } : { x: 'cat', y: 'value' }),
 				color: 'series',
-				scales: horizontal ? { y: { type: 'categorical' } } : {},
 				tooltip: {
 					sync: false,
 					strategy: 'series',

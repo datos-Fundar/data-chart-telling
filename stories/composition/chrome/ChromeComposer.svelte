@@ -1,6 +1,5 @@
 <script lang="ts">
 	import PlotComposer from '$lib/layout/composer/PlotComposer.svelte';
-	import PlotPanel from '$lib/layout/composer/PlotPanel.svelte';
 	import LinePlot from '$lib/plots/line/Plot.svelte';
 	import { TIME_SERIES } from '../../data/time-series';
 	import type { LegendSection } from '$lib/types/layout/legend';
@@ -34,18 +33,12 @@
 	layout={{ columns: 2 }}
 >
 	{#each ['North', 'South'] as region (region)}
-		<PlotPanel>
-			{#snippet children({ width, height })}
-				<LinePlot
-					{width}
-					{height}
-					title={region}
-					data={TIME_SERIES.filter((d) => d.region === region)}
-					x="year"
-					y="value"
-					color="metric"
-				/>
-			{/snippet}
-		</PlotPanel>
+		<LinePlot
+			title={region}
+			data={TIME_SERIES.filter((d) => d.region === region)}
+			x="year"
+			y="value"
+			color="metric"
+		/>
 	{/each}
 </PlotComposer>

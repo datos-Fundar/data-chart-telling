@@ -400,8 +400,8 @@ const OVERLAP_DEMO_SERIES = OVERLAP_DEMO_PROVINCES.map(({ label, sex, province }
  * Tucumán · M to be grouped with it going in, but close enough that once
  * the cluster's own labels spread out, Tucumán · M's *decluttered* label
  * lands right on top of it. Grouping has to key off the post-declutter
- * (final) gap, not the original one, to catch this. See `declutter1D`'s
- * doc comment in `declutter.ts`.
+ * (final) gap, not the original one, to catch this. See `Declutter`'s
+ * doc comment in `Declutter.ts`.
  */
 const NEAR_MISS_SERIES = {
   name: 'Formosa · M',
@@ -514,7 +514,7 @@ const BOUNDS_DEMO_SERIES = ALL_PROVINCES.flatMap((province, i) => [
 /**
  * Twelve series compressed toward a single value, close enough together
  * that the plot's own top edge - not just neighbouring labels - constrains
- * how they can spread. Exercises `bounds`-aware clamping in `declutter1D`:
+ * how they can spread. Exercises `bounds`-aware clamping in `Declutter`:
  * labels stay inside the plot's content box instead of spilling past it,
  * while a run's leader lines still fan out cleanly.
  *

@@ -1,7 +1,9 @@
 import type { Accessor } from '$lib/types/plots/data/common';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
 import type { GeoScalesConfig } from '$lib/types/layout/coordinates';
-import type { SegmentsConfig, MarginConfig } from '$lib/types/plots/props';
+import type { SegmentsConfig, MarginConfig, HoverConfig } from '$lib/types/plots/props';
+import type { HoverPosition } from '$lib/types/phases';
+import type { TooltipProp } from '$lib/types/layout/tooltip';
 import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import type { MarkerConfig } from '$lib/types/markers/all';
@@ -47,6 +49,8 @@ export type GeoPlotState<TProps extends Record<string, unknown>> = {
 	) => boolean;
 	segments: SegmentsConfig<GeoSegmentStyle>;
 	scales: GeoScalesConfig;
+	/** The plot's `tooltip`, which the "hover" phase reads. */
+	tooltip?: TooltipProp<TaggedGeoFeature<TProps>>;
 	/** The raw `markers` prop - GeoPlot interleaves it with the base map by draw order, not a plain append. */
 	authoredMarkers: GeoMarkersConfig[];
 	width: number;
@@ -62,13 +66,16 @@ export type GeoPlotState<TProps extends Record<string, unknown>> = {
 	/** "scales" phase output: each feature's own resolved opacity, composed from `opacity` and the opacity ramp - `undefined` where `opacity` itself is unset/returns nothing. */
 	resolveOpacity?: (feature: GeoFeature<TProps>) => number | undefined;
 
-	// "markers" phase output - full draw-order merge with `authoredMarkers`,
-	// minus live hover pointer handlers on the base 'geo' marker(s); see
-	// `attachFeatureHover`.
+	// "markers" phase output - full draw-order merge with `authoredMarkers`.
 	markers?: MarkerConfig[];
 	styleGroups?: GeoStyleGroup<TProps>[];
 	/** "tooltip" phase output: how a hovered feature reads, unless `tooltip.format` says otherwise. */
 	tooltipFormat?: (feature: GeoFeature<TProps>) => string;
+
+	// "hover" phase output: what the pointer can match, the features drawn and hovered, and where each sits.
+	hover?: HoverConfig<TaggedGeoFeature<TProps>>;
+	hoverPosition?: HoverPosition;
+	hoverRows?: TaggedGeoFeature<TProps>[];
 };
 
 /** The environment every GeoPlot phase reads from, alongside the growing state. */

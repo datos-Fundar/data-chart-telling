@@ -1,7 +1,6 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import Core from '$lib/plots/area/Core.svelte';
-	import PlotShell from '$lib/layout/shell/PlotShell.svelte';
-	import { buildAreaPresentation } from '$lib/plots/area/presentation';
+	import Plot from '$lib/layout/plot/Plot.svelte';
+	import { buildAreaDefaults } from '$lib/plots/area/defaults';
 	import type { AreaPlotProps, AreaPlotCoreProps } from '$lib/types/plots/area/props';
 
 	/**
@@ -24,11 +23,12 @@
 		margins = $bindable(),
 		...core
 	}: AreaPlotProps<TData> = $props();
+
 </script>
 
-<PlotShell
-	{Core}
+<Plot
 	core={core as AreaPlotCoreProps<TData>}
+	defaults={buildAreaDefaults}
 	bind:margins
 	{title}
 	{subtitle}
@@ -40,5 +40,4 @@
 	{timeline}
 	{facet}
 	{tooltip}
-	presentation={buildAreaPresentation<TData>}
 />

@@ -1,3 +1,4 @@
+import { merge } from '$lib/utils/merge';
 import type { PlotStylesConfig, PlotStylesConfigInput, TextStyle } from '$lib/types/configuration/styling';
 
 /**
@@ -7,7 +8,7 @@ import type { PlotStylesConfig, PlotStylesConfigInput, TextStyle } from '$lib/ty
  */
 
 // ── Defaults ────────────────────────────────────────────────────────────────
-// `axis.locale` defaults to `es-AR` and `axis.compactDisplay` to `long`.
+// `axis.locale` defaults to `es-AR` and `axis.compactDisplay` to `short`.
 
 const text = (over: Partial<TextStyle>): TextStyle => ({
 	font: 'inherit',
@@ -38,6 +39,13 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		margin: '0.5rem 0px'
 	},
 
+	// Title and subtitle (or header), a divider, legend, plot, then caption (or
+	// footer). With no title, subtitle or header, the divider has nothing above
+	// it, so it isn't drawn.
+	chrome: {
+		order: ['header', 'title', 'subtitle', 'divider', 'legend', 'plot', 'footer', 'caption']
+	},
+
 	title: text({ size: '1.5rem', weight: 500, leading: '1.2' }),
 	subtitle: text({
 		size: '1rem',
@@ -56,6 +64,9 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		gap: '0.5rem 2rem',
 		swatchSize: '0.9rem',
 		disabledOpacity: 0.12,
+		pretty: true,
+		seriesTitle: { enabled: true, text: 'Series' },
+		sizeScale: { gap: '12px' },
 		navButton: {
 			background: 'transparent',
 			color: 'currentColor',
@@ -105,7 +116,7 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		yTickPadding: 10,
 		grid: false,
 		locale: 'es-AR',
-		compactDisplay: 'long'
+		compactDisplay: 'short'
 	},
 
 	tooltip: {
@@ -118,6 +129,7 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 	},
 
 	margins: { top: 'auto', right: 'auto', bottom: 'auto', left: 'auto' },
+	frameClip: { tolerance: 5 },
 	// ColorBrewer Dark2 - qualitative, harmonious, and dark enough to read on white.
 	palette: ['#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02', '#a6761d', '#666666'],
 	symbols: ['circle', 'square', 'triangle', 'diamond', 'star', 'cross'],
@@ -172,23 +184,6 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		}
 	}
 };
-
-// ── Merge ─────────────────────────────────────────────────────────────────────
-
-function isPlainObject(v: unknown): v is Record<string, unknown> {
-	return typeof v === 'object' && v !== null && !Array.isArray(v);
-}
-
-function merge<T>(base: T, patch: Record<string, unknown>): T {
-	const out = { ...(base as Record<string, unknown>) };
-	for (const key in patch) {
-		const pv = patch[key];
-		if (pv === undefined) continue;
-		const bv = out[key];
-		out[key] = isPlainObject(bv) && isPlainObject(pv) ? merge(bv, pv) : pv;
-	}
-	return out as T;
-}
 
 // ── Reactive store ──────────────────────────────────────────────────────────
 
@@ -250,6 +245,7 @@ export function configToCssVars(c: PlotStylesConfig): Record<string, string> {
 		'--dct-legend-title-weight': String(c.legend.titleWeight),
 		'--dct-legend-gap': c.legend.gap,
 		'--dct-legend-swatch': c.legend.swatchSize,
+		'--dct-legend-size-gap': c.legend.sizeScale.gap,
 
 		'--dct-legend-nav-bg': c.legend.navButton.background,
 		'--dct-legend-nav-color': c.legend.navButton.color,

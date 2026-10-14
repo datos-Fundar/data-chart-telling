@@ -54,14 +54,14 @@ describe('BasePlotLayout - axis.locale / axis.compactDisplay (configuration)', (
     expect(arTicks).not.toEqual(enTicks);
   });
 
-  test('defaults to compactDisplay: long, spelling the unit out', async () => {
-    const ticks = await renderYTicks();
-    expect(ticks.some((t) => /[a-zA-ZÀ-ÿ]{4,}/.test(t))).toBe(true);
-  });
-
-  test('setConfiguration({ axis: { compactDisplay: "short" } }) switches to a single-letter unit', async () => {
-    setConfiguration({ axis: { compactDisplay: 'short' } });
+  test('defaults to compactDisplay: short, abbreviating the unit', async () => {
     const ticks = await renderYTicks();
     expect(ticks.every((t) => !/[a-zA-ZÀ-ÿ]{4,}/.test(t))).toBe(true);
+  });
+
+  test('setConfiguration({ axis: { compactDisplay: "long" } }) spells the unit out', async () => {
+    setConfiguration({ axis: { compactDisplay: 'long' } });
+    const ticks = await renderYTicks();
+    expect(ticks.some((t) => /[a-zA-ZÀ-ÿ]{4,}/.test(t))).toBe(true);
   });
 });

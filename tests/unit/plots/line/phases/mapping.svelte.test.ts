@@ -1,10 +1,10 @@
 import { describe, test, expect } from 'vitest';
 import { stageOf } from '../../_helpers/stages';
-import { buildLineKind } from '$lib/plots/line/kind';
+import { buildLineDefaults } from '$lib/plots/line/defaults';
 import type { LinePlotState } from '$lib/types/plots/line/state';
 import type { Series } from '$lib/types/plots/data/common';
 
-const buildMapping = stageOf(buildLineKind<Row>(), 'mapping');
+const buildMapping = stageOf(buildLineDefaults<Row>(), 'mapping');
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 

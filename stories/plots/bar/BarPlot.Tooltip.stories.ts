@@ -253,11 +253,11 @@ export const HorizontalStackedTooltip: Story = {
 		width: 900,
 		height: 900,
 		data: AGE_BRACKET_BY_PROVINCE,
-		x: 'province',
-		y: 'value',
+		x: 'value',
+		y: 'province',
 		color: 'bracket',
 		scales: {
-			y: { type: 'categorical', sort: provinceSort }
+			y: { sort: provinceSort }
 		} satisfies AxisBasedScalesConfig,
 		tooltip: {
 			sync: false,
@@ -266,7 +266,7 @@ export const HorizontalStackedTooltip: Story = {
 				return `${province} / ${bracket}: ${value}`;
 			}
 		},
-		transforms: [{ type: 'stackY' as const }],
+		transforms: [{ type: 'stackX' as const }],
 		markers: [{ type: 'hover', showLabels: false }]
 	}
 };
@@ -280,10 +280,10 @@ export const HorizontalSingleSeriesTooltip: Story = {
 		width: 900,
 		height: 900,
 		data: AGE_BRACKET_BY_PROVINCE.filter((d) => d.bracket === '0 to 14 years'),
-		x: 'province',
-		y: 'value',
+		x: 'value',
+		y: 'province',
 		scales: {
-			y: { type: 'categorical', sort: provinceSort }
+			y: { sort: provinceSort }
 		} satisfies AxisBasedScalesConfig,
 		tooltip: {
 			sync: false,

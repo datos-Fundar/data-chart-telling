@@ -1,12 +1,10 @@
+import type { Pipeline } from '$lib/phases/Pipeline';
 import type { Snippet } from 'svelte';
-import type {
-	HoverPoint,
-	HoverStrategy,
-	TooltipOptions,
-	TooltipProp
-} from '$lib/types/layout/tooltip';
-import type { LegendSection } from '$lib/types/layout/legend';
+import type { TooltipOptions, TooltipProp } from '$lib/types/layout/tooltip';
+import type { HoverPoint, HoverStrategy } from '$lib/types/layout/hover';
+import type { LegendExtension, LegendSection } from '$lib/types/layout/legend';
 import type { FacetConfig } from '$lib/types/layout/facet';
+import type { GridPlacement } from '$lib/types/layout/grid';
 import type { TimelineConfig } from '$lib/types/layout/timeline';
 import type { Segment } from '$lib/types/plots/segments/config';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
@@ -26,6 +24,9 @@ export type MarkersConfig<TMarker> = TMarker[];
  * Area-specific segments win over catch-all ones.
  */
 export type SegmentsConfig<TStyle> = Record<string, Segment<TStyle>[]>;
+
+/** One side of a box. */
+export type MarginSide = 'top' | 'right' | 'bottom' | 'left';
 
 /** Margin overrides per side: a number pins it, `'auto'` fits it to its content. Unset sides use the theme's. */
 export type MarginConfig = Partial<{
@@ -84,36 +85,26 @@ export type PlotChromeItem =
 	| 'divider';
 
 /**
- * The chrome's default `order`: title and subtitle (or header), a divider,
- * legend, plot, then caption (or footer). With no title, subtitle or header,
- * the divider has nothing above it, so it isn't drawn.
- */
-export const DEFAULT_CHROME_ORDER: readonly PlotChromeItem[] = [
-	'header',
-	'title',
-	'subtitle',
-	'divider',
-	'legend',
-	'plot',
-	'footer',
-	'caption'
-];
-
-/**
- * What's drawn around a plot, as its shell and container read it: every block
+ * What's drawn around a figure, as `Figure` and `FigureChrome` read it: every block
  * optional, `header` drawn instead of `title`/`subtitle` and `footer` instead
- * of `caption`. `order` lists the blocks top to bottom (see
- * {@link DEFAULT_CHROME_ORDER}); one left out isn't drawn, except `plot`, which then
+ * of `caption`. `order` lists the blocks top to bottom (by default, the
+ * configuration's `chrome.order`); one left out isn't drawn, except `plot`, which then
  * goes last. Any number of `divider`s may sit in it, each drawn only between
  * two drawn blocks.
  */
-export type PlotChrome = {
+export type PlotChromeConfig = {
 	title?: string;
 	subtitle?: string;
 	caption?: string;
 	header?: Snippet;
 	footer?: Snippet;
-	legend?: LegendSection[];
+	/**
+	 * The figure's legend: unset or `true`, the one its plots read as - their
+	 * series, scales, and the segments and markers that name themselves; `false`,
+	 * none; a list of sections, exactly those; `{ items, sections }`, the
+	 * automatic one with those added.
+	 */
+	legend?: LegendSection[] | LegendExtension | boolean;
 	order?: PlotChromeItem[];
 };
 
@@ -134,7 +125,7 @@ type HeadingBlock =
 	| ChromeBlock<{ header?: never; title?: never; subtitle?: never }, never>;
 
 type LegendBlock =
-	| ChromeBlock<{ legend: LegendSection[] | undefined }, 'legend'>
+	| ChromeBlock<{ legend: LegendSection[] | LegendExtension | boolean | undefined }, 'legend'>
 	| ChromeBlock<{ legend?: never }, never>;
 
 type ClosingBlock =
@@ -156,7 +147,7 @@ type ChromeCombination<THeading, TLegend, TClosing> =
  * What's drawn around a plot: accepted by every plot kind and by
  * `PlotComposer`. `header` replaces `title`/`subtitle` and `footer`
  * replaces `caption`, so each excludes the other. `order` lists the blocks
- * top to bottom, out of the ones set here plus `plot` and `divider`; see {@link PlotChrome}.
+ * top to bottom, out of the ones set here plus `plot` and `divider`; see {@link PlotChromeConfig}.
  */
 export type PlotChromeProps = ChromeCombination<HeadingBlock, LegendBlock, ClosingBlock>;
 
@@ -192,7 +183,19 @@ export type PlotCoreProps<
 > = TDataContract &
 	PlotCommonProps<TStyles, TSegmentStyle, TMarker, TScales, TCoordinates> & {
 		tooltip?: TooltipConfig<TRow>;
+		/** One facet panel's part of a run of the data phases over every panel: the core then runs only the phases after them. */
+		panelState?: object;
+		/** The kind's pipeline, built once by its plot: the core runs it over its own props. */
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		pipeline?: Pipeline<any, any>;
 	};
+
+/**
+ * A figure's box - a plot's or a `PlotComposer`'s: its own `width` and
+ * `height`, or, drawn straight inside a `PlotComposer`, the cell it takes
+ * there (an `area`, or an `inset` floating over it), whose size it draws at.
+ */
+export type FigureBoxProps = GridPlacement & { width?: number; height?: number };
 
 /** A plot component's public props: its core props, chrome, `timeline`, `facet` and an author-facing `tooltip`. */
 export type BasePlotProps<
@@ -204,7 +207,8 @@ export type BasePlotProps<
 	TScales extends ScalesConfig<TRow>,
 	TCoordinates = undefined
 > = TDataContract &
-	PlotCommonProps<TStyles, TSegmentStyle, TMarker, TScales, TCoordinates> &
+	Omit<PlotCommonProps<TStyles, TSegmentStyle, TMarker, TScales, TCoordinates>, 'width' | 'height'> &
+	FigureBoxProps &
 	PlotChromeProps & {
 		tooltip?: TooltipProp<TRow>;
 		timeline?: TimelineConfig<TRow>;

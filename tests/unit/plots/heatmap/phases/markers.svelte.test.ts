@@ -1,9 +1,15 @@
 import { describe, test, expect } from 'vitest';
-import { buildMarkers } from '$lib/plots/heatmap/phases/markers';
-import { buildTransforms } from '$lib/layout/phases/transforms';
+import { TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
+import { StylesPhase } from '$lib/phases/styles/StylesPhase';
+import { buildHeatmapDefaults } from '$lib/plots/heatmap/defaults';
+import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
 import type { HeatmapPlotState, HeatmapPlotCtx } from '$lib/types/plots/heatmap/state';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { CellMarkerConfig, TextMarkerConfig } from '$lib/types/markers/common';
+import { stageOf } from '../../_helpers/stages';
+
+/** The kind's "markers" stage: its own marks, the state's markers, then its value labels. */
+const buildMarkers = stageOf(buildHeatmapDefaults<Row>(), 'markers');
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -15,9 +21,8 @@ const FLAT: Row[] = [
 ];
 
 const CTX: HeatmapPlotCtx = {
-	cfg: { continuous: { min: '#000000', max: '#ffffff' } } as PlotStylesConfig,
-	range: undefined,
-	legendInteraction: null
+	cfg: { ...DEFAULT_CONFIG, continuous: { min: '#000000', max: '#ffffff' } } as PlotStylesConfig,
+	range: undefined
 };
 
 function buildAll(
@@ -40,7 +45,8 @@ function buildAll(
 		...overrides
 	};
 	const ctx = { ...CTX, ...ctxOverrides };
-	return buildMarkers(buildTransforms<typeof state>()(state, ctx), ctx).markers ?? [];
+	const styles = new StylesPhase<typeof state, HeatmapPlotCtx>(buildHeatmapDefaults<Row>().styles).run;
+	return buildMarkers(styles(new TransformsPhase<typeof state>().run(state, ctx), ctx), ctx).markers ?? [];
 }
 
 /** The cells the phase draws, without its value labels. */

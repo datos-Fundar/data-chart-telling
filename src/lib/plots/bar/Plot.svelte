@@ -1,11 +1,10 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import Core from '$lib/plots/bar/Core.svelte';
-	import PlotShell from '$lib/layout/shell/PlotShell.svelte';
-	import { buildBarPresentation } from '$lib/plots/bar/presentation';
+	import Plot from '$lib/layout/plot/Plot.svelte';
+	import { buildBarDefaults } from '$lib/plots/bar/defaults';
 	import type { BarPlotProps, BarPlotCoreProps } from '$lib/types/plots/bar/props';
 
 	/**
-	 * A bar plot, vertical by default - or horizontal with `scales.y.type: 'categorical'`. Draws from pre-built `series` or flat `data` rows.
+	 * A bar plot: vertical when its categories run along `x`, horizontal when they run along `y` (the value then on `x`, as in svelteplot's `BarX`). Draws from pre-built `series` or flat `data` rows.
 	 * Optional chrome (`title`, `subtitle`, `caption`, `header`, `footer`,
 	 * `legend`) frames it; `timeline` and `facet` slice its `data` rows.
 	 */
@@ -23,11 +22,12 @@
 		margins = $bindable(),
 		...core
 	}: BarPlotProps<TData> = $props();
+
 </script>
 
-<PlotShell
-	{Core}
+<Plot
 	core={core as BarPlotCoreProps<TData>}
+	defaults={buildBarDefaults}
 	bind:margins
 	{title}
 	{subtitle}
@@ -39,5 +39,4 @@
 	{timeline}
 	{facet}
 	{tooltip}
-	presentation={buildBarPresentation<TData>}
 />

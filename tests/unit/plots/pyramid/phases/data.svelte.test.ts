@@ -1,11 +1,11 @@
 import { describe, test, expect } from 'vitest';
 import { stageOf } from '../../_helpers/stages';
-import { buildPyramidKind } from '$lib/plots/pyramid/kind';
+import { buildPyramidDefaults } from '$lib/plots/pyramid/defaults';
 import type { PyramidPlotState, PyramidPlotCtx } from '$lib/types/plots/pyramid/state';
 import type { Series } from '$lib/types/plots/data/common';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 
-const buildData = stageOf(buildPyramidKind<Row>(), 'data');
+const buildData = stageOf(buildPyramidDefaults<Row>(), 'data');
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -15,13 +15,11 @@ const buildData = stageOf(buildPyramidKind<Row>(), 'data');
 type Row = { ageGroup: string; pct: number | null };
 
 const CTX: PyramidPlotCtx = {
-	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as PlotStylesConfig,
-	formatValue: (v) => `${v}`,
-	legendInteraction: null
+	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as PlotStylesConfig
 };
 
 function series(name: string, data: Row[]): Series<Row> {
-	return { name, x: 'ageGroup', y: 'pct', data };
+	return { name, x: 'pct', y: 'ageGroup', data };
 }
 
 function build(overrides: Partial<PyramidPlotState<Row>> = {}) {
@@ -78,7 +76,7 @@ describe('buildData - series resolution', () => {
 			width: 400,
 			height: 300
 		};
-		const result = stageOf(buildPyramidKind<GroupedRow>(), 'data')(state, CTX);
+		const result = stageOf(buildPyramidDefaults<GroupedRow>(), 'data')(state, CTX);
 		expect(result.resolvedSeries!.map((s) => s.name).sort()).toEqual(['Female', 'Male']);
 	});
 });

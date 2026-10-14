@@ -172,13 +172,12 @@ describe('BarPlot - series layout', () => {
 	});
 });
 
-describe('BarPlot - orientation (scales.x/y.type: "categorical")', () => {
-	test('marking scales.y as categorical renders horizontal bars (BarX)', async () => {
+describe('BarPlot - orientation (read off which axis holds the categories)', () => {
+	test('categories on y render horizontal bars (BarX)', async () => {
 		const { container } = await render(BarPlot, {
 			width: 600,
 			height: 400,
-			series: SERIES,
-			scales: { y: { type: 'categorical' } } satisfies AxisBasedScalesConfig
+			series: SERIES.map((s) => ({ ...s, x: s.y, y: s.x }))
 		});
 		const svg = await waitForSvg(container);
 		expect(svg.querySelectorAll('g.bar-x rect').length).toBe(

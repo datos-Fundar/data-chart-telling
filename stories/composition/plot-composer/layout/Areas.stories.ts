@@ -7,13 +7,14 @@ import { demoSource } from '../../../common/docsSource';
 
 /**
  * `PlotComposer` combines separate plots into one figure (the way patchwork does
- * for ggplot): each `PlotPanel` child receives its box and renders any plot, and
+ * for ggplot): every plot drawn straight in it takes a cell and draws at its size, and
  * the composer carries the figure's own title, legend, caption, panel tags,
  * shared hover and a shared timeline.
  *
  * `layout.areas` describes the figure as a grid of names, one string per row:
  * each name is a cell, a name repeated across cells spans them, and `.` leaves
- * a cell empty. A `PlotPanel` is placed by giving it the `area` it should fill.
+ * a cell empty. A plot is placed by giving it the `area` it should fill; anything
+ * else goes in a `GridCell`, which takes `area` the same way.
  * The stories build up from one area to a full dashboard; every panel here is a
  * placeholder showing its label and the box it hands to a plot.
  */

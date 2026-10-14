@@ -2,10 +2,12 @@
   import type { LegendItemsLayout, LegendSection } from '$lib/types/layout/legend';
   import DiscreteSection from '$lib/layout/legend/DiscreteSection.svelte';
   import ContinuousSection from '$lib/layout/legend/ContinuousSection.svelte';
+  import SizeSection from '$lib/layout/legend/SizeSection.svelte';
+  import SymbolSection from '$lib/layout/legend/SymbolSection.svelte';
 
   /**
    * Renders one or more legend sections side by side, dispatching each to the
-   * matching section renderer. Discrete and continuous sections can be mixed.
+   * matching section renderer. Discrete, continuous, size and symbol sections can be mixed.
    * A lone discrete section's items default to horizontal flow; vertical once
    * a second section joins. A section's own `layout` always wins.
    */
@@ -25,6 +27,10 @@
         <DiscreteSection {section} {defaultItemsLayout} />
       {:else if section.type === 'continuous'}
         <ContinuousSection {section} />
+      {:else if section.type === 'size'}
+        <SizeSection {section} />
+      {:else if section.type === 'symbol'}
+        <SymbolSection {section} {defaultItemsLayout} />
       {/if}
     </div>
   {/each}

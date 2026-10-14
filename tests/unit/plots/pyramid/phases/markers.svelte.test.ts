@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
-import { buildMarkers } from '$lib/plots/pyramid/phases/markers';
-import { buildTransforms } from '$lib/layout/phases/transforms';
+import { TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
+import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { buildGroupedSeries } from '$lib/plots/utils/segments';
 import type {
 	PyramidPlotState,
@@ -10,19 +10,23 @@ import type {
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { BarMarkerConfig } from '$lib/types/markers/common';
+import type { PlotInteraction } from '$lib/layout/interaction/PlotInteraction.svelte';
+import { stageOf } from '../../_helpers/stages';
+import { buildPyramidDefaults } from '$lib/plots/pyramid/defaults';
+
+/** The kind's "markers" stage: its own marks, the state's markers, then its value labels. */
+const buildMarkers = stageOf(buildPyramidDefaults<Row>(), 'markers');
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
 type Row = { ageGroup: string; pct: number | null };
 
 const CTX: PyramidPlotCtx = {
-	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as PlotStylesConfig,
-	formatValue: (v) => `${v}`,
-	legendInteraction: null
+	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as PlotStylesConfig
 };
 
 function series(name: string, side: 'left' | 'right', data: Row[]): PyramidSeries<Row> {
-	return { name, x: 'ageGroup', y: 'pct', data, side };
+	return { name, x: 'pct', y: 'ageGroup', data, side };
 }
 
 function build(
@@ -42,6 +46,10 @@ function build(
 		scales: {},
 		width: 400,
 		height: 300,
+		axes: PlotAxes.build({
+			series: [{ x: 'pct', y: 'ageGroup', data: [{ pct: 1, ageGroup: 'a' }] }],
+			discrete: 1
+		}),
 		groupedSeries,
 		resolvedSeries: groupedSeries.map((g) => g.series),
 		gapFillMaps: new Map(),
@@ -52,7 +60,7 @@ function build(
 	// this phase's own segment/gap-fill bars - narrowed back from the state's
 	// broader accumulating `markers` union.
 	const ctx = { ...CTX, ...ctxOverrides };
-	return buildMarkers(buildTransforms<typeof state>()(state, ctx), ctx)
+	return buildMarkers(new TransformsPhase<typeof state>().run(state, ctx), ctx)
 		.markers as BarMarkerConfig[];
 }
 
@@ -99,7 +107,14 @@ describe('buildMarkers - style resolution', () => {
 	});
 
 	test('a disabled-fill override wins over the series color', () => {
-		const [marker] = build({}, { disabledFillFor: () => ({ fill: 'gray', fillOpacity: 0.3 }) });
+		const [marker] = build(
+			{},
+			{
+				interaction: {
+					fillFor: () => ({ fill: 'gray', fillOpacity: 0.3 })
+				} as unknown as PlotInteraction
+			}
+		);
 		expect(marker.styles?.fill).toBe('gray');
 		expect(marker.styles?.fillOpacity).toBe(0.3);
 	});

@@ -14,7 +14,7 @@
 	import BarPlot from '$lib/plots/bar/Plot.svelte';
 	import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
 	import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-	import type { HoverStrategy } from '$lib/types/layout/tooltip';
+	import type { HoverStrategy } from '$lib/types/layout/hover';
 	import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
 	import type { HeatCell } from '../../data/heat-cells';
 	import { REGION_BARS, type RegionYear } from '../../data/region-bars';

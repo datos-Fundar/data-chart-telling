@@ -1,10 +1,10 @@
 import { describe, test, expect, vi, afterEach } from 'vitest';
 import { stageOf } from '../../_helpers/stages';
-import { buildBarKind } from '$lib/plots/bar/kind';
+import { buildBarDefaults } from '$lib/plots/bar/defaults';
 import type { BarPlotState } from '$lib/types/plots/bar/state';
 import type { Series } from '$lib/types/plots/data/common';
 
-const buildMapping = stageOf(buildBarKind<Row>(), 'mapping');
+const buildMapping = stageOf(buildBarDefaults<Row>(), 'mapping');
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -22,38 +22,50 @@ const SERIES: Series<Row>[] = [
 	}
 ];
 
+const STATE: BarPlotState<Row> = {
+	series: SERIES,
+	segments: {},
+	gaps: {},
+	scales: {},
+	width: 400,
+	height: 300
+};
+
 function build(overrides: Partial<BarPlotState<Row>> = {}) {
-	const state: BarPlotState<Row> = {
-		segments: {},
-		gaps: {},
-		scales: {},
-		width: 400,
-		height: 300,
-		resolvedSeries: SERIES,
-		...overrides
-	};
-	return buildMapping(state);
+	return buildMapping({ ...STATE, resolvedSeries: SERIES, ...overrides });
 }
 
 afterEach(() => vi.restoreAllMocks());
 
-describe('buildMapping - category axis', () => {
-	test('defaults to x when neither axis is marked categorical', () => {
-		const result = build();
-		expect(result.categoricalAxis).toBe('x');
-		expect(result.isHorizontal).toBe(false);
+describe('category axis (read by the "data" phase)', () => {
+	const buildData = stageOf(buildBarDefaults<Row>(), 'data');
+	const axesOf = (overrides: Partial<BarPlotState<Row>>) =>
+		buildData({ ...STATE, ...overrides } as BarPlotState<Row>).axes!;
+
+	test('is x when x holds the categories', () => {
+		expect(axesOf({})).toMatchObject({ category: 'x', value: 'y', orientation: 'vertical' });
 	});
 
-	test('marks y as horizontal when scales.y.type is categorical', () => {
-		const result = build({ scales: { y: { type: 'categorical' } } });
-		expect(result.categoricalAxis).toBe('y');
-		expect(result.isHorizontal).toBe(true);
+	test('is y, and the bars horizontal, when y holds the categories', () => {
+		const axes = axesOf({ series: [{ name: 'a', x: 'value', y: 'category', data: SERIES[0].data }] });
+		expect(axes).toMatchObject({ category: 'y', value: 'x', orientation: 'horizontal' });
 	});
 
-	test('warns and defaults to x when both axes are marked categorical', () => {
+	test('numeric categories default to x; scales.y.type puts them on y', () => {
+		const years = [{ category: 2020, value: 10 }] as unknown as Row[];
+		const vertical = axesOf({ series: [{ name: 'a', x: 'category', y: 'value', data: years }] });
+		expect(vertical).toMatchObject({ category: 'x', x: { origin: 'promoted' } });
+		const horizontal = axesOf({
+			series: [{ name: 'a', x: 'value', y: 'category', data: years }],
+			scales: { y: { type: 'band' } }
+		});
+		expect(horizontal).toMatchObject({ category: 'y', y: { origin: 'explicit' } });
+	});
+
+	test('warns and defaults to x when both axes are categorical', () => {
 		const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-		const result = build({ scales: { x: { type: 'categorical' }, y: { type: 'categorical' } } });
-		expect(result.categoricalAxis).toBe('x');
+		const axes = axesOf({ scales: { x: { type: 'categorical' }, y: { type: 'categorical' } } });
+		expect(axes.category).toBe('x');
 		expect(warn).toHaveBeenCalledOnce();
 	});
 });

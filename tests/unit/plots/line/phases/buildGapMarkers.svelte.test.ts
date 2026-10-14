@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { buildGapMarkers } from '$lib/plots/line/phases/markers';
+import { buildGapMarkers } from '$lib/plots/line/markers';
 import type { Series } from '$lib/types/plots/data/common';
 import type { GapsConfig } from '$lib/types/plots/gaps';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';

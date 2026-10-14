@@ -1,11 +1,12 @@
-import type { Snippet } from 'svelte';
-import type { HoverStrategy } from '$lib/types/layout/tooltip';
+import type { HoverStrategy } from '$lib/types/layout/hover';
 import type { Orientation, TimeValue } from '$lib/types/layout/timeline';
 
 /**
  * How a `PlotComposer` arranges its panels: `areas` names the grid cells
  * (one string per row, `.` for empty), else panels flow into `columns`;
- * `widths`/`heights` are relative track sizes.
+ * `widths`/`heights` are relative track sizes. `align` lines up every
+ * panel's plot area with its row and column, like facets do - for panels
+ * whose plots draw no chrome of their own.
  */
 export type ComposerLayout = {
 	areas?: string[];
@@ -13,6 +14,7 @@ export type ComposerLayout = {
 	widths?: number[];
 	heights?: number[];
 	gap?: number;
+	align?: boolean;
 };
 
 /** Labels a composer stamps on its panels in order: `'A'` (A, B, C…), `'a'`, `'1'`, `'I'` (roman), or an explicit list. */
@@ -33,9 +35,3 @@ export type ComposerHoverConfig = {
 	sync?: boolean;
 };
 
-/** The box a `PlotPanel` hands its plot. */
-export type PanelContext = { width: number; height: number };
-export type PanelSnippet = Snippet<[PanelContext]>;
-
-/** An inset panel's box as fractions of its area, from the left and bottom edges. */
-export type PanelInset = { left: number; bottom: number; right: number; top: number };

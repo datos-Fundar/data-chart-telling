@@ -1,22 +1,23 @@
 import { describe, test, expect } from 'vitest';
-import { mergeBin, defaultBin } from '$lib/plots/histogram/phases/transforms';
-import { buildHistogramKind } from '$lib/plots/histogram/kind';
+import { buildHistogramDefaults } from '$lib/plots/histogram/defaults';
 import { stageOf } from '../../_helpers/stages';
-import { buildMarkers } from '$lib/plots/histogram/phases/markers';
 import {
 	DEFAULT_CONFIG,
 	setConfiguration,
 	resetConfiguration
 } from '$lib/configuration/config.svelte';
-import { SERIES_KEY } from '$lib/layout/phases/transforms';
+import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import type { HistogramPlotState, HistogramPlotCtx } from '$lib/types/plots/histogram/state';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
+/** The kind's "markers" stage: its own marks, the state's markers, then its value labels. */
+const buildMarkers = stageOf(buildHistogramDefaults<Row>(), 'markers');
+
 type Row = Record<string, unknown>;
 
-const buildData = stageOf(buildHistogramKind<Row>(), 'data');
-const buildTransforms = stageOf(buildHistogramKind<Row>(), 'transforms');
-const buildScales = stageOf(buildHistogramKind<Row>(), 'scales');
+const buildData = stageOf(buildHistogramDefaults<Row>(), 'data');
+const buildTransforms = stageOf(buildHistogramDefaults<Row>(), 'transforms');
+const buildScales = stageOf(buildHistogramDefaults<Row>(), 'scales');
 type Rect = {
 	type: 'rect';
 	series: string;
@@ -26,7 +27,7 @@ type Rect = {
 	styles: { fillOpacity: number };
 };
 
-const CTX = { cfg: DEFAULT_CONFIG, legendInteraction: null } as HistogramPlotCtx;
+const CTX = { cfg: DEFAULT_CONFIG } as HistogramPlotCtx;
 
 const rows: Row[] = [
 	{ v: 1, g: 'A' },
@@ -64,6 +65,18 @@ function run(state: HistogramPlotState<Row>, ctx: HistogramPlotCtx = CTX) {
 
 const rects = (state: HistogramPlotState<Row>) =>
 	(state.markers ?? []).filter((m) => m.type === 'rect') as unknown as Rect[];
+
+/** The transforms a histogram runs over the plot's own, as its defaults merge them. */
+const mergeBin = (
+	own: { type: string; [key: string]: unknown }[],
+	cfg: typeof DEFAULT_CONFIG,
+	horizontal = false
+) =>
+	buildHistogramDefaults().transforms!.transforms!(
+		{ transforms: own, axes: { isHorizontal: horizontal } } as never,
+		{ cfg } as never
+	) as { type: string; [key: string]: unknown }[];
+const defaultBin = (cfg: typeof DEFAULT_CONFIG) => mergeBin([], cfg)[0];
 
 describe('mergeBin', () => {
 	test('with no transforms of its own, a histogram runs the default count bin', () => {
@@ -123,14 +136,14 @@ describe('buildMarkers', () => {
 });
 
 describe('buildScales', () => {
-	test("the bins' edges set x; y, a plain count, is left to svelteplot's own bars", () => {
+	test("the bins' edges set x; y, the count, runs from zero to the tallest bin", () => {
 		const state = buildScales(
 			buildTransforms(flatState({ transforms: [{ type: 'binX', thresholds: [0, 10, 20] }] }), CTX)
 		);
 		const [xLo, xHi] = state.scales.x?.domain as [number, number];
 		expect(xLo).toBeLessThanOrEqual(1);
 		expect(xHi).toBeGreaterThanOrEqual(18);
-		expect(state.scales.y?.domain).toBeUndefined();
+		expect(state.scales.y).toMatchObject({ domain: [0, 2], nice: true });
 	});
 
 	test('a marker with its own rows grows the axes to cover it, y still from zero', () => {
@@ -175,7 +188,7 @@ describe('histogram bars from the configuration', () => {
 		setConfiguration({ histogram: { fillOpacity: 0.4 } });
 		try {
 			const cfg = { ...DEFAULT_CONFIG, histogram: { inset: 1, fillOpacity: 0.4 } };
-			const [bar] = rects(run(flatState(), { cfg, legendInteraction: null }));
+			const [bar] = rects(run(flatState(), { cfg }));
 			expect(bar.styles.fillOpacity).toBe(0.4);
 		} finally {
 			resetConfiguration();

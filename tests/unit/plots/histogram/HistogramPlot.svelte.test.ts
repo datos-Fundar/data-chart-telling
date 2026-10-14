@@ -24,6 +24,26 @@ function bars(svg: SVGSVGElement): SVGRectElement[] {
 	});
 }
 
+describe('HistogramPlot - horizontal', () => {
+	test('a plot given only `y` bins along y: one horizontal bar per non-empty bin, as long as its count', async () => {
+		const { container } = render(HistogramPlot, {
+			width: 400,
+			height: 300,
+			data: rows,
+			y: 'v',
+			transforms: [{ type: 'binY' as const, thresholds: [0, 10, 20] }]
+		});
+		const svg = (await waitForSvg(container)) as unknown as SVGSVGElement;
+		const drawn = bars(svg).map((r) => r.getBoundingClientRect());
+		expect(drawn).toHaveLength(2);
+		// Two rows in [0, 10), three in [10, 20): the bins' lengths run along x.
+		const widths = drawn.map((r) => r.width).sort((a, b) => a - b);
+		expect(widths[1] / widths[0]).toBeCloseTo(3 / 2, 1);
+		// Every bar grows from the same zero baseline on the left.
+		expect(Math.abs(drawn[0].left - drawn[1].left)).toBeLessThan(1);
+	});
+});
+
 describe('HistogramPlot', () => {
 	test('a flat plot with no grouping draws one bar per non-empty bin', async () => {
 		const { container } = render(HistogramPlot, {

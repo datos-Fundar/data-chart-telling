@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { resolveGapRuns, resolveGapsForSeries, isGapValue } from '$lib/plots/utils/gaps';
-import { resolveEasing } from '$lib/utils/interpolate';
+import { Interpolation } from '$lib/utils/Interpolation';
 import type { Series } from '$lib/types/plots/data/common';
 import type { GapZonesConfig } from '$lib/types/plots/gaps';
 
@@ -97,7 +97,7 @@ describe('resolveGapRuns - middle', () => {
     expect(eased[mid].x).toBe(linear[mid].x);
     // Y follows the quadIn curve instead of a straight line.
     const t = mid / (linear.length - 1);
-    const expectedY = 40 + (60 - 40) * resolveEasing('quadIn')(t);
+    const expectedY = 40 + (60 - 40) * Interpolation.buildEasing('quadIn')(t);
     expect(eased[mid].y).toBeCloseTo(expectedY);
     expect(eased[mid].y).not.toBeCloseTo(linear[mid].y);
   });

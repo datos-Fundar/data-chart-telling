@@ -8,14 +8,12 @@ import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import { POPULATION_PYRAMID, FEMALE_2022_WITH_GAPS } from '../../../../../stories/data/population-pyramid';
 import { waitForSvg, countBarRects, countTextLabels } from '../../_helpers/svg';
 
-// PyramidPlot's `Series.x`/`.y` are category/magnitude (not the top-level
-// `x`/`y` prop names, which mean magnitude/category) - see Plot.svelte's
-// own `flat`/`signedValue`, which read `s.x` as category and `s.y` as value.
-const FEMALE = { name: 'Female', x: 'ageGroup' as const, y: 'pct' as const, data: FEMALE_2022_WITH_GAPS };
+// A series' `x`/`y` are the visual axes, like the top-level props: `x` the magnitude, `y` the category.
+const FEMALE = { name: 'Female', x: 'pct' as const, y: 'ageGroup' as const, data: FEMALE_2022_WITH_GAPS };
 const MALE = {
   name: 'Male',
-  x: 'ageGroup' as const,
-  y: 'pct' as const,
+  x: 'pct' as const,
+  y: 'ageGroup' as const,
   data: POPULATION_PYRAMID.filter((d) => d.year === 2022 && d.sex === 'Male'),
 };
 const REAL_COUNT = FEMALE_2022_WITH_GAPS.filter((d) => d.pct != null).length;

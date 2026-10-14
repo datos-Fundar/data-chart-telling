@@ -59,7 +59,7 @@ describe('symbol channel - plot level (Scatter)', () => {
 	 * series per category, so `symbol`'s domain can't be computed from just
 	 * one marker call's own (single-category) slice - it collapsed to
 	 * whichever shape sits at index 0 for every series until
-	 * `scatter/phases/markers.ts` started computing it once, globally, from
+	 * `scatter/markers.ts` started computing it once, globally, from
 	 * `state.flat`, and passing it down as an explicit `scales.symbol.domain`.
 	 */
 	test('symbol still varies correctly when color also splits data into series', async () => {

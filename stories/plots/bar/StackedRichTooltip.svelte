@@ -37,13 +37,13 @@
 		width={900}
 		height={900}
 		data={AGE_BRACKET_BY_PROVINCE}
-		x="province"
-		y="value"
+		x="value"
+		y="province"
 		color="bracket"
 		scales={{
-			y: { type: 'categorical', sort: provinceSort }
+			y: { sort: provinceSort }
 		} satisfies AxisBasedScalesConfig}
-		transforms={[{ type: 'stackY' }]}
+		transforms={[{ type: 'stackX' }]}
 		markers={[{ type: 'hover', showLabels: false }]}
 		tooltip={{
 			sync: false,

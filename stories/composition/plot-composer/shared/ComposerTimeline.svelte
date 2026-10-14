@@ -1,6 +1,5 @@
 <script lang="ts">
 	import PlotComposer from '$lib/layout/composer/PlotComposer.svelte';
-	import PlotPanel from '$lib/layout/composer/PlotPanel.svelte';
 	import LinePlot from '$lib/plots/line/Plot.svelte';
 	import BarPlot from '$lib/plots/bar/Plot.svelte';
 	import Scrubber from '../../../common/Scrubber.svelte';
@@ -19,33 +18,21 @@
 			timeline={{ progress, values: YEARS, orientation: 'horizontal' }}
 			layout={{ columns: 2, widths: [3, 2] }}
 		>
-			<PlotPanel>
-				{#snippet children({ width, height })}
-					<LinePlot
-						{width}
-						{height}
-						data={TIME_SERIES.filter((d) => d.metric === 'GDP')}
-						x="year"
-						y="value"
-						color="region"
-						scales={{ x: { domain: [2018, 2022] }, y: { domain: [0, 100] } }}
-						timeline={{ accessor: 'year' }}
-					/>
-				{/snippet}
-			</PlotPanel>
-			<PlotPanel>
-				{#snippet children({ width, height })}
-					<BarPlot
-						{width}
-						{height}
-						data={TIME_SERIES.filter((d) => d.metric === 'GDP')}
-						x="region"
-						y="value"
-						scales={{ y: { domain: [0, 100] } }}
-						timeline={{ accessor: 'year' }}
-					/>
-				{/snippet}
-			</PlotPanel>
+			<LinePlot
+				data={TIME_SERIES.filter((d) => d.metric === 'GDP')}
+				x="year"
+				y="value"
+				color="region"
+				scales={{ x: { domain: [2018, 2022] }, y: { domain: [0, 100] } }}
+				timeline={{ accessor: 'year' }}
+			/>
+			<BarPlot
+				data={TIME_SERIES.filter((d) => d.metric === 'GDP')}
+				x="region"
+				y="value"
+				scales={{ y: { domain: [0, 100] } }}
+				timeline={{ accessor: 'year' }}
+			/>
 		</PlotComposer>
 	{/snippet}
 </Scrubber>

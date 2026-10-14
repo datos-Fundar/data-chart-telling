@@ -252,3 +252,28 @@ describe('DiscreteSection - custom navButton snippet', () => {
 		expect(nextBtn?.textContent?.trim()).toBe('›');
 	});
 });
+
+describe('DiscreteSection - columns next to other sections', () => {
+	const columnsOf = async (count: number, own?: Partial<DiscreteLegendSection>) => {
+		const { container } = await render(LegendLayout, {
+			sections: [
+				{ type: 'discrete', items: shortItems(count), ...own },
+				{ type: 'continuous', min: 0, max: 1 }
+			]
+		});
+		const grid = container.querySelector('.dct-discrete') as HTMLElement;
+		return grid.style.gridTemplateColumns;
+	};
+
+	test('favor rows: two items side by side, then half as many columns as items, at most four', async () => {
+		expect(await columnsOf(2)).toBe('repeat(2, max-content)');
+		expect(await columnsOf(4)).toBe('repeat(2, max-content)');
+		expect(await columnsOf(5)).toBe('repeat(3, max-content)');
+		expect(await columnsOf(12)).toBe('repeat(4, max-content)');
+	});
+
+	test('a section with its own columns or layout keeps them', async () => {
+		expect(await columnsOf(4, { columns: 1 })).toBe('repeat(1, max-content)');
+		expect(await columnsOf(4, { layout: { type: 'vertical' } })).toBe('repeat(1, max-content)');
+	});
+});

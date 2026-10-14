@@ -1,5 +1,5 @@
 import type { AreaStyle } from '$lib/types/plots/styling';
-import type { AxisPlotState, AxisPlotCtx, ValueLabelsCtx } from '$lib/types/layout/phases';
+import type { AxisPlotState, AxisPlotCtx } from '$lib/types/phases';
 
 /** HistogramPlot's pipeline state: the shared axis-based state, with no extras of its own. */
 export type HistogramPlotState<TData extends Record<string, unknown>> = AxisPlotState<
@@ -8,4 +8,4 @@ export type HistogramPlotState<TData extends Record<string, unknown>> = AxisPlot
 >;
 
 /** The environment every HistogramPlot phase reads from, alongside the growing state. */
-export type HistogramPlotCtx = AxisPlotCtx & ValueLabelsCtx;
+export type HistogramPlotCtx = AxisPlotCtx;

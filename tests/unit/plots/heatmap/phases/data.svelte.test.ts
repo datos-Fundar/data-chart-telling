@@ -1,10 +1,10 @@
 import { describe, test, expect } from 'vitest';
 import { stageOf } from '../../_helpers/stages';
-import { buildHeatmapKind } from '$lib/plots/heatmap/kind';
+import { buildHeatmapDefaults } from '$lib/plots/heatmap/defaults';
 import type { HeatmapPlotState } from '$lib/types/plots/heatmap/state';
 import type { Series } from '$lib/types/plots/data/common';
 
-const buildData = stageOf(buildHeatmapKind<Row>(), 'data');
+const buildData = stageOf(buildHeatmapDefaults<Row>(), 'data');
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 

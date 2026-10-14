@@ -26,3 +26,13 @@ export type GapZonesConfig<TStyle> = {
 
 /** `styles.gaps`: series name (or `'default'`) to its {@link GapZonesConfig}; `'default'` fills the zones a named entry leaves unset. */
 export type GapsConfig<TStyle> = Record<string, GapZonesConfig<TStyle>>;
+
+/** A point sampled along a gap-fill bridge, already resolved to plot data-space numbers. */
+export type GapPoint = { x: number; y: number };
+
+/** One gap row's resolved fill - the interpolated value to render instead of the missing one, and which zone produced it. */
+export type DiscreteGapFill<TStyle> = {
+  value: number;
+  kind: 'start' | 'middle' | 'end';
+  style?: TStyle;
+};

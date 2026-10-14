@@ -25,10 +25,10 @@
 	title="Value by category, two unrelated groups"
 	subtitle="Strategy: y · Sync: on - each facet sorted by its own value"
 	data={UNRELATED_SORT_DATA}
-	x={'category' as keyof GroupValue}
-	y="value"
+	x="value"
+	y={'category' as keyof GroupValue}
 	scales={{
-		y: { type: 'categorical', sort: (a: GroupValue, b: GroupValue) => a.value - b.value }
+		y: { sort: (a: GroupValue, b: GroupValue) => a.value - b.value }
 	}}
 	facet={{ by: 'group' as keyof GroupValue, columns: 2 }}
 	tooltip={{

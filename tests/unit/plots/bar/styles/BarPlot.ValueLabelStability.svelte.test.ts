@@ -45,6 +45,6 @@ describe('BarPlot - outside-anchored value labels reserve room up front', () => 
     await new Promise((r) => setTimeout(r, 300));
 
     expect(svg.isConnected).toBe(true);
-    expect(container.querySelector('svg')).toBe(svg);
+    expect(container.querySelector('.dct-plot svg')).toBe(svg);
   });
 });

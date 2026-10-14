@@ -1,5 +1,6 @@
 import type { StrokeStyle, DotStyle, FontStyle, AreaStyle } from '$lib/types/plots/styling';
 import type { SymbolType } from '$lib/types/plots/constants';
+import type { PlotChromeItem } from '$lib/types/plots/props';
 
 export type TextStyle = {
 	/** font-family */
@@ -44,6 +45,13 @@ export type PlotStylesConfig = {
 		margin: string;
 	};
 
+	// ── Chrome ──────────────────────────────────────────────────────────────────
+	/** What a plot's or composer's chrome draws around it. */
+	chrome: {
+		/** The blocks, top to bottom, when a figure doesn't set its own `order` - see {@link PlotChromeItem}. */
+		order: PlotChromeItem[];
+	};
+
 	// ── Text blocks ─────────────────────────────────────────────────────────────
 	title: TextStyle;
 	subtitle: TextStyle;
@@ -63,6 +71,25 @@ export type PlotStylesConfig = {
 		swatchSize: string;
 		/** Fallback opacity for a legend-disabled series/value when a section doesn't set its own style. */
 		disabledOpacity: number;
+		/**
+		 * Whether names read off the data show as words (`gdp_per_capita` as
+		 * "Gdp per capita"): an item with no `label`, and the titles the
+		 * automatic legend takes from field names. Display only - toggling
+		 * still goes by the name itself.
+		 */
+		pretty: boolean;
+		/**
+		 * The automatic legend's series section, titled `text` once the legend
+		 * shows other sections too - a size or shape scale, or sections it adds.
+		 */
+		seriesTitle: {
+			enabled: boolean;
+			text: string;
+		};
+		/** A size section: `gap` is the room between its dots (CSS length). */
+		sizeScale: {
+			gap: string;
+		};
 		/** Prev/next arrows shown when a `layout: { type: 'horizontal' }` discrete section overflows `maxRows`. */
 		navButton: {
 			background: string;
@@ -126,6 +153,7 @@ export type PlotStylesConfig = {
 		yTickPadding: number;
 		grid: boolean;
 		locale: string;
+		/** Compact units abbreviated (`'short'`, the default: `1 M`) or spelled out (`'long'`: `1 millón`). Axes and size legends. */
 		compactDisplay: 'short' | 'long';
 	};
 
@@ -151,6 +179,16 @@ export type PlotStylesConfig = {
 		right: number | 'auto';
 		bottom: number | 'auto';
 		left: number | 'auto';
+	};
+	/** Marker clipping to the plot's inner frame (see `FrameClip`). */
+	frameClip: {
+		/**
+		 * How far (px) a clipped mark may reach past the frame before it's cut,
+		 * so strokes and labels on the edge aren't shaved off. A number sets all
+		 * four sides; a string takes CSS shorthand px values for 1-4 sides, e.g.
+		 * `'4px'`, `'4px 8px'`, `'0 8px 4px'`, `'0 8px 4px 2px'`.
+		 */
+		tolerance: number | string;
 	};
 	/** Discrete categorical palette (grouped series). */
 	palette: string[];

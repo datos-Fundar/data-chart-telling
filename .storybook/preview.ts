@@ -191,16 +191,17 @@ const preview: Preview = {
 					'Layout',
 					[
 						'Facets',
-						['Grid', 'MarginAlignment', 'Paginated', 'Carousel'],
+						['Grid', 'MarginAlignment', 'Paginated', 'Carousel', 'RowsAndCols'],
 						'Legend',
-						['Discrete', 'Continuous', 'Composition', 'Interactive', 'Paginated'],
+						['Automatic', 'Discrete', 'Continuous', 'Composition', 'Interactive', 'Paginated'],
+						'Statistics',
+						'Timeline',
 						'Tooltip',
 						['Basics', 'MultiSeries', 'Customization', 'FacetSync'],
-						'Statistics'
 					],
 					'Configuration',
 					'Composition',
-					['Chrome', 'PlotShell', 'PlotComposer']
+					['Chrome', 'Plot', 'PlotComposer']
 				]
 			}
 		}

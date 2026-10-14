@@ -9,7 +9,6 @@ export type GeoFeaturesMarkerConfig = {
 	strokeWidth?: number;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	onclick?: (e: Event, d: any) => void;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	onpointerenter?: (e: Event, d: any) => void;
-	onpointerleave?: (e: Event) => void;
+	/** The features the pointer can match as the plot's hover, by `__id`. */
+	hover?: Map<string, Record<string, unknown>>;
 };

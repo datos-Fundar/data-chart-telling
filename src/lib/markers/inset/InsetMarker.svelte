@@ -3,7 +3,7 @@
   import { buildInsetProjection } from './insetProjection';
   import { insetBox } from './insetLayout';
   import { filterGeometryParts } from '$lib/plots/utils/geoAccessors';
-  import TooltipLayout from '$lib/layout/tooltip/TooltipLayout.svelte';
+  import Tooltip from '$lib/layout/tooltip/Tooltip.svelte';
   import type { GeoInsetMarkerConfig } from '$lib/types/markers/geo';
   import type { GeoFeature } from '$lib/types/plots/data/geo';
   import type { TooltipAnchorX, TooltipAnchorY } from '$lib/types/layout/tooltip';
@@ -96,7 +96,7 @@
    * Purely a coordinate reference (`pointer-events: none` - never itself a
    * hover target) sized exactly to the inset's own box, so `onInsetPointer*`
    * below can convert a screen-space pointer event into the same box-local
-   * `x`/`y` space `TooltipLayout`'s `bounds` expects, the same way
+   * `x`/`y` space `Tooltip`'s `bounds` expects, the same way
    * `BasePlotLayout`'s own cursor tracking does for the main map.
    */
   let boxRectEl = $state<SVGRectElement>();
@@ -124,7 +124,6 @@
 {#if path}
   <g class="dct-geo-inset" transform="translate({box.left + left}, {box.top + top})">
     {#each insetFeatures as f, i (i)}
-      <!-- svelte-ignore a11y_no_static_element_interactions -->
       <path
         d={path(f as GeoJSON.Feature) ?? undefined}
         fill={marker.styles?.fill ?? defaultFill}
@@ -138,14 +137,13 @@
       />
     {/each}
     {#if marker.tooltip}
-      <!-- svelte-ignore a11y_no_static_element_interactions -->
       <rect x={0} y={0} width={box.width} height={box.height} fill="transparent" pointer-events="none" bind:this={boxRectEl} />
     {/if}
     {#if marker.tooltip}
       {@const tooltip = marker.tooltip}
       <foreignObject x={0} y={0} width={box.width} height={box.height} style="overflow: visible; pointer-events: none;">
         <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: 100%; height: 100%;">
-          <TooltipLayout
+          <Tooltip
             visible={hovered != null}
             x={hovered?.x ?? 0}
             y={hovered?.y ?? 0}

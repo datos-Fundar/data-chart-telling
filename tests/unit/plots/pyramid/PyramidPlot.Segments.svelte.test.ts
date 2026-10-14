@@ -19,7 +19,7 @@ const DATA_PROPS = {
 // correctly as plain strings (e.g. '5-9' > '20-24' lexicographically), so
 // each matching bucket is addressed as its own single-point area.
 function areasFor(ageGroups: string[]): Area[] {
-	return ageGroups.map((ageGroup) => ({ x: { from: ageGroup, to: ageGroup } }));
+	return ageGroups.map((ageGroup) => ({ y: { from: ageGroup, to: ageGroup } }));
 }
 
 function barStyles(svg: SVGElement): string[] {

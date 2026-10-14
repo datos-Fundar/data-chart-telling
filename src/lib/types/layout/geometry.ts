@@ -12,6 +12,10 @@ export type ScopedMarkerSegment<TData> = {
  */
 export type ScopedMarkerGroup<TData> = {
   name: string;
+  /** The series' id, when it differs from its name - see `Series.id`. */
+  id?: string;
+  /** The facet panel the series belongs to. */
+  panel?: string;
   data: TData[];
   color: string;
   segments: ScopedMarkerSegment<TData>[];

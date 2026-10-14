@@ -1,12 +1,12 @@
 <script lang="ts">
 	import PlotComposer from '$lib/layout/composer/PlotComposer.svelte';
-	import PlotPanel from '$lib/layout/composer/PlotPanel.svelte';
+	import GridCell from '$lib/layout/grid/GridCell.svelte';
 	import type { ComposerLayout, ComposerTags } from '$lib/types/layout/composer';
 	import Placeholder from './Placeholder.svelte';
 
 	/**
 	 * Lays out placeholder panels with a given `layout`. `panels` lists the `area`
-	 * of each `PlotPanel` in order; `undefined` leaves it to flow into the next
+	 * of each panel in order; `undefined` leaves it to flow into the next
 	 * free cell.
 	 */
 	let {
@@ -26,10 +26,10 @@
 
 <PlotComposer {width} {height} {layout} {tags}>
 	{#each panels as area, i (i)}
-		<PlotPanel {area}>
+		<GridCell {area}>
 			{#snippet children({ width, height })}
 				<Placeholder label={area ?? String(i + 1)} {width} {height} />
 			{/snippet}
-		</PlotPanel>
+		</GridCell>
 	{/each}
 </PlotComposer>

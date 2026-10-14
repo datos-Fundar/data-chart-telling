@@ -233,14 +233,14 @@ export const FromExplicitSeries: Story = {
 		series: [
 			{
 				name: 'Female',
-				x: 'ageGroup',
-				y: 'pct',
+				x: 'pct',
+				y: 'ageGroup',
 				data: DATA.filter((d) => d.sex === 'Female')
 			} satisfies Series<PopulationRow>,
 			{
 				name: 'Male',
-				x: 'ageGroup',
-				y: 'pct',
+				x: 'pct',
+				y: 'ageGroup',
 				data: DATA.filter((d) => d.sex === 'Male')
 			} satisfies Series<PopulationRow>
 		],

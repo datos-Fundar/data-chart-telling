@@ -1,7 +1,6 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import Core from '$lib/plots/scatter/Core.svelte';
-	import PlotShell from '$lib/layout/shell/PlotShell.svelte';
-	import { buildScatterPresentation } from '$lib/plots/scatter/presentation';
+	import Plot from '$lib/layout/plot/Plot.svelte';
+	import { buildScatterDefaults } from '$lib/plots/scatter/defaults';
 	import type { ScatterPlotProps, ScatterPlotCoreProps } from '$lib/types/plots/scatter/props';
 
 	/**
@@ -23,11 +22,12 @@
 		margins = $bindable(),
 		...core
 	}: ScatterPlotProps<TData> = $props();
+
 </script>
 
-<PlotShell
-	{Core}
+<Plot
 	core={core as ScatterPlotCoreProps<TData>}
+	defaults={buildScatterDefaults}
 	bind:margins
 	{title}
 	{subtitle}
@@ -39,5 +39,4 @@
 	{timeline}
 	{facet}
 	{tooltip}
-	presentation={buildScatterPresentation<TData>}
 />

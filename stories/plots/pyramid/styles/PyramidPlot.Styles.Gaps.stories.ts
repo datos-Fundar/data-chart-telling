@@ -21,7 +21,7 @@ const meta = {
   args: {
     width: 940,
     height: 520,
-    series: [{ name: 'Female', x: 'ageGroup', y: 'pct', data: FEMALE_2022_WITH_GAPS }],
+    series: [{ name: 'Female', x: 'pct', y: 'ageGroup', data: FEMALE_2022_WITH_GAPS }],
     scales: { y: { domain: AGE_GROUPS } },
   },
   argTypes: {
@@ -84,11 +84,11 @@ export const LeadingAndTrailingGapsOptIn: Story = {
 // ── Series-aware form, both sides ─────────────────────────────────────────────
 
 const FEMALE_AND_MALE_2022 = [
-  { name: 'Female', x: 'ageGroup' as const, y: 'pct' as const, data: FEMALE_2022_WITH_GAPS },
+  { name: 'Female', x: 'pct' as const, y: 'ageGroup' as const, data: FEMALE_2022_WITH_GAPS },
   {
     name: 'Male',
-    x: 'ageGroup' as const,
-    y: 'pct' as const,
+    x: 'pct' as const,
+    y: 'ageGroup' as const,
     data: POPULATION_PYRAMID.filter((d) => d.year === 2022 && d.sex === 'Male'),
   },
 ];
