@@ -1,0 +1,3 @@
+# Fast checks on every commit: eslint on the staged files, then the type check.
+pnpm exec lint-staged
+pnpm check

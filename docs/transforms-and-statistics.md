@@ -1,0 +1,80 @@
+# Transforms and statistics
+
+Both derive rows from the data before drawing. A **transform** reshapes the rows themselves (stack, bin, smooth, sort, filter). A **statistic** computes a summary of the data (regression, moving average, density) and draws it as an extra mark.
+
+## Transforms
+
+`transforms` is an array of flat objects: `type` picks the transform and the other fields are its channels and options, named as in [svelteplot's transforms](https://svelteplot.dev). It exists on a plot (it then runs once over all the plot's series) and on each [marker](markers.md) (over the marker's rows).
+
+```svelte
+<!-- stacked bars -->
+<BarPlot {width} {height} data={rows} x="province" y="value" color="sex" transforms={[{ type: 'stackY' }]} />
+
+<!-- a 6-month moving average, run on the plot's rows -->
+<LinePlot
+	{width}
+	{height}
+	data={rows}
+	x="date"
+	y="index"
+	color="division"
+	transforms={[{ type: 'windowY', k: 6, reduce: 'mean' }]}
+/>
+```
+
+![Stacked bars](images/transforms-stack.png)
+
+![Lines smoothed by a moving average](images/transforms-window.png)
+
+| Family | `type` | Does |
+| --- | --- | --- |
+| Stack | `stackX`, `stackY`, `stackMosaicX`, `stackMosaicY` | Cumulative stacking. Options: `offset` (`'none'`, `'wiggle'`, `'center'`, `'normalize'`, `'diverging'`), `order`, `reverse` |
+| Bin | `binX`, `binY`, `bin` | Count or reduce rows into bins. Options: `thresholds` (a count, a list, or `'auto'`, `'scott'`, `'sturges'`, `'freedman-diaconis'`), `interval`, `domain`, `cumulative`; reducers by channel (`y: 'count'`, `fill: 'mean'`, ...) |
+| Group | `groupX`, `groupY`, `groupZ`, `group` | Reduce rows per category with named reducers (`count`, `sum`, `mean`, `p25`, ...) or functions |
+| Window | `windowX`, `windowY` | Sliding window: `k` (size), `reduce` (`'mean'`, `'median'`, `'sum'`, `'max'`, ...), `anchor`, `strict` |
+| Bollinger | `bollingerX`, `bollingerY` | Moving average and band: `n`, `k` |
+| Normalize | `normalizeX`, `normalizeY`, `normalizeParallelX`, `normalizeParallelY` | Rebase to a reference: `basis` (`'first'`, `'last'`, `'min'`, `'max'`, `'mean'`, `'median'`, `'sum'`, `'deviation'`) |
+| Map | `mapX`, `mapY` | `map`: `'cumsum'`, `'rank'`, `'quantile'` or a function |
+| Interval | `intervalX`, `intervalY` | Turn a value into an `[x1, x2]` interval of a given size |
+| Jitter | `jitterX`, `jitterY` | Random offset: `width`, `std`, `distribution` (`'uniform'`, `'normal'`), `seed` |
+| Shift | `shiftX`, `shiftY` | Move by `by` (a number, or a string offset) |
+| Density | `densityX`, `densityY` | Kernel density estimate: `kernel`, `bandwidth` |
+| Sort | `sort`, `shuffle`, `reverse` | Reorder rows (matters for the path a line takes and which dot lands on top) |
+| Filter | `filter` | Keep rows a test holds for |
+| Select | `select`, `selectFirst`, `selectLast`, `selectMinX`, `selectMaxX`, `selectMinY`, `selectMaxY` | Keep one row per group, such as each series' last point or peak |
+
+Bar stacking is always `stackY`, also for horizontal bars. A transform on a `HistogramPlot` is merged over the plot's default binning, so `{ type: 'binX', thresholds: 20 }` changes the bins and the rest stays.
+
+## Statistics
+
+`statistics` is an array of derived summaries drawn as extra marks. On a plot it computes one per series by default; on a marker it applies to that marker's own rows.
+
+```svelte
+<ScatterPlot
+	{width}
+	{height}
+	data={rows}
+	x="gdp"
+	y="life"
+	statistics={[{ type: 'regression', regressionType: 'linear', confidence: 0.95 }]}
+/>
+```
+
+![A scatter plot with a regression line and confidence band](images/statistics-regression.png)
+
+| `type` | Draws | Options |
+| --- | --- | --- |
+| `regression` | A fitted curve with a confidence band | `regressionType` (`'linear'`, `'quad'`, `'poly'`, `'exp'`, `'log'`, `'pow'`, `'loess'`), `order`, `base`, `span`, `confidence` (`false` omits the band), `styles` |
+| `movingAverage` | A smoothed line | `k` (required), `reduce`, `styles` |
+| `bollinger` | Moving average and a band of `k` standard deviations | `n`, `k`, `styles` |
+| `density` | A 1D density curve over `x` | `kernel`, `bandwidth`, `styles` |
+| `density2d` | 2D density contour bands | `bandwidth`, `thresholds`, `styles` |
+| `box` | A box plot per category | the options of the [`box` marker](markers.md) |
+
+Which series a statistic runs over:
+
+- omitted: one statistic per series;
+- `series: ['a', 'b']`: only the named series;
+- `pooled: true`: one statistic over all series combined.
+
+The same summaries are available as markers (`regression`, `bollinger`, `density`, `box`, ...) when more control over the mark is needed.

@@ -1,0 +1,114 @@
+# @fundar/data-chart-telling - guide for LLMs and coding agents
+
+Svelte 5 plot components on top of svelteplot. This file is checked against the source; the runnable files in `examples/` are type-checked and mounted by the test suite, and `docs/` has one page per topic. If this text and `dist/**/*.d.ts` differ, the types are right - tell the user.
+
+## Setup
+
+- Peer dependencies: `svelte@^5`, `svelteplot@^0.14`; `topojson-client` only for GeoPlot with TopoJSON.
+- The package ships Svelte components, so the app builds with `@sveltejs/vite-plugin-svelte` or SvelteKit.
+- Import from the package root: `import { LinePlot } from '@fundar/data-chart-telling'`.
+- Types ship with the package (`dist/index.d.ts`, JSDoc on every config field).
+
+## The mental model
+
+- A **plot** is one graph (axes + marks). Titles, subtitle, caption, legend, facets and a timeline are props of the plot itself.
+- Plots: `LinePlot AreaPlot BarPlot HistogramPlot HeatmapPlot PyramidPlot ScatterPlot GeoPlot`.
+- `PlotComposer` lays several plots out in one figure with shared hover, legend and timeline.
+- `width` and `height` are pixel numbers on a standalone plot. To fill a container or the window, bind its size (`examples/ResponsiveLine.svelte`) and render the plot once both are > 0.
+
+## Data
+
+Two ways to give data, one per plot:
+
+```svelte
+<LinePlot data={rows} x="year" y="value" color="region" {width} {height} />
+<LinePlot series={[{ name: 'North', x: 'year', y: 'value', data: rowsNorth }]} {width} {height} />
+```
+
+- `x`, `y`, `color`, `grouping`, `opacity`, `symbol`, `r`, `length` take a field name or an accessor function.
+- `grouping` splits `data` into series. When unset, `color` groups too, so the usual call is `color="region"`: one series per region, each with its own color.
+- Dates are `Date` objects (UTC midnight avoids timezone shifts); numeric years are numbers.
+- Rows are parsed, typed and sorted by the app before they reach the plot (a `?raw` CSV import plus a small parser is enough).
+- A series' name is what the legend, value labels and tooltip show: name values in the data.
+
+## Props of every x/y plot
+
+| Prop | Purpose |
+| --- | --- |
+| `title` `subtitle` `caption` | Text chrome. `header` / `footer` snippets replace title+subtitle / caption. |
+| `legend` | unset/`true`: automatic legend; `false`: none; `{ series: { interactive: { enabled: true, disabled: { mode: 'omit' } } } }` adjusts a section. |
+| `order` | Chrome blocks top to bottom, e.g. `['title','subtitle','legend','plot','caption']`; rows as `'(plot, timeline)'`; `'divider'` between blocks. |
+| `scales` | Per channel: `{ x: { label, tickFormat, domain, type, ticks, grid }, y: {...}, color: { scheme, domain } }`. |
+| `styles` | `{ values: {...}, frame: true, gaps: {...} }` (shape depends on the kind). |
+| `segments` | Style ranges of the data (rule 1 below). |
+| `markers` | Extra marks, an array of `{ type: '...', ... }`. |
+| `margins` | `{ top, right, bottom, left }`, each a number or `'auto'` (all `'auto'` by default). |
+| `tooltip` | `true` or `{ strategy, sync, format, content, series, anchorX, anchorY }`. |
+| `timeline` | `{ accessor: 'year' }` steps through the rows by a field, drawn as a player bar (default); `type: 'rule'` draws a rule beside the plot instead. |
+| `facet` | `{ by: 'field', columns, gap, scales: 'shared'\|'free', mode: 'grid'\|'carousel'\|'paginated' }` or `{ rows, cols }`. |
+| `transforms` `statistics` | svelteplot transforms / derived summaries (regression, movingAverage, ...). |
+
+Per kind: `BarPlot` x = category, y = value (swap for horizontal bars); `PyramidPlot` mirrors two series around zero; `HeatmapPlot` colors cells by `color`; `HistogramPlot` bins one numeric field; `ScatterPlot` takes `r` (size) and `symbol`; `GeoPlot` takes GeoJSON/TopoJSON in `data` and `coordinates` for the projection (`docs/geo.md`).
+
+## Switches
+
+- **Hover and tooltip** are enabled by `tooltip` and/or a hover marker. The usual look: `tooltip={true} markers={[{ type: 'hover' }]}`. `tooltip.strategy` is `'x' | 'y' | 'punctual' | 'series'`.
+- **Value labels**: `styles={{ values: { show: true } }}`. On a LinePlot they sit at the end of each series, spread apart automatically, and the right margin grows to fit them (keep `margins.right` at `'auto'`). Format with `values.format: (value, seriesName) => string`; style with `values.fontStyle`.
+- **Toggling series from the legend**: `interactive.enabled` on the series section.
+- **A frame** around the plot area: `styles={{ frame: true }}`.
+
+## Rules that matter
+
+1. `segments` is an object keyed by series name or `'default'`: `{ default: [{ areas: [{ x: { from, to } }], styles: { stroke: { strokeDasharray: '6 4' } } }] }`. A segment without `areas` is a baseline for everything; area-specific segments override it.
+2. The global configuration holds data (`setConfiguration(...)` is cloned); functions go in plot props such as `format` and `tickFormat`.
+3. A continuous color ramp is `scales.color.scheme: [colorA, colorB]` (or a named ramp such as `'blues'`); categorical colors come from `palette` or a `scheme` record.
+4. `margins` at `'auto'` (the default) fit value labels and long tick text from the measured text, also when `scales.y.domain` is pinned. A fixed number sets the side exactly.
+5. `tooltip.sync: true` in a `facet` or `PlotComposer` shows the highlight in every panel: that is how panels compare the same x.
+6. On a BarPlot the tooltip triggers anywhere over a bar's whole band (and its series' slice, when grouped).
+7. `r` takes raw values and its sqrt scale makes area follow the value; tune with `scales.r.range`. A literal number is a fixed pixel radius.
+8. Narrow plots with long category or series names: shorten the text in the data, format with `tickFormat` / `values.format`, or give `margins` more room.
+9. In Svelte 5 components, `state` is taken by the `$state` rune: name local variables otherwise.
+10. Stacking is `transforms={[{ type: 'stackY' }]}`, also for horizontal bars (the value channel is the one stacked).
+
+## Reading and driving plot state (custom UI)
+
+Inside a plot's snippets (`header`, `footer`, tooltip `content`) or any child of a figure, call during component init:
+
+- `useFigure()` returns `{ hover, legend, timeline }` for the whole figure.
+- `usePlot()` returns the same plus `margins`, `scales`, `axes`, `data`, `width`, `height`, `svelteplot` (inside a plot, e.g. a `component` marker).
+- `legend.off` (names of hidden series), `legend.isOff(name)`, `legend.toggle(name, action)`, `turnOff`, `turnOn`. `action` is `{ mode: 'dim' | 'hide' | 'omit' }`; `'omit'` removes the series and refits the axes, so the visible domain follows `legend.off`.
+- `timeline.steps`, `value`, `progress`, `playing`, `seek(p)`, `seekValue(v)`, `next()`, `previous()`, `play()`, `pause()`, `toggle()`, `setSpeed()`.
+- `hover.activeX`, `activeY`, `activeSeries`, `source`.
+
+The timeline is a player bar by default: `timeline={{ accessor: 'year', player: { controls: ['play','value','slider','speed','loop'], format, autoplay, loop, speed, stepDuration } }}`. `type: 'rule'` draws a guide beside the plot instead, driven by `progress` (a slider or scroll position of your own).
+
+## Markers
+
+Add with `markers={[{ type: '...' }]}`. For x/y plots:
+`area arrow bar bollinger box brush cell component delaunayLink delaunayMesh delta density difference dot hover hull image line raster rect regression rule text tick trail voronoi voronoiMesh waffle`.
+GeoPlot: `graticule sphere dot text vector link contour inset geo-hover geo-component`.
+
+- `delta` annotates the difference between two series at a position: `{ type: 'delta', axis: 'x', at: 2020, from: { type: 'series', series: 'A' }, to: { type: 'series', series: 'B' }, formatDiff: (d) => d.toFixed(1) }`.
+- `rule` (`axis`, `value`), `text` (`text`), `dot` annotate; `component` mounts your own Svelte component inside the plot (it can call `usePlot()`).
+- Each plot kind types its own marker union (`AxisBasedMarkersConfig`, `GeoMarkersConfig`); `satisfies` on a markers array gives completion.
+
+## Theming and locale
+
+- `setConfiguration(partial)` deep-merges global defaults (colors, fonts, spacing, legend, tooltip, timeline); `resetConfiguration()` restores them. Inside an `$effect`, wrap the call in `untrack`.
+- `THEMES` has `Default Editorial Dark Compact`: `setConfiguration(THEMES.Editorial)`.
+- Number and date text follows `axis.locale` (default `'es-AR'`) in the configuration; per axis, `tickFormat: (d) => new Intl.NumberFormat('en-US').format(d)` or an `Intl.*FormatOptions` object.
+
+## Docs (in `docs/`)
+
+`getting-started.md`, `concepts.md`, `plots.md`, `scales.md`, `styles-and-segments.md`, `markers.md`, `transforms-and-statistics.md`, `tooltip-and-hover.md`, `legend.md`, `timeline.md`, `chrome.md`, `facets.md`, `composer.md`, `state.md`, `geo.md`, `theming.md`.
+
+## Examples (in `examples/`, all runnable)
+
+- `ResponsiveLine.svelte` - fill the window, end-of-line labels, axis labels.
+- `Tooltip.svelte` - tooltip + hover marker.
+- `Segments.svelte` - styling a range of the data.
+- `LegendToggle.svelte` + `LegendReader.svelte` - interactive legend and reading its state.
+- `TimelinePlayer.svelte` - animated bar chart with a player.
+- `Facets.svelte` - small multiples with a synced tooltip.
+- `BarValues.svelte` - value labels on bars.
+- `CustomTooltip.svelte` + `TooltipCard.svelte` - a tooltip drawn with your own card (`tooltip.content`).

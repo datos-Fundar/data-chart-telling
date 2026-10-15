@@ -10,7 +10,10 @@ const dirname =
     ? __dirname
     : path.dirname(fileURLToPath(import.meta.url));
 
-const alias = { $lib: path.resolve(dirname, './src/lib') };
+const alias = {
+  $lib: path.resolve(dirname, './src/lib'),
+  '@fundar/data-chart-telling': path.resolve(dirname, './src/lib/index.ts'),
+};
 
 export default defineConfig({
   resolve: { alias },
