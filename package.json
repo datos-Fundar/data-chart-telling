@@ -17,9 +17,6 @@
 		"docs:images": "node scripts/docs-images.mjs",
 		"prepare": "husky"
 	},
-	"lint-staged": {
-		"*.{ts,js,svelte}": "eslint --max-warnings=0"
-	},
 	"files": [
 		"dist",
 		"docs",
@@ -87,7 +84,6 @@
 		"globals": "^17.4.0",
 		"husky": "^9.1.7",
 		"knip": "^6.32.1",
-		"lint-staged": "^17.6.0",
 		"playwright": "^1.64.0",
 		"prettier": "^3.8.1",
 		"prettier-plugin-svelte": "^3.5.1",

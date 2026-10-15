@@ -8,7 +8,6 @@ import ChromeDividerStyleSource from './ChromeDividerStyle.svelte?raw';
 import ChromeComposerSource from './ChromeComposer.svelte?raw';
 import { demoSource } from '../../common/docsSource';
 import { TIME_SERIES } from '../../data/time-series';
-import type { LegendSection } from '$lib/types/layout/legend';
 
 /**
  * What's drawn around a plot: `title`, `subtitle`, `caption`, a `legend`,

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import type { GeoScalesConfig, CoordinatesConfig } from '$lib/types/layout/coordinates';
-import { WORLD_COUNTRIES, type WorldCountryProps } from './data';
+import { WORLD_COUNTRIES } from './data';
 import { countryPopulation } from './channels';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────

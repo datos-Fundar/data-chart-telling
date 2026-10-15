@@ -17,7 +17,6 @@ import type {
 	LegendSource,
 	LegendRange,
 	LegendSection,
-	MarkLegend,
 	SizeLegendSection,
 	SymbolLegendSection
 } from '$lib/types/layout/legend';

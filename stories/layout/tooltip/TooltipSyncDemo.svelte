@@ -25,7 +25,6 @@
 	const defaultStrategy: HoverStrategy =
 		kind === 'heatmap' ? 'punctual' : kind === 'pyramid' ? 'y' : 'x';
 
-	// svelte-ignore state_referenced_locally
 	let strategy = $state<HoverStrategy>(defaultStrategy);
 	let sync = $state(true);
 

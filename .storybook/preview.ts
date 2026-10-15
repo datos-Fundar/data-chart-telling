@@ -29,7 +29,9 @@ const preview: Preview = {
 			source: {
 				type: 'dynamic',
 				// Overridable per-story via `parameters.docs.source.code` - see `renderSource`.
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				transform: (_src: string, ctx: any) => {
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 					const c = ctx.component as any;
 					const name =
 						ctx.parameters?.docs?.source?.name ||
