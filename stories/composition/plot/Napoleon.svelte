@@ -124,7 +124,7 @@
 			subtitle="Plain svelteplot inside the plots' own chrome"
 			data={steppedTroops}
 			{legend}
-			timeline={{ accessor: 'step', progress, filterMode: 'upTo', orientation: 'horizontal' }}
+			timeline={{ accessor: 'step', type: 'rule', progress, filterMode: 'upTo', orientation: 'horizontal' }}
 		>
 			{#snippet footer()}
 				<span>

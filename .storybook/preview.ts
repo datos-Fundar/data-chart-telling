@@ -197,7 +197,7 @@ const preview: Preview = {
 						['Automatic', 'Discrete', 'Continuous', 'Composition', 'Interactive', 'Paginated'],
 						'Statistics',
 						'Timeline',
-						['Rule', 'Player'],
+						['Player', 'Rule'],
 						'Tooltip',
 						['Basics', 'MultiSeries', 'Customization', 'FacetSync'],
 					],

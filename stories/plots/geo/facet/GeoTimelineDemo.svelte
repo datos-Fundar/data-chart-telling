@@ -60,7 +60,7 @@
 					styles: { dotFill: '#dc2626' }
 				}
 			]}
-			timeline={{ accessor: 'year', progress, orientation: 'horizontal' }}
+			timeline={{ accessor: 'year', type: 'rule', progress, orientation: 'horizontal' }}
 		/>
 	{/snippet}
 </Scrubber>

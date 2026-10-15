@@ -30,7 +30,7 @@ export type ComposerTags = 'A' | 'a' | '1' | 'I' | 'i' | string[];
 export type ComposerTimelineConfig = TimelineCallbacks & {
 	progress?: number;
 	values: TimeValue[];
-	/** How it draws. Defaults to `'rule'`. */
+	/** How it draws. Defaults to `'player'`. */
 	type?: TimelineType;
 	/** The player bar's own options, when `type` is `'player'`. */
 	player?: PlayerConfig;

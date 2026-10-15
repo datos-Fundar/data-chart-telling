@@ -39,7 +39,7 @@
 		y="value"
 		color="region"
 		{scales}
-		timeline={{ accessor: 'year', filterMode: 'upTo', progress: 0.5 }}
+		timeline={{ accessor: 'year', type: 'rule', filterMode: 'upTo', progress: 0.5 }}
 	/>
 	<LinePlot
 		width={760}
@@ -50,6 +50,6 @@
 		y="value"
 		color="region"
 		{scales}
-		timeline={{ accessor: 'year', filterMode: 'upTo', progress: 0.5, orientation: 'horizontal' }}
+		timeline={{ accessor: 'year', type: 'rule', filterMode: 'upTo', progress: 0.5, orientation: 'horizontal' }}
 	/>
 </div>

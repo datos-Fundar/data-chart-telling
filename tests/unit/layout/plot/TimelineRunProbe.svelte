@@ -9,11 +9,11 @@
 	/** A faceted line plot whose only changing prop is its timeline's `progress`. */
 	let { progress, onDataRun }: { progress: number; onDataRun: () => void } = $props();
 
-	const data = ['Norte', 'Sur', 'Cuyo'].flatMap((region, r) =>
-		[2021, 2022, 2023].map((anio, a) => ({ anio, region, valor: 3 + r * 7 + a }))
+	const data = ['North', 'South', 'Center'].flatMap((region, r) =>
+		[2021, 2022, 2023].map((year, a) => ({ year, region, value: 3 + r * 7 + a }))
 	);
 	type Row = Record<string, unknown>;
-	const core = { data, width: 720, height: 360, x: 'anio', y: 'valor' } as const;
+	const core = { data, width: 720, height: 360, x: 'year', y: 'value' } as const;
 	const facet: FacetConfig<Row> = { by: 'region' };
 
 	// The line kind's pipeline, counting its data runs.
@@ -26,7 +26,7 @@
 		};
 		return pipeline;
 	}
-	const timeline = $derived<TimelineConfig<Row>>({ accessor: 'anio', progress });
+	const timeline = $derived<TimelineConfig<Row>>({ accessor: 'year', type: 'rule', progress });
 </script>
 
 <Plot Core={LineCore} {core} {defaults} {facet} {timeline} />

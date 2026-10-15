@@ -10,11 +10,12 @@ import RuleStyleDemoSource from './RuleStyleDemo.svelte?raw';
 import { demoSource } from '../../common/docsSource';
 
 /**
- * The default timeline: a rule beside the plot - a line with the steps written
- * along it and the current one emphasised. A plot's `timeline` slices its rows
+ * `type: 'rule'` draws the timeline as a rule beside the plot - a line with the
+ * steps written along it and the current one emphasised. A plot's `timeline` slices its rows
  * by `accessor` and follows `progress` (`0`-`1`) across the steps; `orientation`
  * says which way the rule runs, `thickness` how much room it takes, and `show`
- * hides it. For a bar with play, pause and a slider, see `Layout/Timeline/Player`.
+ * hides it. The default timeline is the player, a bar with play, pause and a
+ * slider: see `Layout/Timeline/Player`.
  */
 const meta = {
   title: 'Layout/Timeline/Rule',
@@ -25,7 +26,7 @@ const meta = {
 export default meta;
 
 /**
- * A vertical rule - the default for plots that are wider than tall. It sits to
+ * A vertical rule - the rule's default orientation, suited to plots that are wider than tall. It sits to
  * the right of the plot: a vertical timeline is the same as putting
  * `'(plot, timeline)'` in the chrome's `order`, which it configures for you.
  */

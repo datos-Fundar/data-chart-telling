@@ -14,10 +14,10 @@ import PlayerStyleDemoSource from './PlayerStyleDemo.svelte?raw';
 import { demoSource } from '../../common/docsSource';
 
 /**
- * A timeline draws as a `'rule'` beside the plot (the default: a line with its
- * steps written along it) or as a `'player'`: a bar in the figure's chrome
+ * A timeline draws as a `'player'` (the default): a bar in the figure's chrome
  * with play and pause, the current step, a slider, and optionally a speed and a
- * loop button.
+ * loop button. `type: 'rule'` draws it as a rule beside the plot instead: see
+ * `Layout/Timeline/Rule`.
  *
  * A player keeps its own position, starting from the timeline's `progress`
  * and telling `onprogress` as it moves; setting `progress` again takes it

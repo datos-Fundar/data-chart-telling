@@ -10,8 +10,8 @@
 </script>
 
 <!--
-	`timeline` slices the plot's rows by `accessor` and draws a rule in the
-	chrome: `progress` (0-1) picks the step, `orientation` says which way it
+	`type: 'rule'` draws the timeline as a rule in the chrome, slicing the
+	plot's rows by `accessor`: `progress` (0-1) picks the step, `orientation` says which way it
 	runs - and, vertical, that it sits beside the plot, as `order`'s
 	'(plot, timeline)' would. An `order` of your own places it instead.
 -->
@@ -24,5 +24,5 @@
 	y="value"
 	scales={{ y: { domain: [0, 100] } }}
 	{order}
-	timeline={{ accessor: 'year', progress: 0.5, orientation }}
+	timeline={{ accessor: 'year', type: 'rule', progress: 0.5, orientation }}
 />

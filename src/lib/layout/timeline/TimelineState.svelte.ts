@@ -69,7 +69,7 @@ export class TimelineState {
 	}
 
 	get type(): TimelineType {
-		return this.#settings()?.type ?? 'rule';
+		return this.#settings()?.type ?? 'player';
 	}
 
 	/** Which way a `'rule'` runs; a `'player'` is always horizontal. */

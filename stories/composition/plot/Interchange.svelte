@@ -34,7 +34,7 @@
 				x="rooms"
 				y="people"
 				color="pct"
-				timeline={{ accessor: 'year', progress, orientation: 'vertical' }}
+				timeline={{ accessor: 'year', type: 'rule', progress, orientation: 'vertical' }}
 				scales={{ x: { label: 'Rooms' }, y: { label: 'People' } }}
 				styles={{ values: { format: (v) => `${(v * 100).toFixed(0)}%` } }}
 			/>
@@ -48,7 +48,7 @@
 				x="year"
 				y="value"
 				color="metric"
-				timeline={{ accessor: 'year', progress, orientation: 'vertical' }}
+				timeline={{ accessor: 'year', type: 'rule', progress, orientation: 'vertical' }}
 				facet={{ by: 'metric' as keyof SeriesPoint, columns: 2 }}
 			/>
 		{:else}
@@ -60,7 +60,7 @@
 				data={northSeries}
 				x="year"
 				y="value"
-				timeline={{ accessor: 'year', progress, orientation: 'vertical', filterMode: 'upTo' }}
+				timeline={{ accessor: 'year', type: 'rule', progress, orientation: 'vertical', filterMode: 'upTo' }}
 				facet={{ by: 'metric' as keyof SeriesPoint, columns: 2 }}
 			/>
 		{/if}

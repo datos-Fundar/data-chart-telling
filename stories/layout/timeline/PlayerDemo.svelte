@@ -4,8 +4,8 @@
 </script>
 
 <!--
-	`type: 'player'` draws the timeline as a bar in the chrome, below the plot
-	by default: play and pause, the current step and a slider.
+	A timeline is a player unless `type` says otherwise: a bar in the chrome,
+	below the plot by default, with play and pause, the current step and a slider.
 -->
 <BarPlot
 	width={760}
@@ -15,5 +15,5 @@
 	x="region"
 	y="value"
 	scales={{ y: { domain: [0, 100] } }}
-	timeline={{ accessor: 'year', type: 'player' }}
+	timeline={{ accessor: 'year' }}
 />

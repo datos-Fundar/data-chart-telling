@@ -15,7 +15,7 @@
 			height={440}
 			title="One scrubber, two plots"
 			subtitle="Each panel's timeline only names its own time field"
-			timeline={{ progress, values: YEARS, orientation: 'horizontal' }}
+			timeline={{ type: 'rule', progress, values: YEARS, orientation: 'horizontal' }}
 			layout={{ columns: 2, widths: [3, 2] }}
 		>
 			<LinePlot

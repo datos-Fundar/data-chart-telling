@@ -135,7 +135,7 @@ describe('FigureChrome - order', () => {
 	});
 
 	test('a vertical rule timeline sits beside the plot, as `(plot, timeline)` would', async () => {
-		const timeline = { accessor: 'year', progress: 0.5, orientation: 'vertical' };
+		const timeline = { accessor: 'year', type: 'rule', progress: 0.5, orientation: 'vertical' };
 		expect(await blocks({ title: 'T', timeline })).toEqual([
 			'heading:title',
 			'divider',
@@ -149,7 +149,7 @@ describe('FigureChrome - order', () => {
 	});
 
 	test('a row of `order` that places the vertical timeline wins', async () => {
-		const timeline = { accessor: 'year', progress: 0.5, orientation: 'vertical' };
+		const timeline = { accessor: 'year', type: 'rule', progress: 0.5, orientation: 'vertical' };
 		expect(await blocks({ title: 'T', timeline, order: ['title', '(timeline, plot)'] })).toEqual([
 			'heading:title',
 			'row(timeline, plot)'
@@ -157,7 +157,7 @@ describe('FigureChrome - order', () => {
 	});
 
 	test('a horizontal rule timeline is the `timeline` block, wherever `order` puts it', async () => {
-		const timeline = { accessor: 'year', progress: 0.5, orientation: 'horizontal' };
+		const timeline = { accessor: 'year', type: 'rule', progress: 0.5, orientation: 'horizontal' };
 		expect(await blocks({ title: 'T', timeline })).toEqual([
 			'heading:title',
 			'divider',
@@ -179,7 +179,7 @@ describe('FigureChrome - a rule timeline', () => {
 			data: DATA,
 			x: 'year',
 			y: 'value',
-			timeline: { accessor: 'year', progress: 0.5, orientation }
+			timeline: { accessor: 'year', type: 'rule', progress: 0.5, orientation }
 		});
 		const root = container.querySelector('.dct-figure-chrome')!;
 		await vi.waitFor(() => expect(root.querySelector('.dct-timeline-rule svg')).toBeTruthy());

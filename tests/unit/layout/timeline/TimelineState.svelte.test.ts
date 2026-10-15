@@ -9,6 +9,13 @@ function make(settings: Partial<TimelineSettings> = {}) {
 	return { state, set: (next: Partial<TimelineSettings>) => (current = { ...current, ...next }) };
 }
 
+describe('TimelineState - how it draws', () => {
+	test('is a player unless its owner asks for a rule', () => {
+		expect(make().state.type).toBe('player');
+		expect(make({ type: 'rule' }).state.type).toBe('rule');
+	});
+});
+
 describe('TimelineState - where it is', () => {
 	test("follows the owner's progress, and lands on the step it is at", () => {
 		const { state, set } = make({ progress: 0.5 });

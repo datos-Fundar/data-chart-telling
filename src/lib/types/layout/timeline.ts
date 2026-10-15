@@ -24,7 +24,7 @@ export type TimelineInterpolation<TRow extends Record<string, unknown>> = {
   segmentEasing?: EasingName | EasingFn;
 };
 
-/** How a timeline draws: a `'rule'` beside the plot, or a `'player'` bar in the chrome. */
+/** How a timeline draws: a `'player'` bar in the chrome (the default), or a `'rule'` beside the plot. */
 export type TimelineType = 'rule' | 'player';
 
 /** A piece of the player bar. */
@@ -65,7 +65,7 @@ export type TimelineCallbacks = {
 
 export type TimelineConfig<TRow extends Record<string, unknown>> = TimelineCallbacks & {
   accessor: Accessor<TRow, TimeValue>;
-  /** How it draws. Defaults to `'rule'`. */
+  /** How it draws. Defaults to `'player'`. */
   type?: TimelineType;
   /** The player bar's own options, when `type` is `'player'`. */
   player?: PlayerConfig;

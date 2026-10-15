@@ -14,15 +14,15 @@ import type { FacetConfig } from '$lib/types/layout/facet';
 
 const [LineCore, AreaCore, BarCore, ScatterCore, HistogramCore, HeatmapCore, PyramidCore] = Array(7).fill(GenericCore);
 
-type Row = { anio: number; region: string; sector: string; valor: number };
+type Row = { year: number; region: string; sector: string; value: number };
 
-const ROWS: Row[] = ['Norte', 'Sur', 'Cuyo'].flatMap((region, r) =>
-	['Agro', 'Industria'].flatMap((sector, s) =>
-		[2021, 2022, 2023].map((anio, a) => ({
-			anio,
+const ROWS: Row[] = ['North', 'South', 'Center'].flatMap((region, r) =>
+	['Agriculture', 'Industry'].flatMap((sector, s) =>
+		[2021, 2022, 2023].map((year, a) => ({
+			year,
 			region,
 			sector,
-			valor: 3 + r * 7 + s * 4 + a * (r + 1)
+			value: 3 + r * 7 + s * 4 + a * (r + 1)
 		}))
 	)
 );
@@ -45,8 +45,8 @@ const CASES: Case[] = [
 		buildDefaults: buildLineDefaults,
 		core: {
 			...BOX,
-			x: 'anio',
-			y: 'valor',
+			x: 'year',
+			y: 'value',
 			color: 'sector',
 			statistics: [{ type: 'movingAverage', k: 2 }],
 			styles: { values: { show: true } }
@@ -56,7 +56,7 @@ const CASES: Case[] = [
 		name: 'stacked area',
 		Core: AreaCore,
 		buildDefaults: buildAreaDefaults,
-		core: { ...BOX, x: 'anio', y: 'valor', color: 'sector', transforms: [{ type: 'stackY' }] }
+		core: { ...BOX, x: 'year', y: 'value', color: 'sector', transforms: [{ type: 'stackY' }] }
 	},
 	{
 		name: 'stacked bar with value labels',
@@ -64,8 +64,8 @@ const CASES: Case[] = [
 		buildDefaults: buildBarDefaults,
 		core: {
 			...BOX,
-			x: 'anio',
-			y: 'valor',
+			x: 'year',
+			y: 'value',
 			color: 'sector',
 			transforms: [{ type: 'stackY' }],
 			styles: { values: { show: true } }
@@ -75,7 +75,7 @@ const CASES: Case[] = [
 		name: 'grouped bar',
 		Core: BarCore,
 		buildDefaults: buildBarDefaults,
-		core: { ...BOX, x: 'anio', y: 'valor', color: 'sector' }
+		core: { ...BOX, x: 'year', y: 'value', color: 'sector' }
 	},
 	{
 		name: 'scatter with an author marker',
@@ -83,8 +83,8 @@ const CASES: Case[] = [
 		buildDefaults: buildScatterDefaults,
 		core: {
 			...BOX,
-			x: 'anio',
-			y: 'valor',
+			x: 'year',
+			y: 'value',
 			color: 'sector',
 			markers: [{ type: 'dot', transforms: [{ type: 'selectLast' }], styles: { r: 6 } }]
 		}
@@ -93,25 +93,25 @@ const CASES: Case[] = [
 		name: 'histogram',
 		Core: HistogramCore,
 		buildDefaults: buildHistogramDefaults,
-		core: { ...BOX, x: 'valor', color: 'sector' }
+		core: { ...BOX, x: 'value', color: 'sector' }
 	},
 	{
 		name: 'heatmap',
 		Core: HeatmapCore,
 		buildDefaults: buildHeatmapDefaults,
-		core: { ...BOX, x: 'anio', y: 'sector', color: 'valor' }
+		core: { ...BOX, x: 'year', y: 'sector', color: 'value' }
 	},
 	{
 		name: 'pyramid',
 		Core: PyramidCore,
 		buildDefaults: buildPyramidDefaults,
-		core: { ...BOX, x: 'valor', y: 'anio', color: 'sector' }
+		core: { ...BOX, x: 'value', y: 'year', color: 'sector' }
 	}
 ];
 
 const FACETS: [string, FacetConfig<Row>][] = [
 	['by region', { by: 'region' }],
-	['rows x cols, free', { rows: 'region', cols: 'anio', scales: 'free' }]
+	['rows x cols, free', { rows: 'region', cols: 'year', scales: 'free' }]
 ];
 
 /** The rendered SVGs, with generated ids left out. */
@@ -185,7 +185,7 @@ describe('Plot - a series keeps its color in every facet panel', () => {
 
 	test('a panel with only one series draws it in its own color, not the first one', async () => {
 		const facet: FacetConfig<Row> = { rows: 'region', cols: 'sector' };
-		const core = { ...BOX, x: 'anio', y: 'valor', color: 'sector' };
+		const core = { ...BOX, x: 'year', y: 'value', color: 'sector' };
 		const props = { Core: LineCore, core, buildDefaults: buildLineDefaults, facet };
 
 		const once = await render(PanelRunProbe, { ...props, once: true });
@@ -197,7 +197,7 @@ describe('Plot - a series keeps its color in every facet panel', () => {
 		const perFacetStrokes = strokes(perFacet.container);
 		perFacet.unmount();
 
-		// Panels go row by row: Norte/Agro, Norte/Industria, Sur/Agro, ...
+		// Panels go row by row: North/Agriculture, North/Industry, South/Agriculture, ...
 		const agro = onceStrokes[0][0];
 		const industria = onceStrokes[1][0];
 		expect(agro).not.toBe(industria);
@@ -234,8 +234,8 @@ describe('Plot - data runs with a legend', () => {
 			type: 'discrete',
 			interactive: { enabled: true, disabled: { mode, style: { opacity: 0.1 } } },
 			items: [
-				{ name: 'Agro', symbol: 'line' },
-				{ name: 'Industria', symbol: 'line' }
+				{ name: 'Agriculture', symbol: 'line' },
+				{ name: 'Industry', symbol: 'line' }
 			]
 		}
 	];
@@ -253,7 +253,7 @@ describe('Plot - data runs with a legend', () => {
 	async function renderWith(mode: 'dim' | 'omit', count: { runs: number }) {
 		const view = await render(PanelRunProbe, {
 			Core: LineCore,
-			core: { ...BOX, x: 'anio', y: 'valor', color: 'sector' },
+			core: { ...BOX, x: 'year', y: 'value', color: 'sector' },
 			buildDefaults: buildLineDefaults,
 			facet: { by: 'region' },
 			once: true,
@@ -268,7 +268,7 @@ describe('Plot - data runs with a legend', () => {
 		const count = { runs: 0 };
 		const view = await renderWith('dim', count);
 		expect(count.runs).toBe(1);
-		toggle(view.container, 'Industria');
+		toggle(view.container, 'Industry');
 		await vi.waitFor(() => {
 			for (const lines of linesPerPanel(view.container)) {
 				expect(lines.map((p) => p.style.strokeOpacity)).toEqual(['1', '0.1']);
@@ -281,7 +281,7 @@ describe('Plot - data runs with a legend', () => {
 	test('omitting a series runs the data phases once more, for every panel', async () => {
 		const count = { runs: 0 };
 		const view = await renderWith('omit', count);
-		toggle(view.container, 'Industria');
+		toggle(view.container, 'Industry');
 		await vi.waitFor(() =>
 			expect(linesPerPanel(view.container).map((l) => l.length)).toEqual([1, 1, 1])
 		);
