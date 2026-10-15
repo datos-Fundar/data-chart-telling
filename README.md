@@ -100,3 +100,7 @@ Working examples live in [examples/](examples/); the Storybook (`pnpm storybook`
 ## For LLMs and coding agents
 
 [llms.txt](llms.txt) is the index and [llms-full.txt](llms-full.txt) is a single-file guide with the rules that matter most. Both ship inside the npm package, next to the runnable [examples/](examples/).
+
+## License
+
+[MIT](LICENSE). Keep the copyright notice and license text in copies of the code.
