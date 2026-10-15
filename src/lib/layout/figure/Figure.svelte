@@ -2,6 +2,8 @@
 	import FigureChrome from '$lib/layout/figure/FigureChrome.svelte';
 	import GridCell from '$lib/layout/grid/GridCell.svelte';
 	import LegendLayout from '$lib/layout/legend/LegendLayout.svelte';
+	import TimelinePlayer from '$lib/layout/timeline/TimelinePlayer.svelte';
+	import { TimelineState } from '$lib/layout/timeline/TimelineState.svelte';
 	import { GridCellsRegistry } from '$lib/layout/grid/GridCellsRegistry.svelte';
 	import {
 		getConfiguration,
@@ -25,6 +27,8 @@
 	 * caption...) around `body`, which gets the box that's left - or `body`
 	 * alone in a themed box when there's no chrome.
 	 *
+	 * Its timeline, when it is a player bar, is the chrome's `timeline` block.
+	 *
 	 * Its legend: unset or `true`, the one its plots read as - what they
 	 * register on its `LegendState`; `false`, none; a list of sections,
 	 * exactly those; `{ items, sections, series, color... }`, the automatic one
@@ -45,11 +49,14 @@
 		order,
 		hoverStrategy,
 		hoverSync,
+		timelineState,
 		body
 	}: PlotChromeConfig &
 		FigureBoxProps & {
 			hoverStrategy: HoverStrategy;
 			hoverSync: boolean;
+			/** The figure's timeline, made and watched by its plot or composer: shared with everything inside, and drawn here as a player bar when it is one. */
+			timelineState?: TimelineState | null;
 			body: PlotBoxSnippet;
 		} = $props();
 
@@ -62,6 +69,16 @@
 		ownHover.strategy = hoverStrategy;
 		ownHover.sync = hoverSync;
 	});
+
+	// svelte-ignore state_referenced_locally
+	if (timelineState) TimelineState.provide(timelineState);
+	const playerShown = $derived(
+		!!timelineState &&
+			timelineState.enabled &&
+			timelineState.type === 'player' &&
+			timelineState.shown &&
+			timelineState.controls.length > 0
+	);
 
 	// Read once at setup: a figure that shows a legend of its own scopes its toggles - and what its plots register - to itself.
 	const outer = LegendState.current();
@@ -97,6 +114,7 @@
 	 */
 	const hasChrome = $derived(
 		Boolean(title || subtitle || caption || header || footer) ||
+			playerShown ||
 			legendMode === 'auto' ||
 			(legendMode === 'explicit' && sections.length > 0)
 	);
@@ -104,6 +122,12 @@
 
 {#snippet legendSnippet()}
 	<LegendLayout {sections} />
+{/snippet}
+
+{#snippet playerSnippet()}
+	{#if timelineState && timelineState.steps.length > 1}
+		<TimelinePlayer timeline={timelineState} />
+	{/if}
 {/snippet}
 
 {#snippet frame(w: number, h: number)}
@@ -118,11 +142,17 @@
 			{footer}
 			{order}
 			legend={sections.length > 0 ? legendSnippet : undefined}
+			timeline={playerShown ? playerSnippet : undefined}
 			plot={body}
 		/>
 	{:else}
 		<!-- No chrome means no container to stamp the `--dct-*` vars that facet and timeline chrome read. -->
-		<div style={cssVarsStyle(configToCssVars(cfg))} style:width="{w}px" style:height="{h}px">
+		<div
+			style={cssVarsStyle(configToCssVars(cfg))}
+			style:font-family="var(--dct-font, inherit)"
+			style:width="{w}px"
+			style:height="{h}px"
+		>
 			{@render body({ width: w, height: h })}
 		</div>
 	{/if}

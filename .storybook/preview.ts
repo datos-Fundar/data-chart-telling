@@ -10,8 +10,9 @@ const preview: Preview = {
 		data: { control: false }
 	},
 	beforeEach: () => {
-		// `DEFAULT_CONFIG` is an intentional no-op theme; apply the Default
-		// preset so every story shows an opinionated look out of the box. Runs
+		// `DEFAULT_CONFIG` follows the host's fonts and styles, and a Storybook
+		// canvas has none; apply the Default preset (a system sans-serif font)
+		// so every story shows a clean look out of the box. Runs
 		// before each story, so it re-asserts even after a story (e.g. the
 		// Configuration demo) resets or switches the global config.
 		setConfiguration(THEMES.Default);
@@ -196,6 +197,7 @@ const preview: Preview = {
 						['Automatic', 'Discrete', 'Continuous', 'Composition', 'Interactive', 'Paginated'],
 						'Statistics',
 						'Timeline',
+						['Rule', 'Player'],
 						'Tooltip',
 						['Basics', 'MultiSeries', 'Customization', 'FacetSync'],
 					],

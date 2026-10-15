@@ -277,21 +277,36 @@ export type LegendOverride<TSection extends { type: string }, TComputed extends 
 	| (Omit<TSection, 'type' | TComputed> & { match?: string })[];
 
 /**
+ * How to adjust what a `color` channel draws: the continuous section of a
+ * numeric one, or the discrete section of series a categorical one makes. It
+ * takes what both sections share, plus each one's own - what a section lacks
+ * is ignored. `interactive` takes either section's options.
+ */
+export type ColorOverride = Omit<
+	ContinuousLegendSection,
+	'type' | 'min' | 'max' | 'colorMin' | 'colorMax' | 'scheme' | 'pivot' | 'opacity' | 'interactive'
+> &
+	Pick<DiscreteLegendSection, 'layout' | 'navButton'> & {
+		interactive?: ContinuousInteractiveConfig & DiscreteInteractiveConfig;
+		/** Adjusts only the continuous section titled so. */
+		match?: string;
+	};
+
+/**
  * What a figure adds to, or changes in, its automatic legend, keeping what
  * its plots read as: `items` after the plots' own series, in the same
  * section, `sections` after the automatic ones, and one key per channel to
  * adjust the section that channel draws - `series` the discrete section,
- * `color` and `opacity` the continuous ones, `size` and `symbol` theirs.
- * Only `color` can be `interactive`, and only its first ramp is.
+ * `color` and `opacity` the continuous ones, `size` and `symbol` theirs. A
+ * categorical `color` is the series, so `color` adjusts the discrete section
+ * too (`series` wins where both set the same). Only `color` can make a
+ * ramp `interactive`, and only its first ramp is.
  */
 export type LegendExtension = {
 	items?: LegendItem[];
 	sections?: LegendSection[];
 	series?: Omit<DiscreteLegendSection, 'type' | 'items'>;
-	color?: LegendOverride<
-		ContinuousLegendSection,
-		'min' | 'max' | 'colorMin' | 'colorMax' | 'scheme' | 'pivot' | 'opacity'
-	>;
+	color?: ColorOverride | ColorOverride[];
 	opacity?: LegendOverride<
 		ContinuousLegendSection,
 		'min' | 'max' | 'colorMin' | 'colorMax' | 'scheme' | 'pivot' | 'opacity' | 'interactive'

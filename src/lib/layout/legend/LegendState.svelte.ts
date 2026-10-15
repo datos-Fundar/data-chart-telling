@@ -246,6 +246,7 @@ export class LegendState {
 							type: 'discrete',
 							...(title ? { title: cfg.legend.seriesTitle.text } : {}),
 							items,
+							...LegendState.#adjustment(extension?.color, undefined, format),
 							...extension?.series
 						} satisfies DiscreteLegendSection
 					]

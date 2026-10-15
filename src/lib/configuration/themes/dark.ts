@@ -1,7 +1,8 @@
+import { SYSTEM_FONT } from '$lib/configuration/fonts';
 import type { PlotStylesConfigInput } from '$lib/types/configuration/styling';
 
 export const DARK_THEME: PlotStylesConfigInput = {
-	font: 'ui-sans-serif, system-ui, sans-serif',
+	font: SYSTEM_FONT,
 	color: '#e5e7eb',
 	background: '#0f172a',
 	divider: { color: 'color-mix(in srgb, #e5e7eb 18%, transparent)' },

@@ -431,4 +431,16 @@ describe('LegendState - adjusting the automatic sections', () => {
 		const ramps = legend.sections({ color: { interactive: { enabled: true } } }).filter((s) => s.type === 'continuous');
 		expect(ramps.map((s) => (s as { interactive?: { enabled?: boolean } }).interactive?.enabled)).toEqual([true, false]);
 	});
+
+	test('`color` adjusts the series of a categorical color, and `series` wins over it', () => {
+		const legend = new LegendState();
+		legend.register(
+			'p',
+			LegendState.entriesOf({ resolvedSeries: [{ name: 'a' }, { name: 'b' }], colorForSeries: (n) => `c-${n}` })
+		);
+		const [byColor] = legend.sections({ color: { title: 'Group', interactive: { enabled: true } } });
+		expect(byColor).toMatchObject({ type: 'discrete', title: 'Group', interactive: { enabled: true } });
+		const [both] = legend.sections({ color: { title: 'Group' }, series: { title: 'Mine' } });
+		expect(both).toMatchObject({ title: 'Mine' });
+	});
 });

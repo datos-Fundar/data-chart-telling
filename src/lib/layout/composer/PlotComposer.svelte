@@ -2,9 +2,8 @@
 	import Figure from '$lib/layout/figure/Figure.svelte';
 	import Grid from '$lib/layout/grid/Grid.svelte';
 	import TimelineFrame from '$lib/layout/timeline/TimelineFrame.svelte';
-	import { TimelineSteps } from '$lib/layout/timeline/TimelineSteps';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import { SharedTimeline } from '$lib/layout/composer/SharedTimeline';
+	import { TimelineState } from '$lib/layout/timeline/TimelineState.svelte';
 	import type { Snippet } from 'svelte';
 	import type { FigureBoxProps, PlotChromeProps } from '$lib/types/plots/props';
 	import type { PlotBoxContext } from '$lib/types/layout/figure';
@@ -50,19 +49,14 @@
 
 	const cfg = $derived(getConfiguration());
 
-	// svelte-ignore state_referenced_locally
-	if (timeline) {
-		SharedTimeline.provide({
-			progress: () => timeline?.progress ?? 0,
-			values: () => timeline?.values ?? []
-		});
-	}
+	// One timeline for every panel, which the plots below follow instead of their own.
+	const timelineState = new TimelineState(() => timeline);
+	timelineState.watch();
 
 	/** Height of the tag row above every panel, when the composer tags them. */
 	const TAG_H = 24;
 
-	const steps = $derived(new TimelineSteps(timeline?.values ?? []));
-	const selectedValue = $derived(steps.at(timeline?.progress ?? 0));
+	const selectedValue = $derived(timelineState.value);
 </script>
 
 {#snippet grid({ width: w, height: h }: PlotBoxContext)}
@@ -84,9 +78,9 @@
 {/snippet}
 
 {#snippet body({ width: w, height: h }: PlotBoxContext)}
-	{#if timeline && selectedValue !== undefined}
+	{#if timeline && timeline.type !== 'player' && selectedValue !== undefined}
 		<TimelineFrame
-			steps={steps.values}
+			steps={timelineState.steps}
 			{selectedValue}
 			orientation={timeline.orientation}
 			show={timeline.show}
@@ -114,5 +108,6 @@
 	{order}
 	hoverStrategy={hover?.strategy ?? 'x'}
 	hoverSync={hover?.sync ?? false}
+	{timelineState}
 	{body}
 />

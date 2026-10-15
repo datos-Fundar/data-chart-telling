@@ -1,5 +1,11 @@
 import type { HoverStrategy } from '$lib/types/layout/hover';
-import type { Orientation, TimeValue } from '$lib/types/layout/timeline';
+import type {
+	Orientation,
+	PlayerConfig,
+	TimeValue,
+	TimelineCallbacks,
+	TimelineType
+} from '$lib/types/layout/timeline';
 
 /**
  * How a `PlotComposer` arranges its panels: `areas` names the grid cells
@@ -20,10 +26,14 @@ export type ComposerLayout = {
 /** Labels a composer stamps on its panels in order: `'A'` (A, B, C…), `'a'`, `'1'`, `'I'` (roman), or an explicit list. */
 export type ComposerTags = 'A' | 'a' | '1' | 'I' | 'i' | string[];
 
-/** One scrubber for every panel: plots with a `timeline` follow its `progress` over `values`. */
-export type ComposerTimelineConfig = {
-	progress: number;
+/** One timeline for every panel: plots with a `timeline` follow its `progress` over `values`. */
+export type ComposerTimelineConfig = TimelineCallbacks & {
+	progress?: number;
 	values: TimeValue[];
+	/** How it draws. Defaults to `'rule'`. */
+	type?: TimelineType;
+	/** The player bar's own options, when `type` is `'player'`. */
+	player?: PlayerConfig;
 	orientation?: Orientation;
 	show?: boolean;
 	thickness?: number;

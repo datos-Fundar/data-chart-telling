@@ -1,6 +1,7 @@
 import { getContext, setContext } from 'svelte';
 import type { PlotHover } from '$lib/layout/hover/PlotHover.svelte';
 import type { LegendState } from '$lib/layout/legend/LegendState.svelte';
+import type { TimelineState } from '$lib/layout/timeline/TimelineState.svelte';
 import type { PlotMargins } from '$lib/layout/margins/PlotMargins.svelte';
 import type { PlotAxes } from '$lib/phases/data/PlotAxes';
 
@@ -10,6 +11,7 @@ const PLOT_CONTEXT_KEY = Symbol('dct-plot-context');
 export type PlotContextParts<T extends Record<string, unknown>> = {
 	hover: PlotHover<T>;
 	legend: LegendState | null;
+	timeline: TimelineState | null;
 	margins: PlotMargins;
 	scales: () => object | undefined;
 	axes: () => PlotAxes | undefined;
@@ -19,12 +21,13 @@ export type PlotContextParts<T extends Record<string, unknown>> = {
 
 /**
  * Everything one plot is, gathered where what draws inside it can reach it:
- * its hover, its figure's legend, its margins, scales, axes, rows and box. The
+ * its hover, its figure's legend and timeline, its margins, scales, axes, rows and box. The
  * mutable side; {@link PublicPlotContext} is what a user gets to read.
  */
 export class PlotContext<T extends Record<string, unknown> = Record<string, unknown>> {
 	readonly hover: PlotHover<T>;
 	readonly legend: LegendState | null;
+	readonly timeline: TimelineState | null;
 	readonly margins: PlotMargins;
 	readonly #parts: PlotContextParts<T>;
 
@@ -32,6 +35,7 @@ export class PlotContext<T extends Record<string, unknown> = Record<string, unkn
 		this.#parts = parts;
 		this.hover = parts.hover;
 		this.legend = parts.legend;
+		this.timeline = parts.timeline;
 		this.margins = parts.margins;
 	}
 

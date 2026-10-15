@@ -57,6 +57,7 @@
 	import Tooltip from '$lib/layout/tooltip/Tooltip.svelte';
 	import { PlotHover } from '$lib/layout/hover/PlotHover.svelte';
 	import { PlotContext } from '$lib/layout/plot/PlotContext';
+	import { TimelineState } from '$lib/layout/timeline/TimelineState.svelte';
 	import type { PlotAxes } from '$lib/phases/data/PlotAxes';
 	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 	import type { AxisValue } from '$lib/types/layout/mapping';
@@ -176,6 +177,7 @@
 	PlotContext.provide<TData>({
 		hover: ctrl,
 		legend,
+		timeline: TimelineState.current(),
 		margins: plotMargins,
 		scales: () => scales,
 		axes: () => state.axes,

@@ -24,7 +24,8 @@ export type {
 	PublicFigureContext,
 	PublicHover,
 	PublicPlotHover,
-	PublicLegend
+	PublicLegend,
+	PublicTimeline
 } from './layout/plot/PublicPlotContext';
 
 // Custom geo projections - usable as `scales.projection.type`.
@@ -39,6 +40,7 @@ export {
 	DEFAULT_CONFIG
 } from './configuration/config.svelte';
 export { THEMES } from './configuration/themes';
+export { SYSTEM_FONT } from './configuration/fonts';
 export type {
 	ThemeName
 } from './configuration/themes';
@@ -154,7 +156,11 @@ export type {
 export type {
 	TimeValue,
 	Orientation,
-	TimelineConfig
+	TimelineConfig,
+	TimelineType,
+	TimelineCallbacks,
+	PlayerConfig,
+	PlayerControl
 } from './types/layout/timeline';
 export type {
 	ComposerLayout,

@@ -71,8 +71,9 @@ export type ScalesConfig<TData = Record<string, unknown>> =
 	| GeoScalesConfig;
 
 /**
- * A block a plot's chrome draws, `plot` for the plot itself, or `divider` for
- * a line between two blocks, styled by the configuration's `divider`.
+ * A block a plot's chrome draws, `plot` for the plot itself, `timeline` for
+ * its timeline when that's a player bar, or `divider` for a line between two
+ * blocks, styled by the configuration's `divider`.
  */
 export type PlotChromeItem =
 	| 'title'
@@ -82,6 +83,7 @@ export type PlotChromeItem =
 	| 'plot'
 	| 'caption'
 	| 'footer'
+	| 'timeline'
 	| 'divider';
 
 /**
@@ -139,7 +141,7 @@ type ChromeCombination<THeading, TLegend, TClosing> =
 	THeading extends ChromeBlock<infer HP, infer HI>
 		? TLegend extends ChromeBlock<infer LP, infer LI>
 			? TClosing extends ChromeBlock<infer CP, infer CI>
-				? HP & LP & CP & { order?: (HI | LI | CI | 'plot' | 'divider')[] }
+				? HP & LP & CP & { order?: (HI | LI | CI | 'plot' | 'timeline' | 'divider')[] }
 				: never
 			: never
 		: never;
@@ -148,7 +150,7 @@ type ChromeCombination<THeading, TLegend, TClosing> =
  * What's drawn around a plot: accepted by every plot kind and by
  * `PlotComposer`. `header` replaces `title`/`subtitle` and `footer`
  * replaces `caption`, so each excludes the other. `order` lists the blocks
- * top to bottom, out of the ones set here plus `plot` and `divider`; see {@link PlotChromeConfig}.
+ * top to bottom, out of the ones set here plus `plot`, `timeline` and `divider`; see {@link PlotChromeConfig}.
  */
 export type PlotChromeProps = ChromeCombination<HeadingBlock, LegendBlock, ClosingBlock>;
 

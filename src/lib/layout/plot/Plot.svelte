@@ -10,7 +10,7 @@
 	import PanelRun from '$lib/layout/plot/PanelRun.svelte';
 	import GenericCore from '$lib/layout/plot/Core.svelte';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import { SharedTimeline } from '$lib/layout/composer/SharedTimeline';
+	import { TimelineState } from '$lib/layout/timeline/TimelineState.svelte';
 	import { HoverState } from '$lib/layout/hover/HoverState.svelte';
 	import { HoverSettings } from '$lib/layout/hover/HoverSettings';
 	import { Interpolation } from '$lib/utils/Interpolation';
@@ -96,7 +96,13 @@
 	const tooltipConfig = $derived(hoverSettings.tooltip);
 	const rows = $derived(data ?? (core?.data as TRow[] | undefined));
 
-	const sharedTimeline = SharedTimeline.current();
+	// Inside a composer with a timeline, that one drives every panel; otherwise
+	// this plot has one of its own, which its figure draws when it's a player.
+	const outerTimeline = TimelineState.current();
+	const sharedTimeline = outerTimeline?.enabled ? outerTimeline : null;
+	const ownTimeline = sharedTimeline ? null : new TimelineState(() => timeline);
+	ownTimeline?.watch();
+	const timelineState = sharedTimeline ?? ownTimeline;
 	const parentScope = HoverState.scope();
 	const scopeOf = (facetValue: string) => {
 		const parent = parentScope();
@@ -246,10 +252,11 @@
 		<TimelineLayout
 			data={rows}
 			accessor={timeline.accessor}
-			progress={sharedTimeline ? sharedTimeline.progress() : (timeline.progress ?? 0)}
-			values={sharedTimeline?.values() ?? timeline.values}
+			progress={timelineState?.progress ?? timeline.progress ?? 0}
+			values={sharedTimeline ? sharedTimeline.steps : timeline.values}
+			onsteps={ownTimeline ? (found) => ownTimeline.setSteps(found) : undefined}
 			orientation={timeline.orientation}
-			show={sharedTimeline ? false : timeline.show}
+			show={sharedTimeline || timeline.type === 'player' ? false : timeline.show}
 			thickness={timeline.thickness ?? cfg.timeline.thickness}
 			filterMode={slicing.filterMode}
 			interpolate={timelineInterpolation}
@@ -279,5 +286,6 @@
 	{order}
 	hoverStrategy={hoverSettings.strategy}
 	hoverSync={hoverSettings.sync}
+	timelineState={ownTimeline}
 	{body}
 />

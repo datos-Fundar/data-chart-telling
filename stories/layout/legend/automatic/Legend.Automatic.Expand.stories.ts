@@ -21,8 +21,10 @@ import { demoSource } from '../../../common/docsSource';
  * `legend` takes one key per channel, each the configuration of the section
  * that channel draws, minus what the plots compute for it:
  * - `series`: the discrete section of the plots' series;
- * - `color`: the continuous section of a color ramp - the only one that can
- *   be `interactive`;
+ * - `color`: the continuous section of a numeric color ramp - the only one
+ *   whose ramp can be `interactive` - and, as a categorical color is what makes
+ *   the series, their discrete section too (`series` wins where both set the
+ *   same option);
  * - `opacity`: the continuous section of an opacity ramp;
  * - `size` and `symbol`: the sections of a dot's `r` and `symbol` channels.
  *

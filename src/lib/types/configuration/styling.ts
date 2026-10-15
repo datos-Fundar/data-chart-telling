@@ -258,6 +258,60 @@ export type PlotStylesConfig = {
 		thickness: number;
 		/** Space between a plot (or a composition's panels) and its timeline, as a CSS length. */
 		gap: string;
+		/** The `'rule'` timeline beside a plot: a line with its steps written along it. */
+		rule: {
+			/** Font size of the steps, in px. */
+			fontSize: number;
+			/** Font size of the current step, in px. */
+			activeFontSize: number;
+			activeFontWeight: number | string;
+			/** Opacity of the steps other than the current one. */
+			labelOpacity: number;
+			/** Width of the line, in px. */
+			axisWidth: number;
+			axisOpacity: number;
+		};
+		/** The `'player'` timeline: a bar in the chrome with play, the current step, a slider and more. */
+		player: {
+			/** The controls it draws, in order, unless a timeline sets its own `player.controls`. */
+			controls: ('play' | 'value' | 'slider' | 'speed' | 'loop')[];
+			/** The speeds its speed control cycles through, as multiples of `stepDuration`. */
+			speeds: number[];
+			/** Milliseconds each step lasts at speed `1`. */
+			stepDuration: number;
+			background: string;
+			color: string;
+			/** CSS length. */
+			radius: string;
+			padding: string;
+			gap: string;
+			fontSize: string;
+			fontWeight: number | string;
+			/** Width reserved for the current step's text, so the slider doesn't shift as it changes. */
+			valueWidth: string;
+			/** The play and pause button. */
+			button: {
+				size: string;
+				background: string;
+				color: string;
+				hoverBackground: string;
+				radius: string;
+			};
+			/** The slider's line. */
+			track: { height: string; color: string; fillColor: string; radius: string };
+			/** The slider's handle. */
+			thumb: { size: string; color: string };
+			/** The speed and loop buttons. */
+			toggle: {
+				background: string;
+				color: string;
+				activeBackground: string;
+				activeColor: string;
+				radius: string;
+				fontSize: string;
+				padding: string;
+			};
+		};
 	};
 	/**
 	 * In-SVG hover highlight: crosshair rule, dot + value label, and the area

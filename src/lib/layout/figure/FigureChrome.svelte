@@ -25,6 +25,7 @@
 		subtitle,
 		caption,
 		legend,
+		timeline,
 		header,
 		footer,
 		order,
@@ -36,6 +37,7 @@
 		subtitle?: string;
 		caption?: string;
 		legend?: Snippet;
+		timeline?: Snippet;
 		header?: Snippet;
 		footer?: Snippet;
 		order?: readonly PlotChromeItem[];
@@ -59,6 +61,8 @@
 				return !!header;
 			case 'legend':
 				return !!legend;
+			case 'timeline':
+				return !!timeline;
 			case 'caption':
 				return !footer && !!caption;
 			case 'footer':
@@ -127,6 +131,8 @@
 			<div class="dct-figure-chrome__header">{@render header?.()}</div>
 		{:else if block.type === 'legend'}
 			<div class="dct-figure-chrome__legend">{@render legend?.()}</div>
+		{:else if block.type === 'timeline'}
+			<div class="dct-figure-chrome__timeline">{@render timeline?.()}</div>
 		{:else if block.type === 'divider'}
 			<hr class="dct-figure-chrome__divider" />
 		{:else if block.type === 'plot'}
@@ -198,6 +204,11 @@
 	.dct-figure-chrome__legend {
 		flex: 0 0 auto;
 		padding: var(--dct-legend-pad, 0.75rem 0);
+	}
+
+	.dct-figure-chrome__timeline {
+		flex: 0 0 auto;
+		padding: var(--dct-timeline-pad, 0.5rem 0);
 	}
 
 	.dct-figure-chrome__body {

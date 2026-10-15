@@ -39,11 +39,11 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		margin: '0.5rem 0px'
 	},
 
-	// Title and subtitle (or header), a divider, legend, plot, then caption (or
-	// footer). With no title, subtitle or header, the divider has nothing above
+	// Title and subtitle (or header), a divider, legend, plot, a player timeline,
+	// then caption (or footer). With no title, subtitle or header, the divider has nothing above
 	// it, so it isn't drawn.
 	chrome: {
-		order: ['header', 'title', 'subtitle', 'divider', 'legend', 'plot', 'footer', 'caption']
+		order: ['header', 'title', 'subtitle', 'divider', 'legend', 'plot', 'timeline', 'footer', 'caption']
 	},
 
 	title: text({ size: '1.5rem', weight: 500, leading: '1.2' }),
@@ -160,7 +160,56 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 	area: { fillOpacity: 0.6 },
 	histogram: { inset: 1, fillOpacity: 1 },
 	scatter: { dotRadius: 5 },
-	timeline: { axisColor: 'currentColor', activeColor: '#e6580d', thickness: 60, gap: '12px' },
+	timeline: {
+		axisColor: 'currentColor',
+		activeColor: '#1b9e77',
+		thickness: 60,
+		gap: '12px',
+		rule: {
+			fontSize: 12,
+			activeFontSize: 20,
+			activeFontWeight: 'bold',
+			labelOpacity: 0.55,
+			axisWidth: 1.5,
+			axisOpacity: 0.7
+		},
+		player: {
+			controls: ['play', 'value', 'slider'],
+			speeds: [0.5, 1, 2],
+			stepDuration: 800,
+			background: 'color-mix(in srgb, currentColor 6%, transparent)',
+			color: 'currentColor',
+			radius: '0.5rem',
+			padding: '0.5rem 1rem',
+			gap: '1rem',
+			fontSize: '0.875rem',
+			fontWeight: 500,
+			valueWidth: '3rem',
+			button: {
+				size: '2rem',
+				background: '#1b9e77',
+				color: '#ffffff',
+				hoverBackground: '#0c4937',
+				radius: '999px'
+			},
+			track: {
+				height: '3px',
+				color: 'color-mix(in srgb, currentColor 25%, transparent)',
+				fillColor: '#1b9e77',
+				radius: '999px'
+			},
+			thumb: { size: '14px', color: '#1b9e77' },
+			toggle: {
+				background: 'transparent',
+				color: 'currentColor',
+				activeBackground: '#1b9e77',
+				activeColor: '#ffffff',
+				radius: '0.375rem',
+				fontSize: '0.75rem',
+				padding: '0.125rem 0.5rem'
+			}
+		}
+	},
 	hover: {
 		rule: { stroke: '#e6580d', strokeOpacity: 0.35, strokeWidth: 1.5, strokeDasharray: '4 4' },
 		dot: { dotRadius: 5, dotFill: 'currentColor' },
@@ -279,6 +328,33 @@ export function configToCssVars(c: PlotStylesConfig): Record<string, string> {
 		'--dct-timeline-axis': c.timeline.axisColor,
 		'--dct-timeline-active': c.timeline.activeColor,
 		'--dct-timeline-gap': c.timeline.gap,
+
+		'--dct-player-bg': c.timeline.player.background,
+		'--dct-player-color': c.timeline.player.color,
+		'--dct-player-radius': c.timeline.player.radius,
+		'--dct-player-pad': c.timeline.player.padding,
+		'--dct-player-gap': c.timeline.player.gap,
+		'--dct-player-size': c.timeline.player.fontSize,
+		'--dct-player-weight': String(c.timeline.player.fontWeight),
+		'--dct-player-value-width': c.timeline.player.valueWidth,
+		'--dct-player-button-size': c.timeline.player.button.size,
+		'--dct-player-button-bg': c.timeline.player.button.background,
+		'--dct-player-button-color': c.timeline.player.button.color,
+		'--dct-player-button-hover-bg': c.timeline.player.button.hoverBackground,
+		'--dct-player-button-radius': c.timeline.player.button.radius,
+		'--dct-player-track-height': c.timeline.player.track.height,
+		'--dct-player-track-color': c.timeline.player.track.color,
+		'--dct-player-track-fill': c.timeline.player.track.fillColor,
+		'--dct-player-track-radius': c.timeline.player.track.radius,
+		'--dct-player-thumb-size': c.timeline.player.thumb.size,
+		'--dct-player-thumb-color': c.timeline.player.thumb.color,
+		'--dct-player-toggle-bg': c.timeline.player.toggle.background,
+		'--dct-player-toggle-color': c.timeline.player.toggle.color,
+		'--dct-player-toggle-active-bg': c.timeline.player.toggle.activeBackground,
+		'--dct-player-toggle-active-color': c.timeline.player.toggle.activeColor,
+		'--dct-player-toggle-radius': c.timeline.player.toggle.radius,
+		'--dct-player-toggle-size': c.timeline.player.toggle.fontSize,
+		'--dct-player-toggle-pad': c.timeline.player.toggle.padding,
 
 		'--dct-heat-min': c.continuous.min,
 		'--dct-heat-max': c.continuous.max,

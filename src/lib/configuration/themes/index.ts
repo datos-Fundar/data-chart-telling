@@ -6,9 +6,10 @@ import { COMPACT_THEME } from './compact';
 
 /**
  * Ready-made theme presets - partial configs deep-merged over
- * `DEFAULT_CONFIG` by `setConfiguration`. `DEFAULT_CONFIG` itself stays an
- * opinion-free no-op (`font: 'inherit'`, `color: 'currentColor'`, …); these
- * are the actual visual identities consumers can opt into.
+ * `DEFAULT_CONFIG` by `setConfiguration`. `DEFAULT_CONFIG` itself stays
+ * opinion-free (`font: 'inherit'`, `color: 'currentColor'`, …), following the
+ * host project's styles; these are the visual identities consumers can opt
+ * into, `Default` being the plain one with a system sans-serif font.
  */
 export const THEMES = {
 	Default: DEFAULT_THEME,

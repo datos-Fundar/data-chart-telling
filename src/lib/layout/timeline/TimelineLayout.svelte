@@ -1,4 +1,5 @@
 <script lang="ts" generics="TRow extends Record<string, unknown>">
+  import { untrack } from 'svelte';
   import { resolveAccessor } from '$lib/plots/utils/accessors';
   import TimelineFrame from '$lib/layout/timeline/TimelineFrame.svelte';
   import { TimelineSteps } from '$lib/layout/timeline/TimelineSteps';
@@ -28,6 +29,7 @@
     thickness = 60,
     filterMode = 'exact',
     interpolate,
+    onsteps,
     width,
     height,
     child,
@@ -41,6 +43,8 @@
     thickness?: number;
     filterMode?: 'exact' | 'upTo';
     interpolate?: TimelineInterpolation<TRow>;
+    /** Told the steps, whenever they change - for whoever else draws or drives the timeline. */
+    onsteps?: (values: TimeValue[]) => void;
     width: number;
     height: number;
     child: TimelineChildSnippet<TRow>;
@@ -49,6 +53,11 @@
   const getTime = $derived(resolveAccessor<TRow>(accessor));
 
   const steps = $derived(TimelineSteps.of(values, data, getTime));
+
+  $effect(() => {
+    const found = steps.values;
+    untrack(() => onsteps?.(found));
+  });
 
   const progressEasingFn = $derived(Interpolation.buildEasing(interpolate?.progressEasing));
   const segmentEasingFn = $derived(Interpolation.buildEasing(interpolate?.segmentEasing));

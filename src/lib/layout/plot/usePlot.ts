@@ -2,7 +2,7 @@ import { PublicFigureContext, PublicPlotContext } from '$lib/layout/plot/PublicP
 
 /**
  * What the plot around the calling component is: its hover, its figure's
- * legend, margins, scales, rows and box, and svelteplot's own state as
+ * legend and timeline, margins, scales, rows and box, and svelteplot's own state as
  * `svelteplot`. Call it during init, in anything drawn inside a plot.
  */
 export function usePlot<
@@ -11,7 +11,7 @@ export function usePlot<
 	return PublicPlotContext.use<T>();
 }
 
-/** What the figure around the calling component is: its hover and legend. Call it during init, anywhere inside a figure - its chrome too. */
+/** What the figure around the calling component is: its hover, legend and timeline. Call it during init, anywhere inside a figure - its chrome too. */
 export function useFigure(): PublicFigureContext {
 	return PublicFigureContext.use();
 }
