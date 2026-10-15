@@ -9,6 +9,7 @@
 	// permissive - without it, Storybook's bare `render: () => ({ Component })`
 	// typing rejects a zero-prop-plus-runes component.
 	const props = $props();
+	// svelte-ignore state_referenced_locally
 	void props;
 
 	type FacetThemeName = 'Default' | 'Purple' | 'Green';

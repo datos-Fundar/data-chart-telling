@@ -138,6 +138,7 @@
 {#if path}
 	<g class="dct-geo-inset" transform="translate({box.left + left}, {box.top + top})">
 		{#each insetFeatures as f, i (i)}
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<path
 				d={path(f as GeoJSON.Feature) ?? undefined}
 				fill={marker.styles?.fill ?? defaultFill}

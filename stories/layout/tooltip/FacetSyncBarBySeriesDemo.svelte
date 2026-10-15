@@ -6,6 +6,7 @@
 
 	// Zero-prop marker - keeps Storybook's render typing happy.
 	const props = $props();
+	// svelte-ignore state_referenced_locally
 	void props;
 
 	let layout = $state<'stacked' | 'grouped'>('stacked');

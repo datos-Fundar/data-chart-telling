@@ -22,6 +22,7 @@
 
 	const { kind = 'line' }: { kind?: 'line' | 'heatmap' | 'bar' | 'pyramid' } = $props();
 
+	// svelte-ignore state_referenced_locally
 	const defaultStrategy: HoverStrategy =
 		kind === 'heatmap' ? 'punctual' : kind === 'pyramid' ? 'y' : 'x';
 

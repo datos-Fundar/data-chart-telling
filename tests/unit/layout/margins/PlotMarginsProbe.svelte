@@ -39,6 +39,7 @@
 		settle: (m) => onSettle?.(m)
 	});
 
+	// svelte-ignore state_referenced_locally
 	onReady(margins);
 </script>
 

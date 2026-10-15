@@ -158,7 +158,7 @@
 
 	const cfg = $derived(getConfiguration());
 	setPlotDefaults({
-		numberFormat: { useGrouping: 'min2', compactDisplay: cfg.axis.compactDisplay }
+		numberFormat: { useGrouping: 'min2', compactDisplay: untrack(() => cfg.axis.compactDisplay) }
 	});
 
 	// Created once: this plot's margins, grown to fit the labels its markers report.

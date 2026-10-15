@@ -8,6 +8,7 @@
 		onReady
 	}: { section: ContinuousLegendSection; onReady: (store: LegendState) => void } = $props();
 
+	// svelte-ignore state_referenced_locally
 	onReady(LegendState.provide());
 </script>
 

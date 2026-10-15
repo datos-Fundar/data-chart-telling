@@ -40,7 +40,7 @@
 	// leaving `compactDisplay` stuck on whatever config was left over from
 	// the previously-mounted story.
 	resetConfiguration();
-	setConfiguration({ axis: { locale: active, compactDisplay } });
+	setConfiguration({ axis: untrack(() => ({ locale: active, compactDisplay })) });
 
 	// Only `locale` needs to react to the button after that initial mount -
 	// `setConfiguration` itself reads+writes the global config, so it must
