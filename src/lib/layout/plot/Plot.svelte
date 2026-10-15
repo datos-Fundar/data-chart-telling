@@ -256,8 +256,7 @@
 			values={sharedTimeline ? sharedTimeline.steps : timeline.values}
 			onsteps={ownTimeline ? (found) => ownTimeline.setSteps(found) : undefined}
 			orientation={timeline.orientation}
-			show={sharedTimeline || timeline.type === 'player' ? false : timeline.show}
-			thickness={timeline.thickness ?? cfg.timeline.thickness}
+			show={false}
 			filterMode={slicing.filterMode}
 			interpolate={timelineInterpolation}
 			width={w}

@@ -103,8 +103,8 @@ describe('PlotComposer', () => {
 	test('its timeline drives every panel, which draws no scrubber of its own', async () => {
 		const { container } = await render(ComposerProbe, { progress: 0 });
 		await plots(container);
-		expect(container.querySelectorAll('.dct-timeline__gutter').length).toBe(1);
-		expect(container.querySelectorAll('.dct-grid-cell--figure .dct-timeline__gutter').length).toBe(0);
+		expect(container.querySelectorAll('.dct-figure-chrome__timeline').length).toBe(1);
+		expect(container.querySelectorAll('.dct-grid-cell--figure .dct-figure-chrome__timeline').length).toBe(0);
 		await vi.waitFor(() => {
 			for (const plot of container.querySelectorAll('.dct-plot')) {
 				// The first step only: one point per line, on axes that span every step.

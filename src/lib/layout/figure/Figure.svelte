@@ -3,6 +3,7 @@
 	import GridCell from '$lib/layout/grid/GridCell.svelte';
 	import LegendLayout from '$lib/layout/legend/LegendLayout.svelte';
 	import TimelinePlayer from '$lib/layout/timeline/TimelinePlayer.svelte';
+	import TimelineRule from '$lib/layout/timeline/TimelineRule.svelte';
 	import { TimelineState } from '$lib/layout/timeline/TimelineState.svelte';
 	import { GridCellsRegistry } from '$lib/layout/grid/GridCellsRegistry.svelte';
 	import {
@@ -27,7 +28,7 @@
 	 * caption...) around `body`, which gets the box that's left - or `body`
 	 * alone in a themed box when there's no chrome.
 	 *
-	 * Its timeline, when it is a player bar, is the chrome's `timeline` block.
+	 * Its timeline - a rule or a player bar - is the chrome's `timeline` block.
 	 *
 	 * Its legend: unset or `true`, the one its plots read as - what they
 	 * register on its `LegendState`; `false`, none; a list of sections,
@@ -72,12 +73,16 @@
 
 	// svelte-ignore state_referenced_locally
 	if (timelineState) TimelineState.provide(timelineState);
-	const playerShown = $derived(
+	/** Whether the chrome draws the timeline: a rule or a player bar - one with controls to draw. */
+	const timelineShown = $derived(
 		!!timelineState &&
 			timelineState.enabled &&
-			timelineState.type === 'player' &&
 			timelineState.shown &&
-			timelineState.controls.length > 0
+			(timelineState.type === 'rule' || timelineState.controls.length > 0)
+	);
+	/** A vertical rule sits beside the plot, as if the chrome's `order` had `'(plot, timeline)'`. */
+	const timelineBesidePlot = $derived(
+		timelineShown && timelineState!.type === 'rule' && timelineState!.orientation === 'vertical'
 	);
 
 	// Read once at setup: a figure that shows a legend of its own scopes its toggles - and what its plots register - to itself.
@@ -114,7 +119,7 @@
 	 */
 	const hasChrome = $derived(
 		Boolean(title || subtitle || caption || header || footer) ||
-			playerShown ||
+			timelineShown ||
 			legendMode === 'auto' ||
 			(legendMode === 'explicit' && sections.length > 0)
 	);
@@ -124,8 +129,10 @@
 	<LegendLayout {sections} />
 {/snippet}
 
-{#snippet playerSnippet()}
-	{#if timelineState && timelineState.steps.length > 1}
+{#snippet timelineSnippet()}
+	{#if timelineState && timelineState.type === 'rule'}
+		<TimelineRule timeline={timelineState} />
+	{:else if timelineState && timelineState.steps.length > 1}
 		<TimelinePlayer timeline={timelineState} />
 	{/if}
 {/snippet}
@@ -142,7 +149,8 @@
 			{footer}
 			{order}
 			legend={sections.length > 0 ? legendSnippet : undefined}
-			timeline={playerShown ? playerSnippet : undefined}
+			timeline={timelineShown ? timelineSnippet : undefined}
+			{timelineBesidePlot}
 			plot={body}
 		/>
 	{:else}

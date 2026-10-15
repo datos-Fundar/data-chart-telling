@@ -1,6 +1,6 @@
 import type { StrokeStyle, DotStyle, FontStyle, AreaStyle } from '$lib/types/plots/styling';
 import type { SymbolType } from '$lib/types/plots/constants';
-import type { PlotChromeItem } from '$lib/types/plots/props';
+import type { PlotChromeEntry } from '$lib/types/plots/props';
 
 export type TextStyle = {
 	/** font-family */
@@ -48,8 +48,10 @@ export type PlotStylesConfig = {
 	// ── Chrome ──────────────────────────────────────────────────────────────────
 	/** What a plot's or composer's chrome draws around it. */
 	chrome: {
-		/** The blocks, top to bottom, when a figure doesn't set its own `order` - see {@link PlotChromeItem}. */
-		order: PlotChromeItem[];
+		/** The blocks, top to bottom, when a figure doesn't set its own `order` - see {@link PlotChromeEntry}. */
+		order: PlotChromeEntry[];
+		/** The space between the blocks of a row of the chrome, as a CSS length. */
+		rowGap: string;
 	};
 
 	// ── Text blocks ─────────────────────────────────────────────────────────────

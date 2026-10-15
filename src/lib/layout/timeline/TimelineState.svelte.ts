@@ -4,6 +4,7 @@ import { TimelineSteps } from '$lib/layout/timeline/TimelineSteps';
 import type {
 	PlayerConfig,
 	PlayerControl,
+	Orientation,
 	TimeValue,
 	TimelineCallbacks,
 	TimelineType
@@ -21,6 +22,8 @@ export type TimelineSettings = TimelineCallbacks & {
 	progress?: number;
 	values?: TimeValue[];
 	show?: boolean;
+	orientation?: Orientation;
+	thickness?: number;
 };
 
 /**
@@ -67,6 +70,16 @@ export class TimelineState {
 
 	get type(): TimelineType {
 		return this.#settings()?.type ?? 'rule';
+	}
+
+	/** Which way a `'rule'` runs; a `'player'` is always horizontal. */
+	get orientation(): Orientation {
+		return this.type === 'player' ? 'horizontal' : (this.#settings()?.orientation ?? 'vertical');
+	}
+
+	/** How much room a `'rule'` takes across, in px. */
+	get thickness(): number {
+		return this.#settings()?.thickness ?? getConfiguration().timeline.thickness;
 	}
 
 	/** Whether the owner wants it drawn. */

@@ -15,7 +15,8 @@ import type { LegendSection } from '$lib/types/layout/legend';
  * `header`/`footer` snippets in place of the text, and dividers between
  * blocks. Every plot kind and `PlotComposer` take the same props, and
  * `order` lists the blocks top to bottom - only the ones passed, plus `plot`
- * and any number of `divider`s, checked by the props' type.
+ * and any number of `divider`s, checked by the props' type. A string like
+ * `'(plot, legend)'` puts blocks side by side in one row.
  */
 const meta = {
 	title: 'Composition/Chrome',
@@ -45,17 +46,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const LEGEND: LegendSection[] = [
-	{
-		type: 'discrete',
-		columns: 2,
-		items: [
-			{ name: 'GDP', symbol: 'line' },
-			{ name: 'Employment', symbol: 'line' }
-		]
-	}
-];
-
 const CAPTION = 'Source: synthetic demo data.';
 
 /**
@@ -66,8 +56,7 @@ export const Default: Story = {
 	args: {
 		title: 'GDP vs. Employment',
 		subtitle: 'North region, 2018-2022',
-		caption: CAPTION,
-		legend: LEGEND
+		caption: CAPTION
 	}
 };
 
@@ -77,8 +66,7 @@ export const Default: Story = {
  */
 export const NoHeadingNoDivider: Story = {
 	args: {
-		caption: CAPTION,
-		legend: LEGEND
+		caption: CAPTION
 	}
 };
 
@@ -92,7 +80,6 @@ export const ManyDividers: Story = {
 		title: 'GDP vs. Employment',
 		subtitle: 'North region, 2018-2022',
 		caption: CAPTION,
-		legend: LEGEND,
 		order: ['title', 'subtitle', 'divider', 'legend', 'divider', 'plot', 'divider', 'caption']
 	}
 };
@@ -103,7 +90,6 @@ export const CustomOrder: Story = {
 		title: 'GDP vs. Employment',
 		subtitle: 'North region, 2018-2022',
 		caption: CAPTION,
-		legend: LEGEND,
 		order: ['title', 'subtitle', 'divider', 'caption', 'divider', 'plot', 'divider', 'legend']
 	}
 };
@@ -117,8 +103,51 @@ export const LeaveBlocksOut: Story = {
 		title: 'GDP vs. Employment',
 		subtitle: 'North region, 2018-2022',
 		caption: CAPTION,
-		legend: LEGEND,
 		order: ['title', 'divider', 'caption']
+	}
+};
+
+/**
+ * A string in parentheses puts two or three blocks side by side in one row:
+ * `'(legend, caption)'`. The plot takes the width the others leave, and the
+ * others take as much as they need; a row without the plot shares its width
+ * among its blocks, none of them stretching. Each block still counts once,
+ * and a row with only one drawn is a plain block.
+ */
+export const Rows: Story = {
+	args: {
+		title: 'GDP vs. Employment',
+		subtitle: 'North region, 2018-2022',
+		caption: CAPTION,
+		order: ['title', 'subtitle', 'divider', '(legend, caption)', 'plot']
+	}
+};
+
+/**
+ * A row with the plot: the legend sits beside it and the plot takes the rest of
+ * the width. The automatic legend adjusts through `legend` - here it runs
+ * vertically, with a title of its own for the series.
+ */
+export const PlotInARow: Story = {
+	args: {
+		title: 'GDP vs. Employment',
+		subtitle: 'North region, 2018-2022',
+		caption: CAPTION,
+		legend: { series: { title: 'Indicators', layout: { type: 'vertical' } } },
+		order: ['title', 'subtitle', 'divider', '(plot, legend)', 'caption']
+	}
+};
+
+/**
+ * The legend is always there to place: `order` takes `'legend'` with no
+ * `legend` prop, and the figure reads one off what its plots draw. Here it
+ * sits under the plot instead of above it.
+ */
+export const AutomaticLegendInOrder: Story = {
+	args: {
+		title: 'GDP vs. Employment',
+		subtitle: 'North region, 2018-2022',
+		order: ['title', 'subtitle', 'divider', 'plot', 'legend']
 	}
 };
 

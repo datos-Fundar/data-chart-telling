@@ -43,7 +43,8 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 	// then caption (or footer). With no title, subtitle or header, the divider has nothing above
 	// it, so it isn't drawn.
 	chrome: {
-		order: ['header', 'title', 'subtitle', 'divider', 'legend', 'plot', 'timeline', 'footer', 'caption']
+		order: ['header', 'title', 'subtitle', 'divider', 'legend', 'plot', 'timeline', 'footer', 'caption'],
+		rowGap: '1rem'
 	},
 
 	title: text({ size: '1.5rem', weight: 500, leading: '1.2' }),
@@ -281,6 +282,7 @@ export function configToCssVars(c: PlotStylesConfig): Record<string, string> {
 		'--dct-divider-width': c.divider.width,
 		'--dct-divider-style': c.divider.style,
 		'--dct-divider-margin': c.divider.margin,
+		'--dct-row-gap': c.chrome.rowGap,
 
 		...t('title', c.title),
 		...t('subtitle', c.subtitle),

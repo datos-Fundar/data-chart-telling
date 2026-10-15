@@ -1,8 +1,6 @@
 <script lang="ts">
 	import Figure from '$lib/layout/figure/Figure.svelte';
 	import Grid from '$lib/layout/grid/Grid.svelte';
-	import TimelineFrame from '$lib/layout/timeline/TimelineFrame.svelte';
-	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { TimelineState } from '$lib/layout/timeline/TimelineState.svelte';
 	import type { Snippet } from 'svelte';
 	import type { FigureBoxProps, PlotChromeProps } from '$lib/types/plots/props';
@@ -47,8 +45,6 @@
 		children: Snippet;
 	} = $props();
 
-	const cfg = $derived(getConfiguration());
-
 	// One timeline for every panel, which the plots below follow instead of their own.
 	const timelineState = new TimelineState(() => timeline);
 	timelineState.watch();
@@ -56,7 +52,6 @@
 	/** Height of the tag row above every panel, when the composer tags them. */
 	const TAG_H = 24;
 
-	const selectedValue = $derived(timelineState.value);
 </script>
 
 {#snippet grid({ width: w, height: h }: PlotBoxContext)}
@@ -78,20 +73,7 @@
 {/snippet}
 
 {#snippet body({ width: w, height: h }: PlotBoxContext)}
-	{#if timeline && timeline.type !== 'player' && selectedValue !== undefined}
-		<TimelineFrame
-			steps={timelineState.steps}
-			{selectedValue}
-			orientation={timeline.orientation}
-			show={timeline.show}
-			thickness={timeline.thickness ?? cfg.timeline.thickness}
-			width={w}
-			height={h}
-			child={grid}
-		/>
-	{:else}
-		{@render grid({ width: w, height: h })}
-	{/if}
+	{@render grid({ width: w, height: h })}
 {/snippet}
 
 <Figure

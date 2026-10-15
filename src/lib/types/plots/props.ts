@@ -87,6 +87,19 @@ export type PlotChromeItem =
 	| 'divider';
 
 /**
+ * Two or three blocks drawn side by side in one row of the chrome, written as
+ * `'(plot, timeline)'`. The `plot` takes the width the others leave, and the
+ * others take as much as they need; a row without a `plot` shares its width
+ * among its blocks, none of them stretching.
+ */
+export type PlotChromeRow<TItem extends string = Exclude<PlotChromeItem, 'divider'>> =
+	| `(${TItem}, ${TItem})`
+	| `(${TItem}, ${TItem}, ${TItem})`;
+
+/** One entry of a chrome `order`: a block, or a row of blocks. */
+export type PlotChromeEntry = PlotChromeItem | PlotChromeRow;
+
+/**
  * What's drawn around a figure, as `Figure` and `FigureChrome` read it: every block
  * optional, `header` drawn instead of `title`/`subtitle` and `footer` instead
  * of `caption`. `order` lists the blocks top to bottom (by default, the
@@ -108,7 +121,7 @@ export type PlotChromeConfig = {
 	 * symbol }`, with the section of each channel adjusted (see {@link LegendExtension}).
 	 */
 	legend?: LegendSection[] | LegendExtension | boolean;
-	order?: PlotChromeItem[];
+	order?: PlotChromeEntry[];
 };
 
 /**
@@ -127,9 +140,11 @@ type HeadingBlock =
 	| ChromeBlock<{ header?: never; title?: never; subtitle: string | undefined }, 'subtitle'>
 	| ChromeBlock<{ header?: never; title?: never; subtitle?: never }, never>;
 
-type LegendBlock =
-	| ChromeBlock<{ legend: LegendSection[] | LegendExtension | boolean | undefined }, 'legend'>
-	| ChromeBlock<{ legend?: never }, never>;
+/** The legend is always there to place: unset, a figure reads one off what its plots draw. */
+type LegendBlock = ChromeBlock<
+	{ legend?: LegendSection[] | LegendExtension | boolean | undefined },
+	'legend'
+>;
 
 type ClosingBlock =
 	| ChromeBlock<{ footer: Snippet | undefined; caption?: never }, 'footer'>
@@ -141,7 +156,19 @@ type ChromeCombination<THeading, TLegend, TClosing> =
 	THeading extends ChromeBlock<infer HP, infer HI>
 		? TLegend extends ChromeBlock<infer LP, infer LI>
 			? TClosing extends ChromeBlock<infer CP, infer CI>
-				? HP & LP & CP & { order?: (HI | LI | CI | 'plot' | 'timeline' | 'divider')[] }
+				? HP &
+						LP &
+						CP & {
+							order?: (
+								| HI
+								| LI
+								| CI
+								| 'plot'
+								| 'timeline'
+								| 'divider'
+								| PlotChromeRow<HI | LI | CI | 'plot' | 'timeline'>
+							)[];
+						}
 				: never
 			: never
 		: never;

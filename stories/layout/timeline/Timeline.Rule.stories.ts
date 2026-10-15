@@ -24,15 +24,41 @@ const meta = {
 
 export default meta;
 
-/** A vertical rule - the default for plots that are wider than tall. */
+/**
+ * A vertical rule - the default for plots that are wider than tall. It sits to
+ * the right of the plot: a vertical timeline is the same as putting
+ * `'(plot, timeline)'` in the chrome's `order`, which it configures for you.
+ */
 export const Vertical: StoryObj = {
   render: () => ({ Component: RuleDemo, props: { orientation: 'vertical' } }),
   parameters: demoSource(RuleDemoSource),
 };
 
-/** A horizontal rule - typical below a plot on narrow layouts. */
+/** A horizontal rule - typical below a plot on narrow layouts. It takes the `timeline` block's place in the chrome's `order`, below the plot by default. */
 export const Horizontal: StoryObj = {
   render: () => ({ Component: RuleDemo, props: { orientation: 'horizontal' } }),
+  parameters: demoSource(RuleDemoSource),
+};
+
+/**
+ * To keep a vertical rule but on the left, say so in `order`: a row that
+ * places the timeline and the plot yourself, `'(timeline, plot)'`, wins over
+ * the one the vertical rule would set up.
+ */
+export const LeftOfThePlot: StoryObj = {
+  render: () => ({
+    Component: RuleDemo,
+    props: { orientation: 'vertical', order: ['title', '(timeline, plot)'] },
+  }),
+  parameters: demoSource(RuleDemoSource),
+};
+
+/** A horizontal rule is the `timeline` block, so `order` moves it like any other - here above the plot. */
+export const AboveThePlot: StoryObj = {
+  render: () => ({
+    Component: RuleDemo,
+    props: { orientation: 'horizontal', order: ['title', 'timeline', 'plot'] },
+  }),
   parameters: demoSource(RuleDemoSource),
 };
 
