@@ -20,7 +20,10 @@ describe('MovingAverageStatistic.build', () => {
 
 	test('falls back to the source color when styles.stroke is unset', () => {
 		const data = [{ x: 0, y: 0 }];
-		const marker = MovingAverageStatistic.build({ data, x: 'x', y: 'y', color: '#ff0000' }, { k: 1 });
+		const marker = MovingAverageStatistic.build(
+			{ data, x: 'x', y: 'y', color: '#ff0000' },
+			{ k: 1 }
+		);
 		expect(marker.styles?.stroke).toBe('#ff0000');
 	});
 

@@ -9,7 +9,12 @@ const testConfig = {
 describe('MarkerChannels.buildFill', () => {
 	test('returns undefined when color is unset', () => {
 		const data = [{ x: 1, y: 2 }];
-		const result = MarkerChannels.buildFill(data, undefined, undefined, testConfig as PlotStylesConfig);
+		const result = MarkerChannels.buildFill(
+			data,
+			undefined,
+			undefined,
+			testConfig as PlotStylesConfig
+		);
 		expect(result).toBeUndefined();
 	});
 

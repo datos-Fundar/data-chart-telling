@@ -22,7 +22,6 @@
 		margins = $bindable(),
 		...core
 	}: BarPlotProps<TData> = $props();
-
 </script>
 
 <Plot

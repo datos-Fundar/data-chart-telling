@@ -20,11 +20,7 @@
 	import { Slice } from '$lib/layout/plot/Slice';
 	import type { TooltipProp } from '$lib/types/layout/tooltip';
 	import type { MarginConfig, PlotChromeConfig } from '$lib/types/plots/props';
-	import type {
-		PlotCellContext,
-		PlotCellSnippet,
-		PlotCoreBase
-	} from '$lib/types/layout/plot';
+	import type { PlotCellContext, PlotCellSnippet, PlotCoreBase } from '$lib/types/layout/plot';
 	import type { FacetCellContext, FacetConfig } from '$lib/types/layout/facet';
 	import type { TimelineConfig, TimeValue } from '$lib/types/layout/timeline';
 	import type { LegendState } from '$lib/layout/legend/LegendState.svelte';
@@ -91,7 +87,11 @@
 	// The kind's pipeline, built once per plot: every core it renders runs it.
 	const pipeline = $derived(defaults ? Pipeline.of(defaults()) : undefined);
 	const hoverSettings = $derived(
-		new HoverSettings(tooltip, markers ?? core?.markers, pipeline?.hoverStrategy(core ?? {}, cfg) ?? 'x')
+		new HoverSettings(
+			tooltip,
+			markers ?? core?.markers,
+			pipeline?.hoverStrategy(core ?? {}, cfg) ?? 'x'
+		)
 	);
 	const tooltipConfig = $derived(hoverSettings.tooltip);
 	const rows = $derived(data ?? (core?.data as TRow[] | undefined));
@@ -110,9 +110,7 @@
 	};
 
 	// How the rows divide into slices: timeline steps and facet panels.
-	const slicing = $derived(
-		new Slice({ rows, timeline, facet, filterMode: pipeline?.filterMode })
-	);
+	const slicing = $derived(new Slice({ rows, timeline, facet, filterMode: pipeline?.filterMode }));
 	// A boolean, so a timeline step re-slicing the same rows invalidates nothing downstream.
 	const sliced = $derived(slicing.sliced);
 	$effect(() => {
@@ -176,11 +174,7 @@
 	{:else if Core && sliced}
 		<Core {...(slice ?? buildSliceProps)(ctx)} {pipeline} />
 	{:else if Core}
-		<Core
-			{...withoutMargins((slice ?? buildSliceProps)(ctx))}
-			bind:margins
-			{pipeline}
-		/>
+		<Core {...withoutMargins((slice ?? buildSliceProps)(ctx))} bind:margins {pipeline} />
 	{/if}
 {/snippet}
 

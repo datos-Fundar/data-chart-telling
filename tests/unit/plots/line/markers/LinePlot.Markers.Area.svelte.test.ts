@@ -29,9 +29,7 @@ describe('LinePlot - markers.area', () => {
 			data: FEMALE_LIFE_EXPECTANCY.map((d) => ({ ...d, year: new Date(d.year, 0, 1) })),
 			x: 'value',
 			y: 'year',
-			markers: [
-				{ type: 'area', x: 'value', y: 'year' }
-			] satisfies AxisBasedMarkersConfig[]
+			markers: [{ type: 'area', x: 'value', y: 'year' }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
 		expect(countAreaPaths(svg)).toBe(1);

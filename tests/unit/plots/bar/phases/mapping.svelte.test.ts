@@ -47,7 +47,9 @@ describe('category axis (read by the "data" phase)', () => {
 	});
 
 	test('is y, and the bars horizontal, when y holds the categories', () => {
-		const axes = axesOf({ series: [{ name: 'a', x: 'value', y: 'category', data: SERIES[0].data }] });
+		const axes = axesOf({
+			series: [{ name: 'a', x: 'value', y: 'category', data: SERIES[0].data }]
+		});
 		expect(axes).toMatchObject({ category: 'y', value: 'x', orientation: 'horizontal' });
 	});
 

@@ -38,7 +38,9 @@ type Story = StoryObj<typeof meta>;
  * hovered point, plus the plot's rows and size, over its own SVG.
  */
 export const UsePlot: Story = {
-	parameters: demoSource(`${UsePlotDemoSource}\n\n<!-- HoverReadout.svelte -->\n${HoverReadoutSource}`)
+	parameters: demoSource(
+		`${UsePlotDemoSource}\n\n<!-- HoverReadout.svelte -->\n${HoverReadoutSource}`
+	)
 };
 
 /**

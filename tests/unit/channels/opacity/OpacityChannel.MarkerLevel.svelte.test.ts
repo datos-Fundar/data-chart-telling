@@ -38,9 +38,7 @@ describe('opacity channel - marker level (dot)', () => {
 		expect(opacities.length).toBe(WEATHER_STATIONS.length);
 
 		const scale = resolveOpacityScale({ domain: [-10, 30], range: [0.1, 1] }, [-10, 30], [0.2, 1]);
-		const expected = new Set(
-			WEATHER_STATIONS.map((s) => Math.round(scale(s.tempC) * 32) / 32)
-		);
+		const expected = new Set(WEATHER_STATIONS.map((s) => Math.round(scale(s.tempC) * 32) / 32));
 		const rendered = new Set(opacities.map((o) => Math.round(o * 32) / 32));
 		expect(rendered).toEqual(expected);
 		// More than one bucket - proves it isn't silently collapsing to one flat opacity.

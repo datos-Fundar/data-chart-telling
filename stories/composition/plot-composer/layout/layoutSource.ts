@@ -25,10 +25,7 @@ export function layoutSource({ layout, panels, tags, width = 720, height = 320 }
 		...(tags ? [`tags=${typeof tags === 'string' ? `"${tags}"` : `{${literal(tags)}}`}`] : [])
 	];
 	const body = panels
-		.map(
-			(area) =>
-				`  <!-- any plot -->\n` + `  <LinePlot${area ? ` area="${area}"` : ''} … />`
-		)
+		.map((area) => `  <!-- any plot -->\n` + `  <LinePlot${area ? ` area="${area}"` : ''} … />`)
 		.join('\n');
 	return {
 		docs: {

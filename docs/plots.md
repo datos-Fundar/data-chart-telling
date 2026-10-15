@@ -2,16 +2,16 @@
 
 Eight plot kinds share one set of props (see [Concepts](concepts.md)). They differ in what they draw, which channels they need and how they hover.
 
-| Plot | Draws | Needs |
-| --- | --- | --- |
-| [`LinePlot`](#lineplot) | A line per series | `x`, `y` |
-| [`AreaPlot`](#areaplot) | A filled area per series | `x`, `y` |
-| [`BarPlot`](#barplot) | Bars, grouped, stacked or horizontal | a category channel and a value channel |
-| [`HistogramPlot`](#histogramplot) | Counts of a numeric field in bins | `x` or `y` |
-| [`HeatmapPlot`](#heatmapplot) | A grid of colored cells | `x`, `y`, `color` |
-| [`PyramidPlot`](#pyramidplot) | Two series mirrored around zero | a category channel, a value channel, two series |
-| [`ScatterPlot`](#scatterplot) | A point per row | `x`, `y` |
-| [`GeoPlot`](#geoplot) | A map from GeoJSON or TopoJSON | `data` (see [Maps](geo.md)) |
+| Plot                              | Draws                                | Needs                                           |
+| --------------------------------- | ------------------------------------ | ----------------------------------------------- |
+| [`LinePlot`](#lineplot)           | A line per series                    | `x`, `y`                                        |
+| [`AreaPlot`](#areaplot)           | A filled area per series             | `x`, `y`                                        |
+| [`BarPlot`](#barplot)             | Bars, grouped, stacked or horizontal | a category channel and a value channel          |
+| [`HistogramPlot`](#histogramplot) | Counts of a numeric field in bins    | `x` or `y`                                      |
+| [`HeatmapPlot`](#heatmapplot)     | A grid of colored cells              | `x`, `y`, `color`                               |
+| [`PyramidPlot`](#pyramidplot)     | Two series mirrored around zero      | a category channel, a value channel, two series |
+| [`ScatterPlot`](#scatterplot)     | A point per row                      | `x`, `y`                                        |
+| [`GeoPlot`](#geoplot)             | A map from GeoJSON or TopoJSON       | `data` (see [Maps](geo.md))                     |
 
 All of them accept `data` with `grouping`/`color`, or pre-built `series`.
 
@@ -43,7 +43,15 @@ One line per series. Rows with a missing value (`null`, `undefined`, `NaN`) brea
 One filled area per series, under the line from `y` to the baseline. Default fill opacity comes from `area.fillOpacity` in the configuration.
 
 ```svelte
-<AreaPlot {width} {height} data={rows} x="year" y="value" color="region" transforms={[{ type: 'stackY' }]} />
+<AreaPlot
+	{width}
+	{height}
+	data={rows}
+	x="year"
+	y="value"
+	color="region"
+	transforms={[{ type: 'stackY' }]}
+/>
 ```
 
 ![A stacked area plot](images/plots-area.png)
@@ -126,7 +134,16 @@ Two series mirrored around a shared zero baseline, such as a population pyramid.
 A dot per row.
 
 ```svelte
-<ScatterPlot {width} {height} data={countries} x="gdp" y="life" r="population" color="continent" symbol="income" />
+<ScatterPlot
+	{width}
+	{height}
+	data={countries}
+	x="gdp"
+	y="life"
+	r="population"
+	color="continent"
+	symbol="income"
+/>
 ```
 
 ![A scatter plot sized, colored and shaped by channels](images/plots-scatter.png)

@@ -4,11 +4,7 @@ import { PANEL_KEY, FacetPhase } from '$lib/phases/facet/FacetPhase';
 import { TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import type {
-	PhaseStage,
-	StatisticsStageOptions,
-	StatisticsStageState
-} from '$lib/types/phases';
+import type { PhaseStage, StatisticsStageOptions, StatisticsStageState } from '$lib/types/phases';
 
 /** Marker kinds that draw from a channel pair, so they take the plot's `x`/`y` when the author leaves one out. */
 const POSITIONED_KINDS = new Set(['line', 'area', 'dot']);

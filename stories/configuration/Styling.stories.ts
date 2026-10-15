@@ -20,9 +20,9 @@ import ConfigDemo from './ConfigDemo.svelte';
  * ```
  */
 const meta = {
-  title: 'Configuration/Styling',
-  component: ConfigDemo,
-  parameters: { layout: 'padded' },
+	title: 'Configuration/Styling',
+	component: ConfigDemo,
+	parameters: { layout: 'padded' }
 } satisfies Meta<typeof ConfigDemo>;
 
 export default meta;

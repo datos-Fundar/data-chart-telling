@@ -47,7 +47,10 @@ describe('PyramidPlot - scales', () => {
 			width: 560,
 			height: 520,
 			...DATA_PROPS,
-			scales: { y: { domain: AGE_GROUPS }, grouping: { reverse: true } } satisfies AxisBasedScalesConfig
+			scales: {
+				y: { domain: AGE_GROUPS },
+				grouping: { reverse: true }
+			} satisfies AxisBasedScalesConfig
 		});
 		const svg = await waitForSvg(container);
 		// With reverse, should still render all bars

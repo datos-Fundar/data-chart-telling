@@ -21,7 +21,6 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 const GAP_KINDS = ['start', 'middle', 'end'] as const;
 
-
 type Row = Record<string, unknown>;
 
 /**
@@ -128,17 +127,16 @@ export function buildValueLabels<TData extends Record<string, unknown>>(
 	const valueOf = ValueLabels.valueOf(state);
 
 	const top = (d: ProcessedRow) => geometry.spanOf(d)?.[1] ?? 0;
-	const position =
-		geometry.stacked
-			? (d: ProcessedRow) => {
-					const [from, to] = geometry.spanOf(d) ?? [0, 0];
-					return (from + to) / 2;
-				}
-			: anchor === 'middle' && !isHorizontal
-				? (d: ProcessedRow) => top(d) / 2
-				: anchor === 'end'
-					? () => 0
-					: top;
+	const position = geometry.stacked
+		? (d: ProcessedRow) => {
+				const [from, to] = geometry.spanOf(d) ?? [0, 0];
+				return (from + to) / 2;
+			}
+		: anchor === 'middle' && !isHorizontal
+			? (d: ProcessedRow) => top(d) / 2
+			: anchor === 'end'
+				? () => 0
+				: top;
 	// Outward from the bar's top along the value axis: up for a vertical bar, right for a horizontal one.
 	const outward = anchor === 'outside' ? 6 : anchor === 'start' ? -4 : anchor === 'end' ? 4 : 0;
 	const textAnchor =

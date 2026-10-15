@@ -45,8 +45,12 @@ function buildAll(
 		...overrides
 	};
 	const ctx = { ...CTX, ...ctxOverrides };
-	const styles = new StylesPhase<typeof state, HeatmapPlotCtx>(buildHeatmapDefaults<Row>().styles).run;
-	return buildMarkers(styles(new TransformsPhase<typeof state>().run(state, ctx), ctx), ctx).markers ?? [];
+	const styles = new StylesPhase<typeof state, HeatmapPlotCtx>(buildHeatmapDefaults<Row>().styles)
+		.run;
+	return (
+		buildMarkers(styles(new TransformsPhase<typeof state>().run(state, ctx), ctx), ctx).markers ??
+		[]
+	);
 }
 
 /** The cells the phase draws, without its value labels. */

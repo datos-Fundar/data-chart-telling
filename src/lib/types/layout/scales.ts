@@ -3,7 +3,6 @@ import type { AxisChannelName, IndependentChannelName } from '$lib/types/layout/
 
 // ── Per-consumer channels: each consumer resolves its own ramp ───────────────
 
-
 /** A continuous or categorical color ramp. */
 export type ColorScaleConfig = {
 	/** `[min, max]` for a continuous ramp, or the category list for a categorical one. Auto-computed from the data when omitted. */
@@ -59,7 +58,6 @@ export type ChannelScalesConfig<TChannel extends IndependentChannelName = Indepe
 
 // ── Plot-wide channels: one svelteplot scale shared by every mark ───────────
 
-
 /** `r` (radius/size) config - plot-level only, consumed via {@link AxisBasedScalesConfig.r}. */
 export type RScaleConfig = {
 	domain?: [number, number];
@@ -75,7 +73,6 @@ export type LengthScaleConfig = {
 };
 
 // ── Axis channels (x/y): one scale shared by every mark ─────────────────────
-
 
 /** Scale types that lay out distinct categories - an axis paired with one plays the "index" role, so the other is the plain magnitude/value axis. */
 export const DISCRETE_SCALE_TYPES = ['band', 'categorical', 'point', 'ordinal'] as const;

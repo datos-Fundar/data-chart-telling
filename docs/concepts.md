@@ -35,15 +35,15 @@ A series' `name` is what the legend, the value labels and the tooltip show.
 
 A **channel** maps a field of each row to a visual property. Each channel takes a field name (`'region'`) or an accessor function (`(d) => d.region`).
 
-| Channel | Maps a row to | Configure with |
-| --- | --- | --- |
-| `x`, `y` | Position on the horizontal and vertical axis | `scales.x`, `scales.y` |
-| `color` | A color: categorical (one per value) or continuous (a ramp) | `scales.color` |
-| `grouping` | Which series the row belongs to | `scales.grouping` |
-| `opacity` | A fill or stroke opacity | `scales.opacity` |
-| `symbol` | A marker shape (categorical) | `scales.symbol` |
-| `r` | A dot radius, scaled so that area follows the value | `scales.r` |
-| `length` | A vector or spike length | `scales.length` |
+| Channel    | Maps a row to                                               | Configure with         |
+| ---------- | ----------------------------------------------------------- | ---------------------- |
+| `x`, `y`   | Position on the horizontal and vertical axis                | `scales.x`, `scales.y` |
+| `color`    | A color: categorical (one per value) or continuous (a ramp) | `scales.color`         |
+| `grouping` | Which series the row belongs to                             | `scales.grouping`      |
+| `opacity`  | A fill or stroke opacity                                    | `scales.opacity`       |
+| `symbol`   | A marker shape (categorical)                                | `scales.symbol`        |
+| `r`        | A dot radius, scaled so that area follows the value         | `scales.r`             |
+| `length`   | A vector or spike length                                    | `scales.length`        |
 
 `grouping` splits `data` into series. When it is unset, `color` groups too, so one accessor both separates and colors the series - the usual case. Pass both to group by one field and color by another:
 
@@ -57,22 +57,22 @@ Details for each channel scale are in [Scales](scales.md).
 
 ## Props every plot shares
 
-| Prop | Purpose | Docs |
-| --- | --- | --- |
-| `width`, `height` | Pixel size of the figure (not needed inside a composer cell) | [Getting started](getting-started.md) |
-| `data` / `series` | The rows | above |
-| `x`, `y`, `color`, `grouping`, `opacity`, `symbol`, `r`, `length` | Channels | above |
-| `scales` | Axis and channel scales | [Scales](scales.md) |
-| `styles` | Value labels, frame, gap filling | [Styles and segments](styles-and-segments.md) |
-| `segments` | Style ranges of the data | [Styles and segments](styles-and-segments.md) |
-| `markers` | Extra marks | [Markers](markers.md) |
-| `transforms`, `statistics` | Derive rows before drawing | [Transforms and statistics](transforms-and-statistics.md) |
-| `margins` | Space around the plot area | below |
-| `tooltip` | Floating tooltip | [Tooltip and hover](tooltip-and-hover.md) |
-| `legend` | The legend | [Legend](legend.md) |
-| `timeline` | Step through the data by a field | [Timeline](timeline.md) |
-| `facet` | Small multiples | [Facets](facets.md) |
-| `title`, `subtitle`, `caption`, `header`, `footer`, `order` | Chrome | [Chrome](chrome.md) |
+| Prop                                                              | Purpose                                                      | Docs                                                      |
+| ----------------------------------------------------------------- | ------------------------------------------------------------ | --------------------------------------------------------- |
+| `width`, `height`                                                 | Pixel size of the figure (not needed inside a composer cell) | [Getting started](getting-started.md)                     |
+| `data` / `series`                                                 | The rows                                                     | above                                                     |
+| `x`, `y`, `color`, `grouping`, `opacity`, `symbol`, `r`, `length` | Channels                                                     | above                                                     |
+| `scales`                                                          | Axis and channel scales                                      | [Scales](scales.md)                                       |
+| `styles`                                                          | Value labels, frame, gap filling                             | [Styles and segments](styles-and-segments.md)             |
+| `segments`                                                        | Style ranges of the data                                     | [Styles and segments](styles-and-segments.md)             |
+| `markers`                                                         | Extra marks                                                  | [Markers](markers.md)                                     |
+| `transforms`, `statistics`                                        | Derive rows before drawing                                   | [Transforms and statistics](transforms-and-statistics.md) |
+| `margins`                                                         | Space around the plot area                                   | below                                                     |
+| `tooltip`                                                         | Floating tooltip                                             | [Tooltip and hover](tooltip-and-hover.md)                 |
+| `legend`                                                          | The legend                                                   | [Legend](legend.md)                                       |
+| `timeline`                                                        | Step through the data by a field                             | [Timeline](timeline.md)                                   |
+| `facet`                                                           | Small multiples                                              | [Facets](facets.md)                                       |
+| `title`, `subtitle`, `caption`, `header`, `footer`, `order`       | Chrome                                                       | [Chrome](chrome.md)                                       |
 
 `GeoPlot` takes the same chrome, `tooltip`, `legend`, `styles`, `segments` and `markers`, with GeoJSON in `data` instead of rows and `coordinates` in place of axes (see [Maps](geo.md)).
 
@@ -84,15 +84,15 @@ Details for each channel scale are in [Scales](scales.md).
 
 A plot draws its marks, axes and automatic legend by default. These are switched on by a prop:
 
-| Feature | Switch |
-| --- | --- |
-| Tooltip | `tooltip` (`true` or an options object) |
-| In-plot hover highlight | a `{ type: 'hover' }` marker |
-| Value labels | `styles={{ values: { show: true } }}` |
+| Feature                         | Switch                                                    |
+| ------------------------------- | --------------------------------------------------------- |
+| Tooltip                         | `tooltip` (`true` or an options object)                   |
+| In-plot hover highlight         | a `{ type: 'hover' }` marker                              |
+| Value labels                    | `styles={{ values: { show: true } }}`                     |
 | Toggling series from the legend | `legend={{ series: { interactive: { enabled: true } } }}` |
-| A frame around the plot area | `styles={{ frame: true }}` |
-| Timeline | `timeline={{ accessor: 'year' }}` |
-| Facets | `facet={{ by: 'region' }}` |
+| A frame around the plot area    | `styles={{ frame: true }}`                                |
+| Timeline                        | `timeline={{ accessor: 'year' }}`                         |
+| Facets                          | `facet={{ by: 'region' }}`                                |
 
 ## Reading the rest of the docs
 

@@ -59,24 +59,9 @@ const preview: Preview = {
 					'Plots',
 					[
 						'AreaPlot',
-						[
-							'Series',
-							'Scales',
-							'Styles',
-							'Segments',
-							'Markers',
-							'Tooltip'
-						],
+						['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
 						'BarPlot',
-						[
-							'Series',
-							'Scales',
-							'Styles',
-							'Segments',
-							'Markers',
-							['Rules', 'Hover'],
-							'Tooltip'
-						],
+						['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip'],
 						'GeoPlot',
 						[
 							'Series',
@@ -90,22 +75,9 @@ const preview: Preview = {
 							'Tooltip'
 						],
 						'HeatmapPlot',
-						[
-							'Series',
-							'Scales',
-							'Styles',
-							'Segments',
-							'Markers',
-							['Rules', 'Hover'],
-							'Tooltip'
-						],
+						['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip'],
 						'HistogramPlot',
-						[
-							'Series',
-							'Scales',
-							'Tooltip',
-							'Transforms',
-						],
+						['Series', 'Scales', 'Tooltip', 'Transforms'],
 						'LinePlot',
 						[
 							'Series',
@@ -117,15 +89,7 @@ const preview: Preview = {
 							'Tooltip'
 						],
 						'PyramidPlot',
-						[
-							'Series',
-							'Scales',
-							'Styles',
-							'Segments',
-							'Markers',
-							['Rules'],
-							'Tooltip'
-						],
+						['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules'], 'Tooltip'],
 						'ScatterPlot',
 						[
 							'Series',
@@ -136,16 +100,12 @@ const preview: Preview = {
 							'Markers',
 							['Rules', 'Hover', 'Custom'],
 							'Tooltip'
-						],
+						]
 					],
 					'Channels',
 					[
 						'Color',
-						[
-							'Plot Level',
-							'Marker Level',
-							'Independent Ramps'
-						],
+						['Plot Level', 'Marker Level', 'Independent Ramps'],
 						'Length',
 						'Opacity',
 						'R',
@@ -153,10 +113,7 @@ const preview: Preview = {
 						'X1X2Y1Y2'
 					],
 					'Transforms',
-					[
-						'Bin',
-						'Stack',
-					],
+					['Bin', 'Stack'],
 					'Markers',
 					[
 						'Area',
@@ -189,7 +146,7 @@ const preview: Preview = {
 						'Trail',
 						'Vector',
 						'Voronoi',
-						'Waffle',
+						'Waffle'
 					],
 					'Layout',
 					[
@@ -201,7 +158,7 @@ const preview: Preview = {
 						'Timeline',
 						['Player', 'Rule'],
 						'Tooltip',
-						['Basics', 'MultiSeries', 'Customization', 'FacetSync'],
+						['Basics', 'MultiSeries', 'Customization', 'FacetSync']
 					],
 					'Configuration',
 					'Composition',

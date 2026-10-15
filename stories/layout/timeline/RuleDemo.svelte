@@ -6,7 +6,10 @@
 	let {
 		orientation = 'vertical',
 		order
-	}: { orientation?: Orientation; order?: ('title' | 'plot' | 'timeline' | '(timeline, plot)' | '(plot, timeline)' | 'divider')[] } = $props();
+	}: {
+		orientation?: Orientation;
+		order?: ('title' | 'plot' | 'timeline' | '(timeline, plot)' | '(plot, timeline)' | 'divider')[];
+	} = $props();
 </script>
 
 <!--

@@ -19,7 +19,8 @@
 		color="metric"
 		scales={{ y: { domain: [0, 160] } }}
 	/>
-	<BarPlot inset={{ left: 0.62, bottom: 0.5, right: 0.98, top: 0.98 }}
+	<BarPlot
+		inset={{ left: 0.62, bottom: 0.5, right: 0.98, top: 0.98 }}
 		data={REGION_BARS.filter((d) => d.year === 2022)}
 		x="region"
 		y="value"

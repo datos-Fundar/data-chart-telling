@@ -26,19 +26,19 @@
 
 Each axis takes an `AxisScale`.
 
-| Field | Meaning |
-| --- | --- |
-| `type` | `'auto'` (default), `'linear'`, `'pow'`, `'sqrt'`, `'log'`, `'symlog'`, `'time'`, `'utc'`, `'band'`, `'point'`, `'ordinal'`, `'categorical'` and the color-oriented types (`'sequential'`, `'diverging'`, `'threshold'`, ...) |
-| `domain`, `range` | Explicit input and output extent |
-| `reverse`, `nice`, `zero`, `clamp`, `round`, `percent` | Direction, rounding and baseline behaviour |
-| `label`, `labelAnchor`, `labelOrientation`, `labelPosition`, `titleFontSize` | The axis title (`label: false` hides it) |
-| `ticks`, `tickSpacing`, `tickSize`, `tickPadding`, `tickRotate` | Tick placement and size |
-| `tickFormat` | `false`, an `Intl.NumberFormatOptions` / `Intl.DateTimeFormatOptions` object, or `(d, index, ticks) => string` |
-| `grid` | `true` or a stroke style for gridlines |
-| `axisDisplay` | `'visible'` (default), `'hidden'` (keeps the space, so aligned panels stay aligned) or `'none'` |
-| `padding`, `paddingInner`, `paddingOuter`, `align` | Band and point spacing |
-| `insetLeft`, `insetRight`, `insetTop`, `insetBottom` | Pixels kept free at each end |
-| `interval`, `base`, `constant`, `sort` | Time/discrete intervals, log base, symlog constant, category order |
+| Field                                                                        | Meaning                                                                                                                                                                                                                       |
+| ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`                                                                       | `'auto'` (default), `'linear'`, `'pow'`, `'sqrt'`, `'log'`, `'symlog'`, `'time'`, `'utc'`, `'band'`, `'point'`, `'ordinal'`, `'categorical'` and the color-oriented types (`'sequential'`, `'diverging'`, `'threshold'`, ...) |
+| `domain`, `range`                                                            | Explicit input and output extent                                                                                                                                                                                              |
+| `reverse`, `nice`, `zero`, `clamp`, `round`, `percent`                       | Direction, rounding and baseline behaviour                                                                                                                                                                                    |
+| `label`, `labelAnchor`, `labelOrientation`, `labelPosition`, `titleFontSize` | The axis title (`label: false` hides it)                                                                                                                                                                                      |
+| `ticks`, `tickSpacing`, `tickSize`, `tickPadding`, `tickRotate`              | Tick placement and size                                                                                                                                                                                                       |
+| `tickFormat`                                                                 | `false`, an `Intl.NumberFormatOptions` / `Intl.DateTimeFormatOptions` object, or `(d, index, ticks) => string`                                                                                                                |
+| `grid`                                                                       | `true` or a stroke style for gridlines                                                                                                                                                                                        |
+| `axisDisplay`                                                                | `'visible'` (default), `'hidden'` (keeps the space, so aligned panels stay aligned) or `'none'`                                                                                                                               |
+| `padding`, `paddingInner`, `paddingOuter`, `align`                           | Band and point spacing                                                                                                                                                                                                        |
+| `insetLeft`, `insetRight`, `insetTop`, `insetBottom`                         | Pixels kept free at each end                                                                                                                                                                                                  |
+| `interval`, `base`, `constant`, `sort`                                       | Time/discrete intervals, log base, symlog constant, category order                                                                                                                                                            |
 
 Number and date text defaults follow `axis.locale` and `axis.compactDisplay` in the [configuration](theming.md#locale).
 
@@ -46,12 +46,12 @@ Number and date text defaults follow `axis.locale` and `axis.compactDisplay` in 
 
 `scales.color` configures the `color` channel (and a choropleth on a map).
 
-| Field | Meaning |
-| --- | --- |
-| `domain` | `[min, max]` for a continuous value, or the list of categories |
-| `scheme` | A named [d3-scale-chromatic](https://d3js.org/d3-scale-chromatic) ramp (`'turbo'`, `'blues'`, `'rdylbu'`, case-insensitive), two or more colors to interpolate, or a `Record<category, color>` |
-| `pivot` | Splits an array `scheme` into two halves meeting at this value (a diverging ramp) |
-| `unknown` | Color of a value outside the mapping (default `#ccc`) |
+| Field     | Meaning                                                                                                                                                                                        |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `domain`  | `[min, max]` for a continuous value, or the list of categories                                                                                                                                 |
+| `scheme`  | A named [d3-scale-chromatic](https://d3js.org/d3-scale-chromatic) ramp (`'turbo'`, `'blues'`, `'rdylbu'`, case-insensitive), two or more colors to interpolate, or a `Record<category, color>` |
+| `pivot`   | Splits an array `scheme` into two halves meeting at this value (a diverging ramp)                                                                                                              |
+| `unknown` | Color of a value outside the mapping (default `#ccc`)                                                                                                                                          |
 
 A continuous ramp is set with `scheme: [colorA, colorB]`. Categorical colors come from the configuration's `palette` unless `scheme` is a category-to-color record.
 

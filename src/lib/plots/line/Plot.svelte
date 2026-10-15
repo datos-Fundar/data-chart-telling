@@ -23,7 +23,6 @@
 		margins = $bindable(),
 		...core
 	}: LinePlotProps<TData> = $props();
-
 </script>
 
 <Plot

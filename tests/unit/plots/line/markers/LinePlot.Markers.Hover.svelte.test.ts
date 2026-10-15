@@ -57,7 +57,9 @@ describe('LinePlot - markers.hover', () => {
 			height: 300,
 			series: [FEMALE],
 			segments,
-			markers: [{ type: 'hover', series: 'female', scope: 'segment' }] satisfies AxisBasedMarkersConfig[]
+			markers: [
+				{ type: 'hover', series: 'female', scope: 'segment' }
+			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
 		expect(svg).toBeTruthy();

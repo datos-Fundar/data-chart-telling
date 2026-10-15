@@ -45,7 +45,8 @@
 	timeline={progress === undefined ? undefined : { progress, values: [2018, 2019, 2020] }}
 >
 	{#each ['North', 'South'] as region (region)}
-		<LinePlot area={layout.areas ? region.toLowerCase() : undefined}
+		<LinePlot
+			area={layout.areas ? region.toLowerCase() : undefined}
 			title={titled ? region : undefined}
 			data={DATA.filter((d) => d.region === region)}
 			x="year"

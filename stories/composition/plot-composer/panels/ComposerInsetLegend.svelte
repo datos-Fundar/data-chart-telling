@@ -26,13 +26,7 @@
 	title="A legend inside the plot"
 	subtitle="An inset panel can hold anything, not only a plot"
 >
-	<LinePlot
-		data={north}
-		x="year"
-		y="value"
-		color="metric"
-		scales={{ y: { domain: [0, 160] } }}
-	/>
+	<LinePlot data={north} x="year" y="value" color="metric" scales={{ y: { domain: [0, 160] } }} />
 	<GridCell inset={{ left: 0.1, bottom: 0.72, right: 0.3, top: 0.95 }}>
 		<LegendLayout sections={legend} />
 	</GridCell>

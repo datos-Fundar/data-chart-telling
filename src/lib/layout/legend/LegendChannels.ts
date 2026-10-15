@@ -71,7 +71,9 @@ export class LegendChannels {
 	static #colorOf(marker: LegendSource, plot: LegendPlot): string | undefined {
 		const own = LegendChannels.look([marker]).color;
 		if (own) return own;
-		const fill = [marker.fill, marker.stroke].find((v): v is string => typeof v === 'string' && v !== 'none');
+		const fill = [marker.fill, marker.stroke].find(
+			(v): v is string => typeof v === 'string' && v !== 'none'
+		);
 		if (fill) return fill;
 		const name = marker.series ?? plot.resolvedSeries?.[0]?.name;
 		return name !== undefined && name !== 'default' ? plot.colorForSeries?.(name) : undefined;
@@ -84,9 +86,13 @@ export class LegendChannels {
 	} {
 		const scheme = scale?.scheme;
 		const isRamp =
-			typeof scheme === 'string' || (Array.isArray(scheme) && scheme.every((c) => typeof c === 'string'));
+			typeof scheme === 'string' ||
+			(Array.isArray(scheme) && scheme.every((c) => typeof c === 'string'));
 		return isRamp
-			? { scheme: scheme as string | string[], ...(scale?.pivot !== undefined ? { pivot: scale.pivot } : {}) }
+			? {
+					scheme: scheme as string | string[],
+					...(scale?.pivot !== undefined ? { pivot: scale.pivot } : {})
+				}
 			: {};
 	}
 
@@ -171,7 +177,8 @@ export class LegendChannels {
 		if (!plot.opacityDomain) return [];
 		const source = plot.channels?.opacity?.source;
 		const name = plot.resolvedSeries?.[0]?.name;
-		const color = name !== undefined && name !== 'default' ? plot.colorForSeries?.(name) : undefined;
+		const color =
+			name !== undefined && name !== 'default' ? plot.colorForSeries?.(name) : undefined;
 		return LegendChannels.#opacityEntry(
 			typeof source === 'string' ? source : undefined,
 			plot.opacityDomain,
@@ -208,9 +215,7 @@ export class LegendChannels {
 		);
 		if (sized.length === 0) return [];
 		const values = sized.flatMap((marker) =>
-			LegendChannels.#values(marker, marker.r)
-				.map(Number)
-				.filter(Number.isFinite)
+			LegendChannels.#values(marker, marker.r).map(Number).filter(Number.isFinite)
 		);
 		if (values.length === 0) return [];
 		const { filled, color, symbol } = LegendChannels.look(sized);
@@ -245,7 +250,8 @@ export class LegendChannels {
 		if (domain.length === 0) return [];
 		const shapeOf = resolveSymbolScale(config, domain, getConfiguration().symbols);
 		const { filled, color } = LegendChannels.look(shaped);
-		const source = plot.channels?.symbol?.source ?? LegendChannels.#title(shaped[0].symbol, 'symbol');
+		const source =
+			plot.channels?.symbol?.source ?? LegendChannels.#title(shaped[0].symbol, 'symbol');
 		return [
 			{
 				type: 'symbol',

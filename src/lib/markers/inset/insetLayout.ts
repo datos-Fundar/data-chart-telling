@@ -9,20 +9,20 @@ type Vertical = 'top' | 'middle' | 'bottom';
  * keywords.
  */
 export function parseInsetLocation(location: GeoInsetLocation): { h: Horizontal; v: Vertical } {
-  const parts = location.split('-');
-  let h: Horizontal | undefined;
-  let v: Vertical | undefined;
-  for (const part of parts) {
-    if (part === 'left' || part === 'right') h = part;
-    else if (part === 'top' || part === 'bottom') v = part;
-  }
-  // Any leftover 'middle' fills whichever axis wasn't claimed above.
-  for (const part of parts) {
-    if (part !== 'middle') continue;
-    if (v === undefined) v = 'middle';
-    else if (h === undefined) h = 'middle';
-  }
-  return { h: h ?? 'middle', v: v ?? 'middle' };
+	const parts = location.split('-');
+	let h: Horizontal | undefined;
+	let v: Vertical | undefined;
+	for (const part of parts) {
+		if (part === 'left' || part === 'right') h = part;
+		else if (part === 'top' || part === 'bottom') v = part;
+	}
+	// Any leftover 'middle' fills whichever axis wasn't claimed above.
+	for (const part of parts) {
+		if (part !== 'middle') continue;
+		if (v === undefined) v = 'middle';
+		else if (h === undefined) h = 'middle';
+	}
+	return { h: h ?? 'middle', v: v ?? 'middle' };
 }
 
 export type InsetBox = { left: number; top: number; width: number; height: number };
@@ -33,17 +33,23 @@ export type InsetBox = { left: number; top: number; width: number; height: numbe
  * it's anchored to.
  */
 export function insetBox(
-  location: GeoInsetLocation,
-  widthFraction: number,
-  heightFraction: number,
-  margin: number,
-  frameWidth: number,
-  frameHeight: number,
+	location: GeoInsetLocation,
+	widthFraction: number,
+	heightFraction: number,
+	margin: number,
+	frameWidth: number,
+	frameHeight: number
 ): InsetBox {
-  const { h, v } = parseInsetLocation(location);
-  const width = frameWidth * widthFraction;
-  const height = frameHeight * heightFraction;
-  const left = h === 'left' ? margin : h === 'right' ? frameWidth - margin - width : (frameWidth - width) / 2;
-  const top = v === 'top' ? margin : v === 'bottom' ? frameHeight - margin - height : (frameHeight - height) / 2;
-  return { left, top, width, height };
+	const { h, v } = parseInsetLocation(location);
+	const width = frameWidth * widthFraction;
+	const height = frameHeight * heightFraction;
+	const left =
+		h === 'left' ? margin : h === 'right' ? frameWidth - margin - width : (frameWidth - width) / 2;
+	const top =
+		v === 'top'
+			? margin
+			: v === 'bottom'
+				? frameHeight - margin - height
+				: (frameHeight - height) / 2;
+	return { left, top, width, height };
 }

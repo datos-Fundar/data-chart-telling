@@ -67,7 +67,7 @@ export const Band: Story = {
 				{
 					areas: [],
 					styles: {
-						stroke: { stroke: 'red'}
+						stroke: { stroke: 'red' }
 					}
 				}
 			]

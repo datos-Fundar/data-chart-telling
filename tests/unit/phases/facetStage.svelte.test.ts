@@ -41,7 +41,8 @@ function state(overrides: Partial<State> = {}): State {
 
 /** The whole shared pipeline, with a kind that draws nothing of its own. */
 function run(overrides: Partial<State> = {}): State {
-	return runStages(Pipeline.ofAxisKind<State, AxisPlotCtx>({ markers: { marks: () => [] } }), 
+	return runStages(
+		Pipeline.ofAxisKind<State, AxisPlotCtx>({ markers: { marks: () => [] } }),
 		state(overrides),
 		CTX
 	);
@@ -55,7 +56,9 @@ describe('FacetPhase', () => {
 			{ key: 'Norte', label: 'Norte' },
 			{ key: 'Sur', label: 'Sur' }
 		]);
-		const narrowed = new FacetPhase<State>().run(state({ facet: { by: 'region', values: ['Sur'] } }));
+		const narrowed = new FacetPhase<State>().run(
+			state({ facet: { by: 'region', values: ['Sur'] } })
+		);
 		expect(narrowed.panels!.map((p) => p.key)).toEqual(['Sur']);
 		expect(narrowed.panelOf!(ROWS[0])).toBeUndefined();
 		expect(narrowed.panelOf!(ROWS[4])).toBe('Sur');
@@ -96,7 +99,8 @@ describe('the pipeline over every panel at once', () => {
 		const out = run({ data: withoutSurAgro });
 		const sur = out.resolvedSeries!.filter((s) => s.panel === 'Sur').map((s) => s.name);
 		expect(sur).toEqual(['Industria']);
-		const alone = runStages(Pipeline.ofAxisKind<State, AxisPlotCtx>({ markers: { marks: () => [] } }), 
+		const alone = runStages(
+			Pipeline.ofAxisKind<State, AxisPlotCtx>({ markers: { marks: () => [] } }),
 			state({ data: withoutSurAgro.filter((r) => r.region === 'Sur'), facet: undefined }),
 			CTX
 		);
@@ -166,7 +170,8 @@ describe('the pipeline over every panel at once', () => {
 
 	test('line value labels keep one label per series in every panel', () => {
 		const lineCtx: LinePlotCtx = { cfg: DEFAULT_CONFIG };
-		const out = runStages(Pipeline.ofAxisKind(buildLineDefaults<Row>()), 
+		const out = runStages(
+			Pipeline.ofAxisKind(buildLineDefaults<Row>()),
 			{ ...state(), values: { show: true } } as LinePlotState<Row>,
 			lineCtx
 		);

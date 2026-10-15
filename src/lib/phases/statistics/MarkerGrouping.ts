@@ -104,7 +104,8 @@ export class MarkerGrouping {
 		return markers.map((marker) => {
 			const m = marker as TMarker & MarkerLike & Record<string, unknown>;
 			if (m.series !== undefined) return marker;
-			if (grouping === undefined) return MarkerGrouping.withSeriesColor(m, plot.defaultColor) as TMarker;
+			if (grouping === undefined)
+				return MarkerGrouping.withSeriesColor(m, plot.defaultColor) as TMarker;
 			const updates: Record<string, unknown> = {};
 			if (GROUPING_KINDS.has(m.type) && m.grouping === undefined) updates.grouping = grouping;
 			if (COLOR_KINDS.has(m.type) && m.color === undefined && !MarkerGrouping.#hasFlatColor(m)) {

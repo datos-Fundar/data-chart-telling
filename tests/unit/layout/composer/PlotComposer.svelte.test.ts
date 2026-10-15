@@ -35,7 +35,9 @@ describe('PlotComposer', () => {
 	test('tags its panels in order', async () => {
 		const { container } = await render(ComposerProbe, { tags: 'A' });
 		await plots(container);
-		const tags = [...container.querySelectorAll('.dct-grid-cell--figure .dct-grid-cell__label')].map((t) => t.textContent);
+		const tags = [
+			...container.querySelectorAll('.dct-grid-cell--figure .dct-grid-cell__label')
+		].map((t) => t.textContent);
 		expect(tags).toEqual(['A', 'B']);
 	});
 
@@ -104,7 +106,9 @@ describe('PlotComposer', () => {
 		const { container } = await render(ComposerProbe, { progress: 0 });
 		await plots(container);
 		expect(container.querySelectorAll('.dct-figure-chrome__timeline').length).toBe(1);
-		expect(container.querySelectorAll('.dct-grid-cell--figure .dct-figure-chrome__timeline').length).toBe(0);
+		expect(
+			container.querySelectorAll('.dct-grid-cell--figure .dct-figure-chrome__timeline').length
+		).toBe(0);
 		await vi.waitFor(() => {
 			for (const plot of container.querySelectorAll('.dct-plot')) {
 				// The first step only: one point per line, on axes that span every step.
@@ -124,9 +128,9 @@ describe('PlotComposer - an inset plot', () => {
 		const { container } = await render(InsetProbe, {});
 		await vi.waitFor(() => expect(container.querySelectorAll('.dct-plot').length).toBe(2));
 		const grid = container.querySelector('.dct-grid')!.getBoundingClientRect();
-		const [main, inset] = [...container.querySelectorAll<HTMLElement>('.dct-grid-cell--figure')].map((p) =>
-			p.getBoundingClientRect()
-		);
+		const [main, inset] = [
+			...container.querySelectorAll<HTMLElement>('.dct-grid-cell--figure')
+		].map((p) => p.getBoundingClientRect());
 		expect(main.width).toBeCloseTo(grid.width, 0);
 		expect(inset.left - grid.left).toBeCloseTo(grid.width * 0.5, 0);
 		expect(inset.top - grid.top).toBeCloseTo(0, 0);
@@ -176,7 +180,9 @@ describe('PlotComposer - placing its children', () => {
 		const cells = [...outer.children].filter((c) => c.classList.contains('dct-grid-cell'));
 		const tags = cells.map((c) => c.querySelector(':scope > .dct-grid-cell__label')?.textContent);
 		expect(tags).toEqual(['A', 'B', 'C']);
-		const nested = [...cells[2].querySelectorAll(':scope .dct-grid .dct-grid-cell__label')].map((t) => t.textContent);
+		const nested = [...cells[2].querySelectorAll(':scope .dct-grid .dct-grid-cell__label')].map(
+			(t) => t.textContent
+		);
 		expect(nested).toEqual(['i', 'ii']);
 	});
 });

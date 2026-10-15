@@ -181,9 +181,9 @@ export const CustomColorHighlight: Story = {
 			Female: [
 				{
 					areas: areasFor(['80-84', '85+']),
-					styles: {  fill: '#d6336c', fillOpacity: 1 }
+					styles: { fill: '#d6336c', fillOpacity: 1 }
 				},
-				{ styles: {fillOpacity: 0.25 } }
+				{ styles: { fillOpacity: 0.25 } }
 			],
 			Male: [
 				{

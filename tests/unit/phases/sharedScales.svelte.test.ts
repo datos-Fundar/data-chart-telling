@@ -20,20 +20,29 @@ const values = (
 
 describe('buildSharedAxisScale', () => {
 	test('a band keeps the order the data gives it when its kind asks for that', () => {
-		const slice = (dataOrder?: boolean) => ({ ...values(['b', 'a'], [], { band: ['x'] }), dataOrder });
-		expect(SharedScalesPhase.buildSharedAxisScale([slice(true)], 'x')).toEqual({ domain: ['b', 'a'] });
+		const slice = (dataOrder?: boolean) => ({
+			...values(['b', 'a'], [], { band: ['x'] }),
+			dataOrder
+		});
+		expect(SharedScalesPhase.buildSharedAxisScale([slice(true)], 'x')).toEqual({
+			domain: ['b', 'a']
+		});
 		expect(SharedScalesPhase.buildSharedAxisScale([slice()], 'x')).toEqual({ domain: ['a', 'b'] });
 	});
 
 	test('spans every facet on a numeric axis, niced', () => {
-		expect(SharedScalesPhase.buildSharedAxisScale([values([1, 5], []), values([3, 12], [])], 'x')).toEqual({
+		expect(
+			SharedScalesPhase.buildSharedAxisScale([values([1, 5], []), values([3, 12], [])], 'x')
+		).toEqual({
 			domain: [1, 12],
 			nice: false
 		});
 	});
 
 	test('nices the extent itself, with a fine step, so short panels do not over-round', () => {
-		expect(SharedScalesPhase.buildSharedAxisScale([values([], [0, 58], { zero: ['y'] })], 'y')).toEqual({
+		expect(
+			SharedScalesPhase.buildSharedAxisScale([values([], [0, 58], { zero: ['y'] })], 'y')
+		).toEqual({
 			domain: [0, 60],
 			nice: false
 		});
@@ -41,7 +50,10 @@ describe('buildSharedAxisScale', () => {
 
 	test('includes zero when a facet asks for it', () => {
 		expect(
-			SharedScalesPhase.buildSharedAxisScale([values([], [4, 9], { zero: ['y'] }), values([], [2, 3])], 'y')
+			SharedScalesPhase.buildSharedAxisScale(
+				[values([], [4, 9], { zero: ['y'] }), values([], [2, 3])],
+				'y'
+			)
 		).toEqual({ domain: [0, 9], nice: false });
 	});
 
@@ -55,7 +67,9 @@ describe('buildSharedAxisScale', () => {
 	});
 
 	test('a band axis of numbers stays categorical', () => {
-		expect(SharedScalesPhase.buildSharedAxisScale([values([2020, 2010], [], { band: ['x'] })], 'x')).toEqual({
+		expect(
+			SharedScalesPhase.buildSharedAxisScale([values([2020, 2010], [], { band: ['x'] })], 'x')
+		).toEqual({
 			domain: [2010, 2020]
 		});
 	});
@@ -63,9 +77,11 @@ describe('buildSharedAxisScale', () => {
 	test('dates span earliest to latest', () => {
 		const a = new Date('2020-01-01');
 		const b = new Date('2021-06-01');
-		expect(SharedScalesPhase.buildSharedAxisScale([values([b], []), values([a], [])], 'x')).toEqual({
-			domain: [a, b]
-		});
+		expect(SharedScalesPhase.buildSharedAxisScale([values([b], []), values([a], [])], 'x')).toEqual(
+			{
+				domain: [a, b]
+			}
+		);
 	});
 
 	test('no values, no domain', () => {

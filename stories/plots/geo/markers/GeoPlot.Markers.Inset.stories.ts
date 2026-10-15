@@ -2,7 +2,12 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
-import { ARGENTINA_PROVINCES, CABA_COMUNAS, AMBA_PARTIDOS, type ArgentinaProvinceProps } from '../data';
+import {
+	ARGENTINA_PROVINCES,
+	CABA_COMUNAS,
+	AMBA_PARTIDOS,
+	type ArgentinaProvinceProps
+} from '../data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `inset` renders a small, independently-projected map panel anchored to a
@@ -13,26 +18,26 @@ import { ARGENTINA_PROVINCES, CABA_COMUNAS, AMBA_PARTIDOS, type ArgentinaProvinc
 // precedence when both are given).
 
 const meta = {
-  title: 'Plots/GeoPlot/Markers/Inset',
-  component: GeoPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 500,
-    data: ARGENTINA_PROVINCES,
-    featureId: (f) => (f.properties as ArgentinaProvinceProps).nombre,
-    coordinates: { projection: { type: argentinaBicontinental } },
-  },
-  argTypes: {
-    width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
-    height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
-    data: { control: false },
-    scales: { control: false },
-    markers: { control: false },
-  },
-  parameters: {
-    docs: { source: { name: 'GeoPlot' } },
-  },
+	title: 'Plots/GeoPlot/Markers/Inset',
+	component: GeoPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 500,
+		data: ARGENTINA_PROVINCES,
+		featureId: (f) => (f.properties as ArgentinaProvinceProps).nombre,
+		coordinates: { projection: { type: argentinaBicontinental } }
+	},
+	argTypes: {
+		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
+		height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
+		data: { control: false },
+		scales: { control: false },
+		markers: { control: false }
+	},
+	parameters: {
+		docs: { source: { name: 'GeoPlot' } }
+	}
 } satisfies Meta<typeof GeoPlot>;
 
 export default meta;
@@ -58,7 +63,7 @@ const TIERRA_DEL_FUEGO = 'Tierra del Fuego, Antártida e Islas del Atlántico Su
  * `ARGENTINA_PROVINCES`' actual part centroids rather than guessed.
  */
 const isAntarcticPart = (part: { centroid: [number, number] }, feature: { __id: string }) =>
-  feature.__id === TIERRA_DEL_FUEGO && (part.centroid[1] < -60 || part.centroid[0] > -50);
+	feature.__id === TIERRA_DEL_FUEGO && (part.centroid[1] < -60 || part.centroid[0] > -50);
 
 /**
  * `location` anchors the inset to a `side-anchor` pair - `'right-middle'`
@@ -67,29 +72,29 @@ const isAntarcticPart = (part: { centroid: [number, number] }, feature: { __id: 
  * ids `segments` keys by.
  */
 export const FilterByFeatureName: Story = {
-  args: {
-    markers: [
-      {
-        type: 'inset',
-        location: 'right-middle',
-        features: ['Ciudad Autónoma de Buenos Aires'],
-        styles: { fill: '#dc2626' },
-      },
-    ] satisfies GeoMarkersConfig[],
-  },
+	args: {
+		markers: [
+			{
+				type: 'inset',
+				location: 'right-middle',
+				features: ['Ciudad Autónoma de Buenos Aires'],
+				styles: { fill: '#dc2626' }
+			}
+		] satisfies GeoMarkersConfig[]
+	}
 };
 
 /** `features` accepts a list - several provinces shown together in one inset. */
 export const MultipleFeatures: Story = {
-  args: {
-    markers: [
-      {
-        type: 'inset',
-        location: 'right-middle',
-        features: ['Ciudad Autónoma de Buenos Aires', 'Buenos Aires'],
-      },
-    ] satisfies GeoMarkersConfig[],
-  },
+	args: {
+		markers: [
+			{
+				type: 'inset',
+				location: 'right-middle',
+				features: ['Ciudad Autónoma de Buenos Aires', 'Buenos Aires']
+			}
+		] satisfies GeoMarkersConfig[]
+	}
 };
 
 /**
@@ -98,16 +103,16 @@ export const MultipleFeatures: Story = {
  * which aren't part of `ARGENTINA_PROVINCES` at all.
  */
 export const ExplicitDataset: Story = {
-  args: {
-    markers: [
-      {
-        type: 'inset',
-        location: 'right-middle',
-        data: AMBA_PARTIDOS,
-        styles: { stroke: '#dc2626', strokeWidth: 1 },
-      },
-    ] satisfies GeoMarkersConfig[],
-  },
+	args: {
+		markers: [
+			{
+				type: 'inset',
+				location: 'right-middle',
+				data: AMBA_PARTIDOS,
+				styles: { stroke: '#dc2626', strokeWidth: 1 }
+			}
+		] satisfies GeoMarkersConfig[]
+	}
 };
 
 /**
@@ -134,19 +139,19 @@ export const ExplicitDataset: Story = {
  * near ±90°.
  */
 export const AntarcticSector: Story = {
-  args: {
-    coordinates: { projection: { type: 'mercator', domain: 'data' } },
-    excludeParts: isAntarcticPart,
-    markers: [
-      {
-        type: 'inset',
-        location: 'bottom-right',
-        features: [TIERRA_DEL_FUEGO],
-        featurePartsFilter: isAntarcticPart,
-        projection: { type: 'azimuthal-equidistant', rotate: [49.5, 90] },
-      },
-    ] satisfies GeoMarkersConfig[],
-  },
+	args: {
+		coordinates: { projection: { type: 'mercator', domain: 'data' } },
+		excludeParts: isAntarcticPart,
+		markers: [
+			{
+				type: 'inset',
+				location: 'bottom-right',
+				features: [TIERRA_DEL_FUEGO],
+				featurePartsFilter: isAntarcticPart,
+				projection: { type: 'azimuthal-equidistant', rotate: [49.5, 90] }
+			}
+		] satisfies GeoMarkersConfig[]
+	}
 };
 
 /**
@@ -157,39 +162,39 @@ export const AntarcticSector: Story = {
  * - mirroring the layout Argentina's IGN uses on official maps.
  */
 export const CombinedInsets: Story = {
-  args: {
-    coordinates: { projection: { type: 'mercator', domain: 'data' } },
-    excludeParts: isAntarcticPart,
-    markers: [
-      {
-        type: 'inset',
-        location: 'right-middle',
-        data: CABA_COMUNAS,
-        styles: { stroke: '#dc2626', strokeWidth: 1 },
-      },
-      {
-        type: 'inset',
-        location: 'bottom-right',
-        features: [TIERRA_DEL_FUEGO],
-        featurePartsFilter: isAntarcticPart,
-        projection: { type: 'azimuthal-equidistant', rotate: [49.5, 90] },
-      },
-    ] satisfies GeoMarkersConfig[],
-  },
+	args: {
+		coordinates: { projection: { type: 'mercator', domain: 'data' } },
+		excludeParts: isAntarcticPart,
+		markers: [
+			{
+				type: 'inset',
+				location: 'right-middle',
+				data: CABA_COMUNAS,
+				styles: { stroke: '#dc2626', strokeWidth: 1 }
+			},
+			{
+				type: 'inset',
+				location: 'bottom-right',
+				features: [TIERRA_DEL_FUEGO],
+				featurePartsFilter: isAntarcticPart,
+				projection: { type: 'azimuthal-equidistant', rotate: [49.5, 90] }
+			}
+		] satisfies GeoMarkersConfig[]
+	}
 };
 
 /** `width`/`height` (as a fraction of the plot's own size) and `margin` (pixels from the edge) control the inset box's size/position. */
 export const CustomSize: Story = {
-  args: {
-    markers: [
-      {
-        type: 'inset',
-        location: 'top-left',
-        features: ['Ciudad Autónoma de Buenos Aires'],
-        width: 0.4,
-        height: 0.3,
-        margin: 20,
-      },
-    ] satisfies GeoMarkersConfig[],
-  },
+	args: {
+		markers: [
+			{
+				type: 'inset',
+				location: 'top-left',
+				features: ['Ciudad Autónoma de Buenos Aires'],
+				width: 0.4,
+				height: 0.3,
+				margin: 20
+			}
+		] satisfies GeoMarkersConfig[]
+	}
 };

@@ -19,9 +19,7 @@ export class AuthorMarkers {
 	 * its series, then runs each marker's own transforms over its rows - its
 	 * segment's or series' rows when it's scoped to one, the plot's rows otherwise.
 	 */
-	static prepare<
-		T extends { type: string; component?: unknown; props?: unknown }
-	>(
+	static prepare<T extends { type: string; component?: unknown; props?: unknown }>(
 		markers: T[],
 		plot: {
 			grouping?: unknown;
@@ -79,16 +77,17 @@ export class AuthorMarkers {
 	 * transforms run, per series. A plot without transforms draws its rows as
 	 * they are, so its markers are left as is, as is a kind that draws no rows.
 	 */
-	static withProcessedRows<T extends { type: string }>(
-		marker: T,
-		processed?: ProcessedData
-	): T {
+	static withProcessedRows<T extends { type: string }>(marker: T, processed?: ProcessedData): T {
 		const own = marker as T & {
 			data?: unknown;
 			series?: unknown;
 			grouping?: unknown;
 		} & Record<string, unknown>;
-		if (own.data !== undefined || !AuthorMarkers.#drawsRows(own.type) || !processed?.transforms.length) {
+		if (
+			own.data !== undefined ||
+			!AuthorMarkers.#drawsRows(own.type) ||
+			!processed?.transforms.length
+		) {
 			return marker;
 		}
 		const rows =

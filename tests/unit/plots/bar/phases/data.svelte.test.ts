@@ -46,7 +46,10 @@ function build(
 		height: 300,
 		...overrides
 	};
-	const ctx: BarPlotCtx = { cfg: FAKE_CFG, interaction: new PlotInteraction(() => FAKE_CFG, { legend: legendInteraction }) };
+	const ctx: BarPlotCtx = {
+		cfg: FAKE_CFG,
+		interaction: new PlotInteraction(() => FAKE_CFG, { legend: legendInteraction })
+	};
 	return buildData(state, ctx) as ResolvedData;
 }
 

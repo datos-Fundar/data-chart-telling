@@ -10,24 +10,24 @@ import { WORLD_COUNTRIES, FLIGHT_ROUTES } from '../data';
 // which reads clearly on a global, non-Mercator projection.
 
 const meta = {
-  title: 'Plots/GeoPlot/Markers/Link',
-  component: GeoPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 500,
-    data: WORLD_COUNTRIES,
-    styles: { fill: '#e2e8f0', stroke: '#94a3b8' },
-  },
-  argTypes: {
-    width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
-    height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
-    data: { control: false },
-    markers: { control: false },
-  },
-  parameters: {
-    docs: { source: { name: 'GeoPlot' } },
-  },
+	title: 'Plots/GeoPlot/Markers/Link',
+	component: GeoPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 500,
+		data: WORLD_COUNTRIES,
+		styles: { fill: '#e2e8f0', stroke: '#94a3b8' }
+	},
+	argTypes: {
+		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
+		height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
+		data: { control: false },
+		markers: { control: false }
+	},
+	parameters: {
+		docs: { source: { name: 'GeoPlot' } }
+	}
 } satisfies Meta<typeof GeoPlot>;
 
 export default meta;
@@ -41,20 +41,20 @@ type Story = StoryObj<typeof meta>;
  * than a straight line between the two endpoints.
  */
 export const SphericalLinks: Story = {
-  args: {
-    coordinates: { projection: 'equal-earth' },
-    markers: [
-      {
-        type: 'link',
-        data: FLIGHT_ROUTES,
-        x1: 'fromLon',
-        y1: 'fromLat',
-        x2: 'toLon',
-        y2: 'toLat',
-        styles: { stroke: '#dc2626', strokeWidth: 1.5, strokeOpacity: 0.8 },
-      },
-    ] satisfies GeoMarkersConfig[],
-  },
+	args: {
+		coordinates: { projection: 'equal-earth' },
+		markers: [
+			{
+				type: 'link',
+				data: FLIGHT_ROUTES,
+				x1: 'fromLon',
+				y1: 'fromLat',
+				x2: 'toLon',
+				y2: 'toLat',
+				styles: { stroke: '#dc2626', strokeWidth: 1.5, strokeOpacity: 0.8 }
+			}
+		] satisfies GeoMarkersConfig[]
+	}
 };
 
 /**
@@ -63,21 +63,21 @@ export const SphericalLinks: Story = {
  * the same projection to see the difference.
  */
 export const LinearLinks: Story = {
-  args: {
-    coordinates: { projection: 'equal-earth' },
-    markers: [
-      {
-        type: 'link',
-        data: FLIGHT_ROUTES,
-        x1: 'fromLon',
-        y1: 'fromLat',
-        x2: 'toLon',
-        y2: 'toLat',
-        curve: 'linear',
-        styles: { stroke: '#0891b2', strokeWidth: 1.5, strokeOpacity: 0.8 },
-      },
-    ] satisfies GeoMarkersConfig[],
-  },
+	args: {
+		coordinates: { projection: 'equal-earth' },
+		markers: [
+			{
+				type: 'link',
+				data: FLIGHT_ROUTES,
+				x1: 'fromLon',
+				y1: 'fromLat',
+				x2: 'toLon',
+				y2: 'toLat',
+				curve: 'linear',
+				styles: { stroke: '#0891b2', strokeWidth: 1.5, strokeOpacity: 0.8 }
+			}
+		] satisfies GeoMarkersConfig[]
+	}
 };
 
 /**
@@ -89,20 +89,20 @@ export const LinearLinks: Story = {
  * correctly wherever the globe is currently facing.
  */
 export const OnOrthographicGlobe: Story = {
-  args: {
-    coordinates: { projection: { type: 'orthographic', rotate: [60, -10] }, zoom: true },
-    markers: [
-      { type: 'sphere', behind: true, styles: { fill: '#f8fafc', stroke: 'currentColor' } },
-      { type: 'graticule', styles: { stroke: '#e2e8f0' } },
-      {
-        type: 'link',
-        data: FLIGHT_ROUTES,
-        x1: 'fromLon',
-        y1: 'fromLat',
-        x2: 'toLon',
-        y2: 'toLat',
-        styles: { stroke: '#dc2626', strokeWidth: 1.5 },
-      },
-    ] satisfies GeoMarkersConfig[],
-  },
+	args: {
+		coordinates: { projection: { type: 'orthographic', rotate: [60, -10] }, zoom: true },
+		markers: [
+			{ type: 'sphere', behind: true, styles: { fill: '#f8fafc', stroke: 'currentColor' } },
+			{ type: 'graticule', styles: { stroke: '#e2e8f0' } },
+			{
+				type: 'link',
+				data: FLIGHT_ROUTES,
+				x1: 'fromLon',
+				y1: 'fromLat',
+				x2: 'toLon',
+				y2: 'toLat',
+				styles: { stroke: '#dc2626', strokeWidth: 1.5 }
+			}
+		] satisfies GeoMarkersConfig[]
+	}
 };

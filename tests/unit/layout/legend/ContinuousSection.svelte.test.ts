@@ -203,9 +203,8 @@ describe('ContinuousSection - the numbers at its edges', () => {
 	const section: ContinuousLegendSection = { type: 'continuous', min: 140, max: 1_397_715_000 };
 
 	test('read by the configured locale and compact display, like the axes', async () => {
-		const { setConfiguration, resetConfiguration } = await import(
-			'$lib/configuration/config.svelte'
-		);
+		const { setConfiguration, resetConfiguration } =
+			await import('$lib/configuration/config.svelte');
 		try {
 			setConfiguration({ axis: { locale: 'en-US', compactDisplay: 'short' } });
 			const en = render(ContinuousSection, { section });

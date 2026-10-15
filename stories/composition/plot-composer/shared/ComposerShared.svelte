@@ -17,12 +17,5 @@
 	legend={{ series: { title: 'region', interactive: { enabled: true } } }}
 >
 	<LinePlot data={gdp} x="year" y="value" color="region" tooltip />
-	<BarPlot
-		data={gdp}
-		x="year"
-		y="value"
-		color="region"
-		transforms={[{ type: 'stackY' }]}
-		tooltip
-	/>
+	<BarPlot data={gdp} x="year" y="value" color="region" transforms={[{ type: 'stackY' }]} tooltip />
 </PlotComposer>

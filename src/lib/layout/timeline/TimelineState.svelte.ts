@@ -95,7 +95,8 @@ export class TimelineState {
 
 	/** Reports the steps the plots found in their rows. */
 	setSteps(values: TimeValue[]): void {
-		const same = values.length === this.#steps.length && values.every((v, i) => v === this.#steps[i]);
+		const same =
+			values.length === this.#steps.length && values.every((v, i) => v === this.#steps[i]);
 		if (!same) this.#steps = values;
 	}
 
@@ -141,7 +142,9 @@ export class TimelineState {
 
 	/** Milliseconds each step lasts at speed `1`. */
 	get stepDuration(): number {
-		return this.#settings()?.player?.stepDuration ?? getConfiguration().timeline.player.stepDuration;
+		return (
+			this.#settings()?.player?.stepDuration ?? getConfiguration().timeline.player.stepDuration
+		);
 	}
 
 	/** How the current step reads. */

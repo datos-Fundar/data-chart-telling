@@ -7,7 +7,7 @@ function cellSize(container: Element): { width: number; height: number } {
 	if (!cell) throw new Error('no facet cell rendered');
 	return {
 		width: Number(cell.getAttribute('data-width')),
-		height: Number(cell.getAttribute('data-height')),
+		height: Number(cell.getAttribute('data-height'))
 	};
 }
 
@@ -19,7 +19,7 @@ describe('FacetLayout - paginated mode sizes cells off the current page, not the
 			mode: 'paginated',
 			pageSize: 1,
 			width: 600,
-			height: 400,
+			height: 400
 		});
 
 		const { height } = cellSize(container);
@@ -36,7 +36,7 @@ describe('FacetLayout - paginated mode sizes cells off the current page, not the
 			mode: 'paginated',
 			pageSize: 4,
 			width: 600,
-			height: 400,
+			height: 400
 		});
 
 		const { height } = cellSize(container);
@@ -52,7 +52,7 @@ describe('FacetLayout - paginated mode sizes cells off the current page, not the
 			columns: 3,
 			mode: 'paginated',
 			width: 600,
-			height: 400,
+			height: 400
 		});
 
 		const { height } = cellSize(container);
@@ -63,7 +63,7 @@ describe('FacetLayout - paginated mode sizes cells off the current page, not the
 			columns: 3,
 			mode: 'grid',
 			width: 600,
-			height: 400,
+			height: 400
 		});
 		expect(height).toBe(cellSize(grid.container).height);
 	});
@@ -77,7 +77,7 @@ describe('FacetLayout - navLayout', () => {
 			mode: 'paginated',
 			pageSize: 1,
 			width: 600,
-			height: 400,
+			height: 400
 		});
 
 		expect(container.querySelector('.dct-facet-paginated__nav')).toBeTruthy();
@@ -93,7 +93,7 @@ describe('FacetLayout - navLayout', () => {
 			pageSize: 1,
 			navLayout: 'below',
 			width: 600,
-			height: 400,
+			height: 400
 		});
 
 		const nav = container.querySelector('.dct-facet-paginated__nav-below');
@@ -117,7 +117,7 @@ describe('FacetLayout - navLayout', () => {
 			mode: 'paginated',
 			pageSize: 1,
 			width: 600,
-			height: 400,
+			height: 400
 		});
 		expect(height).toBeLessThan(cellSize(overlay.container).height);
 	});
@@ -129,7 +129,7 @@ describe('FacetLayout - navLayout', () => {
 			mode: 'paginated',
 			navLayout: 'below',
 			width: 600,
-			height: 400,
+			height: 400
 		});
 
 		expect(container.querySelector('.dct-facet-paginated__nav-below')).toBeFalsy();

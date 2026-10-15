@@ -8,7 +8,15 @@ Both derive rows from the data before drawing. A **transform** reshapes the rows
 
 ```svelte
 <!-- stacked bars -->
-<BarPlot {width} {height} data={rows} x="province" y="value" color="sex" transforms={[{ type: 'stackY' }]} />
+<BarPlot
+	{width}
+	{height}
+	data={rows}
+	x="province"
+	y="value"
+	color="sex"
+	transforms={[{ type: 'stackY' }]}
+/>
 
 <!-- a 6-month moving average, run on the plot's rows -->
 <LinePlot
@@ -26,22 +34,22 @@ Both derive rows from the data before drawing. A **transform** reshapes the rows
 
 ![Lines smoothed by a moving average](images/transforms-window.png)
 
-| Family | `type` | Does |
-| --- | --- | --- |
-| Stack | `stackX`, `stackY`, `stackMosaicX`, `stackMosaicY` | Cumulative stacking. Options: `offset` (`'none'`, `'wiggle'`, `'center'`, `'normalize'`, `'diverging'`), `order`, `reverse` |
-| Bin | `binX`, `binY`, `bin` | Count or reduce rows into bins. Options: `thresholds` (a count, a list, or `'auto'`, `'scott'`, `'sturges'`, `'freedman-diaconis'`), `interval`, `domain`, `cumulative`; reducers by channel (`y: 'count'`, `fill: 'mean'`, ...) |
-| Group | `groupX`, `groupY`, `groupZ`, `group` | Reduce rows per category with named reducers (`count`, `sum`, `mean`, `p25`, ...) or functions |
-| Window | `windowX`, `windowY` | Sliding window: `k` (size), `reduce` (`'mean'`, `'median'`, `'sum'`, `'max'`, ...), `anchor`, `strict` |
-| Bollinger | `bollingerX`, `bollingerY` | Moving average and band: `n`, `k` |
-| Normalize | `normalizeX`, `normalizeY`, `normalizeParallelX`, `normalizeParallelY` | Rebase to a reference: `basis` (`'first'`, `'last'`, `'min'`, `'max'`, `'mean'`, `'median'`, `'sum'`, `'deviation'`) |
-| Map | `mapX`, `mapY` | `map`: `'cumsum'`, `'rank'`, `'quantile'` or a function |
-| Interval | `intervalX`, `intervalY` | Turn a value into an `[x1, x2]` interval of a given size |
-| Jitter | `jitterX`, `jitterY` | Random offset: `width`, `std`, `distribution` (`'uniform'`, `'normal'`), `seed` |
-| Shift | `shiftX`, `shiftY` | Move by `by` (a number, or a string offset) |
-| Density | `densityX`, `densityY` | Kernel density estimate: `kernel`, `bandwidth` |
-| Sort | `sort`, `shuffle`, `reverse` | Reorder rows (matters for the path a line takes and which dot lands on top) |
-| Filter | `filter` | Keep rows a test holds for |
-| Select | `select`, `selectFirst`, `selectLast`, `selectMinX`, `selectMaxX`, `selectMinY`, `selectMaxY` | Keep one row per group, such as each series' last point or peak |
+| Family    | `type`                                                                                        | Does                                                                                                                                                                                                                             |
+| --------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Stack     | `stackX`, `stackY`, `stackMosaicX`, `stackMosaicY`                                            | Cumulative stacking. Options: `offset` (`'none'`, `'wiggle'`, `'center'`, `'normalize'`, `'diverging'`), `order`, `reverse`                                                                                                      |
+| Bin       | `binX`, `binY`, `bin`                                                                         | Count or reduce rows into bins. Options: `thresholds` (a count, a list, or `'auto'`, `'scott'`, `'sturges'`, `'freedman-diaconis'`), `interval`, `domain`, `cumulative`; reducers by channel (`y: 'count'`, `fill: 'mean'`, ...) |
+| Group     | `groupX`, `groupY`, `groupZ`, `group`                                                         | Reduce rows per category with named reducers (`count`, `sum`, `mean`, `p25`, ...) or functions                                                                                                                                   |
+| Window    | `windowX`, `windowY`                                                                          | Sliding window: `k` (size), `reduce` (`'mean'`, `'median'`, `'sum'`, `'max'`, ...), `anchor`, `strict`                                                                                                                           |
+| Bollinger | `bollingerX`, `bollingerY`                                                                    | Moving average and band: `n`, `k`                                                                                                                                                                                                |
+| Normalize | `normalizeX`, `normalizeY`, `normalizeParallelX`, `normalizeParallelY`                        | Rebase to a reference: `basis` (`'first'`, `'last'`, `'min'`, `'max'`, `'mean'`, `'median'`, `'sum'`, `'deviation'`)                                                                                                             |
+| Map       | `mapX`, `mapY`                                                                                | `map`: `'cumsum'`, `'rank'`, `'quantile'` or a function                                                                                                                                                                          |
+| Interval  | `intervalX`, `intervalY`                                                                      | Turn a value into an `[x1, x2]` interval of a given size                                                                                                                                                                         |
+| Jitter    | `jitterX`, `jitterY`                                                                          | Random offset: `width`, `std`, `distribution` (`'uniform'`, `'normal'`), `seed`                                                                                                                                                  |
+| Shift     | `shiftX`, `shiftY`                                                                            | Move by `by` (a number, or a string offset)                                                                                                                                                                                      |
+| Density   | `densityX`, `densityY`                                                                        | Kernel density estimate: `kernel`, `bandwidth`                                                                                                                                                                                   |
+| Sort      | `sort`, `shuffle`, `reverse`                                                                  | Reorder rows (matters for the path a line takes and which dot lands on top)                                                                                                                                                      |
+| Filter    | `filter`                                                                                      | Keep rows a test holds for                                                                                                                                                                                                       |
+| Select    | `select`, `selectFirst`, `selectLast`, `selectMinX`, `selectMaxX`, `selectMinY`, `selectMaxY` | Keep one row per group, such as each series' last point or peak                                                                                                                                                                  |
 
 Bar stacking is always `stackY`, also for horizontal bars. A transform on a `HistogramPlot` is merged over the plot's default binning, so `{ type: 'binX', thresholds: 20 }` changes the bins and the rest stays.
 
@@ -62,14 +70,14 @@ Bar stacking is always `stackY`, also for horizontal bars. A transform on a `His
 
 ![A scatter plot with a regression line and confidence band](images/statistics-regression.png)
 
-| `type` | Draws | Options |
-| --- | --- | --- |
-| `regression` | A fitted curve with a confidence band | `regressionType` (`'linear'`, `'quad'`, `'poly'`, `'exp'`, `'log'`, `'pow'`, `'loess'`), `order`, `base`, `span`, `confidence` (`false` omits the band), `styles` |
-| `movingAverage` | A smoothed line | `k` (required), `reduce`, `styles` |
-| `bollinger` | Moving average and a band of `k` standard deviations | `n`, `k`, `styles` |
-| `density` | A 1D density curve over `x` | `kernel`, `bandwidth`, `styles` |
-| `density2d` | 2D density contour bands | `bandwidth`, `thresholds`, `styles` |
-| `box` | A box plot per category | the options of the [`box` marker](markers.md) |
+| `type`          | Draws                                                | Options                                                                                                                                                           |
+| --------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `regression`    | A fitted curve with a confidence band                | `regressionType` (`'linear'`, `'quad'`, `'poly'`, `'exp'`, `'log'`, `'pow'`, `'loess'`), `order`, `base`, `span`, `confidence` (`false` omits the band), `styles` |
+| `movingAverage` | A smoothed line                                      | `k` (required), `reduce`, `styles`                                                                                                                                |
+| `bollinger`     | Moving average and a band of `k` standard deviations | `n`, `k`, `styles`                                                                                                                                                |
+| `density`       | A 1D density curve over `x`                          | `kernel`, `bandwidth`, `styles`                                                                                                                                   |
+| `density2d`     | 2D density contour bands                             | `bandwidth`, `thresholds`, `styles`                                                                                                                               |
+| `box`           | A box plot per category                              | the options of the [`box` marker](markers.md)                                                                                                                     |
 
 Which series a statistic runs over:
 

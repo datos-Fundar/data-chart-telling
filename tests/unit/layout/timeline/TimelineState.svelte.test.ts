@@ -46,7 +46,7 @@ describe('TimelineState - where it is', () => {
 		expect(state.value).toBe(2003);
 	});
 
-	test("without values of its own it takes the steps its plots report", () => {
+	test('without values of its own it takes the steps its plots report', () => {
 		const state = new TimelineState(() => ({}));
 		expect(state.value).toBeUndefined();
 		state.setSteps([1, 2, 3]);
@@ -108,7 +108,7 @@ describe('TimelineState - playing', () => {
 		expect(onspeed.mock.calls.map(([s]) => s)).toEqual([2, 4, 1]);
 	});
 
-	test('starts from the owner\'s loop and speed, and tells it of changes', () => {
+	test("starts from the owner's loop and speed, and tells it of changes", () => {
 		const onloop = vi.fn();
 		const { state } = make({ player: { loop: true, speed: 2, onloop } });
 		expect(state.loop).toBe(true);

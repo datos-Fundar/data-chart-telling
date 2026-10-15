@@ -60,7 +60,13 @@
 				data={northSeries}
 				x="year"
 				y="value"
-				timeline={{ accessor: 'year', type: 'rule', progress, orientation: 'vertical', filterMode: 'upTo' }}
+				timeline={{
+					accessor: 'year',
+					type: 'rule',
+					progress,
+					orientation: 'vertical',
+					filterMode: 'upTo'
+				}}
 				facet={{ by: 'metric' as keyof SeriesPoint, columns: 2 }}
 			/>
 		{/if}

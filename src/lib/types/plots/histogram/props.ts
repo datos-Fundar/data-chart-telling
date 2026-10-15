@@ -7,7 +7,10 @@ import type { AreaStyle } from '$lib/types/plots/styling';
 import type { AxisChannelName, ChannelAccessors } from '$lib/types/layout/mapping';
 
 /** Flat rows binned on one axis: `x` for vertical bars, or `y` alone for horizontal ones. A bin's count is its length. */
-type HistogramDataProps<TRow extends Record<string, unknown>> = Omit<DataProps<TRow>, AxisChannelName> &
+type HistogramDataProps<TRow extends Record<string, unknown>> = Omit<
+	DataProps<TRow>,
+	AxisChannelName
+> &
 	(
 		| (Required<Pick<ChannelAccessors<TRow>, 'x'>> & { y?: never })
 		| (Required<Pick<ChannelAccessors<TRow>, 'y'>> & { x?: never })

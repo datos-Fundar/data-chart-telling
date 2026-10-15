@@ -94,20 +94,20 @@ export const WithEarthquakeDots: Story = {
 	args: {
 		data: WORLD_COUNTRIES,
 		coordinates: {
-      projection: { type: 'orthographic', rotate: [65, 15] },
-      zoom: true,
-      rotate: true,
-    },
+			projection: { type: 'orthographic', rotate: [65, 15] },
+			zoom: true,
+			rotate: true
+		},
 		markers: [
 			{
-        type: 'sphere',
-        behind: true,
-        styles: { fill: '#f8fafc', stroke: 'currentColor' }
-      },
+				type: 'sphere',
+				behind: true,
+				styles: { fill: '#f8fafc', stroke: 'currentColor' }
+			},
 			{
-        type: 'graticule',
-        styles: { stroke: '#e2e8f0' }
-      },
+				type: 'graticule',
+				styles: { stroke: '#e2e8f0' }
+			},
 			{
 				type: 'dot',
 				data: EARTHQUAKES,

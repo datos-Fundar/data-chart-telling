@@ -24,13 +24,13 @@ Plots drawn straight inside the composer take a cell of the grid and draw at the
 
 `layout` arranges the cells:
 
-| Field | Meaning |
-| --- | --- |
-| `columns` | Flow children into this many columns |
-| `areas` | Named cells: one string per row, names separated by spaces, `.` for an empty cell (`['a a b', 'a a c']`) |
-| `widths`, `heights` | Relative track sizes |
-| `gap` | Pixels between cells (default 12) |
-| `align` | Line up every panel's plot area with its row and column, as facets do. Assumes the panels draw no chrome of their own |
+| Field               | Meaning                                                                                                               |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `columns`           | Flow children into this many columns                                                                                  |
+| `areas`             | Named cells: one string per row, names separated by spaces, `.` for an empty cell (`['a a b', 'a a c']`)              |
+| `widths`, `heights` | Relative track sizes                                                                                                  |
+| `gap`               | Pixels between cells (default 12)                                                                                     |
+| `align`             | Line up every panel's plot area with its row and column, as facets do. Assumes the panels draw no chrome of their own |
 
 ## Placing a child
 

@@ -23,7 +23,6 @@
 		margins = $bindable(),
 		...core
 	}: AreaPlotProps<TData> = $props();
-
 </script>
 
 <Plot

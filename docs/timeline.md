@@ -18,17 +18,17 @@
 
 ## Options
 
-| Option | Meaning |
-| --- | --- |
-| `accessor` | Field (or function) giving each row's step - required |
-| `type` | `'player'` (default) draws a control bar in the chrome; `'rule'` draws a guide with the steps written along it |
-| `progress` | The position, `0`-`1`. A player keeps its own position from there on, until `progress` changes |
-| `values` | The steps, when not every distinct value of `accessor` |
-| `filterMode` | `'exact'` shows the rows of the current step; `'upTo'` shows every row up to it (a cumulative reveal). `LinePlot` defaults to `'upTo'` |
-| `interpolate` | Tween values between steps so a scrub is smooth: `true`, or `{ key, value, create, progressEasing, segmentEasing }`. Line and bar plots default to interpolating their value channel |
-| `scales` | `'shared'` (default): axes span every step, so they hold still while scrubbing; `'free'` refits them to each step |
-| `onprogress`, `onvalue` | Called with the new position (`0`-`1`) and with the step it lands on |
-| `orientation`, `show`, `thickness` | A rule's direction (`'vertical'` default, beside the plot; `'horizontal'`), visibility and size |
+| Option                             | Meaning                                                                                                                                                                              |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `accessor`                         | Field (or function) giving each row's step - required                                                                                                                                |
+| `type`                             | `'player'` (default) draws a control bar in the chrome; `'rule'` draws a guide with the steps written along it                                                                       |
+| `progress`                         | The position, `0`-`1`. A player keeps its own position from there on, until `progress` changes                                                                                       |
+| `values`                           | The steps, when not every distinct value of `accessor`                                                                                                                               |
+| `filterMode`                       | `'exact'` shows the rows of the current step; `'upTo'` shows every row up to it (a cumulative reveal). `LinePlot` defaults to `'upTo'`                                               |
+| `interpolate`                      | Tween values between steps so a scrub is smooth: `true`, or `{ key, value, create, progressEasing, segmentEasing }`. Line and bar plots default to interpolating their value channel |
+| `scales`                           | `'shared'` (default): axes span every step, so they hold still while scrubbing; `'free'` refits them to each step                                                                    |
+| `onprogress`, `onvalue`            | Called with the new position (`0`-`1`) and with the step it lands on                                                                                                                 |
+| `orientation`, `show`, `thickness` | A rule's direction (`'vertical'` default, beside the plot; `'horizontal'`), visibility and size                                                                                      |
 
 ## Player
 
@@ -52,15 +52,15 @@ The player is a bar in the chrome, below the plot by default, placed like any ot
 />
 ```
 
-| `player` option | Meaning |
-| --- | --- |
-| `controls` | The controls drawn, in this order: `'play'`, `'value'`, `'slider'`, `'speed'`, `'loop'` |
-| `autoplay` | Start playing as soon as there are steps |
-| `loop`, `speed` | Where the player starts; it keeps them from there and tells `onloop` / `onspeed` on change |
-| `speeds` | Speeds the speed control cycles through |
-| `stepDuration` | Milliseconds per step at speed `1` |
-| `format` | How the current step reads in the `'value'` control |
-| `onplay`, `onspeed`, `onloop` | Change callbacks |
+| `player` option               | Meaning                                                                                    |
+| ----------------------------- | ------------------------------------------------------------------------------------------ |
+| `controls`                    | The controls drawn, in this order: `'play'`, `'value'`, `'slider'`, `'speed'`, `'loop'`    |
+| `autoplay`                    | Start playing as soon as there are steps                                                   |
+| `loop`, `speed`               | Where the player starts; it keeps them from there and tells `onloop` / `onspeed` on change |
+| `speeds`                      | Speeds the speed control cycles through                                                    |
+| `stepDuration`                | Milliseconds per step at speed `1`                                                         |
+| `format`                      | How the current step reads in the `'value'` control                                        |
+| `onplay`, `onspeed`, `onloop` | Change callbacks                                                                           |
 
 Defaults for `controls`, `speeds` and `stepDuration` come from `timeline.player` in the [configuration](theming.md), together with the bar's colors and sizes.
 

@@ -31,7 +31,9 @@ const types = (markers?: AxisBasedMarkersConfig[]) => markers?.map((m) => m.type
 describe('StatisticsPhase', () => {
 	test('puts the plot-level statistics before the author markers', () => {
 		const rule = { type: 'rule', y: 3 } as unknown as AxisBasedMarkersConfig;
-		const out = new StatisticsPhase().run(state({ statistics: [MOVING_AVERAGE], authorMarkers: [rule] }));
+		const out = new StatisticsPhase().run(
+			state({ statistics: [MOVING_AVERAGE], authorMarkers: [rule] })
+		);
 		expect(types(out.markers)).toEqual(['line', 'line', 'rule']);
 	});
 
@@ -74,7 +76,9 @@ describe('StatisticsPhase', () => {
 	test('inheritPositions gives a line/area/dot marker the plot x/y, and only those kinds', () => {
 		const line = { type: 'line', data: rows } as unknown as AxisBasedMarkersConfig;
 		const rule = { type: 'rule', y: 3 } as unknown as AxisBasedMarkersConfig;
-		const out = new StatisticsPhase({ inheritPositions: true }).run(state({ authorMarkers: [line, rule] }));
+		const out = new StatisticsPhase({ inheritPositions: true }).run(
+			state({ authorMarkers: [line, rule] })
+		);
 		expect(out.markers![0]).toMatchObject({ x: 'x', y: 'y' });
 		expect(out.markers![1]).not.toHaveProperty('x');
 	});

@@ -61,7 +61,12 @@ export const QuadrantDividers: Story = {
 		data: COUNTRIES,
 		color: 'region',
 		markers: [
-			{ type: 'rule', axis: 'x', value: 15, styles: { strokeDasharray: '4 4', strokeOpacity: 0.5 } },
+			{
+				type: 'rule',
+				axis: 'x',
+				value: 15,
+				styles: { strokeDasharray: '4 4', strokeOpacity: 0.5 }
+			},
 			{ type: 'rule', axis: 'y', value: 75, styles: { strokeDasharray: '4 4', strokeOpacity: 0.5 } }
 		] satisfies AxisBasedMarkersConfig[]
 	}

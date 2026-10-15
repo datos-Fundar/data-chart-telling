@@ -158,7 +158,9 @@
 		appearance: none;
 		width: var(--dct-player-thumb-size, 14px);
 		height: var(--dct-player-thumb-size, 14px);
-		margin-top: calc((var(--dct-player-track-height, 3px) - var(--dct-player-thumb-size, 14px)) / 2);
+		margin-top: calc(
+			(var(--dct-player-track-height, 3px) - var(--dct-player-thumb-size, 14px)) / 2
+		);
 		border: none;
 		border-radius: 50%;
 		background: var(--dct-player-thumb-color, currentColor);

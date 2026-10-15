@@ -18,15 +18,15 @@ The chrome is everything a figure draws around its plot: title, subtitle, legend
 
 ![A plot with title, subtitle and caption](images/chrome.png)
 
-| Prop | Type | Meaning |
-| --- | --- | --- |
-| `title` | `string` | Heading |
-| `subtitle` | `string` | Line under the title |
-| `caption` | `string` | Note under the plot |
-| `header` | `Snippet` | Replaces `title` and `subtitle` with your markup |
-| `footer` | `Snippet` | Replaces `caption` with your markup |
-| `legend` | see [Legend](legend.md) | The legend |
-| `order` | `PlotChromeEntry[]` | Which blocks draw, top to bottom |
+| Prop       | Type                    | Meaning                                          |
+| ---------- | ----------------------- | ------------------------------------------------ |
+| `title`    | `string`                | Heading                                          |
+| `subtitle` | `string`                | Line under the title                             |
+| `caption`  | `string`                | Note under the plot                              |
+| `header`   | `Snippet`               | Replaces `title` and `subtitle` with your markup |
+| `footer`   | `Snippet`               | Replaces `caption` with your markup              |
+| `legend`   | see [Legend](legend.md) | The legend                                       |
+| `order`    | `PlotChromeEntry[]`     | Which blocks draw, top to bottom                 |
 
 `header` and `footer` are snippets declared inside the component:
 

@@ -16,7 +16,8 @@ export class PerGroup {
 			const { z, data, ...rest } = channels;
 			const rows = (data as Row[] | undefined) ?? [];
 			if (z == null || !rows.length) return run(channels, options);
-			const read = typeof z === 'function' ? (z as (d: Row) => unknown) : (d: Row) => d[z as string];
+			const read =
+				typeof z === 'function' ? (z as (d: Row) => unknown) : (d: Row) => d[z as string];
 			const key = typeof z === 'function' ? GROUP_KEY : (z as string);
 			const groups = new Map<unknown, Row[]>();
 			for (const row of rows) {

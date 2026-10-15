@@ -15,7 +15,11 @@ const AUTO_SCALED_RADIUS_ESTIMATE = 20;
  * `sizePx` wide, so the largest dot doesn't clip the frame. All-equal values
  * widen by a unit instead.
  */
-function paddedDomain(values: number[], radiusPx: number, sizePx: number): [number, number] | undefined {
+function paddedDomain(
+	values: number[],
+	radiusPx: number,
+	sizePx: number
+): [number, number] | undefined {
 	const finite = values.filter((v) => Number.isFinite(v));
 	if (finite.length === 0) return undefined;
 	const min = Math.min(...finite);
@@ -37,7 +41,10 @@ function fitDomains<TData extends Record<string, unknown>>(
 	const { scales, channels, groupedSeries } = state;
 	const processed = state.processedData!;
 	const position = TransformsPhase.processedPosition(processed);
-	const extra = { x: MarkerAxisValues.of(state.markers ?? [], 'x'), y: MarkerAxisValues.of(state.markers ?? [], 'y') };
+	const extra = {
+		x: MarkerAxisValues.of(state.markers ?? [], 'x'),
+		y: MarkerAxisValues.of(state.markers ?? [], 'y')
+	};
 	// The largest radius a dot renders at, from the `r` channel and segment styles.
 	const r = channels!.r;
 	const radius =
@@ -57,7 +64,10 @@ function fitDomains<TData extends Record<string, unknown>>(
 		state.height
 	);
 	const fit: Partial<Record<'x' | 'y', Partial<AxisScale<TData>>>> = {};
-	for (const [axis, size] of [['x', box.width], ['y', box.height]] as const) {
+	for (const [axis, size] of [
+		['x', box.width],
+		['y', box.height]
+	] as const) {
 		if (scales[axis]?.domain) continue;
 		const values = [...processed.data.map((d) => Number(position[axis](d))), ...extra[axis]];
 		const domain = paddedDomain(values, radius, size);

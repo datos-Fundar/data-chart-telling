@@ -22,7 +22,6 @@
 		margins = $bindable(),
 		...core
 	}: ScatterPlotProps<TData> = $props();
-
 </script>
 
 <Plot

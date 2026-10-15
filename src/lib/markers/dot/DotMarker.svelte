@@ -38,7 +38,9 @@
 	);
 
 	const resolvedFill = $derived(MarkerChannels.buildFill(displayData, color, scales, cfg));
-	const resolvedSymbolFn = $derived(MarkerChannels.buildSymbol(displayData, symbolProp, scales, cfg));
+	const resolvedSymbolFn = $derived(
+		MarkerChannels.buildSymbol(displayData, symbolProp, scales, cfg)
+	);
 	/**
 	 * `opacity` can't be a live per-row function the way `color`/`symbol` are -
 	 * svelteplot re-derives its own domain from whatever a `fillOpacity`

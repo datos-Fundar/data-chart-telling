@@ -44,4 +44,3 @@ export type ComposerHoverConfig = {
 	strategy?: HoverStrategy;
 	sync?: boolean;
 };
-

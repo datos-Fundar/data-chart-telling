@@ -32,7 +32,7 @@ export type GapPoint = { x: number; y: number };
 
 /** One gap row's resolved fill - the interpolated value to render instead of the missing one, and which zone produced it. */
 export type DiscreteGapFill<TStyle> = {
-  value: number;
-  kind: 'start' | 'middle' | 'end';
-  style?: TStyle;
+	value: number;
+	kind: 'start' | 'middle' | 'end';
+	style?: TStyle;
 };

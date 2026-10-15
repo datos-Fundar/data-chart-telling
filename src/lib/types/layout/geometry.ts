@@ -1,7 +1,7 @@
 /** One resolved segment for scoped-marker rendering - see {@link ScopedMarkerGroup}. */
 export type ScopedMarkerSegment<TData> = {
-  match: (row: TData) => boolean;
-  color: string;
+	match: (row: TData) => boolean;
+	color: string;
 };
 
 /**
@@ -11,12 +11,12 @@ export type ScopedMarkerSegment<TData> = {
  * kind's segment style shape (e.g. `fill` vs `stroke.stroke`).
  */
 export type ScopedMarkerGroup<TData> = {
-  name: string;
-  /** The series' id, when it differs from its name - see `Series.id`. */
-  id?: string;
-  /** The facet panel the series belongs to. */
-  panel?: string;
-  data: TData[];
-  color: string;
-  segments: ScopedMarkerSegment<TData>[];
+	name: string;
+	/** The series' id, when it differs from its name - see `Series.id`. */
+	id?: string;
+	/** The facet panel the series belongs to. */
+	panel?: string;
+	data: TData[];
+	color: string;
+	segments: ScopedMarkerSegment<TData>[];
 };

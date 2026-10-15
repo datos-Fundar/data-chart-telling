@@ -255,7 +255,10 @@
 			{/each}
 		{:else}
 			<HoverMarker
-				marker={MarkerGrouping.withHoverSeriesColor(marker, group.segments[0]?.color ?? group.color)}
+				marker={MarkerGrouping.withHoverSeriesColor(
+					marker,
+					group.segments[0]?.color ?? group.color
+				)}
 				data={seriesPoints}
 				activePoint={seriesPoints[0] ?? null}
 				impliesCrosshairX={ctrl.impliesCrosshairX}

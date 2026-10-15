@@ -49,7 +49,10 @@ export function buildFacetKeyOf<TRow extends Record<string, unknown>>(
 	const getRow = facet.rows === undefined ? null : resolveAccessor<TRow>(facet.rows);
 	const getCol = facet.cols === undefined ? null : resolveAccessor<TRow>(facet.cols);
 	return (row) =>
-		facetGridKey(getRow ? String(getRow(row)) : undefined, getCol ? String(getCol(row)) : undefined);
+		facetGridKey(
+			getRow ? String(getRow(row)) : undefined,
+			getCol ? String(getCol(row)) : undefined
+		);
 }
 
 /**
@@ -85,7 +88,15 @@ export function buildFacetPanels<TRow extends Record<string, unknown>>(
 			const group = groups.get(key);
 			if (!group?.rows.length) return [];
 			const label = row !== undefined && col !== undefined ? `${row} · ${col}` : (row ?? col ?? '');
-			return [{ key, label, rows: group.rows, ...(row !== undefined ? { row } : {}), ...(col !== undefined ? { col } : {}) }];
+			return [
+				{
+					key,
+					label,
+					rows: group.rows,
+					...(row !== undefined ? { row } : {}),
+					...(col !== undefined ? { col } : {})
+				}
+			];
 		})
 	);
 }

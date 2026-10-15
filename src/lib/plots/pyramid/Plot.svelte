@@ -22,7 +22,6 @@
 		margins = $bindable(),
 		...core
 	}: PyramidPlotProps<TData> = $props();
-
 </script>
 
 <Plot

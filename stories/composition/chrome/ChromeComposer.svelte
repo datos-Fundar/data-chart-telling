@@ -29,7 +29,7 @@
 	subtitle="North region vs South region, 2018-2022"
 	caption="Source: synthetic demo data."
 	{legend}
-	order={['divider', 'legend', 'caption', 'divider', 'plot', 'divider', 'title', 'subtitle',]}
+	order={['divider', 'legend', 'caption', 'divider', 'plot', 'divider', 'title', 'subtitle']}
 	layout={{ columns: 2 }}
 >
 	{#each ['North', 'South'] as region (region)}

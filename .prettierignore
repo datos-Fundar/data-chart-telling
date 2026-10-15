@@ -7,3 +7,6 @@ bun.lockb
 
 # Miscellaneous
 /static/
+
+# Geo fixtures, loaded raw by the stories
+/stories/plots/geo/data/

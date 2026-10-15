@@ -19,25 +19,25 @@
 
 ## Data
 
-| Prop | Meaning |
-| --- | --- |
-| `data` | A GeoJSON `FeatureCollection`, an array of `Feature`s, or a TopoJSON `Topology` |
-| `object` | Required for a `Topology`: the key under `topology.objects` to draw. Needs the optional `topojson-client` package |
-| `featureId` | Accessor for each feature's stable id. Default: `feature.id ?? properties.id ?? properties.name`. It is the key of `segments`, and identifies features in hover and click |
-| `color` | `(feature) => number \| undefined` - the value of a choropleth. Features without one use `styles.fill` or their `segments` |
+| Prop           | Meaning                                                                                                                                                                                                      |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `data`         | A GeoJSON `FeatureCollection`, an array of `Feature`s, or a TopoJSON `Topology`                                                                                                                              |
+| `object`       | Required for a `Topology`: the key under `topology.objects` to draw. Needs the optional `topojson-client` package                                                                                            |
+| `featureId`    | Accessor for each feature's stable id. Default: `feature.id ?? properties.id ?? properties.name`. It is the key of `segments`, and identifies features in hover and click                                    |
+| `color`        | `(feature) => number \| undefined` - the value of a choropleth. Features without one use `styles.fill` or their `segments`                                                                                   |
 | `excludeParts` | `(part, feature) => boolean`, where `part` is `{ centroid, geometry }` - drops geometry parts from drawing and hover (a distant territory drawn in an inset instead). `segments` still apply to what remains |
 
 ## Styles
 
 `styles` for a map:
 
-| Field | Meaning |
-| --- | --- |
-| `fill`, `fillOpacity` | Base fill of features with no choropleth value or segment |
-| `stroke`, `strokeWidth` | Base outline |
-| `tileLayer` | A raster basemap under the features: `{ url, attribution, opacity, minZoom, maxZoom, tileSize }`. Mercator-family projections only |
-| `onFeatureClick` | `(feature, event) => void` |
-| `frame` | A border around the map |
+| Field                   | Meaning                                                                                                                            |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `fill`, `fillOpacity`   | Base fill of features with no choropleth value or segment                                                                          |
+| `stroke`, `strokeWidth` | Base outline                                                                                                                       |
+| `tileLayer`             | A raster basemap under the features: `{ url, attribution, opacity, minZoom, maxZoom, tileSize }`. Mercator-family projections only |
+| `onFeatureClick`        | `(feature, event) => void`                                                                                                         |
+| `frame`                 | A border around the map                                                                                                            |
 
 ## Scales
 
@@ -48,7 +48,13 @@
 Per-feature styling, keyed by feature id, with `'default'` as the baseline for every feature:
 
 ```svelte
-<GeoPlot ... segments={{ default: [{ styles: { fillOpacity: 0.7 } }], argentina: [{ styles: { fill: '#3b82f6' } }] }} />
+<GeoPlot
+	...
+	segments={{
+		default: [{ styles: { fillOpacity: 0.7 } }],
+		argentina: [{ styles: { fill: '#3b82f6' } }]
+	}}
+/>
 ```
 
 Style fields: `fill`, `fillOpacity`, `stroke`, `strokeWidth`.
@@ -57,13 +63,13 @@ Style fields: `fill`, `fillOpacity`, `stroke`, `strokeWidth`.
 
 `coordinates` bundles the projection and the gestures.
 
-| Field | Meaning |
-| --- | --- |
+| Field        | Meaning                                                                                                                                                                                                                                                                                                                       |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `projection` | A name - `'equal-earth'` (default), `'mercator'`, `'orthographic'`, `'albers'`, `'albers-usa'`, `'azimuthal-equal-area'`, `'conic-conformal'`, `'equirectangular'`, `'stereographic'`, `'transverse-mercator'` and the other svelteplot projections - or an object `{ type, rotate, center, parallels, inset, clip, domain }` |
-| `zoom` | `true` or `{ min, max, initial }`: wheel and pinch zoom |
-| `pan` | `true`: drag to pan a flat projection |
-| `rotate` | `true`: drag to spin an `'orthographic'` globe |
-| `camera` | A declarative viewpoint (below) |
+| `zoom`       | `true` or `{ min, max, initial }`: wheel and pinch zoom                                                                                                                                                                                                                                                                       |
+| `pan`        | `true`: drag to pan a flat projection                                                                                                                                                                                                                                                                                         |
+| `rotate`     | `true`: drag to spin an `'orthographic'` globe                                                                                                                                                                                                                                                                                |
+| `camera`     | A declarative viewpoint (below)                                                                                                                                                                                                                                                                                               |
 
 `projection.type` can also be a custom factory. The package ships `argentinaBicontinental`, a projection fitted to Argentina's full territory (the mainland, the Antarctic sector and the islands):
 
@@ -104,16 +110,16 @@ Style fields: `fill`, `fillOpacity`, `stroke`, `strokeWidth`.
 
 Map markers go in `markers`, like on other plots. `dot` and `text` work as on any plot; the map-specific ones:
 
-| `type` | Draws |
-| --- | --- |
-| `graticule` | Longitude and latitude gridlines: `step`, `stepX`, `stepY`, `behind` |
-| `sphere` | The globe outline (for `'orthographic'`): `styles`, `behind` |
-| `vector` | Arrows or spikes at points: `data`, `x`, `y`, `length`, `rotate`, `shape` (`'arrow'`, `'spike'`, `'arrow-filled'`), `anchor` |
-| `link` | Lines between point pairs: `data`, `x1`, `y1`, `x2`, `y2`, `curve` (`'auto'` traces great-circle arcs, `'linear'`) |
-| `contour` | Contour lines of a scalar field: `data` with `x`, `y`, `value`, or a sampler function; `thresholds`, `fill`, `stroke`, `clip` (`'land'` or `'ocean'`), `behind` |
-| `inset` | A small, separately projected map anchored to an edge of the plot (see below) |
-| `geo-hover` | Restyles the hovered feature: `styles` (an area style) |
-| `geo-component` | Your own Svelte component |
+| `type`          | Draws                                                                                                                                                           |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `graticule`     | Longitude and latitude gridlines: `step`, `stepX`, `stepY`, `behind`                                                                                            |
+| `sphere`        | The globe outline (for `'orthographic'`): `styles`, `behind`                                                                                                    |
+| `vector`        | Arrows or spikes at points: `data`, `x`, `y`, `length`, `rotate`, `shape` (`'arrow'`, `'spike'`, `'arrow-filled'`), `anchor`                                    |
+| `link`          | Lines between point pairs: `data`, `x1`, `y1`, `x2`, `y2`, `curve` (`'auto'` traces great-circle arcs, `'linear'`)                                              |
+| `contour`       | Contour lines of a scalar field: `data` with `x`, `y`, `value`, or a sampler function; `thresholds`, `fill`, `stroke`, `clip` (`'land'` or `'ocean'`), `behind` |
+| `inset`         | A small, separately projected map anchored to an edge of the plot (see below)                                                                                   |
+| `geo-hover`     | Restyles the hovered feature: `styles` (an area style)                                                                                                          |
+| `geo-component` | Your own Svelte component                                                                                                                                       |
 
 ### Insets
 

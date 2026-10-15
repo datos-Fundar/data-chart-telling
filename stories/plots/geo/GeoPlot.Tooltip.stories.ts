@@ -2,32 +2,37 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import RichTooltip from './RichTooltip.svelte';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
-import { ARGENTINA_PROVINCES, CABA_COMUNAS, type ArgentinaProvinceProps, type CabaComunaProps } from './data';
+import {
+	ARGENTINA_PROVINCES,
+	CABA_COMUNAS,
+	type ArgentinaProvinceProps,
+	type CabaComunaProps
+} from './data';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Plots/GeoPlot/Tooltip',
-  component: GeoPlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 500,
-    data: ARGENTINA_PROVINCES,
-    featureId: (f) => (f.properties as ArgentinaProvinceProps).nombre,
-    coordinates: { projection: { type: argentinaBicontinental } },
-  },
-  argTypes: {
-    width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
-    height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
-    data: { control: false },
-    scales: { control: false },
-    tooltip: { control: false },
-  },
-  parameters: {
-    docs: { source: { name: 'GeoPlot' } },
-  },
+	title: 'Plots/GeoPlot/Tooltip',
+	component: GeoPlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 500,
+		data: ARGENTINA_PROVINCES,
+		featureId: (f) => (f.properties as ArgentinaProvinceProps).nombre,
+		coordinates: { projection: { type: argentinaBicontinental } }
+	},
+	argTypes: {
+		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
+		height: { control: { type: 'range', min: 280, max: 700, step: 20 } },
+		data: { control: false },
+		scales: { control: false },
+		tooltip: { control: false }
+	},
+	parameters: {
+		docs: { source: { name: 'GeoPlot' } }
+	}
 } satisfies Meta<typeof GeoPlot>;
 
 export default meta;
@@ -41,12 +46,12 @@ type Story = StoryObj<typeof meta>;
  * since a map has no x-only/y-only axis to match along.
  */
 export const BasicTooltip: Story = {
-  args: {
-    tooltip: {
-      sync: false,
-      format: (f) => (f.properties as ArgentinaProvinceProps).nombre,
-    },
-  },
+	args: {
+		tooltip: {
+			sync: false,
+			format: (f) => (f.properties as ArgentinaProvinceProps).nombre
+		}
+	}
 };
 
 /**
@@ -54,33 +59,33 @@ export const BasicTooltip: Story = {
  * with the portion before the first break used as the heading.
  */
 export const RichFormat: Story = {
-  args: {
-    tooltip: {
-      sync: false,
-      format: (f) => {
-        const { nombre, population } = f.properties as ArgentinaProvinceProps;
-        return `${nombre}\nPopulation: ${population.toLocaleString()}`;
-      },
-    },
-  },
+	args: {
+		tooltip: {
+			sync: false,
+			format: (f) => {
+				const { nombre, population } = f.properties as ArgentinaProvinceProps;
+				return `${nombre}\nPopulation: ${population.toLocaleString()}`;
+			}
+		}
+	}
 };
 
 /** Computed tooltip text - `format` can derive any string from the feature, here a share of the total population across the fixture. */
 export const ComputedFormat: Story = {
-  args: {
-    tooltip: {
-      sync: false,
-      format: (f) => {
-        const { nombre, population } = f.properties as ArgentinaProvinceProps;
-        const total = ARGENTINA_PROVINCES.reduce(
-          (sum, p) => sum + (p.properties as ArgentinaProvinceProps).population,
-          0,
-        );
-        const share = ((population / total) * 100).toFixed(1);
-        return `${nombre}: ${share}% of shown population`;
-      },
-    },
-  },
+	args: {
+		tooltip: {
+			sync: false,
+			format: (f) => {
+				const { nombre, population } = f.properties as ArgentinaProvinceProps;
+				const total = ARGENTINA_PROVINCES.reduce(
+					(sum, p) => sum + (p.properties as ArgentinaProvinceProps).population,
+					0
+				);
+				const share = ((population / total) * 100).toFixed(1);
+				return `${nombre}: ${share}% of shown population`;
+			}
+		}
+	}
 };
 
 /**
@@ -93,7 +98,7 @@ export const ComputedFormat: Story = {
  * its default dark tooltip box whenever `content` is set.
  */
 export const CustomContent: StoryObj = {
-  render: () => ({ Component: RichTooltip }),
+	render: () => ({ Component: RichTooltip })
 };
 
 /**
@@ -104,21 +109,21 @@ export const CustomContent: StoryObj = {
  * overflow.
  */
 export const CustomAnchor: Story = {
-  args: {
-    tooltip: {
-      sync: false,
-      anchorX: 'left',
-      anchorY: 'top',
-      format: (f) => (f.properties as ArgentinaProvinceProps).nombre,
-    },
-  },
+	args: {
+		tooltip: {
+			sync: false,
+			anchorX: 'left',
+			anchorY: 'top',
+			format: (f) => (f.properties as ArgentinaProvinceProps).nombre
+		}
+	}
 };
 
 const TIERRA_DEL_FUEGO = 'Tierra del Fuego, Antártida e Islas del Atlántico Sur';
 
 /** See `Markers/Inset`'s `isAntarcticPart` for why this predicate is needed (splits one feature's geometry between the main map and an inset). */
 const isAntarcticPart = (part: { centroid: [number, number] }, feature: { __id: string }) =>
-  feature.__id === TIERRA_DEL_FUEGO && (part.centroid[1] < -60 || part.centroid[0] > -50);
+	feature.__id === TIERRA_DEL_FUEGO && (part.centroid[1] < -60 || part.centroid[0] > -50);
 
 /**
  * An `inset` marker can carry its own `tooltip`, independent of the plot's
@@ -137,38 +142,38 @@ const isAntarcticPart = (part: { centroid: [number, number] }, feature: { __id: 
  * panel now floats its own tooltip on hover, in addition to the main map's.
  */
 export const TooltipOnInsets: Story = {
-  args: {
-    coordinates: { projection: { type: 'mercator', domain: 'data' } },
-    excludeParts: isAntarcticPart,
-    tooltip: {
-      sync: false,
-      format: (f) => (f.properties as ArgentinaProvinceProps).nombre,
-    },
-    markers: [
-      {
-        type: 'inset',
-        location: 'right-middle',
-        data: CABA_COMUNAS,
-        styles: { stroke: '#dc2626', strokeWidth: 1 },
-        tooltip: {
-          format: (f) => {
-            const { comuna, barrios } = f.properties as CabaComunaProps;
-            return `Comuna ${comuna}\n${barrios}`;
-          },
-        },
-      },
-      {
-        type: 'inset',
-        location: 'bottom-right',
-        features: [TIERRA_DEL_FUEGO],
-        featurePartsFilter: isAntarcticPart,
-        projection: { type: 'azimuthal-equidistant', rotate: [49.5, 90] },
-        tooltip: {
-          format: () => 'Antártida e Islas del Atlántico Sur',
-        },
-      },
-    ] satisfies GeoMarkersConfig[],
-  },
+	args: {
+		coordinates: { projection: { type: 'mercator', domain: 'data' } },
+		excludeParts: isAntarcticPart,
+		tooltip: {
+			sync: false,
+			format: (f) => (f.properties as ArgentinaProvinceProps).nombre
+		},
+		markers: [
+			{
+				type: 'inset',
+				location: 'right-middle',
+				data: CABA_COMUNAS,
+				styles: { stroke: '#dc2626', strokeWidth: 1 },
+				tooltip: {
+					format: (f) => {
+						const { comuna, barrios } = f.properties as CabaComunaProps;
+						return `Comuna ${comuna}\n${barrios}`;
+					}
+				}
+			},
+			{
+				type: 'inset',
+				location: 'bottom-right',
+				features: [TIERRA_DEL_FUEGO],
+				featurePartsFilter: isAntarcticPart,
+				projection: { type: 'azimuthal-equidistant', rotate: [49.5, 90] },
+				tooltip: {
+					format: () => 'Antártida e Islas del Atlántico Sur'
+				}
+			}
+		] satisfies GeoMarkersConfig[]
+	}
 };
 
 /**
@@ -186,40 +191,40 @@ export const TooltipOnInsets: Story = {
  * Hover each panel (and the main map) to compare.
  */
 export const TooltipOnInsetsWithAnchorInheritance: Story = {
-  args: {
-    coordinates: { projection: { type: 'mercator', domain: 'data' } },
-    excludeParts: isAntarcticPart,
-    tooltip: {
-      sync: false,
-      anchorX: 'left',
-      anchorY: 'top',
-      format: (f) => (f.properties as ArgentinaProvinceProps).nombre,
-    },
-    markers: [
-      {
-        type: 'inset',
-        location: 'right-middle',
-        data: CABA_COMUNAS,
-        styles: { stroke: '#dc2626', strokeWidth: 1 },
-        tooltip: {
-          // No anchorX/anchorY here - inherits the top-level's 'left'/'top'.
-          format: (f) => {
-            const { comuna, barrios } = f.properties as CabaComunaProps;
-            return `Comuna ${comuna}\n${barrios}`;
-          },
-        },
-      },
-      {
-        type: 'inset',
-        location: 'bottom-right',
-        features: [TIERRA_DEL_FUEGO],
-        featurePartsFilter: isAntarcticPart,
-        projection: { type: 'azimuthal-equidistant', rotate: [49.5, 90] },
-        tooltip: {
-          anchorX: 'right', // Own override - wins over the inherited 'left'.
-          format: () => 'Antártida e Islas del Atlántico Sur',
-        },
-      },
-    ] satisfies GeoMarkersConfig[],
-  },
+	args: {
+		coordinates: { projection: { type: 'mercator', domain: 'data' } },
+		excludeParts: isAntarcticPart,
+		tooltip: {
+			sync: false,
+			anchorX: 'left',
+			anchorY: 'top',
+			format: (f) => (f.properties as ArgentinaProvinceProps).nombre
+		},
+		markers: [
+			{
+				type: 'inset',
+				location: 'right-middle',
+				data: CABA_COMUNAS,
+				styles: { stroke: '#dc2626', strokeWidth: 1 },
+				tooltip: {
+					// No anchorX/anchorY here - inherits the top-level's 'left'/'top'.
+					format: (f) => {
+						const { comuna, barrios } = f.properties as CabaComunaProps;
+						return `Comuna ${comuna}\n${barrios}`;
+					}
+				}
+			},
+			{
+				type: 'inset',
+				location: 'bottom-right',
+				features: [TIERRA_DEL_FUEGO],
+				featurePartsFilter: isAntarcticPart,
+				projection: { type: 'azimuthal-equidistant', rotate: [49.5, 90] },
+				tooltip: {
+					anchorX: 'right', // Own override - wins over the inherited 'left'.
+					format: () => 'Antártida e Islas del Atlántico Sur'
+				}
+			}
+		] satisfies GeoMarkersConfig[]
+	}
 };

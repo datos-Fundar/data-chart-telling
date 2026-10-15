@@ -6,20 +6,28 @@ A plot builds its legend from what it draws: its series, the scales its channels
 
 `legend` is unset or `true` for the automatic legend, `false` for none. The automatic legend can have these sections:
 
-| Section | Appears when | Content |
-| --- | --- | --- |
-| series (discrete) | the plot has several series | one item per series, in its color and mark |
-| color (continuous) | `color` is a continuous value | a ramp with its min and max |
-| opacity | `opacity` is a continuous value | a ramp fading across the opacity range |
-| size | `r` is mapped | a few dots at representative values |
-| symbol | `symbol` is mapped | each category next to its shape |
+| Section            | Appears when                    | Content                                    |
+| ------------------ | ------------------------------- | ------------------------------------------ |
+| series (discrete)  | the plot has several series     | one item per series, in its color and mark |
+| color (continuous) | `color` is a continuous value   | a ramp with its min and max                |
+| opacity            | `opacity` is a continuous value | a ramp fading across the opacity range     |
+| size               | `r` is mapped                   | a few dots at representative values        |
+| symbol             | `symbol` is mapped              | each category next to its shape            |
 
 Segments and markers join the series section when they carry a `legend` label:
 
 ```svelte
 <LinePlot
 	...
-	segments={{ default: [{ areas: [{ x: { from: 2020 } }], styles: { stroke: { strokeDasharray: '4 4' } }, legend: 'Projection' }] }}
+	segments={{
+		default: [
+			{
+				areas: [{ x: { from: 2020 } }],
+				styles: { stroke: { strokeDasharray: '4 4' } },
+				legend: 'Projection'
+			}
+		]
+	}}
 />
 ```
 
@@ -30,19 +38,16 @@ Segments and markers join the series section when they carry a `legend` label:
 Items become clickable with `interactive` on the series section. `disabled` says what a hidden series becomes:
 
 ```svelte
-<LinePlot
-	...
-	legend={{ series: { interactive: { enabled: true, disabled: { mode: 'omit' } } } }}
-/>
+<LinePlot ... legend={{ series: { interactive: { enabled: true, disabled: { mode: 'omit' } } } }} />
 ```
 
 ![Legend items as toggles](images/legend-interactive.png)
 
-| `disabled.mode` | A hidden series... |
-| --- | --- |
+| `disabled.mode`   | A hidden series...                                                                    |
+| ----------------- | ------------------------------------------------------------------------------------- |
 | `'dim'` (default) | stays, faded (`style` sets how: opacity, fill, ...; default `legend.disabledOpacity`) |
-| `'hide'` | becomes transparent, the axes keep its range |
-| `'omit'` | is removed and the axes refit to the rest |
+| `'hide'`          | becomes transparent, the axes keep its range                                          |
+| `'omit'`          | is removed and the axes refit to the rest                                             |
 
 `interactive.legendStyle` is `'badge'` (default: pills filled with the series color and an eye toggle) or `'basic'` (swatches). `showIcon` toggles the symbol in a badge.
 

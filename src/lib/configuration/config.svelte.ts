@@ -1,5 +1,9 @@
 import { merge } from '$lib/utils/merge';
-import type { PlotStylesConfig, PlotStylesConfigInput, TextStyle } from '$lib/types/configuration/styling';
+import type {
+	PlotStylesConfig,
+	PlotStylesConfigInput,
+	TextStyle
+} from '$lib/types/configuration/styling';
 
 /**
  * Global, reactive styling configuration. Chrome reads it as CSS custom
@@ -43,7 +47,17 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 	// then caption (or footer). With no title, subtitle or header, the divider has nothing above
 	// it, so it isn't drawn.
 	chrome: {
-		order: ['header', 'title', 'subtitle', 'divider', 'legend', 'plot', 'timeline', 'footer', 'caption'],
+		order: [
+			'header',
+			'title',
+			'subtitle',
+			'divider',
+			'legend',
+			'plot',
+			'timeline',
+			'footer',
+			'caption'
+		],
 		rowGap: '1rem'
 	},
 

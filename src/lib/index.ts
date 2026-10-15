@@ -41,9 +41,7 @@ export {
 } from './configuration/config.svelte';
 export { THEMES } from './configuration/themes';
 export { SYSTEM_FONT } from './configuration/fonts';
-export type {
-	ThemeName
-} from './configuration/themes';
+export type { ThemeName } from './configuration/themes';
 
 // ── Utils ─────────────────────────────────────────────────────────────────────
 export { groupBy, buildSeries } from './utils/grouping';
@@ -71,17 +69,8 @@ export type {
 	SizeChannelName,
 	ChannelAccessors
 } from './types/layout/mapping';
-export type {
-	AxisScale,
-	AxisBasedScalesConfig,
-	ChannelScalesConfig
-} from './types/layout/scales';
-export type {
-	Accessor,
-	Series,
-	SeriesProps,
-	DataProps
-} from './types/plots/data/common';
+export type { AxisScale, AxisBasedScalesConfig, ChannelScalesConfig } from './types/layout/scales';
+export type { Accessor, Series, SeriesProps, DataProps } from './types/plots/data/common';
 export type {
 	BasePlotProps,
 	PlotCoreProps,
@@ -99,9 +88,7 @@ export type {
 	GeoStylesConfig,
 	GeoTileLayerConfig
 } from './types/layout/styles';
-export type {
-	GapsConfig
-} from './types/plots/gaps';
+export type { GapsConfig } from './types/plots/gaps';
 export type {
 	LineSegmentStyle,
 	BarSegmentStyle,
@@ -109,50 +96,26 @@ export type {
 	GeoSegmentStyle,
 	ScatterSegmentStyle
 } from './types/plots/segments/common';
-export type {
-	Range,
-	Area,
-	Segment
-} from './types/plots/segments/config';
-export type {
-	SymbolType
-} from './types/plots/constants';
-export type {
-	FontStyle,
-	StrokeStyle,
-	DotStyle,
-	AreaStyle
-} from './types/plots/styling';
+export type { Range, Area, Segment } from './types/plots/segments/config';
+export type { SymbolType } from './types/plots/constants';
+export type { FontStyle, StrokeStyle, DotStyle, AreaStyle } from './types/plots/styling';
 export type {
 	AxisBasedMarkersConfig,
 	BrushSelection,
 	MarkerCurveName
 } from './types/markers/common';
-export type {
-	StatisticConfig
-} from './types/layout/statistics';
+export type { StatisticConfig } from './types/layout/statistics';
 export type * from './types/transforms';
-export type {
-	GeoFeature,
-	GeoJsonInput,
-	GeoDataProps,
-	Topology
-} from './types/plots/data/geo';
+export type { GeoFeature, GeoJsonInput, GeoDataProps, Topology } from './types/plots/data/geo';
 export type {
 	GeoCustomProjection,
 	GeoCustomProjectionFactory,
 	GeoScalesConfig,
 	CoordinatesConfig
 } from './types/layout/coordinates';
-export type {
-	GeoCameraConfig
-} from './types/plots/camera';
-export type {
-	GeoMarkersConfig
-} from './types/markers/geo';
-export type {
-	SharedAxisValues
-} from './types/phases';
+export type { GeoCameraConfig } from './types/plots/camera';
+export type { GeoMarkersConfig } from './types/markers/geo';
+export type { SharedAxisValues } from './types/phases';
 export type {
 	TimeValue,
 	Orientation,
@@ -196,11 +159,7 @@ export type {
 	LegendMark,
 	LegendRange
 } from './types/layout/legend';
-export type {
-	HoverStrategy,
-	HoverPoint,
-	HoverDisplayPoint
-} from './types/layout/hover';
+export type { HoverStrategy, HoverPoint, HoverDisplayPoint } from './types/layout/hover';
 export type {
 	PlotStylesConfig,
 	PlotStylesConfigInput,

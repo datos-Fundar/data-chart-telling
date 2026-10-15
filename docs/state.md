@@ -25,7 +25,8 @@ A footer that toggles series through the legend:
 
 {#each series as entry (entry.name)}
 	<button onclick={() => figure.legend?.toggle(entry.name, { mode: 'omit' })}>
-		{figure.legend?.isOff(entry.name) ? 'Show' : 'Hide'} {entry.name}
+		{figure.legend?.isOff(entry.name) ? 'Show' : 'Hide'}
+		{entry.name}
 	</button>
 {/each}
 ```
@@ -58,9 +59,13 @@ Works inside a plot - in a [`component` marker](markers.md#custom-components), w
 ```
 
 ```svelte
-<LinePlot ... tooltip markers={[{ type: 'hover' }, { type: 'component', component: HoverReadout }]} />
+<LinePlot
+	...
+	tooltip
+	markers={[{ type: 'hover' }, { type: 'component', component: HoverReadout }]}
+/>
 ```
 
 ## When to use them
 
-Reach for these instead of re-implementing a legend, a timeline control or a hover readout beside the plot: the figure already holds that state, and a widget reading it stays in step with the plot. [examples/LegendReader.svelte](../examples/LegendReader.svelte) is a runnable reader, and the Storybook group *Configuration / State* has both patterns.
+Reach for these instead of re-implementing a legend, a timeline control or a hover readout beside the plot: the figure already holds that state, and a widget reading it stays in step with the plot. [examples/LegendReader.svelte](../examples/LegendReader.svelte) is a runnable reader, and the Storybook group _Configuration / State_ has both patterns.

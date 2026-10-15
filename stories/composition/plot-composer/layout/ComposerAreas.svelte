@@ -25,17 +25,6 @@
 		color="metric"
 		tooltip
 	/>
-	<BarPlot
-		area="b"
-		data={REGION_BARS.filter((d) => d.year === 2022)}
-		x="region"
-		y="value"
-	/>
-	<ScatterPlot
-		area="c"
-		data={COUNTRIES}
-		x="gdpPerCapita"
-		y="lifeExpectancy"
-		color="region"
-	/>
+	<BarPlot area="b" data={REGION_BARS.filter((d) => d.year === 2022)} x="region" y="value" />
+	<ScatterPlot area="c" data={COUNTRIES} x="gdpPerCapita" y="lifeExpectancy" color="region" />
 </PlotComposer>

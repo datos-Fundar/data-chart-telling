@@ -2,46 +2,43 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import type { YearPoint } from '../data';
+import { FEMALE_LIFE_EXPECTANCY, MALE_LIFE_EXPECTANCY } from '../data';
 import {
-  FEMALE_LIFE_EXPECTANCY,
-  MALE_LIFE_EXPECTANCY,
-} from '../data';
-import {
-  FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-  MALE_LIFE_EXPECTANCY_BY_PROVINCE,
+	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+	MALE_LIFE_EXPECTANCY_BY_PROVINCE
 } from '../../bar/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Plots/LinePlot/Styles/Values',
-  component: LinePlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 400,
-  },
-  argTypes: {
-    width: {
-      description: 'Plot width in pixels.',
-      control: { type: 'range', min: 300, max: 940, step: 50 },
-    },
-    height: {
-      description: 'Plot height in pixels.',
-      control: { type: 'range', min: 200, max: 700, step: 50 },
-    },
-    series: {
-      description: 'Data series to render.',
-      control: false,
-    },
-    styles: {
-      description: 'Rendering style overrides.',
-      control: false,
-    },
-  },
-  parameters: {
-    docs: { source: { name: 'LinePlot' } },
-  },
+	title: 'Plots/LinePlot/Styles/Values',
+	component: LinePlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 400
+	},
+	argTypes: {
+		width: {
+			description: 'Plot width in pixels.',
+			control: { type: 'range', min: 300, max: 940, step: 50 }
+		},
+		height: {
+			description: 'Plot height in pixels.',
+			control: { type: 'range', min: 200, max: 700, step: 50 }
+		},
+		series: {
+			description: 'Data series to render.',
+			control: false
+		},
+		styles: {
+			description: 'Rendering style overrides.',
+			control: false
+		}
+	},
+	parameters: {
+		docs: { source: { name: 'LinePlot' } }
+	}
 } satisfies Meta<typeof LinePlot>;
 
 export default meta;
@@ -53,16 +50,16 @@ type Story = StoryObj<typeof meta>;
  * No style overrides, the plot uses the configured theme defaults.
  */
 export const Default: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      }
-    ],
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			}
+		]
+	}
 };
 
 /**
@@ -73,19 +70,19 @@ export const Default: Story = {
  * is `'start'`, which places the text to the right of the endpoint.
  */
 export const ShowValues: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      }
-    ],
-    styles: {
-      values: { show: true },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			}
+		],
+		styles: {
+			values: { show: true }
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 /**
@@ -94,22 +91,22 @@ export const ShowValues: Story = {
  * default `"${seriesName} - ${value}"` label.
  */
 export const CustomFormat: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      }
-    ],
-    styles: {
-      values: {
-        show: true,
-        format: (v: number, name: string) => `${name} → ${v.toFixed(1)} yr`,
-      },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			}
+		],
+		styles: {
+			values: {
+				show: true,
+				format: (v: number, name: string) => `${name} → ${v.toFixed(1)} yr`
+			}
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 /**
@@ -119,28 +116,28 @@ export const CustomFormat: Story = {
  * respective endpoints.
  */
 export const TwoSeriesWithLabels: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      },
-      {
-        name: 'male',
-        x: 'year',
-        y: 'value',
-        data: MALE_LIFE_EXPECTANCY,
-      }
-    ],
-    styles: {
-      values: {
-        show: true,
-        format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
-      },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			},
+			{
+				name: 'male',
+				x: 'year',
+				y: 'value',
+				data: MALE_LIFE_EXPECTANCY
+			}
+		],
+		styles: {
+			values: {
+				show: true,
+				format: (v: number, name: string) => `${name} (${v.toFixed(1)})`
+			}
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 /**
@@ -149,23 +146,23 @@ export const TwoSeriesWithLabels: Story = {
  * omitted.
  */
 export const AnchorStart: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      }
-    ],
-    styles: {
-      values: {
-        show: true,
-        anchor: 'start',
-        format: (v: number) => `${v.toFixed(1)} yr`,
-      },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			}
+		],
+		styles: {
+			values: {
+				show: true,
+				anchor: 'start',
+				format: (v: number) => `${v.toFixed(1)} yr`
+			}
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 /**
@@ -174,23 +171,23 @@ export const AnchorStart: Story = {
  * clip outside the right edge of the plot.
  */
 export const AnchorOutside: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      }
-    ],
-    styles: {
-      values: {
-        show: true,
-        anchor: 'outside',
-        format: (v: number) => `${v.toFixed(1)} yr`,
-      },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			}
+		],
+		styles: {
+			values: {
+				show: true,
+				anchor: 'outside',
+				format: (v: number) => `${v.toFixed(1)} yr`
+			}
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 /**
@@ -200,29 +197,29 @@ export const AnchorOutside: Story = {
  * by the difference in y values (~5 years here).
  */
 export const TwoSeriesLabelsOutside: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      },
-      {
-        name: 'male',
-        x: 'year',
-        y: 'value',
-        data: MALE_LIFE_EXPECTANCY,
-      }
-    ],
-    styles: {
-      values: {
-        show: true,
-        anchor: 'outside',
-        format: (v: number, name: string) => `${name}: ${v.toFixed(1)} yr`,
-      },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			},
+			{
+				name: 'male',
+				x: 'year',
+				y: 'value',
+				data: MALE_LIFE_EXPECTANCY
+			}
+		],
+		styles: {
+			values: {
+				show: true,
+				anchor: 'outside',
+				format: (v: number, name: string) => `${name}: ${v.toFixed(1)} yr`
+			}
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 /**
@@ -234,24 +231,24 @@ export const TwoSeriesLabelsOutside: Story = {
  * further above the endpoint.
  */
 export const CustomOffsets: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      }
-    ],
-    styles: {
-      values: {
-        show: true,
-        anchor: 'outside',
-        format: (v: number) => `${v.toFixed(1)} yr`,
-        fontStyle: { dy: -18 },
-      },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			}
+		],
+		styles: {
+			values: {
+				show: true,
+				anchor: 'outside',
+				format: (v: number) => `${v.toFixed(1)} yr`,
+				fontStyle: { dy: -18 }
+			}
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 /**
@@ -260,24 +257,24 @@ export const CustomOffsets: Story = {
  * combined with `dy` to shift the text slightly.
  */
 export const AnchorMiddle: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      }
-    ],
-    styles: {
-      values: {
-        show: true,
-        anchor: 'middle',
-        format: (v: number) => `${v.toFixed(1)} yr`,
-        fontStyle: { dy: 18 },
-      },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			}
+		],
+		styles: {
+			values: {
+				show: true,
+				anchor: 'middle',
+				format: (v: number) => `${v.toFixed(1)} yr`,
+				fontStyle: { dy: 18 }
+			}
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 /**
@@ -285,24 +282,24 @@ export const AnchorMiddle: Story = {
  * toward the chart's zero side. Mirror image of the default `'start'`.
  */
 export const AnchorEnd: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      }
-    ],
-    styles: {
-      values: {
-        show: true,
-        anchor: 'end',
-        format: (v: number) => `${v.toFixed(1)} yr`,
-        fontStyle: { dy: -18 },
-      },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			}
+		],
+		styles: {
+			values: {
+				show: true,
+				anchor: 'end',
+				format: (v: number) => `${v.toFixed(1)} yr`,
+				fontStyle: { dy: -18 }
+			}
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 /**
@@ -312,86 +309,91 @@ export const AnchorEnd: Story = {
  * (`lineAnchor: 'bottom'`), with a nudge via `dy`.
  */
 export const LowLevelTextPlacement: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      }
-    ],
-    styles: {
-      values: {
-        show: true,
-        format: (v: number) => `${v.toFixed(1)} yr`,
-        fontStyle: {
-          textAnchor: 'end',
-          lineAnchor: 'bottom',
-          dy: -10,
-          dx: 0,
-        },
-      },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			}
+		],
+		styles: {
+			values: {
+				show: true,
+				format: (v: number) => `${v.toFixed(1)} yr`,
+				fontStyle: {
+					textAnchor: 'end',
+					lineAnchor: 'bottom',
+					dy: -10,
+					dx: 0
+				}
+			}
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 // ── Declutter ───────────────────────────────────────────────────────────────
 
 function provinceTrajectory(shape: YearPoint[], targetLastValue: number): YearPoint[] {
-  const offset = targetLastValue - shape[shape.length - 1].value;
-  return shape.map((d) => ({ year: d.year, value: d.value + offset }));
+	const offset = targetLastValue - shape[shape.length - 1].value;
+	return shape.map((d) => ({ year: d.year, value: d.value + offset }));
 }
 
 function provinceValue(list: { province: string; value: number }[], province: string): number {
-  return list.find((d) => d.province === province)!.value;
+	return list.find((d) => d.province === province)!.value;
 }
 
 const MALE_CLUSTER_COMPRESSION = 0.3;
 
 function compressTowardMean(values: number[], factor: number): number[] {
-  const mean = values.reduce((a, b) => a + b, 0) / values.length;
-  return values.map((v) => mean + (v - mean) * factor);
+	const mean = values.reduce((a, b) => a + b, 0) / values.length;
+	return values.map((v) => mean + (v - mean) * factor);
 }
 
 const OVERLAP_DEMO_PROVINCES: { label: string; sex: 'male' | 'female'; province: string }[] = [
-  // Cluster A. male, mid-range: compressed toward its own mean below, so it
-  // overlaps far more aggressively than its real spread would.
-  { label: 'Tucumán · M', sex: 'male', province: 'Tucumán' },
-  { label: 'Santa Fe · M', sex: 'male', province: 'Santa Fe' },
-  { label: 'Córdoba · M', sex: 'male', province: 'Córdoba' },
-  { label: 'Buenos Aires · M', sex: 'male', province: 'Buenos Aires' },
-  // Cluster B. female, upper-range: real spread, overlaps internally, well
-  // clear of A.
-  { label: 'Tucumán · F', sex: 'female', province: 'Tucumán' },
-  { label: 'Santa Fe · F', sex: 'female', province: 'Santa Fe' },
-  { label: 'Córdoba · F', sex: 'female', province: 'Córdoba' },
-  { label: 'Buenos Aires · F', sex: 'female', province: 'Buenos Aires' },
-  // Isolated. far below both clusters, needs no decluttering.
-  { label: 'La Rioja · M', sex: 'male', province: 'La Rioja' },
+	// Cluster A. male, mid-range: compressed toward its own mean below, so it
+	// overlaps far more aggressively than its real spread would.
+	{ label: 'Tucumán · M', sex: 'male', province: 'Tucumán' },
+	{ label: 'Santa Fe · M', sex: 'male', province: 'Santa Fe' },
+	{ label: 'Córdoba · M', sex: 'male', province: 'Córdoba' },
+	{ label: 'Buenos Aires · M', sex: 'male', province: 'Buenos Aires' },
+	// Cluster B. female, upper-range: real spread, overlaps internally, well
+	// clear of A.
+	{ label: 'Tucumán · F', sex: 'female', province: 'Tucumán' },
+	{ label: 'Santa Fe · F', sex: 'female', province: 'Santa Fe' },
+	{ label: 'Córdoba · F', sex: 'female', province: 'Córdoba' },
+	{ label: 'Buenos Aires · F', sex: 'female', province: 'Buenos Aires' },
+	// Isolated. far below both clusters, needs no decluttering.
+	{ label: 'La Rioja · M', sex: 'male', province: 'La Rioja' }
 ];
 
 const MALE_CLUSTER_PROVINCES = ['Tucumán', 'Santa Fe', 'Córdoba', 'Buenos Aires'];
-const MALE_CLUSTER_REAL_VALUES = MALE_CLUSTER_PROVINCES.map((p) => provinceValue(MALE_LIFE_EXPECTANCY_BY_PROVINCE, p));
-const MALE_CLUSTER_COMPRESSED_VALUES = compressTowardMean(MALE_CLUSTER_REAL_VALUES, MALE_CLUSTER_COMPRESSION);
+const MALE_CLUSTER_REAL_VALUES = MALE_CLUSTER_PROVINCES.map((p) =>
+	provinceValue(MALE_LIFE_EXPECTANCY_BY_PROVINCE, p)
+);
+const MALE_CLUSTER_COMPRESSED_VALUES = compressTowardMean(
+	MALE_CLUSTER_REAL_VALUES,
+	MALE_CLUSTER_COMPRESSION
+);
 const MALE_CLUSTER_TARGETS = new Map(
-  MALE_CLUSTER_PROVINCES.map((province, i) => [province, MALE_CLUSTER_COMPRESSED_VALUES[i]]),
+	MALE_CLUSTER_PROVINCES.map((province, i) => [province, MALE_CLUSTER_COMPRESSED_VALUES[i]])
 );
 
 const OVERLAP_DEMO_SERIES = OVERLAP_DEMO_PROVINCES.map(({ label, sex, province }) => {
-  const shape = sex === 'female' ? FEMALE_LIFE_EXPECTANCY : MALE_LIFE_EXPECTANCY;
-  const target =
-    (sex === 'male' ? MALE_CLUSTER_TARGETS.get(province) : undefined) ??
-    provinceValue(
-      sex === 'female' ? FEMALE_LIFE_EXPECTANCY_BY_PROVINCE : MALE_LIFE_EXPECTANCY_BY_PROVINCE,
-      province,
-    );
-  return {
-    name: label,
-    x: 'year' as const,
-    y: 'value' as const,
-    data: provinceTrajectory(shape, target),
-  };
+	const shape = sex === 'female' ? FEMALE_LIFE_EXPECTANCY : MALE_LIFE_EXPECTANCY;
+	const target =
+		(sex === 'male' ? MALE_CLUSTER_TARGETS.get(province) : undefined) ??
+		provinceValue(
+			sex === 'female' ? FEMALE_LIFE_EXPECTANCY_BY_PROVINCE : MALE_LIFE_EXPECTANCY_BY_PROVINCE,
+			province
+		);
+	return {
+		name: label,
+		x: 'year' as const,
+		y: 'value' as const,
+		data: provinceTrajectory(shape, target)
+	};
 });
 
 /**
@@ -404,10 +406,10 @@ const OVERLAP_DEMO_SERIES = OVERLAP_DEMO_PROVINCES.map(({ label, sex, province }
  * doc comment in `Declutter.ts`.
  */
 const NEAR_MISS_SERIES = {
-  name: 'Formosa · M',
-  x: 'year' as const,
-  y: 'value' as const,
-  data: provinceTrajectory(MALE_LIFE_EXPECTANCY, 77.3),
+	name: 'Formosa · M',
+	x: 'year' as const,
+	y: 'value' as const,
+	data: provinceTrajectory(MALE_LIFE_EXPECTANCY, 77.3)
 };
 
 /**
@@ -424,15 +426,15 @@ const NEAR_MISS_SERIES = {
  * at its own, differently-sized fan.
  */
 export const DeclutteredLabels: Story = {
-  args: {
-    series: OVERLAP_DEMO_SERIES,
-    styles: {
-      values: {
-        show: true,
-        format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
-      },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		series: OVERLAP_DEMO_SERIES,
+		styles: {
+			values: {
+				show: true,
+				format: (v: number, name: string) => `${name} (${v.toFixed(1)})`
+			}
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 /**
@@ -446,26 +448,26 @@ export const DeclutteredLabels: Story = {
  * than the default.
  */
 export const DeclutteredLabelsCustomStyle: Story = {
-  args: {
-    series: OVERLAP_DEMO_SERIES,
-    styles: {
-      values: {
-        show: true,
-        format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
-        fontStyle: {
-          fontWeight: 'bold',
-          stroke: 'white',
-          strokeWidth: 3,
-          paintOrder: 'stroke',
-        },
-        strokeStyle: {
-          stroke: '#1e293b',
-          strokeWidth: 1.5,
-          strokeDasharray: '2 3',
-        },
-      },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		series: OVERLAP_DEMO_SERIES,
+		styles: {
+			values: {
+				show: true,
+				format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
+				fontStyle: {
+					fontWeight: 'bold',
+					stroke: 'white',
+					strokeWidth: 3,
+					paintOrder: 'stroke'
+				},
+				strokeStyle: {
+					stroke: '#1e293b',
+					strokeWidth: 1.5,
+					strokeDasharray: '2 3'
+				}
+			}
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 /**
@@ -479,36 +481,36 @@ export const DeclutteredLabelsCustomStyle: Story = {
  * line and lane, aligned with (not overlapping) the other four.
  */
 export const DeclutteredLabelsNearMissSeries: Story = {
-  args: {
-    series: [...OVERLAP_DEMO_SERIES, NEAR_MISS_SERIES],
-    styles: {
-      values: {
-        show: true,
-        format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
-      },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		series: [...OVERLAP_DEMO_SERIES, NEAR_MISS_SERIES],
+		styles: {
+			values: {
+				show: true,
+				format: (v: number, name: string) => `${name} (${v.toFixed(1)})`
+			}
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 const ALL_PROVINCES = ['Buenos Aires', 'Córdoba', 'Santa Fe', 'Formosa', 'Tucumán', 'La Rioja'];
 const BOUNDS_DEMO_REAL_VALUES = [
-  ...ALL_PROVINCES.map((p) => provinceValue(MALE_LIFE_EXPECTANCY_BY_PROVINCE, p)),
-  ...ALL_PROVINCES.map((p) => provinceValue(FEMALE_LIFE_EXPECTANCY_BY_PROVINCE, p)),
+	...ALL_PROVINCES.map((p) => provinceValue(MALE_LIFE_EXPECTANCY_BY_PROVINCE, p)),
+	...ALL_PROVINCES.map((p) => provinceValue(FEMALE_LIFE_EXPECTANCY_BY_PROVINCE, p))
 ];
 const BOUNDS_DEMO_TARGETS = compressTowardMean(BOUNDS_DEMO_REAL_VALUES, 0.12);
 const BOUNDS_DEMO_SERIES = ALL_PROVINCES.flatMap((province, i) => [
-  {
-    name: `${province} · M`,
-    x: 'year' as const,
-    y: 'value' as const,
-    data: provinceTrajectory(MALE_LIFE_EXPECTANCY, BOUNDS_DEMO_TARGETS[i]),
-  },
-  {
-    name: `${province} · F`,
-    x: 'year' as const,
-    y: 'value' as const,
-    data: provinceTrajectory(FEMALE_LIFE_EXPECTANCY, BOUNDS_DEMO_TARGETS[ALL_PROVINCES.length + i]),
-  },
+	{
+		name: `${province} · M`,
+		x: 'year' as const,
+		y: 'value' as const,
+		data: provinceTrajectory(MALE_LIFE_EXPECTANCY, BOUNDS_DEMO_TARGETS[i])
+	},
+	{
+		name: `${province} · F`,
+		x: 'year' as const,
+		y: 'value' as const,
+		data: provinceTrajectory(FEMALE_LIFE_EXPECTANCY, BOUNDS_DEMO_TARGETS[ALL_PROVINCES.length + i])
+	}
 ]);
 
 /**
@@ -525,16 +527,16 @@ const BOUNDS_DEMO_SERIES = ALL_PROVINCES.flatMap((province, i) => [
  * different one than this story means to demonstrate.
  */
 export const DeclutteredLabelsBoundedByPlot: Story = {
-  args: {
-    height: 400,
-    series: BOUNDS_DEMO_SERIES,
-    styles: {
-      values: {
-        show: true,
-        format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
-      },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		height: 400,
+		series: BOUNDS_DEMO_SERIES,
+		styles: {
+			values: {
+				show: true,
+				format: (v: number, name: string) => `${name} (${v.toFixed(1)})`
+			}
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 // Real INDEC poverty-rate series (% of population below the poverty line,
@@ -542,32 +544,32 @@ export const DeclutteredLabelsBoundedByPlot: Story = {
 // both bugs below in a consuming app: `GENERAL_10` from the reporting API
 // this package is embedded in.
 const POVERTY_RATE_BY_PROVINCE: Record<string, YearPoint[]> = {
-  'San Juan': [
-    { year: 2016, value: 43.6 },
-    { year: 2017, value: 32.41 },
-  ],
-  Jujuy: [
-    { year: 2016, value: 36.92 },
-    { year: 2017, value: 32.02 },
-  ],
-  Formosa: [
-    { year: 2016, value: 33.48 },
-    { year: 2017, value: 31.06 },
-  ],
-  'Buenos Aires': [
-    { year: 2016, value: 32.49 },
-    { year: 2017, value: 25.58 },
-  ],
-  Chubut: [
-    { year: 2016, value: 22.38 },
-    { year: 2017, value: 19.68 },
-  ],
+	'San Juan': [
+		{ year: 2016, value: 43.6 },
+		{ year: 2017, value: 32.41 }
+	],
+	Jujuy: [
+		{ year: 2016, value: 36.92 },
+		{ year: 2017, value: 32.02 }
+	],
+	Formosa: [
+		{ year: 2016, value: 33.48 },
+		{ year: 2017, value: 31.06 }
+	],
+	'Buenos Aires': [
+		{ year: 2016, value: 32.49 },
+		{ year: 2017, value: 25.58 }
+	],
+	Chubut: [
+		{ year: 2016, value: 22.38 },
+		{ year: 2017, value: 19.68 }
+	]
 };
 const POVERTY_RATE_SERIES = Object.entries(POVERTY_RATE_BY_PROVINCE).map(([name, data]) => ({
-  name,
-  x: 'year' as const,
-  y: 'value' as const,
-  data,
+	name,
+	x: 'year' as const,
+	y: 'value' as const,
+	data
 }));
 
 /**
@@ -580,14 +582,14 @@ const POVERTY_RATE_SERIES = Object.entries(POVERTY_RATE_BY_PROVINCE).map(([name,
  * that fix. Clamped back in here the same way a run is.
  */
 export const IsolatedLabelBoundedByPlot: Story = {
-  args: {
-    series: POVERTY_RATE_SERIES,
-    scales: { y: { domain: [20, 45] } },
-    styles: {
-      values: {
-        show: true,
-        format: (v: number, name: string) => `${name} (${v.toFixed(1)})`,
-      },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		series: POVERTY_RATE_SERIES,
+		scales: { y: { domain: [20, 45] } },
+		styles: {
+			values: {
+				show: true,
+				format: (v: number, name: string) => `${name} (${v.toFixed(1)})`
+			}
+		} satisfies AxisBasedStylesConfig
+	}
 };

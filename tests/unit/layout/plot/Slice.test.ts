@@ -53,7 +53,12 @@ describe('Slice.keep', () => {
 });
 
 describe('Slice', () => {
-	const inputs = { rows: undefined as Row[] | undefined, timeline: undefined, facet: undefined, filterMode: undefined };
+	const inputs = {
+		rows: undefined as Row[] | undefined,
+		timeline: undefined,
+		facet: undefined,
+		filterMode: undefined
+	};
 
 	test('is sliced only with rows and a timeline or facet', () => {
 		expect(new Slice<Row>({ ...inputs, rows: [{}] }).sliced).toBe(false);
@@ -65,7 +70,9 @@ describe('Slice', () => {
 		const timeline = { accessor: 'year' };
 		expect(new Slice<Row>({ ...inputs, timeline, filterMode: 'upTo' }).filterMode).toBe('upTo');
 		const own = { ...timeline, filterMode: 'exact' as const };
-		expect(new Slice<Row>({ ...inputs, timeline: own, filterMode: 'upTo' }).filterMode).toBe('exact');
+		expect(new Slice<Row>({ ...inputs, timeline: own, filterMode: 'upTo' }).filterMode).toBe(
+			'exact'
+		);
 	});
 
 	test('reports slicing that cannot work', () => {
@@ -77,7 +84,13 @@ describe('Slice', () => {
 		const shared = { '': { x: { domain: [0, 1] } } };
 		const timeline = { accessor: 'year' };
 		expect(new Slice<Row>({ ...inputs, timeline }).timelineScales(shared)).toBe(shared['']);
-		expect(new Slice<Row>({ ...inputs, timeline: { ...timeline, scales: 'free' } }).timelineScales(shared)).toBeUndefined();
-		expect(new Slice<Row>({ ...inputs, timeline, facet: { by: 'r' } }).timelineScales(shared)).toBeUndefined();
+		expect(
+			new Slice<Row>({ ...inputs, timeline: { ...timeline, scales: 'free' } }).timelineScales(
+				shared
+			)
+		).toBeUndefined();
+		expect(
+			new Slice<Row>({ ...inputs, timeline, facet: { by: 'r' } }).timelineScales(shared)
+		).toBeUndefined();
 	});
 });

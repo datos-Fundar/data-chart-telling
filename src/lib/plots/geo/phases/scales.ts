@@ -89,6 +89,14 @@ export function buildScales<TProps extends Record<string, unknown>>(
 			}
 		: undefined;
 
-	return { ...state, colorDomain: valueDomain ?? undefined,
-		opacityDomain: opacityDomain && typeof opacityDomain[0] === 'number' ? (opacityDomain as [number, number]) : undefined, resolveColor, resolveOpacity };
+	return {
+		...state,
+		colorDomain: valueDomain ?? undefined,
+		opacityDomain:
+			opacityDomain && typeof opacityDomain[0] === 'number'
+				? (opacityDomain as [number, number])
+				: undefined,
+		resolveColor,
+		resolveOpacity
+	};
 }

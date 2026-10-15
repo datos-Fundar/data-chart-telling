@@ -67,11 +67,19 @@ export function buildValueLabels<TData extends Record<string, unknown>>(
 			const shift = anchor === 'middle' ? 0 : outward * (anchor === 'end' ? 4 : 6);
 			// Away from the baseline: left/right on a horizontal pyramid, down/up on a vertical one.
 			const awayAnchor = isHorizontal
-				? anchor === 'middle' ? 'middle' : isLeft ? 'end' : 'start'
+				? anchor === 'middle'
+					? 'middle'
+					: isLeft
+						? 'end'
+						: 'start'
 				: 'middle';
 			const awayLine = isHorizontal
 				? 'middle'
-				: anchor === 'middle' ? 'middle' : isLeft ? 'top' : 'bottom';
+				: anchor === 'middle'
+					? 'middle'
+					: isLeft
+						? 'top'
+						: 'bottom';
 			return [
 				{
 					type: 'text',
@@ -113,13 +121,18 @@ export function buildMarks<TData extends Record<string, unknown>>(
 	const isHorizontal = state.axes?.isHorizontal ?? true;
 	/** One bar's own channels: its category, and its span from the baseline to its signed value. */
 	const span = (category: unknown, to: unknown) =>
-		({ isHorizontal, [categoryAxis]: category, [`${valueAxis}1`]: 0, [`${valueAxis}2`]: to }) as Pick<
-			BarMarkerConfig,
-			'isHorizontal' | 'x' | 'y' | 'x1' | 'x2' | 'y1' | 'y2'
-		>;
+		({
+			isHorizontal,
+			[categoryAxis]: category,
+			[`${valueAxis}1`]: 0,
+			[`${valueAxis}2`]: to
+		}) as Pick<BarMarkerConfig, 'isHorizontal' | 'x' | 'y' | 'x1' | 'x2' | 'y1' | 'y2'>;
 	// The real bars draw the rows the "transforms" phase left, read through its channels.
 	const processedGroups = new Map(
-		TransformsPhase.buildProcessedGroups<BarSegmentStyle>(state, false).map((g) => [seriesIdOf(g.series), g])
+		TransformsPhase.buildProcessedGroups<BarSegmentStyle>(state, false).map((g) => [
+			seriesIdOf(g.series),
+			g
+		])
 	);
 
 	const markers: BarMarkerConfig[] = [];
@@ -156,7 +169,8 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		}
 
 		const fillMap =
-			gapFillMaps!.get(seriesIdOf(group.series)) ?? new Map<TData, DiscreteGapFill<BarSegmentStyle>>();
+			gapFillMaps!.get(seriesIdOf(group.series)) ??
+			new Map<TData, DiscreteGapFill<BarSegmentStyle>>();
 		for (const kind of GAP_KINDS) {
 			const filledRows = group.series.data.filter((d) => fillMap.get(d)?.kind === kind);
 			if (filledRows.length === 0) continue;

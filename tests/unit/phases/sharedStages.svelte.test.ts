@@ -62,7 +62,10 @@ describe('DataPhase', () => {
 		const line = new DataPhase<State, AxisPlotCtx>().run(state(), CTX).axes!;
 		expect(line).toMatchObject({ x: { kind: 'continuous' }, value: 'y', orientation: 'vertical' });
 
-		const bars = new DataPhase<State, AxisPlotCtx>({ discreteAxes: 1 }).run(state({ x: 'g', color: undefined }), CTX).axes!;
+		const bars = new DataPhase<State, AxisPlotCtx>({ discreteAxes: 1 }).run(
+			state({ x: 'g', color: undefined }),
+			CTX
+		).axes!;
 		expect(bars).toMatchObject({ category: 'x', value: 'y', orientation: 'vertical' });
 
 		const horizontal = new DataPhase<State, AxisPlotCtx>({ discreteAxes: 1 }).run(
@@ -84,7 +87,9 @@ describe('DataPhase', () => {
 			CTX
 		);
 		expect(discrete.gapFillMaps!.get('A')!.get(rows[1])!.value).toBe(4);
-		expect(new DataPhase<State, AxisPlotCtx>().run(state({ data: rows, gaps }), CTX).gapFillMaps).toBeUndefined();
+		expect(
+			new DataPhase<State, AxisPlotCtx>().run(state({ data: rows, gaps }), CTX).gapFillMaps
+		).toBeUndefined();
 	});
 
 	test('orderSeries reorders the series; colorOrder alone decides which color each takes', () => {
@@ -104,17 +109,19 @@ describe('DataPhase', () => {
 		const legendInteraction = new LegendState();
 		legendInteraction.turnOff('B', { mode: 'omit' });
 		const plain = new DataPhase<State, AxisPlotCtx>().run(state(), CTX);
-		const out = new DataPhase<State, AxisPlotCtx>().run(state(), { ...CTX, interaction: new PlotInteraction(() => CTX.cfg, { legend: legendInteraction }) });
+		const out = new DataPhase<State, AxisPlotCtx>().run(state(), {
+			...CTX,
+			interaction: new PlotInteraction(() => CTX.cfg, { legend: legendInteraction })
+		});
 		expect(names(out)).toEqual(['A']);
 		expect(out.allSeriesNames).toEqual(['B', 'A']);
 		expect(out.colorForSeries!('A')).toBe(plain.colorForSeries!('A'));
 	});
 
 	test("scoped groups read a segment's own color through segments.color", () => {
-		const out = new DataPhase<State, AxisPlotCtx>({ segments: { color: (style) => style?.fill } }).run(
-			state({ segments: { A: [{ styles: { fill: '#123456' } }] } }),
-			CTX
-		);
+		const out = new DataPhase<State, AxisPlotCtx>({
+			segments: { color: (style) => style?.fill }
+		}).run(state({ segments: { A: [{ styles: { fill: '#123456' } }] } }), CTX);
 		const a = out.scopedGroups!.find((g) => g.name === 'A')!;
 		expect(a.segments[0].color).toBe('#123456');
 	});
@@ -129,8 +136,10 @@ describe('DataPhase', () => {
 
 describe('MappingPhase', () => {
 	const mapped = (overrides: Partial<State> = {}) =>
-		new MappingPhase<State, AxisPlotCtx>().run(new DataPhase<State, AxisPlotCtx>().run(state(overrides), CTX), CTX)
-			.channels!;
+		new MappingPhase<State, AxisPlotCtx>().run(
+			new DataPhase<State, AxisPlotCtx>().run(state(overrides), CTX),
+			CTX
+		).channels!;
 
 	test('x/y read the first series’ own accessors', () => {
 		const channels = mapped();
@@ -219,7 +228,8 @@ describe('Pipeline.ofAxisKind', () => {
 	});
 
 	test('the "tooltip" phase leaves the default format, the same on every plot', () => {
-		const shared = runStages(Pipeline.ofAxisKind<State, AxisPlotCtx>({ markers: { marks: () => [] } }), 
+		const shared = runStages(
+			Pipeline.ofAxisKind<State, AxisPlotCtx>({ markers: { marks: () => [] } }),
 			state({ grouping: 'g' }),
 			CTX
 		);
@@ -272,7 +282,10 @@ describe('series identity', () => {
 	});
 
 	test('a series without its own id is identified by its name', () => {
-		const out = new TransformsPhase<State>().run(new DataPhase<State, AxisPlotCtx>().run(state(), CTX), CTX);
+		const out = new TransformsPhase<State>().run(
+			new DataPhase<State, AxisPlotCtx>().run(state(), CTX),
+			CTX
+		);
 		expect(new Set(tags(out).map(([name, id]) => name === id))).toEqual(new Set([true]));
 	});
 

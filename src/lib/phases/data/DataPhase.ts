@@ -6,12 +6,7 @@ import { buildGapFillMaps, isGapValue } from '$lib/plots/utils/gaps';
 import { FacetPhase } from '$lib/phases/facet/FacetPhase';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { Accessor, Series } from '$lib/types/plots/data/common';
-import type {
-	AxisPlotState,
-	AxisPlotCtx,
-	DataStageOptions,
-	PhaseStage
-} from '$lib/types/phases';
+import type { AxisPlotState, AxisPlotCtx, DataStageOptions, PhaseStage } from '$lib/types/phases';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyAxisState = AxisPlotState<any, any, any, any>;

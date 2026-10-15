@@ -6,11 +6,11 @@
 
 `styles` is typed per plot kind, with these fields on the axis-based plots:
 
-| Field | Plots | Purpose |
-| --- | --- | --- |
-| `values` | all axis-based plots | Value labels on the marks |
-| `frame` | all plots | A border around the plot area |
-| `gaps` | `LinePlot`, `BarPlot`, `PyramidPlot` | Bridges over missing values |
+| Field    | Plots                                | Purpose                       |
+| -------- | ------------------------------------ | ----------------------------- |
+| `values` | all axis-based plots                 | Value labels on the marks     |
+| `frame`  | all plots                            | A border around the plot area |
+| `gaps`   | `LinePlot`, `BarPlot`, `PyramidPlot` | Bridges over missing values   |
 
 `GeoPlot` has its own `styles` (base fill and stroke, tile layer, click handler) - see [Maps](geo.md).
 
@@ -36,14 +36,14 @@
 
 ![End-of-line value labels](images/styles-values.png)
 
-| Field | Meaning |
-| --- | --- |
-| `show` | Draws the labels. Off by default, except on a heatmap |
-| `anchor` | `'outside'`, `'start'`, `'middle'`, `'end'` - where a label sits on its mark |
-| `format` | `(value, seriesName) => string` |
-| `hoverIsolate` | Hovering a label dims every other series |
-| `fontStyle` | Text style: `fontSize`, `fill`, `dx`, `dy`, `textAnchor`, `lineAnchor`, `rotate`, `class`, ... Overrides the anchor's placement field by field |
-| `strokeStyle` | Style of the connector lines drawn from labels that had to move apart |
+| Field          | Meaning                                                                                                                                        |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `show`         | Draws the labels. Off by default, except on a heatmap                                                                                          |
+| `anchor`       | `'outside'`, `'start'`, `'middle'`, `'end'` - where a label sits on its mark                                                                   |
+| `format`       | `(value, seriesName) => string`                                                                                                                |
+| `hoverIsolate` | Hovering a label dims every other series                                                                                                       |
+| `fontStyle`    | Text style: `fontSize`, `fill`, `dx`, `dy`, `textAnchor`, `lineAnchor`, `rotate`, `class`, ... Overrides the anchor's placement field by field |
+| `strokeStyle`  | Style of the connector lines drawn from labels that had to move apart                                                                          |
 
 Where the labels go depends on the plot: the end of each series on a line or area plot, one per bar on a bar, pyramid or histogram, one per point on a scatter, one per cell on a heatmap. On lines, overlapping labels spread apart, share one column and are joined to their points by elbow connectors; the right margin grows to fit them when it is `'auto'`. The spread is tuned by `text.declutter` in the [configuration](theming.md).
 
@@ -98,14 +98,14 @@ type Range = { from?: AxisValue; to?: AxisValue }; // inclusive on both ends
 
 The style shape depends on the plot:
 
-| Plot | Style type | Fields |
-| --- | --- | --- |
-| `LinePlot` | `LineSegmentStyle` | `stroke` (line style), `dots` (dot style) |
-| `AreaPlot`, `HistogramPlot` | `AreaStyle` | `fill`, `fillOpacity`, `stroke`, ... |
-| `BarPlot`, `PyramidPlot` | `BarSegmentStyle` (`AreaStyle`) | `fill`, `fillOpacity`, `stroke`, ... |
-| `HeatmapPlot` | `CellSegmentStyle` (`AreaStyle`) | `fill`, `fillOpacity`, `stroke`, `strokeWidth` |
-| `ScatterPlot` | `ScatterSegmentStyle` (`DotStyle`) | dot fill, stroke, radius, symbol |
-| `GeoPlot` | `GeoSegmentStyle` | `fill`, `fillOpacity`, `stroke`, `strokeWidth` |
+| Plot                        | Style type                         | Fields                                         |
+| --------------------------- | ---------------------------------- | ---------------------------------------------- |
+| `LinePlot`                  | `LineSegmentStyle`                 | `stroke` (line style), `dots` (dot style)      |
+| `AreaPlot`, `HistogramPlot` | `AreaStyle`                        | `fill`, `fillOpacity`, `stroke`, ...           |
+| `BarPlot`, `PyramidPlot`    | `BarSegmentStyle` (`AreaStyle`)    | `fill`, `fillOpacity`, `stroke`, ...           |
+| `HeatmapPlot`               | `CellSegmentStyle` (`AreaStyle`)   | `fill`, `fillOpacity`, `stroke`, `strokeWidth` |
+| `ScatterPlot`               | `ScatterSegmentStyle` (`DotStyle`) | dot fill, stroke, radius, symbol               |
+| `GeoPlot`                   | `GeoSegmentStyle`                  | `fill`, `fillOpacity`, `stroke`, `strokeWidth` |
 
 ### Examples
 

@@ -3,7 +3,12 @@
 The whole package reads its styling - fonts, colors, spacing, the legend, tooltip, axes, plot geometry - from one global, reactive configuration. Changing it re-themes every plot on screen; nothing is passed prop by prop.
 
 ```ts
-import { setConfiguration, getConfiguration, resetConfiguration, THEMES } from '@fundar/data-chart-telling';
+import {
+	setConfiguration,
+	getConfiguration,
+	resetConfiguration,
+	THEMES
+} from '@fundar/data-chart-telling';
 
 setConfiguration(THEMES.Editorial); // a ready-made theme
 
@@ -26,25 +31,25 @@ resetConfiguration(); // back to the shipped defaults
 
 ## Sections
 
-| Key | Controls |
-| --- | --- |
-| `font`, `color`, `background` | Base text of every figure |
-| `palette` | Categorical series colors, in order |
-| `symbols` | Shape cycle for the `symbol` channel |
-| `continuous` | Default ramp endpoints, label color and opacity range for continuous color and opacity |
-| `spacing`, `chrome` | Padding around header, legend and caption; the chrome `order` and `rowGap` |
-| `title`, `subtitle`, `caption` | Text blocks: `font`, `size`, `weight`, `color`, `leading`, `spacing` |
-| `divider` | The line a `'divider'` in the chrome `order` draws |
-| `legend` | Text, gaps, swatches, `disabledOpacity`, paginated nav buttons, the continuous bar, its handles, ticks and labels, and the `seriesTitle` and `sizeScale` options |
-| `axis` | Axis color, font and tick sizes, `grid`, and the number locale (below) |
-| `tooltip` | Tooltip background, color, font size, padding, radius, border |
-| `margins` | Default margin per side (`'auto'` or a number) |
-| `line`, `area`, `bar`, `pyramid`, `histogram`, `scatter` | Per-kind defaults: stroke width, dot radius, series padding, gap fills, fill opacity, inset |
-| `text` | `declutter` geometry of value labels and connectors |
-| `hover` | Look of the hover marker: `rule`, `dot`, `font`, `area` |
-| `timeline` | The rule (`rule`) and the player bar (`player`: controls, speeds, `stepDuration`, button, track, thumb, toggle) |
-| `facet` | The position badge and prev/next buttons |
-| `frameClip` | Tolerance for clipping marks to the plot frame |
+| Key                                                      | Controls                                                                                                                                                         |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `font`, `color`, `background`                            | Base text of every figure                                                                                                                                        |
+| `palette`                                                | Categorical series colors, in order                                                                                                                              |
+| `symbols`                                                | Shape cycle for the `symbol` channel                                                                                                                             |
+| `continuous`                                             | Default ramp endpoints, label color and opacity range for continuous color and opacity                                                                           |
+| `spacing`, `chrome`                                      | Padding around header, legend and caption; the chrome `order` and `rowGap`                                                                                       |
+| `title`, `subtitle`, `caption`                           | Text blocks: `font`, `size`, `weight`, `color`, `leading`, `spacing`                                                                                             |
+| `divider`                                                | The line a `'divider'` in the chrome `order` draws                                                                                                               |
+| `legend`                                                 | Text, gaps, swatches, `disabledOpacity`, paginated nav buttons, the continuous bar, its handles, ticks and labels, and the `seriesTitle` and `sizeScale` options |
+| `axis`                                                   | Axis color, font and tick sizes, `grid`, and the number locale (below)                                                                                           |
+| `tooltip`                                                | Tooltip background, color, font size, padding, radius, border                                                                                                    |
+| `margins`                                                | Default margin per side (`'auto'` or a number)                                                                                                                   |
+| `line`, `area`, `bar`, `pyramid`, `histogram`, `scatter` | Per-kind defaults: stroke width, dot radius, series padding, gap fills, fill opacity, inset                                                                      |
+| `text`                                                   | `declutter` geometry of value labels and connectors                                                                                                              |
+| `hover`                                                  | Look of the hover marker: `rule`, `dot`, `font`, `area`                                                                                                          |
+| `timeline`                                               | The rule (`rule`) and the player bar (`player`: controls, speeds, `stepDuration`, button, track, thumb, toggle)                                                  |
+| `facet`                                                  | The position badge and prev/next buttons                                                                                                                         |
+| `frameClip`                                              | Tolerance for clipping marks to the plot frame                                                                                                                   |
 
 ## Locale
 
@@ -73,138 +78,138 @@ The text blocks map `title`, `subtitle` and `caption` to `--dct-{block}-{font|si
 
 ### base
 
-| CSS variable | Config path |
-| --- | --- |
-| `--dct-font` | `font` |
-| `--dct-fg` | `color` |
-| `--dct-bg` | `background` |
+| CSS variable | Config path  |
+| ------------ | ------------ |
+| `--dct-font` | `font`       |
+| `--dct-fg`   | `color`      |
+| `--dct-bg`   | `background` |
 
 ### spacing
 
-| CSS variable | Config path |
-| --- | --- |
-| `--dct-header-pad` | `spacing.headerPadding` |
-| `--dct-legend-pad` | `spacing.legendPadding` |
+| CSS variable        | Config path              |
+| ------------------- | ------------------------ |
+| `--dct-header-pad`  | `spacing.headerPadding`  |
+| `--dct-legend-pad`  | `spacing.legendPadding`  |
 | `--dct-caption-pad` | `spacing.captionPadding` |
-| `--dct-bleed` | `spacing.bleed` |
+| `--dct-bleed`       | `spacing.bleed`          |
 
 ### divider
 
-| CSS variable | Config path |
-| --- | --- |
-| `--dct-divider-color` | `divider.color` |
-| `--dct-divider-width` | `divider.width` |
-| `--dct-divider-style` | `divider.style` |
+| CSS variable           | Config path      |
+| ---------------------- | ---------------- |
+| `--dct-divider-color`  | `divider.color`  |
+| `--dct-divider-width`  | `divider.width`  |
+| `--dct-divider-style`  | `divider.style`  |
 | `--dct-divider-margin` | `divider.margin` |
 
 ### chrome
 
-| CSS variable | Config path |
-| --- | --- |
+| CSS variable    | Config path     |
+| --------------- | --------------- |
 | `--dct-row-gap` | `chrome.rowGap` |
 
 ### legend
 
-| CSS variable | Config path |
-| --- | --- |
-| `--dct-legend-font` | `legend.font` |
-| `--dct-legend-size` | `legend.size` |
-| `--dct-legend-weight` | `legend.weight` |
-| `--dct-legend-color` | `legend.color` |
-| `--dct-legend-title-size` | `legend.titleSize` |
-| `--dct-legend-title-weight` | `legend.titleWeight` |
-| `--dct-legend-gap` | `legend.gap` |
-| `--dct-legend-swatch` | `legend.swatchSize` |
-| `--dct-legend-size-gap` | `legend.sizeScale.gap` |
-| `--dct-legend-nav-bg` | `legend.navButton.background` |
-| `--dct-legend-nav-color` | `legend.navButton.color` |
-| `--dct-legend-nav-size` | `legend.navButton.size` |
-| `--dct-legend-nav-font-size` | `legend.navButton.fontSize` |
-| `--dct-legend-nav-disabled-opacity` | `legend.navButton.disabledOpacity` |
-| `--dct-continuous-handle-width` | `legend.continuous.handle.width` |
-| `--dct-continuous-handle-height` | `legend.continuous.handle.height` |
-| `--dct-continuous-handle-radius` | `legend.continuous.handle.radius` |
-| `--dct-continuous-handle-fill` | `legend.continuous.handle.fill` |
-| `--dct-continuous-handle-stroke` | `legend.continuous.handle.stroke` |
-| `--dct-continuous-handle-stroke-width` | `legend.continuous.handle.strokeWidth` |
-| `--dct-continuous-tick-color` | `legend.continuous.tick.color` |
-| `--dct-continuous-tick-width` | `legend.continuous.tick.width` |
-| `--dct-continuous-tick-length` | `legend.continuous.tick.length` |
-| `--dct-continuous-label-rotate` | `legend.continuous.label.rotate` |
-| `--dct-continuous-label-size` | `legend.continuous.label.size` |
-| `--dct-continuous-label-weight` | `legend.continuous.label.weight` |
+| CSS variable                            | Config path                              |
+| --------------------------------------- | ---------------------------------------- |
+| `--dct-legend-font`                     | `legend.font`                            |
+| `--dct-legend-size`                     | `legend.size`                            |
+| `--dct-legend-weight`                   | `legend.weight`                          |
+| `--dct-legend-color`                    | `legend.color`                           |
+| `--dct-legend-title-size`               | `legend.titleSize`                       |
+| `--dct-legend-title-weight`             | `legend.titleWeight`                     |
+| `--dct-legend-gap`                      | `legend.gap`                             |
+| `--dct-legend-swatch`                   | `legend.swatchSize`                      |
+| `--dct-legend-size-gap`                 | `legend.sizeScale.gap`                   |
+| `--dct-legend-nav-bg`                   | `legend.navButton.background`            |
+| `--dct-legend-nav-color`                | `legend.navButton.color`                 |
+| `--dct-legend-nav-size`                 | `legend.navButton.size`                  |
+| `--dct-legend-nav-font-size`            | `legend.navButton.fontSize`              |
+| `--dct-legend-nav-disabled-opacity`     | `legend.navButton.disabledOpacity`       |
+| `--dct-continuous-handle-width`         | `legend.continuous.handle.width`         |
+| `--dct-continuous-handle-height`        | `legend.continuous.handle.height`        |
+| `--dct-continuous-handle-radius`        | `legend.continuous.handle.radius`        |
+| `--dct-continuous-handle-fill`          | `legend.continuous.handle.fill`          |
+| `--dct-continuous-handle-stroke`        | `legend.continuous.handle.stroke`        |
+| `--dct-continuous-handle-stroke-width`  | `legend.continuous.handle.strokeWidth`   |
+| `--dct-continuous-tick-color`           | `legend.continuous.tick.color`           |
+| `--dct-continuous-tick-width`           | `legend.continuous.tick.width`           |
+| `--dct-continuous-tick-length`          | `legend.continuous.tick.length`          |
+| `--dct-continuous-label-rotate`         | `legend.continuous.label.rotate`         |
+| `--dct-continuous-label-size`           | `legend.continuous.label.size`           |
+| `--dct-continuous-label-weight`         | `legend.continuous.label.weight`         |
 | `--dct-continuous-label-overlap-rotate` | `legend.continuous.label.overlap.rotate` |
 
 ### axis
 
-| CSS variable | Config path |
-| --- | --- |
+| CSS variable       | Config path  |
+| ------------------ | ------------ |
 | `--dct-axis-color` | `axis.color` |
 
 ### tooltip
 
-| CSS variable | Config path |
-| --- | --- |
-| `--dct-tooltip-bg` | `tooltip.background` |
-| `--dct-tooltip-color` | `tooltip.color` |
-| `--dct-tooltip-size` | `tooltip.fontSize` |
-| `--dct-tooltip-pad` | `tooltip.padding` |
-| `--dct-tooltip-radius` | `tooltip.radius` |
-| `--dct-tooltip-border` | `tooltip.border` |
+| CSS variable           | Config path          |
+| ---------------------- | -------------------- |
+| `--dct-tooltip-bg`     | `tooltip.background` |
+| `--dct-tooltip-color`  | `tooltip.color`      |
+| `--dct-tooltip-size`   | `tooltip.fontSize`   |
+| `--dct-tooltip-pad`    | `tooltip.padding`    |
+| `--dct-tooltip-radius` | `tooltip.radius`     |
+| `--dct-tooltip-border` | `tooltip.border`     |
 
 ### timeline
 
-| CSS variable | Config path |
-| --- | --- |
-| `--dct-timeline-axis` | `timeline.axisColor` |
-| `--dct-timeline-active` | `timeline.activeColor` |
-| `--dct-timeline-gap` | `timeline.gap` |
-| `--dct-player-bg` | `timeline.player.background` |
-| `--dct-player-color` | `timeline.player.color` |
-| `--dct-player-radius` | `timeline.player.radius` |
-| `--dct-player-pad` | `timeline.player.padding` |
-| `--dct-player-gap` | `timeline.player.gap` |
-| `--dct-player-size` | `timeline.player.fontSize` |
-| `--dct-player-weight` | `timeline.player.fontWeight` |
-| `--dct-player-value-width` | `timeline.player.valueWidth` |
-| `--dct-player-button-size` | `timeline.player.button.size` |
-| `--dct-player-button-bg` | `timeline.player.button.background` |
-| `--dct-player-button-color` | `timeline.player.button.color` |
-| `--dct-player-button-hover-bg` | `timeline.player.button.hoverBackground` |
-| `--dct-player-button-radius` | `timeline.player.button.radius` |
-| `--dct-player-track-height` | `timeline.player.track.height` |
-| `--dct-player-track-color` | `timeline.player.track.color` |
-| `--dct-player-track-fill` | `timeline.player.track.fillColor` |
-| `--dct-player-track-radius` | `timeline.player.track.radius` |
-| `--dct-player-thumb-size` | `timeline.player.thumb.size` |
-| `--dct-player-thumb-color` | `timeline.player.thumb.color` |
-| `--dct-player-toggle-bg` | `timeline.player.toggle.background` |
-| `--dct-player-toggle-color` | `timeline.player.toggle.color` |
-| `--dct-player-toggle-active-bg` | `timeline.player.toggle.activeBackground` |
-| `--dct-player-toggle-active-color` | `timeline.player.toggle.activeColor` |
-| `--dct-player-toggle-radius` | `timeline.player.toggle.radius` |
-| `--dct-player-toggle-size` | `timeline.player.toggle.fontSize` |
-| `--dct-player-toggle-pad` | `timeline.player.toggle.padding` |
+| CSS variable                       | Config path                               |
+| ---------------------------------- | ----------------------------------------- |
+| `--dct-timeline-axis`              | `timeline.axisColor`                      |
+| `--dct-timeline-active`            | `timeline.activeColor`                    |
+| `--dct-timeline-gap`               | `timeline.gap`                            |
+| `--dct-player-bg`                  | `timeline.player.background`              |
+| `--dct-player-color`               | `timeline.player.color`                   |
+| `--dct-player-radius`              | `timeline.player.radius`                  |
+| `--dct-player-pad`                 | `timeline.player.padding`                 |
+| `--dct-player-gap`                 | `timeline.player.gap`                     |
+| `--dct-player-size`                | `timeline.player.fontSize`                |
+| `--dct-player-weight`              | `timeline.player.fontWeight`              |
+| `--dct-player-value-width`         | `timeline.player.valueWidth`              |
+| `--dct-player-button-size`         | `timeline.player.button.size`             |
+| `--dct-player-button-bg`           | `timeline.player.button.background`       |
+| `--dct-player-button-color`        | `timeline.player.button.color`            |
+| `--dct-player-button-hover-bg`     | `timeline.player.button.hoverBackground`  |
+| `--dct-player-button-radius`       | `timeline.player.button.radius`           |
+| `--dct-player-track-height`        | `timeline.player.track.height`            |
+| `--dct-player-track-color`         | `timeline.player.track.color`             |
+| `--dct-player-track-fill`          | `timeline.player.track.fillColor`         |
+| `--dct-player-track-radius`        | `timeline.player.track.radius`            |
+| `--dct-player-thumb-size`          | `timeline.player.thumb.size`              |
+| `--dct-player-thumb-color`         | `timeline.player.thumb.color`             |
+| `--dct-player-toggle-bg`           | `timeline.player.toggle.background`       |
+| `--dct-player-toggle-color`        | `timeline.player.toggle.color`            |
+| `--dct-player-toggle-active-bg`    | `timeline.player.toggle.activeBackground` |
+| `--dct-player-toggle-active-color` | `timeline.player.toggle.activeColor`      |
+| `--dct-player-toggle-radius`       | `timeline.player.toggle.radius`           |
+| `--dct-player-toggle-size`         | `timeline.player.toggle.fontSize`         |
+| `--dct-player-toggle-pad`          | `timeline.player.toggle.padding`          |
 
 ### heatmap ramp
 
-| CSS variable | Config path |
-| --- | --- |
-| `--dct-heat-min` | `continuous.min` |
-| `--dct-heat-max` | `continuous.max` |
+| CSS variable      | Config path             |
+| ----------------- | ----------------------- |
+| `--dct-heat-min`  | `continuous.min`        |
+| `--dct-heat-max`  | `continuous.max`        |
 | `--dct-heat-text` | `continuous.labelColor` |
 
 ### facet
 
-| CSS variable | Config path |
-| --- | --- |
-| `--dct-facet-indicator-bg` | `facet.indicator.background` |
-| `--dct-facet-indicator-color` | `facet.indicator.color` |
-| `--dct-facet-indicator-size` | `facet.indicator.fontSize` |
-| `--dct-facet-indicator-pad` | `facet.indicator.padding` |
-| `--dct-facet-indicator-radius` | `facet.indicator.radius` |
-| `--dct-facet-nav-bg` | `facet.navButton.background` |
-| `--dct-facet-nav-color` | `facet.navButton.color` |
-| `--dct-facet-nav-btn-size` | `facet.navButton.size` |
-| `--dct-facet-nav-font-size` | `facet.navButton.fontSize` |
+| CSS variable                       | Config path                       |
+| ---------------------------------- | --------------------------------- |
+| `--dct-facet-indicator-bg`         | `facet.indicator.background`      |
+| `--dct-facet-indicator-color`      | `facet.indicator.color`           |
+| `--dct-facet-indicator-size`       | `facet.indicator.fontSize`        |
+| `--dct-facet-indicator-pad`        | `facet.indicator.padding`         |
+| `--dct-facet-indicator-radius`     | `facet.indicator.radius`          |
+| `--dct-facet-nav-bg`               | `facet.navButton.background`      |
+| `--dct-facet-nav-color`            | `facet.navButton.color`           |
+| `--dct-facet-nav-btn-size`         | `facet.navButton.size`            |
+| `--dct-facet-nav-font-size`        | `facet.navButton.fontSize`        |
 | `--dct-facet-nav-disabled-opacity` | `facet.navButton.disabledOpacity` |

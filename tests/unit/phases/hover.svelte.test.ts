@@ -16,24 +16,34 @@ describe('buildHoverConfig', () => {
 	const base = { points: [], label: () => '', format: () => '', defaultStrategy: 'x' as const };
 
 	test('is active with a tooltip or a hover marker, and only then', () => {
-		expect(HoverPhase.buildHoverConfig<Row>({ ...base, tooltip: undefined, markers: [] }).active).toBe(false);
 		expect(
-			HoverPhase.buildHoverConfig<Row>({ ...base, tooltip: undefined, markers: [{ type: 'hover' }] }).active
+			HoverPhase.buildHoverConfig<Row>({ ...base, tooltip: undefined, markers: [] }).active
+		).toBe(false);
+		expect(
+			HoverPhase.buildHoverConfig<Row>({
+				...base,
+				tooltip: undefined,
+				markers: [{ type: 'hover' }]
+			}).active
 		).toBe(true);
 		const tooltip = { format: () => '', sync: false };
 		expect(HoverPhase.buildHoverConfig<Row>({ ...base, tooltip, markers: [] }).active).toBe(true);
 	});
 
 	test("falls back to the plot kind's own strategy, and the tooltip's wins over it", () => {
-		expect(HoverPhase.buildHoverConfig<Row>({ ...base, tooltip: undefined, markers: [] }).strategy).toBe('x');
+		expect(
+			HoverPhase.buildHoverConfig<Row>({ ...base, tooltip: undefined, markers: [] }).strategy
+		).toBe('x');
 		const tooltip = { format: () => '', sync: false, strategy: 'series' as const };
-		expect(HoverPhase.buildHoverConfig<Row>({ ...base, tooltip, markers: [] }).strategy).toBe('series');
+		expect(HoverPhase.buildHoverConfig<Row>({ ...base, tooltip, markers: [] }).strategy).toBe(
+			'series'
+		);
 	});
 
 	test('carries pointMatching only when given', () => {
-		expect(HoverPhase.buildHoverConfig<Row>({ ...base, tooltip: undefined, markers: [] })).not.toHaveProperty(
-			'pointMatching'
-		);
+		expect(
+			HoverPhase.buildHoverConfig<Row>({ ...base, tooltip: undefined, markers: [] })
+		).not.toHaveProperty('pointMatching');
 		const contains = HoverPhase.buildHoverConfig<Row>({
 			...base,
 			tooltip: undefined,
@@ -107,10 +117,9 @@ describe('the "hover" phase', () => {
 		{ year: 2021, region: 'Sur', value: 4 }
 	];
 	const runKind = (defaults: AxisPlotDefaults<never, never>, props: Record<string, unknown>) =>
-		Pipeline.ofAxisKind(defaults as never).run(
-			{ data: SALES, width: 400, height: 300, ...props },
-			{ cfg: DEFAULT_CONFIG } as never
-		) as {
+		Pipeline.ofAxisKind(defaults as never).run({ data: SALES, width: 400, height: 300, ...props }, {
+			cfg: DEFAULT_CONFIG
+		} as never) as {
 			hover?: HoverConfig<Sale>;
 			hoverPosition?: { x: (r: never) => unknown; y: (r: never) => unknown };
 		};

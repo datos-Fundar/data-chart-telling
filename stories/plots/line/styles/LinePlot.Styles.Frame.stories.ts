@@ -6,34 +6,34 @@ import { FEMALE_LIFE_EXPECTANCY } from '../data';
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-  title: 'Plots/LinePlot/Styles/Frame',
-  component: LinePlot,
-  tags: ['autodocs'],
-  args: {
-    width: 940,
-    height: 400,
-  },
-  argTypes: {
-    width: {
-      description: 'Plot width in pixels.',
-      control: { type: 'range', min: 300, max: 940, step: 50 },
-    },
-    height: {
-      description: 'Plot height in pixels.',
-      control: { type: 'range', min: 200, max: 700, step: 50 },
-    },
-    series: {
-      description: 'Data series to render.',
-      control: false,
-    },
-    styles: {
-      description: 'Rendering style overrides.',
-      control: false,
-    },
-  },
-  parameters: {
-    docs: { source: { name: 'LinePlot' } },
-  },
+	title: 'Plots/LinePlot/Styles/Frame',
+	component: LinePlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 400
+	},
+	argTypes: {
+		width: {
+			description: 'Plot width in pixels.',
+			control: { type: 'range', min: 300, max: 940, step: 50 }
+		},
+		height: {
+			description: 'Plot height in pixels.',
+			control: { type: 'range', min: 200, max: 700, step: 50 }
+		},
+		series: {
+			description: 'Data series to render.',
+			control: false
+		},
+		styles: {
+			description: 'Rendering style overrides.',
+			control: false
+		}
+	},
+	parameters: {
+		docs: { source: { name: 'LinePlot' } }
+	}
 } satisfies Meta<typeof LinePlot>;
 
 export default meta;
@@ -48,19 +48,19 @@ type Story = StoryObj<typeof meta>;
  * kind via `styles.frame`, not just `LinePlot`.
  */
 export const FrameDefault: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      },
-    ],
-    styles: {
-      frame: true,
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			}
+		],
+		styles: {
+			frame: true
+		} satisfies AxisBasedStylesConfig
+	}
 };
 
 /**
@@ -69,24 +69,24 @@ export const FrameDefault: Story = {
  * to pull the frame in from the content box's own edges.
  */
 export const FrameCustomStyle: Story = {
-  args: {
-    series: [
-      {
-        name: 'female',
-        x: 'year',
-        y: 'value',
-        data: FEMALE_LIFE_EXPECTANCY,
-      },
-    ],
-    styles: {
-      frame: {
-        stroke: '#6366f1',
-        strokeWidth: 2,
-        fill: '#6366f1',
-        fillOpacity: 0.04,
-        borderRadius: 8,
-        inset: 4,
-      },
-    } satisfies AxisBasedStylesConfig,
-  },
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			}
+		],
+		styles: {
+			frame: {
+				stroke: '#6366f1',
+				strokeWidth: 2,
+				fill: '#6366f1',
+				fillOpacity: 0.04,
+				borderRadius: 8,
+				inset: 4
+			}
+		} satisfies AxisBasedStylesConfig
+	}
 };

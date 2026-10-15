@@ -10,7 +10,10 @@
 	];
 	const state = {
 		hover: { active: true, points: [], label: () => '' },
-		hoverPosition: { x: (d: Record<string, unknown>) => d.x as number, y: (d: Record<string, unknown>) => d.y as number },
+		hoverPosition: {
+			x: (d: Record<string, unknown>) => d.x as number,
+			y: (d: Record<string, unknown>) => d.y as number
+		},
 		hoverRows: rows
 	};
 </script>

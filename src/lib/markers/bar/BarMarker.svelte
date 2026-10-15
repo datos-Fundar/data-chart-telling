@@ -20,7 +20,9 @@
 	const plot = usePlot().svelteplot;
 	const hover = PlotContext.current()?.hover;
 	const enter = $derived(
-		marker.hover ? () => hover?.onPointer((marker.data ?? []) as Record<string, unknown>[]) : undefined
+		marker.hover
+			? () => hover?.onPointer((marker.data ?? []) as Record<string, unknown>[])
+			: undefined
 	);
 	const leave = $derived(marker.hover ? hover?.onLeave : undefined);
 	function categoryScaleFor(isHorizontal: boolean) {

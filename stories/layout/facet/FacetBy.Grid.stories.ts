@@ -27,14 +27,16 @@ type Story = StoryObj<typeof meta>;
 export const TwoSideBySide: Story = {
 	args: {
 		data: facetGroups(2),
-		facet: { by: 'group', columns: 2 } }
+		facet: { by: 'group', columns: 2 }
+	}
 };
 
 /** Two groups, one column - stacked vertically. */
 export const TwoStacked: Story = {
 	args: {
 		data: facetGroups(2),
-		facet: { by: 'group', columns: 1 } }
+		facet: { by: 'group', columns: 1 }
+	}
 };
 
 /** Four groups in a 2×2 grid. */

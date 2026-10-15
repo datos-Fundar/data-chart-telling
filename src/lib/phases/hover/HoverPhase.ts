@@ -66,7 +66,9 @@ export class HoverPhase<
 			position,
 			include: HoverPhase.#hoverable(state, ctx, raw, valueAxis),
 			row: options.row?.(state) as ((row: Row) => Row) | undefined,
-			decorate: options.decorate?.(state, ctx) as ((row: Row) => Partial<HoverDisplayPoint>) | undefined
+			decorate: options.decorate?.(state, ctx) as
+				| ((row: Row) => Partial<HoverDisplayPoint>)
+				| undefined
 		});
 		const hover = HoverPhase.buildHoverConfig<Row>({
 			tooltip: state.tooltip as TooltipConfig<Row> | undefined,

@@ -132,7 +132,9 @@
 	const getX = $derived(state.hoverPosition!.x as (d: TData) => AxisValue);
 	const getY = $derived(state.hoverPosition!.y as (d: TData) => AxisValue);
 	const hover = $derived(state.hover as HoverConfig<TData>);
-	const scales = $derived(state.scales as (AxisBasedScalesConfig<TData> & GeoScalesConfig) | undefined);
+	const scales = $derived(
+		state.scales as (AxisBasedScalesConfig<TData> & GeoScalesConfig) | undefined
+	);
 	const seriesData = $derived(state.resolvedSeries as Series<TSeries>[] | undefined);
 	const scopedGroups = $derived(state.scopedGroups as ScopedMarkerGroup<TSeries>[] | undefined);
 
@@ -219,7 +221,10 @@
 		ctrl.onMove(e);
 	}
 
-	const resolvedMarkers = $derived([...((state.markers ?? []) as MarkerConfig[]), ...(markers ?? [])]);
+	const resolvedMarkers = $derived([
+		...((state.markers ?? []) as MarkerConfig[]),
+		...(markers ?? [])
+	]);
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->

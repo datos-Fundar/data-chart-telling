@@ -43,7 +43,8 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 	state: GeoPlotState<TProps>,
 	ctx: GeoPlotCtx<TProps>
 ): GeoPlotState<TProps> {
-	const { features, segments, authoredMarkers, color, grouping, resolveColor, resolveOpacity } = state;
+	const { features, segments, authoredMarkers, color, grouping, resolveColor, resolveOpacity } =
+		state;
 	const { range, fill, fillOpacity, stroke, strokeWidth, cfg, onFeatureClick } = ctx;
 	const OPACITY_STEPS = 32;
 
@@ -65,7 +66,8 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 	for (const f of features!) {
 		const style = getFeatureStyle(f);
 		const rawOpacity = resolveOpacity?.(f);
-		const opacity = rawOpacity != null ? Math.round(rawOpacity * OPACITY_STEPS) / OPACITY_STEPS : undefined;
+		const opacity =
+			rawOpacity != null ? Math.round(rawOpacity * OPACITY_STEPS) / OPACITY_STEPS : undefined;
 		const key = JSON.stringify({ style, opacity });
 		let group = groups.get(key);
 		if (!group) {

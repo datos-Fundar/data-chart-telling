@@ -26,7 +26,6 @@
 		margins = $bindable(),
 		...core
 	}: HistogramPlotProps<TData> = $props();
-
 </script>
 
 <Plot

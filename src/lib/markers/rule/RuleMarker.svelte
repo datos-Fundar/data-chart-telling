@@ -33,15 +33,13 @@
 
 <RuleMark
 	data={rows}
-	{...axis === 'x' ?
-		{ x: position, y1: marker.y1, y2: marker.y2 } :
-		{ y: position, x1: marker.x1, x2: marker.x2 }
-	}
+	{...axis === 'x'
+		? { x: position, y1: marker.y1, y2: marker.y2 }
+		: { y: position, x1: marker.x1, x2: marker.x2 }}
 	inset={marker.inset}
-	{...axis === 'x' ?
-		{ insetTop: marker.insetTop, insetBottom: marker.insetBottom } :
-		{ insetLeft: marker.insetLeft, insetRight: marker.insetRight }
-	}
+	{...axis === 'x'
+		? { insetTop: marker.insetTop, insetBottom: marker.insetBottom }
+		: { insetLeft: marker.insetLeft, insetRight: marker.insetRight }}
 	stroke={styles?.stroke ?? 'currentColor'}
 	strokeWidth={styles?.strokeWidth ?? 1}
 	strokeOpacity={styles?.strokeOpacity ?? 1}

@@ -55,7 +55,15 @@ The package ships Svelte components, so the app needs the Svelte compiler (`@sve
 `type: 'rule'` draws a **rule** beside the plot instead, a line with the steps written along it. The page drives it through `progress` (`0` to `1`), from a slider, scroll position or anything else.
 
 ```svelte
-<LinePlot {width} {height} data={rows} x="year" y="value" color="region" timeline={{ accessor: 'year', type: 'rule', progress }} />
+<LinePlot
+	{width}
+	{height}
+	data={rows}
+	x="year"
+	y="value"
+	color="region"
+	timeline={{ accessor: 'year', type: 'rule', progress }}
+/>
 ```
 
 ![A line plot revealed up to the current step, with a timeline rule](docs/images/timeline-rule.png)
@@ -66,26 +74,26 @@ See [Timeline](docs/timeline.md) for both in detail.
 
 Start with the concepts; the rest is organised by what you want a plot to do.
 
-| Topic | What it covers |
-| --- | --- |
-| [Getting started](docs/getting-started.md) | Installing, a first plot, sizing a plot to its container, loading data |
-| [Concepts](docs/concepts.md) | Plots and figures, rows and series, channels, the props every plot shares |
-| [Plots](docs/plots.md) | The eight plot kinds: what each one draws and what it needs |
-| [Scales](docs/scales.md) | Axes (`x`, `y`) and channel scales (`color`, `grouping`, `opacity`, `symbol`, `r`, `length`) |
-| [Styles and segments](docs/styles-and-segments.md) | Value labels, frames, gap filling, and styling ranges of the data |
-| [Markers](docs/markers.md) | Extra marks on a plot: annotations, regions, hover highlights, custom components |
-| [Transforms and statistics](docs/transforms-and-statistics.md) | Stacking, binning, smoothing, regression and the other data transforms |
-| [Tooltip and hover](docs/tooltip-and-hover.md) | Floating tooltips, in-plot highlights, syncing hover across plots |
-| [Legend](docs/legend.md) | The automatic legend, toggling series, custom sections |
-| [Timeline](docs/timeline.md) | Stepping through the data by time, with a player bar (default) or a rule |
-| [Chrome](docs/chrome.md) | Title, subtitle, caption, header, footer, dividers and their order |
-| [Facets](docs/facets.md) | Small multiples: grids, carousels, pages |
-| [Composer](docs/composer.md) | Several plots in one figure, with shared hover, legend and timeline |
-| [Reading plot state](docs/state.md) | `usePlot` and `useFigure`, to build custom UI around a plot |
-| [Maps](docs/geo.md) | GeoPlot: data, projections, choropleths, camera and map markers |
-| [Theming](docs/theming.md) | The global configuration, themes, locale and CSS variables |
-| [Architecture](docs/architecture.md) | How a plot is assembled, for contributors |
-| [Development](docs/development.md) | Building, testing, Storybook and publishing |
+| Topic                                                          | What it covers                                                                               |
+| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| [Getting started](docs/getting-started.md)                     | Installing, a first plot, sizing a plot to its container, loading data                       |
+| [Concepts](docs/concepts.md)                                   | Plots and figures, rows and series, channels, the props every plot shares                    |
+| [Plots](docs/plots.md)                                         | The eight plot kinds: what each one draws and what it needs                                  |
+| [Scales](docs/scales.md)                                       | Axes (`x`, `y`) and channel scales (`color`, `grouping`, `opacity`, `symbol`, `r`, `length`) |
+| [Styles and segments](docs/styles-and-segments.md)             | Value labels, frames, gap filling, and styling ranges of the data                            |
+| [Markers](docs/markers.md)                                     | Extra marks on a plot: annotations, regions, hover highlights, custom components             |
+| [Transforms and statistics](docs/transforms-and-statistics.md) | Stacking, binning, smoothing, regression and the other data transforms                       |
+| [Tooltip and hover](docs/tooltip-and-hover.md)                 | Floating tooltips, in-plot highlights, syncing hover across plots                            |
+| [Legend](docs/legend.md)                                       | The automatic legend, toggling series, custom sections                                       |
+| [Timeline](docs/timeline.md)                                   | Stepping through the data by time, with a player bar (default) or a rule                     |
+| [Chrome](docs/chrome.md)                                       | Title, subtitle, caption, header, footer, dividers and their order                           |
+| [Facets](docs/facets.md)                                       | Small multiples: grids, carousels, pages                                                     |
+| [Composer](docs/composer.md)                                   | Several plots in one figure, with shared hover, legend and timeline                          |
+| [Reading plot state](docs/state.md)                            | `usePlot` and `useFigure`, to build custom UI around a plot                                  |
+| [Maps](docs/geo.md)                                            | GeoPlot: data, projections, choropleths, camera and map markers                              |
+| [Theming](docs/theming.md)                                     | The global configuration, themes, locale and CSS variables                                   |
+| [Architecture](docs/architecture.md)                           | How a plot is assembled, for contributors                                                    |
+| [Development](docs/development.md)                             | Building, testing, Storybook and publishing                                                  |
 
 Working examples live in [examples/](examples/); the Storybook (`pnpm storybook`) shows every option live.
 

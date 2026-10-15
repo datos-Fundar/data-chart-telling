@@ -37,8 +37,8 @@ describe('SymbolPath - the shape a dot draws', () => {
 
 	test('fitted scales a shape to fill a square, centred in it', () => {
 		expect(SymbolPath.fitted('circle', 8)).toBe('M8,4A4,4,0,1,1,0,4A4,4,0,1,1,8,4');
-		const ys = [...SymbolPath.fitted('triangle', 8).matchAll(/[ML][\d.e-]+,([\d.e-]+)/g)].map(
-			(m) => Number(m[1])
+		const ys = [...SymbolPath.fitted('triangle', 8).matchAll(/[ML][\d.e-]+,([\d.e-]+)/g)].map((m) =>
+			Number(m[1])
 		);
 		// Wider than tall: fitted by its width, centred on its height.
 		expect(Math.min(...ys) + Math.max(...ys)).toBeCloseTo(8);

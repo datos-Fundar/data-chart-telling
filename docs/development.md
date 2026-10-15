@@ -19,10 +19,10 @@ pnpm install
 
 [Husky](https://typicode.github.io/husky) installs the hooks on `pnpm install`:
 
-- `pre-commit` runs `eslint .` over the whole project and `pnpm check`.
+- `pre-commit` runs `pnpm lint` (Prettier check and ESLint over the whole project) and `pnpm check`.
 - `pre-push` runs `pnpm test`, the node and browser suites.
 
-`git commit --no-verify` and `git push --no-verify` skip them. Formatting is left out of the hooks (many tracked files are not yet formatted): run `pnpm prettier --write` on the files you add.
+`git commit --no-verify` and `git push --no-verify` skip them. `pnpm format` fixes what the Prettier check reports.
 
 ## Tests
 

@@ -16,7 +16,13 @@
 	y="lifeExpectancy"
 	markers={[
 		{ type: 'dot', data: COUNTRIES, x: 'gdpPerCapita', y: 'lifeExpectancy', color: 'population' },
-		{ type: 'dot', data: COUNTRIES, x: 'gdpPerCapita', y: 'lifeExpectancy', color: 'lifeExpectancy' }
+		{
+			type: 'dot',
+			data: COUNTRIES,
+			x: 'gdpPerCapita',
+			y: 'lifeExpectancy',
+			color: 'lifeExpectancy'
+		}
 	]}
 	legend={{
 		color: [

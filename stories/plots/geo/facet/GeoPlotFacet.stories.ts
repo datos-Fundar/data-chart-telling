@@ -13,16 +13,16 @@ import GeoPlotFacetDemo from './GeoPlotFacetDemo.svelte';
  * sizing/clamping.
  */
 const meta = {
-  title: 'Plots/GeoPlot/Facet',
-  component: GeoPlotFacetDemo,
-  tags: ['autodocs'],
-  args: { width: 900, height: 600 },
-  argTypes: {
-    width: { control: { type: 'range', min: 400, max: 1200, step: 20 } },
-    height: { control: { type: 'range', min: 300, max: 900, step: 20 } },
-    groupCount: { control: false },
-    columns: { control: false },
-  },
+	title: 'Plots/GeoPlot/Facet',
+	component: GeoPlotFacetDemo,
+	tags: ['autodocs'],
+	args: { width: 900, height: 600 },
+	argTypes: {
+		width: { control: { type: 'range', min: 400, max: 1200, step: 20 } },
+		height: { control: { type: 'range', min: 300, max: 900, step: 20 } },
+		groupCount: { control: false },
+		columns: { control: false }
+	}
 } satisfies Meta<typeof GeoPlotFacetDemo>;
 
 export default meta;

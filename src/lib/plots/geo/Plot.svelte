@@ -38,7 +38,6 @@
 		...core
 	}: GeoPlotProps<TProps> = $props();
 
-
 	const sliced = $derived(timeline != null || facet != null);
 	// Only resolved here when slicing; otherwise the core resolves `data` itself.
 	const resolved = createGeoFeatures<TProps>(
@@ -70,7 +69,8 @@
 	/** The core's props for one slice: the features and marker rows it keeps. */
 	function sliceProps(slice: PlotCellContext<Row>): GeoPlotCoreProps<TProps> {
 		const tip = slice.tooltip as TooltipConfig<GeoFeature<TProps>> | undefined;
-		if (!sliced) return { ...core, width: slice.width, height: slice.height, margins, tooltip: tip };
+		if (!sliced)
+			return { ...core, width: slice.width, height: slice.height, margins, tooltip: tip };
 		return {
 			...core,
 			data: features.filter(slice.keep) as unknown as GeoFeature<TProps>[],

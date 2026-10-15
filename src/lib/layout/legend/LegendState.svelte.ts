@@ -264,7 +264,8 @@ export class LegendState {
 		const merged: Record<string, unknown> = {};
 		for (const { match, ...config } of list as (T & { match?: string })[]) {
 			const matches =
-				match === undefined || (title !== undefined && (match === title || match === format(title)));
+				match === undefined ||
+				(title !== undefined && (match === title || match === format(title)));
 			if (matches) Object.assign(merged, config);
 		}
 		return merged as Partial<T>;
@@ -325,14 +326,13 @@ export class LegendState {
 			(list ?? []).flatMap((segment) => LegendState.#markEntry(segment, mark, color(name)))
 		);
 		const markers = (plot.markers ?? []).flatMap((marker) =>
-			LegendState.#markEntry(marker, MarkerKinds.of(marker.type)?.legendSymbol, color(marker.series))
+			LegendState.#markEntry(
+				marker,
+				MarkerKinds.of(marker.type)?.legendSymbol,
+				color(marker.series)
+			)
 		);
-		return [
-			...series,
-			...segments,
-			...markers,
-			...LegendChannels.of(plot)
-		];
+		return [...series, ...segments, ...markers, ...LegendChannels.of(plot)];
 	}
 
 	/** A segment's or marker's own entry, when it names itself on the legend. */

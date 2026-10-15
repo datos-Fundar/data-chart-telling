@@ -5,8 +5,15 @@ import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
 import { resolveColorScale } from '$lib/utils/color';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import type { DotMarkerConfig } from '$lib/types/markers/basic';
-import type { ArgentinaProvinceProps, WorldCountryProps } from '../../../../../stories/plots/geo/data';
-import { ARGENTINA_PROVINCES, WORLD_COUNTRIES, WEATHER_STATIONS } from '../../../../../stories/plots/geo/data';
+import type {
+	ArgentinaProvinceProps,
+	WorldCountryProps
+} from '../../../../../stories/plots/geo/data';
+import {
+	ARGENTINA_PROVINCES,
+	WORLD_COUNTRIES,
+	WEATHER_STATIONS
+} from '../../../../../stories/plots/geo/data';
 import { COUNTRIES } from '../../../../../stories/plots/scatter/data';
 import { waitForSvg, countGeoPaths, countDotMarks } from '../../../plots/_helpers/svg';
 
@@ -152,8 +159,12 @@ describe('color channel - independent ramps: segment-scoped (GeoPlot)', () => {
 		// Both start of their own ramp (t=0) - Córdoba (in the segment) reads
 		// the segment's green→yellow ramp; Mendoza (not in the segment) reads
 		// the plot-level red→blue ramp, despite sharing the same `color` value.
-		expect(fillOf(svg, 'Córdoba')).toContain(resolveColorScale({ scheme: ['#00ff00', '#ffff00'] }, [0, 10], [])(0));
-		expect(fillOf(svg, 'Mendoza')).toContain(resolveColorScale({ scheme: ['#ff0000', '#0000ff'] }, [0, 10], [])(0));
+		expect(fillOf(svg, 'Córdoba')).toContain(
+			resolveColorScale({ scheme: ['#00ff00', '#ffff00'] }, [0, 10], [])(0)
+		);
+		expect(fillOf(svg, 'Mendoza')).toContain(
+			resolveColorScale({ scheme: ['#ff0000', '#0000ff'] }, [0, 10], [])(0)
+		);
 	});
 
 	test("a segment's own domain is auto-computed from just that segment's own features, not the whole dataset", async () => {
@@ -181,11 +192,19 @@ describe('color channel - independent ramps: segment-scoped (GeoPlot)', () => {
 		// own two features) - under the whole dataset's domain ([0, 1e6], via
 		// Buenos Aires/Santa Fe) it would land at t≈0.0001, nowhere near pure
 		// black or white, so both endpoint checks together pin the domain down.
-		const segmentDomainColor = resolveColorScale({ scheme: ['#000000', '#ffffff'] }, [100, 200], [])(100);
+		const segmentDomainColor = resolveColorScale(
+			{ scheme: ['#000000', '#ffffff'] },
+			[100, 200],
+			[]
+		)(100);
 		expect(fillOf(svg, 'Córdoba')).toContain(segmentDomainColor);
 
 		// Mendoza (value 200) is the segment's own max → t=1 → pure white.
-		const segmentMaxColor = resolveColorScale({ scheme: ['#000000', '#ffffff'] }, [100, 200], [])(200);
+		const segmentMaxColor = resolveColorScale(
+			{ scheme: ['#000000', '#ffffff'] },
+			[100, 200],
+			[]
+		)(200);
 		expect(fillOf(svg, 'Mendoza')).toContain(segmentMaxColor);
 	});
 
@@ -203,8 +222,12 @@ describe('color channel - independent ramps: segment-scoped (GeoPlot)', () => {
 		});
 		const svg = await waitForSvg(container);
 
-		expect(fillOf(svg, 'Córdoba')).toContain(resolveColorScale({ scheme: ['#00ff00', '#ffff00'] }, [0, 1], [])(0));
-		expect(fillOf(svg, 'Mendoza')).toContain(resolveColorScale({ scheme: ['#ff0000', '#0000ff'] }, [0, 1], [])(0));
+		expect(fillOf(svg, 'Córdoba')).toContain(
+			resolveColorScale({ scheme: ['#00ff00', '#ffff00'] }, [0, 1], [])(0)
+		);
+		expect(fillOf(svg, 'Mendoza')).toContain(
+			resolveColorScale({ scheme: ['#ff0000', '#0000ff'] }, [0, 1], [])(0)
+		);
 	});
 });
 

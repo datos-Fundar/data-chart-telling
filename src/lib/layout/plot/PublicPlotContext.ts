@@ -235,7 +235,8 @@ export class PublicFigureContext {
 	/** The enclosing figure's context. Call during component init, below a figure. */
 	static use(): PublicFigureContext {
 		const hover = HoverState.current();
-		if (!hover) throw new Error('useFigure() must be called inside a figure (a plot or a PlotComposer).');
+		if (!hover)
+			throw new Error('useFigure() must be called inside a figure (a plot or a PlotComposer).');
 		return new PublicFigureContext(hover, LegendState.current(), TimelineState.current());
 	}
 }

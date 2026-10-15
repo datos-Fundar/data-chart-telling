@@ -26,10 +26,7 @@ function legendDisabling(...names: string[]): LegendState {
 	return legend;
 }
 
-function build(
-	overrides: Partial<LinePlotState<Row>> = {},
-	legendInteraction?: LegendState
-) {
+function build(overrides: Partial<LinePlotState<Row>> = {}, legendInteraction?: LegendState) {
 	const state: LinePlotState<Row> = {
 		series: [series('a', [{ x: 1, y: 10 }])],
 		segments: {},
@@ -39,7 +36,10 @@ function build(
 		height: 300,
 		...overrides
 	};
-	const ctx: LinePlotCtx = { cfg: FAKE_CFG, interaction: new PlotInteraction(() => FAKE_CFG, { legend: legendInteraction }) };
+	const ctx: LinePlotCtx = {
+		cfg: FAKE_CFG,
+		interaction: new PlotInteraction(() => FAKE_CFG, { legend: legendInteraction })
+	};
 	return buildData(state, ctx);
 }
 

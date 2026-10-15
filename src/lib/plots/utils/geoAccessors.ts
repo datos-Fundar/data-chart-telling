@@ -1,46 +1,46 @@
 import type { GeoFeature } from '$lib/types/plots/data/geo';
 
 function flattenCoords(geom: GeoJSON.Geometry, out: [number, number][]): void {
-  switch (geom.type) {
-    case 'Point':
-      out.push(geom.coordinates as [number, number]);
-      break;
-    case 'MultiPoint':
-    case 'LineString':
-      for (const c of geom.coordinates as [number, number][]) out.push(c);
-      break;
-    case 'MultiLineString':
-    case 'Polygon':
-      for (const ring of geom.coordinates as [number, number][][]) {
-        for (const c of ring) out.push(c);
-      }
-      break;
-    case 'MultiPolygon':
-      for (const poly of geom.coordinates as [number, number][][][]) {
-        for (const ring of poly) {
-          for (const c of ring) out.push(c);
-        }
-      }
-      break;
-    case 'GeometryCollection':
-      for (const g of geom.geometries) flattenCoords(g, out);
-      break;
-  }
+	switch (geom.type) {
+		case 'Point':
+			out.push(geom.coordinates as [number, number]);
+			break;
+		case 'MultiPoint':
+		case 'LineString':
+			for (const c of geom.coordinates as [number, number][]) out.push(c);
+			break;
+		case 'MultiLineString':
+		case 'Polygon':
+			for (const ring of geom.coordinates as [number, number][][]) {
+				for (const c of ring) out.push(c);
+			}
+			break;
+		case 'MultiPolygon':
+			for (const poly of geom.coordinates as [number, number][][][]) {
+				for (const ring of poly) {
+					for (const c of ring) out.push(c);
+				}
+			}
+			break;
+		case 'GeometryCollection':
+			for (const g of geom.geometries) flattenCoords(g, out);
+			break;
+	}
 }
 
 function boundsCenter(coords: [number, number][]): [number, number] {
-  if (coords.length === 0) return [0, 0];
-  let minX = Infinity;
-  let maxX = -Infinity;
-  let minY = Infinity;
-  let maxY = -Infinity;
-  for (const [x, y] of coords) {
-    if (x < minX) minX = x;
-    if (x > maxX) maxX = x;
-    if (y < minY) minY = y;
-    if (y > maxY) maxY = y;
-  }
-  return [(minX + maxX) / 2, (minY + maxY) / 2];
+	if (coords.length === 0) return [0, 0];
+	let minX = Infinity;
+	let maxX = -Infinity;
+	let minY = Infinity;
+	let maxY = -Infinity;
+	for (const [x, y] of coords) {
+		if (x < minX) minX = x;
+		if (x > maxX) maxX = x;
+		if (y < minY) minY = y;
+		if (y > maxY) maxY = y;
+	}
+	return [(minX + maxX) / 2, (minY + maxY) / 2];
 }
 
 /**
@@ -52,9 +52,9 @@ function boundsCenter(coords: [number, number][]): [number, number] {
  * multi-part geometry whose pieces are geographically spread out.
  */
 export function geometryCentroid(geometry: GeoJSON.Geometry): [number, number] {
-  const coords: [number, number][] = [];
-  flattenCoords(geometry, coords);
-  return boundsCenter(coords);
+	const coords: [number, number][] = [];
+	flattenCoords(geometry, coords);
+	return boundsCenter(coords);
 }
 
 /**
@@ -66,16 +66,16 @@ export function geometryCentroid(geometry: GeoJSON.Geometry): [number, number] {
  * part) and `filterGeometryParts` (keep/drop whole parts).
  */
 export function splitGeometryParts(geometry: GeoJSON.Geometry): GeoJSON.Geometry[] {
-  switch (geometry.type) {
-    case 'MultiPolygon':
-      return geometry.coordinates.map((polygon) => ({ type: 'Polygon', coordinates: polygon }));
-    case 'MultiLineString':
-      return geometry.coordinates.map((line) => ({ type: 'LineString', coordinates: line }));
-    case 'GeometryCollection':
-      return geometry.geometries.flatMap((g) => splitGeometryParts(g));
-    default:
-      return [geometry];
-  }
+	switch (geometry.type) {
+		case 'MultiPolygon':
+			return geometry.coordinates.map((polygon) => ({ type: 'Polygon', coordinates: polygon }));
+		case 'MultiLineString':
+			return geometry.coordinates.map((line) => ({ type: 'LineString', coordinates: line }));
+		case 'GeometryCollection':
+			return geometry.geometries.flatMap((g) => splitGeometryParts(g));
+		default:
+			return [geometry];
+	}
 }
 
 /**
@@ -92,7 +92,7 @@ export function splitGeometryParts(geometry: GeoJSON.Geometry): GeoJSON.Geometry
  * single point.
  */
 export function geometryPartCentroids(geometry: GeoJSON.Geometry): [number, number][] {
-  return splitGeometryParts(geometry).map((part) => geometryCentroid(part));
+	return splitGeometryParts(geometry).map((part) => geometryCentroid(part));
 }
 
 /**
@@ -106,33 +106,40 @@ export function geometryPartCentroids(geometry: GeoJSON.Geometry): [number, numb
  * exclude the latter while an inset shows only it.
  */
 export function filterGeometryParts(
-  geometry: GeoJSON.Geometry,
-  keep: (part: { centroid: [number, number]; geometry: GeoJSON.Geometry }) => boolean,
+	geometry: GeoJSON.Geometry,
+	keep: (part: { centroid: [number, number]; geometry: GeoJSON.Geometry }) => boolean
 ): GeoJSON.Geometry | null {
-  const parts = splitGeometryParts(geometry);
-  const keptParts = parts.filter((part) => keep({ centroid: geometryCentroid(part), geometry: part }));
-  if (keptParts.length === parts.length) return geometry;
-  if (keptParts.length === 0) return null;
-  if (parts.length === 1) return keptParts[0];
-  switch (geometry.type) {
-    case 'MultiPolygon':
-      return { type: 'MultiPolygon', coordinates: keptParts.map((part) => (part as GeoJSON.Polygon).coordinates) };
-    case 'MultiLineString':
-      return {
-        type: 'MultiLineString',
-        coordinates: keptParts.map((part) => (part as GeoJSON.LineString).coordinates),
-      };
-    case 'GeometryCollection':
-      return { type: 'GeometryCollection', geometries: keptParts };
-    default:
-      return geometry;
-  }
+	const parts = splitGeometryParts(geometry);
+	const keptParts = parts.filter((part) =>
+		keep({ centroid: geometryCentroid(part), geometry: part })
+	);
+	if (keptParts.length === parts.length) return geometry;
+	if (keptParts.length === 0) return null;
+	if (parts.length === 1) return keptParts[0];
+	switch (geometry.type) {
+		case 'MultiPolygon':
+			return {
+				type: 'MultiPolygon',
+				coordinates: keptParts.map((part) => (part as GeoJSON.Polygon).coordinates)
+			};
+		case 'MultiLineString':
+			return {
+				type: 'MultiLineString',
+				coordinates: keptParts.map((part) => (part as GeoJSON.LineString).coordinates)
+			};
+		case 'GeometryCollection':
+			return { type: 'GeometryCollection', geometries: keptParts };
+		default:
+			return geometry;
+	}
 }
 
 /** Default `featureId`: `feature.id`, else `properties.id`, else `properties.name`. */
-export function defaultFeatureId<TProps extends Record<string, unknown>>(f: GeoFeature<TProps>): string {
-  const props = f.properties as Record<string, unknown> | null;
-  return String(f.id ?? props?.id ?? props?.name ?? '');
+export function defaultFeatureId<TProps extends Record<string, unknown>>(
+	f: GeoFeature<TProps>
+): string {
+	const props = f.properties as Record<string, unknown> | null;
+	return String(f.id ?? props?.id ?? props?.name ?? '');
 }
 
 /**
@@ -142,29 +149,31 @@ export function defaultFeatureId<TProps extends Record<string, unknown>>(f: GeoF
  * letterboxed margin reaches (see `clampBoundsToDataPadding` in
  * `$lib/plots/utils/tiles`).
  */
-export function geometryLonLatBounds(geometry: GeoJSON.Geometry): [number, number, number, number] | null {
-  const coords: [number, number][] = [];
-  flattenCoords(geometry, coords);
-  if (coords.length === 0) return null;
-  let minLon = Infinity;
-  let maxLon = -Infinity;
-  let minLat = Infinity;
-  let maxLat = -Infinity;
-  for (const [lon, lat] of coords) {
-    if (lon < minLon) minLon = lon;
-    if (lon > maxLon) maxLon = lon;
-    if (lat < minLat) minLat = lat;
-    if (lat > maxLat) maxLat = lat;
-  }
-  return [minLon, minLat, maxLon, maxLat];
+export function geometryLonLatBounds(
+	geometry: GeoJSON.Geometry
+): [number, number, number, number] | null {
+	const coords: [number, number][] = [];
+	flattenCoords(geometry, coords);
+	if (coords.length === 0) return null;
+	let minLon = Infinity;
+	let maxLon = -Infinity;
+	let minLat = Infinity;
+	let maxLat = -Infinity;
+	for (const [lon, lat] of coords) {
+		if (lon < minLon) minLon = lon;
+		if (lon > maxLon) maxLon = lon;
+		if (lat < minLat) minLat = lat;
+		if (lat > maxLat) maxLat = lat;
+	}
+	return [minLon, minLat, maxLon, maxLat];
 }
 
 function toRad(deg: number): number {
-  return (deg * Math.PI) / 180;
+	return (deg * Math.PI) / 180;
 }
 
 function toDeg(rad: number): number {
-  return (rad * 180) / Math.PI;
+	return (rad * 180) / Math.PI;
 }
 
 /**
@@ -182,44 +191,47 @@ function toDeg(rad: number): number {
  * the bug entirely while still producing the same geodesic visual.
  */
 export function greatCircleInterpolate(
-  lon1: number,
-  lat1: number,
-  lon2: number,
-  lat2: number,
-  steps = 64,
+	lon1: number,
+	lat1: number,
+	lon2: number,
+	lat2: number,
+	steps = 64
 ): [number, number][] {
-  const phi1 = toRad(lat1);
-  const lambda1 = toRad(lon1);
-  const phi2 = toRad(lat2);
-  const lambda2 = toRad(lon2);
-  const sinPhi1 = Math.sin(phi1);
-  const cosPhi1 = Math.cos(phi1);
-  const sinPhi2 = Math.sin(phi2);
-  const cosPhi2 = Math.cos(phi2);
+	const phi1 = toRad(lat1);
+	const lambda1 = toRad(lon1);
+	const phi2 = toRad(lat2);
+	const lambda2 = toRad(lon2);
+	const sinPhi1 = Math.sin(phi1);
+	const cosPhi1 = Math.cos(phi1);
+	const sinPhi2 = Math.sin(phi2);
+	const cosPhi2 = Math.cos(phi2);
 
-  const d =
-    2 *
-    Math.asin(
-      Math.sqrt(Math.sin((phi2 - phi1) / 2) ** 2 + cosPhi1 * cosPhi2 * Math.sin((lambda2 - lambda1) / 2) ** 2),
-    );
-  if (!Number.isFinite(d) || d === 0) {
-    return [
-      [lon1, lat1],
-      [lon2, lat2],
-    ];
-  }
+	const d =
+		2 *
+		Math.asin(
+			Math.sqrt(
+				Math.sin((phi2 - phi1) / 2) ** 2 +
+					cosPhi1 * cosPhi2 * Math.sin((lambda2 - lambda1) / 2) ** 2
+			)
+		);
+	if (!Number.isFinite(d) || d === 0) {
+		return [
+			[lon1, lat1],
+			[lon2, lat2]
+		];
+	}
 
-  const points: [number, number][] = [];
-  for (let i = 0; i <= steps; i++) {
-    const f = i / steps;
-    const a = Math.sin((1 - f) * d) / Math.sin(d);
-    const b = Math.sin(f * d) / Math.sin(d);
-    const x = a * cosPhi1 * Math.cos(lambda1) + b * cosPhi2 * Math.cos(lambda2);
-    const y = a * cosPhi1 * Math.sin(lambda1) + b * cosPhi2 * Math.sin(lambda2);
-    const z = a * sinPhi1 + b * sinPhi2;
-    const phi = Math.atan2(z, Math.sqrt(x * x + y * y));
-    const lambda = Math.atan2(y, x);
-    points.push([toDeg(lambda), toDeg(phi)]);
-  }
-  return points;
+	const points: [number, number][] = [];
+	for (let i = 0; i <= steps; i++) {
+		const f = i / steps;
+		const a = Math.sin((1 - f) * d) / Math.sin(d);
+		const b = Math.sin(f * d) / Math.sin(d);
+		const x = a * cosPhi1 * Math.cos(lambda1) + b * cosPhi2 * Math.cos(lambda2);
+		const y = a * cosPhi1 * Math.sin(lambda1) + b * cosPhi2 * Math.sin(lambda2);
+		const z = a * sinPhi1 + b * sinPhi2;
+		const phi = Math.atan2(z, Math.sqrt(x * x + y * y));
+		const lambda = Math.atan2(y, x);
+		points.push([toDeg(lambda), toDeg(phi)]);
+	}
+	return points;
 }

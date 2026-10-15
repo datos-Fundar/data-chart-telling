@@ -57,7 +57,12 @@ function tweenState<T>(args: {
 
 		if (progress != null) {
 			setCurrent(
-				args.lerp(from!, to!, Interpolation.buildEasing(transition?.easing)(clamp01(progress)), direction)
+				args.lerp(
+					from!,
+					to!,
+					Interpolation.buildEasing(transition?.easing)(clamp01(progress)),
+					direction
+				)
 			);
 			return;
 		}

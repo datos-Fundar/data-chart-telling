@@ -100,7 +100,10 @@ export class ValueLabels {
 
 	/** Each series' value farthest from zero, read on `valueAxis` - the widest label it can show. */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	extremes<S extends Series<any>>(series: S[], valueAxis: 'x' | 'y' = 'y'): { series: S; value: number }[] {
+	extremes<S extends Series<any>>(
+		series: S[],
+		valueAxis: 'x' | 'y' = 'y'
+	): { series: S; value: number }[] {
 		return series.flatMap((s) => {
 			const accessor = s[valueAxis];
 			if (accessor === undefined) return [];

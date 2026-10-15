@@ -129,9 +129,10 @@ describe('FigureChrome - order', () => {
 	});
 
 	test('a row keeps each block once, and is a plain block when only one is drawn', async () => {
-		expect(
-			await blocks({ title: 'T', order: ['(title, subtitle)', '(plot, title)'] })
-		).toEqual(['heading:title', 'plot']);
+		expect(await blocks({ title: 'T', order: ['(title, subtitle)', '(plot, title)'] })).toEqual([
+			'heading:title',
+			'plot'
+		]);
 	});
 
 	test('a vertical rule timeline sits beside the plot, as `(plot, timeline)` would', async () => {
@@ -184,7 +185,11 @@ describe('FigureChrome - a rule timeline', () => {
 		const root = container.querySelector('.dct-figure-chrome')!;
 		await vi.waitFor(() => expect(root.querySelector('.dct-timeline-rule svg')).toBeTruthy());
 		const rect = (selector: string) => root.querySelector(selector)!.getBoundingClientRect();
-		return { rule: rect('.dct-timeline-rule'), svg: rect('.dct-timeline-rule svg'), body: rect('.dct-figure-chrome__body') };
+		return {
+			rule: rect('.dct-timeline-rule'),
+			svg: rect('.dct-timeline-rule svg'),
+			body: rect('.dct-figure-chrome__body')
+		};
 	}
 
 	test('a vertical one is as tall as the plot beside it, and as wide as `thickness`', async () => {

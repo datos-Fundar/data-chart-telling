@@ -18,9 +18,9 @@ import { demoSource } from '../../common/docsSource';
  * slider: see `Layout/Timeline/Player`.
  */
 const meta = {
-  title: 'Layout/Timeline/Rule',
-  tags: ['autodocs'],
-  parameters: { layout: 'padded' },
+	title: 'Layout/Timeline/Rule',
+	tags: ['autodocs'],
+	parameters: { layout: 'padded' }
 } satisfies Meta;
 
 export default meta;
@@ -31,14 +31,14 @@ export default meta;
  * `'(plot, timeline)'` in the chrome's `order`, which it configures for you.
  */
 export const Vertical: StoryObj = {
-  render: () => ({ Component: RuleDemo, props: { orientation: 'vertical' } }),
-  parameters: demoSource(RuleDemoSource),
+	render: () => ({ Component: RuleDemo, props: { orientation: 'vertical' } }),
+	parameters: demoSource(RuleDemoSource)
 };
 
 /** A horizontal rule - typical below a plot on narrow layouts. It takes the `timeline` block's place in the chrome's `order`, below the plot by default. */
 export const Horizontal: StoryObj = {
-  render: () => ({ Component: RuleDemo, props: { orientation: 'horizontal' } }),
-  parameters: demoSource(RuleDemoSource),
+	render: () => ({ Component: RuleDemo, props: { orientation: 'horizontal' } }),
+	parameters: demoSource(RuleDemoSource)
 };
 
 /**
@@ -47,32 +47,32 @@ export const Horizontal: StoryObj = {
  * the one the vertical rule would set up.
  */
 export const LeftOfThePlot: StoryObj = {
-  render: () => ({
-    Component: RuleDemo,
-    props: { orientation: 'vertical', order: ['title', '(timeline, plot)'] },
-  }),
-  parameters: demoSource(RuleDemoSource),
+	render: () => ({
+		Component: RuleDemo,
+		props: { orientation: 'vertical', order: ['title', '(timeline, plot)'] }
+	}),
+	parameters: demoSource(RuleDemoSource)
 };
 
 /** A horizontal rule is the `timeline` block, so `order` moves it like any other - here above the plot. */
 export const AboveThePlot: StoryObj = {
-  render: () => ({
-    Component: RuleDemo,
-    props: { orientation: 'horizontal', order: ['title', 'timeline', 'plot'] },
-  }),
-  parameters: demoSource(RuleDemoSource),
+	render: () => ({
+		Component: RuleDemo,
+		props: { orientation: 'horizontal', order: ['title', 'timeline', 'plot'] }
+	}),
+	parameters: demoSource(RuleDemoSource)
 };
 
 /** `TimelineLayout` coupled to a draggable scrubber and a real plot (vertical). */
 export const InteractiveVertical: StoryObj = {
-  render: () => ({ Component: TimelineLayoutDemo, props: { orientation: 'vertical' } }),
-  parameters: demoSource(TimelineLayoutDemoSource),
+	render: () => ({ Component: TimelineLayoutDemo, props: { orientation: 'vertical' } }),
+	parameters: demoSource(TimelineLayoutDemoSource)
 };
 
 /** Same coupling, horizontal orientation. */
 export const InteractiveHorizontal: StoryObj = {
-  render: () => ({ Component: TimelineLayoutDemo, props: { orientation: 'horizontal' } }),
-  parameters: demoSource(TimelineLayoutDemoSource),
+	render: () => ({ Component: TimelineLayoutDemo, props: { orientation: 'horizontal' } }),
+	parameters: demoSource(TimelineLayoutDemoSource)
 };
 
 /**
@@ -82,8 +82,11 @@ export const InteractiveHorizontal: StoryObj = {
  * the tween visibly bridges years that don't exist in the dataset.
  */
 export const Interpolated: StoryObj = {
-  render: () => ({ Component: TimelineLayoutInterpolatedDemo, props: { orientation: 'horizontal' } }),
-  parameters: demoSource(TimelineLayoutInterpolatedDemoSource),
+	render: () => ({
+		Component: TimelineLayoutInterpolatedDemo,
+		props: { orientation: 'horizontal' }
+	}),
+	parameters: demoSource(TimelineLayoutInterpolatedDemoSource)
 };
 
 /**
@@ -94,8 +97,8 @@ export const Interpolated: StoryObj = {
  * `Layout/Timeline/Player`.
  */
 export const Styling: StoryObj = {
-  render: () => ({ Component: RuleStyleDemo }),
-  parameters: {
-    docs: { ...demoSource(RuleStyleDemoSource).docs, story: { inline: false, height: '800px' } },
-  },
+	render: () => ({ Component: RuleStyleDemo }),
+	parameters: {
+		docs: { ...demoSource(RuleStyleDemoSource).docs, story: { inline: false, height: '800px' } }
+	}
 };

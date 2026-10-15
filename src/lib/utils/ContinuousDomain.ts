@@ -12,7 +12,8 @@ export class ContinuousDomain {
 		values: number[],
 		fromZero = false
 	): [number, number] | null {
-		if (authorDomain && typeof authorDomain[0] === 'number') return authorDomain as [number, number];
+		if (authorDomain && typeof authorDomain[0] === 'number')
+			return authorDomain as [number, number];
 		if (!values.length) return null;
 		return [Math.min(...values, ...(fromZero ? [0] : [])), Math.max(...values)];
 	}

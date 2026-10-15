@@ -12,7 +12,8 @@ import { buildHeatmapDefaults } from '$lib/plots/heatmap/defaults';
 import { buildPyramidDefaults } from '$lib/plots/pyramid/defaults';
 import type { FacetConfig } from '$lib/types/layout/facet';
 
-const [LineCore, AreaCore, BarCore, ScatterCore, HistogramCore, HeatmapCore, PyramidCore] = Array(7).fill(GenericCore);
+const [LineCore, AreaCore, BarCore, ScatterCore, HistogramCore, HeatmapCore, PyramidCore] =
+	Array(7).fill(GenericCore);
 
 type Row = { year: number; region: string; sector: string; value: number };
 

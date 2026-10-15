@@ -38,12 +38,12 @@
 		children
 	}: PlotChromeProps &
 		FigureBoxProps & {
-		layout?: ComposerLayout;
-		tags?: ComposerTags;
-		hover?: ComposerHoverConfig;
-		timeline?: ComposerTimelineConfig;
-		children: Snippet;
-	} = $props();
+			layout?: ComposerLayout;
+			tags?: ComposerTags;
+			hover?: ComposerHoverConfig;
+			timeline?: ComposerTimelineConfig;
+			children: Snippet;
+		} = $props();
 
 	// One timeline for every panel, which the plots below follow instead of their own.
 	const timelineState = new TimelineState(() => timeline);
@@ -51,7 +51,6 @@
 
 	/** Height of the tag row above every panel, when the composer tags them. */
 	const TAG_H = 24;
-
 </script>
 
 {#snippet grid({ width: w, height: h }: PlotBoxContext)}

@@ -11,15 +11,15 @@ const DEFAULT_KEY = 'default';
  * `default` < grouping bucket < feature-specific, most specific last.
  */
 export function resolveSegmentsForFeature<TStyle>(
-  segments: SegmentsConfig<TStyle>,
-  featureId: string,
-  groupingValue?: string,
+	segments: SegmentsConfig<TStyle>,
+	featureId: string,
+	groupingValue?: string
 ): Segment<TStyle>[] {
-  return [
-    ...(segments[DEFAULT_KEY] ?? []),
-    ...(groupingValue ? (segments[groupingValue] ?? []) : []),
-    ...(segments[featureId] ?? []),
-  ];
+	return [
+		...(segments[DEFAULT_KEY] ?? []),
+		...(groupingValue ? (segments[groupingValue] ?? []) : []),
+		...(segments[featureId] ?? [])
+	];
 }
 
 /**
@@ -32,14 +32,14 @@ export function resolveSegmentsForFeature<TStyle>(
  * segment entry merges rather than being dropped.
  */
 export function resolveFeatureStyle<TStyle extends object>(
-  segments: SegmentsConfig<TStyle>,
-  featureId: string,
-  groupingValue?: string,
+	segments: SegmentsConfig<TStyle>,
+	featureId: string,
+	groupingValue?: string
 ): TStyle {
-  return resolveSegmentsForFeature(segments, featureId, groupingValue).reduce(
-    (acc, seg) => ({ ...acc, ...(seg.styles ?? {}) }),
-    {} as TStyle,
-  );
+	return resolveSegmentsForFeature(segments, featureId, groupingValue).reduce(
+		(acc, seg) => ({ ...acc, ...(seg.styles ?? {}) }),
+		{} as TStyle
+	);
 }
 
 /**
@@ -51,11 +51,11 @@ export function resolveFeatureStyle<TStyle extends object>(
  * from another wouldn't be a coherent scale).
  */
 export function resolveFeatureScales<TStyle>(
-  segments: SegmentsConfig<TStyle>,
-  featureId: string,
-  groupingValue?: string,
+	segments: SegmentsConfig<TStyle>,
+	featureId: string,
+	groupingValue?: string
 ): ChannelScalesConfig | undefined {
-  return resolveSegmentsForFeature(segments, featureId, groupingValue).reduce<
-    ChannelScalesConfig | undefined
-  >((acc, seg) => seg.scales ?? acc, undefined);
+	return resolveSegmentsForFeature(segments, featureId, groupingValue).reduce<
+		ChannelScalesConfig | undefined
+	>((acc, seg) => seg.scales ?? acc, undefined);
 }

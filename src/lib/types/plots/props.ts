@@ -37,7 +37,10 @@ export type MarginConfig = Partial<{
 }>;
 
 /** The tooltip a plot's core draws from: {@link TooltipOptions} with `sync` resolved. Without `format`, the core uses its own default. */
-export type TooltipConfig<TRow extends Record<string, unknown>> = Omit<TooltipOptions<TRow>, 'sync'> & {
+export type TooltipConfig<TRow extends Record<string, unknown>> = Omit<
+	TooltipOptions<TRow>,
+	'sync'
+> & {
 	sync: boolean;
 };
 
@@ -237,7 +240,10 @@ export type BasePlotProps<
 	TScales extends ScalesConfig<TRow>,
 	TCoordinates = undefined
 > = TDataContract &
-	Omit<PlotCommonProps<TStyles, TSegmentStyle, TMarker, TScales, TCoordinates>, 'width' | 'height'> &
+	Omit<
+		PlotCommonProps<TStyles, TSegmentStyle, TMarker, TScales, TCoordinates>,
+		'width' | 'height'
+	> &
 	FigureBoxProps &
 	PlotChromeProps & {
 		tooltip?: TooltipProp<TRow>;

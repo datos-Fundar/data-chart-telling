@@ -70,7 +70,10 @@ describe('opacity channel - plot level (Geo)', () => {
 			data: ARGENTINA_PROVINCES,
 			color: () => 5,
 			opacity: (f) => (nameOf(f) === 'Córdoba' ? 0 : 100),
-			scales: { color: { domain: [0, 10], scheme: ['#ff0000', '#ff0000'] }, opacity: { domain: [0, 100], range: [0, 1] } }
+			scales: {
+				color: { domain: [0, 10], scheme: ['#ff0000', '#ff0000'] },
+				opacity: { domain: [0, 100], range: [0, 1] }
+			}
 		});
 		const svg = await waitForSvg(container);
 		expect(countGeoPaths(svg)).toBe(ARGENTINA_PROVINCES.length);

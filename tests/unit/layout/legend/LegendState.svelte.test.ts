@@ -217,7 +217,14 @@ describe('LegendState - dot sizes', () => {
 			})
 		);
 		expect(legend.sections()).toEqual([
-			{ type: 'size', title: 'Pop', domain: [0, 2000], range: [2, 20], color: undefined, filled: true }
+			{
+				type: 'size',
+				title: 'Pop',
+				domain: [0, 2000],
+				range: [2, 20],
+				color: undefined,
+				filled: true
+			}
 		]);
 	});
 });
@@ -298,7 +305,9 @@ describe('LegendState - the series section title', () => {
 		]);
 		return legend;
 	};
-	const extra = { sections: [{ type: 'discrete' as const, title: 'Source', items: [{ name: 'x' }] }] };
+	const extra = {
+		sections: [{ type: 'discrete' as const, title: 'Source', items: [{ name: 'x' }] }]
+	};
 
 	afterEach(() => resetConfiguration());
 
@@ -323,7 +332,9 @@ describe('LegendState - channels of any marker', () => {
 
 	test('a numeric color channel is a continuous scale, titled by its field', () => {
 		const [entry] = LegendState.entriesOf({
-			markers: [{ type: 'area', data: rows, color: 'v', scales: { color: { scheme: ['red', 'blue'] } } }]
+			markers: [
+				{ type: 'area', data: rows, color: 'v', scales: { color: { scheme: ['red', 'blue'] } } }
+			]
 		});
 		expect(entry).toEqual({
 			type: 'scale',
@@ -341,7 +352,9 @@ describe('LegendState - channels of any marker', () => {
 
 	test('a categorical color channel is one item per category, in the color the marker draws it', () => {
 		const entries = LegendState.entriesOf({
-			markers: [{ type: 'hull', data: rows, color: 'group', scales: { color: { scheme: ['red', 'blue'] } } }]
+			markers: [
+				{ type: 'hull', data: rows, color: 'group', scales: { color: { scheme: ['red', 'blue'] } } }
+			]
 		});
 		expect(entries).toMatchObject([
 			{ type: 'mark', name: 'a', mark: 'area' },
@@ -351,7 +364,9 @@ describe('LegendState - channels of any marker', () => {
 			resolvedSeries: [{ name: 'a' }],
 			markers: [{ type: 'hull', data: rows, color: 'group' }]
 		});
-		expect(taken.filter((e) => e.type === 'mark').map((e) => (e as { name: string }).name)).toEqual(['b']);
+		expect(taken.filter((e) => e.type === 'mark').map((e) => (e as { name: string }).name)).toEqual(
+			['b']
+		);
 	});
 
 	test('a numeric opacity channel is one color fading across its range', () => {
@@ -362,7 +377,14 @@ describe('LegendState - channels of any marker', () => {
 		const legend = new LegendState();
 		legend.register('p', [entry]);
 		expect(legend.sections()).toMatchObject([
-			{ type: 'continuous', title: 'V', min: 10, max: 30, colorMin: 'teal', opacity: [expect.any(Number), expect.any(Number)] }
+			{
+				type: 'continuous',
+				title: 'V',
+				min: 10,
+				max: 30,
+				colorMin: 'teal',
+				opacity: [expect.any(Number), expect.any(Number)]
+			}
 		]);
 	});
 
@@ -373,7 +395,10 @@ describe('LegendState - channels of any marker', () => {
 
 	test('size and shape channels read from any marker, not only dots', () => {
 		const entries = LegendState.entriesOf({
-			markers: [{ type: 'trail', data: rows, r: 'v' }, { type: 'image', data: rows, symbol: 'group' }]
+			markers: [
+				{ type: 'trail', data: rows, r: 'v' },
+				{ type: 'image', data: rows, symbol: 'group' }
+			]
 		});
 		expect(entries.map((e) => e.type)).toEqual(['size', 'symbol']);
 	});
@@ -422,24 +447,39 @@ describe('LegendState - adjusting the automatic sections', () => {
 		const legend = new LegendState();
 		register(legend);
 		const sections = legend.sections({ color: { width: 99 } });
-		expect(sections.filter((s) => s.type === 'continuous').map((s) => (s as { width?: number }).width)).toEqual([99, 99]);
+		expect(
+			sections.filter((s) => s.type === 'continuous').map((s) => (s as { width?: number }).width)
+		).toEqual([99, 99]);
 	});
 
 	test('only the first interactive ramp drives the legend range', () => {
 		const legend = new LegendState();
 		register(legend);
-		const ramps = legend.sections({ color: { interactive: { enabled: true } } }).filter((s) => s.type === 'continuous');
-		expect(ramps.map((s) => (s as { interactive?: { enabled?: boolean } }).interactive?.enabled)).toEqual([true, false]);
+		const ramps = legend
+			.sections({ color: { interactive: { enabled: true } } })
+			.filter((s) => s.type === 'continuous');
+		expect(
+			ramps.map((s) => (s as { interactive?: { enabled?: boolean } }).interactive?.enabled)
+		).toEqual([true, false]);
 	});
 
 	test('`color` adjusts the series of a categorical color, and `series` wins over it', () => {
 		const legend = new LegendState();
 		legend.register(
 			'p',
-			LegendState.entriesOf({ resolvedSeries: [{ name: 'a' }, { name: 'b' }], colorForSeries: (n) => `c-${n}` })
+			LegendState.entriesOf({
+				resolvedSeries: [{ name: 'a' }, { name: 'b' }],
+				colorForSeries: (n) => `c-${n}`
+			})
 		);
-		const [byColor] = legend.sections({ color: { title: 'Group', interactive: { enabled: true } } });
-		expect(byColor).toMatchObject({ type: 'discrete', title: 'Group', interactive: { enabled: true } });
+		const [byColor] = legend.sections({
+			color: { title: 'Group', interactive: { enabled: true } }
+		});
+		expect(byColor).toMatchObject({
+			type: 'discrete',
+			title: 'Group',
+			interactive: { enabled: true }
+		});
 		const [both] = legend.sections({ color: { title: 'Group' }, series: { title: 'Mine' } });
 		expect(both).toMatchObject({ title: 'Mine' });
 	});

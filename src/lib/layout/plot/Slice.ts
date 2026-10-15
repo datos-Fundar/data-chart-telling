@@ -105,10 +105,7 @@ export class Slice<TRow extends Record<string, unknown>> {
 	): TScales | undefined {
 		const key = this.panelKey(place);
 		if (key === undefined) return undefined;
-		return merge(
-			shared?.[key] as TScales | undefined,
-			this.#axes?.(place) as TScales | undefined
-		);
+		return merge(shared?.[key] as TScales | undefined, this.#axes?.(place) as TScales | undefined);
 	}
 
 	/** The scales a timeline alone keeps every step on - the domains all its rows span - unless it fits each step's own. */

@@ -6,8 +6,8 @@ import type { MarkLegend } from '$lib/types/layout/legend';
 
 /** A half-open interval on one axis. Both bounds are inclusive; omit either to leave that end open. */
 export type Range = {
-  from?: AxisValue;
-  to?: AxisValue;
+	from?: AxisValue;
+	to?: AxisValue;
 };
 
 /**
@@ -19,8 +19,8 @@ export type Range = {
  * - For heatmaps both `x` (column) and `y` (row) are used to address cells.
  */
 export type Area = {
-  x?: Range;
-  y?: Range;
+	x?: Range;
+	y?: Range;
 };
 
 /**
@@ -35,18 +35,18 @@ export type Area = {
  * therefore acts as a fallback baseline that area-specific segments override.
  */
 export type Segment<TStyle> = {
-  areas?: Area[];
-  scales?: ChannelScalesConfig;
-  styles?: TStyle;
-  /** Names the segment on its plot's automatic legend - see {@link MarkLegend}. */
-  legend?: MarkLegend;
+	areas?: Area[];
+	scales?: ChannelScalesConfig;
+	styles?: TStyle;
+	/** Names the segment on its plot's automatic legend - see {@link MarkLegend}. */
+	legend?: MarkLegend;
 };
 
 /** One contiguous, styled slice of a series' data - ready to draw as its own mark. */
 export type VisualSegment<T extends Record<string, unknown>, TStyle = LineSegmentStyle> = {
-  data: T[];
-  scales?: ChannelScalesConfig;
-  styles: TStyle;
+	data: T[];
+	scales?: ChannelScalesConfig;
+	styles: TStyle;
 };
 
 /**
@@ -58,6 +58,6 @@ export type VisualSegment<T extends Record<string, unknown>, TStyle = LineSegmen
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type VisualGroup<S extends Series<any>, TStyle = LineSegmentStyle> = {
-  series: S;
-  visualSegments: VisualSegment<S['data'][number], TStyle>[];
+	series: S;
+	visualSegments: VisualSegment<S['data'][number], TStyle>[];
 };

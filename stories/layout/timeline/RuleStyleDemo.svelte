@@ -50,6 +50,12 @@
 		y="value"
 		color="region"
 		{scales}
-		timeline={{ accessor: 'year', type: 'rule', filterMode: 'upTo', progress: 0.5, orientation: 'horizontal' }}
+		timeline={{
+			accessor: 'year',
+			type: 'rule',
+			filterMode: 'upTo',
+			progress: 0.5,
+			orientation: 'horizontal'
+		}}
 	/>
 </div>

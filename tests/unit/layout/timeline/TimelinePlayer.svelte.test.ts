@@ -68,7 +68,7 @@ describe('a plot with a player timeline', () => {
 		return blocks.filter(Boolean);
 	}
 
-	test("draws the player in the chrome, where `order` puts it", async () => {
+	test('draws the player in the chrome, where `order` puts it', async () => {
 		expect(await order(['plot', 'timeline'])).toEqual(['plot', 'timeline']);
 		expect(await order(['timeline', 'plot'])).toEqual(['timeline', 'plot']);
 	});

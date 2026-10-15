@@ -4,7 +4,9 @@ import { MarkerAxisValues } from '$lib/phases/scales/MarkerAxisValues';
 
 describe('inheritPlotGrouping', () => {
 	test('a grouping-capable marker inherits the plot’s grouping, falling back to its color', () => {
-		const [density] = MarkerGrouping.inheritPlotGrouping([{ type: 'density' }], { color: 'region' });
+		const [density] = MarkerGrouping.inheritPlotGrouping([{ type: 'density' }], {
+			color: 'region'
+		});
 		expect((density as { grouping?: string }).grouping).toBe('region');
 	});
 
@@ -16,9 +18,12 @@ describe('inheritPlotGrouping', () => {
 	});
 
 	test('an explicit flat color keeps the marker ungrouped by color, but grouping still inherits', () => {
-		const [dot] = MarkerGrouping.inheritPlotGrouping([{ type: 'dot', styles: { dotFill: '#dc2626' } }], {
-			color: 'region'
-		});
+		const [dot] = MarkerGrouping.inheritPlotGrouping(
+			[{ type: 'dot', styles: { dotFill: '#dc2626' } }],
+			{
+				color: 'region'
+			}
+		);
 		expect((dot as { color?: string }).color).toBeUndefined();
 	});
 
@@ -33,9 +38,12 @@ describe('inheritPlotGrouping', () => {
 	});
 
 	test('a line with its own stroke keeps it, and only inherits the grouping', () => {
-		const [line] = MarkerGrouping.inheritPlotGrouping([{ type: 'line', styles: { stroke: '#111827' } }], {
-			color: 'region'
-		});
+		const [line] = MarkerGrouping.inheritPlotGrouping(
+			[{ type: 'line', styles: { stroke: '#111827' } }],
+			{
+				color: 'region'
+			}
+		);
 		expect((line as { color?: string }).color).toBeUndefined();
 		expect((line as { grouping?: string }).grouping).toBe('region');
 	});
