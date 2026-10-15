@@ -27,8 +27,8 @@
 	 *
 	 * Its legend: unset or `true`, the one its plots read as - what they
 	 * register on its `LegendState`; `false`, none; a list of sections,
-	 * exactly those; `{ items, sections }`, the automatic one with those
-	 * added. A figure inside another (a composer's panel) leaves an unset
+	 * exactly those; `{ items, sections, series, color... }`, the automatic one
+	 * with those added and the sections of each channel adjusted. A figure inside another (a composer's panel) leaves an unset
 	 * legend to the outer one, which reads every panel's plots.
 	 */
 	let {

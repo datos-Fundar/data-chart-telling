@@ -6,6 +6,7 @@ import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import type { DotMarkerConfig } from '$lib/types/markers/basic';
 import { WORLD_COUNTRIES, WEATHER_STATIONS, type WorldCountryProps } from '../../../plots/geo/data';
 import { COUNTRIES } from '../../../plots/scatter/data';
+import { countryPopulation, countryGdp } from '../../../plots/geo/channels';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // This package resolves its own color ramp per consumer instead of routing
@@ -77,7 +78,7 @@ type Story = StoryObj<typeof meta>;
  */
 export const Default: Story = {
 	args: {
-		color: (f) => (f.properties as WorldCountryProps).pop_est,
+		color: countryPopulation,
 		scales: { color: { domain: [1_000_000, 1_400_000_000], scheme: ['#e0e7ff', '#4f46e5'] } },
 		styles: { stroke: '#94a3b8' },
 		markers: [
@@ -101,7 +102,7 @@ export const Default: Story = {
  */
 export const IndependentRamp: Story = {
 	args: {
-		color: (f) => (f.properties as WorldCountryProps).pop_est,
+		color: countryPopulation,
 		scales: { color: { domain: [1_000_000, 1_400_000_000], scheme: ['#e0e7ff', '#4f46e5'] } },
 		styles: { stroke: '#94a3b8' },
 		markers: [
@@ -129,7 +130,7 @@ export const IndependentRamp: Story = {
  */
 export const SegmentRamp: Story = {
 	args: {
-		color: (f) => (f.properties as WorldCountryProps).gdp_md,
+		color: countryGdp,
 		grouping: (f) => globalSouthOrNorth(f as never),
 		scales: {
 			color: { scheme: 'blues' }

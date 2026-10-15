@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { ContinuousLegendSection } from '$lib/types/layout/legend';
-	import { makeColorScale } from '$lib/utils/color';
+	import { makeColorScale, resolveColorScale } from '$lib/utils/color';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
+	import { AxisNumberFormat } from '$lib/layout/legend/AxisNumberFormat';
 	import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 
 	let { section }: { section: ContinuousLegendSection } = $props();
@@ -11,7 +12,7 @@
 	const gradientId = `dct-grad-${Math.random().toString(36).slice(2)}`;
 	const barWidth = $derived(section.width ?? 170);
 
-	const fmt = $derived(section.format ?? ((v: number) => String(v)));
+	const fmt = $derived(section.format ?? AxisNumberFormat.of([section.min, section.max], cfg));
 	const isInteractive = $derived(section.interactive?.enabled ?? false);
 
 	// How far the default handle bleeds past its 0/1 track position, so the
@@ -77,19 +78,30 @@
 			: [section.min, section.max]
 	);
 	const colorScale = $derived(
-		makeColorScale(
-			colorDomain[0],
-			colorDomain[1],
-			section.colorMin ?? cfg.continuous.min,
-			section.colorMax ?? cfg.continuous.max
-		)
+		section.scheme !== undefined
+			? resolveColorScale({ scheme: section.scheme, pivot: section.pivot }, colorDomain, [
+					cfg.continuous.min,
+					cfg.continuous.max
+				])
+			: makeColorScale(
+					colorDomain[0],
+					colorDomain[1],
+					section.colorMin ?? cfg.continuous.min,
+					section.colorMax ?? cfg.continuous.max
+				)
 	);
 
 	const stops = $derived(
 		Array.from({ length: 20 }, (_, i) => {
 			const t = i / 19;
 			const v = section.min + t * (section.max - section.min);
-			return { offset: t * 100, color: colorScale(v) };
+			return section.opacity
+				? {
+						offset: t * 100,
+						color: section.colorMin ?? 'currentColor',
+						opacity: section.opacity[0] + t * (section.opacity[1] - section.opacity[0])
+					}
+				: { offset: t * 100, color: colorScale(v), opacity: 1 };
 		})
 	);
 
@@ -188,7 +200,7 @@
 		<defs>
 			<linearGradient id={gradientId} x1="0" x2="1" y1="0" y2="0">
 				{#each stops as s (s.offset)}
-					<stop offset="{s.offset}%" stop-color={s.color} />
+					<stop offset="{s.offset}%" stop-color={s.color} stop-opacity={s.opacity} />
 				{/each}
 			</linearGradient>
 		</defs>

@@ -314,3 +314,121 @@ describe('LegendState - the series section title', () => {
 		expect(twoSeries().sections(extra)[0]).not.toHaveProperty('title');
 	});
 });
+
+describe('LegendState - channels of any marker', () => {
+	const rows = [
+		{ t: 1, group: 'a', v: 10 },
+		{ t: 2, group: 'b', v: 30 }
+	];
+
+	test('a numeric color channel is a continuous scale, titled by its field', () => {
+		const [entry] = LegendState.entriesOf({
+			markers: [{ type: 'area', data: rows, color: 'v', scales: { color: { scheme: ['red', 'blue'] } } }]
+		});
+		expect(entry).toEqual({
+			type: 'scale',
+			channel: 'color',
+			title: 'v',
+			min: 10,
+			max: 30,
+			scheme: ['red', 'blue']
+		});
+		const [named] = LegendState.entriesOf({
+			markers: [{ type: 'area', data: rows, color: 'v', scales: { color: { scheme: 'warm' } } }]
+		});
+		expect(named).toMatchObject({ scheme: 'warm' });
+	});
+
+	test('a categorical color channel is one item per category, in the color the marker draws it', () => {
+		const entries = LegendState.entriesOf({
+			markers: [{ type: 'hull', data: rows, color: 'group', scales: { color: { scheme: ['red', 'blue'] } } }]
+		});
+		expect(entries).toMatchObject([
+			{ type: 'mark', name: 'a', mark: 'area' },
+			{ type: 'mark', name: 'b', mark: 'area' }
+		]);
+		const taken = LegendState.entriesOf({
+			resolvedSeries: [{ name: 'a' }],
+			markers: [{ type: 'hull', data: rows, color: 'group' }]
+		});
+		expect(taken.filter((e) => e.type === 'mark').map((e) => (e as { name: string }).name)).toEqual(['b']);
+	});
+
+	test('a numeric opacity channel is one color fading across its range', () => {
+		const [entry] = LegendState.entriesOf({
+			markers: [{ type: 'rect', data: rows, opacity: 'v', fill: 'teal' }]
+		});
+		expect(entry).toMatchObject({ type: 'opacity', title: 'v', min: 10, max: 30, color: 'teal' });
+		const legend = new LegendState();
+		legend.register('p', [entry]);
+		expect(legend.sections()).toMatchObject([
+			{ type: 'continuous', title: 'V', min: 10, max: 30, colorMin: 'teal', opacity: [expect.any(Number), expect.any(Number)] }
+		]);
+	});
+
+	test('a plot hands over its own color and opacity domains', () => {
+		const entries = LegendState.entriesOf({ colorDomain: [0, 5], opacityDomain: [1, 2] });
+		expect(entries.map((e) => e.type)).toEqual(['scale', 'opacity']);
+	});
+
+	test('size and shape channels read from any marker, not only dots', () => {
+		const entries = LegendState.entriesOf({
+			markers: [{ type: 'trail', data: rows, r: 'v' }, { type: 'image', data: rows, symbol: 'group' }]
+		});
+		expect(entries.map((e) => e.type)).toEqual(['size', 'symbol']);
+	});
+
+	test('plots drawing the same ramp share one section; different ramps do not', () => {
+		const legend = new LegendState();
+		legend.register('p1', LegendState.entriesOf({ colorDomain: [0, 5] }));
+		legend.register('p2', LegendState.entriesOf({ colorDomain: [0, 5] }));
+		expect(legend.sections()).toHaveLength(1);
+		legend.register('p3', LegendState.entriesOf({ colorDomain: [0, 9] }));
+		expect(legend.sections()).toHaveLength(2);
+	});
+});
+
+describe('LegendState - adjusting the automatic sections', () => {
+	const rows = [
+		{ v: 1, w: 5, group: 'a' },
+		{ v: 9, w: 7, group: 'b' }
+	];
+	const register = (legend: LegendState) =>
+		legend.register(
+			'p',
+			LegendState.entriesOf({
+				resolvedSeries: [{ name: 'a' }, { name: 'b' }],
+				colorForSeries: (name) => `c-${name}`,
+				markers: [
+					{ type: 'rect', data: rows, color: 'v' },
+					{ type: 'area', data: rows, color: 'w' }
+				]
+			})
+		);
+
+	test('a channel key adjusts its section', () => {
+		const legend = new LegendState();
+		register(legend);
+		const [series, v] = legend.sections({
+			series: { columns: 3 },
+			color: { match: 'v', format: (n) => `<${n}>` }
+		});
+		expect(series).toMatchObject({ type: 'discrete', columns: 3 });
+		expect(v).toMatchObject({ type: 'continuous', title: 'V' });
+		expect((v as { format: (n: number) => string }).format(1)).toBe('<1>');
+	});
+
+	test('an entry without match adjusts every section of its channel', () => {
+		const legend = new LegendState();
+		register(legend);
+		const sections = legend.sections({ color: { width: 99 } });
+		expect(sections.filter((s) => s.type === 'continuous').map((s) => (s as { width?: number }).width)).toEqual([99, 99]);
+	});
+
+	test('only the first interactive ramp drives the legend range', () => {
+		const legend = new LegendState();
+		register(legend);
+		const ramps = legend.sections({ color: { interactive: { enabled: true } } }).filter((s) => s.type === 'continuous');
+		expect(ramps.map((s) => (s as { interactive?: { enabled?: boolean } }).interactive?.enabled)).toEqual([true, false]);
+	});
+});

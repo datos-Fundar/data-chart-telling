@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, WEATHER_STATIONS, type WeatherStation } from '../data';
+import { countryPopulation } from '../channels';
 
 // `x`/`y`/`value` below use the field-key shorthand (`'lon'` instead of
 // `(d) => (d as WeatherStation).lon`) - see `DotMarkerConfig`'s own doc.
@@ -19,7 +20,8 @@ const meta = {
 		width: 940,
 		height: 500,
 		data: WORLD_COUNTRIES,
-		coordinates: { projection: 'mercator' }
+		coordinates: { projection: 'mercator' },
+		color: countryPopulation
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -57,7 +59,7 @@ export const SizedByTemperature: Story = {
 				data: WEATHER_STATIONS,
 				x: 'lon',
 				y: 'lat',
-				r: (d) => (d as WeatherStation).tempC / 2,
+				r: (d) => (d as WeatherStation).tempC,
 				styles: { dotFill: '#f97316', dotFillOpacity: 0.7, dotStroke: '#c2410c' }
 			}
 		] satisfies GeoMarkersConfig[]
@@ -72,14 +74,14 @@ export const SizedByTemperature: Story = {
  */
 export const ColoredByTemperature: Story = {
 	args: {
-		styles: { fillOpacity: 0.3, stroke: '#94a3b8' },
+		styles: { stroke: '#94a3b8' },
 		markers: [
 			{
 				type: 'dot',
 				data: WEATHER_STATIONS,
 				x: 'lon',
 				y: 'lat',
-				r: 8,
+				r: (d) => (d as WeatherStation).tempC,
 				color: 'tempC',
 				scales: { color: { scheme: ['#3b82f6', '#dc2626'] } },
 				styles: { dotStroke: '#1e293b' }

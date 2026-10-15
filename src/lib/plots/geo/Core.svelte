@@ -2,6 +2,7 @@
 	import { createGeoFeatures } from '$lib/plots/geo/features.svelte';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { LegendState } from '$lib/layout/legend/LegendState.svelte';
+	import { ChannelName } from '$lib/plots/utils/ChannelName';
 	import { Margins } from '$lib/layout/margins/Margins';
 	import BasePlotLayout from '$lib/layout/base/BasePlotLayout.svelte';
 	import type { GeoPlotCoreProps } from '$lib/types/plots/geo/props';
@@ -128,6 +129,12 @@
 		hoverRows: plotState.hoverRows,
 		markers: markersOut,
 		scales: layoutScales,
+		channels: {
+			color: { source: ChannelName.of(color, 'color') },
+			opacity: { source: ChannelName.of(opacity, 'opacity') }
+		},
+		colorDomain: plotState.colorDomain,
+		opacityDomain: plotState.opacityDomain,
 		styles: resolvedStyles,
 		marginEstimate: Margins.GEO_ESTIMATE
 	});

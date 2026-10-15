@@ -1,6 +1,11 @@
 import type { Snippet } from 'svelte';
 import type { SymbolType, LineStyle } from '$lib/types/plots/constants';
 import type { StrokeStyle, DotStyle } from '$lib/types/plots/styling';
+import type {
+	ColorScaleConfig,
+	OpacityScaleConfig,
+	SymbolScaleConfig
+} from '$lib/types/layout/scales';
 
 export type LegendSectionType = 'discrete' | 'continuous' | 'size' | 'symbol';
 
@@ -119,6 +124,12 @@ export type ContinuousLegendSection = {
 	max: number;
 	colorMin?: string;
 	colorMax?: string;
+	/** A named ramp (e.g. `'turbo'`) or 2+ colors to draw the bar in, over `colorMin`/`colorMax`. */
+	scheme?: string | string[];
+	/** Splits an array `scheme` into two halves meeting at this value (diverging). */
+	pivot?: number;
+	/** Draws the bar in one color (`colorMin`, the text color by default) fading across this opacity range, instead of a color ramp. */
+	opacity?: [number, number];
 	ticks?: number[];
 	width?: number;
 	format?: (v: number) => string;
@@ -187,7 +198,8 @@ export type LegendMark = 'line' | 'dot' | 'area' | 'bar' | 'cell' | 'rect' | 'ge
  * What a plot draws that a legend can show - registered on the figure's
  * `LegendState` as the plot resolves: a series (its name, color and how it
  * draws), a segment or marker that names itself on the legend (`'mark'`), a
- * continuous color scale (the domain its colors span), the size scale its
+ * continuous color scale (the domain its colors span), the opacity scale
+ * its marks fade across, the size scale its
  * dots' `r` channel draws with, or the shapes its dots' `symbol` channel
  * draws each category as.
  */
@@ -228,6 +240,20 @@ export type LegendEntry =
 			max: number;
 			colorMin?: string;
 			colorMax?: string;
+			scheme?: string | string[];
+			pivot?: number;
+	  }
+	| {
+			type: 'opacity';
+			channel: 'opacity';
+			title?: string;
+			min: number;
+			max: number;
+			/** The opacity at `min` and at `max`. */
+			opacityMin: number;
+			opacityMax: number;
+			/** The color the marks draw in. Defaults to the text color. */
+			color?: string;
 	  };
 
 /**
@@ -237,12 +263,89 @@ export type LegendEntry =
  */
 export type MarkLegend = string | (Omit<LegendItem, 'name' | 'disabled'> & { label: string });
 
+/** What a legend reads each automatic section from: the series, or the channel a scale encodes. */
+export type LegendChannel = 'series' | 'color' | 'opacity' | 'size' | 'symbol';
+
 /**
- * What a figure adds to its automatic legend, keeping what its plots read
- * as: `items` after the plots' own series, in the same section, and
- * `sections` after the automatic ones.
+ * How to adjust one automatic section: its own configuration, minus what the
+ * plots compute for it. An entry with a `match` (one, or several in a list) adjusts
+ * only the sections titled so - by the field or function name, or as the
+ * legend shows it - and one without adjusts all of that channel's.
+ */
+export type LegendOverride<TSection extends { type: string }, TComputed extends string> =
+	| (Omit<TSection, 'type' | TComputed> & { match?: string })
+	| (Omit<TSection, 'type' | TComputed> & { match?: string })[];
+
+/**
+ * What a figure adds to, or changes in, its automatic legend, keeping what
+ * its plots read as: `items` after the plots' own series, in the same
+ * section, `sections` after the automatic ones, and one key per channel to
+ * adjust the section that channel draws - `series` the discrete section,
+ * `color` and `opacity` the continuous ones, `size` and `symbol` theirs.
+ * Only `color` can be `interactive`, and only its first ramp is.
  */
 export type LegendExtension = {
 	items?: LegendItem[];
 	sections?: LegendSection[];
+	series?: Omit<DiscreteLegendSection, 'type' | 'items'>;
+	color?: LegendOverride<
+		ContinuousLegendSection,
+		'min' | 'max' | 'colorMin' | 'colorMax' | 'scheme' | 'pivot' | 'opacity'
+	>;
+	opacity?: LegendOverride<
+		ContinuousLegendSection,
+		'min' | 'max' | 'colorMin' | 'colorMax' | 'scheme' | 'pivot' | 'opacity' | 'interactive'
+	>;
+	size?: LegendOverride<SizeLegendSection, 'domain' | 'range' | 'color' | 'filled' | 'symbol'>;
+	symbol?: LegendOverride<SymbolLegendSection, 'items' | 'color' | 'filled'>;
+};
+
+/** A segment or marker as the legend reads it: whether it names itself, the channels it draws with and the colors it draws in. */
+export type LegendSource = {
+	type?: string;
+	series?: string;
+	data?: unknown[];
+	color?: unknown;
+	opacity?: unknown;
+	r?: unknown;
+	symbol?: unknown;
+	scales?: {
+		color?: ColorScaleConfig;
+		opacity?: OpacityScaleConfig;
+		symbol?: SymbolScaleConfig;
+	};
+	legend?: MarkLegend;
+	fill?: unknown;
+	stroke?: unknown;
+	styles?: {
+		fill?: unknown;
+		stroke?: unknown;
+		dotFill?: unknown;
+		dotStroke?: unknown;
+		dotSymbol?: unknown;
+		strokeDasharray?: unknown;
+	};
+};
+
+/** What a plot hands the legend to read its entries from. */
+export type LegendPlot = {
+	resolvedSeries?: { name: string }[];
+	colorForSeries?: (name: string) => string;
+	markers?: LegendSource[];
+	segments?: Record<string, LegendSource[] | undefined>;
+	/** The `[min, max]` a plot-level color ramp spans, when the plot has no `color` channel to read it from. */
+	colorDomain?: [number, number];
+	/** The `[min, max]` of a plot-level numeric `opacity` channel. */
+	opacityDomain?: [number, number];
+	channels?: {
+		r?: { source?: unknown };
+		symbol?: { source?: unknown };
+		color?: { source?: unknown };
+		opacity?: { source?: unknown };
+	};
+	scales?: {
+		r?: { domain?: [number, number]; range?: [number, number] };
+		color?: { domain?: unknown; scheme?: unknown; pivot?: number };
+		opacity?: OpacityScaleConfig;
+	};
 };

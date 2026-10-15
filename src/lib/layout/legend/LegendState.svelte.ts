@@ -1,19 +1,20 @@
 import { getContext, setContext, untrack } from 'svelte';
 import { SvelteMap } from 'svelte/reactivity';
-import { resolveAccessor } from '$lib/plots/utils/accessors';
 import { getConfiguration } from '$lib/configuration/config.svelte';
-import { resolveSymbolScale } from '$lib/utils/symbol';
+import { MarkerKinds } from '$lib/markers/MarkerKinds';
+import { LegendChannels } from '$lib/layout/legend/LegendChannels';
 import { LegendText } from '$lib/layout/legend/LegendText';
-import type { SymbolType } from '$lib/types/plots/constants';
-import type { SymbolScaleConfig } from '$lib/types/layout/scales';
 import type {
 	ContinuousLegendSection,
 	DiscreteLegendSection,
 	LegendDisabledAction,
+	LegendChannel,
 	LegendEntry,
 	LegendExtension,
 	LegendItem,
 	LegendMark,
+	LegendPlot,
+	LegendSource,
 	LegendRange,
 	LegendSection,
 	MarkLegend,
@@ -22,27 +23,6 @@ import type {
 } from '$lib/types/layout/legend';
 
 const LEGEND_KEY = Symbol('dct-legend');
-
-/** A segment or marker as the legend reads it: whether it names itself, and the colors it draws in. */
-type LegendSource = {
-	type?: string;
-	series?: string;
-	data?: unknown[];
-	r?: unknown;
-	symbol?: unknown;
-	scales?: { symbol?: SymbolScaleConfig };
-	legend?: MarkLegend;
-	fill?: unknown;
-	stroke?: unknown;
-	styles?: {
-		fill?: unknown;
-		stroke?: unknown;
-		dotFill?: unknown;
-		dotStroke?: unknown;
-		dotSymbol?: unknown;
-		strokeDasharray?: unknown;
-	};
-};
 
 /**
  * A figure's legend, shared by every plot and legend under it: what the
@@ -158,7 +138,9 @@ export class LegendState {
 				? `${entry.type}:${entry.name}`
 				: entry.type === 'size' || entry.type === 'symbol'
 					? `${entry.type}:${entry.title ?? ''}`
-					: undefined;
+					: entry.type === 'scale' || entry.type === 'opacity'
+						? JSON.stringify(entry)
+						: undefined;
 		const once = (type: LegendEntry['type']) =>
 			all.filter(
 				(entry, i) =>
@@ -170,6 +152,7 @@ export class LegendState {
 			...once('series'),
 			...once('mark'),
 			...once('scale'),
+			...once('opacity'),
 			...once('size'),
 			...once('symbol')
 		];
@@ -190,8 +173,11 @@ export class LegendState {
 		const entries = this.entries;
 		const cfg = getConfiguration();
 		const format = (title: string) => LegendText.of(title, cfg);
+		const adjust = (channel: Exclude<LegendChannel, 'series'>, title: string | undefined) =>
+			LegendState.#adjustment(extension?.[channel], title, format);
 		const items: LegendItem[] = [];
 		const ramps: LegendSection[] = [];
+		let interactive = false;
 		for (const entry of entries) {
 			if (entry.type === 'size') {
 				const { title, domain, range, color, filled, symbol } = entry;
@@ -202,7 +188,8 @@ export class LegendState {
 					range,
 					color,
 					filled,
-					...(symbol ? { symbol } : {})
+					...(symbol ? { symbol } : {}),
+					...adjust('size', title)
 				} satisfies SizeLegendSection);
 			} else if (entry.type === 'symbol') {
 				const { title, items: shapes, color, filled } = entry;
@@ -211,18 +198,39 @@ export class LegendState {
 					title: title && format(title),
 					items: shapes,
 					color,
-					filled
+					filled,
+					...adjust('symbol', title)
 				} satisfies SymbolLegendSection);
-			} else if (entry.type === 'scale') {
-				const { title, min, max, colorMin, colorMax } = entry;
+			} else if (entry.type === 'opacity') {
+				const { title, min, max, opacityMin, opacityMax, color } = entry;
 				ramps.push({
 					type: 'continuous',
 					title: title && format(title),
 					min,
 					max,
-					colorMin,
-					colorMax
+					opacity: [opacityMin, opacityMax],
+					...(color ? { colorMin: color } : {}),
+					...adjust('opacity', title)
 				} satisfies ContinuousLegendSection);
+			} else if (entry.type === 'scale') {
+				const { title, min, max, colorMin, colorMax, scheme, pivot } = entry;
+				const section = {
+					type: 'continuous',
+					title: title && format(title),
+					min,
+					max,
+					colorMin,
+					colorMax,
+					...(scheme !== undefined ? { scheme } : {}),
+					...(pivot !== undefined ? { pivot } : {}),
+					...adjust('color', title)
+				} satisfies ContinuousLegendSection as ContinuousLegendSection;
+				// The legend holds one range, so only the first interactive ramp drives it.
+				if (section.interactive?.enabled) {
+					if (interactive) section.interactive = { ...section.interactive, enabled: false };
+					interactive = true;
+				}
+				ramps.push(section);
 			} else {
 				items.push(LegendState.#itemOf(entry));
 			}
@@ -237,11 +245,29 @@ export class LegendState {
 						{
 							type: 'discrete',
 							...(title ? { title: cfg.legend.seriesTitle.text } : {}),
-							items
+							items,
+							...extension?.series
 						} satisfies DiscreteLegendSection
 					]
 				: [];
 		return [...discrete, ...others];
+	}
+
+	/** What `override` changes in the section titled `title`: the entries that match it, in order, merged. */
+	static #adjustment<T extends object>(
+		override: T | (T & { match?: string })[] | undefined,
+		title: string | undefined,
+		format: (title: string) => string
+	): Partial<T> {
+		if (!override) return {};
+		const list = Array.isArray(override) ? override : [override];
+		const merged: Record<string, unknown> = {};
+		for (const { match, ...config } of list as (T & { match?: string })[]) {
+			const matches =
+				match === undefined || (title !== undefined && (match === title || match === format(title)));
+			if (matches) Object.assign(merged, config);
+		}
+		return merged as Partial<T>;
 	}
 
 	/**
@@ -275,22 +301,16 @@ export class LegendState {
 	 * its color, drawn as the plot's own mark - the first of its markers a
 	 * legend can show, as dots in the shape they share - then each of its
 	 * segments and markers that names itself (its `legend`), in its own color
-	 * and mark, then the scales its dots' `r` and `symbol` channels draw with.
+	 * and mark, then what the plot's and its markers' `color`, `opacity`, `r`
+	 * and `symbol` channels draw with.
 	 */
-	static entriesOf(plot: {
-		resolvedSeries?: { name: string }[];
-		colorForSeries?: (name: string) => string;
-		markers?: LegendSource[];
-		segments?: Record<string, LegendSource[] | undefined>;
-		channels?: { r?: unknown; symbol?: unknown };
-		scales?: { r?: { domain?: [number, number]; range?: [number, number] } };
-	}): LegendEntry[] {
+	static entriesOf(plot: LegendPlot): LegendEntry[] {
 		const color = (name: string | undefined) =>
 			name !== undefined && name !== 'default' ? plot.colorForSeries?.(name) : undefined;
 		const mark = plot.markers
-			?.map((marker) => LegendState.#MARKS[marker.type ?? ''])
+			?.map((marker) => MarkerKinds.of(marker.type)?.legendSymbol)
 			.find((kind) => kind !== undefined);
-		const dots = LegendState.#look(
+		const dots = LegendChannels.look(
 			(plot.markers ?? []).filter((marker) => marker.type === 'dot' && !marker.legend)
 		);
 		const series: LegendEntry[] = (plot.resolvedSeries ?? []).map((s) => ({
@@ -305,113 +325,14 @@ export class LegendState {
 			(list ?? []).flatMap((segment) => LegendState.#markEntry(segment, mark, color(name)))
 		);
 		const markers = (plot.markers ?? []).flatMap((marker) =>
-			LegendState.#markEntry(marker, LegendState.#MARKS[marker.type ?? ''], color(marker.series))
+			LegendState.#markEntry(marker, MarkerKinds.of(marker.type)?.legendSymbol, color(marker.series))
 		);
 		return [
 			...series,
 			...segments,
 			...markers,
-			...LegendState.#sizeEntries(plot),
-			...LegendState.#symbolEntries(plot)
+			...LegendChannels.of(plot)
 		];
-	}
-
-	/**
-	 * The size scale of the plot's dots that size by a value (`r` as a field
-	 * or function), as svelteplot draws it: a square-root scale from 0 to the
-	 * largest value onto 0-10 px, unless `scales.r` pins either end. The dots'
-	 * own color when they share one, filled unless they all draw as rings.
-	 */
-	static #sizeEntries(plot: {
-		markers?: LegendSource[];
-		channels?: { r?: unknown };
-		scales?: { r?: { domain?: [number, number]; range?: [number, number] } };
-	}): LegendEntry[] {
-		const dots = (plot.markers ?? []).filter(
-			(marker) => marker.type === 'dot' && marker.r !== undefined && typeof marker.r !== 'number'
-		);
-		if (dots.length === 0) return [];
-		const values = dots.flatMap((marker) => {
-			const read = resolveAccessor(marker.r as never) as (row: unknown) => unknown;
-			return (marker.data ?? []).map((row) => Number(read(row))).filter(Number.isFinite);
-		});
-		if (values.length === 0) return [];
-		const { filled, color, symbol } = LegendState.#look(dots);
-		const source = (plot.channels?.r as { source?: unknown } | undefined)?.source ?? dots[0].r;
-		return [
-			{
-				type: 'size',
-				channel: 'r',
-				...(typeof source === 'string' ? { title: source } : {}),
-				domain: plot.scales?.r?.domain ?? [0, Math.max(...values)],
-				range: plot.scales?.r?.range ?? [0, 10],
-				...(color ? { color } : {}),
-				filled,
-				...(symbol ? { symbol } : {})
-			}
-		];
-	}
-
-	/**
-	 * The shape scale of the plot's dots that take their shape from a value
-	 * (`symbol` as a field or function): each category, in order, next to the
-	 * shape the dots draw it as - by `scales.symbol`, else the theme's shape
-	 * cycle. Colored and filled as the size scale is.
-	 */
-	static #symbolEntries(plot: {
-		markers?: LegendSource[];
-		channels?: { symbol?: unknown };
-	}): LegendEntry[] {
-		const dots = (plot.markers ?? []).filter(
-			(marker) => marker.type === 'dot' && marker.symbol !== undefined
-		);
-		if (dots.length === 0) return [];
-		const config = dots[0].scales?.symbol;
-		const categories = (marker: LegendSource) => {
-			const read = resolveAccessor(marker.symbol as never) as (row: unknown) => unknown;
-			return (marker.data ?? []).map((row) => read(row)).filter((v) => v != null).map(String);
-		};
-		const domain = (config?.domain ?? dots.flatMap(categories)).filter(
-			(value, i, all) => all.indexOf(value) === i
-		);
-		if (domain.length === 0) return [];
-		const shapeOf = resolveSymbolScale(config, domain, getConfiguration().symbols);
-		const { filled, color } = LegendState.#look(dots);
-		const source = (plot.channels?.symbol as { source?: unknown } | undefined)?.source;
-		return [
-			{
-				type: 'symbol',
-				channel: 'symbol',
-				...(typeof source === 'string' ? { title: source } : {}),
-				items: domain.map((name) => ({ name, symbol: shapeOf(name) })),
-				...(color ? { color } : {}),
-				filled
-			}
-		];
-	}
-
-	/**
-	 * How `dots` draw: filled unless they all draw as rings; in the one color
-	 * they share (their fill, or their stroke as rings), if any; in the one
-	 * shape they share, unless a `symbol` channel shapes them.
-	 */
-	static #look(dots: LegendSource[]): { filled: boolean; color?: string; symbol?: SymbolType } {
-		const filled = dots.length === 0 || dots.some((dot) => dot.styles?.dotFill !== 'none');
-		const shared = <T>(values: unknown[], keep: (value: unknown) => value is T) => {
-			const unique = values.filter(keep).filter((value, i, all) => all.indexOf(value) === i);
-			return unique.length === 1 && values.every(keep) ? unique[0] : undefined;
-		};
-		const color = shared(
-			dots.map((dot) => (filled ? dot.styles?.dotFill : dot.styles?.dotStroke)),
-			(value): value is string => typeof value === 'string' && value !== 'none'
-		);
-		const symbol = dots.some((dot) => dot.symbol !== undefined)
-			? undefined
-			: shared(
-					dots.map((dot) => dot.styles?.dotSymbol),
-					(value): value is SymbolType => typeof value === 'string'
-				);
-		return { filled, ...(color ? { color } : {}), ...(symbol ? { symbol } : {}) };
 	}
 
 	/** A segment's or marker's own entry, when it names itself on the legend. */
@@ -433,7 +354,7 @@ export class LegendState {
 			source.stroke
 		].find((value): value is string => typeof value === 'string' && value !== 'none');
 		const dashed = styles.strokeDasharray !== undefined && styles.strokeDasharray !== 'none';
-		const dot = mark === 'dot' ? LegendState.#look([source]) : undefined;
+		const dot = mark === 'dot' ? LegendChannels.look([source]) : undefined;
 		const symbol = own.symbol ?? dot?.symbol;
 		const filled = own.filled ?? dot?.filled;
 		return [
@@ -464,22 +385,4 @@ export class LegendState {
 					: {})
 		};
 	}
-
-	/** How each marker type shows on a legend - a type missing here shows as a swatch. */
-	static readonly #MARKS: Record<string, LegendMark | undefined> = {
-		line: 'line',
-		rule: 'line',
-		regression: 'line',
-		bollinger: 'line',
-		trail: 'line',
-		dot: 'dot',
-		area: 'area',
-		density: 'area',
-		hull: 'area',
-		difference: 'area',
-		bar: 'bar',
-		box: 'bar',
-		rect: 'rect',
-		cell: 'cell'
-	};
 }

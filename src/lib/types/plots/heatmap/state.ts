@@ -22,6 +22,8 @@ export type HeatmapPlotState<TData extends Record<string, unknown>> = AxisPlotSt
 
 	/** "scales" phase output: each row's own resolved color, composed from `channels.color` and the color ramp. */
 	resolveColor?: (row: TData) => string;
+	/** "scales" phase output: the `[min, max]` of the `opacity` values - `undefined` unless `opacity` is numeric. */
+	opacityDomain?: [number, number];
 	/** "scales" phase output: each row's own resolved opacity, composed from `channels.opacity` and the opacity ramp - `undefined` when `opacity` itself is unset. */
 	resolveOpacity?: (row: TData) => number;
 };

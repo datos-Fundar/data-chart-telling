@@ -4,6 +4,7 @@ import type { GeoStylesConfig } from '$lib/types/layout/styles';
 import type { CoordinatesConfig } from '$lib/types/layout/coordinates';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from './data';
+import { provincePopulation } from './channels';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Defaults to the `argentinaBicontinental` projection (see the `Scales`
@@ -82,7 +83,7 @@ export const CustomFillStroke: Story = {
  */
 export const ChoroplethColorRamp: Story = {
 	args: {
-		color: (f) => (f.properties as ArgentinaProvinceProps).population,
+		color: provincePopulation,
 		// `coordinates` is set here too, not just `scales.color` - Storybook merges
 		// `args` shallowly, so a story-level `coordinates` object replaces the
 		// meta's `coordinates: { projection: … }` entirely rather than merging
@@ -99,7 +100,7 @@ export const ChoroplethColorRamp: Story = {
 /** Inverted color ramp - swaps the scheme's colors so higher-population provinces appear in the lighter tone instead of the darker one. */
 export const InvertedColorRamp: Story = {
 	args: {
-		color: (f) => (f.properties as ArgentinaProvinceProps).population,
+		color: provincePopulation,
 		// `coordinates` is set here too, not just `scales.color` - Storybook merges
 		// `args` shallowly, so a story-level `coordinates` object replaces the
 		// meta's `coordinates: { projection: … }` entirely rather than merging

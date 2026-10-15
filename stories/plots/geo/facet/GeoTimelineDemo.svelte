@@ -3,6 +3,7 @@
 	import Scrubber from '../../../common/Scrubber.svelte';
 	import { ARGENTINA_PROVINCES, WEATHER_STATIONS } from '../data';
 	import type { GeoFeature } from '$lib/types/plots/data/geo';
+	import { provincePopulation } from '../channels';
 
 	const YEARS = [2010, 2015, 2020, 2025];
 
@@ -45,7 +46,7 @@
 			subtitle="One timeline slices the provinces and the stations' readings"
 			data={PROVINCES_BY_YEAR}
 			featureId={(f) => String(f.properties?.nombre)}
-			color={(f) => Number(f.properties?.population)}
+			color={provincePopulation}
 			excludeParts={isAntarcticPart}
 			scales={{ color: { scheme: 'blues' } }}
 			coordinates={{ projection: { type: 'mercator', domain: 'data' } }}

@@ -21,14 +21,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * `Plot` can wrap several different plots and let them be swapped
- * in and out while sharing the same chrome: title, subtitle, caption, legend,
- * timeline and facet stay put, and only the plot inside changes. Here a line,
- * bar and heatmap plot are interchanged under one set of chrome props.
+ * Every plot kind draws its own chrome (title, subtitle, caption, legend,
+ * timeline and facet), so swapping kinds swaps the whole plot, chrome
+ * included - nothing is shared between them. What stays is the props: the same
+ * ones are accepted by a line, bar and heatmap plot, and here they are
+ * interchanged next to one external scrubber that drives each one's timeline.
  *
- * This is not what `PlotComposer` does: the composer lays several plots
- * out side by side in one figure, while `Plot` shows one plot at a time in
- * a common frame.
+ * To lay several plots out in one figure with a shared chrome, use
+ * `PlotComposer`.
  */
 export const InterchangeablePlots: Story = {
 	parameters: demoSource(InterchangeSource)

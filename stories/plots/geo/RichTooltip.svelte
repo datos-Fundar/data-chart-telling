@@ -6,6 +6,7 @@
 	import TooltipCard from '../../common/TooltipCard.svelte';
 	import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from './data';
 	import type { GeoFeature } from '$lib/types/plots/data/geo';
+	import { provincePopulation } from './channels';
 
 	const cfg = getConfiguration();
 
@@ -42,7 +43,7 @@
 		height={500}
 		data={ARGENTINA_PROVINCES}
 		featureId={(f) => f.properties!.nombre}
-		color={(f) => f.properties!.population}
+		color={provincePopulation}
 		scales={{ color: { domain: VALUE_DOMAIN } }}
 		coordinates={{ projection: { type: argentinaBicontinental } }}
 		tooltip={{

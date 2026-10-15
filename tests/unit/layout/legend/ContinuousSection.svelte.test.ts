@@ -198,3 +198,24 @@ describe('ContinuousSection - syncing with an externally-set range', () => {
 		});
 	});
 });
+
+describe('ContinuousSection - the numbers at its edges', () => {
+	const section: ContinuousLegendSection = { type: 'continuous', min: 140, max: 1_397_715_000 };
+
+	test('read by the configured locale and compact display, like the axes', async () => {
+		const { setConfiguration, resetConfiguration } = await import(
+			'$lib/configuration/config.svelte'
+		);
+		try {
+			setConfiguration({ axis: { locale: 'en-US', compactDisplay: 'short' } });
+			const en = render(ContinuousSection, { section });
+			await expect.element(en.getByText('1.4B')).toBeInTheDocument();
+			en.unmount();
+			setConfiguration({ axis: { locale: 'es-AR', compactDisplay: 'long' } });
+			const es = render(ContinuousSection, { section });
+			await expect.element(es.getByText(/mil millones/)).toBeInTheDocument();
+		} finally {
+			resetConfiguration();
+		}
+	});
+});

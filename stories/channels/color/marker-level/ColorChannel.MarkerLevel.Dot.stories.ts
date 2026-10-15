@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES, WEATHER_STATIONS, type WorldCountryProps } from '../../../plots/geo/data';
+import { countryPopulation } from '../../../plots/geo/channels';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `dot` marker's own `color` + `scales.color` is independent of the plot's
@@ -20,7 +21,7 @@ const meta = {
 		height: 500,
 		data: WORLD_COUNTRIES,
 		coordinates: { projection: 'mercator' },
-		color: (f) => (f.properties as WorldCountryProps).pop_est,
+		color: countryPopulation,
 		styles: { stroke: '#94a3b8' }
 	},
 	argTypes: {

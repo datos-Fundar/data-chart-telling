@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '../../../plots/geo/data';
+import { provincePopulation } from '../../../plots/geo/channels';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Same channel, different plot kind - GeoPlot has no x/y axis pair, but
@@ -40,14 +41,14 @@ type Story = StoryObj<typeof meta>;
  */
 export const Default: Story = {
 	args: {
-		color: (f) => (f.properties as ArgentinaProvinceProps).population
+		color: provincePopulation
 	}
 };
 
 /** `scales.color.scheme` swaps the ramp's colors without touching `color` itself. */
 export const CustomScheme: Story = {
 	args: {
-		color: (f) => (f.properties as ArgentinaProvinceProps).population,
+		color: provincePopulation,
 		scales: {
 			color: {
 				scheme: 'viridis'

@@ -1,59 +1,14 @@
+import { MarkerKinds } from '$lib/markers/MarkerKinds';
 import { Transforms } from '$lib/phases/transforms/Transforms';
 import { MarkerGrouping } from '$lib/phases/statistics/MarkerGrouping';
 import { SERIES_ID_KEY, SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import type { ProcessedData } from '$lib/types/phases';
-import type { MarkerConfig } from '$lib/types/markers/all';
 import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
 
 type Row = Record<string, unknown>;
 
 /** Kinds that handle `scope: 'segment'` themselves, at render time. */
 const RENDER_SCOPED_KINDS = new Set(['component', 'hover']);
-
-/**
- * Whether each marker kind draws the plot's rows when it has no `data` of its
- * own - the kinds `GeometryLayout` hands `marker.data ?? rows`. Typed over
- * every kind, so a new kind can't be added without choosing its value.
- */
-const DRAWS_ROWS_DEFAULTS = {
-	area: true,
-	arrow: true,
-	bar: true,
-	bollinger: true,
-	brush: false,
-	box: true,
-	cell: true,
-	component: false,
-	contour: false,
-	delaunayLink: true,
-	delaunayMesh: true,
-	delta: false,
-	density: true,
-	difference: true,
-	dot: true,
-	geo: false,
-	'geo-component': true,
-	'geo-hover': false,
-	graticule: false,
-	hover: false,
-	hull: true,
-	image: true,
-	inset: false,
-	line: true,
-	link: false,
-	raster: true,
-	rect: true,
-	regression: true,
-	rule: false,
-	sphere: false,
-	text: true,
-	tick: true,
-	trail: true,
-	vector: false,
-	voronoi: true,
-	voronoiMesh: true,
-	waffle: true
-} satisfies Record<MarkerConfig['type'], boolean>;
 
 /** The plot's own author markers, made ready for the rest of the pipeline. */
 export class AuthorMarkers {
@@ -111,7 +66,7 @@ export class AuthorMarkers {
 
 	/** Whether a marker's kind draws the plot's rows when it sets no `data`. */
 	static #drawsRows(type: string): boolean {
-		return type in DRAWS_ROWS_DEFAULTS && DRAWS_ROWS_DEFAULTS[type as MarkerConfig['type']];
+		return MarkerKinds.of(type)?.drawsRows ?? false;
 	}
 
 	/**

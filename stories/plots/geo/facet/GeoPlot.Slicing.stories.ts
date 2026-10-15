@@ -3,6 +3,7 @@ import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import GeoTimelineDemo from './GeoTimelineDemo.svelte';
 import { WORLD_COUNTRIES } from '../data';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
+import { gdpPerPerson } from '../channels';
 
 const NORTH = new Set(['Europe', 'North America', 'Asia']);
 
@@ -46,10 +47,7 @@ type Story = StoryObj<typeof meta>;
 export const FacetByHemisphere: Story = {
 	args: {
 		title: 'GDP per person, Global North and South',
-		color: (f) => {
-			const p = f.properties as { gdp_md: number; pop_est: number };
-			return p.pop_est ? (p.gdp_md * 1e6) / p.pop_est : undefined;
-		},
+		color: gdpPerPerson,
 		scales: { color: { scheme: 'blues' } },
 		coordinates: { projection: { type: 'equal-earth', domain: 'data' } },
 		facet: { by: 'hemisphere', columns: 2 }

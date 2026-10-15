@@ -1,52 +1,13 @@
+import { MarkerKinds } from '$lib/markers/MarkerKinds';
 import type { MarkerConfig } from '$lib/types/markers/all';
 
 /**
  * How marks are clipped to the plot's frame. Which markers are clipped is
- * per kind, with a marker's own `clip` overriding it, and a clipped mark may
+ * per kind (`MarkerKinds`), with a marker's own `clip` overriding it, and a clipped mark may
  * reach `top`/`right`/`bottom`/`left` px past the frame before it's cut
  * (from `frameClip.tolerance`).
  */
 export class FrameClipping {
-	static readonly defaults = {
-		area: true,
-		arrow: false,
-		bar: true,
-		bollinger: true,
-		brush: false,
-		box: true,
-		cell: true,
-		component: false,
-		contour: false,
-		delaunayLink: true,
-		delaunayMesh: true,
-		delta: false,
-		density: true,
-		difference: true,
-		dot: false,
-		geo: false,
-		'geo-component': false,
-		'geo-hover': false,
-		graticule: false,
-		hover: false,
-		hull: true,
-		image: false,
-		inset: false,
-		line: true,
-		link: false,
-		raster: true,
-		rect: true,
-		regression: true,
-		rule: true,
-		sphere: false,
-		text: false,
-		tick: true,
-		trail: true,
-		vector: false,
-		voronoi: true,
-		voronoiMesh: true,
-		waffle: true
-	} satisfies Record<MarkerConfig['type'], boolean>;
-
 	constructor(
 		readonly top: number,
 		readonly right: number,
@@ -74,6 +35,6 @@ export class FrameClipping {
 
 	/** Whether `marker` is clipped: its own `clip` when set, otherwise its kind's default. */
 	static isClipped(marker: { type: MarkerConfig['type']; clip?: unknown }): boolean {
-		return (marker.clip ?? FrameClipping.defaults[marker.type]) === true;
+		return (marker.clip ?? MarkerKinds.of(marker.type)?.clip) === true;
 	}
 }

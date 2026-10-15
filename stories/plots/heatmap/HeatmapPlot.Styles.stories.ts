@@ -91,7 +91,7 @@ export const WarmColorRamp: Story = {
 		y: 'sex',
 		color: 'value',
 		scales: {
-			color: { domain: [70, 85], scheme: ['darkblue', 'cornflowerblue'] }
+			color: { domain: [70, 85], scheme: 'warm' }
 		},
 		styles: {
 			values: { format: (v: number) => `${v.toFixed(1)} yr` }

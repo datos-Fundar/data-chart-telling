@@ -5,38 +5,15 @@
 	import Scrubber from '../../common/Scrubber.svelte';
 	import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
 	import { HEAT_CELLS } from '../../data/heat-cells';
-	import type { LegendSection } from '$lib/types/layout/legend';
 
 	/**
-	 * Three plot kinds, one set of chrome props. Title, legend, timeline and
-	 * facet are the same props on every plot kind - switching kinds only
-	 * changes the component and its own encodings.
+	 * Three plot kinds, the same chrome props. Title, legend, timeline and
+	 * facet are props every plot kind takes on its own - switching kinds swaps
+	 * the whole plot (chrome included), and only the scrubber's position is
+	 * shared, since it lives outside.
 	 */
 	let kind = $state<'line' | 'bar' | 'heatmap'>('line');
-	const maxPct = Math.max(...HEAT_CELLS.map((d) => d.pct));
-	const continuousLegend: LegendSection[] = [
-		{
-			type: 'continuous',
-			title: 'Percentage',
-			min: 0,
-			max: maxPct,
-			format: (v) => `${(v * 100).toFixed(0)}%`,
-			width: 180
-		}
-	];
-
 	const northSeries = TIME_SERIES.filter((d) => d.region === 'North');
-	const indicatorLegend: LegendSection[] = [
-		{
-			type: 'discrete',
-			title: 'Indicator',
-			columns: 2,
-			items: [
-				{ name: 'GDP', symbol: 'line' },
-				{ name: 'Employment', symbol: 'line' }
-			]
-		}
-	];
 </script>
 
 <div class="switcher">
@@ -51,13 +28,12 @@
 			<HeatmapPlot
 				width={720}
 				height={520}
-				title="Same chrome, interchangeable plot"
+				title="Same props, interchangeable plot"
 				subtitle="HeatmapPlot"
 				data={HEAT_CELLS.filter((d) => d.scenario === 'Baseline')}
 				x="rooms"
 				y="people"
 				color="pct"
-				legend={continuousLegend}
 				timeline={{ accessor: 'year', progress, orientation: 'vertical' }}
 				scales={{ x: { label: 'Rooms' }, y: { label: 'People' } }}
 				styles={{ values: { format: (v) => `${(v * 100).toFixed(0)}%` } }}
@@ -66,25 +42,25 @@
 			<LinePlot
 				width={720}
 				height={460}
-				title="Same chrome, interchangeable plot"
+				title="Same props, interchangeable plot"
 				subtitle="LinePlot"
 				data={northSeries}
 				x="year"
 				y="value"
 				color="metric"
-				legend={indicatorLegend}
+				timeline={{ accessor: 'year', progress, orientation: 'vertical' }}
 				facet={{ by: 'metric' as keyof SeriesPoint, columns: 2 }}
 			/>
 		{:else}
 			<BarPlot
 				width={720}
 				height={460}
-				title="Same chrome, interchangeable plot"
+				title="Same props, interchangeable plot"
 				subtitle="BarPlot"
 				data={northSeries}
 				x="year"
 				y="value"
-				legend={indicatorLegend}
+				timeline={{ accessor: 'year', progress, orientation: 'vertical', filterMode: 'upTo' }}
 				facet={{ by: 'metric' as keyof SeriesPoint, columns: 2 }}
 			/>
 		{/if}

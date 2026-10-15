@@ -38,6 +38,7 @@ function extendWithColorScales<TData extends Record<string, unknown>>(
 	const resolveColor = (row: TData) => colorScale(Number(colorAcc.accessor(row)));
 
 	const opacityAcc = channels!.opacity;
+	let opacityDomainOut: [number, number] | undefined;
 	const resolveOpacity = opacityAcc
 		? (() => {
 				const rawVals = rows.map((d) => opacityAcc.accessor(d)).filter((v) => v != null);
@@ -47,6 +48,7 @@ function extendWithColorScales<TData extends Record<string, unknown>>(
 						? [Math.min(...rawVals.map(Number)), Math.max(...rawVals.map(Number))]
 						: [0, 1]
 					: [...new Set(rawVals.map(String))];
+				if (allNumeric && rawVals.length) opacityDomainOut = opacityDomain as [number, number];
 				const opacityScale = resolveOpacityScale(
 					scales.opacity,
 					opacityDomain,
@@ -62,6 +64,7 @@ function extendWithColorScales<TData extends Record<string, unknown>>(
 			...scales,
 			...(colorAcc.source !== undefined ? { color: { ...scales.color, domain: valueDomain } } : {})
 		},
+		opacityDomain: opacityDomainOut,
 		resolveColor,
 		resolveOpacity
 	};

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import { WORLD_COUNTRIES, WORLD_TOPOLOGY, type WorldCountryProps } from './data';
+import { countryPopulation } from './channels';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // GeoPlot has no x/y series concept - "data" is the map itself. These
@@ -72,11 +73,16 @@ export const ExplicitFeatureId: Story = {
  * choropleth color ramp (see the `Styles`/`Scales` stories for controlling
  * that ramp's domain and colors). Here it's each country's estimated
  * population.
+ *
+ * The automatic legend titles the ramp with the name of the `color` function,
+ * so give it a name (`countryPopulation` here, shown as "Country population")
+ * instead of an inline arrow function, which has none and leaves the legend
+ * untitled.
  */
 export const ContinuousColor: Story = {
 	args: {
 		data: WORLD_COUNTRIES,
-		color: (f) => (f.properties as WorldCountryProps).pop_est
+		color: countryPopulation
 	}
 };
 

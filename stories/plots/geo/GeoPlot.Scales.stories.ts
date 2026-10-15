@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import type { GeoScalesConfig, CoordinatesConfig } from '$lib/types/layout/coordinates';
 import { WORLD_COUNTRIES, type WorldCountryProps } from './data';
+import { countryPopulation } from './channels';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `scales.color` configures the choropleth colour domain - the only scale a
@@ -43,7 +44,7 @@ type Story = StoryObj<typeof meta>;
  */
 export const ExplicitColorDomain: Story = {
 	args: {
-		color: (f) => (f.properties as WorldCountryProps).pop_est,
+		color: countryPopulation,
 		scales: {
 			color: { domain: [1_000_000, 1_400_000_000] }
 		} satisfies GeoScalesConfig,

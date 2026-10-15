@@ -102,7 +102,8 @@ export type PlotChromeConfig = {
 	 * The figure's legend: unset or `true`, the one its plots read as - their
 	 * series, scales, and the segments and markers that name themselves; `false`,
 	 * none; a list of sections, exactly those; `{ items, sections }`, the
-	 * automatic one with those added.
+	 * automatic one with those added, and `{ series, color, opacity, size,
+	 * symbol }`, with the section of each channel adjusted (see {@link LegendExtension}).
 	 */
 	legend?: LegendSection[] | LegendExtension | boolean;
 	order?: PlotChromeItem[];
