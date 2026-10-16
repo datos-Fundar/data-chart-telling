@@ -40,7 +40,7 @@ export default defineConfig({
 		coverage: {
 			provider: 'v8',
 			include: ['src/lib/**'],
-			reporter: ['text-summary', 'lcov']
+			reporter: ['text-summary', 'lcov', 'json-summary', 'json']
 		},
 		projects: [
 			// ── Node unit tests ──────────────────────────────────────────────────────

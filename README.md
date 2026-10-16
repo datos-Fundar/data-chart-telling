@@ -9,9 +9,8 @@
 [![npm](https://img.shields.io/npm/v/@fundar/data-chart-telling?label=npm&logo=npm&logoColor=white)](https://www.npmjs.com/package/@fundar/data-chart-telling)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/datos-Fundar/data-chart-telling?label=Latest%20Release&display_name=tag&logo=github&logoColor=white)](https://github.com/datos-Fundar/data-chart-telling/releases/latest)
 ![GitHub License](https://img.shields.io/github/license/datos-Fundar/data-chart-telling?label=License&logo=github&logoColor=white)
-[![CircleCI](https://img.shields.io/circleci/build/gh/datos-Fundar/data-chart-telling/main?label=CircleCI%20Build&logo=circleci&logoColor=white)](https://circleci.com/gh/datos-Fundar/data-chart-telling)
-[![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/datos-Fundar/data-chart-telling/main?label=CodeFactor&logo=codefactor&logoColor=white)](https://www.codefactor.io/repository/github/datos-fundar/data-chart-telling)
-[![Codecov](https://img.shields.io/codecov/c/gh/datos-Fundar/data-chart-telling?label=Codecov&logo=codecov&logoColor=white)](https://codecov.io/gh/datos-Fundar/data-chart-telling)
+[![CI](https://img.shields.io/github/actions/workflow/status/datos-Fundar/data-chart-telling/ci.yml?branch=main&label=CI&logo=githubactions&logoColor=white)](https://github.com/datos-Fundar/data-chart-telling/actions/workflows/ci.yml)
+[![CodeQL](https://img.shields.io/github/actions/workflow/status/datos-Fundar/data-chart-telling/codeql.yml?branch=main&label=CodeQL&logo=github&logoColor=white)](https://github.com/datos-Fundar/data-chart-telling/actions/workflows/codeql.yml)
 
 ## Introduction
 
