@@ -62,12 +62,33 @@ pnpm docs:images tooltip scales   # only these figures
 
 A figure can set `export const meta = { hover: { x, y } }` in a `<script module>` block to rest the pointer before the shot. The data is synthetic and deterministic (`scripts/docs-figures/data.ts`), and axes are set to English. `docs/images` is left out of the npm package.
 
+## Continuous integration
+
+GitHub Actions runs on every pull request and on pushes to `main`:
+
+- `CI` lints, type-checks and builds, then runs the node and browser suites with coverage. The coverage summary is commented on the pull request, or shown in the workflow summary when it is too long, and the raw reports are uploaded as the `coverage` artifact.
+- `CodeQL` scans the code for security issues, and also runs weekly.
+
+`main` is protected: changes land through a pull request with the `CI` checks passing.
+
 ## Publishing
+
+Releases are published to npm by the `Release` workflow, with [trusted publishing](https://docs.npmjs.com/trusted-publishers), so no npm token is stored in the repository.
+
+1. In a branch, bump the version and update `CHANGELOG.md`:
+
+   ```bash
+   pnpm version <major|minor|patch> --no-git-tag-version
+   ```
+
+2. Open a pull request, wait for the checks and merge it.
+3. Create a GitHub Release on `main` with the tag `v<version>`.
+
+Publishing the release runs the `Release` workflow: it checks that the tag matches `version` in `package.json`, runs lint, type check and tests, and publishes. `prepack` runs `svelte-package` and `publint`, so a publish always ships a clean build. The package ships `dist/`, `examples/`, `llms.txt` and `llms-full.txt`.
+
+To inspect what would be uploaded without publishing:
 
 ```bash
 pnpm build
-pnpm pack              # dry run: inspect what would be uploaded
-pnpm publish --access public
+pnpm pack
 ```
-
-`prepack` runs `svelte-package` and `publint`, so a publish always ships a clean build. The package ships `dist/`, `examples/`, `llms.txt` and `llms-full.txt`. Bump `version` in `package.json` before each publish.
