@@ -1,0 +1,2 @@
+# The full test suite (node unit tests and browser component tests) before anything leaves the machine.
+pnpm test

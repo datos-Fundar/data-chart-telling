@@ -1,5 +1,5 @@
 <script lang="ts">
-	import LineChart from '$lib/charts/line/Chart.svelte';
+	import LinePlot from '$lib/plots/line/Plot.svelte';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { paletteColor } from '$lib/utils/color';
 	import TooltipCard from '../../common/TooltipCard.svelte';
@@ -7,8 +7,8 @@
 
 	const cfg = getConfiguration();
 
-	// Matches the `z: 'metric'` grouping order below, which is what drives
-	// colour assignment inside LineChart — kept in lockstep here since `content`
+	// Matches the `color: 'metric'` grouping order below, which is what drives
+	// colour assignment inside LinePlot - kept in lockstep here since `content`
 	// only gets the raw rows back, not their series colour.
 	const METRICS = ['GDP', 'Employment'];
 	const METRIC_COLORS = [paletteColor(0, cfg.palette), paletteColor(1, cfg.palette)];
@@ -26,17 +26,17 @@
 			display: `$ ${row.value} M`
 		}))
 		.sort((a, b) => b.value - a.value)}
-	<TooltipCard heading={String(year)} {entries} footer="PBI vs. Empleo" />
+	<TooltipCard heading={String(year)} {entries} footer="GDP vs. Employment" />
 {/snippet}
 
 <div class="custom-content-demo">
-	<LineChart
+	<LinePlot
 		width={680}
 		height={440}
 		{data}
 		x="year"
 		y="value"
-		z={'metric' as keyof SeriesPoint}
+		color={'metric' as keyof SeriesPoint}
 		tooltip={{ strategy: 'x', content }}
 		markers={[{ type: 'hover' }]}
 	/>

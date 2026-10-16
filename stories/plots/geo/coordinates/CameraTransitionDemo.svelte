@@ -6,7 +6,7 @@
 		{ label: 'Japan', features: ['Japan'] }
 	] as const;
 
-	/** The `coordinates` this component feeds `<GeoPlot>` — exported for the story's docs source override, see `stories/common/docsSource.ts`. */
+	/** The `coordinates` this component feeds `<GeoPlot>` - exported for the story's docs source override, see `stories/common/docsSource.ts`. */
 	export function coordinatesForScene(sceneIndex: number, duration: number): CoordinatesConfig {
 		return {
 			camera: {

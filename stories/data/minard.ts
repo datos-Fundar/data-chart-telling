@@ -1,4 +1,4 @@
-// Charles Minard's 1812 map of Napoleon's Russian campaign — troop position,
+// Charles Minard's 1812 map of Napoleon's Russian campaign - troop position,
 // size and direction along the march to Moscow and the retreat. Data from the
 // R package `HistData` (https://friendly.github.io/HistData/reference/Minard.html),
 // the same dataset svelteplot's own `trail/napoleon` example uses
@@ -10,7 +10,7 @@ export type MinardRow = {
 	survivors: number;
 	/** `'A'` advance (toward Moscow), `'R'` retreat. */
 	direction: 'A' | 'R';
-	/** Which of the three army columns this row belongs to — keeps the trails from connecting across columns. */
+	/** Which of the three army columns this row belongs to - keeps the trails from connecting across columns. */
 	group: '1' | '2' | '3';
 };
 
@@ -70,7 +70,7 @@ export const MINARD_TROOPS: MinardRow[] = [
 
 export type MinardCityLabel = { name: string; lon: number; lat: number };
 
-/** Country labels rendered on the map (not part of the original CSV) — the same five svelteplot's own example places by hand. */
+/** Country labels rendered on the map (not part of the original CSV) - the same five svelteplot's own example places by hand. */
 export const MINARD_COUNTRY_LABELS: MinardCityLabel[] = [
 	{ name: 'Russia', lon: 33.4, lat: 56 },
 	{ name: 'Belarus', lon: 27.9534, lat: 53.7098 },

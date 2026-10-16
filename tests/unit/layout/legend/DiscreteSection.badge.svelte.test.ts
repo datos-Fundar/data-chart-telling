@@ -3,7 +3,7 @@ import { describe, test, expect, vi } from 'vitest';
 import DiscreteSectionWidthProbe from './DiscreteSectionWidthProbe.svelte';
 import type { DiscreteLegendSection } from '$lib/types/layout/legend';
 
-describe('DiscreteSection – interactive badge style', () => {
+describe('DiscreteSection - interactive badge style', () => {
 	test('is the default once interactive.enabled: true, filling the badge with the series color', async () => {
 		const section: DiscreteLegendSection = {
 			type: 'discrete',
@@ -19,7 +19,7 @@ describe('DiscreteSection – interactive badge style', () => {
 		expect(badge.style.color).toBe('rgb(255, 255, 255)');
 		expect(container.querySelector('.dct-discrete__eye')).toBeTruthy();
 		// The symbol icon is also shown inside the badge, colored like the
-		// label rather than the series color — its shape fill is set directly
+		// label rather than the series color - its shape fill is set directly
 		// (not via the badge's `color` style), so it's asserted separately.
 		const swatchShape = container.querySelector('.dct-discrete__swatch rect');
 		expect(swatchShape).toBeTruthy();
@@ -124,7 +124,7 @@ describe('DiscreteSection – interactive badge style', () => {
 	test('interactive.disabled overrides the dim opacity applied to a toggled-off item', async () => {
 		const section: DiscreteLegendSection = {
 			type: 'discrete',
-			interactive: { enabled: true, disabled: { mode: 'style', style: { opacity: 0.42 } } },
+			interactive: { enabled: true, disabled: { mode: 'dim', style: { opacity: 0.42 } } },
 			items: [{ name: 'a', label: 'Serie A', color: '#4f46e5' }]
 		};
 		const { container } = await render(DiscreteSectionWidthProbe, { section });

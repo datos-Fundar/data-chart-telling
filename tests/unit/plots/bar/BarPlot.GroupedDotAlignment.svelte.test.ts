@@ -10,21 +10,16 @@ const DATA = [
 
 // Checks the hover dot lands on its own segment, for both orientations.
 describe.each([['vertical', false] as const, ['horizontal', true] as const])(
-	'BarPlot – grouped dot lands inside its own segment (%s)',
+	'BarPlot - grouped dot lands inside its own segment (%s)',
 	(_label, horizontal) => {
 		test('each series own dot falls within that series own rendered bar, not the other one', async () => {
 			const { container } = await render(BarPlot, {
 				width: 400,
 				height: 300,
 				data: DATA,
-				x: 'cat',
-				y: 'value',
-				z: 'series',
-				scales: horizontal
-					? { y: { type: 'categorical' }, z: { seriesLayout: 'grouped' } }
-					: { z: { seriesLayout: 'grouped' } },
+				...(horizontal ? { x: 'value', y: 'cat' } : { x: 'cat', y: 'value' }),
+				color: 'series',
 				tooltip: {
-					facetId: '',
 					sync: false,
 					strategy: 'series',
 					format: (row: unknown) => (row as { series: string }).series

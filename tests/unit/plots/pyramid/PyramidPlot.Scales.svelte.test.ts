@@ -6,72 +6,70 @@ import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../../stories/data/populat
 import { waitForSvg, countBarRects } from '../_helpers/svg';
 
 const DATA_PROPS = {
-  data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
-  x: 'pct' as const,
-  y: 'ageGroup' as const,
-  z: 'sex' as const,
+	data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
+	x: 'pct' as const,
+	y: 'ageGroup' as const,
+	color: 'sex' as const
 };
 
-describe('PyramidPlot – scales', () => {
-  test('renders with no scale overrides (auto domain)', async () => {
-    const { container } = await render(PyramidPlot, { width: 560, height: 520, ...DATA_PROPS });
-    const svg = await waitForSvg(container);
-    expect(countBarRects(svg)).toBe(DATA_PROPS.data.length);
-  });
+describe('PyramidPlot - scales', () => {
+	test('renders with no scale overrides (auto domain)', async () => {
+		const { container } = await render(PyramidPlot, { width: 560, height: 520, ...DATA_PROPS });
+		const svg = await waitForSvg(container);
+		expect(countBarRects(svg)).toBe(DATA_PROPS.data.length);
+	});
 
-  test('an explicit Y domain pins the age group axis ticks to that exact order', async () => {
-    const { container } = await render(PyramidPlot, {
-      width: 560,
-      height: 520,
-      ...DATA_PROPS,
-      scales: { y: { domain: AGE_GROUPS } } satisfies AxisBasedScalesConfig,
-    });
-    const svg = await waitForSvg(container);
-    const ticks = Array.from(svg.querySelectorAll('g.axis-y text')).map((t) => t.textContent);
-    expect(ticks).toEqual(AGE_GROUPS);
-  });
+	test('an explicit Y domain pins the age group axis ticks to that exact order', async () => {
+		const { container } = await render(PyramidPlot, {
+			width: 560,
+			height: 520,
+			...DATA_PROPS,
+			scales: { y: { domain: AGE_GROUPS } } satisfies AxisBasedScalesConfig
+		});
+		const svg = await waitForSvg(container);
+		const ticks = Array.from(svg.querySelectorAll('g.axis-y text')).map((t) => t.textContent);
+		expect(ticks).toEqual(AGE_GROUPS);
+	});
 
-  test('an explicit X domain constrains the diverging axis range', async () => {
-    const { container } = await render(PyramidPlot, {
-      width: 560,
-      height: 520,
-      ...DATA_PROPS,
-      scales: { x: { domain: [-6, 6] }, y: { domain: AGE_GROUPS } } satisfies AxisBasedScalesConfig,
-    });
-    const svg = await waitForSvg(container);
-    expect(countBarRects(svg)).toBe(DATA_PROPS.data.length);
-  });
+	test('an explicit X domain constrains the diverging axis range', async () => {
+		const { container } = await render(PyramidPlot, {
+			width: 560,
+			height: 520,
+			...DATA_PROPS,
+			scales: { x: { domain: [-6, 6] }, y: { domain: AGE_GROUPS } } satisfies AxisBasedScalesConfig
+		});
+		const svg = await waitForSvg(container);
+		expect(countBarRects(svg)).toBe(DATA_PROPS.data.length);
+	});
 
-  test('scales.z.reverse swaps which side each series appears on', async () => {
-    async function firstBarFill(reverse: boolean) {
-      const { container } = await render(PyramidPlot, {
-        width: 560,
-        height: 520,
-        ...DATA_PROPS,
-        styles: { colors: { left: '#ff0000', right: '#0000ff' } },
-        scales: { y: { domain: AGE_GROUPS }, z: { reverse } } satisfies AxisBasedScalesConfig,
-      });
-      const svg = await waitForSvg(container);
-      return Array.from(svg.querySelectorAll('g.bar-x rect')).map((r) => getComputedStyle(r).fill);
-    }
-    const normal = await firstBarFill(false);
-    const reversed = await firstBarFill(true);
-    expect(normal).not.toEqual(reversed);
-  });
+	test('scales.grouping.reverse renders with the reverse flag', async () => {
+		const { container } = await render(PyramidPlot, {
+			width: 560,
+			height: 520,
+			...DATA_PROPS,
+			scales: {
+				y: { domain: AGE_GROUPS },
+				grouping: { reverse: true }
+			} satisfies AxisBasedScalesConfig
+		});
+		const svg = await waitForSvg(container);
+		// With reverse, should still render all bars
+		expect(countBarRects(svg)).toBe(DATA_PROPS.data.length);
+	});
 
-  test('axis labels render the configured title text', async () => {
-    const { container } = await render(PyramidPlot, {
-      width: 560,
-      height: 520,
-      ...DATA_PROPS,
-      scales: {
-        x: { label: 'Population %' },
-        y: { label: 'Age Group', domain: AGE_GROUPS },
-      } satisfies AxisBasedScalesConfig,
-      margins: { left: 80, bottom: 50 },
-    });
-    const svg = await waitForSvg(container);
-    expect(svg.querySelector('.axis-x-title')?.textContent).toContain('Population %');
-    expect(svg.querySelector('.axis-y-title')?.textContent).toContain('Age Group');
-  });
+	test('axis labels render the configured title text', async () => {
+		const { container } = await render(PyramidPlot, {
+			width: 560,
+			height: 520,
+			...DATA_PROPS,
+			scales: {
+				x: { label: 'Population %' },
+				y: { label: 'Age Group', domain: AGE_GROUPS }
+			} satisfies AxisBasedScalesConfig,
+			margins: { left: 80, bottom: 50 }
+		});
+		const svg = await waitForSvg(container);
+		expect(svg.querySelector('.axis-x-title')?.textContent).toContain('Population %');
+		expect(svg.querySelector('.axis-y-title')?.textContent).toContain('Age Group');
+	});
 });

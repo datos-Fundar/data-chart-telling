@@ -4,7 +4,7 @@ import ConfigDemo from './ConfigDemo.svelte';
 /**
  * The package ships a single global, reactive styling configuration. Call
  * `setConfiguration({...})` (a deep-merge over the defaults) and every chart on
- * screen restyles at once — font, colours, discrete palette, continuous
+ * screen restyles at once - font, colours, discrete palette, continuous
  * gradient, axis, spacing, legend, tooltip and timeline.
  *
  * ```ts
@@ -20,9 +20,9 @@ import ConfigDemo from './ConfigDemo.svelte';
  * ```
  */
 const meta = {
-  title: 'Configuration/Styling',
-  component: ConfigDemo,
-  parameters: { layout: 'padded' },
+	title: 'Configuration/Styling',
+	component: ConfigDemo,
+	parameters: { layout: 'padded' }
 } satisfies Meta<typeof ConfigDemo>;
 
 export default meta;

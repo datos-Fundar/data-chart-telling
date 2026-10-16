@@ -7,11 +7,11 @@ function cellSize(container: Element): { width: number; height: number } {
 	if (!cell) throw new Error('no facet cell rendered');
 	return {
 		width: Number(cell.getAttribute('data-width')),
-		height: Number(cell.getAttribute('data-height')),
+		height: Number(cell.getAttribute('data-height'))
 	};
 }
 
-describe('FacetLayout – paginated mode sizes cells off the current page, not the total entry count', () => {
+describe('FacetLayout - paginated mode sizes cells off the current page, not the total entry count', () => {
 	test('pageSize: 1 out of 9 entries fills the chart area instead of being sized as 1 of 3 rows', async () => {
 		const { container } = await render(FacetSizeProbe, {
 			groupCount: 9,
@@ -19,7 +19,7 @@ describe('FacetLayout – paginated mode sizes cells off the current page, not t
 			mode: 'paginated',
 			pageSize: 1,
 			width: 600,
-			height: 400,
+			height: 400
 		});
 
 		const { height } = cellSize(container);
@@ -36,7 +36,7 @@ describe('FacetLayout – paginated mode sizes cells off the current page, not t
 			mode: 'paginated',
 			pageSize: 4,
 			width: 600,
-			height: 400,
+			height: 400
 		});
 
 		const { height } = cellSize(container);
@@ -52,24 +52,24 @@ describe('FacetLayout – paginated mode sizes cells off the current page, not t
 			columns: 3,
 			mode: 'paginated',
 			width: 600,
-			height: 400,
+			height: 400
 		});
 
 		const { height } = cellSize(container);
-		// Default pageSize = 3x3 = 9, i.e. one page holds every entry — same
+		// Default pageSize = 3x3 = 9, i.e. one page holds every entry - same
 		// geometry as plain 'grid' mode, so this must match its sizing exactly.
 		const grid = await render(FacetSizeProbe, {
 			groupCount: 9,
 			columns: 3,
 			mode: 'grid',
 			width: 600,
-			height: 400,
+			height: 400
 		});
 		expect(height).toBe(cellSize(grid.container).height);
 	});
 });
 
-describe('FacetLayout – navLayout', () => {
+describe('FacetLayout - navLayout', () => {
 	test('default (overlay) renders nav buttons and indicator absolutely positioned over the grid', async () => {
 		const { container } = await render(FacetSizeProbe, {
 			groupCount: 4,
@@ -77,7 +77,7 @@ describe('FacetLayout – navLayout', () => {
 			mode: 'paginated',
 			pageSize: 1,
 			width: 600,
-			height: 400,
+			height: 400
 		});
 
 		expect(container.querySelector('.dct-facet-paginated__nav')).toBeTruthy();
@@ -93,7 +93,7 @@ describe('FacetLayout – navLayout', () => {
 			pageSize: 1,
 			navLayout: 'below',
 			width: 600,
-			height: 400,
+			height: 400
 		});
 
 		const nav = container.querySelector('.dct-facet-paginated__nav-below');
@@ -117,7 +117,7 @@ describe('FacetLayout – navLayout', () => {
 			mode: 'paginated',
 			pageSize: 1,
 			width: 600,
-			height: 400,
+			height: 400
 		});
 		expect(height).toBeLessThan(cellSize(overlay.container).height);
 	});
@@ -129,7 +129,7 @@ describe('FacetLayout – navLayout', () => {
 			mode: 'paginated',
 			navLayout: 'below',
 			width: 600,
-			height: 400,
+			height: 400
 		});
 
 		expect(container.querySelector('.dct-facet-paginated__nav-below')).toBeFalsy();

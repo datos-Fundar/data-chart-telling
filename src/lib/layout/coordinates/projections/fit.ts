@@ -6,9 +6,9 @@
  * few hand-picked extremity points stand in for a region's true extent.
  */
 export function pointsToFitFeature(points: [number, number][]): GeoJSON.Feature {
-  return {
-    type: 'Feature',
-    properties: null,
-    geometry: { type: 'MultiPoint', coordinates: points },
-  };
+	return {
+		type: 'Feature',
+		properties: null,
+		geometry: { type: 'MultiPoint', coordinates: points }
+	};
 }

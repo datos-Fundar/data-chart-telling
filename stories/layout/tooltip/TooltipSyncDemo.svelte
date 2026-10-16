@@ -10,11 +10,11 @@
 </script>
 
 <script lang="ts">
-	import LineChart from '$lib/charts/line/Chart.svelte';
-	import BarChart from '$lib/charts/bar/Chart.svelte';
-	import HeatmapChart from '$lib/charts/heatmap/Chart.svelte';
-	import PyramidChart from '$lib/charts/pyramid/Chart.svelte';
-	import type { HoverStrategy } from '$lib/types/layout/tooltip';
+	import LinePlot from '$lib/plots/line/Plot.svelte';
+	import BarPlot from '$lib/plots/bar/Plot.svelte';
+	import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
+	import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
+	import type { HoverStrategy } from '$lib/types/layout/hover';
 	import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
 	import type { HeatCell } from '../../data/heat-cells';
 	import { REGION_BARS, type RegionYear } from '../../data/region-bars';
@@ -22,10 +22,10 @@
 
 	const { kind = 'line' }: { kind?: 'line' | 'heatmap' | 'bar' | 'pyramid' } = $props();
 
+	// svelte-ignore state_referenced_locally
 	const defaultStrategy: HoverStrategy =
 		kind === 'heatmap' ? 'punctual' : kind === 'pyramid' ? 'y' : 'x';
 
-	// svelte-ignore state_referenced_locally
 	let strategy = $state<HoverStrategy>(defaultStrategy);
 	let sync = $state(true);
 
@@ -41,11 +41,11 @@
 		<span class="demo__sep">|</span>
 		<span class="demo__label">sync:</span>
 		<button class:active={sync} onclick={() => (sync = !sync)}>{sync ? 'on' : 'off'}</button>
-		<span class="demo__hint">hover a facet — the match is mirrored in the others</span>
+		<span class="demo__hint">hover a facet - the match is mirrored in the others</span>
 	</div>
 
 	{#if kind === 'heatmap'}
-		<HeatmapChart
+		<HeatmapPlot
 			width={760}
 			height={460}
 			title="Households by rooms (2022)"
@@ -53,7 +53,7 @@
 			data={heatData}
 			x={'rooms' as keyof HeatCell}
 			y={'people' as keyof HeatCell}
-			z={'pct' as keyof HeatCell}
+			color={'pct' as keyof HeatCell}
 			scales={{ x: { label: 'Rooms' }, y: { label: 'People' } }}
 			styles={{ values: { show: false, format: (v) => `${(v * 100).toFixed(0)}%` } }}
 			facet={{ by: 'scenario' as keyof HeatCell, columns: 2 }}
@@ -61,7 +61,7 @@
 			markers={[{ type: 'hover' }]}
 		/>
 	{:else if kind === 'bar'}
-		<BarChart
+		<BarPlot
 			width={760}
 			height={420}
 			title="Value by region and year"
@@ -74,7 +74,7 @@
 			markers={[{ type: 'hover' }]}
 		/>
 	{:else if kind === 'pyramid'}
-		<PyramidChart
+		<PyramidPlot
 			width={760}
 			height={520}
 			title="Population pyramid by year"
@@ -82,10 +82,12 @@
 			data={pyramidData}
 			y={'ageGroup' as keyof PopulationRow}
 			x={'pct' as keyof PopulationRow}
-			z={'sex' as keyof PopulationRow}
-			scales={{ y: { domain: AGE_GROUPS } }}
+			color={'sex' as keyof PopulationRow}
+			scales={{
+				y: { domain: AGE_GROUPS },
+				color: { scheme: { Female: '#d6336c', Male: '#1971c2' } }
+			}}
 			styles={{
-				colors: { left: '#d6336c', right: '#1971c2' },
 				values: { format: (v) => `${v.toFixed(1)}%` }
 			}}
 			facet={{ by: 'year' as keyof PopulationRow, columns: 2 }}
@@ -93,7 +95,7 @@
 			markers={[{ type: 'hover' }]}
 		/>
 	{:else}
-		<LineChart
+		<LinePlot
 			width={760}
 			height={440}
 			title="GDP vs. Employment by region"
@@ -101,7 +103,7 @@
 			data={TIME_SERIES}
 			x="year"
 			y="value"
-			z={'metric' as keyof SeriesPoint}
+			color={'metric' as keyof SeriesPoint}
 			legend={[
 				{
 					type: 'discrete',

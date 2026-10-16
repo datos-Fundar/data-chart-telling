@@ -1,602 +1,122 @@
-# data-chart-telling
+<div align="center">
 
-A Svelte 5 component library for building data visualisation charts, built on top of [svelteplot](https://svelteplot.dev). It provides low-level **plot** primitives (single graphs) and will grow to include higher-level **chart** compositions with titles, legends, facets, and timelines.
+<img src="docs/images/logo.png" alt="data-chart-telling-logo" />
 
----
-
-## Build & publish
-
-After making changes, rebuild the package distributable:
-
-```bash
-pnpm build
-```
-
-`prepack` runs `svelte-package` followed by `publint` automatically before packing, so a publish will always ship a clean build:
-
-```bash
-# dry-run — inspect what will be uploaded
-pnpm pack
-
-# publish to the npm registry
-pnpm publish --access public
-```
-
-> Bump `version` in `package.json` before each publish.
+</div>
 
 ---
 
-## Tests
+[![npm](https://img.shields.io/npm/v/@fundar/data-chart-telling?label=npm&logo=npm&logoColor=white)](https://www.npmjs.com/package/@fundar/data-chart-telling)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/datos-Fundar/data-chart-telling?label=Latest%20Release&display_name=tag&logo=github&logoColor=white)](https://github.com/datos-Fundar/data-chart-telling/releases/latest)
+![GitHub License](https://img.shields.io/github/license/datos-Fundar/data-chart-telling?label=License&logo=github&logoColor=white)
+[![CI](https://img.shields.io/github/actions/workflow/status/datos-Fundar/data-chart-telling/ci.yml?branch=main&label=CI&logo=githubactions&logoColor=white)](https://github.com/datos-Fundar/data-chart-telling/actions/workflows/ci.yml)
+[![CodeQL](https://img.shields.io/github/actions/workflow/status/datos-Fundar/data-chart-telling/codeql.yml?branch=main&label=CodeQL&logo=github&logoColor=white)](https://github.com/datos-Fundar/data-chart-telling/actions/workflows/codeql.yml)
 
-### Unit tests (node)
+## Introduction
 
-Pure logic tests — no browser required.
+Svelte 5 plots for data storytelling, built on [svelteplot](https://svelteplot.dev). A plot is one graph - axes and marks - that carries its own title, legend, tooltip, facets and timeline, so a finished, readable figure is one component with a handful of props.
 
-```bash
-pnpm test
-```
-
-This runs both the **node unit** project and the **browser component** project (Chromium via Playwright).
-
-To run only the node unit tests:
-
-```bash
-pnpm vitest run --project=unit
-```
-
-To run only the browser component tests:
-
-```bash
-pnpm vitest run --project=browser
-```
-
-### Storybook interaction tests
-
-Run stories as Vitest tests (requires Storybook to boot internally):
-
-```bash
-pnpm test:stories
-```
-
----
-
-## Storybook
-
-Serve the component explorer locally:
-
-```bash
-pnpm storybook
-# → http://localhost:6006
-```
-
-Build a static Storybook for deployment:
-
-```bash
-pnpm build-storybook
-```
-
----
-
-## Chart types
-
-> **Vocabulary**: a _plot_ is a single graph (axes + marks). A _chart_ wraps a plot with a title, caption, legend, facets, and/or a timeline.
-
-### Charts
-
-| Component | Import path | Description |
-| --- | --- | --- |
-| `BarChart` | `$lib/charts/bar/Chart.svelte` | Vertical bar chart with title/caption/legend/facet/timeline chrome. |
-| `HeatmapChart` | `$lib/charts/heatmap/Chart.svelte` | Grid of colour-coded cells. Colour domain is computed over the full dataset for cross-facet comparability. |
-| `LineChart` | `$lib/charts/line/Chart.svelte` | Line chart. Default timeline mode is `upTo` (cumulative reveal). |
-| `PyramidChart` | `$lib/charts/pyramid/Chart.svelte` | Population-pyramid-style diverging bar chart with a shared zero baseline. |
-
-### Plots
-
-| Component | Import path | Description |
-| --- | --- | --- |
-| `BarPlot` | `$lib/plots/bar/Plot.svelte` | Vertical bar chart. Supports multiple series and per-series range segments. |
-| `HeatmapPlot` | `$lib/plots/heatmap/Plot.svelte` | Grid of colour-coded cells. |
-| `LinePlot` | `$lib/plots/line/Plot.svelte` | Line chart. Supports multiple series and per-series range segments with independent stroke styles. |
-| `PyramidPlot` | `$lib/plots/pyramid/Plot.svelte` | Diverging horizontal bar chart; each series is mirrored left or right of a shared zero baseline. |
-| `GeoPlot` | `$lib/plots/geo/Plot.svelte` | Geographic map rendered from GeoJSON/TopoJSON with optional choropleth styling and interactive markers. |
-
-All components accept explicit `width` and `height` in pixels (svelteplot does not auto-size).
-
----
-
-### Plot props (BarPlot, LinePlot, HeatmapPlot, PyramidPlot)
-
-Plots accept either `series` (pre-built `Series[]`) or the `data` + `x`/`y`/`z` flat-rows path — these are mutually exclusive.
-
-| Prop | Type | Default | BarPlot | HeatmapPlot | LinePlot | PyramidPlot |
-| ---- | ---- | ------- | ------- | ----------- | -------- | ----------- |
-| `width` | `number` | — | ✅ | ✅ | ✅ | ✅ |
-| `height` | `number` | — | ✅ | ✅ | ✅ | ✅ |
-| `series` | `Series[]` | — | ✅ | ✅ | ✅ | ✅ |
-| `data` | `TData[]` | — | ✅ | ✅ | ✅ | ✅ |
-| `x` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
-| `y` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
-| `z` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
-| `segments` | `SegmentsConfig<TStyle>` | `[]` | ✅ | ✅ | ✅ | ✅ |
-| `markers` | `Marker[]` | `[]` | ✅ | ✅ | ✅ | ✅ |
-| `scales` | `AxisBasedScalesConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
-| `margins` | `MarginConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
-| `tooltip` | `TooltipConfig` | | ✅ | ✅ | ✅ | ✅ |
-| `styles` | `BasePlotStyles` | | ✅ | ✅ | ✅ | ✅ |
-
-#### GeoPlot props
-
-Unlike x/y plots, `GeoPlot` uses GeoJSON/TopoJSON as its data source (no x/y/z axes). It accepts either a `FeatureCollection`, a `Feature[]`, or a TopoJSON `Topology` (with the `object` key to specify which named object to extract).
-
-| Prop | Type | Default | Description |
-| ---- | ---- | ------- | ----------- |
-| `width` | `number` | — | Plot width in pixels. |
-| `height` | `number` | — | Plot height in pixels. |
-| `data` | `FeatureCollection \| Feature[] \| Topology` | — | GeoJSON (FeatureCollection or Feature array) or TopoJSON Topology. |
-| `object` | `string` | — | Required when `data` is a TopoJSON Topology — the key under `topology.objects` to extract. |
-| `featureId` | `Accessor<GeoFeature, string>` | `feature.id ?? feature.properties?.id ?? feature.properties?.name` | Resolver for each feature's stable id (used for `segments` lookup and hover identification). |
-| `value` | `(feature: GeoFeature) => number \| undefined` | — | Optional continuous accessor for choropleth colouring (mirrors heatmap's `z`). |
-| `excludeParts` | `(part: GeoGeometry, feature: GeoFeature) => boolean` | — | Excludes matching geometry parts from rendering/hover (e.g. for inset markers). Return `true` to exclude. |
-| `segments` | `SegmentsConfig<GeoSegmentStyle>` | `[]` | Per-feature styling (keyed by `featureId`). |
-| `markers` | `GeoMarker[]` | `[]` | Array of markers: `graticule`, `sphere`, `dot`, `vector`, `link`, `contour`, `inset`, or custom `component`. |
-| `scales` | `GeoScalesConfig` | `{}` | Projection and colour scale config. |
-| `margins` | `MarginConfig` | `{}` | Top/right/bottom/left margin overrides. |
-| `tooltip` | `TooltipConfig<GeoFeature>` | — | Hover/click tooltip configuration. |
-| `styles` | `GeoStyles<TProps>` | — | Base map fill, choropleth ramp, tile layer, zoom, and click handlers. |
-
-#### `BasePlotStyles` sub-properties (BarPlot, LinePlot, HeatmapPlot, PyramidPlot)
-
-| Sub-prop | Type | BarPlot default | HeatmapPlot default | LinePlot default | PyramidPlot default |
-| -------- | ---- | --------------- | ------------------- | ---------------- | ------------------- |
-| `styles.values.show` | `boolean` | `false` | `true` | `false` (last point) | `false` |
-| `styles.values.format` | `(v: number, seriesName: string) => string` | `v => \`${v}\`` | `v => \`${v}\`` | `(v, name) => \`${name} - ${v}\`` | `v => \`${v}\`` |
-| `styles.values.anchor` | `'outside' \| 'start' \| 'middle' \| 'end'` | `'outside'` | — | `'start'` | `'outside'` |
-| `styles.values.dx` | `number` | | | | |
-| `styles.values.dy` | `number` | | | | |
-| `styles.values.textAnchor` | `'start' \| 'end' \| 'middle'` | | `'middle'` | | |
-| `styles.values.lineAnchor` | `'top' \| 'bottom' \| 'middle'` | | `'middle'` | | |
-| `styles.values.rotate` | `number` | | | | |
-| `styles.values.class` | `string` | | | | |
-| `styles.values.textClass` | `string` | | | | |
-| `styles.colors.min` | `string` | — | cfg `continuous.min` | — | — |
-| `styles.colors.max` | `string` | — | cfg `continuous.max` | — | — |
-| `styles.colors.left` | `string` | — | — | — | palette index 0 |
-| `styles.colors.right` | `string` | — | — | — | palette index 1 |
-
-#### `GeoStyles` sub-properties (GeoPlot)
-
-| Sub-prop | Type | Default | Description |
-| -------- | ---- | ------- | ----------- |
-| `styles.fill` | `string` | palette[0] | Base map fill for features not styled by `segments` or choropleth. |
-| `styles.fillOpacity` | `number` | `1` | Base map fill opacity. |
-| `styles.stroke` | `string` | cfg `axis.color` | Base map feature stroke colour. |
-| `styles.strokeWidth` | `number` | `0.5` | Base map feature stroke width. |
-| `styles.colors.min` | `string` | cfg `continuous.min` | Choropleth ramp minimum colour (when `value` is provided). |
-| `styles.colors.max` | `string` | cfg `continuous.max` | Choropleth ramp maximum colour (when `value` is provided). |
-| `styles.tileLayer` | `GeoTileLayerConfig` | — | XYZ raster basemap config (URL, opacity, zoom range). Mercator-family projections only. |
-| `styles.zoom` | `boolean \| GeoZoomConfig` | `false` | Enable/configure drag-pan + scroll-zoom (`false` = static map). |
-| `styles.onFeatureClick` | `(feature: GeoFeature, event: Event) => void` | — | Click handler for base-map features. |
-
-#### Scales: `AxisBasedScalesConfig` (x/y plots) vs `GeoScalesConfig` (GeoPlot)
-
-X/Y plots use `AxisBasedScalesConfig` with `x`, `y`, `z` axis configurations. GeoPlot uses `GeoScalesConfig` with projection and colour settings instead. `ScalesConfig` is the union of both (`AxisBasedScalesConfig | GeoScalesConfig`) — each plot kind's own `scales` prop narrows to whichever one applies to it.
-
-| Prop | AxisBasedScalesConfig (BarPlot, LinePlot, HeatmapPlot, PyramidPlot) | GeoScalesConfig (GeoPlot) |
-| ---- | ------- | ------- |
-| `x` | ✅ (AxisScale) | ❌ |
-| `y` | ✅ (AxisScale) | ❌ |
-| `z` | ✅ (AxisScale) | ❌ |
-| `projection` | ❌ | ✅ (GeoProjectionConfig) |
-| `color` | ❌ | ✅ (`{ domain?: [number, number] }`) |
-
-#### Props distribution across all plot kinds
-
-| Prop | BarPlot | HeatmapPlot | LinePlot | PyramidPlot | GeoPlot | Notes |
-| ---- | ------- | ----------- | -------- | ----------- | ------- | ----- |
-| `width` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots. |
-| `height` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots. |
-| `segments` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots; GeoPlot uses `SegmentsConfig<GeoSegmentStyle>`, others use their own `SegmentStyle` type. |
-| `markers` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots; GeoPlot uses `GeoMarker[]`, others use `Marker[]`. |
-| `margins` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots. |
-| `tooltip` | ✅ | ✅ | ✅ | ✅ | ✅ | Common to all plots; row type varies per plot. |
-| `styles` | ✅ | ✅ | ✅ | ✅ | ✅ | Common; type is `BasePlotStyles` for x/y plots, `GeoStyles<TProps>` for GeoPlot. |
-| `scales` | ✅ | ✅ | ✅ | ✅ | ✅ | Common; type is `AxisBasedScalesConfig<TData>` for x/y plots, `GeoScalesConfig` for GeoPlot. |
-| `series` | ✅ | ✅ | ✅ | ✅ | ❌ | X/Y plots only (mutually exclusive with `data`/`x`/`y`/`z`). |
-| `data` | ✅ (TData[]) | ✅ (TData[]) | ✅ (TData[]) | ✅ (TData[]) | ✅ (FeatureCollection \| Feature[] \| Topology) | Common; data shape differs — x/y plots use flat rows, GeoPlot uses geo features. |
-| `x` | ✅ | ✅ | ✅ | ✅ | ❌ | X/Y plots only. |
-| `y` | ✅ | ✅ | ✅ | ✅ | ❌ | X/Y plots only. |
-| `z` | ✅ | ✅ | ✅ | ✅ | ❌ | X/Y plots only (used as series selector in bar/line/pyramid, value accessor in heatmap). |
-| `object` | ❌ | ❌ | ❌ | ❌ | ✅ (optional) | GeoPlot only; required when `data` is a TopoJSON Topology. |
-| `featureId` | ❌ | ❌ | ❌ | ❌ | ✅ (optional) | GeoPlot only; resolves feature identity for `segments` lookup and hover. |
-| `value` | ❌ | ❌ | ❌ | ❌ | ✅ (optional) | GeoPlot only; drives choropleth colouring (analogous to heatmap's `z`). |
-| `excludeParts` | ❌ | ❌ | ❌ | ❌ | ✅ (optional) | GeoPlot only; filters geometry parts from rendering. |
-
----
-
-### Chart props
-
-| Prop | Type | Default | BarChart | HeatmapChart | LineChart | PyramidChart |
-| ---- | ---- | ------- | -------- | ------------ | --------- | ------------ |
-| `width` | `number` | — | ✅ | ✅ | ✅ | ✅ |
-| `height` | `number` | — | ✅ | ✅ | ✅ | ✅ |
-| `data` | `TRow[]` | — | ✅ | ✅ | ✅ | ✅ |
-| `x` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
-| `y` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
-| `z` | `Accessor` | — | ✅ | ✅ | ✅ | ✅ |
-| `title` | `string` | | ✅ | ✅ | ✅ | ✅ |
-| `subtitle` | `string` | | ✅ | ✅ | ✅ | ✅ |
-| `caption` | `string` | | ✅ | ✅ | ✅ | ✅ |
-| `header` | `Snippet` | | ✅ | ✅ | ✅ | ✅ |
-| `footer` | `Snippet` | | ✅ | ✅ | ✅ | ✅ |
-| `legend` | `LegendSection[]` | | ✅ | ✅ | ✅ | ✅ |
-| `segments` | `SegmentsConfig<TStyle>` | `[]` | ✅ | ✅ | ✅ | ✅ |
-| `markers` | `Marker[]` | `[]` | ✅ | ✅ | ✅ | ✅ |
-| `scales` | `AxisBasedScalesConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
-| `margins` | `MarginConfig` | `{}` | ✅ | ✅ | ✅ | ✅ |
-| `facet` | `FacetConfig` | | ✅ | ✅ | ✅ | ✅ |
-| `timeline` | `TimelineConfig` | | ✅ | ✅ | ✅ | ✅ |
-| `tooltip` | `TooltipProp` | | ✅ | ✅ | ✅ | ✅ |
-| `styles` | `BasePlotStyles` | | ✅ | ✅ | ✅ | ✅ |
-
-`header` and `footer` are Svelte 5 snippets that replace the string props when richer markup is needed (custom styles, logos, links, etc.). When `header` is provided it takes full precedence over `title`/`subtitle`; when `footer` is provided it takes full precedence over `caption`. Use the natural snippet syntax:
+It aims for a sweet spot between the flexibility of `d3`, the declarative spirit of the _grammar of graphics_ (data mapped to channels, scales and marks) and the convenience of a classic plotting library, where each plot kind is a first-class component.
 
 ```svelte
-<LineChart ...>
-  {#snippet header()}
-    <div style="display:flex; justify-content:space-between">
-      <h3 style="color:#2563eb">My Chart</h3>
-      <img src="/logo.svg" alt="Logo" />
-    </div>
-  {/snippet}
+<script lang="ts">
+	import { LinePlot } from '@fundar/data-chart-telling';
 
-  {#snippet footer()}
-    <small>Source: <a href="...">Dataset</a> · Updated Q3 2024</small>
-  {/snippet}
-</LineChart>
+	const rows = [
+		{ year: 2020, region: 'North', value: 3.1 },
+		{ year: 2021, region: 'North', value: 3.8 },
+		{ year: 2020, region: 'South', value: 2.2 },
+		{ year: 2021, region: 'South', value: 2.9 }
+	];
+</script>
+
+<LinePlot
+	width={720}
+	height={400}
+	title="Value by region"
+	data={rows}
+	x="year"
+	y="value"
+	color="region"
+	tooltip
+	scales={{ x: { label: false } }}
+	styles={{ values: { show: true } }}
+/>
 ```
 
-See the [BasePlotStyles sub-properties table](#baseplotstyles-sub-properties-barplot-lineplot-heatmapplot-pyramidplot) above — charts accept the same `styles` shape and pass it through to their underlying plot.  
+![A line plot with a title, a legend, end-of-line value labels and a tooltip](docs/images/readme-hero.png)
 
----
+Eight plot kinds - line, area, bar, histogram, heatmap, pyramid, scatter and geographic maps - share one vocabulary: the same channels (`x`, `y`, `color`, `grouping`, `opacity`, `symbol`, `r`), the same `scales`, `styles`, `segments`, `markers`, `transforms`, `tooltip`, `legend`, `timeline` and `facet` props, and one global theme.
 
-### Segments
+## Install
 
-The `segments` prop separates data ranges from visual styling. Every plot kind shares the same underlying types; the style shape (`TStyle`) differs per mark.
-
-| Plot | `segments` type | Key structure | Lookup |
-| ---- | --------------- | ------------- | ------ |
-| `LinePlot` / `LineChart` | `SegmentsConfig<LineSegmentStyle>` | Named keys (series names) or `'default'` | By series name (`z` accessor or series index). |
-| `BarPlot` / `BarChart` | `SegmentsConfig<BarSegmentStyle>` | Named keys (series names) or `'default'` | By series name (`z` accessor or series index). |
-| `PyramidPlot` / `PyramidChart` | `SegmentsConfig<BarSegmentStyle>` | Named keys (series names) or `'default'` | By series name (`z` accessor or series index). |
-| `HeatmapPlot` / `HeatmapChart` | `SegmentsConfig<CellSegmentStyle>` | `'default'` key only | All cells (can be restricted by `areas` coordinates). |
-| `GeoPlot` | `SegmentsConfig<GeoSegmentStyle>` | Named keys (feature ids) or `'default'` | By feature id (`featureId` accessor or derived from properties). |
-
-**Segment styles by plot:**
-
-| SegmentStyle type | Supports | Plot(s) |
-| --- | --- | --- |
-| `LineSegmentStyle` | `stroke` (line), `dots` (endpoint markers) | `LinePlot` / `LineChart` |
-| `BarSegmentStyle` | `fill`, `fillOpacity` | `BarPlot` / `BarChart`, `PyramidPlot` / `PyramidChart` |
-| `CellSegmentStyle` | `fill`, `fillOpacity`, `stroke`, `strokeWidth` | `HeatmapPlot` / `HeatmapChart` |
-| `GeoSegmentStyle` | `fill`, `fillOpacity`, `stroke`, `strokeWidth` | `GeoPlot` |
-
-#### Core types
-
-```ts
-type Range           = { from?: AxisValue; to?: AxisValue };  // inclusive on both sides
-type Area            = { x?: Range; y?: Range };              // 2-D rectangular region
-type Segment<TStyle> = { areas?: Area[]; style?: TStyle };
+```bash
+pnpm add @fundar/data-chart-telling svelte svelteplot
+# only for GeoPlot fed with TopoJSON
+pnpm add topojson-client
 ```
 
-A **`Segment`** matches a data point (or heatmap cell) when the point falls inside **any** of its `areas`. Omitting `areas` creates a **catch-all** that matches every data point — but catch-alls are always evaluated **last**, regardless of their position in the list, so area-specific segments always win. This lets a catch-all placed first act as a fallback baseline that highlighted ranges override.
+The package ships Svelte components, so the app needs the Svelte compiler (`@sveltejs/vite-plugin-svelte` or SvelteKit). Types ship with it.
 
-An **`Area`** restricts by x, y, or both. Both bounds of a `Range` are **inclusive**. Omitting `x` or `y` leaves that axis unrestricted.
+## Stepping through time
 
-#### `Segments` structure
+`timeline` slices the rows by a field and steps through them. It draws as a **player** by default: play and pause, the current step and a slider, in the figure's chrome.
 
-`segments` is always an **array of groups**. Each group is a plain object whose keys map to `Segment[]` lists:
-
-```ts
-// 'default' key — applies its segments to every series
-type DefaultSegmentsMap<TStyle>     = { default: Segment<TStyle>[] };
-
-// named keys — applies segments only to the named series
-type SeriesAwareSegmentsMap<TStyle> = Record<string, Segment<TStyle>[]>;
-
-// one element of the array — either form, or a mix of both key types
-type SegmentsStyle<TStyle> = DefaultSegmentsMap<TStyle> | SeriesAwareSegmentsMap<TStyle>;
-
-// the prop type: an ordered list of groups
-type Segments<TStyle> = SegmentsStyle<TStyle>[];
+```svelte
+<BarPlot {width} {height} data={rows} x="region" y="value" timeline={{ accessor: 'year' }} />
 ```
 
-Having multiple groups lets you organise segments by concern — for example one group for per-series stroke colours and a second for shared dot markers applied via `'default'`. Groups are processed in order and their resolved segments are concatenated per series before evaluation.
+![A bar plot with a player bar](docs/images/timeline-player.png)
 
-#### Examples
-
-**Line chart — baseline colour with a highlighted range (catch-all as fallback):**
+`type: 'rule'` draws a **rule** beside the plot instead, a line with the steps written along it. The page drives it through `progress` (`0` to `1`), from a slider, scroll position or anything else.
 
 ```svelte
 <LinePlot
-  {width} {height}
-  series={[{ name: 'gdp', x: 'year', y: 'value', data: GDP }]}
-  segments={[
-    {
-      gdp: [
-        { style: { stroke: { stroke: '#94a3b8', strokeWidth: 1 } } },
-        { areas: [{ x: { from: 2008, to: 2010 } }],
-          style: { stroke: { stroke: '#ef4444', strokeWidth: 3 } } },
-      ],
-    },
-  ]}
+	{width}
+	{height}
+	data={rows}
+	x="year"
+	y="value"
+	color="region"
+	timeline={{ accessor: 'year', type: 'rule', progress }}
 />
 ```
 
-**Line chart — per-series baseline colours + shared dot markers (two-group approach):**
+![A line plot revealed up to the current step, with a timeline rule](docs/images/timeline-rule.png)
 
-```svelte
-<LinePlot
-  {width} {height}
-  data={LIFE_EXPECTANCY} x="year" y="value" z="sex"
-  segments={[
-    // Group 1: per-series catch-all stroke colours
-    { female: [{ style: { stroke: { stroke: 'steelblue' } } }],
-      male:   [{ style: { stroke: { stroke: 'tomato'    } } }] },
-    // Group 2: dots for all series in a specific range
-    { default: [
-        { areas: [{ x: { from: 2010, to: 2012 } }],
-          style: { dots: { dotRadius: 5, dotSymbol: 'circle' } } },
-      ],
-    },
-  ]}
-/>
-```
+See [Timeline](docs/timeline.md) for both in detail.
 
-**Heatmap — highlight specific columns, rows, and individual cells:**
+## Documentation
 
-```svelte
-<HeatmapChart
-  {width} {height} {data} {x} {y} {z}
-  segments={[
-    {
-      default: [
-        { areas: [{ x: { from: 'Q1', to: 'Q1' } }, { x: { from: 'Q3', to: 'Q3' } }],
-          style: { stroke: '#f59e0b', strokeWidth: 2 } },
-        { areas: [{ x: { from: 'Q2', to: 'Q2' }, y: { from: 1, to: 2 } }],
-          style: { fill: '#ef4444', fillOpacity: 0.8 } },
-      ],
-    },
-  ]}
-/>
-```
+Start with the concepts; the rest is organised by what you want a plot to do.
 
-**GeoPlot — per-feature styling and catch-all fallback (note: GeoPlot keys are feature ids, not series names):**
+| Topic                                                          | What it covers                                                                               |
+| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| [Getting started](docs/getting-started.md)                     | Installing, a first plot, sizing a plot to its container, loading data                       |
+| [Concepts](docs/concepts.md)                                   | Plots and figures, rows and series, channels, the props every plot shares                    |
+| [Plots](docs/plots.md)                                         | The eight plot kinds: what each one draws and what it needs                                  |
+| [Scales](docs/scales.md)                                       | Axes (`x`, `y`) and channel scales (`color`, `grouping`, `opacity`, `symbol`, `r`, `length`) |
+| [Styles and segments](docs/styles-and-segments.md)             | Value labels, frames, gap filling, and styling ranges of the data                            |
+| [Markers](docs/markers.md)                                     | Extra marks on a plot: annotations, regions, hover highlights, custom components             |
+| [Transforms and statistics](docs/transforms-and-statistics.md) | Stacking, binning, smoothing, regression and the other data transforms                       |
+| [Tooltip and hover](docs/tooltip-and-hover.md)                 | Floating tooltips, in-plot highlights, syncing hover across plots                            |
+| [Legend](docs/legend.md)                                       | The automatic legend, toggling series, custom sections                                       |
+| [Timeline](docs/timeline.md)                                   | Stepping through the data by time, with a player bar (default) or a rule                     |
+| [Chrome](docs/chrome.md)                                       | Title, subtitle, caption, header, footer, dividers and their order                           |
+| [Facets](docs/facets.md)                                       | Small multiples: grids, carousels, pages                                                     |
+| [Composer](docs/composer.md)                                   | Several plots in one figure, with shared hover, legend and timeline                          |
+| [Reading plot state](docs/state.md)                            | `usePlot` and `useFigure`, to build custom UI around a plot                                  |
+| [Maps](docs/geo.md)                                            | GeoPlot: data, projections, choropleths, camera and map markers                              |
+| [Theming](docs/theming.md)                                     | The global configuration, themes, locale and CSS variables                                   |
+| [Architecture](docs/architecture.md)                           | How a plot is assembled, for contributors                                                    |
+| [Development](docs/development.md)                             | Building, testing, Storybook and publishing                                                  |
 
-```svelte
-<GeoPlot
-  {width} {height}
-  data={COUNTRIES_GEOJSON}
-  value={(f) => f.properties?.population}
-  segments={[
-    {
-      // Catch-all baseline (always evaluated last)
-      default: [
-        { style: { fillOpacity: 0.7, stroke: '#94a3b8' } },
-      ],
-      // Per-feature overrides (matched by feature id)
-      argentina: [
-        { style: { fill: '#3b82f6', fillOpacity: 0.9 } },
-      ],
-      brazil: [
-        { style: { fill: '#ef4444', fillOpacity: 0.9 } },
-      ],
-    },
-  ]}
-/>
-```
+Working examples live in [examples/](examples/); the Storybook (`pnpm storybook`) shows every option live.
 
-Omitting `segments` (or passing `[]`) renders every mark in its default palette colour.
+## For LLMs and coding agents
 
----
+[llms.txt](llms.txt) is the index and [llms-full.txt](llms-full.txt) is a single-file guide with the rules that matter most. Both ship inside the npm package, next to the runnable [examples/](examples/).
 
-## Theming & configuration
+## License
 
-The whole package reads its default styling — fonts, colours, spacing, legend/tooltip/axis chrome, plot geometry — from one global, reactive config store (`src/lib/configuration/config.svelte.ts`). Overriding it re-themes every chart on screen; nothing needs to be passed prop-by-prop to each component.
-
-```ts
-import { setConfiguration, getConfiguration, resetConfiguration } from '@fundar/data-chart-telling';
-
-setConfiguration({
-  font: '"Inter", sans-serif',
-  palette: ['#4f46e5', '#e6580d', '#16a34a'],
-  legend: { continuous: { label: { size: '0.8125rem', weight: 400 } } }
-});
-
-getConfiguration();   // read the live, merged config
-resetConfiguration(); // restore shipped defaults
-```
-
-- `setConfiguration` takes a **deep-partial** patch (`ChartConfigInput`) and deep-merges it into the current config — you only specify the leaves you want to change, everything else keeps its previous value. It's reactive (`$state`-backed), so applying it re-renders every mounted chart.
-- Call it once at app startup (or per-theme-switch); it's global, not per-chart. A single chart can still override specific visuals via its own props (`styles`, `scales`, a section's own `format`/`color`, etc.) — those always win over the global config.
-
-### How values reach the DOM
-
-The config feeds two different consumers, and a field is **one or the other**, never both:
-
-1. **CSS custom properties** — `configToCssVars` flattens the relevant fields into `--dct-*` variables, which `ChartContainer` stamps on its own root element; every component's scoped `<style>` block reads them with a hardcoded fallback (e.g. `font-size: var(--dct-continuous-label-size, 0.875rem)`). These are the fields listed with a **CSS variable** below — you can also override them directly with plain CSS on a wrapping element instead of going through `setConfiguration`, if you only need a one-off, non-reactive tweak.
-2. **Plain JS values** — read directly by plot components as props svelteplot needs (numeric tick sizes, the categorical `palette` array, margins, gradient endpoints, hover geometry, per-mark defaults). These have **no** CSS variable — `setConfiguration` (or editing `DEFAULT_CONFIG`) is the only way to change them.
-
-### Reference
-
-All types live in `src/lib/types/configuration/styling.ts`; all defaults in `src/lib/configuration/config.svelte.ts`. "CSS variable" is `—` for JS-only fields.
-
-#### Base
-
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `font` | `string` | `'inherit'` | `--dct-font` |
-| `color` | `string` | `'currentColor'` | `--dct-fg` |
-| `background` | `string` | `'transparent'` | `--dct-bg` |
-| `border` | `string` | `'color-mix(in srgb, currentColor 15%, transparent)'` | `--dct-border` |
-
-#### Spacing
-
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `spacing.headerPadding` | `string` | `'0.75rem 0 1rem'` | `--dct-header-pad` |
-| `spacing.legendPadding` | `string` | `'0.75rem 0'` | `--dct-legend-pad` |
-| `spacing.captionPadding` | `string` | `'0.5rem 0'` | `--dct-caption-pad` |
-| `spacing.bleed` | `string` | `'12px'` | `--dct-bleed` |
-
-#### Text blocks: `title`, `subtitle`, `caption`
-
-Each is a `TextStyle` — `{ font, size, weight, color, leading, spacing }` — mapped to `--dct-{title|subtitle|caption}-{font|size|weight|color|leading|spacing}`. Shared base before per-block overrides: `font: 'inherit'`, `size: '1rem'`, `weight: 400`, `color: 'inherit'`, `leading: '1.3'`, `spacing: 'normal'`.
-
-| Block | Overrides its own default |
-| ----- | -------------------------- |
-| `title` | `size: '1.5rem'`, `weight: 500`, `leading: '1.2'` |
-| `subtitle` | `size: '1rem'`, `weight: 400`, `color: 'color-mix(in srgb, currentColor 85%, transparent)'` |
-| `caption` | `size: '0.75rem'`, `color: 'color-mix(in srgb, currentColor 75%, transparent)'` |
-
-#### Legend
-
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `legend.font` | `string` | `'inherit'` | `--dct-legend-font` |
-| `legend.size` | `string` | `'0.875rem'` | `--dct-legend-size` |
-| `legend.weight` | `number \| string` | `400` | `--dct-legend-weight` |
-| `legend.color` | `string` | `'inherit'` | `--dct-legend-color` |
-| `legend.titleSize` | `string` | `'0.875rem'` | `--dct-legend-title-size` |
-| `legend.titleWeight` | `number \| string` | `500` | `--dct-legend-title-weight` |
-| `legend.gap` | `string` (CSS `gap` shorthand) | `'0.5rem 2rem'` | `--dct-legend-gap` |
-| `legend.swatchSize` | `string` | `'1.25rem'` | `--dct-legend-swatch` |
-| `legend.disabledOpacity` | `number` | `0.12` | — (fallback for a legend-disabled series/value when a section doesn't set its own style) |
-
-`legend.navButton` — prev/next arrows on an overflowing horizontal discrete section:
-
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `legend.navButton.background` | `string` | `'transparent'` | `--dct-legend-nav-bg` |
-| `legend.navButton.color` | `string` | `'currentColor'` | `--dct-legend-nav-color` |
-| `legend.navButton.size` | `string` | `'1.5rem'` | `--dct-legend-nav-size` |
-| `legend.navButton.fontSize` | `string` | `'1rem'` | `--dct-legend-nav-font-size` |
-| `legend.navButton.disabledOpacity` | `number` | `0.3` | `--dct-legend-nav-disabled-opacity` |
-
-`legend.continuous` — the gradient bar itself, its draggable handles, ticks, and labels:
-
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `legend.continuous.height` | `number` (px) | `20` | — |
-| `legend.continuous.barHeight` | `number` (px) | `12` | — |
-| `legend.continuous.barRadius` | `number` (px) | `2` | — |
-| `legend.continuous.handle.width` | `string` | `'6px'` | `--dct-continuous-handle-width` |
-| `legend.continuous.handle.height` | `string` | `'20px'` | `--dct-continuous-handle-height` |
-| `legend.continuous.handle.radius` | `string` | `'3px'` | `--dct-continuous-handle-radius` |
-| `legend.continuous.handle.fill` | `string` | `'currentColor'` | `--dct-continuous-handle-fill` |
-| `legend.continuous.handle.stroke` | `string` | `'var(--dct-bg, #fff)'` | `--dct-continuous-handle-stroke` |
-| `legend.continuous.handle.strokeWidth` | `string` | `'1.5px'` | `--dct-continuous-handle-stroke-width` |
-| `legend.continuous.tick.color` | `string` | `'currentColor'` | `--dct-continuous-tick-color` |
-| `legend.continuous.tick.width` | `string` | `'1px'` | `--dct-continuous-tick-width` |
-| `legend.continuous.tick.length` | `string` | `'6px'` | `--dct-continuous-tick-length` |
-| `legend.continuous.label.rotate` | `string` | `'0deg'` | `--dct-continuous-label-rotate` |
-| `legend.continuous.label.size` | `string` | `'0.875rem'` | `--dct-continuous-label-size` |
-| `legend.continuous.label.weight` | `number \| string` | `600` | `--dct-continuous-label-weight` |
-
-`legend.continuous.label.overlap` — interactive mode only: once dragging brings the lo/hi handle labels too close to read side by side, both flip to read top-to-bottom instead of clipping or overlapping:
-
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `legend.continuous.label.overlap.enabled` | `boolean` | `true` | — (`false` always keeps both labels horizontal, however close together) |
-| `legend.continuous.label.overlap.margin` | `number` (px) | `4` | — (horizontal slack the two labels need before they're considered overlapping) |
-| `legend.continuous.label.overlap.rotate` | `string` | `'90deg'` | `--dct-continuous-label-overlap-rotate` (lo rotates by this; hi by its negation, via `calc(... * -1)`, so both still grow inward toward the bar) |
-
-#### Axis
-
-Consumed as plain numeric/boolean props by the underlying svelteplot axes — only `color` is also exposed as a CSS variable (used by non-plot axis-adjacent chrome).
-
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `axis.color` | `string` | `'currentColor'` | `--dct-axis-color` |
-| `axis.fontSize` | `number` | `14` | — |
-| `axis.labelFontSize` | `number` | `14` | — |
-| `axis.titleFontSize` | `number` | `14` | — |
-| `axis.xTickSize` | `number` | `5` | — |
-| `axis.yTickSize` | `number` | `5` | — |
-| `axis.xTickPadding` | `number` | `10` | — |
-| `axis.yTickPadding` | `number` | `10` | — |
-| `axis.grid` | `boolean` | `false` | — |
-| `axis.locale` | `string` | `'es-AR'` | — |
-| `axis.compactDisplay` | `'short' \| 'long'` | `'long'` | — (`'1 mil'` vs `'1 K'`) |
-
-`axis.locale`/`axis.compactDisplay` feed svelteplot's own automatic tick formatter — the one it falls back to on any axis without its own explicit `scales.x`/`scales.y.tickFormat`. Whether a given axis abbreviates at all (vs. spelling every digit out) stays svelteplot's own per-axis call, based on that axis's value range; these two only change the *wording* once it decides to. `axis.locale` updates a chart already on screen; `axis.compactDisplay` is read once when a chart mounts (it goes through svelteplot's own `setPlotDefaults` context hook, not a per-instance prop) and needs a remount to pick up a later change.
-
-#### Tooltip
-
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `tooltip.background` | `string` | `'#111827'` | `--dct-tooltip-bg` |
-| `tooltip.color` | `string` | `'#ffffff'` | `--dct-tooltip-color` |
-| `tooltip.fontSize` | `string` | `'0.8125rem'` | `--dct-tooltip-size` |
-| `tooltip.padding` | `string` | `'0.5rem 0.75rem'` | `--dct-tooltip-pad` |
-| `tooltip.radius` | `string` | `'0.375rem'` | `--dct-tooltip-radius` |
-| `tooltip.border` | `string` | `'none'` | `--dct-tooltip-border` |
-
-#### Plot geometry & colour (all JS-only — no CSS variables)
-
-| Field | Type | Default |
-| ----- | ---- | ------- |
-| `margins.top/right/bottom/left` | `number \| 'auto'` | `'auto'` each — lets svelteplot size that side to fit whatever it actually renders there; a number pins it exactly |
-| `palette` | `string[]` | `['#4f46e5', '#e6580d', '#16a34a', '#dc2626', '#0891b2', '#9333ea', '#ca8a04', '#db2777']` — categorical series colours |
-| `continuous.min` / `continuous.max` | `string` | `'#e0e7ff'` / `'#4f46e5'` — heatmap/choropleth gradient endpoints |
-| `continuous.labelColor` | `string` | `'#111827'` — on-cell label colour |
-| `line.strokeWidth` | `number` | `3` |
-| `line.dotRadius` | `number` | `4` |
-| `line.gap.stroke` / `line.gap.dots` | `StrokeStyle` / `DotStyle` | `{ strokeOpacity: 0.6, strokeDasharray: '4 4' }` / `{}` — fallback for `LinePlot`'s `styles.gaps` |
-| `line.valueLabels.elbowGap` | `number` | `10` — shortest leader-line lane distance before it bends |
-| `line.valueLabels.laneStep` | `number` | `7` — extra distance each subsequent lane sits out |
-| `line.valueLabels.labelGap` | `number` | `6` — clearance between the outermost lane and its label |
-| `line.valueLabels.connectorColor` | `string` | `'#94a3b8'` |
-| `line.valueLabels.connectorWidth` | `number` | `0.5` |
-| `bar.gap` | `AreaStyle` | `{ fillOpacity: 0.5 }` — fallback for `BarPlot`'s `styles.gaps` |
-| `bar.seriesPadding` | `number` (0–1) | `0.2` — fallback `scales.z.seriesPadding` for grouped series |
-| `bar.paddingInner` | `number` (0–1) | `0.15` — gap between category groups |
-| `bar.paddingOuter` | `number` (0–1) | `0.15` — gap before the first / after the last group |
-| `pyramid.gap` | `AreaStyle` | `{ fillOpacity: 0.5 }` — fallback for `PyramidPlot`'s `styles.gaps` |
-| `scatter.dotRadius` | `number` | `5` |
-| `timeline.thickness` | `number` | `60` |
-| `hover.rule` | `StrokeStyle` | `{ stroke: '#e6580d', strokeOpacity: 0.35, strokeWidth: 1.5, strokeDasharray: '4 4' }` — hover crosshair |
-| `hover.dot` | `DotStyle` | `{ dotRadius: 5, dotFill: 'currentColor' }` |
-| `hover.font` | `FontStyle` | `{ fill: 'currentColor', fontSize: 12, dy: -18 }` |
-| `hover.area` | `AreaStyle` | `{ fill: '#94a3b8', fillOpacity: 0.25 }` — band highlight on a band scale |
-
-`timeline.axisColor` / `timeline.activeColor` are the two exceptions in this group — they *do* have CSS variables (see below), since the timeline gutter is HTML chrome, not an SVG plot mark.
-
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `timeline.axisColor` | `string` | `'currentColor'` | `--dct-timeline-axis` |
-| `timeline.activeColor` | `string` | `'#e6580d'` | `--dct-timeline-active` |
-
-#### Facet (small multiples)
-
-| Field | Type | Default | CSS variable |
-| ----- | ---- | ------- | ------------- |
-| `facet.indicator.background` | `string` | `'#111827'` | `--dct-facet-indicator-bg` |
-| `facet.indicator.color` | `string` | `'#ffffff'` | `--dct-facet-indicator-color` |
-| `facet.indicator.fontSize` | `string` | `'0.8125rem'` | `--dct-facet-indicator-size` |
-| `facet.indicator.padding` | `string` | `'0.125rem 0.5rem'` | `--dct-facet-indicator-pad` |
-| `facet.indicator.radius` | `string` | `'999px'` | `--dct-facet-indicator-radius` |
-| `facet.navButton.background` | `string` | `'#111827'` | `--dct-facet-nav-bg` |
-| `facet.navButton.color` | `string` | `'#ffffff'` | `--dct-facet-nav-color` |
-| `facet.navButton.size` | `string` | `'2rem'` | `--dct-facet-nav-btn-size` |
-| `facet.navButton.fontSize` | `string` | `'1.1rem'` | `--dct-facet-nav-font-size` |
-| `facet.navButton.disabledOpacity` | `number` | `0.3` | `--dct-facet-nav-disabled-opacity` |
-
----
-
-## Public API
-
-```ts
-import {
-  ...
-} from '@fundar/data-chart-telling';
-```
+[MIT](LICENSE). Keep the copyright notice and license text in copies of the code.

@@ -1,5 +1,5 @@
 import type { GeoCameraTransition } from '$lib/types/plots/camera';
-import { resolveEasing } from '$lib/utils/interpolate';
+import { Interpolation } from '$lib/utils/Interpolation';
 import type { GeoRotate } from './rotate.svelte';
 import type { GeoZoomTransform } from './zoom.svelte';
 
@@ -20,7 +20,7 @@ function tweenState<T>(args: {
 	equals: (a: T, b: T) => boolean;
 }) {
 	let current = $state<T | undefined>(undefined);
-	// Mirrors `current` without being reactive — read this, not `current`,
+	// Mirrors `current` without being reactive - read this, not `current`,
 	// inside the effect below, or the async `tick()` write to `current` would
 	// re-trigger this very effect (see `rotate.svelte.ts`'s own warning).
 	let lastValue: T | undefined;
@@ -57,14 +57,19 @@ function tweenState<T>(args: {
 
 		if (progress != null) {
 			setCurrent(
-				args.lerp(from!, to!, resolveEasing(transition?.easing)(clamp01(progress)), direction)
+				args.lerp(
+					from!,
+					to!,
+					Interpolation.buildEasing(transition?.easing)(clamp01(progress)),
+					direction
+				)
 			);
 			return;
 		}
 
 		if (!changed) return;
 		const duration = Math.max(0, transition?.duration ?? 750);
-		const easing = resolveEasing(transition?.easing);
+		const easing = Interpolation.buildEasing(transition?.easing);
 		const startFrom = from!;
 		const endTo = to!;
 		const start = performance.now();
@@ -100,7 +105,7 @@ function transformEquals(a: GeoZoomTransform, b: GeoZoomTransform): boolean {
 	return a.x === b.x && a.y === b.y && a.k === b.k;
 }
 
-/** Signed angular delta from `a` to `b` in degrees — the smaller one for `'shortest'`, the way around it for `'longest'`. */
+/** Signed angular delta from `a` to `b` in degrees - the smaller one for `'shortest'`, the way around it for `'longest'`. */
 function angleDelta(a: number, b: number, direction: 'shortest' | 'longest'): number {
 	const shortest = ((((b - a + 180) % 360) + 360) % 360) - 180;
 	if (direction === 'shortest') return shortest;
@@ -124,7 +129,7 @@ function rotateEquals(a: GeoRotate, b: GeoRotate): boolean {
 	return a[0] === b[0] && a[1] === b[1] && a[2] === b[2];
 }
 
-/** Tweens the camera's pixel-space `{x,y,k}` transform toward `target()` — see `tweenState`'s doc comment for the two transition modes. */
+/** Tweens the camera's pixel-space `{x,y,k}` transform toward `target()` - see `tweenState`'s doc comment for the two transition modes. */
 export function createCameraTransformTween(args: {
 	target: () => GeoZoomTransform | undefined;
 	transition: () => GeoCameraTransition | undefined;

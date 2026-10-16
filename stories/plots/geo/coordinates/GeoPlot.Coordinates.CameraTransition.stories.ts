@@ -10,7 +10,7 @@ import { WORLD_COUNTRIES } from '../data';
 // (`ClickToFly`) or scrubbed from a live `progress` value (`ScrollToFly`,
 // `ScrubToFly`). Each demo renders through a wrapper component, so
 // `parameters.docs.source.code` overrides the "show code" panel with the
-// real `<GeoPlot>` call via `renderSource` — see `stories/common/docsSource.ts`.
+// real `<GeoPlot>` call via `renderSource` - see `stories/common/docsSource.ts`.
 
 const meta = {
 	title: 'Plots/GeoPlot/Coordinates/CameraTransition',
@@ -24,7 +24,7 @@ const meta = {
 
 export default meta;
 
-/** Click the button to swap `camera.target` between two feature sets — `GeoPlot` auto-plays the move. */
+/** Click the button to swap `camera.target` between two feature sets - `GeoPlot` auto-plays the move. */
 export const ClickToFly: StoryObj<typeof CameraTransitionDemo> = {
 	render: (args) => ({ Component: CameraTransitionDemo, props: args }),
 	args: { duration: 1000 },
@@ -45,7 +45,7 @@ export const ClickToFly: StoryObj<typeof CameraTransitionDemo> = {
 	}
 };
 
-/** Scroll the panel — `camera.transition.progress` is driven from scroll position, so the move stalls/reverses with it. */
+/** Scroll the panel - `camera.transition.progress` is driven from scroll position, so the move stalls/reverses with it. */
 export const ScrollToFly: StoryObj<typeof CameraScrollDemo> = {
 	render: (args) => ({ Component: CameraScrollDemo, props: args }),
 	parameters: {
@@ -62,7 +62,7 @@ export const ScrollToFly: StoryObj<typeof CameraScrollDemo> = {
 	}
 };
 
-/** Drag the slider — `camera.transition.progress` comes straight from a range input, standing in for whatever real input (scroll, a timeline, ...) a host would wire it to. */
+/** Drag the slider - `camera.transition.progress` comes straight from a range input, standing in for whatever real input (scroll, a timeline, ...) a host would wire it to. */
 export const ScrubToFly: StoryObj<typeof CameraScrubberDemo> = {
 	render: (args) => ({ Component: CameraScrubberDemo, props: args }),
 	parameters: {

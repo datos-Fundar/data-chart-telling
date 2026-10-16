@@ -27,3 +27,7 @@ test-results
 
 *storybook.log
 storybook-static
+
+# Coverage
+coverage
+.vitest-reports

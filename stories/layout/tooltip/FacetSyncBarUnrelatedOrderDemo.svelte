@@ -12,23 +12,24 @@
 </script>
 
 <script lang="ts">
-	import BarChart from '$lib/charts/bar/Chart.svelte';
+	import BarPlot from '$lib/plots/bar/Plot.svelte';
 
-	// Zero-prop marker — keeps Storybook's render typing happy.
+	// Zero-prop marker - keeps Storybook's render typing happy.
 	const props = $props();
+	// svelte-ignore state_referenced_locally
 	void props;
 </script>
 
-<BarChart
+<BarPlot
 	width={680}
 	height={440}
 	title="Value by category, two unrelated groups"
-	subtitle="Strategy: y · Sync: on — each facet sorted by its own value"
+	subtitle="Strategy: y · Sync: on - each facet sorted by its own value"
 	data={UNRELATED_SORT_DATA}
-	x={'category' as keyof GroupValue}
-	y="value"
+	x="value"
+	y={'category' as keyof GroupValue}
 	scales={{
-		y: { type: 'categorical', sort: (a: GroupValue, b: GroupValue) => a.value - b.value }
+		y: { sort: (a: GroupValue, b: GroupValue) => a.value - b.value }
 	}}
 	facet={{ by: 'group' as keyof GroupValue, columns: 2 }}
 	tooltip={{

@@ -32,7 +32,7 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** `coordinates.pan: true` — drag-to-translate only, no scroll-zoom. */
+/** `coordinates.pan: true` - drag-to-translate only, no scroll-zoom. */
 export const PanEnabled: Story = {
 	args: {
 		coordinates: {

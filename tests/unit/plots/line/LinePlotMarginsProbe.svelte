@@ -9,7 +9,7 @@
 	 * Exercises `LinePlot`'s bindable `margins` the way a real consumer would:
 	 * holds it as local `$state`, passes it straight back in via `bind:margins`.
 	 * `data-margins` on the wrapper `<div>` exposes the current value for tests
-	 * to read off the DOM — this component has no other way to surface it,
+	 * to read off the DOM - this component has no other way to surface it,
 	 * since `render()` only gives a test access to the rendered markup.
 	 */
 	let {

@@ -1,12 +1,15 @@
 <script lang="ts">
+	import { getConfiguration } from '$lib/configuration/config.svelte';
+	import { LegendText } from '$lib/layout/legend/LegendText';
 	import DiscreteSymbolIcon from '$lib/layout/legend/DiscreteSymbolIcon.svelte';
 	import type { LegendItem } from '$lib/types/layout/legend';
 
 	let { item, color }: { item: LegendItem; color: string } = $props();
+	const cfg = $derived(getConfiguration());
 </script>
 
 <DiscreteSymbolIcon {item} {color} />
-<span class="dct-discrete__label">{item.label || item.name}</span>
+<span class="dct-discrete__label">{item.label || LegendText.of(item.name, cfg)}</span>
 
 <style>
 	.dct-discrete__label {

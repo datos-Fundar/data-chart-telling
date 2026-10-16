@@ -1,6 +1,6 @@
 {
-  "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": ["stories/**/*.stories.ts", "tests/**/*.test.ts"],
-  "project": ["src/lib/**/*.{ts,svelte}"],
-  "ignore": ["dist/**"]
+	"$schema": "https://unpkg.com/knip@6/schema.json",
+	"entry": ["stories/**/*.stories.ts", "tests/**/*.test.ts"],
+	"project": ["src/lib/**/*.{ts,svelte}"],
+	"ignore": ["dist/**"]
 }

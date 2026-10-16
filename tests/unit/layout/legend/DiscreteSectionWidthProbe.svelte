@@ -5,7 +5,7 @@
 	/**
 	 * Routes through `LegendLayout` (not `DiscreteSection` directly) so tests
 	 * exercise the real `.dct-legend` → `.dct-legend__section` nesting a chart
-	 * actually renders into — `.dct-legend__section` is a shrink-to-fit flex
+	 * actually renders into - `.dct-legend__section` is a shrink-to-fit flex
 	 * item, and that's exactly the ancestor whose width previously collapsed
 	 * once pagination narrowed the visible page (see the long comment on
 	 * DiscreteSection's measurement effect). A bare wrapper `<div>` around

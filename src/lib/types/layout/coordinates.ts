@@ -1,9 +1,10 @@
 import type { GeoProjection } from 'd3-geo';
 import type { GeoCameraConfig } from '$lib/types/plots/camera';
+import type { ChannelScalesConfig, LengthScaleConfig } from '$lib/types/layout/scales';
 
 /**
  * The projection names svelteplot's `<Plot projection>` accepts as a string
- * (svelteplot itself doesn't export this as a type — defined here so authors
+ * (svelteplot itself doesn't export this as a type - defined here so authors
  * get autocomplete/type-checking over the full supported set).
  */
 export type GeoProjectionName =
@@ -26,7 +27,7 @@ export type GeoProjectionName =
 
 /**
  * What a custom projection factory (e.g. `argentinaBicontinental` under
- * `$lib`'s geo projections) must return — just enough of d3's `GeoProjection`
+ * `$lib`'s geo projections) must return - just enough of d3's `GeoProjection`
  * for svelteplot to stream marks through it and invert pointer coordinates
  * back to lon/lat. Deliberately narrower than importing `GeoProjection`
  * itself, since a hand-tuned custom projection may not implement its full
@@ -60,7 +61,7 @@ export type GeoProjectionConfig =
 			 * instead of the projection's own default (whole-world-sized) framing,
 			 * regardless of which named projection is active. Also what makes
 			 * `'identity'`/`'reflect-y'` (which otherwise have no scale/translate of
-			 * their own — they pass lon/lat through as-is) size themselves to fill
+			 * their own - they pass lon/lat through as-is) size themselves to fill
 			 * the plot. Pass `'data'` to fit to whatever was already given to the
 			 * plot's own `data` prop, instead of repeating it here.
 			 */
@@ -68,16 +69,17 @@ export type GeoProjectionConfig =
 	  };
 
 /**
- * `scales` prop for GeoPlot — the geo analog of `AxisBasedScalesConfig`.
- * A map has no x/y/z axis pair, so this only configures the choropleth
- * colour domain (the coordinate system itself is `coordinates.projection`).
+ * `scales` prop for GeoPlot - the geo analog of `AxisBasedScalesConfig`. A
+ * map has no x/y axis pair (the coordinate system is `coordinates.projection`),
+ * so this carries the channels in {@link ChannelScalesConfig} plus `length` -
+ * GeoPlot's own plot-wide-only channel (a `vector` marker's magnitude),
+ * the geo analog of `AxisBasedScalesConfig.r`.
  */
-export type GeoScalesConfig = {
-	/** Continuous choropleth value domain — mirrors heatmap's `scales.z.domain`. */
-	color?: { domain?: [number, number] };
+export type GeoScalesConfig = ChannelScalesConfig & {
+	length?: LengthScaleConfig;
 };
 
-/** Wheel/pinch scale gesture only — see `CoordinatesConfig.pan` for drag-to-translate, and `.rotate` for drag-to-spin-the-globe. */
+/** Wheel/pinch scale gesture only - see `CoordinatesConfig.pan` for drag-to-translate, and `.rotate` for drag-to-spin-the-globe. */
 export type GeoZoomConfig = {
 	min?: number;
 	max?: number;
@@ -85,7 +87,7 @@ export type GeoZoomConfig = {
 };
 
 /**
- * `coordinates` prop for GeoPlot — bundles the projection, interactive
+ * `coordinates` prop for GeoPlot - bundles the projection, interactive
  * gestures, and the declarative `camera`, resolved by `CoordinatesLayout`.
  */
 export type CoordinatesConfig = {
@@ -97,6 +99,6 @@ export type CoordinatesConfig = {
 	pan?: boolean;
 	/** `true` enables drag-to-rotate on `orthographic` (claims the drag gesture from `pan`). */
 	rotate?: boolean;
-	/** `GeoPlot`'s own declarative "current viewpoint" — frame/zoom/anchor on a target, animated on change. See `GeoCameraConfig`. */
+	/** `GeoPlot`'s own declarative "current viewpoint" - frame/zoom/anchor on a target, animated on change. See `GeoCameraConfig`. */
 	camera?: GeoCameraConfig;
 };

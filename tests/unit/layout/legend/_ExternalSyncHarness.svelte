@@ -1,16 +1,15 @@
 <script lang="ts">
 	import ContinuousSection from '$lib/layout/legend/ContinuousSection.svelte';
-	import { provideLegendInteraction } from '$lib/layout/legend/interaction.svelte';
+	import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 	import type { ContinuousLegendSection } from '$lib/types/layout/legend';
-	import type { LegendInteractionStore } from '$lib/types/layout/legend';
 
 	let {
 		section,
 		onReady
-	}: { section: ContinuousLegendSection; onReady: (store: LegendInteractionStore) => void } =
-		$props();
+	}: { section: ContinuousLegendSection; onReady: (store: LegendState) => void } = $props();
 
-	onReady(provideLegendInteraction());
+	// svelte-ignore state_referenced_locally
+	onReady(LegendState.provide());
 </script>
 
 <ContinuousSection {section} />

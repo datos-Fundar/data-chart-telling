@@ -1,27 +1,18 @@
-import type { ChartConfig, ChartConfigInput, TextStyle } from '$lib/types/configuration/styling';
+import { merge } from '$lib/utils/merge';
+import type {
+	PlotStylesConfig,
+	PlotStylesConfigInput,
+	TextStyle
+} from '$lib/types/configuration/styling';
 
 /**
- * Global, reactive styling configuration for the whole package.
- *
- * One source of truth feeds two consumers:
- *   1. HTML chrome (container, legend, caption, tooltip) reads it as **CSS
- *      custom properties** — {@link configToCssVars} flattens the config and
- *      {@link ChartContainer} stamps the variables on its root so the scoped
- *      `<style>` blocks resolve them.
- *   2. Plots read it as **plain JS values** for the props svelteplot needs as
- *      numbers/strings (margins, tick font sizes, palette, gradient endpoints).
- *
- * Because the store is a module-level Svelte `$state`, calling
- * {@link setConfiguration} re-renders every chart on screen.
+ * Global, reactive styling configuration. Chrome reads it as CSS custom
+ * properties ({@link configToCssVars}); plots read it as plain values.
+ * {@link setConfiguration} re-renders every plot.
  */
 
 // ── Defaults ────────────────────────────────────────────────────────────────
-// Mirror the values the components shipped with, so adopting the config system
-// is visually a no-op until something is overridden — except `axis.locale`,
-// which defaults to `es-AR` instead of svelteplot's own `en-US`, and
-// `axis.compactDisplay`, which defaults to `long` instead of svelteplot's
-// own `short` (Spanish's short form is inconsistent about letter case —
-// `'1 K'` vs `'10 k'` for the same unit — while its long form isn't).
+// `axis.locale` defaults to `es-AR` and `axis.compactDisplay` to `short`.
 
 const text = (over: Partial<TextStyle>): TextStyle => ({
 	font: 'inherit',
@@ -33,17 +24,41 @@ const text = (over: Partial<TextStyle>): TextStyle => ({
 	...over
 });
 
-export const DEFAULT_CONFIG: ChartConfig = {
+export const DEFAULT_CONFIG: PlotStylesConfig = {
 	font: 'inherit',
 	color: 'currentColor',
 	background: 'transparent',
-	border: 'color-mix(in srgb, currentColor 15%, transparent)',
 
 	spacing: {
-		headerPadding: '0.75rem 0 1rem',
-		legendPadding: '0.75rem 0',
+		headerPadding: '0.5rem 0',
+		legendPadding: '0.5rem 0',
 		captionPadding: '0.5rem 0',
 		bleed: '12px'
+	},
+
+	divider: {
+		color: 'color-mix(in srgb, currentColor 15%, transparent)',
+		width: '1px',
+		style: 'solid',
+		margin: '0.5rem 0px'
+	},
+
+	// Title and subtitle (or header), a divider, legend, plot, a player timeline,
+	// then caption (or footer). With no title, subtitle or header, the divider has nothing above
+	// it, so it isn't drawn.
+	chrome: {
+		order: [
+			'header',
+			'title',
+			'subtitle',
+			'divider',
+			'legend',
+			'plot',
+			'timeline',
+			'footer',
+			'caption'
+		],
+		rowGap: '1rem'
 	},
 
 	title: text({ size: '1.5rem', weight: 500, leading: '1.2' }),
@@ -62,8 +77,11 @@ export const DEFAULT_CONFIG: ChartConfig = {
 		titleSize: '0.875rem',
 		titleWeight: 500,
 		gap: '0.5rem 2rem',
-		swatchSize: '1.25rem',
+		swatchSize: '0.9rem',
 		disabledOpacity: 0.12,
+		pretty: true,
+		seriesTitle: { enabled: true, text: 'Series' },
+		sizeScale: { gap: '12px' },
 		navButton: {
 			background: 'transparent',
 			color: 'currentColor',
@@ -113,7 +131,7 @@ export const DEFAULT_CONFIG: ChartConfig = {
 		yTickPadding: 10,
 		grid: false,
 		locale: 'es-AR',
-		compactDisplay: 'long'
+		compactDisplay: 'short'
 	},
 
 	tooltip: {
@@ -126,21 +144,25 @@ export const DEFAULT_CONFIG: ChartConfig = {
 	},
 
 	margins: { top: 'auto', right: 'auto', bottom: 'auto', left: 'auto' },
-	palette: ['#4f46e5', '#e6580d', '#16a34a', '#dc2626', '#0891b2', '#9333ea', '#ca8a04', '#db2777'],
-	continuous: { min: '#e0e7ff', max: '#4f46e5', labelColor: '#111827' },
+	frameClip: { tolerance: 5 },
+	// ColorBrewer Dark2 - qualitative, harmonious, and dark enough to read on white.
+	palette: ['#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02', '#a6761d', '#666666'],
+	symbols: ['circle', 'square', 'triangle', 'diamond', 'star', 'cross'],
+	continuous: { min: '#f7fcfd', max: '#1b9e77', labelColor: '#111827', opacityRange: [0.2, 1] },
 	line: {
 		strokeWidth: 3,
 		dotRadius: 4,
 		gap: {
 			stroke: { strokeOpacity: 0.6, strokeDasharray: '4 4' },
 			dots: {}
-		},
-		valueLabels: {
+		}
+	},
+	text: {
+		declutter: {
 			elbowGap: 10,
 			laneStep: 7,
 			labelGap: 6,
-			connectorColor: '#94a3b8',
-			connectorWidth: 0.5
+			connector: { stroke: '#94a3b8', strokeWidth: 0.5 }
 		}
 	},
 	bar: {
@@ -150,8 +172,59 @@ export const DEFAULT_CONFIG: ChartConfig = {
 		paddingOuter: 0.15
 	},
 	pyramid: { gap: { fillOpacity: 0.5 } },
+	area: { fillOpacity: 0.6 },
+	histogram: { inset: 1, fillOpacity: 1 },
 	scatter: { dotRadius: 5 },
-	timeline: { axisColor: 'currentColor', activeColor: '#e6580d', thickness: 60 },
+	timeline: {
+		axisColor: 'currentColor',
+		activeColor: '#1b9e77',
+		thickness: 60,
+		gap: '12px',
+		rule: {
+			fontSize: 12,
+			activeFontSize: 20,
+			activeFontWeight: 'bold',
+			labelOpacity: 0.55,
+			axisWidth: 1.5,
+			axisOpacity: 0.7
+		},
+		player: {
+			controls: ['play', 'value', 'slider'],
+			speeds: [0.5, 1, 2],
+			stepDuration: 800,
+			background: 'color-mix(in srgb, currentColor 6%, transparent)',
+			color: 'currentColor',
+			radius: '0.5rem',
+			padding: '0.5rem 1rem',
+			gap: '1rem',
+			fontSize: '0.875rem',
+			fontWeight: 500,
+			valueWidth: '3rem',
+			button: {
+				size: '2rem',
+				background: '#1b9e77',
+				color: '#ffffff',
+				hoverBackground: '#0c4937',
+				radius: '999px'
+			},
+			track: {
+				height: '3px',
+				color: 'color-mix(in srgb, currentColor 25%, transparent)',
+				fillColor: '#1b9e77',
+				radius: '999px'
+			},
+			thumb: { size: '14px', color: '#1b9e77' },
+			toggle: {
+				background: 'transparent',
+				color: 'currentColor',
+				activeBackground: '#1b9e77',
+				activeColor: '#ffffff',
+				radius: '0.375rem',
+				fontSize: '0.75rem',
+				padding: '0.125rem 0.5rem'
+			}
+		}
+	},
 	hover: {
 		rule: { stroke: '#e6580d', strokeOpacity: 0.35, strokeWidth: 1.5, strokeDasharray: '4 4' },
 		dot: { dotRadius: 5, dotFill: 'currentColor' },
@@ -176,34 +249,17 @@ export const DEFAULT_CONFIG: ChartConfig = {
 	}
 };
 
-// ── Merge ─────────────────────────────────────────────────────────────────────
-
-function isPlainObject(v: unknown): v is Record<string, unknown> {
-	return typeof v === 'object' && v !== null && !Array.isArray(v);
-}
-
-function merge<T>(base: T, patch: Record<string, unknown>): T {
-	const out = { ...(base as Record<string, unknown>) };
-	for (const key in patch) {
-		const pv = patch[key];
-		if (pv === undefined) continue;
-		const bv = out[key];
-		out[key] = isPlainObject(bv) && isPlainObject(pv) ? merge(bv, pv) : pv;
-	}
-	return out as T;
-}
-
 // ── Reactive store ──────────────────────────────────────────────────────────
 
-let current = $state<ChartConfig>(structuredClone(DEFAULT_CONFIG));
+let current = $state<PlotStylesConfig>(structuredClone(DEFAULT_CONFIG));
 
 /** Read the live, reactive configuration. */
-export function getConfiguration(): ChartConfig {
+export function getConfiguration(): PlotStylesConfig {
 	return current;
 }
 
 /** Deep-merge a partial override into the global configuration. Reactive. */
-export function setConfiguration(patch: ChartConfigInput): ChartConfig {
+export function setConfiguration(patch: PlotStylesConfigInput): PlotStylesConfig {
 	current = merge(current, patch);
 	return current;
 }
@@ -216,7 +272,7 @@ export function resetConfiguration(): void {
 // ── CSS variable bridge ───────────────────────────────────────────────────────
 
 /** Flatten a config into the `--dct-*` custom properties used by the styles. */
-export function configToCssVars(c: ChartConfig): Record<string, string> {
+export function configToCssVars(c: PlotStylesConfig): Record<string, string> {
 	const t = (prefix: string, s: TextStyle): Record<string, string> => ({
 		[`--dct-${prefix}-font`]: s.font,
 		[`--dct-${prefix}-size`]: s.size,
@@ -230,12 +286,17 @@ export function configToCssVars(c: ChartConfig): Record<string, string> {
 		'--dct-font': c.font,
 		'--dct-fg': c.color,
 		'--dct-bg': c.background,
-		'--dct-border': c.border,
 
 		'--dct-header-pad': c.spacing.headerPadding,
 		'--dct-legend-pad': c.spacing.legendPadding,
 		'--dct-caption-pad': c.spacing.captionPadding,
 		'--dct-bleed': c.spacing.bleed,
+
+		'--dct-divider-color': c.divider.color,
+		'--dct-divider-width': c.divider.width,
+		'--dct-divider-style': c.divider.style,
+		'--dct-divider-margin': c.divider.margin,
+		'--dct-row-gap': c.chrome.rowGap,
 
 		...t('title', c.title),
 		...t('subtitle', c.subtitle),
@@ -249,6 +310,7 @@ export function configToCssVars(c: ChartConfig): Record<string, string> {
 		'--dct-legend-title-weight': String(c.legend.titleWeight),
 		'--dct-legend-gap': c.legend.gap,
 		'--dct-legend-swatch': c.legend.swatchSize,
+		'--dct-legend-size-gap': c.legend.sizeScale.gap,
 
 		'--dct-legend-nav-bg': c.legend.navButton.background,
 		'--dct-legend-nav-color': c.legend.navButton.color,
@@ -281,6 +343,34 @@ export function configToCssVars(c: ChartConfig): Record<string, string> {
 
 		'--dct-timeline-axis': c.timeline.axisColor,
 		'--dct-timeline-active': c.timeline.activeColor,
+		'--dct-timeline-gap': c.timeline.gap,
+
+		'--dct-player-bg': c.timeline.player.background,
+		'--dct-player-color': c.timeline.player.color,
+		'--dct-player-radius': c.timeline.player.radius,
+		'--dct-player-pad': c.timeline.player.padding,
+		'--dct-player-gap': c.timeline.player.gap,
+		'--dct-player-size': c.timeline.player.fontSize,
+		'--dct-player-weight': String(c.timeline.player.fontWeight),
+		'--dct-player-value-width': c.timeline.player.valueWidth,
+		'--dct-player-button-size': c.timeline.player.button.size,
+		'--dct-player-button-bg': c.timeline.player.button.background,
+		'--dct-player-button-color': c.timeline.player.button.color,
+		'--dct-player-button-hover-bg': c.timeline.player.button.hoverBackground,
+		'--dct-player-button-radius': c.timeline.player.button.radius,
+		'--dct-player-track-height': c.timeline.player.track.height,
+		'--dct-player-track-color': c.timeline.player.track.color,
+		'--dct-player-track-fill': c.timeline.player.track.fillColor,
+		'--dct-player-track-radius': c.timeline.player.track.radius,
+		'--dct-player-thumb-size': c.timeline.player.thumb.size,
+		'--dct-player-thumb-color': c.timeline.player.thumb.color,
+		'--dct-player-toggle-bg': c.timeline.player.toggle.background,
+		'--dct-player-toggle-color': c.timeline.player.toggle.color,
+		'--dct-player-toggle-active-bg': c.timeline.player.toggle.activeBackground,
+		'--dct-player-toggle-active-color': c.timeline.player.toggle.activeColor,
+		'--dct-player-toggle-radius': c.timeline.player.toggle.radius,
+		'--dct-player-toggle-size': c.timeline.player.toggle.fontSize,
+		'--dct-player-toggle-pad': c.timeline.player.toggle.padding,
 
 		'--dct-heat-min': c.continuous.min,
 		'--dct-heat-max': c.continuous.max,

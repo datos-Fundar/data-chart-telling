@@ -1,6 +1,24 @@
 {
 	"name": "@fundar/data-chart-telling",
 	"version": "0.0.64",
+	"description": "Declarative charts, maps and small multiples for Svelte, built on svelteplot.",
+	"license": "MIT",
+	"author": "Ezequiel Puerta",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/datos-Fundar/data-chart-telling.git"
+	},
+	"homepage": "https://github.com/datos-Fundar/data-chart-telling#readme",
+	"bugs": {
+		"url": "https://github.com/datos-Fundar/data-chart-telling/issues"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"engines": {
+		"node": ">=20.19"
+	},
+	"packageManager": "pnpm@11.25.0",
 	"type": "module",
 	"scripts": {
 		"build": "svelte-package",
@@ -11,12 +29,22 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"test": "vitest run --project=unit --project=browser",
+		"test:coverage": "node scripts/coverage.mjs",
 		"test:stories": "vitest run --project=storybook",
 		"storybook": "storybook dev -p 6006",
-		"build-storybook": "storybook build"
+		"build-storybook": "storybook build",
+		"docs:images": "node scripts/docs-images.mjs",
+		"prepare": "husky"
 	},
 	"files": [
-		"dist"
+		"LICENSE",
+		"CHANGELOG.md",
+		"dist",
+		"docs",
+		"!docs/images",
+		"examples",
+		"llms.txt",
+		"llms-full.txt"
 	],
 	"sideEffects": [
 		"**/*.css"
@@ -32,8 +60,10 @@
 	},
 	"dependencies": {
 		"@types/geojson": "^7946.0.16",
+		"d3-array": "^3.2.4",
 		"d3-geo": "^3.1.1",
 		"d3-interpolate": "^3.0.1",
+		"d3-scale-chromatic": "^3.1.0",
 		"d3-selection": "^3.0.0",
 		"d3-zoom": "^3.0.0"
 	},
@@ -58,8 +88,10 @@
 		"@storybook/svelte-vite": "^10.4.1",
 		"@sveltejs/package": "^2.5.7",
 		"@sveltejs/vite-plugin-svelte": "^7.0.0",
+		"@types/d3-array": "^3.2.2",
 		"@types/d3-geo": "^3.1.0",
 		"@types/d3-interpolate": "^3.0.4",
+		"@types/d3-scale-chromatic": "^3.1.0",
 		"@types/d3-selection": "^3.0.11",
 		"@types/d3-zoom": "^3.0.8",
 		"@types/node": "^22",
@@ -71,8 +103,9 @@
 		"eslint-plugin-storybook": "^10.4.1",
 		"eslint-plugin-svelte": "^3.17.0",
 		"globals": "^17.4.0",
+		"husky": "^9.1.7",
 		"knip": "^6.32.1",
-		"playwright": "^1.60.0",
+		"playwright": "^1.64.0",
 		"prettier": "^3.8.1",
 		"prettier-plugin-svelte": "^3.5.1",
 		"publint": "^0.3.18",
@@ -88,6 +121,11 @@
 		"vitest-browser-svelte": "^2.1.1"
 	},
 	"keywords": [
-		"svelte"
+		"svelte",
+		"svelteplot",
+		"charts",
+		"data-visualization",
+		"maps",
+		"small-multiples"
 	]
 }

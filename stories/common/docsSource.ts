@@ -58,10 +58,21 @@ function serialize(v: unknown, depth = 0): string {
  * global `docs.source.transform` derives automatically from a story's
  * `component`/`args`. A story that instead renders through a wrapper
  * component can call this directly to override `parameters.docs.source.code`
- * with the real underlying invocation — see `CameraTransitionDemo`'s
+ * with the real underlying invocation - see `CameraTransitionDemo`'s
  * `<script module>` export for the pattern.
  */
 export function renderSource(name: string, props: Record<string, unknown>): string {
 	const lines = Object.entries(props).map(([k, v]) => `  ${k}={${serialize(v, 1)}}`);
 	return lines.length ? `<${name}\n${lines.join('\n')}\n/>` : `<${name} />`;
+}
+
+/**
+ * `parameters` that show a demo component's own source (imported with
+ * `?raw`) in its Docs panel - for a story rendered through a demo whose markup
+ * `renderSource` can't rebuild from args (snippets, several plots, state).
+ * Set it on each story's `parameters`: on the meta it's lost, since Storybook
+ * gives every story a `docs.source` of its own.
+ */
+export function demoSource(raw: string) {
+	return { docs: { source: { code: raw.trim().replace(/\t/g, '  '), language: 'html' } } };
 }

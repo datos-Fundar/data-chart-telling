@@ -33,7 +33,7 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** Frame + fit a set of features by id — same id space as `segments`/`featureId`. */
+/** Frame + fit a set of features by id - same id space as `segments`/`featureId`. */
 export const FitToFeatures: Story = {
 	args: {
 		coordinates: {
@@ -71,7 +71,7 @@ export const AnchorBottomRight: Story = {
 	}
 };
 
-/** An explicit `center` point instead of `features`/`bounds` — no extent to fit, so `zoom` is used directly as the pixel scale. */
+/** An explicit `center` point instead of `features`/`bounds` - no extent to fit, so `zoom` is used directly as the pixel scale. */
 export const ExplicitCenter: Story = {
 	args: {
 		coordinates: {
@@ -83,7 +83,7 @@ export const ExplicitCenter: Story = {
 	}
 };
 
-/** The same `features` target on an `orthographic` globe — centering rotates the sphere instead of panning pixels. */
+/** The same `features` target on an `orthographic` globe - centering rotates the sphere instead of panning pixels. */
 export const OrthographicFit: Story = {
 	args: {
 		coordinates: {

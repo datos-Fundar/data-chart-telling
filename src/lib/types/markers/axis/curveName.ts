@@ -1,0 +1,22 @@
+/** Curve interpolation for an area, difference or trail marker - svelteplot's own `CurveName`. */
+export type MarkerCurveName =
+	| 'basis'
+	| 'basis-closed'
+	| 'basis-open'
+	| 'bundle'
+	| 'bump-x'
+	| 'bump-y'
+	| 'cardinal'
+	| 'cardinal-closed'
+	| 'cardinal-open'
+	| 'catmull-rom'
+	| 'catmull-rom-closed'
+	| 'catmull-rom-open'
+	| 'linear'
+	| 'linear-closed'
+	| 'monotone-x'
+	| 'monotone-y'
+	| 'natural'
+	| 'step'
+	| 'step-after'
+	| 'step-before';

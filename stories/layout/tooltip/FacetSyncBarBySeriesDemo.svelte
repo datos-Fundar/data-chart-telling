@@ -1,19 +1,20 @@
 <script lang="ts">
-	import BarChart from '$lib/charts/bar/Chart.svelte';
+	import BarPlot from '$lib/plots/bar/Plot.svelte';
 	import { REGION_SECTOR_BARS, type RegionSector } from '../../data/region-bars';
-	import type { BarSeriesLayout } from '$lib/plots/bar/layout.svelte';
 
 	type Orientation = 'vertical' | 'horizontal';
 
-	// Zero-prop marker — keeps Storybook's render typing happy.
+	// Zero-prop marker - keeps Storybook's render typing happy.
 	const props = $props();
+	// svelte-ignore state_referenced_locally
 	void props;
 
-	let layout = $state<BarSeriesLayout>('stacked');
+	let layout = $state<'stacked' | 'grouped'>('stacked');
 	let orientation = $state<Orientation>('vertical');
 
-	const LAYOUTS: BarSeriesLayout[] = ['stacked', 'grouped'];
+	const LAYOUTS: ('stacked' | 'grouped')[] = ['stacked', 'grouped'];
 	const ORIENTATIONS: Orientation[] = ['vertical', 'horizontal'];
+	const horizontal = $derived(orientation === 'horizontal');
 </script>
 
 <div class="demo">
@@ -27,22 +28,19 @@
 		{#each ORIENTATIONS as o (o)}
 			<button class:active={orientation === o} onclick={() => (orientation = o)}>{o}</button>
 		{/each}
-		<span class="demo__hint">hover a segment — the same sector highlights in every region</span>
+		<span class="demo__hint">hover a segment - the same sector highlights in every region</span>
 	</div>
 
-	<BarChart
+	<BarPlot
 		width={760}
 		height={420}
 		title="Value by sector, faceted by region"
 		subtitle="Layout: {layout} · Orientation: {orientation} · Strategy: series · Sync: on"
 		data={REGION_SECTOR_BARS}
-		x={'region' as keyof RegionSector}
-		y="value"
-		z={'sector' as keyof RegionSector}
-		scales={{
-			y: orientation === 'horizontal' ? { type: 'categorical' } : undefined,
-			z: { seriesLayout: layout }
-		}}
+		x={horizontal ? 'value' : ('region' as keyof RegionSector)}
+		y={horizontal ? ('region' as keyof RegionSector) : 'value'}
+		color={'sector' as keyof RegionSector}
+		transforms={layout === 'stacked' ? [{ type: horizontal ? 'stackX' : 'stackY' }] : []}
 		facet={{ by: 'region' as keyof RegionSector, columns: 2 }}
 		tooltip={{
 			strategy: 'series',

@@ -6,22 +6,22 @@ import type { DiscreteLegendSection, LegendItem } from '$lib/types/layout/legend
 
 // Labels are deliberately much wider than any of the test container widths
 // below (combined with `flex-shrink: 0` on `.dct-discrete__item`), so exactly
-// one item lands per row regardless of font metrics — making the row count
+// one item lands per row regardless of font metrics - making the row count
 // (and therefore the page chunking) deterministic across environments.
 function longItems(count: number): LegendItem[] {
 	return Array.from({ length: count }, (_, i) => ({
 		name: `series-${i}`,
-		label: `Jurisdicción de prueba número ${i}`
+		label: `Test jurisdiction number ${i}`
 	}));
 }
 
-// Short, roughly equal-width labels — the opposite of `longItems` above.
+// Short, roughly equal-width labels - the opposite of `longItems` above.
 // Deliberately much narrower than the container widths this is used with, so
-// a single visible item is nowhere near what the container has available —
+// a single visible item is nowhere near what the container has available -
 // exactly the gap needed to catch the container silently shrinking down to
 // hug whatever page happens to be showing.
 function shortItems(count: number): LegendItem[] {
-	return Array.from({ length: count }, (_, i) => ({ name: `s${i}`, label: `Ítem ${i}` }));
+	return Array.from({ length: count }, (_, i) => ({ name: `s${i}`, label: `Item ${i}` }));
 }
 
 function visibleContainer(container: Element): Element {
@@ -44,7 +44,7 @@ async function waitForRows(container: Element): Promise<void> {
 	});
 }
 
-describe('DiscreteSection – layout: { type: "vertical" } (explicit)', () => {
+describe('DiscreteSection - layout: { type: "vertical" } (explicit)', () => {
 	test('an explicit vertical layout keeps the grid, with no pagination chrome at all', async () => {
 		const section: DiscreteLegendSection = {
 			type: 'discrete',
@@ -59,7 +59,7 @@ describe('DiscreteSection – layout: { type: "vertical" } (explicit)', () => {
 	});
 });
 
-describe('DiscreteSection – layout: { type: "flex" }', () => {
+describe('DiscreteSection - layout: { type: "flex" }', () => {
 	test('wraps every item across rows, with no pagination chrome', async () => {
 		const section: DiscreteLegendSection = {
 			type: 'discrete',
@@ -74,7 +74,7 @@ describe('DiscreteSection – layout: { type: "flex" }', () => {
 	});
 });
 
-describe('DiscreteSection – a lone section defaults to horizontal layout', () => {
+describe('DiscreteSection - a lone section defaults to horizontal layout', () => {
 	test('omitting layout renders horizontally when the legend has only this one section', async () => {
 		const section: DiscreteLegendSection = { type: 'discrete', items: longItems(3) };
 		const { container } = await render(DiscreteSectionWidthProbe, { section, width: 2000 });
@@ -96,7 +96,7 @@ describe('DiscreteSection – a lone section defaults to horizontal layout', () 
 	});
 });
 
-describe('DiscreteSection – layout: { type: "horizontal" } without overflow', () => {
+describe('DiscreteSection - layout: { type: "horizontal" } without overflow', () => {
 	test('a single row of items renders no nav arrows', async () => {
 		const section: DiscreteLegendSection = {
 			type: 'discrete',
@@ -111,7 +111,7 @@ describe('DiscreteSection – layout: { type: "horizontal" } without overflow', 
 	});
 });
 
-describe('DiscreteSection – layout: { type: "horizontal", maxRows: 1 } (default maxRows)', () => {
+describe('DiscreteSection - layout: { type: "horizontal", maxRows: 1 } (default maxRows)', () => {
 	test('paginates one item (one row) per page, in order, with no item lost or duplicated', async () => {
 		const items = longItems(4);
 		const section: DiscreteLegendSection = {
@@ -125,15 +125,15 @@ describe('DiscreteSection – layout: { type: "horizontal", maxRows: 1 } (defaul
 		expect(visibleLabels(container)).toEqual([items[0].label]);
 
 		const nextBtn = container.querySelector(
-			'button[aria-label="Página siguiente de referencias"]'
+			'button[aria-label="Next legend page"]'
 		) as HTMLButtonElement;
 		const prevBtn = container.querySelector(
-			'button[aria-label="Página anterior de referencias"]'
+			'button[aria-label="Previous legend page"]'
 		) as HTMLButtonElement;
 		expect(nextBtn).toBeTruthy();
 		expect(prevBtn.disabled).toBe(true);
 
-		// No page indicator ("1 / 4") — only the prev button, the rows, and
+		// No page indicator ("1 / 4") - only the prev button, the rows, and
 		// the next button, flanking the rows rather than sitting below them.
 		const paginated = container.querySelector('.dct-discrete-paginated') as HTMLElement;
 		expect(paginated.children.length).toBe(3);
@@ -163,8 +163,8 @@ describe('DiscreteSection – layout: { type: "horizontal", maxRows: 1 } (defaul
 	});
 });
 
-describe('DiscreteSection – layout: { type: "horizontal", maxRows: 2 }', () => {
-	test('5 single-item rows chunk into pages of 2, 2, then 1 — the exact scenario reported', async () => {
+describe('DiscreteSection - layout: { type: "horizontal", maxRows: 2 }', () => {
+	test('5 single-item rows chunk into pages of 2, 2, then 1 - the exact scenario reported', async () => {
 		const items = longItems(5);
 		const section: DiscreteLegendSection = {
 			type: 'discrete',
@@ -177,7 +177,7 @@ describe('DiscreteSection – layout: { type: "horizontal", maxRows: 2 }', () =>
 		expect(visibleLabels(container)).toEqual([items[0].label, items[1].label]);
 
 		const nextBtn = container.querySelector(
-			'button[aria-label="Página siguiente de referencias"]'
+			'button[aria-label="Next legend page"]'
 		) as HTMLButtonElement;
 
 		nextBtn.click();
@@ -191,12 +191,12 @@ describe('DiscreteSection – layout: { type: "horizontal", maxRows: 2 }', () =>
 	});
 });
 
-describe('DiscreteSection – regression: the paginated container must not shrink across pages', () => {
+describe('DiscreteSection - regression: the paginated container must not shrink across pages', () => {
 	test('container width stays constant, and every item appears exactly once, across every page', async () => {
 		// Short items on purpose: a single visible item is nowhere near the
 		// 300px available, so if the container quietly shrinks down to fit
 		// whatever's currently showing (rather than staying pinned at the full
-		// available width), it's obvious here — with `longItems` a lone item
+		// available width), it's obvious here - with `longItems` a lone item
 		// is already close to the container width, masking exactly this bug.
 		const items = shortItems(24);
 		const section: DiscreteLegendSection = {
@@ -214,7 +214,7 @@ describe('DiscreteSection – regression: the paginated container must not shrin
 		expect(widthAtPage1).toBeGreaterThan(200);
 
 		const nextBtn = container.querySelector(
-			'button[aria-label="Página siguiente de referencias"]'
+			'button[aria-label="Next legend page"]'
 		) as HTMLButtonElement;
 
 		const seen: string[] = [...visibleLabels(container)];
@@ -237,7 +237,7 @@ describe('DiscreteSection – regression: the paginated container must not shrin
 	});
 });
 
-describe('DiscreteSection – custom navButton snippet', () => {
+describe('DiscreteSection - custom navButton snippet', () => {
 	test('falls back to the default arrow button when none is supplied', async () => {
 		const section: DiscreteLegendSection = {
 			type: 'discrete',
@@ -247,8 +247,33 @@ describe('DiscreteSection – custom navButton snippet', () => {
 		const { container } = await render(DiscreteSectionWidthProbe, { section, width: 150 });
 
 		await waitForRows(container);
-		const nextBtn = container.querySelector('button[aria-label="Página siguiente de referencias"]');
+		const nextBtn = container.querySelector('button[aria-label="Next legend page"]');
 		expect(nextBtn).toBeTruthy();
 		expect(nextBtn?.textContent?.trim()).toBe('›');
+	});
+});
+
+describe('DiscreteSection - columns next to other sections', () => {
+	const columnsOf = async (count: number, own?: Partial<DiscreteLegendSection>) => {
+		const { container } = await render(LegendLayout, {
+			sections: [
+				{ type: 'discrete', items: shortItems(count), ...own },
+				{ type: 'continuous', min: 0, max: 1 }
+			]
+		});
+		const grid = container.querySelector('.dct-discrete') as HTMLElement;
+		return grid.style.gridTemplateColumns;
+	};
+
+	test('favor rows: two items side by side, then half as many columns as items, at most four', async () => {
+		expect(await columnsOf(2)).toBe('repeat(2, max-content)');
+		expect(await columnsOf(4)).toBe('repeat(2, max-content)');
+		expect(await columnsOf(5)).toBe('repeat(3, max-content)');
+		expect(await columnsOf(12)).toBe('repeat(4, max-content)');
+	});
+
+	test('a section with its own columns or layout keeps them', async () => {
+		expect(await columnsOf(4, { columns: 1 })).toBe('repeat(1, max-content)');
+		expect(await columnsOf(4, { layout: { type: 'vertical' } })).toBe('repeat(1, max-content)');
 	});
 });

@@ -1,0 +1,49 @@
+# @fundar/data-chart-telling
+
+> Svelte 5 plot components (line, area, bar, histogram, heatmap, pyramid, scatter, geo) built on svelteplot, with titles, legends, tooltips, facets, timelines and value labels built in. Plots take pixel `width`/`height`; hover and tooltips are switched on with `tooltip` and a `hover` marker.
+
+Start with the full guide: it lists the mental model, the props every plot shares, the switches and the rules that matter. Runnable examples are type-checked, so copy them as a starting point.
+
+## Guide
+
+- [Full guide](./llms-full.txt): API overview, switches, rules, state hooks (`useFigure`, `usePlot`), markers, theming
+
+## Docs
+
+- [Getting started](./docs/getting-started.md): install, first plot, sizing, data
+- [Concepts](./docs/concepts.md): plots, figures, rows and series, channels, shared props
+- [Plots](./docs/plots.md): the eight plot kinds
+- [Scales](./docs/scales.md): axes and channel scales
+- [Styles and segments](./docs/styles-and-segments.md): value labels, frame, gaps, ranges of data
+- [Markers](./docs/markers.md): annotations, regions, hover highlight, custom components
+- [Transforms and statistics](./docs/transforms-and-statistics.md): stacking, binning, smoothing, regression
+- [Tooltip and hover](./docs/tooltip-and-hover.md): tooltip options, hover marker, sync
+- [Legend](./docs/legend.md): automatic legend, toggling series, sections
+- [Timeline](./docs/timeline.md): player (default) and rule
+- [Chrome](./docs/chrome.md): title, caption, header, footer, order, dividers
+- [Facets](./docs/facets.md): small multiples
+- [Composer](./docs/composer.md): several plots in one figure
+- [Reading plot state](./docs/state.md): `useFigure`, `usePlot`
+- [Maps](./docs/geo.md): GeoPlot, projections, camera, map markers
+- [Theming](./docs/theming.md): configuration, themes, locale, CSS variables
+
+## Examples
+
+- [Responsive line chart with end labels](./examples/ResponsiveLine.svelte)
+- [Tooltip and hover marker](./examples/Tooltip.svelte)
+- [Segments (styling a range of data)](./examples/Segments.svelte)
+- [Interactive legend and reading its state](./examples/LegendToggle.svelte)
+- [Timeline player](./examples/TimelinePlayer.svelte)
+- [Facets with a synced tooltip](./examples/Facets.svelte)
+- [Bars with value labels](./examples/BarValues.svelte)
+- [Custom tooltip card](./examples/CustomTooltip.svelte)
+- [Shared example data](./examples/data.ts)
+
+## Types
+
+- [Public exports](./dist/index.d.ts): every config type, with JSDoc on each field
+
+## Optional
+
+- [README](./README.md): overview and documentation index
+- [Package manifest](./package.json): peer dependencies (`svelte`, `svelteplot`, optional `topojson-client`)

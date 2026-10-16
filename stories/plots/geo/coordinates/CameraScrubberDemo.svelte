@@ -4,7 +4,7 @@
 	export const SCENE_A = { features: ['Argentina', 'Chile', 'Uruguay', 'Paraguay', 'Bolivia'] };
 	export const SCENE_B = { features: ['Japan'] };
 
-	/** The `coordinates` this component feeds `<GeoPlot>` for a given `progress` — exported for the story's docs source override. `target` flips once, at `progress === 0`. */
+	/** The `coordinates` this component feeds `<GeoPlot>` for a given `progress` - exported for the story's docs source override. `target` flips once, at `progress === 0`. */
 	export function coordinatesForProgress(progress: number): CoordinatesConfig {
 		return {
 			camera: {

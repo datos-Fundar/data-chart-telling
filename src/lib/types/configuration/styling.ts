@@ -1,4 +1,6 @@
 import type { StrokeStyle, DotStyle, FontStyle, AreaStyle } from '$lib/types/plots/styling';
+import type { SymbolType } from '$lib/types/plots/constants';
+import type { PlotChromeEntry } from '$lib/types/plots/props';
 
 export type TextStyle = {
 	/** font-family */
@@ -15,12 +17,14 @@ export type TextStyle = {
 	spacing: string;
 };
 
-export type ChartConfig = {
+/** How a chrome divider's line is drawn, as a CSS border style. */
+export type DividerLineStyle = 'solid' | 'dashed' | 'dotted' | 'double';
+
+export type PlotStylesConfig = {
 	// ── Base ──────────────────────────────────────────────────────────────────
 	font: string;
 	color: string;
 	background: string;
-	border: string;
 
 	// ── Spacing / padding ───────────────────────────────────────────────────────
 	spacing: {
@@ -28,6 +32,26 @@ export type ChartConfig = {
 		legendPadding: string;
 		captionPadding: string;
 		bleed: string;
+	};
+
+	// ── Divider ─────────────────────────────────────────────────────────────────
+	/** The line every `'divider'` in a plot's chrome `order` draws. */
+	divider: {
+		color: string;
+		/** Line thickness, e.g. `'1px'`. */
+		width: string;
+		style: DividerLineStyle;
+		/** Space around the line, as a CSS `margin`. */
+		margin: string;
+	};
+
+	// ── Chrome ──────────────────────────────────────────────────────────────────
+	/** What a plot's or composer's chrome draws around it. */
+	chrome: {
+		/** The blocks, top to bottom, when a figure doesn't set its own `order` - see {@link PlotChromeEntry}. */
+		order: PlotChromeEntry[];
+		/** The space between the blocks of a row of the chrome, as a CSS length. */
+		rowGap: string;
 	};
 
 	// ── Text blocks ─────────────────────────────────────────────────────────────
@@ -49,6 +73,25 @@ export type ChartConfig = {
 		swatchSize: string;
 		/** Fallback opacity for a legend-disabled series/value when a section doesn't set its own style. */
 		disabledOpacity: number;
+		/**
+		 * Whether names read off the data show as words (`gdp_per_capita` as
+		 * "Gdp per capita"): an item with no `label`, and the titles the
+		 * automatic legend takes from field names. Display only - toggling
+		 * still goes by the name itself.
+		 */
+		pretty: boolean;
+		/**
+		 * The automatic legend's series section, titled `text` once the legend
+		 * shows other sections too - a size or shape scale, or sections it adds.
+		 */
+		seriesTitle: {
+			enabled: boolean;
+			text: string;
+		};
+		/** A size section: `gap` is the room between its dots (CSS length). */
+		sizeScale: {
+			gap: string;
+		};
 		/** Prev/next arrows shown when a `layout: { type: 'horizontal' }` discrete section overflows `maxRows`. */
 		navButton: {
 			background: string;
@@ -93,7 +136,7 @@ export type ChartConfig = {
 					enabled: boolean;
 					/** How many px of horizontal slack the two labels need between them before they're considered overlapping (and flipped). */
 					margin: number;
-					/** Rotation magnitude applied once overlapping — lo rotates by this amount, hi by its negation, so both still grow inward toward the bar instead of off its edges. */
+					/** Rotation magnitude applied once overlapping - lo rotates by this amount, hi by its negation, so both still grow inward toward the bar instead of off its edges. */
 					rotate: string;
 				};
 			};
@@ -112,6 +155,7 @@ export type ChartConfig = {
 		yTickPadding: number;
 		grid: boolean;
 		locale: string;
+		/** Compact units abbreviated (`'short'`, the default: `1 M`) or spelled out (`'long'`: `1 millón`). Axes and size legends. */
 		compactDisplay: 'short' | 'long';
 	};
 
@@ -128,8 +172,8 @@ export type ChartConfig = {
 	// ── Plot geometry / colour ──────────────────────────────────────────────────
 	/**
 	 * Per-side plot margin. `'auto'` (the default) lets svelteplot size that
-	 * side to fit whatever it actually renders there — tick labels, an axis
-	 * title, rotated ticks — instead of clipping content or leaving unused
+	 * side to fit whatever it actually renders there - tick labels, an axis
+	 * title, rotated ticks - instead of clipping content or leaving unused
 	 * space. A number pins that side exactly, opting out of auto-sizing.
 	 */
 	margins: {
@@ -138,61 +182,142 @@ export type ChartConfig = {
 		bottom: number | 'auto';
 		left: number | 'auto';
 	};
+	/** Marker clipping to the plot's inner frame (see `FrameClip`). */
+	frameClip: {
+		/**
+		 * How far (px) a clipped mark may reach past the frame before it's cut,
+		 * so strokes and labels on the edge aren't shaved off. A number sets all
+		 * four sides; a string takes CSS shorthand px values for 1-4 sides, e.g.
+		 * `'4px'`, `'4px 8px'`, `'0 8px 4px'`, `'0 8px 4px 2px'`.
+		 */
+		tolerance: number | string;
+	};
 	/** Discrete categorical palette (grouped series). */
 	palette: string[];
-	/** Continuous gradient endpoints + on-cell label colour. */
-	continuous: { min: string; max: string; labelColor: string };
+	/** Default shape cycle for the `symbol` channel, in order. */
+	symbols: SymbolType[];
+	/** Continuous gradient endpoints + on-cell label colour, plus the default opacity-channel range. */
+	continuous: { min: string; max: string; labelColor: string; opacityRange: [number, number] };
 	/** Default line geometry. */
 	line: {
 		strokeWidth: number;
 		dotRadius: number;
 		/**
-		 * Default gap-fill bridge styling (`LinePlot`'s `styles.gaps`) — the
+		 * Default gap-fill bridge styling (`LinePlot`'s `styles.gaps`) - the
 		 * fallback merged under whatever a gap zone's own `style` sets, the
 		 * same way `hover.rule`/`hover.dot` back every hover marker's style.
 		 */
 		gap: { stroke: StrokeStyle; dots: DotStyle };
-		/**
-		 * End-of-line value-label declutter geometry and connector styling —
-		 * `LinePlot`-specific, since only line charts spread colliding
-		 * end-point labels apart with elbow-routed leader lines.
-		 */
-		valueLabels: {
-			/** Shortest lane's distance (px) from the data point before a leader line bends. */
+	};
+	/** Default text-marker behavior. */
+	text: {
+		/** Geometry and connector of a decluttered text marker (`declutter`) - e.g. LinePlot's end-of-line value labels. */
+		declutter: {
+			/** Shortest lane's distance (px) from the point before a connector bends. */
 			elbowGap: number;
-			/** Extra distance (px) each subsequent lane sits out from the last. */
+			/** Extra distance (px) each further lane sits out from the last. */
 			laneStep: number;
-			/** Clearance (px) between the outermost lane and the label text it feeds into. */
+			/** Clearance (px) between the outermost lane and the label text. */
 			labelGap: number;
-			/** Default leader-line colour — overridable per-plot via `styles.values.strokeStyle`. */
-			connectorColor: string;
-			/** Default leader-line width — overridable per-plot via `styles.values.strokeStyle`. */
-			connectorWidth: number;
+			/** Default connector stroke. */
+			connector: StrokeStyle;
 		};
 	};
 	/** Default bar-mark styling. */
 	bar: {
-		/** Default gap-fill styling (`BarPlot`'s `styles.gaps`) — the fallback merged under whatever a gap zone's own `style` sets. */
+		/** Default gap-fill styling (`BarPlot`'s `styles.gaps`) - the fallback merged under whatever a gap zone's own `style` sets. */
 		gap: AreaStyle;
-		/** Fallback `scales.z.seriesPadding` (0–1) for 'grouped' series layout, when a plot doesn't set its own. */
+		/** Gap (0-1) between the bars of side-by-side series within one category, as a fraction of each bar's slice. */
 		seriesPadding: number;
-		/** Fallback gap (0–1) *between* category groups on BarPlot's own category axis, when a plot doesn't set its own `scales.x/y.paddingInner`. */
+		/** Fallback gap (0-1) *between* category groups on BarPlot's own category axis, when a plot doesn't set its own `scales.x/y.paddingInner`. */
 		paddingInner: number;
-		/** Fallback gap (0–1) before the first and after the last category group on BarPlot's own category axis, when a plot doesn't set its own `scales.x/y.paddingOuter`. */
+		/** Fallback gap (0-1) before the first and after the last category group on BarPlot's own category axis, when a plot doesn't set its own `scales.x/y.paddingOuter`. */
 		paddingOuter: number;
 	};
 	/** Default pyramid-bar styling. */
 	pyramid: {
-		/** Default gap-fill styling (`PyramidPlot`'s `styles.gaps`) — the fallback merged under whatever a gap zone's own `style` sets. */
+		/** Default gap-fill styling (`PyramidPlot`'s `styles.gaps`) - the fallback merged under whatever a gap zone's own `style` sets. */
 		gap: AreaStyle;
+	};
+	/** Default area-plot styling. */
+	area: {
+		/** Fill opacity of every area marker that sets none of its own. */
+		fillOpacity: number;
+	};
+	/** Default histogram styling. */
+	histogram: {
+		/** Pixels taken off each side of every bar, so neighbouring bars leave a gap of twice this. */
+		inset: number;
+		/** Fill opacity of every bar, so a grouped histogram's bars behind another group's still show. */
+		fillOpacity: number;
 	};
 	/** Default scatter point geometry. */
 	scatter: { dotRadius: number };
 	/** Timeline gutter styling. */
-	timeline: { axisColor: string; activeColor: string; thickness: number };
+	timeline: {
+		axisColor: string;
+		activeColor: string;
+		thickness: number;
+		/** Space between a plot (or a composition's panels) and its timeline, as a CSS length. */
+		gap: string;
+		/** The `'rule'` timeline beside a plot: a line with its steps written along it. */
+		rule: {
+			/** Font size of the steps, in px. */
+			fontSize: number;
+			/** Font size of the current step, in px. */
+			activeFontSize: number;
+			activeFontWeight: number | string;
+			/** Opacity of the steps other than the current one. */
+			labelOpacity: number;
+			/** Width of the line, in px. */
+			axisWidth: number;
+			axisOpacity: number;
+		};
+		/** The `'player'` timeline: a bar in the chrome with play, the current step, a slider and more. */
+		player: {
+			/** The controls it draws, in order, unless a timeline sets its own `player.controls`. */
+			controls: ('play' | 'value' | 'slider' | 'speed' | 'loop')[];
+			/** The speeds its speed control cycles through, as multiples of `stepDuration`. */
+			speeds: number[];
+			/** Milliseconds each step lasts at speed `1`. */
+			stepDuration: number;
+			background: string;
+			color: string;
+			/** CSS length. */
+			radius: string;
+			padding: string;
+			gap: string;
+			fontSize: string;
+			fontWeight: number | string;
+			/** Width reserved for the current step's text, so the slider doesn't shift as it changes. */
+			valueWidth: string;
+			/** The play and pause button. */
+			button: {
+				size: string;
+				background: string;
+				color: string;
+				hoverBackground: string;
+				radius: string;
+			};
+			/** The slider's line. */
+			track: { height: string; color: string; fillColor: string; radius: string };
+			/** The slider's handle. */
+			thumb: { size: string; color: string };
+			/** The speed and loop buttons. */
+			toggle: {
+				background: string;
+				color: string;
+				activeBackground: string;
+				activeColor: string;
+				radius: string;
+				fontSize: string;
+				padding: string;
+			};
+		};
+	};
 	/**
 	 * In-SVG hover highlight: crosshair rule, dot + value label, and the area
-	 * highlight — a restyled feature on `GeoPlot`, or an `areaX`/`areaY` band
+	 * highlight - a restyled feature on `GeoPlot`, or an `areaX`/`areaY` band
 	 * on an axis-based plot's band scale.
 	 */
 	hover: { rule: StrokeStyle; dot: DotStyle; font: FontStyle; area: AreaStyle };
@@ -220,7 +345,7 @@ export type ChartConfig = {
 };
 
 /** Deep-partial input accepted by `setConfiguration`. */
-export type ChartConfigInput = DeepPartial<ChartConfig>;
+export type PlotStylesConfigInput = DeepPartial<PlotStylesConfig>;
 
 type DeepPartial<T> = {
 	[K in keyof T]?: T[K] extends (infer U)[] ? U[] : T[K] extends object ? DeepPartial<T[K]> : T[K];

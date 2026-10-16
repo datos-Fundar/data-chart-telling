@@ -1,4 +1,4 @@
-// Flat categorical bars over a few years — used by the BarChart stories.
+// Flat categorical bars over a few years - used by the BarPlot stories.
 
 export type RegionYear = { year: number; region: string; value: number };
 
@@ -10,7 +10,7 @@ export const REGION_BARS: RegionYear[] = [2018, 2020, 2022].flatMap((year) =>
 	}))
 );
 
-// Regions with two sectors each — for the `strategy: 'series'` facet-sync demo.
+// Regions with two sectors each - for the `strategy: 'series'` facet-sync demo.
 export type RegionSector = { region: string; sector: string; value: number };
 
 export const REGION_SECTOR_BARS: RegionSector[] = ['North', 'Central', 'South', 'East'].flatMap(
