@@ -1,6 +1,23 @@
-# data-chart-telling
+<div align="center">
+
+<img src="docs/images/logo.png" alt="data-chart-telling-logo" />
+
+</div>
+
+---
+
+[![npm](https://img.shields.io/npm/v/@fundar/data-chart-telling?label=npm&logo=npm&logoColor=white)](https://www.npmjs.com/package/@fundar/data-chart-telling)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/datos-Fundar/data-chart-telling?label=Latest%20Release&display_name=tag&logo=github&logoColor=white)](https://github.com/datos-Fundar/data-chart-telling/releases/latest)
+![GitHub License](https://img.shields.io/github/license/datos-Fundar/data-chart-telling?label=License&logo=github&logoColor=white)
+[![CircleCI](https://img.shields.io/circleci/build/gh/datos-Fundar/data-chart-telling/main?label=CircleCI%20Build&logo=circleci&logoColor=white)](https://circleci.com/gh/datos-Fundar/data-chart-telling)
+[![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/datos-Fundar/data-chart-telling/main?label=CodeFactor&logo=codefactor&logoColor=white)](https://www.codefactor.io/repository/github/datos-fundar/data-chart-telling)
+[![Codecov](https://img.shields.io/codecov/c/gh/datos-Fundar/data-chart-telling?label=Codecov&logo=codecov&logoColor=white)](https://codecov.io/gh/datos-Fundar/data-chart-telling)
+
+## Introduction
 
 Svelte 5 plots for data storytelling, built on [svelteplot](https://svelteplot.dev). A plot is one graph - axes and marks - that carries its own title, legend, tooltip, facets and timeline, so a finished, readable figure is one component with a handful of props.
+
+It aims for a sweet spot between the flexibility of `d3`, the declarative spirit of the _grammar of graphics_ (data mapped to channels, scales and marks) and the convenience of a classic plotting library, where each plot kind is a first-class component.
 
 ```svelte
 <script lang="ts">
