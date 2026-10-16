@@ -10,3 +10,6 @@ bun.lockb
 
 # Geo fixtures, loaded raw by the stories
 /stories/plots/geo/data/
+
+# Local Claude Code settings
+/.claude/
