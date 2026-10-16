@@ -62,8 +62,9 @@ export default defineConfig({
 					name: 'browser',
 					browser: {
 						enabled: true,
+						headless: true,
 						provider: playwright(),
-						instances: [{ browser: 'chromium', headless: true }]
+						instances: [{ browser: 'chromium' }]
 					},
 					include: ['src/**/*.svelte.test.ts', 'tests/**/*.svelte.test.ts'],
 					// Many parallel browser iframes intermittently lose their orchestrator connection.

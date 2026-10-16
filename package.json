@@ -29,7 +29,7 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"test": "vitest run --project=unit --project=browser",
-		"test:coverage": "vitest run --project=unit --project=browser --coverage",
+		"test:coverage": "node scripts/coverage.mjs",
 		"test:stories": "vitest run --project=storybook",
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build",
