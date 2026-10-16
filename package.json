@@ -1,7 +1,24 @@
 {
 	"name": "@fundar/data-chart-telling",
 	"version": "0.0.64",
+	"description": "Declarative charts, maps and small multiples for Svelte, built on svelteplot.",
 	"license": "MIT",
+	"author": "Ezequiel Puerta",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/datos-Fundar/data-chart-telling.git"
+	},
+	"homepage": "https://github.com/datos-Fundar/data-chart-telling#readme",
+	"bugs": {
+		"url": "https://github.com/datos-Fundar/data-chart-telling/issues"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"engines": {
+		"node": ">=20.19"
+	},
+	"packageManager": "pnpm@11.25.0",
 	"type": "module",
 	"scripts": {
 		"build": "svelte-package",
@@ -12,6 +29,7 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"test": "vitest run --project=unit --project=browser",
+		"test:coverage": "vitest run --project=unit --project=browser --coverage",
 		"test:stories": "vitest run --project=storybook",
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build",
@@ -20,6 +38,7 @@
 	},
 	"files": [
 		"LICENSE",
+		"CHANGELOG.md",
 		"dist",
 		"docs",
 		"!docs/images",
@@ -102,6 +121,11 @@
 		"vitest-browser-svelte": "^2.1.1"
 	},
 	"keywords": [
-		"svelte"
+		"svelte",
+		"svelteplot",
+		"charts",
+		"data-visualization",
+		"maps",
+		"small-multiples"
 	]
 }
