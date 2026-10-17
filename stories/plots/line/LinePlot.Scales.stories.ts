@@ -2,7 +2,12 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/line/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import { FEMALE_LIFE_EXPECTANCY, LIFE_EXPECTANCY, type YearPoint } from './data';
+import {
+	FEMALE_LIFE_EXPECTANCY,
+	FEMALE_LIFE_EXPECTANCY_SINCE_1947,
+	LIFE_EXPECTANCY,
+	type YearPoint
+} from './data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -519,5 +524,79 @@ export const DottedGrid: Story = {
 		scales: {
 			y: { grid: { strokeDasharray: '2 3', strokeOpacity: 0.5 } }
 		} satisfies AxisBasedScalesConfig
+	}
+};
+
+// ── Edge ticks ────────────────────────────────────────────────────────────────
+
+const SINCE_1947 = [
+	{
+		name: 'female',
+		x: 'year',
+		y: 'value',
+		data: FEMALE_LIFE_EXPECTANCY_SINCE_1947
+	} satisfies Series<YearPoint>
+];
+
+/**
+ * Edge ticks, the default: a continuous x axis adds a tick at the data's first
+ * and last values (1947 and 2019) beside its nice ones, so the reader sees
+ * where the data starts and ends. 1947 crowds the 1950 tick, so the default
+ * `collision: 'drop-nice'` keeps 1947 and drops 1950. 2019 has room next to
+ * 2010 and simply joins the ticks.
+ *
+ * The default comes from `axis.edgeTicks.x` in the configuration (see
+ * _Configuration / Styling / Scales / Edge ticks_); `scales.x.edgeTicks` overrides it per plot.
+ */
+export const EdgeTicksDropNice: Story = {
+	args: { series: SINCE_1947 }
+};
+
+/**
+ * `edgeTicks: { collision: 'drop-edge' }` - when an edge tick crowds a nice
+ * one, the nice tick stays and the edge tick goes: 1950 instead of 1947.
+ * 2019 still shows, since it does not crowd 2010.
+ */
+export const EdgeTicksDropEdge: Story = {
+	args: {
+		series: SINCE_1947,
+		scales: { x: { edgeTicks: { collision: 'drop-edge' } } } satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * `edgeTicks: { collision: 'extend' }` - the axis widens to the next nice
+ * tick past the crowding edge, so it starts at 1940 and every tick is a round
+ * one on that side. The other end, which had room, still ends at 2019.
+ */
+export const EdgeTicksExtend: Story = {
+	args: {
+		series: SINCE_1947,
+		scales: { x: { edgeTicks: { collision: 'extend' } } } satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * `edgeTicks: false` - only the nice ticks, as d3 or Observable Plot draw
+ * them: the axis rounds out to 1940 and 2020, so the line starts and ends a
+ * little inside it and no tick marks the data's first or last year.
+ */
+export const EdgeTicksOff: Story = {
+	args: {
+		series: SINCE_1947,
+		scales: { x: { edgeTicks: false } } satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * `scales.y.edgeTicks: true` - the y axis, off by default, ticks the data's
+ * lowest and highest values too (61.4 and 80.2). 80.2 crowds the 80 tick, so
+ * `'drop-nice'` keeps 80.2; `{ collision: 'extend' }` would round the axis out
+ * to the next nice tick instead.
+ */
+export const EdgeTicksOnY: Story = {
+	args: {
+		series: SINCE_1947,
+		scales: { y: { edgeTicks: true } } satisfies AxisBasedScalesConfig
 	}
 };

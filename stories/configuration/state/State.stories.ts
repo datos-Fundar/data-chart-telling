@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import UsePlotDemo from './state/UsePlotDemo.svelte';
-import UsePlotDemoSource from './state/UsePlotDemo.svelte?raw';
-import HoverReadoutSource from './state/HoverReadout.svelte?raw';
-import UseFigureDemo from './state/UseFigureDemo.svelte';
-import UseFigureDemoSource from './state/UseFigureDemo.svelte?raw';
-import FigureReadoutSource from './state/FigureReadout.svelte?raw';
-import { demoSource } from '../common/docsSource';
+import UsePlotDemo from './UsePlotDemo.svelte';
+import UsePlotDemoSource from './UsePlotDemo.svelte?raw';
+import HoverReadoutSource from './HoverReadout.svelte?raw';
+import UseFigureDemo from './UseFigureDemo.svelte';
+import UseFigureDemoSource from './UseFigureDemo.svelte?raw';
+import FigureReadoutSource from './FigureReadout.svelte?raw';
+import { demoSource } from '../../common/docsSource';
 
 /**
  * A plot's state - its hover, legend, margins, scales, rows and size - is

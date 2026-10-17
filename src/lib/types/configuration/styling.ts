@@ -1,6 +1,7 @@
 import type { StrokeStyle, DotStyle, FontStyle, AreaStyle } from '$lib/types/plots/styling';
 import type { SymbolType } from '$lib/types/plots/constants';
 import type { PlotChromeEntry } from '$lib/types/plots/props';
+import type { EdgeTicksOptions } from '$lib/types/layout/scales';
 
 export type TextStyle = {
 	/** font-family */
@@ -155,8 +156,8 @@ export type PlotStylesConfig = {
 		yTickPadding: number;
 		grid: boolean;
 		locale: string;
-		/** Compact units abbreviated (`'short'`, the default: `1 M`) or spelled out (`'long'`: `1 millón`). Axes and size legends. */
 		compactDisplay: 'short' | 'long';
+		edgeTicks: { x: EdgeTicksOptions; y: EdgeTicksOptions };
 	};
 
 	// ── Tooltip ─────────────────────────────────────────────────────────────────

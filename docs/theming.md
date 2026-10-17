@@ -61,6 +61,16 @@ setConfiguration({ axis: { locale: 'en-US', compactDisplay: 'long' } });
 
 `axis.locale` updates plots already on screen. `axis.compactDisplay` is read when a plot mounts, so a later change shows on the next mount.
 
+## Edge ticks
+
+`axis.edgeTicks.x` and `axis.edgeTicks.y` (`{ enabled, collision }`, on for x and off for y, both `'drop-nice'`) add a tick at the data's first and last values beside the nice ones, on a continuous axis whose other axis is continuous too, so a reader sees where the data starts and ends. When one lands too close to a nice tick for both labels, `collision` picks what gives way: `'drop-nice'` keeps the data's tick, `'drop-edge'` keeps the nice one, `'extend'` widens the axis to the next nice tick past the data.
+
+```ts
+setConfiguration({ axis: { edgeTicks: { x: { enabled: true, collision: 'extend' } } } });
+```
+
+A plot overrides it with `scales.x.edgeTicks` or `scales.y.edgeTicks` (see [Scales](scales.md)).
+
 ## CSS variables
 
 Some fields reach the DOM as CSS custom properties, which every figure sets on its root element and the components read with a fallback. Those can also be overridden with plain CSS on a wrapping element for a one-off, non-reactive tweak:

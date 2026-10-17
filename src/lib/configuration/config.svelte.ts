@@ -131,7 +131,11 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		yTickPadding: 10,
 		grid: false,
 		locale: 'es-AR',
-		compactDisplay: 'short'
+		compactDisplay: 'short',
+		edgeTicks: {
+			x: { enabled: true, collision: 'drop-nice' },
+			y: { enabled: false, collision: 'drop-nice' }
+		}
 	},
 
 	tooltip: {

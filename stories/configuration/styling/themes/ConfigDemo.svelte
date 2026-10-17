@@ -4,8 +4,8 @@
 	import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
 	import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 	import { THEMES, type ThemeName } from '$lib/configuration/themes';
-	import { TIME_SERIES, type SeriesPoint } from '../data/time-series';
-	import { HEAT_CELLS, type HeatCell } from '../data/heat-cells';
+	import { TIME_SERIES, type SeriesPoint } from '../../../data/time-series';
+	import { HEAT_CELLS, type HeatCell } from '../../../data/heat-cells';
 
 	let active = $state<ThemeName>('Default');
 
