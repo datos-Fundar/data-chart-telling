@@ -143,7 +143,7 @@ describe('buildScales', () => {
 		const [xLo, xHi] = state.scales.x?.domain as [number, number];
 		expect(xLo).toBeLessThanOrEqual(1);
 		expect(xHi).toBeGreaterThanOrEqual(18);
-		expect(state.scales.y).toMatchObject({ domain: [0, 2], nice: true });
+		expect(state.scales.y).toMatchObject({ domain: [0, 2], nice: false });
 	});
 
 	test('a marker with its own rows grows the axes to cover it, y still from zero', () => {

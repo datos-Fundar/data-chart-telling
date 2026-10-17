@@ -38,7 +38,7 @@ Two ways to give data, one per plot:
 | `title` `subtitle` `caption` | Text chrome. `header` / `footer` snippets replace title+subtitle / caption. |
 | `legend` | unset/`true`: automatic legend; `false`: none; `{ series: { interactive: { enabled: true, disabled: { mode: 'omit' } } } }` adjusts a section. |
 | `order` | Chrome blocks top to bottom, e.g. `['title','subtitle','legend','plot','caption']`; rows as `'(plot, timeline)'`; `'divider'` between blocks. |
-| `scales` | Per channel: `{ x: { label, tickFormat, domain, type, ticks, grid }, y: {...}, color: { scheme, domain } }`. |
+| `scales` | Per channel: `{ x: { label, tickFormat, domain, type, ticks, grid, niceTolerance }, y: {...}, color: { scheme, domain } }`. Stacked parts adding up to a hair past a tick (`100.2`) stay on it; `niceTolerance` (default `0.05` of a step) tunes that. |
 | `styles` | `{ values: {...}, frame: true, gaps: {...} }` (shape depends on the kind). |
 | `segments` | Style ranges of the data (rule 1 below). |
 | `markers` | Extra marks, an array of `{ type: '...', ... }`. |

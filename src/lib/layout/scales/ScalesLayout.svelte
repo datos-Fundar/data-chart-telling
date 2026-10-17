@@ -4,7 +4,7 @@
 	import { AxisX, AxisY, GridX, GridY } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import { tickStep, ticksInRange, naturalTickCount } from '$lib/layout/scales/niceDomain';
+	import { NiceTicks } from '$lib/layout/scales/NiceTicks';
 	import { DISCRETE_SCALE_TYPES } from '$lib/types/layout/scales';
 	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 	import type { AxisValue } from '$lib/types/layout/mapping';
@@ -75,7 +75,7 @@
 			return undefined;
 		if (oppositeType != null && isDiscreteType(oppositeType)) return undefined;
 		const uniqueCount = new Set(values.map(String)).size;
-		const natural = naturalTickCount(span, spacing, min);
+		const natural = NiceTicks.count(span, spacing, min);
 		return uniqueCount >= 2 && uniqueCount < natural ? uniqueCount : undefined;
 	}
 
@@ -94,17 +94,25 @@
 		if (!extent) return undefined;
 		const [lo, hi] = extent;
 		if (!Number.isInteger(lo) || !Number.isInteger(hi)) return undefined;
-		return hi - lo < naturalTickCount(span, spacing, min) ? 1 : undefined;
+		return hi - lo < NiceTicks.count(span, spacing, min) ? 1 : undefined;
 	}
 
 	const xSpan = $derived(Math.max(0, width - numericMargins.left - numericMargins.right));
 	const ySpan = $derived(Math.max(0, height - numericMargins.top - numericMargins.bottom));
 
-	const xTickCount = $derived(autoTickCount(plot.scales.y.type, scales?.x, xValues, xSpan, 80, 3));
-	const yTickCount = $derived(autoTickCount(plot.scales.x.type, scales?.y, yValues, ySpan, 50, 2));
+	const xTickCount = $derived(
+		autoTickCount(plot.scales.y.type, scales?.x, xValues, xSpan, NiceTicks.SPACING.x, 3)
+	);
+	const yTickCount = $derived(
+		autoTickCount(plot.scales.x.type, scales?.y, yValues, ySpan, NiceTicks.SPACING.y, 2)
+	);
 
-	const xTickInterval = $derived(integerTickInterval(scales?.x, xValues, xSpan, 80, 3));
-	const yTickInterval = $derived(integerTickInterval(scales?.y, yValues, ySpan, 50, 2));
+	const xTickInterval = $derived(
+		integerTickInterval(scales?.x, xValues, xSpan, NiceTicks.SPACING.x, 3)
+	);
+	const yTickInterval = $derived(
+		integerTickInterval(scales?.y, yValues, ySpan, NiceTicks.SPACING.y, 2)
+	);
 
 	/**
 	 * A continuous axis' nice ticks plus its domain's endpoints, when the
@@ -132,18 +140,20 @@
 		const extent = axisExtent(scale, values);
 		if (!extent) return undefined;
 		const [lo, hi] = extent;
-		const count = naturalTickCount(span, spacing, min);
+		const count = NiceTicks.count(span, spacing, min);
 		// Whole-number values (years, counts) never get ticks between them.
 		const integers = values.every((v) => typeof v !== 'number' || Number.isInteger(v));
-		const step = integers ? Math.max(1, tickStep(lo, hi, count)) : tickStep(lo, hi, count);
-		const base = ticksInRange(lo, hi, step);
+		const step = integers
+			? Math.max(1, NiceTicks.step(lo, hi, count))
+			: NiceTicks.step(lo, hi, count);
+		const base = NiceTicks.inRange(lo, hi, step);
 		const eps = step * 1e-6;
 		const withLo = base.length === 0 || base[0] - lo > eps ? [lo, ...base] : base;
 		return withLo.length === 0 || hi - withLo[withLo.length - 1] > eps ? [...withLo, hi] : withLo;
 	}
 
 	const xTicksExplicit = $derived(
-		edgeInclusiveTicks(plot.scales.y.type, scales?.x, xValues, xSpan, 80, 3)
+		edgeInclusiveTicks(plot.scales.y.type, scales?.x, xValues, xSpan, NiceTicks.SPACING.x, 3)
 	);
 
 	const yTitleFontSize = $derived(scales?.y?.titleFontSize ?? cfg.axis.titleFontSize);

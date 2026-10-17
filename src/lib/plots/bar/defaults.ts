@@ -4,8 +4,7 @@ import {
 	buildHitAreas,
 	buildBarGeometry
 } from '$lib/plots/bar/markers';
-import { niceDomain, naturalTickCount } from '$lib/layout/scales/niceDomain';
-import { Margins } from '$lib/layout/margins/Margins';
+import { NiceTicks } from '$lib/layout/scales/NiceTicks';
 import { SERIES_KEY, TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { AxisPlotDefaults } from '$lib/types/phases';
@@ -21,7 +20,6 @@ import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/bar/state';
 function fitValueDomain<TData extends Record<string, unknown>>(
 	state: BarPlotState<TData>
 ): Partial<Record<'x' | 'y', Partial<AxisScale<TData>>>> {
-	const isHorizontal = state.axes?.isHorizontal ?? false;
 	const axis = PlotAxes.valueOf(state);
 	const scale = state.scales[axis];
 	if (scale?.domain != null || scale?.ticks != null || scale?.nice != null) return {};
@@ -37,10 +35,7 @@ function fitValueDomain<TData extends Record<string, unknown>>(
 		hi = Math.max(hi, ...span);
 	}
 	if (hi <= lo) return {};
-	const spacing = isHorizontal ? 80 : 50;
-	const box = Margins.AXIS_ESTIMATE.contentBox(state.width, state.height);
-	const count = naturalTickCount(isHorizontal ? box.width : box.height, spacing, 2);
-	return { [axis]: { domain: niceDomain(lo, hi, count) } };
+	return { [axis]: { domain: NiceTicks.fit(state, axis, lo, hi, scale?.niceTolerance) } };
 }
 
 /**

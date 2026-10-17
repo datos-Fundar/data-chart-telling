@@ -48,6 +48,12 @@ describe('buildSharedAxisScale', () => {
 		});
 	});
 
+	test('a total a hair past a tick stays on it', () => {
+		expect(
+			SharedScalesPhase.buildSharedAxisScale([values([], [0, 100.2], { zero: ['y'] })], 'y')
+		).toEqual({ domain: [0, 100], nice: false });
+	});
+
 	test('includes zero when a facet asks for it', () => {
 		expect(
 			SharedScalesPhase.buildSharedAxisScale(

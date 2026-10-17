@@ -49,7 +49,7 @@
 	import type { ComponentProps, Snippet } from 'svelte';
 	import { Plot, Pointer, setPlotDefaults } from 'svelteplot';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import { buildScale } from '$lib/layout/scales/buildScale';
+	import { SveltePlotScale } from '$lib/layout/scales/SveltePlotScale';
 	import ScalesLayout from '$lib/layout/scales/ScalesLayout.svelte';
 	import GeometryLayout from '$lib/layout/geometry/GeometryLayout.svelte';
 	import CoordinatesLayout from '$lib/layout/coordinates/CoordinatesLayout.svelte';
@@ -187,9 +187,9 @@
 		size: () => ({ width, height })
 	});
 
-	// `buildScale` already left only svelteplot's own scale options.
-	const resolvedX = $derived(buildScale(scales?.x, data, getX) as SveltePlotProps['x']);
-	const resolvedY = $derived(buildScale(scales?.y, data, getY) as SveltePlotProps['y']);
+	// `SveltePlotScale.build` already left only svelteplot's own scale options.
+	const resolvedX = $derived(SveltePlotScale.build(scales?.x, data, getX) as SveltePlotProps['x']);
+	const resolvedY = $derived(SveltePlotScale.build(scales?.y, data, getY) as SveltePlotProps['y']);
 	/** Threaded straight into svelteplot's own `r` scale option - see `RScaleConfig`'s own doc comment for why this isn't independently resolved like `color`. */
 	const resolvedR = $derived(scales?.r as SveltePlotProps['r']);
 	/** Threaded straight into svelteplot's own `length` scale option - see `LengthScaleConfig`'s own doc comment. `GeoPlot`-only in practice (see `scales`'s own doc comment), same mechanism as `r`. */

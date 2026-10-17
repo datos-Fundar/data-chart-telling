@@ -129,6 +129,7 @@ export type AxisScale<TData = Record<string, unknown>> = {
 	interval?: string | number;
 	clamp?: boolean;
 	nice?: boolean;
+	niceTolerance?: number;
 	zero?: boolean;
 	round?: boolean;
 	percent?: boolean;

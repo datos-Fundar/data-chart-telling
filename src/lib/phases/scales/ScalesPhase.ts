@@ -2,6 +2,7 @@ import { resolveAccessor } from '$lib/plots/utils/accessors';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import { MarkerAxisValues } from '$lib/phases/scales/MarkerAxisValues';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
+import { NiceTicks } from '$lib/layout/scales/NiceTicks';
 import { DISCRETE_SCALE_TYPES } from '$lib/types/layout/scales';
 import type { AxisChannelName } from '$lib/types/layout/mapping';
 import type { AxisScale } from '$lib/types/layout/scales';
@@ -116,11 +117,18 @@ export class ScalesPhase<
 			const own = numeric(ScalesPhase.processedValues(processedData, axis));
 			if (!own) continue;
 			const values = [...own, ...derived, ...(zero.has(axis) ? [0] : [])];
-			scales[axis] = {
-				...scales[axis],
-				domain: [Math.min(...values), Math.max(...values)],
-				nice: scales[axis]?.nice ?? true
-			};
+			const lo = Math.min(...values);
+			const hi = Math.max(...values);
+			const author = scales[axis];
+			// Niced here, with a tolerance, so parts that add up to a whole land on its tick.
+			const niced = author?.nice !== false && author?.ticks == null && hi > lo;
+			scales[axis] = niced
+				? {
+						...author,
+						domain: NiceTicks.fit(state, axis, lo, hi, author?.niceTolerance),
+						nice: false
+					}
+				: { ...author, domain: [lo, hi], nice: author?.nice ?? true };
 		}
 
 		const next = { ...state, scales } as TState;
