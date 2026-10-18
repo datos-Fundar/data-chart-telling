@@ -3,7 +3,14 @@ import type { AxisValue } from '$lib/types/layout/mapping';
 import type { Accessor } from '$lib/types/plots/data/common';
 import type { EasingName, EasingFn } from '$lib/types/misc/easing';
 
+/** A step as the timeline works with it: a number (a date as its timestamp). */
 export type TimeValue = number;
+
+/** A step as the rows hold it: a number, a `Date` or a date string. */
+export type TimeInput = TimeValue | Date | string;
+
+/** A step as authors see it: a `Date` on a timeline of dates, else the number. */
+export type TimelineStep = number | Date;
 export type Orientation = 'horizontal' | 'vertical';
 
 export type TimelineChildContext<TRow extends Record<string, unknown>> = {
@@ -48,8 +55,8 @@ export type PlayerConfig = {
 	speeds?: number[];
 	/** Milliseconds each step lasts at speed `1`. Defaults to the configuration's `timeline.player.stepDuration`. */
 	stepDuration?: number;
-	/** How the current step reads in the `'value'` control. Defaults to the step itself. */
-	format?: (value: TimeValue) => string;
+	/** How a step reads, in the player and along a rule. Defaults to the step, or a date label for dates. */
+	format?: (value: TimelineStep) => string;
 	onplay?: (playing: boolean) => void;
 	onspeed?: (speed: number) => void;
 	onloop?: (loop: boolean) => void;
@@ -60,11 +67,14 @@ export type TimelineCallbacks = {
 	/** Called with the new position, `0`-`1`, whenever the player or the reader moves it. */
 	onprogress?: (progress: number) => void;
 	/** Called with the step the position lands on, when that step changes. */
-	onvalue?: (value: TimeValue) => void;
+	onvalue?: (value: TimelineStep) => void;
 };
 
 export type TimelineConfig<TRow extends Record<string, unknown>> = TimelineCallbacks & {
-	accessor: Accessor<TRow, TimeValue>;
+	/** The field (or function) giving each row's step: a number, a `Date`, or an ISO or `dateFormat` date string. */
+	accessor: Accessor<TRow, TimeInput>;
+	/** How a non-ISO date string reads, with `YYYY`, `MM`, `DD`, `HH`, `mm`, `ss`, e.g. `'DD/MM/YYYY'`. */
+	dateFormat?: string;
 	/** How it draws. Defaults to `'player'`. */
 	type?: TimelineType;
 	/** The player bar's own options, when `type` is `'player'`. */
@@ -75,7 +85,8 @@ export type TimelineConfig<TRow extends Record<string, unknown>> = TimelineCallb
 	 * with its own `timeline`, the composer's wins and nothing draws here.
 	 */
 	progress?: number;
-	values?: TimeValue[];
+	/** The steps, when not every distinct value of `accessor`. */
+	values?: TimeInput[];
 	/** Which way a `'rule'` runs. A `'player'` is always horizontal. */
 	orientation?: Orientation;
 	show?: boolean;

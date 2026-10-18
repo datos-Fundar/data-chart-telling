@@ -1,3 +1,4 @@
+import { TimelineTime } from '$lib/layout/timeline/TimelineTime';
 import { isFacetWrap } from '$lib/layout/facet/config';
 import type { FacetConfig } from '$lib/types/layout/facet';
 import type { TimelineConfig } from '$lib/types/layout/timeline';
@@ -42,9 +43,12 @@ export function buildGeoSlicing(args: {
 
 	let combos: Partial<Record<Dimension, unknown>>[] = [{}];
 	for (const dimension of Object.keys(fields) as Dimension[]) {
-		const values = [
-			...new Set(rows.map((row) => readField(fields[dimension]!, row)).filter((v) => v != null))
-		];
+		const read = rows.map((row) => readField(fields[dimension]!, row)).filter((v) => v != null);
+		// Dates on the same step are one value.
+		const time = new TimelineTime(timeline?.dateFormat);
+		const keyOf = (value: unknown) =>
+			dimension === 'time' ? String(time.toTime(value) ?? value) : value;
+		const values = [...new Map(read.map((value) => [keyOf(value), value])).values()];
 		combos = combos.flatMap((combo) => values.map((value) => ({ ...combo, [dimension]: value })));
 	}
 

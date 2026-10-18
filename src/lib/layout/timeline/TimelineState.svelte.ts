@@ -1,11 +1,14 @@
 import { getContext, setContext, untrack } from 'svelte';
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { TimelineSteps } from '$lib/layout/timeline/TimelineSteps';
+import { TimelineTime } from '$lib/layout/timeline/TimelineTime';
 import type {
 	PlayerConfig,
 	PlayerControl,
 	Orientation,
+	TimeInput,
 	TimeValue,
+	TimelineStep,
 	TimelineCallbacks,
 	TimelineType
 } from '$lib/types/layout/timeline';
@@ -20,7 +23,9 @@ export type TimelineSettings = TimelineCallbacks & {
 	type?: TimelineType;
 	player?: PlayerConfig;
 	progress?: number;
-	values?: TimeValue[];
+	values?: TimeInput[];
+	/** How a non-ISO date string in `values` reads. */
+	dateFormat?: string;
 	show?: boolean;
 	orientation?: Orientation;
 	thickness?: number;
@@ -39,6 +44,7 @@ export type TimelineSettings = TimelineCallbacks & {
 export class TimelineState {
 	readonly #settings: () => TimelineSettings | undefined;
 	#steps = $state<TimeValue[]>([]);
+	#temporal = $state(false);
 	#own = $state<{ base: number; value: number } | null>(null);
 	#playing = $state(false);
 	#loop = $state(false);
@@ -89,15 +95,33 @@ export class TimelineState {
 
 	/** The steps it moves across, ascending: the owner's `values`, else those its plots report. */
 	get steps(): TimeValue[] {
-		const values = this.#settings()?.values;
-		return values?.length ? new TimelineSteps(values).values : this.#steps;
+		const values = this.#ownerValues;
+		return values ? new TimelineSteps(values).values : this.#steps;
 	}
 
-	/** Reports the steps the plots found in their rows. */
-	setSteps(values: TimeValue[]): void {
+	/** Whether the steps are dates. */
+	get temporal(): boolean {
+		const settings = this.#settings();
+		if (!settings?.values?.length) return this.#temporal;
+		return new TimelineTime(settings.dateFormat).isTemporal(settings.values);
+	}
+
+	/** Reports the steps the plots found in their rows, and whether they are dates. */
+	setSteps(values: TimeValue[], temporal = false): void {
 		const same =
 			values.length === this.#steps.length && values.every((v, i) => v === this.#steps[i]);
 		if (!same) this.#steps = values;
+		if (temporal !== this.#temporal) this.#temporal = temporal;
+	}
+
+	/** The owner's `values` as steps, or `undefined` without any. */
+	get #ownerValues(): TimeValue[] | undefined {
+		const settings = this.#settings();
+		if (!settings?.values?.length) return undefined;
+		const time = new TimelineTime(settings.dateFormat);
+		return settings.values
+			.map((value) => time.toTime(value))
+			.filter((value): value is TimeValue => value !== undefined);
 	}
 
 	/** The position across the steps, `0`-`1`. */
@@ -147,9 +171,22 @@ export class TimelineState {
 		);
 	}
 
-	/** How the current step reads. */
+	/** How a step reads: the player's `format`, else a date label or the number. */
 	get format(): (value: TimeValue) => string {
-		return this.#settings()?.player?.format ?? ((value) => String(value));
+		const own = this.#settings()?.player?.format;
+		if (own) return (value) => own(this.step(value));
+		if (this.temporal) return TimelineTime.dateLabel(this.steps, getConfiguration().axis.locale);
+		return (value) => String(value);
+	}
+
+	/** A step as authors see it. */
+	step(value: TimeValue): TimelineStep {
+		return TimelineTime.toStep(value, this.temporal);
+	}
+
+	/** An author's step as the timeline's own, or `undefined` when it reads as none. */
+	timeOf(value: TimeInput): TimeValue | undefined {
+		return new TimelineTime(this.#settings()?.dateFormat).toTime(value);
 	}
 
 	/** Moves to `progress` (`0`-`1`), and tells the owner. */
@@ -240,7 +277,7 @@ export class TimelineState {
 			const value = this.value;
 			untrack(() => {
 				if (last !== undefined && value !== undefined && value !== last) {
-					this.#settings()?.onvalue?.(value);
+					this.#settings()?.onvalue?.(this.step(value));
 				}
 				last = value;
 			});

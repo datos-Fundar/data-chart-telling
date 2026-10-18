@@ -28,6 +28,7 @@
 			<Timeline
 				currentValue={timeline.value}
 				values={timeline.steps}
+				format={timeline.format}
 				orientation={timeline.orientation}
 				width={measuredWidth}
 				height={measuredHeight}

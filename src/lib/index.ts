@@ -117,8 +117,6 @@ export type { GeoCameraConfig } from './types/plots/camera';
 export type { GeoMarkersConfig } from './types/markers/geo';
 export type { SharedAxisValues } from './types/phases';
 export type {
-	TimeValue,
-	Orientation,
 	TimelineConfig,
 	TimelineType,
 	TimelineCallbacks,

@@ -8,7 +8,7 @@ Works anywhere inside a figure, including the `header`, `footer` and `content` s
 
 - `hover` - `activeX`, `activeY`, `activeSeries`, `strategy`, `sync`, `source` (the id of the plot owning the hover).
 - `legend` (or `null`) - `entries`, `range`, `off` (names of hidden series), `isOff(name)`, `turnOff(name, action)`, `turnOn(name)`, `toggle(name, action)`. `action` is `{ mode: 'dim' | 'hide' | 'omit' }`; `'omit'` removes the series and refits the axes.
-- `timeline` (or `null`) - `enabled`, `steps`, `value`, `index`, `progress`, `playing`, `loop`, `speed`, `speeds`, `controls`, and `seek`, `seekIndex`, `seekValue`, `next`, `previous`, `play`, `pause`, `toggle`, `setLoop`, `setSpeed`, `cycleSpeed`.
+- `timeline` (or `null`) - `enabled`, `steps`, `value`, `index`, `progress`, `playing`, `loop`, `speed`, `speeds`, `controls`, and `seek`, `seekIndex`, `seekValue`, `next`, `previous`, `play`, `pause`, `toggle`, `setLoop`, `setSpeed`, `cycleSpeed`. On a timeline of dates, `steps` and `value` are `Date`s and `seekValue` takes a `Date` or a date string.
 
 A footer that toggles series through the legend:
 

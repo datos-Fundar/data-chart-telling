@@ -246,9 +246,10 @@
 		<TimelineLayout
 			data={rows}
 			accessor={timeline.accessor}
+			dateFormat={timeline.dateFormat}
 			progress={timelineState?.progress ?? timeline.progress ?? 0}
 			values={sharedTimeline ? sharedTimeline.steps : timeline.values}
-			onsteps={ownTimeline ? (found) => ownTimeline.setSteps(found) : undefined}
+			onsteps={ownTimeline ? (found, temporal) => ownTimeline.setSteps(found, temporal) : undefined}
 			orientation={timeline.orientation}
 			show={false}
 			filterMode={slicing.filterMode}

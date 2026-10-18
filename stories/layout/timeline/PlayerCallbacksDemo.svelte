@@ -3,7 +3,8 @@
 	import { TIME_SERIES } from '../../data/time-series';
 
 	let progress = $state(0);
-	let year = $state<number | undefined>();
+	// A step: a number here (a year), a `Date` on a timeline of dates.
+	let year = $state<number | Date | undefined>();
 	let playing = $state(false);
 	let speed = $state(1);
 	let loop = $state(false);

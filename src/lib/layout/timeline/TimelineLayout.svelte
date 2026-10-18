@@ -3,9 +3,11 @@
 	import { resolveAccessor } from '$lib/plots/utils/accessors';
 	import TimelineFrame from '$lib/layout/timeline/TimelineFrame.svelte';
 	import { TimelineSteps } from '$lib/layout/timeline/TimelineSteps';
+	import { TimelineTime } from '$lib/layout/timeline/TimelineTime';
 	import { Interpolation } from '$lib/utils/Interpolation';
 	import type {
 		Orientation,
+		TimeInput,
 		TimeValue,
 		TimelineChildSnippet,
 		TimelineInterpolation
@@ -22,6 +24,7 @@
 	let {
 		data,
 		accessor,
+		dateFormat,
 		progress,
 		values,
 		orientation = 'vertical',
@@ -35,28 +38,44 @@
 		child
 	}: {
 		data: TRow[];
-		accessor: Accessor<TRow, TimeValue>;
+		accessor: Accessor<TRow, TimeInput>;
+		/** How a non-ISO date string reads. */
+		dateFormat?: string;
 		progress: number;
-		values?: TimeValue[];
+		values?: TimeInput[];
 		orientation?: Orientation;
 		show?: boolean;
 		thickness?: number;
 		filterMode?: 'exact' | 'upTo';
 		interpolate?: TimelineInterpolation<TRow>;
-		/** Told the steps, whenever they change - for whoever else draws or drives the timeline. */
-		onsteps?: (values: TimeValue[]) => void;
+		/** Told the steps, and whether they are dates, when they change. */
+		onsteps?: (values: TimeValue[], temporal: boolean) => void;
 		width: number;
 		height: number;
 		child: TimelineChildSnippet<TRow>;
 	} = $props();
 
-	const getTime = $derived(resolveAccessor<TRow>(accessor));
+	const time = $derived(new TimelineTime(dateFormat));
+	const getRaw = $derived(resolveAccessor<TRow>(accessor) as (row: TRow) => unknown);
+	/** A row's step, or `undefined` when its value reads as none. */
+	const getTime = $derived((row: TRow) => time.toTime(getRaw(row)));
+	/** The rows with a step; one without shows at every step. */
+	const timed = $derived(data.filter((row) => getTime(row) !== undefined));
+	const untimed = $derived(data.filter((row) => getTime(row) === undefined));
 
-	const steps = $derived(TimelineSteps.of(values, data, getTime));
+	const steps = $derived(
+		TimelineSteps.of(
+			values?.map((value) => time.toTime(value)).filter((v): v is TimeValue => v !== undefined),
+			timed,
+			getTime as (row: TRow) => TimeValue
+		)
+	);
+	const temporal = $derived(time.isTemporal(values?.length ? values : timed.map(getRaw)));
 
 	$effect(() => {
 		const found = steps.values;
-		untrack(() => onsteps?.(found));
+		const dates = temporal;
+		untrack(() => onsteps?.(found, dates));
 	});
 
 	const progressEasingFn = $derived(Interpolation.buildEasing(interpolate?.progressEasing));
@@ -77,12 +96,19 @@
 			);
 			return upper;
 		}
-		return { ...upper, [accessor]: x, [valueField]: value } as TRow;
+		return {
+			...upper,
+			[accessor]: time.toValueLike(x, upper[accessor]),
+			[valueField]: value
+		} as TRow;
 	}
 
 	const filtered = $derived.by(() => {
 		const discrete = () =>
-			data.filter((d) => TimelineSteps.matches(getTime(d), selectedValue, filterMode));
+			data.filter((d) => {
+				const at = getTime(d);
+				return at === undefined || TimelineSteps.matches(at, selectedValue, filterMode);
+			});
 
 		if (!interpolate) return discrete();
 		if (!interpolate.value) {
@@ -96,14 +122,14 @@
 		const getValue = resolveAccessor<TRow>(interpolate.value) as (d: TRow) => number;
 		const create = interpolate.create ?? defaultCreate;
 
-		const groups = Map.groupBy(data, (row) => String(getKey(row)));
+		const groups = Map.groupBy(timed, (row) => String(getKey(row)));
 
-		const result: TRow[] = [];
+		const result: TRow[] = [...untimed];
 		for (const rows of groups.values()) {
 			const tweened = Interpolation.tweenSeries({
 				rows,
 				x: currentTime,
-				getTime,
+				getTime: getTime as (row: TRow) => TimeValue,
 				getValue,
 				create,
 				segmentEasing: segmentEasingFn

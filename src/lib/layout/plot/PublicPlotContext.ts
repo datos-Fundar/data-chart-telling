@@ -8,7 +8,7 @@ import type { Margins } from '$lib/layout/margins/Margins';
 import type { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { HoverPoint, HoverStrategy } from '$lib/types/layout/hover';
-import type { PlayerControl, TimeValue } from '$lib/types/layout/timeline';
+import type { PlayerControl, TimeInput, TimelineStep } from '$lib/types/layout/timeline';
 import type { LegendDisabledAction, LegendEntry, LegendRange } from '$lib/types/layout/legend';
 
 /** What the pointer is over, shared by every plot in a figure. Read-only. */
@@ -136,8 +136,8 @@ export class PublicTimeline {
 	}
 
 	/** Every step it moves across, ascending. */
-	get steps(): TimeValue[] {
-		return this.#state.steps;
+	get steps(): TimelineStep[] {
+		return this.#state.steps.map((step) => this.#state.step(step));
 	}
 
 	/** The position across the steps, `0`-`1`. */
@@ -146,8 +146,9 @@ export class PublicTimeline {
 	}
 
 	/** The step the position lands on, or `undefined` without steps. */
-	get value(): TimeValue | undefined {
-		return this.#state.value;
+	get value(): TimelineStep | undefined {
+		const { value } = this.#state;
+		return value === undefined ? undefined : this.#state.step(value);
 	}
 
 	get index(): number {
@@ -183,8 +184,10 @@ export class PublicTimeline {
 		this.#state.seekIndex(index);
 	}
 
-	seekValue(value: TimeValue): void {
-		this.#state.seekValue(value);
+	/** Moves to the step closest to `value`. */
+	seekValue(value: TimeInput): void {
+		const time = this.#state.timeOf(value);
+		if (time !== undefined) this.#state.seekValue(time);
 	}
 
 	next(): void {
