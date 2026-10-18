@@ -61,9 +61,33 @@ export class TooltipState {
 		);
 	});
 
-	/** The text `rows` read as through `format`, one line each. */
-	static text<TRow>(rows: TRow[], format: (row: TRow) => string): string {
-		return rows.map(format).join('\n');
+	/** The text `rows` read as through `format`, one line each, in `sort`'s order when given. */
+	static text<TRow>(
+		rows: TRow[],
+		format: (row: TRow) => string,
+		sort?: (a: TRow, b: TRow) => number
+	): string {
+		return (sort ? [...rows].sort(sort) : rows).map(format).join('\n');
+	}
+
+	/**
+	 * Orders rows from the highest value `valueOf` reads to the lowest. A row
+	 * without a numeric value goes after every one with, and rows that tie keep
+	 * the order the hover matched them in.
+	 */
+	static descending<TRow>(valueOf: (row: TRow) => unknown): (a: TRow, b: TRow) => number {
+		const numberOf = (row: TRow) => {
+			const value = valueOf(row);
+			return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+		};
+		return (a, b) => {
+			const left = numberOf(a);
+			const right = numberOf(b);
+			if (left === undefined || right === undefined) {
+				return (left === undefined ? 1 : 0) - (right === undefined ? 1 : 0);
+			}
+			return right - left;
+		};
 	}
 
 	/** A value as plain text: a date as a locale date, anything else as itself. */

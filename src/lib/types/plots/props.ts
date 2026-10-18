@@ -59,7 +59,11 @@ export type HoverConfig<TRow extends Record<string, unknown>> = {
 	strategy?: HoverStrategy;
 	/** Resolved sync flag for the *local* hover store (ignored once a shared store is in scope). */
 	sync?: boolean;
-	tooltip?: TooltipConfig<TRow> & { format: (row: TRow) => string };
+	/** The resolved tooltip: its `format`, and the order its text reads the rows in (a `content` snippet gets them as matched). */
+	tooltip?: TooltipConfig<TRow> & {
+		format: (row: TRow) => string;
+		sort?: (a: TRow, b: TRow) => number;
+	};
 	/** When it returns `true`, that pointer event is treated as a leave instead of a move - lets a nested layout opt part of the plot out of hover matching. */
 	exclude?: (e: PointerEvent) => boolean;
 	/** How to resolve a pointer event to a candidate point - see {@link PointMatchingStrategy}. Defaults to `'nearest'`. */

@@ -87,8 +87,9 @@ export type AxisPlotState<
 	// plot's own marks in front.
 	markers?: AxisBasedMarkersConfig[];
 
-	// "tooltip" phase output: how a hovered row reads, unless `tooltip.format` says otherwise.
+	// "tooltip" phase output: how a hovered row reads, unless `tooltip.format` says otherwise, and the order the rows read in.
 	tooltipFormat?: (row: Record<string, unknown>) => string;
+	tooltipSort?: (a: Record<string, unknown>, b: Record<string, unknown>) => number;
 
 	// "hover" phase output: what the pointer can match and how the hover reads, the rows drawn and hovered, and where each sits.
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

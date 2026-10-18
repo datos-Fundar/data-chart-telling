@@ -57,3 +57,47 @@ describe('TooltipState.default', () => {
 		expect(TooltipState.value(date)).toBe(date.toLocaleDateString());
 	});
 });
+
+describe('TooltipState.descending', () => {
+	const byValue = TooltipState.descending((row: { value?: unknown }) => row.value);
+
+	test('orders rows from the highest value to the lowest', () => {
+		const rows = [{ value: 2 }, { value: 9 }, { value: -1 }, { value: 5 }];
+		expect([...rows].sort(byValue).map((row) => row.value)).toEqual([9, 5, 2, -1]);
+	});
+
+	test('rows without a numeric value go last, in the order they came', () => {
+		const rows = [
+			{ id: 'a', value: null },
+			{ id: 'b', value: 3 },
+			{ id: 'c', value: 'n/a' },
+			{ id: 'd', value: 7 },
+			{ id: 'e', value: NaN }
+		];
+		expect([...rows].sort(byValue).map((row) => row.id)).toEqual(['d', 'b', 'a', 'c', 'e']);
+	});
+
+	test('ties keep the order the hover matched them in', () => {
+		const rows = [
+			{ id: 'a', value: 4 },
+			{ id: 'b', value: 4 },
+			{ id: 'c', value: 4 }
+		];
+		expect([...rows].sort(byValue).map((row) => row.id)).toEqual(['a', 'b', 'c']);
+	});
+});
+
+describe('TooltipState.text', () => {
+	const rows = [{ value: 1 }, { value: 3 }, { value: 2 }];
+	const format = (row: { value: number }) => String(row.value);
+
+	test('reads the rows in the order given, without a sort', () => {
+		expect(TooltipState.text(rows, format)).toBe('1\n3\n2');
+	});
+
+	test("reads them in the sort's order, leaving the rows themselves alone", () => {
+		const sort = TooltipState.descending((row: { value: number }) => row.value);
+		expect(TooltipState.text(rows, format, sort)).toBe('3\n2\n1');
+		expect(rows.map((row) => row.value)).toEqual([1, 3, 2]);
+	});
+});

@@ -43,7 +43,7 @@ Two ways to give data, one per plot:
 | `segments` | Style ranges of the data (rule 1 below). |
 | `markers` | Extra marks, an array of `{ type: '...', ... }`. |
 | `margins` | `{ top, right, bottom, left }`, each a number or `'auto'` (all `'auto'` by default). |
-| `tooltip` | `true` or `{ strategy, sync, format, content, series, anchorX, anchorY }`. |
+| `tooltip` | `true` or `{ strategy, sync, format, content, series, anchorX, anchorY }`. The text lists matched rows highest value first; a `content` snippet gets them unsorted. |
 | `timeline` | `{ accessor: 'year' }` steps through the rows by a field, drawn as a player bar (default); `type: 'rule'` draws a rule beside the plot instead. |
 | `facet` | `{ by: 'field', columns, gap, scales: 'shared'\|'free', mode: 'grid'\|'carousel'\|'paginated' }` or `{ rows, cols }`. |
 | `transforms` `statistics` | svelteplot transforms / derived summaries (regression, movingAverage, ...). |

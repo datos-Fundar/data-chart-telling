@@ -309,6 +309,7 @@
 			y={ctrl.tooltipPosition?.y ?? 0}
 			rows={ctrl.matchedRows.map((p) => p.row)}
 			format={hover.tooltip.format}
+			sort={hover.tooltip.sort}
 			content={hover.tooltip.content}
 			anchorX={hover.tooltip.anchorX}
 			anchorY={hover.tooltip.anchorY}

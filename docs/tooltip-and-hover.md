@@ -12,14 +12,14 @@ A plot becomes interactive when it is given a `tooltip`, a `{ type: 'hover' }` m
 
 `tooltip` is `true` for the defaults, or an options object:
 
-| Option               | Meaning                                                                                                                                                                                       |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `strategy`           | How related points are found: `'x'`, `'y'`, `'punctual'` (the exact point) or `'series'` (all points of the hovered series). Defaults per plot kind                                           |
-| `sync`               | Show the highlight in every synced plot too (default `false`)                                                                                                                                 |
-| `format`             | `(row) => string` - the tooltip text for the hovered row (`\n` breaks lines)                                                                                                                  |
-| `content`            | A snippet `{#snippet content({ rows })}` replacing the text with custom markup. It is drawn in a plain card, so the markup brings its own background, colors and spacing                      |
-| `series`             | Only these series appear in the tooltip                                                                                                                                                       |
-| `anchorX`, `anchorY` | Preferred side of the cursor: `'left' \| 'middle' \| 'right'` (default `'right'`) and `'top' \| 'middle' \| 'bottom'` (default `'bottom'`). It moves to the other side when it would overflow |
+| Option               | Meaning                                                                                                                                                                                                                                |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `strategy`           | How related points are found: `'x'`, `'y'`, `'punctual'` (the exact point) or `'series'` (all points of the hovered series). Defaults per plot kind                                                                                    |
+| `sync`               | Show the highlight in every synced plot too (default `false`)                                                                                                                                                                          |
+| `format`             | `(row) => string` - the tooltip text for the hovered row (`\n` breaks lines). With several rows, they read from the highest value to the lowest (a stacked row by its own value)                                                       |
+| `content`            | A snippet `{#snippet content({ rows })}` replacing the text with custom markup. It gets the rows as the hover matched them, unsorted, and is drawn in a plain card, so the markup brings its own order, background, colors and spacing |
+| `series`             | Only these series appear in the tooltip                                                                                                                                                                                                |
+| `anchorX`, `anchorY` | Preferred side of the cursor: `'left' \| 'middle' \| 'right'` (default `'right'`) and `'top' \| 'middle' \| 'bottom'` (default `'bottom'`). It moves to the other side when it would overflow                                          |
 
 ```svelte
 {#snippet content({ rows })}

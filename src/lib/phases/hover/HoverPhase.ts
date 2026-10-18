@@ -73,6 +73,7 @@ export class HoverPhase<
 		const hover = HoverPhase.buildHoverConfig<Row>({
 			tooltip: state.tooltip as TooltipConfig<Row> | undefined,
 			format: state.tooltipFormat!,
+			sort: state.tooltipSort,
 			markers: state.authorMarkers ?? [],
 			points: points as HoverPoint<Row>[],
 			label: label as (row: Row) => string,
@@ -110,13 +111,14 @@ export class HoverPhase<
 	static buildHoverConfig<TRow extends Record<string, unknown>>(args: {
 		tooltip: TooltipConfig<TRow> | undefined;
 		format: (row: TRow) => string;
+		sort?: (a: TRow, b: TRow) => number;
 		markers: { type: string }[];
 		points: HoverPoint<TRow>[];
 		label: (row: TRow) => string;
 		defaultStrategy: HoverStrategy;
 		pointMatching?: PointMatchingStrategy;
 	}): HoverConfig<TRow> {
-		const { tooltip, format, markers, points, label, defaultStrategy, pointMatching } = args;
+		const { tooltip, format, sort, markers, points, label, defaultStrategy, pointMatching } = args;
 		const settings = new HoverSettings(tooltip, markers, defaultStrategy);
 		return {
 			active: settings.active,
@@ -124,7 +126,11 @@ export class HoverPhase<
 			label,
 			strategy: settings.strategy,
 			sync: settings.sync,
-			tooltip: tooltip && { ...tooltip, format: tooltip.format ?? format },
+			tooltip: tooltip && {
+				...tooltip,
+				format: tooltip.format ?? format,
+				...(sort ? { sort } : {})
+			},
 			...(pointMatching ? { pointMatching } : {})
 		};
 	}
