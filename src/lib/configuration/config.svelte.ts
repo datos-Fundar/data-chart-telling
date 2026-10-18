@@ -235,6 +235,13 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		font: { fill: 'currentColor', fontSize: 12, dy: -18 },
 		area: { fill: '#94a3b8', fillOpacity: 0.25 }
 	},
+	// Beside a vertical delta (taken on x), above a horizontal one (on y).
+	delta: {
+		text: {
+			x: { dx: 12, dy: 0, lineAnchor: 'middle', textAnchor: 'start' },
+			y: { dx: 0, dy: -10, lineAnchor: 'middle', textAnchor: 'middle' }
+		}
+	},
 	facet: {
 		indicator: {
 			background: '#111827',

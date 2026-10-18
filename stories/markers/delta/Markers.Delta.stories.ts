@@ -63,8 +63,7 @@ export const XDeltaBetweenTwoSeries: Story = {
 				from: { type: 'series', series: 'female' },
 				to: { type: 'series', series: 'male' },
 				line: { stroke: 'grey', strokeDasharray: '6 6' },
-				formatDiff: (d) => d.toFixed(0),
-				text: { dx: 12, lineAnchor: 'middle' }
+				formatDiff: (d) => d.toFixed(0)
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
@@ -91,7 +90,7 @@ export const XDeltaToBaseline: Story = {
 				axis: 'x',
 				at: 2018,
 				from: { type: 'series', series: 'female' },
-				text: { dx: 20, lineAnchor: 'middle' }
+				text: { dx: 20 }
 			}
 		] satisfies AxisBasedMarkersConfig[],
 		scales: { y: { domain: [78, 85] } }
@@ -118,7 +117,7 @@ export const XDeltaToAxisValue: Story = {
 				at: 2018,
 				from: { type: 'series', series: 'female' },
 				to: { type: 'axis', value: 80 },
-				text: { dx: 20, lineAnchor: 'middle' }
+				text: { dx: 20 }
 			}
 		] satisfies AxisBasedMarkersConfig[],
 		scales: { y: { domain: [78, 85] } }
@@ -142,7 +141,7 @@ export const MultipleXDeltas: Story = {
 				from: { type: 'series', series: 'female' },
 				to: { type: 'series', series: 'male' },
 				formatDiff: (d) => d.toFixed(0),
-				text: { dx: -12, lineAnchor: 'middle' }
+				text: { dx: -12, textAnchor: 'end' }
 			},
 			{
 				type: 'delta',
@@ -150,8 +149,7 @@ export const MultipleXDeltas: Story = {
 				at: 2008,
 				from: { type: 'series', series: 'female' },
 				to: { type: 'series', series: 'male' },
-				formatDiff: (d) => d.toFixed(0),
-				text: { dx: 12, lineAnchor: 'middle' }
+				formatDiff: (d) => d.toFixed(0)
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
@@ -176,8 +174,7 @@ export const YDeltaBetweenTwoSeries: Story = {
 				at: 78,
 				from: { type: 'series', series: 'female' },
 				to: { type: 'series', series: 'male' },
-				formatDiff: (d) => `${d} yr`,
-				text: { dy: -10, lineAnchor: 'middle' }
+				formatDiff: (d) => `${d} yr`
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
@@ -206,8 +203,7 @@ export const YDeltaToBaseline: Story = {
 				axis: 'y',
 				at: 81,
 				from: { type: 'series', series: 'female' },
-				formatDiff: (d) => `${d.toFixed(0)} yr`,
-				text: { dy: -10, lineAnchor: 'middle' }
+				formatDiff: (d) => `${d.toFixed(0)} yr`
 			}
 		] satisfies AxisBasedMarkersConfig[],
 		scales: { x: { domain: [2008, 2020] } }
@@ -236,8 +232,7 @@ export const YDeltaToAxisValue: Story = {
 				from: { type: 'series', series: 'female' },
 				to: { type: 'axis', value: 2016 },
 				line: { strokeDasharray: '6 4' },
-				formatDiff: (d) => `${d} yr`,
-				text: { dy: -10, lineAnchor: 'middle' }
+				formatDiff: (d) => `${d} yr`
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
@@ -259,8 +254,7 @@ export const MultipleYDeltas: Story = {
 				at: 78,
 				from: { type: 'series', series: 'female' },
 				to: { type: 'series', series: 'male' },
-				formatDiff: (d) => `${d} yr`,
-				text: { dy: -10, lineAnchor: 'middle' }
+				formatDiff: (d) => `${d} yr`
 			},
 			{
 				type: 'delta',
@@ -268,8 +262,7 @@ export const MultipleYDeltas: Story = {
 				at: 79,
 				from: { type: 'series', series: 'female' },
 				to: { type: 'series', series: 'male' },
-				formatDiff: (d) => `${d} yr`,
-				text: { dy: -10, lineAnchor: 'middle' }
+				formatDiff: (d) => `${d} yr`
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

@@ -1,5 +1,5 @@
 import type { StrokeStyle, DotStyle, FontStyle, AreaStyle } from '$lib/types/plots/styling';
-import type { SymbolType } from '$lib/types/plots/constants';
+import type { LineAnchor, SymbolType, TextAnchor } from '$lib/types/plots/constants';
 import type { PlotChromeEntry } from '$lib/types/plots/props';
 import type { EdgeTicksOptions } from '$lib/types/layout/scales';
 
@@ -322,6 +322,14 @@ export type PlotStylesConfig = {
 	 * on an axis-based plot's band scale.
 	 */
 	hover: { rule: StrokeStyle; dot: DotStyle; font: FontStyle; area: AreaStyle };
+
+	/** The `delta` marker's label offset and anchor, per axis the delta is taken on. A marker's own `text` wins. */
+	delta: {
+		text: Record<
+			'x' | 'y',
+			{ dx: number; dy: number; lineAnchor: LineAnchor; textAnchor: TextAnchor }
+		>;
+	};
 
 	// ── Facet (small multiples) ──────────────────────────────────────────────────
 	facet: {
