@@ -1,6 +1,6 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { Box } from '$lib/layout/margins/Box';
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import { SERIES_ID_KEY, SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { seriesIdOf } from '$lib/utils/grouping';
 import { Transforms } from '$lib/phases/transforms/Transforms';

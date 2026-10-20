@@ -1,6 +1,6 @@
 import { buildSeries } from '$lib/utils/grouping';
 import { resolveColorScale } from '$lib/utils/color';
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import { buildGroupedSeries, buildScopedMarkerGroups } from '$lib/plots/utils/segments';
 import { buildGapFillMaps, isGapValue } from '$lib/plots/utils/gaps';
 import { FacetPanels } from '$lib/phases/facet/FacetPanels';

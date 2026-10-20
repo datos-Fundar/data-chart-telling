@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Geo } from 'svelteplot';
-	import { resolveAccessor } from '$lib/plots/utils/accessors';
+	import { resolveAccessor } from '$lib/utils/accessors';
 	import { greatCircleInterpolate } from '$lib/plots/utils/geoAccessors';
 	import type { GeoLinkMarkerConfig } from '$lib/types/markers/geo';
 

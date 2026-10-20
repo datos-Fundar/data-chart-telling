@@ -1,4 +1,4 @@
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import { merge } from '$lib/utils/merge';
 import { TimelineSteps } from '$lib/layout/timeline/TimelineSteps';
 import { TimelineTime } from '$lib/layout/timeline/TimelineTime';

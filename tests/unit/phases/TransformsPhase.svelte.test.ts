@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
 import { Pipeline } from '$lib/phases/Pipeline';
 import { GAP_KIND, GAP_VALUE } from '$lib/phases/transforms/TransformsPhase';
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import { buildBarDefaults } from '$lib/plots/bar/defaults';
 import { buildLineDefaults } from '$lib/plots/line/defaults';
 import { buildPyramidDefaults } from '$lib/plots/pyramid/defaults';

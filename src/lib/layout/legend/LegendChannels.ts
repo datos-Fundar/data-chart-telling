@@ -1,4 +1,4 @@
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { ChannelName } from '$lib/plots/utils/ChannelName';
 import { MarkerKinds } from '$lib/markers/MarkerKinds';

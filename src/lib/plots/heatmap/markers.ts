@@ -1,6 +1,6 @@
 import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import { DisabledStyle } from '$lib/layout/legend/DisabledStyle';
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 
 import type { ProcessedChannel } from '$lib/types/phases';
 import type { AxisValue } from '$lib/types/layout/mapping';

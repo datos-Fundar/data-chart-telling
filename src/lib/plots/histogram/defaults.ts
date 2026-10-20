@@ -1,6 +1,6 @@
 import { buildMarks, buildValueLabels } from '$lib/plots/histogram/markers';
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { AxisPlotDefaults, ProcessedChannel, ProcessedRow } from '$lib/types/phases';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';

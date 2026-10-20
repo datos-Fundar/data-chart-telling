@@ -1,7 +1,7 @@
 import { Transforms } from '$lib/phases/transforms/Transforms';
 import { seriesIdOf } from '$lib/utils/grouping';
 import { PANEL_KEY } from '$lib/phases/facet/FacetPanels';
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import { buildGroupedSeries } from '$lib/plots/utils/segments';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { Series } from '$lib/types/plots/data/common';

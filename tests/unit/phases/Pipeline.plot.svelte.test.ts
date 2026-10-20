@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import { Pipeline } from '$lib/phases/Pipeline';
 import { buildLineDefaults } from '$lib/plots/line/defaults';
 import { buildBarDefaults } from '$lib/plots/bar/defaults';

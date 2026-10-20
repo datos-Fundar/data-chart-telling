@@ -1,4 +1,4 @@
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import {
 	geometryCentroid,
 	filterGeometryParts,

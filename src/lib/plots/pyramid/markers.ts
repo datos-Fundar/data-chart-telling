@@ -1,4 +1,4 @@
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import { SERIES_ID_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { seriesIdOf } from '$lib/utils/grouping';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';

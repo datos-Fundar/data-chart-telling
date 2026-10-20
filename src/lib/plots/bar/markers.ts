@@ -31,15 +31,7 @@ export function buildBarGeometry<TData extends Record<string, unknown>>(
 ) {
 	const valueAxis = PlotAxes.valueOf(state);
 	const categoryAxis = PlotAxes.categoryOf(state);
-	const domain = state.scales[valueAxis]?.domain;
-	// Bars rise from zero, or from the nearest end of a domain that leaves it out.
-	const baseline = (() => {
-		const lo = Number(domain?.[0]);
-		const hi = Number(domain?.[(domain?.length ?? 1) - 1]);
-		if (!domain || domain.length < 2 || Number.isNaN(lo) || Number.isNaN(hi)) return 0;
-		const [min, max] = [Math.min(lo, hi), Math.max(lo, hi)];
-		return min > 0 ? min : max < 0 ? max : 0;
-	})();
+	const baseline = PlotAxes.baselineOf(state);
 	const { stacked, of: spanOf } = ProcessedPositions.span(
 		state.processedData!,
 		valueAxis as 'x' | 'y',

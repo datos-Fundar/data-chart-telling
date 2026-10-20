@@ -1,7 +1,7 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { Transforms } from '$lib/phases/transforms/Transforms';
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 
 import type { HistogramPlotState, HistogramPlotCtx } from '$lib/types/plots/histogram/state';

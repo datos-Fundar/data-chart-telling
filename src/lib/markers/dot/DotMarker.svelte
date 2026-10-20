@@ -2,7 +2,7 @@
 	import { Dot } from 'svelteplot';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import { resolveAccessor } from '$lib/plots/utils/accessors';
+	import { resolveAccessor } from '$lib/utils/accessors';
 	import type { DotMarkerConfig } from '$lib/types/markers/common';
 
 	/**

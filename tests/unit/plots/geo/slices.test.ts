@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { buildGeoSlicing } from '$lib/plots/geo/slices';
 import { Slice } from '$lib/layout/plot/Slice';
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 
 const feature = (name: string, year?: number) => ({
 	type: 'Feature',

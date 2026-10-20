@@ -1,4 +1,4 @@
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { Series, Accessor } from '$lib/types/plots/data/common';
 

@@ -1,6 +1,6 @@
 <script lang="ts" generics="TRow extends Record<string, unknown>">
 	import { isMobile } from '$lib/stores/device';
-	import { resolveAccessor } from '$lib/plots/utils/accessors';
+	import { resolveAccessor } from '$lib/utils/accessors';
 	import FacetIndicator from '$lib/layout/facet/FacetIndicator.svelte';
 	import Grid from '$lib/layout/grid/Grid.svelte';
 	import GridCell from '$lib/layout/grid/GridCell.svelte';
