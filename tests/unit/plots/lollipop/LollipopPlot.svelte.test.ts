@@ -1,5 +1,6 @@
 import { render } from 'vitest-browser-svelte';
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, vi, beforeEach } from 'vitest';
+import { ClevelandMarkers } from '$lib/plots/cleveland/ClevelandMarkers';
 import LollipopPlot from '$lib/plots/lollipop/Plot.svelte';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
 import { waitForSvg, countDotMarks } from '../_helpers/svg';
@@ -15,6 +16,39 @@ const stems = (svg: SVGElement, axis: 'x' | 'y' = 'x') =>
 	Array.from(svg.querySelectorAll(`g.rule-${axis} line`)) as SVGLineElement[];
 
 describe('LollipopPlot', () => {
+	beforeEach(() => ClevelandMarkers.resetWarnings());
+
+	test('warns, pointing to the plots for several series, when a category has values in two', async () => {
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+		render(LollipopPlot, {
+			width: 400,
+			height: 300,
+			data: [...rows, { c: 'a', v: 7, g: 'B' }],
+			x: 'c',
+			y: 'v',
+			color: 'g'
+		});
+		await vi.waitFor(() =>
+			expect(warn).toHaveBeenCalledWith(expect.stringContaining('Use DumbbellPlot for two series'))
+		);
+		warn.mockRestore();
+	});
+
+	test('does not warn when each category has one value, even across series', async () => {
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+		const { container } = render(LollipopPlot, {
+			width: 400,
+			height: 300,
+			data: rows,
+			x: 'c',
+			y: 'v',
+			color: 'c'
+		});
+		await waitForSvg(container);
+		expect(warn).not.toHaveBeenCalled();
+		warn.mockRestore();
+	});
+
 	test('a flat data plot draws one stem and one dot per category', async () => {
 		const { container } = render(LollipopPlot, {
 			width: 400,
@@ -80,12 +114,16 @@ describe('LollipopPlot', () => {
 		});
 		const svg = await waitForSvg(container);
 		const [a, , c] = stems(svg);
-		// Same baseline end for all three; `c` extends the other way from `a`.
-		const baseline = (line: SVGLineElement) => Number(line.getAttribute('y1'));
-		const tip = (line: SVGLineElement) => Number(line.getAttribute('y2'));
-		expect(baseline(a)).toBeCloseTo(baseline(c));
-		expect(tip(a)).toBeLessThan(baseline(a));
-		expect(tip(c)).toBeGreaterThan(baseline(c));
+		const ends = (line: SVGLineElement) => [
+			Number(line.getAttribute('y1')),
+			Number(line.getAttribute('y2'))
+		];
+		// Every stem shares the baseline end; `a` rises above it and `c` hangs below it.
+		const [aFrom, aTo] = ends(a);
+		const [cFrom, cTo] = ends(c);
+		expect(aFrom).toBeCloseTo(cTo);
+		expect(aTo).toBeLessThan(aFrom);
+		expect(cFrom).toBeGreaterThan(cTo);
 	});
 
 	test('the configured dot radius and stem width apply unless a segment sets its own', async () => {

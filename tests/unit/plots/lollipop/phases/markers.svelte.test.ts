@@ -36,11 +36,16 @@ describe('LollipopPlot markers', () => {
 		expect(dots[0].styles?.dotRadius).toBe(DEFAULT_CONFIG.lollipop.dotRadius);
 	});
 
-	test('upright stems run along y from the baseline, sideways ones along x', () => {
-		const upright = marksOf({ data: rows, x: 'c', y: 'v' }).rules[0];
-		expect([upright.axis, upright.y1, upright.x1]).toEqual(['x', 0, undefined]);
-		const sideways = marksOf({ data: rows, x: 'v', y: 'c' }).rules[0];
-		expect([sideways.axis, sideways.x1, sideways.y1]).toEqual(['y', 0, undefined]);
+	test('a stem joins the baseline and the value, along the value axis', () => {
+		const stem = (props: Row) => {
+			const rule = marksOf(props).rules[0];
+			return { axis: rule.axis, ends: [rule.y1, rule.y2, rule.x1, rule.x2], rows: rule.data };
+		};
+		const upright = stem({ data: rows, x: 'c', y: 'v' });
+		expect([upright.axis, upright.ends]).toEqual(['x', ['from', 'to', undefined, undefined]]);
+		expect(upright.rows?.[0]).toMatchObject({ category: 'a1', from: 0, to: 1 });
+		const sideways = stem({ data: rows, x: 'v', y: 'c' });
+		expect([sideways.axis, sideways.ends]).toEqual(['y', [undefined, undefined, 'from', 'to']]);
 	});
 
 	test('a series the legend dims takes the disabled stroke and dots', () => {

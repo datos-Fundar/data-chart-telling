@@ -2,18 +2,20 @@
 
 Every plot kind shares one set of props (see [Concepts](concepts.md)). They differ in what they draw, which channels they need and how they hover.
 
-| Plot                              | Draws                                   | Needs                                           |
-| --------------------------------- | --------------------------------------- | ----------------------------------------------- |
-| [`LinePlot`](#lineplot)           | A line per series                       | `x`, `y`                                        |
-| [`AreaPlot`](#areaplot)           | A filled area per series                | `x`, `y`                                        |
-| [`BarPlot`](#barplot)             | Bars, grouped, stacked or horizontal    | a category channel and a value channel          |
-| [`HistogramPlot`](#histogramplot) | Counts of a numeric field in bins       | `x` or `y`                                      |
-| [`BoxPlot`](#boxplot)             | The distribution of values per category | a category channel and a value channel          |
-| [`LollipopPlot`](#lollipopplot)   | One dot on a stem per category          | a category channel and a value channel          |
-| [`HeatmapPlot`](#heatmapplot)     | A grid of colored cells                 | `x`, `y`, `color`                               |
-| [`PyramidPlot`](#pyramidplot)     | Two series mirrored around zero         | a category channel, a value channel, two series |
-| [`ScatterPlot`](#scatterplot)     | A point per row                         | `x`, `y`                                        |
-| [`GeoPlot`](#geoplot)             | A map from GeoJSON or TopoJSON          | `data` (see [Maps](geo.md))                     |
+| Plot                              | Draws                                   | Needs                                                 |
+| --------------------------------- | --------------------------------------- | ----------------------------------------------------- |
+| [`LinePlot`](#lineplot)           | A line per series                       | `x`, `y`                                              |
+| [`AreaPlot`](#areaplot)           | A filled area per series                | `x`, `y`                                              |
+| [`BarPlot`](#barplot)             | Bars, grouped, stacked or horizontal    | a category channel and a value channel                |
+| [`HistogramPlot`](#histogramplot) | Counts of a numeric field in bins       | `x` or `y`                                            |
+| [`BoxPlot`](#boxplot)             | The distribution of values per category | a category channel and a value channel                |
+| [`LollipopPlot`](#lollipopplot)   | One dot on a stem per category          | a category channel and a value channel                |
+| [`DumbbellPlot`](#dumbbellplot)   | Two dots per category, joined           | a category channel, a value channel, two series       |
+| [`ClevelandPlot`](#clevelandplot) | Any number of dots per category, joined | a category channel, a value channel, a series per dot |
+| [`HeatmapPlot`](#heatmapplot)     | A grid of colored cells                 | `x`, `y`, `color`                                     |
+| [`PyramidPlot`](#pyramidplot)     | Two series mirrored around zero         | a category channel, a value channel, two series       |
+| [`ScatterPlot`](#scatterplot)     | A point per row                         | `x`, `y`                                              |
+| [`GeoPlot`](#geoplot)             | A map from GeoJSON or TopoJSON          | `data` (see [Maps](geo.md))                           |
 
 All of them accept `data` with `grouping`/`color`, or pre-built `series`.
 
@@ -228,13 +230,78 @@ One value per category, drawn as a dot on a thin stem that rises from the baseli
 
 ![Lollipop plot of life expectancy by province](images/lollipop.png)
 
-- `grouping` (or `color`) draws one set of lollipops per group. Groups that share categories draw on top of each other, so split them with `facet` instead, or color by the category field itself.
+- `grouping` (or `color`) draws one set of lollipops per group, as long as each category has a value in only one of them - coloring by the category field itself is the usual case. A category with values in several groups warns: that is a [`DumbbellPlot`](#dumbbellplot) (two) or a [`ClevelandPlot`](#clevelandplot) (any number).
 - Categories keep the order the data gives them; `scales.x.domain` (or `y`) orders them.
 - The value axis reaches zero, where the stems start; pinning `scales.y.domain` moves the baseline to the nearest end of it, and a negative value hangs below zero.
 - `scales.x.paddingInner` / `paddingOuter` set the room around each lollipop; the defaults, with the dot radius and the stem width, come from `lollipop` in the [configuration](theming.md).
 - `styles.values` writes each value just past its dot.
 - `segments` restyle whole categories: `styles: { stroke: {...}, dots: {...} }` restyle their stems and dots (`areas: [{ x: { from: 'Salta', to: 'Salta' } }]`).
 - The tooltip reads one lollipop at a time, along the category axis.
+
+## DumbbellPlot
+
+Two dots per category, one for each of two series, joined by a connector: the gap between them is what the eye reads, such as a before and an after, or two groups. Categories on `x` stand the rows upright; on `y` they lie sideways. A plot with any other number of series warns and points to [`LollipopPlot`](#lollipopplot) (one) or [`ClevelandPlot`](#clevelandplot) (any number).
+
+<!-- example: examples/Dumbbell.svelte -->
+
+```svelte
+<script lang="ts">
+	import { DumbbellPlot } from '@fundar/data-chart-telling';
+	import { PROVINCE_VALUES } from './data';
+</script>
+
+<!-- Two dots per province, one per sex, joined by a connector: the gap in life expectancy at birth. -->
+<DumbbellPlot
+	width={720}
+	height={400}
+	data={PROVINCE_VALUES}
+	x="value"
+	y="province"
+	color="sex"
+	scales={{ x: { domain: [70, 85] } }}
+	styles={{ values: { show: true } }}
+/>
+```
+
+<!-- /example -->
+
+![Dumbbell plot of life expectancy by province and sex](images/dumbbell.png)
+
+- `grouping` (or `color`) names the two series; the legend toggles them like any other.
+- The value axis fits the values without reaching for zero; pin `scales.y.domain` to start it at zero.
+- Categories keep the order the data gives them; `scales.x.domain` (or `y`) orders them.
+- The connector is a neutral gray; its color and width, the dot radius and the padding come from `dumbbell` in the [configuration](theming.md).
+- `styles.values` writes each value past its dot, away from the other one. A label past the lowest dot can reach the axis labels when that dot sits at the edge of the axis; pin `scales.y.domain` (or `x`) wide enough to leave it room.
+- `segments` restyle the dots of chosen categories (`styles: { dots: { dotRadius: 9 } }`, `areas: [{ x: { from: 'Salta', to: 'Salta' } }]`).
+- The tooltip reads one category at a time, listing its two values.
+
+## ClevelandPlot
+
+The general form of the family: per category, one dot for each series that has a value there, joined by a connector from the lowest to the highest. A [`LollipopPlot`](#lollipopplot) is its one-series case and a [`DumbbellPlot`](#dumbbellplot) its two-series case, which check their series and point here when they need more. Categories on `x` stand the rows upright; on `y` they lie sideways.
+
+<!-- example: examples/Cleveland.svelte -->
+
+```svelte
+<script lang="ts">
+	import { ClevelandPlot } from '@fundar/data-chart-telling';
+	import { AGE_SHARES } from './data';
+</script>
+
+<!-- One dot per census year in each age group, joined from the lowest share to the highest. -->
+<ClevelandPlot width={720} height={400} data={AGE_SHARES} x="share" y="ageGroup" grouping="year" />
+```
+
+<!-- /example -->
+
+![Cleveland dot plot of age group shares across census years](images/cleveland.png)
+
+- `grouping` (or `color`) gives one dot per group in each category. Numeric fields need `grouping` to split into series; `color` on a number draws a continuous ramp instead.
+- The connector spans the lowest and the highest dot of each category, so a series the legend omits leaves the range.
+- The value axis fits the values without reaching for zero; pin `scales.y.domain` to start it at zero.
+- Its defaults come from `cleveland` in the [configuration](theming.md).
+- `styles.values` writes each value: past the highest dot and the lowest of its category, and beside those between them.
+- `segments` restyle the dots of chosen categories, as in [`DumbbellPlot`](#dumbbellplot).
+- The tooltip reads one category at a time, listing every series.
 
 ## HeatmapPlot
 

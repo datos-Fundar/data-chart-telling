@@ -12,6 +12,8 @@ import { buildHeatmapDefaults } from '$lib/plots/heatmap/defaults';
 import { buildPyramidDefaults } from '$lib/plots/pyramid/defaults';
 import { buildBoxDefaults } from '$lib/plots/box/defaults';
 import { buildLollipopDefaults } from '$lib/plots/lollipop/defaults';
+import { buildDumbbellDefaults } from '$lib/plots/dumbbell/defaults';
+import { buildClevelandDefaults } from '$lib/plots/cleveland/defaults';
 import type { FacetConfig } from '$lib/types/layout/facet';
 
 const [
@@ -23,8 +25,10 @@ const [
 	HeatmapCore,
 	PyramidCore,
 	BoxCore,
-	LollipopCore
-] = Array(9).fill(GenericCore);
+	LollipopCore,
+	DumbbellCore,
+	ClevelandCore
+] = Array(11).fill(GenericCore);
 
 type Row = { year: number; region: string; sector: string; value: number };
 
@@ -130,6 +134,18 @@ const CASES: Case[] = [
 		Core: LollipopCore,
 		buildDefaults: buildLollipopDefaults,
 		core: { ...BOX, x: 'sector', y: 'value', color: 'sector' }
+	},
+	{
+		name: 'dumbbell',
+		Core: DumbbellCore,
+		buildDefaults: buildDumbbellDefaults,
+		core: { ...BOX, x: 'year', y: 'value', color: 'sector' }
+	},
+	{
+		name: 'cleveland',
+		Core: ClevelandCore,
+		buildDefaults: buildClevelandDefaults,
+		core: { ...BOX, x: 'year', y: 'value', color: 'sector' }
 	}
 ];
 

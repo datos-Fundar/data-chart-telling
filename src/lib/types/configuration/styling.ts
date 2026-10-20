@@ -18,6 +18,22 @@ export type TextStyle = {
 	spacing: string;
 };
 
+/** What the plots that join dots along a category (lollipop, dumbbell, Cleveland) read from their own configuration block. */
+export type DotRangeStyling = {
+	/** Radius of every dot that sets none of its own, in px. */
+	dotRadius: number;
+	/** Width of every connector that sets none of its own, in px. */
+	stemWidth: number;
+	/** Color of the connector of a category with several dots; a lone dot's stem takes its series' color. Unset, the axis color. */
+	connectorColor?: string;
+	/** Gap, in px, between a dot and its value label, unless the labels' own `dx`/`dy` set one. */
+	labelGap: number;
+	/** Fallback gap (0-1) between neighbouring categories, when a plot doesn't set its own `scales.x/y.paddingInner`. */
+	paddingInner: number;
+	/** Fallback gap (0-1) before the first and after the last category, when a plot doesn't set its own `scales.x/y.paddingOuter`. */
+	paddingOuter: number;
+};
+
 /** How a chrome divider's line is drawn, as a CSS border style. */
 export type DividerLineStyle = 'solid' | 'dashed' | 'dotted' | 'double';
 
@@ -262,18 +278,11 @@ export type PlotStylesConfig = {
 		paddingOuter: number;
 	};
 	/** Default lollipop-plot styling. */
-	lollipop: {
-		/** Radius of every dot that sets none of its own, in px. */
-		dotRadius: number;
-		/** Width of every stem that sets none of its own, in px. */
-		stemWidth: number;
-		/** Gap, in px, between a dot and its value label, unless the labels' own `dx`/`dy` set one. */
-		labelGap: number;
-		/** Fallback gap (0-1) between the lollipops of neighbouring categories, when a plot doesn't set its own `scales.x/y.paddingInner`. */
-		paddingInner: number;
-		/** Fallback gap (0-1) before the first and after the last lollipop, when a plot doesn't set its own `scales.x/y.paddingOuter`. */
-		paddingOuter: number;
-	};
+	lollipop: DotRangeStyling;
+	/** Default dumbbell-plot styling. */
+	dumbbell: DotRangeStyling;
+	/** Default Cleveland-plot styling. */
+	cleveland: DotRangeStyling;
 	/** Default scatter point geometry. */
 	scatter: { dotRadius: number };
 	/** Timeline gutter styling. */

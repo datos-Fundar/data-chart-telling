@@ -4,7 +4,7 @@
 	import type { LollipopPlotProps, LollipopPlotCoreProps } from '$lib/types/plots/lollipop/props';
 
 	/**
-	 * A lollipop plot: one value per category as a dot on a thin stem that rises from the baseline, upright, or sideways when the categories run along `y`. Draws from pre-built `series` or flat `data` rows.
+	 * A lollipop plot: one value per category as a dot on a thin stem that rises from the baseline, upright, or sideways when the categories run along `y`. Draws from pre-built `series` or flat `data` rows. For several series per category, see `DumbbellPlot` and `ClevelandPlot`.
 	 * Optional chrome (`title`, `subtitle`, `caption`, `header`, `footer`,
 	 * `legend`) frames it; `timeline` and `facet` slice its `data` rows.
 	 * `margins` is bindable: it reports the margin the plot settled on.

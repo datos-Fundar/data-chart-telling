@@ -1,11 +1,7 @@
-import type { AxisPlotState, AxisPlotCtx } from '$lib/types/phases';
-import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
+import type { ClevelandPlotState, ClevelandPlotCtx } from '$lib/types/plots/cleveland/state';
 
-/** LollipopPlot's pipeline state: the shared axis-based state, with no extras of its own. */
-export type LollipopPlotState<TData extends Record<string, unknown>> = AxisPlotState<
-	TData,
-	LineSegmentStyle
->;
+/** LollipopPlot's pipeline state: a ClevelandPlot's. */
+export type LollipopPlotState<TData extends Record<string, unknown>> = ClevelandPlotState<TData>;
 
 /** The environment every LollipopPlot phase reads from, alongside the growing state. */
-export type LollipopPlotCtx = AxisPlotCtx;
+export type LollipopPlotCtx = ClevelandPlotCtx;

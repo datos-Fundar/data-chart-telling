@@ -10,6 +10,8 @@ import HistogramPlot from '$lib/plots/histogram/Plot.svelte';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
 import BoxPlot from '$lib/plots/box/Plot.svelte';
 import LollipopPlot from '$lib/plots/lollipop/Plot.svelte';
+import DumbbellPlot from '$lib/plots/dumbbell/Plot.svelte';
+import ClevelandPlot from '$lib/plots/cleveland/Plot.svelte';
 import { waitForSvg } from './_helpers/svg';
 
 /**
@@ -21,6 +23,11 @@ import { waitForSvg } from './_helpers/svg';
 
 const NUMERIC = Array.from({ length: 12 }, (_, i) => ({ x: i + 1, y: (i * 7) % 11, g: 'A' }));
 const CATEGORIES = ['a', 'b', 'c', 'd', 'e'].map((x, i) => ({ x, y: i + 2, g: 'A' }));
+/** Two series over the same categories: what a dumbbell joins. */
+const DUAL = CATEGORIES.flatMap((d) => [
+	{ ...d, g: 'before' },
+	{ ...d, y: d.y + 3, g: 'after' }
+]);
 const PYRAMID = ['0-4', '5-9', '10-14', '15-19'].flatMap((age, i) => [
 	{ age, pct: i + 1, sex: 'F' },
 	{ age, pct: i + 2, sex: 'M' }
@@ -107,6 +114,22 @@ const KINDS: Kind[] = [
 	{
 		name: 'LollipopPlot',
 		Plot: LollipopPlot,
+		props: { data: CATEGORIES, x: 'x', y: 'y' },
+		numericX: false,
+		plotStatistics: true,
+		stackable: false
+	},
+	{
+		name: 'DumbbellPlot',
+		Plot: DumbbellPlot,
+		props: { data: DUAL, x: 'x', y: 'y', color: 'g' },
+		numericX: false,
+		plotStatistics: true,
+		stackable: false
+	},
+	{
+		name: 'ClevelandPlot',
+		Plot: ClevelandPlot,
 		props: { data: CATEGORIES, x: 'x', y: 'y' },
 		numericX: false,
 		plotStatistics: true,
