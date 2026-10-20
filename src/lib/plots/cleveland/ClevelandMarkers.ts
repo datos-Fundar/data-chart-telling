@@ -114,6 +114,9 @@ export class ClevelandMarkers {
 		}
 
 		const { category, value } = ClevelandMarkers.#channels(state);
+		// A number is a literal pixel radius; a field or function sizes each dot by its row.
+		const size = state.channels?.r;
+		const r = size === undefined || typeof size === 'number' ? size : size.accessor;
 		const dots = groups.flatMap((group) => {
 			const name = group.series.name;
 			const color = state.colorForSeries!(name);
@@ -126,6 +129,7 @@ export class ClevelandMarkers {
 					series: name,
 					data: segment.data,
 					...(isHorizontal ? { x: value, y: category } : { x: category, y: value }),
+					r,
 					styles: {
 						dotRadius: disabled?.dotRadius ?? dot?.dotRadius ?? style.dotRadius,
 						dotFill: disabled?.dotFill ?? dot?.dotFill ?? stem?.stroke ?? color,

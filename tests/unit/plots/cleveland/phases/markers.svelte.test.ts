@@ -58,6 +58,14 @@ describe('ClevelandPlot markers', () => {
 		);
 	});
 
+	test('an r channel sizes every dot by its row, a number is a fixed radius', () => {
+		const sized = marksOf({ data: rows, x: 'c', y: 'v', color: 'g', r: 'v' });
+		expect(sized.dots.every((d) => typeof d.r === 'function')).toBe(true);
+		const fixed = marksOf({ data: rows, x: 'c', y: 'v', color: 'g', r: 8 });
+		expect(fixed.dots.every((d) => d.r === 8)).toBe(true);
+		expect(marksOf({ data: rows, x: 'c', y: 'v', color: 'g' }).dots[0].r).toBeUndefined();
+	});
+
 	test('a series the legend omits leaves the ranges', () => {
 		const legend = new LegendState();
 		legend.turnOff('hi', { mode: 'omit' });

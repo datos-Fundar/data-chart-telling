@@ -123,24 +123,24 @@ export const LIFE_GAPS: LifeRow[] = LIFE.filter((row) => row.sex === 'female').m
 );
 
 // ── Life expectancy at birth by province, 2019 ──────────────────────────────
-// Same source as above.
+// Same source as above. `population` is the 2022 census population, in millions.
 
-export type ProvinceRow = { province: string; sex: string; value: number };
+export type ProvinceRow = { province: string; sex: string; value: number; population: number };
 
 const LIFE_EXPECTANCY_BY_PROVINCE = [
-	{ province: 'Buenos Aires', female: 79.9, male: 74.1 },
-	{ province: 'Córdoba', female: 80.8, male: 75.2 },
-	{ province: 'Mendoza', female: 81, male: 75.3 },
-	{ province: 'Salta', female: 79.5, male: 74 },
-	{ province: 'Chubut', female: 82.1, male: 74.9 }
+	{ province: 'Buenos Aires', female: 79.9, male: 74.1, population: 17.5 },
+	{ province: 'Córdoba', female: 80.8, male: 75.2, population: 4 },
+	{ province: 'Mendoza', female: 81, male: 75.3, population: 2 },
+	{ province: 'Salta', female: 79.5, male: 74, population: 1.4 },
+	{ province: 'Chubut', female: 82.1, male: 74.9, population: 0.6 }
 ];
 
 export const PROVINCES = LIFE_EXPECTANCY_BY_PROVINCE.map(({ province }) => province);
 
 export const PROVINCE_VALUES: ProvinceRow[] = LIFE_EXPECTANCY_BY_PROVINCE.flatMap(
-	({ province, female, male }) => [
-		{ province, sex: 'female', value: female },
-		{ province, sex: 'male', value: male }
+	({ province, female, male, population }) => [
+		{ province, sex: 'female', value: female, population },
+		{ province, sex: 'male', value: male, population }
 	]
 );
 

@@ -74,3 +74,15 @@ export const SeriesBased: Story = {
 		] satisfies Series<ProvinceRow>[]
 	}
 };
+
+/** `r: 'population'` sizes every dot by its row's population (millions); the legend gets a size section, titled here through `legend.r.title`. A number is a fixed radius in pixels instead. */
+export const SizedByPopulation: Story = {
+	args: {
+		data: PROVINCE_VALUES,
+		x: 'province',
+		y: 'value',
+		color: 'sex',
+		r: 'population',
+		legend: { r: { title: 'Population (millions)' } }
+	}
+};
