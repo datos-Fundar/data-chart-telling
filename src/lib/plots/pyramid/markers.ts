@@ -1,5 +1,5 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
-import { SERIES_ID_KEY, TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
+import { SERIES_ID_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { seriesIdOf } from '$lib/utils/grouping';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 
@@ -49,57 +49,55 @@ export function buildValueLabels<TData extends Record<string, unknown>>(
 	const valueAxis = PlotAxes.valueOf(state);
 	const isHorizontal = state.axes?.isHorizontal ?? true;
 
-	return TransformsPhase.buildProcessedGroups<BarSegmentStyle>(state, false).flatMap(
-		({ series }): TextMarkerConfig[] => {
-			const id = seriesIdOf(series);
-			const side = state.resolvedSeries!.find((s) => seriesIdOf(s) === id)!.side;
-			const isLeft = side === 'left';
-			const getMagnitude = resolveAccessor(series[valueAxis]!);
-			const magnitude = (d: ProcessedRow) => Math.abs(Number(getMagnitude(d)));
-			const signed = (d: ProcessedRow) => (isLeft ? -magnitude(d) : magnitude(d));
-			const data = processedData.data.filter(
-				(d) => d[SERIES_ID_KEY] === id && !isGapValue(getMagnitude(d))
-			);
-			if (data.length === 0) return [];
-			const outward = isLeft ? -1 : 1;
-			const at =
-				anchor === 'middle' ? (d: ProcessedRow) => signed(d) / 2 : anchor === 'end' ? 0 : signed;
-			const shift = anchor === 'middle' ? 0 : outward * (anchor === 'end' ? 4 : 6);
-			// Away from the baseline: left/right on a horizontal pyramid, down/up on a vertical one.
-			const awayAnchor = isHorizontal
-				? anchor === 'middle'
-					? 'middle'
-					: isLeft
-						? 'end'
-						: 'start'
-				: 'middle';
-			const awayLine = isHorizontal
+	return (state.processedGroups ?? []).flatMap(({ series }): TextMarkerConfig[] => {
+		const id = seriesIdOf(series);
+		const side = state.resolvedSeries!.find((s) => seriesIdOf(s) === id)!.side;
+		const isLeft = side === 'left';
+		const getMagnitude = resolveAccessor(series[valueAxis]!);
+		const magnitude = (d: ProcessedRow) => Math.abs(Number(getMagnitude(d)));
+		const signed = (d: ProcessedRow) => (isLeft ? -magnitude(d) : magnitude(d));
+		const data = processedData.data.filter(
+			(d) => d[SERIES_ID_KEY] === id && !isGapValue(getMagnitude(d))
+		);
+		if (data.length === 0) return [];
+		const outward = isLeft ? -1 : 1;
+		const at =
+			anchor === 'middle' ? (d: ProcessedRow) => signed(d) / 2 : anchor === 'end' ? 0 : signed;
+		const shift = anchor === 'middle' ? 0 : outward * (anchor === 'end' ? 4 : 6);
+		// Away from the baseline: left/right on a horizontal pyramid, down/up on a vertical one.
+		const awayAnchor = isHorizontal
+			? anchor === 'middle'
 				? 'middle'
-				: anchor === 'middle'
-					? 'middle'
-					: isLeft
-						? 'top'
-						: 'bottom';
-			return [
-				{
-					type: 'text',
-					data,
-					[valueAxis]: at,
-					[categoryAxis]: series[categoryAxis] as TextMarkerConfig['y'],
-					text: (d: ProcessedRow) => format(magnitude(d), series.name),
-					styles: {
-						...font,
-						fill: font?.fill ?? ctx.cfg.axis.color,
-						fontSize: font?.fontSize ?? 12,
-						dx: font?.dx ?? (isHorizontal ? shift : 0),
-						dy: font?.dy ?? (isHorizontal ? 0 : -shift),
-						textAnchor: labels.textAnchor ?? awayAnchor,
-						lineAnchor: font?.lineAnchor ?? awayLine
-					}
-				} as TextMarkerConfig
-			];
-		}
-	);
+				: isLeft
+					? 'end'
+					: 'start'
+			: 'middle';
+		const awayLine = isHorizontal
+			? 'middle'
+			: anchor === 'middle'
+				? 'middle'
+				: isLeft
+					? 'top'
+					: 'bottom';
+		return [
+			{
+				type: 'text',
+				data,
+				[valueAxis]: at,
+				[categoryAxis]: series[categoryAxis] as TextMarkerConfig['y'],
+				text: (d: ProcessedRow) => format(magnitude(d), series.name),
+				styles: {
+					...font,
+					fill: font?.fill ?? ctx.cfg.axis.color,
+					fontSize: font?.fontSize ?? 12,
+					dx: font?.dx ?? (isHorizontal ? shift : 0),
+					dy: font?.dy ?? (isHorizontal ? 0 : -shift),
+					textAnchor: labels.textAnchor ?? awayAnchor,
+					lineAnchor: font?.lineAnchor ?? awayLine
+				}
+			} as TextMarkerConfig
+		];
+	});
 }
 
 /**
@@ -129,10 +127,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		}) as Pick<BarMarkerConfig, 'isHorizontal' | 'x' | 'y' | 'x1' | 'x2' | 'y1' | 'y2'>;
 	// The real bars draw the rows the "transforms" phase left, read through its channels.
 	const processedGroups = new Map(
-		TransformsPhase.buildProcessedGroups<BarSegmentStyle>(state, false).map((g) => [
-			seriesIdOf(g.series),
-			g
-		])
+		(state.processedGroups ?? []).map((g) => [seriesIdOf(g.series), g])
 	);
 
 	const markers: BarMarkerConfig[] = [];

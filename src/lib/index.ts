@@ -3,6 +3,7 @@
 // timeline and facets around it.
 export { default as AreaPlot } from './plots/area/Plot.svelte';
 export { default as BarPlot } from './plots/bar/Plot.svelte';
+export { default as BoxPlot } from './plots/box/Plot.svelte';
 export { default as HistogramPlot } from './plots/histogram/Plot.svelte';
 export { default as HeatmapPlot } from './plots/heatmap/Plot.svelte';
 export { default as LinePlot } from './plots/line/Plot.svelte';
@@ -117,8 +118,6 @@ export type { GeoCameraConfig } from './types/plots/camera';
 export type { GeoMarkersConfig } from './types/markers/geo';
 export type { SharedAxisValues } from './types/phases';
 export type {
-	TimeValue,
-	Orientation,
 	TimelineConfig,
 	TimelineType,
 	TimelineCallbacks,

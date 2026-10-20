@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { SharedScalesPhase } from '$lib/phases/sharedScales/SharedScalesPhase';
 import { buildFacetKeyOf, buildFacetPanels, buildFacetPlaceKey } from '$lib/layout/facet/config';
-import { PANEL_KEY } from '$lib/phases/facet/FacetPhase';
+import { PANEL_KEY } from '$lib/phases/facet/FacetPanels';
 import { buildLineDefaults } from '$lib/plots/line/defaults';
 import type { FacetConfig } from '$lib/types/layout/facet';
 import type { SharedAxisValues } from '$lib/types/phases';
@@ -46,6 +46,12 @@ describe('buildSharedAxisScale', () => {
 			domain: [0, 60],
 			nice: false
 		});
+	});
+
+	test('a total a hair past a tick stays on it', () => {
+		expect(
+			SharedScalesPhase.buildSharedAxisScale([values([], [0, 100.2], { zero: ['y'] })], 'y')
+		).toEqual({ domain: [0, 100], nice: false });
 	});
 
 	test('includes zero when a facet asks for it', () => {

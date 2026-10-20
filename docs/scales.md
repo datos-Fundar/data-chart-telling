@@ -2,23 +2,38 @@
 
 `scales` configures how data values become positions and visual properties. It has one entry per channel.
 
+<!-- example: examples/Scales.svelte -->
+
 ```svelte
+<script lang="ts">
+	import { LinePlot } from '@fundar/data-chart-telling';
+	import { PRICES } from './data';
+</script>
+
+<!-- Axis labels, a fixed domain with gridlines and a color per series. -->
 <LinePlot
-	{width}
-	{height}
-	data={rows}
+	width={720}
+	height={400}
+	data={PRICES}
 	x="date"
 	y="index"
-	color="division"
+	color="commodity"
 	scales={{
 		x: { label: 'Month' },
-		y: { label: 'Index (Jan 2021 = 100)', domain: [90, 280], grid: true },
+		y: { label: 'Index (Jan 2021 = 100)', domain: [0, 600], grid: true },
 		color: {
-			scheme: { Food: '#1b9e77', Transport: '#d95f02', Housing: '#7570b3', Health: '#e7298a' }
+			scheme: {
+				'Brent oil': '#1b9e77',
+				'Natural gas': '#d95f02',
+				Coal: '#7570b3',
+				Wheat: '#e7298a'
+			}
 		}
 	}}
 />
 ```
+
+<!-- /example -->
 
 ![A line plot with a labelled axis, gridlines and custom colors](images/scales.png)
 
@@ -26,19 +41,21 @@
 
 Each axis takes an `AxisScale`.
 
-| Field                                                                        | Meaning                                                                                                                                                                                                                       |
-| ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type`                                                                       | `'auto'` (default), `'linear'`, `'pow'`, `'sqrt'`, `'log'`, `'symlog'`, `'time'`, `'utc'`, `'band'`, `'point'`, `'ordinal'`, `'categorical'` and the color-oriented types (`'sequential'`, `'diverging'`, `'threshold'`, ...) |
-| `domain`, `range`                                                            | Explicit input and output extent                                                                                                                                                                                              |
-| `reverse`, `nice`, `zero`, `clamp`, `round`, `percent`                       | Direction, rounding and baseline behaviour                                                                                                                                                                                    |
-| `label`, `labelAnchor`, `labelOrientation`, `labelPosition`, `titleFontSize` | The axis title (`label: false` hides it)                                                                                                                                                                                      |
-| `ticks`, `tickSpacing`, `tickSize`, `tickPadding`, `tickRotate`              | Tick placement and size                                                                                                                                                                                                       |
-| `tickFormat`                                                                 | `false`, an `Intl.NumberFormatOptions` / `Intl.DateTimeFormatOptions` object, or `(d, index, ticks) => string`                                                                                                                |
-| `grid`                                                                       | `true` or a stroke style for gridlines                                                                                                                                                                                        |
-| `axisDisplay`                                                                | `'visible'` (default), `'hidden'` (keeps the space, so aligned panels stay aligned) or `'none'`                                                                                                                               |
-| `padding`, `paddingInner`, `paddingOuter`, `align`                           | Band and point spacing                                                                                                                                                                                                        |
-| `insetLeft`, `insetRight`, `insetTop`, `insetBottom`                         | Pixels kept free at each end                                                                                                                                                                                                  |
-| `interval`, `base`, `constant`, `sort`                                       | Time/discrete intervals, log base, symlog constant, category order                                                                                                                                                            |
+| Field                                                                        | Meaning                                                                                                                                                                                                                                                                                                                                                                                         |
+| ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`                                                                       | `'auto'` (default), `'linear'`, `'pow'`, `'sqrt'`, `'log'`, `'symlog'`, `'time'`, `'utc'`, `'band'`, `'point'`, `'ordinal'`, `'categorical'` and the color-oriented types (`'sequential'`, `'diverging'`, `'threshold'`, ...)                                                                                                                                                                   |
+| `domain`, `range`                                                            | Explicit input and output extent                                                                                                                                                                                                                                                                                                                                                                |
+| `reverse`, `nice`, `zero`, `clamp`, `round`, `percent`                       | Direction, rounding and baseline behaviour                                                                                                                                                                                                                                                                                                                                                      |
+| `niceTolerance`                                                              | How far past a tick, as a share of the step, a domain the plot nices itself still ends on it (default `0.05`), so parts adding up to `100.2` stay at `100`. Applies to stacked and ranged axes, axes grown to cover markers or a transform's output, a bar plot's value axis and shared facet/timeline domains; `0` rounds like d3                                                              |
+| `edgeTicks`                                                                  | Ticks at the data's first and last values beside the nice ones. `false` turns them off, `true` on, `{ collision: 'drop-nice' \| 'drop-edge' \| 'extend' }` picks what happens when one crowds a nice tick. Defaults to `axis.edgeTicks.x` / `.y` in the [configuration](theming.md#edge-ticks) (on for x, off for y); ignored when the axis sets `ticks`, `tickSpacing`, `interval` or `domain` |
+| `label`, `labelAnchor`, `labelOrientation`, `labelPosition`, `titleFontSize` | The axis title (`label: false` hides it)                                                                                                                                                                                                                                                                                                                                                        |
+| `ticks`, `tickSpacing`, `tickSize`, `tickPadding`, `tickRotate`              | Tick placement and size                                                                                                                                                                                                                                                                                                                                                                         |
+| `tickFormat`                                                                 | `false`, an `Intl.NumberFormatOptions` / `Intl.DateTimeFormatOptions` object, or `(d, index, ticks) => string`                                                                                                                                                                                                                                                                                  |
+| `grid`                                                                       | `true` or a stroke style for gridlines                                                                                                                                                                                                                                                                                                                                                          |
+| `axisDisplay`                                                                | `'visible'` (default), `'hidden'` (keeps the space, so aligned panels stay aligned) or `'none'`                                                                                                                                                                                                                                                                                                 |
+| `padding`, `paddingInner`, `paddingOuter`, `align`                           | Band and point spacing                                                                                                                                                                                                                                                                                                                                                                          |
+| `insetLeft`, `insetRight`, `insetTop`, `insetBottom`                         | Pixels kept free at each end                                                                                                                                                                                                                                                                                                                                                                    |
+| `interval`, `base`, `constant`, `sort`                                       | Time/discrete intervals, log base, symlog constant, category order                                                                                                                                                                                                                                                                                                                              |
 
 Number and date text defaults follow `axis.locale` and `axis.compactDisplay` in the [configuration](theming.md#locale).
 

@@ -6,8 +6,8 @@
 	/**
 	 * A plot's floating tooltip at `(x, y)`, inside a `position: relative`
 	 * parent and themed by the `--dct-tooltip-*` variables. It reads the rows
-	 * the hover matched: its own `content` snippet, given every row, or each
-	 * row's `format` text, one per line. It sits at `anchorX`/`anchorY` of the
+	 * the hover matched: its own `content` snippet, given every row as matched,
+	 * or each row's `format` text, one per line, in `sort`'s order. It sits at `anchorX`/`anchorY` of the
 	 * point (default right and below) and moves over where it would leave its
 	 * plot's box - or `bounds`, when given. See {@link TooltipState}.
 	 */
@@ -17,6 +17,7 @@
 		y,
 		rows,
 		format,
+		sort,
 		content,
 		bounds,
 		anchorX = 'right',
@@ -30,6 +31,8 @@
 		/** Every row the hover matched. */
 		rows: TRow[];
 		format: (row: TRow) => string;
+		/** The order the `format` text reads the rows in. Unset, as matched. */
+		sort?: (a: TRow, b: TRow) => number;
 		/** Custom tooltip body, given every row; replaces the `format` text and the default box. */
 		content?: Snippet<[{ rows: TRow[] }]>;
 		/** Box the tooltip must stay within. Defaults to its plot's box. */
@@ -63,7 +66,7 @@
 		{#if content}
 			{@render content({ rows })}
 		{:else}
-			{TooltipState.text(rows, format)}
+			{TooltipState.text(rows, format, sort)}
 		{/if}
 	</div>
 {/if}

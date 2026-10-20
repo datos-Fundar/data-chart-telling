@@ -131,7 +131,11 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		yTickPadding: 10,
 		grid: false,
 		locale: 'es-AR',
-		compactDisplay: 'short'
+		compactDisplay: 'short',
+		edgeTicks: {
+			x: { enabled: true, collision: 'drop-nice' },
+			y: { enabled: false, collision: 'drop-nice' }
+		}
 	},
 
 	tooltip: {
@@ -174,6 +178,7 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 	pyramid: { gap: { fillOpacity: 0.5 } },
 	area: { fillOpacity: 0.6 },
 	histogram: { inset: 1, fillOpacity: 1 },
+	box: { fillOpacity: 0.9, paddingInner: 0.4, paddingOuter: 0.2 },
 	scatter: { dotRadius: 5 },
 	timeline: {
 		axisColor: 'currentColor',
@@ -230,6 +235,13 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		dot: { dotRadius: 5, dotFill: 'currentColor' },
 		font: { fill: 'currentColor', fontSize: 12, dy: -18 },
 		area: { fill: '#94a3b8', fillOpacity: 0.25 }
+	},
+	// Beside a vertical delta (taken on x), above a horizontal one (on y).
+	delta: {
+		text: {
+			x: { dx: 12, dy: 0, lineAnchor: 'middle', textAnchor: 'start' },
+			y: { dx: 0, dy: -10, lineAnchor: 'middle', textAnchor: 'middle' }
+		}
 	},
 	facet: {
 		indicator: {

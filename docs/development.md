@@ -35,7 +35,7 @@ pnpm test:stories                      # every story as a test (boots Storybook 
 
 - Component tests must end in `.svelte.test.ts`; that suffix is what routes a file to the browser project.
 - Browser tests render with `vitest-browser-svelte`. A dot renders as a `<path>`, not a `<circle>`; styles live in the `style` attribute.
-- `tests/unit/docs` and `tests/unit/examples.svelte.test.ts` guard the LLM-facing docs: every example mounts, and the links and exports named in `llms.txt` and `llms-full.txt` exist.
+- `tests/unit/docs` and `tests/unit/examples.svelte.test.ts` guard the LLM-facing docs: every example mounts, the links and exports named in `llms.txt` and `llms-full.txt` exist, and the example snippets in the Markdown match their files.
 
 ## Storybook
 
@@ -53,14 +53,23 @@ Every option has a story under `stories/`, grouped as Plots, Markers, Transforms
 
 ## Documentation figures
 
-Every screenshot in the docs is a real component in `scripts/docs-figures/figures/`, type-checked by `pnpm check` and rendered by Playwright:
+Every screenshot in the docs is an example, rendered by Playwright to `docs/images/<name>.png` in kebab-case (`examples/LineByRegion.svelte` is `line-by-region.png`). The examples and the screenshots share one file of small real datasets, `examples/data.ts`, which names the source of each, and axes are set to English. `docs/images` is left out of the npm package.
 
 ```bash
-pnpm docs:images               # regenerate docs/images/*.png
-pnpm docs:images tooltip scales   # only these figures
+pnpm docs:images                  # regenerate docs/images/*.png
+pnpm docs:images tooltip scales   # only these
 ```
 
-A figure can set `export const meta = { hover: { x, y } }` in a `<script module>` block to rest the pointer before the shot. The data is synthetic and deterministic (`scripts/docs-figures/data.ts`), and axes are set to English. `docs/images` is left out of the npm package.
+`scripts/docs-figures/figures.json` lists the examples that get no screenshot (`skip`) and where the pointer rests before a shot (`meta`, e.g. `{ "hover": { "x": 330, "y": 160 } }`). The maps are the exception: their GeoJSON is too large to ship in `examples/`, so they are components of their own in `scripts/docs-figures/figures/`, importing it from `stories/`, and their snippets in `geo.md` and `styles-and-segments.md` are written by hand.
+
+The Markdown shows each example's source between `<!-- example: examples/Name.svelte -->` and `<!-- /example -->`:
+
+```bash
+pnpm docs:examples           # copy each example's source into README.md and docs/*.md
+pnpm docs:examples --check   # fail when a block is out of date
+```
+
+`tests/unit/docs/examples-sync.test.ts` runs the check, so a snippet never drifts from its example or its screenshot.
 
 ## Continuous integration
 

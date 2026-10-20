@@ -7,7 +7,7 @@
 	width={480}
 	height={520}
 	data={ARGENTINA_PROVINCES}
-	featureId={(f) => String(f.properties?.nombre)}
+	featureId={(feature) => String(feature.properties?.nombre)}
 	coordinates={{
 		projection: 'mercator',
 		camera: {

@@ -2,7 +2,7 @@ import type { HoverStrategy } from '$lib/types/layout/hover';
 import type {
 	Orientation,
 	PlayerConfig,
-	TimeValue,
+	TimeInput,
 	TimelineCallbacks,
 	TimelineType
 } from '$lib/types/layout/timeline';
@@ -29,7 +29,10 @@ export type ComposerTags = 'A' | 'a' | '1' | 'I' | 'i' | string[];
 /** One timeline for every panel: plots with a `timeline` follow its `progress` over `values`. */
 export type ComposerTimelineConfig = TimelineCallbacks & {
 	progress?: number;
-	values: TimeValue[];
+	/** The steps: numbers, `Date`s or date strings. */
+	values: TimeInput[];
+	/** How a non-ISO date string in `values` reads. */
+	dateFormat?: string;
 	/** How it draws. Defaults to `'player'`. */
 	type?: TimelineType;
 	/** The player bar's own options, when `type` is `'player'`. */

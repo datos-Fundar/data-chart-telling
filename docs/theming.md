@@ -31,25 +31,26 @@ resetConfiguration(); // back to the shipped defaults
 
 ## Sections
 
-| Key                                                      | Controls                                                                                                                                                         |
-| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `font`, `color`, `background`                            | Base text of every figure                                                                                                                                        |
-| `palette`                                                | Categorical series colors, in order                                                                                                                              |
-| `symbols`                                                | Shape cycle for the `symbol` channel                                                                                                                             |
-| `continuous`                                             | Default ramp endpoints, label color and opacity range for continuous color and opacity                                                                           |
-| `spacing`, `chrome`                                      | Padding around header, legend and caption; the chrome `order` and `rowGap`                                                                                       |
-| `title`, `subtitle`, `caption`                           | Text blocks: `font`, `size`, `weight`, `color`, `leading`, `spacing`                                                                                             |
-| `divider`                                                | The line a `'divider'` in the chrome `order` draws                                                                                                               |
-| `legend`                                                 | Text, gaps, swatches, `disabledOpacity`, paginated nav buttons, the continuous bar, its handles, ticks and labels, and the `seriesTitle` and `sizeScale` options |
-| `axis`                                                   | Axis color, font and tick sizes, `grid`, and the number locale (below)                                                                                           |
-| `tooltip`                                                | Tooltip background, color, font size, padding, radius, border                                                                                                    |
-| `margins`                                                | Default margin per side (`'auto'` or a number)                                                                                                                   |
-| `line`, `area`, `bar`, `pyramid`, `histogram`, `scatter` | Per-kind defaults: stroke width, dot radius, series padding, gap fills, fill opacity, inset                                                                      |
-| `text`                                                   | `declutter` geometry of value labels and connectors                                                                                                              |
-| `hover`                                                  | Look of the hover marker: `rule`, `dot`, `font`, `area`                                                                                                          |
-| `timeline`                                               | The rule (`rule`) and the player bar (`player`: controls, speeds, `stepDuration`, button, track, thumb, toggle)                                                  |
-| `facet`                                                  | The position badge and prev/next buttons                                                                                                                         |
-| `frameClip`                                              | Tolerance for clipping marks to the plot frame                                                                                                                   |
+| Key                                                             | Controls                                                                                                                                                                                                                                                                                  |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `font`, `color`, `background`                                   | Base text of every figure                                                                                                                                                                                                                                                                 |
+| `palette`                                                       | Categorical series colors, in order                                                                                                                                                                                                                                                       |
+| `symbols`                                                       | Shape cycle for the `symbol` channel                                                                                                                                                                                                                                                      |
+| `continuous`                                                    | Default ramp endpoints, label color and opacity range for continuous color and opacity                                                                                                                                                                                                    |
+| `spacing`, `chrome`                                             | Padding around header, legend and caption; the chrome `order` and `rowGap`                                                                                                                                                                                                                |
+| `title`, `subtitle`, `caption`                                  | Text blocks: `font`, `size`, `weight`, `color`, `leading`, `spacing`                                                                                                                                                                                                                      |
+| `divider`                                                       | The line a `'divider'` in the chrome `order` draws                                                                                                                                                                                                                                        |
+| `legend`                                                        | Text, gaps, swatches, `disabledOpacity`, paginated nav buttons, the continuous bar, its handles, ticks and labels, and the `seriesTitle` and `sizeScale` options                                                                                                                          |
+| `axis`                                                          | Axis color, font and tick sizes, `grid`, and the number locale (below)                                                                                                                                                                                                                    |
+| `tooltip`                                                       | Tooltip background, color, font size, padding, radius, border                                                                                                                                                                                                                             |
+| `margins`                                                       | Default margin per side (`'auto'` or a number)                                                                                                                                                                                                                                            |
+| `line`, `area`, `bar`, `pyramid`, `histogram`, `box`, `scatter` | Per-kind defaults: stroke width, dot radius, series padding, gap fills, fill opacity, inset, box padding                                                                                                                                                                                  |
+| `text`                                                          | `declutter` geometry of value labels and connectors                                                                                                                                                                                                                                       |
+| `hover`                                                         | Look of the hover marker: `rule`, `dot`, `font`, `area`                                                                                                                                                                                                                                   |
+| `delta`                                                         | The `delta` marker's label, per axis the delta is taken on: `text.x` (beside a vertical delta: `dx: 12`, `textAnchor: 'start'`) and `text.y` (above a horizontal one: `dy: -10`, `textAnchor: 'middle'`). `lineAnchor` picks where along the delta the label sits and how it aligns there |
+| `timeline`                                                      | The rule (`rule`) and the player bar (`player`: controls, speeds, `stepDuration`, button, track, thumb, toggle)                                                                                                                                                                           |
+| `facet`                                                         | The position badge and prev/next buttons                                                                                                                                                                                                                                                  |
+| `frameClip`                                                     | Tolerance for clipping marks to the plot frame                                                                                                                                                                                                                                            |
 
 ## Locale
 
@@ -60,6 +61,16 @@ setConfiguration({ axis: { locale: 'en-US', compactDisplay: 'long' } });
 ```
 
 `axis.locale` updates plots already on screen. `axis.compactDisplay` is read when a plot mounts, so a later change shows on the next mount.
+
+## Edge ticks
+
+`axis.edgeTicks.x` and `axis.edgeTicks.y` (`{ enabled, collision }`, on for x and off for y, both `'drop-nice'`) add a tick at the data's first and last values beside the nice ones, on a continuous axis whose other axis is continuous too, so a reader sees where the data starts and ends. When one lands too close to a nice tick for both labels, `collision` picks what gives way: `'drop-nice'` keeps the data's tick, `'drop-edge'` keeps the nice one, `'extend'` widens the axis to the next nice tick past the data.
+
+```ts
+setConfiguration({ axis: { edgeTicks: { x: { enabled: true, collision: 'extend' } } } });
+```
+
+A plot overrides it with `scales.x.edgeTicks` or `scales.y.edgeTicks` (see [Scales](scales.md)).
 
 ## CSS variables
 

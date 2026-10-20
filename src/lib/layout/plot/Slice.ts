@@ -1,6 +1,7 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
 import { merge } from '$lib/utils/merge';
 import { TimelineSteps } from '$lib/layout/timeline/TimelineSteps';
+import { TimelineTime } from '$lib/layout/timeline/TimelineTime';
 import { buildFacetAxesDisplay } from '$lib/layout/facet/axes';
 import { buildFacetPlaceKey, isFacetWrap } from '$lib/layout/facet/config';
 import type { FacetCellContext, FacetConfig } from '$lib/types/layout/facet';
@@ -71,11 +72,12 @@ export class Slice<TRow extends Record<string, unknown>> {
 			});
 		};
 		if (timeline && place.time !== undefined) {
-			const get = resolveAccessor<TRow>(timeline.accessor);
+			const get = resolveAccessor<TRow>(timeline.accessor as never) as (row: TRow) => unknown;
+			const reader = new TimelineTime(timeline.dateFormat);
 			const time = place.time;
 			tests.push((row) => {
-				const value = get(row);
-				if (value == null) return true;
+				const value = reader.toTime(get(row));
+				if (value === undefined) return true;
 				return TimelineSteps.matches(value, time, this.filterMode);
 			});
 		}

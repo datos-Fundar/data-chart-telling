@@ -13,24 +13,23 @@ pnpm add @fundar/data-chart-telling svelte svelteplot
 
 ## A first plot
 
+<!-- example: examples/FirstPlot.svelte -->
+
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-
-	const rows = [
-		{ year: 2020, region: 'North', value: 3.1 },
-		{ year: 2021, region: 'North', value: 3.8 },
-		{ year: 2020, region: 'South', value: 2.2 },
-		{ year: 2021, region: 'South', value: 2.9 }
-	];
+	import { REGION_VALUES } from './data';
 </script>
 
-<LinePlot width={720} height={400} data={rows} x="year" y="value" color="region" />
+<!-- The smallest useful plot: rows, the fields to map and a pixel size. -->
+<LinePlot width={720} height={400} data={REGION_VALUES} x="date" y="value" color="region" />
 ```
+
+<!-- /example -->
 
 ![A line plot with one line per region](images/first-plot.png)
 
-- `data` is an array of flat rows; `x` and `y` name the fields that position each row.
+- `data` is an array of flat rows, here `{ date, region, value }` from [examples/data.ts](../examples/data.ts); `x` and `y` name the fields that position each row.
 - `color="region"` splits the rows into one series per region and gives each its own color.
 - `width` and `height` are pixels.
 

@@ -1,5 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { HoverPhase } from '$lib/phases/hover/HoverPhase';
+import { HoverSettings } from '$lib/layout/hover/HoverSettings';
 import { Pipeline } from '$lib/phases/Pipeline';
 import { buildLineDefaults } from '$lib/plots/line/defaults';
 import { buildBarDefaults } from '$lib/plots/bar/defaults';
@@ -12,39 +13,39 @@ import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 
 type Row = Record<string, unknown>;
 
-describe('buildHoverConfig', () => {
+describe('HoverSettings.buildConfig', () => {
 	const base = { points: [], label: () => '', format: () => '', defaultStrategy: 'x' as const };
 
 	test('is active with a tooltip or a hover marker, and only then', () => {
 		expect(
-			HoverPhase.buildHoverConfig<Row>({ ...base, tooltip: undefined, markers: [] }).active
+			HoverSettings.buildConfig<Row>({ ...base, tooltip: undefined, markers: [] }).active
 		).toBe(false);
 		expect(
-			HoverPhase.buildHoverConfig<Row>({
+			HoverSettings.buildConfig<Row>({
 				...base,
 				tooltip: undefined,
 				markers: [{ type: 'hover' }]
 			}).active
 		).toBe(true);
 		const tooltip = { format: () => '', sync: false };
-		expect(HoverPhase.buildHoverConfig<Row>({ ...base, tooltip, markers: [] }).active).toBe(true);
+		expect(HoverSettings.buildConfig<Row>({ ...base, tooltip, markers: [] }).active).toBe(true);
 	});
 
 	test("falls back to the plot kind's own strategy, and the tooltip's wins over it", () => {
 		expect(
-			HoverPhase.buildHoverConfig<Row>({ ...base, tooltip: undefined, markers: [] }).strategy
+			HoverSettings.buildConfig<Row>({ ...base, tooltip: undefined, markers: [] }).strategy
 		).toBe('x');
 		const tooltip = { format: () => '', sync: false, strategy: 'series' as const };
-		expect(HoverPhase.buildHoverConfig<Row>({ ...base, tooltip, markers: [] }).strategy).toBe(
+		expect(HoverSettings.buildConfig<Row>({ ...base, tooltip, markers: [] }).strategy).toBe(
 			'series'
 		);
 	});
 
 	test('carries pointMatching only when given', () => {
 		expect(
-			HoverPhase.buildHoverConfig<Row>({ ...base, tooltip: undefined, markers: [] })
+			HoverSettings.buildConfig<Row>({ ...base, tooltip: undefined, markers: [] })
 		).not.toHaveProperty('pointMatching');
-		const contains = HoverPhase.buildHoverConfig<Row>({
+		const contains = HoverSettings.buildConfig<Row>({
 			...base,
 			tooltip: undefined,
 			markers: [],

@@ -12,7 +12,7 @@ Svelte 5 plot components on top of svelteplot. This file is checked against the 
 ## The mental model
 
 - A **plot** is one graph (axes + marks). Titles, subtitle, caption, legend, facets and a timeline are props of the plot itself.
-- Plots: `LinePlot AreaPlot BarPlot HistogramPlot HeatmapPlot PyramidPlot ScatterPlot GeoPlot`.
+- Plots: `LinePlot AreaPlot BarPlot HistogramPlot BoxPlot HeatmapPlot PyramidPlot ScatterPlot GeoPlot`.
 - `PlotComposer` lays several plots out in one figure with shared hover, legend and timeline.
 - `width` and `height` are pixel numbers on a standalone plot. To fill a container or the window, bind its size (`examples/ResponsiveLine.svelte`) and render the plot once both are > 0.
 
@@ -38,17 +38,17 @@ Two ways to give data, one per plot:
 | `title` `subtitle` `caption` | Text chrome. `header` / `footer` snippets replace title+subtitle / caption. |
 | `legend` | unset/`true`: automatic legend; `false`: none; `{ series: { interactive: { enabled: true, disabled: { mode: 'omit' } } } }` adjusts a section. |
 | `order` | Chrome blocks top to bottom, e.g. `['title','subtitle','legend','plot','caption']`; rows as `'(plot, timeline)'`; `'divider'` between blocks. |
-| `scales` | Per channel: `{ x: { label, tickFormat, domain, type, ticks, grid }, y: {...}, color: { scheme, domain } }`. |
+| `scales` | Per channel: `{ x: { label, tickFormat, domain, type, ticks, grid, niceTolerance, edgeTicks }, y: {...}, color: { scheme, domain } }`. Stacked parts adding up to a hair past a tick (`100.2`) stay on it; `niceTolerance` (default `0.05` of a step) tunes that. A continuous x axis also ticks the data's first and last values (y too with `edgeTicks: true`); `edgeTicks: false` or `{ collision: 'drop-nice'\|'drop-edge'\|'extend' }` (global defaults: `axis.edgeTicks.x` / `.y`). |
 | `styles` | `{ values: {...}, frame: true, gaps: {...} }` (shape depends on the kind). |
 | `segments` | Style ranges of the data (rule 1 below). |
 | `markers` | Extra marks, an array of `{ type: '...', ... }`. |
 | `margins` | `{ top, right, bottom, left }`, each a number or `'auto'` (all `'auto'` by default). |
-| `tooltip` | `true` or `{ strategy, sync, format, content, series, anchorX, anchorY }`. |
-| `timeline` | `{ accessor: 'year' }` steps through the rows by a field, drawn as a player bar (default); `type: 'rule'` draws a rule beside the plot instead. |
+| `tooltip` | `true` or `{ strategy, sync, format, content, series, anchorX, anchorY }`. The text lists matched rows highest value first; a `content` snippet gets them unsorted. |
+| `timeline` | `{ accessor: 'year' }` steps through the rows by a field, drawn as a player bar (default); `type: 'rule'` draws a rule beside the plot instead. The field may hold numbers, `Date`s or date strings (ISO, or any other with `dateFormat: 'DD/MM/YYYY'`); date steps read as dates, and reach `onvalue`, `player.format` and `useFigure().timeline` (`steps`, `value`, `seekValue`) as `Date`s. |
 | `facet` | `{ by: 'field', columns, gap, scales: 'shared'\|'free', mode: 'grid'\|'carousel'\|'paginated' }` or `{ rows, cols }`. |
 | `transforms` `statistics` | svelteplot transforms / derived summaries (regression, movingAverage, ...). |
 
-Per kind: `BarPlot` x = category, y = value (swap for horizontal bars); `PyramidPlot` mirrors two series around zero; `HeatmapPlot` colors cells by `color`; `HistogramPlot` bins one numeric field; `ScatterPlot` takes `r` (size) and `symbol`; `GeoPlot` takes GeoJSON/TopoJSON in `data` and `coordinates` for the projection (`docs/geo.md`).
+Per kind: `BarPlot` x = category, y = value (swap for horizontal bars); `PyramidPlot` mirrors two series around zero; `HeatmapPlot` colors cells by `color`; `HistogramPlot` bins one numeric field; `BoxPlot` x = category, y = value, one box per category (its tooltip row is the box summary: `min`, `p25`, `median`, `p75`, `max`, `count`, `outliers`); `ScatterPlot` takes `r` (size) and `symbol`; `GeoPlot` takes GeoJSON/TopoJSON in `data` and `coordinates` for the projection (`docs/geo.md`).
 
 ## Switches
 
@@ -104,11 +104,39 @@ GeoPlot: `graticule sphere dot text vector link contour inset geo-hover geo-comp
 
 ## Examples (in `examples/`, all runnable)
 
+- `LineByRegion.svelte` - one line per region with title, legend, end labels and tooltip.
 - `ResponsiveLine.svelte` - fill the window, end-of-line labels, axis labels.
 - `Tooltip.svelte` - tooltip + hover marker.
 - `Segments.svelte` - styling a range of the data.
 - `LegendToggle.svelte` + `LegendReader.svelte` - interactive legend and reading its state.
 - `TimelinePlayer.svelte` - animated bar chart with a player.
+- `TimelineRule.svelte` - a timeline rule moved by a slider through `progress`.
 - `Facets.svelte` - small multiples with a synced tooltip.
 - `BarValues.svelte` - value labels on bars.
 - `CustomTooltip.svelte` + `TooltipCard.svelte` - a tooltip drawn with your own card (`tooltip.content`).
+- `FirstPlot.svelte` - the smallest plot: rows, fields and a pixel size.
+- `LineDates.svelte` - line per series over a date axis, with end labels.
+- `StackedArea.svelte` - stacked area plot.
+- `GroupedBars.svelte` - vertical bars grouped by color.
+- `HorizontalBars.svelte` - horizontal bars.
+- `Histogram.svelte` - overlapping histograms.
+- `Box.svelte` - box plots per group.
+- `Heatmap.svelte` - heatmap.
+- `Pyramid.svelte` - population pyramid.
+- `Scatter.svelte` - scatter plot sized, colored and shaped by channels.
+- `Scales.svelte` - axis labels, fixed domain, gridlines and series colors.
+- `ValueLabels.svelte` - end-of-line value labels with a custom format.
+- `Gaps.svelte` - filling gaps of missing values.
+- `SegmentHighlight.svelte` - highlighting a range of one series.
+- `SegmentsBySeries.svelte` - segments per series and shared rules.
+- `HeatmapSegments.svelte` - segments on a heatmap.
+- `Markers.svelte` - hover, rule and delta markers.
+- `StackedBars.svelte` - bars stacked with stackY.
+- `MovingAverage.svelte` - moving average with windowY.
+- `Regression.svelte` - linear regression with a confidence band.
+- `LegendSections.svelte` - explicit legend sections.
+- `Chrome.svelte` - title, subtitle and caption.
+- `ChromeOrder.svelte` - ordering chrome blocks with dividers.
+- `FacetsCarousel.svelte` - facets as a carousel.
+- `FacetsRowsCols.svelte` - facets by rows and columns.
+- `Composer.svelte` - several plots in one figure.

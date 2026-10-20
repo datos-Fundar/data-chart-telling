@@ -1,7 +1,8 @@
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import { MarkerAxisValues } from '$lib/phases/scales/MarkerAxisValues';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
+import { NiceTicks } from '$lib/layout/scales/NiceTicks';
 import { DISCRETE_SCALE_TYPES } from '$lib/types/layout/scales';
 import type { AxisChannelName } from '$lib/types/layout/mapping';
 import type { AxisScale } from '$lib/types/layout/scales';
@@ -113,14 +114,21 @@ export class ScalesPhase<
 			// A transform's own output on an axis from zero (a bin's count) has no baseline row to reach it.
 			const aggregated = (processedData?.transforms.length ?? 0) > 0 && zero.has(axis);
 			if (!derived.length && !ranged && !aggregated) continue;
-			const own = numeric(ScalesPhase.processedValues(processedData, axis));
+			const own = numeric(ProcessedPositions.values(processedData, axis));
 			if (!own) continue;
 			const values = [...own, ...derived, ...(zero.has(axis) ? [0] : [])];
-			scales[axis] = {
-				...scales[axis],
-				domain: [Math.min(...values), Math.max(...values)],
-				nice: scales[axis]?.nice ?? true
-			};
+			const lo = Math.min(...values);
+			const hi = Math.max(...values);
+			const author = scales[axis];
+			// Niced here, with a tolerance, so parts that add up to a whole land on its tick.
+			const niced = author?.nice !== false && author?.ticks == null && hi > lo;
+			scales[axis] = niced
+				? {
+						...author,
+						domain: NiceTicks.fit(state, axis, lo, hi, author?.niceTolerance),
+						nice: false
+					}
+				: { ...author, domain: [lo, hi], nice: author?.nice ?? true };
 		}
 
 		const next = { ...state, scales } as TState;
@@ -150,20 +158,9 @@ export class ScalesPhase<
 			}
 		}
 		if (this.keepsDataOrder && !band.domain) {
-			band.domain = [...new Set(ScalesPhase.processedValues(processed, axis))] as never;
+			band.domain = [...new Set(ProcessedPositions.values(processed, axis))] as never;
 		}
 		return band;
-	}
-
-	/** Every value the plot's own processed rows sit at on one axis. */
-	static processedValues(processed: ProcessedData | undefined, axis: AxisChannelName): unknown[] {
-		if (!processed) return [];
-		return POSITION_CHANNELS[axis].flatMap((name) => {
-			const channel = processed.channels[name];
-			if (channel === undefined) return [];
-			const read = resolveAccessor(channel as never) as (row: unknown) => unknown;
-			return processed.data.map((row) => read(row as never));
-		});
 	}
 
 	/** The axes `refs` name, by name or by the role they play in this state. */
@@ -192,7 +189,7 @@ export class ScalesPhase<
 
 	/** How far an axis reaches from zero: the largest magnitude its rows, and the gaps filled in between them, sit at. */
 	static #reachOf(state: AnyAxisState, axis: AxisChannelName): number {
-		const rows = ScalesPhase.processedValues(state.processedData, axis)
+		const rows = ProcessedPositions.values(state.processedData, axis)
 			.filter((v) => !isGapValue(v))
 			.map((v) => Math.abs(Number(v)));
 		const filled = [...(state.gapFillMaps?.values() ?? [])].flatMap((fills) =>

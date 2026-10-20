@@ -6,33 +6,53 @@ Both derive rows from the data before drawing. A **transform** reshapes the rows
 
 `transforms` is an array of flat objects: `type` picks the transform and the other fields are its channels and options, named as in [svelteplot's transforms](https://svelteplot.dev). It exists on a plot (it then runs once over all the plot's series) and on each [marker](markers.md) (over the marker's rows).
 
+<!-- example: examples/StackedBars.svelte -->
+
 ```svelte
-<!-- stacked bars -->
+<script lang="ts">
+	import { BarPlot } from '@fundar/data-chart-telling';
+	import { SEX_SHARES } from './data';
+</script>
+
+<!-- Each sex's share of the population per census, stacked with `stackY` so a bar adds up to 100%. -->
 <BarPlot
-	{width}
-	{height}
-	data={rows}
-	x="province"
-	y="value"
+	width={720}
+	height={400}
+	data={SEX_SHARES}
+	x="year"
+	y="share"
 	color="sex"
 	transforms={[{ type: 'stackY' }]}
 />
+```
 
-<!-- a 6-month moving average, run on the plot's rows -->
+<!-- /example -->
+
+![Stacked bars](images/stacked-bars.png)
+
+<!-- example: examples/MovingAverage.svelte -->
+
+```svelte
+<script lang="ts">
+	import { LinePlot } from '@fundar/data-chart-telling';
+	import { PRICES } from './data';
+</script>
+
+<!-- A 6-month moving average, run on the plot's rows. -->
 <LinePlot
-	{width}
-	{height}
-	data={rows}
+	width={720}
+	height={400}
+	data={PRICES}
 	x="date"
 	y="index"
-	color="division"
+	color="commodity"
 	transforms={[{ type: 'windowY', k: 6, reduce: 'mean' }]}
 />
 ```
 
-![Stacked bars](images/transforms-stack.png)
+<!-- /example -->
 
-![Lines smoothed by a moving average](images/transforms-window.png)
+![Lines smoothed by a moving average](images/moving-average.png)
 
 | Family    | `type`                                                                                        | Does                                                                                                                                                                                                                             |
 | --------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -57,18 +77,28 @@ Bar stacking is always `stackY`, also for horizontal bars. A transform on a `His
 
 `statistics` is an array of derived summaries drawn as extra marks. On a plot it computes one per series by default; on a marker it applies to that marker's own rows.
 
+<!-- example: examples/Regression.svelte -->
+
 ```svelte
+<script lang="ts">
+	import { ScatterPlot } from '@fundar/data-chart-telling';
+	import { COUNTRIES } from './data';
+</script>
+
+<!-- A linear regression with its 95% confidence band. -->
 <ScatterPlot
-	{width}
-	{height}
-	data={rows}
+	width={720}
+	height={400}
+	data={COUNTRIES}
 	x="gdp"
 	y="life"
 	statistics={[{ type: 'regression', regressionType: 'linear', confidence: 0.95 }]}
 />
 ```
 
-![A scatter plot with a regression line and confidence band](images/statistics-regression.png)
+<!-- /example -->
+
+![A scatter plot with a regression line and confidence band](images/regression.png)
 
 | `type`          | Draws                                                | Options                                                                                                                                                           |
 | --------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |

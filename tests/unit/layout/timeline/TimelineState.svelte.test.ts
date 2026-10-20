@@ -1,5 +1,6 @@
 import { describe, test, expect, vi } from 'vitest';
 import { TimelineState, type TimelineSettings } from '$lib/layout/timeline/TimelineState.svelte';
+import { PublicTimeline } from '$lib/layout/plot/PublicPlotContext';
 
 const VALUES = [2000, 2001, 2002, 2003, 2004];
 
@@ -115,5 +116,40 @@ describe('TimelineState - playing', () => {
 		expect(state.speed).toBe(2);
 		state.setLoop(false);
 		expect(onloop).toHaveBeenCalledWith(false);
+	});
+});
+
+describe('TimelineState - a timeline of dates', () => {
+	const MONTHS = ['2023-01', '2023-02', '2023-03'];
+	const MARCH = new Date(Date.UTC(2023, 2, 1));
+
+	test('works with numbers inside, and hands authors dates', () => {
+		const { state } = make({ values: MONTHS, progress: 1 });
+		expect(state.temporal).toBe(true);
+		expect(state.value).toBe(MARCH.getTime());
+		expect(state.step(state.value!)).toEqual(MARCH);
+	});
+
+	test('a year timeline hands its steps over as numbers', () => {
+		const { state } = make({ progress: 1 });
+		expect(state.temporal).toBe(false);
+		expect(state.step(state.value!)).toBe(2004);
+	});
+
+	test('`player.format` is given each step as a Date', () => {
+		const format = vi.fn((date: number | Date) => (date as Date).toISOString().slice(0, 7));
+		const { state } = make({ values: MONTHS, player: { format } });
+		expect(state.format(MARCH.getTime())).toBe('2023-03');
+		expect(format).toHaveBeenCalledWith(MARCH);
+	});
+
+	test('`useFigure().timeline` reads and moves it in dates', () => {
+		const { state } = make({ values: MONTHS, progress: 0 });
+		const timeline = new PublicTimeline(state);
+		expect(timeline.steps).toEqual(MONTHS.map((month) => new Date(`${month}-01T00:00:00Z`)));
+		timeline.seekValue('2023-02');
+		expect(timeline.value).toEqual(new Date(Date.UTC(2023, 1, 1)));
+		timeline.seekValue(MARCH);
+		expect(timeline.index).toBe(2);
 	});
 });

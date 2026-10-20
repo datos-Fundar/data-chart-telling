@@ -1,8 +1,7 @@
 import { Transforms } from '$lib/phases/transforms/Transforms';
 import { seriesIdOf } from '$lib/utils/grouping';
-import { PANEL_KEY } from '$lib/phases/facet/FacetPhase';
+import { PANEL_KEY } from '$lib/phases/facet/FacetPanels';
 import { resolveAccessor } from '$lib/plots/utils/accessors';
-import { isGapValue } from '$lib/plots/utils/gaps';
 import { buildGroupedSeries } from '$lib/plots/utils/segments';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { Series } from '$lib/types/plots/data/common';
@@ -39,7 +38,8 @@ const NOT_OPTIONS = new Set(['data', 'z', 'grouping', 'transforms', 'sort', 'fil
  * The "transforms" phase every axis-based plot shares: runs the plot-level
  * transforms once over every visible series' rows together, so a stack sees
  * every series and a bin keeps each series apart (both group by series), and
- * leaves the result in `state.processedData` for the plot's own marks. With
+ * leaves the result in `state.processedData` for the plot's own marks - and
+ * in `state.processedGroups`, split back into the visual groups they draw. With
  * facet panels, the transforms run once per panel's rows, so a stack never
  * combines two panels, and every row they return keeps its panel. A gap that
  * `styles.gaps` fills is read at its interpolated value, so it takes its place
@@ -51,9 +51,12 @@ export class TransformsPhase<
 > implements PhaseStage<TState, TCtx> {
 	readonly phase = 'transforms' as const;
 	readonly #options: TransformsStageOptions<TState, TCtx>;
+	readonly #connect: boolean;
 
-	constructor(options: TransformsStageOptions<TState, TCtx> = {}) {
+	/** `connect`: whether a series' visual segments bridge into each other, as the kind's "data" phase splits them. */
+	constructor(options: TransformsStageOptions<TState, TCtx> = {}, connect = true) {
 		this.#options = options;
+		this.#connect = connect;
 	}
 
 	run = (state: TState, ctx: TCtx): TState => {
@@ -91,7 +94,7 @@ export class TransformsPhase<
 				Object.entries({ x, y }).filter(([, channel]) => channel !== undefined)
 			) as ProcessedData['channels'];
 			const processedData: ProcessedData = { data, channels, options: {}, transforms };
-			return { ...state, processedData };
+			return this.#withGroups({ ...state, processedData });
 		}
 
 		const out = TransformsPhase.#runByPanel(data, (rows) =>
@@ -120,8 +123,17 @@ export class TransformsPhase<
 			options: markOptions,
 			transforms
 		};
-		return { ...state, processedData };
+		return this.#withGroups({ ...state, processedData });
 	};
+
+	/** `state` with its processed rows split into the visual groups the kind's marks draw (`processedGroups`). */
+	#withGroups(state: TState): TState {
+		const processedGroups =
+			this.#options.groups === 'runs'
+				? TransformsPhase.#buildRuns(state)
+				: TransformsPhase.#buildGroups(state, this.#connect);
+		return { ...state, processedGroups };
+	}
 
 	/** What a gap-filled row carries: its interpolated value and the kind of zone that filled it. */
 	static #fillTags(fill: { value: number; kind: string } | undefined): ProcessedRow {
@@ -133,9 +145,9 @@ export class TransformsPhase<
 	 * into its styled visual segments by `segments`, matched on the processed `x`.
 	 * Each series reads its rows through its value axis: a stack's top, a bin's start.
 	 */
-	static buildProcessedGroups<TStyle>(
+	static #buildGroups<TStyle>(
 		state: TransformsStageState & { segments?: SegmentsConfig<TStyle> },
-		connect = true
+		connect: boolean
 	): VisualGroup<Series<ProcessedRow>, TStyle>[] {
 		const { data } = state.processedData!;
 		const series = (state.resolvedSeries ?? []).map((s) =>
@@ -151,11 +163,11 @@ export class TransformsPhase<
 	/**
 	 * The processed rows in their own order, split into runs of consecutive rows
 	 * from the same visible series, each cut into its styled visual segments like
-	 * {@link TransformsPhase.buildProcessedGroups}. Drawn in turn, the runs keep the rows' order
+	 * {@link TransformsPhase.#buildGroups}. Drawn in turn, the runs keep the rows' order
 	 * across series, so a transform that reorders rows (`sort`, `reverse`,
 	 * `shuffle`) decides which rows paint on top. Unreordered, each series is one run.
 	 */
-	static buildProcessedRuns<TStyle>(
+	static #buildRuns<TStyle>(
 		state: TransformsStageState & { segments?: SegmentsConfig<TStyle> }
 	): VisualGroup<Series<ProcessedRow>, TStyle>[] {
 		const byId = new Map((state.resolvedSeries ?? []).map((s) => [seriesIdOf(s), s]));
@@ -168,64 +180,6 @@ export class TransformsPhase<
 			else runs.push(TransformsPhase.#processedSeries(state, source, [row]));
 		}
 		return buildGroupedSeries<Series<ProcessedRow>, TStyle>(runs, state.segments, false);
-	}
-
-	/**
-	 * Where a processed row sits: the top of its value (`y2`, or `y` - `x2`/`x`
-	 * when `valueAxis` is `x`) and, on the other axis, its own position (or the
-	 * middle of its `1`-`2` span, a bin's centre).
-	 */
-	static processedPosition(
-		processed: ProcessedData,
-		valueAxis: 'x' | 'y' = 'y'
-	): {
-		x: (row: ProcessedRow) => unknown;
-		y: (row: ProcessedRow) => unknown;
-	} {
-		const { channels } = processed;
-		const read = (channel: ProcessedChannel) =>
-			resolveAccessor(channel as never) as (row: ProcessedRow) => unknown;
-		const along = (axis: 'x' | 'y') => {
-			const own = channels[axis];
-			const from = channels[`${axis}1`];
-			const to = channels[`${axis}2`];
-			if (axis === valueAxis) {
-				const top = to ?? own;
-				return top !== undefined ? read(top) : () => undefined;
-			}
-			if (own !== undefined) return read(own);
-			if (from === undefined || to === undefined) return () => undefined;
-			return (row: ProcessedRow) => (Number(read(from)(row)) + Number(read(to)(row))) / 2;
-		};
-		return { x: along('x'), y: along('y') };
-	}
-
-	/**
-	 * A processed row's span along `valueAxis`: from its `1` channel (a stack's
-	 * bottom) or, with none, from `baseline`, to its top. `undefined` when the
-	 * row has no value there. `stacked` tells a stack from plain values.
-	 */
-	static processedSpan(
-		processed: ProcessedData,
-		valueAxis: 'x' | 'y',
-		baseline = 0
-	): { stacked: boolean; of: (row: ProcessedRow) => [number, number] | undefined } {
-		const from = processed.channels[`${valueAxis}1`];
-		const stacked = from !== undefined && processed.channels[`${valueAxis}2`] !== undefined;
-		const top = TransformsPhase.processedPosition(processed, valueAxis)[valueAxis];
-		const bottom = stacked
-			? (resolveAccessor(from as never) as (row: ProcessedRow) => unknown)
-			: () => baseline;
-		return {
-			stacked,
-			of: (row) => {
-				const end = top(row);
-				const start = bottom(row);
-				if (isGapValue(end) || isGapValue(start)) return undefined;
-				const span: [number, number] = [Number(start), Number(end)];
-				return Number.isFinite(span[0]) && Number.isFinite(span[1]) ? span : undefined;
-			}
-		};
 	}
 
 	/**
@@ -295,6 +249,7 @@ export class TransformsPhase<
 		return {
 			name: source.name,
 			...(source.id !== undefined ? { id: source.id } : {}),
+			...(source.panel !== undefined ? { panel: source.panel } : {}),
 			x: read('x'),
 			y: read('y'),
 			data

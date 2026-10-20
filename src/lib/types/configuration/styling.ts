@@ -1,6 +1,7 @@
 import type { StrokeStyle, DotStyle, FontStyle, AreaStyle } from '$lib/types/plots/styling';
-import type { SymbolType } from '$lib/types/plots/constants';
+import type { LineAnchor, SymbolType, TextAnchor } from '$lib/types/plots/constants';
 import type { PlotChromeEntry } from '$lib/types/plots/props';
+import type { EdgeTicksOptions } from '$lib/types/layout/scales';
 
 export type TextStyle = {
 	/** font-family */
@@ -155,8 +156,8 @@ export type PlotStylesConfig = {
 		yTickPadding: number;
 		grid: boolean;
 		locale: string;
-		/** Compact units abbreviated (`'short'`, the default: `1 M`) or spelled out (`'long'`: `1 millón`). Axes and size legends. */
 		compactDisplay: 'short' | 'long';
+		edgeTicks: { x: EdgeTicksOptions; y: EdgeTicksOptions };
 	};
 
 	// ── Tooltip ─────────────────────────────────────────────────────────────────
@@ -251,6 +252,15 @@ export type PlotStylesConfig = {
 		/** Fill opacity of every bar, so a grouped histogram's bars behind another group's still show. */
 		fillOpacity: number;
 	};
+	/** Default box-plot styling. */
+	box: {
+		/** Fill opacity of every box that sets none of its own. */
+		fillOpacity: number;
+		/** Fallback gap (0-1) between the boxes of neighbouring categories, when a plot doesn't set its own `scales.x/y.paddingInner`. */
+		paddingInner: number;
+		/** Fallback gap (0-1) before the first and after the last box, when a plot doesn't set its own `scales.x/y.paddingOuter`. */
+		paddingOuter: number;
+	};
 	/** Default scatter point geometry. */
 	scatter: { dotRadius: number };
 	/** Timeline gutter styling. */
@@ -321,6 +331,14 @@ export type PlotStylesConfig = {
 	 * on an axis-based plot's band scale.
 	 */
 	hover: { rule: StrokeStyle; dot: DotStyle; font: FontStyle; area: AreaStyle };
+
+	/** The `delta` marker's label offset and anchor, per axis the delta is taken on. A marker's own `text` wins. */
+	delta: {
+		text: Record<
+			'x' | 'y',
+			{ dx: number; dy: number; lineAnchor: LineAnchor; textAnchor: TextAnchor }
+		>;
+	};
 
 	// ── Facet (small multiples) ──────────────────────────────────────────────────
 	facet: {

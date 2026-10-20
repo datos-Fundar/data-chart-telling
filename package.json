@@ -1,6 +1,6 @@
 {
 	"name": "@fundar/data-chart-telling",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "Declarative charts, maps and small multiples for Svelte, built on svelteplot.",
 	"license": "MIT",
 	"author": "Ezequiel Puerta",
@@ -34,6 +34,7 @@
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build",
 		"docs:images": "node scripts/docs-images.mjs",
+		"docs:examples": "node scripts/sync-examples.mjs",
 		"prepare": "husky"
 	},
 	"files": [

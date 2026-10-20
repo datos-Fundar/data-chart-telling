@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PlayerDemo from './PlayerDemo.svelte';
 import PlayerDemoSource from './PlayerDemo.svelte?raw';
+import PlayerDatesDemo from './PlayerDatesDemo.svelte';
+import PlayerDatesDemoSource from './PlayerDatesDemo.svelte?raw';
 import PlayerControlsDemo from './PlayerControlsDemo.svelte';
 import PlayerControlsDemoSource from './PlayerControlsDemo.svelte?raw';
 import PlayerCallbacksDemo from './PlayerCallbacksDemo.svelte';
@@ -36,6 +38,15 @@ export default meta;
 export const Player: StoryObj = {
 	render: () => ({ Component: PlayerDemo }),
 	parameters: demoSource(PlayerDemoSource)
+};
+
+/**
+ * A timeline's field may hold numbers, `Date`s or date strings: ISO ones read
+ * on their own, any other through `dateFormat`. Date steps read as dates.
+ */
+export const Dates: StoryObj = {
+	render: () => ({ Component: PlayerDatesDemo }),
+	parameters: demoSource(PlayerDatesDemoSource)
 };
 
 /**

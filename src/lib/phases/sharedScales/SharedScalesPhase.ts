@@ -1,7 +1,8 @@
-import { nice as niceExtent } from 'd3-array';
+import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
+import { NiceTicks } from '$lib/layout/scales/NiceTicks';
 import { ScalesPhase } from '$lib/phases/scales/ScalesPhase';
 import { Pipeline } from '$lib/phases/Pipeline';
-import { PANEL_KEY, FacetPhase } from '$lib/phases/facet/FacetPhase';
+import { PANEL_KEY, FacetPanels } from '$lib/phases/facet/FacetPanels';
 import type { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { isFacetWrap } from '$lib/layout/facet/config';
 import { MarkerAxisValues } from '$lib/phases/scales/MarkerAxisValues';
@@ -32,6 +33,7 @@ type SharedScalesState = FacetStageState & {
 	axes?: PlotAxes;
 	processedData?: ProcessedData;
 	markers?: object[];
+	scales?: Partial<Record<AxisChannelName, { niceTolerance?: number }>>;
 	sharedScales?: Record<string, AxisBasedScalesConfig<never>>;
 };
 
@@ -85,7 +87,7 @@ export class SharedScalesPhase<TState extends SharedScalesState, TCtx> implement
 		/** The channel's domain over `members` panels, or every row without them. */
 		const domainOver = (channel: SharedChannel, members: string[] | undefined): SharedScale => {
 			if (fromPhase.has(channel)) {
-				const scoped = members ? FacetPhase.narrowToPanels(state, members) : state;
+				const scoped = members ? FacetPanels.narrowToPanels(state, members) : state;
 				const scales = (this.#kindScales.run(scoped, ctx) as { scales?: unknown }).scales as
 					| Record<string, { domain?: unknown[] } | undefined>
 					| undefined;
@@ -96,7 +98,11 @@ export class SharedScalesPhase<TState extends SharedScalesState, TCtx> implement
 			const values = members
 				? members.map((panel) => SharedScalesPhase.buildPanelAxisValues(state, panel, layout))
 				: [SharedScalesPhase.buildPanelAxisValues(state, undefined, layout)];
-			return SharedScalesPhase.buildSharedAxisScale(values, channel);
+			return SharedScalesPhase.buildSharedAxisScale(
+				values,
+				channel,
+				state.scales?.[channel]?.niceTolerance
+			);
 		};
 
 		const cache = new Map<string, SharedScale>();
@@ -137,7 +143,11 @@ export class SharedScalesPhase<TState extends SharedScalesState, TCtx> implement
 	 * count derived from each panel's height, which over-rounds short panels and
 	 * can disagree between panels of different heights.
 	 */
-	static buildSharedAxisScale(slices: SharedAxisValues[], axis: AxisChannelName): SharedScale {
+	static buildSharedAxisScale(
+		slices: SharedAxisValues[],
+		axis: AxisChannelName,
+		niceTolerance?: number
+	): SharedScale {
 		const values = slices
 			.flatMap((slice) => slice[axis])
 			.filter((v) => v != null && v !== '' && !(typeof v === 'number' && !Number.isFinite(v)));
@@ -152,7 +162,9 @@ export class SharedScalesPhase<TState extends SharedScalesState, TCtx> implement
 			const numbers = slices.some((slice) => slice.zero.includes(axis))
 				? [...(values as number[]), 0]
 				: (values as number[]);
-			return { domain: niceExtent(Math.min(...numbers), Math.max(...numbers), 10), nice: false };
+			const lo = Math.min(...numbers);
+			const hi = Math.max(...numbers);
+			return { domain: NiceTicks.domain(lo, hi, 10, niceTolerance), nice: false };
 		}
 		if (values.every((v) => v instanceof Date)) {
 			const times = (values as Date[]).map((d) => +d);
@@ -179,7 +191,7 @@ export class SharedScalesPhase<TState extends SharedScalesState, TCtx> implement
 			inPanel((marker as Record<string, unknown>)[PANEL_KEY])
 		);
 		const values = (axis: AxisChannelName) => [
-			...ScalesPhase.processedValues(processed, axis),
+			...ProcessedPositions.values(processed, axis),
 			...MarkerAxisValues.of(markers as never[], axis)
 		];
 		return {

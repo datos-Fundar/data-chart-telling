@@ -1,6 +1,6 @@
 # @fundar/data-chart-telling
 
-> Svelte 5 plot components (line, area, bar, histogram, heatmap, pyramid, scatter, geo) built on svelteplot, with titles, legends, tooltips, facets, timelines and value labels built in. Plots take pixel `width`/`height`; hover and tooltips are switched on with `tooltip` and a `hover` marker.
+> Svelte 5 plot components (line, area, bar, histogram, box, heatmap, pyramid, scatter, geo) built on svelteplot, with titles, legends, tooltips, facets, timelines and value labels built in. Plots take pixel `width`/`height`; hover and tooltips are switched on with `tooltip` and a `hover` marker.
 
 Start with the full guide: it lists the mental model, the props every plot shares, the switches and the rules that matter. Runnable examples are type-checked, so copy them as a starting point.
 
@@ -12,7 +12,7 @@ Start with the full guide: it lists the mental model, the props every plot share
 
 - [Getting started](./docs/getting-started.md): install, first plot, sizing, data
 - [Concepts](./docs/concepts.md): plots, figures, rows and series, channels, shared props
-- [Plots](./docs/plots.md): the eight plot kinds
+- [Plots](./docs/plots.md): the nine plot kinds
 - [Scales](./docs/scales.md): axes and channel scales
 - [Styles and segments](./docs/styles-and-segments.md): value labels, frame, gaps, ranges of data
 - [Markers](./docs/markers.md): annotations, regions, hover highlight, custom components
@@ -29,14 +29,42 @@ Start with the full guide: it lists the mental model, the props every plot share
 
 ## Examples
 
+- [Line plot by region with title, legend, end labels and tooltip](./examples/LineByRegion.svelte)
 - [Responsive line chart with end labels](./examples/ResponsiveLine.svelte)
 - [Tooltip and hover marker](./examples/Tooltip.svelte)
 - [Segments (styling a range of data)](./examples/Segments.svelte)
 - [Interactive legend and reading its state](./examples/LegendToggle.svelte)
 - [Timeline player](./examples/TimelinePlayer.svelte)
+- [Timeline rule driven by a slider](./examples/TimelineRule.svelte)
 - [Facets with a synced tooltip](./examples/Facets.svelte)
 - [Bars with value labels](./examples/BarValues.svelte)
 - [Custom tooltip card](./examples/CustomTooltip.svelte)
+- [The smallest plot: rows, fields and a pixel size](./examples/FirstPlot.svelte)
+- [Line per series over a date axis, with end labels](./examples/LineDates.svelte)
+- [Stacked area plot](./examples/StackedArea.svelte)
+- [Vertical bars grouped by color](./examples/GroupedBars.svelte)
+- [Horizontal bars](./examples/HorizontalBars.svelte)
+- [Overlapping histograms](./examples/Histogram.svelte)
+- [Box plots per group](./examples/Box.svelte)
+- [Heatmap](./examples/Heatmap.svelte)
+- [Population pyramid](./examples/Pyramid.svelte)
+- [Scatter plot sized, colored and shaped by channels](./examples/Scatter.svelte)
+- [Axis labels, fixed domain, gridlines and series colors](./examples/Scales.svelte)
+- [End-of-line value labels with a custom format](./examples/ValueLabels.svelte)
+- [Filling gaps of missing values](./examples/Gaps.svelte)
+- [Highlighting a range of one series](./examples/SegmentHighlight.svelte)
+- [Segments per series and shared rules](./examples/SegmentsBySeries.svelte)
+- [Segments on a heatmap](./examples/HeatmapSegments.svelte)
+- [Hover, rule and delta markers](./examples/Markers.svelte)
+- [Bars stacked with stackY](./examples/StackedBars.svelte)
+- [Moving average with windowY](./examples/MovingAverage.svelte)
+- [Linear regression with a confidence band](./examples/Regression.svelte)
+- [Explicit legend sections](./examples/LegendSections.svelte)
+- [Title, subtitle and caption](./examples/Chrome.svelte)
+- [Ordering chrome blocks with dividers](./examples/ChromeOrder.svelte)
+- [Facets as a carousel](./examples/FacetsCarousel.svelte)
+- [Facets by rows and columns](./examples/FacetsRowsCols.svelte)
+- [Several plots in one figure](./examples/Composer.svelte)
 - [Shared example data](./examples/data.ts)
 
 ## Types

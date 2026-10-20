@@ -1,5 +1,5 @@
+import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { buildMarks, buildValueLabels } from '$lib/plots/scatter/markers';
-import { TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
 import { Margins } from '$lib/layout/margins/Margins';
 import { MarkerAxisValues } from '$lib/phases/scales/MarkerAxisValues';
 import type { AxisScale } from '$lib/types/layout/scales';
@@ -40,7 +40,7 @@ function fitDomains<TData extends Record<string, unknown>>(
 ): Partial<Record<'x' | 'y', Partial<AxisScale<TData>>>> {
 	const { scales, channels, groupedSeries } = state;
 	const processed = state.processedData!;
-	const position = TransformsPhase.processedPosition(processed);
+	const position = ProcessedPositions.of(processed);
 	const extra = {
 		x: MarkerAxisValues.of(state.markers ?? [], 'x'),
 		y: MarkerAxisValues.of(state.markers ?? [], 'y')
@@ -88,6 +88,7 @@ export function buildScatterDefaults<TData extends Record<string, unknown>>(): A
 				connect: false
 			}
 		},
+		transforms: { groups: 'runs' },
 		scales: { fit: fitDomains },
 		markers: { marks: buildMarks, valueLabels: buildValueLabels },
 		hover: {

@@ -44,6 +44,21 @@ async function hoverCenterAndReadTooltip(
 }
 
 describe('LinePlot - tooltip', () => {
+	test('lists the hovered series from the highest value to the lowest', async () => {
+		// Male comes first in the data and sits below female every year.
+		const { container } = await render(LinePlot, {
+			width: 400,
+			height: 300,
+			series: [MALE, FEMALE],
+			tooltip: { strategy: 'x', format: (row) => String((row as YearPoint).value) }
+		});
+		await hoverCenterAndReadTooltip(container);
+		const lines = container.querySelector('.dct-tooltip')!.textContent!.trim().split('\n');
+		const values = lines.map(Number);
+		expect(values).toHaveLength(2);
+		expect(values[0]).toBeGreaterThan(values[1]);
+	});
+
 	test('no floating tooltip appears without a tooltip config', async () => {
 		const { container } = await render(LinePlot, { width: 400, height: 300, series: [FEMALE] });
 		await waitForSvg(container);

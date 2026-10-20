@@ -1,7 +1,8 @@
 import { render } from 'vitest-browser-svelte';
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, afterEach } from 'vitest';
 import LinePlot from '$lib/plots/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
+import { resetConfiguration, setConfiguration } from '$lib/configuration/config.svelte';
 import {
 	FEMALE_LIFE_EXPECTANCY,
 	MALE_LIFE_EXPECTANCY
@@ -101,5 +102,53 @@ describe('LinePlot - markers.deltas', () => {
 		const svg = await waitForSvg(container);
 		const female2020 = FEMALE_LIFE_EXPECTANCY.find((d) => d.year === 2020)!.value;
 		expect(svg.querySelector('g.text text')?.textContent).toBe(female2020.toFixed(1));
+	});
+});
+
+describe('LinePlot - delta label offset', () => {
+	afterEach(() => resetConfiguration());
+
+	/** Where the delta's label sits, as svelteplot's `translate`, `dx`/`dy` included. */
+	async function labelAt(axis: 'x' | 'y', text?: { dx?: number; dy?: number }) {
+		const { container } = await render(LinePlot, {
+			width: 400,
+			height: 300,
+			series: [FEMALE, MALE],
+			markers: [
+				{
+					type: 'delta',
+					axis,
+					at: axis === 'x' ? 2020 : 78,
+					from: { type: 'series', series: 'female' },
+					to: { type: 'series', series: 'male' },
+					...(text ? { text } : {})
+				}
+			] satisfies AxisBasedMarkersConfig[]
+		});
+		const svg = await waitForSvg(container);
+		await expect.poll(() => svg.querySelector('g.text text')).not.toBeNull();
+		const transform = svg.querySelector('g.text text')!.getAttribute('transform')!;
+		const [, x, y] = /translate\(([-\d.]+),\s*([-\d.]+)\)/.exec(transform)!;
+		return { x: Number(x), y: Number(y) };
+	}
+
+	test('sits beside a delta taken on x, by the configured dx', async () => {
+		const own = await labelAt('x', { dx: 0 });
+		const byDefault = await labelAt('x');
+		expect(byDefault.x - own.x).toBe(12);
+		setConfiguration({ delta: { text: { x: { dx: 30 } } } });
+		expect((await labelAt('x')).x - own.x).toBe(30);
+	});
+
+	test('sits above a delta taken on y, by the configured dy', async () => {
+		const own = await labelAt('y', { dy: 0 });
+		const byDefault = await labelAt('y');
+		expect(byDefault.y - own.y).toBe(-10);
+	});
+
+	test("the marker's own dx and dy win over the configuration", async () => {
+		setConfiguration({ delta: { text: { x: { dx: 30 } } } });
+		const own = await labelAt('x', { dx: 0 });
+		expect((await labelAt('x', { dx: 5 })).x - own.x).toBe(5);
 	});
 });

@@ -1,10 +1,6 @@
+import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { getConfiguration } from '$lib/configuration/config.svelte';
-import {
-	GAP_KIND,
-	GAP_VALUE,
-	SERIES_ID_KEY,
-	TransformsPhase
-} from '$lib/phases/transforms/TransformsPhase';
+import { GAP_KIND, GAP_VALUE, SERIES_ID_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { seriesIdOf } from '$lib/utils/grouping';
 import { resolveGapAreaStyle } from '$lib/plots/utils/gaps';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
@@ -44,12 +40,12 @@ export function buildBarGeometry<TData extends Record<string, unknown>>(
 		const [min, max] = [Math.min(lo, hi), Math.max(lo, hi)];
 		return min > 0 ? min : max < 0 ? max : 0;
 	})();
-	const { stacked, of: spanOf } = TransformsPhase.processedSpan(
+	const { stacked, of: spanOf } = ProcessedPositions.span(
 		state.processedData!,
 		valueAxis as 'x' | 'y',
 		baseline
 	);
-	const position = TransformsPhase.processedPosition(state.processedData!, valueAxis as 'x' | 'y');
+	const position = ProcessedPositions.of(state.processedData!, valueAxis as 'x' | 'y');
 	const categoryOf = (row: ProcessedRow) => position[categoryAxis as 'x' | 'y'](row) as AxisValue;
 
 	const names = [...new Set((state.groupedSeries ?? []).map((g) => g.series.name))];
@@ -250,7 +246,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		row[GAP_VALUE] === undefined && geometry.spanOf(row) !== undefined;
 
 	const segmentMarkers: BarMarkerConfig[] = [];
-	TransformsPhase.buildProcessedGroups<BarSegmentStyle>(state, false).forEach((group) => {
+	(state.processedGroups ?? []).forEach((group) => {
 		const name = group.series.name;
 		const slice = geometry.sliceOf(name);
 		const defaultColor = colorForSeries!(name);

@@ -3,7 +3,7 @@ import type { Accessor, Series } from '$lib/types/plots/data/common';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import type { ProcessedData } from '../transforms/phase';
+import type { ProcessedData, TransformsStageState } from '../transforms/phase';
 import type { FacetStageState } from '../facet/phase';
 import type { PlotAxes } from '$lib/phases/data/PlotAxes';
 
@@ -27,6 +27,8 @@ export type StatisticsStageState = Pick<FacetStageState, 'panels'> & {
 	scopedGroups?: ScopedMarkerGroup<any>[];
 	/** The plot's rows after its own transforms, which an author marker without rows of its own draws. */
 	processedData?: ProcessedData;
+	/** Those rows split back into the plot's visual groups, which a series without a value of its own (a histogram's) is measured by. */
+	processedGroups?: TransformsStageState['processedGroups'];
 	markers?: AxisBasedMarkersConfig[];
 };
 /* eslint-enable @typescript-eslint/no-explicit-any */

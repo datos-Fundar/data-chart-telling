@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { ROWS } from './data';
+	import { REGION_VALUES } from './data';
 
 	// A plot draws at the pixel size it is given. To fill a container (or the
 	// window), bind its size and pass it down.
@@ -13,15 +13,15 @@
 		<LinePlot
 			{width}
 			{height}
-			title="Value by region"
-			subtitle="Index, 2016-2023"
-			data={ROWS}
-			x="year"
+			title="Monthly inflation by region"
+			subtitle="Change from the previous month, 2023-2026"
+			data={REGION_VALUES}
+			x="date"
 			y="value"
 			color="region"
 			scales={{
-				x: { label: 'Year', tickFormat: (d) => String(d) },
-				y: { label: 'Index' }
+				x: { label: 'Month' },
+				y: { label: 'Inflation (%)' }
 			}}
 			styles={{ values: { show: true, format: (v, name) => `${name}: ${v}` } }}
 			margins={{ right: 'auto' }}

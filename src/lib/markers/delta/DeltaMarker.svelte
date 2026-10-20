@@ -3,12 +3,15 @@
 	import DotMarker from '$lib/markers/dot/DotMarker.svelte';
 	import TextMarker from '$lib/markers/text/TextMarker.svelte';
 	import { Delta } from '$lib/markers/delta/Delta';
+	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import type { Series } from '$lib/types/plots/data/common';
 	import type { DeltaMarkerConfig } from '$lib/types/markers/axis/delta';
 
 	let { marker, data = [] }: { marker: DeltaMarkerConfig; data?: Series<TData>[] } = $props();
 
 	const resolved = $derived(Delta.build(marker.axis, data, marker));
+	const label = $derived(getConfiguration().delta.text[marker.axis]);
+	const lineAnchor = $derived(marker.text?.lineAnchor ?? label.lineAnchor);
 
 	const clampRange = $derived.by((): [number, number] | undefined => {
 		const domain = marker.axis === 'x' ? marker.yDomain : marker.xDomain;
@@ -27,10 +30,9 @@
 	}
 
 	function textVaryCoord(fromVis: number, toVis: number) {
-		const anchor = marker.text?.lineAnchor ?? 'middle';
-		return anchor === 'top'
+		return lineAnchor === 'top'
 			? Math.max(fromVis, toVis)
-			: anchor === 'bottom'
+			: lineAnchor === 'bottom'
 				? Math.min(fromVis, toVis)
 				: (fromVis + toVis) / 2;
 	}
@@ -82,12 +84,12 @@
 			styles: {
 				fontWeight: 'bold',
 				fontSize: 14,
-				textAnchor: 'middle',
+				textAnchor: label.textAnchor,
 				fill: marker.line?.stroke ?? 'currentColor',
 				...marker.text,
-				dx: marker.text?.dx ?? (marker.axis === 'x' ? 12 : 0),
-				dy: marker.text?.dy ?? (marker.axis === 'x' ? 0 : -10),
-				lineAnchor: marker.axis === 'x' ? (marker.text?.lineAnchor ?? 'middle') : 'bottom'
+				dx: marker.text?.dx ?? label.dx,
+				dy: marker.text?.dy ?? label.dy,
+				lineAnchor
 			}
 		}}
 	/>

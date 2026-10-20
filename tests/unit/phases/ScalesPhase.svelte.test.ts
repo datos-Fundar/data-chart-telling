@@ -128,7 +128,33 @@ describe('ScalesPhase - what a kind fits and adds', () => {
 		];
 		const transforms = [{ type: 'stackY' }];
 		const kind = { scales: { zero: ['y' as const] } };
-		expect(build(kind, { data: rows, transforms }).y?.domain).toEqual([0, 9]);
+		expect(build(kind, { data: rows, transforms }).y?.domain).toEqual([0, 10]);
+	});
+
+	test('stacked parts that add up to a whole a hair past it stay on its tick', () => {
+		// Shares rounded at the source: 1991 adds up to 100.2, 2001 to 99.5.
+		const rows = [
+			{ c: 1991, g: 'a', v: 60.1 },
+			{ c: 1991, g: 'b', v: 40.1 },
+			{ c: 2001, g: 'a', v: 59.7 },
+			{ c: 2001, g: 'b', v: 39.8 }
+		];
+		const kind = { scales: { zero: ['y' as const] } };
+		const props = { data: rows, grouping: 'g', transforms: [{ type: 'stackY' }] };
+		expect(build(kind, props).y).toMatchObject({ domain: [0, 100], nice: false });
+		expect(build(kind, { ...props, height: 900 }).y?.domain).toEqual([0, 100]);
+	});
+
+	test('`scales.<axis>.niceTolerance` sets how far past a tick still counts as on it', () => {
+		const rows = [
+			{ c: 1, g: 'a', v: 60.1 },
+			{ c: 1, g: 'b', v: 40.1 }
+		];
+		const kind = { scales: { zero: ['y' as const] } };
+		const props = { data: rows, grouping: 'g', transforms: [{ type: 'stackY' }] };
+		expect(build(kind, { ...props, scales: { y: { niceTolerance: 0 } } }).y?.domain).toEqual([
+			0, 120
+		]);
 	});
 });
 

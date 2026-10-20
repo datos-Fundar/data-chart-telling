@@ -105,6 +105,17 @@ export const BINNED_SCALE_TYPES = ['threshold', 'quantile', 'quantize'] as const
 export type BinnedScaleType = (typeof BINNED_SCALE_TYPES)[number];
 
 /**
+ * What an axis does when the tick at the data's first or last value would
+ * crowd the nice tick next to it: `'drop-nice'` keeps the data's tick and
+ * drops the nice one, `'drop-edge'` keeps the nice tick and drops the data's,
+ * `'extend'` widens the axis to the next nice tick past the data.
+ */
+export type EdgeTickCollision = 'drop-nice' | 'drop-edge' | 'extend';
+
+/** Whether an axis adds ticks at the data's first and last values, and what it does when one crowds a nice tick. */
+export type EdgeTicksOptions = { enabled: boolean; collision: EdgeTickCollision };
+
+/**
  * Scale overrides for one plot axis - svelteplot's `ScaleOptions` and
  * `XScaleOptions`, plus this package's own fields. `TData` is the row type
  * {@link AxisScale.sort} compares.
@@ -129,6 +140,8 @@ export type AxisScale<TData = Record<string, unknown>> = {
 	interval?: string | number;
 	clamp?: boolean;
 	nice?: boolean;
+	niceTolerance?: number;
+	edgeTicks?: boolean | { collision?: EdgeTickCollision };
 	zero?: boolean;
 	round?: boolean;
 	percent?: boolean;

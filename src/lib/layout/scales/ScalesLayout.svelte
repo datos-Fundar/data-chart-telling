@@ -4,7 +4,8 @@
 	import { AxisX, AxisY, GridX, GridY } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import { tickStep, ticksInRange, naturalTickCount } from '$lib/layout/scales/niceDomain';
+	import { NiceTicks } from '$lib/layout/scales/NiceTicks';
+	import { EdgeTicks } from '$lib/layout/scales/EdgeTicks';
 	import { DISCRETE_SCALE_TYPES } from '$lib/types/layout/scales';
 	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 	import type { AxisValue } from '$lib/types/layout/mapping';
@@ -17,7 +18,8 @@
 		width,
 		height,
 		numericMargins,
-		scales
+		scales,
+		edgeDomains = undefined
 	}: {
 		data: TData[];
 		getX: (d: TData) => AxisValue;
@@ -26,6 +28,11 @@
 		height: number;
 		numericMargins: { top: number; right: number; bottom: number; left: number };
 		scales?: AxisBasedScalesConfig<TData>;
+		/**
+		 * Where to leave the domain an axis widens to when an edge tick's
+		 * `'extend'` resolved a collision (see `EdgeTicks`), for the plot to give its scale.
+		 */
+		edgeDomains?: Map<'x' | 'y', [number, number]>;
 	} = $props();
 
 	const cfg = $derived(getConfiguration());
@@ -50,7 +57,7 @@
 		return hi > lo ? [lo, hi] : undefined;
 	}
 
-	/** An axis paired with a discrete scale plays the "index" role for the pair, so *this* axis is the plain magnitude/value one (see `autoTickCount`, `edgeInclusiveTicks`). */
+	/** An axis paired with a discrete scale plays the "index" role for the pair, so *this* axis is the plain magnitude/value one (see `autoTickCount`, `edgeTicksOf`). */
 	const isDiscreteType = (type: string) =>
 		(DISCRETE_SCALE_TYPES as readonly string[]).includes(type);
 
@@ -75,7 +82,7 @@
 			return undefined;
 		if (oppositeType != null && isDiscreteType(oppositeType)) return undefined;
 		const uniqueCount = new Set(values.map(String)).size;
-		const natural = naturalTickCount(span, spacing, min);
+		const natural = NiceTicks.count(span, spacing, min);
 		return uniqueCount >= 2 && uniqueCount < natural ? uniqueCount : undefined;
 	}
 
@@ -94,32 +101,40 @@
 		if (!extent) return undefined;
 		const [lo, hi] = extent;
 		if (!Number.isInteger(lo) || !Number.isInteger(hi)) return undefined;
-		return hi - lo < naturalTickCount(span, spacing, min) ? 1 : undefined;
+		return hi - lo < NiceTicks.count(span, spacing, min) ? 1 : undefined;
 	}
 
 	const xSpan = $derived(Math.max(0, width - numericMargins.left - numericMargins.right));
 	const ySpan = $derived(Math.max(0, height - numericMargins.top - numericMargins.bottom));
 
-	const xTickCount = $derived(autoTickCount(plot.scales.y.type, scales?.x, xValues, xSpan, 80, 3));
-	const yTickCount = $derived(autoTickCount(plot.scales.x.type, scales?.y, yValues, ySpan, 50, 2));
+	const xTickCount = $derived(
+		autoTickCount(plot.scales.y.type, scales?.x, xValues, xSpan, NiceTicks.SPACING.x, 3)
+	);
+	const yTickCount = $derived(
+		autoTickCount(plot.scales.x.type, scales?.y, yValues, ySpan, NiceTicks.SPACING.y, 2)
+	);
 
-	const xTickInterval = $derived(integerTickInterval(scales?.x, xValues, xSpan, 80, 3));
-	const yTickInterval = $derived(integerTickInterval(scales?.y, yValues, ySpan, 50, 2));
+	const xTickInterval = $derived(
+		integerTickInterval(scales?.x, xValues, xSpan, NiceTicks.SPACING.x, 3)
+	);
+	const yTickInterval = $derived(
+		integerTickInterval(scales?.y, yValues, ySpan, NiceTicks.SPACING.y, 2)
+	);
 
 	/**
-	 * A continuous axis' nice ticks plus its domain's endpoints, when the
-	 * opposite axis is continuous too - at least a whole unit apart when every
-	 * value is a whole number. Unset when the caller sets tick density
-	 * or the domain.
+	 * A continuous axis' nice ticks plus the data's first and last values (see
+	 * {@link EdgeTicks}), when its other axis is continuous too and the author
+	 * left its density and domain to the plot. Unset otherwise.
 	 */
-	function edgeInclusiveTicks(
+	function edgeTicksOf(
+		axis: 'x' | 'y',
+		type: string | undefined,
 		oppositeType: string | undefined,
 		scale: AxisBasedScalesConfig<TData>['x'],
 		values: AxisValue[],
 		span: number,
-		spacing: number,
 		min: number
-	): number[] | undefined {
+	) {
 		if (
 			scale?.ticks != null ||
 			scale?.tickSpacing != null ||
@@ -127,24 +142,42 @@
 			scale?.domain != null
 		)
 			return undefined;
+		if (type != null && isDiscreteType(type)) return undefined;
 		if (oppositeType != null && isDiscreteType(oppositeType)) return undefined;
 		if (scale?.type != null && scale.type !== 'linear' && scale.type !== 'auto') return undefined;
-		const extent = axisExtent(scale, values);
-		if (!extent) return undefined;
-		const [lo, hi] = extent;
-		const count = naturalTickCount(span, spacing, min);
-		// Whole-number values (years, counts) never get ticks between them.
-		const integers = values.every((v) => typeof v !== 'number' || Number.isInteger(v));
-		const step = integers ? Math.max(1, tickStep(lo, hi, count)) : tickStep(lo, hi, count);
-		const base = ticksInRange(lo, hi, step);
-		const eps = step * 1e-6;
-		const withLo = base.length === 0 || base[0] - lo > eps ? [lo, ...base] : base;
-		return withLo.length === 0 || hi - withLo[withLo.length - 1] > eps ? [...withLo, hi] : withLo;
+		const present = values.filter((v) => v != null);
+		if (!present.every((v) => typeof v === 'number')) return undefined;
+		return EdgeTicks.build({
+			axis,
+			values: (present as number[]).filter(Number.isFinite),
+			span,
+			spacing: NiceTicks.SPACING[axis],
+			min,
+			fontSize: cfg.axis.fontSize,
+			options: EdgeTicks.resolve(scale?.edgeTicks, cfg.axis.edgeTicks[axis])
+		});
 	}
 
-	const xTicksExplicit = $derived(
-		edgeInclusiveTicks(plot.scales.y.type, scales?.x, xValues, xSpan, 80, 3)
+	const xEdgeTicks = $derived(
+		edgeTicksOf('x', plot.scales.x.type, plot.scales.y.type, scales?.x, xValues, xSpan, 3)
 	);
+	const yEdgeTicks = $derived(
+		edgeTicksOf('y', plot.scales.y.type, plot.scales.x.type, scales?.y, yValues, ySpan, 2)
+	);
+
+	// Hands the plot the domain an axis widens to, only when it changes.
+	$effect(() => {
+		const next = { x: xEdgeTicks?.domain, y: yEdgeTicks?.domain };
+		untrack(() => {
+			for (const axis of ['x', 'y'] as const) {
+				const domain = next[axis];
+				const current = edgeDomains?.get(axis);
+				if (domain?.[0] === current?.[0] && domain?.[1] === current?.[1]) continue;
+				if (domain) edgeDomains?.set(axis, domain);
+				else edgeDomains?.delete(axis);
+			}
+		});
+	});
 
 	const yTitleFontSize = $derived(scales?.y?.titleFontSize ?? cfg.axis.titleFontSize);
 
@@ -191,7 +224,7 @@
 
 {#snippet axisX()}
 	<AxisX
-		ticks={xTicksExplicit}
+		ticks={xEdgeTicks?.ticks}
 		tickCount={xTickCount}
 		interval={xTickInterval}
 		tickSize={scales?.x?.tickSize ?? cfg.axis.xTickSize}
@@ -207,6 +240,7 @@
 {/if}
 {#snippet axisY()}
 	<AxisY
+		ticks={yEdgeTicks?.ticks}
 		tickCount={yTickCount}
 		interval={yTickInterval}
 		tickSize={scales?.y?.tickSize ?? cfg.axis.yTickSize}

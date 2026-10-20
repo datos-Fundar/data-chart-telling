@@ -1,12 +1,12 @@
+import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import {
 	buildMarks,
 	buildValueLabels,
 	buildHitAreas,
 	buildBarGeometry
 } from '$lib/plots/bar/markers';
-import { niceDomain, naturalTickCount } from '$lib/layout/scales/niceDomain';
-import { Margins } from '$lib/layout/margins/Margins';
-import { SERIES_KEY, TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
+import { NiceTicks } from '$lib/layout/scales/NiceTicks';
+import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { AxisPlotDefaults } from '$lib/types/phases';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
@@ -21,13 +21,12 @@ import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/bar/state';
 function fitValueDomain<TData extends Record<string, unknown>>(
 	state: BarPlotState<TData>
 ): Partial<Record<'x' | 'y', Partial<AxisScale<TData>>>> {
-	const isHorizontal = state.axes?.isHorizontal ?? false;
 	const axis = PlotAxes.valueOf(state);
 	const scale = state.scales[axis];
 	if (scale?.domain != null || scale?.ticks != null || scale?.nice != null) return {};
 	// Every bar's span, as the "transforms" phase left it - its baseline is
 	// unknown until the domain is, so a plain bar reads as reaching from zero.
-	const { of: spanOf } = TransformsPhase.processedSpan(state.processedData!, axis as 'x' | 'y');
+	const { of: spanOf } = ProcessedPositions.span(state.processedData!, axis as 'x' | 'y');
 	let lo = 0;
 	let hi = 0;
 	for (const row of state.processedData?.data ?? []) {
@@ -37,10 +36,7 @@ function fitValueDomain<TData extends Record<string, unknown>>(
 		hi = Math.max(hi, ...span);
 	}
 	if (hi <= lo) return {};
-	const spacing = isHorizontal ? 80 : 50;
-	const box = Margins.AXIS_ESTIMATE.contentBox(state.width, state.height);
-	const count = naturalTickCount(isHorizontal ? box.width : box.height, spacing, 2);
-	return { [axis]: { domain: niceDomain(lo, hi, count) } };
+	return { [axis]: { domain: NiceTicks.fit(state, axis, lo, hi, scale?.niceTolerance) } };
 }
 
 /**
@@ -71,7 +67,7 @@ export function buildBarDefaults<TData extends Record<string, unknown>>(): AxisP
 				reach: (labels, state) => {
 					if (labels.anchor !== 'outside') return [];
 					const axis = PlotAxes.valueOf(state) as 'x' | 'y';
-					if (TransformsPhase.processedSpan(state.processedData!, axis).stacked) return [];
+					if (ProcessedPositions.span(state.processedData!, axis).stacked) return [];
 					if (!state.axes?.isHorizontal) {
 						const at = { y: -labels.offset('y') };
 						return [labels.edgeBox('0', { x: 'middle', y: 'before' }, at, ['top'])];

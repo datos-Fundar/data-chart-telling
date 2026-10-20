@@ -1,4 +1,4 @@
-import { HoverPhase } from '$lib/phases/hover/HoverPhase';
+import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import { resolveFeatureStyle } from '$lib/plots/utils/geoSegments';
 import { DisabledStyle } from '$lib/layout/legend/DisabledStyle';
 import type { MarkerConfig } from '$lib/types/markers/all';
@@ -50,8 +50,7 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 
 	function rangeFilteredStyle(base: GeoSegmentStyle, f: TaggedGeoFeature<TProps>): GeoSegmentStyle {
 		if (range == null || !color) return base;
-		const v = color(f);
-		if (v == null || (v >= range.min && v <= range.max)) return base;
+		if (LegendState.inRange(color(f), range)) return base;
 		return { ...base, ...DisabledStyle.fill(range.disabledStyle) };
 	}
 
@@ -85,7 +84,7 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 	// What the pointer can match: the features inside the legend's range, by id.
 	const hoverable = new Map(
 		features!
-			.filter((f) => !range || !color || HoverPhase.inRange(color(f), range))
+			.filter((f) => !range || !color || LegendState.inRange(color(f), range))
 			.map((f) => [f.__id, f as unknown as Record<string, unknown>])
 	);
 	const featureMarkers: GeoFeaturesMarkerConfig[] = styleGroups.map((group) => ({

@@ -46,10 +46,11 @@
 	import { PlotMargins } from '$lib/layout/margins/PlotMargins.svelte';
 	import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 	import { onDestroy, untrack } from 'svelte';
+	import { SvelteMap } from 'svelte/reactivity';
 	import type { ComponentProps, Snippet } from 'svelte';
 	import { Plot, Pointer, setPlotDefaults } from 'svelteplot';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import { buildScale } from '$lib/layout/scales/buildScale';
+	import { SveltePlotScale } from '$lib/layout/scales/SveltePlotScale';
 	import ScalesLayout from '$lib/layout/scales/ScalesLayout.svelte';
 	import GeometryLayout from '$lib/layout/geometry/GeometryLayout.svelte';
 	import CoordinatesLayout from '$lib/layout/coordinates/CoordinatesLayout.svelte';
@@ -187,9 +188,20 @@
 		size: () => ({ width, height })
 	});
 
-	// `buildScale` already left only svelteplot's own scale options.
-	const resolvedX = $derived(buildScale(scales?.x, data, getX) as SveltePlotProps['x']);
-	const resolvedY = $derived(buildScale(scales?.y, data, getY) as SveltePlotProps['y']);
+	/** The domains `ScalesLayout` widens an axis to, for an edge tick's `'extend'` (see `EdgeTicks`). */
+	const edgeDomains = new SvelteMap<'x' | 'y', [number, number]>();
+
+	// `SveltePlotScale.build` already left only svelteplot's own scale options.
+	const resolvedX = $derived.by(() => {
+		const built = SveltePlotScale.build(scales?.x, data, getX);
+		const domain = edgeDomains.get('x');
+		return (domain ? { ...built, domain, nice: false } : built) as SveltePlotProps['x'];
+	});
+	const resolvedY = $derived.by(() => {
+		const built = SveltePlotScale.build(scales?.y, data, getY);
+		const domain = edgeDomains.get('y');
+		return (domain ? { ...built, domain, nice: false } : built) as SveltePlotProps['y'];
+	});
 	/** Threaded straight into svelteplot's own `r` scale option - see `RScaleConfig`'s own doc comment for why this isn't independently resolved like `color`. */
 	const resolvedR = $derived(scales?.r as SveltePlotProps['r']);
 	/** Threaded straight into svelteplot's own `length` scale option - see `LengthScaleConfig`'s own doc comment. `GeoPlot`-only in practice (see `scales`'s own doc comment), same mechanism as `r`. */
@@ -253,7 +265,7 @@
 		<StylesLayout styles={state.styles} {width} {height} {numericMargins} />
 		<!-- Axes for every kind but GeoPlot. -->
 		{#if scales !== undefined && coordinates === undefined}
-			<ScalesLayout {data} {getX} {getY} {width} {height} {numericMargins} {scales} />
+			<ScalesLayout {data} {getX} {getY} {width} {height} {numericMargins} {scales} {edgeDomains} />
 		{/if}
 		<GeometryLayout
 			markers={resolvedMarkers}
@@ -297,6 +309,7 @@
 			y={ctrl.tooltipPosition?.y ?? 0}
 			rows={ctrl.matchedRows.map((p) => p.row)}
 			format={hover.tooltip.format}
+			sort={hover.tooltip.sort}
 			content={hover.tooltip.content}
 			anchorX={hover.tooltip.anchorX}
 			anchorY={hover.tooltip.anchorY}

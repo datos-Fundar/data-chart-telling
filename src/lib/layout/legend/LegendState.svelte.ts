@@ -55,6 +55,11 @@ export class LegendState {
 		return LegendState.current() ?? new LegendState();
 	}
 
+	/** Whether `value` lies within `range`; a missing value always does. */
+	static inRange(value: number | null | undefined, range: { min: number; max: number }): boolean {
+		return value == null || (value >= range.min && value <= range.max);
+	}
+
 	/** Whether `series` is turned off. */
 	isOff(series: string): boolean {
 		return this.disabled.has(series);

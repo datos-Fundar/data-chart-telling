@@ -1,9 +1,10 @@
+import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { buildMarks, buildValueLabels } from '$lib/plots/pyramid/markers';
 import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { seriesIdOf } from '$lib/utils/grouping';
 import { isGapValue } from '$lib/plots/utils/gaps';
-import { SERIES_ID_KEY, TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
+import { SERIES_ID_KEY } from '$lib/phases/transforms/TransformsPhase';
 import type { AxisPlotDefaults } from '$lib/types/phases';
 import type { ProcessedRow } from '$lib/types/phases';
 import type { Series } from '$lib/types/plots/data/common';
@@ -87,7 +88,7 @@ export function buildPyramidDefaults<TData extends Record<string, unknown>>(): A
 			// side - and its category, and reads as its magnitude.
 			position: (state) => {
 				const value = PlotAxes.valueOf(state);
-				const place = TransformsPhase.processedPosition(state.processedData!, value);
+				const place = ProcessedPositions.of(state.processedData!, value);
 				const valueOf = ValueLabels.valueOf(state);
 				const sideOf = new Map((state.resolvedSeries ?? []).map((s) => [seriesIdOf(s), s.side]));
 				const signed = (row: ProcessedRow) => {

@@ -180,13 +180,23 @@ describe('ScalesPhase', () => {
 		expect(new ScalesPhase<State, AxisPlotCtx>().run(prepared(), CTX).scales).toEqual({});
 	});
 
-	test('grows each numeric axis to cover a derived marker, from zero where asked', () => {
+	test('grows each numeric axis to cover a derived marker, from zero where asked, niced', () => {
 		const out = new ScalesPhase<State, AxisPlotCtx>({ zero: ['y'] }).run(
 			{ ...prepared(), markers: [derived] },
 			CTX
 		);
-		expect(out.scales.x?.domain).toEqual([1, 10]);
-		expect(out.scales.y?.domain).toEqual([0, 20]);
+		expect(out.scales.x).toMatchObject({ domain: [0, 10], nice: false });
+		expect(out.scales.y).toMatchObject({ domain: [0, 20], nice: false });
+	});
+
+	test('an author `nice: false` or own `ticks` keeps the plain extent', () => {
+		const run = (y: Record<string, unknown>) =>
+			new ScalesPhase<State, AxisPlotCtx>({ zero: ['y'] }).run(
+				{ ...prepared({ scales: { y } }), markers: [derived] },
+				CTX
+			).scales.y;
+		expect(run({ nice: false })).toMatchObject({ domain: [0, 20], nice: false });
+		expect(run({ ticks: [0, 7, 14] })).toMatchObject({ domain: [0, 20], nice: true });
 	});
 
 	test('grows to the ranges a transform gave the rows (a stack’s top)', () => {
@@ -195,7 +205,7 @@ describe('ScalesPhase', () => {
 			CTX
 		);
 		const [, hi] = out.scales.y?.domain as [number, number];
-		expect(hi).toBe(9);
+		expect(hi).toBe(10);
 	});
 
 	test('a pinned domain is left alone', () => {
@@ -302,12 +312,22 @@ describe('series identity', () => {
 		]);
 	});
 
-	test('the processed rows split back into one group per series id', () => {
+	test('leaves the processed rows split back into one group per series id', () => {
 		const out = new TransformsPhase<State>().run(twins(), CTX);
-		const groups = TransformsPhase.buildProcessedGroups(out);
-		expect(groups.map((g) => [g.series.id, g.series.data.length])).toEqual([
+		expect(out.processedGroups!.map((g) => [g.series.id, g.series.data.length])).toEqual([
 			['p1/A', 2],
 			['p2/A', 1]
+		]);
+	});
+
+	test("with `groups: 'runs'`, leaves runs of consecutive rows in the rows' own order", () => {
+		const out = new TransformsPhase<State>({ groups: 'runs' }).run(
+			{ ...twins(), transforms: [{ type: 'reverse' }] },
+			CTX
+		);
+		expect(out.processedGroups!.map((g) => [g.series.id, g.series.data.length])).toEqual([
+			['p2/A', 1],
+			['p1/A', 2]
 		]);
 	});
 });

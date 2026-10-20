@@ -35,6 +35,23 @@ export const MALE_LIFE_EXPECTANCY: YearPoint[] = LIFE_EXPECTANCY.filter(
 	(d) => d.sex === 'male'
 ).map((d) => ({ year: d.year, value: d.value }));
 
+/**
+ * Life expectancy at birth in Argentina, women, at each census-era life table
+ * (INDEC) from 1947 to 2019. The years are uneven and 1947 sits three years
+ * before 1950, so an axis with ticks every ten years has its first data tick
+ * crowding the second.
+ */
+export const FEMALE_LIFE_EXPECTANCY_SINCE_1947: YearPoint[] = [
+	{ year: 1947, value: 61.4 },
+	{ year: 1965, value: 69.5 },
+	{ year: 1972, value: 70.8 },
+	{ year: 1980, value: 72.7 },
+	{ year: 1991, value: 75.6 },
+	{ year: 2001, value: 77.5 },
+	{ year: 2009, value: 78.8 },
+	{ year: 2019, value: 80.2 }
+];
+
 export type YearPointWithGaps = { year: number; value: number | null };
 
 /**

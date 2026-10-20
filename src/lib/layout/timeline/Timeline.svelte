@@ -15,12 +15,15 @@
 		currentValue,
 		values,
 		orientation = 'vertical',
+		format = (value: TimeValue) => String(value),
 		width,
 		height
 	}: {
 		currentValue: TimeValue;
 		values: TimeValue[];
 		orientation?: Orientation;
+		/** How a step's label reads. */
+		format?: (value: TimeValue) => string;
 		width: number;
 		height: number;
 	} = $props();
@@ -72,7 +75,7 @@
 		<Text
 			data={baseValues}
 			{...isHorizontal ? { x: identity, y: 0 } : { x: 0, y: identity }}
-			text={(d: TimeValue) => `${d}`}
+			text={(d: TimeValue) => format(d)}
 			{...textOffset}
 			fontSize={rule.fontSize}
 			fill="var(--dct-timeline-axis, currentColor)"
@@ -82,7 +85,7 @@
 		<Text
 			data={[currentValue]}
 			{...isHorizontal ? { x: identity, y: 0 } : { x: 0, y: identity }}
-			text={(d: TimeValue) => `${d}`}
+			text={(d: TimeValue) => format(d)}
 			{...textOffset}
 			fontSize={rule.activeFontSize}
 			fontWeight={rule.activeFontWeight}

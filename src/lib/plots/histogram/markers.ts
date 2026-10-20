@@ -1,11 +1,11 @@
-import { SERIES_KEY, TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
+import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
+import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { Transforms } from '$lib/phases/transforms/Transforms';
 import { resolveAccessor } from '$lib/plots/utils/accessors';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 
 import type { HistogramPlotState, HistogramPlotCtx } from '$lib/types/plots/histogram/state';
 import type { AxisBasedMarkersConfig, TextMarkerConfig } from '$lib/types/markers/common';
-import type { AreaStyle } from '$lib/types/plots/styling';
 import type { ProcessedRow } from '$lib/types/phases';
 import type { ValueLabels } from '$lib/layout/styles/ValueLabels';
 
@@ -28,7 +28,7 @@ export function buildValueLabels<TData extends Record<string, unknown>>(
 	const value = PlotAxes.valueOf(state);
 	const binned = PlotAxes.other(value);
 	const horizontal = value === 'x';
-	const position = TransformsPhase.processedPosition(processed, value);
+	const position = ProcessedPositions.of(processed, value);
 	const read = (channel: unknown) =>
 		channel === undefined
 			? undefined
@@ -93,8 +93,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 	const { channels, options, transforms } = state.processedData!;
 	const fillOpacity = ctx.cfg.histogram.fillOpacity;
 
-	// Bins are discrete, so adjacent segments share no boundary bar to bridge.
-	const rects = TransformsPhase.buildProcessedGroups<AreaStyle>(state, false).flatMap((group) => {
+	const rects = (state.processedGroups ?? []).flatMap((group) => {
 		const disabled = ctx.interaction?.fillFor(group.series.name);
 		return group.visualSegments.map((seg) =>
 			Transforms.finish(

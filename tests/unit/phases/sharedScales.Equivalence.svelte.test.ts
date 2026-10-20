@@ -3,6 +3,7 @@ import { SharedScalesPhase } from '$lib/phases/sharedScales/SharedScalesPhase';
 import { buildFacetPanels } from '$lib/layout/facet/config';
 import { Pipeline } from '$lib/phases/Pipeline';
 import { ScalesPhase } from '$lib/phases/scales/ScalesPhase';
+import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import type { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { MarkerAxisValues } from '$lib/phases/scales/MarkerAxisValues';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
@@ -12,6 +13,7 @@ import { buildBarDefaults } from '$lib/plots/bar/defaults';
 import { buildScatterDefaults } from '$lib/plots/scatter/defaults';
 import { buildHistogramDefaults } from '$lib/plots/histogram/defaults';
 import { buildHeatmapDefaults } from '$lib/plots/heatmap/defaults';
+import { buildBoxDefaults } from '$lib/plots/box/defaults';
 import type { AxisPipelineProps } from '$lib/phases/Pipeline';
 import type { SharedAxisValues } from '$lib/types/phases';
 import type { FacetConfig } from '$lib/types/layout/facet';
@@ -73,6 +75,11 @@ const CASES: Case[] = [
 		name: 'heatmap',
 		kind: buildHeatmapDefaults<Row>(),
 		props: { x: 'anio', y: 'sector', color: 'valor' }
+	},
+	{
+		name: 'box',
+		kind: buildBoxDefaults<Row>(),
+		props: { x: 'sector', y: 'valor', color: 'sector' }
 	}
 ];
 
@@ -95,7 +102,7 @@ function perFacetValues(kind: Case['kind'], props: AxisPipelineProps<Row>) {
 			axes?: PlotAxes;
 		};
 		const values = (axis: 'x' | 'y') => [
-			...ScalesPhase.processedValues(state.processedData, axis),
+			...ProcessedPositions.values(state.processedData, axis),
 			...MarkerAxisValues.of(state.markers ?? [], axis)
 		];
 		return {

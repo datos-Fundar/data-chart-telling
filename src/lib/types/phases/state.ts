@@ -1,4 +1,4 @@
-import type { Series } from '$lib/types/plots/data/common';
+import type { Accessor, Series } from '$lib/types/plots/data/common';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type {
 	SegmentsConfig,
@@ -14,7 +14,7 @@ import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
 import type { MarkerTransform } from '$lib/types/transforms';
-import type { ProcessedData } from '$lib/types/phases/transforms/phase';
+import type { ProcessedData, ProcessedRow } from '$lib/types/phases/transforms/phase';
 import type { FacetStageState } from '$lib/types/phases/facet/phase';
 import type { AxisBasedStylesConfig, ValuesStyle } from '$lib/types/layout/styles';
 import type { ValueLabels } from '$lib/layout/styles/ValueLabels';
@@ -63,6 +63,8 @@ export type AxisPlotState<
 	/** What each position channel is, which one holds the categories, and which way the plot runs. */
 	axes?: PlotAxes;
 	resolvedSeries?: TSeries[];
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	seriesGrouping?: Accessor<any, unknown>;
 	/** Every series name, before legend-omitted ones are dropped, so colors stay put. */
 	allSeriesNames?: string[];
 	groupedSeries?: VisualGroup<TSeries, TStyle>[];
@@ -75,8 +77,9 @@ export type AxisPlotState<
 	// "mapping" phase output.
 	channels?: ResolvedChannels<TData>;
 
-	// "transforms" phase output: what the plot's own marks draw.
+	// "transforms" phase output: what the plot's own marks draw, and the same rows split into their visual groups.
 	processedData?: ProcessedData;
+	processedGroups?: VisualGroup<Series<ProcessedRow>, TStyle>[];
 
 	// "styles" phase output: `values` over the kind's own defaults.
 	valueLabels?: ValueLabels;
@@ -87,8 +90,9 @@ export type AxisPlotState<
 	// plot's own marks in front.
 	markers?: AxisBasedMarkersConfig[];
 
-	// "tooltip" phase output: how a hovered row reads, unless `tooltip.format` says otherwise.
+	// "tooltip" phase output: how a hovered row reads, unless `tooltip.format` says otherwise, and the order the rows read in.
 	tooltipFormat?: (row: Record<string, unknown>) => string;
+	tooltipSort?: (a: Record<string, unknown>, b: Record<string, unknown>) => number;
 
 	// "hover" phase output: what the pointer can match and how the hover reads, the rows drawn and hovered, and where each sits.
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

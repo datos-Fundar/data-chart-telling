@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
 import { Pipeline } from '$lib/phases/Pipeline';
-import { HoverPhase } from '$lib/phases/hover/HoverPhase';
+import { HoverSettings } from '$lib/layout/hover/HoverSettings';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import { PlotInteraction } from '$lib/layout/interaction/PlotInteraction.svelte';
@@ -172,22 +172,20 @@ describe('HoverPhase - where a candidate sits', () => {
 	});
 });
 
-describe('HoverPhase.strategyOf', () => {
+describe('HoverSettings.strategyOf', () => {
 	const axes = (series: { x?: string; y?: string; data: Row[] }[], discrete?: 0 | 1 | 2) =>
 		PlotAxes.build({ series, discrete });
 	const rows = [{ a: 'p', n: 1, m: 2 }];
 
 	test('runs along the axis that is not measured', () => {
-		expect(HoverPhase.strategyOf({ axes: axes([{ x: 'n', y: 'm', data: rows }]) })).toBe('x');
-		expect(HoverPhase.strategyOf({ axes: axes([{ x: 'a', y: 'n', data: rows }], 1) })).toBe('x');
-		expect(HoverPhase.strategyOf({ axes: axes([{ x: 'n', y: 'a', data: rows }], 1) })).toBe('y');
+		expect(HoverSettings.strategyOf(axes([{ x: 'n', y: 'm', data: rows }]))).toBe('x');
+		expect(HoverSettings.strategyOf(axes([{ x: 'a', y: 'n', data: rows }], 1))).toBe('x');
+		expect(HoverSettings.strategyOf(axes([{ x: 'n', y: 'a', data: rows }], 1))).toBe('y');
 	});
 
 	test('is exact when both axes hold categories, and x without axes', () => {
-		expect(HoverPhase.strategyOf({ axes: axes([{ x: 'a', y: 'a', data: rows }], 2) })).toBe(
-			'punctual'
-		);
-		expect(HoverPhase.strategyOf({})).toBe('x');
+		expect(HoverSettings.strategyOf(axes([{ x: 'a', y: 'a', data: rows }], 2))).toBe('punctual');
+		expect(HoverSettings.strategyOf(undefined)).toBe('x');
 	});
 
 	test('a kind declares its own only when the axes cannot say it (a scatter)', () => {

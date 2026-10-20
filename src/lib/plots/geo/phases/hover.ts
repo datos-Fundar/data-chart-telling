@@ -1,4 +1,5 @@
-import { HoverPhase } from '$lib/phases/hover/HoverPhase';
+import { LegendState } from '$lib/layout/legend/LegendState.svelte';
+import { HoverSettings } from '$lib/layout/hover/HoverSettings';
 import type { GeoPlotState, GeoPlotCtx, TaggedGeoFeature } from '$lib/types/plots/geo/state';
 
 /** Whether a pointer event is over an `inset` marker's panel, which has its own hover. */
@@ -20,10 +21,10 @@ export function buildHover<TProps extends Record<string, unknown>>(
 	const features = state.features!;
 	const label = (f: TaggedGeoFeature<TProps>) => f.__id;
 	const points = features
-		.filter((f) => !range || !color || HoverPhase.inRange(color(f), range))
+		.filter((f) => !range || !color || LegendState.inRange(color(f), range))
 		.map((f) => ({ x: f.__cx, y: f.__cy, row: f, label: label(f) }));
 	const hover = {
-		...HoverPhase.buildHoverConfig<TaggedGeoFeature<TProps>>({
+		...HoverSettings.buildConfig<TaggedGeoFeature<TProps>>({
 			tooltip: tooltip as never,
 			format: state.tooltipFormat as (row: TaggedGeoFeature<TProps>) => string,
 			markers: authoredMarkers,
@@ -33,8 +34,7 @@ export function buildHover<TProps extends Record<string, unknown>>(
 			// Match the feature under the cursor, not the nearest centroid.
 			pointMatching: 'contains'
 		}),
-		// A map has no axis to draw a crosshair rule against - 'punctual' here
-		// only means "exact XY hover match", unlike heatmap's own use of it.
+		// A map has no axes for a crosshair: 'punctual' only means an exact match.
 		strategy: 'punctual' as const,
 		crosshair: false,
 		exclude: isOverInset

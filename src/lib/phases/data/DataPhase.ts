@@ -3,7 +3,7 @@ import { resolveColorScale } from '$lib/utils/color';
 import { resolveAccessor } from '$lib/plots/utils/accessors';
 import { buildGroupedSeries, buildScopedMarkerGroups } from '$lib/plots/utils/segments';
 import { buildGapFillMaps, isGapValue } from '$lib/plots/utils/gaps';
-import { FacetPhase } from '$lib/phases/facet/FacetPhase';
+import { FacetPanels } from '$lib/phases/facet/FacetPanels';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { Accessor, Series } from '$lib/types/plots/data/common';
 import type { AxisPlotState, AxisPlotCtx, DataStageOptions, PhaseStage } from '$lib/types/phases';
@@ -13,10 +13,11 @@ type AnyAxisState = AxisPlotState<any, any, any, any>;
 
 /**
  * The "data" phase every axis-based plot shares: its series (from `series`,
- * or flat rows split by {@link DataPhase.buildGrouping}), what each position
- * channel is and which way the plot runs ({@link PlotAxes}), each series'
- * color, the series a legend omits dropped, each series cut into its styled
- * visual segments, and - for a discrete mark - the values its gaps fill in.
+ * or flat rows split by `seriesGrouping`: its `grouping`, or a categorical
+ * `color`), what each position channel is and which way the plot runs
+ * ({@link PlotAxes}), each series' color, the series a legend omits dropped,
+ * each series cut into its styled visual segments, and - for a discrete
+ * mark - the values its gaps fill in.
  * Colors and axes come from every series, before any is omitted or split by
  * facet panel, so they stay put and every panel agrees.
  */
@@ -36,8 +37,8 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 		const { series, data, segments, scales } = state;
 		const { connect = true, color: segmentColor } = options.segments ?? {};
 
-		const built: Series[] =
-			series ?? buildSeries(data ?? [], state.x, state.y, DataPhase.buildGrouping(state));
+		const seriesGrouping = DataPhase.#buildGrouping(state);
+		const built: Series[] = series ?? buildSeries(data ?? [], state.x, state.y, seriesGrouping);
 		const fullSeries = options.orderSeries ? options.orderSeries(built, state) : built;
 		const axes = PlotAxes.build({
 			series: fullSeries,
@@ -52,7 +53,7 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 		);
 		const panelSeries =
 			state.panels && state.panelOf && !series
-				? FacetPhase.splitSeriesByPanel(fullSeries, state.panels, state.panelOf)
+				? FacetPanels.splitSeries(fullSeries, state.panels, state.panelOf)
 				: fullSeries;
 		const resolvedSeries = ctx.interaction?.legend?.withoutOmitted(panelSeries) ?? panelSeries;
 		const groupedSeries = buildGroupedSeries(resolvedSeries, segments, connect);
@@ -71,6 +72,7 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 			...state,
 			axes,
 			resolvedSeries,
+			seriesGrouping,
 			allSeriesNames: fullSeries.map((s) => s.name),
 			groupedSeries,
 			flat: resolvedSeries.flatMap((s) => s.data),
@@ -86,7 +88,7 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 	 * when that names categories. A numeric `color` is a continuous value (a
 	 * heatmap's cells), so it colors rows without grouping them.
 	 */
-	static buildGrouping(
+	static #buildGrouping(
 		state: Pick<AnyAxisState, 'grouping' | 'color' | 'data'>
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	): Accessor<any, unknown> | undefined {

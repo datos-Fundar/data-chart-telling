@@ -1,9 +1,7 @@
-import { TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
 import { Transforms } from '$lib/phases/transforms/Transforms';
 
 import type { AreaPlotState, AreaPlotCtx } from '$lib/types/plots/area/state';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import type { AreaStyle } from '$lib/types/plots/styling';
 
 /**
  * AreaPlot's "markers" phase: one `area` per visual segment of each series,
@@ -38,7 +36,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 	const dimByName = (name: string) =>
 		dimmed ? { opacity: () => name, scales: { opacity: opacityScale } } : {};
 
-	const areas = TransformsPhase.buildProcessedGroups<AreaStyle>(state).flatMap((group) =>
+	const areas = (state.processedGroups ?? []).flatMap((group) =>
 		group.visualSegments.map((seg) =>
 			Transforms.finish(
 				{

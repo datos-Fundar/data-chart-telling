@@ -37,11 +37,39 @@ Segments and markers join the series section when they carry a `legend` label:
 
 Items become clickable with `interactive` on the series section. `disabled` says what a hidden series becomes:
 
+<!-- example: examples/LegendToggle.svelte -->
+
 ```svelte
-<LinePlot ... legend={{ series: { interactive: { enabled: true, disabled: { mode: 'omit' } } } }} />
+<script lang="ts">
+	import { LinePlot } from '@fundar/data-chart-telling';
+	import { REGION_VALUES } from './data';
+	import LegendReader from './LegendReader.svelte';
+</script>
+
+<!--
+	The automatic legend can toggle series. `mode: 'omit'` drops a hidden series
+	and refits the axes to what is left; 'dim' and 'hide' keep the axes.
+	Anything inside the figure (here, the footer) reads the toggles through
+	`useFigure().legend` - see LegendReader.
+-->
+<LinePlot
+	width={720}
+	height={400}
+	data={REGION_VALUES}
+	x="date"
+	y="value"
+	color="region"
+	legend={{ series: { interactive: { enabled: true, disabled: { mode: 'omit' } } } }}
+>
+	{#snippet footer()}
+		<LegendReader />
+	{/snippet}
+</LinePlot>
 ```
 
-![Legend items as toggles](images/legend-interactive.png)
+<!-- /example -->
+
+![Legend items as toggles](images/legend-toggle.png)
 
 | `disabled.mode`   | A hidden series...                                                                    |
 | ----------------- | ------------------------------------------------------------------------------------- |
@@ -77,20 +105,39 @@ Each channel key adjusts the section that channel draws: any section field excep
 
 A list replaces the automatic legend with exactly those sections:
 
-```ts
-legend={[
-	{
-		type: 'discrete',
-		title: 'Indicator',
-		interactive: { enabled: true },
-		items: [
-			{ name: 'GDP', color: '#4f46e5', symbol: 'line' },
-			{ name: 'Employment', color: '#e6580d', symbol: 'line' }
-		]
-	},
-	{ type: 'continuous', title: 'Share', min: 0, max: 100, scheme: 'blues' }
-]}
+<!-- example: examples/LegendSections.svelte -->
+
+```svelte
+<script lang="ts">
+	import { LinePlot } from '@fundar/data-chart-telling';
+	import { REGION_VALUES } from './data';
+</script>
+
+<!-- An explicit legend: a discrete section of toggles and a continuous ramp. -->
+<LinePlot
+	width={720}
+	height={400}
+	data={REGION_VALUES}
+	x="date"
+	y="value"
+	color="region"
+	legend={[
+		{
+			type: 'discrete',
+			title: 'Region',
+			interactive: { enabled: true },
+			items: [
+				{ name: 'GBA', color: '#4f46e5', symbol: 'line' },
+				{ name: 'Cuyo', color: '#e6580d', symbol: 'line' },
+				{ name: 'Northwest', color: '#16a34a', symbol: 'line' }
+			]
+		},
+		{ type: 'continuous', title: 'Share', min: 0, max: 100, scheme: 'blues' }
+	]}
+/>
 ```
+
+<!-- /example -->
 
 ![A legend of explicit sections: discrete items and a continuous ramp](images/legend-sections.png)
 

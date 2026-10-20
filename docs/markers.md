@@ -2,28 +2,39 @@
 
 `markers` adds marks to a plot beyond the ones its kind draws: annotations, regions, derived shapes, hover highlights, or any Svelte component. It is an array of objects; `type` picks the marker and the other fields configure it.
 
+<!-- example: examples/Markers.svelte -->
+
 ```svelte
+<script lang="ts">
+	import { LinePlot } from '@fundar/data-chart-telling';
+	import { LIFE } from './data';
+</script>
+
+<!-- Markers add marks to a plot: a hover highlight, a reference rule and a delta between two series. -->
 <LinePlot
-	{width}
-	{height}
-	data={lifeExpectancy}
+	width={720}
+	height={400}
+	data={LIFE}
 	x="year"
 	y="value"
 	color="sex"
+	scales={{ x: { edgeTicks: true } }}
 	markers={[
 		{ type: 'hover' },
-		{ type: 'rule', axis: 'x', value: 2020, styles: { stroke: '#999', strokeDasharray: '4 4' } },
+		{ type: 'rule', axis: 'x', value: 2001, styles: { stroke: '#999', strokeDasharray: '4 4' } },
 		{
 			type: 'delta',
 			axis: 'x',
-			at: 2018,
+			at: 1980,
 			from: { type: 'series', series: 'female' },
 			to: { type: 'series', series: 'male' },
-			formatDiff: (d) => d.toFixed(1)
+			formatDiff: (difference) => difference.toFixed(1)
 		}
 	]}
 />
 ```
+
+<!-- /example -->
 
 ![A line plot with a reference rule and a delta between two series](images/markers.png)
 
