@@ -4,9 +4,9 @@ import { HoverSettings } from '$lib/layout/hover/HoverSettings';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import type { AxisValue } from '$lib/types/layout/mapping';
-import type { HoverDisplayPoint, HoverPoint, HoverStrategy } from '$lib/types/layout/hover';
-import type { HoverConfig, PointMatchingStrategy, TooltipConfig } from '$lib/types/plots/props';
-import type { LegendState } from '$lib/layout/legend/LegendState.svelte';
+import type { HoverDisplayPoint, HoverPoint } from '$lib/types/layout/hover';
+import type { TooltipConfig } from '$lib/types/plots/props';
+import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import type {
 	AxisPlotCtx,
 	AxisPlotState,
@@ -23,15 +23,10 @@ type Row = Record<string, unknown>;
 
 /**
  * The "hover" phase every axis-based plot shares: what the pointer can match
- * (`hover`, the config `BasePlotLayout` mounts), the rows it draws and hovers
- * over (`hoverRows`) and where each sits (`hoverPosition`), from the kind's
- * options over everything placed before - the plot's `tooltip` and hover
- * markers, the tooltip phase's format, the legend in scope. A core only reads them.
- *
- * Every plot gets the same candidates: each processed row (or each of the
- * kind's own hover `rows`) of a series the legend shows, at its position, in its series' color - except a gap row (one
- * with no value, or filled in) and a row whose color falls outside the
- * legend's narrowed range.
+ * (`hover`), the rows it hovers over (`hoverRows`) and where each sits
+ * (`hoverPosition`). Candidates are the processed rows (or the kind's own
+ * hover `rows`) of the series the legend shows, except gap rows and rows
+ * outside the legend's narrowed range.
  */
 export class HoverPhase<
 	TState extends AnyAxisState,
@@ -74,7 +69,7 @@ export class HoverPhase<
 				| ((row: Row) => Partial<HoverDisplayPoint>)
 				| undefined
 		});
-		const hover = HoverPhase.buildHoverConfig<Row>({
+		const hover = HoverSettings.buildConfig<Row>({
 			tooltip: state.tooltip as TooltipConfig<Row> | undefined,
 			format:
 				(options.format?.(state) as ((row: Row) => string) | undefined) ?? state.tooltipFormat!,
@@ -83,7 +78,7 @@ export class HoverPhase<
 			markers: state.authorMarkers ?? [],
 			points: points as HoverPoint<Row>[],
 			label: label as (row: Row) => string,
-			defaultStrategy: options.strategy ?? HoverPhase.strategyOf(state),
+			defaultStrategy: options.strategy ?? HoverSettings.strategyOf(state.axes),
 			pointMatching: options.pointMatching
 		});
 		const hitAreas = options.hitAreas?.(state, hover as never, ctx) ?? [];
@@ -95,51 +90,6 @@ export class HoverPhase<
 			...(hitAreas.length > 0 ? { markers: [...(state.markers ?? []), ...hitAreas] } : {})
 		};
 	};
-
-	/**
-	 * The hover strategy a plot's axes ask for: along the axis that isn't
-	 * measured (a bar's categories, a line's `x`), or one exact cell at a time
-	 * when both axes hold categories.
-	 */
-	static strategyOf(state: { axes?: PlotAxes }): HoverStrategy {
-		const { axes } = state;
-		if (!axes) return 'x';
-		if (axes.isDiscrete('x') && axes.isDiscrete('y')) return 'punctual';
-		return PlotAxes.other(PlotAxes.valueOf(state));
-	}
-
-	/**
-	 * A plot's `hover` config for `BasePlotLayout`: active whenever there's a
-	 * tooltip or a hover marker, with the strategy and sync those two resolve to
-	 * (the plot kind's own `defaultStrategy` when neither sets one). The tooltip
-	 * reads as `format` unless it sets its own.
-	 */
-	static buildHoverConfig<TRow extends Record<string, unknown>>(args: {
-		tooltip: TooltipConfig<TRow> | undefined;
-		format: (row: TRow) => string;
-		sort?: (a: TRow, b: TRow) => number;
-		markers: { type: string }[];
-		points: HoverPoint<TRow>[];
-		label: (row: TRow) => string;
-		defaultStrategy: HoverStrategy;
-		pointMatching?: PointMatchingStrategy;
-	}): HoverConfig<TRow> {
-		const { tooltip, format, sort, markers, points, label, defaultStrategy, pointMatching } = args;
-		const settings = new HoverSettings(tooltip, markers, defaultStrategy);
-		return {
-			active: settings.active,
-			points,
-			label,
-			strategy: settings.strategy,
-			sync: settings.sync,
-			tooltip: tooltip && {
-				...tooltip,
-				format: tooltip.format ?? format,
-				...(sort ? { sort } : {})
-			},
-			...(pointMatching ? { pointMatching } : {})
-		};
-	}
 
 	/**
 	 * Hover candidates for a plot's own processed rows: each visible row at its
@@ -201,12 +151,7 @@ export class HoverPhase<
 		return (row) => {
 			if (isGapValue(position[valueAxis](row as never)) || row[GAP_VALUE] !== undefined)
 				return false;
-			return !range || !color || HoverPhase.inRange(Number(color(row as never)), range);
+			return !range || !color || LegendState.inRange(Number(color(row as never)), range);
 		};
-	}
-
-	/** Whether a value sits within the legend's narrowed range; one with no value is never dimmed. */
-	static inRange(value: number | null | undefined, range: { min: number; max: number }): boolean {
-		return value == null || (value >= range.min && value <= range.max);
 	}
 }

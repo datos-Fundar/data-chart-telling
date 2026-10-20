@@ -9,6 +9,7 @@ import { StylesPhase } from '$lib/phases/styles/StylesPhase';
 import { MarkersPhase } from '$lib/phases/markers/MarkersPhase';
 import { TooltipPhase } from '$lib/phases/tooltip/TooltipPhase';
 import { HoverPhase } from '$lib/phases/hover/HoverPhase';
+import { HoverSettings } from '$lib/layout/hover/HoverSettings';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type {
 	AxisPlotState,
@@ -232,7 +233,7 @@ export class Pipeline<TState, TCtx = unknown> {
 		if (fixed !== undefined) return fixed;
 		const upToData = this.stages.filter((s) => s.phase === 'data');
 		const state = Pipeline.#through(upToData, this.#seed(props), Pipeline.#ctxFor<TCtx>(cfg, null));
-		return HoverPhase.strategyOf(state as { axes?: PlotAxes });
+		return HoverSettings.strategyOf((state as { axes?: PlotAxes }).axes);
 	}
 
 	/** The plot's default `timeline.filterMode`. */

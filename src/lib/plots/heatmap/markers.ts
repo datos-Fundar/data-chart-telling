@@ -1,3 +1,4 @@
+import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import { DisabledStyle } from '$lib/layout/legend/DisabledStyle';
 import { resolveAccessor } from '$lib/plots/utils/accessors';
 
@@ -122,7 +123,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 	})();
 
 	function rangeFilteredStyle(base: CellSegmentStyle, value: number): CellSegmentStyle {
-		if (range == null || (value >= range.min && value <= range.max)) return base;
+		if (range == null || LegendState.inRange(value, range)) return base;
 		return { ...base, ...DisabledStyle.fill(range.disabledStyle) };
 	}
 
