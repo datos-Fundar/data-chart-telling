@@ -1,5 +1,4 @@
 import { resolveAccessor } from '$lib/plots/utils/accessors';
-import { DataPhase } from '$lib/phases/data/DataPhase';
 import type { ResolvedChannels } from '$lib/types/layout/mapping';
 import type {
 	AxisPlotState,
@@ -15,7 +14,7 @@ type AnyAxisState = AxisPlotState<any, any, any, any>;
  * The "mapping" phase every axis-based plot shares: every channel resolved to
  * a row accessor. `x`/`y` (and `color`) read the first series' own, falling
  * back to the plot's props; `grouping` is the key the "data" phase split rows
- * by ({@link DataPhase.buildGrouping}); any other channel resolves only when
+ * by (its `seriesGrouping`); any other channel resolves only when
  * its prop is set, and a size channel given a number stays that literal size.
  * An unset `x`/`y` reads each row itself, with no `source`.
  */
@@ -33,14 +32,13 @@ export class MappingPhase<
 	run = (state: TState, ctx: TCtx): TState => {
 		const first = state.resolvedSeries?.[0];
 		const identity = { accessor: (d: unknown) => d };
-		const grouping = DataPhase.buildGrouping(state);
 		const size = (value: unknown) =>
 			typeof value === 'number' ? value : MappingPhase.#channel(value);
 
 		const channels = {
 			x: MappingPhase.#channel(first?.x ?? state.x) ?? identity,
 			y: MappingPhase.#channel(first?.y ?? state.y) ?? identity,
-			grouping: MappingPhase.#channel(grouping),
+			grouping: MappingPhase.#channel(state.seriesGrouping),
 			color: MappingPhase.#channel(first?.color ?? state.color),
 			opacity: MappingPhase.#channel(state.opacity),
 			symbol: MappingPhase.#channel(state.symbol),

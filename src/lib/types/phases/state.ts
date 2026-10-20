@@ -1,4 +1,4 @@
-import type { Series } from '$lib/types/plots/data/common';
+import type { Accessor, Series } from '$lib/types/plots/data/common';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type {
 	SegmentsConfig,
@@ -63,6 +63,8 @@ export type AxisPlotState<
 	/** What each position channel is, which one holds the categories, and which way the plot runs. */
 	axes?: PlotAxes;
 	resolvedSeries?: TSeries[];
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	seriesGrouping?: Accessor<any, unknown>;
 	/** Every series name, before legend-omitted ones are dropped, so colors stay put. */
 	allSeriesNames?: string[];
 	groupedSeries?: VisualGroup<TSeries, TStyle>[];
