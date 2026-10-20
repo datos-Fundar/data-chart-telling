@@ -2,13 +2,16 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ClevelandPlot from '$lib/plots/cleveland/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import { AGE_SHARES } from '$examples/data';
+import { SEQUENTIAL_COLORS } from '../colors';
 
 /** Only the first and last census, so every category has two dots and its labels fit. */
 const ENDS = AGE_SHARES.filter((row) => row.year === 1991 || row.year === 2022);
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `styles.values` writes each dot's value: past the highest and the lowest of its
-// category, and beside the ones between.
+// category, and beside the ones between. `select` picks which dots of each category are written
+// (`'first'`, `'last'`, `'min'`, `'max'`, or a list of those), `series` which series, and
+// `color: 'series'` colors each label like its dot.
 
 const meta = {
 	title: 'Plots/ClevelandPlot/Styles/Values',
@@ -17,6 +20,7 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
+		scales: { color: SEQUENTIAL_COLORS },
 		data: ENDS,
 		x: 'ageGroup',
 		y: 'share',
@@ -49,9 +53,36 @@ export const Sideways: Story = {
 	args: {
 		x: 'share',
 		y: 'ageGroup',
-		scales: { x: { domain: [14, 26] } },
+		scales: { color: SEQUENTIAL_COLORS, x: { domain: [14, 26] } },
 		styles: {
 			values: { show: true, format: (value: number) => `${value} %` }
+		} satisfies AxisBasedStylesConfig
+	}
+};
+
+/** With four censuses, `select: ['min', 'max']` writes only the lowest and the highest share of each age group. */
+export const OnlyTheEnds: Story = {
+	args: {
+		data: AGE_SHARES,
+		scales: { color: SEQUENTIAL_COLORS, y: { domain: [14, 26] } },
+		styles: {
+			values: { show: true, select: ['min', 'max'], color: 'series' }
+		} satisfies AxisBasedStylesConfig
+	}
+};
+
+/** `select` takes a list: the first and the last census of each age group here. */
+export const FirstAndLast: Story = {
+	args: {
+		data: AGE_SHARES,
+		scales: { color: SEQUENTIAL_COLORS, y: { domain: [14, 26] } },
+		styles: {
+			values: {
+				show: true,
+				select: ['first', 'last'],
+				color: 'series',
+				format: (value: number) => `${value}%`
+			}
 		} satisfies AxisBasedStylesConfig
 	}
 };

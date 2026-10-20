@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ClevelandPlot from '$lib/plots/cleveland/Plot.svelte';
 import { AGE_SHARES, type AgeShareRow } from '$examples/data';
+import { SEQUENTIAL_COLORS } from './colors';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Hovering a category reads its rows - one per series - through the same
@@ -13,6 +14,7 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
+		scales: { color: SEQUENTIAL_COLORS },
 		data: AGE_SHARES,
 		x: 'ageGroup',
 		y: 'share',

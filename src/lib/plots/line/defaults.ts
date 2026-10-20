@@ -1,4 +1,5 @@
 import { buildMarks } from '$lib/plots/line/markers';
+import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import type { AxisPlotDefaults } from '$lib/types/phases';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { LinePlotState, LinePlotCtx } from '$lib/types/plots/line/state';
@@ -19,6 +20,7 @@ export function buildLineDefaults<TData extends Record<string, unknown>>(): Axis
 				return state.resolvedSeries?.[0] && state.colorForSeries?.(state.resolvedSeries[0].name);
 			}
 		},
+		transforms: { labels: { select: 'last', skip: ValueLabels.skipGaps } },
 		styles: {
 			values: {
 				anchor: 'start',

@@ -47,7 +47,7 @@ One line per series. Rows with a missing value (`null`, `undefined`, `NaN`) brea
 
 ![A line plot with end-of-line labels](images/line-dates.png)
 
-- `styles.values.show` writes a label at the end of each series, with the series name and value. Overlapping labels spread apart automatically and the margin grows to fit them.
+- `styles.values.show` writes a label at the end of each series, with the series name and value. Overlapping labels spread apart automatically and the margin grows to fit them. `styles.values.select` labels another point instead - or besides: `'first'`, `'min'`, `'max'`, or a list such as `['first', 'last']`.
 - Hover finds the points sharing the hovered `x`.
 - With a [`timeline`](timeline.md), the line reveals itself up to the current step and interpolates `y` between steps.
 - `segments` style ranges of a line; `markers` add `delta`, `rule`, `text` and the rest (see [Markers](markers.md)).
@@ -301,7 +301,7 @@ The general form of the family: per category, one dot for each series that has a
 - The connector spans the lowest and the highest dot of each category, so a series the legend omits leaves the range.
 - The value axis fits the values without reaching for zero; pin `scales.y.domain` to start it at zero.
 - Its defaults come from `cleveland` in the [configuration](theming.md).
-- `styles.values` writes each value: past the highest dot and the lowest of its category, and beside those between them.
+- `styles.values` writes each value: past the highest dot and the lowest of its category, and beside those between them. `select` (`'first'`, `'last'`, `'min'`, `'max'`, or a list) labels only those dots of each category, `series` only those series, and `color: 'series'` writes each label in its dot's series color. `format(value, seriesName, row)` also gets the row, so a label can name its category (see [Styles and segments](styles-and-segments.md#value-labels)).
 - `segments` restyle the dots of chosen categories, as in [`DumbbellPlot`](#dumbbellplot).
 - The tooltip reads one category at a time, listing every series.
 

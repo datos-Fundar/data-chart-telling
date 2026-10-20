@@ -46,14 +46,17 @@
 
 ![End-of-line value labels](images/value-labels.png)
 
-| Field          | Meaning                                                                                                                                        |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `show`         | Draws the labels. Off by default, except on a heatmap                                                                                          |
-| `anchor`       | `'outside'`, `'start'`, `'middle'`, `'end'` - where a label sits on its mark                                                                   |
-| `format`       | `(value, seriesName) => string`                                                                                                                |
-| `hoverIsolate` | Hovering a label dims every other series                                                                                                       |
-| `fontStyle`    | Text style: `fontSize`, `fill`, `dx`, `dy`, `textAnchor`, `lineAnchor`, `rotate`, `class`, ... Overrides the anchor's placement field by field |
-| `strokeStyle`  | Style of the connector lines drawn from labels that had to move apart                                                                          |
+| Field          | Meaning                                                                                                                                                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `show`         | Draws the labels. Off by default, except on a heatmap                                                                                                                                                                     |
+| `anchor`       | `'outside'`, `'start'`, `'middle'`, `'end'` - where a label sits on its mark                                                                                                                                              |
+| `select`       | Which row of each group is labelled: `'first'`, `'last'`, `'min'`, `'max'`, or a list of them. A group is a series on a line or area plot (default `'last'`), a category on the plots that join dots (default: every dot) |
+| `series`       | Labels only these series, by name                                                                                                                                                                                         |
+| `color`        | `'series'` writes each label in its series' color; any other CSS color writes them all in it (`fontStyle.fill` wins)                                                                                                      |
+| `format`       | `(value, seriesName, row) => string`; `row` is the labelled row, for its other fields                                                                                                                                     |
+| `hoverIsolate` | Hovering a label dims every other series                                                                                                                                                                                  |
+| `fontStyle`    | Text style: `fontSize`, `fill`, `dx`, `dy`, `textAnchor`, `lineAnchor`, `rotate`, `class`, ... Overrides the anchor's placement field by field                                                                            |
+| `strokeStyle`  | Style of the connector lines drawn from labels that had to move apart                                                                                                                                                     |
 
 Where the labels go depends on the plot: the end of each series on a line or area plot, one per bar on a bar, pyramid or histogram, one per point on a scatter, one per cell on a heatmap. On lines, overlapping labels spread apart, share one column and are joined to their points by elbow connectors; the right margin grows to fit them when it is `'auto'`. The spread is tuned by `text.declutter` in the [configuration](theming.md).
 

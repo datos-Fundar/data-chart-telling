@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ClevelandPlot from '$lib/plots/cleveland/Plot.svelte';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import { AGE_SHARES } from '$examples/data';
+import { SEQUENTIAL_COLORS } from './colors';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The value axis fits the values, without reaching for zero; the category axis
@@ -41,6 +42,7 @@ type Story = StoryObj<typeof meta>;
 export const Labels: Story = {
 	args: {
 		scales: {
+			color: SEQUENTIAL_COLORS,
 			x: { label: false },
 			y: { label: 'Share of the population (%)' }
 		} satisfies AxisBasedScalesConfig
@@ -51,6 +53,7 @@ export const Labels: Story = {
 export const CategoryOrder: Story = {
 	args: {
 		scales: {
+			color: SEQUENTIAL_COLORS,
 			x: { domain: ['65+', '45-64', '30-44', '15-29', '0-14'] }
 		} satisfies AxisBasedScalesConfig
 	}
@@ -60,6 +63,7 @@ export const CategoryOrder: Story = {
 export const FromZero: Story = {
 	args: {
 		scales: {
+			color: SEQUENTIAL_COLORS,
 			y: { domain: [0, 30] }
 		} satisfies AxisBasedScalesConfig
 	}
@@ -69,6 +73,7 @@ export const FromZero: Story = {
 export const EdgeRoom: Story = {
 	args: {
 		scales: {
+			color: SEQUENTIAL_COLORS,
 			x: { paddingOuter: 1 }
 		} satisfies AxisBasedScalesConfig
 	}

@@ -146,9 +146,10 @@ export class ClevelandMarkers {
 	};
 
 	/**
-	 * The value labels, one `'text'` marker per place a dot can hold in its
-	 * range: past the top end (above, or right of it), past the bottom end
-	 * (below, or left of it) and, for the dots between, beside it.
+	 * The value labels of the dots `styles.values.of` picks, one `'text'` marker
+	 * per place a dot can hold in its range - past the top end (above, or right
+	 * of it), past the bottom end (below, or left of it) and, for the dots
+	 * between, beside it - and per series, when they take their series' color.
 	 */
 	valueLabels = <TData extends Record<string, unknown>>(
 		labels: ValueLabels,
@@ -167,13 +168,7 @@ export class ClevelandMarkers {
 		const gap = labels.offset(isHorizontal ? 'x' : 'y', ctx.cfg[this.#options.config].labelGap);
 		const nameOf = (d: ProcessedRow) => String(d[SERIES_KEY]);
 
-		const ranges = ClevelandRanges.of(state, this.#options.fromBaseline ?? false);
-		const rowsBy = (role: ClevelandRole) =>
-			ranges.entries.flatMap((entry) =>
-				entry.dots
-					.filter((dot) => ClevelandRanges.roleOf(entry, dot.value) === role)
-					.map((dot) => dot.row)
-			);
+		const picked = this.#picked(state);
 		// Where a label sits from its dot, by role: along the range (past an end) or across it (between).
 		const placement: Record<ClevelandRole, Place> = {
 			max: isHorizontal
@@ -186,53 +181,98 @@ export class ClevelandMarkers {
 				? { dx: 0, dy: -gap, textAnchor: 'middle', lineAnchor: 'bottom' }
 				: { dx: gap, dy: 0, textAnchor: 'start', lineAnchor: 'middle' }
 		};
+		// What fills the labels of a series: the one fill all share, its own color, or the axis'.
+		const fillOf = (series: string) =>
+			labels.fill ??
+			(labels.color === 'series' ? state.colorForSeries!(series) : undefined) ??
+			ctx.cfg.axis.color;
+		const names =
+			labels.color === 'series' && !labels.fill
+				? (state.resolvedSeries ?? []).map((s) => s.name)
+				: [''];
 
-		return (['max', 'min', 'between'] as const).flatMap((role): TextMarkerConfig[] => {
-			const data = rowsBy(role);
-			if (data.length === 0) return [];
-			const at = placement[role];
-			return [
-				{
-					type: 'text',
-					data,
-					...(isHorizontal ? { x: value, y: category } : { x: category, y: value }),
-					text: (d: ProcessedRow) => format(Number(read(d) ?? valueOf(d)), nameOf(d)),
-					styles: {
-						...font,
-						fill: font?.fill ?? ctx.cfg.axis.color,
-						fontSize: font?.fontSize ?? 12,
-						dx: font?.dx ?? at.dx,
-						dy: font?.dy ?? at.dy,
-						textAnchor: labels.textAnchor ?? at.textAnchor,
-						lineAnchor: font?.lineAnchor ?? at.lineAnchor
+		return (['max', 'min', 'between'] as const).flatMap((role) =>
+			names.flatMap((name): TextMarkerConfig[] => {
+				const data = picked
+					.filter(
+						({ entry, dot }) =>
+							ClevelandRanges.roleOf(entry, dot.value) === role &&
+							(name === '' || dot.series === name)
+					)
+					.map(({ dot }) => dot.row);
+				if (data.length === 0) return [];
+				const at = placement[role];
+				return [
+					{
+						type: 'text',
+						data,
+						...(isHorizontal ? { x: value, y: category } : { x: category, y: value }),
+						text: (d: ProcessedRow) =>
+							format(Number(read(d) ?? valueOf(d)), nameOf(d), d as Record<string, unknown>),
+						styles: {
+							...font,
+							fill: fillOf(name),
+							fontSize: font?.fontSize ?? 12,
+							dx: font?.dx ?? at.dx,
+							dy: font?.dy ?? at.dy,
+							textAnchor: labels.textAnchor ?? at.textAnchor,
+							lineAnchor: font?.lineAnchor ?? at.lineAnchor
+						}
 					}
-				}
-			];
-		});
+				];
+			})
+		);
 	};
 
 	/**
-	 * Room for the value labels past the dots at the end of the value axis, so
-	 * the farthest one fits inside the figure instead of crossing its edge.
+	 * Room for the labels past the dots at the end of the value axis, so the
+	 * farthest one fits inside the figure instead of crossing its edge. Only the
+	 * dots at the top end of their range reach there, and only the picked ones.
 	 */
 	reach = <TData extends Record<string, unknown>>(
 		labels: ValueLabels,
 		state: ClevelandPlotState<TData>
 	): EdgeBox[] => {
 		const gap = labels.config[this.#options.config].labelGap;
+		const top = this.#picked(state).filter(
+			({ entry, dot }) => ClevelandRanges.roleOf(entry, dot.value) === 'max'
+		);
+		if (top.length === 0) return [];
 		if (!state.axes?.isHorizontal) {
 			const at = { y: -labels.offset('y', gap) };
 			return [labels.edgeBox('0', { x: 'middle', y: 'before' }, at, ['top'])];
 		}
 		const at = { x: labels.offset('x', gap) };
-		return labels
-			.extremes(state.resolvedSeries ?? [], PlotAxes.valueOf(state))
-			.map(({ series, value }) =>
-				labels.edgeBox(labels.format(value, series.name), { x: 'after', y: 'middle' }, at, [
-					'right'
-				])
-			);
+		const texts = new Set(top.map(({ dot }) => labels.format(dot.value, dot.series, dot.row)));
+		return [...texts].map((text) =>
+			labels.edgeBox(text, { x: 'after', y: 'middle' }, at, ['right'])
+		);
 	};
+
+	/**
+	 * The dots `styles.values` labels, each with the category it sits in: the rows
+	 * the "transforms" phase picked (`labelled`), traced back to the dots of each
+	 * category by the series they belong to.
+	 */
+	#picked<TData extends Record<string, unknown>>(state: ClevelandPlotState<TData>) {
+		const categoryAxis = PlotAxes.categoryOf(state) as 'x' | 'y';
+		const position = ProcessedPositions.of(
+			state.processedData!,
+			PlotAxes.valueOf(state) as 'x' | 'y'
+		);
+		const ranges = ClevelandRanges.of(state, this.#options.fromBaseline ?? false);
+		const keyOf = (category: unknown, series: string) => `${String(category)}\u0000${series}`;
+		const chosen = new Set(
+			(state.labelled ?? []).map((row) =>
+				keyOf(position[categoryAxis](row), String(row[SERIES_KEY]))
+			)
+		);
+		return ranges.entries.flatMap((entry) =>
+			entry.dots
+				.filter((dot) => chosen.has(keyOf(entry.category, dot.series)))
+				.map((dot) => ({ entry, dot }))
+		);
+	}
 
 	/** Warns, once, when the series layout is not one this plot is for. */
 	#validate(ranges: ClevelandRanges): void {

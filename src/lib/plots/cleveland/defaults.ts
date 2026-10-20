@@ -1,4 +1,5 @@
 import { ClevelandMarkers } from '$lib/plots/cleveland/ClevelandMarkers';
+import { ClevelandRanges } from '$lib/plots/cleveland/ClevelandRanges';
 import type { AxisPlotDefaults } from '$lib/types/phases';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type {
@@ -41,6 +42,8 @@ export function buildClevelandDefaults<TData extends Record<string, unknown>>(
 				}
 			})
 		},
+		// A dot is labelled by what its category's dots say: the first, the highest... of each.
+		transforms: { labels: { group: 'category', skip: ClevelandRanges.skipGaps } },
 		styles: { values: { reach: markers.reach } },
 		markers: { marks: markers.marks, valueLabels: markers.valueLabels }
 	};

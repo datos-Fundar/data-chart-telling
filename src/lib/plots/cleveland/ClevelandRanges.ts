@@ -1,6 +1,7 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { isGapValue } from '$lib/plots/utils/gaps';
+import type { ProcessedData, ProcessedRow } from '$lib/types/phases';
 import type {
 	ClevelandPlotState,
 	ClevelandEntry,
@@ -64,6 +65,19 @@ export class ClevelandRanges {
 			seriesCount: groups.length,
 			maxSeriesPerCategory
 		});
+	}
+
+	/** The rows that cannot be labelled, because they have no value: for the "transforms" phase's `labels.skip`. */
+	static skipGaps(state: {
+		processedData?: ProcessedData;
+		axes?: PlotAxes;
+	}): (row: ProcessedRow) => boolean {
+		const valueAxis = PlotAxes.valueOf(state) as 'x' | 'y';
+		const read = ProcessedPositions.of(state.processedData!, valueAxis)[valueAxis];
+		return (row) => {
+			const raw = read(row);
+			return isGapValue(raw) || !Number.isFinite(Number(raw));
+		};
 	}
 
 	/** Where `value` sits in its category's range: the top end when it is the largest (or the only one), the bottom end when the smallest, else between. */

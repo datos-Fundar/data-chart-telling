@@ -593,3 +593,43 @@ export const IsolatedLabelBoundedByPlot: Story = {
 		} satisfies AxisBasedStylesConfig
 	}
 };
+
+/** `select` picks which point of each series is labelled: here the first and the last. */
+export const FirstAndLast: Story = {
+	args: {
+		series: [
+			{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY },
+			{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY }
+		],
+		margins: { left: 80, right: 80 },
+		styles: {
+			values: { show: true, select: ['first', 'last'] }
+		} satisfies AxisBasedStylesConfig
+	}
+};
+
+/** `select: 'max'` labels each series' highest point, above it. */
+export const Peak: Story = {
+	args: {
+		series: [
+			{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY },
+			{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY }
+		],
+		styles: {
+			values: { show: true, select: 'max', anchor: 'outside' }
+		} satisfies AxisBasedStylesConfig
+	}
+};
+
+/** `series` labels only the named series, and `color` writes the labels in one color. */
+export const OneSeries: Story = {
+	args: {
+		series: [
+			{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY },
+			{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY }
+		],
+		styles: {
+			values: { show: true, series: 'female', color: '#7570b3' }
+		} satisfies AxisBasedStylesConfig
+	}
+};

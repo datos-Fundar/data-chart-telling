@@ -1,4 +1,6 @@
 import { Transforms } from '$lib/phases/transforms/Transforms';
+import { ValueSelection } from '$lib/phases/transforms/ValueSelection';
+import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { seriesIdOf } from '$lib/utils/grouping';
 import { PANEL_KEY } from '$lib/phases/facet/FacetPanels';
 import { resolveAccessor } from '$lib/utils/accessors';
@@ -126,13 +128,57 @@ export class TransformsPhase<
 		return this.#withGroups({ ...state, processedData });
 	};
 
-	/** `state` with its processed rows split into the visual groups the kind's marks draw (`processedGroups`). */
+	/**
+	 * `state` with its processed rows split into the visual groups the kind's marks
+	 * draw (`processedGroups`), and the rows its value labels are written for
+	 * (`labelled`).
+	 */
 	#withGroups(state: TState): TState {
 		const processedGroups =
 			this.#options.groups === 'runs'
 				? TransformsPhase.#buildRuns(state)
 				: TransformsPhase.#buildGroups(state, this.#connect);
-		return { ...state, processedGroups };
+		return { ...state, processedGroups, ...this.#labelled(state) };
+	}
+
+	/**
+	 * The rows `styles.values` writes labels for, picked per facet panel - a
+	 * panel's own last row, not the last of every panel - by the author's
+	 * `select` and `series`, over the plot's own default. Left out while the
+	 * labels are off, or when the plot picks no rows.
+	 */
+	#labelled(state: TState): Pick<TransformsStageState, 'labelled' | 'labelSelects'> {
+		const options = this.#options.labels;
+		const values = state.values;
+		if (!options || !values?.show) return {};
+		const processed = state.processedData!;
+		const valueAxis = PlotAxes.valueOf(state) as 'x' | 'y';
+		const select = values.select ?? options.select;
+		const selections = ValueSelection.transforms(select, values.series, valueAxis);
+		const position = ProcessedPositions.of(processed, valueAxis);
+		const skip = options.skip?.(state);
+		const channels = {
+			x: position.x,
+			y: position.y,
+			group:
+				options.group === 'category'
+					? position[PlotAxes.categoryOf(state) as 'x' | 'y']
+					: SERIES_ID_KEY
+		};
+		const panels = new Map<unknown, ProcessedRow[]>();
+		for (const row of processed.data) {
+			if (skip?.(row)) continue;
+			const bucket = panels.get(row[PANEL_KEY]);
+			if (bucket) bucket.push(row);
+			else panels.set(row[PANEL_KEY], [row]);
+		}
+		const labelled = new Set(
+			[...panels.values()].flatMap((rows) => ValueSelection.pick(rows, selections, channels))
+		);
+		return {
+			labelled: processed.data.filter((row) => labelled.has(row)),
+			labelSelects: ValueSelection.selectors(select)
+		};
 	}
 
 	/** What a gap-filled row carries: its interpolated value and the kind of zone that filled it. */

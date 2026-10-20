@@ -2,6 +2,7 @@ import type { Series } from '$lib/types/plots/data/common';
 import type { MarkerTransform } from '$lib/types/transforms';
 import type { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { VisualGroup } from '$lib/types/plots/segments/config';
+import type { ValuesStyle, ValueSelect } from '$lib/types/layout/styles';
 
 /** A row the plot-level transforms produced: the source row's fields, plus whatever channels they add (often symbol-keyed). */
 export type ProcessedRow = Record<string | symbol, unknown>;
@@ -37,6 +38,12 @@ export type TransformsStageState = {
 	gapFillMaps?: Map<string, Map<unknown, { value: number; kind: string }>>;
 	transforms?: MarkerTransform[];
 	processedData?: ProcessedData;
+	/** The plot's `styles.values`, which picks the rows its labels are written for. */
+	values?: ValuesStyle;
+	/** The processed rows `styles.values` labels, once the labels are on and the plot picks them (see {@link TransformsStageOptions.labels}). */
+	labelled?: ProcessedRow[];
+	/** What `styles.values.select` came to - the author's, else the plot's default - which says where the labelled rows can sit. */
+	labelSelects?: ValueSelect[];
 	/** The processed rows split back into the visual groups the plot's own marks draw. */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	processedGroups?: VisualGroup<Series<ProcessedRow>, any>[];
@@ -53,4 +60,17 @@ export type TransformsStageOptions<TState extends TransformsStageState, TCtx> = 
 	 * `shuffle`) decides which rows paint on top.
 	 */
 	groups?: 'series' | 'runs';
+	/**
+	 * The plot picks the rows its value labels are written for, when the labels
+	 * are on: `styles.values.select` and `series` run as transforms over the
+	 * processed rows, into `labelled`.
+	 */
+	labels?: {
+		/** The rows picked when `styles.values.select` is unset. Defaults to every row. */
+		select?: ValueSelect | ValueSelect[];
+		/** What a selector picks among: each series (the default), or each category. */
+		group?: 'series' | 'category';
+		/** A test for the rows that cannot be labelled (a gap), read off the state once. */
+		skip?: (state: TransformsStageState) => (row: ProcessedRow) => boolean;
+	};
 };

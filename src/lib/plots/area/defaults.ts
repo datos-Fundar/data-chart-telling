@@ -1,4 +1,5 @@
 import { buildMarks } from '$lib/plots/area/markers';
+import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import type { AxisPlotDefaults } from '$lib/types/phases';
 import type { AreaStyle } from '$lib/types/plots/styling';
 import type { AreaPlotState, AreaPlotCtx } from '$lib/types/plots/area/state';
@@ -12,6 +13,7 @@ export function buildAreaDefaults<TData extends Record<string, unknown>>(): Axis
 		data: { segments: { color: (style: AreaStyle | undefined) => style?.fill } },
 		statistics: { inheritPositions: true },
 		scales: { zero: ['y'] },
+		transforms: { labels: { select: 'last', skip: ValueLabels.skipGaps } },
 		styles: {
 			values: {
 				anchor: 'start',

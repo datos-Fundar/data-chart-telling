@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ClevelandPlot from '$lib/plots/cleveland/Plot.svelte';
 import type { LegendExtension } from '$lib/types/layout/legend';
 import { AGE_SHARES } from '$examples/data';
+import { SEQUENTIAL_COLORS } from './colors';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Each series shows in the automatic legend under its name and color. Extending
@@ -16,6 +17,7 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
+		scales: { color: SEQUENTIAL_COLORS },
 		data: AGE_SHARES,
 		x: 'ageGroup',
 		y: 'share',

@@ -280,4 +280,62 @@ describe('LinePlot - styles.values', () => {
 		const connectors = svg.querySelectorAll('path[fill="none"][d^="M"][d*="H"][d*="V"]');
 		expect(connectors.length).toBe(3);
 	});
+
+	describe('select, series and color', () => {
+		const labelsOf = async (values: NonNullable<AxisBasedStylesConfig['values']>) => {
+			const { container } = await render(LinePlot, {
+				width: 600,
+				height: 300,
+				series: [FEMALE, MALE],
+				styles: { values: { show: true, format: (v: number) => String(v), ...values } },
+				margins: { right: 80, left: 80 }
+			});
+			const svg = await waitForSvg(container);
+			return Array.from(svg.querySelectorAll('g.text text')).map((t) => t.textContent);
+		};
+		const first = (rows: { value: number }[]) => rows[0].value;
+		const last = (rows: { value: number }[]) => rows[rows.length - 1].value;
+		const top = (rows: { value: number }[]) => Math.max(...rows.map((r) => r.value));
+
+		test('each series is labelled at its last point unless `select` says otherwise', async () => {
+			expect((await labelsOf({})).sort()).toEqual(
+				[last(FEMALE_LIFE_EXPECTANCY), last(MALE_LIFE_EXPECTANCY)].map(String).sort()
+			);
+		});
+
+		test('`select` labels the first, the lowest or the highest point of each series, or a list of them', async () => {
+			expect((await labelsOf({ select: 'first' })).sort()).toEqual(
+				[first(FEMALE_LIFE_EXPECTANCY), first(MALE_LIFE_EXPECTANCY)].map(String).sort()
+			);
+			expect((await labelsOf({ select: 'max' })).sort()).toEqual(
+				[top(FEMALE_LIFE_EXPECTANCY), top(MALE_LIFE_EXPECTANCY)].map(String).sort()
+			);
+			expect(await labelsOf({ select: ['first', 'last'] })).toHaveLength(4);
+		});
+
+		test('`series` labels only the named series', async () => {
+			expect(await labelsOf({ series: 'male' })).toEqual([String(last(MALE_LIFE_EXPECTANCY))]);
+		});
+
+		test('`color` writes the labels in one color, which `fontStyle.fill` overrides', async () => {
+			const fills = async (values: NonNullable<AxisBasedStylesConfig['values']>) => {
+				const { container } = await render(LinePlot, {
+					width: 600,
+					height: 300,
+					series: [FEMALE, MALE],
+					styles: { values: { show: true, ...values } },
+					margins: { right: 120 }
+				});
+				const svg = await waitForSvg(container);
+				return new Set(
+					Array.from(svg.querySelectorAll('g.text text')).map((t) => getComputedStyle(t).fill)
+				);
+			};
+			expect((await fills({})).size).toBe(2);
+			expect((await fills({ color: 'crimson' })).size).toBe(1);
+			expect([...(await fills({ color: 'crimson', fontStyle: { fill: 'navy' } }))]).not.toEqual([
+				...(await fills({ color: 'crimson' }))
+			]);
+		});
+	});
 });

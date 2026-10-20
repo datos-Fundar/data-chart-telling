@@ -4,7 +4,11 @@ import { Pipeline } from '$lib/phases/Pipeline';
 import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import { PlotInteraction } from '$lib/layout/interaction/PlotInteraction.svelte';
 import { buildClevelandDefaults } from '$lib/plots/cleveland/defaults';
-import type { DotMarkerConfig, RuleMarkerConfig } from '$lib/types/markers/common';
+import type {
+	DotMarkerConfig,
+	RuleMarkerConfig,
+	TextMarkerConfig
+} from '$lib/types/markers/common';
 
 type Row = Record<string, unknown>;
 
@@ -17,7 +21,8 @@ function marksOf(props: Row, legend: LegendState | null = null) {
 	) as { markers: { type: string }[] };
 	return {
 		rules: markers.filter((m): m is RuleMarkerConfig => m.type === 'rule'),
-		dots: markers.filter((m): m is DotMarkerConfig => m.type === 'dot')
+		dots: markers.filter((m): m is DotMarkerConfig => m.type === 'dot'),
+		texts: markers.filter((m): m is TextMarkerConfig => m.type === 'text')
 	};
 }
 
@@ -94,5 +99,77 @@ describe('ClevelandPlot markers', () => {
 		});
 		const red = dots.filter((d) => d.styles?.dotFill === 'red');
 		expect(red.flatMap((d) => (d.data as Row[]).map((r) => r.c))).toEqual(['b', 'b']);
+	});
+
+	describe('value labels', () => {
+		/** The values written, per label marker, in the order the markers draw. */
+		const written = (values: Row) => {
+			const { texts } = marksOf({ data: rows, x: 'c', y: 'v', color: 'g', styles: { values } });
+			return texts.map((t) =>
+				(t.data as Row[]).map((row) => (t.text as (d: Row) => string)(row)).sort()
+			);
+		};
+
+		test('write every dot unless `of` picks some', () => {
+			// Past the top end (a lone dot is its own top), past the bottom end, and beside the dots between.
+			expect(written({ show: true })).toEqual([['3', '6', '9'], ['1', '4'], ['5']]);
+		});
+
+		test('`select` writes only the picked dots of each category: its ends, one end, its first or last', () => {
+			expect(written({ show: true, select: ['min', 'max'] })).toEqual([
+				['3', '6', '9'],
+				['1', '4']
+			]);
+			expect(written({ show: true, select: 'max' })).toEqual([['3', '6', '9']]);
+			// A lone dot is the lowest of its category too, and the top of its range.
+			expect(written({ show: true, select: 'min' })).toEqual([['3'], ['1', '4']]);
+			// The first or last row of each category, in series order; a lone dot is both.
+			expect(written({ show: true, select: 'first' })).toEqual([['3'], ['1', '4']]);
+			expect(written({ show: true, select: 'last' })).toEqual([['3', '6', '9']]);
+		});
+
+		test('`series` writes only the dots of those series, before `select` picks among them', () => {
+			expect(written({ show: true, series: 'mid' })).toEqual([['5']]);
+			expect(written({ show: true, series: ['lo', 'mid'], select: 'min' })).toEqual([
+				['3'],
+				['1', '4']
+			]);
+		});
+
+		test('format gets the value, the series and the row of each label', () => {
+			const { texts } = marksOf({
+				data: rows,
+				x: 'c',
+				y: 'v',
+				color: 'g',
+				styles: {
+					values: {
+						show: true,
+						select: 'last',
+						format: (v: number, name: string, row?: Row) => `${row?.c}/${name}: ${v}`
+					}
+				}
+			});
+			const text = texts[0].text as (d: Row) => string;
+			expect((texts[0].data as Row[]).map((row) => text(row)).sort()).toEqual([
+				'a/hi: 9',
+				'b/hi: 6',
+				'c/lo: 3'
+			]);
+		});
+
+		test('color writes them in their series color, or in one color', () => {
+			const fills = (color: string) =>
+				marksOf({
+					data: rows,
+					x: 'c',
+					y: 'v',
+					color: 'g',
+					styles: { values: { show: true, select: ['min', 'max'], color } }
+				}).texts.map((t) => t.styles?.fill);
+			// `hi` writes the top ends, `lo` the bottom ones: one marker per series and role.
+			expect(new Set(fills('series')).size).toBe(2);
+			expect(fills('crimson').every((fill) => fill === 'crimson')).toBe(true);
+		});
 	});
 });

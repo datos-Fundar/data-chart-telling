@@ -3,6 +3,7 @@ import ClevelandPlot from '$lib/plots/cleveland/Plot.svelte';
 import type { SegmentsConfig } from '$lib/types/plots/props';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import { AGE_SHARES } from '$examples/data';
+import { SEQUENTIAL_COLORS } from './colors';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `segments` restyles some of a series' dots: each segment's `areas` selects the
@@ -16,6 +17,7 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
+		scales: { color: SEQUENTIAL_COLORS },
 		data: AGE_SHARES,
 		x: 'ageGroup',
 		y: 'share',

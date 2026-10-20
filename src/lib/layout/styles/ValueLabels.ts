@@ -3,7 +3,6 @@ import { Box } from '$lib/layout/margins/Box';
 import { resolveAccessor } from '$lib/utils/accessors';
 import { SERIES_ID_KEY, SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { seriesIdOf } from '$lib/utils/grouping';
-import { Transforms } from '$lib/phases/transforms/Transforms';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
@@ -14,7 +13,7 @@ import type { FontStyle, StrokeStyle } from '$lib/types/plots/styling';
 import type { TextAnchor, ValueAnchor } from '$lib/types/plots/constants';
 import type { BoxAnchors, EdgeBox } from '$lib/types/layout/box';
 import type { MarginSide } from '$lib/types/plots/props';
-import type { AxisPlotCtx, AxisPlotState, ProcessedRow } from '$lib/types/phases';
+import type { AxisPlotCtx, AxisPlotState, ProcessedData, ProcessedRow } from '$lib/types/phases';
 import type { TextMarkerConfig } from '$lib/types/markers/common';
 
 /**
@@ -26,12 +25,14 @@ import type { TextMarkerConfig } from '$lib/types/markers/common';
 export class ValueLabels {
 	readonly show: boolean;
 	readonly anchor: ValueAnchor;
-	readonly format: (value: number, seriesName: string) => string;
+	readonly format: (value: number, seriesName: string, row?: Record<string, unknown>) => string;
 	readonly hoverIsolate: boolean;
 	readonly font: FontStyle | undefined;
 	readonly fontSize: number;
 	/** The connectors of labels that had to move apart. */
 	readonly strokeStyle: StrokeStyle | undefined;
+	/** `'series'` writes each label in its series' color; any other CSS color writes them all in it. */
+	readonly color: 'series' | string | undefined;
 	/** How labels that would overlap move apart - the configuration's `text.declutter`. */
 	readonly declutter: PlotStylesConfig['text']['declutter'];
 	/** Where the labels are expected to sit: boxes around their points, on the edges those can reach. */
@@ -51,6 +52,7 @@ export class ValueLabels {
 		this.font = values?.fontStyle;
 		this.fontSize = typeof this.font?.fontSize === 'number' ? this.font.fontSize : 12;
 		this.strokeStyle = values?.strokeStyle;
+		this.color = values?.color;
 		this.declutter = cfg.text.declutter;
 		this.#cfg = cfg;
 		this.reach = (this.show && reach?.(this)) || [];
@@ -70,6 +72,15 @@ export class ValueLabels {
 	/** The configuration the labels were built under, for a plot kind's own label defaults. */
 	get config(): PlotStylesConfig {
 		return this.#cfg;
+	}
+
+	/**
+	 * The fill every label takes whatever its series: the author's own
+	 * `fontStyle.fill`, else a literal `color`. `undefined` leaves each label to
+	 * its plot's default (its series' color, or the axis').
+	 */
+	get fill(): string | undefined {
+		return this.font?.fill ?? (this.color === 'series' ? undefined : this.color);
 	}
 
 	/** One line of label text's height. */
@@ -208,36 +219,38 @@ export class ValueLabels {
 				state.colorForSeries?.(nameOf(d))
 			);
 		};
-		const marker = Transforms.resolve<TextMarkerConfig>(
-			{
-				type: 'text',
-				data: processed.data,
-				x: (processed.channels.x ?? position.x) as TextMarkerConfig['x'],
-				y: (processed.channels.y2 ?? processed.channels.y ?? topOf) as TextMarkerConfig['y'],
-				grouping: SERIES_ID_KEY,
-				transforms: [
-					{
-						type: 'filter',
-						filter: (d: ProcessedRow) => !isGapValue(valueOf(d)) && !isGapValue(topOf(d))
-					},
-					{ type: 'selectLast' }
-				],
-				text: (d: ProcessedRow) => format(Number(valueOf(d)), nameOf(d)),
-				styles: {
-					...font,
-					fontSize: font?.fontSize ?? 12,
-					dx: font?.dx ?? (anchor === 'start' ? 6 : anchor === 'end' ? -6 : 0),
-					dy: font?.dy ?? (anchor === 'outside' ? -8 : 0),
-					textAnchor:
-						this.textAnchor ?? (anchor === 'start' || anchor === 'end' ? anchor : 'middle'),
-					lineAnchor: font?.lineAnchor ?? (anchor === 'outside' ? 'bottom' : 'middle')
-				},
-				fill: font?.fill ? undefined : colorOf,
-				declutter: { connector: this.strokeStyle }
+		const marker: TextMarkerConfig = {
+			type: 'text',
+			// The rows the "transforms" phase picked for the labels: by default each series' last.
+			data: state.labelled ?? [],
+			x: (processed.channels.x ?? position.x) as TextMarkerConfig['x'],
+			y: (processed.channels.y2 ?? processed.channels.y ?? topOf) as TextMarkerConfig['y'],
+			grouping: SERIES_ID_KEY,
+			text: (d: ProcessedRow) => format(Number(valueOf(d)), nameOf(d)),
+			styles: {
+				...font,
+				...(this.fill ? { fill: this.fill } : {}),
+				fontSize: font?.fontSize ?? 12,
+				dx: font?.dx ?? (anchor === 'start' ? 6 : anchor === 'end' ? -6 : 0),
+				dy: font?.dy ?? (anchor === 'outside' ? -8 : 0),
+				textAnchor: this.textAnchor ?? (anchor === 'start' || anchor === 'end' ? anchor : 'middle'),
+				lineAnchor: font?.lineAnchor ?? (anchor === 'outside' ? 'bottom' : 'middle')
 			},
-			processed.data
-		);
+			fill: this.fill ? undefined : colorOf,
+			declutter: { connector: this.strokeStyle }
+		};
 		return marker.data?.length ? [marker] : [];
+	}
+
+	/** The rows of a series-over-`x` plot that cannot be labelled: a gap, or a stack with no top. For the "transforms" phase's `labels.skip`. */
+	static skipGaps<TData extends Record<string, unknown>>(state: {
+		processedData?: ProcessedData;
+		resolvedSeries?: Series<TData>[];
+		axes?: PlotAxes;
+	}): (row: ProcessedRow) => boolean {
+		const valueOf = ValueLabels.valueOf(state);
+		const top = ProcessedPositions.of(state.processedData!).y;
+		return (row) => isGapValue(valueOf(row)) || isGapValue(top(row));
 	}
 
 	/**
@@ -267,11 +280,14 @@ export class ValueLabels {
 		const { elbowGap, laneStep, labelGap } = this.declutter;
 		const lanes = elbowGap + (series.length - 1) * laneStep + labelGap;
 		const at = { x: series.length > 1 ? (Math.sign(dx) || 1) * lanes : dx, y: dy };
+		// Only a label that can sit at the plot's right end - any but a first point's - reaches that edge.
+		const selects = state.labelSelects ?? [];
+		const atRight = selects.length === 0 || selects.some((select) => select !== 'first');
 		const edges: MarginSide[] = [
 			'top',
 			'bottom',
 			...(dx < 0 ? (['left'] as const) : []),
-			...(dx >= 0 || series.length > 1 ? (['right'] as const) : [])
+			...((dx >= 0 || series.length > 1) && atRight ? (['right'] as const) : [])
 		];
 
 		const texts: string[] = [];

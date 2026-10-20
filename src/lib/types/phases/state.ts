@@ -16,7 +16,7 @@ import type { StatisticConfig } from '$lib/types/layout/statistics';
 import type { MarkerTransform } from '$lib/types/transforms';
 import type { ProcessedData, ProcessedRow } from '$lib/types/phases/transforms/phase';
 import type { FacetStageState } from '$lib/types/phases/facet/phase';
-import type { AxisBasedStylesConfig, ValuesStyle } from '$lib/types/layout/styles';
+import type { AxisBasedStylesConfig, ValuesStyle, ValueSelect } from '$lib/types/layout/styles';
 import type { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import type { PlotInteraction } from '$lib/layout/interaction/PlotInteraction.svelte';
 import type { PlotAxes } from '$lib/phases/data/PlotAxes';
@@ -80,6 +80,10 @@ export type AxisPlotState<
 	// "transforms" phase output: what the plot's own marks draw, and the same rows split into their visual groups.
 	processedData?: ProcessedData;
 	processedGroups?: VisualGroup<Series<ProcessedRow>, TStyle>[];
+	/** The processed rows `styles.values` writes labels for, when the labels are on and the plot picks them. */
+	labelled?: ProcessedRow[];
+	/** What `styles.values.select` came to - the author's, else the plot's default. */
+	labelSelects?: ValueSelect[];
 
 	// "styles" phase output: `values` over the kind's own defaults.
 	valueLabels?: ValueLabels;
