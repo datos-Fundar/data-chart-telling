@@ -1,6 +1,6 @@
 import { AuthorMarkers } from '$lib/phases/statistics/AuthorMarkers';
 import { Statistics } from '$lib/phases/statistics/Statistics';
-import { PANEL_KEY, FacetPhase } from '$lib/phases/facet/FacetPhase';
+import { PANEL_KEY, FacetPanels } from '$lib/phases/facet/FacetPanels';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { PhaseStage, StatisticsStageOptions, StatisticsStageState } from '$lib/types/phases';
@@ -30,7 +30,7 @@ export class StatisticsPhase<TState extends StatisticsStageState> implements Pha
 	run = (state: TState): TState => {
 		if (!state.panels) return { ...state, markers: this.#resolve(state) };
 		const markers = state.panels.flatMap((panel) =>
-			this.#resolve(FacetPhase.narrowToPanel(state, panel.key)).map(
+			this.#resolve(FacetPanels.narrowToPanel(state, panel.key)).map(
 				(marker) => ({ ...marker, [PANEL_KEY]: panel.key }) as unknown as AxisBasedMarkersConfig
 			)
 		);

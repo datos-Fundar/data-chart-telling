@@ -2,7 +2,7 @@ import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { NiceTicks } from '$lib/layout/scales/NiceTicks';
 import { ScalesPhase } from '$lib/phases/scales/ScalesPhase';
 import { Pipeline } from '$lib/phases/Pipeline';
-import { PANEL_KEY, FacetPhase } from '$lib/phases/facet/FacetPhase';
+import { PANEL_KEY, FacetPanels } from '$lib/phases/facet/FacetPanels';
 import type { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { isFacetWrap } from '$lib/layout/facet/config';
 import { MarkerAxisValues } from '$lib/phases/scales/MarkerAxisValues';
@@ -87,7 +87,7 @@ export class SharedScalesPhase<TState extends SharedScalesState, TCtx> implement
 		/** The channel's domain over `members` panels, or every row without them. */
 		const domainOver = (channel: SharedChannel, members: string[] | undefined): SharedScale => {
 			if (fromPhase.has(channel)) {
-				const scoped = members ? FacetPhase.narrowToPanels(state, members) : state;
+				const scoped = members ? FacetPanels.narrowToPanels(state, members) : state;
 				const scales = (this.#kindScales.run(scoped, ctx) as { scales?: unknown }).scales as
 					| Record<string, { domain?: unknown[] } | undefined>
 					| undefined;

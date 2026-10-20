@@ -1,7 +1,7 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { quantile } from 'd3-array';
 import { SERIES_ID_KEY, SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
-import { PANEL_KEY } from '$lib/phases/facet/FacetPhase';
+import { PANEL_KEY } from '$lib/phases/facet/FacetPanels';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { TooltipState } from '$lib/layout/tooltip/TooltipState.svelte';
 import { isGapValue } from '$lib/plots/utils/gaps';

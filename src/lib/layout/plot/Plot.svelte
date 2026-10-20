@@ -14,7 +14,7 @@
 	import { HoverState } from '$lib/layout/hover/HoverState.svelte';
 	import { HoverSettings } from '$lib/layout/hover/HoverSettings';
 	import { Interpolation } from '$lib/utils/Interpolation';
-	import { FacetPhase } from '$lib/phases/facet/FacetPhase';
+	import { FacetPanels } from '$lib/phases/facet/FacetPanels';
 	import { merge } from '$lib/utils/merge';
 	import { Pipeline } from '$lib/phases/Pipeline';
 	import { Slice } from '$lib/layout/plot/Slice';
@@ -191,7 +191,9 @@
 			margins: place.margins,
 			tooltip: tooltipConfig,
 			scales: slicing.facetScales<TScales>(sharedScales, place),
-			panel: panels ? FacetPhase.buildPanelState(panels, slicing.panelKey(place) ?? '') : undefined,
+			panel: panels
+				? FacetPanels.buildPanelState(panels, slicing.panelKey(place) ?? '')
+				: undefined,
 			keep: slicing.keep({ time, facet: place })
 		})}
 	</HoverScope>

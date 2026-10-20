@@ -1,6 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { Pipeline } from '$lib/phases/Pipeline';
-import { PANEL_KEY, FacetPhase } from '$lib/phases/facet/FacetPhase';
+import { FacetPhase } from '$lib/phases/facet/FacetPhase';
+import { PANEL_KEY, FacetPanels } from '$lib/phases/facet/FacetPanels';
 import { SERIES_ID_KEY, SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { buildLineDefaults } from '$lib/plots/line/defaults';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
@@ -85,10 +86,10 @@ describe('the pipeline over every panel at once', () => {
 	test('"data" splits each series into one per panel, same name, own id and panel', () => {
 		const out = run();
 		expect(out.resolvedSeries!.map((s) => [s.panel, s.name, s.id, s.data.length])).toEqual([
-			['Norte', 'Agro', FacetPhase.buildPanelSeriesId('Norte', 'Agro'), 2],
-			['Norte', 'Industria', FacetPhase.buildPanelSeriesId('Norte', 'Industria'), 2],
-			['Sur', 'Agro', FacetPhase.buildPanelSeriesId('Sur', 'Agro'), 2],
-			['Sur', 'Industria', FacetPhase.buildPanelSeriesId('Sur', 'Industria'), 2]
+			['Norte', 'Agro', FacetPanels.buildSeriesId('Norte', 'Agro'), 2],
+			['Norte', 'Industria', FacetPanels.buildSeriesId('Norte', 'Industria'), 2],
+			['Sur', 'Agro', FacetPanels.buildSeriesId('Sur', 'Agro'), 2],
+			['Sur', 'Industria', FacetPanels.buildSeriesId('Sur', 'Industria'), 2]
 		]);
 		expect(out.allSeriesNames).toEqual(['Agro', 'Industria']);
 		expect(out.scopedGroups!.map((g) => g.panel)).toEqual(['Norte', 'Norte', 'Sur', 'Sur']);
@@ -113,7 +114,7 @@ describe('the pipeline over every panel at once', () => {
 		const row = run().processedData!.data[4];
 		expect([row[SERIES_KEY], row[SERIES_ID_KEY], row[PANEL_KEY]]).toEqual([
 			'Agro',
-			FacetPhase.buildPanelSeriesId('Sur', 'Agro'),
+			FacetPanels.buildSeriesId('Sur', 'Agro'),
 			'Sur'
 		]);
 	});

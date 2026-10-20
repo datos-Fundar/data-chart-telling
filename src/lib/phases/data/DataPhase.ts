@@ -3,7 +3,7 @@ import { resolveColorScale } from '$lib/utils/color';
 import { resolveAccessor } from '$lib/plots/utils/accessors';
 import { buildGroupedSeries, buildScopedMarkerGroups } from '$lib/plots/utils/segments';
 import { buildGapFillMaps, isGapValue } from '$lib/plots/utils/gaps';
-import { FacetPhase } from '$lib/phases/facet/FacetPhase';
+import { FacetPanels } from '$lib/phases/facet/FacetPanels';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { Accessor, Series } from '$lib/types/plots/data/common';
 import type { AxisPlotState, AxisPlotCtx, DataStageOptions, PhaseStage } from '$lib/types/phases';
@@ -53,7 +53,7 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 		);
 		const panelSeries =
 			state.panels && state.panelOf && !series
-				? FacetPhase.splitSeriesByPanel(fullSeries, state.panels, state.panelOf)
+				? FacetPanels.splitSeries(fullSeries, state.panels, state.panelOf)
 				: fullSeries;
 		const resolvedSeries = ctx.interaction?.legend?.withoutOmitted(panelSeries) ?? panelSeries;
 		const groupedSeries = buildGroupedSeries(resolvedSeries, segments, connect);
