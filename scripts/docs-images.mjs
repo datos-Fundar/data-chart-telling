@@ -1,9 +1,12 @@
-// Renders each figure in scripts/docs-figures/figures to docs/images/<name>.png.
+// Renders each example (and each figure in scripts/docs-figures/figures) to
+// docs/images/<name>.png, named in kebab-case: examples/LineByRegion.svelte is
+// line-by-region.png. scripts/docs-figures/figures.json lists the examples left
+// out and where the pointer rests before a shot.
 // Usage: pnpm docs:images [name ...]   (no names: every figure)
 import { createServer } from 'vite';
 import { svelte, vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { chromium } from 'playwright';
-import { readdirSync, mkdirSync } from 'node:fs';
+import { readdirSync, readFileSync, mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -12,9 +15,18 @@ const figures = resolve(root, 'scripts/docs-figures');
 const out = resolve(root, 'docs/images');
 mkdirSync(out, { recursive: true });
 
-const all = readdirSync(resolve(figures, 'figures'))
-	.filter((f) => f.endsWith('.svelte'))
-	.map((f) => f.replace('.svelte', ''));
+const { skip } = JSON.parse(readFileSync(resolve(figures, 'figures.json'), 'utf8'));
+const svelteNames = (dir) =>
+	readdirSync(dir)
+		.filter((f) => f.endsWith('.svelte'))
+		.map((f) => f.replace('.svelte', ''));
+const kebab = (name) => name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+const all = [
+	...svelteNames(resolve(root, 'examples'))
+		.map(kebab)
+		.filter((name) => !skip.includes(name)),
+	...svelteNames(resolve(figures, 'figures'))
+];
 const wanted = process.argv.slice(2);
 const names = wanted.length ? all.filter((n) => wanted.includes(n)) : all;
 

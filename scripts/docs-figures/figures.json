@@ -1,0 +1,7 @@
+{
+	"skip": ["legend-reader", "tooltip-card", "responsive-line"],
+	"meta": {
+		"tooltip": { "hover": { "x": 330, "y": 160 } },
+		"custom-tooltip": { "hover": { "x": 330, "y": 160 } }
+	}
+}

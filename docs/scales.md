@@ -2,23 +2,38 @@
 
 `scales` configures how data values become positions and visual properties. It has one entry per channel.
 
+<!-- example: examples/Scales.svelte -->
+
 ```svelte
+<script lang="ts">
+	import { LinePlot } from '@fundar/data-chart-telling';
+	import { PRICES } from './data';
+</script>
+
+<!-- Axis labels, a fixed domain with gridlines and a color per series. -->
 <LinePlot
-	{width}
-	{height}
-	data={rows}
+	width={720}
+	height={400}
+	data={PRICES}
 	x="date"
 	y="index"
-	color="division"
+	color="commodity"
 	scales={{
 		x: { label: 'Month' },
-		y: { label: 'Index (Jan 2021 = 100)', domain: [90, 280], grid: true },
+		y: { label: 'Index (Jan 2021 = 100)', domain: [0, 600], grid: true },
 		color: {
-			scheme: { Food: '#1b9e77', Transport: '#d95f02', Housing: '#7570b3', Health: '#e7298a' }
+			scheme: {
+				'Brent oil': '#1b9e77',
+				'Natural gas': '#d95f02',
+				Coal: '#7570b3',
+				Wheat: '#e7298a'
+			}
 		}
 	}}
 />
 ```
+
+<!-- /example -->
 
 ![A line plot with a labelled axis, gridlines and custom colors](images/scales.png)
 

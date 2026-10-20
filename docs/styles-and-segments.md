@@ -16,14 +16,22 @@
 
 ### Value labels
 
+<!-- example: examples/ValueLabels.svelte -->
+
 ```svelte
+<script lang="ts">
+	import { LinePlot } from '@fundar/data-chart-telling';
+	import { PRICES } from './data';
+</script>
+
+<!-- End-of-line value labels with a custom format and font size. -->
 <LinePlot
-	{width}
-	{height}
-	data={rows}
+	width={720}
+	height={400}
+	data={PRICES}
 	x="date"
 	y="index"
-	color="division"
+	color="commodity"
 	styles={{
 		values: {
 			show: true,
@@ -34,7 +42,9 @@
 />
 ```
 
-![End-of-line value labels](images/styles-values.png)
+<!-- /example -->
+
+![End-of-line value labels](images/value-labels.png)
 
 | Field          | Meaning                                                                                                                                        |
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -55,24 +65,35 @@ Where the labels go depends on the plot: the end of each series on a line or are
 
 A row whose value is `null`, `undefined` or `NaN` breaks a line. `styles.gaps` bridges the break with a distinct, interpolated stretch. It is keyed by series name, or `'default'` for the series with no entry of their own, and has three zones: `start` (before the first real point), `middle` and `end` (after the last).
 
+<!-- example: examples/Gaps.svelte -->
+
 ```svelte
+<script lang="ts">
+	import { LinePlot } from '@fundar/data-chart-telling';
+	import { LIFE_GAPS } from './data';
+</script>
+
+<!-- Missing values bridged: dashed in the middle, faded at the start, extended to the 2025 projection at the end. -->
 <LinePlot
-	{width}
-	{height}
-	series={[{ name: 'female', x: 'year', y: 'value', data: rowsWithHoles }]}
+	width={720}
+	height={400}
+	series={[{ name: 'female', x: 'year', y: 'value', data: LIFE_GAPS }]}
+	scales={{ x: { edgeTicks: true }, y: { domain: [55, 85] } }}
 	styles={{
 		gaps: {
 			default: {
 				middle: { interpolate: 'linear', style: { stroke: { strokeDasharray: '4 4' } } },
-				start: { x: 2007, style: { stroke: { strokeOpacity: 0.4 } } },
-				end: { x: 2023, y: 85 }
+				start: { x: 1940, style: { stroke: { strokeOpacity: 0.4 } } },
+				end: { x: 2025, y: 81.1 }
 			}
 		}
 	}}
 />
 ```
 
-![A line bridged across missing values with dashed segments](images/styles-gaps.png)
+<!-- /example -->
+
+![A line bridged across missing values with dashed segments](images/gaps.png)
 
 - `middle` bridges holes between real points, `interpolate` is an easing name (default `'linear'`).
 - `start` and `end` reach out to the given `x` (required to fill the zone), landing on `y` there (default: the nearest real value).
@@ -111,16 +132,26 @@ The style shape depends on the plot:
 
 A baseline color with a highlighted range:
 
+<!-- example: examples/SegmentHighlight.svelte -->
+
 ```svelte
+<script lang="ts">
+	import { LinePlot } from '@fundar/data-chart-telling';
+	import { REGION_VALUES } from './data';
+
+	const gba = REGION_VALUES.filter((row) => row.region === 'GBA');
+</script>
+
+<!-- A grey line with the 2023-2024 surge drawn in red. -->
 <LinePlot
-	{width}
-	{height}
-	series={[{ name: 'gdp', x: 'year', y: 'value', data: gdp }]}
+	width={720}
+	height={380}
+	series={[{ name: 'GBA', x: 'date', y: 'value', data: gba }]}
 	segments={{
-		gdp: [
+		GBA: [
 			{ styles: { stroke: { stroke: '#94a3b8', strokeWidth: 1 } } },
 			{
-				areas: [{ x: { from: 2008, to: 2010 } }],
+				areas: [{ x: { from: new Date('2023-07-01'), to: new Date('2024-03-01') } }],
 				styles: { stroke: { stroke: '#ef4444', strokeWidth: 3 } }
 			}
 		]
@@ -128,24 +159,35 @@ A baseline color with a highlighted range:
 />
 ```
 
-![A grey line with a highlighted red range](images/segments-highlight.png)
+<!-- /example -->
+
+![A grey line with a highlighted red range](images/segment-highlight.png)
 
 Per-series colors, plus dots over a range shared by every series:
 
+<!-- example: examples/SegmentsBySeries.svelte -->
+
 ```svelte
+<script lang="ts">
+	import { LinePlot } from '@fundar/data-chart-telling';
+	import { LIFE } from './data';
+</script>
+
+<!-- Segments per series name, plus `default` for rules shared by every series. -->
 <LinePlot
-	{width}
-	{height}
-	data={lifeExpectancy}
+	width={720}
+	height={380}
+	data={LIFE}
 	x="year"
 	y="value"
 	color="sex"
+	scales={{ x: { edgeTicks: true } }}
 	segments={{
 		female: [{ styles: { stroke: { stroke: 'steelblue' } } }],
 		male: [{ styles: { stroke: { stroke: 'tomato' } } }],
 		default: [
 			{
-				areas: [{ x: { from: 2010, to: 2012 } }],
+				areas: [{ x: { from: 1965, to: 1980 } }],
 				styles: { dots: { dotRadius: 5, dotSymbol: 'circle' } }
 			}
 		]
@@ -153,7 +195,9 @@ Per-series colors, plus dots over a range shared by every series:
 />
 ```
 
-![Two series colored individually, with dots on a shared range](images/segments-series.png)
+<!-- /example -->
+
+![Two series colored individually, with dots on a shared range](images/segments-by-series.png)
 
 Two areas in one segment, the second with a `y` limit:
 
@@ -169,22 +213,30 @@ Two areas in one segment, the second with a `y` limit:
 
 Heatmap columns and cells:
 
+<!-- example: examples/HeatmapSegments.svelte -->
+
 ```svelte
+<script lang="ts">
+	import { HeatmapPlot } from '@fundar/data-chart-telling';
+	import { HOUSEHOLDS } from './data';
+</script>
+
+<!-- Segments on a heatmap: an outlined column and a filled block of overcrowded households. -->
 <HeatmapPlot
-	{width}
-	{height}
-	{data}
-	x="quarter"
-	y="product"
-	color="sales"
+	width={560}
+	height={360}
+	data={HOUSEHOLDS}
+	x="rooms"
+	y="people"
+	color="share"
 	segments={{
 		default: [
 			{
-				areas: [{ x: { from: 'Q1', to: 'Q1' } }, { x: { from: 'Q3', to: 'Q3' } }],
+				areas: [{ x: { from: '1', to: '1' } }],
 				styles: { stroke: '#f59e0b', strokeWidth: 2 }
 			},
 			{
-				areas: [{ x: { from: 'Q2', to: 'Q2' }, y: { from: 'Alpha', to: 'Beta' } }],
+				areas: [{ x: { from: '1', to: '2' }, y: { from: '4', to: '5+' } }],
 				styles: { fill: '#ef4444', fillOpacity: 0.8 }
 			}
 		]
@@ -192,7 +244,9 @@ Heatmap columns and cells:
 />
 ```
 
-![A heatmap with highlighted columns and cells](images/segments-heatmap.png)
+<!-- /example -->
+
+![A heatmap with highlighted columns and cells](images/heatmap-segments.png)
 
 Map features, keyed by feature id:
 

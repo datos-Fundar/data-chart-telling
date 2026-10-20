@@ -2,17 +2,33 @@
 
 `timeline` steps a plot through its data by a field - usually a year or a date. Each step shows the rows of one value of that field. It draws as a **player** by default - a control bar with play, pause and a slider - or as a **rule**, a guide beside the plot that the page drives (`type: 'rule'`).
 
+<!-- example: examples/TimelinePlayer.svelte -->
+
 ```svelte
+<script lang="ts">
+	import { BarPlot } from '@fundar/data-chart-telling';
+	import { REGION_VALUES } from './data';
+</script>
+
+<!--
+	`timeline` slices the rows by `accessor`. A timeline is a player by default:
+	play/pause, the current step and a slider in the chrome. `progress` sets where
+	it starts. `type: 'rule'` draws a guide beside the plot with no controls
+	instead (see TimelineRule). To build your own widget, read
+	`useFigure().timeline` (seek, play, pause, next, ...).
+-->
 <BarPlot
-	{width}
-	{height}
-	data={rows}
+	width={720}
+	height={400}
+	data={REGION_VALUES}
 	x="region"
 	y="value"
-	scales={{ y: { domain: [0, 100] } }}
-	timeline={{ accessor: 'year' }}
+	scales={{ y: { domain: [0, 30] } }}
+	timeline={{ accessor: 'date', progress: 0.25, player: { autoplay: false, loop: true } }}
 />
 ```
+
+<!-- /example -->
 
 ![A bar plot with a player bar](images/timeline-player.png)
 
@@ -69,14 +85,31 @@ Defaults for `controls`, `speeds` and `stepDuration` come from `timeline.player`
 
 `type: 'rule'` draws a line with its steps written along it, beside the plot. `progress` picks the step, and the page supplies the control (a slider, a button, scroll position):
 
+<!-- example: examples/TimelineRule.svelte -->
+
 ```svelte
 <script lang="ts">
-	let progress = $state(0);
+	import { LinePlot } from '@fundar/data-chart-telling';
+	import { REGION_VALUES } from './data';
+
+	// A rule has no controls of its own: the page moves it through `progress` (0 to 1).
+	// One step per year; a line plot shows every row up to the current step.
+	let progress = $state(0.5);
 </script>
 
 <input type="range" min="0" max="1" step="0.001" bind:value={progress} />
-<LinePlot ... timeline={{ accessor: 'year', type: 'rule', progress }} />
+<LinePlot
+	width={720}
+	height={400}
+	data={REGION_VALUES}
+	x="date"
+	y="value"
+	color="region"
+	timeline={{ accessor: (row) => row.date.getUTCFullYear(), type: 'rule', progress }}
+/>
 ```
+
+<!-- /example -->
 
 ![A line plot revealed up to the current step, with a timeline rule](images/timeline-rule.png)
 

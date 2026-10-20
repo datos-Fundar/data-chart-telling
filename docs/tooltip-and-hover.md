@@ -4,9 +4,31 @@ A plot becomes interactive when it is given a `tooltip`, a `{ type: 'hover' }` m
 
 ## Tooltip
 
+<!-- example: examples/Tooltip.svelte -->
+
 ```svelte
-<LinePlot {width} {height} data={rows} x="year" y="value" color="region" tooltip />
+<script lang="ts">
+	import { LinePlot } from '@fundar/data-chart-telling';
+	import { REGION_VALUES } from './data';
+</script>
+
+<!--
+	`tooltip` turns the floating box on (`true` for the defaults, or an object
+	to tune it); a `hover` marker draws the in-plot crosshair, dot and label.
+-->
+<LinePlot
+	width={720}
+	height={400}
+	data={REGION_VALUES}
+	x="date"
+	y="value"
+	color="region"
+	tooltip={{ strategy: 'x', format: (row) => `${row.region}: ${row.value}` }}
+	markers={[{ type: 'hover' }]}
+/>
 ```
+
+<!-- /example -->
 
 ![A tooltip and a hover highlight on the hovered point](images/tooltip.png)
 
@@ -21,34 +43,60 @@ A plot becomes interactive when it is given a `tooltip`, a `{ type: 'hover' }` m
 | `series`             | Only these series appear in the tooltip                                                                                                                                                                                                |
 | `anchorX`, `anchorY` | Preferred side of the cursor: `'left' \| 'middle' \| 'right'` (default `'right'`) and `'top' \| 'middle' \| 'bottom'` (default `'bottom'`). It moves to the other side when it would overflow                                          |
 
+<!-- example: examples/CustomTooltip.svelte -->
+
 ```svelte
-{#snippet content({ rows })}
+<script lang="ts">
+	import { LinePlot, getConfiguration, paletteColor } from '@fundar/data-chart-telling';
+	import TooltipCard from './TooltipCard.svelte';
+	import { REGION_VALUES, type RegionRow } from './data';
+
+	const { palette } = getConfiguration();
+	const regions = [...new Set(REGION_VALUES.map((row) => row.region))];
+</script>
+
+<!--
+	`content` replaces the tooltip text with your own markup, drawn in a plain
+	card: TooltipCard brings its own background, colors and spacing. It is given
+	every row the hover matched, in no particular order, so it sorts them itself;
+	series colors come from the configuration's palette.
+-->
+{#snippet content({ rows }: { rows: RegionRow[] })}
 	<TooltipCard
-		heading={String(rows[0].year)}
-		footer="Value by region"
-		entries={rows.map((row) => ({
-			label: row.region,
-			color: colorOf(row.region),
-			value: row.value,
-			display: String(row.value)
-		}))}
+		heading={rows[0].date.toLocaleDateString('en-US', {
+			month: 'long',
+			year: 'numeric',
+			timeZone: 'UTC'
+		})}
+		footer="Monthly inflation (%)"
+		entries={[...rows]
+			.sort((a, b) => b.value - a.value)
+			.map((row) => ({
+				label: row.region,
+				color: paletteColor(regions.indexOf(row.region), palette),
+				value: row.value,
+				display: String(row.value)
+			}))}
 	/>
 {/snippet}
 
 <LinePlot
-	{width}
-	{height}
-	data={rows}
-	x="year"
+	width={720}
+	height={400}
+	data={REGION_VALUES}
+	x="date"
 	y="value"
 	color="region"
 	tooltip={{ strategy: 'x', content }}
+	markers={[{ type: 'hover' }]}
 />
 ```
 
-![A tooltip with custom markup](images/tooltip-content.png)
+<!-- /example -->
 
-[examples/CustomTooltip.svelte](../examples/CustomTooltip.svelte) is the runnable version, with the card in [examples/TooltipCard.svelte](../examples/TooltipCard.svelte).
+![A tooltip with custom markup](images/custom-tooltip.png)
+
+This is [examples/CustomTooltip.svelte](../examples/CustomTooltip.svelte); the card is [examples/TooltipCard.svelte](../examples/TooltipCard.svelte).
 
 The default strategy follows the plot's axes: it matches along the category (or index) axis - points sharing the hovered `x` when the value axis is vertical, sharing `y` when it is horizontal - and `punctual` (the exact point) on heatmaps and scatter plots.
 

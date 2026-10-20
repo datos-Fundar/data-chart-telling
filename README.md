@@ -18,24 +18,21 @@ Svelte 5 plots for data storytelling, built on [svelteplot](https://svelteplot.d
 
 It aims for a sweet spot between the flexibility of `d3`, the declarative spirit of the _grammar of graphics_ (data mapped to channels, scales and marks) and the convenience of a classic plotting library, where each plot kind is a first-class component.
 
+<!-- example: examples/LineByRegion.svelte -->
+
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-
-	const rows = [
-		{ year: 2020, region: 'North', value: 3.1 },
-		{ year: 2021, region: 'North', value: 3.8 },
-		{ year: 2020, region: 'South', value: 2.2 },
-		{ year: 2021, region: 'South', value: 2.9 }
-	];
+	import { REGION_VALUES } from './data';
 </script>
 
+<!-- One line per region, with a title, the automatic legend, end-of-line values and a tooltip. -->
 <LinePlot
 	width={720}
 	height={400}
-	title="Value by region"
-	data={rows}
-	x="year"
+	title="Monthly inflation by region (%)"
+	data={REGION_VALUES}
+	x="date"
 	y="value"
 	color="region"
 	tooltip
@@ -44,7 +41,11 @@ It aims for a sweet spot between the flexibility of `d3`, the declarative spirit
 />
 ```
 
-![A line plot with a title, a legend, end-of-line value labels and a tooltip](docs/images/readme-hero.png)
+<!-- /example -->
+
+![A line plot with a title, a legend, end-of-line value labels and a tooltip](docs/images/line-by-region.png)
+
+Every Svelte snippet in this README is a runnable file in [examples/](examples/), and the data comes from [examples/data.ts](examples/data.ts).
 
 Eight plot kinds - line, area, bar, histogram, heatmap, pyramid, scatter and geographic maps - share one vocabulary: the same channels (`x`, `y`, `color`, `grouping`, `opacity`, `symbol`, `r`), the same `scales`, `styles`, `segments`, `markers`, `transforms`, `tooltip`, `legend`, `timeline` and `facet` props, and one global theme.
 
@@ -62,25 +63,63 @@ The package ships Svelte components, so the app needs the Svelte compiler (`@sve
 
 `timeline` slices the rows by a field and steps through them. It draws as a **player** by default: play and pause, the current step and a slider, in the figure's chrome.
 
+<!-- example: examples/TimelinePlayer.svelte -->
+
 ```svelte
-<BarPlot {width} {height} data={rows} x="region" y="value" timeline={{ accessor: 'year' }} />
+<script lang="ts">
+	import { BarPlot } from '@fundar/data-chart-telling';
+	import { REGION_VALUES } from './data';
+</script>
+
+<!--
+	`timeline` slices the rows by `accessor`. A timeline is a player by default:
+	play/pause, the current step and a slider in the chrome. `progress` sets where
+	it starts. `type: 'rule'` draws a guide beside the plot with no controls
+	instead (see TimelineRule). To build your own widget, read
+	`useFigure().timeline` (seek, play, pause, next, ...).
+-->
+<BarPlot
+	width={720}
+	height={400}
+	data={REGION_VALUES}
+	x="region"
+	y="value"
+	scales={{ y: { domain: [0, 30] } }}
+	timeline={{ accessor: 'date', progress: 0.25, player: { autoplay: false, loop: true } }}
+/>
 ```
+
+<!-- /example -->
 
 ![A bar plot with a player bar](docs/images/timeline-player.png)
 
 `type: 'rule'` draws a **rule** beside the plot instead, a line with the steps written along it. The page drives it through `progress` (`0` to `1`), from a slider, scroll position or anything else.
 
+<!-- example: examples/TimelineRule.svelte -->
+
 ```svelte
+<script lang="ts">
+	import { LinePlot } from '@fundar/data-chart-telling';
+	import { REGION_VALUES } from './data';
+
+	// A rule has no controls of its own: the page moves it through `progress` (0 to 1).
+	// One step per year; a line plot shows every row up to the current step.
+	let progress = $state(0.5);
+</script>
+
+<input type="range" min="0" max="1" step="0.001" bind:value={progress} />
 <LinePlot
-	{width}
-	{height}
-	data={rows}
-	x="year"
+	width={720}
+	height={400}
+	data={REGION_VALUES}
+	x="date"
 	y="value"
 	color="region"
-	timeline={{ accessor: 'year', type: 'rule', progress }}
+	timeline={{ accessor: (row) => row.date.getUTCFullYear(), type: 'rule', progress }}
 />
 ```
+
+<!-- /example -->
 
 ![A line plot revealed up to the current step, with a timeline rule](docs/images/timeline-rule.png)
 

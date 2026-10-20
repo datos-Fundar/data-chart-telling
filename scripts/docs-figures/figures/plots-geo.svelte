@@ -7,8 +7,8 @@
 	width={480}
 	height={520}
 	data={ARGENTINA_PROVINCES}
-	featureId={(f) => String(f.properties?.nombre)}
-	color={(f) => Number(f.properties?.population)}
+	featureId={(feature) => String(feature.properties?.nombre)}
+	color={(feature) => Number(feature.properties?.population)}
 	scales={{ color: { scheme: 'blues' } }}
 	coordinates={{ projection: { type: argentinaBicontinental } }}
 />

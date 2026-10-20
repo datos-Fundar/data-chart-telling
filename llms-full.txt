@@ -104,11 +104,38 @@ GeoPlot: `graticule sphere dot text vector link contour inset geo-hover geo-comp
 
 ## Examples (in `examples/`, all runnable)
 
+- `LineByRegion.svelte` - one line per region with title, legend, end labels and tooltip.
 - `ResponsiveLine.svelte` - fill the window, end-of-line labels, axis labels.
 - `Tooltip.svelte` - tooltip + hover marker.
 - `Segments.svelte` - styling a range of the data.
 - `LegendToggle.svelte` + `LegendReader.svelte` - interactive legend and reading its state.
 - `TimelinePlayer.svelte` - animated bar chart with a player.
+- `TimelineRule.svelte` - a timeline rule moved by a slider through `progress`.
 - `Facets.svelte` - small multiples with a synced tooltip.
 - `BarValues.svelte` - value labels on bars.
 - `CustomTooltip.svelte` + `TooltipCard.svelte` - a tooltip drawn with your own card (`tooltip.content`).
+- `FirstPlot.svelte` - the smallest plot: rows, fields and a pixel size.
+- `LineDates.svelte` - line per series over a date axis, with end labels.
+- `StackedArea.svelte` - stacked area plot.
+- `GroupedBars.svelte` - vertical bars grouped by color.
+- `HorizontalBars.svelte` - horizontal bars.
+- `Histogram.svelte` - overlapping histograms.
+- `Heatmap.svelte` - heatmap.
+- `Pyramid.svelte` - population pyramid.
+- `Scatter.svelte` - scatter plot sized, colored and shaped by channels.
+- `Scales.svelte` - axis labels, fixed domain, gridlines and series colors.
+- `ValueLabels.svelte` - end-of-line value labels with a custom format.
+- `Gaps.svelte` - filling gaps of missing values.
+- `SegmentHighlight.svelte` - highlighting a range of one series.
+- `SegmentsBySeries.svelte` - segments per series and shared rules.
+- `HeatmapSegments.svelte` - segments on a heatmap.
+- `Markers.svelte` - hover, rule and delta markers.
+- `StackedBars.svelte` - bars stacked with stackY.
+- `MovingAverage.svelte` - moving average with windowY.
+- `Regression.svelte` - linear regression with a confidence band.
+- `LegendSections.svelte` - explicit legend sections.
+- `Chrome.svelte` - title, subtitle and caption.
+- `ChromeOrder.svelte` - ordering chrome blocks with dividers.
+- `FacetsCarousel.svelte` - facets as a carousel.
+- `FacetsRowsCols.svelte` - facets by rows and columns.
+- `Composer.svelte` - several plots in one figure.
