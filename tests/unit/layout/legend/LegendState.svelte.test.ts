@@ -227,6 +227,13 @@ describe('LegendState - dot sizes', () => {
 			}
 		]);
 	});
+	test('the legend extension adjusts the size section under the name of its channel, `r`', () => {
+		const legend = new LegendState();
+		legend.register('p', LegendState.entriesOf(sized([{}])));
+		expect(legend.sections({ r: { title: 'People' } })).toMatchObject([
+			{ type: 'size', title: 'People' }
+		]);
+	});
 });
 
 describe('LegendState - dot shapes', () => {

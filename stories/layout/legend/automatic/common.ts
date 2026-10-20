@@ -14,7 +14,7 @@ export const AUTOMATIC_ARGS = {
 export const LEGEND_ARG_TYPES = {
 	legend: {
 		description:
-			'Unset or `true`: the legend the plot reads off what it draws. `false`: none. A list of sections: exactly those. `{ items, sections }`: the automatic one with those added. `{ series, color, opacity, size, symbol }`: the automatic one with the section of each channel adjusted.',
+			'Unset or `true`: the legend the plot reads off what it draws. `false`: none. A list of sections: exactly those. `{ items, sections }`: the automatic one with those added. `{ series, color, opacity, r, symbol }`: the automatic one with the section of each channel adjusted.',
 		control: false
 	}
 } as const;

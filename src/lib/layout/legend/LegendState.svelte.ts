@@ -193,7 +193,7 @@ export class LegendState {
 					color,
 					filled,
 					...(symbol ? { symbol } : {}),
-					...adjust('size', title)
+					...adjust('r', title)
 				} satisfies SizeLegendSection);
 			} else if (entry.type === 'symbol') {
 				const { title, items: shapes, color, filled } = entry;

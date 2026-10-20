@@ -16,7 +16,7 @@
 	symbol="region"
 	r="population"
 	legend={{
-		size: { title: 'People', values: [10, 100, 300], format: (v: number) => `${v} M` },
+		r: { title: 'People', values: [10, 100, 300], format: (v: number) => `${v} M` },
 		symbol: { title: 'Region', columns: 2 }
 	}}
 />

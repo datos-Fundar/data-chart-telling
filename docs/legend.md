@@ -94,12 +94,12 @@ legend={{
 	series: { title: 'Division', layout: { type: 'flex' } },
 	color: { title: 'Temperature', interactive: { enabled: true } },
 	opacity: { title: 'Confidence' },
-	size: { title: 'Population' },
+	r: { title: 'Population' },
 	symbol: { title: 'Income group' }
 }}
 ```
 
-Each channel key adjusts the section that channel draws: any section field except what the plots compute (items, ranges, domains). An entry with `match` adjusts only the section whose title matches; a list of entries adjusts several.
+Each key is the name of the channel (the plot's own prop: `r` for the size section) and adjusts the section that channel draws: any section field except what the plots compute (items, ranges, domains). An entry with `match` adjusts only the section whose title matches; a list of entries adjusts several.
 
 ## Explicit sections
 

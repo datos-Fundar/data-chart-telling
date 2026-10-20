@@ -18,7 +18,7 @@ import { AUTOMATIC_ARGS, LEGEND_ARG_TYPES } from './common';
  * - `false`: no legend;
  * - a list of sections: exactly those (see `Replace`);
  * - `{ items, sections }`: the automatic legend with those added (see `Add`);
- * - `{ series, color, opacity, size, symbol }`: the automatic legend with the
+ * - `{ series, color, opacity, r, symbol }`: the automatic legend with the
  *   section each channel draws adjusted (see `Expand`).
  *
  * The other stories in this folder: `Types` shows what the legend reads for

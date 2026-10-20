@@ -263,8 +263,8 @@ export type LegendEntry =
  */
 export type MarkLegend = string | (Omit<LegendItem, 'name' | 'disabled'> & { label: string });
 
-/** What a legend reads each automatic section from: the series, or the channel a scale encodes. */
-export type LegendChannel = 'series' | 'color' | 'opacity' | 'size' | 'symbol';
+/** What a legend reads each automatic section from: the series, or the channel a scale encodes - named as the plot's own prop (`r` for sizes). */
+export type LegendChannel = 'series' | 'color' | 'opacity' | 'r' | 'symbol';
 
 /**
  * How to adjust one automatic section: its own configuration, minus what the
@@ -311,7 +311,7 @@ export type LegendExtension = {
 		ContinuousLegendSection,
 		'min' | 'max' | 'colorMin' | 'colorMax' | 'scheme' | 'pivot' | 'opacity' | 'interactive'
 	>;
-	size?: LegendOverride<SizeLegendSection, 'domain' | 'range' | 'color' | 'filled' | 'symbol'>;
+	r?: LegendOverride<SizeLegendSection, 'domain' | 'range' | 'color' | 'filled' | 'symbol'>;
 	symbol?: LegendOverride<SymbolLegendSection, 'items' | 'color' | 'filled'>;
 };
 
