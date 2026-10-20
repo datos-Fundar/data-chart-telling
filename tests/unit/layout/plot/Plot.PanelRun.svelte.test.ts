@@ -11,10 +11,20 @@ import { buildHistogramDefaults } from '$lib/plots/histogram/defaults';
 import { buildHeatmapDefaults } from '$lib/plots/heatmap/defaults';
 import { buildPyramidDefaults } from '$lib/plots/pyramid/defaults';
 import { buildBoxDefaults } from '$lib/plots/box/defaults';
+import { buildLollipopDefaults } from '$lib/plots/lollipop/defaults';
 import type { FacetConfig } from '$lib/types/layout/facet';
 
-const [LineCore, AreaCore, BarCore, ScatterCore, HistogramCore, HeatmapCore, PyramidCore, BoxCore] =
-	Array(8).fill(GenericCore);
+const [
+	LineCore,
+	AreaCore,
+	BarCore,
+	ScatterCore,
+	HistogramCore,
+	HeatmapCore,
+	PyramidCore,
+	BoxCore,
+	LollipopCore
+] = Array(9).fill(GenericCore);
 
 type Row = { year: number; region: string; sector: string; value: number };
 
@@ -113,6 +123,12 @@ const CASES: Case[] = [
 		name: 'box',
 		Core: BoxCore,
 		buildDefaults: buildBoxDefaults,
+		core: { ...BOX, x: 'sector', y: 'value', color: 'sector' }
+	},
+	{
+		name: 'lollipop',
+		Core: LollipopCore,
+		buildDefaults: buildLollipopDefaults,
 		core: { ...BOX, x: 'sector', y: 'value', color: 'sector' }
 	}
 ];

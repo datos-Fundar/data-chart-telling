@@ -14,6 +14,7 @@ import { buildScatterDefaults } from '$lib/plots/scatter/defaults';
 import { buildHistogramDefaults } from '$lib/plots/histogram/defaults';
 import { buildHeatmapDefaults } from '$lib/plots/heatmap/defaults';
 import { buildBoxDefaults } from '$lib/plots/box/defaults';
+import { buildLollipopDefaults } from '$lib/plots/lollipop/defaults';
 import type { AxisPipelineProps } from '$lib/phases/Pipeline';
 import type { SharedAxisValues } from '$lib/types/phases';
 import type { FacetConfig } from '$lib/types/layout/facet';
@@ -79,6 +80,11 @@ const CASES: Case[] = [
 	{
 		name: 'box',
 		kind: buildBoxDefaults<Row>(),
+		props: { x: 'sector', y: 'valor', color: 'sector' }
+	},
+	{
+		name: 'lollipop',
+		kind: buildLollipopDefaults<Row>(),
 		props: { x: 'sector', y: 'valor', color: 'sector' }
 	}
 ];

@@ -90,6 +90,8 @@ const preview: Preview = {
 							['Rules', 'Deltas', 'Custom'],
 							'Tooltip'
 						],
+						'LollipopPlot',
+						['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
 						'PyramidPlot',
 						['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules'], 'Tooltip'],
 						'ScatterPlot',

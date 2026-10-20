@@ -4,12 +4,13 @@
 export { default as AreaPlot } from './plots/area/Plot.svelte';
 export { default as BarPlot } from './plots/bar/Plot.svelte';
 export { default as BoxPlot } from './plots/box/Plot.svelte';
-export { default as HistogramPlot } from './plots/histogram/Plot.svelte';
+export { default as GeoPlot } from './plots/geo/Plot.svelte';
 export { default as HeatmapPlot } from './plots/heatmap/Plot.svelte';
+export { default as HistogramPlot } from './plots/histogram/Plot.svelte';
 export { default as LinePlot } from './plots/line/Plot.svelte';
+export { default as LollipopPlot } from './plots/lollipop/Plot.svelte';
 export { default as PyramidPlot } from './plots/pyramid/Plot.svelte';
 export { default as ScatterPlot } from './plots/scatter/Plot.svelte';
-export { default as GeoPlot } from './plots/geo/Plot.svelte';
 
 // ── Composition ─────────────────────────────────────────────────────────────
 // Separate plots combined into one figure, with chrome of its own.

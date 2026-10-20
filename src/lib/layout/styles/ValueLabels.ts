@@ -67,6 +67,11 @@ export class ValueLabels {
 		return new ValueLabels(values, cfg, options, reach && ((labels) => reach(labels, state)));
 	}
 
+	/** The configuration the labels were built under, for a plot kind's own label defaults. */
+	get config(): PlotStylesConfig {
+		return this.#cfg;
+	}
+
 	/** One line of label text's height. */
 	get lineHeight(): number {
 		return this.fontSize * 1.2;

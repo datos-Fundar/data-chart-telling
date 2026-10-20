@@ -9,6 +9,7 @@ import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
 import HistogramPlot from '$lib/plots/histogram/Plot.svelte';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
 import BoxPlot from '$lib/plots/box/Plot.svelte';
+import LollipopPlot from '$lib/plots/lollipop/Plot.svelte';
 import { waitForSvg } from './_helpers/svg';
 
 /**
@@ -98,6 +99,14 @@ const KINDS: Kind[] = [
 	{
 		name: 'BoxPlot',
 		Plot: BoxPlot,
+		props: { data: CATEGORIES, x: 'x', y: 'y' },
+		numericX: false,
+		plotStatistics: true,
+		stackable: false
+	},
+	{
+		name: 'LollipopPlot',
+		Plot: LollipopPlot,
 		props: { data: CATEGORIES, x: 'x', y: 'y' },
 		numericX: false,
 		plotStatistics: true,

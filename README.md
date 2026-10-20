@@ -47,7 +47,7 @@ It aims for a sweet spot between the flexibility of `d3`, the declarative spirit
 
 Every Svelte snippet in this README is a runnable file in [examples/](examples/), and the data comes from [examples/data.ts](examples/data.ts).
 
-Nine plot kinds - line, area, bar, histogram, box, heatmap, pyramid, scatter and geographic maps - share one vocabulary: the same channels (`x`, `y`, `color`, `grouping`, `opacity`, `symbol`, `r`), the same `scales`, `styles`, `segments`, `markers`, `transforms`, `tooltip`, `legend`, `timeline` and `facet` props, and one global theme.
+Every plot kind shares one vocabulary: the same channels (`x`, `y`, `color`, `grouping`, `opacity`, `symbol`, `r`), the same `scales`, `styles`, `segments`, `markers`, `transforms`, `tooltip`, `legend`, `timeline` and `facet` props, and one global theme.
 
 ## Install
 
@@ -133,7 +133,7 @@ Start with the concepts; the rest is organised by what you want a plot to do.
 | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | [Getting started](docs/getting-started.md)                     | Installing, a first plot, sizing a plot to its container, loading data                       |
 | [Concepts](docs/concepts.md)                                   | Plots and figures, rows and series, channels, the props every plot shares                    |
-| [Plots](docs/plots.md)                                         | The eight plot kinds: what each one draws and what it needs                                  |
+| [Plots](docs/plots.md)                                         | Every plot kind: what it draws and what it needs                                             |
 | [Scales](docs/scales.md)                                       | Axes (`x`, `y`) and channel scales (`color`, `grouping`, `opacity`, `symbol`, `r`, `length`) |
 | [Styles and segments](docs/styles-and-segments.md)             | Value labels, frames, gap filling, and styling ranges of the data                            |
 | [Markers](docs/markers.md)                                     | Extra marks on a plot: annotations, regions, hover highlights, custom components             |

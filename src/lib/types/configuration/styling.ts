@@ -261,6 +261,19 @@ export type PlotStylesConfig = {
 		/** Fallback gap (0-1) before the first and after the last box, when a plot doesn't set its own `scales.x/y.paddingOuter`. */
 		paddingOuter: number;
 	};
+	/** Default lollipop-plot styling. */
+	lollipop: {
+		/** Radius of every dot that sets none of its own, in px. */
+		dotRadius: number;
+		/** Width of every stem that sets none of its own, in px. */
+		stemWidth: number;
+		/** Gap, in px, between a dot and its value label, unless the labels' own `dx`/`dy` set one. */
+		labelGap: number;
+		/** Fallback gap (0-1) between the lollipops of neighbouring categories, when a plot doesn't set its own `scales.x/y.paddingInner`. */
+		paddingInner: number;
+		/** Fallback gap (0-1) before the first and after the last lollipop, when a plot doesn't set its own `scales.x/y.paddingOuter`. */
+		paddingOuter: number;
+	};
 	/** Default scatter point geometry. */
 	scatter: { dotRadius: number };
 	/** Timeline gutter styling. */

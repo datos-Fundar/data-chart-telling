@@ -1,6 +1,6 @@
 # Plots
 
-Nine plot kinds share one set of props (see [Concepts](concepts.md)). They differ in what they draw, which channels they need and how they hover.
+Every plot kind shares one set of props (see [Concepts](concepts.md)). They differ in what they draw, which channels they need and how they hover.
 
 | Plot                              | Draws                                   | Needs                                           |
 | --------------------------------- | --------------------------------------- | ----------------------------------------------- |
@@ -9,6 +9,7 @@ Nine plot kinds share one set of props (see [Concepts](concepts.md)). They diffe
 | [`BarPlot`](#barplot)             | Bars, grouped, stacked or horizontal    | a category channel and a value channel          |
 | [`HistogramPlot`](#histogramplot) | Counts of a numeric field in bins       | `x` or `y`                                      |
 | [`BoxPlot`](#boxplot)             | The distribution of values per category | a category channel and a value channel          |
+| [`LollipopPlot`](#lollipopplot)   | One dot on a stem per category          | a category channel and a value channel          |
 | [`HeatmapPlot`](#heatmapplot)     | A grid of colored cells                 | `x`, `y`, `color`                               |
 | [`PyramidPlot`](#pyramidplot)     | Two series mirrored around zero         | a category channel, a value channel, two series |
 | [`ScatterPlot`](#scatterplot)     | A point per row                         | `x`, `y`                                        |
@@ -196,6 +197,44 @@ Summarizes the values of each series per category as a box: it spans the middle 
 - `scales.x.paddingInner` / `paddingOuter` set how wide the boxes are; the defaults come from `box` in the [configuration](theming.md).
 - The tooltip reads one box at a time, not every value inside it: the hovered row carries `category`, `min`, `p25`, `median`, `p75`, `max`, `count` and `outliers`.
 - `segments` restyle whole categories (`areas: [{ x: { from: 'Bus', to: 'Bus' } }]`). A segment that splits one category's values draws two boxes.
+
+## LollipopPlot
+
+One value per category, drawn as a dot on a thin stem that rises from the baseline: a lighter alternative to bars when there are many categories. String values on `x` stand the lollipops upright; on `y` they lie sideways.
+
+<!-- example: examples/Lollipop.svelte -->
+
+```svelte
+<script lang="ts">
+	import { LollipopPlot } from '@fundar/data-chart-telling';
+	import { PROVINCE_VALUES } from './data';
+
+	const female = PROVINCE_VALUES.filter((row) => row.sex === 'female');
+</script>
+
+<!-- One dot on a stem per province: female life expectancy at birth, with its value beside it. -->
+<LollipopPlot
+	width={720}
+	height={400}
+	data={female}
+	x="value"
+	y="province"
+	scales={{ x: { domain: [70, 85] } }}
+	styles={{ values: { show: true } }}
+/>
+```
+
+<!-- /example -->
+
+![Lollipop plot of life expectancy by province](images/lollipop.png)
+
+- `grouping` (or `color`) draws one set of lollipops per group. Groups that share categories draw on top of each other, so split them with `facet` instead, or color by the category field itself.
+- Categories keep the order the data gives them; `scales.x.domain` (or `y`) orders them.
+- The value axis reaches zero, where the stems start; pinning `scales.y.domain` moves the baseline to the nearest end of it, and a negative value hangs below zero.
+- `scales.x.paddingInner` / `paddingOuter` set the room around each lollipop; the defaults, with the dot radius and the stem width, come from `lollipop` in the [configuration](theming.md).
+- `styles.values` writes each value just past its dot.
+- `segments` restyle whole categories: `styles: { stroke: {...}, dots: {...} }` restyle their stems and dots (`areas: [{ x: { from: 'Salta', to: 'Salta' } }]`).
+- The tooltip reads one lollipop at a time, along the category axis.
 
 ## HeatmapPlot
 

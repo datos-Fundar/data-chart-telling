@@ -3,6 +3,7 @@
 		"paths": {
 			"$lib": ["./src/lib"],
 			"$lib/*": ["./src/lib/*"],
+			"$examples/*": ["./examples/*"],
 			"@fundar/data-chart-telling": ["./src/lib/index.ts"]
 		},
 		"lib": ["esnext", "DOM", "DOM.Iterable"],

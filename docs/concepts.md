@@ -2,7 +2,7 @@
 
 ## Plots and figures
 
-A **plot** is one graph: axes and marks. Every plot is a component named after what it draws - `LinePlot`, `AreaPlot`, `BarPlot`, `HistogramPlot`, `BoxPlot`, `HeatmapPlot`, `PyramidPlot`, `ScatterPlot`, `GeoPlot` (see [Plots](plots.md)).
+A **plot** is one graph: axes and marks. Every plot is a component named after what it draws, such as `LinePlot` or `BarPlot` (see [Plots](plots.md) for all of them).
 
 A plot is drawn inside a **figure**: the box that holds the plot together with its [chrome](chrome.md) (title, subtitle, legend, timeline, caption). Every plot component is a figure, so a plot with a `title` and a `legend` is still one component. A [`PlotComposer`](composer.md) is a figure that holds several plots.
 

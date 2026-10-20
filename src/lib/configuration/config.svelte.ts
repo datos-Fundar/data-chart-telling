@@ -179,6 +179,7 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 	area: { fillOpacity: 0.6 },
 	histogram: { inset: 1, fillOpacity: 1 },
 	box: { fillOpacity: 0.9, paddingInner: 0.4, paddingOuter: 0.2 },
+	lollipop: { dotRadius: 6, stemWidth: 2, labelGap: 10, paddingInner: 0.5, paddingOuter: 0.5 },
 	scatter: { dotRadius: 5 },
 	timeline: {
 		axisColor: 'currentColor',
