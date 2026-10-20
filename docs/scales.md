@@ -63,14 +63,15 @@ Number and date text defaults follow `axis.locale` and `axis.compactDisplay` in 
 
 `scales.color` configures the `color` channel (and a choropleth on a map).
 
-| Field     | Meaning                                                                                                                                                                                        |
-| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `domain`  | `[min, max]` for a continuous value, or the list of categories                                                                                                                                 |
-| `scheme`  | A named [d3-scale-chromatic](https://d3js.org/d3-scale-chromatic) ramp (`'turbo'`, `'blues'`, `'rdylbu'`, case-insensitive), two or more colors to interpolate, or a `Record<category, color>` |
-| `pivot`   | Splits an array `scheme` into two halves meeting at this value (a diverging ramp)                                                                                                              |
-| `unknown` | Color of a value outside the mapping (default `#ccc`)                                                                                                                                          |
+| Field         | Meaning                                                                                                                                                                                        |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `domain`      | `[min, max]` for a continuous value, or the list of categories                                                                                                                                 |
+| `scheme`      | A named [d3-scale-chromatic](https://d3js.org/d3-scale-chromatic) ramp (`'turbo'`, `'blues'`, `'rdylbu'`, case-insensitive), two or more colors to interpolate, or a `Record<category, color>` |
+| `schemeRange` | The part of a named `scheme` to use, as `[from, to]` fractions of it (default `[0, 1]`): `[0.3, 1]` skips the near-white start of a ramp like `'blues'`                                        |
+| `pivot`       | Splits an array `scheme` into two halves meeting at this value (a diverging ramp)                                                                                                              |
+| `unknown`     | Color of a value outside the mapping (default `#ccc`)                                                                                                                                          |
 
-A continuous ramp is set with `scheme: [colorA, colorB]`. Categorical colors come from the configuration's `palette` unless `scheme` is a category-to-color record.
+A continuous ramp is set with `scheme: [colorA, colorB]`. Categorical colors come from the configuration's `palette` unless `scheme` is a category-to-color record. Series that follow one another (years, say) read better on a named sequential ramp, which is sampled across the series in order: `scheme: 'blues', schemeRange: [0.3, 1]`.
 
 A marker can carry its own `scales.color`, independent of the plot's, so two ramps can coexist in one plot.
 

@@ -96,6 +96,26 @@ describe('resolveColorScale', () => {
 		expect(scale('z')).toBe('#ccc');
 	});
 
+	test('schemeRange uses only a part of a named scheme, in the continuous and the categorical case', () => {
+		const full = resolveColorScale({ scheme: 'blues' }, [0, 100], ['#000000', '#ffffff']);
+		const trimmed = resolveColorScale(
+			{ scheme: 'blues', schemeRange: [0.5, 1] },
+			[0, 100],
+			['#000000', '#ffffff']
+		);
+		// The trimmed ramp starts where the full one is halfway, and ends together with it.
+		expect(trimmed(0)).toBe(full(50));
+		expect(trimmed(100)).toBe(full(100));
+
+		const categories = resolveColorScale(
+			{ scheme: 'blues', schemeRange: [0.5, 1] },
+			['a', 'b'],
+			['#000000', '#ffffff']
+		);
+		expect(categories('a')).toBe(full(50));
+		expect(categories('b')).toBe(full(100));
+	});
+
 	test('a pivot works with a named scheme too (not just an explicit array)', () => {
 		const scale = resolveColorScale(
 			{ scheme: 'rdylbu', pivot: 50 },

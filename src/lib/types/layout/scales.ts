@@ -13,6 +13,10 @@ export type ColorScaleConfig = {
 	 * category → color map. Defaults to the theme's own 2-color ramp.
 	 */
 	scheme?: string | string[] | Record<string, string>;
+	/**
+	 * The part of a named `scheme` ramp to use, as `[from, to]` fractions of it (default `[0, 1]`). `[0.3, 1]` skips the near-white start of a sequential ramp such as `'blues'`, so its first color stays visible. Ignored for a literal `scheme`.
+	 */
+	schemeRange?: [number, number];
 	/** Splits an array `scheme` into two halves meeting at this domain value (diverging). Ignored for a `Record` scheme. */
 	pivot?: number;
 	/** Fallback color for a missing/unmapped value. Defaults to `'#ccc'`. */

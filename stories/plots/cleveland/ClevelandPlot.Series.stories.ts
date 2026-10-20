@@ -64,3 +64,14 @@ export const SeriesBased: Story = {
 		] satisfies Series<AgeShareRow>[]
 	}
 };
+
+/** Series that follow one another read best on a sequential ramp: `scales.color.scheme` takes a named one, here `'blues'`, sampled across the series in order. `schemeRange` skips its near-white start. */
+export const SequentialColors: Story = {
+	args: {
+		data: AGE_SHARES,
+		x: 'ageGroup',
+		y: 'share',
+		grouping: 'year',
+		scales: { color: { scheme: 'blues', schemeRange: [0.3, 1] } }
+	}
+};

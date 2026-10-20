@@ -297,6 +297,7 @@ The general form of the family: per category, one dot for each series that has a
 ![Cleveland dot plot of age group shares across census years](images/cleveland.png)
 
 - `grouping` (or `color`) gives one dot per group in each category. Numeric fields need `grouping` to split into series; `color` on a number draws a continuous ramp instead.
+- `scales.color.scheme: 'blues'` colors the series on a sequential ramp, which reads better than the default palette when the series follow one another, such as years; `schemeRange: [0.3, 1]` skips the ramp's near-white start.
 - The connector spans the lowest and the highest dot of each category, so a series the legend omits leaves the range.
 - The value axis fits the values without reaching for zero; pin `scales.y.domain` to start it at zero.
 - Its defaults come from `cleveland` in the [configuration](theming.md).

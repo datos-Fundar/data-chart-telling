@@ -77,6 +77,8 @@ export function resolveColorScale(
 		typeof scheme === 'string' ? NAMED_SCHEMES[scheme.toLowerCase()] : undefined;
 	if (typeof scheme === 'string' && !namedInterpolator) return () => unknown;
 
+	const [from, to] = config?.schemeRange ?? [0, 1];
+	const named = namedInterpolator && ((t: number) => namedInterpolator(from + t * (to - from)));
 	const resolvedScheme = namedInterpolator ? undefined : (scheme as string[]).map(resolveCssColor);
 	if (resolvedScheme && resolvedScheme.length === 0) return () => unknown;
 	if (resolvedScheme && resolvedScheme.length === 1) {
@@ -89,9 +91,7 @@ export function resolveColorScale(
 		const categories = domain as string[];
 		const swatches =
 			resolvedScheme ??
-			categories.map((_, i) =>
-				namedInterpolator!(categories.length > 1 ? i / (categories.length - 1) : 0)
-			);
+			categories.map((_, i) => named!(categories.length > 1 ? i / (categories.length - 1) : 0));
 		return (v) => {
 			if (v == null) return unknown;
 			const idx = categories.indexOf(String(v));
@@ -103,7 +103,7 @@ export function resolveColorScale(
 	const [lo, hi] = domain as [number, number];
 	let interpolator: (t: number) => string;
 	if (namedInterpolator) {
-		interpolator = namedInterpolator;
+		interpolator = named!;
 	} else {
 		try {
 			interpolator = piecewise(interpolateRgb, resolvedScheme!) as (t: number) => string;
