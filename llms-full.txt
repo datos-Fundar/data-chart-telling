@@ -12,7 +12,7 @@ Svelte 5 plot components on top of svelteplot. This file is checked against the 
 ## The mental model
 
 - A **plot** is one graph (axes + marks). Titles, subtitle, caption, legend, facets and a timeline are props of the plot itself.
-- Plots: `LinePlot AreaPlot BarPlot HistogramPlot HeatmapPlot PyramidPlot ScatterPlot GeoPlot`.
+- Plots: `LinePlot AreaPlot BarPlot HistogramPlot BoxPlot HeatmapPlot PyramidPlot ScatterPlot GeoPlot`.
 - `PlotComposer` lays several plots out in one figure with shared hover, legend and timeline.
 - `width` and `height` are pixel numbers on a standalone plot. To fill a container or the window, bind its size (`examples/ResponsiveLine.svelte`) and render the plot once both are > 0.
 
@@ -48,7 +48,7 @@ Two ways to give data, one per plot:
 | `facet` | `{ by: 'field', columns, gap, scales: 'shared'\|'free', mode: 'grid'\|'carousel'\|'paginated' }` or `{ rows, cols }`. |
 | `transforms` `statistics` | svelteplot transforms / derived summaries (regression, movingAverage, ...). |
 
-Per kind: `BarPlot` x = category, y = value (swap for horizontal bars); `PyramidPlot` mirrors two series around zero; `HeatmapPlot` colors cells by `color`; `HistogramPlot` bins one numeric field; `ScatterPlot` takes `r` (size) and `symbol`; `GeoPlot` takes GeoJSON/TopoJSON in `data` and `coordinates` for the projection (`docs/geo.md`).
+Per kind: `BarPlot` x = category, y = value (swap for horizontal bars); `PyramidPlot` mirrors two series around zero; `HeatmapPlot` colors cells by `color`; `HistogramPlot` bins one numeric field; `BoxPlot` x = category, y = value, one box per category (its tooltip row is the box summary: `min`, `p25`, `median`, `p75`, `max`, `count`, `outliers`); `ScatterPlot` takes `r` (size) and `symbol`; `GeoPlot` takes GeoJSON/TopoJSON in `data` and `coordinates` for the projection (`docs/geo.md`).
 
 ## Switches
 
@@ -120,6 +120,7 @@ GeoPlot: `graticule sphere dot text vector link contour inset geo-hover geo-comp
 - `GroupedBars.svelte` - vertical bars grouped by color.
 - `HorizontalBars.svelte` - horizontal bars.
 - `Histogram.svelte` - overlapping histograms.
+- `Box.svelte` - box plots per group.
 - `Heatmap.svelte` - heatmap.
 - `Pyramid.svelte` - population pyramid.
 - `Scatter.svelte` - scatter plot sized, colored and shaped by channels.

@@ -10,10 +10,11 @@ import { buildScatterDefaults } from '$lib/plots/scatter/defaults';
 import { buildHistogramDefaults } from '$lib/plots/histogram/defaults';
 import { buildHeatmapDefaults } from '$lib/plots/heatmap/defaults';
 import { buildPyramidDefaults } from '$lib/plots/pyramid/defaults';
+import { buildBoxDefaults } from '$lib/plots/box/defaults';
 import type { FacetConfig } from '$lib/types/layout/facet';
 
-const [LineCore, AreaCore, BarCore, ScatterCore, HistogramCore, HeatmapCore, PyramidCore] =
-	Array(7).fill(GenericCore);
+const [LineCore, AreaCore, BarCore, ScatterCore, HistogramCore, HeatmapCore, PyramidCore, BoxCore] =
+	Array(8).fill(GenericCore);
 
 type Row = { year: number; region: string; sector: string; value: number };
 
@@ -107,6 +108,12 @@ const CASES: Case[] = [
 		Core: PyramidCore,
 		buildDefaults: buildPyramidDefaults,
 		core: { ...BOX, x: 'value', y: 'year', color: 'sector' }
+	},
+	{
+		name: 'box',
+		Core: BoxCore,
+		buildDefaults: buildBoxDefaults,
+		core: { ...BOX, x: 'sector', y: 'value', color: 'sector' }
 	}
 ];
 

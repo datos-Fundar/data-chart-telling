@@ -1,7 +1,7 @@
-import { SERIES_KEY, TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
+import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
+import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 
 import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/scatter/state';
-import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
 import type { DotMarkerConfig, TextMarkerConfig } from '$lib/types/markers/common';
 import type { ProcessedRow } from '$lib/types/phases';
 import type { AxisValue } from '$lib/types/layout/mapping';
@@ -22,7 +22,7 @@ export function buildValueLabels<TData extends Record<string, unknown>>(
 	const { processedData } = state;
 	if (!processedData?.data.length) return [];
 	const { font, format } = labels;
-	const position = TransformsPhase.processedPosition(processedData);
+	const position = ProcessedPositions.of(processedData);
 	const nameOf = (d: ProcessedRow) => String(d[SERIES_KEY]);
 	const valueOf = ValueLabels.valueOf(state);
 	return [
@@ -108,7 +108,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 			: undefined;
 
 	const markers: DotMarkerConfig[] = [];
-	TransformsPhase.buildProcessedRuns<ScatterSegmentStyle>(state).forEach((group) => {
+	(state.processedGroups ?? []).forEach((group) => {
 		const defaultColor = colorForSeries!(group.series.name);
 		const disabledDots = interaction?.dotsFor(group.series.name);
 

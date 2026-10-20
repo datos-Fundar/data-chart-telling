@@ -1,3 +1,4 @@
+import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { NiceTicks } from '$lib/layout/scales/NiceTicks';
 import { ScalesPhase } from '$lib/phases/scales/ScalesPhase';
 import { Pipeline } from '$lib/phases/Pipeline';
@@ -190,7 +191,7 @@ export class SharedScalesPhase<TState extends SharedScalesState, TCtx> implement
 			inPanel((marker as Record<string, unknown>)[PANEL_KEY])
 		);
 		const values = (axis: AxisChannelName) => [
-			...ScalesPhase.processedValues(processed, axis),
+			...ProcessedPositions.values(processed, axis),
 			...MarkerAxisValues.of(markers as never[], axis)
 		];
 		return {

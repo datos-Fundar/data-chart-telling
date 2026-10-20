@@ -1,5 +1,4 @@
 import { getConfiguration } from '$lib/configuration/config.svelte';
-import { TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
 import { resolveGapRuns, resolveGapsForSeries } from '$lib/plots/utils/gaps';
 
 import type { GapPoint } from '$lib/types/plots/gaps';
@@ -234,7 +233,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 	const { colorForSeries, gaps } = state;
 	const disabledStrokeFor = (name: string) => ctx.interaction?.strokeFor(name);
 	const disabledDotsFor = (name: string) => ctx.interaction?.dotsFor(name);
-	const groups = TransformsPhase.buildProcessedGroups<LineSegmentStyle>(state);
+	const groups = state.processedGroups ?? [];
 
 	const lineMarkers = buildLineMarkers({
 		groupedSeries: groups,

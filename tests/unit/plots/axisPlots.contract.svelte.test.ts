@@ -8,6 +8,7 @@ import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
 import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
 import HistogramPlot from '$lib/plots/histogram/Plot.svelte';
 import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
+import BoxPlot from '$lib/plots/box/Plot.svelte';
 import { waitForSvg } from './_helpers/svg';
 
 /**
@@ -92,6 +93,14 @@ const KINDS: Kind[] = [
 		props: { data: NUMERIC.map((d) => ({ ...d, v: d.y })), x: 'x', y: 'g', color: 'v' },
 		numericX: false,
 		plotStatistics: false,
+		stackable: false
+	},
+	{
+		name: 'BoxPlot',
+		Plot: BoxPlot,
+		props: { data: CATEGORIES, x: 'x', y: 'y' },
+		numericX: false,
+		plotStatistics: true,
 		stackable: false
 	}
 ];

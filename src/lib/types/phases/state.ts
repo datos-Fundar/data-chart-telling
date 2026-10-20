@@ -14,7 +14,7 @@ import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
 import type { MarkerTransform } from '$lib/types/transforms';
-import type { ProcessedData } from '$lib/types/phases/transforms/phase';
+import type { ProcessedData, ProcessedRow } from '$lib/types/phases/transforms/phase';
 import type { FacetStageState } from '$lib/types/phases/facet/phase';
 import type { AxisBasedStylesConfig, ValuesStyle } from '$lib/types/layout/styles';
 import type { ValueLabels } from '$lib/layout/styles/ValueLabels';
@@ -75,8 +75,9 @@ export type AxisPlotState<
 	// "mapping" phase output.
 	channels?: ResolvedChannels<TData>;
 
-	// "transforms" phase output: what the plot's own marks draw.
+	// "transforms" phase output: what the plot's own marks draw, and the same rows split into their visual groups.
 	processedData?: ProcessedData;
+	processedGroups?: VisualGroup<Series<ProcessedRow>, TStyle>[];
 
 	// "styles" phase output: `values` over the kind's own defaults.
 	valueLabels?: ValueLabels;

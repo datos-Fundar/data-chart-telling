@@ -1,3 +1,4 @@
+import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import {
 	buildMarks,
 	buildValueLabels,
@@ -5,7 +6,7 @@ import {
 	buildBarGeometry
 } from '$lib/plots/bar/markers';
 import { NiceTicks } from '$lib/layout/scales/NiceTicks';
-import { SERIES_KEY, TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
+import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { AxisPlotDefaults } from '$lib/types/phases';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
@@ -25,7 +26,7 @@ function fitValueDomain<TData extends Record<string, unknown>>(
 	if (scale?.domain != null || scale?.ticks != null || scale?.nice != null) return {};
 	// Every bar's span, as the "transforms" phase left it - its baseline is
 	// unknown until the domain is, so a plain bar reads as reaching from zero.
-	const { of: spanOf } = TransformsPhase.processedSpan(state.processedData!, axis as 'x' | 'y');
+	const { of: spanOf } = ProcessedPositions.span(state.processedData!, axis as 'x' | 'y');
 	let lo = 0;
 	let hi = 0;
 	for (const row of state.processedData?.data ?? []) {
@@ -66,7 +67,7 @@ export function buildBarDefaults<TData extends Record<string, unknown>>(): AxisP
 				reach: (labels, state) => {
 					if (labels.anchor !== 'outside') return [];
 					const axis = PlotAxes.valueOf(state) as 'x' | 'y';
-					if (TransformsPhase.processedSpan(state.processedData!, axis).stacked) return [];
+					if (ProcessedPositions.span(state.processedData!, axis).stacked) return [];
 					if (!state.axes?.isHorizontal) {
 						const at = { y: -labels.offset('y') };
 						return [labels.edgeBox('0', { x: 'middle', y: 'before' }, at, ['top'])];

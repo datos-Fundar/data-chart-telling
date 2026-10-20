@@ -62,6 +62,8 @@ const preview: Preview = {
 						['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
 						'BarPlot',
 						['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip'],
+						'BoxPlot',
+						['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
 						'GeoPlot',
 						[
 							'Series',

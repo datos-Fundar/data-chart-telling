@@ -312,12 +312,22 @@ describe('series identity', () => {
 		]);
 	});
 
-	test('the processed rows split back into one group per series id', () => {
+	test('leaves the processed rows split back into one group per series id', () => {
 		const out = new TransformsPhase<State>().run(twins(), CTX);
-		const groups = TransformsPhase.buildProcessedGroups(out);
-		expect(groups.map((g) => [g.series.id, g.series.data.length])).toEqual([
+		expect(out.processedGroups!.map((g) => [g.series.id, g.series.data.length])).toEqual([
 			['p1/A', 2],
 			['p2/A', 1]
+		]);
+	});
+
+	test("with `groups: 'runs'`, leaves runs of consecutive rows in the rows' own order", () => {
+		const out = new TransformsPhase<State>({ groups: 'runs' }).run(
+			{ ...twins(), transforms: [{ type: 'reverse' }] },
+			CTX
+		);
+		expect(out.processedGroups!.map((g) => [g.series.id, g.series.data.length])).toEqual([
+			['p2/A', 1],
+			['p1/A', 2]
 		]);
 	});
 });

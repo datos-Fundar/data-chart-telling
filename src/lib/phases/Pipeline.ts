@@ -150,7 +150,7 @@ export class Pipeline<TState, TCtx = unknown> {
 				new FacetPhase<TState>(),
 				new DataPhase<TState, TCtx>(kind.data),
 				new MappingPhase<TState, TCtx>(kind.mapping),
-				new TransformsPhase<TState, TCtx>(kind.transforms),
+				new TransformsPhase<TState, TCtx>(kind.transforms, kind.data?.segments?.connect),
 				new StatisticsPhase<TState>(kind.statistics),
 				new SharedScalesPhase<TState, TCtx>(kind.sharedScales, scales),
 				scales,

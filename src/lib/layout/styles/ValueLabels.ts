@@ -1,6 +1,7 @@
+import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { Box } from '$lib/layout/margins/Box';
 import { resolveAccessor } from '$lib/plots/utils/accessors';
-import { SERIES_ID_KEY, SERIES_KEY, TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
+import { SERIES_ID_KEY, SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { seriesIdOf } from '$lib/utils/grouping';
 import { Transforms } from '$lib/phases/transforms/Transforms';
 import { isGapValue } from '$lib/plots/utils/gaps';
@@ -187,7 +188,7 @@ export class ValueLabels {
 		const processed = state.processedData;
 		if (!processed) return [];
 		const { font, anchor, format } = this;
-		const position = TransformsPhase.processedPosition(processed);
+		const position = ProcessedPositions.of(processed);
 		const topOf = (d: ProcessedRow) => position.y(d);
 		const nameOf = (d: ProcessedRow) => String(d[SERIES_KEY]);
 		const valueOf = ValueLabels.valueOf(state);

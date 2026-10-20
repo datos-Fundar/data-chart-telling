@@ -252,6 +252,15 @@ export type PlotStylesConfig = {
 		/** Fill opacity of every bar, so a grouped histogram's bars behind another group's still show. */
 		fillOpacity: number;
 	};
+	/** Default box-plot styling. */
+	box: {
+		/** Fill opacity of every box that sets none of its own. */
+		fillOpacity: number;
+		/** Fallback gap (0-1) between the boxes of neighbouring categories, when a plot doesn't set its own `scales.x/y.paddingInner`. */
+		paddingInner: number;
+		/** Fallback gap (0-1) before the first and after the last box, when a plot doesn't set its own `scales.x/y.paddingOuter`. */
+		paddingOuter: number;
+	};
 	/** Default scatter point geometry. */
 	scatter: { dotRadius: number };
 	/** Timeline gutter styling. */

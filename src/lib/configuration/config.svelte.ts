@@ -178,6 +178,7 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 	pyramid: { gap: { fillOpacity: 0.5 } },
 	area: { fillOpacity: 0.6 },
 	histogram: { inset: 1, fillOpacity: 1 },
+	box: { fillOpacity: 0.9, paddingInner: 0.4, paddingOuter: 0.2 },
 	scatter: { dotRadius: 5 },
 	timeline: {
 		axisColor: 'currentColor',

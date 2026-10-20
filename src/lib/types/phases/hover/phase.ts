@@ -19,6 +19,12 @@ export type HoverStageOptions<TState, TCtx = unknown> = {
 	 * that isn't measured, or `'punctual'` with both axes holding categories.
 	 */
 	strategy?: HoverStrategy;
+	/** The rows the pointer hovers over, when they aren't the ones drawn (a box plot's one summary per box). Defaults to the processed rows. */
+	rows?: (state: TState) => Record<string | symbol, unknown>[];
+	/** How a hovered row reads in the tooltip unless the author sets `format`. Defaults to the shared tooltip text. */
+	format?: (state: TState) => (row: never) => string;
+	/** The order a tooltip's rows read in. Defaults to the shared order: highest value first. */
+	sort?: (state: TState) => (a: never, b: never) => number;
 	/** Where a row sits. Defaults to its processed position: a stacked row's top, a bin's centre. */
 	position?: (state: TState) => HoverPosition;
 	/** The short label drawn next to a hovered row. Defaults to its value. */

@@ -1,4 +1,5 @@
-import { GAP_VALUE, SERIES_KEY, TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
+import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
+import { GAP_VALUE, SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { HoverSettings } from '$lib/layout/hover/HoverSettings';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { isGapValue } from '$lib/plots/utils/gaps';
@@ -27,8 +28,8 @@ type Row = Record<string, unknown>;
  * options over everything placed before - the plot's `tooltip` and hover
  * markers, the tooltip phase's format, the legend in scope. A core only reads them.
  *
- * Every plot gets the same candidates: each processed row of a series the
- * legend shows, at its position, in its series' color - except a gap row (one
+ * Every plot gets the same candidates: each processed row (or each of the
+ * kind's own hover `rows`) of a series the legend shows, at its position, in its series' color - except a gap row (one
  * with no value, or filled in) and a row whose color falls outside the
  * legend's narrowed range.
  */
@@ -48,7 +49,7 @@ export class HoverPhase<
 		const valueAxis = PlotAxes.valueOf(state);
 		const raw =
 			options.position?.(state) ??
-			(TransformsPhase.processedPosition(state.processedData!, valueAxis) as HoverPosition);
+			(ProcessedPositions.of(state.processedData!, valueAxis) as HoverPosition);
 		// A processed position reads as raw; the hover controller and the plot's
 		// scales want its value as a number, unless that axis lays out categories.
 		const position: HoverPosition =
@@ -58,8 +59,11 @@ export class HoverPhase<
 		const label =
 			options.label?.(state) ??
 			((row: never) => String(state.channels![valueAxis].accessor(row as Row)));
+		const processed: ProcessedData = options.rows
+			? { ...state.processedData!, data: options.rows(state) }
+			: state.processedData!;
 		const points = HoverPhase.buildProcessedHoverPoints<Row>({
-			processed: state.processedData!,
+			processed,
 			colorFor: state.colorForSeries!,
 			legendInteraction: ctx.interaction?.legend,
 			label: label as (row: Row) => string,
@@ -72,8 +76,10 @@ export class HoverPhase<
 		});
 		const hover = HoverPhase.buildHoverConfig<Row>({
 			tooltip: state.tooltip as TooltipConfig<Row> | undefined,
-			format: state.tooltipFormat!,
-			sort: state.tooltipSort,
+			format:
+				(options.format?.(state) as ((row: Row) => string) | undefined) ?? state.tooltipFormat!,
+			sort:
+				(options.sort?.(state) as ((a: Row, b: Row) => number) | undefined) ?? state.tooltipSort,
 			markers: state.authorMarkers ?? [],
 			points: points as HoverPoint<Row>[],
 			label: label as (row: Row) => string,
@@ -85,7 +91,7 @@ export class HoverPhase<
 			...state,
 			hover,
 			hoverPosition: position,
-			hoverRows: state.processedData!.data,
+			hoverRows: processed.data,
 			...(hitAreas.length > 0 ? { markers: [...(state.markers ?? []), ...hitAreas] } : {})
 		};
 	};
@@ -154,7 +160,7 @@ export class HoverPhase<
 		position?: HoverPosition;
 	}): HoverPoint<TRow>[] {
 		const { processed, colorFor, legendInteraction, label, include, row: rowOf, decorate } = args;
-		const processedPosition = TransformsPhase.processedPosition(processed);
+		const processedPosition = ProcessedPositions.of(processed);
 		const position = args.position ?? {
 			x: processedPosition.x,
 			y: (row: never) => Number(processedPosition.y(row as ProcessedRow))

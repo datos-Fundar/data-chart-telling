@@ -1,17 +1,18 @@
 # Plots
 
-Eight plot kinds share one set of props (see [Concepts](concepts.md)). They differ in what they draw, which channels they need and how they hover.
+Nine plot kinds share one set of props (see [Concepts](concepts.md)). They differ in what they draw, which channels they need and how they hover.
 
-| Plot                              | Draws                                | Needs                                           |
-| --------------------------------- | ------------------------------------ | ----------------------------------------------- |
-| [`LinePlot`](#lineplot)           | A line per series                    | `x`, `y`                                        |
-| [`AreaPlot`](#areaplot)           | A filled area per series             | `x`, `y`                                        |
-| [`BarPlot`](#barplot)             | Bars, grouped, stacked or horizontal | a category channel and a value channel          |
-| [`HistogramPlot`](#histogramplot) | Counts of a numeric field in bins    | `x` or `y`                                      |
-| [`HeatmapPlot`](#heatmapplot)     | A grid of colored cells              | `x`, `y`, `color`                               |
-| [`PyramidPlot`](#pyramidplot)     | Two series mirrored around zero      | a category channel, a value channel, two series |
-| [`ScatterPlot`](#scatterplot)     | A point per row                      | `x`, `y`                                        |
-| [`GeoPlot`](#geoplot)             | A map from GeoJSON or TopoJSON       | `data` (see [Maps](geo.md))                     |
+| Plot                              | Draws                                   | Needs                                           |
+| --------------------------------- | --------------------------------------- | ----------------------------------------------- |
+| [`LinePlot`](#lineplot)           | A line per series                       | `x`, `y`                                        |
+| [`AreaPlot`](#areaplot)           | A filled area per series                | `x`, `y`                                        |
+| [`BarPlot`](#barplot)             | Bars, grouped, stacked or horizontal    | a category channel and a value channel          |
+| [`HistogramPlot`](#histogramplot) | Counts of a numeric field in bins       | `x` or `y`                                      |
+| [`BoxPlot`](#boxplot)             | The distribution of values per category | a category channel and a value channel          |
+| [`HeatmapPlot`](#heatmapplot)     | A grid of colored cells                 | `x`, `y`, `color`                               |
+| [`PyramidPlot`](#pyramidplot)     | Two series mirrored around zero         | a category channel, a value channel, two series |
+| [`ScatterPlot`](#scatterplot)     | A point per row                         | `x`, `y`                                        |
+| [`GeoPlot`](#geoplot)             | A map from GeoJSON or TopoJSON          | `data` (see [Maps](geo.md))                     |
 
 All of them accept `data` with `grouping`/`color`, or pre-built `series`.
 
@@ -168,6 +169,33 @@ Bins the rows of each series along one axis and draws the count per bin. Give `x
 - Override the default binning with a `binX` (or `binY`) transform: `transforms={[{ type: 'binX', thresholds: 20 }]}`. A transform given here is merged over the default one.
 - `transforms={[{ type: 'stackY' }]}` stacks groups in each bin.
 - `segments={{ default: [{ styles: { fillOpacity: 0.7 } }] }}` makes overlapping groups translucent.
+
+## BoxPlot
+
+Summarizes the values of each series per category as a box: it spans the middle half of the values (25th to 75th percentile), the line across it is the median, the whiskers reach the farthest values within 1.5 times the box's height, and dots mark the values past them. String values on `x` stand the boxes upright; on `y` they lie sideways.
+
+<!-- example: examples/Box.svelte -->
+
+```svelte
+<script lang="ts">
+	import { BoxPlot } from '@fundar/data-chart-telling';
+	import { HEIGHTS } from './data';
+</script>
+
+<!-- One box per group: quartiles, median, whiskers and outliers of each height distribution. -->
+<BoxPlot width={720} height={400} data={HEIGHTS} x="group" y="height" color="group" />
+```
+
+<!-- /example -->
+
+![Box plots of two height distributions](images/box.png)
+
+- `grouping` (or `color`) draws one box per group and category. Groups that share categories draw their boxes on top of each other, so split them with `facet` instead, or color by the category field itself.
+- Categories keep the order the data gives them; `scales.x.domain` (or `y`) orders them.
+- The value axis fits the values without reaching for zero; pin `scales.y.domain` to start it at zero.
+- `scales.x.paddingInner` / `paddingOuter` set how wide the boxes are; the defaults come from `box` in the [configuration](theming.md).
+- The tooltip reads one box at a time, not every value inside it: the hovered row carries `category`, `min`, `p25`, `median`, `p75`, `max`, `count` and `outliers`.
+- `segments` restyle whole categories (`areas: [{ x: { from: 'Bus', to: 'Bus' } }]`). A segment that splits one category's values draws two boxes.
 
 ## HeatmapPlot
 

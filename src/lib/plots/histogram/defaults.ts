@@ -45,7 +45,7 @@ export function buildHistogramDefaults<TData extends Record<string, unknown>>():
 	HistogramPlotCtx
 > {
 	return {
-		data: { segments: { color: (style: AreaStyle | undefined) => style?.fill } },
+		data: { segments: { color: (style: AreaStyle | undefined) => style?.fill, connect: false } },
 		transforms: {
 			transforms: (state, ctx) =>
 				mergeBin(state.transforms ?? [], ctx.cfg, state.axes?.isHorizontal ?? false)

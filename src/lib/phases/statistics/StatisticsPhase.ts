@@ -1,7 +1,6 @@
 import { AuthorMarkers } from '$lib/phases/statistics/AuthorMarkers';
 import { Statistics } from '$lib/phases/statistics/Statistics';
 import { PANEL_KEY, FacetPhase } from '$lib/phases/facet/FacetPhase';
-import { TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { PhaseStage, StatisticsStageOptions, StatisticsStageState } from '$lib/types/phases';
@@ -72,7 +71,7 @@ export class StatisticsPhase<TState extends StatisticsStageState> implements Pha
 		const valueAxis = PlotAxes.valueOf(state);
 		const measured =
 			state.processedData && resolvedSeries.some((s) => s[valueAxis] === undefined)
-				? TransformsPhase.buildProcessedGroups(state).map((group) => group.series)
+				? (state.processedGroups ?? []).map((group) => group.series)
 				: resolvedSeries;
 
 		return [

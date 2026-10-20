@@ -47,7 +47,7 @@ It aims for a sweet spot between the flexibility of `d3`, the declarative spirit
 
 Every Svelte snippet in this README is a runnable file in [examples/](examples/), and the data comes from [examples/data.ts](examples/data.ts).
 
-Eight plot kinds - line, area, bar, histogram, heatmap, pyramid, scatter and geographic maps - share one vocabulary: the same channels (`x`, `y`, `color`, `grouping`, `opacity`, `symbol`, `r`), the same `scales`, `styles`, `segments`, `markers`, `transforms`, `tooltip`, `legend`, `timeline` and `facet` props, and one global theme.
+Nine plot kinds - line, area, bar, histogram, box, heatmap, pyramid, scatter and geographic maps - share one vocabulary: the same channels (`x`, `y`, `color`, `grouping`, `opacity`, `symbol`, `r`), the same `scales`, `styles`, `segments`, `markers`, `transforms`, `tooltip`, `legend`, `timeline` and `facet` props, and one global theme.
 
 ## Install
 
