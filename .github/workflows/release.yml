@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+env:
+  HUSKY: 0
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - name: Check the tag matches package.json
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if [ "${{ github.event.release.tag_name }}" != "v$version" ]; then
+            echo "Release tag ${{ github.event.release.tag_name }} does not match package.json version v$version"
+            exit 1
+          fi
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm lint
+      - run: pnpm check
+      - run: pnpm test
+      # Trusted Publishing needs npm 11.5.1 or newer.
+      - run: npm install --global npm@latest
+      - run: pnpm publish --access public --no-git-checks
