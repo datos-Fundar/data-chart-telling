@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlotFacetDemo from './GeoPlotFacetDemo.svelte';
+import GeoPlotFacetDemoSource from './GeoPlotFacetDemo.svelte?raw';
+import { demoSource } from '../../../common/docsSource';
 
 /**
  * `GeoPlot`'s tile-layer basemap inside a faceted grid - every row × column
@@ -28,29 +30,59 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+// Set per story: a meta-level `docs.source` is overridden by each story's own.
+const parameters = demoSource(GeoPlotFacetDemoSource);
+
 /** 1 row × 1 column - a single map, no facet grid at all. */
-export const Rows1Cols1: Story = { args: { groupCount: 1, columns: 1 } };
+export const Rows1Cols1: Story = {
+	args: { groupCount: 1, columns: 1 },
+	parameters
+};
 
 /** 1 row × 2 columns - two maps side by side. */
-export const Rows1Cols2: Story = { args: { groupCount: 2, columns: 2 } };
+export const Rows1Cols2: Story = {
+	args: { groupCount: 2, columns: 2 },
+	parameters
+};
 
 /** 2 rows × 1 column - two maps stacked vertically. */
-export const Rows2Cols1: Story = { args: { groupCount: 2, columns: 1 } };
+export const Rows2Cols1: Story = {
+	args: { groupCount: 2, columns: 1 },
+	parameters
+};
 
 /** 1 row × 3 columns. */
-export const Rows1Cols3: Story = { args: { groupCount: 3, columns: 3 } };
+export const Rows1Cols3: Story = {
+	args: { groupCount: 3, columns: 3 },
+	parameters
+};
 
 /** 3 rows × 1 column. */
-export const Rows3Cols1: Story = { args: { groupCount: 3, columns: 1 } };
+export const Rows3Cols1: Story = {
+	args: { groupCount: 3, columns: 1 },
+	parameters
+};
 
 /** 2 rows × 2 columns - the configuration that has broken repeatedly. */
-export const Rows2Cols2: Story = { args: { groupCount: 4, columns: 2 } };
+export const Rows2Cols2: Story = {
+	args: { groupCount: 4, columns: 2 },
+	parameters
+};
 
 /** 2 rows × 3 columns. */
-export const Rows2Cols3: Story = { args: { groupCount: 6, columns: 3 } };
+export const Rows2Cols3: Story = {
+	args: { groupCount: 6, columns: 3 },
+	parameters
+};
 
 /** 3 rows × 2 columns. */
-export const Rows3Cols2: Story = { args: { groupCount: 6, columns: 2 } };
+export const Rows3Cols2: Story = {
+	args: { groupCount: 6, columns: 2 },
+	parameters
+};
 
 /** 3 rows × 3 columns. */
-export const Rows3Cols3: Story = { args: { groupCount: 9, columns: 3 } };
+export const Rows3Cols3: Story = {
+	args: { groupCount: 9, columns: 3 },
+	parameters
+};

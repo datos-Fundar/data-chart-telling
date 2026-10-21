@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/geo/Plot.svelte';
 import GeoTimelineDemo from './GeoTimelineDemo.svelte';
+import GeoTimelineDemoSource from './GeoTimelineDemo.svelte?raw';
+import { demoSource } from '../../../common/docsSource';
 import { WORLD_COUNTRIES } from '../data';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
 import { gdpPerPerson } from '../channels';
@@ -33,7 +35,10 @@ const meta = {
 		height: 460,
 		data: COUNTRIES_BY_HEMISPHERE
 	},
-	argTypes: { data: { control: false }, facet: { control: false } }
+	argTypes: { data: { control: false }, facet: { control: false } },
+	parameters: {
+		docs: { source: { name: 'GeoPlot' } }
+	}
 } satisfies Meta<typeof GeoPlot>;
 
 export default meta;
@@ -56,5 +61,6 @@ export const FacetByHemisphere: Story = {
 
 /** The provinces (long format, one geometry per year) and a dot marker's yearly readings, both scrubbed by one `timeline`. */
 export const Timeline: StoryObj = {
-	render: () => ({ Component: GeoTimelineDemo })
+	render: () => ({ Component: GeoTimelineDemo }),
+	parameters: demoSource(GeoTimelineDemoSource)
 };
