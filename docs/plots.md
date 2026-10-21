@@ -12,6 +12,7 @@ Every plot kind shares one set of props (see [Concepts](concepts.md)). They diff
 | [LollipopPlot](plots/lollipop.md)   | One dot on a stem per category          | a category channel and a value channel                |
 | [DumbbellPlot](plots/dumbbell.md)   | Two dots per category, joined           | a category channel, a value channel, two series       |
 | [ClevelandPlot](plots/cleveland.md) | Any number of dots per category, joined | a category channel, a value channel, a series per dot |
+| [ForestPlot](plots/forest.md)       | One dot on an interval per row          | a category channel, a value channel, `lower`/`upper`  |
 | [HeatmapPlot](plots/heatmap.md)     | A grid of colored cells                 | `x`, `y`, `color`                                     |
 | [PyramidPlot](plots/pyramid.md)     | Two series mirrored around zero         | a category channel, a value channel, two series       |
 | [ScatterPlot](plots/scatter.md)     | A point per row                         | `x`, `y`                                              |

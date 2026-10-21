@@ -4,13 +4,14 @@
 export { default as AreaPlot } from './plots/area/Plot.svelte';
 export { default as BarPlot } from './plots/bar/Plot.svelte';
 export { default as BoxPlot } from './plots/box/Plot.svelte';
+export { default as ClevelandPlot } from './plots/cleveland/Plot.svelte';
+export { default as DumbbellPlot } from './plots/dumbbell/Plot.svelte';
+export { default as ForestPlot } from './plots/forest/Plot.svelte';
 export { default as GeoPlot } from './plots/geo/Plot.svelte';
 export { default as HeatmapPlot } from './plots/heatmap/Plot.svelte';
 export { default as HistogramPlot } from './plots/histogram/Plot.svelte';
 export { default as LinePlot } from './plots/line/Plot.svelte';
 export { default as LollipopPlot } from './plots/lollipop/Plot.svelte';
-export { default as DumbbellPlot } from './plots/dumbbell/Plot.svelte';
-export { default as ClevelandPlot } from './plots/cleveland/Plot.svelte';
 export { default as PyramidPlot } from './plots/pyramid/Plot.svelte';
 export { default as ScatterPlot } from './plots/scatter/Plot.svelte';
 

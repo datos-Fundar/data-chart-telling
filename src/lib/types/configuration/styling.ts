@@ -22,6 +22,8 @@ export type TextStyle = {
 export type DotRangeStyling = {
 	/** Radius of every dot that sets none of its own, in px. */
 	dotRadius: number;
+	/** Whether every connector draws a cap - a short tick across it - at each end, unless `styles.connector.caps` says otherwise. */
+	caps?: boolean;
 	/** Width of every connector that sets none of its own, in px; `'dots'` makes it as thick as the dots are wide, a band. */
 	stemWidth: number | 'dots';
 	/** Color of the connector of a category with several dots; a lone dot's stem takes its series' color. Unset, the axis color. */
@@ -284,6 +286,8 @@ export type PlotStylesConfig = {
 	dumbbell: DotRangeStyling;
 	/** Default Cleveland-plot styling. */
 	cleveland: DotRangeStyling;
+	/** Default forest-plot styling: the dot is the estimate, the stem its interval. */
+	forest: DotRangeStyling;
 	/** What `styles.connector` falls back to on the plots that join dots (lollipop, dumbbell, Cleveland). */
 	connector: {
 		/** The colors of a connector colored `{ by: 'sign' }`: where the value rose, fell, or did not move. */
@@ -296,6 +300,8 @@ export type PlotStylesConfig = {
 		outsideOpacity: number;
 		/** A connector drawn as an arrow (`styles.connector.arrow`): its thickness, and the length (px) and angle (degrees) of its head. */
 		arrow: { width: number; headLength: number; headAngle: number };
+		/** The length (px) of the caps a connector draws at its ends (`styles.connector.caps`). */
+		capLength: number;
 		/** Font size of a connector's label, in px. */
 		labelFontSize: number;
 		/** Gap, in px, between a connector and its label when it is written beside it. */

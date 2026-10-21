@@ -161,6 +161,8 @@ export type ConnectorStyle = {
 	 * the configuration's `connector.arrow.width`: thinner than a band.
 	 */
 	arrow?: boolean | { headLength?: number; headAngle?: number };
+	/** Caps - a short tick across the connector - at each end of it: `true`, or `{ length }` in px (the configuration's `connector.capLength`). Defaults to the plot's own: on for a forest plot, off for the rest. */
+	caps?: boolean | { length?: number };
 	/** A label on each connector, centered on the stretch between `from` and `to`: `true` for the difference with its defaults, or its options. */
 	label?: boolean | ConnectorLabel;
 };

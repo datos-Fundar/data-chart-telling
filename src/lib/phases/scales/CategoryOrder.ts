@@ -1,6 +1,7 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
+import { rowInterval, type IntervalAccessors } from '$lib/plots/utils/rowInterval';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import type { AxisChannelName } from '$lib/types/layout/mapping';
 import type { CategorySort } from '$lib/types/layout/scales';
@@ -24,7 +25,7 @@ export class CategoryOrder {
 	 */
 	static of(
 		sort: CategorySort,
-		state: { processedData?: ProcessedData; axes?: PlotAxes },
+		state: { processedData?: ProcessedData; axes?: PlotAxes } & IntervalAccessors,
 		axis: AxisChannelName
 	): unknown[] | undefined {
 		const processed = state.processedData;
@@ -35,16 +36,20 @@ export class CategoryOrder {
 		const valueOf = position[valueAxis];
 
 		// Each category, in the order the rows give them, with the values it holds.
-		const held = new Map<string, { category: unknown; values: number[]; own: number[] }>();
+		const held = new Map<
+			string,
+			{ category: unknown; series: string; values: number[]; own: number[] }
+		>();
 		for (const row of processed.data) {
 			const category = categoryOf(row);
 			const key = String(category);
 			let entry = held.get(key);
-			if (!entry) held.set(key, (entry = { category, values: [], own: [] }));
+			if (!entry)
+				held.set(key, (entry = { category, series: String(row[SERIES_KEY]), values: [], own: [] }));
 			const raw = valueOf(row);
 			const value = Number(raw);
 			if (isGapValue(raw) || !Number.isFinite(value)) continue;
-			entry.values.push(value);
+			entry.values.push(...rowInterval(state, row, value));
 			if (sort.series === undefined || String(row[SERIES_KEY]) === sort.series) {
 				entry.own.push(value);
 			}
@@ -59,14 +64,24 @@ export class CategoryOrder {
 			return entry.own.length === 0 ? undefined : entry.own.reduce((sum, v) => sum + v, 0);
 		};
 		const sign = sort.order === 'descending' ? -1 : 1;
-		return [...held.values()]
-			.map((entry, index) => ({ entry, index, key: keyOf(entry) }))
-			.sort((a, b) => {
-				if (a.key === undefined || b.key === undefined) {
-					return (a.key === undefined ? 1 : 0) - (b.key === undefined ? 1 : 0) || a.index - b.index;
-				}
-				return sign * (a.key - b.key) || a.index - b.index;
-			})
-			.map(({ entry }) => entry.category);
+		const sorted = (entries: typeof held extends Map<string, infer E> ? E[] : never) =>
+			entries
+				.map((entry, index) => ({ entry, index, key: keyOf(entry) }))
+				.sort((a, b) => {
+					if (a.key === undefined || b.key === undefined) {
+						return (
+							(a.key === undefined ? 1 : 0) - (b.key === undefined ? 1 : 0) || a.index - b.index
+						);
+					}
+					return sign * (a.key - b.key) || a.index - b.index;
+				})
+				.map(({ entry }) => entry);
+		const entries = [...held.values()];
+		if (!sort.grouped) return sorted(entries).map((entry) => entry.category);
+		const bySeries = new Map<string, typeof entries>();
+		for (const entry of entries) {
+			bySeries.set(entry.series, [...(bySeries.get(entry.series) ?? []), entry]);
+		}
+		return [...bySeries.values()].flatMap((group) => sorted(group).map((entry) => entry.category));
 	}
 }

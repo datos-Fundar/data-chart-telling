@@ -46,6 +46,39 @@ export const REGION_VALUES: RegionRow[] = INFLATION_BY_REGION.flatMap(({ region,
 	MONTHS.map((date, monthIndex) => ({ date, region, value: inflation[monthIndex] }))
 );
 
+// ── Monthly inflation by region and year ────────────────────────────────────
+// The series above, summarized per region and year: the mean of the monthly
+// changes and the lowest and highest month. 2026 holds the eight months so far.
+
+export type InflationRange = {
+	period: string;
+	region: string;
+	year: number;
+	mean: number;
+	min: number;
+	max: number;
+};
+
+const round1 = (value: number) => Math.round(value * 10) / 10;
+
+export const INFLATION_RANGES: InflationRange[] = INFLATION_BY_REGION.flatMap(
+	({ region, inflation }) =>
+		[2023, 2024, 2025, 2026].map((year) => {
+			const months = MONTHS.flatMap((date, monthIndex) =>
+				date.getUTCFullYear() === year ? [inflation[monthIndex]] : []
+			);
+			const mean = months.reduce((sum, value) => sum + value, 0) / months.length;
+			return {
+				period: `${region} ${year}`,
+				region,
+				year,
+				mean: round1(mean),
+				min: Math.min(...months),
+				max: Math.max(...months)
+			};
+		})
+);
+
 // ── International commodity prices ──────────────────────────────────────────
 // IMF, Primary Commodity Prices (PCPS), via DBnomics. Monthly, 2021-2024, as
 // an index with January 2021 = 100 so every commodity shares one axis.

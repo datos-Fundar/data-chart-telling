@@ -11,7 +11,7 @@ export type ClevelandPlotState<TData extends Record<string, unknown>> = AxisPlot
 export type ClevelandPlotCtx = AxisPlotCtx;
 
 /** The configuration blocks the Cleveland-style plots draw their defaults from: one per plot. */
-export type ClevelandConfigKey = 'lollipop' | 'dumbbell' | 'cleveland';
+export type ClevelandConfigKey = 'lollipop' | 'dumbbell' | 'cleveland' | 'forest';
 
 /** One category's dots along the value axis: the row each one draws, and the range they span. */
 export type ClevelandEntry = {
@@ -48,6 +48,8 @@ export type ClevelandOptions = {
 	config: ClevelandConfigKey;
 	/** Whether the baseline counts as one end of every range, so a lone value is a stem rising from it (`true`), or the range is only what the values span. */
 	fromBaseline?: boolean;
+	/** Whether each dot stands for an interval - its row's `lower` and `upper`, or `error` around it - which its connector spans, instead of the dots of its category. */
+	interval?: boolean;
 	/** What is wrong with the series layout, if anything: the plot warns once and draws anyway. */
 	validate?: (layout: ClevelandLayout) => string | undefined;
 };

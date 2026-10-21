@@ -100,6 +100,14 @@ export class ClevelandConnector {
 		return { ...this.#defaults.arrow, ...own };
 	}
 
+	/** The length (px) of the caps a connector draws at its ends, `undefined` when it draws none, given whether the plot draws them unless told otherwise. */
+	caps(byDefault: boolean | undefined): number | undefined {
+		const { caps } = this.style;
+		const on = caps === undefined ? (byDefault ?? false) : caps !== false;
+		if (!on) return undefined;
+		return (typeof caps === 'object' ? caps.length : undefined) ?? this.#defaults.capLength;
+	}
+
 	/** The label options: `undefined` without a label. */
 	get label(): ConnectorLabel | undefined {
 		const { label } = this.style;

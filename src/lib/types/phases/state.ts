@@ -44,6 +44,10 @@ export type AxisPlotState<
 	width: number;
 	height: number;
 	margins?: MarginConfig;
+	/** The interval a point stands for, on the plots that draw one (`ForestPlot`): its lower and upper end, or the half-width around it, each a field key or a function of the row. */
+	lower?: Accessor<TData, unknown>;
+	upper?: Accessor<TData, unknown>;
+	error?: Accessor<TData, unknown>;
 	/** The plot's `styles`, which `BasePlotLayout` draws its frame from. */
 	styles?: AxisBasedStylesConfig;
 	/** The plot's `styles.values`, which its "markers" phase turns into a value-label `text` marker. */

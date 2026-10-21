@@ -122,7 +122,7 @@ export type EdgeTicksOptions = { enabled: boolean; collision: EdgeTickCollision 
 /**
  * A category axis ordered by what each category holds: `'value'` by its value
  * in one `series` (or, without one, the sum of its values) and `'range'` by the
- * spread between its lowest and its highest value. A category with nothing to
+ * spread between its lowest and its highest value (an interval's ends count, on the plots that have them). A category with nothing to
  * sort by goes last.
  */
 export type CategorySort = {
@@ -131,6 +131,8 @@ export type CategorySort = {
 	series?: string;
 	/** Defaults to `'ascending'`. */
 	order?: 'ascending' | 'descending';
+	/** Sort within each series instead of across all of them: the series stay together, in the order they first appear. */
+	grouped?: boolean;
 };
 
 /**

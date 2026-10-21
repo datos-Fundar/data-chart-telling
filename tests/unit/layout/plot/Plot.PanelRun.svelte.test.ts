@@ -14,6 +14,7 @@ import { buildBoxDefaults } from '$lib/plots/box/defaults';
 import { buildLollipopDefaults } from '$lib/plots/lollipop/defaults';
 import { buildDumbbellDefaults } from '$lib/plots/dumbbell/defaults';
 import { buildClevelandDefaults } from '$lib/plots/cleveland/defaults';
+import { buildForestDefaults } from '$lib/plots/forest/defaults';
 import type { FacetConfig } from '$lib/types/layout/facet';
 
 const [
@@ -27,8 +28,9 @@ const [
 	BoxCore,
 	LollipopCore,
 	DumbbellCore,
-	ClevelandCore
-] = Array(11).fill(GenericCore);
+	ClevelandCore,
+	ForestCore
+] = Array(12).fill(GenericCore);
 
 type Row = { year: number; region: string; sector: string; value: number };
 
@@ -146,6 +148,12 @@ const CASES: Case[] = [
 		Core: ClevelandCore,
 		buildDefaults: buildClevelandDefaults,
 		core: { ...BOX, x: 'year', y: 'value', color: 'sector' }
+	},
+	{
+		name: 'forest',
+		Core: ForestCore,
+		buildDefaults: buildForestDefaults,
+		core: { ...BOX, x: 'sector', y: 'value', color: 'sector', lower: 'value', upper: 'value' }
 	}
 ];
 

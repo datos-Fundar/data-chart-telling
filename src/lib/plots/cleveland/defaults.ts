@@ -1,5 +1,8 @@
 import { ClevelandMarkers } from '$lib/plots/cleveland/ClevelandMarkers';
 import { ClevelandRanges } from '$lib/plots/cleveland/ClevelandRanges';
+import { NiceTicks } from '$lib/layout/scales/NiceTicks';
+import { PlotAxes } from '$lib/phases/data/PlotAxes';
+import type { AxisScale } from '$lib/types/layout/scales';
 import type { AxisPlotDefaults } from '$lib/types/phases';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type {
@@ -7,6 +10,26 @@ import type {
 	ClevelandPlotState,
 	ClevelandPlotCtx
 } from '$lib/types/plots/cleveland/state';
+
+/**
+ * The domain a plot of intervals fits to them on its value axis, niced to as many
+ * ticks as fit the plot. Left out when the author pins the axis, or there is
+ * nothing to fit.
+ */
+function fitInterval<TData extends Record<string, unknown>>(
+	state: ClevelandPlotState<TData>,
+	fromBaseline: boolean
+): Partial<Record<'x' | 'y', Partial<AxisScale<TData>>>> {
+	const axis = PlotAxes.valueOf(state);
+	const scale = state.scales[axis];
+	if (scale?.domain != null || scale?.ticks != null || scale?.nice != null) return {};
+	const { entries } = ClevelandRanges.of(state, fromBaseline, {}, true);
+	if (entries.length === 0) return {};
+	const lo = Math.min(...entries.map((entry) => entry.from));
+	const hi = Math.max(...entries.map((entry) => entry.to));
+	if (!(hi > lo)) return {};
+	return { [axis]: { domain: NiceTicks.fit(state, axis, lo, hi, scale?.niceTolerance) } };
+}
 
 /**
  * ClevelandPlot on the shared pipeline, and the base of its wrappers: per
@@ -35,6 +58,10 @@ export function buildClevelandDefaults<TData extends Record<string, unknown>>(
 			// A stem rises from the baseline, which the value axis then reaches.
 			zero: options.fromBaseline ? ['value'] : [],
 			bandOrder: 'data',
+			// An interval's ends are values the axis must reach, and the dots alone do not say where they are.
+			fit: options.interval
+				? (state) => fitInterval(state, options.fromBaseline ?? false)
+				: undefined,
 			defaults: (_state, ctx) => ({
 				category: {
 					paddingInner: ctx.cfg[options.config].paddingInner,

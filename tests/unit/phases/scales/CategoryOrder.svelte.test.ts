@@ -2,6 +2,7 @@ import { describe, test, expect } from 'vitest';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
 import { Pipeline } from '$lib/phases/Pipeline';
 import { buildClevelandDefaults } from '$lib/plots/cleveland/defaults';
+import { buildForestDefaults } from '$lib/plots/forest/defaults';
 import { buildBarDefaults } from '$lib/plots/bar/defaults';
 import type { AxisPlotDefaults } from '$lib/types/phases';
 import type { CategorySort } from '$lib/types/layout/scales';
@@ -143,5 +144,45 @@ describe('scales.sort by what the categories hold', () => {
 		const orders = Object.values(run.sharedScales ?? {}).map((scales) => scales.x?.domain);
 		expect(orders).toHaveLength(2);
 		for (const order of orders) expect(order).toEqual(['a', 'c', 'b']);
+	});
+});
+
+describe('scales.sort on an interval plot', () => {
+	const forest = buildForestDefaults<Row>();
+	/** Two groups of two rows: widths a 2, b 8 (group x), c 6, d 1 (group y); values a 5, b 3, c 9, d 7. */
+	const intervals = [
+		{ c: 'a', v: 5, lo: 4, hi: 6, g: 'x' },
+		{ c: 'b', v: 3, lo: 0, hi: 8, g: 'x' },
+		{ c: 'c', v: 9, lo: 6, hi: 12, g: 'y' },
+		{ c: 'd', v: 7, lo: 6.5, hi: 7.5, g: 'y' }
+	];
+	const order = (sort: CategorySort) =>
+		domainOf(
+			forest,
+			{
+				data: intervals,
+				x: 'c',
+				y: 'v',
+				lower: 'lo',
+				upper: 'hi',
+				color: 'g',
+				scales: { x: { sort } }
+			},
+			'x'
+		).domain;
+
+	test('by range orders them by the width of their interval', () => {
+		expect(order({ by: 'range' })).toEqual(['d', 'a', 'c', 'b']);
+	});
+
+	test('grouped keeps each series together and orders within it', () => {
+		expect(order({ by: 'range', grouped: true })).toEqual(['a', 'b', 'd', 'c']);
+		expect(order({ by: 'value', order: 'descending' })).toEqual(['c', 'd', 'a', 'b']);
+		expect(order({ by: 'value', order: 'descending', grouped: true })).toEqual([
+			'a',
+			'b',
+			'c',
+			'd'
+		]);
 	});
 });

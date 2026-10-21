@@ -68,6 +68,8 @@ const preview: Preview = {
 						['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
 						'DumbbellPlot',
 						['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+						'ForestPlot',
+						['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
 						'GeoPlot',
 						[
 							'Series',

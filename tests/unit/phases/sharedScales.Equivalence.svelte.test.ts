@@ -17,6 +17,7 @@ import { buildBoxDefaults } from '$lib/plots/box/defaults';
 import { buildLollipopDefaults } from '$lib/plots/lollipop/defaults';
 import { buildDumbbellDefaults } from '$lib/plots/dumbbell/defaults';
 import { buildClevelandDefaults } from '$lib/plots/cleveland/defaults';
+import { buildForestDefaults } from '$lib/plots/forest/defaults';
 import type { AxisPipelineProps } from '$lib/phases/Pipeline';
 import type { SharedAxisValues } from '$lib/types/phases';
 import type { FacetConfig } from '$lib/types/layout/facet';
@@ -98,6 +99,11 @@ const CASES: Case[] = [
 		name: 'cleveland',
 		kind: buildClevelandDefaults<Row>(),
 		props: { x: 'anio', y: 'valor', color: 'sector' }
+	},
+	{
+		name: 'forest',
+		kind: buildForestDefaults<Row>(),
+		props: { x: 'sector', y: 'valor', color: 'sector', lower: 'valor', upper: 'valor' }
 	}
 ];
 

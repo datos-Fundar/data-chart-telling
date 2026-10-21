@@ -1,6 +1,7 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { isGapValue } from '$lib/plots/utils/gaps';
+import { rowInterval } from '$lib/plots/utils/rowInterval';
 import type { ProcessedData, ProcessedRow } from '$lib/types/phases';
 import type {
 	ClevelandPlotState,
@@ -33,7 +34,8 @@ export class ClevelandRanges {
 	static of<TData extends Record<string, unknown>>(
 		state: ClevelandPlotState<TData>,
 		fromBaseline: boolean,
-		ends: { from?: string; to?: string } = {}
+		ends: { from?: string; to?: string } = {},
+		interval = false
 	): ClevelandRanges {
 		const valueAxis = PlotAxes.valueOf(state) as 'x' | 'y';
 		const categoryAxis = PlotAxes.categoryOf(state) as 'x' | 'y';
@@ -67,8 +69,10 @@ export class ClevelandRanges {
 						seriesOf.set(key, new Set());
 					}
 					entry.dots.push({ row, value, series: group.series.name });
-					entry.from = Math.min(entry.from, value);
-					entry.to = Math.max(entry.to, value);
+					// A dot that stands for an interval spans it; else only its own value.
+					const [low, high] = interval ? rowInterval(state, row, value) : [value, value];
+					entry.from = Math.min(entry.from, low);
+					entry.to = Math.max(entry.to, high);
 					seriesOf.get(key)!.add(group.series.name);
 				}
 			}
@@ -91,6 +95,14 @@ export class ClevelandRanges {
 				last === undefined || first === undefined
 					? undefined
 					: [Math.min(first, last), Math.max(first, last)];
+		}
+		if (interval) {
+			// What an interval says is its own width, from its lower end to its upper.
+			for (const entry of byCategory.values()) {
+				entry.difference = entry.to - entry.from;
+				entry.change = [entry.from, entry.to];
+				entry.span = [entry.from, entry.to];
+			}
 		}
 		const maxSeriesPerCategory = Math.max(0, ...[...seriesOf.values()].map((s) => s.size));
 		return new ClevelandRanges([...byCategory.values()], {

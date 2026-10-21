@@ -12,6 +12,7 @@ import BoxPlot from '$lib/plots/box/Plot.svelte';
 import LollipopPlot from '$lib/plots/lollipop/Plot.svelte';
 import DumbbellPlot from '$lib/plots/dumbbell/Plot.svelte';
 import ClevelandPlot from '$lib/plots/cleveland/Plot.svelte';
+import ForestPlot from '$lib/plots/forest/Plot.svelte';
 import { waitForSvg } from './_helpers/svg';
 
 /**
@@ -130,6 +131,14 @@ const KINDS: Kind[] = [
 	{
 		name: 'ClevelandPlot',
 		Plot: ClevelandPlot,
+		props: { data: CATEGORIES, x: 'x', y: 'y' },
+		numericX: false,
+		plotStatistics: true,
+		stackable: false
+	},
+	{
+		name: 'ForestPlot',
+		Plot: ForestPlot,
 		props: { data: CATEGORIES, x: 'x', y: 'y' },
 		numericX: false,
 		plotStatistics: true,

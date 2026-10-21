@@ -8,6 +8,7 @@ import type {
 	ClevelandPlotState,
 	ClevelandPlotCtx,
 	ClevelandOptions,
+	ClevelandEntry,
 	ClevelandRole
 } from '$lib/types/plots/cleveland/state';
 import type {
@@ -15,7 +16,8 @@ import type {
 	ArrowMarkerConfig,
 	DotMarkerConfig,
 	RuleMarkerConfig,
-	TextMarkerConfig
+	TextMarkerConfig,
+	TickMarkerConfig
 } from '$lib/types/markers/common';
 import type { ProcessedRow } from '$lib/types/phases';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
@@ -62,7 +64,8 @@ export class ClevelandMarkers {
 		const ranges = ClevelandRanges.of(
 			state,
 			this.#options.fromBaseline ?? false,
-			ClevelandConnector.ends(state)
+			ClevelandConnector.ends(state),
+			this.#options.interval ?? false
 		);
 		this.#validate(ranges);
 
@@ -192,6 +195,11 @@ export class ClevelandMarkers {
 			];
 		});
 
+		// Caps: a tick across each end of a connector, in its look - one marker per look, which a marker takes once for all its ticks.
+		const capLength = connector.caps(style.caps);
+		const caps =
+			capLength === undefined ? [] : this.#caps(ranges.entries, looks, capLength, isHorizontal);
+
 		const { category, value } = ClevelandMarkers.#channels(state);
 		// A number is a literal pixel radius; a field or function sizes each dot by its row.
 		const r = size === undefined || typeof size === 'number' ? size : size.accessor;
@@ -222,11 +230,48 @@ export class ClevelandMarkers {
 		}) as DotMarkerConfig[];
 		return [
 			...rules,
+			...caps,
 			...arrows,
 			...dots,
 			...this.#connectorLabels(state, ctx, connector, looks, isHorizontal)
 		];
 	};
+
+	/** The caps of the connectors: a tick at each end of those that have a length, one marker per stroke look. */
+	#caps(
+		entries: readonly ClevelandEntry[],
+		looks: { row: Record<string, unknown> }[],
+		length: number,
+		isHorizontal: boolean
+	): TickMarkerConfig[] {
+		const byLook = new Map<
+			string,
+			{ look: Record<string, unknown>; rows: Record<string, unknown>[] }
+		>();
+		entries.forEach((entry, index) => {
+			if (!(entry.to > entry.from)) return;
+			const look = looks[index].row;
+			const key = [look.stroke, look.strokeWidth, look.strokeOpacity].join('|');
+			const group = byLook.get(key) ?? { look, rows: [] };
+			group.rows.push(
+				{ category: entry.category, end: entry.from },
+				{ category: entry.category, end: entry.to }
+			);
+			byLook.set(key, group);
+		});
+		return [...byLook.values()].map(({ look, rows }) => ({
+			type: 'tick',
+			legend: false,
+			data: rows,
+			...(isHorizontal ? { x: 'end', y: 'category' } : { x: 'category', y: 'end' }),
+			tickLength: length,
+			styles: {
+				stroke: look.stroke as string,
+				strokeWidth: look.strokeWidth as number,
+				strokeOpacity: look.strokeOpacity as number
+			}
+		}));
+	}
 
 	/** The label on each connector, when `styles.connector.label` asks for one: written at its middle, beside it or on it. */
 	#connectorLabels<TData extends Record<string, unknown>>(
@@ -388,7 +433,12 @@ export class ClevelandMarkers {
 			state.processedData!,
 			PlotAxes.valueOf(state) as 'x' | 'y'
 		);
-		const ranges = ClevelandRanges.of(state, this.#options.fromBaseline ?? false);
+		const ranges = ClevelandRanges.of(
+			state,
+			this.#options.fromBaseline ?? false,
+			{},
+			this.#options.interval ?? false
+		);
 		const keyOf = (category: unknown, series: string) => `${String(category)}\u0000${series}`;
 		const chosen = new Set(
 			(state.labelled ?? []).map((row) =>
