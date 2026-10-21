@@ -92,3 +92,17 @@ export const OutsideStyled: Story = {
 		} satisfies ConnectorBasedStylesConfig
 	}
 };
+
+/** With four censuses, the arrow goes between the two `from` and `to` name - here from 2001 to 2022 - and the line runs on to the other dots. */
+export const ArrowBetweenTwoCensuses: Story = {
+	args: {
+		styles: {
+			connector: {
+				arrow: true,
+				from: '2001',
+				to: '2022',
+				color: { by: 'sign', positive: '#16a34a', negative: '#dc2626' }
+			}
+		} satisfies ConnectorBasedStylesConfig
+	}
+};

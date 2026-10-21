@@ -109,3 +109,29 @@ export const BandWithLabel: Story = {
 		} satisfies ConnectorBasedStylesConfig
 	}
 };
+
+/** `arrow: true` draws each connector as an arrow from the first census to the last: it points the way the share moved, and the sign colors it. */
+export const Arrows: Story = {
+	args: {
+		styles: {
+			connector: {
+				arrow: true,
+				color: { by: 'sign', positive: '#16a34a', negative: '#dc2626' },
+				label: { format: (value: number) => `${value > 0 ? '+' : ''}${value.toFixed(1)} pts` }
+			}
+		} satisfies ConnectorBasedStylesConfig
+	}
+};
+
+/** The arrow is as thick as `width` says - thinner than a band by default - and `arrow` takes the head's `headLength` and `headAngle`. */
+export const BoldArrows: Story = {
+	args: {
+		styles: {
+			connector: {
+				arrow: { headLength: 12, headAngle: 45 },
+				width: 3,
+				color: '#334155'
+			}
+		} satisfies ConnectorBasedStylesConfig
+	}
+};

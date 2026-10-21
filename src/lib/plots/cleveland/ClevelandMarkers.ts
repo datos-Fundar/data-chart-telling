@@ -12,6 +12,7 @@ import type {
 } from '$lib/types/plots/cleveland/state';
 import type {
 	AxisBasedMarkersConfig,
+	ArrowMarkerConfig,
 	DotMarkerConfig,
 	RuleMarkerConfig,
 	TextMarkerConfig
@@ -108,6 +109,20 @@ export class ClevelandMarkers {
 				strokeOpacity:
 					disabled?.strokeOpacity ?? stem?.strokeOpacity ?? connector.opacity(range) ?? 1
 			};
+			// ...as an arrow from one dot to the other, when the connector asks for one...
+			const arrow = connector.arrow;
+			const way =
+				arrow && entry.change && entry.change[0] !== entry.change[1] ? entry.change : undefined;
+			const drawn = way
+				? {
+						category,
+						start: way[0],
+						end: way[1],
+						stroke: span.stroke,
+						strokeWidth: connector.width(range, dotRadius) ?? arrow!.width,
+						strokeOpacity: span.strokeOpacity
+					}
+				: undefined;
 			// ...and what runs on past either end of it, to the other series' dots.
 			const outside = connector.outside(neutral);
 			const beyond = [
@@ -126,7 +141,9 @@ export class ClevelandMarkers {
 			return {
 				range,
 				row: span,
-				rows: [span, ...beyond],
+				// A stretch drawn as an arrow is not one of the lines.
+				rows: drawn ? beyond : [span, ...beyond],
+				arrow: drawn,
 				dash: disabled?.strokeDasharray ?? stem?.strokeDasharray
 			};
 		});
@@ -148,6 +165,32 @@ export class ClevelandMarkers {
 				...(dash ? { styles: { strokeDasharray: dash } } : {})
 			})
 		);
+
+		// The arrows, one marker per dash pattern like the lines, each from its `from` dot to its `to` dot.
+		const head = connector.arrow;
+		const arrows = [...byDash].flatMap(([dash, group]): ArrowMarkerConfig[] => {
+			const rows = group.flatMap((look) => (look.arrow ? [look.arrow] : []));
+			if (rows.length === 0 || !head) return [];
+			return [
+				{
+					type: 'arrow',
+					legend: false,
+					data: rows,
+					...(isHorizontal
+						? { x1: 'start', x2: 'end', y1: 'category', y2: 'category' }
+						: { y1: 'start', y2: 'end', x1: 'category', x2: 'category' }),
+					headLength: head.headLength,
+					headAngle: head.headAngle,
+					// The shaft starts and ends at the edge of its dots, not under them.
+					insetStart: dotRadius,
+					insetEnd: dotRadius,
+					stroke: 'stroke',
+					strokeWidth: 'strokeWidth',
+					strokeOpacity: 'strokeOpacity',
+					...(dash ? { styles: { strokeDasharray: dash } } : {})
+				}
+			];
+		});
 
 		const { category, value } = ClevelandMarkers.#channels(state);
 		// A number is a literal pixel radius; a field or function sizes each dot by its row.
@@ -179,6 +222,7 @@ export class ClevelandMarkers {
 		}) as DotMarkerConfig[];
 		return [
 			...rules,
+			...arrows,
 			...dots,
 			...this.#connectorLabels(state, ctx, connector, looks, isHorizontal)
 		];

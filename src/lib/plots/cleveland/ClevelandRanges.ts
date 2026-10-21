@@ -60,7 +60,8 @@ export class ClevelandRanges {
 							from: ends,
 							to: ends,
 							difference: undefined,
-							span: undefined
+							span: undefined,
+							change: undefined
 						};
 						byCategory.set(key, entry);
 						seriesOf.set(key, new Set());
@@ -85,6 +86,7 @@ export class ClevelandRanges {
 			const last = at(ends.to ?? 'last');
 			const first = fromBaseline ? baseline : at(ends.from ?? 'first');
 			entry.difference = last === undefined || first === undefined ? undefined : last - first;
+			entry.change = last === undefined || first === undefined ? undefined : [first, last];
 			entry.span =
 				last === undefined || first === undefined
 					? undefined

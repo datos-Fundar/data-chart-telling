@@ -7,7 +7,8 @@ import { buildClevelandDefaults } from '$lib/plots/cleveland/defaults';
 import type {
 	DotMarkerConfig,
 	RuleMarkerConfig,
-	TextMarkerConfig
+	TextMarkerConfig,
+	ArrowMarkerConfig
 } from '$lib/types/markers/common';
 
 type Row = Record<string, unknown>;
@@ -22,7 +23,8 @@ function marksOf(props: Row, legend: LegendState | null = null) {
 	return {
 		rules: markers.filter((m): m is RuleMarkerConfig => m.type === 'rule'),
 		dots: markers.filter((m): m is DotMarkerConfig => m.type === 'dot'),
-		texts: markers.filter((m): m is TextMarkerConfig => m.type === 'text')
+		texts: markers.filter((m): m is TextMarkerConfig => m.type === 'text'),
+		arrows: markers.filter((m): m is ArrowMarkerConfig => m.type === 'arrow')
 	};
 }
 
@@ -379,6 +381,56 @@ describe('ClevelandPlot markers', () => {
 		test('opacity applies to the connectors, a stem keeps its own segment style', () => {
 			expect(withConnector({ opacity: 0.4 }).a.strokeOpacity).toBe(0.4);
 			expect(connectors({ data: rows, x: 'c', y: 'v', color: 'g' }).a.strokeOpacity).toBe(1);
+		});
+
+		test('arrow draws the from-to stretch as an arrow pointing the way the value moved, the rest as lines', () => {
+			const { rules, arrows } = marksOf({
+				data: rows,
+				x: 'c',
+				y: 'v',
+				color: 'g',
+				styles: { connector: { arrow: true, from: 'lo', to: 'mid' } }
+			});
+			expect(arrows).toHaveLength(1);
+			const [{ data, headLength, headAngle, insetStart, insetEnd }] = arrows;
+			// `a`: lo 1 to mid 5 - the arrow - and 5-9 beyond it, a line; `b` has no mid, so no arrow.
+			expect(data).toEqual([
+				expect.objectContaining({
+					category: 'a',
+					start: 1,
+					end: 5,
+					strokeWidth: DEFAULT_CONFIG.connector.arrow.width
+				})
+			]);
+			expect(headLength).toBe(DEFAULT_CONFIG.connector.arrow.headLength);
+			expect(headAngle).toBe(DEFAULT_CONFIG.connector.arrow.headAngle);
+			// The shaft stops at the edge of the dots.
+			expect([insetStart, insetEnd]).toEqual([
+				DEFAULT_CONFIG.cleveland.dotRadius,
+				DEFAULT_CONFIG.cleveland.dotRadius
+			]);
+			const lines = (rules.flatMap((r) => r.data) as Row[]).filter((r) => r.category === 'a');
+			expect(lines.map((r) => [r.from, r.to])).toEqual([[5, 9]]);
+		});
+
+		test('an arrow follows the direction of the change, and takes the head and width it is given', () => {
+			const falling = [
+				{ c: 'a', v: 9, g: 'lo' },
+				{ c: 'a', v: 1, g: 'hi' }
+			];
+			const { arrows, rules } = marksOf({
+				data: falling,
+				x: 'c',
+				y: 'v',
+				color: 'g',
+				styles: { connector: { arrow: { headLength: 12, headAngle: 40 }, width: 3 } }
+			});
+			expect(arrows[0].data).toEqual([
+				expect.objectContaining({ start: 9, end: 1, strokeWidth: 3 })
+			]);
+			expect([arrows[0].headLength, arrows[0].headAngle]).toEqual([12, 40]);
+			// The whole connector is the arrow: no line is left.
+			expect(rules.flatMap((r) => r.data)).toHaveLength(0);
 		});
 
 		test('a label is one text marker, on the middle of each connector that has a difference (`c` has one dot, so none)', () => {

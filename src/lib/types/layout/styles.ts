@@ -154,6 +154,13 @@ export type ConnectorStyle = {
 	 * connector color at a lower opacity. The stretch between the two keeps `color` and `opacity`.
 	 */
 	outside?: string | { color?: string; opacity?: number };
+	/**
+	 * Draws the stretch between `from` and `to` as an arrow pointing at the `to` dot - the way
+	 * the value moved - instead of a line. `true` takes the configuration's head, or give its
+	 * `headLength` (px) and `headAngle` (degrees). An arrow is as thick as `width` says, else
+	 * the configuration's `connector.arrow.width`: thinner than a band.
+	 */
+	arrow?: boolean | { headLength?: number; headAngle?: number };
 	/** A label on each connector, centered on the stretch between `from` and `to`: `true` for the difference with its defaults, or its options. */
 	label?: boolean | ConnectorLabel;
 };

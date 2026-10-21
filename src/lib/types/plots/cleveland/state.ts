@@ -25,6 +25,8 @@ export type ClevelandEntry = {
 	difference: number | undefined;
 	/** The stretch between the `from` series' dot and the `to` series' - lowest value first - `undefined` when either has none. With a baseline, the whole range. */
 	span: [number, number] | undefined;
+	/** Where the difference goes, from the `from` end to the `to` end - not sorted: an arrow's way. `undefined` when either end has no value. */
+	change: [number, number] | undefined;
 };
 
 /** Where a dot sits in its category's range: at the top end, at the bottom end, or between them. */

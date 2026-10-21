@@ -92,6 +92,14 @@ export class ClevelandConnector {
 		};
 	}
 
+	/** The head of the arrow a connector is drawn as, `undefined` when it is a line. */
+	get arrow(): { width: number; headLength: number; headAngle: number } | undefined {
+		const { arrow } = this.style;
+		if (!arrow) return undefined;
+		const own = arrow === true ? {} : arrow;
+		return { ...this.#defaults.arrow, ...own };
+	}
+
 	/** The label options: `undefined` without a label. */
 	get label(): ConnectorLabel | undefined {
 		const { label } = this.style;

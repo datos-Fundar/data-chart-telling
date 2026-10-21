@@ -294,6 +294,8 @@ export type PlotStylesConfig = {
 		differenceScheme: string[];
 		/** Opacity (0-1) of the part of a connector outside the stretch between its `from` and `to` dots. */
 		outsideOpacity: number;
+		/** A connector drawn as an arrow (`styles.connector.arrow`): its thickness, and the length (px) and angle (degrees) of its head. */
+		arrow: { width: number; headLength: number; headAngle: number };
 		/** Font size of a connector's label, in px. */
 		labelFontSize: number;
 		/** Gap, in px, between a connector and its label when it is written beside it. */

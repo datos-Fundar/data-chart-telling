@@ -59,4 +59,21 @@ describe('DumbbellPlot', () => {
 		);
 		warn.mockRestore();
 	});
+
+	test('connector.arrow draws an arrow per category instead of the line', async () => {
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+		const { container } = render(DumbbellPlot, {
+			width: 400,
+			height: 300,
+			data: rows,
+			x: 'c',
+			y: 'v',
+			color: 'g',
+			styles: { connector: { arrow: true } }
+		});
+		const svg = await waitForSvg(container);
+		expect(svg.querySelectorAll('g.arrow path')).toHaveLength(2);
+		expect(connectors(svg)).toHaveLength(0);
+		warn.mockRestore();
+	});
 });

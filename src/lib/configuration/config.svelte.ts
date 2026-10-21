@@ -207,6 +207,7 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		sign: { positive: '#1b9e77', negative: '#d95f02', zero: '#9ca3af' },
 		lengthScheme: ['#d1d5db', '#374151'],
 		differenceScheme: ['#d95f02', '#e5e7eb', '#1b9e77'],
+		arrow: { width: 2, headLength: 8, headAngle: 60 },
 		outsideOpacity: 0.4,
 		labelFontSize: 11,
 		labelGap: 4
