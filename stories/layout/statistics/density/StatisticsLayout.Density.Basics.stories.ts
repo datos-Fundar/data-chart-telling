@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import AreaPlot from '$lib/plots/area/Plot.svelte';
-import { COUNTRIES } from '../../../plots/scatter/data';
+import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
+import { COUNTRIES } from '../../../plots/correlation/scatter/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `statistics: [{ type: 'density' }]` is a 1D kernel density over the plot's

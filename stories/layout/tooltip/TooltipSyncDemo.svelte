@@ -10,10 +10,10 @@
 </script>
 
 <script lang="ts">
-	import LinePlot from '$lib/plots/line/Plot.svelte';
-	import BarPlot from '$lib/plots/bar/Plot.svelte';
-	import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-	import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+	import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
+	import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 	import type { HoverStrategy } from '$lib/types/layout/hover';
 	import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
 	import type { HeatCell } from '../../data/heat-cells';

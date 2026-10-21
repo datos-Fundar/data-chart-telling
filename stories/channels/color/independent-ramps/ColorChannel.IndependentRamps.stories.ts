@@ -1,12 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import { renderSource } from '../../../common/docsSource';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import type { DotMarkerConfig } from '$lib/types/markers/basic';
-import { WORLD_COUNTRIES, WEATHER_STATIONS, type WorldCountryProps } from '../../../plots/geo/data';
-import { COUNTRIES } from '../../../plots/scatter/data';
-import { countryPopulation, countryGdp } from '../../../plots/geo/channels';
+import {
+	WORLD_COUNTRIES,
+	WEATHER_STATIONS,
+	type WorldCountryProps
+} from '../../../plots/map/geo/data';
+import { COUNTRIES } from '../../../plots/correlation/scatter/data';
+import { countryPopulation, countryGdp } from '../../../plots/map/geo/channels';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // This package resolves its own color ramp per consumer instead of routing

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import PlotComposer from '$lib/layout/composer/PlotComposer.svelte';
-	import LinePlot from '$lib/plots/line/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 	import { TIME_SERIES } from '../../data/time-series';
 	import type { LegendSection } from '$lib/types/layout/legend';
 

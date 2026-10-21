@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest';
 import { SharedScalesPhase } from '$lib/phases/sharedScales/SharedScalesPhase';
 import { buildFacetKeyOf, buildFacetPanels, buildFacetPlaceKey } from '$lib/layout/facet/config';
 import { PANEL_KEY } from '$lib/phases/facet/FacetPanels';
-import { buildLineDefaults } from '$lib/plots/line/defaults';
+import { buildLineDefaults } from '$lib/plots/evolution/line/defaults';
 import type { FacetConfig } from '$lib/types/layout/facet';
 import type { SharedAxisValues } from '$lib/types/phases';
 

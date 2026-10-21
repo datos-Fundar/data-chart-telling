@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import LinePlot from '$lib/plots/line/Plot.svelte';
-	import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+	import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 	import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 	import { THEMES, type ThemeName } from '$lib/configuration/themes';
 	import { TIME_SERIES, type SeriesPoint } from '../../../data/time-series';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
+	import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 	import { HEAT_CELLS } from '../../../data/heat-cells';
 </script>
 

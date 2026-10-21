@@ -1,18 +1,18 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import type { Component } from 'svelte';
-import BarPlot from '$lib/plots/bar/Plot.svelte';
-import LinePlot from '$lib/plots/line/Plot.svelte';
-import AreaPlot from '$lib/plots/area/Plot.svelte';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-import HistogramPlot from '$lib/plots/histogram/Plot.svelte';
-import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-import BoxPlot from '$lib/plots/box/Plot.svelte';
-import LollipopPlot from '$lib/plots/lollipop/Plot.svelte';
-import DumbbellPlot from '$lib/plots/dumbbell/Plot.svelte';
-import ClevelandPlot from '$lib/plots/cleveland/Plot.svelte';
-import ForestPlot from '$lib/plots/forest/Plot.svelte';
+import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
+import HistogramPlot from '$lib/plots/distribution/histogram/Plot.svelte';
+import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
+import BoxPlot from '$lib/plots/distribution/box/Plot.svelte';
+import LollipopPlot from '$lib/plots/ranking/lollipop/Plot.svelte';
+import DumbbellPlot from '$lib/plots/ranking/dumbbell/Plot.svelte';
+import ClevelandPlot from '$lib/plots/ranking/cleveland/Plot.svelte';
+import ForestPlot from '$lib/plots/ranking/forest/Plot.svelte';
 import { waitForSvg } from './_helpers/svg';
 
 /**

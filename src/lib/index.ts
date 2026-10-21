@@ -1,19 +1,19 @@
 // ── Plots ───────────────────────────────────────────────────────────────────
 // One mark family each, with optional chrome (title, legend, caption),
 // timeline and facets around it.
-export { default as AreaPlot } from './plots/area/Plot.svelte';
-export { default as BarPlot } from './plots/bar/Plot.svelte';
-export { default as BoxPlot } from './plots/box/Plot.svelte';
-export { default as ClevelandPlot } from './plots/cleveland/Plot.svelte';
-export { default as DumbbellPlot } from './plots/dumbbell/Plot.svelte';
-export { default as ForestPlot } from './plots/forest/Plot.svelte';
-export { default as GeoPlot } from './plots/geo/Plot.svelte';
-export { default as HeatmapPlot } from './plots/heatmap/Plot.svelte';
-export { default as HistogramPlot } from './plots/histogram/Plot.svelte';
-export { default as LinePlot } from './plots/line/Plot.svelte';
-export { default as LollipopPlot } from './plots/lollipop/Plot.svelte';
-export { default as PyramidPlot } from './plots/pyramid/Plot.svelte';
-export { default as ScatterPlot } from './plots/scatter/Plot.svelte';
+export { default as AreaPlot } from './plots/evolution/area/Plot.svelte';
+export { default as BarPlot } from './plots/ranking/bar/Plot.svelte';
+export { default as BoxPlot } from './plots/distribution/box/Plot.svelte';
+export { default as ClevelandPlot } from './plots/ranking/cleveland/Plot.svelte';
+export { default as DumbbellPlot } from './plots/ranking/dumbbell/Plot.svelte';
+export { default as ForestPlot } from './plots/ranking/forest/Plot.svelte';
+export { default as GeoPlot } from './plots/map/geo/Plot.svelte';
+export { default as HeatmapPlot } from './plots/correlation/heatmap/Plot.svelte';
+export { default as HistogramPlot } from './plots/distribution/histogram/Plot.svelte';
+export { default as LinePlot } from './plots/evolution/line/Plot.svelte';
+export { default as LollipopPlot } from './plots/ranking/lollipop/Plot.svelte';
+export { default as PyramidPlot } from './plots/distribution/pyramid/Plot.svelte';
+export { default as ScatterPlot } from './plots/correlation/scatter/Plot.svelte';
 
 // ── Composition ─────────────────────────────────────────────────────────────
 // Separate plots combined into one figure, with chrome of its own.

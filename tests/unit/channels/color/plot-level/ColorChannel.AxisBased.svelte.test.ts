@@ -1,11 +1,11 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
-import BarPlot from '$lib/plots/bar/Plot.svelte';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-import LinePlot from '$lib/plots/line/Plot.svelte';
-import { LIFE_EXPECTANCY_BY_PROVINCE } from '../../../../../stories/plots/bar/data';
-import { COUNTRIES } from '../../../../../stories/plots/scatter/data';
-import { LIFE_EXPECTANCY } from '../../../../../stories/plots/line/data';
+import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+import { LIFE_EXPECTANCY_BY_PROVINCE } from '../../../../../stories/plots/ranking/bar/data';
+import { COUNTRIES } from '../../../../../stories/plots/correlation/scatter/data';
+import { LIFE_EXPECTANCY } from '../../../../../stories/plots/evolution/line/data';
 import { waitForSvg } from '../../../plots/_helpers/svg';
 
 // Plots using categorical color channels (discrete series grouping) can be

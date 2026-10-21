@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import AreaPlot from '$lib/plots/area/Plot.svelte';
+import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
 import { MEASUREMENTS } from '../../data/measurements';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────

@@ -7,9 +7,9 @@ import {
 	CABA_COMUNAS,
 	AMBA_PARTIDOS,
 	type ArgentinaProvinceProps
-} from '../../plots/geo/data';
+} from '../../plots/map/geo/data';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
-import GeoPlot from '$lib/plots/geo/Plot.svelte';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // An `inset` marker - a small, independently-projected map panel anchored

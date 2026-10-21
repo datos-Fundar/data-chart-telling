@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import BarPlot from '$lib/plots/bar/Plot.svelte';
+import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import AutoRotateDemo from './AutoRotateDemo.svelte';
 import AutoRotateDemoSource from './AutoRotateDemo.svelte?raw';

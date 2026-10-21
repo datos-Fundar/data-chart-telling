@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import LinePlot from '$lib/plots/line/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 	import { resetConfiguration, setConfiguration } from '$lib/configuration/config.svelte';
 	import { TIME_SERIES } from '../../data/time-series';
 

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import ComposerDemo from './ComposerDemo.svelte';
 import ComposerDemoSource from './ComposerDemo.svelte?raw';
 import { demoSource } from '../../../common/docsSource';
-import { FEMALE_LIFE_EXPECTANCY } from '../../../plots/line/data';
+import { FEMALE_LIFE_EXPECTANCY } from '../../../plots/evolution/line/data';
 import { AUTOMATIC_ARGS, LEGEND_ARG_TYPES } from './common';
 
 /**

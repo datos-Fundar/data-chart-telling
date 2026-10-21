@@ -3,10 +3,10 @@ import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
 import { Pipeline } from '$lib/phases/Pipeline';
 import { GAP_KIND, GAP_VALUE } from '$lib/phases/transforms/TransformsPhase';
 import { resolveAccessor } from '$lib/utils/accessors';
-import { buildBarDefaults } from '$lib/plots/bar/defaults';
-import { buildLineDefaults } from '$lib/plots/line/defaults';
-import { buildPyramidDefaults } from '$lib/plots/pyramid/defaults';
-import { buildClevelandDefaults } from '$lib/plots/cleveland/defaults';
+import { buildBarDefaults } from '$lib/plots/ranking/bar/defaults';
+import { buildLineDefaults } from '$lib/plots/evolution/line/defaults';
+import { buildPyramidDefaults } from '$lib/plots/distribution/pyramid/defaults';
+import { buildClevelandDefaults } from '$lib/plots/ranking/cleveland/defaults';
 import type { AxisPlotDefaults, ProcessedData, ProcessedRow } from '$lib/types/phases';
 import type { ValueSelect } from '$lib/types/layout/styles';
 

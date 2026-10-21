@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import BarPlot from '$lib/plots/bar/Plot.svelte';
+import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import { TIME_SERIES } from '../../data/time-series';
 import { CAR_SPECS } from '../../data/car-specs';
 

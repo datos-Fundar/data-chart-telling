@@ -1,6 +1,6 @@
 <script lang="ts">
-	import BarPlot from '$lib/plots/bar/Plot.svelte';
-	import { LIFE_EXPECTANCY } from '../../../plots/line/data';
+	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+	import { LIFE_EXPECTANCY } from '../../../plots/evolution/line/data';
 </script>
 
 <!-- A bar plot's series show as a swatch. -->

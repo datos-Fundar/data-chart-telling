@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import BarPlot from '$lib/plots/bar/Plot.svelte';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import { PROVINCE_BARS, PROVINCE_LINES } from '../../data/facet-groups';
 
 /**

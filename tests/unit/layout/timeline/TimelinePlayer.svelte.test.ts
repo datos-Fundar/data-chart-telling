@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import TimelinePlayer from '$lib/layout/timeline/TimelinePlayer.svelte';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import { TimelineState } from '$lib/layout/timeline/TimelineState.svelte';
 import type { PlayerControl } from '$lib/types/layout/timeline';
 

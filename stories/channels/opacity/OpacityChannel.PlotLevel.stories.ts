@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-import GeoPlot from '$lib/plots/geo/Plot.svelte';
+import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import { renderSource } from '../../common/docsSource';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from '../../plots/heatmap/data';
-import { WORLD_COUNTRIES, WEATHER_STATIONS } from '../../plots/geo/data';
+import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from '../../plots/correlation/heatmap/data';
+import { WORLD_COUNTRIES, WEATHER_STATIONS } from '../../plots/map/geo/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `opacity` channel: a plot-level `opacity` accessor plus `scales.opacity`

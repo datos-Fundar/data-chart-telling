@@ -6,7 +6,7 @@ import type {
 import { pointsToFitFeature } from './fit';
 
 // Representative extremity points - not real border geometry (which stays
-// out of `src/lib`, see stories/plots/geo/data.ts), just enough for
+// out of `src/lib`, see stories/plots/map/geo/data.ts), just enough for
 // `fitSize` to frame Argentina's full territorial claim sensibly. These are
 // plain real-world coordinates, not derived from any particular dataset, so
 // they work the same way regardless of which Argentina GeoJSON actually

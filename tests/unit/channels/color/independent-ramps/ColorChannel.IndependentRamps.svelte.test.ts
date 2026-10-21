@@ -1,20 +1,20 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
-import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import { resolveColorScale } from '$lib/utils/color';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import type { DotMarkerConfig } from '$lib/types/markers/basic';
 import type {
 	ArgentinaProvinceProps,
 	WorldCountryProps
-} from '../../../../../stories/plots/geo/data';
+} from '../../../../../stories/plots/map/geo/data';
 import {
 	ARGENTINA_PROVINCES,
 	WORLD_COUNTRIES,
 	WEATHER_STATIONS
-} from '../../../../../stories/plots/geo/data';
-import { COUNTRIES } from '../../../../../stories/plots/scatter/data';
+} from '../../../../../stories/plots/map/geo/data';
+import { COUNTRIES } from '../../../../../stories/plots/correlation/scatter/data';
 import { waitForSvg, countGeoPaths, countDotMarks } from '../../../plots/_helpers/svg';
 
 function fillsOf(svg: SVGElement, selector: string): string[] {

@@ -1,6 +1,6 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { LegendSection } from '$lib/types/layout/legend';
 
 const DATA = [2000, 2005, 2010].map((year, i) => ({ year, value: 10 + i }));

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-import { COUNTRIES } from '../../plots/scatter/data';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import { COUNTRIES } from '../../plots/correlation/scatter/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `r` sizes every dot by a per-row value - see `Plots/ScatterPlot/Bubble` for

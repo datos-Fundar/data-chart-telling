@@ -1,10 +1,10 @@
 <script lang="ts">
-	import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-	import GeoPlot from '$lib/plots/geo/Plot.svelte';
+	import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
+	import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 	import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 	import { HEAT_CELLS } from '../../../data/heat-cells';
-	import { ARGENTINA_PROVINCES } from '../../../plots/geo/data';
-	import { provincePopulation } from '../../../plots/geo/channels';
+	import { ARGENTINA_PROVINCES } from '../../../plots/map/geo/data';
+	import { provincePopulation } from '../../../plots/map/geo/channels';
 </script>
 
 <!--

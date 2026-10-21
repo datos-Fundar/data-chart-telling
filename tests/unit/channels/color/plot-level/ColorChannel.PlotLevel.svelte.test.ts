@@ -1,10 +1,10 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
-import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import type { ArgentinaProvinceProps } from '../../../../../stories/plots/geo/data';
-import { ARGENTINA_PROVINCES } from '../../../../../stories/plots/geo/data';
-import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from '../../../../../stories/plots/heatmap/data';
+import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
+import type { ArgentinaProvinceProps } from '../../../../../stories/plots/map/geo/data';
+import { ARGENTINA_PROVINCES } from '../../../../../stories/plots/map/geo/data';
+import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from '../../../../../stories/plots/correlation/heatmap/data';
 import { waitForSvg, countCells, countGeoPaths } from '../../../plots/_helpers/svg';
 
 function fillsOf(svg: SVGElement, selector: string): string[] {

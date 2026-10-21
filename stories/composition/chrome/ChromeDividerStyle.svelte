@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import LinePlot from '$lib/plots/line/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 	import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 	import { TIME_SERIES } from '../../data/time-series';
 	import type { PlotStylesConfigInput } from '$lib/types/configuration/styling';

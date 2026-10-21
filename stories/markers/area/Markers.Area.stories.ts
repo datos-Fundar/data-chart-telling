@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { FEMALE_LIFE_EXPECTANCY, MALE_LIFE_EXPECTANCY } from '../../plots/line/data';
+import { FEMALE_LIFE_EXPECTANCY, MALE_LIFE_EXPECTANCY } from '../../plots/evolution/line/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // An `area` marker (svelteplot's own `AreaX`/`AreaY`) - a filled area under a

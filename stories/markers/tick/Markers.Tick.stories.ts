@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES } from '../../plots/scatter/data';
+import { COUNTRIES } from '../../plots/correlation/scatter/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `tick` marker (svelteplot's own `TickX`/`TickY`) - a short line per row

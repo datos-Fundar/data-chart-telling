@@ -1,8 +1,8 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, afterEach } from 'vitest';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
-import { COUNTRIES } from '../../../../stories/plots/scatter/data';
+import { COUNTRIES } from '../../../../stories/plots/correlation/scatter/data';
 import { waitForSvg } from '../../plots/_helpers/svg';
 
 function shapesOf(svg: SVGElement): string[] {

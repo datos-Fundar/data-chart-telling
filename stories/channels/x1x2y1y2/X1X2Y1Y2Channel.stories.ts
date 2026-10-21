@@ -1,8 +1,8 @@
 import type { Meta } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { renderSource } from '../../common/docsSource';
-import { LIFE_EXPECTANCY } from '../../plots/line/data';
+import { LIFE_EXPECTANCY } from '../../plots/evolution/line/data';
 import { GOOGL_AUGUST_2026, AMZN_AUGUST_2026, type StockDay } from '../../data/stockPrices';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import LinePlot from '$lib/plots/line/Plot.svelte';
-	import BarPlot from '$lib/plots/bar/Plot.svelte';
-	import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+	import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 	import Scrubber from '../../common/Scrubber.svelte';
 	import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
 	import { HEAT_CELLS } from '../../data/heat-cells';

@@ -1,4 +1,4 @@
-import { LIFE_EXPECTANCY } from '../../../plots/line/data';
+import { LIFE_EXPECTANCY } from '../../../plots/evolution/line/data';
 
 /** The line plot every automatic-legend story starts from: one series per sex. */
 export const AUTOMATIC_ARGS = {

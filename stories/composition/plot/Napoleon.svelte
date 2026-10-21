@@ -2,7 +2,7 @@
 	import { Plot as SveltePlot, Geo, Trail, Text, Graticule, Frame } from 'svelteplot';
 	import Plot from '$lib/layout/plot/Plot.svelte';
 	import Scrubber from '../../common/Scrubber.svelte';
-	import { WORLD_TOPOLOGY } from '../../plots/geo/data';
+	import { WORLD_TOPOLOGY } from '../../plots/map/geo/data';
 	import { MINARD_TROOPS, MINARD_COUNTRY_LABELS, type MinardRow } from '../../data/minard';
 	import type { LegendSection } from '$lib/types/layout/legend';
 

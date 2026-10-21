@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { FEMALE_LIFE_EXPECTANCY, LIFE_EXPECTANCY } from '../../plots/line/data';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import { FEMALE_LIFE_EXPECTANCY, LIFE_EXPECTANCY } from '../../plots/evolution/line/data';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `rule` marker (svelteplot's own `RuleX`/`RuleY`) - a vertical/horizontal

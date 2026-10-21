@@ -1,12 +1,12 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
-import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
+import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import { resolveOpacityScale } from '$lib/utils/opacity';
-import type { ArgentinaProvinceProps } from '../../../../stories/plots/geo/data';
-import { ARGENTINA_PROVINCES } from '../../../../stories/plots/geo/data';
-import { COUNTRIES } from '../../../../stories/plots/scatter/data';
+import type { ArgentinaProvinceProps } from '../../../../stories/plots/map/geo/data';
+import { ARGENTINA_PROVINCES } from '../../../../stories/plots/map/geo/data';
+import { COUNTRIES } from '../../../../stories/plots/correlation/scatter/data';
 import { waitForSvg, countCells, countGeoPaths } from '../../plots/_helpers/svg';
 
 function opacitiesOf(svg: SVGElement, selector: string): number[] {

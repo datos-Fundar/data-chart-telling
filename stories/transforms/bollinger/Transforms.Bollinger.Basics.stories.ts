@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { DAILY_TEMPERATURE, BUENOS_AIRES_TEMPERATURE } from '../../data/daily-temperature';
 import { GOOGL_AUGUST_2026 } from '../../data/stockPrices';

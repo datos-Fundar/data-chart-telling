@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import TooltipSyncDemo, { heatData, pyramidData } from './TooltipSyncDemo.svelte';
 import FacetSyncBarBySeriesDemo from './FacetSyncBarBySeriesDemo.svelte';
 import FacetSyncBarUnrelatedOrderDemo, {

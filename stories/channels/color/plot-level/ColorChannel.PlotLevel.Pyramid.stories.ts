@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
+import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../data/population-pyramid';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────

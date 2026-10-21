@@ -4,16 +4,16 @@ import {
 	WORLD_COUNTRIES,
 	ARGENTINA_PROVINCES,
 	type ArgentinaProvinceProps
-} from '../../plots/geo/data';
+} from '../../plots/map/geo/data';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import {
 	FEMALE_LIFE_EXPECTANCY,
 	MALE_LIFE_EXPECTANCY,
 	LIFE_EXPECTANCY
-} from '../../plots/line/data';
-import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+} from '../../plots/evolution/line/data';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `geo-hover` marker - the in-map hover highlight, restyling whichever

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import PlotComposer from '$lib/layout/composer/PlotComposer.svelte';
-	import LinePlot from '$lib/plots/line/Plot.svelte';
-	import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-	import { LIFE_EXPECTANCY } from '../../../plots/line/data';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+	import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+	import { LIFE_EXPECTANCY } from '../../../plots/evolution/line/data';
 </script>
 
 <!-- The panels leave their legend to the composer, which shows every series they draw, once. -->

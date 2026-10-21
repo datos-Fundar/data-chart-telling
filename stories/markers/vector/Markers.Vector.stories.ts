@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { WORLD_COUNTRIES, POPULATION_SHIFT } from '../../plots/geo/data';
-import GeoPlot from '$lib/plots/geo/Plot.svelte';
+import { WORLD_COUNTRIES, POPULATION_SHIFT } from '../../plots/map/geo/data';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `vector` marker (svelteplot's own `Vector`) - an arrow/spike per row,

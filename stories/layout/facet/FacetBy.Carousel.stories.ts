@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import { createRawSnippet } from 'svelte';
-import BarPlot from '$lib/plots/bar/Plot.svelte';
+import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import { facetGroups } from '../../data/facet-groups';
 
 /** `facet: { mode: 'carousel' }` - `visible` facets show at a time; swipe/drag to browse the rest. */

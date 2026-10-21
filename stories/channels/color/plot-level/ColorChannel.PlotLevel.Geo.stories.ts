@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import GeoPlot from '$lib/plots/geo/Plot.svelte';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
-import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '../../../plots/geo/data';
-import { provincePopulation } from '../../../plots/geo/channels';
+import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '../../../plots/map/geo/data';
+import { provincePopulation } from '../../../plots/map/geo/channels';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Same channel, different plot kind - GeoPlot has no x/y axis pair, but

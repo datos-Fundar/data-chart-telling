@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import { SURVEY_ANSWERS } from '../../data/survey-ratings';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────

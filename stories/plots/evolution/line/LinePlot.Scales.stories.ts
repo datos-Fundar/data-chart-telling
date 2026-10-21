@@ -1,0 +1,602 @@
+import type { Meta, StoryObj } from '@storybook/svelte-vite';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+import type { Series } from '$lib/types/plots/data/common';
+import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
+import {
+	FEMALE_LIFE_EXPECTANCY,
+	FEMALE_LIFE_EXPECTANCY_SINCE_1947,
+	LIFE_EXPECTANCY,
+	type YearPoint
+} from './data';
+
+// ── Meta ──────────────────────────────────────────────────────────────────────
+
+const meta = {
+	title: 'Plots/Evolution/LinePlot/Scales',
+	component: LinePlot,
+	tags: ['autodocs'],
+	args: {
+		width: 940,
+		height: 400
+	},
+	argTypes: {
+		width: {
+			description: 'Plot width in pixels.',
+			control: { type: 'range', min: 300, max: 940, step: 50 }
+		},
+		height: {
+			description: 'Plot height in pixels.',
+			control: { type: 'range', min: 200, max: 700, step: 50 }
+		},
+		series: {
+			description: 'Data series to render.',
+			control: false
+		},
+		scales: {
+			description: 'Per-axis scale configuration.',
+			control: false
+		}
+	},
+	parameters: {
+		docs: { source: { name: 'LinePlot' } }
+	}
+} satisfies Meta<typeof LinePlot>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+// ── Stories ───────────────────────────────────────────────────────────────────
+
+/**
+ * No scale overrides - both axes are auto-fitted to the data extent.
+ */
+export const Default: Story = {
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		]
+	}
+};
+
+/**
+ * Constrained Y domain - tightens the visible range to [78, 85], which is
+ * narrower than the auto-fitted range (the 2008 value sits at 77.9 so
+ * auto-fit adds space below it). All data points lie within [78, 85], so
+ * no line is clipped at the frame boundary.
+ *
+ * Compare with `Default` to see how the trend appears more spread out when
+ * the Y range is reduced.
+ */
+export const CustomYDomain: Story = {
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			y: { domain: [78, 85] }
+		} satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * Constrained X domain - restricts both the visible range and the series
+ * data to 2010-2020. The data is filtered to match the domain so the line
+ * starts cleanly at the first in-range point (2010) rather than entering
+ * the frame at an interpolated position from an earlier out-of-range point.
+ */
+export const CustomXDomain: Story = {
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY.filter((d) => d.year >= 2010 && d.year <= 2020)
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			x: { domain: [2010, 2020] }
+		} satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * Axis labels - a human-readable string appears alongside each axis.
+ * Passing `false` to `label` suppresses the label svelteplot would infer
+ * from the field name.
+ */
+export const WithAxisLabels: Story = {
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			x: { label: 'Year' },
+			y: { label: 'Life expectancy (years)' }
+		} satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * Reversed Y axis - values increase downward instead of upward.
+ * Useful for rankings, depth measurements, or other conventions where
+ * a lower number means "better" or "further".
+ */
+export const ReversedY: Story = {
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			y: { reverse: true }
+		} satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * Grid lines on the Y axis - adds horizontal reference lines at every
+ * tick, making it easier to read off individual values without a ruler.
+ */
+export const WithGrid: Story = {
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			y: { grid: true }
+		} satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * Explicit tick values - `ticks` pins exactly which values appear on the
+ * X axis instead of the auto-computed interval. Useful to highlight
+ * specific dates such as policy changes or census rounds.
+ */
+export const CustomTicks: Story = {
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			x: { ticks: [2008, 2012, 2016, 2020] }
+		} satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * Custom tick formatter on Y - the function receives the raw tick value and
+ * returns the display string. Here it appends " yr" to every label.
+ */
+export const CustomTickFormat: Story = {
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			y: {
+				tickFormat: (d: unknown) => `${d} yr`
+			}
+		} satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * Rotated X tick labels at −45°. Useful when labels are long or the plot
+ * is too narrow to show them horizontally without overlap.
+ */
+export const RotatedXTicks: Story = {
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			x: {
+				tickRotate: -45
+			}
+		} satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * Zero-anchored Y axis - `zero: true` forces the Y domain to include 0
+ * even when all data values are far above it. Makes relative magnitudes
+ * honest but compresses the visible trend significantly.
+ */
+export const ZeroAnchoredY: Story = {
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			y: { zero: true }
+		} satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * All overrides combined on a two-series chart: labelled axes, a tighter
+ * Y domain, explicit tick values and a Y grid.
+ */
+export const CombinedOverrides: Story = {
+	args: {
+		data: LIFE_EXPECTANCY,
+		x: 'year',
+		y: 'value',
+		color: 'sex',
+		scales: {
+			x: { label: 'Year', ticks: [2008, 2012, 2016, 2020], grid: false },
+			y: { label: 'Life expectancy (years)', domain: [60, 90], grid: true }
+		} satisfies AxisBasedScalesConfig
+	}
+};
+
+// ── Time-like X axes ─────────────────────────────────────────────────────────
+
+type DatePoint = { date: Date; value: number };
+type IsoDatePoint = { date: string; value: number };
+type MonthPoint = { month: string; value: number };
+type MonthYearPoint = { period: string; value: number };
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+const DATE_OBJECT_DATA: DatePoint[] = [
+	{ date: new Date(2016, 0, 1), value: 12 },
+	{ date: new Date(2017, 0, 1), value: 18 },
+	{ date: new Date(2018, 0, 1), value: 22 },
+	{ date: new Date(2019, 0, 1), value: 27 },
+	{ date: new Date(2020, 0, 1), value: 24 },
+	{ date: new Date(2021, 0, 1), value: 33 },
+	{ date: new Date(2022, 0, 1), value: 41 },
+	{ date: new Date(2023, 0, 1), value: 47 },
+	{ date: new Date(2024, 0, 1), value: 52 }
+];
+
+/**
+ * `Date` objects on the X axis - svelteplot infers a `time` scale, which
+ * sorts and ticks chronologically by construction. Nine yearly points spread
+ * across a wide plot also exercise the tick-count fix: without it, a
+ * pixel-width-based tick request on such a narrow domain could ask for more
+ * ticks than there are distinct years.
+ */
+export const DateObjectXAxis: Story = {
+	args: {
+		series: [
+			{
+				name: 'adoption',
+				x: 'date',
+				y: 'value',
+				data: DATE_OBJECT_DATA
+			} satisfies Series<DatePoint>
+		]
+	}
+};
+
+const ISO_DATE_DATA: IsoDatePoint[] = [
+	{ date: '2023-01-01', value: 14 },
+	{ date: '2023-04-01', value: 19 },
+	{ date: '2023-07-01', value: 25 },
+	{ date: '2023-10-01', value: 21 },
+	{ date: '2024-01-01', value: 28 },
+	{ date: '2024-04-01', value: 33 },
+	{ date: '2024-07-01', value: 30 },
+	{ date: '2024-10-01', value: 38 }
+];
+
+/**
+ * Dates as `'YYYY-MM-DD'` strings - svelteplot infers a `point` (ordinal)
+ * scale for string X values, no `scales.x.sort` needed here: the default
+ * ascending sort is lexicographic, and ISO dates happen to sort
+ * lexicographically in chronological order too.
+ */
+export const IsoDateStringXAxis: Story = {
+	args: {
+		series: [
+			{
+				name: 'signups',
+				x: 'date',
+				y: 'value',
+				data: ISO_DATE_DATA
+			} satisfies Series<IsoDatePoint>
+		]
+	}
+};
+
+const MONTH_DATA: MonthPoint[] = [
+	{ month: 'Jan', value: 20 },
+	{ month: 'Feb', value: 18 },
+	{ month: 'Mar', value: 24 },
+	{ month: 'Apr', value: 30 },
+	{ month: 'May', value: 38 },
+	{ month: 'Jun', value: 45 },
+	{ month: 'Jul', value: 48 },
+	{ month: 'Aug', value: 44 },
+	{ month: 'Sep', value: 36 },
+	{ month: 'Oct', value: 29 },
+	{ month: 'Nov', value: 22 },
+	{ month: 'Dec', value: 25 }
+];
+
+/** Orders month-abbreviation rows by calendar position, not alphabetically. */
+function byMonth(a: Record<string, unknown>, b: Record<string, unknown>): number {
+	const { month: am } = a as MonthPoint;
+	const { month: bm } = b as MonthPoint;
+	return MONTHS.indexOf(am) - MONTHS.indexOf(bm);
+}
+
+/**
+ * Month-name strings within a single year - a plain ordinal scale would sort
+ * these alphabetically (Apr, Aug, Dec, Jan, …), scrambling the seasonal
+ * shape entirely. `scales.x.sort` supplies calendar order instead. The
+ * comparator receives the full row (not just the X value), which is what
+ * makes it possible to sort by any field on the row - see `SortXByYDesc`
+ * below for sorting by Y instead of X.
+ */
+export const MonthNamesSameYear: Story = {
+	args: {
+		series: [
+			{
+				name: 'seasonal',
+				x: 'month',
+				y: 'value',
+				data: MONTH_DATA
+			} satisfies Series<MonthPoint>
+		],
+		scales: {
+			x: { sort: byMonth }
+		} satisfies AxisBasedScalesConfig
+	}
+};
+
+const MONTH_YEAR_DATA: MonthYearPoint[] = [
+	{ period: 'Nov-2025', value: 40 },
+	{ period: 'Dec-2025', value: 46 },
+	{ period: 'Jan-2026', value: 39 },
+	{ period: 'Feb-2026', value: 43 },
+	{ period: 'Mar-2026', value: 50 },
+	{ period: 'Apr-2026', value: 55 }
+];
+
+function byMonthYear(a: Record<string, unknown>, b: Record<string, unknown>): number {
+	const rank = (row: Record<string, unknown>) => {
+		const { period } = row as MonthYearPoint;
+		const [month, year] = period.split('-');
+		return Number(year) * 12 + MONTHS.indexOf(month);
+	};
+	return rank(a) - rank(b);
+}
+
+/**
+ * `'Mmm-YYYY'` strings crossing a year boundary - alphabetical order would
+ * place `Apr-2026` before `Dec-2025`. `scales.x.sort` parses month + year
+ * out of each label so the axis (and the line) stay chronological.
+ */
+export const MonthYearAcrossYears: Story = {
+	args: {
+		series: [
+			{
+				name: 'trend',
+				x: 'period',
+				y: 'value',
+				data: MONTH_YEAR_DATA
+			} satisfies Series<MonthYearPoint>
+		],
+		scales: {
+			x: { sort: byMonthYear }
+		} satisfies AxisBasedScalesConfig
+	}
+};
+
+// ── Custom axis chrome ───────────────────────────────────────────────────────
+
+/**
+ * Vertical Y-axis title, anchored at the top - `labelOrientation: 'vertical'`
+ * rotates the title 90° and draws it beside the ticks instead of
+ * svelteplot's default horizontal title above the plot; `labelPosition: 'top'`
+ * anchors it near the axis's highest tick, reading downward.
+ *
+ * svelteplot can't auto-measure this custom label, so it needs an explicit
+ * `margins.left` wide enough for both the label and the tick digits.
+ */
+export const VerticalYLabelTop: Story = {
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			y: { label: 'Life expectancy (years)', labelOrientation: 'vertical', labelPosition: 'top' }
+		} satisfies AxisBasedScalesConfig,
+		margins: { left: 60 }
+	}
+};
+
+/**
+ * Vertical Y-axis title, centered - `labelPosition` defaults to `'middle'`,
+ * spanning the full axis height instead of sitting at the top.
+ *
+ * Compare with `VerticalYLabelTop`.
+ */
+export const VerticalYLabelMiddle: Story = {
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			y: { label: 'Life expectancy (years)', labelOrientation: 'vertical' }
+		} satisfies AxisBasedScalesConfig,
+		margins: { left: 60 }
+	}
+};
+
+/**
+ * Grid without an axis line - svelteplot doesn't draw a continuous axis
+ * spine at all; the only line an axis draws is the small perpendicular tick
+ * mark at each value, controlled by `tickSize`. Setting it to `0` hides
+ * those marks while `grid: true` keeps the horizontal reference lines,
+ * leaving just floating tick labels plus the grid.
+ */
+export const GridOnlyNoTickMarks: Story = {
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			y: { grid: true, tickSize: 0 }
+		} satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * Styled grid - `grid` accepts a style object (`stroke`, `strokeWidth`,
+ * `strokeOpacity`, `strokeDasharray`) instead of just `true`, here producing
+ * a light dotted grid rather than solid lines.
+ */
+export const DottedGrid: Story = {
+	args: {
+		series: [
+			{
+				name: 'female',
+				x: 'year',
+				y: 'value',
+				data: FEMALE_LIFE_EXPECTANCY
+			} satisfies Series<YearPoint>
+		],
+		scales: {
+			y: { grid: { strokeDasharray: '2 3', strokeOpacity: 0.5 } }
+		} satisfies AxisBasedScalesConfig
+	}
+};
+
+// ── Edge ticks ────────────────────────────────────────────────────────────────
+
+const SINCE_1947 = [
+	{
+		name: 'female',
+		x: 'year',
+		y: 'value',
+		data: FEMALE_LIFE_EXPECTANCY_SINCE_1947
+	} satisfies Series<YearPoint>
+];
+
+/**
+ * Edge ticks, the default: a continuous x axis adds a tick at the data's first
+ * and last values (1947 and 2019) beside its nice ones, so the reader sees
+ * where the data starts and ends. 1947 crowds the 1950 tick, so the default
+ * `collision: 'drop-nice'` keeps 1947 and drops 1950. 2019 has room next to
+ * 2010 and simply joins the ticks.
+ *
+ * The default comes from `axis.edgeTicks.x` in the configuration (see
+ * _Configuration / Styling / Scales / Edge ticks_); `scales.x.edgeTicks` overrides it per plot.
+ */
+export const EdgeTicksDropNice: Story = {
+	args: { series: SINCE_1947 }
+};
+
+/**
+ * `edgeTicks: { collision: 'drop-edge' }` - when an edge tick crowds a nice
+ * one, the nice tick stays and the edge tick goes: 1950 instead of 1947.
+ * 2019 still shows, since it does not crowd 2010.
+ */
+export const EdgeTicksDropEdge: Story = {
+	args: {
+		series: SINCE_1947,
+		scales: { x: { edgeTicks: { collision: 'drop-edge' } } } satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * `edgeTicks: { collision: 'extend' }` - the axis widens to the next nice
+ * tick past the crowding edge, so it starts at 1940 and every tick is a round
+ * one on that side. The other end, which had room, still ends at 2019.
+ */
+export const EdgeTicksExtend: Story = {
+	args: {
+		series: SINCE_1947,
+		scales: { x: { edgeTicks: { collision: 'extend' } } } satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * `edgeTicks: false` - only the nice ticks, as d3 or Observable Plot draw
+ * them: the axis rounds out to 1940 and 2020, so the line starts and ends a
+ * little inside it and no tick marks the data's first or last year.
+ */
+export const EdgeTicksOff: Story = {
+	args: {
+		series: SINCE_1947,
+		scales: { x: { edgeTicks: false } } satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * `scales.y.edgeTicks: true` - the y axis, off by default, ticks the data's
+ * lowest and highest values too (61.4 and 80.2). 80.2 crowds the 80 tick, so
+ * `'drop-nice'` keeps 80.2; `{ collision: 'extend' }` would round the axis out
+ * to the next nice tick instead.
+ */
+export const EdgeTicksOnY: Story = {
+	args: {
+		series: SINCE_1947,
+		scales: { y: { edgeTicks: true } } satisfies AxisBasedScalesConfig
+	}
+};

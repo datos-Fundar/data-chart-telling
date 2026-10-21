@@ -1,6 +1,6 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
-import BarPlot from '$lib/plots/bar/Plot.svelte';
+import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { TimelineTime } from '$lib/layout/timeline/TimelineTime';
 

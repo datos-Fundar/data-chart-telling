@@ -1,11 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import EdgeTicksDemo from './EdgeTicksDemo.svelte';
 import EdgeTicksDemoSource from './EdgeTicksDemo.svelte?raw';
 import { demoSource } from '../../../common/docsSource';
-import { FEMALE_LIFE_EXPECTANCY_SINCE_1947, type YearPoint } from '../../../plots/line/data';
+import {
+	FEMALE_LIFE_EXPECTANCY_SINCE_1947,
+	type YearPoint
+} from '../../../plots/evolution/line/data';
 
 /**
  * `axis.edgeTicks` sets, per axis and for every plot, whether a continuous

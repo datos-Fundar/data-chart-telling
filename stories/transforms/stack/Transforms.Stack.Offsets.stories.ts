@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import AreaPlot from '$lib/plots/area/Plot.svelte';
+import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
 import { ENERGY_MIX } from '../../data/energy-mix';
 import { WEIGHT_FREQUENCY, WEIGHT_PEAK_TOTAL } from '../../data/weight-frequency';
 

@@ -6,8 +6,8 @@ import {
 	resetConfiguration
 } from '$lib/configuration/config.svelte';
 import { TickLabels } from '$lib/layout/scales/TickLabels';
-import BarPlot from '$lib/plots/bar/Plot.svelte';
-import DumbbellPlot from '$lib/plots/dumbbell/Plot.svelte';
+import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+import DumbbellPlot from '$lib/plots/ranking/dumbbell/Plot.svelte';
 import { waitForSvg } from '../../plots/_helpers/svg';
 
 const PROVINCES = ['Buenos Aires', 'Córdoba', 'Mendoza', 'Salta', 'Chubut'];

@@ -1,9 +1,9 @@
 import { describe, test, expect } from 'vitest';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
 import { Pipeline } from '$lib/phases/Pipeline';
-import { buildClevelandDefaults } from '$lib/plots/cleveland/defaults';
-import { buildForestDefaults } from '$lib/plots/forest/defaults';
-import { buildBarDefaults } from '$lib/plots/bar/defaults';
+import { buildClevelandDefaults } from '$lib/plots/ranking/cleveland/defaults';
+import { buildForestDefaults } from '$lib/plots/ranking/forest/defaults';
+import { buildBarDefaults } from '$lib/plots/ranking/bar/defaults';
 import type { AxisPlotDefaults } from '$lib/types/phases';
 import type { CategorySort } from '$lib/types/layout/scales';
 

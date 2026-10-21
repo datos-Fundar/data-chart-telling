@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import BarPlot from '$lib/plots/bar/Plot.svelte';
+	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 	import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 	import type { Series } from '$lib/types/plots/data/common';
 	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';

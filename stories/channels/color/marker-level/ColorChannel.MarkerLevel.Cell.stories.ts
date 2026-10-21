@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
+import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { LIFE_EXPECTANCY_BY_PROVINCE_SEX, type ProvinceSexCell } from '../../../plots/heatmap/data';
+import {
+	LIFE_EXPECTANCY_BY_PROVINCE_SEX,
+	type ProvinceSexCell
+} from '../../../plots/correlation/heatmap/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `cell` marker's own `color` + `scales.color` is independent of the

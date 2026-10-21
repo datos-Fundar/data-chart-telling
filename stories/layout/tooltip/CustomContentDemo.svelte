@@ -1,5 +1,5 @@
 <script lang="ts">
-	import LinePlot from '$lib/plots/line/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { paletteColor } from '$lib/utils/color';
 	import TooltipCard from '../../common/TooltipCard.svelte';

@@ -2,7 +2,7 @@
 	import PlotComposer from '$lib/layout/composer/PlotComposer.svelte';
 	import GridCell from '$lib/layout/grid/GridCell.svelte';
 	import LegendLayout from '$lib/layout/legend/LegendLayout.svelte';
-	import LinePlot from '$lib/plots/line/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 	import { TIME_SERIES } from '../../../data/time-series';
 	import type { LegendSection } from '$lib/types/layout/legend';
 

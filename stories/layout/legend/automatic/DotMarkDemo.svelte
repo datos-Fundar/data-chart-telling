@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-	import { LIFE_EXPECTANCY } from '../../../plots/line/data';
+	import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+	import { LIFE_EXPECTANCY } from '../../../plots/evolution/line/data';
 </script>
 
 <!--

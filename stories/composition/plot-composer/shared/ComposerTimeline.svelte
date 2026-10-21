@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PlotComposer from '$lib/layout/composer/PlotComposer.svelte';
-	import LinePlot from '$lib/plots/line/Plot.svelte';
-	import BarPlot from '$lib/plots/bar/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 	import Scrubber from '../../../common/Scrubber.svelte';
 	import { TIME_SERIES } from '../../../data/time-series';
 

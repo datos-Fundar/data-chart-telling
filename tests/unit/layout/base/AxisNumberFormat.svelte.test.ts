@@ -1,6 +1,6 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, afterEach } from 'vitest';
-import BarPlot from '$lib/plots/bar/Plot.svelte';
+import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 import { waitForSvg } from '../../plots/_helpers/svg';
 

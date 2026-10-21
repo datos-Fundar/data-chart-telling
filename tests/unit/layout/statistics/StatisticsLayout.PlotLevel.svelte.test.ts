@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import {
 	waitForSvg,
 	countRegressionMarks,

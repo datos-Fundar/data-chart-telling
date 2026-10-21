@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { GeoPlot, argentinaBicontinental } from '@fundar/data-chart-telling';
-	import { ARGENTINA_PROVINCES } from '../../../stories/plots/geo/data';
+	import { ARGENTINA_PROVINCES } from '../../../stories/plots/map/geo/data';
 </script>
 
 <GeoPlot

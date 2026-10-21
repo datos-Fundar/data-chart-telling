@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import BarPlot from '$lib/plots/bar/Plot.svelte';
+	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 	import { facetGroups } from '../../data/facet-groups';
 	import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 	import type { PlotStylesConfigInput } from '$lib/types/configuration/styling';

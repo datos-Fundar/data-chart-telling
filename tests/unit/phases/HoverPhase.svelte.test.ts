@@ -5,12 +5,12 @@ import { HoverSettings } from '$lib/layout/hover/HoverSettings';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import { PlotInteraction } from '$lib/layout/interaction/PlotInteraction.svelte';
-import { buildLineDefaults } from '$lib/plots/line/defaults';
-import { buildBarDefaults } from '$lib/plots/bar/defaults';
-import { buildHeatmapDefaults } from '$lib/plots/heatmap/defaults';
-import { buildPyramidDefaults } from '$lib/plots/pyramid/defaults';
-import { buildHistogramDefaults } from '$lib/plots/histogram/defaults';
-import { buildScatterDefaults } from '$lib/plots/scatter/defaults';
+import { buildLineDefaults } from '$lib/plots/evolution/line/defaults';
+import { buildBarDefaults } from '$lib/plots/ranking/bar/defaults';
+import { buildHeatmapDefaults } from '$lib/plots/correlation/heatmap/defaults';
+import { buildPyramidDefaults } from '$lib/plots/distribution/pyramid/defaults';
+import { buildHistogramDefaults } from '$lib/plots/distribution/histogram/defaults';
+import { buildScatterDefaults } from '$lib/plots/correlation/scatter/defaults';
 import type { HoverPoint } from '$lib/types/layout/hover';
 import type { AxisPlotDefaults } from '$lib/types/phases';
 

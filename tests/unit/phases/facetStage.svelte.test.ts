@@ -3,11 +3,11 @@ import { Pipeline } from '$lib/phases/Pipeline';
 import { FacetPhase } from '$lib/phases/facet/FacetPhase';
 import { PANEL_KEY, FacetPanels } from '$lib/phases/facet/FacetPanels';
 import { SERIES_ID_KEY, SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
-import { buildLineDefaults } from '$lib/plots/line/defaults';
+import { buildLineDefaults } from '$lib/plots/evolution/line/defaults';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
 import type { AxisPlotState, AxisPlotCtx } from '$lib/types/phases';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import type { LinePlotCtx, LinePlotState } from '$lib/types/plots/line/state';
+import type { LinePlotCtx, LinePlotState } from '$lib/types/plots/evolution/line/state';
 import { runStages } from '../plots/_helpers/stages';
 
 type Row = { anio: number; region: string; sector: string; valor: number };

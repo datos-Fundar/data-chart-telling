@@ -1,11 +1,11 @@
 <script lang="ts">
 	import PlotComposer from '$lib/layout/composer/PlotComposer.svelte';
-	import LinePlot from '$lib/plots/line/Plot.svelte';
-	import BarPlot from '$lib/plots/bar/Plot.svelte';
-	import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+	import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 	import { TIME_SERIES } from '../../../data/time-series';
 	import { REGION_BARS } from '../../../data/region-bars';
-	import { COUNTRIES } from '../../../plots/scatter/data';
+	import { COUNTRIES } from '../../../plots/correlation/scatter/data';
 </script>
 
 <PlotComposer

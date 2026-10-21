@@ -1,5 +1,5 @@
 <script lang="ts">
-	import BarPlot from '$lib/plots/bar/Plot.svelte';
+	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 	import { REGION_SECTOR_BARS, type RegionSector } from '../../data/region-bars';
 
 	type Orientation = 'vertical' | 'horizontal';

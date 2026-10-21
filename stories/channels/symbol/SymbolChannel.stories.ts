@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-import { COUNTRIES } from '../../plots/scatter/data';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import { COUNTRIES } from '../../plots/correlation/scatter/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `symbol` channel: a categorical shape mapping, independent of `color`.

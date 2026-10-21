@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
-import { LIFE_EXPECTANCY } from '../../../plots/line/data';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+import { LIFE_EXPECTANCY } from '../../../plots/evolution/line/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `color` channel: a plot-level `color` accessor plus `scales.color`

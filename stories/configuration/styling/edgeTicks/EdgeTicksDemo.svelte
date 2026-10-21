@@ -1,10 +1,13 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import LinePlot from '$lib/plots/line/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 	import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 	import type { Series } from '$lib/types/plots/data/common';
 	import type { EdgeTickCollision } from '$lib/types/layout/scales';
-	import { FEMALE_LIFE_EXPECTANCY_SINCE_1947, type YearPoint } from '../../../plots/line/data';
+	import {
+		FEMALE_LIFE_EXPECTANCY_SINCE_1947,
+		type YearPoint
+	} from '../../../plots/evolution/line/data';
 
 	let {
 		enabled = true,

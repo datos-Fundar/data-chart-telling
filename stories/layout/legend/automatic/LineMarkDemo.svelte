@@ -1,6 +1,6 @@
 <script lang="ts">
-	import LinePlot from '$lib/plots/line/Plot.svelte';
-	import { LIFE_EXPECTANCY } from '../../../plots/line/data';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+	import { LIFE_EXPECTANCY } from '../../../plots/evolution/line/data';
 </script>
 
 <!-- A line plot's series show as their stroke. -->

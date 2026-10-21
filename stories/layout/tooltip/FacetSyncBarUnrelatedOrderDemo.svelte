@@ -12,7 +12,7 @@
 </script>
 
 <script lang="ts">
-	import BarPlot from '$lib/plots/bar/Plot.svelte';
+	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 
 	// Zero-prop marker - keeps Storybook's render typing happy.
 	const props = $props();

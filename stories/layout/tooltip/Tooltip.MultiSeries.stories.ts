@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
 
 /** Matching and scoping across multiple series sharing the hovered x. */

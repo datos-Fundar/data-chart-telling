@@ -82,7 +82,7 @@ A marker can carry its own `scales.color`, independent of the plot's, so two ram
 
 ## Grouping
 
-`scales.grouping.reverse` flips which group sorts first, such as which side of a [pyramid](plots/pyramid.md) a series sits on.
+`scales.grouping.reverse` flips which group sorts first, such as which side of a [pyramid](plots/distribution/pyramid.md) a series sits on.
 
 ## Opacity
 

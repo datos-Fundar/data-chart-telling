@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import AddItemsDemo from './AddItemsDemo.svelte';
 import AddItemsDemoSource from './AddItemsDemo.svelte?raw';
 import AddSectionsDemo from './AddSectionsDemo.svelte';

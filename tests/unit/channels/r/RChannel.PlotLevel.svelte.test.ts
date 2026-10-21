@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-import { AMERICAS } from '../../../../stories/plots/scatter/data';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import { AMERICAS } from '../../../../stories/plots/correlation/scatter/data';
 import { waitForSvg } from '../../plots/_helpers/svg';
 
 async function maxDotWidth(range: [number, number]): Promise<number> {

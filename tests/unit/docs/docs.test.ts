@@ -8,8 +8,10 @@ const pages = readdirSync(resolve(root, 'docs')).filter((f) => f.endsWith('.md')
 // Pages for people working on the library, not using it: left out of the LLM index.
 const CONTRIBUTOR = new Set(['architecture.md', 'development.md']);
 const usage = pages.filter((f) => !CONTRIBUTOR.has(f));
-// A page per plot kind lives in a folder of its own, checked like the rest.
-const nested = readdirSync(resolve(root, 'docs/plots')).filter((f) => f.endsWith('.md'));
+// A page per plot kind lives in the folder of its category, checked like the rest.
+const nested = readdirSync(resolve(root, 'docs/plots'), { recursive: true })
+	.map(String)
+	.filter((f) => f.endsWith('.md'));
 const documents = [
 	'README.md',
 	...pages.map((f) => `docs/${f}`),

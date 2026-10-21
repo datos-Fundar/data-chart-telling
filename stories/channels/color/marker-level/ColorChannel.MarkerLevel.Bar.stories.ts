@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import BarPlot from '$lib/plots/bar/Plot.svelte';
+import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { FEMALE_LIFE_EXPECTANCY_BY_PROVINCE, type ProvincePoint } from '../../../plots/bar/data';
+import {
+	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+	type ProvincePoint
+} from '../../../plots/ranking/bar/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `bar` marker's own `color` + `scales.color` is independent of the plot's

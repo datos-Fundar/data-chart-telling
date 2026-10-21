@@ -1,7 +1,7 @@
 <script lang="ts">
-	import LinePlot from '$lib/plots/line/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 	import FigureReadout from './FigureReadout.svelte';
-	import { LIFE_EXPECTANCY } from '../../plots/line/data';
+	import { LIFE_EXPECTANCY } from '../../plots/evolution/line/data';
 </script>
 
 {#snippet footer()}

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from '../../../plots/heatmap/data';
+import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
+import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from '../../../plots/correlation/heatmap/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `color` channel: a plot-level `color` accessor plus `scales.color`
