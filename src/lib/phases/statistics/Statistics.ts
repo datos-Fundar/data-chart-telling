@@ -6,8 +6,9 @@ import { Density2dStatistic } from '$lib/phases/statistics/methods/Density2dStat
 import { BoxStatistic } from '$lib/phases/statistics/methods/BoxStatistic';
 import { RegressionStatistic } from '$lib/phases/statistics/methods/RegressionStatistic';
 import { BollingerStatistic } from '$lib/phases/statistics/methods/BollingerStatistic';
+import { DeviationStatistic } from '$lib/phases/statistics/methods/DeviationStatistic';
 import type { StatisticSource } from '$lib/types/phases/statistics/source';
-import type { AxisValue } from '$lib/types/layout/mapping';
+import type { AxisChannelName, AxisValue } from '$lib/types/layout/mapping';
 import type { Series } from '$lib/types/plots/data/common';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
@@ -20,15 +21,16 @@ import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/co
  */
 export class Statistics {
 	/**
-	 * Builds one {@link StatisticConfig} over a data source into the marker it
-	 * renders as - `regression`/`bollinger` construct their marker directly
-	 * (svelteplot resolves the curve/band itself, at render time); the others
-	 * compute their rows first.
+	 * Builds one {@link StatisticConfig} over a data source into the markers it
+	 * renders as. Every statistic's own `build` returns a list, since one can
+	 * draw several markers (`deviation`'s band and rule); `regression`/`bollinger`
+	 * construct their marker directly (svelteplot resolves the curve/band
+	 * itself, at render time), the others compute their rows first.
 	 */
 	static buildMarker<T extends Record<string, unknown>>(
 		source: StatisticSource<T>,
 		config: StatisticConfig
-	): AxisBasedMarkersConfig {
+	): AxisBasedMarkersConfig[] {
 		switch (config.type) {
 			case 'movingAverage':
 				return MovingAverageStatistic.build(source, config);
@@ -42,6 +44,8 @@ export class Statistics {
 				return RegressionStatistic.build(source, config);
 			case 'bollinger':
 				return BollingerStatistic.build(source, config);
+			case 'deviation':
+				return DeviationStatistic.build(source, config);
 		}
 	}
 
@@ -67,9 +71,11 @@ export class Statistics {
 	static buildForPlot<T extends Record<string, unknown>>(args: {
 		series: Series<T>[];
 		statistics: StatisticConfig[] | undefined;
+		/** The axis the plot measures along, from its `PlotAxes`. */
+		valueAxis?: AxisChannelName;
 		colorFor?: (seriesName: string) => string;
 	}): AxisBasedMarkersConfig[] {
-		const { series, statistics, colorFor } = args;
+		const { series, statistics, valueAxis, colorFor } = args;
 		if (!statistics?.length || !series.length) return [];
 
 		return statistics.flatMap((stat) => {
@@ -79,9 +85,10 @@ export class Statistics {
 					data: pooled,
 					x: Statistics.#accessor(series[0].x),
 					y: Statistics.#accessor(series[0].y),
+					axis: valueAxis,
 					color: colorFor?.(series[0].name)
 				};
-				return [Statistics.buildMarker(source, stat)];
+				return Statistics.buildMarker(source, stat);
 			}
 			const names = stat.series ?? series.map((s) => s.name);
 			return names.flatMap((name) => {
@@ -91,9 +98,10 @@ export class Statistics {
 					data: match.data,
 					x: Statistics.#accessor(match.x),
 					y: Statistics.#accessor(match.y),
+					axis: valueAxis,
 					color: colorFor?.(name)
 				};
-				return [Statistics.buildMarker(source, stat)];
+				return Statistics.buildMarker(source, stat);
 			});
 		});
 	}
@@ -147,7 +155,8 @@ export class Statistics {
 	 */
 	static expandMarkers<TMarker extends { type: string }, T extends Record<string, unknown>>(
 		markers: TMarker[],
-		fallbackData: T[]
+		fallbackData: T[],
+		valueAxis?: AxisChannelName
 	): (TMarker | AxisBasedMarkersConfig)[] {
 		return markers.flatMap((marker) => {
 			const statable = marker as unknown as CommonMarkerConfigWithColor & { styles?: object };
@@ -157,7 +166,11 @@ export class Statistics {
 				typeof v === 'string' || typeof v === 'function';
 			if (!statable.statistics?.length || !isAccessor(x) || !isAccessor(y)) return [marker];
 			const data = (statable.data as Record<string, unknown>[] | undefined) ?? fallbackData;
-			const accessors = { x: x as StatisticSource['x'], y: y as StatisticSource['y'] };
+			const accessors = {
+				x: x as StatisticSource['x'],
+				y: y as StatisticSource['y'],
+				axis: valueAxis
+			};
 			// A marker's `color` channel groups it: each statistic is then derived per
 			// group, in that group's own color - same as a plot's statistics per series.
 			const colorFn = statable.color
@@ -166,7 +179,7 @@ export class Statistics {
 			const flatColor = Statistics.#markerBaseColor(statable);
 			const derived = statable.statistics.flatMap((stat) => {
 				if (!colorFn || !statable.color || stat.pooled) {
-					return [Statistics.buildMarker({ data, ...accessors, color: flatColor }, stat)];
+					return Statistics.buildMarker({ data, ...accessors, color: flatColor }, stat);
 				}
 				return Statistics.#groupRowsByColor(data, statable.color).flatMap((rows) =>
 					Statistics.buildMarker({ data: rows, ...accessors, color: colorFn(rows[0]) }, stat)

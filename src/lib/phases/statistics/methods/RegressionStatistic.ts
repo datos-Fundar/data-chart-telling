@@ -10,21 +10,23 @@ export class RegressionStatistic {
 	static build<T extends Record<string, unknown>>(
 		source: StatisticSource<T>,
 		config: Extract<StatisticConfig, { type: 'regression' }>
-	): RegressionMarkerConfig {
-		return {
-			type: 'regression',
-			data: source.data,
-			x: source.x,
-			y: source.y,
-			regressionType: config.regressionType,
-			order: config.order,
-			base: config.base,
-			span: config.span,
-			confidence: config.confidence,
-			styles: {
-				...config.styles,
-				stroke: config.styles?.stroke ?? source.color ?? STATISTIC_FALLBACK_COLOR
+	): RegressionMarkerConfig[] {
+		return [
+			{
+				type: 'regression',
+				data: source.data,
+				x: source.x,
+				y: source.y,
+				regressionType: config.regressionType,
+				order: config.order,
+				base: config.base,
+				span: config.span,
+				confidence: config.confidence,
+				styles: {
+					...config.styles,
+					stroke: config.styles?.stroke ?? source.color ?? STATISTIC_FALLBACK_COLOR
+				}
 			}
-		};
+		];
 	}
 }

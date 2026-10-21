@@ -16,7 +16,7 @@ export class MovingAverageStatistic {
 	static build<T extends Record<string, unknown>>(
 		source: StatisticSource<T>,
 		config: MovingAverageStatisticOptions
-	): LineMarkerConfig {
+	): LineMarkerConfig[] {
 		const result = Transforms.run({
 			type: 'windowY',
 			data: source.data,
@@ -25,15 +25,17 @@ export class MovingAverageStatistic {
 			k: config.k,
 			reduce: config.reduce ?? 'mean'
 		});
-		return {
-			type: 'line',
-			data: result.data as Record<string, unknown>[],
-			x: result.x as LineMarkerConfig['x'],
-			y: result.y as LineMarkerConfig['y'],
-			styles: {
-				...config.styles,
-				stroke: config.styles?.stroke ?? source.color ?? STATISTIC_FALLBACK_COLOR
+		return [
+			{
+				type: 'line',
+				data: result.data as Record<string, unknown>[],
+				x: result.x as LineMarkerConfig['x'],
+				y: result.y as LineMarkerConfig['y'],
+				styles: {
+					...config.styles,
+					stroke: config.styles?.stroke ?? source.color ?? STATISTIC_FALLBACK_COLOR
+				}
 			}
-		};
+		];
 	}
 }

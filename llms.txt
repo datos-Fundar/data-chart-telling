@@ -31,7 +31,7 @@ Start with the full guide: it lists the mental model, the props every plot share
 - [Scales](./docs/scales.md): axes and channel scales
 - [Styles and segments](./docs/styles-and-segments.md): value labels, frame, gaps, ranges of data
 - [Markers](./docs/markers.md): annotations, regions, hover highlight, custom components
-- [Transforms and statistics](./docs/transforms-and-statistics.md): stacking, binning, smoothing, regression
+- [Transforms and statistics](./docs/transforms-and-statistics.md): stacking, binning, smoothing, regression, and the statistics `regression`, `movingAverage`, `bollinger`, `density`, `density2d`, `box`, `deviation` with their options
 - [Tooltip and hover](./docs/tooltip-and-hover.md): tooltip options, hover marker, sync
 - [Legend](./docs/legend.md): automatic legend, toggling series, sections
 - [Timeline](./docs/timeline.md): player (default) and rule

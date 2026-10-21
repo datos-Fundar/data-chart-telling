@@ -75,7 +75,12 @@ export class StatisticsPhase<TState extends StatisticsStageState> implements Pha
 				: resolvedSeries;
 
 		return [
-			...Statistics.buildForPlot({ series: measured, statistics, colorFor: colorForSeries }),
+			...Statistics.buildForPlot({
+				series: measured,
+				statistics,
+				valueAxis,
+				colorFor: colorForSeries
+			}),
 			...Statistics.expandMarkers(
 				AuthorMarkers.prepare(positioned, {
 					grouping: inheritGrouping ? state.grouping : undefined,
@@ -85,7 +90,8 @@ export class StatisticsPhase<TState extends StatisticsStageState> implements Pha
 					resolvedSeries,
 					scopedGroups: state.scopedGroups
 				}),
-				flat
+				flat,
+				valueAxis
 			)
 		];
 	}

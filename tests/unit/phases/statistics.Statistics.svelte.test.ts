@@ -7,7 +7,7 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 describe('MovingAverageStatistic.build', () => {
 	test('keeps one output row per input row, smoothed via svelteplot’s own windowY', () => {
 		const data = Array.from({ length: 10 }, (_, i) => ({ x: i, y: i * 2 }));
-		const marker = MovingAverageStatistic.build({ data, x: 'x', y: 'y' }, { k: 3 });
+		const [marker] = MovingAverageStatistic.build({ data, x: 'x', y: 'y' }, { k: 3 });
 		expect(marker.type).toBe('line');
 		expect(marker.data).toHaveLength(10);
 		const yFn =
@@ -20,7 +20,7 @@ describe('MovingAverageStatistic.build', () => {
 
 	test('falls back to the source color when styles.stroke is unset', () => {
 		const data = [{ x: 0, y: 0 }];
-		const marker = MovingAverageStatistic.build(
+		const [marker] = MovingAverageStatistic.build(
 			{ data, x: 'x', y: 'y', color: '#ff0000' },
 			{ k: 1 }
 		);
@@ -29,7 +29,7 @@ describe('MovingAverageStatistic.build', () => {
 
 	test('an explicit styles.stroke overrides the source color', () => {
 		const data = [{ x: 0, y: 0 }];
-		const marker = MovingAverageStatistic.build(
+		const [marker] = MovingAverageStatistic.build(
 			{ data, x: 'x', y: 'y', color: '#ff0000' },
 			{ k: 1, styles: { stroke: '#00ff00' } }
 		);
@@ -41,7 +41,7 @@ describe('Statistics.buildMarker', () => {
 	const data = [{ x: 0, y: 0 }];
 
 	test('type: regression resolves to a regression marker', () => {
-		const marker = Statistics.buildMarker(
+		const [marker] = Statistics.buildMarker(
 			{ data, x: 'x', y: 'y' },
 			{ type: 'regression', confidence: 0.9 }
 		);
@@ -50,7 +50,7 @@ describe('Statistics.buildMarker', () => {
 	});
 
 	test('type: bollinger resolves to a bollinger marker', () => {
-		const marker = Statistics.buildMarker(
+		const [marker] = Statistics.buildMarker(
 			{ data, x: 'x', y: 'y' },
 			{ type: 'bollinger', n: 10, k: 3 }
 		);
@@ -60,7 +60,7 @@ describe('Statistics.buildMarker', () => {
 	});
 
 	test('type: movingAverage resolves to a line marker', () => {
-		const marker = Statistics.buildMarker(
+		const [marker] = Statistics.buildMarker(
 			{ data, x: 'x', y: 'y' },
 			{ type: 'movingAverage', k: 1 }
 		);
@@ -179,7 +179,7 @@ describe('density and box statistics', () => {
 	const data = Array.from({ length: 20 }, (_, i) => ({ x: i % 5, y: i }));
 
 	test('type: density resolves to an area marker over svelteplot’s densityX output', () => {
-		const marker = Statistics.buildMarker(
+		const [marker] = Statistics.buildMarker(
 			{ data, x: 'x', y: 'y', color: '#ff0000' },
 			{ type: 'density', bandwidth: 1 }
 		);
@@ -189,7 +189,7 @@ describe('density and box statistics', () => {
 	});
 
 	test('type: density2d resolves to a density marker with the same bandwidth', () => {
-		const marker = Statistics.buildMarker(
+		const [marker] = Statistics.buildMarker(
 			{ data, x: 'x', y: 'y' },
 			{ type: 'density2d', bandwidth: 15 }
 		);
@@ -198,7 +198,7 @@ describe('density and box statistics', () => {
 	});
 
 	test('type: box resolves to a box marker, bar filled with the source color by default', () => {
-		const marker = Statistics.buildMarker(
+		const [marker] = Statistics.buildMarker(
 			{ data, x: 'x', y: 'y', color: '#00ff00' },
 			{ type: 'box', tickMedian: false }
 		);
@@ -208,7 +208,10 @@ describe('density and box statistics', () => {
 	});
 
 	test('type: box does not leak the plot-level series scope into the marker', () => {
-		const marker = Statistics.buildMarker({ data, x: 'x', y: 'y' }, { type: 'box', series: ['A'] });
+		const [marker] = Statistics.buildMarker(
+			{ data, x: 'x', y: 'y' },
+			{ type: 'box', series: ['A'] }
+		);
 		expect(marker).not.toHaveProperty('series');
 	});
 });
@@ -274,7 +277,169 @@ describe('statistic color inheritance', () => {
 	});
 
 	test('with no color anywhere, a statistic falls back to black', () => {
-		const marker = Statistics.buildMarker({ data, x: 'x', y: 'y' }, { type: 'regression' });
+		const [marker] = Statistics.buildMarker({ data, x: 'x', y: 'y' }, { type: 'regression' });
 		expect((marker as { styles?: { stroke?: string } }).styles?.stroke).toBe('#000000');
+	});
+});
+
+describe('deviation statistic', () => {
+	const data = [2, 4, 4, 4, 5, 5, 7, 9].map((v, i) => ({ i, v }));
+	type Rect = { type: 'rect'; data: { lo: number; hi: number }[]; x1?: string; y1?: string };
+	type Rule = { type: 'rule'; axis: 'x' | 'y'; value: number; styles?: { stroke?: string } };
+
+	test('draws a band behind a rule at the mean, spread by the standard deviation', () => {
+		const markers = Statistics.buildMarker(
+			{ data, x: 'i', y: 'v', axis: 'y' },
+			{ type: 'deviation' }
+		);
+		expect(markers.map((m) => m.type)).toEqual(['rect', 'rule']);
+		const [rect, rule] = markers as [Rect, Rule];
+		const sd = Math.sqrt(32 / 7);
+		expect(rule.value).toBe(5);
+		expect(rule.axis).toBe('y');
+		expect(rect.y1).toBe('lo');
+		expect(rect.data[0].lo).toBeCloseTo(5 - sd);
+		expect(rect.data[0].hi).toBeCloseTo(5 + sd);
+	});
+
+	test('reads the value axis from the source: x gives a vertical rule and an x band', () => {
+		const markers = Statistics.buildMarker(
+			{ data, x: 'v', y: 'i', axis: 'x' },
+			{ type: 'deviation' }
+		);
+		const [rect, rule] = markers as [Rect, Rule];
+		expect(rule.axis).toBe('x');
+		expect(rect.x1).toBe('lo');
+		expect(rect).not.toHaveProperty('y1');
+	});
+
+	test('estimator, spread and k are configurable', () => {
+		const markers = Statistics.buildMarker(
+			{ data, x: 'i', y: 'v' },
+			{ type: 'deviation', estimator: 'median', spread: 'mad', k: 2 }
+		);
+		const [rect, rule] = markers as [Rect, Rule];
+		expect(rule.value).toBe(4.5);
+		expect(rect.data[0].hi - rule.value).toBeCloseTo(2 * 1.4826 * 0.5);
+		const [, midrange] = Statistics.buildMarker(
+			{ data, x: 'i', y: 'v' },
+			{ type: 'deviation', estimator: 'midrange' }
+		) as [Rect, Rule];
+		expect(midrange.value).toBe(5.5);
+	});
+
+	test('rule: false and band: false each omit their marker', () => {
+		const source = { data, x: 'i', y: 'v' };
+		expect(
+			Statistics.buildMarker(source, { type: 'deviation', rule: false }).map((m) => m.type)
+		).toEqual(['rect']);
+		expect(
+			Statistics.buildMarker(source, { type: 'deviation', band: false }).map((m) => m.type)
+		).toEqual(['rule']);
+	});
+
+	test('takes the source color, and nothing is drawn without values', () => {
+		const [, rule] = Statistics.buildMarker(
+			{ data, x: 'i', y: 'v', color: '#123456' },
+			{ type: 'deviation' }
+		) as [Rect, Rule];
+		expect(rule.styles?.stroke).toBe('#123456');
+		expect(Statistics.buildMarker({ data: [], x: 'i', y: 'v' }, { type: 'deviation' })).toEqual([]);
+	});
+
+	test('a plot-level deviation runs once per series along the plot’s value axis', () => {
+		const series = ['A', 'B'].map((name) => ({ name, data, x: 'v', y: 'i' }));
+		const markers = Statistics.buildForPlot({
+			series: series as never,
+			statistics: [{ type: 'deviation' }],
+			valueAxis: 'x'
+		});
+		expect(markers).toHaveLength(4);
+		expect((markers[1] as Rule).axis).toBe('x');
+	});
+});
+
+describe('deviation statistic labels', () => {
+	const data = [2, 4, 4, 4, 5, 5, 7, 9].map((v, i) => ({ i, v }));
+	type Label = {
+		type: 'text';
+		text: string;
+		x?: number;
+		y?: number;
+		frameAnchor?: string;
+		styles?: { fill?: string; fontSize?: number; fontWeight?: string };
+	};
+
+	test('label: true names the band’s upper edge and the rule, against the frame’s top for a vertical line', () => {
+		const markers = Statistics.buildMarker(
+			{ data, x: 'v', y: 'i', axis: 'x', color: '#123456' },
+			{ type: 'deviation', band: { label: true }, rule: { label: true } }
+		);
+		expect(markers.map((m) => m.type)).toEqual(['rect', 'text', 'rule', 'text']);
+		const [rect, band, , rule] = markers as unknown as [
+			{ data: { hi: number }[] },
+			Label,
+			unknown,
+			Label
+		];
+		expect(band.text).toBe('STDEV');
+		expect(band.x).toBe(rect.data[0].hi);
+		expect(band.frameAnchor).toBe('top');
+		expect(band.styles?.fill).toBe('#123456');
+		expect(rule.text).toBe('MEAN');
+		expect(rule.x).toBe(5);
+	});
+
+	test('a horizontal line’s label ends at the frame’s right, at its own y', () => {
+		const [, label] = Statistics.buildMarker(
+			{ data, x: 'i', y: 'v', axis: 'y' },
+			{ type: 'deviation', rule: false, band: { label: { edge: 'lower' } } }
+		) as unknown as [unknown, Label];
+		expect(label.frameAnchor).toBe('right');
+		expect(label).not.toHaveProperty('x');
+		expect(label.y).toBeCloseTo(5 - Math.sqrt(32 / 7));
+	});
+
+	test('text and FontStyle override the defaults, and the label never reaches the line’s own styles', () => {
+		const markers = Statistics.buildMarker(
+			{ data, x: 'i', y: 'v' },
+			{
+				type: 'deviation',
+				estimator: 'median',
+				spread: 'mad',
+				rule: { label: { text: 'Mid', styles: { fontWeight: 'bold', fontSize: 14 } } },
+				band: { label: true }
+			}
+		) as unknown as { type: string; text?: string; styles?: object }[];
+		const texts = markers.filter((m) => m.type === 'text');
+		expect(texts.map((t) => t.text)).toEqual(['MAD', 'Mid']);
+		expect(texts[1].styles).toMatchObject({ fontWeight: 'bold', fontSize: 14 });
+		for (const m of markers.filter((m) => m.type === 'rect' || m.type === 'rule')) {
+			expect(m.styles).not.toHaveProperty('label');
+		}
+	});
+});
+
+describe('deviation band label placement', () => {
+	const data = [2, 4, 4, 4, 5, 5, 7, 9].map((v, i) => ({ i, v }));
+	const dxOf = (label: object) => {
+		const [, text] = Statistics.buildMarker(
+			{ data, x: 'v', y: 'i', axis: 'x' },
+			{ type: 'deviation', rule: false, band: { label } }
+		) as unknown as [unknown, { styles: { dx: number } }];
+		return text.styles.dx;
+	};
+
+	test('inside an edge sits toward the band’s middle, outside away from it', () => {
+		// A vertical line: lower values are to its left.
+		expect(dxOf({ edge: 'upper' })).toBeLessThan(0);
+		expect(dxOf({ edge: 'lower' })).toBeGreaterThan(0);
+		expect(dxOf({ edge: 'upper', position: 'outside' })).toBeGreaterThan(0);
+		expect(dxOf({ edge: 'lower', position: 'outside' })).toBeLessThan(0);
+	});
+
+	test('a label’s own dx adds to the default gap, and a gap is always there', () => {
+		expect(dxOf({ styles: { dx: 3 } })).toBe(dxOf({}) + 3);
+		expect(Math.abs(dxOf({}))).toBeGreaterThan(0);
 	});
 });

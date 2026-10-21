@@ -3,7 +3,15 @@ import type { BollingerStatisticOptions } from './bollinger';
 import type { MovingAverageStatisticOptions } from './movingAverage';
 import type { DensityStatisticOptions, Density2DStatisticOptions } from './density';
 import type { BoxStatisticOptions } from './box';
+import type { DeviationStatisticOptions } from './deviation';
 
+export type {
+	DeviationBandLabel,
+	DeviationEstimator,
+	DeviationLabel,
+	DeviationSpread,
+	DeviationStatisticOptions
+} from './deviation';
 export type { RegressionType, RegressionStatisticOptions } from './regression';
 export type { BollingerStatisticOptions } from './bollinger';
 export type { StatisticReducer, MovingAverageStatisticOptions } from './movingAverage';
@@ -29,7 +37,8 @@ export type StatisticScope = { series?: string[]; pooled?: boolean };
  * `line` marker. `density` (1D) calls svelteplot's own `densityX` transform
  * and wraps the curve into an `area` marker; `density2d` and `box` resolve
  * straight to the same `density` and `box` markers a plot author can write
- * directly.
+ * directly; `deviation` computes an estimator and its spread over the plot's
+ * value axis and draws them as a `rule` and a `rect` marker.
  */
 export type StatisticConfig = StatisticScope &
 	(
@@ -39,4 +48,5 @@ export type StatisticConfig = StatisticScope &
 		| ({ type: 'density' } & DensityStatisticOptions)
 		| ({ type: 'density2d' } & Density2DStatisticOptions)
 		| ({ type: 'box' } & BoxStatisticOptions)
+		| ({ type: 'deviation' } & DeviationStatisticOptions)
 	);

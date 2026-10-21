@@ -45,6 +45,17 @@ export type TextMarkerConfig = {
 	edgeAware?: boolean;
 	/** The slice of its category band each label sits in (a grouped bar's series); it is drawn off the band's middle, whatever the band's width. */
 	bandSlice?: BandSlice;
+	/** Where, in the plot's frame, a label sits on an axis it sets no position for: `{ type: 'text', x: 5, frameAnchor: 'top' }` is at the frame's top edge. */
+	frameAnchor?:
+		| 'top'
+		| 'bottom'
+		| 'left'
+		| 'right'
+		| 'top-left'
+		| 'top-right'
+		| 'bottom-left'
+		| 'bottom-right'
+		| 'middle';
 	/** Grows the plot's margins, on every side the author left open, so the labels fit. */
 	fitMargins?: boolean;
 	/** Reports how far the rendered labels reach past the plot's content box, in pixels, on each side. */

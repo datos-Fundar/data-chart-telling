@@ -167,8 +167,9 @@
 )}
 	<Text
 		data={rows}
-		x={x ?? 0}
-		y={y ?? 0}
+		x={x ?? (marker.frameAnchor ? undefined : 0)}
+		y={y ?? (marker.frameAnchor ? undefined : 0)}
+		frameAnchor={marker.frameAnchor}
 		text={text ?? ''}
 		dx={rowDx}
 		dy={rowDy}
