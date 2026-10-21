@@ -70,6 +70,8 @@ setConfiguration({ axis: { locale: 'en-US', compactDisplay: 'long' } });
 setConfiguration({ axis: { edgeTicks: { x: { enabled: true, collision: 'extend' } } } });
 ```
 
+`axis.autoRotate` (default `true`) lets a category axis whose labels do not fit turn them to 45 or 90 degrees, and leave some out when that is not enough; an axis with its own `scales.x.tickRotate` is never touched, and `autoRotate: false` turns it off for every plot. It is read when a plot mounts.
+
 A plot overrides it with `scales.x.edgeTicks` or `scales.y.edgeTicks` (see [Scales](scales.md)).
 
 ## CSS variables

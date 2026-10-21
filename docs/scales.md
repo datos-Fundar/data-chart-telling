@@ -57,6 +57,8 @@ Each axis takes an `AxisScale`.
 | `insetLeft`, `insetRight`, `insetTop`, `insetBottom`                         | Pixels kept free at each end                                                                                                                                                                                                                                                                                                                                                                    |
 | `interval`, `base`, `constant`, `sort`                                       | Time/discrete intervals, log base, symlog constant, category order                                                                                                                                                                                                                                                                                                                              |
 
+A category axis whose labels do not fit side by side turns them by itself: to 45 degrees, else to 90, and when even that is not enough it writes only every few labels (and a vertical category axis, such as the one of horizontal bars, does the same). The margin grows to fit the turned labels. An axis with a `tickRotate` of its own - 0 included, which keeps the labels flat - is left as the author set it, and `axis.autoRotate: false` in the [configuration](theming.md) turns this off for every plot.
+
 Number and date text defaults follow `axis.locale` and `axis.compactDisplay` in the [configuration](theming.md#locale).
 
 ## Color

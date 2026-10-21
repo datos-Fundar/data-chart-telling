@@ -50,7 +50,7 @@ describe('BarPlot - scales', () => {
 				width: 400,
 				height: 300,
 				series: SERIES,
-				scales: { y: { reverse } } satisfies AxisBasedScalesConfig
+				scales: { y: { reverse, ticks: [80] } } satisfies AxisBasedScalesConfig
 			});
 			const svg = await waitForSvg(container);
 			const label = Array.from(svg.querySelectorAll('g.axis-y text')).find(

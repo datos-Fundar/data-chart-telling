@@ -19,7 +19,8 @@
 		height,
 		numericMargins,
 		scales,
-		edgeDomains = undefined
+		edgeDomains = undefined,
+		tickValues = undefined
 	}: {
 		data: TData[];
 		getX: (d: TData) => AxisValue;
@@ -33,6 +34,8 @@
 		 * `'extend'` resolved a collision (see `EdgeTicks`), for the plot to give its scale.
 		 */
 		edgeDomains?: Map<'x' | 'y', [number, number]>;
+		/** The labels a category axis writes, when it leaves some out for want of room. */
+		tickValues?: Partial<Record<'x' | 'y', string[]>>;
 	} = $props();
 
 	const cfg = $derived(getConfiguration());
@@ -179,6 +182,12 @@
 		});
 	});
 
+	/** A turned label is written on one line: the axis does not wrap it. */
+	const turned = $derived(scales?.x?.tickRotate ? { wordwrap: false } : {}) as Record<
+		string,
+		unknown
+	>;
+
 	const yTitleFontSize = $derived(scales?.y?.titleFontSize ?? cfg.axis.titleFontSize);
 
 	/**
@@ -224,7 +233,8 @@
 
 {#snippet axisX()}
 	<AxisX
-		ticks={xEdgeTicks?.ticks}
+		ticks={(xEdgeTicks?.ticks ?? tickValues?.x) as string[] | undefined}
+		{...turned}
 		tickCount={xTickCount}
 		interval={xTickInterval}
 		tickSize={scales?.x?.tickSize ?? cfg.axis.xTickSize}
@@ -240,7 +250,7 @@
 {/if}
 {#snippet axisY()}
 	<AxisY
-		ticks={yEdgeTicks?.ticks}
+		ticks={(yEdgeTicks?.ticks ?? tickValues?.y) as string[] | undefined}
 		tickCount={yTickCount}
 		interval={yTickInterval}
 		tickSize={scales?.y?.tickSize ?? cfg.axis.yTickSize}

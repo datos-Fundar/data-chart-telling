@@ -36,7 +36,7 @@ import { FEMALE_LIFE_EXPECTANCY_SINCE_1947, type YearPoint } from '../../../plot
  * others set the prop on one plot and leave the configuration alone.
  */
 const meta = {
-	title: 'Configuration/Styling/Scales/Edge ticks',
+	title: 'Configuration/Styling/Edge ticks',
 	component: LinePlot,
 	tags: ['autodocs'],
 	args: {

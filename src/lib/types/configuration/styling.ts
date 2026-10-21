@@ -174,6 +174,7 @@ export type PlotStylesConfig = {
 		locale: string;
 		compactDisplay: 'short' | 'long';
 		edgeTicks: { x: EdgeTicksOptions; y: EdgeTicksOptions };
+		autoRotate: boolean;
 	};
 
 	// ── Tooltip ─────────────────────────────────────────────────────────────────

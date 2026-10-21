@@ -135,7 +135,8 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		edgeTicks: {
 			x: { enabled: true, collision: 'drop-nice' },
 			y: { enabled: false, collision: 'drop-nice' }
-		}
+		},
+		autoRotate: true
 	},
 
 	tooltip: {

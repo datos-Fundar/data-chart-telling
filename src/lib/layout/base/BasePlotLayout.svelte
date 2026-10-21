@@ -51,6 +51,7 @@
 	import { Plot, Pointer, setPlotDefaults } from 'svelteplot';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { SveltePlotScale } from '$lib/layout/scales/SveltePlotScale';
+	import { TickLabels } from '$lib/layout/scales/TickLabels';
 	import ScalesLayout from '$lib/layout/scales/ScalesLayout.svelte';
 	import GeometryLayout from '$lib/layout/geometry/GeometryLayout.svelte';
 	import CoordinatesLayout from '$lib/layout/coordinates/CoordinatesLayout.svelte';
@@ -162,6 +163,68 @@
 		numberFormat: { useGrouping: 'min2', compactDisplay: untrack(() => cfg.axis.compactDisplay) }
 	});
 
+	/**
+	 * How the labels of the plot's category axes are laid out when they would not fit
+	 * side by side, unless the author set a `tickRotate` of their own or turned
+	 * `axis.autoRotate` off: the x labels turn (45 degrees, else 90), and either
+	 * axis leaves some out when even that is not enough. Judged against the plot's
+	 * width and height less the margins an `'auto'` side is estimated at, so it holds
+	 * whatever the margins settle on.
+	 */
+	const tickLayout = $derived.by(() => {
+		const bands = state.axes?.bands ?? [];
+		if (!cfg.axis.autoRotate || bands.length === 0) return undefined;
+		const estimate = state.marginEstimate ?? Margins.AXIS_ESTIMATE;
+		const categories = (axis: 'x' | 'y') => {
+			const given = scales?.[axis]?.domain;
+			if (given) return given.map(String);
+			const get = axis === 'x' ? getX : getY;
+			return [...new Set(data.map((row) => String(get(row))))].sort();
+		};
+		const out: {
+			x?: ReturnType<typeof TickLabels.layout>;
+			y?: { every: number; values: string[] };
+		} = {};
+		if (bands.includes('x') && scales?.x?.tickRotate === undefined) {
+			out.x = TickLabels.layout(
+				categories('x'),
+				width - estimate.left - estimate.right,
+				scales?.x?.paddingInner ?? 0.1,
+				cfg.axis.fontSize,
+				cfg
+			);
+		}
+		if (bands.includes('y') && scales?.y?.ticks == null) {
+			const values = categories('y');
+			const every = TickLabels.rows(
+				values.length,
+				height - estimate.top - estimate.bottom,
+				cfg.axis.fontSize
+			);
+			if (every > 1) out.y = { every, values };
+		}
+		return out;
+	});
+	/** `scales` with the rotation the tick layout chose for the x labels. */
+	const layoutScales = $derived.by(() => {
+		const rotate = tickLayout?.x?.rotate;
+		if (!rotate || scales === undefined) return scales;
+		return { ...scales, x: { ...scales.x, tickRotate: rotate } };
+	});
+	/** The category labels a crowded axis still writes: one in every few. */
+	const tickValues = $derived.by(() => {
+		const out: Partial<Record<'x' | 'y', string[]>> = {};
+		const x = tickLayout?.x;
+		if (x && x.every > 1) {
+			const values =
+				scales?.x?.domain?.map(String) ?? [...new Set(data.map((row) => String(getX(row))))].sort();
+			out.x = values.filter((_, index) => index % x.every === 0);
+		}
+		const y = tickLayout?.y;
+		if (y) out.y = y.values.filter((_, index) => index % y.every === 0);
+		return out;
+	});
+
 	// Created once: this plot's margins, grown to fit the labels its markers report.
 	const plotMargins = new PlotMargins({
 		theme: () => cfg.margins,
@@ -170,8 +233,9 @@
 		reserve: () => state.valueLabels?.reach ?? [],
 		size: () => ({ width, height }),
 		resetKey: () => state.resolvedSeries,
-		scales: () => scales,
+		scales: () => layoutScales,
 		tickFontSize: () => cfg.axis.fontSize,
+		tickWidth: () => ({ x: tickLayout?.x?.width }),
 		settle: (settled) => (margins = settled)
 	});
 	const numericMargins = $derived(plotMargins.numeric);
@@ -193,7 +257,7 @@
 
 	// `SveltePlotScale.build` already left only svelteplot's own scale options.
 	const resolvedX = $derived.by(() => {
-		const built = SveltePlotScale.build(scales?.x, data, getX);
+		const built = SveltePlotScale.build(layoutScales?.x, data, getX);
 		const domain = edgeDomains.get('x');
 		return (domain ? { ...built, domain, nice: false } : built) as SveltePlotProps['x'];
 	});
@@ -265,7 +329,17 @@
 		<StylesLayout styles={state.styles} {width} {height} {numericMargins} />
 		<!-- Axes for every kind but GeoPlot. -->
 		{#if scales !== undefined && coordinates === undefined}
-			<ScalesLayout {data} {getX} {getY} {width} {height} {numericMargins} {scales} {edgeDomains} />
+			<ScalesLayout
+				{data}
+				{getX}
+				{getY}
+				{width}
+				{height}
+				{numericMargins}
+				scales={layoutScales}
+				{edgeDomains}
+				{tickValues}
+			/>
 		{/if}
 		<GeometryLayout
 			markers={resolvedMarkers}
