@@ -1,4 +1,3 @@
-export type { MarkerCurveName } from './axis/curveName';
 export * from './axis/line';
 export * from './axis/bar';
 export * from './axis/cell';

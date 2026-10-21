@@ -76,6 +76,8 @@ Start with the full guide: it lists the mental model, the props every plot share
 - [Filling gaps of missing values](./examples/Gaps.svelte)
 - [Highlighting a range of one series](./examples/SegmentHighlight.svelte)
 - [Segments per series and shared rules](./examples/SegmentsBySeries.svelte)
+- [Step plot: a line plot with a step curve](./examples/LineStep.svelte)
+- [A step curve on one segment of a line](./examples/LineStepSegment.svelte)
 - [Segments on a heatmap](./examples/HeatmapSegments.svelte)
 - [Hover, rule and delta markers](./examples/Markers.svelte)
 - [Bars stacked with stackY](./examples/StackedBars.svelte)

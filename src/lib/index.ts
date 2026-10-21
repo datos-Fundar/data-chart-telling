@@ -95,6 +95,7 @@ export type {
 	ConnectorBasedStylesConfig,
 	BulletStylesConfig,
 	GapsAwarePlotStylesConfig,
+	CurveAwarePlotStylesConfig,
 	GeoStylesConfig,
 	GeoTileLayerConfig
 } from './types/layout/styles';
@@ -109,11 +110,7 @@ export type {
 export type { Range, Area, Segment } from './types/plots/segments/config';
 export type { SymbolType } from './types/plots/constants';
 export type { FontStyle, StrokeStyle, DotStyle, AreaStyle } from './types/plots/styling';
-export type {
-	AxisBasedMarkersConfig,
-	BrushSelection,
-	MarkerCurveName
-} from './types/markers/common';
+export type { AxisBasedMarkersConfig, BrushSelection } from './types/markers/common';
 export type { StatisticConfig } from './types/layout/statistics';
 export type * from './types/transforms';
 export type { GeoFeature, GeoJsonInput, GeoDataProps, Topology } from './types/plots/data/geo';

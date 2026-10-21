@@ -10,6 +10,8 @@ import type { StrokeStyle, DotStyle } from '$lib/types/plots/styling';
 import type { LineMarkerConfig, DotMarkerConfig } from '$lib/types/markers/common';
 import type { LinePlotState, LinePlotCtx } from '$lib/types/plots/evolution/line/state';
 import type { AxisValue } from '$lib/types/layout/mapping';
+import type { CurveName } from '$lib/types/layout/styles/curve';
+import type { CurveAwarePlotStylesConfig } from '$lib/types/layout/styles';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 /**
@@ -22,8 +24,10 @@ export function buildLineMarkers<TData extends Record<string, unknown>>(args: {
 	colorFor: (seriesName: string) => string;
 	disabledStrokeFor: (seriesName: string) => StrokeStyle | undefined;
 	disabledDotsFor: (seriesName: string) => DotStyle | undefined;
+	/** The curve of every segment that sets none of its own; `'linear'` when left out. */
+	curve?: CurveName;
 }): (LineMarkerConfig | DotMarkerConfig)[] {
-	const { groupedSeries, colorFor, disabledStrokeFor, disabledDotsFor } = args;
+	const { groupedSeries, colorFor, disabledStrokeFor, disabledDotsFor, curve } = args;
 	const cfg = getConfiguration();
 
 	const markers: (LineMarkerConfig | DotMarkerConfig)[] = [];
@@ -48,6 +52,7 @@ export function buildLineMarkers<TData extends Record<string, unknown>>(args: {
 				data: seg.data,
 				x,
 				y,
+				curve: seg.styles.curve ?? curve,
 				styles: {
 					stroke: disabledStroke?.stroke ?? strokeStyle?.stroke ?? defaultColor,
 					strokeWidth:
@@ -239,7 +244,8 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		groupedSeries: groups,
 		colorFor: colorForSeries!,
 		disabledStrokeFor,
-		disabledDotsFor
+		disabledDotsFor,
+		curve: (state.styles as CurveAwarePlotStylesConfig | undefined)?.curve
 	});
 
 	const gapMarkers = buildGapMarkers({

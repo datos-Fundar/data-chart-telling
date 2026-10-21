@@ -93,6 +93,7 @@ const preview: Preview = {
 								'Scales',
 								'Styles',
 								'Segments',
+								'Curves',
 								'Markers',
 								['Rules', 'Deltas', 'Custom'],
 								'Tooltip'
@@ -100,7 +101,8 @@ const preview: Preview = {
 							'SlopePlot',
 							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
 							'SparklinePlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip']
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							'StepPlot'
 						],
 						'Map',
 						[

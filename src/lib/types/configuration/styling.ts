@@ -2,6 +2,7 @@ import type { StrokeStyle, DotStyle, FontStyle, AreaStyle } from '$lib/types/plo
 import type { LineAnchor, SymbolType, TextAnchor } from '$lib/types/plots/constants';
 import type { PlotChromeEntry } from '$lib/types/plots/props';
 import type { EdgeTicksOptions } from '$lib/types/layout/scales';
+import type { CurveName } from '$lib/types/layout/styles/curve';
 
 export type TextStyle = {
 	/** font-family */
@@ -220,6 +221,8 @@ export type PlotStylesConfig = {
 	continuous: { min: string; max: string; labelColor: string; opacityRange: [number, number] };
 	/** Default line geometry. */
 	line: {
+		/** Curve of every line that sets none (`styles.curve`, a segment's `curve`): `'auto'` joins the points with straight segments, or along the great circle on a projected map. */
+		curve: CurveName | 'auto';
 		strokeWidth: number;
 		dotRadius: number;
 		/**

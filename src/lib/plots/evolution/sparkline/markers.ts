@@ -3,6 +3,7 @@ import { buildLineMarkers } from '$lib/plots/evolution/line/markers';
 import { resolveAccessor } from '$lib/utils/accessors';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import type { AxisValue } from '$lib/types/layout/mapping';
+import type { CurveAwarePlotStylesConfig } from '$lib/types/layout/styles';
 import type { AxisBasedMarkersConfig, DotMarkerConfig } from '$lib/types/markers/common';
 import type {
 	SparklinePlotState,
@@ -33,7 +34,8 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		})),
 		colorFor: state.colorForSeries!,
 		disabledStrokeFor: (name) => ctx.interaction?.strokeFor(name),
-		disabledDotsFor
+		disabledDotsFor,
+		curve: (state.styles as CurveAwarePlotStylesConfig | undefined)?.curve
 	});
 
 	const dots = groups.flatMap((group): DotMarkerConfig[] => {

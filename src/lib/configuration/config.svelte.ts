@@ -155,6 +155,7 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 	symbols: ['circle', 'square', 'triangle', 'diamond', 'star', 'cross'],
 	continuous: { min: '#f7fcfd', max: '#1b9e77', labelColor: '#111827', opacityRange: [0.2, 1] },
 	line: {
+		curve: 'auto',
 		strokeWidth: 3,
 		dotRadius: 4,
 		gap: {

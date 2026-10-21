@@ -4,6 +4,7 @@ import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import type { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import type { ValueAnchor } from '$lib/types/plots/constants';
 import type { EdgeBox } from '$lib/types/layout/box';
+import type { CurveAwarePlotStylesConfig } from '$lib/types/layout/styles';
 import type { AxisBasedMarkersConfig, TextMarkerConfig } from '$lib/types/markers/common';
 import type { SlopePlotState, SlopePlotCtx } from '$lib/types/plots/evolution/slope/state';
 
@@ -39,7 +40,8 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		groupedSeries: groups,
 		colorFor: state.colorForSeries!,
 		disabledStrokeFor: (name) => ctx.interaction?.strokeFor(name),
-		disabledDotsFor: (name) => ctx.interaction?.dotsFor(name)
+		disabledDotsFor: (name) => ctx.interaction?.dotsFor(name),
+		curve: (state.styles as CurveAwarePlotStylesConfig | undefined)?.curve
 	});
 }
 
