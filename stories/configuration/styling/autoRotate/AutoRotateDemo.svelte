@@ -2,7 +2,7 @@
 	import { untrack } from 'svelte';
 	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 	import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
-	import { PROVINCE_VALUES } from '$examples/data';
+	import { PROVINCE_VALUES } from '$datasets';
 
 	let {
 		enabled = true,

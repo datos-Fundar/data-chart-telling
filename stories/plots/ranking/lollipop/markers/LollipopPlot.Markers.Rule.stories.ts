@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LollipopPlot from '$lib/plots/ranking/lollipop/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { PROVINCE_VALUES } from '$examples/data';
+import { PROVINCE_VALUES } from '$datasets';
 
 const FEMALE = PROVINCE_VALUES.filter((row) => row.sex === 'female');
 

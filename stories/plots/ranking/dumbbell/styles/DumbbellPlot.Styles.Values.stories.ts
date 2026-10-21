@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import DumbbellPlot from '$lib/plots/ranking/dumbbell/Plot.svelte';
 import type { ConnectorBasedStylesConfig } from '$lib/types/layout/styles';
-import { AGE_SHARES, PROVINCE_VALUES } from '$examples/data';
+import { AGE_SHARES, PROVINCE_VALUES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `styles.values` writes each dot's value: past the highest and the lowest of its

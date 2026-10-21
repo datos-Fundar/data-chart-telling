@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import DumbbellPlot from '$lib/plots/ranking/dumbbell/Plot.svelte';
-import { PROVINCE_VALUES } from '$examples/data';
+import { PROVINCE_VALUES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `deviation` draws a rule at an estimator (the mean by default) and a band `k` standard

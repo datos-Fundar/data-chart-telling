@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { LIFE } from './data';
+	import { LIFE } from './datasets';
 </script>
 
 <!-- A segment sets its own curve: the female line is straight until 1980 and steps from then on. -->

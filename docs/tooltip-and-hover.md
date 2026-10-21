@@ -9,7 +9,7 @@ A plot becomes interactive when it is given a `tooltip`, a `{ type: 'hover' }` m
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES } from './data';
+	import { REGION_VALUES } from './datasets';
 </script>
 
 <!--
@@ -49,7 +49,7 @@ A plot becomes interactive when it is given a `tooltip`, a `{ type: 'hover' }` m
 <script lang="ts">
 	import { LinePlot, getConfiguration, paletteColor } from '@fundar/data-chart-telling';
 	import TooltipCard from './TooltipCard.svelte';
-	import { REGION_VALUES, type RegionRow } from './data';
+	import { REGION_VALUES, type RegionRow } from './datasets';
 
 	const { palette } = getConfiguration();
 	const regions = [...new Set(REGION_VALUES.map((row) => row.region))];

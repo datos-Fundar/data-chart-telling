@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BulletPlot from '$lib/plots/ranking/bullet/Plot.svelte';
-import { PROVINCE_LIFE } from '$examples/data';
+import { PROVINCE_LIFE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A bullet plot measures each category - here the life expectancy of women in five

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ClevelandPlot from '$lib/plots/ranking/cleveland/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import { AGE_SHARES, type AgeShareRow } from '$examples/data';
+import { AGE_SHARES, type AgeShareRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Every category is one dot for each series that has a value there, joined by a connector

@@ -9,7 +9,7 @@ A small line plot to read a trend at a glance: no axes, no legend, a thin line, 
 ```svelte
 <script lang="ts">
 	import { SparklinePlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES } from './data';
+	import { REGION_VALUES } from './datasets';
 </script>
 
 <!-- One sparkline per region: monthly inflation as a thin line, with its last value beside a dot. -->

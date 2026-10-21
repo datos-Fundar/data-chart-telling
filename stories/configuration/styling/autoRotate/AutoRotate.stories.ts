@@ -4,7 +4,7 @@ import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import AutoRotateDemo from './AutoRotateDemo.svelte';
 import AutoRotateDemoSource from './AutoRotateDemo.svelte?raw';
 import { demoSource } from '../../../common/docsSource';
-import { PROVINCE_VALUES, AGES } from '$examples/data';
+import { PROVINCE_VALUES, AGES } from '$datasets';
 
 /**
  * `axis.autoRotate` (on by default) lets the category axis of any plot turn its

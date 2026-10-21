@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { BarPlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES, MONTHS } from './data';
+	import { REGION_VALUES, MONTHS } from './datasets';
 </script>
 
 <!-- Categories on x, values on y. Swap `x` and `y` for horizontal bars. -->

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ForestPlot from '$lib/plots/ranking/forest/Plot.svelte';
-import { INFLATION_RANGES, type InflationRange } from '$examples/data';
+import { INFLATION_RANGES, type InflationRange } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Hovering a category reads its rows - one per series - through the same

@@ -93,7 +93,6 @@ Start with the full guide: it lists the mental model, the props every plot share
 - [Facets as a carousel](./examples/FacetsCarousel.svelte)
 - [Facets by rows and columns](./examples/FacetsRowsCols.svelte)
 - [Several plots in one figure](./examples/Composer.svelte)
-- [Shared example data](./examples/data.ts)
 - [Example datasets, one file each](./examples/datasets)
 
 ## Types

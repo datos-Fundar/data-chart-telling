@@ -7,7 +7,7 @@
 ```svelte
 <script lang="ts">
 	import { PlotComposer, LinePlot, BarPlot, ScatterPlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES, PROVINCE_VALUES, COUNTRIES } from './data';
+	import { REGION_VALUES, PROVINCE_VALUES, COUNTRIES } from './datasets';
 </script>
 
 <!-- Several plots in one figure, placed on named areas of a grid. -->

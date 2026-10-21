@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { LIFE } from './data';
+	import { LIFE } from './datasets';
 </script>
 
 <!-- A step plot is a line plot with a step curve: each life table holds its value until the next one. -->

@@ -10,7 +10,7 @@ const dirname =
 
 const alias = {
 	$lib: path.resolve(dirname, './src/lib'),
-	$examples: path.resolve(dirname, './examples'),
+	$datasets: path.resolve(dirname, './examples/datasets'),
 	'@fundar/data-chart-telling': path.resolve(dirname, './src/lib/index.ts')
 };
 

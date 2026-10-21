@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { BoxPlot } from '@fundar/data-chart-telling';
-	import { HEIGHTS } from './data';
+	import { HEIGHTS } from './datasets';
 </script>
 
 <!-- One box per group: quartiles, median, whiskers and outliers of each height distribution. -->

@@ -7,7 +7,7 @@
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES } from './data';
+	import { REGION_VALUES } from './datasets';
 </script>
 
 <!-- One panel per region, three columns, sharing scales. A tooltip with `sync` shows in every panel on purpose. -->
@@ -52,7 +52,7 @@ The data phases (grouping, transforms, statistics, shared scales) run once for a
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES } from './data';
+	import { REGION_VALUES } from './datasets';
 </script>
 
 <!-- A carousel shows `visible` panels at a time, with navigation below. -->
@@ -79,7 +79,7 @@ The data phases (grouping, transforms, statistics, shared scales) run once for a
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES } from './data';
+	import { REGION_VALUES } from './datasets';
 
 	// Each region's value split into two sectors.
 	const SECTORS = [

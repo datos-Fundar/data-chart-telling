@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ForestPlot from '$lib/plots/ranking/forest/Plot.svelte';
 import type { ConnectorBasedStylesConfig } from '$lib/types/layout/styles';
-import { INFLATION_RANGES } from '$examples/data';
+import { INFLATION_RANGES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `styles.connector` styles each stem: its `width`, `color` and `opacity`, and its

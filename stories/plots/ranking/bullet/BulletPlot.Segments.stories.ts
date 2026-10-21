@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BulletPlot from '$lib/plots/ranking/bullet/Plot.svelte';
 import type { SegmentsConfig } from '$lib/types/plots/props';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
-import { PROVINCE_LIFE } from '$examples/data';
+import { PROVINCE_LIFE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `segments` restyle the bars of some categories: each segment's `areas` selects the

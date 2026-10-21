@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import SparklinePlot from '$lib/plots/evolution/sparkline/Plot.svelte';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
-import { REGION_VALUES } from '$examples/data';
+import { REGION_VALUES } from '$datasets';
 
 const GBA = REGION_VALUES.filter(({ region }) => region === 'GBA');
 

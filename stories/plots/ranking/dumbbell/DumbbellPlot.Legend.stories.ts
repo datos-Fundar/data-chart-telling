@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import DumbbellPlot from '$lib/plots/ranking/dumbbell/Plot.svelte';
 import type { LegendExtension } from '$lib/types/layout/legend';
-import { PROVINCE_VALUES } from '$examples/data';
+import { PROVINCE_VALUES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Each series shows in the automatic legend under its name and color. Extending

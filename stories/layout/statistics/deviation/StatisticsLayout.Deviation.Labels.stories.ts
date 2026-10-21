@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import DumbbellPlot from '$lib/plots/ranking/dumbbell/Plot.svelte';
-import { PROVINCE_VALUES } from '$examples/data';
+import { PROVINCE_VALUES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `label` on the rule or the band writes its name against the plot's edge, along the line. Its

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import DumbbellPlot from '$lib/plots/ranking/dumbbell/Plot.svelte';
 import type { ConnectorBasedStylesConfig } from '$lib/types/layout/styles';
-import { AGE_SHARES } from '$examples/data';
+import { AGE_SHARES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `styles.connector` styles the line each category draws between its dots: its `width`

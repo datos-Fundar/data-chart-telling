@@ -9,7 +9,7 @@ Bins the rows of each series along one axis and draws the count per bin. Give `x
 ```svelte
 <script lang="ts">
 	import { HistogramPlot } from '@fundar/data-chart-telling';
-	import { HEIGHTS } from './data';
+	import { HEIGHTS } from './datasets';
 </script>
 
 <!-- Two overlapping distributions, one per `grouping` value. -->

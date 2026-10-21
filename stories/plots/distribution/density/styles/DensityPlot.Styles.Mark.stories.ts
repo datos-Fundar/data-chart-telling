@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import DensityPlot from '$lib/plots/distribution/density/Plot.svelte';
 import type { DensityPlotStylesConfig } from '$lib/types/plots/distribution/density/props';
-import { HEIGHTS } from '$examples/data';
+import { HEIGHTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `styles.mark` picks what draws each curve: a filled `'area'` (the default) or

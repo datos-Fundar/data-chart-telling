@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import SparklinePlot from '$lib/plots/evolution/sparkline/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { REGION_VALUES } from '$examples/data';
+import { REGION_VALUES } from '$datasets';
 
 const GBA = REGION_VALUES.filter(({ region }) => region === 'GBA');
 

@@ -9,7 +9,7 @@ A dot per row.
 ```svelte
 <script lang="ts">
 	import { ScatterPlot } from '@fundar/data-chart-telling';
-	import { COUNTRIES } from './data';
+	import { COUNTRIES } from './datasets';
 </script>
 
 <!-- Points sized by `r`, colored by `color` and shaped by `symbol`. -->

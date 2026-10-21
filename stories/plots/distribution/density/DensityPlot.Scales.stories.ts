@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import DensityPlot from '$lib/plots/distribution/density/Plot.svelte';
-import { HEIGHTS } from '$examples/data';
+import { HEIGHTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The domains of a density plot come from what its curves draw: `x` covers the

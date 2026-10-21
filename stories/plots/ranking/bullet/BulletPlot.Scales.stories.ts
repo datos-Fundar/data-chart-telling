@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BulletPlot from '$lib/plots/ranking/bullet/Plot.svelte';
-import { PROVINCE_LIFE } from '$examples/data';
+import { PROVINCE_LIFE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The value axis starts at zero and reaches the bars, the targets and the largest range;

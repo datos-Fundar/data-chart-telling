@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ForestPlot from '$lib/plots/ranking/forest/Plot.svelte';
 import type { SegmentsConfig } from '$lib/types/plots/props';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
-import { INFLATION_RANGES } from '$examples/data';
+import { INFLATION_RANGES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `segments` restyles some of a series' dots: each segment's `areas` selects the

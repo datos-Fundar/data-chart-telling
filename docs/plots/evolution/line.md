@@ -9,7 +9,7 @@ One line per series. Rows with a missing value (`null`, `undefined`, `NaN`) brea
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { PRICES } from './data';
+	import { PRICES } from './datasets';
 </script>
 
 <!-- A line per commodity over a date axis, with end-of-line labels. -->
@@ -43,7 +43,7 @@ A step plot suits a value that holds until something changes it (a rate, a price
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { LIFE } from './data';
+	import { LIFE } from './datasets';
 </script>
 
 <!-- A step plot is a line plot with a step curve: each life table holds its value until the next one. -->
@@ -70,7 +70,7 @@ A segment's own `curve` wins over `styles.curve`, so one stretch of a line can s
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { LIFE } from './data';
+	import { LIFE } from './datasets';
 </script>
 
 <!-- A segment sets its own curve: the female line is straight until 1980 and steps from then on. -->

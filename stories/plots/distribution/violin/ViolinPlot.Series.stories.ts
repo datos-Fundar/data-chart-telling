@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ViolinPlot from '$lib/plots/distribution/violin/Plot.svelte';
-import { IRIS } from '$examples/datasets/iris-flower';
+import { IRIS } from '$datasets';
 
 /** The iris flowers, split in two by the median petal length, for a second grouping. */
 const FLOWERS = IRIS.map((flower) => ({

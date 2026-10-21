@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { PyramidPlot } from '@fundar/data-chart-telling';
-	import { AGES } from './data';
+	import { AGES } from './datasets';
 </script>
 
 <!-- A population pyramid: one side per `color` value. -->

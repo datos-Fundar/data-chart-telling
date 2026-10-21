@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import DumbbellPlot from '$lib/plots/ranking/dumbbell/Plot.svelte';
-import { PROVINCE_VALUES } from '$examples/data';
+import { PROVINCE_VALUES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `estimator` picks the value the rule sits at (`mean`, `median`, `midrange`); `spread` what

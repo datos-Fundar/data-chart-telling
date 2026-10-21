@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import DumbbellPlot from '$lib/plots/ranking/dumbbell/Plot.svelte';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { ConnectorBasedStylesConfig } from '$lib/types/layout/styles';
-import { PROVINCE_VALUES } from '$examples/data';
+import { PROVINCE_VALUES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The value axis fits the values, without reaching for zero; the category axis

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ScatterPlot } from '@fundar/data-chart-telling';
-	import { COUNTRIES } from './data';
+	import { COUNTRIES } from './datasets';
 </script>
 
 <!-- A linear regression with its 95% confidence band. -->

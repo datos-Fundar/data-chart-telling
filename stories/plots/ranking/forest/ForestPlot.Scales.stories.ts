@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ForestPlot from '$lib/plots/ranking/forest/Plot.svelte';
-import { INFLATION_RANGES } from '$examples/data';
+import { INFLATION_RANGES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The value axis fits the intervals, not the estimates alone; the category axis lists

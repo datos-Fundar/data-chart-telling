@@ -7,7 +7,7 @@
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { LIFE } from './data';
+	import { LIFE } from './datasets';
 </script>
 
 <!-- Markers add marks to a plot: a hover highlight, a reference rule and a delta between two series. -->

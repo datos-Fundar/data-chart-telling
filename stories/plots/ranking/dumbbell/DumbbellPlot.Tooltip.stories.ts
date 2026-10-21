@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import DumbbellPlot from '$lib/plots/ranking/dumbbell/Plot.svelte';
-import { PROVINCE_VALUES, type ProvinceRow } from '$examples/data';
+import { PROVINCE_VALUES, type ProvinceRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Hovering a category reads its rows - one per series - through the same

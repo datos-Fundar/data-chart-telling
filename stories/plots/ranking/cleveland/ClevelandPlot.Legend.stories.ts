@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ClevelandPlot from '$lib/plots/ranking/cleveland/Plot.svelte';
 import type { LegendExtension } from '$lib/types/layout/legend';
-import { AGE_SHARES } from '$examples/data';
+import { AGE_SHARES } from '$datasets';
 import { SEQUENTIAL_COLORS } from './colors';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────

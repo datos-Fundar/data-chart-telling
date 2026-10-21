@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ViolinPlot from '$lib/plots/distribution/violin/Plot.svelte';
 import type { ViolinPlotStylesConfig } from '$lib/types/plots/distribution/violin/props';
-import { IRIS } from '$examples/datasets/iris-flower';
+import { IRIS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `styles` sets how each violin is estimated (`kernel`, `bandwidth`, `trim`) and

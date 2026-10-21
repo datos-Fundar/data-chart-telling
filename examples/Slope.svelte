@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { SlopePlot } from '@fundar/data-chart-telling';
-	import { AGE_SHARES } from './data';
+	import { AGE_SHARES } from './datasets';
 
 	const censuses = AGE_SHARES.filter(({ year }) => year === 1991 || year === 2022);
 </script>

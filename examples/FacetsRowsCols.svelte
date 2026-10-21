@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES } from './data';
+	import { REGION_VALUES } from './datasets';
 
 	// Each region's value split into two sectors.
 	const SECTORS = [

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BulletPlot from '$lib/plots/ranking/bullet/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { PROVINCE_LIFE } from '$examples/data';
+import { PROVINCE_LIFE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `styles.values` writes each bar's value, with the same `anchor` and `format` as a bar

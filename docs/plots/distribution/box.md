@@ -9,7 +9,7 @@ Summarizes the values of each series per category as a box: it spans the middle 
 ```svelte
 <script lang="ts">
 	import { BoxPlot } from '@fundar/data-chart-telling';
-	import { HEIGHTS } from './data';
+	import { HEIGHTS } from './datasets';
 </script>
 
 <!-- One box per group: quartiles, median, whiskers and outliers of each height distribution. -->

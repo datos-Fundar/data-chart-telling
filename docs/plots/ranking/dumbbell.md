@@ -9,7 +9,7 @@ Two dots per category, one for each of two series, joined by a connector: the ga
 ```svelte
 <script lang="ts">
 	import { DumbbellPlot } from '@fundar/data-chart-telling';
-	import { PROVINCE_VALUES } from './data';
+	import { PROVINCE_VALUES } from './datasets';
 </script>
 
 <!-- Two dots per province, one per sex, joined by a connector: the gap in life expectancy at birth. -->

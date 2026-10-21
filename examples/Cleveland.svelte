@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ClevelandPlot } from '@fundar/data-chart-telling';
-	import { AGE_SHARES } from './data';
+	import { AGE_SHARES } from './datasets';
 </script>
 
 <!-- One dot per census year in each age group, joined from the lowest share to the highest. The years follow one another, so they take a sequential blues ramp. -->

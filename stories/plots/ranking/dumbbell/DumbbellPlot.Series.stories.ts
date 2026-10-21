@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import DumbbellPlot from '$lib/plots/ranking/dumbbell/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import { PROVINCE_VALUES, type ProvinceRow } from '$examples/data';
+import { PROVINCE_VALUES, type ProvinceRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Every category is two dots, one per series, joined by a connector: the gap between them

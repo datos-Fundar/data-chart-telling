@@ -9,7 +9,7 @@ Per category, a bar for its value, a tick for its `target` and bands behind it -
 ```svelte
 <script lang="ts">
 	import { BulletPlot } from '@fundar/data-chart-telling';
-	import { PROVINCE_LIFE } from './data';
+	import { PROVINCE_LIFE } from './datasets';
 </script>
 
 <!-- Female life expectancy at birth by province: the bar, against a target of 80 years, over bands for under 76, 76 to 80 and over 80. -->

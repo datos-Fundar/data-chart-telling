@@ -42,7 +42,7 @@ Items become clickable with `interactive` on the series section. `disabled` says
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES } from './data';
+	import { REGION_VALUES } from './datasets';
 	import LegendReader from './LegendReader.svelte';
 </script>
 
@@ -110,7 +110,7 @@ A list replaces the automatic legend with exactly those sections:
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES } from './data';
+	import { REGION_VALUES } from './datasets';
 </script>
 
 <!-- An explicit legend: a discrete section of toggles and a continuous ramp. -->

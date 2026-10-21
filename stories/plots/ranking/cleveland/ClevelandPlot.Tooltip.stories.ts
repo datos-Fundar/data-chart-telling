@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ClevelandPlot from '$lib/plots/ranking/cleveland/Plot.svelte';
-import { AGE_SHARES, type AgeShareRow } from '$examples/data';
+import { AGE_SHARES, type AgeShareRow } from '$datasets';
 import { SEQUENTIAL_COLORS } from './colors';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────

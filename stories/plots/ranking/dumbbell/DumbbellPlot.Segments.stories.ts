@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import DumbbellPlot from '$lib/plots/ranking/dumbbell/Plot.svelte';
 import type { SegmentsConfig } from '$lib/types/plots/props';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
-import { PROVINCE_VALUES } from '$examples/data';
+import { PROVINCE_VALUES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `segments` restyles some of a series' dots: each segment's `areas` selects the

@@ -9,7 +9,7 @@ Per row, a dot - an estimate - on a stem that spans its interval: a mean with it
 ```svelte
 <script lang="ts">
 	import { ForestPlot } from '@fundar/data-chart-telling';
-	import { INFLATION_RANGES } from './data';
+	import { INFLATION_RANGES } from './datasets';
 </script>
 
 <!-- One row per region and year: the mean monthly inflation as a dot, on a stem from its lowest to its highest month. -->

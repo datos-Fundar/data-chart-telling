@@ -11,7 +11,7 @@ Both derive rows from the data before drawing. A **transform** reshapes the rows
 ```svelte
 <script lang="ts">
 	import { BarPlot } from '@fundar/data-chart-telling';
-	import { SEX_SHARES } from './data';
+	import { SEX_SHARES } from './datasets';
 </script>
 
 <!-- Each sex's share of the population per census, stacked with `stackY` so a bar adds up to 100%. -->
@@ -35,7 +35,7 @@ Both derive rows from the data before drawing. A **transform** reshapes the rows
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { PRICES } from './data';
+	import { PRICES } from './datasets';
 </script>
 
 <!-- A 6-month moving average, run on the plot's rows. -->
@@ -82,7 +82,7 @@ Bar stacking is always `stackY`, also for horizontal bars. A transform on a `His
 ```svelte
 <script lang="ts">
 	import { ScatterPlot } from '@fundar/data-chart-telling';
-	import { COUNTRIES } from './data';
+	import { COUNTRIES } from './datasets';
 </script>
 
 <!-- A linear regression with its 95% confidence band. -->

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { PRICES } from './data';
+	import { PRICES } from './datasets';
 </script>
 
 <!-- Axis labels, a fixed domain with gridlines and a color per series. -->

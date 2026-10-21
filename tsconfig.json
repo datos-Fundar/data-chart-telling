@@ -3,7 +3,8 @@
 		"paths": {
 			"$lib": ["./src/lib"],
 			"$lib/*": ["./src/lib/*"],
-			"$examples/*": ["./examples/*"],
+			"$datasets": ["./examples/datasets"],
+			"$datasets/*": ["./examples/datasets/*"],
 			"@fundar/data-chart-telling": ["./src/lib/index.ts"]
 		},
 		"lib": ["esnext", "DOM", "DOM.Iterable"],

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ForestPlot from '$lib/plots/ranking/forest/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { INFLATION_RANGES } from '$examples/data';
+import { INFLATION_RANGES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `styles.frame` draws a border around the plot's own content, the same as

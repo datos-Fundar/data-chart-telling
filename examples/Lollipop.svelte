@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { LollipopPlot } from '@fundar/data-chart-telling';
-	import { PROVINCE_VALUES } from './data';
+	import { PROVINCE_VALUES } from './datasets';
 
 	const female = PROVINCE_VALUES.filter((row) => row.sex === 'female');
 </script>

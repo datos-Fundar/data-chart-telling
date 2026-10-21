@@ -9,7 +9,7 @@ A grid of cells, `x` and `y` being the categories of the columns and rows and `c
 ```svelte
 <script lang="ts">
 	import { HeatmapPlot } from '@fundar/data-chart-telling';
-	import { HOUSEHOLDS } from './data';
+	import { HOUSEHOLDS } from './datasets';
 </script>
 
 <!-- One cell per number of rooms and of people, colored by the share of households. -->

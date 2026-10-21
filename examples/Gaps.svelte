@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { LIFE_GAPS } from './data';
+	import { LIFE_GAPS } from './datasets';
 </script>
 
 <!-- Missing values bridged: dashed in the middle, faded at the start, extended to the 2025 projection at the end. -->

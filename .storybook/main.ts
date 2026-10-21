@@ -38,7 +38,7 @@ const config: StorybookConfig = {
 			resolve: {
 				alias: {
 					$lib: path.resolve(__dirname, '../src/lib'),
-					$examples: path.resolve(__dirname, '../examples')
+					$datasets: path.resolve(__dirname, '../examples/datasets')
 				}
 			}
 		});

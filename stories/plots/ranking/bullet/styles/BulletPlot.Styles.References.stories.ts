@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BulletPlot from '$lib/plots/ranking/bullet/Plot.svelte';
 import type { BulletStylesConfig } from '$lib/types/layout/styles';
-import { PROVINCE_LIFE } from '$examples/data';
+import { PROVINCE_LIFE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `styles.bar` sets the thickness of the bar, `styles.ranges` sets the colors and thickness of the bands that grade the value, and

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import DensityPlot from '$lib/plots/distribution/density/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import { HEIGHTS, type HeightRow } from '$examples/data';
+import { HEIGHTS, type HeightRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A density plot smooths the rows of each series on `x` into a kernel density

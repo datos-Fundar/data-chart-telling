@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES } from './data';
+	import { REGION_VALUES } from './datasets';
 
 	// A rule has no controls of its own: the page moves it through `progress` (0 to 1).
 	// One step per year; a line plot shows every row up to the current step.

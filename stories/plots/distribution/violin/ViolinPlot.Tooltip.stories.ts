@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ViolinPlot from '$lib/plots/distribution/violin/Plot.svelte';
-import { IRIS } from '$examples/datasets/iris-flower';
+import { IRIS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Hovering a violin reads its category's summary, as a box plot's tooltip does:

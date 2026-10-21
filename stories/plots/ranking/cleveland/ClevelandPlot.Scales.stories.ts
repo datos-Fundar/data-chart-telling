@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ClevelandPlot from '$lib/plots/ranking/cleveland/Plot.svelte';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { ConnectorBasedStylesConfig } from '$lib/types/layout/styles';
-import { AGE_SHARES } from '$examples/data';
+import { AGE_SHARES } from '$datasets';
 import { SEQUENTIAL_COLORS } from './colors';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────

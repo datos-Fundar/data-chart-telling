@@ -18,7 +18,7 @@ pnpm add @fundar/data-chart-telling svelte svelteplot
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES } from './data';
+	import { REGION_VALUES } from './datasets';
 </script>
 
 <!-- The smallest useful plot: rows, the fields to map and a pixel size. -->
@@ -29,7 +29,7 @@ pnpm add @fundar/data-chart-telling svelte svelteplot
 
 ![A line plot with one line per region](images/first-plot.png)
 
-- `data` is an array of flat rows, here `{ date, region, value }` from [examples/data.ts](../examples/data.ts); `x` and `y` name the fields that position each row.
+- `data` is an array of flat rows, here `{ date, region, value }` from [examples/datasets/inflation-by-region.ts](../examples/datasets/inflation-by-region.ts); `x` and `y` name the fields that position each row.
 - `color="region"` splits the rows into one series per region and gives each its own color.
 - `width` and `height` are pixels.
 

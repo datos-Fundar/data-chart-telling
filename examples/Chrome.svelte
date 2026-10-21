@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { PRICES } from './data';
+	import { PRICES } from './datasets';
 </script>
 
 <!-- A plot carries its own chrome: title, subtitle, legend and caption. -->

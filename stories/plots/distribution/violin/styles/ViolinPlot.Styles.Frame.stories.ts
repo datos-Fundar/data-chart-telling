@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ViolinPlot from '$lib/plots/distribution/violin/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { IRIS } from '$examples/datasets/iris-flower';
+import { IRIS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `styles.frame` draws a border around the plot's own content, the same as

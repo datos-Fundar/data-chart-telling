@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LollipopPlot from '$lib/plots/ranking/lollipop/Plot.svelte';
-import { PROVINCE_VALUES, type ProvinceRow } from '$examples/data';
+import { PROVINCE_VALUES, type ProvinceRow } from '$datasets';
 
 const FEMALE = PROVINCE_VALUES.filter((row) => row.sex === 'female');
 

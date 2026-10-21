@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { HeatmapPlot } from '@fundar/data-chart-telling';
-	import { HOUSEHOLDS } from './data';
+	import { HOUSEHOLDS } from './datasets';
 </script>
 
 <!-- Segments on a heatmap: an outlined column and a filled block of overcrowded households. -->

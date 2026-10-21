@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { DensityPlot } from '@fundar/data-chart-telling';
-	import { HEIGHTS } from './data';
+	import { HEIGHTS } from './datasets';
 </script>
 
 <!-- A smoothed distribution per `grouping` value, the continuous pair of a histogram. -->

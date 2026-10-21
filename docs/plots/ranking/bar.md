@@ -9,7 +9,7 @@ Bars where one axis holds the categories and the other the values. Categories on
 ```svelte
 <script lang="ts">
 	import { BarPlot } from '@fundar/data-chart-telling';
-	import { PROVINCE_VALUES } from './data';
+	import { PROVINCE_VALUES } from './datasets';
 </script>
 
 <!-- Vertical bars, grouped by `color`. -->
@@ -33,7 +33,7 @@ Bars where one axis holds the categories and the other the values. Categories on
 ```svelte
 <script lang="ts">
 	import { BarPlot } from '@fundar/data-chart-telling';
-	import { PROVINCE_VALUES } from './data';
+	import { PROVINCE_VALUES } from './datasets';
 </script>
 
 <!-- Horizontal bars: the categories go on `y`, the values on `x`. -->

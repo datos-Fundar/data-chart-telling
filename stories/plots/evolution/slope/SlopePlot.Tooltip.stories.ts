@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import SlopePlot from '$lib/plots/evolution/slope/Plot.svelte';
-import type { AgeShareRow } from '$examples/data';
-import { AGE_SHARES } from '$examples/data';
+import { type AgeShareRow, AGE_SHARES } from '$datasets';
 
 const CENSUSES = AGE_SHARES.filter(({ year }) => year === 1991 || year === 2022);
 

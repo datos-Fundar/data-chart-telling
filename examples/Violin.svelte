@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ViolinPlot } from '@fundar/data-chart-telling';
-	import { IRIS } from './datasets/iris-flower';
+	import { IRIS } from './datasets';
 </script>
 
 <!-- The sepal length of the flowers of each species: its density, mirrored, with a box inside. -->

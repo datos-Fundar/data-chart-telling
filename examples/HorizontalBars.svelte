@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { BarPlot } from '@fundar/data-chart-telling';
-	import { PROVINCE_VALUES } from './data';
+	import { PROVINCE_VALUES } from './datasets';
 </script>
 
 <!-- Horizontal bars: the categories go on `y`, the values on `x`. -->

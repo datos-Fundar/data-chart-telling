@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BulletPlot from '$lib/plots/ranking/bullet/Plot.svelte';
-import { PROVINCE_LIFE, type ProvinceLifeRow } from '$examples/data';
+import { PROVINCE_LIFE, type ProvinceLifeRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Hovering a category reads its row through the same

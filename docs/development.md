@@ -53,7 +53,7 @@ Every option has a story under `stories/`, grouped as Plots, Markers, Transforms
 
 ## Documentation figures
 
-Every screenshot in the docs is an example, rendered by Playwright to `docs/images/<name>.png` in kebab-case (`examples/LineByRegion.svelte` is `line-by-region.png`). The examples and the screenshots share one file of small real datasets, `examples/data.ts`, which names the source of each, and axes are set to English. `docs/images` is left out of the npm package.
+Every screenshot in the docs is an example, rendered by Playwright to `docs/images/<name>.png` in kebab-case (`examples/LineByRegion.svelte` is `line-by-region.png`). The examples and the screenshots share small real datasets, one file each in `examples/datasets/`, which name their source, and axes are set to English. `docs/images` is left out of the npm package.
 
 ```bash
 pnpm docs:images                  # regenerate docs/images/*.png

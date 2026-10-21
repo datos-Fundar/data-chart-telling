@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import DensityPlot from '$lib/plots/distribution/density/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { HEIGHTS } from '$examples/data';
+import { HEIGHTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `styles.frame` draws a border around the plot's own content, the same as

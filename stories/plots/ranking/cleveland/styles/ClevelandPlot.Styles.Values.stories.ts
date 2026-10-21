@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ClevelandPlot from '$lib/plots/ranking/cleveland/Plot.svelte';
 import type { ConnectorBasedStylesConfig } from '$lib/types/layout/styles';
-import { AGE_SHARES } from '$examples/data';
+import { AGE_SHARES } from '$datasets';
 import { SEQUENTIAL_COLORS } from '../colors';
 
 /** Only the first and last census, so every category has two dots and its labels fit. */

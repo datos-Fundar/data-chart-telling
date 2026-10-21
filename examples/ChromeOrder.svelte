@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { PRICES } from './data';
+	import { PRICES } from './datasets';
 </script>
 
 <!-- `order` places the chrome blocks; `divider` draws a rule between them. -->

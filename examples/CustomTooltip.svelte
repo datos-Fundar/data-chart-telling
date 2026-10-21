@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { LinePlot, getConfiguration, paletteColor } from '@fundar/data-chart-telling';
 	import TooltipCard from './TooltipCard.svelte';
-	import { REGION_VALUES, type RegionRow } from './data';
+	import { REGION_VALUES, type RegionRow } from './datasets';
 
 	const { palette } = getConfiguration();
 	const regions = [...new Set(REGION_VALUES.map((row) => row.region))];

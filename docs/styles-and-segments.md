@@ -21,7 +21,7 @@
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { PRICES } from './data';
+	import { PRICES } from './datasets';
 </script>
 
 <!-- End-of-line value labels with a custom format and font size. -->
@@ -73,7 +73,7 @@ A row whose value is `null`, `undefined` or `NaN` breaks a line. `styles.gaps` b
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { LIFE_GAPS } from './data';
+	import { LIFE_GAPS } from './datasets';
 </script>
 
 <!-- Missing values bridged: dashed in the middle, faded at the start, extended to the 2025 projection at the end. -->
@@ -140,7 +140,7 @@ A baseline color with a highlighted range:
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES } from './data';
+	import { REGION_VALUES } from './datasets';
 
 	const gba = REGION_VALUES.filter((row) => row.region === 'GBA');
 </script>
@@ -173,7 +173,7 @@ Per-series colors, plus dots over a range shared by every series:
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { LIFE } from './data';
+	import { LIFE } from './datasets';
 </script>
 
 <!-- Segments per series name, plus `default` for rules shared by every series. -->
@@ -221,7 +221,7 @@ Heatmap columns and cells:
 ```svelte
 <script lang="ts">
 	import { HeatmapPlot } from '@fundar/data-chart-telling';
-	import { HOUSEHOLDS } from './data';
+	import { HOUSEHOLDS } from './datasets';
 </script>
 
 <!-- Segments on a heatmap: an outlined column and a filled block of overcrowded households. -->
