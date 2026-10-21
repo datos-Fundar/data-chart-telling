@@ -196,14 +196,61 @@ export class ValueLabels {
 	 * (`filter` + `selectLast`, per series), at its top (a stacked row's
 	 * `y2`), labelled with its own value and placed by `anchor`. Labels that
 	 * would overlap fan out into a shared column (`declutter`), colored by the
-	 * segment the row falls in.
+	 * segment the row falls in. A plot that labels each end of its series apart
+	 * passes the `rows` and `anchor` of one end, and `lane` to route its labels
+	 * out to a lane whether or not they overlap (`flip: false` keeps one on the
+	 * left in the margin instead of flipping it over its points).
 	 */
 	atSeriesEnds<TData extends Record<string, unknown>>(
-		state: AxisPlotState<TData, object>
+		state: AxisPlotState<TData, object>,
+		end: {
+			rows?: ProcessedRow[];
+			anchor?: ValueAnchor;
+			lane?: boolean | { elbowGap: number };
+			flip?: boolean;
+		} = {}
+	): TextMarkerConfig[] {
+		if (end.rows) return this.#seriesEnds(state, end);
+		// A label on a series' first point would sit on its own line: it goes out to a lane instead.
+		const firsts = ValueLabels.#firstRows(state);
+		const labelled = state.labelled ?? [];
+		return [
+			...this.#seriesEnds(state, { rows: labelled.filter((row) => !firsts.has(row)) }),
+			...this.#seriesEnds(state, {
+				rows: labelled.filter((row) => firsts.has(row)),
+				lane: { elbowGap: ValueLabels.FIRST_LANE_GAP }
+			})
+		];
+	}
+
+	/** How far (px) a lane takes the label of a series' first point from it - clear of the line that leaves it. */
+	static readonly FIRST_LANE_GAP = 28;
+
+	/** The first row of every series that has more than one. */
+	static #firstRows(state: { processedData?: ProcessedData }): Set<ProcessedRow> {
+		const first = new Map<string, ProcessedRow>();
+		const counts = new Map<string, number>();
+		for (const row of state.processedData?.data ?? []) {
+			const id = String(row[SERIES_ID_KEY]);
+			if (!first.has(id)) first.set(id, row);
+			counts.set(id, (counts.get(id) ?? 0) + 1);
+		}
+		return new Set([...first].filter(([id]) => (counts.get(id) ?? 0) > 1).map(([, row]) => row));
+	}
+
+	#seriesEnds<TData extends Record<string, unknown>>(
+		state: AxisPlotState<TData, object>,
+		end: {
+			rows?: ProcessedRow[];
+			anchor?: ValueAnchor;
+			lane?: boolean | { elbowGap: number };
+			flip?: boolean;
+		}
 	): TextMarkerConfig[] {
 		const processed = state.processedData;
 		if (!processed) return [];
-		const { font, anchor, format } = this;
+		const { font, format } = this;
+		const anchor = end.anchor ?? this.anchor;
 		const position = ProcessedPositions.of(processed);
 		const topOf = (d: ProcessedRow) => position.y(d);
 		const nameOf = (d: ProcessedRow) => String(d[SERIES_KEY]);
@@ -222,7 +269,7 @@ export class ValueLabels {
 		const marker: TextMarkerConfig = {
 			type: 'text',
 			// The rows the "transforms" phase picked for the labels: by default each series' last.
-			data: state.labelled ?? [],
+			data: end.rows ?? state.labelled ?? [],
 			x: (processed.channels.x ?? position.x) as TextMarkerConfig['x'],
 			y: (processed.channels.y2 ?? processed.channels.y ?? topOf) as TextMarkerConfig['y'],
 			grouping: SERIES_ID_KEY,
@@ -237,7 +284,12 @@ export class ValueLabels {
 				lineAnchor: font?.lineAnchor ?? (anchor === 'outside' ? 'bottom' : 'middle')
 			},
 			fill: this.fill ? undefined : colorOf,
-			declutter: { connector: this.strokeStyle }
+			declutter: {
+				connector: this.strokeStyle,
+				aligned: !!end.lane && (anchor === 'start' || anchor === 'end'),
+				elbowGap: typeof end.lane === 'object' ? end.lane.elbowGap : undefined,
+				flip: end.flip
+			}
 		};
 		return marker.data?.length ? [marker] : [];
 	}
@@ -262,10 +314,11 @@ export class ValueLabels {
 	 * every value.
 	 */
 	reachAtSeriesEnds<TData extends Record<string, unknown>>(
-		state: AxisPlotState<TData, object>
+		state: AxisPlotState<TData, object>,
+		anchor: ValueAnchor = this.anchor
 	): EdgeBox[] {
 		const series = state.resolvedSeries ?? [];
-		const { anchor, font, format } = this;
+		const { font, format } = this;
 		const dx =
 			typeof font?.dx === 'number' ? font.dx : anchor === 'start' ? 6 : anchor === 'end' ? -6 : 0;
 		const dy = typeof font?.dy === 'number' ? font.dy : anchor === 'outside' ? -8 : 0;
@@ -283,10 +336,15 @@ export class ValueLabels {
 		// Only a label that can sit at the plot's right end - any but a first point's - reaches that edge.
 		const selects = state.labelSelects ?? [];
 		const atRight = selects.length === 0 || selects.some((select) => select !== 'first');
+		// Likewise a label set before its point reaches the left edge only from a point that can sit there: any but a last one - or a last one that is also the first, of a series with a single point.
+		const atLeft =
+			selects.length === 0 ||
+			selects.some((select) => select !== 'last') ||
+			series.some((s) => s.data.length < 2);
 		const edges: MarginSide[] = [
 			'top',
 			'bottom',
-			...(dx < 0 ? (['left'] as const) : []),
+			...(dx < 0 && atLeft ? (['left'] as const) : []),
 			...((dx >= 0 || series.length > 1) && atRight ? (['right'] as const) : [])
 		];
 

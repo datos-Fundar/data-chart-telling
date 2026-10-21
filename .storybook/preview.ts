@@ -96,7 +96,9 @@ const preview: Preview = {
 								'Markers',
 								['Rules', 'Deltas', 'Custom'],
 								'Tooltip'
-							]
+							],
+							'SlopePlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip']
 						],
 						'Map',
 						[

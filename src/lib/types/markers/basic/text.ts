@@ -15,6 +15,10 @@ export type TextDeclutterConfig = {
 	laneStep?: number;
 	/** Clearance (px) between the outermost lane and the label text. */
 	labelGap?: number;
+	/** Routes every label out to the shared column through a connector, even when none of them overlaps. */
+	aligned?: boolean;
+	/** Whether a leftward fan with no room before the content box flips to the right. Defaults to `true`; labels meant for the margin there turn it off. */
+	flip?: boolean;
 	/** The connectors' stroke. Unset opacity follows each label's own `fillOpacity`. */
 	connector?: StrokeStyle;
 };

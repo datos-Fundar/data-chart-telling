@@ -67,6 +67,8 @@
 			elbowGap: own.elbowGap ?? defaults.elbowGap,
 			laneStep: own.laneStep ?? defaults.laneStep,
 			labelGap: own.labelGap ?? defaults.labelGap,
+			aligned: own.aligned,
+			flip: own.flip,
 			connector: { ...defaults.connector, ...own.connector }
 		};
 	});
@@ -99,9 +101,13 @@
 		if ((!declutter && !marker.edgeAware) || !xScale || !yScale) return undefined;
 		const xOf = channel(x ?? 0);
 		const yOf = channel(y ?? 0);
+		// A band's position is its start; a mark sits at its middle.
+		const middle = (scale: typeof plot.scales.x) =>
+			scale?.type === 'band' ? scale.fn.bandwidth() / 2 : 0;
+		const [dx0, dy0] = [middle(plot.scales.x), middle(plot.scales.y)];
 		return displayData.map((d) => ({
-			px: Number(xScale(xOf(d) as never)),
-			py: Number(yScale(yOf(d) as never))
+			px: Number(xScale(xOf(d) as never)) + dx0,
+			py: Number(yScale(yOf(d) as never)) + dy0
 		}));
 	});
 
@@ -112,6 +118,8 @@
 					dx,
 					fontSize,
 					geometry: declutter,
+					forceAligned: declutter.aligned,
+					flip: declutter.flip,
 					bounds
 				})
 			: undefined

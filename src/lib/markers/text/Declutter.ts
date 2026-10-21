@@ -24,23 +24,30 @@ export class Declutter {
 		geometry: { elbowGap: number; laneStep: number; labelGap: number };
 		/** The content box's left/top/bottom edges (px). */
 		bounds: { left: number; top: number; bottom: number };
+		/** Aligns the labels on the shared column even when none of them overlaps. */
+		forceAligned?: boolean;
+		/** Lets a leftward fan with no room flip right. Defaults to `true`. */
+		flip?: boolean;
 	}): Map<K, LabelLane> {
-		const { items, dx, fontSize, geometry, bounds } = args;
+		const { items, dx, fontSize, geometry, bounds, forceAligned, flip = true } = args;
 		const lanes = new Map<K, LabelLane>();
-		if (items.length < 2) return lanes;
+		if (items.length < 2 && !forceAligned) return lanes;
 
 		const sorted = [...items].sort((a, b) => a.py - b.py);
 		const originals = sorted.map((item) => item.py);
 		const minGap = Math.max(16, fontSize * 1.4);
-		const { finals, connected } = Declutter.#spread(originals, minGap, [bounds.top, bounds.bottom]);
+		const { finals, connected } =
+			sorted.length > 1
+				? Declutter.#spread(originals, minGap, [bounds.top, bounds.bottom])
+				: { finals: originals, connected: [] };
 		const ranks = Declutter.#assignLanes(originals, finals, connected);
 
-		const aligned = ranks.some((r) => r.runSize > 1);
+		const aligned = !!forceAligned || ranks.some((r) => r.runSize > 1);
 		const lanesUsed = aligned ? Math.max(...ranks.map((r) => r.runSize)) : 1;
 		const reach = geometry.elbowGap + (lanesUsed - 1) * geometry.laneStep + geometry.labelGap;
 
 		let dir = Math.sign(dx) || 1;
-		if (aligned && dir === -1) {
+		if (aligned && dir === -1 && flip) {
 			// Unknown room (no x position yet) counts as none: flipping right is never wrong.
 			const rooms = sorted.flatMap((item) => (item.px == null ? [] : [item.px - bounds.left]));
 			if ((rooms.length > 0 ? Math.min(...rooms) : -Infinity) < reach) dir = 1;

@@ -18,6 +18,7 @@ import { buildLollipopDefaults } from '$lib/plots/ranking/lollipop/defaults';
 import { buildDumbbellDefaults } from '$lib/plots/ranking/dumbbell/defaults';
 import { buildClevelandDefaults } from '$lib/plots/ranking/cleveland/defaults';
 import { buildBulletDefaults } from '$lib/plots/ranking/bullet/defaults';
+import { buildSlopeDefaults } from '$lib/plots/evolution/slope/defaults';
 import { buildForestDefaults } from '$lib/plots/ranking/forest/defaults';
 import type { AxisPipelineProps } from '$lib/phases/Pipeline';
 import type { SharedAxisValues } from '$lib/types/phases';
@@ -110,6 +111,11 @@ const CASES: Case[] = [
 		name: 'bullet',
 		kind: buildBulletDefaults<Row>(),
 		props: { x: 'sector', y: 'valor', color: 'sector', target: 'valor', ranges: [100] }
+	},
+	{
+		name: 'slope',
+		kind: buildSlopeDefaults<Row>(),
+		props: { x: 'anio', y: 'valor', color: 'sector' }
 	}
 ];
 

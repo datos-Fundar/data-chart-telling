@@ -264,6 +264,13 @@ export type PlotStylesConfig = {
 		/** Fill opacity of every area marker that sets none of its own. */
 		fillOpacity: number;
 	};
+	/** Default slope-plot styling: a line and a dot per series between the positions of its category axis. */
+	slope: {
+		strokeWidth: number;
+		dotRadius: number;
+		/** Space (0-1, as a fraction of the step between positions) left outside the first and last position; the labels' margins grow beyond it. */
+		padding: number;
+	};
 	/** Default histogram styling. */
 	histogram: {
 		/** Pixels taken off each side of every bar, so neighbouring bars leave a gap of twice this. */

@@ -17,6 +17,7 @@ Every plot kind shares one set of props (see [Concepts](concepts.md)). They diff
 | Ranking      | [ForestPlot](plots/ranking/forest.md)            | One dot on an interval per row             | a category channel, a value channel, `lower`/`upper`    |
 | Evolution    | [LinePlot](plots/evolution/line.md)              | A line per series                          | `x`, `y`                                                |
 | Evolution    | [AreaPlot](plots/evolution/area.md)              | A filled area per series                   | `x`, `y`                                                |
+| Evolution    | [SlopePlot](plots/evolution/slope.md)            | A line per series between two positions    | a category channel with two values, a value channel     |
 | Map          | [GeoPlot](geo.md)                                | A map from GeoJSON or TopoJSON             | `data` (see [Maps](geo.md))                             |
 
 All of them accept `data` with `grouping`/`color`, or pre-built `series`.

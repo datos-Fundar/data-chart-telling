@@ -163,6 +163,15 @@
 		numberFormat: { useGrouping: 'min2', compactDisplay: untrack(() => cfg.axis.compactDisplay) }
 	});
 
+	/** What an `'auto'` side reads as: the plot's own estimate, less the room of an axis that is not drawn. */
+	const marginEstimate = $derived.by(() => {
+		const estimate = state.marginEstimate ?? Margins.AXIS_ESTIMATE;
+		const bare = { x: scales?.x?.axisDisplay === 'none', y: scales?.y?.axisDisplay === 'none' };
+		return estimate.map((value, side) =>
+			(bare.x && side === 'bottom') || (bare.y && side === 'left') ? Math.min(value, 8) : value
+		);
+	});
+
 	/**
 	 * How the labels of the plot's category axes are laid out when they would not fit
 	 * side by side, unless the author set a `tickRotate` of their own or turned
@@ -174,7 +183,7 @@
 	const tickLayout = $derived.by(() => {
 		const bands = state.axes?.bands ?? [];
 		if (!cfg.axis.autoRotate || bands.length === 0) return undefined;
-		const estimate = state.marginEstimate ?? Margins.AXIS_ESTIMATE;
+		const estimate = marginEstimate;
 		const categories = (axis: 'x' | 'y') => {
 			const given = scales?.[axis]?.domain;
 			if (given) return given.map(String);
@@ -229,7 +238,7 @@
 	const plotMargins = new PlotMargins({
 		theme: () => cfg.margins,
 		author: () => margins,
-		estimate: () => state.marginEstimate ?? Margins.AXIS_ESTIMATE,
+		estimate: () => marginEstimate,
 		reserve: () => state.valueLabels?.reach ?? [],
 		size: () => ({ width, height }),
 		resetKey: () => state.resolvedSeries,

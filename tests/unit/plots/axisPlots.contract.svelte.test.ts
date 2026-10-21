@@ -13,6 +13,7 @@ import LollipopPlot from '$lib/plots/ranking/lollipop/Plot.svelte';
 import DumbbellPlot from '$lib/plots/ranking/dumbbell/Plot.svelte';
 import ClevelandPlot from '$lib/plots/ranking/cleveland/Plot.svelte';
 import BulletPlot from '$lib/plots/ranking/bullet/Plot.svelte';
+import SlopePlot from '$lib/plots/evolution/slope/Plot.svelte';
 import ForestPlot from '$lib/plots/ranking/forest/Plot.svelte';
 import { waitForSvg } from './_helpers/svg';
 
@@ -140,6 +141,14 @@ const KINDS: Kind[] = [
 	{
 		name: 'BulletPlot',
 		Plot: BulletPlot,
+		props: { data: CATEGORIES, x: 'x', y: 'y' },
+		numericX: false,
+		plotStatistics: true,
+		stackable: false
+	},
+	{
+		name: 'SlopePlot',
+		Plot: SlopePlot,
 		props: { data: CATEGORIES, x: 'x', y: 'y' },
 		numericX: false,
 		plotStatistics: true,

@@ -141,7 +141,7 @@ export class ScalesPhase<
 		const given = author ?? {};
 		const type =
 			given.type === undefined || given.type === 'auto' || given.type === 'categorical'
-				? 'band'
+				? (own.type ?? 'band')
 				: given.type;
 		const band: AnyAxisScale = { ...own, ...given, type };
 		// A padding the author gives replaces the kind's own inner and outer ones.

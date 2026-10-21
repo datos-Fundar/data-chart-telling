@@ -15,6 +15,7 @@ import { buildLollipopDefaults } from '$lib/plots/ranking/lollipop/defaults';
 import { buildDumbbellDefaults } from '$lib/plots/ranking/dumbbell/defaults';
 import { buildClevelandDefaults } from '$lib/plots/ranking/cleveland/defaults';
 import { buildBulletDefaults } from '$lib/plots/ranking/bullet/defaults';
+import { buildSlopeDefaults } from '$lib/plots/evolution/slope/defaults';
 import { buildForestDefaults } from '$lib/plots/ranking/forest/defaults';
 import type { FacetConfig } from '$lib/types/layout/facet';
 
@@ -31,8 +32,9 @@ const [
 	DumbbellCore,
 	ClevelandCore,
 	ForestCore,
-	BulletCore
-] = Array(13).fill(GenericCore);
+	BulletCore,
+	SlopeCore
+] = Array(14).fill(GenericCore);
 
 type Row = { year: number; region: string; sector: string; value: number };
 
@@ -162,6 +164,12 @@ const CASES: Case[] = [
 		Core: BulletCore,
 		buildDefaults: buildBulletDefaults,
 		core: { ...BOX, x: 'sector', y: 'value', color: 'sector', target: 'value', ranges: [100] }
+	},
+	{
+		name: 'slope',
+		Core: SlopeCore,
+		buildDefaults: buildSlopeDefaults,
+		core: { ...BOX, x: 'year', y: 'value', color: 'sector' }
 	}
 ];
 

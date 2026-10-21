@@ -245,7 +245,7 @@ export const CustomOffsets: Story = {
 				show: true,
 				anchor: 'outside',
 				format: (v: number) => `${v.toFixed(1)} yr`,
-				fontStyle: { dy: -18 }
+				fontStyle: { dy: -10 }
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -601,7 +601,6 @@ export const FirstAndLast: Story = {
 			{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY },
 			{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY }
 		],
-		margins: { left: 80, right: 80 },
 		styles: {
 			values: { show: true, select: ['first', 'last'] }
 		} satisfies AxisBasedStylesConfig
