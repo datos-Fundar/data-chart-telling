@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ClevelandPlot from '$lib/plots/cleveland/Plot.svelte';
-import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
+import type { ConnectorBasedStylesConfig } from '$lib/types/layout/styles';
 import { AGE_SHARES } from '$examples/data';
 import { SEQUENTIAL_COLORS } from '../colors';
 
@@ -44,7 +44,7 @@ type Story = StoryObj<typeof meta>;
 /** `show: true` labels every dot with its value. */
 export const Default: Story = {
 	args: {
-		styles: { values: { show: true } } satisfies AxisBasedStylesConfig
+		styles: { values: { show: true } } satisfies ConnectorBasedStylesConfig
 	}
 };
 
@@ -56,7 +56,7 @@ export const Sideways: Story = {
 		scales: { color: SEQUENTIAL_COLORS, x: { domain: [14, 26] } },
 		styles: {
 			values: { show: true, format: (value: number) => `${value} %` }
-		} satisfies AxisBasedStylesConfig
+		} satisfies ConnectorBasedStylesConfig
 	}
 };
 
@@ -67,7 +67,7 @@ export const OnlyTheEnds: Story = {
 		scales: { color: SEQUENTIAL_COLORS, y: { domain: [14, 26] } },
 		styles: {
 			values: { show: true, select: ['min', 'max'], color: 'series' }
-		} satisfies AxisBasedStylesConfig
+		} satisfies ConnectorBasedStylesConfig
 	}
 };
 
@@ -83,6 +83,6 @@ export const FirstAndLast: Story = {
 				color: 'series',
 				format: (value: number) => `${value}%`
 			}
-		} satisfies AxisBasedStylesConfig
+		} satisfies ConnectorBasedStylesConfig
 	}
 };

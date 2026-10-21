@@ -25,10 +25,15 @@ export class ClevelandRanges {
 		this.layout = layout;
 	}
 
-	/** The ranges of `state`'s rows; `fromBaseline` adds the plot's baseline to each category's values. */
+	/**
+	 * The ranges of `state`'s rows; `fromBaseline` adds the plot's baseline to each
+	 * category's values. A category's difference runs from the series `ends.from`
+	 * to `ends.to` - by default the first and the last one the plot draws.
+	 */
 	static of<TData extends Record<string, unknown>>(
 		state: ClevelandPlotState<TData>,
-		fromBaseline: boolean
+		fromBaseline: boolean,
+		ends: { from?: string; to?: string } = {}
 	): ClevelandRanges {
 		const valueAxis = PlotAxes.valueOf(state) as 'x' | 'y';
 		const categoryAxis = PlotAxes.categoryOf(state) as 'x' | 'y';
@@ -49,7 +54,14 @@ export class ClevelandRanges {
 					let entry = byCategory.get(key);
 					if (!entry) {
 						const ends = fromBaseline ? baseline : value;
-						entry = { category, dots: [], from: ends, to: ends };
+						entry = {
+							category,
+							dots: [],
+							from: ends,
+							to: ends,
+							difference: undefined,
+							span: undefined
+						};
 						byCategory.set(key, entry);
 						seriesOf.set(key, new Set());
 					}
@@ -59,6 +71,19 @@ export class ClevelandRanges {
 					seriesOf.get(key)!.add(group.series.name);
 				}
 			}
+		}
+		const names = groups.map((group) => group.series.name);
+		const start = ends.from ?? names[0];
+		const end = ends.to ?? names[names.length - 1];
+		for (const entry of byCategory.values()) {
+			const at = (series: string) => entry.dots.find((dot) => dot.series === series)?.value;
+			const last = at(end);
+			const first = fromBaseline ? baseline : at(start);
+			entry.difference = last === undefined || first === undefined ? undefined : last - first;
+			entry.span =
+				last === undefined || first === undefined
+					? undefined
+					: [Math.min(first, last), Math.max(first, last)];
 		}
 		const maxSeriesPerCategory = Math.max(0, ...[...seriesOf.values()].map((s) => s.size));
 		return new ClevelandRanges([...byCategory.values()], {

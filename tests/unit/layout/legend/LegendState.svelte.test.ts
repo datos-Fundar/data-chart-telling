@@ -491,3 +491,21 @@ describe('LegendState - adjusting the automatic sections', () => {
 		expect(both).toMatchObject({ title: 'Mine' });
 	});
 });
+
+describe('LegendState - decorative markers', () => {
+	const plot = (rule: Record<string, unknown>) => ({
+		resolvedSeries: [{ name: 'a' }],
+		colorForSeries: () => 'teal',
+		markers: [
+			{ type: 'rule', ...rule },
+			{ type: 'dot', series: 'a' }
+		]
+	});
+
+	test('a marker that is `legend: false` does not give the series its symbol', () => {
+		const [line] = LegendState.entriesOf(plot({}) as never);
+		expect(line).toMatchObject({ type: 'series', mark: 'line' });
+		const [dot] = LegendState.entriesOf(plot({ legend: false }) as never);
+		expect(dot).toMatchObject({ type: 'series', mark: 'dot' });
+	});
+});

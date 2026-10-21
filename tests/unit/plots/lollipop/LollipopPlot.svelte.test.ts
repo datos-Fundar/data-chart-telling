@@ -77,7 +77,7 @@ describe('LollipopPlot', () => {
 		expect(colors.size).toBe(2);
 	});
 
-	test('a series-based plot draws one stem marker per series', async () => {
+	test('a series-based plot draws one stem per category', async () => {
 		const { container } = render(LollipopPlot, {
 			width: 400,
 			height: 300,
@@ -87,7 +87,7 @@ describe('LollipopPlot', () => {
 			]
 		});
 		const svg = await waitForSvg(container);
-		expect(svg.querySelectorAll('g.rule-x')).toHaveLength(2);
+		expect(stems(svg)).toHaveLength(3);
 	});
 
 	test('categories along y lay the lollipops out sideways', async () => {
@@ -154,5 +154,27 @@ describe('LollipopPlot', () => {
 		const svg = await waitForSvg(container);
 		const labels = Array.from(svg.querySelectorAll('g.text text')).map((t) => t.textContent);
 		expect(labels).toEqual(['4', '9', '-3']);
+	});
+
+	test('stems of two looks - one dashed by a segment - draw together, each category once', async () => {
+		const { container } = render(LollipopPlot, {
+			width: 400,
+			height: 300,
+			data: rows,
+			x: 'c',
+			y: 'v',
+			segments: {
+				default: [
+					{
+						areas: [{ x: { from: 'b', to: 'b' } }],
+						styles: { stroke: { strokeDasharray: '4 3' } }
+					}
+				]
+			}
+		});
+		const svg = await waitForSvg(container);
+		// One rule marker per dash pattern, side by side: none replaces another.
+		expect(svg.querySelectorAll('g.rule-x')).toHaveLength(2);
+		expect(stems(svg)).toHaveLength(3);
 	});
 });

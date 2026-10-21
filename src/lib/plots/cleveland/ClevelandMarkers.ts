@@ -3,11 +3,11 @@ import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { ClevelandRanges } from '$lib/plots/cleveland/ClevelandRanges';
+import { ClevelandConnector } from '$lib/plots/cleveland/ClevelandConnector';
 import type {
 	ClevelandPlotState,
 	ClevelandPlotCtx,
 	ClevelandOptions,
-	ClevelandEntry,
 	ClevelandRole
 } from '$lib/types/plots/cleveland/state';
 import type {
@@ -18,6 +18,7 @@ import type {
 } from '$lib/types/markers/common';
 import type { ProcessedRow } from '$lib/types/phases';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
+import type { ConnectorRange } from '$lib/types/layout/styles';
 import type { TextAnchor, LineAnchor } from '$lib/types/plots/constants';
 import type { EdgeBox } from '$lib/types/layout/box';
 
@@ -57,20 +58,16 @@ export class ClevelandMarkers {
 		const { cfg, interaction } = ctx;
 		const style = cfg[this.#options.config];
 		const { isHorizontal } = ClevelandMarkers.#geometry(state);
-		const ranges = ClevelandRanges.of(state, this.#options.fromBaseline ?? false);
+		const ranges = ClevelandRanges.of(
+			state,
+			this.#options.fromBaseline ?? false,
+			ClevelandConnector.ends(state)
+		);
 		this.#validate(ranges);
 
-		const connector = (entries: ClevelandEntry[]): Partial<RuleMarkerConfig> => ({
-			type: 'rule',
-			axis: isHorizontal ? 'y' : 'x',
-			data: entries.map((entry) => ({ category: entry.category, from: entry.from, to: entry.to })),
-			value: 'category',
-			...(isHorizontal ? { x1: 'from', x2: 'to' } : { y1: 'from', y2: 'to' })
-		});
-		const lone = new Map<LineSegmentStyle, ClevelandEntry[]>();
-		const shared: ClevelandEntry[] = [];
-		const segmentOf = new Map<ProcessedRow, { series: string; styles: LineSegmentStyle }>();
+		const connector = ClevelandConnector.of(state, cfg.connector, ranges.entries);
 		const groups = state.processedGroups ?? [];
+		const segmentOf = new Map<ProcessedRow, { series: string; styles: LineSegmentStyle }>();
 		for (const group of groups) {
 			for (const segment of group.visualSegments) {
 				for (const row of segment.data) {
@@ -78,44 +75,82 @@ export class ClevelandMarkers {
 				}
 			}
 		}
-		for (const entry of ranges.entries) {
-			if (entry.dots.length !== 1) {
-				shared.push(entry);
-				continue;
-			}
-			const owner = segmentOf.get(entry.dots[0].row)!;
-			lone.set(owner.styles, [...(lone.get(owner.styles) ?? []), entry]);
-		}
 
-		const rules: RuleMarkerConfig[] = [];
-		if (shared.length > 0) {
-			rules.push({
-				...connector(shared),
-				styles: {
-					stroke: style.connectorColor ?? cfg.axis.color,
-					strokeWidth: style.stemWidth
-				}
-			} as RuleMarkerConfig);
-		}
-		for (const [styles, entries] of lone) {
-			const { series } = segmentOf.get(entries[0].dots[0].row)!;
-			const stem = styles.stroke;
-			const disabled = interaction?.strokeFor(series);
-			rules.push({
-				...connector(entries),
-				series,
-				styles: {
-					stroke: disabled?.stroke ?? stem?.stroke ?? state.colorForSeries!(series),
-					strokeWidth: disabled?.strokeWidth ?? stem?.strokeWidth ?? style.stemWidth,
-					strokeOpacity: disabled?.strokeOpacity ?? stem?.strokeOpacity,
-					strokeDasharray: disabled?.strokeDasharray ?? stem?.strokeDasharray
-				}
-			} as RuleMarkerConfig);
-		}
+		// Each category's connector: a row of its own look. A lone dot's stem takes its series'
+		// color and its segment's style; the legend dims it with the series.
+		const size = state.channels?.r;
+		const dotRadius = typeof size === 'number' ? size : style.dotRadius;
+		const neutral = style.connectorColor ?? cfg.axis.color;
+		const looks = ranges.entries.map((entry) => {
+			const range = connector.rangeOf(entry);
+			const owner = range.series === undefined ? undefined : segmentOf.get(entry.dots[0].row);
+			const stem = owner?.styles.stroke;
+			const disabled = owner && interaction?.strokeFor(owner.series);
+			const strokeWidth =
+				disabled?.strokeWidth ??
+				stem?.strokeWidth ??
+				connector.width(range, dotRadius) ??
+				(style.stemWidth === 'dots' ? dotRadius * 2 : style.stemWidth);
+			// The stretch between the `from` and `to` dots, in the connector's look...
+			const [start, end] = range.span ?? [entry.from, entry.to];
+			const category = entry.category;
+			const span = {
+				category,
+				from: start,
+				to: end,
+				mid: (start + end) / 2,
+				stroke:
+					disabled?.stroke ??
+					stem?.stroke ??
+					connector.color(range) ??
+					(owner ? state.colorForSeries!(owner.series) : neutral),
+				strokeWidth,
+				strokeOpacity:
+					disabled?.strokeOpacity ?? stem?.strokeOpacity ?? connector.opacity(range) ?? 1
+			};
+			// ...and what runs on past either end of it, to the other series' dots.
+			const outside = connector.outside(neutral);
+			const beyond = [
+				[entry.from, start],
+				[end, entry.to]
+			]
+				.filter(([from, to]) => to > from)
+				.map(([from, to]) => ({
+					category,
+					from,
+					to,
+					mid: (from + to) / 2,
+					...outside,
+					strokeWidth
+				}));
+			return {
+				range,
+				row: span,
+				rows: [span, ...beyond],
+				dash: disabled?.strokeDasharray ?? stem?.strokeDasharray
+			};
+		});
+		// One rule marker per dash pattern, which a marker takes once for all its rows.
+		const byDash = new Map<string | undefined, typeof looks>();
+		for (const look of looks) byDash.set(look.dash, [...(byDash.get(look.dash) ?? []), look]);
+		const rules = [...byDash].map(
+			([dash, group]): RuleMarkerConfig => ({
+				type: 'rule',
+				// A connector is not what the series look like: its dots are.
+				legend: false,
+				axis: isHorizontal ? 'y' : 'x',
+				data: group.flatMap((look) => look.rows),
+				value: 'category',
+				...(isHorizontal ? { x1: 'from', x2: 'to' } : { y1: 'from', y2: 'to' }),
+				stroke: 'stroke',
+				strokeWidth: 'strokeWidth',
+				strokeOpacity: 'strokeOpacity',
+				...(dash ? { styles: { strokeDasharray: dash } } : {})
+			})
+		);
 
 		const { category, value } = ClevelandMarkers.#channels(state);
 		// A number is a literal pixel radius; a field or function sizes each dot by its row.
-		const size = state.channels?.r;
 		const r = size === undefined || typeof size === 'number' ? size : size.accessor;
 		const dots = groups.flatMap((group) => {
 			const name = group.series.name;
@@ -142,8 +177,57 @@ export class ClevelandMarkers {
 				};
 			});
 		}) as DotMarkerConfig[];
-		return [...rules, ...dots];
+		return [
+			...rules,
+			...dots,
+			...this.#connectorLabels(state, ctx, connector, looks, isHorizontal)
+		];
 	};
+
+	/** The label on each connector, when `styles.connector.label` asks for one: written at its middle, beside it or on it. */
+	#connectorLabels<TData extends Record<string, unknown>>(
+		state: ClevelandPlotState<TData>,
+		ctx: ClevelandPlotCtx,
+		connector: ClevelandConnector,
+		looks: { range: ConnectorRange; row: Record<string, unknown> }[],
+		isHorizontal: boolean
+	): TextMarkerConfig[] {
+		const label = connector.label;
+		if (!label) return [];
+		const data = looks.flatMap(({ range, row }): Record<string, unknown>[] => {
+			const text = connector.text(range);
+			return text === undefined ? [] : [{ ...row, text }];
+		});
+		if (data.length === 0) return [];
+		const font = label.fontStyle;
+		// Beside a connector: clear of half its thickest, and a few px.
+		const clear =
+			Math.max(...data.map((row) => Number(row.strokeWidth))) / 2 + ctx.cfg.connector.labelGap;
+		const inside = label.anchor === 'middle';
+		const at: Place = inside
+			? { dx: 0, dy: 0, textAnchor: 'middle', lineAnchor: 'middle' }
+			: isHorizontal
+				? { dx: 0, dy: -clear, textAnchor: 'middle', lineAnchor: 'bottom' }
+				: { dx: clear, dy: 0, textAnchor: 'start', lineAnchor: 'middle' };
+		return [
+			{
+				type: 'text',
+				data,
+				...(isHorizontal ? { x: 'mid', y: 'category' } : { x: 'category', y: 'mid' }),
+				text: 'text',
+				styles: {
+					...font,
+					fill: font?.fill ?? ctx.cfg.axis.color,
+					fontSize: font?.fontSize ?? ctx.cfg.connector.labelFontSize,
+					dx: font?.dx ?? at.dx,
+					dy: font?.dy ?? at.dy,
+					textAnchor:
+						font?.textAnchor && font.textAnchor !== 'outside' ? font.textAnchor : at.textAnchor,
+					lineAnchor: font?.lineAnchor ?? at.lineAnchor
+				}
+			} as TextMarkerConfig
+		];
+	}
 
 	/**
 	 * The value labels of the dots `styles.values.of` picks, one `'text'` marker

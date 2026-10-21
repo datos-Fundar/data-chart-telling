@@ -118,7 +118,8 @@
 		const scope = scopedSeriesOf(marker);
 		if (scope) return `${scope}-${marker.type}-${i}`;
 		if (marker.type === 'rule') {
-			const v = typeof marker.value === 'function' ? i : marker.value;
+			// A rule over rows (`data`) has no value of its own to tell it from another one.
+			const v = typeof marker.value === 'function' || marker.data ? i : marker.value;
 			return `rule-${marker.axis}-${v}`;
 		}
 		if (marker.type === 'bar') return `bar-${marker.role}-${i}`;

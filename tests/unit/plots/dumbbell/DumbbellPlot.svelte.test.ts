@@ -32,7 +32,10 @@ describe('DumbbellPlot', () => {
 		expect(countDotMarks(svg)).toBe(4);
 		expect(svg.querySelectorAll('g.dot')).toHaveLength(2);
 		const [line] = connectors(svg);
-		expect(parseFloat(getComputedStyle(line).strokeWidth)).toBe(DEFAULT_CONFIG.dumbbell.stemWidth);
+		// `'dots'` by default: as thick as the dots are wide.
+		expect(parseFloat(getComputedStyle(line).strokeWidth)).toBe(
+			DEFAULT_CONFIG.dumbbell.dotRadius * 2
+		);
 		expect(warn).not.toHaveBeenCalled();
 		warn.mockRestore();
 	});

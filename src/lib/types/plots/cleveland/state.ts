@@ -21,6 +21,10 @@ export type ClevelandEntry = {
 	from: number;
 	/** The largest value of the category - or the baseline, when that is higher and counts as an end. */
 	to: number;
+	/** The `to` series' value minus the `from` series' (the value minus the baseline, for a stem) - `undefined` when either has none. */
+	difference: number | undefined;
+	/** The stretch between the `from` series' dot and the `to` series' - lowest value first - `undefined` when either has none. With a baseline, the whole range. */
+	span: [number, number] | undefined;
 };
 
 /** Where a dot sits in its category's range: at the top end, at the bottom end, or between them. */

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import DumbbellPlot from '$lib/plots/dumbbell/Plot.svelte';
-import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
+import type { ConnectorBasedStylesConfig } from '$lib/types/layout/styles';
 import { AGE_SHARES, PROVINCE_VALUES } from '$examples/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -48,7 +48,7 @@ const CENSUSES = AGE_SHARES.filter((row) => row.year === 1991 || row.year === 20
 export const Default: Story = {
 	args: {
 		...PROVINCES,
-		styles: { values: { show: true } } satisfies AxisBasedStylesConfig
+		styles: { values: { show: true } } satisfies ConnectorBasedStylesConfig
 	}
 };
 
@@ -61,7 +61,7 @@ export const Sideways: Story = {
 		scales: { x: { domain: [70, 85] } },
 		styles: {
 			values: { show: true, format: (value: number) => `${value} years` }
-		} satisfies AxisBasedStylesConfig
+		} satisfies ConnectorBasedStylesConfig
 	}
 };
 
@@ -69,7 +69,7 @@ export const Sideways: Story = {
 export const OnlyTheHigher: Story = {
 	args: {
 		...PROVINCES,
-		styles: { values: { show: true, select: 'max' } } satisfies AxisBasedStylesConfig
+		styles: { values: { show: true, select: 'max' } } satisfies ConnectorBasedStylesConfig
 	}
 };
 
@@ -94,6 +94,6 @@ export const LastSeriesLabelled: Story = {
 				format: (value: number) => `${value}%`,
 				fontStyle: { fontWeight: 600 }
 			}
-		} satisfies AxisBasedStylesConfig
+		} satisfies ConnectorBasedStylesConfig
 	}
 };

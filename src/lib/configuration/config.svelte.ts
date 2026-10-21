@@ -189,7 +189,7 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 	},
 	dumbbell: {
 		dotRadius: 6,
-		stemWidth: 3,
+		stemWidth: 'dots',
 		connectorColor: '#9ca3af',
 		labelGap: 10,
 		paddingInner: 0.5,
@@ -197,11 +197,19 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 	},
 	cleveland: {
 		dotRadius: 5,
-		stemWidth: 2,
+		stemWidth: 5,
 		connectorColor: '#9ca3af',
 		labelGap: 10,
 		paddingInner: 0.5,
 		paddingOuter: 0.5
+	},
+	connector: {
+		sign: { positive: '#1b9e77', negative: '#d95f02', zero: '#9ca3af' },
+		lengthScheme: ['#d1d5db', '#374151'],
+		differenceScheme: ['#d95f02', '#e5e7eb', '#1b9e77'],
+		outsideOpacity: 0.4,
+		labelFontSize: 11,
+		labelGap: 4
 	},
 	scatter: { dotRadius: 5 },
 	timeline: {

@@ -313,8 +313,10 @@ export class LegendState {
 	static entriesOf(plot: LegendPlot): LegendEntry[] {
 		const color = (name: string | undefined) =>
 			name !== undefined && name !== 'default' ? plot.colorForSeries?.(name) : undefined;
+		// A marker that is `legend: false` is decoration - a connector - and does not give the series its symbol.
 		const mark = plot.markers
-			?.map((marker) => MarkerKinds.of(marker.type)?.legendSymbol)
+			?.filter((marker) => marker.legend !== false)
+			.map((marker) => MarkerKinds.of(marker.type)?.legendSymbol)
 			.find((kind) => kind !== undefined);
 		const dots = LegendChannels.look(
 			(plot.markers ?? []).filter((marker) => marker.type === 'dot' && !marker.legend)

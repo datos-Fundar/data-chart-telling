@@ -22,8 +22,8 @@ export type TextStyle = {
 export type DotRangeStyling = {
 	/** Radius of every dot that sets none of its own, in px. */
 	dotRadius: number;
-	/** Width of every connector that sets none of its own, in px. */
-	stemWidth: number;
+	/** Width of every connector that sets none of its own, in px; `'dots'` makes it as thick as the dots are wide, a band. */
+	stemWidth: number | 'dots';
 	/** Color of the connector of a category with several dots; a lone dot's stem takes its series' color. Unset, the axis color. */
 	connectorColor?: string;
 	/** Gap, in px, between a dot and its value label, unless the labels' own `dx`/`dy` set one. */
@@ -284,6 +284,21 @@ export type PlotStylesConfig = {
 	dumbbell: DotRangeStyling;
 	/** Default Cleveland-plot styling. */
 	cleveland: DotRangeStyling;
+	/** What `styles.connector` falls back to on the plots that join dots (lollipop, dumbbell, Cleveland). */
+	connector: {
+		/** The colors of a connector colored `{ by: 'sign' }`: where the value rose, fell, or did not move. */
+		sign: { positive: string; negative: string; zero: string };
+		/** The ramp of a connector colored `{ by: 'length' }`: from the shortest to the longest. */
+		lengthScheme: string[];
+		/** The ramp of a connector colored `{ by: 'difference' }`: falling, still, rising, meeting at 0. */
+		differenceScheme: string[];
+		/** Opacity (0-1) of the part of a connector outside the stretch between its `from` and `to` dots. */
+		outsideOpacity: number;
+		/** Font size of a connector's label, in px. */
+		labelFontSize: number;
+		/** Gap, in px, between a connector and its label when it is written beside it. */
+		labelGap: number;
+	};
 	/** Default scatter point geometry. */
 	scatter: { dotRadius: number };
 	/** Timeline gutter styling. */

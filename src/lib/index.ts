@@ -88,6 +88,7 @@ export type {
 } from './types/plots/props';
 export type {
 	AxisBasedStylesConfig,
+	ConnectorBasedStylesConfig,
 	GapsAwarePlotStylesConfig,
 	GeoStylesConfig,
 	GeoTileLayerConfig

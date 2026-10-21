@@ -36,22 +36,31 @@ const rows = [
 ];
 
 describe('ClevelandPlot markers', () => {
-	test('one connector per category with several dots, from its lowest to its highest value', () => {
+	/** The rows the plot's one connector marker draws, by category. */
+	const connectors = (props: Row, legend: LegendState | null = null) =>
+		Object.fromEntries(
+			(marksOf(props, legend).rules.flatMap((r) => r.data) as Row[]).map((row) => [
+				row.category,
+				row
+			])
+		);
+
+	test('one connector per category, from its lowest to its highest value, in one marker', () => {
 		const { rules } = marksOf({ data: rows, x: 'c', y: 'v', color: 'g' });
-		const shared = rules.find((r) => r.series === undefined)!;
-		expect(shared.data).toEqual([
-			{ category: 'a', from: 1, to: 9 },
-			{ category: 'b', from: 4, to: 6 }
-		]);
-		expect(shared.styles?.stroke).toBe(DEFAULT_CONFIG.cleveland.connectorColor);
-		expect(shared.styles?.strokeWidth).toBe(DEFAULT_CONFIG.cleveland.stemWidth);
+		expect(rules).toHaveLength(1);
+		const rowsOf = connectors({ data: rows, x: 'c', y: 'v', color: 'g' });
+		expect(rowsOf.a).toMatchObject({ from: 1, to: 9, mid: 5 });
+		expect(rowsOf.b).toMatchObject({ from: 4, to: 6 });
+		// Several dots, so the connector is neutral and as thick as the configuration says.
+		expect(rowsOf.a.stroke).toBe(DEFAULT_CONFIG.cleveland.connectorColor);
+		expect(rowsOf.a.strokeWidth).toBe(DEFAULT_CONFIG.cleveland.stemWidth);
 	});
 
 	test('a category with one dot gets a stem in its series color, with no range to span', () => {
-		const { rules } = marksOf({ data: rows, x: 'c', y: 'v', color: 'g' });
-		const lone = rules.find((r) => r.series !== undefined)!;
-		expect(lone.series).toBe('lo');
-		expect(lone.data).toEqual([{ category: 'c', from: 3, to: 3 }]);
+		const { dots } = marksOf({ data: rows, x: 'c', y: 'v', color: 'g' });
+		const lone = connectors({ data: rows, x: 'c', y: 'v', color: 'g' }).c;
+		expect(lone).toMatchObject({ from: 3, to: 3 });
+		expect(lone.stroke).toBe(dots.find((d) => d.series === 'lo')!.styles?.dotFill);
 	});
 
 	test('one dot marker per series, in the series color, at the configured radius', () => {
@@ -61,6 +70,29 @@ describe('ClevelandPlot markers', () => {
 		expect(dots.every((d) => d.styles?.dotRadius === DEFAULT_CONFIG.cleveland.dotRadius)).toBe(
 			true
 		);
+	});
+
+	test("the legend draws the series as dots, not as the connector's line", () => {
+		const interaction = new PlotInteraction(() => DEFAULT_CONFIG, { legend: null });
+		const state = Pipeline.ofAxisKind(buildClevelandDefaults<Row>()).run(
+			{
+				width: 400,
+				height: 300,
+				scales: {},
+				segments: {},
+				markers: [],
+				data: rows,
+				x: 'c',
+				y: 'v',
+				color: 'g'
+			},
+			{ cfg: DEFAULT_CONFIG, interaction }
+		) as unknown as Parameters<typeof LegendState.entriesOf>[0];
+		const series = LegendState.entriesOf(state).filter((entry) => entry.type === 'series') as {
+			mark?: string;
+		}[];
+		expect(series).toHaveLength(3);
+		expect(series.every((entry) => entry.mark === 'dot')).toBe(true);
 	});
 
 	test('an r channel sizes every dot by its row, a number is a fixed radius', () => {
@@ -74,10 +106,12 @@ describe('ClevelandPlot markers', () => {
 	test('a series the legend omits leaves the ranges', () => {
 		const legend = new LegendState();
 		legend.turnOff('hi', { mode: 'omit' });
-		const { rules, dots } = marksOf({ data: rows, x: 'c', y: 'v', color: 'g' }, legend);
+		const { dots } = marksOf({ data: rows, x: 'c', y: 'v', color: 'g' }, legend);
 		expect(dots.map((d) => d.series)).toEqual(['lo', 'mid']);
-		const shared = rules.find((r) => r.series === undefined)!;
-		expect(shared.data).toEqual([{ category: 'a', from: 1, to: 5 }]);
+		expect(connectors({ data: rows, x: 'c', y: 'v', color: 'g' }, legend).a).toMatchObject({
+			from: 1,
+			to: 5
+		});
 	});
 
 	test('a series the legend dims takes the disabled dots', () => {
@@ -170,6 +204,204 @@ describe('ClevelandPlot markers', () => {
 			// `hi` writes the top ends, `lo` the bottom ones: one marker per series and role.
 			expect(new Set(fills('series')).size).toBe(2);
 			expect(fills('crimson').every((fill) => fill === 'crimson')).toBe(true);
+		});
+	});
+
+	describe('styles.connector', () => {
+		const withConnector = (connector: Row, extra: Row = {}) =>
+			connectors({ data: rows, x: 'c', y: 'v', color: 'g', styles: { connector }, ...extra });
+
+		test('width is a number, as thick as the dots are wide, or a function of the connector', () => {
+			expect(withConnector({ width: 9 }).a.strokeWidth).toBe(9);
+			expect(withConnector({ width: 'dots' }).a.strokeWidth).toBe(
+				DEFAULT_CONFIG.cleveland.dotRadius * 2
+			);
+			expect(
+				withConnector({ width: (range: { length: number }) => range.length }).a.strokeWidth
+			).toBe(8);
+		});
+
+		test('color is one color, or a function of what the connector measures', () => {
+			expect(withConnector({ color: 'tomato' }).b.stroke).toBe('tomato');
+			expect(
+				withConnector({ color: (range: { category: unknown }) => `c-${range.category}` }).a.stroke
+			).toBe('c-a');
+		});
+
+		test('color by sign follows the difference between the first and the last series', () => {
+			// `a`: lo 1 -> hi 9 rises; `b`: lo 4 -> hi 6 rises; a falling one has the other color.
+			const sign = { by: 'sign', positive: 'green', negative: 'red' };
+			expect(withConnector({ color: sign }).a.stroke).toBe('green');
+			const falling = connectors({
+				data: [
+					{ c: 'a', v: 9, g: 'lo' },
+					{ c: 'a', v: 1, g: 'hi' }
+				],
+				x: 'c',
+				y: 'v',
+				color: 'g',
+				styles: { connector: { color: sign } }
+			});
+			expect(falling.a.stroke).toBe('red');
+		});
+
+		test("without colors of its own, a sign takes the configuration's, and a length or a difference its ramps", () => {
+			const { sign, outsideOpacity, labelFontSize } = DEFAULT_CONFIG.connector;
+			const rising = withConnector({ color: { by: 'sign' } });
+			expect(rising.a.stroke).toBe(sign.positive);
+			const falling = connectors({
+				data: [
+					{ c: 'a', v: 9, g: 'lo' },
+					{ c: 'a', v: 1, g: 'hi' }
+				],
+				x: 'c',
+				y: 'v',
+				color: 'g',
+				styles: { connector: { color: { by: 'sign' } } }
+			});
+			expect(falling.a.stroke).toBe(sign.negative);
+			// The ramps come from the configuration too: the longest connector ends the length ramp.
+			expect(withConnector({ color: { by: 'length' } }).a.stroke).toMatch(/^rgb\(/);
+			expect(withConnector({ color: { by: 'difference' } }).a.stroke).toMatch(/^rgb\(/);
+			// So do the outside part's opacity and the label's size.
+			const outside = marksOf({
+				data: rows,
+				x: 'c',
+				y: 'v',
+				color: 'g',
+				styles: { connector: { from: 'lo', to: 'mid', label: true } }
+			});
+			const beyond = (outside.rules.flatMap((r) => r.data) as Row[]).find((r) => r.from === 5)!;
+			expect(beyond.strokeOpacity).toBe(outsideOpacity);
+			const label = outside.texts.find((t) => (t.data as Row[]).some((d) => 'text' in d))!;
+			expect(label.styles?.fontSize).toBe(labelFontSize);
+		});
+
+		test('from and to name the series a difference runs between', () => {
+			const sign = { by: 'sign', positive: 'green', negative: 'red' };
+			expect(withConnector({ color: sign, from: 'hi', to: 'lo' }).a.stroke).toBe('red');
+		});
+
+		test('color by length draws the longest connector in the last color of the ramp', () => {
+			const scheme = ['#ffffff', '#000000'];
+			const rowsOf = withConnector({ color: { by: 'length', scheme } });
+			expect(rowsOf.a.stroke).not.toBe(rowsOf.b.stroke);
+			expect(rowsOf.a.stroke).toBe('rgb(0, 0, 0)');
+		});
+
+		test('the connector is split where the from and to dots are: the stretch between them in its look, the rest apart', () => {
+			// `a`: lo 1, mid 5, hi 9. From lo to mid, the stretch 1-5 is the connector's, 5-9 lies outside it.
+			const { rules } = marksOf({
+				data: rows,
+				x: 'c',
+				y: 'v',
+				color: 'g',
+				styles: { connector: { from: 'lo', to: 'mid', color: 'tomato' } }
+			});
+			const parts = (rules.flatMap((r) => r.data) as Row[]).filter((row) => row.category === 'a');
+			expect(parts.map((p) => [p.from, p.to, p.stroke])).toEqual([
+				[1, 5, 'tomato'],
+				[5, 9, DEFAULT_CONFIG.cleveland.connectorColor]
+			]);
+			// Outside, the neutral color at a lower opacity: `a`'s stretch itself is at full opacity.
+			expect(parts[0].strokeOpacity).toBe(1);
+			expect(parts[1].strokeOpacity).toBeLessThan(1);
+		});
+
+		test('outside restyles what lies past the from and to dots', () => {
+			const parts = (
+				marksOf({
+					data: rows,
+					x: 'c',
+					y: 'v',
+					color: 'g',
+					styles: {
+						connector: { from: 'lo', to: 'mid', outside: { color: '#ddd', opacity: 0.2 } }
+					}
+				}).rules.flatMap((r) => r.data) as Row[]
+			).filter((row) => row.category === 'a');
+			expect(parts[1]).toMatchObject({ from: 5, to: 9, stroke: '#ddd', strokeOpacity: 0.2 });
+		});
+
+		test('a category with nothing past its from and to dots is a single stretch', () => {
+			const parts = (
+				marksOf({ data: rows, x: 'c', y: 'v', color: 'g' }).rules.flatMap((r) => r.data) as Row[]
+			).filter((row) => row.category === 'b');
+			expect(parts).toHaveLength(1);
+		});
+
+		test('a label is centered on the stretch between the from and to dots, not on the whole connector', () => {
+			const { texts } = marksOf({
+				data: rows,
+				x: 'c',
+				y: 'v',
+				color: 'g',
+				styles: { connector: { from: 'lo', to: 'mid', label: true } }
+			});
+			const label = texts.find((t) => (t.data as Row[]).some((d) => 'text' in d))!;
+			expect((label.data as Row[]).find((d) => d.category === 'a')).toMatchObject({
+				mid: 3,
+				text: '+4'
+			});
+		});
+
+		test('opacity applies to the connectors, a stem keeps its own segment style', () => {
+			expect(withConnector({ opacity: 0.4 }).a.strokeOpacity).toBe(0.4);
+			expect(connectors({ data: rows, x: 'c', y: 'v', color: 'g' }).a.strokeOpacity).toBe(1);
+		});
+
+		test('a label is one text marker, on the middle of each connector that has a difference (`c` has one dot, so none)', () => {
+			const { texts } = marksOf({
+				data: rows,
+				x: 'c',
+				y: 'v',
+				color: 'g',
+				styles: { connector: { label: true } }
+			});
+			const label = texts.find((t) => (t.data as Row[]).some((d) => 'text' in d))!;
+			expect((label.data as Row[]).map((d) => [d.category, d.text])).toEqual([
+				['a', '+8'],
+				['b', '+2']
+			]);
+		});
+
+		test('a label says the length, or what a function makes of the connector', () => {
+			const labelOf = (label: Row) =>
+				(
+					marksOf({
+						data: rows,
+						x: 'c',
+						y: 'v',
+						color: 'g',
+						styles: { connector: { label } }
+					}).texts.find((t) => (t.data as Row[]).some((d) => 'text' in d))!.data as Row[]
+				).map((d) => d.text);
+			expect(labelOf({ text: 'length' })).toEqual(['8', '2', '0']);
+			expect(labelOf({ format: (v: number) => `${v} pts` })).toEqual(['8 pts', '2 pts']);
+			expect(labelOf({ text: (r: { category: unknown }) => `<${r.category}>` })).toEqual([
+				'<a>',
+				'<b>',
+				'<c>'
+			]);
+		});
+
+		test('a label goes beside the connector, or on it with `anchor: middle`', () => {
+			const styleOf = (label: Row) =>
+				marksOf({
+					data: rows,
+					x: 'c',
+					y: 'v',
+					color: 'g',
+					styles: { connector: { label } }
+				}).texts.find((t) => (t.data as Row[]).some((d) => 'text' in d))!.styles;
+			expect(styleOf({})?.dx).toBeGreaterThan(0);
+			expect(styleOf({})?.dy).toBe(0);
+			expect(styleOf({ anchor: 'middle' })).toMatchObject({
+				dx: 0,
+				dy: 0,
+				textAnchor: 'middle',
+				lineAnchor: 'middle'
+			});
 		});
 	});
 });

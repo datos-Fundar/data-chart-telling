@@ -329,7 +329,7 @@ export type LegendSource = {
 		opacity?: OpacityScaleConfig;
 		symbol?: SymbolScaleConfig;
 	};
-	legend?: MarkLegend;
+	legend?: MarkLegend | false;
 	fill?: unknown;
 	stroke?: unknown;
 	styles?: {

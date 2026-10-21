@@ -13,5 +13,17 @@ export type RuleMarkerConfig = {
 	insetBottom?: number;
 	insetLeft?: number;
 	insetRight?: number;
+	/**
+	 * A stroke color for each row - a field key or a function of the row - drawn
+	 * as it is, not mapped through a color scale. Wins over `styles.stroke`.
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	stroke?: string | ((d: any) => string | undefined);
+	/** A stroke width for each row - a field key or a function of the row. Wins over `styles.strokeWidth`. */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	strokeWidth?: string | ((d: any) => number);
+	/** A stroke opacity for each row - a field key or a function of the row - drawn as it is. Wins over `styles.strokeOpacity`. */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	strokeOpacity?: string | ((d: any) => number);
 	styles?: StrokeStyle;
 } & CommonMarkerConfigWithInterval;

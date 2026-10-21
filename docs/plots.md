@@ -233,7 +233,7 @@ One value per category, drawn as a dot on a thin stem that rises from the baseli
 - `grouping` (or `color`) draws one set of lollipops per group, as long as each category has a value in only one of them - coloring by the category field itself is the usual case. A category with values in several groups warns: that is a [`DumbbellPlot`](#dumbbellplot) (two) or a [`ClevelandPlot`](#clevelandplot) (any number).
 - Categories keep the order the data gives them; `scales.x.domain` (or `y`) orders them.
 - The value axis reaches zero, where the stems start; pinning `scales.y.domain` moves the baseline to the nearest end of it, and a negative value hangs below zero.
-- `scales.x.paddingInner` / `paddingOuter` set the room around each lollipop; the defaults, with the dot radius and the stem width, come from `lollipop` in the [configuration](theming.md).
+- `scales.x.paddingInner` / `paddingOuter` set the room around each lollipop; the defaults, with the dot radius and the stem width (a thin 2 px line), come from `lollipop` in the [configuration](theming.md).
 - `styles.values` writes each value just past its dot.
 - `segments` restyle whole categories: `styles: { stroke: {...}, dots: {...} }` restyle their stems and dots (`areas: [{ x: { from: 'Salta', to: 'Salta' } }]`).
 - The tooltip reads one lollipop at a time, along the category axis.
@@ -271,7 +271,7 @@ Two dots per category, one for each of two series, joined by a connector: the ga
 - The value axis fits the values without reaching for zero; pin `scales.y.domain` to start it at zero.
 - Categories keep the order the data gives them; `scales.x.domain` (or `y`) orders them.
 - `r` sizes the dots by a field (`r="population"`; area follows the value, and the legend gets a size section) or fixes their radius in pixels (`r={8}`).
-- The connector is a neutral gray; its color and width, the dot radius and the padding come from `dumbbell` in the [configuration](theming.md).
+- The connector is a neutral gray as thick as the dots are wide (`stemWidth: 'dots'`), a band; its default color and width, the dot radius and the padding come from `dumbbell` in the [configuration](theming.md). `styles.connector` restyles it per category (see [Connectors](#connectors)).
 - `styles.values` writes each value past its dot, away from the other one. A label past the lowest dot can reach the axis labels when that dot sits at the edge of the axis; pin `scales.y.domain` (or `x`) wide enough to leave it room.
 - `segments` restyle the dots of chosen categories (`styles: { dots: { dotRadius: 9 } }`, `areas: [{ x: { from: 'Salta', to: 'Salta' } }]`).
 - The tooltip reads one category at a time, listing its two values.
@@ -288,8 +288,16 @@ The general form of the family: per category, one dot for each series that has a
 	import { AGE_SHARES } from './data';
 </script>
 
-<!-- One dot per census year in each age group, joined from the lowest share to the highest. -->
-<ClevelandPlot width={720} height={400} data={AGE_SHARES} x="share" y="ageGroup" grouping="year" />
+<!-- One dot per census year in each age group, joined from the lowest share to the highest. The years follow one another, so they take a sequential blues ramp. -->
+<ClevelandPlot
+	width={720}
+	height={400}
+	data={AGE_SHARES}
+	x="share"
+	y="ageGroup"
+	grouping="year"
+	scales={{ color: { scheme: 'blues', schemeRange: [0.3, 1] } }}
+/>
 ```
 
 <!-- /example -->
@@ -300,10 +308,25 @@ The general form of the family: per category, one dot for each series that has a
 - `scales.color.scheme: 'blues'` colors the series on a sequential ramp, which reads better than the default palette when the series follow one another, such as years; `schemeRange: [0.3, 1]` skips the ramp's near-white start.
 - The connector spans the lowest and the highest dot of each category, so a series the legend omits leaves the range.
 - The value axis fits the values without reaching for zero; pin `scales.y.domain` to start it at zero.
-- Its defaults come from `cleveland` in the [configuration](theming.md).
+- Its defaults come from `cleveland` in the [configuration](theming.md): the connector is a neutral gray, 5 px thick.
 - `styles.values` writes each value: past the highest dot and the lowest of its category, and beside those between them. `select` (`'first'`, `'last'`, `'min'`, `'max'`, or a list) labels only those dots of each category, `series` only those series, and `color: 'series'` writes each label in its dot's series color. `format(value, seriesName, row)` also gets the row, so a label can name its category (see [Styles and segments](styles-and-segments.md#value-labels)).
 - `segments` restyle the dots of chosen categories, as in [`DumbbellPlot`](#dumbbellplot).
 - The tooltip reads one category at a time, listing every series.
+
+### Connectors
+
+`styles.connector` styles the line each category draws between its dots, on `DumbbellPlot`, `ClevelandPlot` and `LollipopPlot`:
+
+| Field        | Meaning                                                                                                                                                                                                                    |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `from`, `to` | The series a difference runs between: `to` minus `from`. Default: the first and the last series (the value minus the baseline, on a lollipop)                                                                              |
+| `width`      | Thickness in px, `'dots'` for a band as thick as the dots are wide, or a function of the connector                                                                                                                         |
+| `color`      | One color; `{ by: 'sign', positive, negative, zero }`; `{ by: 'difference' \| 'length', scheme, pivot, ... }` (a color scale, diverging around `pivot: 0` by default for a difference); or a function                      |
+| `opacity`    | 0-1, or a function of the connector                                                                                                                                                                                        |
+| `outside`    | How the part of a connector outside the `from`-`to` stretch looks, where the dots of the other series lie: a color, or `{ color, opacity }`. Default: the neutral connector color, faded                                   |
+| `label`      | `true`, or `{ text, format, anchor, fontStyle }`: `text` is the `'difference'` (signed, the default), the `'length'`, or a function; `anchor` is `'outside'` (beside the connector) or `'middle'` (on it, for a thick one) |
+
+With more than two series, the connector spans the lowest and the highest dot, but only the stretch between the `from` and `to` dots takes `color`, `opacity` and the label (centered on it); the rest is `outside`. A function gets the connector: `{ category, from, to, length, difference, span, series }`, `span` being that stretch. A lone dot's stem keeps its series' color unless `color` is set, and a segment's own `stroke` wins over both.
 
 ## HeatmapPlot
 

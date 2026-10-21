@@ -28,11 +28,18 @@ const rows = ['a', 'b'].flatMap((c, i) =>
 describe('LollipopPlot markers', () => {
 	test('a stem and a dot per series, in its own color, at the configured geometry', () => {
 		const { rules, dots } = marksOf({ data: rows, x: 'c', y: 'v', color: 'g' });
-		expect(rules.map((r) => r.series)).toEqual(['A', 'B']);
+		expect(rules).toHaveLength(1);
+		const stems = rules[0].data as Row[];
 		expect(dots.map((d) => d.series)).toEqual(['A', 'B']);
-		expect(rules[0].styles?.stroke).not.toBe(rules[1].styles?.stroke);
-		expect(dots[0].styles?.dotFill).toBe(rules[0].styles?.stroke);
-		expect(rules[0].styles?.strokeWidth).toBe(DEFAULT_CONFIG.lollipop.stemWidth);
+		// `A` covers a1 and a2, `B` b1 and b2: a stem takes the color of its own series' dots.
+		expect(stems.map((stem) => stem.stroke)).toEqual([
+			dots[0].styles?.dotFill,
+			dots[0].styles?.dotFill,
+			dots[1].styles?.dotFill,
+			dots[1].styles?.dotFill
+		]);
+		expect(stems[0].stroke).not.toBe(stems[2].stroke);
+		expect(stems[0].strokeWidth).toBe(DEFAULT_CONFIG.lollipop.stemWidth);
 		expect(dots[0].styles?.dotRadius).toBe(DEFAULT_CONFIG.lollipop.dotRadius);
 	});
 
@@ -52,9 +59,14 @@ describe('LollipopPlot markers', () => {
 		const legend = new LegendState();
 		legend.turnOff('B', { mode: 'dim' });
 		const { rules, dots } = marksOf({ data: rows, x: 'c', y: 'v', color: 'g' }, legend);
-		expect(rules[1].styles?.strokeOpacity).toBe(DEFAULT_CONFIG.legend.disabledOpacity);
+		const stems = rules[0].data as Row[];
+		expect(stems.map((stem) => stem.strokeOpacity)).toEqual([
+			1,
+			1,
+			DEFAULT_CONFIG.legend.disabledOpacity,
+			DEFAULT_CONFIG.legend.disabledOpacity
+		]);
 		expect(dots[1].styles?.dotFillOpacity).toBe(DEFAULT_CONFIG.legend.disabledOpacity);
-		expect(rules[0].styles?.strokeOpacity).toBeUndefined();
 	});
 
 	test('a segment restyles only the lollipops of the categories it covers', () => {
@@ -70,6 +82,8 @@ describe('LollipopPlot markers', () => {
 		});
 		const red = dots.find((d) => d.styles?.dotFill === 'red')!;
 		expect(new Set((red.data as Row[]).map((r) => r.c))).toEqual(new Set(['b1', 'b2']));
-		expect(rules).toHaveLength(2);
+		// Every stem is still drawn, in one marker.
+		expect(rules).toHaveLength(1);
+		expect(rules[0].data).toHaveLength(4);
 	});
 });

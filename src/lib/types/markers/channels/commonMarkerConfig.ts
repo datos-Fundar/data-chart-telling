@@ -25,6 +25,6 @@ export type CommonMarkerConfig = {
 	transforms?: MarkerTransform[];
 	/** Clips the marker to the plot's frame. Unset, its kind's default applies. */
 	clip?: boolean;
-	/** Names the marker on its plot's automatic legend - see {@link MarkLegend}. */
-	legend?: MarkLegend;
+	/** Names the marker on its plot's automatic legend - see {@link MarkLegend}. `false` keeps a decorative marker out of it, and out of how the plot's series look there. */
+	legend?: MarkLegend | false;
 };
