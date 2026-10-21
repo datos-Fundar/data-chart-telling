@@ -120,6 +120,20 @@ export type EdgeTickCollision = 'drop-nice' | 'drop-edge' | 'extend';
 export type EdgeTicksOptions = { enabled: boolean; collision: EdgeTickCollision };
 
 /**
+ * A category axis ordered by what each category holds: `'value'` by its value
+ * in one `series` (or, without one, the sum of its values) and `'range'` by the
+ * spread between its lowest and its highest value. A category with nothing to
+ * sort by goes last.
+ */
+export type CategorySort = {
+	by: 'value' | 'range';
+	/** For `by: 'value'`: the series whose value orders the categories. */
+	series?: string;
+	/** Defaults to `'ascending'`. */
+	order?: 'ascending' | 'descending';
+};
+
+/**
  * Scale overrides for one plot axis - svelteplot's `ScaleOptions` and
  * `XScaleOptions`, plus this package's own fields. `TData` is the row type
  * {@link AxisScale.sort} compares.
@@ -152,7 +166,8 @@ export type AxisScale<TData = Record<string, unknown>> = {
 	align?: number;
 	base?: number;
 	constant?: number;
-	sort?: (a: TData, b: TData) => number;
+	/** The order of a category axis: a comparator of two rows (each category's first), or a {@link CategorySort} by what the categories hold. Ignored when `domain` is set. */
+	sort?: ((a: TData, b: TData) => number) | CategorySort;
 	grid?:
 		| boolean
 		| { stroke?: string; strokeWidth?: number; strokeOpacity?: number; strokeDasharray?: string };

@@ -55,9 +55,12 @@ Each axis takes an `AxisScale`.
 | `axisDisplay`                                                                | `'visible'` (default), `'hidden'` (keeps the space, so aligned panels stay aligned) or `'none'`                                                                                                                                                                                                                                                                                                 |
 | `padding`, `paddingInner`, `paddingOuter`, `align`                           | Band and point spacing                                                                                                                                                                                                                                                                                                                                                                          |
 | `insetLeft`, `insetRight`, `insetTop`, `insetBottom`                         | Pixels kept free at each end                                                                                                                                                                                                                                                                                                                                                                    |
-| `interval`, `base`, `constant`, `sort`                                       | Time/discrete intervals, log base, symlog constant, category order                                                                                                                                                                                                                                                                                                                              |
+| `interval`, `base`, `constant`                                               | Time/discrete intervals, log base, symlog constant                                                                                                                                                                                                                                                                                                                                              |
+| `sort`                                                                       | Category order: a comparator of two rows, or by what the categories hold (below)                                                                                                                                                                                                                                                                                                                |
 
 A category axis whose labels do not fit side by side turns them by itself: to 45 degrees, else to 90, and when even that is not enough it writes only every few labels (and a vertical category axis, such as the one of horizontal bars, does the same). The margin grows to fit the turned labels. An axis with a `tickRotate` of its own - 0 included, which keeps the labels flat - is left as the author set it, and `axis.autoRotate: false` in the [configuration](theming.md) turns this off for every plot.
+
+A category axis can be ordered by what its categories hold, without writing a comparator: `sort: { by: 'value', series?, order? }` orders them by their value in one `series` (or, without it, by the sum of their values) and `sort: { by: 'range', order? }` by the spread between their lowest and their highest value; `order` is `'ascending'` (default) or `'descending'`. A category with nothing to order by goes last. An explicit `domain` wins. With [facets](facets.md) the order is read off every panel's rows, so the panels share it.
 
 Number and date text defaults follow `axis.locale` and `axis.compactDisplay` in the [configuration](theming.md#locale).
 
@@ -79,7 +82,7 @@ A marker can carry its own `scales.color`, independent of the plot's, so two ram
 
 ## Grouping
 
-`scales.grouping.reverse` flips which group sorts first, such as which side of a [pyramid](plots.md#pyramidplot) a series sits on.
+`scales.grouping.reverse` flips which group sorts first, such as which side of a [pyramid](plots/pyramid.md) a series sits on.
 
 ## Opacity
 

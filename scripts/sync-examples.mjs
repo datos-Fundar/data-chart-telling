@@ -18,9 +18,9 @@ const BLOCK = /(<!-- example: (\S+) -->\n)[\s\S]*?(<!-- \/example -->)/g;
 
 const markdownFiles = [
 	resolve(root, 'README.md'),
-	...readdirSync(resolve(root, 'docs'))
-		.filter((file) => file.endsWith('.md'))
-		.map((file) => resolve(root, 'docs', file))
+	...readdirSync(resolve(root, 'docs'), { recursive: true })
+		.filter((file) => String(file).endsWith('.md'))
+		.map((file) => resolve(root, 'docs', String(file)))
 ];
 
 let stale = 0;

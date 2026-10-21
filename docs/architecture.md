@@ -127,7 +127,7 @@ The public readers of that state are `useFigure()` and `usePlot()` ([Reading plo
 1. Define its props and state types under `types/plots/<kind>/`.
 2. Write `plots/<kind>/defaults.ts`: a builder returning the options of each phase it customises (`data`, `mapping`, `scales`, `styles`, `markers`, `hover`, `timeline`, ...).
 3. Write `plots/<kind>/Plot.svelte`: split chrome, `timeline`, `facet` and core props and render the shared `Plot` with the builder.
-4. Export it from `src/lib/index.ts`, add stories under `stories/plots/<kind>/`, tests under `tests/unit/plots/<kind>/`, and a section in [Plots](plots.md).
+4. Export it from `src/lib/index.ts`, add stories under `stories/plots/<kind>/`, tests under `tests/unit/plots/<kind>/`, and a page in `docs/plots/` with a row in the [Plots](plots.md) table.
 
 ## Conventions
 

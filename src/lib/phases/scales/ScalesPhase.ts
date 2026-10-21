@@ -2,18 +2,13 @@ import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import { MarkerAxisValues } from '$lib/phases/scales/MarkerAxisValues';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
+import { CategoryOrder } from '$lib/phases/scales/CategoryOrder';
 import { NiceTicks } from '$lib/layout/scales/NiceTicks';
 import { DISCRETE_SCALE_TYPES } from '$lib/types/layout/scales';
 import type { AxisChannelName } from '$lib/types/layout/mapping';
 import type { AxisScale } from '$lib/types/layout/scales';
 import type { AxisRef } from '$lib/types/phases/data/axes';
-import type {
-	AxisPlotState,
-	AxisPlotCtx,
-	PhaseStage,
-	ProcessedData,
-	ScalesStageOptions
-} from '$lib/types/phases';
+import type { AxisPlotState, AxisPlotCtx, PhaseStage, ScalesStageOptions } from '$lib/types/phases';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyAxisState = AxisPlotState<any, any, any, any>;
@@ -81,7 +76,7 @@ export class ScalesPhase<
 		for (const axis of AXES) {
 			const own = ScalesPhase.#defaultsOf(defaults, axis, axes);
 			if (axes?.bands.includes(axis)) {
-				scales[axis] = this.#band(scales[axis], own, processedData, axis);
+				scales[axis] = this.#band(scales[axis], own, state, axis);
 				continue;
 			}
 			// The value axis of a plot with categories is never one itself, whatever it was marked as.
@@ -139,9 +134,10 @@ export class ScalesPhase<
 	#band(
 		author: AnyAxisScale | undefined,
 		own: AnyAxisScale,
-		processed: ProcessedData | undefined,
+		state: AnyAxisState,
 		axis: AxisChannelName
 	): AnyAxisScale {
+		const processed = state.processedData;
 		const given = author ?? {};
 		const type =
 			given.type === undefined || given.type === 'auto' || given.type === 'categorical'
@@ -156,6 +152,12 @@ export class ScalesPhase<
 			if (own.paddingOuter !== undefined && given.paddingOuter === undefined) {
 				band.paddingOuter = given.padding;
 			}
+		}
+		// A sort by what the categories hold is read here, off the rows; the axis then draws from its domain.
+		if (CategoryOrder.isDeclarative(band.sort)) {
+			const order = band.domain ? undefined : CategoryOrder.of(band.sort, state, axis);
+			delete band.sort;
+			if (order) band.domain = order as never;
 		}
 		if (this.keepsDataOrder && !band.domain) {
 			band.domain = [...new Set(ProcessedPositions.values(processed, axis))] as never;

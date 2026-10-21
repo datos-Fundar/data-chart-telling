@@ -133,9 +133,14 @@ export type ConnectorLabel = {
  * draws between its dots, and the label on it.
  */
 export type ConnectorStyle = {
-	/** The series a difference starts from. Defaults to the first series. */
+	/**
+	 * Where a difference starts: a series by its name, `'first'` or `'last'` for that series, or
+	 * `'min'` or `'max'` for the category's lowest or highest dot. Defaults to `'first'`. The
+	 * stretch between `from` and `to` is what `color`, `opacity` and the label are for; the rest
+	 * of the connector is `outside`.
+	 */
 	from?: string;
-	/** The series a difference ends at. Defaults to the last series. */
+	/** Where a difference ends - the same options as `from`. Defaults to `'last'`. With `from: 'min'` and `to: 'max'`, the stretch is the whole connector. */
 	to?: string;
 	/** The connector's thickness in px; `'dots'` makes it as thick as the dots are wide, a band. Or a function of the connector. */
 	width?: number | 'dots' | ((range: ConnectorRange) => number);

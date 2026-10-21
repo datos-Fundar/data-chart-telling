@@ -73,12 +73,17 @@ export class ClevelandRanges {
 			}
 		}
 		const names = groups.map((group) => group.series.name);
-		const start = ends.from ?? names[0];
-		const end = ends.to ?? names[names.length - 1];
 		for (const entry of byCategory.values()) {
-			const at = (series: string) => entry.dots.find((dot) => dot.series === series)?.value;
-			const last = at(end);
-			const first = fromBaseline ? baseline : at(start);
+			// An end of the difference: a series' dot, the first or last series', or the lowest or highest dot.
+			const at = (which: string) => {
+				if (which === 'min') return Math.min(...entry.dots.map((dot) => dot.value));
+				if (which === 'max') return Math.max(...entry.dots.map((dot) => dot.value));
+				const series =
+					which === 'first' ? names[0] : which === 'last' ? names[names.length - 1] : which;
+				return entry.dots.find((dot) => dot.series === series)?.value;
+			};
+			const last = at(ends.to ?? 'last');
+			const first = fromBaseline ? baseline : at(ends.from ?? 'first');
 			entry.difference = last === undefined || first === undefined ? undefined : last - first;
 			entry.span =
 				last === undefined || first === undefined

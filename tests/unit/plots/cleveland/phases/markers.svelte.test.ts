@@ -308,6 +308,37 @@ describe('ClevelandPlot markers', () => {
 			expect(parts[1].strokeOpacity).toBeLessThan(1);
 		});
 
+		test("`from: 'min'` and `to: 'max'` make the stretch the whole connector: no outside, the label in its middle", () => {
+			// `a`: lo 1, mid 5, hi 9; first to last is already 1-9, so reverse the series: hi 9 first.
+			const reversed = [
+				{ c: 'a', v: 4, g: 'lo' },
+				{ c: 'a', v: 1, g: 'mid' },
+				{ c: 'a', v: 9, g: 'hi' }
+			];
+			const { rules, texts } = marksOf({
+				data: reversed,
+				x: 'c',
+				y: 'v',
+				color: 'g',
+				styles: { connector: { from: 'min', to: 'max', label: true } }
+			});
+			const parts = rules.flatMap((r) => r.data) as Row[];
+			expect(parts).toHaveLength(1);
+			expect(parts[0]).toMatchObject({ from: 1, to: 9, mid: 5 });
+			const label = texts.find((t) => (t.data as Row[]).some((d) => 'text' in d))!;
+			expect((label.data as Row[])[0]).toMatchObject({ mid: 5, text: '+8' });
+			// By default the stretch runs from the first series' dot to the last's, 4 to 9, and 1-4 lies outside it.
+			const dflt = (
+				marksOf({ data: reversed, x: 'c', y: 'v', color: 'g' }).rules.flatMap(
+					(r) => r.data
+				) as Row[]
+			).map((p) => [p.from, p.to]);
+			expect(dflt).toEqual([
+				[4, 9],
+				[1, 4]
+			]);
+		});
+
 		test('outside restyles what lies past the from and to dots', () => {
 			const parts = (
 				marksOf({

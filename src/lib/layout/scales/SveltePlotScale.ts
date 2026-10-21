@@ -51,7 +51,7 @@ export class SveltePlotScale {
 		getAxisValue: (d: TData) => AxisValue
 	): AxisScale<TData> | undefined {
 		const sort = scale?.sort;
-		if (!sort || scale?.domain) return scale;
+		if (typeof sort !== 'function' || scale?.domain) return scale;
 		const reps = SveltePlotScale.#uniqueRows(rows, getAxisValue);
 		if (reps.length === 0 || !reps.every((r) => typeof getAxisValue(r) === 'string')) return scale;
 		const domain = [...reps].sort(sort).map(getAxisValue);

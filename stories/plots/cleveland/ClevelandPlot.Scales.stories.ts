@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ClevelandPlot from '$lib/plots/cleveland/Plot.svelte';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
+import type { ConnectorBasedStylesConfig } from '$lib/types/layout/styles';
 import { AGE_SHARES } from '$examples/data';
 import { SEQUENTIAL_COLORS } from './colors';
 
@@ -76,5 +77,41 @@ export const EdgeRoom: Story = {
 			color: SEQUENTIAL_COLORS,
 			x: { paddingOuter: 1 }
 		} satisfies AxisBasedScalesConfig
+	}
+};
+
+/** `sort: { by: 'range' }` orders the age groups by how much their share varied across the four censuses, the widest first - the connector, drawn whole from the lowest to the highest dot, is labelled with that spread. */
+export const SortedByRange: Story = {
+	args: {
+		scales: {
+			color: SEQUENTIAL_COLORS,
+			x: { sort: { by: 'range', order: 'descending' } }
+		} satisfies AxisBasedScalesConfig,
+		styles: {
+			// From the lowest dot to the highest: the connector is whole, and so is its label's span.
+			connector: {
+				from: 'min',
+				to: 'max',
+				label: { text: 'length', format: (value: number) => `${value.toFixed(1)} pts` }
+			}
+		} satisfies ConnectorBasedStylesConfig
+	}
+};
+
+/** `sort: { by: 'value', series: '2022' }` orders them by the share in one census: the largest age group of 2022 first - the labels write the 2022 share. */
+export const SortedByLastCensus: Story = {
+	args: {
+		scales: {
+			color: SEQUENTIAL_COLORS,
+			x: { sort: { by: 'value', series: '2022', order: 'descending' } }
+		} satisfies AxisBasedScalesConfig,
+		styles: {
+			connector: { from: 'min', to: 'max' },
+			values: {
+				show: true,
+				select: 'last',
+				format: (value: number) => `${value}%`
+			}
+		} satisfies ConnectorBasedStylesConfig
 	}
 };

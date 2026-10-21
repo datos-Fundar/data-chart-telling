@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import DumbbellPlot from '$lib/plots/dumbbell/Plot.svelte';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
+import type { ConnectorBasedStylesConfig } from '$lib/types/layout/styles';
 import { PROVINCE_VALUES } from '$examples/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -71,5 +72,31 @@ export const EdgeRoom: Story = {
 		scales: {
 			x: { paddingOuter: 1 }
 		} satisfies AxisBasedScalesConfig
+	}
+};
+
+/** `sort: { by: 'range' }` orders the categories by the gap between their dots: here from the widest gap between the sexes to the narrowest, each connector labelled with its gap. */
+export const SortedByGap: Story = {
+	args: {
+		scales: {
+			x: { sort: { by: 'range', order: 'descending' } }
+		} satisfies AxisBasedScalesConfig,
+		styles: {
+			connector: {
+				label: { text: 'length', format: (value: number) => `${value.toFixed(1)} yr` }
+			}
+		} satisfies ConnectorBasedStylesConfig
+	}
+};
+
+/** `sort: { by: 'value', series }` orders them by one series' value: here by female life expectancy, the highest first - the labels write it. */
+export const SortedByOneSeries: Story = {
+	args: {
+		scales: {
+			x: { sort: { by: 'value', series: 'female', order: 'descending' } }
+		} satisfies AxisBasedScalesConfig,
+		styles: {
+			values: { show: true, series: 'female' }
+		} satisfies ConnectorBasedStylesConfig
 	}
 };
