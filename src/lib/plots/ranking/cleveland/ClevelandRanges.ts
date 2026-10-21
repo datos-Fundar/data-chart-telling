@@ -1,7 +1,7 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { isGapValue } from '$lib/plots/utils/gaps';
-import { rowInterval } from '$lib/plots/utils/rowInterval';
+import { RowNumbers } from '$lib/plots/utils/RowNumbers';
 import type { ProcessedData, ProcessedRow } from '$lib/types/phases';
 import type {
 	ClevelandPlotState,
@@ -70,7 +70,7 @@ export class ClevelandRanges {
 					}
 					entry.dots.push({ row, value, series: group.series.name });
 					// A dot that stands for an interval spans it; else only its own value.
-					const [low, high] = interval ? rowInterval(state, row, value) : [value, value];
+					const [low, high] = interval ? RowNumbers.interval(state, row, value) : [value, value];
 					entry.from = Math.min(entry.from, low);
 					entry.to = Math.max(entry.to, high);
 					seriesOf.get(key)!.add(group.series.name);

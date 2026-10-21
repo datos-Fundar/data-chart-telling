@@ -288,6 +288,23 @@ export type PlotStylesConfig = {
 	cleveland: DotRangeStyling;
 	/** Default forest-plot styling: the dot is the estimate, the stem its interval. */
 	forest: DotRangeStyling;
+	/** Default bullet-plot styling: a bar over graded ranges, with a tick at its target. */
+	bullet: {
+		/** The bar's thickness (px) across its category band. */
+		barThickness: number;
+		/** The thickness (px) of the bands that grade the value. */
+		rangeWidth: number;
+		/** The colors of those bands, from the smallest to the largest; the last one repeats if there are more bands. */
+		rangeColors: string[];
+		/** The length (px) and thickness of the target tick. */
+		targetLength: number;
+		targetWidth: number;
+		/** The target tick's color; the axis color when unset. */
+		targetColor?: string;
+		/** Padding between category bands, as fractions (0-1) of a band. */
+		paddingInner: number;
+		paddingOuter: number;
+	};
 	/** What `styles.connector` falls back to on the plots that join dots (lollipop, dumbbell, Cleveland). */
 	connector: {
 		/** The colors of a connector colored `{ by: 'sign' }`: where the value rose, fell, or did not move. */

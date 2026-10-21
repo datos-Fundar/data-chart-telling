@@ -58,17 +58,10 @@ const preview: Preview = {
 				order: [
 					'Plots',
 					[
-						'Distribution',
-						[
-							'HistogramPlot',
-							['Series', 'Scales', 'Tooltip', 'Transforms'],
-							'BoxPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
-							'PyramidPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules'], 'Tooltip']
-						],
 						'Correlation',
 						[
+							'HeatmapPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip'],
 							'ScatterPlot',
 							[
 								'Series',
@@ -79,25 +72,21 @@ const preview: Preview = {
 								'Markers',
 								['Rules', 'Hover', 'Custom'],
 								'Tooltip'
-							],
-							'HeatmapPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip']
+							]
 						],
-						'Ranking',
+						'Distribution',
 						[
-							'BarPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip'],
-							'LollipopPlot',
+							'BoxPlot',
 							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
-							'DumbbellPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
-							'ClevelandPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
-							'ForestPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip']
+							'HistogramPlot',
+							['Series', 'Scales', 'Tooltip', 'Transforms'],
+							'PyramidPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules'], 'Tooltip']
 						],
 						'Evolution',
 						[
+							'AreaPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
 							'LinePlot',
 							[
 								'Series',
@@ -107,9 +96,7 @@ const preview: Preview = {
 								'Markers',
 								['Rules', 'Deltas', 'Custom'],
 								'Tooltip'
-							],
-							'AreaPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip']
+							]
 						],
 						'Map',
 						[
@@ -125,6 +112,21 @@ const preview: Preview = {
 								['Graticule', 'Dot', 'Vector', 'Link', 'Contour', 'Inset', 'Hover', 'Custom'],
 								'Tooltip'
 							]
+						],
+						'Ranking',
+						[
+							'BarPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip'],
+							'BulletPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip'],
+							'ClevelandPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							'DumbbellPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							'ForestPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							'LollipopPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip']
 						]
 					],
 					'Channels',

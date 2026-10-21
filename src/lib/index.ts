@@ -4,6 +4,7 @@
 export { default as AreaPlot } from './plots/evolution/area/Plot.svelte';
 export { default as BarPlot } from './plots/ranking/bar/Plot.svelte';
 export { default as BoxPlot } from './plots/distribution/box/Plot.svelte';
+export { default as BulletPlot } from './plots/ranking/bullet/Plot.svelte';
 export { default as ClevelandPlot } from './plots/ranking/cleveland/Plot.svelte';
 export { default as DumbbellPlot } from './plots/ranking/dumbbell/Plot.svelte';
 export { default as ForestPlot } from './plots/ranking/forest/Plot.svelte';
@@ -90,6 +91,7 @@ export type {
 export type {
 	AxisBasedStylesConfig,
 	ConnectorBasedStylesConfig,
+	BulletStylesConfig,
 	GapsAwarePlotStylesConfig,
 	GeoStylesConfig,
 	GeoTileLayerConfig

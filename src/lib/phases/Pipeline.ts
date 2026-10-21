@@ -47,6 +47,8 @@ export type AxisPipelineProps<TData extends Record<string, unknown>> = {
 	lower?: Accessor<TData, unknown>;
 	upper?: Accessor<TData, unknown>;
 	error?: Accessor<TData, unknown>;
+	target?: unknown;
+	ranges?: unknown[];
 	segments?: unknown;
 	styles?: { gaps?: unknown; values?: unknown };
 	scales?: object;
@@ -319,6 +321,8 @@ export class Pipeline<TState, TCtx = unknown> {
 			lower: props.lower,
 			upper: props.upper,
 			error: props.error,
+			target: props.target,
+			ranges: props.ranges,
 			segments: props.segments ?? {},
 			styles: props.styles,
 			gaps: props.styles?.gaps,

@@ -12,9 +12,9 @@ export type BarMarkerConfig = {
 	insetBottom?: number;
 	insetLeft?: number;
 	insetRight?: number;
+	thickness?: number;
 	styles?: AreaStyle;
 	category?: AxisValue;
-	/** A `'hitArea'` that matches `data` as the plot's hover while the pointer is over it. */
 	hover?: boolean;
 } & CommonMarkerConfigWithColor &
 	CommonMarkerConfigWithInterval;

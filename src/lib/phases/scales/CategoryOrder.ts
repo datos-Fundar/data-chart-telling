@@ -1,7 +1,7 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
-import { rowInterval, type IntervalAccessors } from '$lib/plots/utils/rowInterval';
+import { RowNumbers, type IntervalAccessors } from '$lib/plots/utils/RowNumbers';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import type { AxisChannelName } from '$lib/types/layout/mapping';
 import type { CategorySort } from '$lib/types/layout/scales';
@@ -49,7 +49,7 @@ export class CategoryOrder {
 			const raw = valueOf(row);
 			const value = Number(raw);
 			if (isGapValue(raw) || !Number.isFinite(value)) continue;
-			entry.values.push(...rowInterval(state, row, value));
+			entry.values.push(...RowNumbers.interval(state, row, value));
 			if (sort.series === undefined || String(row[SERIES_KEY]) === sort.series) {
 				entry.own.push(value);
 			}

@@ -14,6 +14,7 @@ import { buildBoxDefaults } from '$lib/plots/distribution/box/defaults';
 import { buildLollipopDefaults } from '$lib/plots/ranking/lollipop/defaults';
 import { buildDumbbellDefaults } from '$lib/plots/ranking/dumbbell/defaults';
 import { buildClevelandDefaults } from '$lib/plots/ranking/cleveland/defaults';
+import { buildBulletDefaults } from '$lib/plots/ranking/bullet/defaults';
 import { buildForestDefaults } from '$lib/plots/ranking/forest/defaults';
 import type { FacetConfig } from '$lib/types/layout/facet';
 
@@ -29,8 +30,9 @@ const [
 	LollipopCore,
 	DumbbellCore,
 	ClevelandCore,
-	ForestCore
-] = Array(12).fill(GenericCore);
+	ForestCore,
+	BulletCore
+] = Array(13).fill(GenericCore);
 
 type Row = { year: number; region: string; sector: string; value: number };
 
@@ -154,6 +156,12 @@ const CASES: Case[] = [
 		Core: ForestCore,
 		buildDefaults: buildForestDefaults,
 		core: { ...BOX, x: 'sector', y: 'value', color: 'sector', lower: 'value', upper: 'value' }
+	},
+	{
+		name: 'bullet',
+		Core: BulletCore,
+		buildDefaults: buildBulletDefaults,
+		core: { ...BOX, x: 'sector', y: 'value', color: 'sector', target: 'value', ranges: [100] }
 	}
 ];
 

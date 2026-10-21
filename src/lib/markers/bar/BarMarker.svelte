@@ -43,14 +43,17 @@
 {#if marker.role === 'segment'}
 	{@const categoryScale = categoryScaleFor(marker.isHorizontal)}
 	{@const bandwidth = categoryScale?.type === 'band' ? categoryScale.fn.bandwidth() : 0}
+	{@const centered =
+		marker.thickness != null ? Math.max(0, (bandwidth - marker.thickness) / 2) : undefined}
 	{#if marker.isHorizontal}
 		<BarX
 			{data}
 			y={marker.y}
 			x1={marker.x1}
 			x2={marker.x2}
-			insetTop={marker.insetTop != null ? marker.insetTop * bandwidth : undefined}
-			insetBottom={marker.insetBottom != null ? marker.insetBottom * bandwidth : undefined}
+			insetTop={centered ?? (marker.insetTop != null ? marker.insetTop * bandwidth : undefined)}
+			insetBottom={centered ??
+				(marker.insetBottom != null ? marker.insetBottom * bandwidth : undefined)}
 			fill={channelFill ?? marker.styles?.fill}
 			fillOpacity={marker.styles?.fillOpacity}
 			stroke={marker.styles?.stroke}
@@ -65,8 +68,9 @@
 			x={marker.x}
 			y1={marker.y1}
 			y2={marker.y2}
-			insetLeft={marker.insetLeft != null ? marker.insetLeft * bandwidth : undefined}
-			insetRight={marker.insetRight != null ? marker.insetRight * bandwidth : undefined}
+			insetLeft={centered ?? (marker.insetLeft != null ? marker.insetLeft * bandwidth : undefined)}
+			insetRight={centered ??
+				(marker.insetRight != null ? marker.insetRight * bandwidth : undefined)}
 			fill={channelFill ?? marker.styles?.fill}
 			fillOpacity={marker.styles?.fillOpacity}
 			stroke={marker.styles?.stroke}

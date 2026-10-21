@@ -211,6 +211,15 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		paddingInner: 0.5,
 		paddingOuter: 0.5
 	},
+	bullet: {
+		barThickness: 10,
+		rangeWidth: 28,
+		rangeColors: ['#9ca3af', '#d1d5db', '#eceff3'],
+		targetLength: 22,
+		targetWidth: 3,
+		paddingInner: 0.4,
+		paddingOuter: 0.3
+	},
 	connector: {
 		sign: { positive: '#1b9e77', negative: '#d95f02', zero: '#9ca3af' },
 		lengthScheme: ['#d1d5db', '#374151'],

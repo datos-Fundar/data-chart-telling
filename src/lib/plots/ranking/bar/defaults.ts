@@ -15,11 +15,12 @@ import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/ranking/bar/stat
 
 /**
  * The domain a bar plot fits to its own bars on its value axis: from zero to
- * the tallest span, niced to as many ticks as fit the plot. Left out when the
+ * the tallest span (and the `extra` values a plot draws beyond its bars), niced to as many ticks as fit the plot. Left out when the
  * author pins the axis, and when there is no span to fit.
  */
-function fitValueDomain<TData extends Record<string, unknown>>(
-	state: BarPlotState<TData>
+export function fitValueDomain<TData extends Record<string, unknown>>(
+	state: BarPlotState<TData>,
+	extra: readonly number[] = []
 ): Partial<Record<'x' | 'y', Partial<AxisScale<TData>>>> {
 	const axis = PlotAxes.valueOf(state);
 	const scale = state.scales[axis];
@@ -29,6 +30,10 @@ function fitValueDomain<TData extends Record<string, unknown>>(
 	const { of: spanOf } = ProcessedPositions.span(state.processedData!, axis as 'x' | 'y');
 	let lo = 0;
 	let hi = 0;
+	for (const value of extra) {
+		lo = Math.min(lo, value);
+		hi = Math.max(hi, value);
+	}
 	for (const row of state.processedData?.data ?? []) {
 		const span = spanOf(row);
 		if (!span) continue;
@@ -59,7 +64,7 @@ export function buildBarDefaults<TData extends Record<string, unknown>>(): AxisP
 			defaults: (_state, ctx) => ({
 				category: { paddingInner: ctx.cfg.bar.paddingInner, paddingOuter: ctx.cfg.bar.paddingOuter }
 			}),
-			fit: fitValueDomain
+			fit: (state) => fitValueDomain(state)
 		},
 		styles: {
 			values: {

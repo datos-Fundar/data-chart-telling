@@ -48,6 +48,9 @@ export type AxisPlotState<
 	lower?: Accessor<TData, unknown>;
 	upper?: Accessor<TData, unknown>;
 	error?: Accessor<TData, unknown>;
+	/** What a bar is measured against, on the plots that draw it (`BulletPlot`): a target, and the upper bounds of the bands grading it. Each is a number, a field key or a function of the row. */
+	target?: unknown;
+	ranges?: unknown[];
 	/** The plot's `styles`, which `BasePlotLayout` draws its frame from. */
 	styles?: AxisBasedStylesConfig;
 	/** The plot's `styles.values`, which its "markers" phase turns into a value-label `text` marker. */
