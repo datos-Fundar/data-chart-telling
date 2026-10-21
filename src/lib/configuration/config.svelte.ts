@@ -183,6 +183,7 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 	slope: { strokeWidth: 2, dotRadius: 5, padding: 0 },
 	histogram: { inset: 1, fillOpacity: 1 },
 	density: { fillOpacity: 0.6, strokeWidth: 2 },
+	violin: { fillOpacity: 0.6, paddingInner: 0.2, paddingOuter: 0.2, boxWidth: 8 },
 	box: { fillOpacity: 0.9, paddingInner: 0.4, paddingOuter: 0.2 },
 	lollipop: {
 		dotRadius: 6,

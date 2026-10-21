@@ -11,6 +11,7 @@ import { buildHistogramDefaults } from '$lib/plots/distribution/histogram/defaul
 import { buildDensityDefaults } from '$lib/plots/distribution/density/defaults';
 import { buildHeatmapDefaults } from '$lib/plots/correlation/heatmap/defaults';
 import { buildPyramidDefaults } from '$lib/plots/distribution/pyramid/defaults';
+import { buildViolinDefaults } from '$lib/plots/distribution/violin/defaults';
 import { buildBoxDefaults } from '$lib/plots/distribution/box/defaults';
 import { buildLollipopDefaults } from '$lib/plots/ranking/lollipop/defaults';
 import { buildDumbbellDefaults } from '$lib/plots/ranking/dumbbell/defaults';
@@ -37,8 +38,9 @@ const [
 	BulletCore,
 	SlopeCore,
 	SparklineCore,
-	DensityCore
-] = Array(16).fill(GenericCore);
+	DensityCore,
+	ViolinCore
+] = Array(17).fill(GenericCore);
 
 type Row = { year: number; region: string; sector: string; value: number };
 
@@ -186,6 +188,12 @@ const CASES: Case[] = [
 		Core: DensityCore,
 		buildDefaults: buildDensityDefaults,
 		core: { ...BOX, x: 'value', color: 'sector' }
+	},
+	{
+		name: 'violin',
+		Core: ViolinCore,
+		buildDefaults: buildViolinDefaults,
+		core: { ...BOX, x: 'sector', y: 'value', color: 'sector' }
 	}
 ];
 

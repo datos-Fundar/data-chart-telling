@@ -20,6 +20,7 @@ export * from './axis/raster';
 export * from './axis/tick';
 export * from './axis/trail';
 export * from './axis/waffle';
+export * from './axis/violin';
 export * from './axis/rule';
 export * from './axis/hover';
 export * from './axis/component';

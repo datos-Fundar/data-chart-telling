@@ -21,6 +21,7 @@ import type { RasterMarkerConfig } from './raster';
 import type { TickMarkerConfig } from './tick';
 import type { TrailMarkerConfig } from './trail';
 import type { WaffleMarkerConfig } from './waffle';
+import type { ViolinMarkerConfig } from './violin';
 import type { RuleMarkerConfig } from './rule';
 import type { HoverMarkerConfig } from './hover';
 import type { CustomComponentMarkerConfig } from './component';
@@ -51,6 +52,7 @@ export type AxisBasedMarkersConfig =
 	| TickMarkerConfig
 	| TrailMarkerConfig
 	| WaffleMarkerConfig
+	| ViolinMarkerConfig
 	| RuleMarkerConfig
 	| HoverMarkerConfig
 	| CustomComponentMarkerConfig

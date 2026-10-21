@@ -83,7 +83,9 @@ const preview: Preview = {
 							'HistogramPlot',
 							['Series', 'Scales', 'Tooltip', 'Transforms'],
 							'PyramidPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules'], 'Tooltip']
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules'], 'Tooltip'],
+							'ViolinPlot',
+							['Series', 'Estimate', 'Styles', 'Tooltip']
 						],
 						'Evolution',
 						[

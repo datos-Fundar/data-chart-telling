@@ -293,6 +293,17 @@ export type PlotStylesConfig = {
 		/** Stroke width of every curve drawn as a line. */
 		strokeWidth: number;
 	};
+	/** Default violin-plot styling. */
+	violin: {
+		/** Fill opacity of every violin that sets none of its own. */
+		fillOpacity: number;
+		/** Fallback gap (0-1) between the violins of neighbouring categories, when a plot doesn't set its own `scales.x/y.paddingInner`. */
+		paddingInner: number;
+		/** Fallback gap (0-1) before the first and after the last violin, when a plot doesn't set its own `scales.x/y.paddingOuter`. */
+		paddingOuter: number;
+		/** Width (px) of the box inside each violin. */
+		boxWidth: number;
+	};
 	/** Default box-plot styling. */
 	box: {
 		/** Fill opacity of every box that sets none of its own. */

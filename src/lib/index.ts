@@ -18,6 +18,7 @@ export { default as PyramidPlot } from './plots/distribution/pyramid/Plot.svelte
 export { default as ScatterPlot } from './plots/correlation/scatter/Plot.svelte';
 export { default as SlopePlot } from './plots/evolution/slope/Plot.svelte';
 export { default as SparklinePlot } from './plots/evolution/sparkline/Plot.svelte';
+export { default as ViolinPlot } from './plots/distribution/violin/Plot.svelte';
 
 // ── Composition ─────────────────────────────────────────────────────────────
 // Separate plots combined into one figure, with chrome of its own.

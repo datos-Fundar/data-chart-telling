@@ -43,6 +43,7 @@ export class MarkerKinds {
 		tick: { clip: true, drawsRows: true },
 		trail: { clip: true, drawsRows: true, legendSymbol: 'line' },
 		vector: { clip: false, drawsRows: false },
+		violin: { clip: true, drawsRows: true, legendSymbol: 'area' },
 		voronoi: { clip: true, drawsRows: true },
 		voronoiMesh: { clip: true, drawsRows: true },
 		waffle: { clip: true, drawsRows: true }

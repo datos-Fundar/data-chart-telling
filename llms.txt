@@ -1,6 +1,6 @@
 # @fundar/data-chart-telling
 
-> Svelte 5 plot components (line, area, bar, density, histogram, box, lollipop, dumbbell, cleveland, forest, bullet, slope, sparkline, heatmap, pyramid, scatter, geo) built on svelteplot, with titles, legends, tooltips, facets, timelines and value labels built in. Plots take pixel `width`/`height`; hover and tooltips are switched on with `tooltip` and a `hover` marker.
+> Svelte 5 plot components (line, area, bar, density, histogram, box, violin, lollipop, dumbbell, cleveland, forest, bullet, slope, sparkline, heatmap, pyramid, scatter, geo) built on svelteplot, with titles, legends, tooltips, facets, timelines and value labels built in. Plots take pixel `width`/`height`; hover and tooltips are switched on with `tooltip` and a `hover` marker.
 
 Start with the full guide: it lists the mental model, the props every plot shares, the switches and the rules that matter. Runnable examples are type-checked, so copy them as a starting point.
 
@@ -19,6 +19,7 @@ Start with the full guide: it lists the mental model, the props every plot share
   - [DensityPlot](./docs/plots/distribution/density.md)
   - [HistogramPlot](./docs/plots/distribution/histogram.md)
   - [BoxPlot](./docs/plots/distribution/box.md)
+  - [ViolinPlot](./docs/plots/distribution/violin.md)
   - [LollipopPlot](./docs/plots/ranking/lollipop.md)
   - [DumbbellPlot](./docs/plots/ranking/dumbbell.md)
   - [ForestPlot](./docs/plots/ranking/forest.md)
@@ -63,6 +64,7 @@ Start with the full guide: it lists the mental model, the props every plot share
 - [Overlapping histograms](./examples/Histogram.svelte)
 - [Density curves per group](./examples/Density.svelte)
 - [Box plots per group](./examples/Box.svelte)
+- [Violin plot of the iris species](./examples/Violin.svelte)
 - [Lollipop plot with value labels](./examples/Lollipop.svelte)
 - [Dumbbell plot of two series](./examples/Dumbbell.svelte)
 - [Forest plot of estimates with intervals](./examples/Forest.svelte)
@@ -92,6 +94,7 @@ Start with the full guide: it lists the mental model, the props every plot share
 - [Facets by rows and columns](./examples/FacetsRowsCols.svelte)
 - [Several plots in one figure](./examples/Composer.svelte)
 - [Shared example data](./examples/data.ts)
+- [Example datasets, one file each](./examples/datasets)
 
 ## Types
 
