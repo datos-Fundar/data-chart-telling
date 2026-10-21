@@ -21,40 +21,23 @@
 
 	const plot = usePlot();
 	const isHorizontal = $derived(plot.axes?.isHorizontal ?? false);
+	const RegressionMark = $derived(isHorizontal ? RegressionX : RegressionY);
 
 	const data = $derived(marker.data ?? []);
 </script>
 
-{#if isHorizontal}
-	<RegressionX
-		{data}
-		x={marker.x}
-		y={marker.y}
-		type={marker.regressionType}
-		order={marker.order}
-		base={marker.base}
-		span={marker.span}
-		confidence={marker.confidence}
-		stroke={marker.styles?.stroke ?? 'currentColor'}
-		strokeWidth={marker.styles?.strokeWidth}
-		strokeOpacity={marker.styles?.strokeOpacity}
-		strokeDasharray={marker.styles?.strokeDasharray}
-		fill={marker.confidence !== false ? 'currentColor' : undefined}
-	/>
-{:else}
-	<RegressionY
-		{data}
-		x={marker.x}
-		y={marker.y}
-		type={marker.regressionType}
-		order={marker.order}
-		base={marker.base}
-		span={marker.span}
-		confidence={marker.confidence}
-		stroke={marker.styles?.stroke ?? 'currentColor'}
-		strokeWidth={marker.styles?.strokeWidth}
-		strokeOpacity={marker.styles?.strokeOpacity}
-		strokeDasharray={marker.styles?.strokeDasharray}
-		fill={marker.confidence !== false ? 'currentColor' : undefined}
-	/>
-{/if}
+<RegressionMark
+	{data}
+	x={marker.x}
+	y={marker.y}
+	type={marker.regressionType}
+	order={marker.order}
+	base={marker.base}
+	span={marker.span}
+	confidence={marker.confidence}
+	stroke={marker.styles?.stroke ?? 'currentColor'}
+	strokeWidth={marker.styles?.strokeWidth}
+	strokeOpacity={marker.styles?.strokeOpacity}
+	strokeDasharray={marker.styles?.strokeDasharray}
+	fill={marker.confidence !== false ? 'currentColor' : undefined}
+/>

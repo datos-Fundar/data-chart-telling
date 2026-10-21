@@ -15,6 +15,7 @@
 
 	const plot = usePlot();
 	const isHorizontal = $derived(plot.axes?.isHorizontal ?? false);
+	const AreaMark = $derived(isHorizontal ? AreaX : AreaY);
 
 	const cfg = $derived(getConfiguration());
 	const data = $derived(marker.data ?? []);
@@ -29,82 +30,33 @@
 	const y2 = $derived(hasYBand ? marker.y2 : (marker.y ?? 0));
 	const x1 = $derived(hasXBand ? marker.x1 : 0);
 	const x2 = $derived(hasXBand ? marker.x2 : (marker.x ?? 0));
+	/** The band's two ends: along `x` when the plot runs horizontally, else along `y`. */
+	const band = $derived(isHorizontal ? { x1, x2 } : { y1, y2 });
 </script>
+
+{#snippet area(rows: typeof data, fillOpacity: number | undefined)}
+	<AreaMark
+		data={rows}
+		x={marker.x}
+		y={marker.y}
+		{...band}
+		z={marker.grouping}
+		stack={false}
+		curve={marker.curve}
+		tension={marker.tension}
+		fill={channelFill ?? marker.styles?.fill}
+		{fillOpacity}
+		stroke={marker.styles?.stroke}
+		strokeWidth={marker.styles?.strokeWidth}
+		strokeOpacity={marker.styles?.strokeOpacity}
+		strokeDasharray={marker.styles?.strokeDasharray}
+	/>
+{/snippet}
 
 {#if opacityBuckets}
 	{#each opacityBuckets as bucket (bucket.value)}
-		{#if isHorizontal}
-			<AreaX
-				data={bucket.data}
-				x={marker.x}
-				{x1}
-				{x2}
-				y={marker.y}
-				z={marker.grouping}
-				stack={false}
-				curve={marker.curve}
-				tension={marker.tension}
-				fill={channelFill ?? marker.styles?.fill}
-				fillOpacity={bucket.value}
-				stroke={marker.styles?.stroke}
-				strokeWidth={marker.styles?.strokeWidth}
-				strokeOpacity={marker.styles?.strokeOpacity}
-				strokeDasharray={marker.styles?.strokeDasharray}
-			/>
-		{:else}
-			<AreaY
-				data={bucket.data}
-				x={marker.x}
-				y={marker.y}
-				{y1}
-				{y2}
-				z={marker.grouping}
-				stack={false}
-				curve={marker.curve}
-				tension={marker.tension}
-				fill={channelFill ?? marker.styles?.fill}
-				fillOpacity={bucket.value}
-				stroke={marker.styles?.stroke}
-				strokeWidth={marker.styles?.strokeWidth}
-				strokeOpacity={marker.styles?.strokeOpacity}
-				strokeDasharray={marker.styles?.strokeDasharray}
-			/>
-		{/if}
+		{@render area(bucket.data, bucket.value)}
 	{/each}
-{:else if isHorizontal}
-	<AreaX
-		{data}
-		x={marker.x}
-		{x1}
-		{x2}
-		y={marker.y}
-		z={marker.grouping}
-		stack={false}
-		curve={marker.curve}
-		tension={marker.tension}
-		fill={channelFill ?? marker.styles?.fill}
-		fillOpacity={marker.styles?.fillOpacity ?? cfg.area.fillOpacity}
-		stroke={marker.styles?.stroke}
-		strokeWidth={marker.styles?.strokeWidth}
-		strokeOpacity={marker.styles?.strokeOpacity}
-		strokeDasharray={marker.styles?.strokeDasharray}
-	/>
 {:else}
-	<AreaY
-		{data}
-		x={marker.x}
-		y={marker.y}
-		{y1}
-		{y2}
-		z={marker.grouping}
-		stack={false}
-		curve={marker.curve}
-		tension={marker.tension}
-		fill={channelFill ?? marker.styles?.fill}
-		fillOpacity={marker.styles?.fillOpacity ?? cfg.area.fillOpacity}
-		stroke={marker.styles?.stroke}
-		strokeWidth={marker.styles?.strokeWidth}
-		strokeOpacity={marker.styles?.strokeOpacity}
-		strokeDasharray={marker.styles?.strokeDasharray}
-	/>
+	{@render area(data, marker.styles?.fillOpacity ?? cfg.area.fillOpacity)}
 {/if}

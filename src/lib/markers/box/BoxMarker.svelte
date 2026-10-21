@@ -18,6 +18,7 @@
 
 	const plot = usePlot();
 	const isHorizontal = $derived(plot.axes?.isHorizontal ?? false);
+	const BoxMark = $derived(isHorizontal ? BoxX : BoxY);
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const data = $derived((marker.data ?? []) as any[]);
@@ -136,8 +137,4 @@
 	});
 </script>
 
-{#if isHorizontal}
-	<BoxX {data} x={marker.x} y={marker.y} sort={marker.sort} {...passthrough} />
-{:else}
-	<BoxY {data} x={marker.x} y={marker.y} sort={marker.sort} {...passthrough} />
-{/if}
+<BoxMark {data} x={marker.x} y={marker.y} sort={marker.sort} {...passthrough} />

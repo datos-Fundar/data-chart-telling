@@ -15,30 +15,18 @@
 
 	const plot = usePlot();
 	const isHorizontal = $derived(plot.axes?.isHorizontal ?? false);
+	const BollingerMark = $derived(isHorizontal ? BollingerX : BollingerY);
 
 	const data = $derived(marker.data ?? []);
 </script>
 
-{#if isHorizontal}
-	<BollingerX
-		{data}
-		x={marker.x}
-		y={marker.y}
-		n={marker.n}
-		k={marker.k}
-		stroke={marker.styles?.stroke}
-		strokeOpacity={marker.styles?.strokeOpacity}
-		fill={marker.styles?.bandFill}
-	/>
-{:else}
-	<BollingerY
-		{data}
-		x={marker.x}
-		y={marker.y}
-		n={marker.n}
-		k={marker.k}
-		stroke={marker.styles?.stroke}
-		strokeOpacity={marker.styles?.strokeOpacity}
-		fill={marker.styles?.bandFill}
-	/>
-{/if}
+<BollingerMark
+	{data}
+	x={marker.x}
+	y={marker.y}
+	n={marker.n}
+	k={marker.k}
+	stroke={marker.styles?.stroke}
+	strokeOpacity={marker.styles?.strokeOpacity}
+	fill={marker.styles?.bandFill}
+/>
