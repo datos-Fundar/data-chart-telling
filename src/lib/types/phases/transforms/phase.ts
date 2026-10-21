@@ -66,6 +66,8 @@ export type TransformsStageOptions<TState extends TransformsStageState, TCtx> = 
 	 * processed rows, into `labelled`.
 	 */
 	labels?: {
+		/** Picks the rows even when `styles.values.show` is unset: for a plot that shows its values by default. */
+		show?: boolean;
 		/** The rows picked when `styles.values.select` is unset. Defaults to every row. */
 		select?: ValueSelect | ValueSelect[];
 		/** What a selector picks among: each series (the default), or each category. */

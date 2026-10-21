@@ -16,6 +16,7 @@ import { buildDumbbellDefaults } from '$lib/plots/ranking/dumbbell/defaults';
 import { buildClevelandDefaults } from '$lib/plots/ranking/cleveland/defaults';
 import { buildBulletDefaults } from '$lib/plots/ranking/bullet/defaults';
 import { buildSlopeDefaults } from '$lib/plots/evolution/slope/defaults';
+import { buildSparklineDefaults } from '$lib/plots/evolution/sparkline/defaults';
 import { buildForestDefaults } from '$lib/plots/ranking/forest/defaults';
 import type { FacetConfig } from '$lib/types/layout/facet';
 
@@ -33,8 +34,9 @@ const [
 	ClevelandCore,
 	ForestCore,
 	BulletCore,
-	SlopeCore
-] = Array(14).fill(GenericCore);
+	SlopeCore,
+	SparklineCore
+] = Array(15).fill(GenericCore);
 
 type Row = { year: number; region: string; sector: string; value: number };
 
@@ -169,6 +171,12 @@ const CASES: Case[] = [
 		name: 'slope',
 		Core: SlopeCore,
 		buildDefaults: buildSlopeDefaults,
+		core: { ...BOX, x: 'year', y: 'value', color: 'sector' }
+	},
+	{
+		name: 'sparkline',
+		Core: SparklineCore,
+		buildDefaults: buildSparklineDefaults,
 		core: { ...BOX, x: 'year', y: 'value', color: 'sector' }
 	}
 ];

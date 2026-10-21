@@ -14,6 +14,7 @@ import DumbbellPlot from '$lib/plots/ranking/dumbbell/Plot.svelte';
 import ClevelandPlot from '$lib/plots/ranking/cleveland/Plot.svelte';
 import BulletPlot from '$lib/plots/ranking/bullet/Plot.svelte';
 import SlopePlot from '$lib/plots/evolution/slope/Plot.svelte';
+import SparklinePlot from '$lib/plots/evolution/sparkline/Plot.svelte';
 import ForestPlot from '$lib/plots/ranking/forest/Plot.svelte';
 import { waitForSvg } from './_helpers/svg';
 
@@ -149,6 +150,14 @@ const KINDS: Kind[] = [
 	{
 		name: 'SlopePlot',
 		Plot: SlopePlot,
+		props: { data: CATEGORIES, x: 'x', y: 'y' },
+		numericX: false,
+		plotStatistics: true,
+		stackable: false
+	},
+	{
+		name: 'SparklinePlot',
+		Plot: SparklinePlot,
 		props: { data: CATEGORIES, x: 'x', y: 'y' },
 		numericX: false,
 		plotStatistics: true,

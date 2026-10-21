@@ -264,6 +264,11 @@ export type PlotStylesConfig = {
 		/** Fill opacity of every area marker that sets none of its own. */
 		fillOpacity: number;
 	};
+	/** Default sparkline styling: a thin line, and the dot on its last point. */
+	sparkline: {
+		strokeWidth: number;
+		dotRadius: number;
+	};
 	/** Default slope-plot styling: a line and a dot per series between the positions of its category axis. */
 	slope: {
 		strokeWidth: number;

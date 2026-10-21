@@ -98,6 +98,8 @@ const preview: Preview = {
 								'Tooltip'
 							],
 							'SlopePlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							'SparklinePlot',
 							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip']
 						],
 						'Map',

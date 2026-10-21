@@ -16,6 +16,7 @@ export { default as LollipopPlot } from './plots/ranking/lollipop/Plot.svelte';
 export { default as PyramidPlot } from './plots/distribution/pyramid/Plot.svelte';
 export { default as ScatterPlot } from './plots/correlation/scatter/Plot.svelte';
 export { default as SlopePlot } from './plots/evolution/slope/Plot.svelte';
+export { default as SparklinePlot } from './plots/evolution/sparkline/Plot.svelte';
 
 // ── Composition ─────────────────────────────────────────────────────────────
 // Separate plots combined into one figure, with chrome of its own.

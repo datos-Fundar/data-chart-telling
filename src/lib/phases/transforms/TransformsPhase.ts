@@ -150,11 +150,11 @@ export class TransformsPhase<
 	#labelled(state: TState): Pick<TransformsStageState, 'labelled' | 'labelSelects'> {
 		const options = this.#options.labels;
 		const values = state.values;
-		if (!options || !values?.show) return {};
+		if (!options || !(values?.show ?? options.show)) return {};
 		const processed = state.processedData!;
 		const valueAxis = PlotAxes.valueOf(state) as 'x' | 'y';
-		const select = values.select ?? options.select;
-		const selections = ValueSelection.transforms(select, values.series, valueAxis);
+		const select = values?.select ?? options.select;
+		const selections = ValueSelection.transforms(select, values?.series, valueAxis);
 		const position = ProcessedPositions.of(processed, valueAxis);
 		const skip = options.skip?.(state);
 		const channels = {
