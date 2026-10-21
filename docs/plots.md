@@ -4,6 +4,7 @@ Every plot kind shares one set of props (see [Concepts](concepts.md)). They diff
 
 | Category     | Plot                                             | Draws                                      | Needs                                                   |
 | ------------ | ------------------------------------------------ | ------------------------------------------ | ------------------------------------------------------- |
+| Distribution | [DensityPlot](plots/distribution/density.md)     | A smoothed distribution of a numeric field | `x` or `y`                                              |
 | Distribution | [HistogramPlot](plots/distribution/histogram.md) | Counts of a numeric field in bins          | `x` or `y`                                              |
 | Distribution | [BoxPlot](plots/distribution/box.md)             | The distribution of values per category    | a category channel and a value channel                  |
 | Distribution | [PyramidPlot](plots/distribution/pyramid.md)     | Two series mirrored around zero            | a category channel, a value channel, two series         |

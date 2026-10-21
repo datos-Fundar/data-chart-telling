@@ -12,6 +12,7 @@ import { buildAreaDefaults } from '$lib/plots/evolution/area/defaults';
 import { buildBarDefaults } from '$lib/plots/ranking/bar/defaults';
 import { buildScatterDefaults } from '$lib/plots/correlation/scatter/defaults';
 import { buildHistogramDefaults } from '$lib/plots/distribution/histogram/defaults';
+import { buildDensityDefaults } from '$lib/plots/distribution/density/defaults';
 import { buildHeatmapDefaults } from '$lib/plots/correlation/heatmap/defaults';
 import { buildBoxDefaults } from '$lib/plots/distribution/box/defaults';
 import { buildLollipopDefaults } from '$lib/plots/ranking/lollipop/defaults';
@@ -122,6 +123,11 @@ const CASES: Case[] = [
 		name: 'sparkline',
 		kind: buildSparklineDefaults<Row>(),
 		props: { x: 'anio', y: 'valor', color: 'sector' }
+	},
+	{
+		name: 'density',
+		kind: buildDensityDefaults<Row>(),
+		props: { x: 'valor', color: 'sector' }
 	}
 ];
 

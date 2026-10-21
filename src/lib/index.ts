@@ -6,6 +6,7 @@ export { default as BarPlot } from './plots/ranking/bar/Plot.svelte';
 export { default as BoxPlot } from './plots/distribution/box/Plot.svelte';
 export { default as BulletPlot } from './plots/ranking/bullet/Plot.svelte';
 export { default as ClevelandPlot } from './plots/ranking/cleveland/Plot.svelte';
+export { default as DensityPlot } from './plots/distribution/density/Plot.svelte';
 export { default as DumbbellPlot } from './plots/ranking/dumbbell/Plot.svelte';
 export { default as ForestPlot } from './plots/ranking/forest/Plot.svelte';
 export { default as GeoPlot } from './plots/map/geo/Plot.svelte';

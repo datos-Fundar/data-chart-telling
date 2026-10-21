@@ -286,6 +286,13 @@ export type PlotStylesConfig = {
 		/** Fill opacity of every bar, so a grouped histogram's bars behind another group's still show. */
 		fillOpacity: number;
 	};
+	/** Default density-plot styling. */
+	density: {
+		/** Fill opacity of every area, so a grouped density's curves behind another group's still show. */
+		fillOpacity: number;
+		/** Stroke width of every curve drawn as a line. */
+		strokeWidth: number;
+	};
 	/** Default box-plot styling. */
 	box: {
 		/** Fill opacity of every box that sets none of its own. */

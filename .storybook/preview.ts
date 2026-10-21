@@ -78,6 +78,8 @@ const preview: Preview = {
 						[
 							'BoxPlot',
 							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							'DensityPlot',
+							['Series', 'Estimate', 'Scales', 'Styles', 'Tooltip'],
 							'HistogramPlot',
 							['Series', 'Scales', 'Tooltip', 'Transforms'],
 							'PyramidPlot',

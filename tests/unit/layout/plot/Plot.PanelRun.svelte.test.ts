@@ -8,6 +8,7 @@ import { buildAreaDefaults } from '$lib/plots/evolution/area/defaults';
 import { buildBarDefaults } from '$lib/plots/ranking/bar/defaults';
 import { buildScatterDefaults } from '$lib/plots/correlation/scatter/defaults';
 import { buildHistogramDefaults } from '$lib/plots/distribution/histogram/defaults';
+import { buildDensityDefaults } from '$lib/plots/distribution/density/defaults';
 import { buildHeatmapDefaults } from '$lib/plots/correlation/heatmap/defaults';
 import { buildPyramidDefaults } from '$lib/plots/distribution/pyramid/defaults';
 import { buildBoxDefaults } from '$lib/plots/distribution/box/defaults';
@@ -35,8 +36,9 @@ const [
 	ForestCore,
 	BulletCore,
 	SlopeCore,
-	SparklineCore
-] = Array(15).fill(GenericCore);
+	SparklineCore,
+	DensityCore
+] = Array(16).fill(GenericCore);
 
 type Row = { year: number; region: string; sector: string; value: number };
 
@@ -178,6 +180,12 @@ const CASES: Case[] = [
 		Core: SparklineCore,
 		buildDefaults: buildSparklineDefaults,
 		core: { ...BOX, x: 'year', y: 'value', color: 'sector' }
+	},
+	{
+		name: 'density',
+		Core: DensityCore,
+		buildDefaults: buildDensityDefaults,
+		core: { ...BOX, x: 'value', color: 'sector' }
 	}
 ];
 

@@ -7,6 +7,7 @@ import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 import HistogramPlot from '$lib/plots/distribution/histogram/Plot.svelte';
+import DensityPlot from '$lib/plots/distribution/density/Plot.svelte';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import BoxPlot from '$lib/plots/distribution/box/Plot.svelte';
 import LollipopPlot from '$lib/plots/ranking/lollipop/Plot.svelte';
@@ -94,6 +95,14 @@ const KINDS: Kind[] = [
 	{
 		name: 'HistogramPlot',
 		Plot: HistogramPlot,
+		props: { data: NUMERIC, x: 'x' },
+		numericX: true,
+		plotStatistics: true,
+		stackable: false
+	},
+	{
+		name: 'DensityPlot',
+		Plot: DensityPlot,
 		props: { data: NUMERIC, x: 'x' },
 		numericX: true,
 		plotStatistics: true,
