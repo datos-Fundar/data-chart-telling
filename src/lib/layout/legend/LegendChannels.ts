@@ -21,6 +21,7 @@ export class LegendChannels {
 		const taken = new Set((plot.resolvedSeries ?? []).map((s) => s.name));
 		return [
 			...LegendChannels.#plotColor(plot),
+			...LegendChannels.#segmentColors(plot),
 			...markers.flatMap((marker) => LegendChannels.#markerColor(marker, taken)),
 			...LegendChannels.#plotOpacity(plot),
 			...markers.flatMap((marker) => LegendChannels.#markerOpacity(marker, plot)),
@@ -126,6 +127,18 @@ export class LegendChannels {
 				scale
 			)
 		];
+	}
+
+	/** One continuous ramp per segment that sets its own, over the values of just its own features. */
+	static #segmentColors(plot: LegendPlot): LegendEntry[] {
+		const source = plot.channels?.color?.source;
+		return (plot.colorRamps ?? []).map(({ name, domain, scale }) =>
+			LegendChannels.#scaleEntry(
+				typeof source === 'string' ? `${source} (${name})` : name,
+				domain,
+				scale
+			)
+		);
 	}
 
 	/**

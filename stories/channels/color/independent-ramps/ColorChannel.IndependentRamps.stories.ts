@@ -15,7 +15,7 @@ import { countryPopulation, countryGdp } from '../../../plots/geo/channels';
 // domain or scheme, even in the same plot. Four variants:
 //
 // - `Default`: a `dot` marker with a `color` accessor but no `scales` of its
-//   own - it inherits the plot's own `scales.color` (same ramp, same domain).
+//   own - it inherits the plot's own `scales.color` scheme, over its own values.
 // - `IndependentRamp`: identical to `Default`, but the marker sets its own
 //   `scales.color` - now it draws from a completely independent ramp instead
 //   of inheriting the plot's.
@@ -73,8 +73,8 @@ type Story = StoryObj<typeof meta>;
  * The plot's own `color`/`scales.color` colors countries by population (a
  * blue ramp). The `dot` marker reads its own `color` accessor (station
  * temperature) but sets no `scales` of its own, so it falls back to and
- * inherits the plot's own ramp - same domain, same scheme, applied to a
- * different value.
+ * inherits the plot's own scheme - the same blue ramp, stretched over the
+ * marker's own values (the plot's domain spans population, not temperature).
  */
 export const Default: Story = {
 	args: {

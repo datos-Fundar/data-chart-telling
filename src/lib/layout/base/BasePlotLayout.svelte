@@ -345,7 +345,6 @@
 			markers={resolvedMarkers}
 			seriesData={seriesData ?? []}
 			scopedGroups={scopedGroups ?? []}
-			channelScales={scales}
 			{ctrl}
 			{width}
 			{height}

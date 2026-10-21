@@ -48,7 +48,6 @@
 	import type { PlotHover } from '$lib/layout/hover/PlotHover.svelte';
 	import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
 	import type { GeoFeature } from '$lib/types/plots/data/geo';
-	import type { ChannelScalesConfig } from '$lib/types/layout/scales';
 	import { MarkerGrouping } from '$lib/phases/statistics/MarkerGrouping';
 	import { FrameClipping } from '$lib/layout/geometry/FrameClipping';
 
@@ -75,7 +74,6 @@
 		markers = [],
 		seriesData = [],
 		scopedGroups = [],
-		channelScales = undefined,
 		ctrl,
 		numericMargins,
 		data = [],
@@ -91,8 +89,6 @@
 		seriesData?: Series<TSeries>[];
 		/** One entry per series that can own a `series`-scoped marker. Same `TSeries` as `seriesData`. */
 		scopedGroups?: ScopedMarkerGroup<TSeries>[];
-		/** This plot kind's own `color`/`grouping` channel config - the fallback a marker's own `scales` inherits when it sets none of its own. */
-		channelScales?: ChannelScalesConfig;
 		/** `BasePlotLayout`'s own hover controller. */
 		ctrl: PlotHover<TData>;
 		/** The plot's own resolved margins - places the content box an `inset` marker needs. */
@@ -176,9 +172,7 @@
 	{:else if marker.type === 'waffle'}
 		<WaffleMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'dot'}
-		<DotMarker
-			marker={{ ...marker, data: marker.data ?? rows, scales: marker.scales ?? channelScales }}
-		/>
+		<DotMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'text'}
 		<TextMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'rule'}

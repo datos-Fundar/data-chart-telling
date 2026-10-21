@@ -350,6 +350,12 @@ export type LegendPlot = {
 	segments?: Record<string, LegendSource[] | undefined>;
 	/** The `[min, max]` a plot-level color ramp spans, when the plot has no `color` channel to read it from. */
 	colorDomain?: [number, number];
+	/** The ramps of the segments that set their own color scale, each over its own features' values. */
+	colorRamps?: {
+		name: string;
+		domain: [number, number];
+		scale: { scheme?: unknown; pivot?: number };
+	}[];
 	/** The `[min, max]` of a plot-level numeric `opacity` channel. */
 	opacityDomain?: [number, number];
 	channels?: {

@@ -36,6 +36,7 @@ export function buildScales<TProps extends Record<string, unknown>>(
 	// Per-segment-key ramp cache - built lazily, once per distinct grouping
 	// value/feature id that actually has its own `scales.color`.
 	const segmentScaleCache = new Map<string, ((v: number) => string) | null>();
+	const colorRamps: NonNullable<GeoPlotState<TProps>['colorRamps']> = [];
 
 	function segmentColorScaleFor(
 		key: string,
@@ -54,6 +55,13 @@ export function buildScales<TProps extends Record<string, unknown>>(
 				)
 			: null;
 		segmentScaleCache.set(key, scale);
+		if (vals.length && segScales?.color) {
+			colorRamps.push({
+				name: key,
+				domain: [Math.min(...vals), Math.max(...vals)],
+				scale: segScales.color
+			});
+		}
 		return scale;
 	}
 
@@ -71,6 +79,16 @@ export function buildScales<TProps extends Record<string, unknown>>(
 				return colorScale ? colorScale(v) : undefined;
 			}
 		: undefined;
+
+	// Every segment ramp is built up front, so the legend can draw each one.
+	if (colorScale) {
+		for (const f of features!) {
+			const featureId = (f as GeoFeature<TProps> & { __id?: string }).__id ?? '';
+			const groupingValue = grouping?.(f);
+			const segScales = resolveFeatureScales(segments, featureId, groupingValue);
+			if (segScales?.color) segmentColorScaleFor(groupingValue ?? featureId, segScales);
+		}
+	}
 
 	// Plot-level only - no segment-scoped opacity ramp (unlike `resolveColor`
 	// above), since there's no concrete use case yet driving that complexity.
@@ -92,6 +110,7 @@ export function buildScales<TProps extends Record<string, unknown>>(
 	return {
 		...state,
 		colorDomain: valueDomain ?? undefined,
+		colorRamps: colorRamps.length ? colorRamps : undefined,
 		opacityDomain:
 			opacityDomain && typeof opacityDomain[0] === 'number'
 				? (opacityDomain as [number, number])

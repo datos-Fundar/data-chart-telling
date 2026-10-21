@@ -134,6 +134,7 @@
 			opacity: { source: ChannelName.of(opacity, 'opacity') }
 		},
 		colorDomain: plotState.colorDomain,
+		colorRamps: plotState.colorRamps,
 		opacityDomain: plotState.opacityDomain,
 		styles: resolvedStyles,
 		marginEstimate: Margins.GEO_ESTIMATE

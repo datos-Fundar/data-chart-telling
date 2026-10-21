@@ -1,5 +1,6 @@
 import type { Accessor } from '$lib/types/plots/data/common';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
+import type { ColorScaleConfig } from '$lib/types/layout/scales';
 import type { GeoScalesConfig } from '$lib/types/layout/coordinates';
 import type { SegmentsConfig, MarginConfig, HoverConfig } from '$lib/types/plots/props';
 import type { HoverPosition } from '$lib/types/phases';
@@ -63,6 +64,8 @@ export type GeoPlotState<TProps extends Record<string, unknown>> = {
 
 	/** "scales" phase output: the `[min, max]` the color ramp spans, before any legend range narrows it - `undefined` without a `color`. */
 	colorDomain?: [number, number];
+	/** "scales" phase output: the ramp of each segment that sets its own `scales.color`, over just its own features. */
+	colorRamps?: { name: string; domain: [number, number]; scale: ColorScaleConfig }[];
 	/** "scales" phase output: the `[min, max]` of the `opacity` values - `undefined` without an `opacity`. */
 	opacityDomain?: [number, number];
 	/** "scales" phase output: each feature's own resolved color, composed from `color` and the color ramp - `undefined` where `color` itself is unset/returns nothing. */

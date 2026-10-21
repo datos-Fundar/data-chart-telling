@@ -14,6 +14,34 @@ export type OpacityBucket<TData> = { value: number; data: TData[] };
  */
 export class MarkerChannels {
 	/**
+	 * The scales a marker with none of its own draws with: the plot's, except
+	 * a numeric color `domain` - it spans the plot's own values, so the
+	 * marker's own values would all land at one end of it. The scheme (and
+	 * pivot) carry over; the domain is read from the marker's own rows.
+	 */
+	static inheritScales(
+		own: ChannelScalesConfig | undefined,
+		plot: ChannelScalesConfig | undefined
+	): ChannelScalesConfig | undefined {
+		if (own || !plot?.color) return own ?? plot;
+		const { domain, ...color } = plot.color;
+		const numeric = Array.isArray(domain) && domain.every((v) => typeof v === 'number');
+		return { ...plot, color: numeric ? color : plot.color };
+	}
+
+	/** `markers`, each `dot` with no scales of its own carrying the plot's ({@link inheritScales}). */
+	static inheritAll<TMarker extends { type: string; scales?: ChannelScalesConfig }>(
+		markers: TMarker[],
+		plot: ChannelScalesConfig | undefined
+	): TMarker[] {
+		return markers.map((marker) =>
+			marker.type === 'dot' && !marker.scales
+				? { ...marker, scales: MarkerChannels.inheritScales(undefined, plot) }
+				: marker
+		);
+	}
+
+	/**
 	 * Resolves a `CommonMarkerConfig` pair into a per-row fill accessor, or
 	 * `undefined` when `color` is unset (caller falls back to its own flat
 	 * fill/stroke). Shared by every marker kind that intersects `CommonMarkerConfig`.

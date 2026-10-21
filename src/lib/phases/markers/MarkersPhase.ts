@@ -4,6 +4,7 @@ import type {
 	MarkersStageOptions,
 	PhaseStage
 } from '$lib/types/phases';
+import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 /**
@@ -36,7 +37,10 @@ export class MarkersPhase<
 				: [];
 		return {
 			...state,
-			markers: [...options.marks(state, ctx), ...(state.markers ?? []), ...valueLabels]
+			markers: MarkerChannels.inheritAll(
+				[...options.marks(state, ctx), ...(state.markers ?? []), ...valueLabels],
+				state.scales as never
+			)
 		};
 	};
 }
