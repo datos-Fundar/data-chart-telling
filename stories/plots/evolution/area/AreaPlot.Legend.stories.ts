@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
-import { ENERGY_MIX } from '../../../data/energy-mix';
+import { AGE_SHARES_BY_YEAR } from '$datasets';
 import { HEIGHT_DENSITY } from '../../../data/height-density';
 import type { LegendSection } from '$lib/types/layout/legend';
 
@@ -49,20 +49,17 @@ function sexLegend(mode: 'dim' | 'hide' | 'omit'): LegendSection[] {
 	];
 }
 
-/** One interactive item per energy source, in the data's own series order. */
-function sourceLegend(mode: 'dim' | 'hide' | 'omit'): LegendSection[] {
+/** One interactive item per age group, in the data's own series order. */
+function ageLegend(mode: 'dim' | 'hide' | 'omit'): LegendSection[] {
 	return [
 		{
 			type: 'discrete',
-			title: 'Source',
+			title: 'Age group',
 			interactive: { enabled: true, ...(mode !== 'dim' ? { disabled: { mode } } : {}) },
-			items: [
-				{ name: 'coal', label: 'Coal', symbol: 'square' },
-				{ name: 'gas', label: 'Gas', symbol: 'square' },
-				{ name: 'nuclear', label: 'Nuclear', symbol: 'square' },
-				{ name: 'hydro', label: 'Hydro', symbol: 'square' },
-				{ name: 'renewables', label: 'Renewables', symbol: 'square' }
-			]
+			items: ['0-14', '15-29', '30-44', '45-64', '65+'].map((name) => ({
+				name,
+				symbol: 'square' as const
+			}))
 		}
 	];
 }
@@ -94,48 +91,48 @@ export const LegendOmitRescalesDomain: Story = {
 };
 
 /**
- * Stacked, a dimmed source keeps its place in the stack: its band fades in
+ * Stacked, a dimmed age group keeps its place in the stack: its band fades in
  * position while the others stay where they are, so the total still reads 100%.
  */
 export const LegendDisabledDimsStacked: Story = {
 	args: {
-		data: ENERGY_MIX,
+		data: AGE_SHARES_BY_YEAR,
 		x: 'year',
 		y: 'share',
-		color: 'source',
+		color: 'ageGroup',
 		transforms: [{ type: 'stackY' }],
 		scales: { y: { domain: [0, 100] } },
-		legend: sourceLegend('dim')
+		legend: ageLegend('dim')
 	}
 };
 
 /**
- * Stacked, `interactive.disabled: { mode: 'hide' }` makes a toggled-off source
+ * Stacked, `interactive.disabled: { mode: 'hide' }` makes a toggled-off age group
  * fully transparent: the gap it leaves stays in the stack and the y-axis keeps
  * its range. Compare with `LegendOmitRescalesStack`.
  */
 export const LegendHideKeepsStack: Story = {
 	args: {
-		data: ENERGY_MIX,
+		data: AGE_SHARES_BY_YEAR,
 		x: 'year',
 		y: 'share',
-		color: 'source',
+		color: 'ageGroup',
 		transforms: [{ type: 'stackY' }],
-		legend: sourceLegend('hide')
+		legend: ageLegend('hide')
 	}
 };
 
 /**
- * Stacked, `interactive.disabled: { mode: 'omit' }` removes a toggled-off source
+ * Stacked, `interactive.disabled: { mode: 'omit' }` removes a toggled-off age group
  * and the stack closes the gap, with the y-axis rescaled to what remains.
  */
 export const LegendOmitRescalesStack: Story = {
 	args: {
-		data: ENERGY_MIX,
+		data: AGE_SHARES_BY_YEAR,
 		x: 'year',
 		y: 'share',
-		color: 'source',
+		color: 'ageGroup',
 		transforms: [{ type: 'stackY' }],
-		legend: sourceLegend('omit')
+		legend: ageLegend('omit')
 	}
 };

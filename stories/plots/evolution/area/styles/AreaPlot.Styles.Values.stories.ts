@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { ENERGY_MIX } from '../../../../data/energy-mix';
+import { AGE_SHARES_BY_YEAR } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `styles.values` labels the end of every area, the same way a line plot labels
@@ -16,11 +16,13 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
-		data: ENERGY_MIX,
+		data: AGE_SHARES_BY_YEAR,
 		x: 'year',
 		y: 'share',
-		color: 'source',
-		scales: { y: { domain: [0, 100], label: 'Share of energy mix (%)' } }
+		color: 'ageGroup',
+		scales: {
+			y: { domain: [0, 100], label: 'Share of the population (%)' }
+		}
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
@@ -44,7 +46,7 @@ export const ShowValues: Story = {
 	}
 };
 
-/** Stacked with `transforms: [{ type: 'stackY' }]`, each label sits at the top of its own band but still reads the source's own share, not the running total. */
+/** Stacked with `transforms: [{ type: 'stackY' }]`, each label sits at the top of its own band but still reads the age group's own share, not the running total. */
 export const Stacked: Story = {
 	args: {
 		transforms: [{ type: 'stackY' }],

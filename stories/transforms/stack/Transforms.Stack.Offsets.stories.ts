@@ -1,10 +1,32 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
-import { ENERGY_MIX } from '../../data/energy-mix';
-import { WEIGHT_FREQUENCY, WEIGHT_PEAK_TOTAL } from '../../data/weight-frequency';
+import { AGE_SHARES_BY_YEAR, HEIGHTS } from '$datasets';
 
-/** Half the tallest total, rounded up to a hundred, so the centered stack fills the axis. */
-const HALF_PEAK = Math.ceil(WEIGHT_PEAK_TOTAL / 2 / 100) * 100;
+const BIN_WIDTH = 3;
+const BINS = Array.from({ length: 12 }, (_, i) => 30 + i * BIN_WIDTH);
+
+/** How many adults of each sex weigh within each 3 kg bin. */
+const WEIGHT_FREQUENCY = ['female', 'male'].flatMap((group) =>
+	BINS.map((weight) => ({
+		weight,
+		group,
+		frequency: HEIGHTS.filter(
+			(d) => d.group === group && d.weight >= weight && d.weight < weight + BIN_WIDTH
+		).length
+	}))
+);
+
+/** Half the tallest total, rounded up to ten, so the centered stack fills the axis. */
+const HALF_PEAK =
+	Math.ceil(
+		Math.max(
+			...BINS.map((weight) =>
+				WEIGHT_FREQUENCY.filter((d) => d.weight === weight).reduce((sum, d) => sum + d.frequency, 0)
+			)
+		) /
+			2 /
+			10
+	) * 10;
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A stack's `offset` moves the whole stack: `normalize` scales every column to
@@ -21,10 +43,10 @@ const meta = {
 	args: {
 		width: 940,
 		height: 460,
-		data: ENERGY_MIX,
+		data: AGE_SHARES_BY_YEAR,
 		x: 'year',
 		y: 'share',
-		color: 'source',
+		color: 'ageGroup',
 		segments: { default: [{ styles: { fillOpacity: 0.85 } }] }
 	},
 	argTypes: {
@@ -51,15 +73,15 @@ export const Normalize: Story = {
 	}
 };
 
-/** `offset: 'center'` centers each weight bin's stack on zero: the two sexes' curves spread out above and below one midline, a mirrored silhouette. */
+/** `offset: 'center'` centers each weight bin's stack on zero: the two sexes' distributions spread out above and below one midline, a mirrored silhouette. */
 export const Center: Story = {
 	args: {
 		data: WEIGHT_FREQUENCY,
 		x: 'weight',
 		y: 'frequency',
-		color: 'sex',
+		color: 'group',
 		scales: {
-			x: { domain: [30, 150], label: 'Weight (kg)' },
+			x: { domain: [30, 66], label: 'Weight (kg)' },
 			y: { domain: [-HALF_PEAK, HALF_PEAK], label: 'Frequency' }
 		},
 		transforms: [{ type: 'stackY', offset: 'center' }]

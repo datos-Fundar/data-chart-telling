@@ -806,31 +806,8 @@ export const AGE_GROUPS = [...new Set(POPULATION_BY_AGE.map(({ ageGroup }) => ag
 export const POPULATION_BY_AGE_AT_2022: AgeRow[] = POPULATION_BY_AGE.filter(
 	({ year }) => year === 2022
 );
-/** The same census data over the years, grouped by sex: the share of each broad age group. */
+/** One broad age group's share of the population in a year. */
 export type AgeShareRow = { year: number; ageGroup: string; share: number };
-
-export const AGE_SHARES: AgeShareRow[] = [
-	{ year: 1991, ageGroup: '0-14', share: 19 },
-	{ year: 1991, ageGroup: '15-29', share: 21.7 },
-	{ year: 1991, ageGroup: '30-44', share: 20.1 },
-	{ year: 1991, ageGroup: '45-64', share: 22.8 },
-	{ year: 1991, ageGroup: '65+', share: 16.5 },
-	{ year: 2001, ageGroup: '0-14', share: 16.9 },
-	{ year: 2001, ageGroup: '15-29', share: 23.2 },
-	{ year: 2001, ageGroup: '30-44', share: 19.9 },
-	{ year: 2001, ageGroup: '45-64', share: 22.3 },
-	{ year: 2001, ageGroup: '65+', share: 17.2 },
-	{ year: 2010, ageGroup: '0-14', share: 16.4 },
-	{ year: 2010, ageGroup: '15-29', share: 22.4 },
-	{ year: 2010, ageGroup: '30-44', share: 22.2 },
-	{ year: 2010, ageGroup: '45-64', share: 22.9 },
-	{ year: 2010, ageGroup: '65+', share: 16.3 },
-	{ year: 2022, ageGroup: '0-14', share: 17.4 },
-	{ year: 2022, ageGroup: '15-29', share: 20.7 },
-	{ year: 2022, ageGroup: '30-44', share: 21.1 },
-	{ year: 2022, ageGroup: '45-64', share: 22 },
-	{ year: 2022, ageGroup: '65+', share: 18.9 }
-];
 
 /** The same census data over the years, grouped by age: the share of each sex. */
 export type SexShareRow = { year: number; sex: string; share: number };
@@ -846,46 +823,56 @@ export const SEX_SHARES: SexShareRow[] = [
 	{ year: 2022, sex: 'Male', share: 46.2 }
 ];
 
-/** The census years by broad age group and sex: the share of the city's population. */
-export const POPULATION_BY_BROAD_AGE: AgeRow[] = [
-	{ year: 1991, ageGroup: '0-14', sex: 'Female', share: 9.4 },
-	{ year: 1991, ageGroup: '0-14', sex: 'Male', share: 9.6 },
-	{ year: 1991, ageGroup: '15-29', sex: 'Female', share: 11.2 },
-	{ year: 1991, ageGroup: '15-29', sex: 'Male', share: 10.5 },
-	{ year: 1991, ageGroup: '30-44', sex: 'Female', share: 10.6 },
-	{ year: 1991, ageGroup: '30-44', sex: 'Male', share: 9.5 },
-	{ year: 1991, ageGroup: '45-64', sex: 'Female', share: 12.9 },
-	{ year: 1991, ageGroup: '45-64', sex: 'Male', share: 9.9 },
-	{ year: 1991, ageGroup: '65+', sex: 'Female', share: 10.5 },
-	{ year: 1991, ageGroup: '65+', sex: 'Male', share: 6 },
-	{ year: 2001, ageGroup: '0-14', sex: 'Female', share: 8.3 },
-	{ year: 2001, ageGroup: '0-14', sex: 'Male', share: 8.6 },
-	{ year: 2001, ageGroup: '15-29', sex: 'Female', share: 11.8 },
-	{ year: 2001, ageGroup: '15-29', sex: 'Male', share: 11.4 },
-	{ year: 2001, ageGroup: '30-44', sex: 'Female', share: 10.5 },
-	{ year: 2001, ageGroup: '30-44', sex: 'Male', share: 9.4 },
-	{ year: 2001, ageGroup: '45-64', sex: 'Female', share: 12.6 },
-	{ year: 2001, ageGroup: '45-64', sex: 'Male', share: 9.7 },
-	{ year: 2001, ageGroup: '65+', sex: 'Female', share: 11 },
-	{ year: 2001, ageGroup: '65+', sex: 'Male', share: 6.2 },
-	{ year: 2010, ageGroup: '0-14', sex: 'Female', share: 8.1 },
-	{ year: 2010, ageGroup: '0-14', sex: 'Male', share: 8.3 },
-	{ year: 2010, ageGroup: '15-29', sex: 'Female', share: 11.5 },
-	{ year: 2010, ageGroup: '15-29', sex: 'Male', share: 10.9 },
-	{ year: 2010, ageGroup: '30-44', sex: 'Female', share: 11.6 },
-	{ year: 2010, ageGroup: '30-44', sex: 'Male', share: 10.6 },
-	{ year: 2010, ageGroup: '45-64', sex: 'Female', share: 12.6 },
-	{ year: 2010, ageGroup: '45-64', sex: 'Male', share: 10.3 },
-	{ year: 2010, ageGroup: '65+', sex: 'Female', share: 10.4 },
-	{ year: 2010, ageGroup: '65+', sex: 'Male', share: 5.9 },
-	{ year: 2022, ageGroup: '0-14', sex: 'Female', share: 8.5 },
-	{ year: 2022, ageGroup: '0-14', sex: 'Male', share: 8.9 },
-	{ year: 2022, ageGroup: '15-29', sex: 'Female', share: 10.5 },
-	{ year: 2022, ageGroup: '15-29', sex: 'Male', share: 10.2 },
-	{ year: 2022, ageGroup: '30-44', sex: 'Female', share: 10.8 },
-	{ year: 2022, ageGroup: '30-44', sex: 'Male', share: 10.2 },
-	{ year: 2022, ageGroup: '45-64', sex: 'Female', share: 12 },
-	{ year: 2022, ageGroup: '45-64', sex: 'Male', share: 9.9 },
-	{ year: 2022, ageGroup: '65+', sex: 'Female', share: 11.9 },
-	{ year: 2022, ageGroup: '65+', sex: 'Male', share: 7 }
+const BROAD_AGE_GROUPS: [string, string[]][] = [
+	['0-14', ['0-4', '5-9', '10-14']],
+	['15-29', ['15-19', '20-24', '25-29']],
+	['30-44', ['30-34', '35-39', '40-44']],
+	['45-64', ['45-49', '50-54', '55-59', '60-64']],
+	['65+', ['65-69', '70-74', '75-79', '80-84', '85+']]
 ];
+
+const CENSUS_YEARS = [1991, 2001, 2010, 2022];
+
+const YEARS = [...new Set(POPULATION_BY_AGE.map(({ year }) => year))];
+
+const roundToTenth = (value: number) => Math.round(value * 10) / 10;
+
+/** The census years by broad age group and sex: the share of the population. */
+export const POPULATION_BY_BROAD_AGE: AgeRow[] = CENSUS_YEARS.flatMap((year) =>
+	BROAD_AGE_GROUPS.flatMap(([ageGroup, ages]) =>
+		(['Female', 'Male'] as const).map((sex) => ({
+			year,
+			ageGroup,
+			sex,
+			share: roundToTenth(
+				POPULATION_BY_AGE.filter(
+					(row) => row.year === year && row.sex === sex && ages.includes(row.ageGroup)
+				).reduce((sum, row) => sum + row.share, 0)
+			)
+		}))
+	)
+);
+
+/** Every year, censuses and projections, by broad age group: the share of the population, each year adding up to 100. */
+export const AGE_SHARES_BY_YEAR: AgeShareRow[] = YEARS.flatMap((year) => {
+	const rows = POPULATION_BY_AGE.filter((row) => row.year === year);
+	const whole = rows.reduce((sum, row) => sum + row.share, 0);
+	// Tenths of a percent of the year's whole, the leftover ones going to the largest remainders so the year adds up to exactly 100.
+	const shares = BROAD_AGE_GROUPS.map(([ageGroup, ages]) => {
+		const exact =
+			(rows.filter((row) => ages.includes(row.ageGroup)).reduce((sum, row) => sum + row.share, 0) /
+				whole) *
+			1000;
+		return { ageGroup, tenths: Math.floor(exact), rest: exact % 1 };
+	});
+	const missing = 1000 - shares.reduce((sum, { tenths }) => sum + tenths, 0);
+	for (const share of [...shares].sort((a, b) => b.rest - a.rest).slice(0, missing)) {
+		share.tenths += 1;
+	}
+	return shares.map(({ ageGroup, tenths }) => ({ year, ageGroup, share: tenths / 10 }));
+});
+
+/** The census years alone: the share of each broad age group. */
+export const AGE_SHARES: AgeShareRow[] = AGE_SHARES_BY_YEAR.filter(({ year }) =>
+	CENSUS_YEARS.includes(year)
+);

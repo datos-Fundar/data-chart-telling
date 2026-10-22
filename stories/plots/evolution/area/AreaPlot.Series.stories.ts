@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import { ENERGY_MIX } from '../../../data/energy-mix';
+import { AGE_SHARES_BY_YEAR } from '$datasets';
 import {
 	HEIGHT_DENSITY,
 	MALE_HEIGHT_DENSITY,
@@ -77,22 +77,26 @@ export const Grouped: Story = {
 /** Without a stacking transform, every area starts from zero on its own, so they overlap and each one reads against the axis. Compare with `Stacked`, where the top edge is the running total. */
 export const NoStacked: Story = {
 	args: {
-		data: ENERGY_MIX,
+		data: AGE_SHARES_BY_YEAR,
 		x: 'year',
 		y: 'share',
-		color: 'source',
-		scales: { y: { domain: [0, 100], label: 'Share of energy mix (%)' } }
+		color: 'ageGroup',
+		scales: {
+			y: { domain: [0, 100], label: 'Share of the population (%)' }
+		}
 	}
 };
 
-/** `transforms: [{ type: 'stackY' }]` stacks the areas on each other, so the top edge is the total of all of them. Here, the parts of a whole: each year's energy mix sums to 100%. */
+/** `transforms: [{ type: 'stackY' }]` stacks the areas on each other, so the top edge is the total of all of them. Here, the parts of a whole: each year's age groups sum to 100%. */
 export const Stacked: Story = {
 	args: {
-		data: ENERGY_MIX,
+		data: AGE_SHARES_BY_YEAR,
 		x: 'year',
 		y: 'share',
-		color: 'source',
+		color: 'ageGroup',
 		transforms: [{ type: 'stackY' }],
-		scales: { y: { domain: [0, 100], label: 'Share of energy mix (%)' } }
+		scales: {
+			y: { domain: [0, 100], label: 'Share of the population (%)' }
+		}
 	}
 };
