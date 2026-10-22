@@ -189,3 +189,19 @@ export const IRIS: IrisRow[] = IRIS_MEASUREMENTS.flatMap(({ species, measurement
 		petalWidth
 	}))
 );
+
+/** The four measurements, in the order the long form lists them. */
+export const IRIS_METRICS = ['Sepal length', 'Sepal width', 'Petal length', 'Petal width'] as const;
+
+/** One row per flower and measurement, for plots that put the measurements on one axis. */
+export type IrisMetricRow = { flower: string; species: string; metric: string; value: number };
+
+export const IRIS_LONG: IrisMetricRow[] = IRIS.flatMap(
+	({ species, sepalLength, sepalWidth, petalLength, petalWidth }, index) =>
+		[sepalLength, sepalWidth, petalLength, petalWidth].map((value, metricIndex) => ({
+			flower: `Flower ${index + 1}`,
+			species,
+			metric: IRIS_METRICS[metricIndex],
+			value
+		}))
+);

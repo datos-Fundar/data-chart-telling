@@ -2,13 +2,14 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { MarkerTransform } from '$lib/types/transforms';
-import { CAR_SPECS, METRIC_ORDER, type CarSpec } from '../../data/car-specs';
+import { IRIS_LONG, IRIS_METRICS, type IrisMetricRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `normalizeParallelY` is `normalizeY` for parallel coordinates: every `x`
 // category is an axis of its own, normalized on its own, while `grouping` still
-// joins one record's values into one line. Without it, a metric in the thousands
-// (weight) flattens every other one against the bottom of the plot.
+// joins one record's values into one line. Without it, the metric with the largest
+// values (sepal length) flattens the smallest (petal width) against the bottom of
+// the plot.
 
 const meta = {
 	title: 'Transforms/Normalize/Parallel coordinates',
@@ -21,7 +22,7 @@ const meta = {
 		x: 'x',
 		y: 'y',
 		// The axes in the rows' own order, so each line visits them left to right.
-		scales: { x: { domain: [...METRIC_ORDER] } }
+		scales: { x: { domain: [...IRIS_METRICS] } }
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -37,67 +38,74 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** One line per model across the metric axes, and a dot per value colored by segment, both run through `transforms`. */
+/** One flower of each species gets a label, so the plot stays readable. */
+const LABELLED = new Set(['Flower 1', 'Flower 51', 'Flower 101']);
+
+/** One line per flower across the measurement axes, and a dot per value colored by species, both run through `transforms`. */
 const parallel = (transforms?: MarkerTransform[]): AxisBasedMarkersConfig[] => [
 	{
 		type: 'line',
-		data: CAR_SPECS,
+		data: IRIS_LONG,
 		x: 'metric',
 		y: 'value',
-		grouping: 'model',
+		grouping: 'flower',
 		transforms,
-		styles: { stroke: '#94a3b8', strokeWidth: 1.5 }
+		styles: { stroke: '#94a3b8', strokeWidth: 1, strokeOpacity: 0.4 }
 	},
 	{
 		type: 'dot',
-		data: CAR_SPECS,
+		data: IRIS_LONG,
 		x: 'metric',
 		y: 'value',
-		grouping: 'model',
-		color: 'segment',
+		grouping: 'flower',
+		color: 'species',
 		transforms,
-		styles: { dotRadius: 5 }
+		styles: { dotRadius: 2.5, dotFillOpacity: 0.6 }
 	}
 ];
 
-/** No transform: weight, in kilograms, sets the scale, and power, economy and price all sit near zero. */
+/** No transform: sepal length, up to 7.9 cm, sets the scale, and petal width, under 2.5 cm, sits flat near the bottom. */
 export const Raw: Story = {
 	args: {
 		markers: parallel(undefined),
-		scales: { x: { domain: [...METRIC_ORDER] }, y: { label: 'Value' } }
+		scales: { x: { domain: [...IRIS_METRICS] }, y: { label: 'Centimeters' } }
 	}
 };
 
-/** `basis: 'extent'`: every metric spans 0-1 between its own lowest and highest model, so the lines cross where models trade off. */
+/** `basis: 'extent'`: every measurement spans 0-1 between its own lowest and highest flower, so the lines show which species are small or large on each axis. */
 export const Extent: Story = {
 	args: {
 		markers: parallel([{ type: 'normalizeParallelY', basis: 'extent' }]),
-		scales: { x: { domain: [...METRIC_ORDER] }, y: { label: 'Within each metric’s range' } }
+		scales: { x: { domain: [...IRIS_METRICS] }, y: { label: 'Within each metric’s range' } }
 	}
 };
 
-/** `basis: 'deviation'`: every metric in standard deviations from its own mean - how unusual each model is, metric by metric. */
+/** `basis: 'deviation'`: every measurement in standard deviations from its own mean - how unusual each flower is, measurement by measurement. */
 export const Deviation: Story = {
 	args: {
 		markers: parallel([{ type: 'normalizeParallelY', basis: 'deviation' }]),
-		scales: { x: { domain: [...METRIC_ORDER] }, y: { label: 'Std. deviations from mean' } }
+		scales: { x: { domain: [...IRIS_METRICS] }, y: { label: 'Std. deviations from mean' } }
 	}
 };
 
-/** A labelled end: a `text` with `selectLast` names each model at its last axis. */
+/** A labelled end: a `text` with `selectLast` names a flower of each species at its last axis. */
 export const WithLabels: Story = {
 	args: {
-		scales: { x: { domain: [...METRIC_ORDER] }, y: { label: 'Within each metric’s range' } },
+		scales: { x: { domain: [...IRIS_METRICS] }, y: { label: 'Within each metric’s range' } },
 		markers: [
 			...parallel([{ type: 'normalizeParallelY', basis: 'extent' }]),
 			{
 				type: 'text',
-				data: CAR_SPECS,
+				data: IRIS_LONG,
 				x: 'metric',
 				y: 'value',
-				grouping: 'model',
-				text: (d: CarSpec) => d.model,
-				transforms: [{ type: 'normalizeParallelY', basis: 'extent' }, { type: 'selectLast' }],
+				grouping: 'flower',
+				text: (d: IrisMetricRow) => d.flower,
+				transforms: [
+					{ type: 'normalizeParallelY', basis: 'extent' },
+					{ type: 'selectLast' },
+					{ type: 'filter', filter: (d: IrisMetricRow) => LABELLED.has(d.flower) }
+				],
 				styles: { textAnchor: 'start', dx: 10, fontSize: 11 }
 			}
 		]
