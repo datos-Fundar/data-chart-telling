@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES } from '../../plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `tick` marker (svelteplot's own `TickX`/`TickY`) - a short line per row
@@ -11,7 +11,7 @@ import { COUNTRIES } from '../../plots/correlation/scatter/data';
 // only the marker itself is on screen. `color` resolves through this
 // package's own `cfg.palette` into `stroke`.
 
-const REGION_DOMAIN = ['Americas', 'Europe', 'Asia', 'Africa'];
+const CONTINENT_DOMAIN = ['Americas', 'Europe', 'Asia', 'Africa'];
 
 const meta = {
 	title: 'Markers/Tick',
@@ -21,9 +21,9 @@ const meta = {
 		width: 940,
 		height: 400,
 		data: [],
-		x: 'gdpPerCapita',
-		y: 'region',
-		scales: { x: { domain: [0, 110] }, y: { type: 'band', domain: REGION_DOMAIN } }
+		x: 'gdp',
+		y: 'continent',
+		scales: { x: { domain: [0, 50_000] }, y: { type: 'band', domain: CONTINENT_DOMAIN } }
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -39,11 +39,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** GDP per capita strip by region - `TickX`, since `x` is quantitative and `y` a band. */
+/** GDP per capita strip by continent - `TickX`, since `x` is quantitative and `y` a band. */
 export const Horizontal: Story = {
 	args: {
 		markers: [
-			{ type: 'tick', data: COUNTRIES, x: 'gdpPerCapita', y: 'region' }
+			{ type: 'tick', data: COUNTRIES_AT_2007, x: 'gdp', y: 'continent' }
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
@@ -51,25 +51,25 @@ export const Horizontal: Story = {
 /** Swapping the axes flips the marker to `TickY`. */
 export const Vertical: Story = {
 	args: {
-		x: 'region',
-		y: 'gdpPerCapita',
-		scales: { y: { domain: [0, 110] }, x: { type: 'band', domain: REGION_DOMAIN } },
+		x: 'continent',
+		y: 'gdp',
+		scales: { y: { domain: [0, 50_000] }, x: { type: 'band', domain: CONTINENT_DOMAIN } },
 		markers: [
-			{ type: 'tick', data: COUNTRIES, x: 'region', y: 'gdpPerCapita' }
+			{ type: 'tick', data: COUNTRIES_AT_2007, x: 'continent', y: 'gdp' }
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
-/** `color` tints each tick by region; `tickLength` and `styles` control the rest. */
-export const ColoredByRegion: Story = {
+/** `color` tints each tick by continent; `tickLength` and `styles` control the rest. */
+export const ColoredByContinent: Story = {
 	args: {
 		markers: [
 			{
 				type: 'tick',
-				data: COUNTRIES,
-				x: 'gdpPerCapita',
-				y: 'region',
-				color: 'region',
+				data: COUNTRIES_AT_2007,
+				x: 'gdp',
+				y: 'continent',
+				color: 'continent',
 				styles: { strokeWidth: 2, strokeOpacity: 0.8 }
 			}
 		] satisfies AxisBasedMarkersConfig[]

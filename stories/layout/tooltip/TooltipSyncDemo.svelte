@@ -14,8 +14,13 @@
 	import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 	import type { HoverStrategy } from '$lib/types/layout/hover';
 	import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
-	import { REGION_BARS, type RegionYear } from '../../data/region-bars';
-	import { AGE_GROUPS, type AgeRow, type PenguinCount } from '$datasets';
+	import {
+		AGE_GROUPS,
+		AGE_SHARES,
+		type AgeRow,
+		type AgeShareRow,
+		type PenguinCount
+	} from '$datasets';
 
 	const { kind = 'line' }: { kind?: 'line' | 'heatmap' | 'bar' | 'pyramid' } = $props();
 
@@ -61,12 +66,12 @@
 		<BarPlot
 			width={760}
 			height={420}
-			title="Value by region and year"
+			title="Population share by age group and year"
 			subtitle="Strategy: {strategy} · Sync: {sync ? 'on' : 'off'}"
-			data={REGION_BARS}
-			x={'region' as keyof RegionYear}
-			y="value"
-			facet={{ by: 'year' as keyof RegionYear, columns: 3 }}
+			data={AGE_SHARES}
+			x={'ageGroup' as keyof AgeShareRow}
+			y="share"
+			facet={{ by: 'year' as keyof AgeShareRow, columns: 2 }}
 			tooltip={{ strategy, sync }}
 			markers={[{ type: 'hover' }]}
 		/>

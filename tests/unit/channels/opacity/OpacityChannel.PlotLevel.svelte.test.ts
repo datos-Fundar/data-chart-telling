@@ -6,7 +6,7 @@ import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import { resolveOpacityScale } from '$lib/utils/opacity';
 import type { ArgentinaProvinceProps } from '../../../../stories/plots/map/geo/data';
 import { ARGENTINA_PROVINCES } from '../../../../stories/plots/map/geo/data';
-import { COUNTRIES } from '../../../../stories/plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 import { waitForSvg, countCells, countGeoPaths } from '../../plots/_helpers/svg';
 
 function opacitiesOf(svg: SVGElement, selector: string): number[] {
@@ -98,7 +98,7 @@ describe('opacity channel - plot level (Scatter)', () => {
 
 	/**
 	 * Regression: same class of bug as `SymbolChannel.PlotLevel`'s own -
-	 * `color` splits data into one series per region, so `opacity`'s domain
+	 * `color` splits data into one series per continent, so `opacity`'s domain
 	 * must be computed once, globally, across every series' combined rows,
 	 * not per marker call (each of which only sees one series' own slice).
 	 */
@@ -106,11 +106,11 @@ describe('opacity channel - plot level (Scatter)', () => {
 		const { container } = render(ScatterPlot, {
 			width: 600,
 			height: 400,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
-			color: 'region',
-			opacity: 'lifeExpectancy'
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
+			color: 'continent',
+			opacity: 'life'
 		});
 		const svg = await waitForSvg(container);
 		expect(new Set(dotOpacitiesOf(svg)).size).toBeGreaterThan(1);

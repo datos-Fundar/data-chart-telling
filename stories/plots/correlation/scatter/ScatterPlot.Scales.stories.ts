@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import { COUNTRIES, AMERICAS } from './data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -12,10 +12,10 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: COUNTRIES,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy',
-		color: 'region'
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life',
+		color: 'continent'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
@@ -53,8 +53,6 @@ export const LogScaleX: Story = {
 /** Constrained Y domain - tightens the visible range instead of auto-fitting to the full data extent. */
 export const CustomYDomain: Story = {
 	args: {
-		data: AMERICAS,
-		color: undefined,
 		scales: { y: { domain: [65, 85] } } satisfies AxisBasedScalesConfig
 	}
 };
@@ -70,7 +68,7 @@ export const ZeroAnchoredY: Story = {
 export const WithAxisLabels: Story = {
 	args: {
 		scales: {
-			x: { label: 'GDP per capita (USD thousands)' },
+			x: { label: 'GDP per capita (USD)' },
 			y: { label: 'Life expectancy (years)' }
 		} satisfies AxisBasedScalesConfig
 	}
@@ -87,7 +85,7 @@ export const WithGrid: Story = {
 export const CustomTickFormat: Story = {
 	args: {
 		scales: {
-			x: { tickFormat: (d: unknown) => `${d}k` }
+			x: { tickFormat: (d: unknown) => `${(d as number) / 1000}k` }
 		} satisfies AxisBasedScalesConfig
 	}
 };
@@ -96,7 +94,7 @@ export const CustomTickFormat: Story = {
 export const CombinedOverrides: Story = {
 	args: {
 		scales: {
-			x: { type: 'log', label: 'GDP per capita (USD thousands)' },
+			x: { type: 'log', label: 'GDP per capita (USD)' },
 			y: { domain: [50, 90], label: 'Life expectancy (years)', grid: true }
 		} satisfies AxisBasedScalesConfig
 	}

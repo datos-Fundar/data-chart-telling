@@ -2,22 +2,22 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES } from '../../../../../../stories/plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 import { waitForSvg, countImageMarks } from '../../../_helpers/svg';
 
 const PIXEL = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"/>';
-const base = { width: 400, height: 300, data: COUNTRIES, x: 'gdpPerCapita', y: 'lifeExpectancy' };
+const base = { width: 400, height: 300, data: COUNTRIES_AT_2007, x: 'gdp', y: 'life' };
 
 describe('ScatterPlot - markers.image', () => {
 	test('renders one image per row, at the resolved `src`', async () => {
 		const { container } = render(ScatterPlot, {
 			...base,
 			markers: [
-				{ type: 'image', x: 'gdpPerCapita', y: 'lifeExpectancy', src: PIXEL }
+				{ type: 'image', x: 'gdp', y: 'life', src: PIXEL }
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
-		expect(countImageMarks(svg)).toBe(COUNTRIES.length);
+		expect(countImageMarks(svg)).toBe(COUNTRIES_AT_2007.length);
 		expect(svg.querySelector('image')?.getAttribute('href')).toBe(PIXEL);
 	});
 
@@ -27,9 +27,9 @@ describe('ScatterPlot - markers.image', () => {
 			markers: [
 				{
 					type: 'image',
-					x: 'gdpPerCapita',
-					y: 'lifeExpectancy',
-					src: (d: { region: string }) => `${PIXEL}#${d.region}`,
+					x: 'gdp',
+					y: 'life',
+					src: (d: { continent: string }) => `${PIXEL}#${d.continent}`,
 					width: 30,
 					height: 12
 				}
@@ -37,7 +37,7 @@ describe('ScatterPlot - markers.image', () => {
 		});
 		const svg = await waitForSvg(container);
 		const first = svg.querySelector('image')!;
-		expect(first.getAttribute('href')).toContain('#Americas');
+		expect(first.getAttribute('href')).toContain(`#${COUNTRIES_AT_2007[0].continent}`);
 		expect(first.getAttribute('width')).toBe('30');
 		expect(first.getAttribute('height')).toBe('12');
 	});
@@ -45,12 +45,14 @@ describe('ScatterPlot - markers.image', () => {
 	test('a `series`-scoped image reuses that series from the plot data', async () => {
 		const { container } = render(ScatterPlot, {
 			...base,
-			color: 'region',
+			color: 'continent',
 			markers: [
-				{ type: 'image', series: 'Europe', x: 'gdpPerCapita', y: 'lifeExpectancy', src: PIXEL }
+				{ type: 'image', series: 'Europe', x: 'gdp', y: 'life', src: PIXEL }
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
-		expect(countImageMarks(svg)).toBe(COUNTRIES.filter((d) => d.region === 'Europe').length);
+		expect(countImageMarks(svg)).toBe(
+			COUNTRIES_AT_2007.filter((d) => d.continent === 'Europe').length
+		);
 	});
 });

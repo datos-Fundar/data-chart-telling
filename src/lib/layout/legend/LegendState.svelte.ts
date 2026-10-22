@@ -22,6 +22,7 @@ import type {
 } from '$lib/types/layout/legend';
 
 const LEGEND_KEY = Symbol('dct-legend');
+const QUIET_KEY = Symbol('dct-legend-quiet');
 
 /**
  * A figure's legend, shared by every plot and legend under it: what the
@@ -48,6 +49,16 @@ export class LegendState {
 		const legend = new LegendState();
 		setContext(LEGEND_KEY, legend);
 		return legend;
+	}
+
+	/** Keeps the plots below out of the enclosing legend: they still follow its toggles, but add nothing to it. Call during component init. */
+	static silence(): void {
+		setContext(QUIET_KEY, true);
+	}
+
+	/** Whether the plots here are kept out of the enclosing legend (see {@link silence}). Call during component init. */
+	static isSilenced(): boolean {
+		return getContext<boolean | undefined>(QUIET_KEY) ?? false;
 	}
 
 	/** The enclosing figure's legend, or a private one for a legend drawn outside any. Call during component init. */

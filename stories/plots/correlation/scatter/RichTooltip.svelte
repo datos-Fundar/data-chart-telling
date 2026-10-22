@@ -3,37 +3,38 @@
 	import TooltipCard from '../../../common/TooltipCard.svelte';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { paletteColor } from '$lib/utils/color';
-	import { COUNTRIES, type CountryPoint } from './data';
+	import { COUNTRIES_AT_2007, type CountryYearRow } from '$datasets';
 
 	const cfg = getConfiguration();
 
-	// Region order matches `color`'s first-appearance order in COUNTRIES, which
+	// Continent order matches `color`'s first-appearance order in COUNTRIES_AT_2007, which
 	// is what drives colour assignment inside ScatterPlot - kept in lockstep here
 	// since `content` only gets the raw row back, not its resolved colour.
-	const REGIONS = ['Americas', 'Europe', 'Asia', 'Africa'] as const;
-	const REGION_COLORS = REGIONS.map((_, i) => paletteColor(i, cfg.palette));
-	const colorFor = (region: CountryPoint['region']) => REGION_COLORS[REGIONS.indexOf(region)];
+	const CONTINENTS = ['Americas', 'Europe', 'Asia', 'Africa'];
+	const CONTINENT_COLORS = CONTINENTS.map((_, i) => paletteColor(i, cfg.palette));
+	const colorFor = (continent: CountryYearRow['continent']) =>
+		CONTINENT_COLORS[CONTINENTS.indexOf(continent)];
 </script>
 
-{#snippet content({ rows }: { rows: CountryPoint[] })}
+{#snippet content({ rows }: { rows: CountryYearRow[] })}
 	{@const row = rows[0]}
 	{#if row}
-		{@const color = colorFor(row.region)}
+		{@const color = colorFor(row.continent)}
 		<TooltipCard
 			heading={row.country}
 			entries={[
-				{ label: 'Region', color, value: 0, display: row.region },
+				{ label: 'Continent', color, value: 0, display: row.continent },
 				{
 					label: 'GDP per capita',
 					color,
-					value: row.gdpPerCapita,
-					display: `$${row.gdpPerCapita.toFixed(1)}k`
+					value: row.gdp,
+					display: `$${(row.gdp / 1000).toFixed(1)}k`
 				},
 				{
 					label: 'Life expectancy',
 					color,
-					value: row.lifeExpectancy,
-					display: `${row.lifeExpectancy.toFixed(1)} yr`
+					value: row.life,
+					display: `${row.life.toFixed(1)} yr`
 				}
 			]}
 			footer={`Population: ${row.population}M`}
@@ -45,15 +46,15 @@
 	<ScatterPlot
 		width={950}
 		height={500}
-		data={COUNTRIES}
-		x="gdpPerCapita"
-		y="lifeExpectancy"
-		color="region"
+		data={COUNTRIES_AT_2007}
+		x="gdp"
+		y="life"
+		color="continent"
 		tooltip={{
 			sync: false,
 			format: (row) => {
-				const { country, gdpPerCapita, lifeExpectancy } = row as CountryPoint;
-				return `${country}: $${gdpPerCapita.toFixed(1)}k, ${lifeExpectancy.toFixed(1)} yr`;
+				const { country, gdp, life } = row as CountryYearRow;
+				return `${country}: $${(gdp / 1000).toFixed(1)}k, ${life.toFixed(1)} yr`;
 			},
 			content
 		}}

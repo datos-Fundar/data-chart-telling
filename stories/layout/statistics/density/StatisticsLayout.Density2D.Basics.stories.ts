@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
-import { COUNTRIES } from '../../../plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `statistics: [{ type: 'density2d' }]` resolves straight to svelteplot's own
@@ -15,9 +15,9 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: COUNTRIES,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy',
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life',
 		r: 4
 	},
 	argTypes: {
@@ -48,10 +48,10 @@ export const SmoothedLevels: Story = {
 	}
 };
 
-/** `color` splits the rows into regions and the statistic follows that grouping, so every region gets its own contour bands in its own color. `styles.stroke` set explicitly overrides that and paints all of them one color. */
-export const PerRegion: Story = {
+/** `color` splits the rows into continents and the statistic follows that grouping, so every continent gets its own contour bands in its own color. `styles.stroke` set explicitly overrides that and paints all of them one color. */
+export const PerContinent: Story = {
 	args: {
-		color: 'region',
+		color: 'continent',
 		statistics: [{ type: 'density2d', bandwidth: 30, styles: { strokeWidth: 1 } }]
 	}
 };

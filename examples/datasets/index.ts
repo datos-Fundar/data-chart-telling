@@ -1,5 +1,5 @@
 export * from './commodity-prices';
-export * from './countries';
+export * from './countries-over-time';
 export * from './heights';
 export * from './inflation-by-region';
 export * from './inflation-ranges';

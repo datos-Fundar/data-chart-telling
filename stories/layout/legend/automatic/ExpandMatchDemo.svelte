@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
-	import { COUNTRIES } from '../../../plots/correlation/scatter/data';
+	import { COUNTRIES_AT_2007 } from '$datasets';
 </script>
 
 <!--
@@ -11,23 +11,23 @@
 <ScatterPlot
 	width={760}
 	height={400}
-	data={COUNTRIES}
-	x="gdpPerCapita"
-	y="lifeExpectancy"
+	data={COUNTRIES_AT_2007}
+	x="gdp"
+	y="life"
 	markers={[
-		{ type: 'dot', data: COUNTRIES, x: 'gdpPerCapita', y: 'lifeExpectancy', color: 'population' },
+		{ type: 'dot', data: COUNTRIES_AT_2007, x: 'gdp', y: 'life', color: 'population' },
 		{
 			type: 'dot',
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
-			color: 'lifeExpectancy'
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
+			color: 'life'
 		}
 	]}
 	legend={{
 		color: [
 			{ match: 'population', title: 'People (millions)', width: 240 },
-			{ match: 'lifeExpectancy', title: 'Years', width: 160 }
+			{ match: 'life', title: 'Years', width: 160 }
 		]
 	}}
 />

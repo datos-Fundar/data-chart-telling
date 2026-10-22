@@ -2,7 +2,7 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES } from '../../../../../../stories/plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 import { waitForSvg, countRasterMarks } from '../../../_helpers/svg';
 
 describe('ScatterPlot - markers.raster', () => {
@@ -35,14 +35,14 @@ describe('ScatterPlot - markers.raster', () => {
 		const { container } = render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
 			markers: [
 				{
 					type: 'raster',
-					x: 'gdpPerCapita',
-					y: 'lifeExpectancy',
+					x: 'gdp',
+					y: 'life',
 					fill: 'population',
 					interpolate: 'nearest'
 				}

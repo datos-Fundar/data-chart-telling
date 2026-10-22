@@ -31,7 +31,7 @@
 	scales={{
 		y: { sort: (a: GroupValue, b: GroupValue) => a.value - b.value }
 	}}
-	facet={{ by: 'group' as keyof GroupValue, columns: 2 }}
+	facet={{ by: 'group' as keyof GroupValue, columns: 2, scales: 'free-y' }}
 	tooltip={{
 		strategy: 'y',
 		sync: true,

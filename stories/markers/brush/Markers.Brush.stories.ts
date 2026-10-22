@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES } from '../../plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `brush` marker (svelteplot's own `Brush`) - an interactive drag-to-select
@@ -18,10 +18,10 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: COUNTRIES,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy',
-		color: 'region'
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life',
+		color: 'continent'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },

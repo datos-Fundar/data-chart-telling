@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HistogramPlot from '$lib/plots/distribution/histogram/Plot.svelte';
-import { COUNTRIES, HEIGHTS, type CountryRow, type HeightRow } from '$datasets';
+import { COUNTRIES_AT_2007, HEIGHTS, type CountryYearRow, type HeightRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Every histogram runs a default `binX` that counts its rows. A `binX` in
@@ -8,10 +8,10 @@ import { COUNTRIES, HEIGHTS, type CountryRow, type HeightRow } from '$datasets';
 // of the default still applies. So a plot can change the bins without restating
 // the count. Any other transform in `transforms` runs after the bin.
 
-const TOTAL_POPULATION = COUNTRIES.reduce((sum, d) => sum + d.population, 0);
+const TOTAL_POPULATION = COUNTRIES_AT_2007.reduce((sum, d) => sum + d.population, 0);
 
 /** The rows' share of the whole population, in percent. */
-const populationShare = (rows: CountryRow[]) =>
+const populationShare = (rows: CountryYearRow[]) =>
 	(rows.reduce((sum, d) => sum + d.population, 0) / TOTAL_POPULATION) * 100;
 
 const meta = {
@@ -81,7 +81,7 @@ export const MeanWeight: Story = {
 /** `cumulative: 1` runs the bins as a running total: each bar reduces the rows of every bin before it, so a share climbs to 100%. Here, the share of the population living in countries up to each life expectancy. */
 export const Cumulative: Story = {
 	args: {
-		data: COUNTRIES,
+		data: COUNTRIES_AT_2007,
 		x: 'life',
 		transforms: [{ type: 'binX', thresholds: 12, y: populationShare, cumulative: 1 }],
 		scales: {

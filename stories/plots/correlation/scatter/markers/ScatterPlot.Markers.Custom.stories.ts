@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import type { CountryPoint } from '../data';
-import { COUNTRIES } from '../data';
+import type { CountryYearRow } from '$datasets';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -13,10 +13,10 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: COUNTRIES,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy',
-		color: 'region'
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life',
+		color: 'continent'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
@@ -40,9 +40,9 @@ export const WithDotMarker: Story = {
 		markers: [
 			{
 				type: 'dot',
-				data: COUNTRIES.filter((d) => d.lifeExpectancy > 82),
-				x: (d: CountryPoint) => d.gdpPerCapita,
-				y: (d: CountryPoint) => d.lifeExpectancy,
+				data: COUNTRIES_AT_2007.filter((d) => d.life > 82),
+				x: (d: CountryYearRow) => d.gdp,
+				y: (d: CountryYearRow) => d.life,
 				styles: {
 					dotRadius: 10,
 					dotFill: 'transparent',
@@ -60,10 +60,10 @@ export const WithTextMarker: Story = {
 		markers: [
 			{
 				type: 'text',
-				data: COUNTRIES.filter((d) => d.lifeExpectancy > 82),
-				x: (d: CountryPoint) => d.gdpPerCapita,
-				y: (d: CountryPoint) => d.lifeExpectancy,
-				text: (d: CountryPoint) => d.country,
+				data: COUNTRIES_AT_2007.filter((d) => d.life > 82),
+				x: (d: CountryYearRow) => d.gdp,
+				y: (d: CountryYearRow) => d.life,
+				text: (d: CountryYearRow) => d.country,
 				styles: { dy: -12, fontSize: 11 }
 			}
 		] satisfies AxisBasedMarkersConfig[]

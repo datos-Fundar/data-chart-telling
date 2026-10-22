@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES, AMERICAS } from '../data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -12,9 +12,9 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: AMERICAS,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy'
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
@@ -71,24 +71,24 @@ export const WithCustomStyle: Story = {
 	}
 };
 
-/** Two regions - the unscoped hover marker responds to whichever cloud's point is nearest the cursor. */
-export const GroupedByRegion: Story = {
+/** Every continent - the unscoped hover marker responds to whichever cloud's point is nearest the cursor. */
+export const GroupedByContinent: Story = {
 	args: {
-		data: COUNTRIES,
-		color: 'region',
+		data: COUNTRIES_AT_2007,
+		color: 'continent',
 		markers: [{ type: 'hover' }] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
 /**
  * Series-scoped marker - `series: 'Americas'` restricts the hover highlight
- * to points in that region only. Hovering the other regions produces no
- * dot or label even though every region is rendered.
+ * to points in that continent only. Hovering the other continents produces no
+ * dot or label even though every continent is rendered.
  */
 export const SeriesScoped: Story = {
 	args: {
-		data: COUNTRIES,
-		color: 'region',
+		data: COUNTRIES_AT_2007,
+		color: 'continent',
 		markers: [{ type: 'hover', series: 'Americas' }] satisfies AxisBasedMarkersConfig[]
 	}
 };

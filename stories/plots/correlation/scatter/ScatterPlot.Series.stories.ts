@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import { COUNTRIES, AMERICAS, EUROPE, type CountryPoint } from './data';
+import { COUNTRIES_AT_2007, type CountryYearRow } from '$datasets';
+
+const CONTINENTS = [...new Set(COUNTRIES_AT_2007.map((d) => d.continent))];
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -43,32 +45,27 @@ export const Default: Story = {
 	args: {
 		series: [
 			{
-				name: 'americas',
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
-				data: AMERICAS
-			} satisfies Series<CountryPoint>
+				name: 'countries',
+				x: 'gdp',
+				y: 'life',
+				data: COUNTRIES_AT_2007
+			} satisfies Series<CountryYearRow>
 		]
 	}
 };
 
 /** Series carry only data; colours live in `segments` so the same data can be re-styled without touching the series. Because `segments` is not present here, it uses the default palette. */
-export const TwoSeries: Story = {
+export const SeriesPerContinent: Story = {
 	args: {
-		series: [
-			{
-				name: 'americas',
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
-				data: AMERICAS
-			} satisfies Series<CountryPoint>,
-			{
-				name: 'europe',
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
-				data: EUROPE
-			} satisfies Series<CountryPoint>
-		]
+		series: CONTINENTS.map(
+			(continent) =>
+				({
+					name: continent,
+					x: 'gdp',
+					y: 'life',
+					data: COUNTRIES_AT_2007.filter((d) => d.continent === continent)
+				}) satisfies Series<CountryYearRow>
+		)
 	}
 };
 
@@ -79,13 +76,13 @@ export const TwoSeries: Story = {
  * - `y`: field name for Y-axis values (life expectancy)
  * - `color`: grouping dimension (categorical field that creates separate series per value)
  *
- * ScatterPlot automatically creates one series per unique `color` value (one per region).
+ * ScatterPlot automatically creates one series per unique `color` value (one per continent).
  */
-export const TwoSeriesUsingDataAndGrouping: Story = {
+export const SeriesUsingDataAndGrouping: Story = {
 	args: {
-		data: COUNTRIES,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy',
-		color: 'region'
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life',
+		color: 'continent'
 	}
 };

@@ -1,8 +1,8 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
-import type { CountryPoint } from '../../../../../stories/plots/correlation/scatter/data';
-import { AMERICAS, COUNTRIES } from '../../../../../stories/plots/correlation/scatter/data';
+import type { CountryYearRow } from '$datasets';
+import { COUNTRIES_AT_2007 } from '$datasets';
 import { waitForSvg } from '../../_helpers/svg';
 
 function noTooltipDom(container: Element) {
@@ -14,9 +14,9 @@ describe('ScatterPlot - tooltip', () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: AMERICAS,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy'
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life'
 		});
 		await waitForSvg(container);
 		expect(noTooltipDom(container)).toBeNull();
@@ -26,12 +26,12 @@ describe('ScatterPlot - tooltip', () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: AMERICAS,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
 			tooltip: {
 				sync: false,
-				format: (row) => `${(row as CountryPoint).country}`
+				format: (row) => `${(row as CountryYearRow).country}`
 			}
 		});
 		await waitForSvg(container);
@@ -42,14 +42,13 @@ describe('ScatterPlot - tooltip', () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
-			color: 'region',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
+			color: 'continent',
 			tooltip: {
 				sync: false,
-				format: (row) =>
-					`${(row as CountryPoint).country}: ${(row as CountryPoint).lifeExpectancy} yr`
+				format: (row) => `${(row as CountryYearRow).country}: ${(row as CountryYearRow).life} yr`
 			}
 		});
 		const svg = await waitForSvg(container);
@@ -60,14 +59,14 @@ describe('ScatterPlot - tooltip', () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
-			color: 'region',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
+			color: 'continent',
 			tooltip: {
 				sync: false,
 				series: ['Americas'],
-				format: (row) => `${(row as CountryPoint).country}`
+				format: (row) => `${(row as CountryYearRow).country}`
 			}
 		});
 		const svg = await waitForSvg(container);

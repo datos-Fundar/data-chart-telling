@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
-import { COUNTRIES } from '../../../plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `statistics` entry's own `series` field controls what it fits against:
 // omitted, it pools every resolved series into one combined source; named,
 // it fits once per listed series, using that series' own data/color. Series
 // themselves come from `color` (or an explicit `grouping`) splitting the data
-// by region - the same three stories below, at three different scopes.
+// by continent - the same three stories below, at three different scopes.
 
 const meta = {
 	title: 'Layout/Statistics/Regression/Scoping',
@@ -16,9 +16,9 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: COUNTRIES,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy',
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life',
 		r: 6
 	},
 	argTypes: {
@@ -42,18 +42,18 @@ export const Pooled: Story = {
 	}
 };
 
-/** Plot level, grouped by series: `color: 'region'` splits the data into one series per continent, and with no `series` scope the statistic fits one regression per continent in that continent's color. */
+/** Plot level, grouped by series: `color: 'continent'` splits the data into one series per continent, and with no `series` scope the statistic fits one regression per continent in that continent's color. */
 export const GroupedByContinent: Story = {
 	args: {
-		color: 'region',
+		color: 'continent',
 		statistics: [{ type: 'regression', confidence: false }]
 	}
 };
 
-/** `pooled: true` opts out of the per-series default: `color: 'region'` still splits the data, but one regression fits every continent combined. */
+/** `pooled: true` opts out of the per-series default: `color: 'continent'` still splits the data, but one regression fits every continent combined. */
 export const PooledAcrossSeries: Story = {
 	args: {
-		color: 'region',
+		color: 'continent',
 		statistics: [{ type: 'regression', confidence: false, pooled: true }]
 	}
 };
@@ -61,7 +61,7 @@ export const PooledAcrossSeries: Story = {
 /** Scoped to a single series: same `color`-split series as above, but `series: ['Europe']` fits a regression for just that one continent - every country still renders, only Europe gets a line. */
 export const SingleSeriesScoped: Story = {
 	args: {
-		color: 'region',
+		color: 'continent',
 		statistics: [{ type: 'regression', confidence: false, series: ['Europe'] }]
 	}
 };

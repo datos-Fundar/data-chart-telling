@@ -2,7 +2,7 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { AMERICAS, COUNTRIES } from '../../../../../../stories/plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 import { waitForSvg, countDotMarks, countTextLabels } from '../../../_helpers/svg';
 
 // The hover marker's own dot/label only render on an actual cursor match,
@@ -13,14 +13,14 @@ describe('ScatterPlot - markers.hover', () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: AMERICAS,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
 			markers: [{ type: 'hover' }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
 		// Only the base scatter dots - the hover marker itself renders nothing yet.
-		expect(countDotMarks(svg)).toBe(AMERICAS.length);
+		expect(countDotMarks(svg)).toBe(COUNTRIES_AT_2007.length);
 		expect(countTextLabels(svg)).toBe(0);
 	});
 
@@ -28,10 +28,10 @@ describe('ScatterPlot - markers.hover', () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
-			color: 'region',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
+			color: 'continent',
 			markers: [{ type: 'hover', series: 'Americas' }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
@@ -42,9 +42,9 @@ describe('ScatterPlot - markers.hover', () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: AMERICAS,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
 			markers: [
 				{
 					type: 'hover',
@@ -61,9 +61,9 @@ describe('ScatterPlot - markers.hover', () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: AMERICAS,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
 			markers: [{ type: 'hover', ruleX: true, ruleY: true }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);

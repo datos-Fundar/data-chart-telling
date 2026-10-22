@@ -2,7 +2,7 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES } from '../../../../../../stories/plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 import { waitForSvg, countBoxMarks } from '../../../_helpers/svg';
 
 describe('LinePlot - markers.box', () => {
@@ -10,10 +10,10 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'region',
-			y: 'gdpPerCapita',
-			markers: [{ type: 'box', x: 'region', y: 'gdpPerCapita' }] satisfies AxisBasedMarkersConfig[]
+			data: COUNTRIES_AT_2007,
+			x: 'continent',
+			y: 'gdp',
+			markers: [{ type: 'box', x: 'continent', y: 'gdp' }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
 		expect(countBoxMarks(svg)).toBe(1);
@@ -24,11 +24,11 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'region',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'continent',
 			scales: { y: { type: 'band' } },
-			markers: [{ type: 'box', x: 'gdpPerCapita', y: 'region' }] satisfies AxisBasedMarkersConfig[]
+			markers: [{ type: 'box', x: 'gdp', y: 'continent' }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
 		expect(svg.querySelectorAll('g.box-x rect').length).toBe(4);
@@ -39,10 +39,10 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'region',
-			y: 'gdpPerCapita',
-			markers: [{ type: 'box', x: 'region', y: 'gdpPerCapita' }] satisfies AxisBasedMarkersConfig[]
+			data: COUNTRIES_AT_2007,
+			x: 'continent',
+			y: 'gdp',
+			markers: [{ type: 'box', x: 'continent', y: 'gdp' }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
 		expect(svg.querySelectorAll('g.box-y g.tick-y').length).toBe(3);
@@ -52,11 +52,11 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'region',
-			y: 'gdpPerCapita',
+			data: COUNTRIES_AT_2007,
+			x: 'continent',
+			y: 'gdp',
 			markers: [
-				{ type: 'box', x: 'region', y: 'gdpPerCapita', tickMedian: true, tickMinMax: true }
+				{ type: 'box', x: 'continent', y: 'gdp', tickMedian: true, tickMinMax: true }
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
@@ -67,11 +67,11 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'region',
-			y: 'gdpPerCapita',
+			data: COUNTRIES_AT_2007,
+			x: 'continent',
+			y: 'gdp',
 			markers: [
-				{ type: 'box', x: 'region', y: 'gdpPerCapita', tickMinMax: false }
+				{ type: 'box', x: 'continent', y: 'gdp', tickMinMax: false }
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
@@ -83,26 +83,24 @@ describe('LinePlot - markers.box', () => {
 			await render(LinePlot, {
 				width: 400,
 				height: 300,
-				data: COUNTRIES,
-				x: 'region',
-				y: 'gdpPerCapita',
-				markers: [
-					{ type: 'box', x: 'region', y: 'gdpPerCapita' }
-				] satisfies AxisBasedMarkersConfig[]
+				data: COUNTRIES_AT_2007,
+				x: 'continent',
+				y: 'gdp',
+				markers: [{ type: 'box', x: 'continent', y: 'gdp' }] satisfies AxisBasedMarkersConfig[]
 			})
 		).container;
 		const narrow = (
 			await render(LinePlot, {
 				width: 400,
 				height: 300,
-				data: COUNTRIES,
-				x: 'region',
-				y: 'gdpPerCapita',
+				data: COUNTRIES_AT_2007,
+				x: 'continent',
+				y: 'gdp',
 				markers: [
 					{
 						type: 'box',
-						x: 'region',
-						y: 'gdpPerCapita',
+						x: 'continent',
+						y: 'gdp',
 						bar: { insetLeft: 15, insetRight: 15 }
 					}
 				] satisfies AxisBasedMarkersConfig[]
@@ -121,10 +119,10 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'region',
-			y: 'gdpPerCapita',
-			markers: [{ type: 'box', x: 'region', y: 'gdpPerCapita' }] satisfies AxisBasedMarkersConfig[]
+			data: COUNTRIES_AT_2007,
+			x: 'continent',
+			y: 'gdp',
+			markers: [{ type: 'box', x: 'continent', y: 'gdp' }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
 		const rect = svg.querySelector('g.box-y rect');
@@ -139,11 +137,11 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'region',
-			y: 'gdpPerCapita',
+			data: COUNTRIES_AT_2007,
+			x: 'continent',
+			y: 'gdp',
 			markers: [
-				{ type: 'box', x: 'region', y: 'gdpPerCapita', bar: { fill: '#7c3aed' } }
+				{ type: 'box', x: 'continent', y: 'gdp', bar: { fill: '#7c3aed' } }
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
@@ -155,11 +153,11 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'region',
-			y: 'gdpPerCapita',
+			data: COUNTRIES_AT_2007,
+			x: 'continent',
+			y: 'gdp',
 			markers: [
-				{ type: 'box', x: 'region', y: 'gdpPerCapita', bar: { fill: '#fef08a' } }
+				{ type: 'box', x: 'continent', y: 'gdp', bar: { fill: '#fef08a' } }
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
@@ -171,14 +169,14 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'region',
-			y: 'gdpPerCapita',
+			data: COUNTRIES_AT_2007,
+			x: 'continent',
+			y: 'gdp',
 			markers: [
 				{
 					type: 'box',
-					x: 'region',
-					y: 'gdpPerCapita',
+					x: 'continent',
+					y: 'gdp',
 					tickMinMax: true,
 					bar: { fill: '#7c3aed' }
 				}
@@ -200,14 +198,14 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'region',
-			y: 'gdpPerCapita',
+			data: COUNTRIES_AT_2007,
+			x: 'continent',
+			y: 'gdp',
 			markers: [
 				{
 					type: 'box',
-					x: 'region',
-					y: 'gdpPerCapita',
+					x: 'continent',
+					y: 'gdp',
 					tickMedian: { stroke: '#22c55e' },
 					bar: { fill: '#7c3aed' }
 				}
@@ -222,14 +220,14 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'region',
-			y: 'gdpPerCapita',
+			data: COUNTRIES_AT_2007,
+			x: 'continent',
+			y: 'gdp',
 			markers: [
 				{
 					type: 'box',
-					x: 'region',
-					y: 'gdpPerCapita',
+					x: 'continent',
+					y: 'gdp',
 					tickMinMax: { stroke: '#f97316' },
 					bar: { fill: '#7c3aed' }
 				}
@@ -246,14 +244,14 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'region',
-			y: 'gdpPerCapita',
+			data: COUNTRIES_AT_2007,
+			x: 'continent',
+			y: 'gdp',
 			markers: [
 				{
 					type: 'box',
-					x: 'region',
-					y: 'gdpPerCapita',
+					x: 'continent',
+					y: 'gdp',
 					bar: { fill: '#7c3aed' },
 					tickMedian: { stroke: '#ffffff', strokeWidth: 3 },
 					tickMinMax: true
@@ -274,14 +272,14 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'region',
-			y: 'gdpPerCapita',
+			data: COUNTRIES_AT_2007,
+			x: 'continent',
+			y: 'gdp',
 			markers: [
 				{
 					type: 'box',
-					x: 'region',
-					y: 'gdpPerCapita',
+					x: 'continent',
+					y: 'gdp',
 					bar: { insetLeft: 15, insetRight: 15 },
 					tickMedian: { inset: 15 }
 				}
@@ -300,14 +298,14 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'region',
-			y: 'gdpPerCapita',
+			data: COUNTRIES_AT_2007,
+			x: 'continent',
+			y: 'gdp',
 			markers: [
 				{
 					type: 'box',
-					x: 'region',
-					y: 'gdpPerCapita',
+					x: 'continent',
+					y: 'gdp',
 					bar: { fill: '#7c3aed', fillOpacity: 0.3 }
 				}
 			] satisfies AxisBasedMarkersConfig[]
@@ -323,14 +321,14 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'region',
-			y: 'gdpPerCapita',
+			data: COUNTRIES_AT_2007,
+			x: 'continent',
+			y: 'gdp',
 			markers: [
 				{
 					type: 'box',
-					x: 'region',
-					y: 'gdpPerCapita',
+					x: 'continent',
+					y: 'gdp',
 					bar: { fill: '#7c3aed', fillOpacity: 0.3 }
 				}
 			] satisfies AxisBasedMarkersConfig[]
@@ -346,14 +344,14 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'region',
-			y: 'gdpPerCapita',
+			data: COUNTRIES_AT_2007,
+			x: 'continent',
+			y: 'gdp',
 			markers: [
 				{
 					type: 'box',
-					x: 'region',
-					y: 'gdpPerCapita',
+					x: 'continent',
+					y: 'gdp',
 					bar: { fill: '#7c3aed' },
 					dot: { fill: '#f97316' }
 				}
@@ -368,14 +366,14 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'region',
-			y: 'gdpPerCapita',
+			data: COUNTRIES_AT_2007,
+			x: 'continent',
+			y: 'gdp',
 			markers: [
 				{
 					type: 'box',
-					x: 'region',
-					y: 'gdpPerCapita',
+					x: 'continent',
+					y: 'gdp',
 					dot: { fill: null, stroke: '#7c3aed', strokeWidth: 2 }
 				}
 			] satisfies AxisBasedMarkersConfig[]
@@ -392,14 +390,14 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'region',
-			y: 'gdpPerCapita',
+			data: COUNTRIES_AT_2007,
+			x: 'continent',
+			y: 'gdp',
 			markers: [
 				{
 					type: 'box',
-					x: 'region',
-					y: 'gdpPerCapita',
+					x: 'continent',
+					y: 'gdp',
 					dot: { fillOpacity: 0, stroke: '#7c3aed', strokeWidth: 2 }
 				}
 			] satisfies AxisBasedMarkersConfig[]
@@ -420,23 +418,21 @@ describe('LinePlot - markers.box', () => {
 			await render(LinePlot, {
 				width: 400,
 				height: 300,
-				data: COUNTRIES,
-				x: 'region',
-				y: 'gdpPerCapita',
-				markers: [
-					{ type: 'box', x: 'region', y: 'gdpPerCapita' }
-				] satisfies AxisBasedMarkersConfig[]
+				data: COUNTRIES_AT_2007,
+				x: 'continent',
+				y: 'gdp',
+				markers: [{ type: 'box', x: 'continent', y: 'gdp' }] satisfies AxisBasedMarkersConfig[]
 			})
 		).container;
 		const sorted = (
 			await render(LinePlot, {
 				width: 400,
 				height: 300,
-				data: COUNTRIES,
-				x: 'region',
-				y: 'gdpPerCapita',
+				data: COUNTRIES_AT_2007,
+				x: 'continent',
+				y: 'gdp',
 				markers: [
-					{ type: 'box', x: 'region', y: 'gdpPerCapita', sort: 'median' }
+					{ type: 'box', x: 'continent', y: 'gdp', sort: 'median' }
 				] satisfies AxisBasedMarkersConfig[]
 			})
 		).container;
@@ -458,9 +454,9 @@ describe('LinePlot - markers.box', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'region',
-			y: 'gdpPerCapita',
+			data: COUNTRIES_AT_2007,
+			x: 'continent',
+			y: 'gdp',
 			markers: []
 		});
 		const svg = await waitForSvg(container);

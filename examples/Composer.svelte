@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { PlotComposer, LinePlot, BarPlot, ScatterPlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES, PROVINCE_VALUES, COUNTRIES } from './datasets';
+	import { REGION_VALUES, PROVINCE_VALUES, COUNTRIES_AT_2007 } from './datasets';
 </script>
 
 <!-- Several plots in one figure, placed on named areas of a grid. -->
@@ -19,5 +19,5 @@
 		x="province"
 		y="value"
 	/>
-	<ScatterPlot area="c" data={COUNTRIES} x="gdp" y="life" />
+	<ScatterPlot area="c" data={COUNTRIES_AT_2007} x="gdp" y="life" />
 </PlotComposer>

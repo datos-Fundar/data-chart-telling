@@ -2,10 +2,10 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import type { LegendSection } from '$lib/types/layout/legend';
-import { AMERICAS, COUNTRIES, EUROPE } from './data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// An interactive `legend` toggles each region: by default a toggled-off region
+// An interactive `legend` toggles each continent: by default a toggled-off continent
 // dims, or with `interactive.disabled: { mode: 'omit' }` it's removed.
 
 const meta = {
@@ -15,9 +15,9 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: AMERICAS,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy'
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
@@ -34,17 +34,17 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** One interactive item per region; `mode` sets what a toggled-off region does. */
-function regionLegend(mode: 'dim' | 'hide' | 'omit'): LegendSection[] {
+/** One interactive item per continent; `mode` sets what a toggled-off continent does. */
+function continentLegend(mode: 'dim' | 'hide' | 'omit'): LegendSection[] {
 	return [
 		{
 			type: 'discrete',
-			title: 'Region',
+			title: 'Continent',
 			interactive: { enabled: true, ...(mode !== 'dim' ? { disabled: { mode } } : {}) },
-			items: [
-				{ name: 'Americas', symbol: 'circle' },
-				{ name: 'Europe', symbol: 'circle' }
-			]
+			items: ['Americas', 'Europe', 'Asia', 'Africa'].map((name) => ({
+				name,
+				symbol: 'circle' as const
+			}))
 		}
 	];
 }
@@ -53,27 +53,27 @@ function regionLegend(mode: 'dim' | 'hide' | 'omit'): LegendSection[] {
 
 /**
  * A legend-disabled series dims its value labels too, not just its dots.
- * Toggling "Americas" or "Europe" off in the legend above fades that
- * region's point labels along with its dots, instead of leaving the labels
+ * Toggling a continent off in the legend above fades that
+ * continent's point labels along with its dots, instead of leaving the labels
  * at full opacity while the dots fade.
  */
 export const LegendDisabledDimsLabels: Story = {
 	args: {
-		data: [...AMERICAS, ...EUROPE],
-		color: 'region',
-		legend: regionLegend('dim'),
+		data: COUNTRIES_AT_2007,
+		color: 'continent',
+		legend: continentLegend('dim'),
 		styles: {
 			values: { show: true, format: (v: number) => v.toFixed(0) }
 		} satisfies AxisBasedStylesConfig
 	}
 };
 
-/** `interactive.disabled: { mode: 'omit' }` removes a toggled-off region from the plot and rescales both axes. */
+/** `interactive.disabled: { mode: 'omit' }` removes a toggled-off continent from the plot and rescales both axes. */
 export const LegendOmitRescalesDomain: Story = {
 	args: {
-		data: [...AMERICAS, ...EUROPE],
-		color: 'region',
-		legend: regionLegend('omit')
+		data: COUNTRIES_AT_2007,
+		color: 'continent',
+		legend: continentLegend('omit')
 	}
 };
 
@@ -81,12 +81,12 @@ export const LegendOmitRescalesDomain: Story = {
  * `styles.values.hoverIsolate: true` dims every other series while the
  * pointer rests over a value label, exactly like toggling that series off
  * in the legend would - reverting on mouse-leave. Hover a country's label
- * to see every other region's dots and labels fade.
+ * to see every other continent's dots and labels fade.
  */
 export const HoverIsolate: Story = {
 	args: {
-		data: COUNTRIES,
-		color: 'region',
+		data: COUNTRIES_AT_2007,
+		color: 'continent',
 		styles: {
 			values: {
 				show: true,

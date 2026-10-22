@@ -14,7 +14,7 @@ import {
 	WORLD_COUNTRIES,
 	WEATHER_STATIONS
 } from '../../../../../stories/plots/map/geo/data';
-import { COUNTRIES } from '../../../../../stories/plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 import { waitForSvg, countGeoPaths, countDotMarks } from '../../../plots/_helpers/svg';
 
 function fillsOf(svg: SVGElement, selector: string): string[] {
@@ -101,15 +101,15 @@ describe('color channel - independent ramps', () => {
 	});
 
 	test('ScatterPlot: base plot and marker dots each use their own color ramps independently', async () => {
-		const highGdpCountries = COUNTRIES.filter((d) => d.gdpPerCapita > 50);
+		const highGdpCountries = COUNTRIES_AT_2007.filter((d) => d.gdp > 30_000);
 		const { container } = render(ScatterPlot, {
 			width: 600,
 			height: 400,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
 			r: 6,
-			color: 'region',
+			color: 'continent',
 			scales: {
 				color: {
 					scheme: {
@@ -124,10 +124,10 @@ describe('color channel - independent ramps', () => {
 				{
 					type: 'dot',
 					data: highGdpCountries,
-					x: 'gdpPerCapita',
-					y: 'lifeExpectancy',
+					x: 'gdp',
+					y: 'life',
 					r: 10,
-					color: 'lifeExpectancy',
+					color: 'life',
 					scales: { color: { scheme: ['#cffafe', '#0d9488'] } },
 					styles: { dotStroke: '#0f172a', dotStrokeWidth: 2 }
 				}

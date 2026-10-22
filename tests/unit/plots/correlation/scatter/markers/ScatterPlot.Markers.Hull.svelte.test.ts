@@ -2,7 +2,7 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES, AMERICAS } from '../../../../../../stories/plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 import { waitForSvg, countHullPaths } from '../../../_helpers/svg';
 
 describe('ScatterPlot - markers.hull', () => {
@@ -10,11 +10,11 @@ describe('ScatterPlot - markers.hull', () => {
 		const { container } = render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
 			markers: [
-				{ type: 'hull', data: AMERICAS, x: 'gdpPerCapita', y: 'lifeExpectancy' }
+				{ type: 'hull', data: COUNTRIES_AT_2007, x: 'gdp', y: 'life' }
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
@@ -25,12 +25,12 @@ describe('ScatterPlot - markers.hull', () => {
 		const { container } = render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
-			color: 'region',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
+			color: 'continent',
 			markers: [
-				{ type: 'hull', series: 'Americas', x: 'gdpPerCapita', y: 'lifeExpectancy' }
+				{ type: 'hull', series: 'Americas', x: 'gdp', y: 'life' }
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
@@ -41,25 +41,25 @@ describe('ScatterPlot - markers.hull', () => {
 		const { container } = render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
 			markers: [
-				{ type: 'hull', x: 'gdpPerCapita', y: 'lifeExpectancy', grouping: 'region' }
+				{ type: 'hull', x: 'gdp', y: 'life', grouping: 'continent' }
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
-		const regionCount = new Set(COUNTRIES.map((d) => d.region)).size;
-		expect(countHullPaths(svg)).toBe(regionCount);
+		const continentCount = new Set(COUNTRIES_AT_2007.map((d) => d.continent)).size;
+		expect(countHullPaths(svg)).toBe(continentCount);
 	});
 
 	test('does not crash with an empty markers array', async () => {
 		const { container } = render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
 			markers: []
 		});
 		const svg = await waitForSvg(container);

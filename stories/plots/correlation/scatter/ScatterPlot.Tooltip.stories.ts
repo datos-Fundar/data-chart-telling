@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import RichTooltip from './RichTooltip.svelte';
-import { COUNTRIES, AMERICAS, type CountryPoint } from './data';
+import { COUNTRIES_AT_2007, type CountryYearRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -12,9 +12,9 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: AMERICAS,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy'
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
@@ -43,8 +43,8 @@ export const BasicTooltip: Story = {
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { country, gdpPerCapita, lifeExpectancy } = row as CountryPoint;
-				return `${country}: $${gdpPerCapita.toFixed(1)}k, ${lifeExpectancy.toFixed(1)} yr`;
+				const { country, gdp, life } = row as CountryYearRow;
+				return `${country}: $${(gdp / 1000).toFixed(1)}k, ${life.toFixed(1)} yr`;
 			}
 		}
 	}
@@ -56,23 +56,23 @@ export const RichFormat: Story = {
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { country, gdpPerCapita, lifeExpectancy, population } = row as CountryPoint;
-				return `${country}\nGDP: $${gdpPerCapita.toFixed(1)}k · Life exp.: ${lifeExpectancy.toFixed(1)} yr\nPop.: ${population}M`;
+				const { country, gdp, life, population } = row as CountryYearRow;
+				return `${country}\nGDP: $${(gdp / 1000).toFixed(1)}k · Life exp.: ${life.toFixed(1)} yr\nPop.: ${population}M`;
 			}
 		}
 	}
 };
 
-/** Grouped data - `color` renders one point cloud per region; the tooltip follows whichever region's point is nearest the cursor. */
-export const GroupedByRegion: Story = {
+/** Grouped data - `color` renders one point cloud per continent; the tooltip follows whichever continent's point is nearest the cursor. */
+export const GroupedByContinent: Story = {
 	args: {
-		data: COUNTRIES,
-		color: 'region',
+		data: COUNTRIES_AT_2007,
+		color: 'continent',
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { country, region, lifeExpectancy } = row as CountryPoint;
-				return `${country} (${region}): ${lifeExpectancy.toFixed(1)} yr`;
+				const { country, continent, life } = row as CountryYearRow;
+				return `${country} (${continent}): ${life.toFixed(1)} yr`;
 			}
 		}
 	}
@@ -104,8 +104,8 @@ export const CustomAnchor: Story = {
 			anchorX: 'left',
 			anchorY: 'top',
 			format: (row) => {
-				const { country, gdpPerCapita, lifeExpectancy } = row as CountryPoint;
-				return `${country}: $${gdpPerCapita.toFixed(1)}k, ${lifeExpectancy.toFixed(1)} yr`;
+				const { country, gdp, life } = row as CountryYearRow;
+				return `${country}: $${(gdp / 1000).toFixed(1)}k, ${life.toFixed(1)} yr`;
 			}
 		}
 	}

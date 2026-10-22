@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
-	import { COUNTRIES } from '../../../plots/correlation/scatter/data';
+	import { COUNTRIES_AT_2007 } from '$datasets';
 </script>
 
 <!--
@@ -10,13 +10,13 @@
 <ScatterPlot
 	width={760}
 	height={400}
-	data={COUNTRIES}
-	x="gdpPerCapita"
-	y="lifeExpectancy"
-	symbol="region"
+	data={COUNTRIES_AT_2007}
+	x="gdp"
+	y="life"
+	symbol="continent"
 	r="population"
 	legend={{
 		r: { title: 'People', values: [10, 100, 300], format: (v: number) => `${v} M` },
-		symbol: { title: 'Region', columns: 2 }
+		symbol: { title: 'Continent', columns: 2 }
 	}}
 />

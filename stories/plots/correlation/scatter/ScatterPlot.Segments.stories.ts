@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
-import { COUNTRIES } from './data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -13,10 +13,10 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: COUNTRIES,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy',
-		color: 'region'
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life',
+		color: 'continent'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
@@ -36,14 +36,14 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * `default` targets every series - an area covering the high-GDP tail
- * (x ≥ 40) gets a distinct symbol and a stroke ring, regardless of region.
+ * (x ≥ 30,000) gets a distinct symbol and a stroke ring, regardless of continent.
  */
 export const AreaAcrossAllSeries: Story = {
 	args: {
 		segments: {
 			default: [
 				{
-					areas: [{ x: { from: 40 } }],
+					areas: [{ x: { from: 30_000 } }],
 					styles: { dotSymbol: 'triangle', dotStroke: '#111827', dotStrokeWidth: 1.5 }
 				}
 			]
@@ -52,9 +52,9 @@ export const AreaAcrossAllSeries: Story = {
 };
 
 /**
- * Per-series catch-alls set each region's baseline color explicitly instead
+ * Per-series catch-alls set each continent's baseline color explicitly instead
  * of relying on the default palette - useful when a color needs to carry
- * meaning across multiple charts (e.g. a fixed region palette).
+ * meaning across multiple charts (e.g. a fixed continent palette).
  */
 export const PerSeriesColor: Story = {
 	args: {
@@ -71,7 +71,7 @@ export const PerSeriesColor: Story = {
  * Two Y-constrained areas flag life-expectancy outliers directly: below 65
  * in red, above 82 in green - independent of each series' own color.
  *
- * `default` keeps this cross-cutting rule on every region at once, rather
+ * `default` keeps this cross-cutting rule on every continent at once, rather
  * than repeating it per series.
  */
 export const OutlierBands: Story = {
@@ -88,7 +88,7 @@ export const OutlierBands: Story = {
 /**
  * Catch-all as a muted baseline that an area-specific segment overrides -
  * every point starts semi-transparent; the high-income, long-life quadrant
- * (x ≥ 30 AND y ≥ 80) is highlighted at full opacity with a larger radius.
+ * (x ≥ 30,000 AND y ≥ 80) is highlighted at full opacity with a larger radius.
  * The area segment inherits `dotFill` from the catch-all automatically,
  * since it only overrides `dotFillOpacity`/`dotRadius`.
  */
@@ -98,7 +98,7 @@ export const CatchAllWithHighlight: Story = {
 			default: [
 				{ styles: { dotFill: '#6b7280', dotFillOpacity: 0.35 } },
 				{
-					areas: [{ x: { from: 30 }, y: { from: 80 } }],
+					areas: [{ x: { from: 30_000 }, y: { from: 80 } }],
 					styles: { dotFillOpacity: 1, dotRadius: 8 }
 				}
 			]

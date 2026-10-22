@@ -9,7 +9,7 @@ import {
 	WEATHER_STATIONS,
 	type WorldCountryProps
 } from '../../../plots/map/geo/data';
-import { COUNTRIES } from '../../../plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 import { countryPopulation, countryGdp } from '../../../plots/map/geo/channels';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -148,11 +148,11 @@ export const SegmentRamp: Story = {
 const scatterProps = {
 	width: 940,
 	height: 500,
-	data: COUNTRIES,
-	x: 'gdpPerCapita',
-	y: 'lifeExpectancy',
+	data: COUNTRIES_AT_2007,
+	x: 'gdp',
+	y: 'life',
 	r: 6,
-	color: 'region',
+	color: 'continent',
 	scales: {
 		color: {
 			scheme: {
@@ -166,11 +166,11 @@ const scatterProps = {
 	markers: [
 		{
 			type: 'dot',
-			data: COUNTRIES.filter((d) => d.gdpPerCapita > 50),
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007.filter((d) => d.gdp > 30_000),
+			x: 'gdp',
+			y: 'life',
 			r: 10,
-			color: 'lifeExpectancy',
+			color: 'life',
 			scales: { color: { scheme: 'reds' } },
 			styles: { dotStroke: '#0f172a', dotStrokeWidth: 2 }
 		}
@@ -178,7 +178,7 @@ const scatterProps = {
 };
 
 /**
- * `ScatterPlot`'s own `color`/`scales.color` colors points by region (a
+ * `ScatterPlot`'s own `color`/`scales.color` colors points by continent (a
  * discrete scheme); the `dot` marker's own `color`/`scales.color` colors a
  * highlighted subset of high-GDP countries by life expectancy (a continuous
  * red ramp) - same "marker sets its own ramp" mechanism as `IndependentRamp`,

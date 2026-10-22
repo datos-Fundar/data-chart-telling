@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES, HEIGHTS, type CountryRow, type HeightRow } from '$datasets';
+import { COUNTRIES_AT_2007, HEIGHTS, type CountryYearRow, type HeightRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A bin's reducer turns its rows into one value. `y` is that value for `binX`
@@ -12,10 +12,10 @@ import { COUNTRIES, HEIGHTS, type CountryRow, type HeightRow } from '$datasets';
 const meanOf = (rows: HeightRow[], field: 'height' | 'weight') =>
 	rows.reduce((sum, d) => sum + d[field], 0) / rows.length;
 
-const TOTAL_POPULATION = COUNTRIES.reduce((sum, d) => sum + d.population, 0);
+const TOTAL_POPULATION = COUNTRIES_AT_2007.reduce((sum, d) => sum + d.population, 0);
 
 /** The rows' share of the whole population, in percent. */
-const populationShare = (rows: CountryRow[]) =>
+const populationShare = (rows: CountryYearRow[]) =>
 	(rows.reduce((sum, d) => sum + d.population, 0) / TOTAL_POPULATION) * 100;
 
 const meta = {
@@ -74,7 +74,7 @@ export const Cumulative: Story = {
 		markers: [
 			{
 				type: 'rect',
-				data: COUNTRIES,
+				data: COUNTRIES_AT_2007,
 				x: 'life',
 				transforms: [{ type: 'binX', y: populationShare, thresholds: 12, cumulative: 1 }],
 				styles: { fill: '#0d9488', fillOpacity: 0.8 }

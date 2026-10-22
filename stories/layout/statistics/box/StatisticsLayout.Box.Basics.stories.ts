@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
-import { COUNTRIES } from '../../../plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `statistics: [{ type: 'box' }]` resolves straight to a `box` marker
@@ -10,7 +10,7 @@ import { COUNTRIES } from '../../../plots/correlation/scatter/data';
 // falls back to the source series' own color, then to the theme's first
 // palette color.
 
-const REGION_DOMAIN = ['Americas', 'Europe', 'Asia', 'Africa'];
+const CONTINENT_DOMAIN = ['Americas', 'Europe', 'Asia', 'Africa'];
 
 const meta = {
 	title: 'Layout/Statistics/Box/Basics',
@@ -19,11 +19,11 @@ const meta = {
 	args: {
 		width: 940,
 		height: 460,
-		data: COUNTRIES,
-		x: 'region',
-		y: 'gdpPerCapita',
+		data: COUNTRIES_AT_2007,
+		x: 'continent',
+		y: 'gdp',
 		r: 3,
-		scales: { x: { type: 'band', domain: REGION_DOMAIN }, y: { domain: [0, 110] } }
+		scales: { x: { type: 'band', domain: CONTINENT_DOMAIN }, y: { domain: [0, 50_000] } }
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -39,7 +39,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** GDP per capita distribution by region, drawn over the countries' own dots. */
+/** GDP per capita distribution by continent, drawn over the countries' own dots. */
 export const Default: Story = {
 	args: {
 		statistics: [{ type: 'box' }]
@@ -62,7 +62,7 @@ export const CustomStyle: Story = {
 /** `tickMinMax: false` hides the whisker caps; `dot: { fill: true }` colors the outliers with their box's own fill. */
 export const HiddenWhiskers: Story = {
 	args: {
-		color: 'region',
+		color: 'continent',
 		statistics: [{ type: 'box', tickMinMax: false, dot: { fill: true } }]
 	}
 };

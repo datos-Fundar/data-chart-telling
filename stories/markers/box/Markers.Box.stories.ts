@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES } from '../../plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `box` marker (svelteplot's own `BoxX`/`BoxY`) - quartiles/median/outliers
@@ -29,7 +29,7 @@ import { COUNTRIES } from '../../plots/correlation/scatter/data';
 // as `Markers/Bar` (an empty host avoids drawing an unrelated default series
 // through the marker's own, separately-grouped rows).
 
-const REGION_DOMAIN = ['Americas', 'Europe', 'Asia', 'Africa'];
+const CONTINENT_DOMAIN = ['Americas', 'Europe', 'Asia', 'Africa'];
 
 const meta = {
 	title: 'Markers/Box',
@@ -39,9 +39,9 @@ const meta = {
 		width: 940,
 		height: 460,
 		data: [],
-		x: 'region',
-		y: 'gdpPerCapita',
-		scales: { x: { domain: REGION_DOMAIN }, y: { domain: [0, 110] } }
+		x: 'continent',
+		y: 'gdp',
+		scales: { x: { domain: CONTINENT_DOMAIN }, y: { domain: [0, 50_000] } }
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -57,15 +57,15 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Default orientation (`BoxY`) - GDP per capita distribution by region. No `bar`/tick options at all: the fill falls back to this package's own default (`cfg.palette[0]`), and both ticks show at their own default styling (median contrasting, min/max matching the fill). */
+/** Default orientation (`BoxY`) - GDP per capita distribution by continent. No `bar`/tick options at all: the fill falls back to this package's own default (`cfg.palette[0]`), and both ticks show at their own default styling (median contrasting, min/max matching the fill). */
 export const Basic: Story = {
 	args: {
 		markers: [
 			{
 				type: 'box',
-				data: COUNTRIES,
-				x: 'region',
-				y: 'gdpPerCapita'
+				data: COUNTRIES_AT_2007,
+				x: 'continent',
+				y: 'gdp'
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
@@ -74,15 +74,15 @@ export const Basic: Story = {
 /** A quantitative `x` with a categorical `y` picks `BoxX` - the same data, laid out horizontally instead. */
 export const Horizontal: Story = {
 	args: {
-		x: 'gdpPerCapita',
-		y: 'region',
-		scales: { x: { domain: [0, 110] }, y: { type: 'band', domain: REGION_DOMAIN } },
+		x: 'gdp',
+		y: 'continent',
+		scales: { x: { domain: [0, 50_000] }, y: { type: 'band', domain: CONTINENT_DOMAIN } },
 		markers: [
 			{
 				type: 'box',
-				data: COUNTRIES,
-				x: 'gdpPerCapita',
-				y: 'region'
+				data: COUNTRIES_AT_2007,
+				x: 'gdp',
+				y: 'continent'
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
@@ -94,9 +94,9 @@ export const WithMinMaxTicks: Story = {
 		markers: [
 			{
 				type: 'box',
-				data: COUNTRIES,
-				x: 'region',
-				y: 'gdpPerCapita',
+				data: COUNTRIES_AT_2007,
+				x: 'continent',
+				y: 'gdp',
 				tickMinMax: { strokeWidth: 3 },
 				bar: { fill: '#7c3aed' }
 			}
@@ -110,9 +110,9 @@ export const WithMedianAndMinMaxTicks: Story = {
 		markers: [
 			{
 				type: 'box',
-				data: COUNTRIES,
-				x: 'region',
-				y: 'gdpPerCapita',
+				data: COUNTRIES_AT_2007,
+				x: 'continent',
+				y: 'gdp',
 				tickMedian: { strokeWidth: 3 },
 				tickMinMax: true,
 				bar: { fill: '#7c3aed' }
@@ -136,9 +136,9 @@ export const CustomWidth: Story = {
 		markers: [
 			{
 				type: 'box',
-				data: COUNTRIES,
-				x: 'region',
-				y: 'gdpPerCapita',
+				data: COUNTRIES_AT_2007,
+				x: 'continent',
+				y: 'gdp',
 				bar: { fill: '#7c3aed', insetLeft: 40, insetRight: 40 },
 				tickMedian: { strokeWidth: 3 }
 			}
@@ -156,9 +156,9 @@ export const OpacityCascade: Story = {
 		markers: [
 			{
 				type: 'box',
-				data: COUNTRIES,
-				x: 'region',
-				y: 'gdpPerCapita',
+				data: COUNTRIES_AT_2007,
+				x: 'continent',
+				y: 'gdp',
 				bar: { fill: '#7c3aed', fillOpacity: 0.3 },
 				tickMinMax: { strokeOpacity: 1 }
 			}
@@ -179,9 +179,9 @@ export const OutlierDotStyle: Story = {
 		markers: [
 			{
 				type: 'box',
-				data: COUNTRIES,
-				x: 'region',
-				y: 'gdpPerCapita',
+				data: COUNTRIES_AT_2007,
+				x: 'continent',
+				y: 'gdp',
 				dot: { fill: '#f97316', fillOpacity: 1 },
 				bar: { fill: '#7c3aed', fillOpacity: 0.3 }
 			}
@@ -203,9 +203,9 @@ export const HollowOutlierDots: Story = {
 		markers: [
 			{
 				type: 'box',
-				data: COUNTRIES,
-				x: 'region',
-				y: 'gdpPerCapita',
+				data: COUNTRIES_AT_2007,
+				x: 'continent',
+				y: 'gdp',
 				dot: { fill: null, stroke: '#7c3aed', strokeWidth: 2 },
 				bar: { fill: '#7c3aed', fillOpacity: 0.3 }
 			}
@@ -227,13 +227,13 @@ export const HollowOutlierDots: Story = {
  */
 export const CustomSort: Story = {
 	args: {
-		scales: { x: { domain: ['Europe', 'Americas', 'Asia', 'Africa'] }, y: { domain: [0, 110] } },
+		scales: { x: { domain: ['Europe', 'Americas', 'Asia', 'Africa'] }, y: { domain: [0, 50_000] } },
 		markers: [
 			{
 				type: 'box',
-				data: COUNTRIES,
-				x: 'region',
-				y: 'gdpPerCapita',
+				data: COUNTRIES_AT_2007,
+				x: 'continent',
+				y: 'gdp',
 				sort: '-median',
 				bar: { fill: '#7c3aed' }
 			}

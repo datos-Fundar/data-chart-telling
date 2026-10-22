@@ -8,8 +8,13 @@ import FacetSyncBarUnrelatedOrderDemo, {
 } from './FacetSyncBarUnrelatedOrderDemo.svelte';
 import { renderSource } from '../../common/docsSource';
 import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
-import { REGION_BARS, REGION_SECTOR_BARS, type RegionSector } from '../../data/region-bars';
-import { AGE_GROUPS, PENGUIN_COUNTS_BY_SEX } from '$datasets';
+import {
+	AGE_GROUPS,
+	AGE_SHARES,
+	PENGUIN_COUNTS_BY_SEX,
+	POPULATION_BY_BROAD_AGE,
+	type AgeRow
+} from '$datasets';
 
 /** `tooltip.sync: true` broadcasts the hover to every faceted panel with a match. */
 const meta = {
@@ -84,19 +89,19 @@ export const FacetSyncLine: StoryObj = {
 	}
 };
 
-/** Faceted bar chart - `x` strategy highlights the same region across years. */
+/** Faceted bar chart - `x` strategy highlights the same age group across years. */
 export const FacetSyncBar: StoryObj = {
 	render: () => ({ Component: TooltipSyncDemo, props: { kind: 'bar' } }),
 	parameters: {
 		docs: {
 			source: {
 				code: renderSource('BarPlot', {
-					title: 'Value by region and year',
+					title: 'Population share by age group and year',
 					subtitle: 'Strategy: x · Sync: on',
-					data: REGION_BARS,
-					x: 'region',
-					y: 'value',
-					facet: { by: 'year', columns: 3 },
+					data: AGE_SHARES,
+					x: 'ageGroup',
+					y: 'share',
+					facet: { by: 'year', columns: 2 },
 					tooltip: { strategy: 'x', sync: true },
 					markers: [{ type: 'hover' }]
 				})
@@ -106,7 +111,7 @@ export const FacetSyncBar: StoryObj = {
 };
 
 /**
- * Faceted by the bar's own category - `'series'` syncs by sector instead of
+ * Faceted by census - `'series'` syncs by sex instead of
  * x/y. Toggle layout (stacked/grouped) and orientation to try every combo.
  */
 export const FacetSyncBarBySeries: StoryObj = {
@@ -115,18 +120,18 @@ export const FacetSyncBarBySeries: StoryObj = {
 		docs: {
 			source: {
 				code: renderSource('BarPlot', {
-					title: 'Value by sector, faceted by region',
+					title: 'Population share by sex, faceted by census',
 					subtitle: 'Strategy: series · Sync: on',
-					data: REGION_SECTOR_BARS,
-					x: 'region',
-					y: 'value',
-					color: 'sector',
+					data: POPULATION_BY_BROAD_AGE.filter((d) => d.year === 1991 || d.year === 2022),
+					x: 'ageGroup',
+					y: 'share',
+					color: 'sex',
 					transforms: [{ type: 'stackY' as const }],
-					facet: { by: 'region', columns: 2 },
+					facet: { by: 'year', columns: 2 },
 					tooltip: {
 						strategy: 'series',
 						sync: true,
-						format: (row: RegionSector) => `${row.sector}: ${row.value}`
+						format: (row: AgeRow) => `${row.sex}: ${row.share}%`
 					},
 					markers: [{ type: 'hover' }]
 				})
@@ -178,7 +183,7 @@ export const FacetSyncBarUnrelatedOrder: StoryObj = {
 					scales: {
 						y: { sort: (a: GroupValue, b: GroupValue) => a.value - b.value }
 					},
-					facet: { by: 'group', columns: 2 },
+					facet: { by: 'group', columns: 2, scales: 'free-y' },
 					tooltip: {
 						strategy: 'y',
 						sync: true,

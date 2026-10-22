@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES } from '../../plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `raster` marker (svelteplot's own `Raster`) - a field painted over a
@@ -18,9 +18,9 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: COUNTRIES,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy'
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -42,8 +42,8 @@ export const InterpolatedPoints: Story = {
 		markers: [
 			{
 				type: 'raster',
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
+				x: 'gdp',
+				y: 'life',
 				fill: 'population',
 				interpolate: 'nearest',
 				fillOpacity: 0.7
@@ -58,8 +58,8 @@ export const BlurredPoints: Story = {
 		markers: [
 			{
 				type: 'raster',
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
+				x: 'gdp',
+				y: 'life',
 				fill: 'population',
 				interpolate: 'nearest',
 				pixelSize: 4,

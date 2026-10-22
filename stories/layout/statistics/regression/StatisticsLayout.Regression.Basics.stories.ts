@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
-import { COUNTRIES } from '../../../plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `statistics: [{ type: 'regression' }]` fits svelteplot's own `RegressionX`/
@@ -17,9 +17,9 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: COUNTRIES,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy',
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life',
 		r: 6
 	},
 	argTypes: {

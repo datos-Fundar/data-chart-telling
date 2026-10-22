@@ -3,7 +3,7 @@
 	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 	import { TIME_SERIES } from '../../../data/time-series';
-	import { REGION_BARS } from '../../../data/region-bars';
+	import { AGE_SHARES } from '$datasets';
 </script>
 
 <PlotComposer
@@ -21,8 +21,8 @@
 	/>
 	<BarPlot
 		inset={{ left: 0.62, bottom: 0.5, right: 0.98, top: 0.98 }}
-		data={REGION_BARS.filter((d) => d.year === 2022)}
-		x="region"
-		y="value"
+		data={AGE_SHARES.filter((d) => d.year === 2022)}
+		x="ageGroup"
+		y="share"
 	/>
 </PlotComposer>

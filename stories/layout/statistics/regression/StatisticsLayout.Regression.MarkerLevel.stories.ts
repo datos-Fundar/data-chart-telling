@@ -1,14 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES } from '../../../plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A marker's own `.statistics` fits against that marker's own `data`,
 // independent of the plot's top-level `statistics` (unset here). Useful to
 // annotate one hand-picked subset without touching `color`/`grouping` at all.
-
-const AMERICAS = COUNTRIES.filter((d) => d.region === 'Americas');
 
 const meta = {
 	title: 'Layout/Statistics/Regression/Marker Level',
@@ -17,9 +15,9 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: COUNTRIES,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy',
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life',
 		r: 6
 	},
 	argTypes: {
@@ -42,9 +40,9 @@ export const MarkerLevel: Story = {
 		markers: [
 			{
 				type: 'dot',
-				data: AMERICAS,
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
+				data: COUNTRIES_AT_2007.filter((d) => d.continent === 'Americas'),
+				x: 'gdp',
+				y: 'life',
 				r: 8,
 				styles: { dotFill: '#7c3aed', dotStroke: '#7c3aed' },
 				statistics: [{ type: 'regression', confidence: false, styles: { stroke: '#7c3aed' } }]

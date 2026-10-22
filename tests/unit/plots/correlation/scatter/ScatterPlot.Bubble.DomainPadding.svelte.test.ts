@@ -1,8 +1,9 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
-import { AMERICAS } from '../../../../../stories/plots/correlation/scatter/data';
 import { waitForSvg } from '../../_helpers/svg';
+
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // Regression coverage: `r` as a channel (field key/accessor) is bound to
 // svelteplot's own auto sqrt scale - its raw values (e.g. a population in
@@ -15,9 +16,9 @@ describe('ScatterPlot - bubble domain padding', () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: AMERICAS,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
 			r: 'population' // population ranges 19-333 - raw values far larger than any sane pixel radius
 		});
 		const svg = await waitForSvg(container);

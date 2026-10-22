@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES } from '../../plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `delaunayLink` (one line per triangulation edge) and `delaunayMesh` (the
@@ -17,9 +17,9 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: COUNTRIES,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy'
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -41,8 +41,8 @@ export const Link: Story = {
 		markers: [
 			{
 				type: 'delaunayLink',
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
+				x: 'gdp',
+				y: 'life',
 				styles: { strokeOpacity: 0.4 }
 			}
 		] satisfies AxisBasedMarkersConfig[]
@@ -55,23 +55,23 @@ export const Mesh: Story = {
 		markers: [
 			{
 				type: 'delaunayMesh',
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
+				x: 'gdp',
+				y: 'life',
 				styles: { strokeOpacity: 0.4 }
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
-/** The plot's `color: 'region'` triangulates each region separately, and the mesh inherits that grouping and tints each one with its region's palette color. */
-export const GroupedByRegion: Story = {
+/** The plot's `color: 'continent'` triangulates each continent separately, and the mesh inherits that grouping and tints each one with its continent's palette color. */
+export const GroupedByContinent: Story = {
 	args: {
-		color: 'region',
+		color: 'continent',
 		markers: [
 			{
 				type: 'delaunayMesh',
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy'
+				x: 'gdp',
+				y: 'life'
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

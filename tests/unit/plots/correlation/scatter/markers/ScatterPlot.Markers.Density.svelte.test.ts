@@ -2,7 +2,7 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES } from '../../../../../../stories/plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 import { waitForSvg, countDensityPaths } from '../../../_helpers/svg';
 
 describe('ScatterPlot - markers.density', () => {
@@ -10,12 +10,10 @@ describe('ScatterPlot - markers.density', () => {
 		const { container } = render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
-			markers: [
-				{ type: 'density', x: 'gdpPerCapita', y: 'lifeExpectancy' }
-			] satisfies AxisBasedMarkersConfig[]
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
+			markers: [{ type: 'density', x: 'gdp', y: 'life' }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
 		expect(countDensityPaths(svg)).toBeGreaterThan(0);
@@ -26,11 +24,11 @@ describe('ScatterPlot - markers.density', () => {
 			await render(ScatterPlot, {
 				width: 400,
 				height: 300,
-				data: COUNTRIES,
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
+				data: COUNTRIES_AT_2007,
+				x: 'gdp',
+				y: 'life',
 				markers: [
-					{ type: 'density', x: 'gdpPerCapita', y: 'lifeExpectancy', thresholds: 4 }
+					{ type: 'density', x: 'gdp', y: 'life', thresholds: 4 }
 				] satisfies AxisBasedMarkersConfig[]
 			})
 		).container;
@@ -38,15 +36,15 @@ describe('ScatterPlot - markers.density', () => {
 			await render(ScatterPlot, {
 				width: 400,
 				height: 300,
-				data: COUNTRIES,
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
+				data: COUNTRIES_AT_2007,
+				x: 'gdp',
+				y: 'life',
 				markers: [
 					{
 						type: 'density',
-						x: 'gdpPerCapita',
-						y: 'lifeExpectancy',
-						grouping: 'region',
+						x: 'gdp',
+						y: 'life',
+						grouping: 'continent',
 						thresholds: 4
 					}
 				] satisfies AxisBasedMarkersConfig[]
@@ -61,9 +59,9 @@ describe('ScatterPlot - markers.density', () => {
 		const { container } = render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
 			markers: []
 		});
 		const svg = await waitForSvg(container);

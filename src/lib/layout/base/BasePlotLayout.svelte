@@ -143,7 +143,9 @@
 	// What this plot draws, on its figure's legend - its series, their colors and marks.
 	const legend = LegendState.current();
 	const legendSource = Symbol('plot');
+	const silenced = LegendState.isSilenced();
 	$effect(() => {
+		if (silenced) return;
 		const entries = LegendState.entriesOf(state as never);
 		untrack(() => legend?.register(legendSource, entries));
 	});

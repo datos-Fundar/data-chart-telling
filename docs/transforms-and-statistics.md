@@ -82,14 +82,14 @@ Bar stacking is always `stackY`, also for horizontal bars. A transform on a `His
 ```svelte
 <script lang="ts">
 	import { ScatterPlot } from '@fundar/data-chart-telling';
-	import { COUNTRIES } from './datasets';
+	import { COUNTRIES_AT_2007 } from './datasets';
 </script>
 
 <!-- A linear regression with its 95% confidence band. -->
 <ScatterPlot
 	width={720}
 	height={400}
-	data={COUNTRIES}
+	data={COUNTRIES_AT_2007}
 	x="gdp"
 	y="life"
 	statistics={[{ type: 'regression', regressionType: 'linear', confidence: 0.95 }]}

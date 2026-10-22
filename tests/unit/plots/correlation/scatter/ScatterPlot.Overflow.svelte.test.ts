@@ -2,8 +2,9 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { AMERICAS } from '../../../../../stories/plots/correlation/scatter/data';
 import { waitForSvg } from '../../_helpers/svg';
+
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // Regression coverage for two related plot-frame overflow bugs: a
 // large-radius dot at the domain edge (fixed via the scatter scales fit)
@@ -18,15 +19,15 @@ describe('ScatterPlot - frame overflow', () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: AMERICAS,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
 			r: 30
 		});
 		const svg = await waitForSvg(container);
 		const svgBox = svg.getBoundingClientRect();
 		const dots = svg.querySelectorAll('g.dot path');
-		expect(dots.length).toBe(AMERICAS.length);
+		expect(dots.length).toBe(COUNTRIES_AT_2007.length);
 		for (const dot of dots) {
 			const box = (dot as SVGGraphicsElement).getBoundingClientRect();
 			expect(box.left).toBeGreaterThanOrEqual(svgBox.left - 1);
@@ -40,15 +41,15 @@ describe('ScatterPlot - frame overflow', () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: AMERICAS,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
 			styles: { values: { show: true } } satisfies AxisBasedStylesConfig
 		});
 		const svg = await waitForSvg(container);
 		const svgBox = svg.getBoundingClientRect();
 		const labels = svg.querySelectorAll('g.text text');
-		expect(labels.length).toBe(AMERICAS.length);
+		expect(labels.length).toBe(COUNTRIES_AT_2007.length);
 		for (const label of labels) {
 			const box = (label as SVGGraphicsElement).getBoundingClientRect();
 			expect(box.left).toBeGreaterThanOrEqual(svgBox.left - 1);
@@ -66,9 +67,9 @@ describe('ScatterPlot - frame overflow', () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: AMERICAS,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
 			styles: {
 				values: { show: true, format: () => 'MMMMMMMMMM' }
 			} satisfies AxisBasedStylesConfig
@@ -77,7 +78,7 @@ describe('ScatterPlot - frame overflow', () => {
 		await new Promise((r) => setTimeout(r, 800));
 		const svgBox = svg.getBoundingClientRect();
 		const labels = svg.querySelectorAll('g.text text');
-		expect(labels.length).toBe(AMERICAS.length);
+		expect(labels.length).toBe(COUNTRIES_AT_2007.length);
 		for (const label of labels) {
 			const box = (label as SVGGraphicsElement).getBoundingClientRect();
 			expect(box.left).toBeGreaterThanOrEqual(svgBox.left - 1);
@@ -100,7 +101,7 @@ describe('ScatterPlot - frame overflow', () => {
 		// live values), which could reposition a label enough to change its own
 		// measured overflow, growing the margin again - an effect that reads
 		// and writes the same state every cycle, tripping Svelte's
-		// `effect_update_depth_exceeded` guard. `AMERICAS`' edge points are
+		// `effect_update_depth_exceeded` guard. `COUNTRIES_AT_2007`' edge points are
 		// exactly what exercises this: without `PlotMargins.remountKey`, the loop (when
 		// present) fires within the first render, well inside the polling window
 		// below.
@@ -112,9 +113,9 @@ describe('ScatterPlot - frame overflow', () => {
 			await render(ScatterPlot, {
 				width: 400,
 				height: 300,
-				data: AMERICAS,
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
+				data: COUNTRIES_AT_2007,
+				x: 'gdp',
+				y: 'life',
 				styles: { values: { show: true } } satisfies AxisBasedStylesConfig
 			});
 			await new Promise((r) => setTimeout(r, 800));

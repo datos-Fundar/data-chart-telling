@@ -1,16 +1,17 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
-import { AMERICAS } from '../../../../stories/plots/correlation/scatter/data';
 import { waitForSvg } from '../../plots/_helpers/svg';
+
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 async function maxDotWidth(range: [number, number]): Promise<number> {
 	const { container } = render(ScatterPlot, {
 		width: 400,
 		height: 300,
-		data: AMERICAS,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy',
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life',
 		r: 'population',
 		scales: { r: { range } }
 	});

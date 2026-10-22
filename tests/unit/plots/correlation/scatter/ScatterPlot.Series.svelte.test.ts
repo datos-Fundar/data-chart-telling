@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
-import { AMERICAS, COUNTRIES } from '../../../../../stories/plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 import { waitForSvg, countDotMarks } from '../../_helpers/svg';
 
 describe('ScatterPlot - series', () => {
@@ -9,45 +9,45 @@ describe('ScatterPlot - series', () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: AMERICAS,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy'
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life'
 		});
 		const svg = await waitForSvg(container);
-		expect(countDotMarks(svg)).toBe(AMERICAS.length);
+		expect(countDotMarks(svg)).toBe(COUNTRIES_AT_2007.length);
 	});
 
 	test('renders one dot per row across every group when color is given', async () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
-			color: 'region'
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
+			color: 'continent'
 		});
 		const svg = await waitForSvg(container);
-		expect(countDotMarks(svg)).toBe(COUNTRIES.length);
+		expect(countDotMarks(svg)).toBe(COUNTRIES_AT_2007.length);
 	});
 
 	test('renders the same dot count from a pre-built series array', async () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			series: [{ name: 'Americas', x: 'gdpPerCapita', y: 'lifeExpectancy', data: AMERICAS }]
+			series: [{ name: 'Countries', x: 'gdp', y: 'life', data: COUNTRIES_AT_2007 }]
 		});
 		const svg = await waitForSvg(container);
-		expect(countDotMarks(svg)).toBe(AMERICAS.length);
+		expect(countDotMarks(svg)).toBe(COUNTRIES_AT_2007.length);
 	});
 
-	test('two regions render distinct fill colors by default', async () => {
+	test('two continents render distinct fill colors by default', async () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
-			color: 'region'
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
+			color: 'continent'
 		});
 		const svg = await waitForSvg(container);
 		const fills = new Set(

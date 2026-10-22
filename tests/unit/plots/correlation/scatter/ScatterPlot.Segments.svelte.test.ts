@@ -3,7 +3,7 @@ import { describe, test, expect, vi } from 'vitest';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
-import { AMERICAS, COUNTRIES } from '../../../../../stories/plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 import { waitForSvg, countDotMarks } from '../../_helpers/svg';
 
 describe('ScatterPlot - segments', () => {
@@ -11,32 +11,32 @@ describe('ScatterPlot - segments', () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: AMERICAS,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
 			segments: {
-				default: [{ areas: [{ x: { from: 40 } }], styles: { dotFill: '#dc2626' } }]
+				default: [{ areas: [{ x: { from: 30_000 } }], styles: { dotFill: '#dc2626' } }]
 			} satisfies SegmentsConfig<ScatterSegmentStyle>
 		});
 		const svg = await waitForSvg(container);
 		// Two style groups (matched vs unmatched) render as two 'dot' markers.
-		expect(countDotMarks(svg)).toBe(AMERICAS.length);
+		expect(countDotMarks(svg)).toBe(COUNTRIES_AT_2007.length);
 		const paths = [...svg.querySelectorAll('g.dot path')];
 		const redOnes = paths.filter((p) =>
 			p.getAttribute('style')?.includes('fill: rgb(220, 38, 38)')
 		);
 		expect(redOnes.length).toBeGreaterThan(0);
-		expect(redOnes.length).toBeLessThan(AMERICAS.length);
+		expect(redOnes.length).toBeLessThan(COUNTRIES_AT_2007.length);
 	});
 
 	test('does not render an extra dot count when segments split a series into groups', async () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
-			color: 'region',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
+			color: 'continent',
 			segments: {
 				default: [
 					{ areas: [{ y: { to: 65 } }], styles: { dotFill: '#dc2626' } },
@@ -45,20 +45,20 @@ describe('ScatterPlot - segments', () => {
 			} satisfies SegmentsConfig<ScatterSegmentStyle>
 		});
 		const svg = await waitForSvg(container);
-		expect(countDotMarks(svg)).toBe(COUNTRIES.length);
+		expect(countDotMarks(svg)).toBe(COUNTRIES_AT_2007.length);
 	});
 
 	test('an area segment inherits dotFill from the series catch-all', async () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: AMERICAS,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
 			segments: {
 				default: [
 					{ styles: { dotFill: '#0891b2' } },
-					{ areas: [{ x: { from: 40 } }], styles: { dotRadius: 10 } }
+					{ areas: [{ x: { from: 30_000 } }], styles: { dotRadius: 10 } }
 				]
 			} satisfies SegmentsConfig<ScatterSegmentStyle>
 		});
@@ -73,9 +73,9 @@ describe('ScatterPlot - segments', () => {
 		await render(ScatterPlot, {
 			width: 400,
 			height: 300,
-			data: AMERICAS,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
 			segments: {
 				default: [{ styles: {} }, { styles: {} }]
 			} satisfies SegmentsConfig<ScatterSegmentStyle>

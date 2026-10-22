@@ -2,10 +2,10 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES } from '../../../../../../stories/plots/correlation/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 import { waitForSvg, countBrushSelections } from '../../../_helpers/svg';
 
-const base = { width: 400, height: 300, data: COUNTRIES, x: 'gdpPerCapita', y: 'lifeExpectancy' };
+const base = { width: 400, height: 300, data: COUNTRIES_AT_2007, x: 'gdp', y: 'life' };
 
 describe('ScatterPlot - markers.brush', () => {
 	test('with no initial selection it draws nothing until the user drags', async () => {

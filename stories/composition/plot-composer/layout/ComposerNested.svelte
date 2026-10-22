@@ -3,7 +3,7 @@
 	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 	import { TIME_SERIES } from '../../../data/time-series';
-	import { REGION_BARS } from '../../../data/region-bars';
+	import { AGE_SHARES } from '$datasets';
 
 	const north = TIME_SERIES.filter((d) => d.region === 'North');
 </script>
@@ -18,13 +18,14 @@
 	layout={{ columns: 1, heights: [1, 1] }}
 >
 	<LinePlot data={north} x="year" y="value" color="metric" />
-	<PlotComposer tags="i" layout={{ columns: 2 }}>
-		{#each [2018, 2022] as year (year)}
+	<PlotComposer layout={{ columns: 2 }}>
+		{#each [1991, 2022] as year (year)}
 			<BarPlot
 				subtitle={String(year)}
-				data={REGION_BARS.filter((d) => d.year === year)}
-				x="region"
-				y="value"
+				data={AGE_SHARES.filter((d) => d.year === year)}
+				x="ageGroup"
+				y="share"
+				legend={false}
 			/>
 		{/each}
 	</PlotComposer>
