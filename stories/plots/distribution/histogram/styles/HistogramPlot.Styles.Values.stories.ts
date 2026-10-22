@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HistogramPlot from '$lib/plots/distribution/histogram/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { MEASUREMENTS } from '../../../../data/measurements';
+import { HEIGHTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `styles.values` labels every non-empty bin with its count. `anchor` places
@@ -14,8 +14,8 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
-		data: MEASUREMENTS,
-		x: 'value'
+		data: HEIGHTS,
+		x: 'height'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 300, max: 940, step: 50 } },

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HistogramPlot from '$lib/plots/distribution/histogram/Plot.svelte';
-import { MEASUREMENTS } from '../../../data/measurements';
+import { HEIGHTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The domains of a histogram come from what its bins draw: `x` covers every bin
@@ -14,8 +14,8 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
-		data: MEASUREMENTS,
-		x: 'value',
+		data: HEIGHTS,
+		x: 'height',
 		grouping: 'group',
 		transforms: [{ type: 'binX', thresholds: 10 }]
 	},
@@ -44,10 +44,10 @@ type Story = StoryObj<typeof meta>;
 /** Both domains derived: `x` covers the bins' edges, `y` runs from zero to the tallest bin. */
 export const Derived: Story = {};
 
-/** A pinned `x` domain: the bins outside 20 to 50 are clipped rather than widening the axis. */
+/** A pinned `x` domain: the bins outside 145 to 175 are clipped rather than widening the axis. */
 export const PinnedX: Story = {
 	args: {
-		scales: { x: { domain: [20, 50], label: 'Length (mm)' } }
+		scales: { x: { domain: [145, 175], label: 'Height (cm)' } }
 	}
 };
 

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { BUENOS_AIRES_TEMPERATURE } from '../../data/daily-temperature';
-import { MEASUREMENTS } from '../../data/measurements';
+import { HEIGHTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `shiftX` transform moves every row's `x` by a fixed amount: a number, or a
@@ -93,22 +93,22 @@ export const WidenToInterval: Story = {
 	}
 };
 
-/** A numeric `shiftY` offsets one copy of a curve: group B's density lifted by 0.05, so the two shapes stack into a small ridgeline. */
+/** A numeric `shiftY` offsets one copy of a curve: the male density lifted by 0.05, so the two shapes stack into a small ridgeline. */
 export const Ridgeline: Story = {
 	args: {
 		scales: { y: { label: 'Density' } },
 		markers: [
 			{
 				type: 'line',
-				data: MEASUREMENTS.filter((d) => d.group === 'A'),
-				x: 'value',
+				data: HEIGHTS.filter((d) => d.group === 'female'),
+				x: 'height',
 				transforms: [{ type: 'densityX' }],
 				styles: { stroke: '#0d9488', strokeWidth: 2 }
 			},
 			{
 				type: 'line',
-				data: MEASUREMENTS.filter((d) => d.group === 'B'),
-				x: 'value',
+				data: HEIGHTS.filter((d) => d.group === 'male'),
+				x: 'height',
 				transforms: [{ type: 'densityX' }, { type: 'shiftY', by: 0.05 }],
 				styles: { stroke: '#ea580c', strokeWidth: 2 }
 			}

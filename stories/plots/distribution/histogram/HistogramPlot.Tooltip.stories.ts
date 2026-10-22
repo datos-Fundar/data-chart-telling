@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HistogramPlot from '$lib/plots/distribution/histogram/Plot.svelte';
-import { MEASUREMENTS } from '../../../data/measurements';
+import { HEIGHTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Hovering a bar shows the bin it covers: its edges, its count, and its group
@@ -14,8 +14,8 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
-		data: MEASUREMENTS,
-		x: 'value',
+		data: HEIGHTS,
+		x: 'height',
 		transforms: [{ type: 'binX', thresholds: 12 }]
 	},
 	argTypes: {

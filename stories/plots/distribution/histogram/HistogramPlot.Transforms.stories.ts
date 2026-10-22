@@ -1,12 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HistogramPlot from '$lib/plots/distribution/histogram/Plot.svelte';
-import { MEASUREMENTS, type Measurement } from '../../../data/measurements';
+import { COUNTRIES, HEIGHTS, type CountryRow, type HeightRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Every histogram runs a default `binX` that counts its rows. A `binX` in
 // `transforms` is merged over that default: the props it sets win, and the rest
 // of the default still applies. So a plot can change the bins without restating
 // the count. Any other transform in `transforms` runs after the bin.
+
+const TOTAL_POPULATION = COUNTRIES.reduce((sum, d) => sum + d.population, 0);
+
+/** The rows' share of the whole population, in percent. */
+const populationShare = (rows: CountryRow[]) =>
+	(rows.reduce((sum, d) => sum + d.population, 0) / TOTAL_POPULATION) * 100;
 
 const meta = {
 	title: 'Plots/Distribution/HistogramPlot/Transforms',
@@ -15,8 +21,8 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
-		data: MEASUREMENTS,
-		x: 'value'
+		data: HEIGHTS,
+		x: 'height'
 	},
 	argTypes: {
 		width: {
@@ -47,11 +53,11 @@ export const DefaultBin: Story = {};
 /** A `binX` with only `thresholds`: the bins change, and the default `count` stays. */
 export const ThresholdsOnly: Story = {
 	args: {
-		transforms: [{ type: 'binX', thresholds: [20, 30, 35, 38, 42, 45, 50] }]
+		transforms: [{ type: 'binX', thresholds: [135, 145, 150, 155, 160, 165, 175, 180] }]
 	}
 };
 
-/** `interval` fixes each bin's width instead of its count: here one unit of `value` per bin, so the bins line up on whole numbers. */
+/** `interval` fixes each bin's width instead of its count: here one centimeter of `height` per bin, so the bins line up on whole numbers. */
 export const Interval: Story = {
 	args: {
 		transforms: [{ type: 'binX', interval: 1 }]
@@ -65,18 +71,23 @@ export const MeanWeight: Story = {
 			{
 				type: 'binX',
 				thresholds: 12,
-				y: (rows: Measurement[]) => rows.reduce((s, d) => s + d.weight, 0) / rows.length
+				y: (rows: HeightRow[]) => rows.reduce((s, d) => s + d.weight, 0) / rows.length
 			}
 		],
 		scales: { y: { label: 'Mean weight' } }
 	}
 };
 
-/** `cumulative: 1` runs the bins as a running total: each bar adds the rows of every bin before it, so the bars climb to the total number of rows. */
+/** `cumulative: 1` runs the bins as a running total: each bar reduces the rows of every bin before it, so a share climbs to 100%. Here, the share of the population living in countries up to each life expectancy. */
 export const Cumulative: Story = {
 	args: {
-		transforms: [{ type: 'binX', thresholds: 12, cumulative: 1 }],
-		scales: { y: { label: 'Rows up to this value' } }
+		data: COUNTRIES,
+		x: 'life',
+		transforms: [{ type: 'binX', thresholds: 12, y: populationShare, cumulative: 1 }],
+		scales: {
+			x: { label: 'Life expectancy (years)' },
+			y: { domain: [0, 100], label: 'Share of population (%)' }
+		}
 	}
 };
 

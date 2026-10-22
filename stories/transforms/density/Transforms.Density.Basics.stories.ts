@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { MEASUREMENTS } from '../../data/measurements';
+import { HEIGHTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `densityX` transform replaces a marker's rows with a kernel density estimate
@@ -39,14 +39,14 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** `densityX` on an `area`: the estimate of every `value`, drawn from zero up to its density. */
+/** `densityX` on an `area`: the estimate of every `height`, drawn from zero up to its density. */
 export const Area: Story = {
 	args: {
 		markers: [
 			{
 				type: 'area',
-				data: MEASUREMENTS,
-				x: 'value',
+				data: HEIGHTS,
+				x: 'height',
 				transforms: [{ type: 'densityX' }],
 				styles: { fill: '#2563eb', fillOpacity: 0.35 }
 			}
@@ -60,15 +60,15 @@ export const AreaWithOutline: Story = {
 		markers: [
 			{
 				type: 'area',
-				data: MEASUREMENTS,
-				x: 'value',
+				data: HEIGHTS,
+				x: 'height',
 				transforms: [{ type: 'densityX' }],
 				styles: { fill: '#2563eb', fillOpacity: 0.2 }
 			},
 			{
 				type: 'line',
-				data: MEASUREMENTS,
-				x: 'value',
+				data: HEIGHTS,
+				x: 'height',
 				transforms: [{ type: 'densityX' }],
 				styles: { stroke: '#1e3a8a', strokeWidth: 2 }
 			}
@@ -82,8 +82,8 @@ export const ByGroup: Story = {
 		markers: [
 			{
 				type: 'area',
-				data: MEASUREMENTS,
-				x: 'value',
+				data: HEIGHTS,
+				x: 'height',
 				grouping: 'group',
 				color: 'group',
 				transforms: [{ type: 'densityX' }],
@@ -100,8 +100,8 @@ export const DensityY: Story = {
 		markers: [
 			{
 				type: 'line',
-				data: MEASUREMENTS,
-				y: 'value',
+				data: HEIGHTS,
+				y: 'height',
 				grouping: 'group',
 				color: 'group',
 				transforms: [{ type: 'densityY' }],

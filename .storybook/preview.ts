@@ -150,7 +150,22 @@ const preview: Preview = {
 						'X1X2Y1Y2'
 					],
 					'Transforms',
-					['Bin', 'Stack'],
+					[
+						'Bin',
+						'Bollinger',
+						'Density',
+						'Filter',
+						'Group',
+						'Interval',
+						'Jitter',
+						'Map',
+						'Normalize',
+						'Select',
+						'Shift',
+						'Sort',
+						'Stack',
+						'Window'
+					],
 					'Markers',
 					[
 						'Area',

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { SURVEY_ANSWERS, type SurveyAnswer } from '../../data/survey-ratings';
+import { HEIGHTS, type HeightRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The group transforms collapse a marker's rows into one row per group and
@@ -21,7 +21,7 @@ const meta = {
 		data: [],
 		x: 'x',
 		y: 'y',
-		scales: { x: { label: 'Rating (1-5)' }, y: { label: 'Answers' } }
+		scales: { x: { label: 'Height (cm)' }, y: { label: 'People' } }
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -37,16 +37,16 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Every answer as a faint, jittered dot, for context behind a group's summary. */
-const answerCloud: AxisBasedMarkersConfig = {
+/** Every person as a faint, jittered dot, for context behind a group's summary. */
+const peopleCloud: AxisBasedMarkersConfig = {
 	type: 'dot',
-	data: SURVEY_ANSWERS,
-	x: 'rating',
-	y: 'recommend',
-	color: 'product',
+	data: HEIGHTS,
+	x: 'height',
+	y: 'weight',
+	color: 'group',
 	transforms: [
 		{ type: 'jitterX', width: 0.3 },
-		{ type: 'jitterY', width: 0.35 }
+		{ type: 'jitterY', width: 0.05 }
 	],
 	styles: { dotRadius: 2.5, dotFillOpacity: 0.3, dotStroke: 'none' }
 };
@@ -54,35 +54,35 @@ const answerCloud: AxisBasedMarkersConfig = {
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * `groupX` with `y: 'count'`: how many answers gave each rating, one dot per
- * rating and product, joined per product by a line. A group's rows come out in
+ * `groupX` with `y: 'count'`: how many people have each height, one dot per
+ * height and sex, joined per sex by a line. A group's rows come out in
  * the order each value first appears, and a line joins consecutive rows of the
- * same `grouping`, so the line sorts them by product, then by rating.
+ * same `grouping`, so the line sorts them by sex, then by height.
  */
 export const CountPerValue: Story = {
 	args: {
 		markers: [
 			{
 				type: 'line',
-				data: SURVEY_ANSWERS,
-				x: 'rating',
-				grouping: 'product',
+				data: HEIGHTS,
+				x: 'height',
+				grouping: 'group',
 				transforms: [
 					{ type: 'groupX', y: 'count' },
 					{
 						type: 'sort',
-						sort: (a: SurveyAnswer, b: SurveyAnswer) =>
-							a.product.localeCompare(b.product) || a.rating - b.rating
+						sort: (a: HeightRow, b: HeightRow) =>
+							a.group.localeCompare(b.group) || a.height - b.height
 					}
 				],
 				styles: { stroke: '#cbd5e1', strokeWidth: 2 }
 			},
 			{
 				type: 'dot',
-				data: SURVEY_ANSWERS,
-				x: 'rating',
-				grouping: 'product',
-				color: 'product',
+				data: HEIGHTS,
+				x: 'height',
+				grouping: 'group',
+				color: 'group',
 				transforms: [{ type: 'groupX', y: 'count' }],
 				styles: { dotRadius: 6, dotStroke: 'white' }
 			}
@@ -90,17 +90,17 @@ export const CountPerValue: Story = {
 	}
 };
 
-/** `groupX` with `y: 'mean'` reduces the marker's own `y`: the average "would recommend" score at each rating, over every answer. */
+/** `groupX` with `y: 'mean'` reduces the marker's own `y`: the average weight at each height, over every person. */
 export const MeanPerValue: Story = {
 	args: {
-		scales: { x: { label: 'Rating (1-5)' }, y: { label: 'Would recommend (0-10)' } },
+		scales: { x: { label: 'Height (cm)' }, y: { label: 'Weight (kg)' } },
 		markers: [
-			answerCloud,
+			peopleCloud,
 			{
 				type: 'line',
-				data: SURVEY_ANSWERS,
-				x: 'rating',
-				y: 'recommend',
+				data: HEIGHTS,
+				x: 'height',
+				y: 'weight',
 				transforms: [
 					{ type: 'groupX', y: 'mean' },
 					{ type: 'sort', sort: { channel: 'x' } }
@@ -111,26 +111,26 @@ export const MeanPerValue: Story = {
 	}
 };
 
-/** `groupY` groups by a category on `y` and reduces to `x`: each product's mean rating, a big dot over its answers. */
+/** `groupY` groups by a category on `y` and reduces to `x`: each sex's mean height, a big dot over its people. */
 export const GroupY: Story = {
 	args: {
-		scales: { x: { label: 'Rating (1-5)' }, y: { label: false } },
+		scales: { x: { label: 'Height (cm)' }, y: { label: false } },
 		markers: [
 			{
 				type: 'dot',
-				data: SURVEY_ANSWERS,
-				x: 'rating',
-				y: 'product',
-				color: 'product',
+				data: HEIGHTS,
+				x: 'height',
+				y: 'group',
+				color: 'group',
 				transforms: [{ type: 'jitterX', width: 0.3 }],
 				styles: { dotRadius: 2.5, dotFillOpacity: 0.35, dotStroke: 'none' }
 			},
 			{
 				type: 'dot',
-				data: SURVEY_ANSWERS,
-				x: 'rating',
-				y: 'product',
-				color: 'product',
+				data: HEIGHTS,
+				x: 'height',
+				y: 'group',
+				color: 'group',
 				transforms: [{ type: 'groupY', x: 'mean' }],
 				styles: { dotRadius: 9, dotStroke: '#111827', dotStrokeWidth: 1.5 }
 			}
@@ -138,19 +138,19 @@ export const GroupY: Story = {
 	}
 };
 
-/** `groupZ` reduces each `grouping` to one row, both channels at once: `x: 'mean', y: 'mean'` is each product's centroid. */
+/** `groupZ` reduces each `grouping` to one row, both channels at once: `x: 'mean', y: 'mean'` is each sex's centroid. */
 export const GroupZ: Story = {
 	args: {
-		scales: { x: { label: 'Rating (1-5)' }, y: { label: 'Would recommend (0-10)' } },
+		scales: { x: { label: 'Height (cm)' }, y: { label: 'Weight (kg)' } },
 		markers: [
-			answerCloud,
+			peopleCloud,
 			{
 				type: 'dot',
-				data: SURVEY_ANSWERS,
-				x: 'rating',
-				y: 'recommend',
-				grouping: 'product',
-				color: 'product',
+				data: HEIGHTS,
+				x: 'height',
+				y: 'weight',
+				grouping: 'group',
+				color: 'group',
 				transforms: [{ type: 'groupZ', x: 'mean', y: 'mean' }],
 				styles: { dotRadius: 10, dotStroke: '#111827', dotStrokeWidth: 1.5 }
 			}
@@ -158,16 +158,16 @@ export const GroupZ: Story = {
 	}
 };
 
-/** `group` with `r: 'count'`: one bubble per rating-score pair, sized by how many answers share it. */
+/** `group` with `r: 'count'`: one bubble per height and sex, sized by how many people share it. */
 export const Bubbles: Story = {
 	args: {
-		scales: { x: { label: 'Rating (1-5)' }, y: { label: 'Would recommend (0-10)' } },
+		scales: { x: { label: 'Height (cm)' }, y: { label: false } },
 		markers: [
 			{
 				type: 'dot',
-				data: SURVEY_ANSWERS,
-				x: 'rating',
-				y: 'recommend',
+				data: HEIGHTS,
+				x: 'height',
+				y: 'group',
 				transforms: [{ type: 'group', r: 'count' }],
 				styles: { dotFill: '#2563eb', dotFillOpacity: 0.6, dotStroke: 'white' }
 			}
@@ -178,15 +178,15 @@ export const Bubbles: Story = {
 /** `group` with `fill: 'count'` colors each pair by its count instead - the reducer becomes the marker's `color`. */
 export const ColoredByCount: Story = {
 	args: {
-		scales: { x: { label: 'Rating (1-5)' }, y: { label: 'Would recommend (0-10)' } },
+		scales: { x: { label: 'Height (cm)' }, y: { label: false } },
 		markers: [
 			{
 				type: 'dot',
-				data: SURVEY_ANSWERS,
-				x: 'rating',
-				y: 'recommend',
+				data: HEIGHTS,
+				x: 'height',
+				y: 'group',
 				transforms: [{ type: 'group', fill: 'count' }],
-				styles: { dotRadius: 9, dotStroke: 'none', dotSymbol: 'square' }
+				styles: { dotRadius: 8, dotStroke: 'none', dotSymbol: 'square' }
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
-import { MEASUREMENTS } from '../../data/measurements';
+import { HEIGHTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A plot's own `transforms` run over every series' rows before the plot draws
@@ -16,9 +16,9 @@ const meta = {
 	args: {
 		width: 940,
 		height: 420,
-		data: MEASUREMENTS,
-		x: 'value',
-		y: 'value',
+		data: HEIGHTS,
+		x: 'height',
+		y: 'height',
 		scales: { y: { label: 'Density' } }
 	},
 	argTypes: {
@@ -35,7 +35,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** A single series: the plot draws the estimate of every row's `value`. */
+/** A single series: the plot draws the estimate of every row's `height`. */
 export const SingleSeries: Story = {
 	args: {
 		transforms: [{ type: 'densityX' }]

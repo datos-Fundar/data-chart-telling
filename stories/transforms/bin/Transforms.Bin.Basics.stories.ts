@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { MEASUREMENTS } from '../../data/measurements';
+import { HEIGHTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `binX` transform on a `rect` marker: the marker's rows are grouped into bins
@@ -37,14 +37,14 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** `binX` with the default `count` reducer: each bar is the number of rows whose `value` falls in its bin. */
+/** `binX` with the default `count` reducer: each bar is the number of rows whose `height` falls in its bin. */
 export const Count: Story = {
 	args: {
 		markers: [
 			{
 				type: 'rect',
-				data: MEASUREMENTS,
-				x: 'value',
+				data: HEIGHTS,
+				x: 'height',
 				transforms: [{ type: 'binX', y: 'count', thresholds: 12 }],
 				styles: { fill: '#2563eb', fillOpacity: 0.8 }
 			}
@@ -58,8 +58,8 @@ export const BinY: Story = {
 		markers: [
 			{
 				type: 'rect',
-				data: MEASUREMENTS,
-				y: 'value',
+				data: HEIGHTS,
+				y: 'height',
 				transforms: [{ type: 'binY', x: 'count', thresholds: 12 }],
 				styles: { fill: '#16a34a', fillOpacity: 0.8 }
 			}
@@ -73,8 +73,8 @@ export const NoGaps: Story = {
 		markers: [
 			{
 				type: 'rect',
-				data: MEASUREMENTS,
-				x: 'value',
+				data: HEIGHTS,
+				x: 'height',
 				transforms: [{ type: 'binX', y: 'count', thresholds: 12, insetLeft: 0, insetRight: 0 }],
 				styles: { fill: '#9333ea', fillOpacity: 0.8 }
 			}

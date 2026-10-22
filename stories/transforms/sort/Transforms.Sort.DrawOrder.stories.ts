@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { MarkerTransform } from '$lib/types/transforms';
-import { MEASUREMENTS } from '../../data/measurements';
-import { SURVEY_ANSWERS, type SurveyAnswer } from '../../data/survey-ratings';
+import { HEIGHTS, type HeightRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Of two overlapping dots, the one drawn later covers the other, and a
@@ -17,11 +16,11 @@ const meta = {
 	args: {
 		width: 940,
 		height: 460,
-		data: MEASUREMENTS,
-		x: 'value',
+		data: HEIGHTS,
+		x: 'height',
 		y: 'weight',
 		color: 'group',
-		scales: { x: { label: 'Value' }, y: { label: 'Weight' } },
+		scales: { x: { label: 'Height (cm)' }, y: { label: 'Weight (kg)' } },
 		segments: { default: [{ styles: { dotRadius: 9, dotStroke: 'white', dotStrokeWidth: 1 } }] }
 	},
 	argTypes: {
@@ -38,32 +37,35 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** Weight per centimeter of height: the bubbles' size, which is not a position on either axis. */
+const weightPerCentimeter = (row: HeightRow) => row.weight / row.height;
+
 /**
- * Survey answers as bubbles sized by the respondent's age (above 15, so the
- * sizes spread), jittered into tight clouds - size has nothing to do with
- * position, so big and small bubbles overlap, and the draw order decides which
- * stay visible. `transforms` run after the jitter.
+ * People as bubbles sized by their weight per centimeter of height, jittered
+ * into tight columns - size has nothing to do with position, so big and small
+ * bubbles overlap, and the draw order decides which stay visible. `transforms`
+ * run after the jitter.
  */
 const bubbles = (transforms: MarkerTransform[]): Story['args'] => ({
-	data: SURVEY_ANSWERS,
-	x: 'rating',
-	y: 'recommend',
-	color: 'product',
-	r: (d: Record<string, unknown>) => (d.age as number) - 15,
+	data: HEIGHTS,
+	x: 'height',
+	y: 'weight',
+	color: 'group',
+	r: (d: Record<string, unknown>) => weightPerCentimeter(d as HeightRow),
 	scales: {
-		x: { ticks: [1, 2, 3, 4, 5], label: 'Rating (1-5)' },
-		y: { label: 'Would recommend (0-10)' }
+		x: { label: 'Height (cm)' },
+		y: { label: 'Weight (kg)' }
 	},
 	segments: { default: [{ styles: { dotStroke: 'white', dotStrokeWidth: 1 } }] },
-	transforms: [{ type: 'jitterX', width: 0.2 }, { type: 'jitterY', width: 0.25 }, ...transforms]
+	transforms: [{ type: 'jitterX', width: 0.3 }, ...transforms]
 });
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** No transform: every row of group A, then every row of group B - so B covers A wherever they overlap. */
+/** No transform: every female row, then every male row - so males cover females wherever they overlap. */
 export const DataOrder: Story = {};
 
-/** `reverse`: B's rows come first now, so A covers B in the overlap. */
+/** `reverse`: the male rows come first now, so females cover males in the overlap. */
 export const Reverse: Story = {
 	args: { transforms: [{ type: 'reverse' }] }
 };
@@ -78,12 +80,22 @@ export const ShuffleSeed: Story = {
 	args: { transforms: [{ type: 'shuffle', seed: 3 }] }
 };
 
-/** `sort: 'age'`: the oldest respondents' bubbles come last, on top, and cover the small ones in each cloud. */
+/** `sort` by weight per centimeter: the biggest bubbles come last, on top, and cover the small ones in each column. */
 export const BiggestOnTop: Story = {
-	args: bubbles([{ type: 'sort', sort: 'age' }])
+	args: bubbles([
+		{
+			type: 'sort',
+			sort: (a: HeightRow, b: HeightRow) => weightPerCentimeter(a) - weightPerCentimeter(b)
+		}
+	])
 };
 
-/** A comparator, oldest first: the big bubbles are drawn first, and every small one stays visible on top of them. */
+/** A comparator, biggest first: the big bubbles are drawn first, and every small one stays visible on top of them. */
 export const SmallestOnTop: Story = {
-	args: bubbles([{ type: 'sort', sort: (a: SurveyAnswer, b: SurveyAnswer) => b.age - a.age }])
+	args: bubbles([
+		{
+			type: 'sort',
+			sort: (a: HeightRow, b: HeightRow) => weightPerCentimeter(b) - weightPerCentimeter(a)
+		}
+	])
 };
