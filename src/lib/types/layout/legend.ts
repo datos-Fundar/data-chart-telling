@@ -119,6 +119,8 @@ export type ContinuousInteractiveConfig = {
 export type ContinuousLegendSection = {
 	type: 'continuous';
 	title?: string;
+	/** The channel the section reads, which tells apart automatic sections that share a title. */
+	channel?: Exclude<LegendChannel, 'series'>;
 	columns?: number;
 	min: number;
 	max: number;
@@ -128,7 +130,7 @@ export type ContinuousLegendSection = {
 	scheme?: string | string[];
 	/** Splits an array `scheme` into two halves meeting at this value (diverging). */
 	pivot?: number;
-	/** Draws the bar in one color (`colorMin`, the text color by default) fading across this opacity range, instead of a color ramp. */
+	/** Draws the bar in one color (`colorMin`, `legend.continuous.opacity.color` by default) fading across this opacity range over a checkerboard, instead of a color ramp. */
 	opacity?: [number, number];
 	ticks?: number[];
 	width?: number;
@@ -144,6 +146,8 @@ export type ContinuousLegendSection = {
 export type SizeLegendSection = {
 	type: 'size';
 	title?: string;
+	/** The channel the section reads, which tells apart automatic sections that share a title. */
+	channel?: Exclude<LegendChannel, 'series'>;
 	columns?: number;
 	domain: [number, number];
 	range: [number, number];
@@ -167,6 +171,8 @@ export type SizeLegendSection = {
 export type SymbolLegendSection = {
 	type: 'symbol';
 	title?: string;
+	/** The channel the section reads, which tells apart automatic sections that share a title. */
+	channel?: Exclude<LegendChannel, 'series'>;
 	columns?: number;
 	/** Item flow direction, as in a discrete section. */
 	layout?: LegendItemsLayout;

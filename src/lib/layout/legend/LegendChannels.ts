@@ -185,13 +185,20 @@ export class LegendChannels {
 		];
 	}
 
-	/** The plot's own numeric `opacity` channel, over the `opacityDomain` it hands over. */
+	/**
+	 * The plot's own numeric `opacity` channel, over the `opacityDomain` it hands
+	 * over, in its series' color - unless a `color` channel colors the marks, and
+	 * no one color stands for them.
+	 */
 	static #plotOpacity(plot: LegendPlot): LegendEntry[] {
 		if (!plot.opacityDomain) return [];
 		const source = plot.channels?.opacity?.source;
 		const name = plot.resolvedSeries?.[0]?.name;
+		const colored = plot.channels?.color?.source !== undefined || !!plot.colorDomain;
 		const color =
-			name !== undefined && name !== 'default' ? plot.colorForSeries?.(name) : undefined;
+			!colored && name !== undefined && name !== 'default'
+				? plot.colorForSeries?.(name)
+				: undefined;
 		return LegendChannels.#opacityEntry(
 			typeof source === 'string' ? source : undefined,
 			plot.opacityDomain,

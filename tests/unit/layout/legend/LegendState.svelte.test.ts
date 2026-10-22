@@ -219,6 +219,7 @@ describe('LegendState - dot sizes', () => {
 		expect(legend.sections()).toEqual([
 			{
 				type: 'size',
+				channel: 'r',
 				title: 'Pop',
 				domain: [0, 2000],
 				range: [2, 20],

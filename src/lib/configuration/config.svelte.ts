@@ -93,6 +93,10 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 			height: 20,
 			barHeight: 12,
 			barRadius: 2,
+			opacity: {
+				color: '#000',
+				checker: { size: 4, light: '#fff', dark: '#d4d4d8' }
+			},
 			// A slim vertical bar handle, taller than the 12px gradient track.
 			handle: {
 				width: '6px',

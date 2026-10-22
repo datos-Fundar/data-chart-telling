@@ -15,10 +15,18 @@
 	const defaultItemsLayout = $derived<LegendItemsLayout>(
 		sections.length === 1 ? { type: 'horizontal' } : { type: 'vertical' }
 	);
+
+	// Sections of different channels can share a title, so a key leads with its channel; a repeat takes its position.
+	const keys = $derived.by(() => {
+		const bases = sections.map(
+			(section) => `${'channel' in section ? section.channel : section.type}:${section.title ?? ''}`
+		);
+		return bases.map((base, i) => (bases.indexOf(base) === i ? base : `${base}:${i}`));
+	});
 </script>
 
 <div class="dct-legend">
-	{#each sections as section, i (section.title ?? i)}
+	{#each sections as section, i (keys[i])}
 		<div class="dct-legend__section">
 			{#if section.title}
 				<div class="dct-legend__title">{section.title}</div>

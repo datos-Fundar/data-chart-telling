@@ -187,6 +187,7 @@ export class LegendState {
 				const { title, domain, range, color, filled, symbol } = entry;
 				ramps.push({
 					type: 'size',
+					channel: 'r',
 					title: title && format(title),
 					domain,
 					range,
@@ -199,6 +200,7 @@ export class LegendState {
 				const { title, items: shapes, color, filled } = entry;
 				ramps.push({
 					type: 'symbol',
+					channel: 'symbol',
 					title: title && format(title),
 					items: shapes,
 					color,
@@ -209,6 +211,7 @@ export class LegendState {
 				const { title, min, max, opacityMin, opacityMax, color } = entry;
 				ramps.push({
 					type: 'continuous',
+					channel: 'opacity',
 					title: title && format(title),
 					min,
 					max,
@@ -220,6 +223,7 @@ export class LegendState {
 				const { title, min, max, colorMin, colorMax, scheme, pivot } = entry;
 				const section = {
 					type: 'continuous',
+					channel: 'color',
 					title: title && format(title),
 					min,
 					max,

@@ -128,6 +128,13 @@ export type PlotStylesConfig = {
 			barHeight: number;
 			/** Corner radius (px) of the gradient bar and excluded-range overlays. */
 			barRadius: number;
+			/** The bar of an opacity section: one color fading over a checkerboard, so it reads as transparency and not as a color ramp. */
+			opacity: {
+				/** The color that fades, unless the marker it describes draws in one of its own. */
+				color: string;
+				/** The checkerboard behind the bar: its squares' size (px) and two colors. */
+				checker: { size: number; light: string; dark: string };
+			};
 			/** The draggable lo/hi handle. */
 			handle: {
 				width: string;

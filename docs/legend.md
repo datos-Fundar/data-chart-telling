@@ -6,13 +6,13 @@ A plot builds its legend from what it draws: its series, the scales its channels
 
 `legend` is unset or `true` for the automatic legend, `false` for none. The automatic legend can have these sections:
 
-| Section            | Appears when                    | Content                                    |
-| ------------------ | ------------------------------- | ------------------------------------------ |
-| series (discrete)  | the plot has several series     | one item per series, in its color and mark |
-| color (continuous) | `color` is a continuous value   | a ramp with its min and max                |
-| opacity            | `opacity` is a continuous value | a ramp fading across the opacity range     |
-| size               | `r` is mapped                   | a few dots at representative values        |
-| symbol             | `symbol` is mapped              | each category next to its shape            |
+| Section            | Appears when                    | Content                                                    |
+| ------------------ | ------------------------------- | ---------------------------------------------------------- |
+| series (discrete)  | the plot has several series     | one item per series, in its color and mark                 |
+| color (continuous) | `color` is a continuous value   | a ramp with its min and max                                |
+| opacity            | `opacity` is a continuous value | a bar fading across the opacity range, over a checkerboard |
+| size               | `r` is mapped                   | a few dots at representative values                        |
+| symbol             | `symbol` is mapped              | each category next to its shape                            |
 
 Segments and markers join the series section when they carry a `legend` label:
 
@@ -149,5 +149,7 @@ Section types:
 - `symbol` - `items` of `{ name, symbol }`, `color`, `filled`, `layout`.
 
 ## Placement and look
+
+An opacity section draws its bar as one color fading over a checkerboard, so it reads as transparency and not as a color ramp; the color is the marker's own when it has one, else `legend.continuous.opacity.color` (black by default), and `legend.continuous.opacity.checker` sets the squares.
 
 The legend is a chrome block: `order` places it (`'legend'`, or in a row with the plot). Its fonts, gaps, swatch size and the continuous bar's geometry are `legend.*` in the [configuration](theming.md). A paginated section's prev/next arrows are replaceable with a `navButton` snippet.

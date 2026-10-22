@@ -45,8 +45,8 @@ const SERIES = [
 // alphabetical order: Biscoe, Dream, Torgersen.
 
 /**
- * Highlight a region - dims all cells except the Adelie row for a range of
- * islands. Useful for focusing on a particular slice of the data.
+ * Highlight a region - outlines the Adelie cells of a range of islands.
+ * Useful for focusing on a particular slice of the data.
  */
 export const HighlightRegion: Story = {
 	args: {
@@ -60,10 +60,7 @@ export const HighlightRegion: Story = {
 							y: { from: 'Adelie', to: 'Adelie' }
 						}
 					],
-					styles: { fillOpacity: 1 }
-				},
-				{
-					styles: { fillOpacity: 0.3 }
+					styles: { stroke: '#000', strokeWidth: 3 }
 				}
 			]
 		} satisfies SegmentsConfig<CellSegmentStyle>
@@ -71,8 +68,7 @@ export const HighlightRegion: Story = {
 };
 
 /**
- * Highlight a row (species) - every Adelie cell is highlighted with full opacity;
- * the other rows are dimmed.
+ * Highlight a row (species) - every Adelie cell is outlined.
  */
 export const HighlightSpecies: Story = {
 	args: {
@@ -81,10 +77,7 @@ export const HighlightSpecies: Story = {
 			default: [
 				{
 					areas: [{ y: { from: 'Adelie', to: 'Adelie' } }],
-					styles: { fillOpacity: 0.95 }
-				},
-				{
-					styles: { fillOpacity: 0.25 }
+					styles: { stroke: '#000', strokeWidth: 3 }
 				}
 			]
 		} satisfies SegmentsConfig<CellSegmentStyle>
@@ -92,8 +85,8 @@ export const HighlightSpecies: Story = {
 };
 
 /**
- * Highlight columns (islands) - all cells in specific islands are shown
- * at full brightness; others are faded.
+ * Highlight columns (islands) - all cells in specific islands are outlined,
+ * leaving every fill as the count draws it.
  */
 export const HighlightIslands: Story = {
 	args: {
@@ -105,10 +98,7 @@ export const HighlightIslands: Story = {
 						{ x: { from: 'Biscoe', to: 'Biscoe' } },
 						{ x: { from: 'Torgersen', to: 'Torgersen' } }
 					],
-					styles: { fillOpacity: 1 }
-				},
-				{
-					styles: { fillOpacity: 0.3 }
+					styles: { stroke: '#000', strokeWidth: 3 }
 				}
 			]
 		} satisfies SegmentsConfig<CellSegmentStyle>
@@ -116,10 +106,10 @@ export const HighlightIslands: Story = {
 };
 
 /**
- * Multiple highlight areas with different opacities - creates a visual
- * hierarchy by dimming some regions more than others.
+ * Multiple highlight areas with different strokes - creates a visual
+ * hierarchy by outlining some regions more strongly than others.
  */
-export const LayeredOpacity: Story = {
+export const LayeredStrokes: Story = {
 	args: {
 		series: SERIES,
 		segments: {
@@ -131,7 +121,7 @@ export const LayeredOpacity: Story = {
 							y: { from: 'Adelie', to: 'Adelie' }
 						}
 					],
-					styles: { fillOpacity: 1 }
+					styles: { stroke: '#000', strokeWidth: 3 }
 				},
 				{
 					areas: [
@@ -140,10 +130,7 @@ export const LayeredOpacity: Story = {
 							y: { from: 'Gentoo', to: 'Gentoo' }
 						}
 					],
-					styles: { fillOpacity: 0.6 }
-				},
-				{
-					styles: { fillOpacity: 0.25 }
+					styles: { stroke: '#000', strokeWidth: 1.5, strokeDasharray: '4 3' }
 				}
 			]
 		} satisfies SegmentsConfig<CellSegmentStyle>
@@ -151,8 +138,8 @@ export const LayeredOpacity: Story = {
 };
 
 /**
- * Highlight with custom stroke - draws attention to a region with both
- * opacity and a visible border.
+ * Highlight with a custom stroke - the color and width of the border are
+ * the segment's own.
  */
 export const HighlightWithStroke: Story = {
 	args: {
@@ -166,14 +153,7 @@ export const HighlightWithStroke: Story = {
 							y: { from: 'Adelie', to: 'Adelie' }
 						}
 					],
-					styles: {
-						fillOpacity: 0.9,
-						stroke: '#f59f00',
-						strokeWidth: 2
-					}
-				},
-				{
-					styles: { fillOpacity: 0.3 }
+					styles: { stroke: '#f59f00', strokeWidth: 4 }
 				}
 			]
 		} satisfies SegmentsConfig<CellSegmentStyle>
