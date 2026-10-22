@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BoxPlot from '$lib/plots/distribution/box/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { BUENOS_AIRES_TRIPS } from '../../../../data/commute-times';
+import { IRIS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A BoxPlot's own boxes are its marks. A `rule` marker adds a reference line
@@ -14,10 +14,10 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
-		data: BUENOS_AIRES_TRIPS,
-		x: 'mode',
-		y: 'minutes',
-		color: 'mode'
+		data: IRIS,
+		x: 'species',
+		y: 'petalLength',
+		color: 'species'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
@@ -32,14 +32,14 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** A dashed rule at an hour: the boxes that reach past it hold the trips longer than that. */
-export const OneHourTarget: Story = {
+/** A dashed rule at 2.5 cm: the boxes that reach past it hold the flowers with longer petals. */
+export const PetalThreshold: Story = {
 	args: {
 		markers: [
 			{
 				type: 'rule',
 				axis: 'y',
-				value: 60,
+				value: 2.5,
 				styles: { strokeDasharray: '4 4', strokeOpacity: 0.7 }
 			}
 		] satisfies AxisBasedMarkersConfig[]

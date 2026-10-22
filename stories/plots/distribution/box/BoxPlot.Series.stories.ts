@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BoxPlot from '$lib/plots/distribution/box/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import { BUENOS_AIRES_TRIPS, COMMUTE_TRIPS, type CommuteTrip } from '../../../data/commute-times';
+import { IRIS, IRIS_LONG, type IrisRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Every series draws one box per category of its rows: the box spans the
@@ -44,62 +44,63 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** One series, one box per mode of transport: Buenos Aires commute times, in minutes. */
+/** One series, one box per species: the petal length of Fisher's irises, in centimeters. */
 export const Default: Story = {
 	args: {
-		data: BUENOS_AIRES_TRIPS,
-		x: 'mode',
-		y: 'minutes'
+		data: IRIS,
+		x: 'species',
+		y: 'petalLength'
 	}
 };
 
-/** `color: 'mode'` makes each mode its own series, so every box takes its own color. */
+/** `color: 'species'` makes each species its own series, so every box takes its own color. */
 export const Grouped: Story = {
 	args: {
-		data: BUENOS_AIRES_TRIPS,
-		x: 'mode',
-		y: 'minutes',
-		color: 'mode'
+		data: IRIS,
+		x: 'species',
+		y: 'petalLength',
+		color: 'species'
 	}
 };
 
-/** The categories on `y` and the minutes on `x` lay the same boxes out sideways. */
+/** The categories on `y` and the petal lengths on `x` lay the same boxes out sideways. */
 export const Horizontal: Story = {
 	args: {
-		data: BUENOS_AIRES_TRIPS,
-		x: 'minutes',
-		y: 'mode',
-		color: 'mode'
+		data: IRIS,
+		x: 'petalLength',
+		y: 'species',
+		color: 'species'
 	}
 };
 
-/** Pre-built `series`: active modes and motorized ones, each series in its own color over its own categories. */
+/** Pre-built `series`: setosa and the other two species, each series in its own color over its own categories. */
 export const SeriesBased: Story = {
 	args: {
 		series: [
 			{
-				name: 'Active',
-				x: 'mode',
-				y: 'minutes',
-				data: BUENOS_AIRES_TRIPS.filter((d) => d.mode === 'Walk' || d.mode === 'Bike')
+				name: 'Setosa',
+				x: 'species',
+				y: 'petalLength',
+				data: IRIS.filter((d) => d.species === 'setosa')
 			},
 			{
-				name: 'Motorized',
-				x: 'mode',
-				y: 'minutes',
-				data: BUENOS_AIRES_TRIPS.filter((d) => d.mode !== 'Walk' && d.mode !== 'Bike')
+				name: 'Others',
+				x: 'species',
+				y: 'petalLength',
+				data: IRIS.filter((d) => d.species !== 'setosa')
 			}
-		] satisfies Series<CommuteTrip>[]
+		] satisfies Series<IrisRow>[]
 	}
 };
 
-/** `facet: { by: 'city' }` draws one panel per city on a shared scale, so their boxes compare side by side. */
-export const FacetedByCity: Story = {
+/** `facet: { by: 'metric' }` draws one panel per measurement on a shared scale, so their boxes compare side by side. */
+export const FacetedByMetric: Story = {
 	args: {
-		data: COMMUTE_TRIPS,
-		x: 'mode',
-		y: 'minutes',
-		color: 'mode',
-		facet: { by: 'city' }
+		height: 700,
+		data: IRIS_LONG,
+		x: 'species',
+		y: 'value',
+		color: 'species',
+		facet: { by: 'metric', columns: 2, axes: 'outer' }
 	}
 };

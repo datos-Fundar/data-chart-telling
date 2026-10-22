@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BoxPlot from '$lib/plots/distribution/box/Plot.svelte';
 import type { SegmentsConfig } from '$lib/types/plots/props';
 import type { AreaStyle } from '$lib/types/plots/styling';
-import { BUENOS_AIRES_TRIPS } from '../../../data/commute-times';
+import { IRIS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `segments` restyles some of a series' boxes: each segment's `areas` selects
@@ -18,9 +18,9 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
-		data: BUENOS_AIRES_TRIPS,
-		x: 'mode',
-		y: 'minutes'
+		data: IRIS,
+		x: 'species',
+		y: 'petalLength'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
@@ -37,22 +37,27 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** The bus box in a strong red, the rest in the default color. */
+/** The versicolor box in a strong red, the rest in the default color. */
 export const HighlightOne: Story = {
 	args: {
 		segments: {
-			default: [{ areas: [{ x: { from: 'Bus', to: 'Bus' } }], styles: { fill: '#dc2626' } }]
+			default: [
+				{ areas: [{ x: { from: 'versicolor', to: 'versicolor' } }], styles: { fill: '#dc2626' } }
+			]
 		} satisfies SegmentsConfig<AreaStyle>
 	}
 };
 
-/** Public transport outlined and faded, so the active and private modes stand out. */
+/** Versicolor and virginica outlined and faded, so setosa stands out. */
 export const Outlined: Story = {
 	args: {
 		segments: {
 			default: [
 				{
-					areas: [{ x: { from: 'Bus', to: 'Bus' } }, { x: { from: 'Train', to: 'Train' } }],
+					areas: [
+						{ x: { from: 'versicolor', to: 'versicolor' } },
+						{ x: { from: 'Train', to: 'Train' } }
+					],
 					styles: { fillOpacity: 0.25, stroke: '#1f2937', strokeWidth: 1 }
 				}
 			]

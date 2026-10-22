@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BoxPlot from '$lib/plots/distribution/box/Plot.svelte';
 import type { BoxSummaryRow } from '$lib/types/plots/distribution/box/state';
-import { BUENOS_AIRES_TRIPS } from '../../../data/commute-times';
+import { IRIS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Hovering a box shows its summary rather than every value inside it: the
@@ -16,10 +16,10 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
-		data: BUENOS_AIRES_TRIPS,
-		x: 'mode',
-		y: 'minutes',
-		color: 'mode'
+		data: IRIS,
+		x: 'species',
+		y: 'petalLength',
+		color: 'species'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
@@ -51,7 +51,7 @@ export const CustomFormat: Story = {
 			sync: false,
 			format: (row) => {
 				const { category, median, p25, p75, count } = row as BoxSummaryRow;
-				return `${category}: ${median} min (middle half ${p25}-${p75}), ${count} trips`;
+				return `${category}: ${median} cm (middle half ${p25}-${p75}), ${count} flowers`;
 			}
 		}
 	}

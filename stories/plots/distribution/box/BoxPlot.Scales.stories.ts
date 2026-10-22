@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BoxPlot from '$lib/plots/distribution/box/Plot.svelte';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import { BUENOS_AIRES_TRIPS } from '../../../data/commute-times';
+import { IRIS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The value axis fits the values without reaching for zero, and the category
@@ -15,10 +15,10 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
-		data: BUENOS_AIRES_TRIPS,
-		x: 'mode',
-		y: 'minutes',
-		color: 'mode'
+		data: IRIS,
+		x: 'species',
+		y: 'petalLength',
+		color: 'species'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
@@ -42,26 +42,26 @@ type Story = StoryObj<typeof meta>;
 export const Labels: Story = {
 	args: {
 		scales: {
-			x: { label: 'Mode of transport' },
-			y: { label: 'One-way trip (minutes)' }
+			x: { label: 'Species' },
+			y: { label: 'Petal length (cm)' }
 		} satisfies AxisBasedScalesConfig
 	}
 };
 
-/** A `domain` on the category axis orders the boxes: here from the slowest to the fastest mode. */
+/** A `domain` on the category axis orders the boxes: here from the shortest to the longest petals. */
 export const CategoryOrder: Story = {
 	args: {
 		scales: {
-			x: { domain: ['Walk', 'Bike', 'Car', 'Bus', 'Train'] }
+			x: { domain: ['setosa', 'versicolor', 'virginica'] }
 		} satisfies AxisBasedScalesConfig
 	}
 };
 
-/** A pinned `y` domain from zero shows each box against the full trip length. */
+/** A pinned `y` domain from zero shows each box against the full petal length. */
 export const FromZero: Story = {
 	args: {
 		scales: {
-			y: { domain: [0, 160] }
+			y: { domain: [0, 8] }
 		} satisfies AxisBasedScalesConfig
 	}
 };
@@ -70,7 +70,7 @@ export const FromZero: Story = {
 export const BoxWidth: Story = {
 	args: {
 		scales: {
-			x: { paddingInner: 0.1 }
+			x: { paddingInner: 0.6 }
 		} satisfies AxisBasedScalesConfig
 	}
 };

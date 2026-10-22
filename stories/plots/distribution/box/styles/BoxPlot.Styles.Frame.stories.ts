@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BoxPlot from '$lib/plots/distribution/box/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { BUENOS_AIRES_TRIPS } from '../../../../data/commute-times';
+import { IRIS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `styles.frame` draws a border around the plot's own content, the same as
@@ -14,10 +14,10 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
-		data: BUENOS_AIRES_TRIPS,
-		x: 'mode',
-		y: 'minutes',
-		color: 'mode'
+		data: IRIS,
+		x: 'species',
+		y: 'petalLength',
+		color: 'species'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 300, max: 940, step: 50 } },
