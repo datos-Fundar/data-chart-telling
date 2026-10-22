@@ -190,25 +190,6 @@ export const AMBA_PARTIDOS: GeoFeature<AmbaPartidoProps>[] = (
 // ── Point fixtures ────────────────────────────────────────────────────────────
 // Real city coordinates, used by the point-based markers (dot/vector/link/contour).
 
-export type WeatherStation = {
-	city: string;
-	lon: number;
-	lat: number;
-	tempC: number;
-};
-
-/** Real capitals with a made-up temperature reading - mirrors svelteplot's `dot/weather` and `contour/weather` examples. */
-export const WEATHER_STATIONS: WeatherStation[] = [
-	{ city: 'Buenos Aires', lon: -58.4, lat: -34.6, tempC: 28 },
-	{ city: 'Santiago', lon: -70.6, lat: -33.4, tempC: 24 },
-	{ city: 'Brasília', lon: -47.9, lat: -15.8, tempC: 31 },
-	{ city: 'Montevideo', lon: -56.2, lat: -34.9, tempC: 22 },
-	{ city: 'Asunción', lon: -57.6, lat: -25.3, tempC: 33 },
-	{ city: 'La Paz', lon: -68.1, lat: -16.5, tempC: 14 },
-	{ city: 'Bogotá', lon: -74.1, lat: 4.7, tempC: 19 },
-	{ city: 'Lima', lon: -77.0, lat: -12.0, tempC: 21 }
-];
-
 export type WorldTemperaturePoint = { lon: number; lat: number; tempC: number };
 
 /**

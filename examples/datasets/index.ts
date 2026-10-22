@@ -1,5 +1,6 @@
 export * from './commodity-prices';
 export * from './countries-over-time';
+export * from './daily-temperature';
 export * from './heights';
 export * from './inflation-by-region';
 export * from './inflation-ranges';
@@ -8,3 +9,4 @@ export * from './life-expectancy';
 export * from './penguins';
 export * from './population-by-age';
 export * from './province-life-expectancy';
+export * from './weather-stations';

@@ -2,12 +2,9 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import {
-	WORLD_COUNTRIES,
-	WEATHER_STATIONS,
-	type WeatherStation
-} from '../../../../../../stories/plots/map/geo/data';
+import { WORLD_COUNTRIES } from '../../../../../../stories/plots/map/geo/data';
 import { waitForSvg, countDotMarks, countTextLabels } from '../../../_helpers/svg';
+import { WEATHER_STATIONS, type WeatherStation } from '$datasets';
 
 describe('GeoPlot - custom component marker', () => {
 	test('mounts DotMarker with lon/lat accessors', async () => {

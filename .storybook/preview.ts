@@ -171,6 +171,7 @@ const preview: Preview = {
 						'Area',
 						'Arrow',
 						'Bar',
+						'Bollinger',
 						'Box',
 						'Brush',
 						'Cell',

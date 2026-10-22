@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { WORLD_COUNTRIES, WEATHER_STATIONS, type WeatherStation } from '../data';
+import { WORLD_COUNTRIES } from '../data';
 import { countryPopulation } from '../channels';
+import { WEATHER_STATIONS, type WeatherStation } from '$datasets';
 
 // `x`/`y`/`value` below use the field-key shorthand (`'lon'` instead of
 // `(d) => (d as WeatherStation).lon`) - see `DotMarkerConfig`'s own doc.

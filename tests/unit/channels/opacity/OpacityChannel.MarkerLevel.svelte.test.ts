@@ -3,8 +3,9 @@ import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import { resolveOpacityScale } from '$lib/utils/opacity';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { WORLD_COUNTRIES, WEATHER_STATIONS } from '../../../../stories/plots/map/geo/data';
+import { WORLD_COUNTRIES } from '../../../../stories/plots/map/geo/data';
 import { waitForSvg } from '../../plots/_helpers/svg';
+import { WEATHER_STATIONS } from '$datasets';
 
 function dotOpacitiesOf(svg: SVGElement): number[] {
 	return Array.from(svg.querySelectorAll('g.dot path')).map((el) => {

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { DAILY_TEMPERATURE, BUENOS_AIRES_TEMPERATURE } from '../../data/daily-temperature';
+import { DAILY_TEMPERATURE, BUENOS_AIRES_TEMPERATURE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `windowY` transform slides a window of `k` rows along a marker's rows and

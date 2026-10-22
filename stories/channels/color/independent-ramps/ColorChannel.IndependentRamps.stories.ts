@@ -4,13 +4,10 @@ import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import { renderSource } from '../../../common/docsSource';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import type { DotMarkerConfig } from '$lib/types/markers/basic';
-import {
-	WORLD_COUNTRIES,
-	WEATHER_STATIONS,
-	type WorldCountryProps
-} from '../../../plots/map/geo/data';
+import { WORLD_COUNTRIES, type WorldCountryProps } from '../../../plots/map/geo/data';
 import { COUNTRIES_AT_2007 } from '$datasets';
 import { countryPopulation, countryGdp } from '../../../plots/map/geo/channels';
+import { WEATHER_STATIONS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // This package resolves its own color ramp per consumer instead of routing

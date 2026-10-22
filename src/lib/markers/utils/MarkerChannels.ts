@@ -1,7 +1,9 @@
+import { resolveAccessor } from '$lib/utils/accessors';
 import { resolveColorScale } from '$lib/utils/color';
 import { resolveOpacityScale } from '$lib/utils/opacity';
 import { resolveSymbolScale } from '$lib/utils/symbol';
 import type { ChannelScalesConfig } from '$lib/types/layout/scales';
+import type { ProcessedData } from '$lib/types/phases';
 import type { SymbolType } from '$lib/types/plots/constants';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 
@@ -37,6 +39,25 @@ export class MarkerChannels {
 		return markers.map((marker) =>
 			marker.type === 'dot' && !marker.scales
 				? { ...marker, scales: MarkerChannels.inheritScales(undefined, plot) }
+				: marker
+		);
+	}
+
+	/**
+	 * `markers`, each `bollinger` that draws the plot's own rows (it sets no `data`)
+	 * and no `x` or `y` of its own, reading the plot's: they are the same rows, so
+	 * the same channels place them.
+	 */
+	static inheritPosition<
+		TMarker extends { type: string; data?: unknown; x?: unknown; y?: unknown }
+	>(markers: TMarker[], processed: ProcessedData | undefined): TMarker[] {
+		if (!processed) return markers;
+		const read = (channel: unknown) =>
+			channel === undefined ? undefined : resolveAccessor(channel as never);
+		const plot = { x: read(processed.channels.x), y: read(processed.channels.y) };
+		return markers.map((marker) =>
+			marker.type === 'bollinger' && marker.data === undefined
+				? { ...marker, x: marker.x ?? plot.x, y: marker.y ?? plot.y }
 				: marker
 		);
 	}

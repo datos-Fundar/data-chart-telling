@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { WORLD_COUNTRIES, WEATHER_STATIONS, type WeatherStation } from '../data';
+import { WORLD_COUNTRIES } from '../data';
+import { WEATHER_STATIONS, type WeatherStation } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `component` mounts an arbitrary Svelte component as a mark - the same

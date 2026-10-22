@@ -2,8 +2,9 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { WORLD_COUNTRIES, WEATHER_STATIONS } from '../../../../../../stories/plots/map/geo/data';
+import { WORLD_COUNTRIES } from '../../../../../../stories/plots/map/geo/data';
 import { waitForSvg, countContourPaths } from '../../../_helpers/svg';
+import { WEATHER_STATIONS } from '$datasets';
 
 describe('GeoPlot - contour marker', () => {
 	test('scatter-interpolation mode renders contour paths without crashing', async () => {

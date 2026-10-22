@@ -37,9 +37,12 @@ export class MarkersPhase<
 				: [];
 		return {
 			...state,
-			markers: MarkerChannels.inheritAll(
-				[...options.marks(state, ctx), ...(state.markers ?? []), ...valueLabels],
-				state.scales as never
+			markers: MarkerChannels.inheritPosition(
+				MarkerChannels.inheritAll(
+					[...options.marks(state, ctx), ...(state.markers ?? []), ...valueLabels],
+					state.scales as never
+				),
+				state.processedData
 			)
 		};
 	};

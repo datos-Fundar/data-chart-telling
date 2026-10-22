@@ -1,9 +1,10 @@
 <script lang="ts">
 	import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 	import Scrubber from '../../../../common/Scrubber.svelte';
-	import { ARGENTINA_PROVINCES, WEATHER_STATIONS } from '../data';
+	import { ARGENTINA_PROVINCES } from '../data';
 	import type { GeoFeature } from '$lib/types/plots/data/geo';
 	import { provincePopulation } from '../channels';
+	import { WEATHER_STATIONS } from '$datasets';
 
 	const YEARS = [2010, 2015, 2020, 2025];
 
