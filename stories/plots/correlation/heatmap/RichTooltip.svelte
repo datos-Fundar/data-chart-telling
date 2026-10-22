@@ -3,11 +3,11 @@
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { makeColorScale } from '$lib/utils/color';
 	import TooltipCard from '../../../common/TooltipCard.svelte';
-	import { LIFE_EXPECTANCY_BY_PROVINCE_SEX, type ProvinceSexCell } from './data';
+	import { PENGUIN_COUNTS, type PenguinSpeciesCount } from '$datasets';
 
 	const cfg = getConfiguration();
 
-	const COLOR_DOMAIN: [number, number] = [70, 85];
+	const COLOR_DOMAIN: [number, number] = [0, 120];
 	const colorScale = makeColorScale(
 		COLOR_DOMAIN[0],
 		COLOR_DOMAIN[1],
@@ -16,20 +16,20 @@
 	);
 </script>
 
-{#snippet content({ rows }: { rows: ProvinceSexCell[] })}
+{#snippet content({ rows }: { rows: PenguinSpeciesCount[] })}
 	{@const row = rows[0]}
 	{#if row}
 		<TooltipCard
-			heading="{row.province} - {row.sex}"
+			heading="{row.island} - {row.species}"
 			entries={[
 				{
-					label: 'Life expectancy',
-					color: colorScale(row.value),
-					value: row.value,
-					display: `${row.value.toFixed(1)} yr`
+					label: 'Penguins',
+					color: colorScale(row.count),
+					value: row.count,
+					display: `${row.count} penguins`
 				}
 			]}
-			footer="Life expectancy at birth"
+			footer="Palmer Station penguins"
 		/>
 	{/if}
 {/snippet}
@@ -40,19 +40,19 @@
 		height={420}
 		series={[
 			{
-				name: 'life_expectancy',
-				x: 'province',
-				y: 'sex',
-				color: 'value',
-				data: LIFE_EXPECTANCY_BY_PROVINCE_SEX
+				name: 'penguins',
+				x: 'island',
+				y: 'species',
+				color: 'count',
+				data: PENGUIN_COUNTS
 			}
 		]}
 		scales={{ color: { domain: COLOR_DOMAIN } }}
 		tooltip={{
 			sync: false,
 			format: (row) => {
-				const { province, sex, value } = row as ProvinceSexCell;
-				return `${province} - ${sex}: ${value.toFixed(1)} yr`;
+				const { island, species, count } = row as PenguinSpeciesCount;
+				return `${island} - ${species}: ${count} penguins`;
 			},
 			content
 		}}

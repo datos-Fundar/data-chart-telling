@@ -1,10 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import {
-	LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-	type ProvinceSexCell
-} from '../../../plots/correlation/heatmap/data';
+import { PENGUIN_COUNTS, type PenguinSpeciesCount } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `cell` marker's own `color` + `scales.color` is independent of the
@@ -23,9 +20,9 @@ const meta = {
 	args: {
 		width: 940,
 		height: 420,
-		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-		x: 'province',
-		y: 'sex',
+		data: PENGUIN_COUNTS,
+		x: 'island',
+		y: 'species',
 		// The base cells carry no `color` of their own here, so their default
 		// value-label formatter has nothing to read - hidden to avoid a
 		// confusing "NaN" under the marker's own colored overlay.
@@ -46,7 +43,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * The `cell` marker's own `color: 'value'` accessor drives its fill - the
+ * The `cell` marker's own `color: 'count'` accessor drives its fill - the
  * default palette's own continuous ramp, since the marker sets no `scales`
  * of its own. `fill` is still required by `CellMarkerConfig`'s own shape,
  * but `color` takes priority over it whenever it resolves to a value.
@@ -56,10 +53,10 @@ export const Default: Story = {
 		markers: [
 			{
 				type: 'cell',
-				x: (d) => (d as ProvinceSexCell).province,
-				y: (d) => (d as ProvinceSexCell).sex,
+				x: (d) => (d as PenguinSpeciesCount).island,
+				y: (d) => (d as PenguinSpeciesCount).species,
 				fill: () => '#e5e7eb',
-				color: 'value',
+				color: 'count',
 				inset: 0.5
 			}
 		] satisfies AxisBasedMarkersConfig[]
@@ -72,11 +69,11 @@ export const CustomScheme: Story = {
 		markers: [
 			{
 				type: 'cell',
-				x: (d) => (d as ProvinceSexCell).province,
-				y: (d) => (d as ProvinceSexCell).sex,
+				x: (d) => (d as PenguinSpeciesCount).island,
+				y: (d) => (d as PenguinSpeciesCount).species,
 				fill: () => '#e5e7eb',
-				color: 'value',
-				scales: { color: { domain: [70, 85], scheme: 'viridis' } },
+				color: 'count',
+				scales: { color: { domain: [0, 120], scheme: 'viridis' } },
 				inset: 0.5
 			}
 		] satisfies AxisBasedMarkersConfig[]

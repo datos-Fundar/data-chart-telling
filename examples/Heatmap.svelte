@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { HeatmapPlot } from '@fundar/data-chart-telling';
-	import { HOUSEHOLDS } from './datasets';
+	import { PENGUIN_COUNTS } from './datasets';
 </script>
 
-<!-- One cell per number of rooms and of people, colored by the share of households. -->
-<HeatmapPlot width={560} height={360} data={HOUSEHOLDS} x="rooms" y="people" color="share" />
+<!-- One cell per island and species, colored by the number of penguins. -->
+<HeatmapPlot width={560} height={360} data={PENGUIN_COUNTS} x="island" y="species" color="count" />

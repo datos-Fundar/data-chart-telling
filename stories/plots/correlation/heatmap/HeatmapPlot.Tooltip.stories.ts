@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import RichTooltip from './RichTooltip.svelte';
-import { LIFE_EXPECTANCY_BY_PROVINCE_SEX, type ProvinceSexCell } from './data';
+import { PENGUIN_COUNTS, type PenguinSpeciesCount } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -30,12 +30,12 @@ type Story = StoryObj<typeof meta>;
 
 const SERIES = [
 	{
-		name: 'life_expectancy',
-		x: 'province',
-		y: 'sex',
-		color: 'value',
-		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX
-	} satisfies Series<ProvinceSexCell>
+		name: 'penguins',
+		x: 'island',
+		y: 'species',
+		color: 'count',
+		data: PENGUIN_COUNTS
+	} satisfies Series<PenguinSpeciesCount>
 ];
 
 // ── Stories ───────────────────────────────────────────────────────────────────
@@ -52,8 +52,8 @@ export const BasicTooltip: Story = {
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { province, sex, value } = row as ProvinceSexCell;
-				return `${province} - ${sex}: ${value.toFixed(1)} yr`;
+				const { island, species, count } = row as PenguinSpeciesCount;
+				return `${island} - ${species}: ${count} penguins`;
 			}
 		}
 	}
@@ -69,8 +69,8 @@ export const RichFormat: Story = {
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { province, sex, value } = row as ProvinceSexCell;
-				return `Province: ${province}\nSex: ${sex}\nLife expectancy: ${value.toFixed(1)} yr`;
+				const { island, species, count } = row as PenguinSpeciesCount;
+				return `Island: ${island}\nSpecies: ${species}\nPenguins: ${count}`;
 			}
 		}
 	}
@@ -78,7 +78,7 @@ export const RichFormat: Story = {
 
 /**
  * Computed tooltip - the format function can derive any string from the row.
- * Here it shows the life expectancy relative to an 80-year threshold.
+ * Here it shows the count relative to a 50-penguin threshold.
  */
 export const ComputedFormat: Story = {
 	args: {
@@ -86,18 +86,18 @@ export const ComputedFormat: Story = {
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { province, sex, value } = row as ProvinceSexCell;
-				const delta = (value - 80).toFixed(1);
-				const sign = value >= 80 ? '+' : '';
-				return `${province} - ${sex}: ${value.toFixed(1)} yr (${sign}${delta} vs 80)`;
+				const { island, species, count } = row as PenguinSpeciesCount;
+				const delta = count - 50;
+				const sign = count >= 50 ? '+' : '';
+				return `${island} - ${species}: ${count} penguins (${sign}${delta} vs 50)`;
 			}
 		}
 	}
 };
 
 /**
- * Rounded value format - displays life expectancy as a clean rounded number
- * of years for easier interpretation at a glance.
+ * Rounded value format - displays the count as a plain number of penguins
+ * for easier interpretation at a glance.
  */
 export const RoundedValue: Story = {
 	args: {
@@ -105,8 +105,8 @@ export const RoundedValue: Story = {
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { province, sex, value } = row as ProvinceSexCell;
-				return `${province} - ${sex}\n${Math.round(value)} yr`;
+				const { island, species, count } = row as PenguinSpeciesCount;
+				return `${island} - ${species}\n${count} penguins`;
 			}
 		}
 	}
@@ -141,8 +141,8 @@ export const CustomAnchor: Story = {
 			anchorX: 'left',
 			anchorY: 'top',
 			format: (row) => {
-				const { province, sex, value } = row as ProvinceSexCell;
-				return `${province} - ${sex}: ${value.toFixed(1)} yr`;
+				const { island, species, count } = row as PenguinSpeciesCount;
+				return `${island} - ${species}: ${count} penguins`;
 			}
 		}
 	}

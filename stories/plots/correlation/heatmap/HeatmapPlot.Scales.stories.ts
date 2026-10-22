@@ -2,7 +2,12 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import { LIFE_EXPECTANCY_BY_PROVINCE_SEX, PROVINCES, SEXES, type ProvinceSexCell } from './data';
+import {
+	PENGUIN_COUNTS,
+	PENGUIN_ISLANDS,
+	PENGUIN_SPECIES,
+	type PenguinSpeciesCount
+} from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -37,12 +42,12 @@ export const Default: Story = {
 	args: {
 		series: [
 			{
-				name: 'life_expectancy',
-				x: 'province',
-				y: 'sex',
-				color: 'value',
-				data: LIFE_EXPECTANCY_BY_PROVINCE_SEX
-			} satisfies Series<ProvinceSexCell>
+				name: 'penguins',
+				x: 'island',
+				y: 'species',
+				color: 'count',
+				data: PENGUIN_COUNTS
+			} satisfies Series<PenguinSpeciesCount>
 		]
 	}
 };
@@ -55,22 +60,22 @@ export const WithAxisLabels: Story = {
 	args: {
 		series: [
 			{
-				name: 'life_expectancy',
-				x: 'province',
-				y: 'sex',
-				color: 'value',
-				data: LIFE_EXPECTANCY_BY_PROVINCE_SEX
-			} satisfies Series<ProvinceSexCell>
+				name: 'penguins',
+				x: 'island',
+				y: 'species',
+				color: 'count',
+				data: PENGUIN_COUNTS
+			} satisfies Series<PenguinSpeciesCount>
 		],
 		scales: {
-			x: { label: 'Province' },
-			y: { label: 'Sex' }
+			x: { label: 'Island' },
+			y: { label: 'Species' }
 		} satisfies AxisBasedScalesConfig
 	}
 };
 
 /**
- * Explicit domain ordering for X axis - ensures provinces appear in the
+ * Explicit domain ordering for X axis - ensures PENGUIN_ISLANDS appear in the
  * desired order rather than alphabetically. The `domain` array pins the
  * exact order and set of values shown.
  */
@@ -78,24 +83,24 @@ export const ExplicitXDomain: Story = {
 	args: {
 		series: [
 			{
-				name: 'life_expectancy',
-				x: 'province',
-				y: 'sex',
-				color: 'value',
-				data: LIFE_EXPECTANCY_BY_PROVINCE_SEX
-			} satisfies Series<ProvinceSexCell>
+				name: 'penguins',
+				x: 'island',
+				y: 'species',
+				color: 'count',
+				data: PENGUIN_COUNTS
+			} satisfies Series<PenguinSpeciesCount>
 		],
 		scales: {
-			x: { domain: PROVINCES, label: 'Province' },
-			y: { domain: SEXES, label: 'Sex' }
+			x: { domain: PENGUIN_ISLANDS, label: 'Island' },
+			y: { domain: PENGUIN_SPECIES, label: 'Species' }
 		} satisfies AxisBasedScalesConfig
 	}
 };
 
 /**
- * Explicit color domain - pins the colour scale to a fixed `[70, 85]` range
+ * Explicit color domain - pins the colour scale to a fixed `[0, 120]` range
  * instead of auto-fitting to the visible data's min/max. Spreads the colour
- * ramp across the full plausible life-expectancy range, making it easier to
+ * ramp across the full plausible range of counts, making it easier to
  * read the gradient at a glance rather than always stretching to whichever
  * values happen to be shown.
  */
@@ -103,59 +108,59 @@ export const ExplicitColorDomain: Story = {
 	args: {
 		series: [
 			{
-				name: 'life_expectancy',
-				x: 'province',
-				y: 'sex',
-				color: 'value',
-				data: LIFE_EXPECTANCY_BY_PROVINCE_SEX
-			} satisfies Series<ProvinceSexCell>
+				name: 'penguins',
+				x: 'island',
+				y: 'species',
+				color: 'count',
+				data: PENGUIN_COUNTS
+			} satisfies Series<PenguinSpeciesCount>
 		],
 		scales: {
-			color: { domain: [70, 85] }
+			color: { domain: [0, 120] }
 		} satisfies AxisBasedScalesConfig
 	}
 };
 
 /**
- * Reversed Y axis - sexes appear bottom-to-top instead of top-to-bottom.
+ * Reversed Y axis - PENGUIN_SPECIES appear bottom-to-top instead of top-to-bottom.
  * Useful for matching reading direction or presentation conventions.
  */
 export const ReversedY: Story = {
 	args: {
 		series: [
 			{
-				name: 'life_expectancy',
-				x: 'province',
-				y: 'sex',
-				color: 'value',
-				data: LIFE_EXPECTANCY_BY_PROVINCE_SEX
-			} satisfies Series<ProvinceSexCell>
+				name: 'penguins',
+				x: 'island',
+				y: 'species',
+				color: 'count',
+				data: PENGUIN_COUNTS
+			} satisfies Series<PenguinSpeciesCount>
 		],
 		scales: {
 			y: { reverse: true },
-			color: { domain: [70, 85] }
+			color: { domain: [0, 120] }
 		} satisfies AxisBasedScalesConfig
 	}
 };
 
 /**
- * Rotated X tick labels - makes province labels more readable when they
+ * Rotated X tick labels - makes island labels more readable when they
  * might otherwise overlap on narrow charts.
  */
 export const RotatedXTicks: Story = {
 	args: {
 		series: [
 			{
-				name: 'life_expectancy',
-				x: 'province',
-				y: 'sex',
-				color: 'value',
-				data: LIFE_EXPECTANCY_BY_PROVINCE_SEX
-			} satisfies Series<ProvinceSexCell>
+				name: 'penguins',
+				x: 'island',
+				y: 'species',
+				color: 'count',
+				data: PENGUIN_COUNTS
+			} satisfies Series<PenguinSpeciesCount>
 		],
 		scales: {
 			x: { tickRotate: -45 },
-			color: { domain: [70, 85] }
+			color: { domain: [0, 120] }
 		} satisfies AxisBasedScalesConfig
 	}
 };
@@ -167,17 +172,17 @@ export const CombinedOverrides: Story = {
 	args: {
 		series: [
 			{
-				name: 'life_expectancy',
-				x: 'province',
-				y: 'sex',
-				color: 'value',
-				data: LIFE_EXPECTANCY_BY_PROVINCE_SEX
-			} satisfies Series<ProvinceSexCell>
+				name: 'penguins',
+				x: 'island',
+				y: 'species',
+				color: 'count',
+				data: PENGUIN_COUNTS
+			} satisfies Series<PenguinSpeciesCount>
 		],
 		scales: {
-			x: { domain: PROVINCES, label: 'Province', tickRotate: -45 },
-			y: { domain: SEXES, label: 'Sex' },
-			color: { domain: [70, 85] }
+			x: { domain: PENGUIN_ISLANDS, label: 'Island', tickRotate: -45 },
+			y: { domain: PENGUIN_SPECIES, label: 'Species' },
+			color: { domain: [0, 120] }
 		} satisfies AxisBasedScalesConfig
 	}
 };

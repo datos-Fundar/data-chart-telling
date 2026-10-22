@@ -1,12 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import {
-	LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	MALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	type ProvinceSexCell
-} from './data';
+import { PENGUIN_COUNTS, type PenguinSpeciesCount } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -36,47 +31,47 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * Single series with explicit series object - data is grouped into one series
- * with x, y, color dimensions mapping to 'province', 'sex', and 'value' fields.
+ * with x, y, color dimensions mapping to 'island', 'species', and 'count' fields.
  *
- * The heatmap displays life expectancy across provinces and sex.
+ * The heatmap displays how many penguins of each species live on each island.
  */
 export const Default: Story = {
 	args: {
 		series: [
 			{
-				name: 'life_expectancy',
-				x: 'province',
-				y: 'sex',
-				color: 'value',
-				data: LIFE_EXPECTANCY_BY_PROVINCE_SEX
-			} satisfies Series<ProvinceSexCell>
+				name: 'penguins',
+				x: 'island',
+				y: 'species',
+				color: 'count',
+				data: PENGUIN_COUNTS
+			} satisfies Series<PenguinSpeciesCount>
 		]
 	}
 };
 
 /**
  * Alternative data structure - the same grid built from two separate
- * per-sex series instead of one combined array. Each series only carries
- * its own row of cells; `HeatmapPlot` merges every series' data onto the
+ * per-species series instead of one combined array. Each series only carries
+ * its own rows of cells; `HeatmapPlot` merges every series' data onto the
  * same x/y/color accessors before drawing.
  */
-export const TwoSeriesBySex: Story = {
+export const TwoSeriesBySpecies: Story = {
 	args: {
 		series: [
 			{
-				name: 'female',
-				x: 'province',
-				y: 'sex',
-				color: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
-			} satisfies Series<ProvinceSexCell>,
+				name: 'adelie',
+				x: 'island',
+				y: 'species',
+				color: 'count',
+				data: PENGUIN_COUNTS.filter((d) => d.species === 'Adelie')
+			} satisfies Series<PenguinSpeciesCount>,
 			{
-				name: 'male',
-				x: 'province',
-				y: 'sex',
-				color: 'value',
-				data: MALE_LIFE_EXPECTANCY_BY_PROVINCE
-			} satisfies Series<ProvinceSexCell>
+				name: 'others',
+				x: 'island',
+				y: 'species',
+				color: 'count',
+				data: PENGUIN_COUNTS.filter((d) => d.species !== 'Adelie')
+			} satisfies Series<PenguinSpeciesCount>
 		]
 	}
 };
@@ -87,9 +82,9 @@ export const TwoSeriesBySex: Story = {
  */
 export const UsingDataShorthand: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-		x: 'province',
-		y: 'sex',
-		color: 'value'
+		data: PENGUIN_COUNTS,
+		x: 'island',
+		y: 'species',
+		color: 'count'
 	}
 };

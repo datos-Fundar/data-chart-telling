@@ -1,6 +1,6 @@
 <script lang="ts">
 	import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
-	import { HEAT_CELLS } from '../../../data/heat-cells';
+	import { PENGUIN_COUNTS } from '$datasets';
 </script>
 
 <!--
@@ -11,10 +11,10 @@
 <HeatmapPlot
 	width={760}
 	height={420}
-	data={HEAT_CELLS.filter((d) => d.scenario === 'Baseline' && d.year === 2022)}
-	x="rooms"
-	y="people"
-	color="pct"
-	legend={{ color: { title: 'Share of homes', width: 260, interactive: { enabled: true } } }}
-	styles={{ values: { format: (v: number) => `${(v * 100).toFixed(0)}%` } }}
+	data={PENGUIN_COUNTS}
+	x="island"
+	y="species"
+	color="count"
+	legend={{ color: { title: 'Penguins', width: 260, interactive: { enabled: true } } }}
+	styles={{ values: { format: (v: number) => `${v}` } }}
 />

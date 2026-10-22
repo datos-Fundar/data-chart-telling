@@ -3,7 +3,7 @@ import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import { renderSource } from '../../common/docsSource';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from '../../plots/correlation/heatmap/data';
+import { PENGUIN_COUNTS } from '$datasets';
 import { WORLD_COUNTRIES, WEATHER_STATIONS } from '../../plots/map/geo/data';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -30,10 +30,10 @@ const meta = {
 	args: {
 		width: 940,
 		height: 420,
-		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-		x: 'province',
-		y: 'sex',
-		color: 'value'
+		data: PENGUIN_COUNTS,
+		x: 'island',
+		y: 'species',
+		color: 'count'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -49,22 +49,21 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * `opacity: 'value'` dims lower life-expectancy cells, independent of
- * `color` (which is also driven by `value` here, but could just as easily
- * read a different field entirely).
+ * `opacity: 'speciesTotal'` dims the cells of the less numerous species,
+ * independent of `color` (which reads `count`).
  */
 export const Default: Story = {
 	args: {
-		opacity: 'value'
+		opacity: 'speciesTotal'
 	}
 };
 
 /** `scales.opacity.range` narrows the dimming - cells never drop below 0.5 opacity here, instead of the theme's own default floor. */
 export const CustomRange: Story = {
 	args: {
-		opacity: 'value',
+		opacity: 'speciesTotal',
 		scales: {
-			opacity: { domain: [70, 85], range: [0.5, 1] }
+			opacity: { domain: [0, 150], range: [0.5, 1] }
 		}
 	}
 };
@@ -82,10 +81,9 @@ const markerLevelProps = {
 			x: 'lon',
 			y: 'lat',
 			r: 8,
-			color: 'tempC',
 			opacity: 'tempC',
 			scales: { opacity: { range: [0.25, 1] } },
-			styles: { dotStroke: '#1e293b' }
+			styles: { dotFill: '#2563eb', dotStroke: '#1e293b' }
 		}
 	] satisfies GeoMarkersConfig[]
 };

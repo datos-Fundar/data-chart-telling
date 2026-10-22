@@ -2,7 +2,7 @@
 	import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 	import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 	import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
-	import { HEAT_CELLS } from '../../../data/heat-cells';
+	import { PENGUIN_COUNTS } from '$datasets';
 	import { ARGENTINA_PROVINCES } from '../../../plots/map/geo/data';
 	import { provincePopulation } from '../../../plots/map/geo/channels';
 </script>
@@ -16,11 +16,11 @@
 		width={760}
 		height={320}
 		title="Color and opacity"
-		data={HEAT_CELLS.filter((d) => d.scenario === 'Baseline' && d.year === 2022)}
-		x="rooms"
-		y="people"
-		color="pct"
-		opacity="people"
+		data={PENGUIN_COUNTS}
+		x="island"
+		y="species"
+		color="count"
+		opacity="speciesTotal"
 		scales={{ color: { scheme: 'warm' } }}
 	/>
 	<GeoPlot

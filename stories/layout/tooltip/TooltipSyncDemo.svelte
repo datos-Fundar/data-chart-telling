@@ -1,9 +1,7 @@
 <script module lang="ts">
-	import { HEAT_CELLS } from '../../data/heat-cells';
-	import { POPULATION_BY_AGE } from '$datasets';
+	import { PENGUIN_COUNTS_BY_SEX, POPULATION_BY_AGE } from '$datasets';
 
 	/** Filtered data reused by the story's docs source override, see `stories/common/docsSource.ts`. */
-	export const heatData = HEAT_CELLS.filter((d) => d.year === 2022);
 	export const pyramidData = POPULATION_BY_AGE.filter((d) =>
 		[1991, 2022, 2030, 2040].includes(d.year)
 	);
@@ -16,9 +14,8 @@
 	import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 	import type { HoverStrategy } from '$lib/types/layout/hover';
 	import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
-	import type { HeatCell } from '../../data/heat-cells';
 	import { REGION_BARS, type RegionYear } from '../../data/region-bars';
-	import { AGE_GROUPS, type AgeRow } from '$datasets';
+	import { AGE_GROUPS, type AgeRow, type PenguinCount } from '$datasets';
 
 	const { kind = 'line' }: { kind?: 'line' | 'heatmap' | 'bar' | 'pyramid' } = $props();
 
@@ -48,15 +45,15 @@
 		<HeatmapPlot
 			width={760}
 			height={460}
-			title="Households by rooms (2022)"
+			title="Penguins by island and species"
 			subtitle="Strategy: {strategy} · Sync: {sync ? 'on' : 'off'}"
-			data={heatData}
-			x={'rooms' as keyof HeatCell}
-			y={'people' as keyof HeatCell}
-			color={'share' as keyof HeatCell}
-			scales={{ x: { label: 'Rooms' }, y: { label: 'People' } }}
-			styles={{ values: { show: false, format: (v) => `${(v * 100).toFixed(0)}%` } }}
-			facet={{ by: 'scenario' as keyof HeatCell, columns: 2 }}
+			data={PENGUIN_COUNTS_BY_SEX}
+			x={'island' as keyof PenguinCount}
+			y={'species' as keyof PenguinCount}
+			color={'count' as keyof PenguinCount}
+			scales={{ x: { label: 'Island' }, y: { label: 'Species' } }}
+			styles={{ values: { show: false, format: (v) => `${v}` } }}
+			facet={{ by: 'sex' as keyof PenguinCount, columns: 2 }}
 			tooltip={{ strategy, sync }}
 			markers={[{ type: 'hover' }]}
 		/>

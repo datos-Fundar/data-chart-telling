@@ -3,14 +3,14 @@ import { describe, test, expect, vi } from 'vitest';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
-import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from '../../../../../stories/plots/correlation/heatmap/data';
+import { PENGUIN_COUNTS } from '$datasets';
 import { waitForSvg, countCells } from '../../_helpers/svg';
 
 const DATA_PROPS = {
-	data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-	x: 'province' as const,
-	y: 'sex' as const,
-	color: 'value' as const
+	data: PENGUIN_COUNTS,
+	x: 'island' as const,
+	y: 'species' as const,
+	color: 'count' as const
 };
 
 function styleAttrs(svg: SVGElement): string[] {
@@ -19,10 +19,10 @@ function styleAttrs(svg: SVGElement): string[] {
 
 describe('HeatmapPlot - segments (areas, "default" key)', () => {
 	test('an area segment and the catch-all each apply their own fillOpacity', async () => {
-		const xFrom = 'Buenos Aires';
-		const xTo = 'Formosa';
-		const yFrom = 'Female';
-		const yTo = 'Female';
+		const xFrom = 'Biscoe';
+		const xTo = 'Dream';
+		const yFrom = 'Adelie';
+		const yTo = 'Adelie';
 		const { container } = await render(HeatmapPlot, {
 			width: 400,
 			height: 300,
@@ -38,14 +38,14 @@ describe('HeatmapPlot - segments (areas, "default" key)', () => {
 			} satisfies SegmentsConfig<CellSegmentStyle>
 		});
 		const svg = await waitForSvg(container);
-		expect(countCells(svg)).toBe(LIFE_EXPECTANCY_BY_PROVINCE_SEX.length);
-		const matchedCount = LIFE_EXPECTANCY_BY_PROVINCE_SEX.filter(
-			(d) => d.province >= xFrom && d.province <= xTo && d.sex >= yFrom && d.sex <= yTo
+		expect(countCells(svg)).toBe(PENGUIN_COUNTS.length);
+		const matchedCount = PENGUIN_COUNTS.filter(
+			(d) => d.island >= xFrom && d.island <= xTo && d.species >= yFrom && d.species <= yTo
 		).length;
 		const styles = styleAttrs(svg);
 		expect(styles.filter((s) => s.includes('fill-opacity: 1;')).length).toBe(matchedCount);
 		expect(styles.filter((s) => s.includes('fill-opacity: 0.3')).length).toBe(
-			LIFE_EXPECTANCY_BY_PROVINCE_SEX.length - matchedCount
+			PENGUIN_COUNTS.length - matchedCount
 		);
 	});
 
@@ -74,11 +74,11 @@ describe('HeatmapPlot - segments (areas, "default" key)', () => {
 			width: 400,
 			height: 300,
 			...DATA_PROPS,
-			segments: { life_expectancy: [{ styles: {} }] } satisfies SegmentsConfig<CellSegmentStyle>
+			segments: { penguins: [{ styles: {} }] } satisfies SegmentsConfig<CellSegmentStyle>
 		});
 		await vi.waitFor(
 			() => {
-				expect(warn).toHaveBeenCalledWith(expect.stringContaining('life_expectancy'));
+				expect(warn).toHaveBeenCalledWith(expect.stringContaining('penguins'));
 			},
 			{ timeout: 1000 }
 		);
@@ -95,13 +95,13 @@ describe('HeatmapPlot - segments (catch-all + area merging)', () => {
 			segments: {
 				default: [
 					{ styles: { fill: '#e11d48' } },
-					{ areas: [{ x: { from: 'Buenos Aires', to: 'Formosa' } }], styles: { fillOpacity: 0.5 } }
+					{ areas: [{ x: { from: 'Biscoe', to: 'Dream' } }], styles: { fillOpacity: 0.5 } }
 				]
 			} satisfies SegmentsConfig<CellSegmentStyle>
 		});
 		const svg = await waitForSvg(container);
 		const styles = styleAttrs(svg);
-		expect(styles.length).toBe(LIFE_EXPECTANCY_BY_PROVINCE_SEX.length);
+		expect(styles.length).toBe(PENGUIN_COUNTS.length);
 		styles.forEach((s) => expect(s).toContain('fill: rgb(225, 29, 72)'));
 	});
 });

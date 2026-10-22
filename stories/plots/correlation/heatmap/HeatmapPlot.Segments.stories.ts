@@ -3,7 +3,7 @@ import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
-import { LIFE_EXPECTANCY_BY_PROVINCE_SEX, type ProvinceSexCell } from './data';
+import { PENGUIN_COUNTS, type PenguinSpeciesCount } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -31,22 +31,22 @@ type Story = StoryObj<typeof meta>;
 
 const SERIES = [
 	{
-		name: 'life_expectancy',
-		x: 'province',
-		y: 'sex',
-		color: 'value',
-		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX
-	} satisfies Series<ProvinceSexCell>
+		name: 'penguins',
+		x: 'island',
+		y: 'species',
+		color: 'count',
+		data: PENGUIN_COUNTS
+	} satisfies Series<PenguinSpeciesCount>
 ];
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 // Heatmap segments use the `'default'` key - heatmaps have no named series.
-// `from`/`to` compare category values lexicographically, so provinces fall in
-// alphabetical order: Buenos Aires, Córdoba, Formosa, La Rioja, Santa Fe, Tucumán.
+// `from`/`to` compare category values lexicographically, so islands fall in
+// alphabetical order: Biscoe, Dream, Torgersen.
 
 /**
- * Highlight a region - dims all cells except the female row for a range of
- * provinces. Useful for focusing on a particular demographic slice.
+ * Highlight a region - dims all cells except the Adelie row for a range of
+ * islands. Useful for focusing on a particular slice of the data.
  */
 export const HighlightRegion: Story = {
 	args: {
@@ -56,8 +56,8 @@ export const HighlightRegion: Story = {
 				{
 					areas: [
 						{
-							x: { from: 'Buenos Aires', to: 'Formosa' },
-							y: { from: 'Female', to: 'Female' }
+							x: { from: 'Biscoe', to: 'Dream' },
+							y: { from: 'Adelie', to: 'Adelie' }
 						}
 					],
 					styles: { fillOpacity: 1 }
@@ -71,16 +71,16 @@ export const HighlightRegion: Story = {
 };
 
 /**
- * Highlight a row (sex) - every female cell is highlighted with full opacity;
- * the male row is dimmed.
+ * Highlight a row (species) - every Adelie cell is highlighted with full opacity;
+ * the other rows are dimmed.
  */
-export const HighlightSex: Story = {
+export const HighlightSpecies: Story = {
 	args: {
 		series: SERIES,
 		segments: {
 			default: [
 				{
-					areas: [{ y: { from: 'Female', to: 'Female' } }],
+					areas: [{ y: { from: 'Adelie', to: 'Adelie' } }],
 					styles: { fillOpacity: 0.95 }
 				},
 				{
@@ -92,18 +92,18 @@ export const HighlightSex: Story = {
 };
 
 /**
- * Highlight columns (provinces) - all cells in specific provinces are shown
+ * Highlight columns (islands) - all cells in specific islands are shown
  * at full brightness; others are faded.
  */
-export const HighlightProvinces: Story = {
+export const HighlightIslands: Story = {
 	args: {
 		series: SERIES,
 		segments: {
 			default: [
 				{
 					areas: [
-						{ x: { from: 'Buenos Aires', to: 'Córdoba' } },
-						{ x: { from: 'Tucumán', to: 'Tucumán' } }
+						{ x: { from: 'Biscoe', to: 'Biscoe' } },
+						{ x: { from: 'Torgersen', to: 'Torgersen' } }
 					],
 					styles: { fillOpacity: 1 }
 				},
@@ -127,8 +127,8 @@ export const LayeredOpacity: Story = {
 				{
 					areas: [
 						{
-							x: { from: 'Buenos Aires', to: 'Formosa' },
-							y: { from: 'Female', to: 'Female' }
+							x: { from: 'Biscoe', to: 'Dream' },
+							y: { from: 'Adelie', to: 'Adelie' }
 						}
 					],
 					styles: { fillOpacity: 1 }
@@ -136,8 +136,8 @@ export const LayeredOpacity: Story = {
 				{
 					areas: [
 						{
-							x: { from: 'La Rioja', to: 'Tucumán' },
-							y: { from: 'Male', to: 'Male' }
+							x: { from: 'Dream', to: 'Torgersen' },
+							y: { from: 'Gentoo', to: 'Gentoo' }
 						}
 					],
 					styles: { fillOpacity: 0.6 }
@@ -162,8 +162,8 @@ export const HighlightWithStroke: Story = {
 				{
 					areas: [
 						{
-							x: { from: 'Buenos Aires', to: 'Córdoba' },
-							y: { from: 'Female', to: 'Female' }
+							x: { from: 'Biscoe', to: 'Biscoe' },
+							y: { from: 'Adelie', to: 'Adelie' }
 						}
 					],
 					styles: {

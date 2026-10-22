@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from '../data';
+import { PENGUIN_COUNTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -29,18 +29,18 @@ type Story = StoryObj<typeof meta>;
 
 const SERIES = [
 	{
-		name: 'life_expectancy',
-		x: 'province',
-		y: 'sex',
-		color: 'value',
-		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX
+		name: 'penguins',
+		x: 'island',
+		y: 'species',
+		color: 'count',
+		data: PENGUIN_COUNTS
 	}
 ];
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Vertical rule markers (ruleX) to highlight specific provinces on the
+ * Vertical rule markers (ruleX) to highlight specific islands on the
  * categorical x axis.
  */
 export const WithRuleXMarkers: Story = {
@@ -50,7 +50,7 @@ export const WithRuleXMarkers: Story = {
 			{
 				type: 'rule',
 				axis: 'x',
-				value: 'Córdoba',
+				value: 'Dream',
 				styles: {
 					strokeDasharray: '4 4',
 					strokeOpacity: 0.7
@@ -59,7 +59,7 @@ export const WithRuleXMarkers: Story = {
 			{
 				type: 'rule',
 				axis: 'x',
-				value: 'Tucumán',
+				value: 'Torgersen',
 				styles: {
 					strokeDasharray: '4 4',
 					strokeOpacity: 0.7
@@ -71,7 +71,7 @@ export const WithRuleXMarkers: Story = {
 
 /**
  * Horizontal rule markers (ruleY) to highlight specific rows on the
- * categorical y axis - here, both sexes get their own dashed rule.
+ * categorical y axis - here, two of the species get their own dashed rule.
  */
 export const WithRuleYMarkers: Story = {
 	args: {
@@ -80,7 +80,7 @@ export const WithRuleYMarkers: Story = {
 			{
 				type: 'rule',
 				axis: 'y',
-				value: 'Female',
+				value: 'Adelie',
 				styles: {
 					strokeDasharray: '6 6',
 					strokeOpacity: 0.5
@@ -89,7 +89,7 @@ export const WithRuleYMarkers: Story = {
 			{
 				type: 'rule',
 				axis: 'y',
-				value: 'Male',
+				value: 'Gentoo',
 				styles: {
 					strokeDasharray: '6 6',
 					strokeOpacity: 0.5
@@ -105,15 +105,15 @@ export const WithRuleYMarkers: Story = {
  */
 export const WithMixedMarkers: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-		x: 'province',
-		y: 'sex',
-		color: 'value',
+		data: PENGUIN_COUNTS,
+		x: 'island',
+		y: 'species',
+		color: 'count',
 		markers: [
 			{
 				type: 'rule',
 				axis: 'x',
-				value: 'Buenos Aires',
+				value: 'Biscoe',
 				styles: {
 					strokeDasharray: '4 4',
 					strokeOpacity: 0.6
@@ -122,7 +122,7 @@ export const WithMixedMarkers: Story = {
 			{
 				type: 'rule',
 				axis: 'y',
-				value: 'Female',
+				value: 'Adelie',
 				styles: {
 					strokeDasharray: '6 6',
 					strokeOpacity: 0.5

@@ -2,14 +2,14 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from '../../../../../../stories/plots/correlation/heatmap/data';
+import { PENGUIN_COUNTS } from '$datasets';
 import { waitForSvg, countHoverAreas } from '../../../_helpers/svg';
 
 const DATA_PROPS = {
-	data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-	x: 'province' as const,
-	y: 'sex' as const,
-	color: 'value' as const
+	data: PENGUIN_COUNTS,
+	x: 'island' as const,
+	y: 'species' as const,
+	color: 'count' as const
 };
 
 // Both of a heatmap's axes are band scales, so `areaX`/`areaY` (unlike on a

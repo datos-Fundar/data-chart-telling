@@ -2,17 +2,14 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import {
-	LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-	type ProvinceSexCell
-} from '../../../../../stories/plots/correlation/heatmap/data';
+import { PENGUIN_COUNTS, type PenguinSpeciesCount } from '$datasets';
 import { waitForSvg } from '../../_helpers/svg';
 
 const DATA_PROPS = {
-	data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-	x: 'province' as const,
-	y: 'sex' as const,
-	color: 'value' as const
+	data: PENGUIN_COUNTS,
+	x: 'island' as const,
+	y: 'species' as const,
+	color: 'count' as const
 };
 
 function noTooltipDom(container: Element) {
@@ -34,8 +31,8 @@ describe('HeatmapPlot - tooltip', () => {
 			tooltip: {
 				sync: false,
 				format: (row) => {
-					const { province, sex, value } = row as ProvinceSexCell;
-					return `${province} - ${sex}: ${value.toFixed(1)} yr`;
+					const { island, species, count } = row as PenguinSpeciesCount;
+					return `${island} - ${species}: ${count} penguins`;
 				}
 			}
 		});
@@ -51,8 +48,8 @@ describe('HeatmapPlot - tooltip', () => {
 			tooltip: {
 				sync: false,
 				format: (row) => {
-					const { province, sex, value } = row as ProvinceSexCell;
-					return `${province} - ${sex}: ${value.toFixed(1)} yr`;
+					const { island, species, count } = row as PenguinSpeciesCount;
+					return `${island} - ${species}: ${count} penguins`;
 				}
 			}
 		});
@@ -66,18 +63,18 @@ describe('HeatmapPlot - tooltip', () => {
 			height: 300,
 			series: [
 				{
-					name: 'life_expectancy',
-					x: 'province',
-					y: 'sex',
-					color: 'value',
-					data: LIFE_EXPECTANCY_BY_PROVINCE_SEX
-				} satisfies Series<ProvinceSexCell>
+					name: 'penguins',
+					x: 'island',
+					y: 'species',
+					color: 'count',
+					data: PENGUIN_COUNTS
+				} satisfies Series<PenguinSpeciesCount>
 			],
 			tooltip: {
 				sync: false,
 				format: (row) => {
-					const { province, value } = row as ProvinceSexCell;
-					return `${province}: ${Math.round(value)} yr`;
+					const { island, count } = row as PenguinSpeciesCount;
+					return `${island}: ${count} penguins`;
 				}
 			}
 		});

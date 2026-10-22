@@ -1,11 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import {
-	LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	MALE_LIFE_EXPECTANCY_BY_PROVINCE
-} from '../data';
+import { PENGUIN_COUNTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -33,11 +29,11 @@ type Story = StoryObj<typeof meta>;
 
 const SERIES = [
 	{
-		name: 'life_expectancy',
-		x: 'province',
-		y: 'sex',
-		color: 'value',
-		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX
+		name: 'penguins',
+		x: 'island',
+		y: 'species',
+		color: 'count',
+		data: PENGUIN_COUNTS
 	}
 ];
 
@@ -99,7 +95,7 @@ export const WithoutRules: Story = {
 
 /**
  * Row rule only - `ruleX: false` keeps just the horizontal (`ruleY`) rule,
- * highlighting the hovered cell's sex row without the vertical province rule.
+ * highlighting the hovered cell's species row without the vertical island rule.
  */
 export const RowRuleOnly: Story = {
 	args: {
@@ -116,7 +112,7 @@ export const RowRuleOnly: Story = {
 
 /**
  * Column rule only - `ruleY: false` keeps just the vertical (`ruleX`) rule,
- * highlighting the hovered cell's sex column without the horizontal sex rule.
+ * highlighting the hovered cell's island column without the horizontal species rule.
  */
 export const ColumnRuleOnly: Story = {
 	args: {
@@ -179,27 +175,27 @@ export const WithHighlightCross: Story = {
 };
 
 /**
- * Two series from separate per-sex arrays - the unscoped hover marker
+ * Two series from separate per-species arrays - the unscoped hover marker
  * responds identically whether the grid comes from one combined series or,
- * as here, two merged per-sex series (see `TwoSeriesBySex` in the Series
+ * as here, two merged per-species series (see `TwoSeriesBySpecies` in the Series
  * stories).
  */
-export const TwoSeriesBySex: Story = {
+export const TwoSeriesBySpecies: Story = {
 	args: {
 		series: [
 			{
-				name: 'female',
-				x: 'province',
-				y: 'sex',
-				color: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+				name: 'adelie',
+				x: 'island',
+				y: 'species',
+				color: 'count',
+				data: PENGUIN_COUNTS.filter((d) => d.species === 'Adelie')
 			},
 			{
-				name: 'male',
-				x: 'province',
-				y: 'sex',
-				color: 'value',
-				data: MALE_LIFE_EXPECTANCY_BY_PROVINCE
+				name: 'others',
+				x: 'island',
+				y: 'species',
+				color: 'count',
+				data: PENGUIN_COUNTS.filter((d) => d.species !== 'Adelie')
 			}
 		],
 		markers: [
@@ -216,10 +212,10 @@ export const TwoSeriesBySex: Story = {
  */
 export const FromGroupedData: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-		x: 'province',
-		y: 'sex',
-		color: 'value',
+		data: PENGUIN_COUNTS,
+		x: 'island',
+		y: 'species',
+		color: 'count',
 		markers: [
 			{
 				type: 'hover'

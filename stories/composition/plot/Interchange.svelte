@@ -3,17 +3,16 @@
 	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 	import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 	import Scrubber from '../../common/Scrubber.svelte';
-	import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
-	import { HEAT_CELLS } from '../../data/heat-cells';
+	import { POPULATION_BY_BROAD_AGE, type AgeRow } from '$datasets';
 
 	/**
-	 * Three plot kinds, the same chrome props. Title, legend, timeline and
+	 * Three plot kinds over the same dataset, each a different view of it, with
+	 * the same chrome props. Title, legend, timeline and
 	 * facet are props every plot kind takes on its own - switching kinds swaps
 	 * the whole plot (chrome included), and only the scrubber's position is
 	 * shared, since it lives outside.
 	 */
 	let kind = $state<'line' | 'bar' | 'heatmap'>('line');
-	const northSeries = TIME_SERIES.filter((d) => d.region === 'North');
 </script>
 
 <div class="switcher">
@@ -30,13 +29,12 @@
 				height={520}
 				title="Same props, interchangeable plot"
 				subtitle="HeatmapPlot"
-				data={HEAT_CELLS.filter((d) => d.scenario === 'Baseline')}
-				x="rooms"
-				y="people"
-				color="pct"
+				data={POPULATION_BY_BROAD_AGE}
+				x="ageGroup"
+				y="sex"
+				color="share"
 				timeline={{ accessor: 'year', type: 'rule', progress, orientation: 'vertical' }}
-				scales={{ x: { label: 'Rooms' }, y: { label: 'People' } }}
-				styles={{ values: { format: (v) => `${(v * 100).toFixed(0)}%` } }}
+				scales={{ x: { label: 'Age group' }, y: { label: 'Sex' } }}
 			/>
 		{:else if kind === 'line'}
 			<LinePlot
@@ -44,12 +42,12 @@
 				height={460}
 				title="Same props, interchangeable plot"
 				subtitle="LinePlot"
-				data={northSeries}
+				data={POPULATION_BY_BROAD_AGE}
 				x="year"
-				y="value"
-				color="metric"
+				y="share"
+				color="ageGroup"
 				timeline={{ accessor: 'year', type: 'rule', progress, orientation: 'vertical' }}
-				facet={{ by: 'metric' as keyof SeriesPoint, columns: 2 }}
+				facet={{ by: 'sex' as keyof AgeRow, columns: 2 }}
 			/>
 		{:else}
 			<BarPlot
@@ -57,9 +55,10 @@
 				height={460}
 				title="Same props, interchangeable plot"
 				subtitle="BarPlot"
-				data={northSeries}
+				data={POPULATION_BY_BROAD_AGE}
 				x="year"
-				y="value"
+				y="share"
+				color="ageGroup"
 				timeline={{
 					accessor: 'year',
 					type: 'rule',
@@ -67,7 +66,7 @@
 					orientation: 'vertical',
 					filterMode: 'upTo'
 				}}
-				facet={{ by: 'metric' as keyof SeriesPoint, columns: 2 }}
+				facet={{ by: 'sex' as keyof AgeRow, columns: 2 }}
 			/>
 		{/if}
 	{/snippet}

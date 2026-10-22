@@ -2,14 +2,14 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from '../../../../../stories/plots/correlation/heatmap/data';
+import { PENGUIN_COUNTS } from '$datasets';
 import { waitForSvg, countCells, countTextLabels } from '../../_helpers/svg';
 
 const DATA_PROPS = {
-	data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-	x: 'province' as const,
-	y: 'sex' as const,
-	color: 'value' as const
+	data: PENGUIN_COUNTS,
+	x: 'island' as const,
+	y: 'species' as const,
+	color: 'count' as const
 };
 
 function cellFills(svg: SVGElement): string[] {
@@ -20,11 +20,9 @@ describe('HeatmapPlot - styles.values', () => {
 	test('value labels render by default, one per cell, showing the raw value', async () => {
 		const { container } = await render(HeatmapPlot, { width: 400, height: 300, ...DATA_PROPS });
 		const svg = await waitForSvg(container);
-		expect(countTextLabels(svg)).toBe(LIFE_EXPECTANCY_BY_PROVINCE_SEX.length);
+		expect(countTextLabels(svg)).toBe(PENGUIN_COUNTS.length);
 		const labels = Array.from(svg.querySelectorAll('g.text text')).map((t) => t.textContent);
-		expect(labels).toEqual(
-			expect.arrayContaining(LIFE_EXPECTANCY_BY_PROVINCE_SEX.map((d) => String(d.value)))
-		);
+		expect(labels).toEqual(expect.arrayContaining(PENGUIN_COUNTS.map((d) => String(d.count))));
 	});
 
 	test('values.show: false hides the value labels', async () => {
@@ -36,7 +34,7 @@ describe('HeatmapPlot - styles.values', () => {
 		});
 		const svg = await waitForSvg(container);
 		expect(countTextLabels(svg)).toBe(0);
-		expect(countCells(svg)).toBe(LIFE_EXPECTANCY_BY_PROVINCE_SEX.length);
+		expect(countCells(svg)).toBe(PENGUIN_COUNTS.length);
 	});
 
 	test('a custom format callback overrides the default label text', async () => {
@@ -45,13 +43,13 @@ describe('HeatmapPlot - styles.values', () => {
 			height: 300,
 			...DATA_PROPS,
 			styles: {
-				values: { format: (v: number) => `${v.toFixed(1)} yr` }
+				values: { format: (v: number) => `${v} penguins` }
 			} satisfies AxisBasedStylesConfig
 		});
 		const svg = await waitForSvg(container);
 		const labels = Array.from(svg.querySelectorAll('g.text text')).map((t) => t.textContent);
 		expect(labels).toEqual(
-			expect.arrayContaining(LIFE_EXPECTANCY_BY_PROVINCE_SEX.map((d) => `${d.value.toFixed(1)} yr`))
+			expect.arrayContaining(PENGUIN_COUNTS.map((d) => `${d.count} penguins`))
 		);
 	});
 });
@@ -71,8 +69,8 @@ describe('HeatmapPlot - scales.color', () => {
 		const customSvg = await waitForSvg(customRender.container);
 		const customFills = cellFills(customSvg);
 
-		expect(defaultFills.length).toBe(LIFE_EXPECTANCY_BY_PROVINCE_SEX.length);
-		expect(customFills.length).toBe(LIFE_EXPECTANCY_BY_PROVINCE_SEX.length);
+		expect(defaultFills.length).toBe(PENGUIN_COUNTS.length);
+		expect(customFills.length).toBe(PENGUIN_COUNTS.length);
 		expect(customFills).not.toEqual(defaultFills);
 	});
 });

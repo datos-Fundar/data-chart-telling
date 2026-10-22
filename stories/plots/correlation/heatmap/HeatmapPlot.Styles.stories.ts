@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from './data';
+import { PENGUIN_COUNTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -35,10 +35,10 @@ type Story = StoryObj<typeof meta>;
  */
 export const Default: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-		x: 'province',
-		y: 'sex',
-		color: 'value'
+		data: PENGUIN_COUNTS,
+		x: 'island',
+		y: 'species',
+		color: 'count'
 	}
 };
 
@@ -48,12 +48,12 @@ export const Default: Story = {
  */
 export const NoValueLabels: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-		x: 'province',
-		y: 'sex',
-		color: 'value',
+		data: PENGUIN_COUNTS,
+		x: 'island',
+		y: 'species',
+		color: 'count',
 		scales: {
-			color: { domain: [70, 85] }
+			color: { domain: [0, 120] }
 		},
 		styles: {
 			values: { show: false }
@@ -63,19 +63,19 @@ export const NoValueLabels: Story = {
 
 /**
  * Custom value format - the `format(value)` callback controls how cell values
- * are displayed. Here life expectancy is shown in years with one decimal place.
+ * are displayed. Here each count is shown followed by the unit.
  */
 export const CustomValueFormat: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-		x: 'province',
-		y: 'sex',
-		color: 'value',
+		data: PENGUIN_COUNTS,
+		x: 'island',
+		y: 'species',
+		color: 'count',
 		scales: {
-			color: { domain: [70, 85] }
+			color: { domain: [0, 120] }
 		},
 		styles: {
-			values: { format: (v: number) => `${v.toFixed(1)} yr` }
+			values: { format: (v: number) => `${v} penguins` }
 		} satisfies AxisBasedStylesConfig
 	}
 };
@@ -86,34 +86,34 @@ export const CustomValueFormat: Story = {
  */
 export const WarmColorRamp: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-		x: 'province',
-		y: 'sex',
-		color: 'value',
+		data: PENGUIN_COUNTS,
+		x: 'island',
+		y: 'species',
+		color: 'count',
 		scales: {
-			color: { domain: [70, 85], scheme: 'warm' }
+			color: { domain: [0, 120], scheme: 'warm' }
 		},
 		styles: {
-			values: { format: (v: number) => `${v.toFixed(1)} yr` }
+			values: { format: (v: number) => `${v} penguins` }
 		} satisfies AxisBasedStylesConfig
 	}
 };
 
 /**
  * Custom color ramp - full control over the color gradient from min to max.
- * Here a red-to-green ramp emphasizes low and high life expectancy.
+ * Here a red-to-green ramp emphasizes small and large populations.
  */
 export const CustomColorRamp: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-		x: 'province',
-		y: 'sex',
-		color: 'value',
+		data: PENGUIN_COUNTS,
+		x: 'island',
+		y: 'species',
+		color: 'count',
 		scales: {
-			color: { domain: [70, 85], scheme: ['#ff6b6b', '#51cf66'] }
+			color: { domain: [0, 120], scheme: ['#ff6b6b', '#51cf66'] }
 		},
 		styles: {
-			values: { format: (v: number) => `${v.toFixed(1)} yr` }
+			values: { format: (v: number) => `${v} penguins` }
 		} satisfies AxisBasedStylesConfig
 	}
 };
@@ -124,15 +124,15 @@ export const CustomColorRamp: Story = {
  */
 export const InvertedColorRamp: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-		x: 'province',
-		y: 'sex',
-		color: 'value',
+		data: PENGUIN_COUNTS,
+		x: 'island',
+		y: 'species',
+		color: 'count',
 		scales: {
-			color: { domain: [70, 85], scheme: ['#51cf66', '#ff6b6b'] }
+			color: { domain: [0, 120], scheme: ['#51cf66', '#ff6b6b'] }
 		},
 		styles: {
-			values: { format: (v: number) => `${v.toFixed(1)} yr` }
+			values: { format: (v: number) => `${v} penguins` }
 		} satisfies AxisBasedStylesConfig
 	}
 };

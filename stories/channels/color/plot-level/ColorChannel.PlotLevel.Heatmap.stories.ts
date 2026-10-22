@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
-import { LIFE_EXPECTANCY_BY_PROVINCE_SEX } from '../../../plots/correlation/heatmap/data';
+import { PENGUIN_COUNTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `color` channel: a plot-level `color` accessor plus `scales.color`
@@ -15,9 +15,9 @@ const meta = {
 	args: {
 		width: 940,
 		height: 420,
-		data: LIFE_EXPECTANCY_BY_PROVINCE_SEX,
-		x: 'province',
-		y: 'sex'
+		data: PENGUIN_COUNTS,
+		x: 'island',
+		y: 'species'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -33,23 +33,23 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * `color: 'value'` feeds each cell's life-expectancy value into the plot's
+ * `color: 'count'` feeds each cell's penguin count into the plot's
  * own `scales.color` ramp - no marker config needed, since every plot kind's
  * default marks read the plot-level channel automatically.
  */
 export const Default: Story = {
 	args: {
-		color: 'value'
+		color: 'count'
 	}
 };
 
 /** `scales.color.scheme` swaps the ramp's colors without touching `color` itself. */
 export const CustomScheme: Story = {
 	args: {
-		color: 'value',
+		color: 'count',
 		scales: {
 			color: {
-				domain: [70, 85],
+				domain: [0, 120],
 				scheme: 'viridis'
 			}
 		}

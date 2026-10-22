@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
-import TooltipSyncDemo, { heatData, pyramidData } from './TooltipSyncDemo.svelte';
+import TooltipSyncDemo, { pyramidData } from './TooltipSyncDemo.svelte';
 import FacetSyncBarBySeriesDemo from './FacetSyncBarBySeriesDemo.svelte';
 import FacetSyncBarUnrelatedOrderDemo, {
 	UNRELATED_SORT_DATA,
@@ -9,7 +9,7 @@ import FacetSyncBarUnrelatedOrderDemo, {
 import { renderSource } from '../../common/docsSource';
 import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
 import { REGION_BARS, REGION_SECTOR_BARS, type RegionSector } from '../../data/region-bars';
-import { AGE_GROUPS } from '$datasets';
+import { AGE_GROUPS, PENGUIN_COUNTS_BY_SEX } from '$datasets';
 
 /** `tooltip.sync: true` broadcasts the hover to every faceted panel with a match. */
 const meta = {
@@ -135,22 +135,22 @@ export const FacetSyncBarBySeries: StoryObj = {
 	}
 };
 
-/** Faceted heatmap - `punctual` strategy highlights the same cell in every scenario. */
+/** Faceted heatmap - `punctual` strategy highlights the same cell in every sex. */
 export const FacetSyncHeatmap: StoryObj = {
 	render: () => ({ Component: TooltipSyncDemo, props: { kind: 'heatmap' } }),
 	parameters: {
 		docs: {
 			source: {
 				code: renderSource('HeatmapPlot', {
-					title: 'Households by rooms (2022)',
+					title: 'Penguins by island and species',
 					subtitle: 'Strategy: punctual · Sync: on',
-					data: heatData,
-					x: 'rooms',
-					y: 'people',
-					color: 'share',
-					scales: { x: { label: 'Rooms' }, y: { label: 'People' } },
-					styles: { values: { show: false, format: (v: number) => `${(v * 100).toFixed(0)}%` } },
-					facet: { by: 'scenario', columns: 2 },
+					data: PENGUIN_COUNTS_BY_SEX,
+					x: 'island',
+					y: 'species',
+					color: 'count',
+					scales: { x: { label: 'Island' }, y: { label: 'Species' } },
+					styles: { values: { show: false, format: (v: number) => `${v}` } },
+					facet: { by: 'sex', columns: 2 },
 					tooltip: { strategy: 'punctual', sync: true },
 					markers: [{ type: 'hover' }]
 				})
