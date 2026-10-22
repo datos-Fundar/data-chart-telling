@@ -325,7 +325,11 @@ export class LegendState {
 		const dots = LegendChannels.look(
 			(plot.markers ?? []).filter((marker) => marker.type === 'dot' && !marker.legend)
 		);
-		const series: LegendEntry[] = (plot.resolvedSeries ?? []).map((s) => ({
+		// A series with no rows draws nothing, so it has nothing to show.
+		const drawn = (plot.resolvedSeries ?? []).filter(
+			(s) => !Array.isArray(s.data) || s.data.length > 0
+		);
+		const series: LegendEntry[] = drawn.map((s) => ({
 			type: 'series',
 			name: s.name,
 			color: color(s.name),

@@ -350,7 +350,7 @@ export type LegendSource = {
 
 /** What a plot hands the legend to read its entries from. */
 export type LegendPlot = {
-	resolvedSeries?: { name: string }[];
+	resolvedSeries?: { name: string; data?: unknown[] }[];
 	colorForSeries?: (name: string) => string;
 	markers?: LegendSource[];
 	segments?: Record<string, LegendSource[] | undefined>;

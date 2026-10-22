@@ -104,6 +104,8 @@
 		if (!extent) return undefined;
 		const [lo, hi] = extent;
 		if (!Number.isInteger(lo) || !Number.isInteger(hi)) return undefined;
+		const numbers = values.filter((v): v is number => typeof v === 'number');
+		if (numbers.length === 0 || !numbers.every(Number.isInteger)) return undefined;
 		return hi - lo < NiceTicks.count(span, spacing, min) ? 1 : undefined;
 	}
 
