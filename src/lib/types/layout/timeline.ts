@@ -93,6 +93,9 @@ export type TimelineConfig<TRow extends Record<string, unknown>> = TimelineCallb
 	thickness?: number;
 	filterMode?: 'exact' | 'upTo';
 	interpolate?: boolean | TimelineInterpolation<TRow>;
-	/** `'shared'` (default): x and y span every step's rows, so the axes hold still while scrubbing; `'free'` refits them to each step. */
-	scales?: 'shared' | 'free';
+	/**
+	 * Which position scales the steps share: `'shared'` (default), where x and y span every step's rows, so the axes hold still while scrubbing; `'free'`,
+	 * which refits both to each step; or `'free-x'`/`'free-y'` to refit one and keep the other still.
+	 */
+	scales?: 'shared' | 'free' | 'free-x' | 'free-y';
 };

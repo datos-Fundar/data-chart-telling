@@ -110,12 +110,21 @@ export class Slice<TRow extends Record<string, unknown>> {
 		return merge(shared?.[key] as TScales | undefined, this.#axes?.(place) as TScales | undefined);
 	}
 
-	/** The scales a timeline alone keeps every step on - the domains all its rows span - unless it fits each step's own. */
+	/**
+	 * The scales a timeline alone keeps every step on - the domains all its rows
+	 * span - unless it fits each step's own: both under `'free'`, or the one axis
+	 * `'free-x'`/`'free-y'` names, which leaves the other on its shared domain.
+	 */
 	timelineScales<TScales extends object>(
 		shared: Record<string, object> | undefined
 	): TScales | undefined {
 		const { timeline, facet } = this;
-		if (!timeline || facet || timeline.scales === 'free') return undefined;
-		return shared?.[''] as TScales | undefined;
+		const mode = timeline?.scales;
+		if (!timeline || facet || mode === 'free') return undefined;
+		const all = shared?.[''] as TScales | undefined;
+		if (!all || (mode !== 'free-x' && mode !== 'free-y')) return all;
+		const kept = { ...all } as Record<string, unknown>;
+		delete kept[mode === 'free-x' ? 'x' : 'y'];
+		return kept as TScales;
 	}
 }

@@ -93,4 +93,16 @@ describe('Slice', () => {
 			new Slice<Row>({ ...inputs, timeline, facet: { by: 'r' } }).timelineScales(shared)
 		).toBeUndefined();
 	});
+
+	test('a timeline can free one axis and keep the other on its shared domain', () => {
+		const shared = {
+			'': { x: { domain: [0, 1] }, y: { domain: [0, 9] }, color: { domain: ['a'] } }
+		};
+		const timeline = { accessor: 'year' };
+		const scalesOf = (scales: 'free-x' | 'free-y') =>
+			new Slice<Row>({ ...inputs, timeline: { ...timeline, scales } }).timelineScales(shared);
+		expect(scalesOf('free-x')).toEqual({ y: { domain: [0, 9] }, color: { domain: ['a'] } });
+		expect(scalesOf('free-y')).toEqual({ x: { domain: [0, 1] }, color: { domain: ['a'] } });
+		expect(shared[''].x).toBeDefined();
+	});
 });
