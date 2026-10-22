@@ -1,10 +1,10 @@
 <script module lang="ts">
 	import { HEAT_CELLS } from '../../data/heat-cells';
-	import { POPULATION_PYRAMID } from '../../data/population-pyramid';
+	import { POPULATION_BY_AGE } from '$datasets';
 
 	/** Filtered data reused by the story's docs source override, see `stories/common/docsSource.ts`. */
 	export const heatData = HEAT_CELLS.filter((d) => d.year === 2022);
-	export const pyramidData = POPULATION_PYRAMID.filter((d) =>
+	export const pyramidData = POPULATION_BY_AGE.filter((d) =>
 		[1991, 2022, 2030, 2040].includes(d.year)
 	);
 </script>
@@ -18,7 +18,7 @@
 	import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
 	import type { HeatCell } from '../../data/heat-cells';
 	import { REGION_BARS, type RegionYear } from '../../data/region-bars';
-	import { AGE_GROUPS, type PopulationRow } from '../../data/population-pyramid';
+	import { AGE_GROUPS, type AgeRow } from '$datasets';
 
 	const { kind = 'line' }: { kind?: 'line' | 'heatmap' | 'bar' | 'pyramid' } = $props();
 
@@ -53,7 +53,7 @@
 			data={heatData}
 			x={'rooms' as keyof HeatCell}
 			y={'people' as keyof HeatCell}
-			color={'pct' as keyof HeatCell}
+			color={'share' as keyof HeatCell}
 			scales={{ x: { label: 'Rooms' }, y: { label: 'People' } }}
 			styles={{ values: { show: false, format: (v) => `${(v * 100).toFixed(0)}%` } }}
 			facet={{ by: 'scenario' as keyof HeatCell, columns: 2 }}
@@ -80,9 +80,9 @@
 			title="Population pyramid by year"
 			subtitle="Strategy: {strategy} · Sync: {sync ? 'on' : 'off'}"
 			data={pyramidData}
-			y={'ageGroup' as keyof PopulationRow}
-			x={'pct' as keyof PopulationRow}
-			color={'sex' as keyof PopulationRow}
+			y={'ageGroup' as keyof AgeRow}
+			x={'share' as keyof AgeRow}
+			color={'sex' as keyof AgeRow}
 			scales={{
 				y: { domain: AGE_GROUPS },
 				color: { scheme: { Female: '#d6336c', Male: '#1971c2' } }
@@ -90,7 +90,7 @@
 			styles={{
 				values: { format: (v) => `${v.toFixed(1)}%` }
 			}}
-			facet={{ by: 'year' as keyof PopulationRow, columns: 2 }}
+			facet={{ by: 'year' as keyof AgeRow, columns: 2 }}
 			tooltip={{ strategy, sync }}
 			markers={[{ type: 'hover' }]}
 		/>

@@ -9,7 +9,7 @@ import FacetSyncBarUnrelatedOrderDemo, {
 import { renderSource } from '../../common/docsSource';
 import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
 import { REGION_BARS, REGION_SECTOR_BARS, type RegionSector } from '../../data/region-bars';
-import { AGE_GROUPS } from '../../data/population-pyramid';
+import { AGE_GROUPS } from '$datasets';
 
 /** `tooltip.sync: true` broadcasts the hover to every faceted panel with a match. */
 const meta = {
@@ -147,7 +147,7 @@ export const FacetSyncHeatmap: StoryObj = {
 					data: heatData,
 					x: 'rooms',
 					y: 'people',
-					color: 'pct',
+					color: 'share',
 					scales: { x: { label: 'Rooms' }, y: { label: 'People' } },
 					styles: { values: { show: false, format: (v: number) => `${(v * 100).toFixed(0)}%` } },
 					facet: { by: 'scenario', columns: 2 },
@@ -202,7 +202,7 @@ export const FacetSyncPyramid: StoryObj = {
 					subtitle: 'Strategy: y · Sync: on',
 					data: pyramidData,
 					y: 'ageGroup',
-					x: 'pct',
+					x: 'share',
 					color: 'sex',
 					scales: {
 						y: { domain: AGE_GROUPS },

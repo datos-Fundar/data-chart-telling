@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../../data/population-pyramid';
+import { AGE_GROUPS, POPULATION_BY_AGE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -26,7 +26,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
+const DATA = POPULATION_BY_AGE.filter((d) => d.year === 2022);
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
@@ -37,7 +37,7 @@ const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
 export const WithValueLabels: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: {
@@ -57,7 +57,7 @@ export const WithValueLabels: Story = {
 export const CustomValueFormat: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: {
@@ -77,7 +77,7 @@ export const CustomValueFormat: Story = {
 export const LabelsInside: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
@@ -99,7 +99,7 @@ export const LabelsInside: Story = {
 export const LabelsWithOffset: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: {

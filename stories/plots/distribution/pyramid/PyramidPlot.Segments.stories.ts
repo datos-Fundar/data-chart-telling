@@ -3,7 +3,7 @@ import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { Area } from '$lib/types/plots/segments/config';
 import type { SegmentsConfig } from '$lib/types/plots/props';
-import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../data/population-pyramid';
+import { AGE_GROUPS, POPULATION_BY_AGE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -28,7 +28,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
+const DATA = POPULATION_BY_AGE.filter((d) => d.year === 2022);
 
 // Age group labels are 5-year bins ('0-4', '5-9', … '85+') whose bucket-start
 // numbers don't sort correctly as plain strings (e.g. '5-9' > '20-24'
@@ -52,7 +52,7 @@ function bucketStart(ageGroup: string): number {
 export const HighlightedSegments: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
@@ -72,7 +72,7 @@ export const HighlightedSegments: Story = {
 export const WorkingAgeHighlight: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
@@ -95,7 +95,7 @@ export const WorkingAgeHighlight: Story = {
 export const YouthAndElderlyHighlight: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
@@ -119,7 +119,7 @@ export const YouthAndElderlyHighlight: Story = {
 export const ByDecadePattern: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
@@ -146,7 +146,7 @@ export const ByDecadePattern: Story = {
 export const AsymmetricHighlight: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
@@ -173,7 +173,7 @@ export const AsymmetricHighlight: Story = {
 export const CustomColorHighlight: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },

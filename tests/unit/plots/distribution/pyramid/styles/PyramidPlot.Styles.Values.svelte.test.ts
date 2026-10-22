@@ -3,13 +3,13 @@ import { describe, test, expect } from 'vitest';
 import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import type { ValueAnchor } from '$lib/types/plots/constants';
-import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../../../../stories/data/population-pyramid';
+import { AGE_GROUPS, POPULATION_BY_AGE } from '$datasets';
 import { waitForSvg, countTextLabels } from '../../../_helpers/svg';
 
-const DATA_2022 = POPULATION_PYRAMID.filter((d) => d.year === 2022);
+const DATA_2022 = POPULATION_BY_AGE.filter((d) => d.year === 2022);
 const DATA_PROPS = {
 	data: DATA_2022,
-	x: 'pct' as const,
+	x: 'share' as const,
 	y: 'ageGroup' as const,
 	color: 'sex' as const
 };
@@ -43,7 +43,7 @@ describe('PyramidPlot - styles.values', () => {
 		});
 		const svg = await waitForSvg(container);
 		const labels = Array.from(svg.querySelectorAll('g.text text')).map((t) => t.textContent);
-		expect(labels).toEqual(expect.arrayContaining(DATA_2022.map((d) => `${d.pct.toFixed(1)}%`)));
+		expect(labels).toEqual(expect.arrayContaining(DATA_2022.map((d) => `${d.share.toFixed(1)}%`)));
 	});
 
 	test("anchor changes the label's horizontal position relative to the bar", async () => {

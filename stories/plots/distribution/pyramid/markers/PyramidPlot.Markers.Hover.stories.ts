@@ -2,11 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { Series } from '$lib/types/plots/data/common';
-import {
-	AGE_GROUPS,
-	POPULATION_PYRAMID,
-	type PopulationRow
-} from '../../../../data/population-pyramid';
+import { AGE_GROUPS, POPULATION_BY_AGE, type AgeRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -31,7 +27,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
+const DATA = POPULATION_BY_AGE.filter((d) => d.year === 2022);
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
@@ -44,7 +40,7 @@ const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
 export const Basic: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
@@ -63,7 +59,7 @@ export const Basic: Story = {
 export const WithoutLabels: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
@@ -83,7 +79,7 @@ export const WithoutLabels: Story = {
 export const WithoutRule: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
@@ -104,7 +100,7 @@ export const WithoutRule: Story = {
 export const WithBothAxis: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
@@ -125,7 +121,7 @@ export const WithBothAxis: Story = {
 export const WithCustomRuleStyle: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: {
@@ -155,7 +151,7 @@ export const WithCustomRuleStyle: Story = {
 export const LabelOutsideDot: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: {
@@ -183,7 +179,7 @@ export const LabelOutsideDot: Story = {
 export const SeriesScoped: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
@@ -209,7 +205,7 @@ export const SeriesScoped: Story = {
 export const WithHighlightArea: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
@@ -233,16 +229,16 @@ export const FromExplicitSeries: Story = {
 		series: [
 			{
 				name: 'Female',
-				x: 'pct',
+				x: 'share',
 				y: 'ageGroup',
 				data: DATA.filter((d) => d.sex === 'Female')
-			} satisfies Series<PopulationRow>,
+			} satisfies Series<AgeRow>,
 			{
 				name: 'Male',
-				x: 'pct',
+				x: 'share',
 				y: 'ageGroup',
 				data: DATA.filter((d) => d.sex === 'Male')
-			} satisfies Series<PopulationRow>
+			} satisfies Series<AgeRow>
 		],
 		scales: { y: { domain: AGE_GROUPS } },
 		markers: [

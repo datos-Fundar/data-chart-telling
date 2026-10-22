@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../../data/population-pyramid';
+import { AGE_GROUPS, POPULATION_BY_AGE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -26,7 +26,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
+const DATA = POPULATION_BY_AGE.filter((d) => d.year === 2022);
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
@@ -37,7 +37,7 @@ const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
 export const Default: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } }
@@ -53,7 +53,7 @@ export const Default: Story = {
 export const CustomColorsViaScalesColor: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: {
@@ -72,7 +72,7 @@ export const CustomColorsViaScalesColor: Story = {
 export const CustomColorsViaSegments: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },

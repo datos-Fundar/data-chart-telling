@@ -2,14 +2,10 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import {
-	AGE_GROUPS,
-	POPULATION_PYRAMID,
-	type PopulationRow
-} from '../../../../../stories/data/population-pyramid';
+import { AGE_GROUPS, POPULATION_BY_AGE, type AgeRow } from '$datasets';
 import { waitForSvg, countBarRects } from '../../_helpers/svg';
 
-const DATA_2022 = POPULATION_PYRAMID.filter((d) => d.year === 2022);
+const DATA_2022 = POPULATION_BY_AGE.filter((d) => d.year === 2022);
 
 function barFills(svg: SVGElement): string[] {
 	return Array.from(svg.querySelectorAll('g.bar-x rect')).map((r) => getComputedStyle(r).fill);
@@ -21,7 +17,7 @@ describe('PyramidPlot - data/x/y/color shorthand', () => {
 			width: 560,
 			height: 520,
 			data: DATA_2022,
-			x: 'pct',
+			x: 'share',
 			y: 'ageGroup',
 			color: 'sex'
 		});
@@ -34,7 +30,7 @@ describe('PyramidPlot - data/x/y/color shorthand', () => {
 			width: 560,
 			height: 520,
 			data: DATA_2022,
-			x: 'pct',
+			x: 'share',
 			y: 'ageGroup',
 			color: 'sex',
 			scales: { y: { domain: AGE_GROUPS } }
@@ -47,8 +43,8 @@ describe('PyramidPlot - data/x/y/color shorthand', () => {
 		const { container } = await render(PyramidPlot, {
 			width: 560,
 			height: 520,
-			data: [] as PopulationRow[],
-			x: 'pct',
+			data: [] as AgeRow[],
+			x: 'share',
 			y: 'ageGroup',
 			color: 'sex'
 		});
@@ -64,7 +60,7 @@ describe('PyramidPlot - orientation (read off which axis holds the categories)',
 			height: 520,
 			data: DATA_2022,
 			x: 'ageGroup',
-			y: 'pct',
+			y: 'share',
 			color: 'sex',
 			scales: { x: { domain: AGE_GROUPS } }
 		});
@@ -89,16 +85,16 @@ describe('PyramidPlot - explicit series prop', () => {
 			series: [
 				{
 					name: 'Female',
-					x: 'pct',
+					x: 'share',
 					y: 'ageGroup',
 					data: DATA_2022.filter((d) => d.sex === 'Female')
-				} satisfies Series<PopulationRow>,
+				} satisfies Series<AgeRow>,
 				{
 					name: 'Male',
-					x: 'pct',
+					x: 'share',
 					y: 'ageGroup',
 					data: DATA_2022.filter((d) => d.sex === 'Male')
-				} satisfies Series<PopulationRow>
+				} satisfies Series<AgeRow>
 			],
 			scales: { y: { domain: AGE_GROUPS } }
 		});
@@ -111,7 +107,7 @@ describe('PyramidPlot - explicit series prop', () => {
 			width: 560,
 			height: 520,
 			data: DATA_2022,
-			x: 'pct',
+			x: 'share',
 			y: 'ageGroup',
 			color: 'sex'
 		});

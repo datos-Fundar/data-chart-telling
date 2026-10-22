@@ -5,26 +5,24 @@ import { setConfiguration, resetConfiguration } from '$lib/configuration/config.
 import type { GapsConfig } from '$lib/types/plots/gaps';
 import type { GapsAwarePlotStylesConfig } from '$lib/types/layout/styles';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
-import {
-	POPULATION_PYRAMID,
-	FEMALE_2022_WITH_GAPS
-} from '../../../../../../stories/data/population-pyramid';
+import { POPULATION_BY_AGE } from '$datasets';
+import { FEMALE_2022_WITH_GAPS } from '../../../../../../stories/data/population-gaps';
 import { waitForSvg, countBarRects, countTextLabels } from '../../../_helpers/svg';
 
 // A series' `x`/`y` are the visual axes, like the top-level props: `x` the magnitude, `y` the category.
 const FEMALE = {
 	name: 'Female',
-	x: 'pct' as const,
+	x: 'share' as const,
 	y: 'ageGroup' as const,
 	data: FEMALE_2022_WITH_GAPS
 };
 const MALE = {
 	name: 'Male',
-	x: 'pct' as const,
+	x: 'share' as const,
 	y: 'ageGroup' as const,
-	data: POPULATION_PYRAMID.filter((d) => d.year === 2022 && d.sex === 'Male')
+	data: POPULATION_BY_AGE.filter((d) => d.year === 2022 && d.sex === 'Male')
 };
-const REAL_COUNT = FEMALE_2022_WITH_GAPS.filter((d) => d.pct != null).length;
+const REAL_COUNT = FEMALE_2022_WITH_GAPS.filter((d) => d.share != null).length;
 
 describe('PyramidPlot - gaps (no config)', () => {
 	test('a missing value renders no bar, not a fake-zero one', async () => {

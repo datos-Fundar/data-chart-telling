@@ -2,17 +2,13 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import {
-	AGE_GROUPS,
-	POPULATION_PYRAMID,
-	type PopulationRow
-} from '../../../../../stories/data/population-pyramid';
+import { AGE_GROUPS, POPULATION_BY_AGE, type AgeRow } from '$datasets';
 import { waitForSvg } from '../../_helpers/svg';
 
-const DATA_2022 = POPULATION_PYRAMID.filter((d) => d.year === 2022);
+const DATA_2022 = POPULATION_BY_AGE.filter((d) => d.year === 2022);
 const DATA_PROPS = {
 	data: DATA_2022,
-	x: 'pct' as const,
+	x: 'share' as const,
 	y: 'ageGroup' as const,
 	color: 'sex' as const
 };
@@ -36,8 +32,8 @@ describe('PyramidPlot - tooltip', () => {
 			tooltip: {
 				sync: false,
 				format: (row) => {
-					const { ageGroup, sex, pct } = row as PopulationRow;
-					return `${sex} - ${ageGroup}: ${pct}%`;
+					const { ageGroup, sex, share } = row as AgeRow;
+					return `${sex} - ${ageGroup}: ${share}%`;
 				}
 			}
 		});
@@ -54,8 +50,8 @@ describe('PyramidPlot - tooltip', () => {
 			tooltip: {
 				sync: false,
 				format: (row) => {
-					const { ageGroup, sex, pct } = row as PopulationRow;
-					return `${sex} - ${ageGroup}: ${pct.toFixed(1)}%`;
+					const { ageGroup, sex, share } = row as AgeRow;
+					return `${sex} - ${ageGroup}: ${share.toFixed(1)}%`;
 				}
 			}
 		});
@@ -72,7 +68,7 @@ describe('PyramidPlot - tooltip', () => {
 			tooltip: {
 				sync: false,
 				series: ['Female'],
-				format: (row) => `Female: ${(row as PopulationRow).pct.toFixed(1)}%`
+				format: (row) => `Female: ${(row as AgeRow).share.toFixed(1)}%`
 			}
 		});
 		const svg = await waitForSvg(container);
@@ -86,21 +82,21 @@ describe('PyramidPlot - tooltip', () => {
 			series: [
 				{
 					name: 'Female',
-					x: 'pct',
+					x: 'share',
 					y: 'ageGroup',
 					data: DATA_2022.filter((d) => d.sex === 'Female')
-				} satisfies Series<PopulationRow>,
+				} satisfies Series<AgeRow>,
 				{
 					name: 'Male',
-					x: 'pct',
+					x: 'share',
 					y: 'ageGroup',
 					data: DATA_2022.filter((d) => d.sex === 'Male')
-				} satisfies Series<PopulationRow>
+				} satisfies Series<AgeRow>
 			],
 			scales: { y: { domain: AGE_GROUPS } },
 			tooltip: {
 				sync: false,
-				format: (row) => `${(row as PopulationRow).ageGroup}: ${(row as PopulationRow).pct}%`
+				format: (row) => `${(row as AgeRow).ageGroup}: ${(row as AgeRow).share}%`
 			}
 		});
 		const svg = await waitForSvg(container);
@@ -118,8 +114,8 @@ describe('PyramidPlot - hover matches by row (y), not by bar magnitude (x)', () 
 			tooltip: {
 				sync: false,
 				format: (row) => {
-					const { ageGroup, sex, pct } = row as PopulationRow;
-					return `${sex} - ${ageGroup}: ${pct}%`;
+					const { ageGroup, sex, share } = row as AgeRow;
+					return `${sex} - ${ageGroup}: ${share}%`;
 				}
 			}
 		});

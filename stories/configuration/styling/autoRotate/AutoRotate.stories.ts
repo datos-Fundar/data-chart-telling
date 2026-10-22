@@ -4,7 +4,7 @@ import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import AutoRotateDemo from './AutoRotateDemo.svelte';
 import AutoRotateDemoSource from './AutoRotateDemo.svelte?raw';
 import { demoSource } from '../../../common/docsSource';
-import { PROVINCE_VALUES, AGES } from '$datasets';
+import { PROVINCE_VALUES, POPULATION_BY_AGE_AT_2022 } from '$datasets';
 
 /**
  * `axis.autoRotate` (on by default) lets the category axis of any plot turn its
@@ -91,7 +91,7 @@ export const ManyRows: Story = {
 	args: {
 		width: 420,
 		height: 260,
-		data: AGES.filter((row) => row.sex === 'Female'),
+		data: POPULATION_BY_AGE_AT_2022.filter((row) => row.sex === 'Female'),
 		x: 'share',
 		y: 'ageGroup',
 		color: undefined,

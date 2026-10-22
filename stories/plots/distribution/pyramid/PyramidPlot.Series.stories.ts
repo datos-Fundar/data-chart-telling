@@ -1,11 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import {
-	AGE_GROUPS,
-	POPULATION_PYRAMID,
-	type PopulationRow
-} from '../../../data/population-pyramid';
+import { AGE_GROUPS, POPULATION_BY_AGE, type AgeRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -42,8 +38,8 @@ type Story = StoryObj<typeof meta>;
  */
 export const Default: Story = {
 	args: {
-		data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
-		x: 'pct',
+		data: POPULATION_BY_AGE.filter((d) => d.year === 2022),
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { label: 'Grupo de edad', domain: AGE_GROUPS } }
@@ -56,9 +52,9 @@ export const Default: Story = {
  */
 export const Vertical: Story = {
 	args: {
-		data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
+		data: POPULATION_BY_AGE.filter((d) => d.year === 2022),
 		x: 'ageGroup',
-		y: 'pct',
+		y: 'share',
 		color: 'sex',
 		scales: { x: { label: 'Age group', domain: AGE_GROUPS } }
 	}
@@ -78,16 +74,16 @@ export const ExplicitSeries: Story = {
 		series: [
 			{
 				name: 'Female',
-				x: 'pct',
+				x: 'share',
 				y: 'ageGroup',
-				data: POPULATION_PYRAMID.filter((d) => d.year === 2022 && d.sex === 'Female')
-			} satisfies Series<PopulationRow>,
+				data: POPULATION_BY_AGE.filter((d) => d.year === 2022 && d.sex === 'Female')
+			} satisfies Series<AgeRow>,
 			{
 				name: 'Male',
-				x: 'pct',
+				x: 'share',
 				y: 'ageGroup',
-				data: POPULATION_PYRAMID.filter((d) => d.year === 2022 && d.sex === 'Male')
-			} satisfies Series<PopulationRow>
+				data: POPULATION_BY_AGE.filter((d) => d.year === 2022 && d.sex === 'Male')
+			} satisfies Series<AgeRow>
 		],
 		scales: { y: { label: 'Grupo de edad', domain: AGE_GROUPS } }
 	}
@@ -102,8 +98,8 @@ export const ExplicitSeries: Story = {
  */
 export const YearlySnapshot1991: Story = {
 	args: {
-		data: POPULATION_PYRAMID.filter((d) => d.year === 1991),
-		x: 'pct',
+		data: POPULATION_BY_AGE.filter((d) => d.year === 1991),
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { label: 'Grupo de edad', domain: AGE_GROUPS } }
@@ -115,8 +111,8 @@ export const YearlySnapshot1991: Story = {
  */
 export const YearlySnapshot2010: Story = {
 	args: {
-		data: POPULATION_PYRAMID.filter((d) => d.year === 2010),
-		x: 'pct',
+		data: POPULATION_BY_AGE.filter((d) => d.year === 2010),
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { label: 'Grupo de edad', domain: AGE_GROUPS } }

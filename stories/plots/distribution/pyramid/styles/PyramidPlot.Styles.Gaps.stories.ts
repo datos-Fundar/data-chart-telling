@@ -2,16 +2,13 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 import type { GapsConfig } from '$lib/types/plots/gaps';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
-import {
-	AGE_GROUPS,
-	POPULATION_PYRAMID,
-	FEMALE_2022_WITH_GAPS
-} from '../../../../data/population-pyramid';
+import { AGE_GROUPS, POPULATION_BY_AGE } from '$datasets';
+import { FEMALE_2022_WITH_GAPS } from '../../../../data/population-gaps';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 // `FEMALE_2022_WITH_GAPS` - the same 2022 slice every other PyramidPlot
-// story already uses - has three holes, all `pct: null`: the first two age
+// story already uses - has three holes, all `share: null`: the first two age
 // groups (start), an internal pair (middle), and the last two (end).
 // Without `styles.gaps`, a missing value renders no bar at all -
 // `styles.gaps` fills it with a distinctly-styled bar at an interpolated
@@ -25,7 +22,7 @@ const meta = {
 	args: {
 		width: 940,
 		height: 520,
-		series: [{ name: 'Female', x: 'pct', y: 'ageGroup', data: FEMALE_2022_WITH_GAPS }],
+		series: [{ name: 'Female', x: 'share', y: 'ageGroup', data: FEMALE_2022_WITH_GAPS }],
 		scales: { y: { domain: AGE_GROUPS } }
 	},
 	argTypes: {
@@ -89,12 +86,12 @@ export const LeadingAndTrailingGapsOptIn: Story = {
 // ── Series-aware form, both sides ─────────────────────────────────────────────
 
 const FEMALE_AND_MALE_2022 = [
-	{ name: 'Female', x: 'pct' as const, y: 'ageGroup' as const, data: FEMALE_2022_WITH_GAPS },
+	{ name: 'Female', x: 'share' as const, y: 'ageGroup' as const, data: FEMALE_2022_WITH_GAPS },
 	{
 		name: 'Male',
-		x: 'pct' as const,
+		x: 'share' as const,
 		y: 'ageGroup' as const,
-		data: POPULATION_PYRAMID.filter((d) => d.year === 2022 && d.sex === 'Male')
+		data: POPULATION_BY_AGE.filter((d) => d.year === 2022 && d.sex === 'Male')
 	}
 ];
 

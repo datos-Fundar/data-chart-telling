@@ -3,13 +3,13 @@ import { describe, test, expect } from 'vitest';
 import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 import type { SegmentsConfig } from '$lib/types/plots/props';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
-import { POPULATION_PYRAMID } from '../../../../../../stories/data/population-pyramid';
+import { POPULATION_BY_AGE } from '$datasets';
 import { waitForSvg } from '../../../_helpers/svg';
 
-const DATA_2022 = POPULATION_PYRAMID.filter((d) => d.year === 2022);
+const DATA_2022 = POPULATION_BY_AGE.filter((d) => d.year === 2022);
 const DATA_PROPS = {
 	data: DATA_2022,
-	x: 'pct' as const,
+	x: 'share' as const,
 	y: 'ageGroup' as const,
 	color: 'sex' as const
 };

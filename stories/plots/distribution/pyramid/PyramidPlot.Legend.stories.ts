@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../data/population-pyramid';
+import { AGE_GROUPS, POPULATION_BY_AGE } from '$datasets';
 import type { LegendSection } from '$lib/types/layout/legend';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -29,7 +29,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
+const DATA = POPULATION_BY_AGE.filter((d) => d.year === 2022);
 
 const SEX_LEGEND: LegendSection[] = [
 	{
@@ -54,7 +54,7 @@ const SEX_LEGEND: LegendSection[] = [
 export const LegendDisabledDimsLabels: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		legend: SEX_LEGEND,
@@ -77,7 +77,7 @@ export const LegendDisabledDimsLabels: Story = {
 export const HoverIsolate: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: {

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../../data/population-pyramid';
+import { AGE_GROUPS, POPULATION_BY_AGE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -26,7 +26,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
+const DATA = POPULATION_BY_AGE.filter((d) => d.year === 2022);
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
@@ -38,7 +38,7 @@ const DATA = POPULATION_PYRAMID.filter((d) => d.year === 2022);
 export const WithRuleXMarker: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
@@ -64,7 +64,7 @@ export const WithRuleXMarker: Story = {
 export const MultipleThresholdMarkers: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
@@ -101,7 +101,7 @@ export const MultipleThresholdMarkers: Story = {
 export const SymmetricMarkers: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
@@ -137,7 +137,7 @@ export const SymmetricMarkers: Story = {
 export const AverageMarker: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },
@@ -164,7 +164,7 @@ export const AverageMarker: Story = {
 export const PolicyThresholdMarker: Story = {
 	args: {
 		data: DATA,
-		x: 'pct',
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } },

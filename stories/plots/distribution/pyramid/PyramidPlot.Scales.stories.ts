@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../data/population-pyramid';
+import { AGE_GROUPS, POPULATION_BY_AGE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -33,8 +33,8 @@ type Story = StoryObj<typeof meta>;
  */
 export const Default: Story = {
 	args: {
-		data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
-		x: 'pct',
+		data: POPULATION_BY_AGE.filter((d) => d.year === 2022),
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex'
 	}
@@ -47,8 +47,8 @@ export const Default: Story = {
  */
 export const WithAgeGroupDomain: Story = {
 	args: {
-		data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
-		x: 'pct',
+		data: POPULATION_BY_AGE.filter((d) => d.year === 2022),
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: { y: { domain: AGE_GROUPS } } satisfies AxisBasedScalesConfig
@@ -61,8 +61,8 @@ export const WithAgeGroupDomain: Story = {
  */
 export const WithAxisLabels: Story = {
 	args: {
-		data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
-		x: 'pct',
+		data: POPULATION_BY_AGE.filter((d) => d.year === 2022),
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: {
@@ -78,8 +78,8 @@ export const WithAxisLabels: Story = {
  */
 export const CustomXDomain: Story = {
 	args: {
-		data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
-		x: 'pct',
+		data: POPULATION_BY_AGE.filter((d) => d.year === 2022),
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: {
@@ -95,8 +95,8 @@ export const CustomXDomain: Story = {
  */
 export const CustomXTickFormat: Story = {
 	args: {
-		data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
-		x: 'pct',
+		data: POPULATION_BY_AGE.filter((d) => d.year === 2022),
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: {
@@ -115,8 +115,8 @@ export const CustomXTickFormat: Story = {
  */
 export const WithXGrid: Story = {
 	args: {
-		data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
-		x: 'pct',
+		data: POPULATION_BY_AGE.filter((d) => d.year === 2022),
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: {
@@ -132,8 +132,8 @@ export const WithXGrid: Story = {
  */
 export const CombinedOverrides: Story = {
 	args: {
-		data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
-		x: 'pct',
+		data: POPULATION_BY_AGE.filter((d) => d.year === 2022),
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: {
@@ -156,8 +156,8 @@ export const CombinedOverrides: Story = {
  */
 export const ReversedOrder: Story = {
 	args: {
-		data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
-		x: 'pct',
+		data: POPULATION_BY_AGE.filter((d) => d.year === 2022),
+		x: 'share',
 		y: 'ageGroup',
 		color: 'sex',
 		scales: {
