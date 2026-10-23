@@ -1,3 +1,4 @@
+import { createRawSnippet } from 'svelte';
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
@@ -37,6 +38,8 @@ async function hoverCenterAndReadTooltip(
 		top: parseFloat(tooltip.style.top)
 	};
 }
+
+type Row = Record<string, unknown>;
 
 describe('LinePlot - tooltip', () => {
 	test('lists the hovered series from the highest value to the lowest', async () => {
@@ -180,5 +183,30 @@ describe('LinePlot - tooltip anchor placement', () => {
 		});
 		const { cursorY, top } = await hoverCenterAndReadTooltip(container);
 		expect(top).toBeGreaterThan(cursorY);
+	});
+
+	test('a `content` snippet gets each row with the color the plot draws it in', async () => {
+		const content = createRawSnippet<[{ rows: Row[] }]>((args) => ({
+			render: () =>
+				`<span class="colors">${args()
+					.rows.map((row) => `${row.sex as string}=${row.seriesColor as string}`)
+					.join('|')}</span>`
+		}));
+		const { container } = await render(LinePlot, {
+			width: 400,
+			height: 300,
+			data: LIFE,
+			x: 'year',
+			y: 'value',
+			color: 'sex',
+			scales: { color: { scheme: ['#ff0000', '#0000ff'] } },
+			tooltip: { strategy: 'x', content }
+		});
+		await hoverCenterAndReadTooltip(container);
+		const reported = container.querySelector('.colors')!.textContent!.split('|');
+		expect(reported).toHaveLength(2);
+		expect(reported.map((entry) => entry.split('=')[1])).toEqual(
+			expect.arrayContaining(['#ff0000', '#0000ff'])
+		);
 	});
 });

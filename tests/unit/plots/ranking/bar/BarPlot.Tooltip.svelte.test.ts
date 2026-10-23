@@ -1,25 +1,25 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
-import type { ProvincePoint } from '../../../../../stories/plots/ranking/bar/data';
 import {
-	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	MALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	LIFE_EXPECTANCY_BY_PROVINCE
-} from '../../../../../stories/plots/ranking/bar/data';
+	type ProvinceRow,
+	FEMALE_PROVINCE_VALUES,
+	MALE_PROVINCE_VALUES,
+	PROVINCE_VALUES
+} from '$datasets';
 import { waitForSvg } from '../../_helpers/svg';
 
 const FEMALE = {
 	name: 'female',
 	x: 'province' as const,
 	y: 'value' as const,
-	data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+	data: FEMALE_PROVINCE_VALUES
 };
 const MALE = {
 	name: 'male',
 	x: 'province' as const,
 	y: 'value' as const,
-	data: MALE_LIFE_EXPECTANCY_BY_PROVINCE
+	data: MALE_PROVINCE_VALUES
 };
 
 function noTooltipDom(container: Element) {
@@ -40,7 +40,7 @@ describe('BarPlot - tooltip', () => {
 			series: [FEMALE],
 			tooltip: {
 				sync: false,
-				format: (row) => `${(row as ProvincePoint).province}: ${(row as ProvincePoint).value} yr`
+				format: (row) => `${(row as ProvinceRow).province}: ${(row as ProvinceRow).value} yr`
 			}
 		});
 		await waitForSvg(container);
@@ -55,7 +55,7 @@ describe('BarPlot - tooltip', () => {
 			tooltip: {
 				sync: false,
 				format: (row) =>
-					`${(row as ProvincePoint).province}: ${(row as ProvincePoint).value.toFixed(1)} yr`
+					`${(row as ProvinceRow).province}: ${(row as ProvinceRow).value.toFixed(1)} yr`
 			}
 		});
 		const svg = await waitForSvg(container);
@@ -70,7 +70,7 @@ describe('BarPlot - tooltip', () => {
 			tooltip: {
 				sync: false,
 				series: ['female'],
-				format: (row) => `Female: ${(row as ProvincePoint).value.toFixed(1)} yr`
+				format: (row) => `Female: ${(row as ProvinceRow).value.toFixed(1)} yr`
 			}
 		});
 		const svg = await waitForSvg(container);
@@ -81,7 +81,7 @@ describe('BarPlot - tooltip', () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,
-			data: LIFE_EXPECTANCY_BY_PROVINCE,
+			data: PROVINCE_VALUES,
 			x: 'province',
 			y: 'value',
 			color: 'sex',

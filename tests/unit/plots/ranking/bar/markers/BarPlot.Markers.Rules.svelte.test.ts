@@ -2,14 +2,14 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { FEMALE_LIFE_EXPECTANCY_BY_PROVINCE } from '../../../../../../stories/plots/ranking/bar/data';
+import { FEMALE_PROVINCE_VALUES } from '$datasets';
 import { waitForSvg } from '../../../_helpers/svg';
 
 const FEMALE = {
 	name: 'female',
 	x: 'province' as const,
 	y: 'value' as const,
-	data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+	data: FEMALE_PROVINCE_VALUES
 };
 
 describe('BarPlot - markers.rules', () => {
@@ -29,7 +29,7 @@ describe('BarPlot - markers.rules', () => {
 			width: 400,
 			height: 300,
 			series: [FEMALE],
-			markers: [{ type: 'rule', axis: 'y', value: 82 }] satisfies AxisBasedMarkersConfig[]
+			markers: [{ type: 'rule', axis: 'y', value: 80 }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
 		expect(svg.querySelectorAll('g.rule-y line').length).toBe(1);
@@ -42,7 +42,7 @@ describe('BarPlot - markers.rules', () => {
 			series: [FEMALE],
 			markers: [
 				{ type: 'rule', axis: 'x', value: 'Córdoba' },
-				{ type: 'rule', axis: 'x', value: 'Tucumán' }
+				{ type: 'rule', axis: 'x', value: 'Chubut' }
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
@@ -56,7 +56,7 @@ describe('BarPlot - markers.rules', () => {
 			series: [FEMALE],
 			markers: [
 				{ type: 'rule', axis: 'x', value: 'Córdoba' },
-				{ type: 'rule', axis: 'y', value: 82 }
+				{ type: 'rule', axis: 'y', value: 80 }
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
@@ -98,7 +98,7 @@ describe('BarPlot - markers.rules', () => {
 				{
 					type: 'rule',
 					axis: 'x',
-					data: [{ province: 'Córdoba' }, { province: 'Tucumán' }],
+					data: [{ province: 'Córdoba' }, { province: 'Chubut' }],
 					value: 'province'
 				}
 			] satisfies AxisBasedMarkersConfig[]

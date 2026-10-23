@@ -5,17 +5,14 @@ import { setConfiguration, resetConfiguration } from '$lib/configuration/config.
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
-import {
-	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	LIFE_EXPECTANCY_BY_PROVINCE
-} from '../../../../../../stories/plots/ranking/bar/data';
+import { FEMALE_PROVINCE_VALUES, PROVINCE_VALUES } from '$datasets';
 import { waitForSvg, countDotMarks, countTextLabels, countHoverAreas } from '../../../_helpers/svg';
 
 const FEMALE = {
 	name: 'female',
 	x: 'province' as const,
 	y: 'value' as const,
-	data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+	data: FEMALE_PROVINCE_VALUES
 };
 
 /** Dispatches a centered `pointerenter` on the first per-category hit area - see the tie-break test below for why this selector picks it out from other transparent rects. */
@@ -50,7 +47,7 @@ describe('BarPlot - markers.hover', () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,
-			data: LIFE_EXPECTANCY_BY_PROVINCE,
+			data: PROVINCE_VALUES,
 			x: 'province',
 			y: 'value',
 			color: 'sex',
@@ -301,7 +298,7 @@ describe('BarPlot - markers.hover areaX/areaY', () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,
-			data: LIFE_EXPECTANCY_BY_PROVINCE,
+			data: PROVINCE_VALUES,
 			x: 'province',
 			y: 'value',
 			color: 'sex',

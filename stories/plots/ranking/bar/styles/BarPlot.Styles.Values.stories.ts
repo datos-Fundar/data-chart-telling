@@ -2,11 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import {
-	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	MALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	type ProvincePoint
-} from '../data';
+import { FEMALE_PROVINCE_VALUES, MALE_PROVINCE_VALUES, type ProvinceRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -52,15 +48,15 @@ const FEMALE = {
 	name: 'female',
 	x: 'province',
 	y: 'value',
-	data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
-} satisfies Series<ProvincePoint>;
+	data: FEMALE_PROVINCE_VALUES
+} satisfies Series<ProvinceRow>;
 
 const MALE = {
 	name: 'male',
 	x: 'province',
 	y: 'value',
-	data: MALE_LIFE_EXPECTANCY_BY_PROVINCE
-} satisfies Series<ProvincePoint>;
+	data: MALE_PROVINCE_VALUES
+} satisfies Series<ProvinceRow>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 

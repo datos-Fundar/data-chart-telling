@@ -3,8 +3,7 @@ import { describe, test, expect } from 'vitest';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
-import { LIFE_EXPECTANCY_BY_PROVINCE } from '../../../../../stories/plots/ranking/bar/data';
-import { COUNTRIES_AT_2007, LIFE } from '$datasets';
+import { COUNTRIES_AT_2007, LIFE, PROVINCE_VALUES } from '$datasets';
 import { waitForSvg } from '../../../plots/_helpers/svg';
 
 // Plots using categorical color channels (discrete series grouping) can be
@@ -16,7 +15,7 @@ describe('color channel - axis-based plots', () => {
 		const { container } = render(BarPlot, {
 			width: 600,
 			height: 300,
-			data: LIFE_EXPECTANCY_BY_PROVINCE,
+			data: PROVINCE_VALUES,
 			x: 'province',
 			y: 'value',
 			color: 'sex'

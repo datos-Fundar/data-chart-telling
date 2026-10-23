@@ -3,11 +3,7 @@ import { describe, test, expect, vi } from 'vitest';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import {
-	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	LIFE_EXPECTANCY_BY_PROVINCE,
-	type ProvincePoint
-} from '../../../../../stories/plots/ranking/bar/data';
+import { FEMALE_PROVINCE_VALUES, PROVINCE_VALUES, type ProvinceRow } from '$datasets';
 import { waitForSvg, countBarRects } from '../../_helpers/svg';
 
 const SERIES = [
@@ -15,7 +11,7 @@ const SERIES = [
 		name: 'female',
 		x: 'province' as const,
 		y: 'value' as const,
-		data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+		data: FEMALE_PROVINCE_VALUES
 	}
 ];
 
@@ -23,7 +19,7 @@ describe('BarPlot - scales', () => {
 	test('renders with no scale overrides (auto domain)', async () => {
 		const { container } = await render(BarPlot, { width: 400, height: 300, series: SERIES });
 		const svg = await waitForSvg(container);
-		expect(countBarRects(svg)).toBe(FEMALE_LIFE_EXPECTANCY_BY_PROVINCE.length);
+		expect(countBarRects(svg)).toBe(FEMALE_PROVINCE_VALUES.length);
 	});
 
 	test('a Y domain that excludes 0 clamps bars to the frame instead of overflowing into the margin', async () => {
@@ -37,7 +33,7 @@ describe('BarPlot - scales', () => {
 		const heights = Array.from(svg.querySelectorAll('g.bar-y rect')).map((r) =>
 			Number(r.getAttribute('height'))
 		);
-		expect(heights.length).toBe(FEMALE_LIFE_EXPECTANCY_BY_PROVINCE.length);
+		expect(heights.length).toBe(FEMALE_PROVINCE_VALUES.length);
 		// With the domain floor (75) as the clamped baseline, no bar can be taller
 		// than the plot's own drawable area - before the fix, a literal 0
 		// baseline (well outside [75, 85]) produced heights in the thousands.
@@ -100,12 +96,12 @@ describe('BarPlot - scales', () => {
 			height: 300,
 			series: SERIES,
 			scales: {
-				x: { sort: (a, b) => (b as ProvincePoint).value - (a as ProvincePoint).value }
+				x: { sort: (a, b) => (b as ProvinceRow).value - (a as ProvinceRow).value }
 			} satisfies AxisBasedScalesConfig
 		});
 		const svg = await waitForSvg(container);
 		const ticks = Array.from(svg.querySelectorAll('g.axis-x text')).map((t) => t.textContent);
-		const expected = [...FEMALE_LIFE_EXPECTANCY_BY_PROVINCE]
+		const expected = [...FEMALE_PROVINCE_VALUES]
 			.sort((a, b) => b.value - a.value)
 			.map((d) => d.province);
 		expect(ticks).toEqual(expected);
@@ -117,7 +113,7 @@ describe('BarPlot - series layout', () => {
 		const { container } = await render(BarPlot, {
 			width: 600,
 			height: 400,
-			data: LIFE_EXPECTANCY_BY_PROVINCE,
+			data: PROVINCE_VALUES,
 			x: 'province',
 			y: 'value',
 			color: 'sex'
@@ -133,7 +129,7 @@ describe('BarPlot - series layout', () => {
 		const { container } = await render(BarPlot, {
 			width: 600,
 			height: 400,
-			data: LIFE_EXPECTANCY_BY_PROVINCE,
+			data: PROVINCE_VALUES,
 			x: 'province',
 			y: 'value',
 			color: 'sex',
@@ -141,7 +137,7 @@ describe('BarPlot - series layout', () => {
 		});
 		const svg = await waitForSvg(container);
 		const rects = Array.from(svg.querySelectorAll('g.bar-y rect'));
-		expect(rects.length).toBe(LIFE_EXPECTANCY_BY_PROVINCE.length);
+		expect(rects.length).toBe(PROVINCE_VALUES.length);
 		// Every category's female + male segments should reach the same total
 		// (top-most) pixel across the stack - spot-check via the topmost y.
 		const tops = rects.map((r) => Number(r.getAttribute('transform')?.match(/,([\d.]+)\)/)?.[1]));
@@ -155,7 +151,7 @@ describe('BarPlot - series layout', () => {
 				const { container } = await render(BarPlot, {
 					width: 600,
 					height: 400,
-					data: LIFE_EXPECTANCY_BY_PROVINCE,
+					data: PROVINCE_VALUES,
 					x: 'province',
 					y: 'value',
 					color: 'sex'
@@ -180,9 +176,7 @@ describe('BarPlot - orientation (read off which axis holds the categories)', () 
 			series: SERIES.map((s) => ({ ...s, x: s.y, y: s.x }))
 		});
 		const svg = await waitForSvg(container);
-		expect(svg.querySelectorAll('g.bar-x rect').length).toBe(
-			FEMALE_LIFE_EXPECTANCY_BY_PROVINCE.length
-		);
+		expect(svg.querySelectorAll('g.bar-x rect').length).toBe(FEMALE_PROVINCE_VALUES.length);
 		expect(svg.querySelectorAll('g.bar-y rect').length).toBe(0);
 		const yTicks = Array.from(svg.querySelectorAll('g.axis-y text')).map((t) => t.textContent);
 		expect(yTicks).toEqual(expect.arrayContaining(['Buenos Aires']));
@@ -201,9 +195,7 @@ describe('BarPlot - orientation (read off which axis holds the categories)', () 
 		});
 		const svg = await waitForSvg(container);
 		expect(warn).toHaveBeenCalledWith(expect.stringContaining('both'));
-		expect(svg.querySelectorAll('g.bar-y rect').length).toBe(
-			FEMALE_LIFE_EXPECTANCY_BY_PROVINCE.length
-		);
+		expect(svg.querySelectorAll('g.bar-y rect').length).toBe(FEMALE_PROVINCE_VALUES.length);
 		warn.mockRestore();
 	});
 });

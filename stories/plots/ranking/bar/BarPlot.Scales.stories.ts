@@ -3,11 +3,11 @@ import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import {
-	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	LIFE_EXPECTANCY_BY_PROVINCE,
-	type ProvincePoint
-} from './data';
-import { ARGENTINA_CHILE_TRENDS } from '$datasets';
+	ARGENTINA_CHILE_TRENDS,
+	FEMALE_PROVINCE_VALUES,
+	PROVINCE_VALUES,
+	type ProvinceRow
+} from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -57,14 +57,14 @@ export const Default: Story = {
 				name: 'female_life_expectancy',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
-			} satisfies Series<ProvincePoint>
+				data: FEMALE_PROVINCE_VALUES
+			} satisfies Series<ProvinceRow>
 		]
 	}
 };
 
 /**
- * Constrained Y domain - tightens the visible range to [75, 88], which makes
+ * Constrained Y domain - tightens the visible range to [78, 84], which makes
  * the variation in life expectancy more visible. Compare with `Default` to see
  * how the bars appear more spread out when the Y range is reduced.
  */
@@ -75,11 +75,11 @@ export const CustomYDomain: Story = {
 				name: 'female_life_expectancy',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
-			} satisfies Series<ProvincePoint>
+				data: FEMALE_PROVINCE_VALUES
+			} satisfies Series<ProvinceRow>
 		],
 		scales: {
-			y: { domain: [70, 88] }
+			y: { domain: [78, 84] }
 		} satisfies AxisBasedScalesConfig
 	}
 };
@@ -96,8 +96,8 @@ export const WithAxisLabels: Story = {
 				name: 'female_life_expectancy',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
-			} satisfies Series<ProvincePoint>
+				data: FEMALE_PROVINCE_VALUES
+			} satisfies Series<ProvinceRow>
 		],
 		scales: {
 			x: { label: 'Province' },
@@ -117,8 +117,8 @@ export const ReversedY: Story = {
 				name: 'female_life_expectancy',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
-			} satisfies Series<ProvincePoint>
+				data: FEMALE_PROVINCE_VALUES
+			} satisfies Series<ProvinceRow>
 		],
 		scales: {
 			y: { reverse: true }
@@ -137,8 +137,8 @@ export const WithGrid: Story = {
 				name: 'female_life_expectancy',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
-			} satisfies Series<ProvincePoint>
+				data: FEMALE_PROVINCE_VALUES
+			} satisfies Series<ProvinceRow>
 		],
 		scales: {
 			y: { grid: true }
@@ -157,8 +157,8 @@ export const CustomTickFormat: Story = {
 				name: 'female_life_expectancy',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
-			} satisfies Series<ProvincePoint>
+				data: FEMALE_PROVINCE_VALUES
+			} satisfies Series<ProvinceRow>
 		],
 		scales: {
 			y: {
@@ -179,8 +179,8 @@ export const RotatedXTicks: Story = {
 				name: 'female_life_expectancy',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
-			} satisfies Series<ProvincePoint>
+				data: FEMALE_PROVINCE_VALUES
+			} satisfies Series<ProvinceRow>
 		],
 		scales: {
 			x: {
@@ -202,8 +202,8 @@ export const ZeroAnchoredY: Story = {
 				name: 'female_life_expectancy',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
-			} satisfies Series<ProvincePoint>
+				data: FEMALE_PROVINCE_VALUES
+			} satisfies Series<ProvinceRow>
 		],
 		scales: {
 			y: { zero: true }
@@ -224,12 +224,12 @@ export const SortXByYDescending: Story = {
 				name: 'female_life_expectancy',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
-			} satisfies Series<ProvincePoint>
+				data: FEMALE_PROVINCE_VALUES
+			} satisfies Series<ProvinceRow>
 		],
 		scales: {
 			x: {
-				sort: (a, b) => (b as ProvincePoint).value - (a as ProvincePoint).value
+				sort: (a, b) => (b as ProvinceRow).value - (a as ProvinceRow).value
 			}
 		} satisfies AxisBasedScalesConfig
 	}
@@ -241,7 +241,7 @@ export const SortXByYDescending: Story = {
  */
 export const CombinedOverrides: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		data: PROVINCE_VALUES,
 		x: 'province',
 		y: 'value',
 		color: 'sex',
@@ -266,7 +266,7 @@ export const CombinedOverrides: Story = {
  */
 export const GroupedSeries: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		data: PROVINCE_VALUES,
 		x: 'province',
 		y: 'value',
 		color: 'sex'
@@ -280,7 +280,7 @@ export const GroupedSeries: Story = {
  */
 export const StackedSeries: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		data: PROVINCE_VALUES,
 		x: 'province',
 		y: 'value',
 		color: 'sex',
@@ -295,7 +295,7 @@ export const StackedSeries: Story = {
  */
 export const WideGroupSpacing: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		data: PROVINCE_VALUES,
 		x: 'province',
 		y: 'value',
 		color: 'sex',
@@ -322,8 +322,8 @@ export const HorizontalBars: Story = {
 				name: 'female_life_expectancy',
 				x: 'value',
 				y: 'province',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
-			} satisfies Series<ProvincePoint>
+				data: FEMALE_PROVINCE_VALUES
+			} satisfies Series<ProvinceRow>
 		]
 	}
 };
@@ -334,7 +334,7 @@ export const HorizontalBars: Story = {
  */
 export const HorizontalGroupedSeries: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		data: PROVINCE_VALUES,
 		x: 'value',
 		y: 'province',
 		color: 'sex'

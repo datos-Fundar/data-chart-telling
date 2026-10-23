@@ -1,55 +1,47 @@
 <script lang="ts">
 	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
-	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import { paletteColor } from '$lib/utils/color';
 	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 	import TooltipCard from '../../../common/TooltipCard.svelte';
-	import {
-		AGE_BRACKET_BY_PROVINCE,
-		AGE_BRACKETS,
-		provinceSort,
-		type AgeBracketPoint
-	} from './data';
-
-	const cfg = getConfiguration();
-
-	// Colour order matches AGE_BRACKETS, which is what drives colour assignment
-	// inside BarPlot when series are auto-created from `color` - kept in
-	// lockstep here since `content` only gets the raw rows back, not their colour.
-	const BRACKET_COLORS = AGE_BRACKETS.map((_, i) => paletteColor(i, cfg.palette));
+	import type { TooltipRow } from '$lib/types/layout/tooltip';
+	import { AGE_SHARES_BY_YEAR, type AgeShareRow } from '$datasets';
 </script>
 
-{#snippet content({ rows }: { rows: AgeBracketPoint[] })}
-	{@const province = rows[0]?.province}
+{#snippet content({ rows }: { rows: TooltipRow<AgeShareRow>[] })}
+	{@const year = rows[0]?.year}
 	{@const entries = rows
 		.map((row) => ({
-			label: row.bracket,
-			color: BRACKET_COLORS[AGE_BRACKETS.indexOf(row.bracket)],
-			value: row.value,
-			display: `${row.value.toFixed(2)}%`
+			label: row.ageGroup,
+			color: row.seriesColor ?? 'currentColor',
+			value: row.share,
+			display: `${row.share.toFixed(1)}%`
 		}))
 		.sort((a, b) => b.value - a.value)}
-	<TooltipCard heading={province} {entries} footer="Projected age distribution, 2040" />
+	<TooltipCard
+		heading={String(year)}
+		{entries}
+		footer="Share of the population by broad age group"
+	/>
 {/snippet}
 
 <div class="rich-tooltip-demo">
 	<BarPlot
 		width={900}
 		height={900}
-		data={AGE_BRACKET_BY_PROVINCE}
-		x="value"
-		y="province"
-		color="bracket"
+		data={AGE_SHARES_BY_YEAR}
+		x="share"
+		y="year"
+		color="ageGroup"
 		scales={{
-			y: { sort: provinceSort }
+			y: { type: 'band' },
+			color: { scheme: 'RdBu' }
 		} satisfies AxisBasedScalesConfig}
 		transforms={[{ type: 'stackX' }]}
 		markers={[{ type: 'hover', showLabels: false }]}
 		tooltip={{
 			sync: false,
 			format: (row) => {
-				const { province, bracket, value } = row as AgeBracketPoint;
-				return `${province} / ${bracket}: ${value}`;
+				const { year, ageGroup, share } = row as AgeShareRow;
+				return `${year} / ${ageGroup}: ${share}`;
 			},
 			content
 		}}

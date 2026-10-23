@@ -5,15 +5,13 @@ import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import RichTooltip from './RichTooltip.svelte';
 import StackedRichTooltip from './StackedRichTooltip.svelte';
 import {
-	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	MALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	LIFE_EXPECTANCY_BY_PROVINCE,
-	AGE_BRACKET_BY_PROVINCE,
-	provinceSort,
-	type ProvincePoint,
-	type ProvinceLifeExpectancy,
-	type AgeBracketPoint
-} from './data';
+	FEMALE_PROVINCE_VALUES,
+	MALE_PROVINCE_VALUES,
+	PROVINCE_VALUES,
+	type ProvinceRow,
+	AGE_SHARES_BY_YEAR,
+	type AgeShareRow
+} from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -55,15 +53,15 @@ const FEMALE = {
 	name: 'female',
 	x: 'province',
 	y: 'value',
-	data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
-} satisfies Series<ProvincePoint>;
+	data: FEMALE_PROVINCE_VALUES
+} satisfies Series<ProvinceRow>;
 
 const MALE = {
 	name: 'male',
 	x: 'province',
 	y: 'value',
-	data: MALE_LIFE_EXPECTANCY_BY_PROVINCE
-} satisfies Series<ProvincePoint>;
+	data: MALE_PROVINCE_VALUES
+} satisfies Series<ProvinceRow>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
@@ -79,7 +77,7 @@ export const BasicTooltip: Story = {
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { province, value } = row as ProvincePoint;
+				const { province, value } = row as ProvinceRow;
 				return `${province}: ${value} yr`;
 			}
 		}
@@ -97,7 +95,7 @@ export const RichFormat: Story = {
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { province, value } = row as ProvincePoint;
+				const { province, value } = row as ProvinceRow;
 				return `Province: ${province}\nLife expectancy: ${value.toFixed(1)} yr`;
 			}
 		}
@@ -106,7 +104,7 @@ export const RichFormat: Story = {
 
 /**
  * Computed tooltip text - the format function can derive any string from the
- * row. Here it shows the difference relative to an 82-year threshold.
+ * row. Here it shows the difference relative to an 80-year threshold.
  */
 export const ComputedFormat: Story = {
 	args: {
@@ -114,10 +112,10 @@ export const ComputedFormat: Story = {
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { province, value } = row as ProvincePoint;
-				const delta = (value - 82).toFixed(1);
-				const sign = value >= 82 ? '+' : '';
-				return `${province}: ${value.toFixed(1)} yr (${sign}${delta} vs 82)`;
+				const { province, value } = row as ProvinceRow;
+				const delta = (value - 80).toFixed(1);
+				const sign = value >= 80 ? '+' : '';
+				return `${province}: ${value.toFixed(1)} yr (${sign}${delta} vs 80)`;
 			}
 		}
 	}
@@ -134,7 +132,7 @@ export const TwoSeries: Story = {
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { province, value } = row as ProvincePoint;
+				const { province, value } = row as ProvinceRow;
 				return `${province}: ${value.toFixed(1)} yr`;
 			}
 		}
@@ -155,7 +153,7 @@ export const SeriesFiltered: Story = {
 			sync: false,
 			series: ['female'],
 			format: (row) => {
-				const { province, value } = row as ProvincePoint;
+				const { province, value } = row as ProvinceRow;
 				return `Female - ${province}: ${value.toFixed(1)} yr`;
 			}
 		}
@@ -164,19 +162,19 @@ export const SeriesFiltered: Story = {
 
 /**
  * Two series from grouped data - `data / x / y / color` auto-creates one
- * series per unique `color` value. The row type is `ProvinceLifeExpectancy`,
+ * series per unique `color` value. The row type is `ProvinceRow`,
  * which carries the `sex` field so the format can include it directly.
  */
 export const TwoSeriesFromGroupedData: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		data: PROVINCE_VALUES,
 		x: 'province',
 		y: 'value',
 		color: 'sex',
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { sex, province, value } = row as ProvinceLifeExpectancy;
+				const { sex, province, value } = row as ProvinceRow;
 				return `${sex} (${province}): ${value.toFixed(1)} yr`;
 			}
 		}
@@ -189,7 +187,7 @@ export const TwoSeriesFromGroupedData: Story = {
  */
 export const GroupedDataSeriesFiltered: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		data: PROVINCE_VALUES,
 		x: 'province',
 		y: 'value',
 		color: 'sex',
@@ -197,7 +195,7 @@ export const GroupedDataSeriesFiltered: Story = {
 			sync: false,
 			series: ['female'],
 			format: (row) => {
-				const { sex, province, value } = row as ProvinceLifeExpectancy;
+				const { sex, province, value } = row as ProvinceRow;
 				return `${sex} (${province}): ${value.toFixed(1)} yr`;
 			}
 		}
@@ -233,7 +231,7 @@ export const CustomAnchor: Story = {
 			anchorX: 'left',
 			anchorY: 'top',
 			format: (row) => {
-				const { province, value } = row as ProvincePoint;
+				const { province, value } = row as ProvinceRow;
 				return `${province}: ${value.toFixed(1)} yr`;
 			}
 		}
@@ -243,27 +241,28 @@ export const CustomAnchor: Story = {
 // ── Horizontal, many categories ─────────────────────────────────────────────
 
 /**
- * Horizontal, stacked, many categories - province on the y-axis (24 of
- * them, so long labels don't need to rotate), age-bracket series stacked to
- * 100% per province. Exercises the same hover-hit-area path as the stories
+ * Horizontal, stacked, many categories - year on the y-axis (22 of
+ * them: the censuses and the projections up to 2040), broad age groups
+ * stacked to 100% per year. Exercises the same hover-hit-area path as the stories
  * above, just with a much larger, thinner-banded category count.
  */
 export const HorizontalStackedTooltip: Story = {
 	args: {
 		width: 900,
 		height: 900,
-		data: AGE_BRACKET_BY_PROVINCE,
-		x: 'value',
-		y: 'province',
-		color: 'bracket',
+		data: AGE_SHARES_BY_YEAR,
+		x: 'share',
+		y: 'year',
+		color: 'ageGroup',
 		scales: {
-			y: { sort: provinceSort }
+			y: { type: 'band' },
+			color: { scheme: 'RdBu' }
 		} satisfies AxisBasedScalesConfig,
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { province, bracket, value } = row as AgeBracketPoint;
-				return `${province} / ${bracket}: ${value}`;
+				const { year, ageGroup, share } = row as AgeShareRow;
+				return `${year} / ${ageGroup}: ${share}`;
 			}
 		},
 		transforms: [{ type: 'stackX' as const }],
@@ -272,24 +271,25 @@ export const HorizontalStackedTooltip: Story = {
 };
 
 /**
- * Same horizontal, many-category layout as above, but a single bracket -
+ * Same horizontal, many-category layout as above, but a single age group -
  * no stacking, no `color`/`grouping`.
  */
 export const HorizontalSingleSeriesTooltip: Story = {
 	args: {
 		width: 900,
 		height: 900,
-		data: AGE_BRACKET_BY_PROVINCE.filter((d) => d.bracket === '0 to 14 years'),
-		x: 'value',
-		y: 'province',
+		data: AGE_SHARES_BY_YEAR.filter((d) => d.ageGroup === '0-14'),
+		x: 'share',
+		y: 'year',
 		scales: {
-			y: { sort: provinceSort }
+			y: { type: 'band' },
+			color: { scheme: 'RdBu' }
 		} satisfies AxisBasedScalesConfig,
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { province, value } = row as AgeBracketPoint;
-				return `${province}: ${value}`;
+				const { year, share } = row as AgeShareRow;
+				return `${year}: ${share}`;
 			}
 		}
 	}

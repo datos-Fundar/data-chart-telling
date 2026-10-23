@@ -1,11 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { FEMALE_LIFE, MALE_LIFE } from '$datasets';
 import {
-	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	MALE_LIFE_EXPECTANCY_BY_PROVINCE
-} from '../../../ranking/bar/data';
+	FEMALE_LIFE,
+	MALE_LIFE,
+	PROVINCES,
+	FEMALE_PROVINCE_VALUES,
+	MALE_PROVINCE_VALUES
+} from '$datasets';
 
 type YearPoint = { year: number; value: number };
 
@@ -346,86 +348,56 @@ function provinceValue(list: { province: string; value: number }[], province: st
 	return list.find((d) => d.province === province)!.value;
 }
 
-const MALE_CLUSTER_COMPRESSION = 0.3;
+/** One series per province and sex: the national curve of that sex, moved to end at the province's own value. */
+function provinceSeries(province: string) {
+	return (['female', 'male'] as const).map((sex) => ({
+		name: `${province} · ${sex === 'female' ? 'F' : 'M'}`,
+		x: 'year' as const,
+		y: 'value' as const,
+		data: provinceTrajectory(
+			sex === 'female' ? FEMALE_LIFE : MALE_LIFE,
+			provinceValue(sex === 'female' ? FEMALE_PROVINCE_VALUES : MALE_PROVINCE_VALUES, province)
+		)
+	}));
+}
 
 function compressTowardMean(values: number[], factor: number): number[] {
 	const mean = values.reduce((a, b) => a + b, 0) / values.length;
 	return values.map((v) => mean + (v - mean) * factor);
 }
 
-const OVERLAP_DEMO_PROVINCES: { label: string; sex: 'male' | 'female'; province: string }[] = [
-	// Cluster A. male, mid-range: compressed toward its own mean below, so it
-	// overlaps far more aggressively than its real spread would.
-	{ label: 'Tucumán · M', sex: 'male', province: 'Tucumán' },
-	{ label: 'Santa Fe · M', sex: 'male', province: 'Santa Fe' },
-	{ label: 'Córdoba · M', sex: 'male', province: 'Córdoba' },
-	{ label: 'Buenos Aires · M', sex: 'male', province: 'Buenos Aires' },
-	// Cluster B. female, upper-range: real spread, overlaps internally, well
-	// clear of A.
-	{ label: 'Tucumán · F', sex: 'female', province: 'Tucumán' },
-	{ label: 'Santa Fe · F', sex: 'female', province: 'Santa Fe' },
-	{ label: 'Córdoba · F', sex: 'female', province: 'Córdoba' },
-	{ label: 'Buenos Aires · F', sex: 'female', province: 'Buenos Aires' },
-	// Isolated. far below both clusters, needs no decluttering.
-	{ label: 'La Rioja · M', sex: 'male', province: 'La Rioja' }
-];
-
-const MALE_CLUSTER_PROVINCES = ['Tucumán', 'Santa Fe', 'Córdoba', 'Buenos Aires'];
-const MALE_CLUSTER_REAL_VALUES = MALE_CLUSTER_PROVINCES.map((p) =>
-	provinceValue(MALE_LIFE_EXPECTANCY_BY_PROVINCE, p)
-);
-const MALE_CLUSTER_COMPRESSED_VALUES = compressTowardMean(
-	MALE_CLUSTER_REAL_VALUES,
-	MALE_CLUSTER_COMPRESSION
-);
-const MALE_CLUSTER_TARGETS = new Map(
-	MALE_CLUSTER_PROVINCES.map((province, i) => [province, MALE_CLUSTER_COMPRESSED_VALUES[i]])
-);
-
-const OVERLAP_DEMO_SERIES = OVERLAP_DEMO_PROVINCES.map(({ label, sex, province }) => {
-	const shape = sex === 'female' ? FEMALE_LIFE : MALE_LIFE;
-	const target =
-		(sex === 'male' ? MALE_CLUSTER_TARGETS.get(province) : undefined) ??
-		provinceValue(
-			sex === 'female' ? FEMALE_LIFE_EXPECTANCY_BY_PROVINCE : MALE_LIFE_EXPECTANCY_BY_PROVINCE,
-			province
-		);
-	return {
-		name: label,
-		x: 'year' as const,
-		y: 'value' as const,
-		data: provinceTrajectory(shape, target)
-	};
-});
+// Cluster A is the five male values (74.0 to 75.3) and cluster B the five
+// female ones (79.5 to 82.1): each overlaps internally, and the two are well
+// clear of each other.
+const OVERLAP_DEMO_SERIES = PROVINCES.flatMap(provinceSeries);
 
 /**
  * A near-miss case for the grouping logic itself: a series whose *original*
- * last value sits comfortably outside cluster A (male), too far from
- * Tucumán · M to be grouped with it going in, but close enough that once
- * the cluster's own labels spread out, Tucumán · M's *decluttered* label
- * lands right on top of it. Grouping has to key off the post-declutter
- * (final) gap, not the original one, to catch this. See `Declutter`'s
- * doc comment in `Declutter.ts`.
+ * last value sits comfortably outside cluster A (male), too far from the
+ * lowest male value to be grouped with it going in, but close enough that
+ * once the cluster's own labels spread out, the lowest label lands right on
+ * top of it. Grouping has to key off the post-declutter (final) gap, not the
+ * original one, to catch this. See `Declutter`'s doc comment in
+ * `Declutter.ts`. This one series is made up: it ends 2.2 units below the
+ * lowest male province.
  */
 const NEAR_MISS_SERIES = {
-	name: 'Formosa · M',
+	name: 'Reference · M',
 	x: 'year' as const,
 	y: 'value' as const,
-	data: provinceTrajectory(MALE_LIFE, 77.3)
+	data: provinceTrajectory(MALE_LIFE, Math.min(...MALE_PROVINCE_VALUES.map((d) => d.value)) - 2.2)
 };
 
 /**
  * End-of-line labels resolve overlap automatically, at real-world severity.
- * Nine series (see `OVERLAP_DEMO_SERIES` above) whose real end-of-period
- * values happen to form two separate four-way pileups (male mid-range,
- * female upper-range) plus one province sitting alone well below both. At
- * the default plot height, each pileup's labels would otherwise land closer
- * together than a label's own height; instead they spread apart just enough
- * to clear one another, each reconnected to its real end point with a thin
- * leader line. Every label - including the isolated series, which needs no
- * decluttering of its own - reaches out to the same shared column, so the
- * whole set lines up on one horizontal line rather than each pileup settling
- * at its own, differently-sized fan.
+ * Ten series (see `OVERLAP_DEMO_SERIES` above), a province and a sex each,
+ * whose real end-of-period values form two separate five-way pileups (male
+ * and female). At the default plot height, each pileup's labels would
+ * otherwise land closer together than a label's own height; instead they
+ * spread apart just enough to clear one another, each reconnected to its
+ * real end point with a thin leader line. Every label reaches out to the
+ * same shared column, so the whole set lines up on one horizontal line
+ * rather than each pileup settling at its own, differently-sized fan.
  */
 export const DeclutteredLabels: Story = {
 	args: {
@@ -475,12 +447,12 @@ export const DeclutteredLabelsCustomStyle: Story = {
 /**
  * Stress-tests a case the other stories don't otherwise exercise: a series
  * that starts out clear of a cluster, but ends up in collision range only
- * once that cluster's own labels have spread out. `Formosa · M` (see
- * `NEAR_MISS_SERIES` above) sits ~1.3 units below Tucumán · M's real value -
- * too far to be grouped with cluster A going in, but Tucumán · M's
- * decluttered label lands almost exactly where Formosa · M's already is.
- * Formosa · M correctly gets pulled into the same run, with its own leader
- * line and lane, aligned with (not overlapping) the other four.
+ * once that cluster's own labels have spread out. `Reference · M` (see
+ * `NEAR_MISS_SERIES` above) sits 2.2 units below the lowest male province -
+ * too far to be grouped with cluster A going in, but that province's
+ * decluttered label lands almost exactly where Reference · M's already is.
+ * Reference · M correctly gets pulled into the same run, with its own leader
+ * line and lane, aligned with (not overlapping) the other five.
  */
 export const DeclutteredLabelsNearMissSeries: Story = {
 	args: {
@@ -494,13 +466,12 @@ export const DeclutteredLabelsNearMissSeries: Story = {
 	}
 };
 
-const ALL_PROVINCES = ['Buenos Aires', 'Córdoba', 'Santa Fe', 'Formosa', 'Tucumán', 'La Rioja'];
 const BOUNDS_DEMO_REAL_VALUES = [
-	...ALL_PROVINCES.map((p) => provinceValue(MALE_LIFE_EXPECTANCY_BY_PROVINCE, p)),
-	...ALL_PROVINCES.map((p) => provinceValue(FEMALE_LIFE_EXPECTANCY_BY_PROVINCE, p))
+	...MALE_PROVINCE_VALUES.map((d) => d.value),
+	...FEMALE_PROVINCE_VALUES.map((d) => d.value)
 ];
 const BOUNDS_DEMO_TARGETS = compressTowardMean(BOUNDS_DEMO_REAL_VALUES, 0.12);
-const BOUNDS_DEMO_SERIES = ALL_PROVINCES.flatMap((province, i) => [
+const BOUNDS_DEMO_SERIES = PROVINCES.flatMap((province, i) => [
 	{
 		name: `${province} · M`,
 		x: 'year' as const,
@@ -511,19 +482,19 @@ const BOUNDS_DEMO_SERIES = ALL_PROVINCES.flatMap((province, i) => [
 		name: `${province} · F`,
 		x: 'year' as const,
 		y: 'value' as const,
-		data: provinceTrajectory(FEMALE_LIFE, BOUNDS_DEMO_TARGETS[ALL_PROVINCES.length + i])
+		data: provinceTrajectory(FEMALE_LIFE, BOUNDS_DEMO_TARGETS[PROVINCES.length + i])
 	}
 ]);
 
 /**
- * Twelve series compressed toward a single value, close enough together
+ * Ten series compressed toward a single value, close enough together
  * that the plot's own top edge - not just neighbouring labels - constrains
  * how they can spread. Exercises `bounds`-aware clamping in `Declutter`:
  * labels stay inside the plot's content box instead of spilling past it,
  * while a run's leader lines still fan out cleanly.
  *
- * 400px, not the package default, deliberately: twelve labels need at least
- * `11 * minGap` (~185px) of clearance to legibly separate at all, so a
+ * 400px, not the package default, deliberately: ten labels need at least
+ * `9 * minGap` (~155px) of clearance to legibly separate at all, so a
  * shorter plot wouldn't be testing bounds-clamping so much as asking for
  * more vertical space than exists at any spacing - a real constraint, but a
  * different one than this story means to demonstrate.

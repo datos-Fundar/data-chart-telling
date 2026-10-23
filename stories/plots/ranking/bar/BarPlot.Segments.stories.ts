@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
-import { FEMALE_LIFE_EXPECTANCY_BY_PROVINCE, LIFE_EXPECTANCY_BY_PROVINCE } from './data';
+import { FEMALE_PROVINCE_VALUES, PROVINCE_VALUES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -47,8 +47,8 @@ type Story = StoryObj<typeof meta>;
  * Simplest form: one series-keyed Segment highlights a single area, and a
  * `default` catch-all styles everything else.
  *
- * The series key (`'female_life_expectancy'`) highlights Tucumán only; every
- * other province - including the Buenos Aires-Santa Fe range - isn't matched
+ * The series key (`'female_life_expectancy'`) highlights Chubut only; every
+ * other province - including the Buenos Aires-Mendoza range - isn't matched
  * by anything series-specific, so it falls through to the `default` catch-all's
  * dimmed style.
  */
@@ -59,7 +59,7 @@ export const HighlightedProvincesSegment: Story = {
 				name: 'female_life_expectancy',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+				data: FEMALE_PROVINCE_VALUES
 			}
 		],
 		segments: {
@@ -68,8 +68,8 @@ export const HighlightedProvincesSegment: Story = {
 					areas: [
 						{
 							x: {
-								from: 'Tucumán',
-								to: 'Tucumán'
+								from: 'Chubut',
+								to: 'Chubut'
 							}
 						}
 					],
@@ -100,7 +100,7 @@ export const MultipleAreasOneSegment: Story = {
 				name: 'female_life_expectancy',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+				data: FEMALE_PROVINCE_VALUES
 			}
 		],
 		segments: {
@@ -108,7 +108,7 @@ export const MultipleAreasOneSegment: Story = {
 				{
 					areas: [
 						{ x: { from: 'Buenos Aires', to: 'Buenos Aires' } },
-						{ x: { from: 'Tucumán', to: 'Tucumán' } }
+						{ x: { from: 'Chubut', to: 'Chubut' } }
 					],
 					styles: { fillOpacity: 0.9 }
 				},
@@ -123,7 +123,7 @@ export const MultipleAreasOneSegment: Story = {
 /**
  * Two Segments with different colors targeting different provinces.
  *
- * - Segment 1: Buenos Aires to Santa Fe - high opacity.
+ * - Segment 1: Buenos Aires to Mendoza - high opacity.
  * - Segment 2: Rest - reduced opacity.
  */
 export const TwoSegmentsDifferentStyles: Story = {
@@ -133,13 +133,13 @@ export const TwoSegmentsDifferentStyles: Story = {
 				name: 'female_life_expectancy',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+				data: FEMALE_PROVINCE_VALUES
 			}
 		],
 		segments: {
 			default: [
 				{
-					areas: [{ x: { from: 'Buenos Aires', to: 'Santa Fe' } }],
+					areas: [{ x: { from: 'Buenos Aires', to: 'Mendoza' } }],
 					styles: { fill: 'tomato', fillOpacity: 0.85 }
 				},
 				{
@@ -157,14 +157,14 @@ export const TwoSegmentsDifferentStyles: Story = {
  */
 export const TwoSegmentsOnAllSeries: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		data: PROVINCE_VALUES,
 		x: 'province',
 		y: 'value',
 		color: 'sex',
 		segments: {
 			default: [
 				{
-					areas: [{ x: { from: 'Buenos Aires', to: 'Santa Fe' } }],
+					areas: [{ x: { from: 'Buenos Aires', to: 'Mendoza' } }],
 					styles: { fillOpacity: 0.85 }
 				},
 				{
@@ -185,14 +185,14 @@ export const TwoSegmentsOnAllSeries: Story = {
  */
 export const SegmentsOnOneSeriesOnly: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		data: PROVINCE_VALUES,
 		x: 'province',
 		y: 'value',
 		color: 'sex',
 		segments: {
 			female: [
 				{
-					areas: [{ x: { from: 'Buenos Aires', to: 'Santa Fe' } }],
+					areas: [{ x: { from: 'Buenos Aires', to: 'Mendoza' } }],
 					styles: { fillOpacity: 0.9 }
 				},
 				{
@@ -209,20 +209,20 @@ export const SegmentsOnOneSeriesOnly: Story = {
  */
 export const CustomFillsPerSeries: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		data: PROVINCE_VALUES,
 		x: 'province',
 		y: 'value',
 		color: 'sex',
 		segments: {
 			female: [
 				{
-					areas: [{ x: { from: 'Buenos Aires', to: 'Formosa' } }],
+					areas: [{ x: { from: 'Buenos Aires', to: 'Salta' } }],
 					styles: { fillOpacity: 0.8 }
 				}
 			],
 			male: [
 				{
-					areas: [{ x: { from: 'Buenos Aires', to: 'Formosa' } }],
+					areas: [{ x: { from: 'Buenos Aires', to: 'Salta' } }],
 					styles: { fill: '#1971c2', fillOpacity: 0.85 }
 				}
 			]

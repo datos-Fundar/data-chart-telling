@@ -1,7 +1,12 @@
 // ── Life expectancy at birth by province, 2019 ──────────────────────────────
 // INDEC, life tables. `population` is the 2022 census population, in millions.
 
-export type ProvinceRow = { province: string; sex: string; value: number; population: number };
+export type ProvinceRow = {
+	province: string;
+	sex: 'female' | 'male';
+	value: number;
+	population: number;
+};
 
 /** One row per province, a column per sex: for the plots that read two values off each row. */
 export type ProvinceLifeRow = {
@@ -26,4 +31,12 @@ export const PROVINCE_VALUES: ProvinceRow[] = PROVINCE_LIFE.flatMap(
 		{ province, sex: 'female', value: female, population },
 		{ province, sex: 'male', value: male, population }
 	]
+);
+
+export const FEMALE_PROVINCE_VALUES: ProvinceRow[] = PROVINCE_VALUES.filter(
+	({ sex }) => sex === 'female'
+);
+
+export const MALE_PROVINCE_VALUES: ProvinceRow[] = PROVINCE_VALUES.filter(
+	({ sex }) => sex === 'male'
 );

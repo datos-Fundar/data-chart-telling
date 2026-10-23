@@ -1,11 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import {
-	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	MALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	LIFE_EXPECTANCY_BY_PROVINCE
-} from '../data';
+import { FEMALE_PROVINCE_VALUES, MALE_PROVINCE_VALUES, PROVINCE_VALUES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -58,7 +54,7 @@ export const Basic: Story = {
 				name: 'female',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+				data: FEMALE_PROVINCE_VALUES
 			}
 		],
 		markers: [
@@ -80,7 +76,7 @@ export const WithoutLabels: Story = {
 				name: 'female',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+				data: FEMALE_PROVINCE_VALUES
 			}
 		],
 		markers: [
@@ -103,7 +99,7 @@ export const WithoutRule: Story = {
 				name: 'female',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+				data: FEMALE_PROVINCE_VALUES
 			}
 		],
 		markers: [
@@ -127,7 +123,7 @@ export const WithBothAxis: Story = {
 				name: 'female',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+				data: FEMALE_PROVINCE_VALUES
 			}
 		],
 		markers: [
@@ -151,7 +147,7 @@ export const WithCustomRuleStyle: Story = {
 				name: 'female',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+				data: FEMALE_PROVINCE_VALUES
 			}
 		],
 		markers: [
@@ -179,13 +175,13 @@ export const TwoSeries: Story = {
 				name: 'female',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+				data: FEMALE_PROVINCE_VALUES
 			},
 			{
 				name: 'male',
 				x: 'province',
 				y: 'value',
-				data: MALE_LIFE_EXPECTANCY_BY_PROVINCE
+				data: MALE_PROVINCE_VALUES
 			}
 		],
 		markers: [
@@ -213,13 +209,13 @@ export const SeriesScoped: Story = {
 				name: 'female',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+				data: FEMALE_PROVINCE_VALUES
 			},
 			{
 				name: 'male',
 				x: 'province',
 				y: 'value',
-				data: MALE_LIFE_EXPECTANCY_BY_PROVINCE
+				data: MALE_PROVINCE_VALUES
 			}
 		],
 		markers: [
@@ -239,7 +235,7 @@ export const SeriesScoped: Story = {
  */
 export const GroupedSeries: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		data: PROVINCE_VALUES,
 		x: 'province',
 		y: 'value',
 		color: 'sex',
@@ -257,7 +253,7 @@ export const GroupedSeries: Story = {
  */
 export const GroupedSeriesWithHighlightArea: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		data: PROVINCE_VALUES,
 		x: 'province',
 		y: 'value',
 		color: 'sex',
@@ -278,7 +274,7 @@ export const GroupedSeriesWithHighlightArea: Story = {
  */
 export const GroupedSeriesWithHighlightAreaHorizontal: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		data: PROVINCE_VALUES,
 		x: 'value',
 		y: 'province',
 		color: 'sex',
@@ -299,7 +295,7 @@ export const GroupedSeriesWithHighlightAreaHorizontal: Story = {
  */
 export const StackedSeries: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		data: PROVINCE_VALUES,
 		x: 'province',
 		y: 'value',
 		color: 'sex',
@@ -327,7 +323,7 @@ export const WithHighlightArea: Story = {
 				name: 'female',
 				x: 'value',
 				y: 'province',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+				data: FEMALE_PROVINCE_VALUES
 			}
 		],
 		markers: [
@@ -352,7 +348,7 @@ export const WithCustomHighlightArea: Story = {
 				name: 'female',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+				data: FEMALE_PROVINCE_VALUES
 			}
 		],
 		markers: [

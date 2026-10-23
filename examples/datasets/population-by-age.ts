@@ -840,6 +840,9 @@ const BROAD_AGE_GROUPS: [string, string[]][] = [
 	['65+', ['65-69', '70-74', '75-79', '80-84', '85+']]
 ];
 
+/** The broad age groups, youngest first. */
+export const BROAD_AGE_GROUP_NAMES = BROAD_AGE_GROUPS.map(([ageGroup]) => ageGroup);
+
 const CENSUS_YEARS = [1991, 2001, 2010, 2022];
 
 const YEARS = [...new Set(POPULATION_BY_AGE.map(({ year }) => year))];

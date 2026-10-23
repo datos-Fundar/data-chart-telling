@@ -1,25 +1,16 @@
 <script lang="ts">
 	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
-	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import { paletteColor } from '$lib/utils/color';
+	import type { TooltipRow } from '$lib/types/layout/tooltip';
 	import TooltipCard from '../../../common/TooltipCard.svelte';
 	import { FEMALE_LIFE, MALE_LIFE, type LifeRow } from '$datasets';
-
-	const cfg = getConfiguration();
-
-	// Series order matches the `series` array below, which is what drives
-	// colour assignment inside LinePlot - kept in lockstep here since `content`
-	// only gets the raw rows back, not their series name/colour.
-	const SERIES_LABELS = ['Female', 'Male'];
-	const SERIES_COLORS = [paletteColor(0, cfg.palette), paletteColor(1, cfg.palette)];
 </script>
 
-{#snippet content({ rows }: { rows: LifeRow[] })}
+{#snippet content({ rows }: { rows: TooltipRow<LifeRow>[] })}
 	{@const year = rows[0]?.year}
 	{@const entries = rows
-		.map((row, i) => ({
-			label: SERIES_LABELS[i],
-			color: SERIES_COLORS[i],
+		.map((row) => ({
+			label: row.sex === 'female' ? 'Female' : 'Male',
+			color: row.seriesColor ?? 'currentColor',
 			value: row.value,
 			display: `${row.value.toFixed(1)} yr`
 		}))

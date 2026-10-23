@@ -3,23 +3,21 @@ import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import type { GapsConfig } from '$lib/types/plots/gaps';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import { READINGS_WITH_GAPS, OTHER_READINGS_NO_GAPS } from '../data';
+import { AGE_GROUPS, FEMALE_2022_WITH_GAPS, MALE_2022 } from '$datasets';
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-/** Orders month-abbreviation rows by calendar position, not alphabetically - see `LinePlot.Scales`' own `byMonth`. */
-function byMonth(a: Record<string, unknown>, b: Record<string, unknown>): number {
-	return MONTHS.indexOf(a.category as string) - MONTHS.indexOf(b.category as string);
+/** Orders age-group rows from the youngest, not alphabetically ('10-14' would come before '5-9'). */
+function byAge(a: Record<string, unknown>, b: Record<string, unknown>): number {
+	return AGE_GROUPS.indexOf(a.ageGroup as string) - AGE_GROUPS.indexOf(b.ageGroup as string);
 }
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
-// Unlike BarPlot's province datasets (no inherent order), months have a
+// Unlike BarPlot's province datasets (no inherent order), age groups have a
 // natural ascending order, which is what makes `styles.gaps`' interpolation
 // worth looking at here - a trend being bridged, not an arbitrary category
-// filled in. `READINGS_WITH_GAPS` has three kinds of holes, all `value:
-// null`: no reading for Jan-Feb (start), an outage at Jun-Jul (middle), and
-// nothing yet for Nov-Dec (end). Without `styles.gaps`, a missing value
+// filled in. `FEMALE_2022_WITH_GAPS` has three kinds of holes, all `share:
+// null`: nothing for 0-4 and 5-9 (start), a gap at 40-44 and 45-49 (middle),
+// and nothing for 80-84 and 85+ (end). Without `styles.gaps`, a missing value
 // renders no bar at all - `styles.gaps` fills it with a distinctly-styled
 // bar at an interpolated value instead, configured independently per zone.
 // Like `segments`, it's keyed by series name (`'default'` for every series
@@ -32,7 +30,7 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
-		series: [{ name: 'reading', x: 'category', y: 'value', data: READINGS_WITH_GAPS }]
+		series: [{ name: 'Female', x: 'ageGroup', y: 'share', data: FEMALE_2022_WITH_GAPS }]
 	},
 	argTypes: {
 		width: {
@@ -44,7 +42,7 @@ const meta = {
 			control: { type: 'range', min: 200, max: 700, step: 50 }
 		},
 		series: {
-			description: 'Data series to render. Missing readings are `null`-valued rows.',
+			description: 'Data series to render. Missing shares are `null`-valued rows.',
 			control: false,
 			table: { type: { summary: 'Series<TData>[]' }, category: 'Data' }
 		},
@@ -65,27 +63,27 @@ type Story = StoryObj<typeof meta>;
 // ── Baseline: no fill ────────────────────────────────────────────────────────
 
 /**
- * Without `styles.gaps`, a missing reading simply renders no bar for that
+ * Without `styles.gaps`, a missing share simply renders no bar for that
  * category - not the fake zero-height bar a raw `null`/`undefined` value
  * would otherwise produce.
  */
 export const NoGapsConfigured: Story = {
 	args: {
-		scales: { x: { sort: byMonth } } satisfies AxisBasedScalesConfig
+		scales: { x: { sort: byAge } } satisfies AxisBasedScalesConfig
 	}
 };
 
 // ── Default key: gaps that apply to every series ─────────────────────────────
 
 /**
- * `middle` fills the internal outage (Jun-Jul) with a bar interpolated
+ * `middle` fills the internal gap (40-44 and 45-49) with a bar interpolated
  * between its two real neighbours. No target needs to be configured - both
  * ends of an internal gap are real data, so the fill is fully determined by
  * the data itself. Default style: the series' own colour, faded.
  */
 export const MiddleGapFilled: Story = {
 	args: {
-		scales: { x: { sort: byMonth } } satisfies AxisBasedScalesConfig,
+		scales: { x: { sort: byAge } } satisfies AxisBasedScalesConfig,
 		styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
 	}
 };
@@ -99,7 +97,7 @@ export const MiddleGapFilled: Story = {
  */
 export const LeadingAndTrailingGapsOptIn: Story = {
 	args: {
-		scales: { x: { sort: byMonth } } satisfies AxisBasedScalesConfig,
+		scales: { x: { sort: byAge } } satisfies AxisBasedScalesConfig,
 		styles: {
 			gaps: { default: { start: { x: 0 }, end: { x: 13 } } } satisfies GapsConfig<BarSegmentStyle>
 		}
@@ -112,7 +110,7 @@ export const LeadingAndTrailingGapsOptIn: Story = {
  */
 export const AllThreeZonesDistinctStyles: Story = {
 	args: {
-		scales: { x: { sort: byMonth } } satisfies AxisBasedScalesConfig,
+		scales: { x: { sort: byAge } } satisfies AxisBasedScalesConfig,
 		styles: {
 			gaps: {
 				default: {
@@ -127,20 +125,20 @@ export const AllThreeZonesDistinctStyles: Story = {
 
 // ── Series-aware form ─────────────────────────────────────────────────────────
 
-const TWO_READINGS = [
-	{ name: 'reading', x: 'category' as const, y: 'value' as const, data: READINGS_WITH_GAPS },
-	{ name: 'other', x: 'category' as const, y: 'value' as const, data: OTHER_READINGS_NO_GAPS }
+const TWO_SERIES = [
+	{ name: 'Female', x: 'ageGroup' as const, y: 'share' as const, data: FEMALE_2022_WITH_GAPS },
+	{ name: 'Male', x: 'ageGroup' as const, y: 'share' as const, data: MALE_2022 }
 ];
 
 /**
- * A gap entry keyed by series name applies only to that series - `other`
- * has no missing readings, so it's unaffected either way.
+ * A gap entry keyed by series name applies only to that series - `Male`
+ * has no missing shares, so it's unaffected either way.
  */
 export const GapsOnOneSeriesOnly: Story = {
 	args: {
-		series: TWO_READINGS,
-		scales: { x: { sort: byMonth } } satisfies AxisBasedScalesConfig,
-		styles: { gaps: { reading: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
+		series: TWO_SERIES,
+		scales: { x: { sort: byAge } } satisfies AxisBasedScalesConfig,
+		styles: { gaps: { Female: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
 	}
 };
 
@@ -155,9 +153,9 @@ export const GapsOnOneSeriesOnly: Story = {
  */
 export const GroupedLayout: Story = {
 	args: {
-		series: TWO_READINGS,
+		series: TWO_SERIES,
 		scales: {
-			x: { sort: byMonth }
+			x: { sort: byAge }
 		} satisfies AxisBasedScalesConfig,
 		styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
 	}
@@ -171,9 +169,9 @@ export const GroupedLayout: Story = {
  */
 export const StackedLayout: Story = {
 	args: {
-		series: TWO_READINGS,
+		series: TWO_SERIES,
 		scales: {
-			x: { sort: byMonth }
+			x: { sort: byAge }
 		} satisfies AxisBasedScalesConfig,
 		transforms: [{ type: 'stackY' as const }],
 		styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
@@ -189,7 +187,7 @@ export const StackedLayout: Story = {
  */
 export const GlobalConfigDefault: Story = {
 	args: {
-		scales: { x: { sort: byMonth } } satisfies AxisBasedScalesConfig,
+		scales: { x: { sort: byAge } } satisfies AxisBasedScalesConfig,
 		styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
 	},
 	parameters: {

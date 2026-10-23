@@ -1,10 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
-import {
-	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	MALE_LIFE_EXPECTANCY_BY_PROVINCE
-} from '../../../../../../stories/plots/ranking/bar/data';
+import { FEMALE_PROVINCE_VALUES, MALE_PROVINCE_VALUES } from '$datasets';
 import type { LegendSection } from '$lib/types/layout/legend';
 
 // Omitting a series via the legend must reflow grouped/stacked bars exactly
@@ -22,11 +19,8 @@ const LEGEND: LegendSection[] = [
 	}
 ];
 
-const MALE = { name: 'male', x: 'province', y: 'value', data: MALE_LIFE_EXPECTANCY_BY_PROVINCE };
-const BOTH = [
-	{ name: 'female', x: 'province', y: 'value', data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE },
-	MALE
-];
+const MALE = { name: 'male', x: 'province', y: 'value', data: MALE_PROVINCE_VALUES };
+const BOTH = [{ name: 'female', x: 'province', y: 'value', data: FEMALE_PROVINCE_VALUES }, MALE];
 
 async function waitForSvg(container: Element): Promise<SVGElement> {
 	let svg: SVGElement | undefined;
@@ -77,7 +71,7 @@ describe('BarPlot - omitting a series in grouped/stacked layout', () => {
 
 		femaleLegendItem(container).click();
 		await vi.waitFor(() => {
-			if (svg.querySelectorAll('g.bar-y rect').length !== MALE_LIFE_EXPECTANCY_BY_PROVINCE.length) {
+			if (svg.querySelectorAll('g.bar-y rect').length !== MALE_PROVINCE_VALUES.length) {
 				throw new Error('female bars not yet omitted');
 			}
 		});
@@ -105,7 +99,7 @@ describe('BarPlot - omitting a series in grouped/stacked layout', () => {
 
 		femaleLegendItem(container).click();
 		await vi.waitFor(() => {
-			if (svg.querySelectorAll('g.bar-y rect').length !== MALE_LIFE_EXPECTANCY_BY_PROVINCE.length) {
+			if (svg.querySelectorAll('g.bar-y rect').length !== MALE_PROVINCE_VALUES.length) {
 				throw new Error('female bars not yet omitted');
 			}
 		});

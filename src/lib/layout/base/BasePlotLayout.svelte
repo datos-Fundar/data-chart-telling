@@ -394,7 +394,7 @@
 			visible={ctrl.showTooltip && ctrl.tooltipPosition != null}
 			x={ctrl.tooltipPosition?.x ?? 0}
 			y={ctrl.tooltipPosition?.y ?? 0}
-			rows={ctrl.matchedRows.map((p) => p.row)}
+			rows={ctrl.matchedRows.map((p) => ({ ...p.row, seriesColor: p.color }))}
 			format={hover.tooltip.format}
 			sort={hover.tooltip.sort}
 			content={hover.tooltip.content}

@@ -1,25 +1,14 @@
 <script lang="ts">
 	import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 	import TooltipCard from '../../../common/TooltipCard.svelte';
-	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import { paletteColor } from '$lib/utils/color';
+	import type { TooltipRow } from '$lib/types/layout/tooltip';
 	import { COUNTRIES_AT_2007, type CountryYearRow } from '$datasets';
-
-	const cfg = getConfiguration();
-
-	// Continent order matches `color`'s first-appearance order in COUNTRIES_AT_2007, which
-	// is what drives colour assignment inside ScatterPlot - kept in lockstep here
-	// since `content` only gets the raw row back, not its resolved colour.
-	const CONTINENTS = ['Americas', 'Europe', 'Asia', 'Africa'];
-	const CONTINENT_COLORS = CONTINENTS.map((_, i) => paletteColor(i, cfg.palette));
-	const colorFor = (continent: CountryYearRow['continent']) =>
-		CONTINENT_COLORS[CONTINENTS.indexOf(continent)];
 </script>
 
-{#snippet content({ rows }: { rows: CountryYearRow[] })}
+{#snippet content({ rows }: { rows: TooltipRow<CountryYearRow>[] })}
 	{@const row = rows[0]}
 	{#if row}
-		{@const color = colorFor(row.continent)}
+		{@const color = row.seriesColor ?? 'currentColor'}
 		<TooltipCard
 			heading={row.country}
 			entries={[

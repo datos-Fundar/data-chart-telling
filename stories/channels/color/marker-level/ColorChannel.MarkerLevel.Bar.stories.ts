@@ -1,10 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import {
-	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	type ProvincePoint
-} from '../../../plots/ranking/bar/data';
+import { FEMALE_PROVINCE_VALUES, type ProvinceRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `bar` marker's own `color` + `scales.color` is independent of the plot's
@@ -24,7 +21,7 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
-		data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
+		data: FEMALE_PROVINCE_VALUES,
 		x: 'province',
 		y: 'value'
 	},
@@ -54,9 +51,9 @@ export const Default: Story = {
 				type: 'bar',
 				role: 'segment',
 				isHorizontal: false,
-				x: (d) => (d as ProvincePoint).province,
+				x: (d) => (d as ProvinceRow).province,
 				y1: () => 0,
-				y2: (d) => (d as ProvincePoint).value,
+				y2: (d) => (d as ProvinceRow).value,
 				insetLeft: 0.3,
 				insetRight: 0.3,
 				color: 'value'
@@ -73,9 +70,9 @@ export const CustomScheme: Story = {
 				type: 'bar',
 				role: 'segment',
 				isHorizontal: false,
-				x: (d) => (d as ProvincePoint).province,
+				x: (d) => (d as ProvinceRow).province,
 				y1: () => 0,
-				y2: (d) => (d as ProvincePoint).value,
+				y2: (d) => (d as ProvinceRow).value,
 				insetLeft: 0.3,
 				insetRight: 0.3,
 				color: 'value',

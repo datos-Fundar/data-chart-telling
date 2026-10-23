@@ -2,11 +2,11 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import {
-	LIFE_EXPECTANCY_BY_PROVINCE,
-	MALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	type ProvincePoint
-} from './data';
+	PROVINCE_VALUES,
+	MALE_PROVINCE_VALUES,
+	FEMALE_PROVINCE_VALUES,
+	type ProvinceRow
+} from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -54,8 +54,8 @@ export const Default: Story = {
 				name: 'female_life_expectancy',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
-			} satisfies Series<ProvincePoint>
+				data: FEMALE_PROVINCE_VALUES
+			} satisfies Series<ProvinceRow>
 		]
 	}
 };
@@ -72,14 +72,14 @@ export const TwoSeries: Story = {
 				name: 'female_life_expectancy',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
-			} satisfies Series<ProvincePoint>,
+				data: FEMALE_PROVINCE_VALUES
+			} satisfies Series<ProvinceRow>,
 			{
 				name: 'male_life_expectancy',
 				x: 'province',
 				y: 'value',
-				data: MALE_LIFE_EXPECTANCY_BY_PROVINCE
-			} satisfies Series<ProvincePoint>
+				data: MALE_PROVINCE_VALUES
+			} satisfies Series<ProvinceRow>
 		]
 	}
 };
@@ -96,7 +96,7 @@ export const TwoSeries: Story = {
  */
 export const TwoSeriesUsingDataAndGrouping: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		data: PROVINCE_VALUES,
 		x: 'province',
 		y: 'value',
 		color: 'sex'

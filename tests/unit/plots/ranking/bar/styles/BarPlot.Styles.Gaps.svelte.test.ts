@@ -5,25 +5,22 @@ import { setConfiguration, resetConfiguration } from '$lib/configuration/config.
 import type { GapsConfig } from '$lib/types/plots/gaps';
 import type { GapsAwarePlotStylesConfig } from '$lib/types/layout/styles';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
-import {
-	READINGS_WITH_GAPS,
-	OTHER_READINGS_NO_GAPS
-} from '../../../../../../stories/plots/ranking/bar/data';
+import { FEMALE_2022_WITH_GAPS, MALE_2022 } from '$datasets';
 import { waitForSvg, countBarRects, countTextLabels } from '../../../_helpers/svg';
 
 const SERIES = {
-	name: 'reading',
-	x: 'category' as const,
-	y: 'value' as const,
-	data: READINGS_WITH_GAPS
+	name: 'Female',
+	x: 'ageGroup' as const,
+	y: 'share' as const,
+	data: FEMALE_2022_WITH_GAPS
 };
 const OTHER_SERIES = {
-	name: 'other',
-	x: 'category' as const,
-	y: 'value' as const,
-	data: OTHER_READINGS_NO_GAPS
+	name: 'Male',
+	x: 'ageGroup' as const,
+	y: 'share' as const,
+	data: MALE_2022
 };
-const REAL_COUNT = READINGS_WITH_GAPS.filter((d) => d.value != null).length;
+const REAL_COUNT = FEMALE_2022_WITH_GAPS.filter((d) => d.share != null).length;
 
 describe('BarPlot - gaps (no config)', () => {
 	test('a missing value renders no bar, not a fake-zero one', async () => {
@@ -55,7 +52,7 @@ describe('BarPlot - gaps (axis title)', () => {
 			styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
 		});
 		const svg = await waitForSvg(container);
-		expect(svg.querySelector('.axis-y-title')?.textContent).toContain('value');
+		expect(svg.querySelector('.axis-y-title')?.textContent).toContain('share');
 	});
 });
 
@@ -94,7 +91,7 @@ describe('BarPlot - gaps (start/end, opt-in)', () => {
 			}
 		});
 		const svg = await waitForSvg(container);
-		expect(countBarRects(svg)).toBe(READINGS_WITH_GAPS.length);
+		expect(countBarRects(svg)).toBe(FEMALE_2022_WITH_GAPS.length);
 	});
 });
 
@@ -143,10 +140,10 @@ describe('BarPlot - gaps (series-aware)', () => {
 			width: 400,
 			height: 300,
 			series: [SERIES, OTHER_SERIES],
-			styles: { gaps: { reading: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
+			styles: { gaps: { Female: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
 		});
 		const svg = await waitForSvg(container);
-		expect(countBarRects(svg)).toBe(REAL_COUNT + OTHER_READINGS_NO_GAPS.length + 2);
+		expect(countBarRects(svg)).toBe(REAL_COUNT + MALE_2022.length + 2);
 	});
 
 	test('`default` applies to every series with no named entry of its own', async () => {
@@ -157,8 +154,8 @@ describe('BarPlot - gaps (series-aware)', () => {
 			styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
 		});
 		const svg = await waitForSvg(container);
-		// `other` has no missing values, so `default` has nothing to fill there.
-		expect(countBarRects(svg)).toBe(REAL_COUNT + OTHER_READINGS_NO_GAPS.length + 2);
+		// `Male` has no missing values, so `default` has nothing to fill there.
+		expect(countBarRects(svg)).toBe(REAL_COUNT + MALE_2022.length + 2);
 	});
 });
 
@@ -199,7 +196,7 @@ describe('BarPlot - gaps (grouped layout)', () => {
 			styles: { gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle> }
 		});
 		const svg = await waitForSvg(container);
-		expect(countBarRects(svg)).toBe(REAL_COUNT + OTHER_READINGS_NO_GAPS.length + 2);
+		expect(countBarRects(svg)).toBe(REAL_COUNT + MALE_2022.length + 2);
 	});
 });
 
@@ -295,7 +292,7 @@ describe('BarPlot - gaps (hover-isolate dimming)', () => {
 		const svg = await waitForSvg(container);
 
 		const otherLabelGroup = Array.from(svg.querySelectorAll('g[role="presentation"]')).find((g) =>
-			g.textContent?.includes('other')
+			g.textContent?.includes('Male')
 		);
 		expect(otherLabelGroup).toBeTruthy();
 		otherLabelGroup!.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
@@ -309,7 +306,7 @@ describe('BarPlot - gaps (hover-isolate dimming)', () => {
 
 		const rects = Array.from(svg.querySelectorAll('g.bar-y rect'));
 		const dimmed = rects.filter((r) => r.getAttribute('style')?.includes('fill-opacity: 0.12'));
-		// Every one of `reading`'s bars - its `REAL_COUNT` real ones plus the 2
+		// Every one of `Female`'s bars - its `REAL_COUNT` real ones plus the 2
 		// gap-fill bars the middle zone adds - dims, not just the real ones.
 		expect(dimmed).toHaveLength(REAL_COUNT + 2);
 	});

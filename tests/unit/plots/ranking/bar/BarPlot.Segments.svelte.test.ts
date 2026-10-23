@@ -3,10 +3,7 @@ import { describe, test, expect, vi } from 'vitest';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
-import {
-	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	LIFE_EXPECTANCY_BY_PROVINCE
-} from '../../../../../stories/plots/ranking/bar/data';
+import { FEMALE_PROVINCE_VALUES, PROVINCE_VALUES } from '$datasets';
 import { waitForSvg, countBarRects } from '../../_helpers/svg';
 
 function styleAttrs(svg: SVGElement): string[] {
@@ -18,21 +15,21 @@ describe('BarPlot - segments (areas)', () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,
-			series: [
-				{ name: 'female', x: 'province', y: 'value', data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE }
-			],
+			series: [{ name: 'female', x: 'province', y: 'value', data: FEMALE_PROVINCE_VALUES }],
 			segments: {
 				female: [
-					{ areas: [{ x: { from: 'Buenos Aires', to: 'Córdoba' } }], styles: { fillOpacity: 0.9 } },
+					{ areas: [{ x: { from: 'Buenos Aires', to: 'Chubut' } }], styles: { fillOpacity: 0.9 } },
 					{ styles: { fillOpacity: 0.3 } }
 				]
 			} satisfies SegmentsConfig<BarSegmentStyle>
 		});
 		const svg = await waitForSvg(container);
-		expect(countBarRects(svg)).toBe(FEMALE_LIFE_EXPECTANCY_BY_PROVINCE.length);
+		expect(countBarRects(svg)).toBe(FEMALE_PROVINCE_VALUES.length);
 		const styles = styleAttrs(svg);
 		expect(styles.filter((s) => s.includes('fill-opacity: 0.9')).length).toBe(2);
-		expect(styles.filter((s) => s.includes('fill-opacity: 0.3')).length).toBe(4);
+		expect(styles.filter((s) => s.includes('fill-opacity: 0.3')).length).toBe(
+			FEMALE_PROVINCE_VALUES.length - 2
+		);
 	});
 
 	test('warns when a series has more than one catch-all segment', async () => {
@@ -40,9 +37,7 @@ describe('BarPlot - segments (areas)', () => {
 		await render(BarPlot, {
 			width: 400,
 			height: 300,
-			series: [
-				{ name: 'female', x: 'province', y: 'value', data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE }
-			],
+			series: [{ name: 'female', x: 'province', y: 'value', data: FEMALE_PROVINCE_VALUES }],
 			segments: {
 				female: [{ styles: {} }, { styles: {} }] // two catch-alls → ambiguous
 			} satisfies SegmentsConfig<BarSegmentStyle>
@@ -60,7 +55,7 @@ describe('BarPlot - segments (areas)', () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,
-			data: LIFE_EXPECTANCY_BY_PROVINCE,
+			data: PROVINCE_VALUES,
 			x: 'province',
 			y: 'value',
 			color: 'sex',
@@ -70,7 +65,7 @@ describe('BarPlot - segments (areas)', () => {
 		});
 		const svg = await waitForSvg(container);
 		const styles = styleAttrs(svg);
-		expect(styles.length).toBe(LIFE_EXPECTANCY_BY_PROVINCE.length);
+		expect(styles.length).toBe(PROVINCE_VALUES.length);
 		styles.forEach((s) => expect(s).toContain('fill-opacity: 0.5'));
 	});
 });
@@ -80,9 +75,7 @@ describe('BarPlot - segments (catch-all + area merging)', () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,
-			series: [
-				{ name: 'female', x: 'province', y: 'value', data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE }
-			],
+			series: [{ name: 'female', x: 'province', y: 'value', data: FEMALE_PROVINCE_VALUES }],
 			segments: {
 				female: [
 					{ styles: { fill: '#e11d48' } },
@@ -92,7 +85,7 @@ describe('BarPlot - segments (catch-all + area merging)', () => {
 		});
 		const svg = await waitForSvg(container);
 		const styles = styleAttrs(svg);
-		expect(styles.length).toBe(FEMALE_LIFE_EXPECTANCY_BY_PROVINCE.length);
+		expect(styles.length).toBe(FEMALE_PROVINCE_VALUES.length);
 		styles.forEach((s) => expect(s).toContain('fill: rgb(225, 29, 72)'));
 	});
 });

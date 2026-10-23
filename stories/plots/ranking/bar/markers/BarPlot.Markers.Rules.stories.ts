@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { FEMALE_LIFE_EXPECTANCY_BY_PROVINCE, LIFE_EXPECTANCY_BY_PROVINCE } from '../data';
+import { FEMALE_PROVINCE_VALUES, PROVINCE_VALUES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -53,7 +53,7 @@ export const WithRuleXMarkers: Story = {
 				name: 'female',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+				data: FEMALE_PROVINCE_VALUES
 			}
 		],
 		markers: [
@@ -69,7 +69,7 @@ export const WithRuleXMarkers: Story = {
 			{
 				type: 'rule',
 				axis: 'x',
-				value: 'Tucumán',
+				value: 'Chubut',
 				styles: {
 					strokeDasharray: '4 4',
 					strokeOpacity: 0.7
@@ -90,14 +90,14 @@ export const WithRuleYMarkers: Story = {
 				name: 'female',
 				x: 'province',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE
+				data: FEMALE_PROVINCE_VALUES
 			}
 		],
 		markers: [
 			{
 				type: 'rule',
 				axis: 'y',
-				value: 82.0,
+				value: 80.0,
 				styles: {
 					strokeDasharray: '6 6',
 					strokeOpacity: 0.5
@@ -106,7 +106,7 @@ export const WithRuleYMarkers: Story = {
 			{
 				type: 'rule',
 				axis: 'y',
-				value: 84.0,
+				value: 82.0,
 				styles: {
 					strokeDasharray: '6 6',
 					strokeOpacity: 0.5
@@ -122,7 +122,7 @@ export const WithRuleYMarkers: Story = {
  */
 export const WithMixedMarkers: Story = {
 	args: {
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		data: PROVINCE_VALUES,
 		x: 'province',
 		y: 'value',
 		color: 'sex',
@@ -139,7 +139,7 @@ export const WithMixedMarkers: Story = {
 			{
 				type: 'rule',
 				axis: 'y',
-				value: 78.7,
+				value: 77.0,
 				styles: {
 					strokeDasharray: '6 6',
 					strokeOpacity: 0.5

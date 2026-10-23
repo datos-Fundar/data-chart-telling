@@ -1,11 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
-import {
-	LIFE_EXPECTANCY_BY_PROVINCE,
-	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
-	MALE_LIFE_EXPECTANCY_BY_PROVINCE
-} from '../../../../../stories/plots/ranking/bar/data';
+import { PROVINCE_VALUES, FEMALE_PROVINCE_VALUES, MALE_PROVINCE_VALUES } from '$datasets';
 import { waitForSvg, countBarRects } from '../../_helpers/svg';
 
 describe('BarPlot - series prop', () => {
@@ -13,9 +9,7 @@ describe('BarPlot - series prop', () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,
-			series: [
-				{ name: 'female', x: 'province', y: 'value', data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE }
-			]
+			series: [{ name: 'female', x: 'province', y: 'value', data: FEMALE_PROVINCE_VALUES }]
 		});
 		const svg = await waitForSvg(container);
 		expect(svg).toBeTruthy();
@@ -25,12 +19,10 @@ describe('BarPlot - series prop', () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,
-			series: [
-				{ name: 'female', x: 'province', y: 'value', data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE }
-			]
+			series: [{ name: 'female', x: 'province', y: 'value', data: FEMALE_PROVINCE_VALUES }]
 		});
 		const svg = await waitForSvg(container);
-		expect(countBarRects(svg)).toBe(FEMALE_LIFE_EXPECTANCY_BY_PROVINCE.length);
+		expect(countBarRects(svg)).toBe(FEMALE_PROVINCE_VALUES.length);
 	});
 
 	test('renders bars for both series', async () => {
@@ -38,14 +30,12 @@ describe('BarPlot - series prop', () => {
 			width: 400,
 			height: 300,
 			series: [
-				{ name: 'female', x: 'province', y: 'value', data: FEMALE_LIFE_EXPECTANCY_BY_PROVINCE },
-				{ name: 'male', x: 'province', y: 'value', data: MALE_LIFE_EXPECTANCY_BY_PROVINCE }
+				{ name: 'female', x: 'province', y: 'value', data: FEMALE_PROVINCE_VALUES },
+				{ name: 'male', x: 'province', y: 'value', data: MALE_PROVINCE_VALUES }
 			]
 		});
 		const svg = await waitForSvg(container);
-		expect(countBarRects(svg)).toBe(
-			FEMALE_LIFE_EXPECTANCY_BY_PROVINCE.length + MALE_LIFE_EXPECTANCY_BY_PROVINCE.length
-		);
+		expect(countBarRects(svg)).toBe(FEMALE_PROVINCE_VALUES.length + MALE_PROVINCE_VALUES.length);
 	});
 
 	test('does not crash with an empty series array', async () => {
@@ -60,12 +50,12 @@ describe('BarPlot - grouped data (data/x/y/color)', () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,
-			data: LIFE_EXPECTANCY_BY_PROVINCE,
+			data: PROVINCE_VALUES,
 			x: 'province',
 			y: 'value',
 			color: 'sex'
 		});
 		const svg = await waitForSvg(container);
-		expect(countBarRects(svg)).toBe(LIFE_EXPECTANCY_BY_PROVINCE.length);
+		expect(countBarRects(svg)).toBe(PROVINCE_VALUES.length);
 	});
 });
