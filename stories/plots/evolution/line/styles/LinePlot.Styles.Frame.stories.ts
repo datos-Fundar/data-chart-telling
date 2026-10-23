@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { FEMALE_LIFE_EXPECTANCY } from '../data';
+import { FEMALE_LIFE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -54,7 +54,7 @@ export const FrameDefault: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		styles: {
@@ -75,7 +75,7 @@ export const FrameCustomStyle: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		styles: {

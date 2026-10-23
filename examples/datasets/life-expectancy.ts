@@ -2,7 +2,10 @@
 // INDEC, life tables. Each year stands for the period around it (1947 is
 // 1946-1948, 2001 is 2000-2001, ...).
 
-export type LifeRow = { year: number; sex: string; value: number | null };
+export type LifeRow = { year: number; sex: 'female' | 'male'; value: number };
+
+/** A life expectancy row that may have a missing value. */
+export type LifeRowWithGaps = Omit<LifeRow, 'value'> & { value: number | null };
 
 const LIFE_EXPECTANCY = [
 	{ year: 1947, female: 61.4, male: 56.9 },
@@ -20,7 +23,16 @@ export const LIFE: LifeRow[] = LIFE_EXPECTANCY.flatMap(({ year, female, male }) 
 	{ year, sex: 'male', value: male }
 ]);
 
+export const FEMALE_LIFE: LifeRow[] = LIFE.filter((row) => row.sex === 'female');
+
+export const MALE_LIFE: LifeRow[] = LIFE.filter((row) => row.sex === 'male');
+
 /** The female series with holes: the first year, one in the middle and the last. */
-export const LIFE_GAPS: LifeRow[] = LIFE.filter((row) => row.sex === 'female').map((row) =>
+export const FEMALE_LIFE_GAPS: LifeRowWithGaps[] = FEMALE_LIFE.map((row) =>
 	[1947, 1980, 2019].includes(row.year) ? { ...row, value: null } : row
+);
+
+/** The male series with a single hole, in a different place than the female one. */
+export const MALE_LIFE_GAPS: LifeRowWithGaps[] = MALE_LIFE.map((row) =>
+	row.year === 1991 ? { ...row, value: null } : row
 );

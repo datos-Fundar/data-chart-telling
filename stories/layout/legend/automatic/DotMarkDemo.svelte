@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
-	import { LIFE_EXPECTANCY } from '../../../plots/evolution/line/data';
+	import { LIFE } from '$datasets';
 </script>
 
 <!--
@@ -12,7 +12,7 @@
 		width={760}
 		height={360}
 		title="Circles"
-		data={LIFE_EXPECTANCY}
+		data={LIFE}
 		x="year"
 		y="value"
 		color="sex"
@@ -21,7 +21,7 @@
 		width={760}
 		height={360}
 		title="Diamonds"
-		data={LIFE_EXPECTANCY}
+		data={LIFE}
 		x="year"
 		y="value"
 		color="sex"

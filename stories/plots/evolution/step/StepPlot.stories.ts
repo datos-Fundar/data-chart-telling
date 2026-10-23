@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
-import { LIFE_EXPECTANCY } from '../line/data';
+import { LIFE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -11,10 +11,11 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
-		color: 'sex'
+		color: 'sex',
+		scales: { x: { nice: false } }
 	},
 	parameters: {
 		docs: {

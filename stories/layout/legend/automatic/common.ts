@@ -1,13 +1,14 @@
-import { LIFE_EXPECTANCY } from '../../../plots/evolution/line/data';
+import { LIFE } from '$datasets';
 
 /** The line plot every automatic-legend story starts from: one series per sex. */
 export const AUTOMATIC_ARGS = {
 	width: 760,
 	height: 360,
-	data: LIFE_EXPECTANCY,
+	data: LIFE,
 	x: 'year',
 	y: 'value',
-	color: 'sex'
+	color: 'sex',
+	scales: { x: { nice: false } }
 };
 
 /** What `legend` takes, as documented on every automatic-legend story's control. */

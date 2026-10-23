@@ -5,20 +5,16 @@ import type { MarkerTransform } from '$lib/types/transforms';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
-import type { YearPoint } from '../../../../../../stories/plots/evolution/line/data';
-import {
-	FEMALE_LIFE_EXPECTANCY,
-	MALE_LIFE_EXPECTANCY
-} from '../../../../../../stories/plots/evolution/line/data';
+import { type LifeRow, FEMALE_LIFE, MALE_LIFE } from '$datasets';
 import { waitForSvg, countDotMarks, countTextLabels } from '../../../_helpers/svg';
 
 const FEMALE = {
 	name: 'female',
 	x: 'year' as const,
 	y: 'value' as const,
-	data: FEMALE_LIFE_EXPECTANCY
+	data: FEMALE_LIFE
 };
-const MALE = { name: 'male', x: 'year' as const, y: 'value' as const, data: MALE_LIFE_EXPECTANCY };
+const MALE = { name: 'male', x: 'year' as const, y: 'value' as const, data: MALE_LIFE };
 
 /** A dot and a label on the series' peak - what a `selectMaxY`/`selectMinY` transform picks. */
 function peakMarkers(
@@ -35,8 +31,8 @@ function peakMarkers(
 
 const TWO_SEGMENTS: SegmentsConfig<LineSegmentStyle> = {
 	female: [
-		{ areas: [{ x: { to: 2014 } }], styles: {} },
-		{ areas: [{ x: { from: 2014 } }], styles: { stroke: { strokeDasharray: '6 4' } } }
+		{ areas: [{ x: { to: 1991 } }], styles: {} },
+		{ areas: [{ x: { from: 1991 } }], styles: { stroke: { strokeDasharray: '6 4' } } }
 	]
 };
 
@@ -50,13 +46,13 @@ describe('LinePlot - markers.custom (component)', () => {
 				{
 					type: 'dot',
 					series: 'female',
-					x: (d: YearPoint) => d.year,
-					y: (d: YearPoint) => d.value
+					x: (d: LifeRow) => d.year,
+					y: (d: LifeRow) => d.value
 				}
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
-		expect(countDotMarks(svg)).toBe(FEMALE_LIFE_EXPECTANCY.length);
+		expect(countDotMarks(svg)).toBe(FEMALE_LIFE.length);
 	});
 
 	test('TextMarker renders one label per data point', async () => {
@@ -68,14 +64,14 @@ describe('LinePlot - markers.custom (component)', () => {
 				{
 					type: 'text',
 					series: 'female',
-					x: (d: YearPoint) => d.year,
-					y: (d: YearPoint) => d.value,
-					text: (d: YearPoint) => String(d.value)
+					x: (d: LifeRow) => d.year,
+					y: (d: LifeRow) => d.value,
+					text: (d: LifeRow) => String(d.value)
 				}
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
-		expect(countTextLabels(svg)).toBe(FEMALE_LIFE_EXPECTANCY.length);
+		expect(countTextLabels(svg)).toBe(FEMALE_LIFE.length);
 	});
 
 	test('a component marker scoped to one series does not affect the other', async () => {
@@ -87,14 +83,14 @@ describe('LinePlot - markers.custom (component)', () => {
 				{
 					type: 'dot',
 					series: 'female',
-					x: (d: YearPoint) => d.year,
-					y: (d: YearPoint) => d.value
+					x: (d: LifeRow) => d.year,
+					y: (d: LifeRow) => d.value
 				}
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
 		// Only female's points get dots - male has none.
-		expect(countDotMarks(svg)).toBe(FEMALE_LIFE_EXPECTANCY.length);
+		expect(countDotMarks(svg)).toBe(FEMALE_LIFE.length);
 	});
 
 	test('selectMaxY marks the maximum value of the series', async () => {

@@ -4,17 +4,14 @@ import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 import type { GapsConfig } from '$lib/types/plots/gaps';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
-import {
-	FEMALE_LIFE_EXPECTANCY_WITH_GAPS,
-	MALE_LIFE_EXPECTANCY_WITH_GAPS
-} from '../../../../../../stories/plots/evolution/line/data';
+import { FEMALE_LIFE_GAPS, MALE_LIFE_GAPS } from '$datasets';
 import { waitForSvg, countLinePaths, countDotMarks } from '../../../_helpers/svg';
 
 const FEMALE = {
 	name: 'female',
 	x: 'year' as const,
 	y: 'value' as const,
-	data: FEMALE_LIFE_EXPECTANCY_WITH_GAPS
+	data: FEMALE_LIFE_GAPS
 };
 
 // A second series whose gap sits in a different place, for series-aware tests.
@@ -22,7 +19,7 @@ const MALE = {
 	name: 'male',
 	x: 'year' as const,
 	y: 'value' as const,
-	data: MALE_LIFE_EXPECTANCY_WITH_GAPS
+	data: MALE_LIFE_GAPS
 };
 
 describe('LinePlot - gaps (no config)', () => {
@@ -72,7 +69,7 @@ describe('LinePlot - gaps (start/end, opt-in)', () => {
 			width: 400,
 			height: 300,
 			series: [FEMALE],
-			styles: { gaps: { default: { start: { x: 2006 } } } satisfies GapsConfig<LineSegmentStyle> }
+			styles: { gaps: { default: { start: { x: 1940 } } } satisfies GapsConfig<LineSegmentStyle> }
 		});
 		const svg = await waitForSvg(container);
 		expect(countLinePaths(svg)).toBe(2);
@@ -83,7 +80,7 @@ describe('LinePlot - gaps (start/end, opt-in)', () => {
 			width: 400,
 			height: 300,
 			series: [FEMALE],
-			styles: { gaps: { default: { end: { x: 2022 } } } satisfies GapsConfig<LineSegmentStyle> }
+			styles: { gaps: { default: { end: { x: 2025 } } } satisfies GapsConfig<LineSegmentStyle> }
 		});
 		const svg = await waitForSvg(container);
 		expect(countLinePaths(svg)).toBe(2);
@@ -96,7 +93,7 @@ describe('LinePlot - gaps (start/end, opt-in)', () => {
 			series: [FEMALE],
 			styles: {
 				gaps: {
-					default: { start: { x: 2006 }, middle: {}, end: { x: 2022 } }
+					default: { start: { x: 1940 }, middle: {}, end: { x: 2025 } }
 				} satisfies GapsConfig<LineSegmentStyle>
 			}
 		});
@@ -207,7 +204,7 @@ describe('LinePlot - gaps (series-aware)', () => {
 			series: [FEMALE, MALE],
 			styles: {
 				gaps: {
-					default: { start: { x: 2006 }, middle: {} },
+					default: { start: { x: 1940 }, middle: {} },
 					// `female` overrides only `middle`; it still inherits `start` from `default`.
 					female: { middle: { style: { stroke: { stroke: '#16a34a' } } } }
 				} satisfies GapsConfig<LineSegmentStyle>

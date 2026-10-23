@@ -1,10 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
-import {
-	FEMALE_LIFE_EXPECTANCY_WITH_GAPS,
-	MALE_LIFE_EXPECTANCY_WITH_GAPS
-} from '../../../../../../stories/plots/evolution/line/data';
+import { FEMALE_LIFE_GAPS, MALE_LIFE_GAPS } from '$datasets';
 import type { LegendSection } from '$lib/types/layout/legend';
 
 // Reproduces the reported bug: clicking a legend item to "disable" a series
@@ -31,8 +28,8 @@ function renderPlot() {
 		width: 950,
 		height: 400,
 		series: [
-			{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY_WITH_GAPS },
-			{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY_WITH_GAPS }
+			{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_GAPS },
+			{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_GAPS }
 		],
 		styles: { gaps: { default: { middle: {} } } },
 		legend: LEGEND

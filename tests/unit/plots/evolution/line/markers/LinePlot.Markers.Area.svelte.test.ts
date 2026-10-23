@@ -2,10 +2,7 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import {
-	FEMALE_LIFE_EXPECTANCY,
-	MALE_LIFE_EXPECTANCY
-} from '../../../../../../stories/plots/evolution/line/data';
+import { FEMALE_LIFE, MALE_LIFE } from '$datasets';
 import { waitForSvg, countAreaPaths } from '../../../_helpers/svg';
 
 describe('LinePlot - markers.area', () => {
@@ -13,7 +10,7 @@ describe('LinePlot - markers.area', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: FEMALE_LIFE_EXPECTANCY,
+			data: FEMALE_LIFE,
 			x: 'year',
 			y: 'value',
 			markers: [{ type: 'area', x: 'year', y: 'value' }] satisfies AxisBasedMarkersConfig[]
@@ -26,7 +23,7 @@ describe('LinePlot - markers.area', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: FEMALE_LIFE_EXPECTANCY.map((d) => ({ ...d, year: new Date(d.year, 0, 1) })),
+			data: FEMALE_LIFE.map((d) => ({ ...d, year: new Date(d.year, 0, 1) })),
 			x: 'value',
 			y: 'year',
 			markers: [{ type: 'area', x: 'value', y: 'year' }] satisfies AxisBasedMarkersConfig[]
@@ -36,9 +33,9 @@ describe('LinePlot - markers.area', () => {
 	});
 
 	test('explicit y1/y2 draws a band between two series', async () => {
-		const band = FEMALE_LIFE_EXPECTANCY.map((d, i) => ({
+		const band = FEMALE_LIFE.map((d, i) => ({
 			year: d.year,
-			low: MALE_LIFE_EXPECTANCY[i].value,
+			low: MALE_LIFE[i].value,
 			high: d.value
 		}));
 		const { container } = render(LinePlot, {
@@ -59,7 +56,7 @@ describe('LinePlot - markers.area', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: FEMALE_LIFE_EXPECTANCY,
+			data: FEMALE_LIFE,
 			x: 'year',
 			y: 'value',
 			markers: [
@@ -75,7 +72,7 @@ describe('LinePlot - markers.area', () => {
 		const { container } = render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: FEMALE_LIFE_EXPECTANCY,
+			data: FEMALE_LIFE,
 			x: 'year',
 			y: 'value',
 			markers: []

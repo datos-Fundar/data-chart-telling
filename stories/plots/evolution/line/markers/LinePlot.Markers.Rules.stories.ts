@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { FEMALE_LIFE_EXPECTANCY, LIFE_EXPECTANCY } from '../data';
+import { FEMALE_LIFE, LIFE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -52,14 +52,14 @@ export const WithRuleXMarkers: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
 			{
 				type: 'rule',
 				axis: 'x',
-				value: 2014,
+				value: 1991,
 				styles: {
 					strokeDasharray: '4 4',
 					strokeOpacity: 0.7
@@ -68,7 +68,7 @@ export const WithRuleXMarkers: Story = {
 			{
 				type: 'rule',
 				axis: 'x',
-				value: 2018,
+				value: 2009,
 				styles: {
 					strokeDasharray: '4 4',
 					strokeOpacity: 0.7
@@ -88,14 +88,14 @@ export const WithRuleYMarkers: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
 			{
 				type: 'rule',
 				axis: 'y',
-				value: 81.0,
+				value: 70.8,
 				styles: {
 					strokeDasharray: '6 6',
 					strokeOpacity: 0.5
@@ -104,7 +104,7 @@ export const WithRuleYMarkers: Story = {
 			{
 				type: 'rule',
 				axis: 'y',
-				value: 83.7,
+				value: 78.8,
 				styles: {
 					strokeDasharray: '6 6',
 					strokeOpacity: 0.5
@@ -119,7 +119,7 @@ export const WithRuleYMarkers: Story = {
  */
 export const WithMixedMarkers: Story = {
 	args: {
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex',
@@ -127,7 +127,7 @@ export const WithMixedMarkers: Story = {
 			{
 				type: 'rule',
 				axis: 'x',
-				value: 2018,
+				value: 2009,
 				styles: {
 					strokeDasharray: '4 4',
 					strokeOpacity: 0.6
@@ -136,7 +136,7 @@ export const WithMixedMarkers: Story = {
 			{
 				type: 'rule',
 				axis: 'y',
-				value: 78.7,
+				value: 72.1,
 				styles: {
 					strokeDasharray: '6 6',
 					strokeOpacity: 0.5

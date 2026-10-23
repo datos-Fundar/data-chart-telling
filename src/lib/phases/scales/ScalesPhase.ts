@@ -96,8 +96,12 @@ export class ScalesPhase<
 		}
 
 		const fitted = options.fit?.({ ...state, scales } as TState, ctx) ?? {};
+		const fittedAxes: AxisChannelName[] = [];
 		for (const axis of AXES) {
-			if (fitted[axis]) scales[axis] = { ...scales[axis], ...fitted[axis] };
+			if (!fitted[axis]) continue;
+			const { fitted: ownDomain, ...fit } = fitted[axis];
+			scales[axis] = { ...scales[axis], ...fit };
+			if (ownDomain) fittedAxes.push(axis);
 		}
 
 		for (const axis of AXES) {
@@ -120,13 +124,13 @@ export class ScalesPhase<
 			scales[axis] = niced
 				? {
 						...author,
-						domain: NiceTicks.fit(state, axis, lo, hi, author?.niceTolerance),
+						domain: NiceTicks.fit(state, axis, lo, hi, NiceTicks.toleranceOf(author?.nice)),
 						nice: false
 					}
 				: { ...author, domain: [lo, hi], nice: author?.nice ?? true };
 		}
 
-		const next = { ...state, scales } as TState;
+		const next = { ...state, scales, ...(fittedAxes.length ? { fittedAxes } : {}) } as TState;
 		return options.extend ? options.extend(next, ctx) : next;
 	};
 

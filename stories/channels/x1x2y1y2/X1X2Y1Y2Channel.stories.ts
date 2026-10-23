@@ -2,7 +2,7 @@ import type { Meta } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { renderSource } from '../../common/docsSource';
-import { LIFE_EXPECTANCY } from '../../plots/evolution/line/data';
+import { LIFE } from '$datasets';
 import { GOOGL_AUGUST_2026, AMZN_AUGUST_2026, type StockDay } from '../../data/stockPrices';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -52,7 +52,7 @@ const stockPriceProps = {
 	y: 'avg',
 	color: 'company',
 	scales: {
-		x: { tickRotate: -45, label: false },
+		x: { tickRotate: -30, label: false },
 		color: {
 			scheme: { GOOGL: 'darkblue', AMZN: 'darkorange' }
 		}
@@ -119,16 +119,17 @@ export const BarMarker: any = {
 const rectMarkerProps = {
 	width: 940,
 	height: 400,
-	data: LIFE_EXPECTANCY,
+	data: LIFE,
 	x: 'year',
 	y: 'value',
 	color: 'sex',
+	scales: { x: { nice: false } },
 	markers: [
 		{
 			type: 'rect',
 			data: [{}],
-			x1: 2010,
-			x2: 2014,
+			x1: 1972,
+			x2: 1991,
 			y1: 70,
 			y2: 90,
 			styles: { fill: '#fde68a', fillOpacity: 0.5 }

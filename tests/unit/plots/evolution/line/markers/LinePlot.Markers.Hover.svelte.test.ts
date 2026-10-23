@@ -4,17 +4,14 @@ import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
-import {
-	FEMALE_LIFE_EXPECTANCY,
-	LIFE_EXPECTANCY
-} from '../../../../../../stories/plots/evolution/line/data';
+import { FEMALE_LIFE, LIFE } from '$datasets';
 import { waitForSvg, countDotMarks, countTextLabels } from '../../../_helpers/svg';
 
 const FEMALE = {
 	name: 'female',
 	x: 'year' as const,
 	y: 'value' as const,
-	data: FEMALE_LIFE_EXPECTANCY
+	data: FEMALE_LIFE
 };
 
 // The hover marker's dot/label/rules only appear once svelteplot's <Pointer>
@@ -38,7 +35,7 @@ describe('LinePlot - markers.hover', () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: LIFE_EXPECTANCY,
+			data: LIFE,
 			x: 'year',
 			y: 'value',
 			color: 'sex',
@@ -51,8 +48,8 @@ describe('LinePlot - markers.hover', () => {
 	test('does not crash with scope "segment" over a segmented series', async () => {
 		const segments: SegmentsConfig<LineSegmentStyle> = {
 			female: [
-				{ areas: [{ x: { to: 2014 } }], styles: {} },
-				{ areas: [{ x: { from: 2014 } }], styles: { stroke: { strokeDasharray: '6 4' } } }
+				{ areas: [{ x: { to: 1991 } }], styles: {} },
+				{ areas: [{ x: { from: 1991 } }], styles: { stroke: { strokeDasharray: '6 4' } } }
 			]
 		};
 		const { container } = await render(LinePlot, {

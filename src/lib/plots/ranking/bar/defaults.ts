@@ -24,7 +24,7 @@ export function fitValueDomain<TData extends Record<string, unknown>>(
 ): Partial<Record<'x' | 'y', Partial<AxisScale<TData>>>> {
 	const axis = PlotAxes.valueOf(state);
 	const scale = state.scales[axis];
-	if (scale?.domain != null || scale?.ticks != null || scale?.nice != null) return {};
+	if (scale?.domain != null || scale?.ticks != null || typeof scale?.nice === 'boolean') return {};
 	// Every bar's span, as the "transforms" phase left it - its baseline is
 	// unknown until the domain is, so a plain bar reads as reaching from zero.
 	const { of: spanOf } = ProcessedPositions.span(state.processedData!, axis as 'x' | 'y');
@@ -41,7 +41,9 @@ export function fitValueDomain<TData extends Record<string, unknown>>(
 		hi = Math.max(hi, ...span);
 	}
 	if (hi <= lo) return {};
-	return { [axis]: { domain: NiceTicks.fit(state, axis, lo, hi, scale?.niceTolerance) } };
+	return {
+		[axis]: { domain: NiceTicks.fit(state, axis, lo, hi, NiceTicks.toleranceOf(scale?.nice)) }
+	};
 }
 
 /**

@@ -4,29 +4,30 @@
 	import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 	import type { Series } from '$lib/types/plots/data/common';
 	import type { EdgeTickCollision } from '$lib/types/layout/scales';
-	import {
-		FEMALE_LIFE_EXPECTANCY_SINCE_1947,
-		type YearPoint
-	} from '../../../plots/evolution/line/data';
+	import { FEMALE_LIFE, type LifeRow } from '$datasets';
 
 	let {
 		enabled = true,
-		collision = 'drop-nice'
+		collision = 'drop-nice',
+		nice = true
 	}: {
 		/** Where `axis.edgeTicks.x.enabled` starts; the toggle switches it live. */
 		enabled?: boolean;
 		/** Where `axis.edgeTicks.x.collision` starts; the buttons switch it live. */
 		collision?: EdgeTickCollision;
+		/** Where `scales.x.nice` starts; the toggle switches it live. */
+		nice?: boolean;
 	} = $props();
 
 	const series = [
-		{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY_SINCE_1947 }
-	] satisfies Series<YearPoint>[];
+		{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }
+	] satisfies Series<LifeRow>[];
 
 	const STRATEGIES: EdgeTickCollision[] = ['drop-nice', 'drop-edge', 'extend'];
 
 	let on = $state(untrack(() => enabled));
 	let strategy = $state(untrack(() => collision));
+	let rounded = $state(untrack(() => nice));
 
 	// A plain statement, so the configuration is set before the plot mounts.
 	resetConfiguration();
@@ -43,6 +44,12 @@
 
 <div class="demo">
 	<div class="demo__controls">
+		<span class="demo__label">scales.x.nice:</span>
+		<button class:active={rounded} onclick={() => (rounded = !rounded)}>
+			{rounded ? 'true' : 'false'}
+		</button>
+	</div>
+	<div class="demo__controls">
 		<span class="demo__label">axis.edgeTicks.x.enabled:</span>
 		<button class:active={on} onclick={() => (on = !on)}>{on ? 'true' : 'false'}</button>
 	</div>
@@ -55,7 +62,7 @@
 		{/each}
 	</div>
 
-	<LinePlot width={720} height={360} {series} />
+	<LinePlot width={720} height={360} {series} scales={{ x: { nice: rounded } }} />
 </div>
 
 <style>

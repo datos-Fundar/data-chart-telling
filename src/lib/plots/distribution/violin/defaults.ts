@@ -15,14 +15,16 @@ import type { ViolinPlotState, ViolinPlotCtx } from '$lib/types/plots/distributi
 function fitValueDomain<TData extends Record<string, unknown>>(state: ViolinPlotState<TData>) {
 	const axis = PlotAxes.valueOf(state);
 	const scale = state.scales[axis];
-	if (scale?.domain != null || scale?.ticks != null || scale?.nice != null) return {};
+	if (scale?.domain != null || scale?.ticks != null || typeof scale?.nice === 'boolean') return {};
 	const values = ProcessedPositions.values(state.processedData, axis)
 		.map(Number)
 		.filter(Number.isFinite);
 	const lo = Math.min(...values);
 	const hi = Math.max(...values);
 	if (!(hi > lo)) return {};
-	return { [axis]: { domain: NiceTicks.fit(state, axis, lo, hi, scale?.niceTolerance) } };
+	return {
+		[axis]: { domain: NiceTicks.fit(state, axis, lo, hi, NiceTicks.toleranceOf(scale?.nice)) }
+	};
 }
 
 /**

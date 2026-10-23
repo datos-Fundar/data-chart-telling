@@ -3,19 +3,16 @@ import { describe, test, expect, afterEach } from 'vitest';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { resetConfiguration, setConfiguration } from '$lib/configuration/config.svelte';
-import {
-	FEMALE_LIFE_EXPECTANCY,
-	MALE_LIFE_EXPECTANCY
-} from '../../../../../../stories/plots/evolution/line/data';
+import { FEMALE_LIFE, MALE_LIFE } from '$datasets';
 import { waitForSvg, countLinePaths, countDotMarks, countTextLabels } from '../../../_helpers/svg';
 
 const FEMALE = {
 	name: 'female',
 	x: 'year' as const,
 	y: 'value' as const,
-	data: FEMALE_LIFE_EXPECTANCY
+	data: FEMALE_LIFE
 };
-const MALE = { name: 'male', x: 'year' as const, y: 'value' as const, data: MALE_LIFE_EXPECTANCY };
+const MALE = { name: 'male', x: 'year' as const, y: 'value' as const, data: MALE_LIFE };
 
 describe('LinePlot - markers.deltas', () => {
 	test('a delta between two series renders a connector line, two dots and a label', async () => {
@@ -27,7 +24,7 @@ describe('LinePlot - markers.deltas', () => {
 				{
 					type: 'delta',
 					axis: 'x',
-					at: 2020,
+					at: 2019,
 					from: { type: 'series', series: 'female' },
 					to: { type: 'series', series: 'male' }
 				}
@@ -49,16 +46,16 @@ describe('LinePlot - markers.deltas', () => {
 				{
 					type: 'delta',
 					axis: 'x',
-					at: 2020,
+					at: 2019,
 					from: { type: 'series', series: 'female' },
 					to: { type: 'series', series: 'male' }
 				}
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
-		const female2020 = FEMALE_LIFE_EXPECTANCY.find((d) => d.year === 2020)!.value;
-		const male2020 = MALE_LIFE_EXPECTANCY.find((d) => d.year === 2020)!.value;
-		const expectedDiff = Math.abs(male2020 - female2020).toFixed(1);
+		const female2019 = FEMALE_LIFE.find((d) => d.year === 2019)!.value;
+		const male2019 = MALE_LIFE.find((d) => d.year === 2019)!.value;
+		const expectedDiff = Math.abs(male2019 - female2019).toFixed(1);
 		expect(svg.querySelector('g.text text')?.textContent).toBe(expectedDiff);
 	});
 
@@ -71,7 +68,7 @@ describe('LinePlot - markers.deltas', () => {
 				{
 					type: 'delta',
 					axis: 'x',
-					at: 2020,
+					at: 2019,
 					from: { type: 'series', series: 'female' },
 					to: { type: 'series', series: 'male' },
 					formatDiff: (diff: number) => `${Math.abs(diff).toFixed(0)} yr`
@@ -79,9 +76,9 @@ describe('LinePlot - markers.deltas', () => {
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
-		const female2020 = FEMALE_LIFE_EXPECTANCY.find((d) => d.year === 2020)!.value;
-		const male2020 = MALE_LIFE_EXPECTANCY.find((d) => d.year === 2020)!.value;
-		const expected = `${Math.abs(male2020 - female2020).toFixed(0)} yr`;
+		const female2019 = FEMALE_LIFE.find((d) => d.year === 2019)!.value;
+		const male2019 = MALE_LIFE.find((d) => d.year === 2019)!.value;
+		const expected = `${Math.abs(male2019 - female2019).toFixed(0)} yr`;
 		expect(svg.querySelector('g.text text')?.textContent).toBe(expected);
 	});
 
@@ -94,14 +91,14 @@ describe('LinePlot - markers.deltas', () => {
 				{
 					type: 'delta',
 					axis: 'x',
-					at: 2020,
+					at: 2019,
 					from: { type: 'series', series: 'female' }
 				}
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
-		const female2020 = FEMALE_LIFE_EXPECTANCY.find((d) => d.year === 2020)!.value;
-		expect(svg.querySelector('g.text text')?.textContent).toBe(female2020.toFixed(1));
+		const female2019 = FEMALE_LIFE.find((d) => d.year === 2019)!.value;
+		expect(svg.querySelector('g.text text')?.textContent).toBe(female2019.toFixed(1));
 	});
 });
 
@@ -118,7 +115,7 @@ describe('LinePlot - delta label offset', () => {
 				{
 					type: 'delta',
 					axis,
-					at: axis === 'x' ? 2020 : 78,
+					at: axis === 'x' ? 2019 : 70,
 					from: { type: 'series', series: 'female' },
 					to: { type: 'series', series: 'male' },
 					...(text ? { text } : {})

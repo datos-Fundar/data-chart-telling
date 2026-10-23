@@ -1,21 +1,16 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
-import type { YearPoint } from '../../../../../stories/plots/evolution/line/data';
-import {
-	FEMALE_LIFE_EXPECTANCY,
-	MALE_LIFE_EXPECTANCY,
-	LIFE_EXPECTANCY
-} from '../../../../../stories/plots/evolution/line/data';
+import { type LifeRow, FEMALE_LIFE, MALE_LIFE, LIFE } from '$datasets';
 import { waitForSvg } from '../../_helpers/svg';
 
 const FEMALE = {
 	name: 'female',
 	x: 'year' as const,
 	y: 'value' as const,
-	data: FEMALE_LIFE_EXPECTANCY
+	data: FEMALE_LIFE
 };
-const MALE = { name: 'male', x: 'year' as const, y: 'value' as const, data: MALE_LIFE_EXPECTANCY };
+const MALE = { name: 'male', x: 'year' as const, y: 'value' as const, data: MALE_LIFE };
 
 function noTooltipDom(container: Element) {
 	return container.querySelector('.dct-tooltip, [class*="tooltip"]');
@@ -50,7 +45,7 @@ describe('LinePlot - tooltip', () => {
 			width: 400,
 			height: 300,
 			series: [MALE, FEMALE],
-			tooltip: { strategy: 'x', format: (row) => String((row as YearPoint).value) }
+			tooltip: { strategy: 'x', format: (row) => String((row as LifeRow).value) }
 		});
 		await hoverCenterAndReadTooltip(container);
 		const lines = container.querySelector('.dct-tooltip')!.textContent!.trim().split('\n');
@@ -72,7 +67,7 @@ describe('LinePlot - tooltip', () => {
 			series: [FEMALE],
 			tooltip: {
 				sync: false,
-				format: (row) => `${(row as YearPoint).year}: ${(row as YearPoint).value} yr`
+				format: (row) => `${(row as LifeRow).year}: ${(row as LifeRow).value} yr`
 			}
 		});
 		await waitForSvg(container);
@@ -86,7 +81,7 @@ describe('LinePlot - tooltip', () => {
 			series: [FEMALE, MALE],
 			tooltip: {
 				sync: false,
-				format: (row) => `${(row as YearPoint).year}: ${(row as YearPoint).value.toFixed(1)} yr`
+				format: (row) => `${(row as LifeRow).year}: ${(row as LifeRow).value.toFixed(1)} yr`
 			}
 		});
 		const svg = await waitForSvg(container);
@@ -101,7 +96,7 @@ describe('LinePlot - tooltip', () => {
 			tooltip: {
 				sync: false,
 				series: ['female'],
-				format: (row) => `Female: ${(row as YearPoint).value.toFixed(1)} yr`
+				format: (row) => `Female: ${(row as LifeRow).value.toFixed(1)} yr`
 			}
 		});
 		const svg = await waitForSvg(container);
@@ -112,7 +107,7 @@ describe('LinePlot - tooltip', () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: LIFE_EXPECTANCY,
+			data: LIFE,
 			x: 'year',
 			y: 'value',
 			color: 'sex',
@@ -134,7 +129,7 @@ describe('LinePlot - tooltip anchor placement', () => {
 			series: [FEMALE, MALE],
 			tooltip: {
 				sync: false,
-				format: (row) => `${(row as YearPoint).year}: ${(row as YearPoint).value.toFixed(1)} yr`
+				format: (row) => `${(row as LifeRow).year}: ${(row as LifeRow).value.toFixed(1)} yr`
 			}
 		});
 		const { cursorX, cursorY, left, top } = await hoverCenterAndReadTooltip(container);
@@ -150,7 +145,7 @@ describe('LinePlot - tooltip anchor placement', () => {
 			tooltip: {
 				sync: false,
 				anchorX: 'left',
-				format: (row) => `${(row as YearPoint).year}: ${(row as YearPoint).value.toFixed(1)} yr`
+				format: (row) => `${(row as LifeRow).year}: ${(row as LifeRow).value.toFixed(1)} yr`
 			}
 		});
 		const { cursorX, left } = await hoverCenterAndReadTooltip(container);
@@ -165,7 +160,7 @@ describe('LinePlot - tooltip anchor placement', () => {
 			tooltip: {
 				sync: false,
 				anchorY: 'top',
-				format: (row) => `${(row as YearPoint).year}: ${(row as YearPoint).value.toFixed(1)} yr`
+				format: (row) => `${(row as LifeRow).year}: ${(row as LifeRow).value.toFixed(1)} yr`
 			}
 		});
 		const { cursorY, top } = await hoverCenterAndReadTooltip(container);
@@ -180,7 +175,7 @@ describe('LinePlot - tooltip anchor placement', () => {
 			tooltip: {
 				sync: false,
 				anchorY: 'bottom',
-				format: (row) => `${(row as YearPoint).year}: ${(row as YearPoint).value.toFixed(1)} yr`
+				format: (row) => `${(row as LifeRow).year}: ${(row as LifeRow).value.toFixed(1)} yr`
 			}
 		});
 		const { cursorY, top } = await hoverCenterAndReadTooltip(container);

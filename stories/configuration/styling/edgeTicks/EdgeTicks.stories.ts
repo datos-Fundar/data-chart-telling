@@ -5,10 +5,7 @@ import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import EdgeTicksDemo from './EdgeTicksDemo.svelte';
 import EdgeTicksDemoSource from './EdgeTicksDemo.svelte?raw';
 import { demoSource } from '../../../common/docsSource';
-import {
-	FEMALE_LIFE_EXPECTANCY_SINCE_1947,
-	type YearPoint
-} from '../../../plots/evolution/line/data';
+import { FEMALE_LIFE, type LifeRow } from '$datasets';
 
 /**
  * `axis.edgeTicks` sets, per axis and for every plot, whether a continuous
@@ -50,8 +47,8 @@ const meta = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY_SINCE_1947
-			} satisfies Series<YearPoint>
+				data: FEMALE_LIFE
+			} satisfies Series<LifeRow>
 		]
 	},
 	parameters: {
@@ -66,7 +63,8 @@ type Story = StoryObj<typeof meta>;
 /**
  * The global configuration, switched live: `axis.edgeTicks.x` turns the x
  * axis' edge ticks on or off and picks its collision strategy for every plot
- * on the page. On, with the default `'drop-nice'`, 1947 replaces the 1950 tick
+ * on the page, and `scales.x.nice` rounds the domain out to 1940 and 2020 or keeps
+ * it on the data. On, with the default `'drop-nice'`, 1947 replaces the 1950 tick
  * it crowds. The configuration is global, so this story renders in a frame of
  * its own.
  */
@@ -75,7 +73,7 @@ export const Default: StoryObj = {
 	parameters: {
 		docs: {
 			source: demoSource(EdgeTicksDemoSource).docs.source,
-			story: { inline: false, height: '520px' }
+			story: { inline: false, height: '560px' }
 		}
 	}
 };

@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import type { YearPoint } from '../data';
-import { FEMALE_LIFE_EXPECTANCY, MALE_LIFE_EXPECTANCY } from '../data';
+import { FEMALE_LIFE, MALE_LIFE } from '$datasets';
 import {
 	FEMALE_LIFE_EXPECTANCY_BY_PROVINCE,
 	MALE_LIFE_EXPECTANCY_BY_PROVINCE
 } from '../../../ranking/bar/data';
+
+type YearPoint = { year: number; value: number };
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -16,7 +17,8 @@ const meta = {
 	tags: ['autodocs'],
 	args: {
 		width: 940,
-		height: 400
+		height: 400,
+		scales: { x: { nice: false } }
 	},
 	argTypes: {
 		width: {
@@ -56,7 +58,7 @@ export const Default: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		]
 	}
@@ -76,7 +78,7 @@ export const ShowValues: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		styles: {
@@ -97,7 +99,7 @@ export const CustomFormat: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		styles: {
@@ -122,13 +124,13 @@ export const TwoSeriesWithLabels: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			},
 			{
 				name: 'male',
 				x: 'year',
 				y: 'value',
-				data: MALE_LIFE_EXPECTANCY
+				data: MALE_LIFE
 			}
 		],
 		styles: {
@@ -152,7 +154,7 @@ export const AnchorStart: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		styles: {
@@ -177,7 +179,7 @@ export const AnchorOutside: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		styles: {
@@ -203,13 +205,13 @@ export const TwoSeriesLabelsOutside: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			},
 			{
 				name: 'male',
 				x: 'year',
 				y: 'value',
-				data: MALE_LIFE_EXPECTANCY
+				data: MALE_LIFE
 			}
 		],
 		styles: {
@@ -237,7 +239,7 @@ export const CustomOffsets: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		styles: {
@@ -263,7 +265,7 @@ export const AnchorMiddle: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		styles: {
@@ -288,7 +290,7 @@ export const AnchorEnd: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		styles: {
@@ -315,7 +317,7 @@ export const LowLevelTextPlacement: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		styles: {
@@ -381,7 +383,7 @@ const MALE_CLUSTER_TARGETS = new Map(
 );
 
 const OVERLAP_DEMO_SERIES = OVERLAP_DEMO_PROVINCES.map(({ label, sex, province }) => {
-	const shape = sex === 'female' ? FEMALE_LIFE_EXPECTANCY : MALE_LIFE_EXPECTANCY;
+	const shape = sex === 'female' ? FEMALE_LIFE : MALE_LIFE;
 	const target =
 		(sex === 'male' ? MALE_CLUSTER_TARGETS.get(province) : undefined) ??
 		provinceValue(
@@ -409,7 +411,7 @@ const NEAR_MISS_SERIES = {
 	name: 'Formosa · M',
 	x: 'year' as const,
 	y: 'value' as const,
-	data: provinceTrajectory(MALE_LIFE_EXPECTANCY, 77.3)
+	data: provinceTrajectory(MALE_LIFE, 77.3)
 };
 
 /**
@@ -503,13 +505,13 @@ const BOUNDS_DEMO_SERIES = ALL_PROVINCES.flatMap((province, i) => [
 		name: `${province} · M`,
 		x: 'year' as const,
 		y: 'value' as const,
-		data: provinceTrajectory(MALE_LIFE_EXPECTANCY, BOUNDS_DEMO_TARGETS[i])
+		data: provinceTrajectory(MALE_LIFE, BOUNDS_DEMO_TARGETS[i])
 	},
 	{
 		name: `${province} · F`,
 		x: 'year' as const,
 		y: 'value' as const,
-		data: provinceTrajectory(FEMALE_LIFE_EXPECTANCY, BOUNDS_DEMO_TARGETS[ALL_PROVINCES.length + i])
+		data: provinceTrajectory(FEMALE_LIFE, BOUNDS_DEMO_TARGETS[ALL_PROVINCES.length + i])
 	}
 ]);
 
@@ -598,8 +600,8 @@ export const IsolatedLabelBoundedByPlot: Story = {
 export const FirstAndLast: Story = {
 	args: {
 		series: [
-			{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY },
-			{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY }
+			{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE },
+			{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE }
 		],
 		styles: {
 			values: { show: true, select: ['first', 'last'] }
@@ -611,8 +613,8 @@ export const FirstAndLast: Story = {
 export const Peak: Story = {
 	args: {
 		series: [
-			{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY },
-			{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY }
+			{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE },
+			{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE }
 		],
 		styles: {
 			values: { show: true, select: 'max', anchor: 'outside' }
@@ -624,8 +626,8 @@ export const Peak: Story = {
 export const OneSeries: Story = {
 	args: {
 		series: [
-			{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY },
-			{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY }
+			{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE },
+			{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE }
 		],
 		styles: {
 			values: { show: true, series: 'female', color: '#7570b3' }

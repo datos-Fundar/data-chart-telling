@@ -3,7 +3,7 @@ import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
 import type { CurveName } from '$lib/types/layout/styles/curve';
-import { LIFE_EXPECTANCY } from './data';
+import { LIFE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -27,7 +27,7 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex'
@@ -115,13 +115,13 @@ export const CatmullRom: Story = {
 // ── One segment: segments[...].styles.curve ───────────────────────────────────
 
 /**
- * A segment sets its own `curve`: the female line is straight until 2012 and
+ * A segment sets its own `curve`: the female line is straight until 1980 and
  * steps from then on. A segment's curve wins over `styles.curve`.
  */
 export const StepOnlyInASegment: Story = {
 	args: {
 		segments: {
-			female: [{ areas: [{ x: { from: 2012 } }], styles: { curve: 'step-after' } }]
+			female: [{ areas: [{ x: { from: 1980 } }], styles: { curve: 'step-after' } }]
 		} satisfies SegmentsConfig<LineSegmentStyle>
 	}
 };
@@ -141,7 +141,7 @@ export const StepExceptASegment: Story = {
 	args: {
 		styles: { curve: 'step-after' },
 		segments: {
-			default: [{ areas: [{ x: { from: 2012, to: 2016 } }], styles: { curve: 'linear' } }]
+			default: [{ areas: [{ x: { from: 1980, to: 2001 } }], styles: { curve: 'linear' } }]
 		} satisfies SegmentsConfig<LineSegmentStyle>
 	}
 };

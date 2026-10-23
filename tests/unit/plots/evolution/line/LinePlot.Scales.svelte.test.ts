@@ -2,12 +2,10 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import { FEMALE_LIFE_EXPECTANCY } from '../../../../../stories/plots/evolution/line/data';
+import { FEMALE_LIFE } from '$datasets';
 import { waitForSvg, countLinePaths } from '../../_helpers/svg';
 
-const SERIES = [
-	{ name: 'female', x: 'year' as const, y: 'value' as const, data: FEMALE_LIFE_EXPECTANCY }
-];
+const SERIES = [{ name: 'female', x: 'year' as const, y: 'value' as const, data: FEMALE_LIFE }];
 
 describe('LinePlot - scales', () => {
 	test('renders with no scale overrides (auto domain)', async () => {
@@ -21,7 +19,7 @@ describe('LinePlot - scales', () => {
 			width: 400,
 			height: 300,
 			series: SERIES,
-			scales: { y: { domain: [78, 85] } } satisfies AxisBasedScalesConfig
+			scales: { y: { domain: [55, 85] } } satisfies AxisBasedScalesConfig
 		});
 		const svg = await waitForSvg(container);
 		expect(countLinePaths(svg)).toBe(1);
@@ -36,10 +34,10 @@ describe('LinePlot - scales', () => {
 					name: 'female',
 					x: 'year',
 					y: 'value',
-					data: FEMALE_LIFE_EXPECTANCY.filter((d) => d.year >= 2010 && d.year <= 2020)
+					data: FEMALE_LIFE.filter((d) => d.year >= 1972 && d.year <= 2019)
 				}
 			],
-			scales: { x: { domain: [2010, 2020] } } satisfies AxisBasedScalesConfig
+			scales: { x: { domain: [1972, 2019] } } satisfies AxisBasedScalesConfig
 		});
 		const svg = await waitForSvg(container);
 		expect(countLinePaths(svg)).toBe(1);
@@ -59,8 +57,8 @@ describe('LinePlot - scales', () => {
 			);
 			return label?.getAttribute('y') ?? label?.closest('[transform]')?.getAttribute('transform');
 		}
-		const normal = await yPositionOf('78', false);
-		const reversed = await yPositionOf('78', true);
+		const normal = await yPositionOf('70', false);
+		const reversed = await yPositionOf('70', true);
 		expect(normal).toBeTruthy();
 		expect(reversed).toBeTruthy();
 		expect(normal).not.toBe(reversed);
@@ -71,11 +69,11 @@ describe('LinePlot - scales', () => {
 			width: 400,
 			height: 300,
 			series: SERIES,
-			scales: { x: { ticks: [2008, 2016, 2020] } } satisfies AxisBasedScalesConfig
+			scales: { x: { ticks: [1950, 1970, 2010] } } satisfies AxisBasedScalesConfig
 		});
 		const svg = await waitForSvg(container);
 		const ticks = Array.from(svg.querySelectorAll('g.axis-x text')).map((t) => t.textContent);
-		expect(ticks).toEqual(['2008', '2016', '2020']);
+		expect(ticks).toEqual(['1950', '1970', '2010']);
 	});
 
 	test('a custom Y tick formatter changes the rendered tick labels', async () => {

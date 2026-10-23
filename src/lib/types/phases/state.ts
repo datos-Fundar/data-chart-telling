@@ -9,7 +9,11 @@ import type {
 import type { HoverPosition } from '$lib/types/phases/hover/phase';
 import type { VisualGroup } from '$lib/types/plots/segments/config';
 import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
-import type { ChannelAccessors, ResolvedChannels } from '$lib/types/layout/mapping';
+import type {
+	AxisChannelName,
+	ChannelAccessors,
+	ResolvedChannels
+} from '$lib/types/layout/mapping';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
@@ -38,6 +42,8 @@ export type AxisPlotState<
 	data?: TData[];
 	segments?: SegmentsConfig<TStyle>;
 	scales: AxisBasedScalesConfig<TData>;
+	/** The axes whose domain the "scales" phase left to the kind's own fit, not the author's `domain`. */
+	fittedAxes?: AxisChannelName[];
 	statistics?: StatisticConfig[];
 	transforms?: MarkerTransform[];
 	authorMarkers?: AxisBasedMarkersConfig[];

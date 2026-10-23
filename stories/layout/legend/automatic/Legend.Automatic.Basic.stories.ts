@@ -3,7 +3,7 @@ import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import ComposerDemo from './ComposerDemo.svelte';
 import ComposerDemoSource from './ComposerDemo.svelte?raw';
 import { demoSource } from '../../../common/docsSource';
-import { FEMALE_LIFE_EXPECTANCY } from '../../../plots/evolution/line/data';
+import { FEMALE_LIFE } from '$datasets';
 import { AUTOMATIC_ARGS, LEGEND_ARG_TYPES } from './common';
 
 /**
@@ -47,7 +47,7 @@ export const SingleSeries: Story = {
 	args: {
 		data: undefined,
 		color: undefined,
-		series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }]
+		series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }]
 	}
 };
 

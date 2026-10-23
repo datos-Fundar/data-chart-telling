@@ -16,8 +16,8 @@ export class SveltePlotScale {
 
 	/**
 	 * The scale without what the package handles itself - `grid`, `axisDisplay`
-	 * and a vertical `label`, which `ScalesLayout` draws, and `niceTolerance`,
-	 * which the "scales" phase applies - with a custom `sort` resolved into a
+	 * and a vertical `label`, which `ScalesLayout` draws, and a `nice` object's `tolerance`,
+	 * which the "scales" phase applies (svelteplot is told plain `nice: true`) - with a custom `sort` resolved into a
 	 * `domain`, and `nice: true` on an unpinned numeric axis.
 	 */
 	static build<TData>(
@@ -37,10 +37,9 @@ export class SveltePlotScale {
 		const out: AxisScale<TData> & { axis?: false } = { ...sorted };
 		delete out.grid;
 		delete out.axisDisplay;
-		delete out.niceTolerance;
 		if (removesAxis) out.axis = false;
 		if (scale?.labelOrientation === 'vertical') out.label = false;
-		if (wantsNice) out.nice = true;
+		if (wantsNice || typeof scale?.nice === 'object') out.nice = true;
 		return out;
 	}
 

@@ -1,11 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { FEMALE_LIFE_EXPECTANCY, type YearPoint } from '../../plots/evolution/line/data';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES } from '../../plots/map/geo/data';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
-import { WEATHER_STATIONS, type WeatherStation } from '$datasets';
+import { WEATHER_STATIONS, type WeatherStation, FEMALE_LIFE, type LifeRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Marker kinds that need real series data (or real pointer interaction) to
@@ -40,8 +39,10 @@ const renderGeoPlot: GeoPlotStory['render'] = (args) => ({ Component: GeoPlot, p
 const LINE_PLOT_ARGS = {
 	width: 940,
 	height: 400,
-	series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }]
+	scales: { x: { nice: false } },
+	series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }]
 } satisfies LinePlotStory['args'];
+
 const GEO_PLOT_ARGS = {
 	width: 940,
 	height: 500,
@@ -59,9 +60,9 @@ export const Delta: LinePlotStory = {
 			{
 				type: 'delta',
 				axis: 'x',
-				at: 2018,
+				at: 2009,
 				from: { type: 'series', series: 'female' },
-				to: { type: 'axis', value: 80 },
+				to: { type: 'axis', value: 70 },
 				text: { dx: 16, lineAnchor: 'middle' }
 			}
 		] satisfies AxisBasedMarkersConfig[]
@@ -152,15 +153,15 @@ export const DotPerDataPoint: LinePlotStory = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
 			{
 				type: 'dot',
 				series: 'female',
-				x: (d: YearPoint) => d.year,
-				y: (d: YearPoint) => d.value
+				x: (d: LifeRow) => d.year,
+				y: (d: LifeRow) => d.value
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
@@ -178,16 +179,16 @@ export const TextPerDataPoint: LinePlotStory = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
 			{
 				type: 'text',
 				series: 'female',
-				x: (d: YearPoint) => d.year,
-				y: (d: YearPoint) => d.value,
-				text: (d: YearPoint) => String(d.value),
+				x: (d: LifeRow) => d.year,
+				y: (d: LifeRow) => d.value,
+				text: (d: LifeRow) => String(d.value),
 				styles: {
 					dy: -10
 				}

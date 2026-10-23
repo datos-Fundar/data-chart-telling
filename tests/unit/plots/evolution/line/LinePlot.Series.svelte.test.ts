@@ -2,11 +2,7 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import {
-	LIFE_EXPECTANCY,
-	FEMALE_LIFE_EXPECTANCY,
-	MALE_LIFE_EXPECTANCY
-} from '../../../../../stories/plots/evolution/line/data';
+import { LIFE, FEMALE_LIFE, MALE_LIFE } from '$datasets';
 import { waitForSvg, countLinePaths } from '../../_helpers/svg';
 
 // ── Explicit series[] ─────────────────────────────────────────────────────────
@@ -16,9 +12,9 @@ describe('LinePlot - series prop', () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
 			height: 300,
-			series: [
-				{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }
-			] satisfies Series<(typeof FEMALE_LIFE_EXPECTANCY)[number]>[]
+			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }] satisfies Series<
+				(typeof FEMALE_LIFE)[number]
+			>[]
 		});
 		const svg = await waitForSvg(container);
 		expect(svg).toBeTruthy();
@@ -28,7 +24,7 @@ describe('LinePlot - series prop', () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
 			height: 300,
-			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }]
+			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }]
 		});
 		const svg = await waitForSvg(container);
 		expect(countLinePaths(svg)).toBe(1);
@@ -39,8 +35,8 @@ describe('LinePlot - series prop', () => {
 			width: 400,
 			height: 300,
 			series: [
-				{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY },
-				{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY }
+				{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE },
+				{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE }
 			]
 		});
 		const svg = await waitForSvg(container);
@@ -61,13 +57,13 @@ describe('LinePlot - grouped data (data/x/y/color)', () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: LIFE_EXPECTANCY,
+			data: LIFE,
 			x: 'year',
 			y: 'value',
 			color: 'sex'
 		});
 		const svg = await waitForSvg(container);
-		// LIFE_EXPECTANCY has exactly two sexes (male/female) → two lines.
+		// LIFE has exactly two sexes (male/female) → two lines.
 		expect(countLinePaths(svg)).toBe(2);
 	});
 });

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { FEMALE_LIFE_EXPECTANCY, MALE_LIFE_EXPECTANCY } from '../../plots/evolution/line/data';
+import { FEMALE_LIFE, MALE_LIFE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // An `area` marker (svelteplot's own `AreaX`/`AreaY`) - a filled area under a
@@ -10,9 +10,9 @@ import { FEMALE_LIFE_EXPECTANCY, MALE_LIFE_EXPECTANCY } from '../../plots/evolut
 // time scale), `AreaY` otherwise - the config never names "X" or "Y" itself. Hosted on a `LinePlot` with its own
 // real series, so the underlying line and the area marker share one scale.
 
-const CONFIDENCE_BAND = FEMALE_LIFE_EXPECTANCY.map((d, i) => ({
+const CONFIDENCE_BAND = FEMALE_LIFE.map((d, i) => ({
 	year: d.year,
-	low: MALE_LIFE_EXPECTANCY[i].value,
+	low: MALE_LIFE[i].value,
 	high: d.value
 }));
 
@@ -23,7 +23,7 @@ const meta = {
 	args: {
 		width: 940,
 		height: 460,
-		data: FEMALE_LIFE_EXPECTANCY,
+		data: FEMALE_LIFE,
 		x: 'year',
 		y: 'value',
 		scales: { y: { domain: [0, 86] } }
@@ -87,7 +87,7 @@ export const Band: Story = {
 /** A quantitative `x` with a temporal `y` picks `AreaX` - the same data, filled along the horizontal axis instead. */
 export const Horizontal: Story = {
 	args: {
-		data: FEMALE_LIFE_EXPECTANCY.map((d) => ({ ...d, year: new Date(d.year, 0, 1) })),
+		data: FEMALE_LIFE.map((d) => ({ ...d, year: new Date(d.year, 0, 1) })),
 		x: 'value',
 		y: 'year',
 		scales: { x: { domain: [0, 86] }, y: { type: 'time', tickFormat: { year: 'numeric' } } },

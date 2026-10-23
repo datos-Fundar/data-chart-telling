@@ -2,8 +2,7 @@ import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { buildMarks, buildValueLabels } from '$lib/plots/correlation/scatter/markers';
 import { Margins } from '$lib/layout/margins/Margins';
 import { MarkerAxisValues } from '$lib/phases/scales/MarkerAxisValues';
-import type { AxisScale } from '$lib/types/layout/scales';
-import type { AxisPlotDefaults } from '$lib/types/phases';
+import type { AxisFit, AxisPlotDefaults } from '$lib/types/phases';
 import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
 import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/correlation/scatter/state';
 
@@ -37,7 +36,7 @@ function paddedDomain(
 function fitDomains<TData extends Record<string, unknown>>(
 	state: ScatterPlotState<TData>,
 	ctx: ScatterPlotCtx
-): Partial<Record<'x' | 'y', Partial<AxisScale<TData>>>> {
+): Partial<Record<'x' | 'y', AxisFit>> {
 	const { scales, channels, groupedSeries } = state;
 	const processed = state.processedData!;
 	const position = ProcessedPositions.of(processed);
@@ -63,7 +62,7 @@ function fitDomains<TData extends Record<string, unknown>>(
 		state.width,
 		state.height
 	);
-	const fit: Partial<Record<'x' | 'y', Partial<AxisScale<TData>>>> = {};
+	const fit: Partial<Record<'x' | 'y', AxisFit>> = {};
 	for (const [axis, size] of [
 		['x', box.width],
 		['y', box.height]
@@ -71,7 +70,7 @@ function fitDomains<TData extends Record<string, unknown>>(
 		if (scales[axis]?.domain) continue;
 		const values = [...processed.data.map((d) => Number(position[axis](d))), ...extra[axis]];
 		const domain = paddedDomain(values, radius, size);
-		if (domain) fit[axis] = { domain };
+		if (domain) fit[axis] = { domain, fitted: true };
 	}
 	return fit;
 }

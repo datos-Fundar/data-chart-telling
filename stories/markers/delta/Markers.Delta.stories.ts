@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { FEMALE_LIFE_EXPECTANCY, LIFE_EXPECTANCY } from '../../plots/evolution/line/data';
+import { FEMALE_LIFE, LIFE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -51,15 +51,16 @@ type Story = StoryObj<typeof meta>;
  */
 export const XDeltaBetweenTwoSeries: Story = {
 	args: {
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex',
+		scales: { x: { nice: false } },
 		markers: [
 			{
 				type: 'delta',
 				axis: 'x',
-				at: 2018,
+				at: 2009,
 				from: { type: 'series', series: 'female' },
 				to: { type: 'series', series: 'male' },
 				line: { stroke: 'grey', strokeDasharray: '6 6' },
@@ -80,20 +81,20 @@ export const XDeltaToBaseline: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
 			{
 				type: 'delta',
-				yDomain: [78, 85],
+				yDomain: [60, 85],
 				axis: 'x',
-				at: 2018,
+				at: 2009,
 				from: { type: 'series', series: 'female' },
 				text: { dx: 20 }
 			}
 		] satisfies AxisBasedMarkersConfig[],
-		scales: { y: { domain: [78, 85] } }
+		scales: { x: { nice: false }, y: { domain: [60, 85] } }
 	}
 };
 
@@ -107,20 +108,20 @@ export const XDeltaToAxisValue: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
 			{
 				type: 'delta',
 				axis: 'x',
-				at: 2018,
+				at: 2009,
 				from: { type: 'series', series: 'female' },
-				to: { type: 'axis', value: 80 },
+				to: { type: 'axis', value: 70 },
 				text: { dx: 20 }
 			}
 		] satisfies AxisBasedMarkersConfig[],
-		scales: { y: { domain: [78, 85] } }
+		scales: { x: { nice: false }, y: { domain: [60, 85] } }
 	}
 };
 
@@ -129,7 +130,7 @@ export const XDeltaToAxisValue: Story = {
  */
 export const MultipleXDeltas: Story = {
 	args: {
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex',
@@ -137,7 +138,7 @@ export const MultipleXDeltas: Story = {
 			{
 				type: 'delta',
 				axis: 'x',
-				at: 2020,
+				at: 2019,
 				from: { type: 'series', series: 'female' },
 				to: { type: 'series', series: 'male' },
 				formatDiff: (d) => d.toFixed(0),
@@ -146,12 +147,13 @@ export const MultipleXDeltas: Story = {
 			{
 				type: 'delta',
 				axis: 'x',
-				at: 2008,
+				at: 1947,
 				from: { type: 'series', series: 'female' },
 				to: { type: 'series', series: 'male' },
 				formatDiff: (d) => d.toFixed(0)
 			}
-		] satisfies AxisBasedMarkersConfig[]
+		] satisfies AxisBasedMarkersConfig[],
+		scales: { x: { nice: false } }
 	}
 };
 
@@ -163,18 +165,19 @@ export const MultipleXDeltas: Story = {
  */
 export const YDeltaBetweenTwoSeries: Story = {
 	args: {
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex',
+		scales: { x: { nice: false } },
 		markers: [
 			{
 				type: 'delta',
 				axis: 'y',
-				at: 78,
+				at: 70,
 				from: { type: 'series', series: 'female' },
 				to: { type: 'series', series: 'male' },
-				formatDiff: (d) => `${d} yr`
+				formatDiff: (d) => `${d.toFixed(1)} yr`
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
@@ -193,20 +196,20 @@ export const YDeltaToBaseline: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
 			{
 				type: 'delta',
-				xDomain: [2008, 2020],
+				xDomain: [1947, 2019],
 				axis: 'y',
-				at: 81,
+				at: 75,
 				from: { type: 'series', series: 'female' },
 				formatDiff: (d) => `${d.toFixed(0)} yr`
 			}
 		] satisfies AxisBasedMarkersConfig[],
-		scales: { x: { domain: [2008, 2020] } }
+		scales: { x: { domain: [1947, 2019] } }
 	}
 };
 
@@ -221,18 +224,19 @@ export const YDeltaToAxisValue: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
+		scales: { x: { nice: false } },
 		markers: [
 			{
 				type: 'delta',
 				axis: 'y',
-				at: 81,
+				at: 75,
 				from: { type: 'series', series: 'female' },
-				to: { type: 'axis', value: 2016 },
+				to: { type: 'axis', value: 2001 },
 				line: { strokeDasharray: '6 4' },
-				formatDiff: (d) => `${d} yr`
+				formatDiff: (d) => `${d.toFixed(1)} yr`
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
@@ -243,26 +247,27 @@ export const YDeltaToAxisValue: Story = {
  */
 export const MultipleYDeltas: Story = {
 	args: {
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex',
+		scales: { x: { nice: false } },
 		markers: [
 			{
 				type: 'delta',
 				axis: 'y',
-				at: 78,
+				at: 70,
 				from: { type: 'series', series: 'female' },
 				to: { type: 'series', series: 'male' },
-				formatDiff: (d) => `${d} yr`
+				formatDiff: (d) => `${d.toFixed(1)} yr`
 			},
 			{
 				type: 'delta',
 				axis: 'y',
-				at: 79,
+				at: 72,
 				from: { type: 'series', series: 'female' },
 				to: { type: 'series', series: 'male' },
-				formatDiff: (d) => `${d} yr`
+				formatDiff: (d) => `${d.toFixed(1)} yr`
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

@@ -5,7 +5,9 @@ import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
 import type { MarkerTransform } from '$lib/types/transforms';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { FEMALE_LIFE_EXPECTANCY, type YearPoint } from '../data';
+import { FEMALE_LIFE } from '$datasets';
+
+type YearPoint = { year: number; value: number };
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -77,7 +79,7 @@ export const WithDotMarker: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
@@ -101,7 +103,7 @@ export const WithTextMarker: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
@@ -135,7 +137,7 @@ export const WithPeakMarker: any = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		]
 	},

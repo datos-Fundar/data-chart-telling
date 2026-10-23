@@ -1,5 +1,6 @@
 import { Margins } from '$lib/layout/margins/Margins';
 import type { AxisChannelName } from '$lib/types/layout/mapping';
+import type { NiceOption } from '$lib/types/layout/scales';
 
 /**
  * "Nice" (1/2/5×10ⁿ) tick steps and the domains they round to, compatible with
@@ -43,6 +44,11 @@ export class NiceTicks {
 		const out: number[] = [];
 		for (let i = lo; i <= hi; i++) out.push(i * step);
 		return out;
+	}
+
+	/** The tolerance a scale's `nice` asks for, or `undefined` for the default. */
+	static toleranceOf(nice: NiceOption | undefined): number | undefined {
+		return typeof nice === 'object' ? nice.tolerance : undefined;
 	}
 
 	/** How many ticks fit `span` pixels at one per `spacing`, and at least `min`. */

@@ -1,10 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
-import {
-	FEMALE_LIFE_EXPECTANCY,
-	MALE_LIFE_EXPECTANCY
-} from '../../../../../../stories/plots/evolution/line/data';
+import { FEMALE_LIFE, MALE_LIFE } from '$datasets';
 import type { LegendSection } from '$lib/types/layout/legend';
 
 // Omitting one series via the legend must not recolor the remaining series.
@@ -52,8 +49,8 @@ describe("LinePlot - omitting a series keeps the remaining one's color stable", 
 			width: 950,
 			height: 400,
 			series: [
-				{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY },
-				{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY }
+				{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE },
+				{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE }
 			],
 			legend: LEGEND
 		});

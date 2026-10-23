@@ -8,10 +8,10 @@ import { buildGroupedSeries } from '$lib/plots/utils/segments';
 import type { Series } from '$lib/types/plots/data/common';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { LineMarkerConfig } from '$lib/types/markers/common';
-import { FEMALE_LIFE_EXPECTANCY } from '../../../../../stories/plots/evolution/line/data';
+import { FEMALE_LIFE } from '$datasets';
 import { waitForSvg } from '../../_helpers/svg';
 
-const SERIES = [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }];
+const SERIES = [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }];
 
 /** The path of the one series' line. */
 async function linePath(props: Record<string, unknown>, Plot: typeof LinePlot = LinePlot) {
@@ -51,7 +51,7 @@ describe('LinePlot - curve', () => {
 			height: 300,
 			series: SERIES,
 			segments: {
-				female: [{ areas: [{ x: { from: 2014 } }], styles: { curve: 'step-after' } }]
+				female: [{ areas: [{ x: { from: 1991 } }], styles: { curve: 'step-after' } }]
 			}
 		});
 		const svg = await waitForSvg(container);
@@ -75,7 +75,7 @@ describe('LinePlot - curve', () => {
 
 	test('the line family takes styles.curve too', async () => {
 		const props = {
-			data: FEMALE_LIFE_EXPECTANCY,
+			data: FEMALE_LIFE,
 			x: 'year',
 			y: 'value',
 			styles: { curve: 'step' }

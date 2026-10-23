@@ -2,19 +2,16 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import {
-	FEMALE_LIFE_EXPECTANCY,
-	MALE_LIFE_EXPECTANCY
-} from '../../../../../../stories/plots/evolution/line/data';
+import { FEMALE_LIFE, MALE_LIFE } from '$datasets';
 import { waitForSvg, countTextLabels } from '../../../_helpers/svg';
 
 const FEMALE = {
 	name: 'female',
 	x: 'year' as const,
 	y: 'value' as const,
-	data: FEMALE_LIFE_EXPECTANCY
+	data: FEMALE_LIFE
 };
-const MALE = { name: 'male', x: 'year' as const, y: 'value' as const, data: MALE_LIFE_EXPECTANCY };
+const MALE = { name: 'male', x: 'year' as const, y: 'value' as const, data: MALE_LIFE };
 
 describe('LinePlot - styles.values', () => {
 	test('no value label by default', async () => {
@@ -33,7 +30,7 @@ describe('LinePlot - styles.values', () => {
 		});
 		const svg = await waitForSvg(container);
 		expect(countTextLabels(svg)).toBe(1);
-		const last = FEMALE_LIFE_EXPECTANCY[FEMALE_LIFE_EXPECTANCY.length - 1];
+		const last = FEMALE_LIFE[FEMALE_LIFE.length - 1];
 		expect(svg.querySelector('g.text text')?.textContent).toBe(`female - ${last.value}`);
 	});
 
@@ -48,7 +45,7 @@ describe('LinePlot - styles.values', () => {
 			margins: { right: 120 }
 		});
 		const svg = await waitForSvg(container);
-		const last = FEMALE_LIFE_EXPECTANCY[FEMALE_LIFE_EXPECTANCY.length - 1];
+		const last = FEMALE_LIFE[FEMALE_LIFE.length - 1];
 		expect(svg.querySelector('g.text text')?.textContent).toBe(
 			`female → ${last.value.toFixed(1)} yr`
 		);
@@ -246,8 +243,8 @@ describe('LinePlot - styles.values', () => {
 		});
 		const svg = await waitForSvg(container);
 		const labels = Array.from(svg.querySelectorAll('g.text text')).map((t) => t.textContent);
-		const lastFemale = FEMALE_LIFE_EXPECTANCY[FEMALE_LIFE_EXPECTANCY.length - 1].value;
-		const lastMale = MALE_LIFE_EXPECTANCY[MALE_LIFE_EXPECTANCY.length - 1].value;
+		const lastFemale = FEMALE_LIFE[FEMALE_LIFE.length - 1].value;
+		const lastMale = MALE_LIFE[MALE_LIFE.length - 1].value;
 		expect(labels).toEqual(
 			expect.arrayContaining([`female (${lastFemale})`, `male (${lastMale})`])
 		);
@@ -299,22 +296,22 @@ describe('LinePlot - styles.values', () => {
 
 		test('each series is labelled at its last point unless `select` says otherwise', async () => {
 			expect((await labelsOf({})).sort()).toEqual(
-				[last(FEMALE_LIFE_EXPECTANCY), last(MALE_LIFE_EXPECTANCY)].map(String).sort()
+				[last(FEMALE_LIFE), last(MALE_LIFE)].map(String).sort()
 			);
 		});
 
 		test('`select` labels the first, the lowest or the highest point of each series, or a list of them', async () => {
 			expect((await labelsOf({ select: 'first' })).sort()).toEqual(
-				[first(FEMALE_LIFE_EXPECTANCY), first(MALE_LIFE_EXPECTANCY)].map(String).sort()
+				[first(FEMALE_LIFE), first(MALE_LIFE)].map(String).sort()
 			);
 			expect((await labelsOf({ select: 'max' })).sort()).toEqual(
-				[top(FEMALE_LIFE_EXPECTANCY), top(MALE_LIFE_EXPECTANCY)].map(String).sort()
+				[top(FEMALE_LIFE), top(MALE_LIFE)].map(String).sort()
 			);
 			expect(await labelsOf({ select: ['first', 'last'] })).toHaveLength(4);
 		});
 
 		test('`series` labels only the named series', async () => {
-			expect(await labelsOf({ series: 'male' })).toEqual([String(last(MALE_LIFE_EXPECTANCY))]);
+			expect(await labelsOf({ series: 'male' })).toEqual([String(last(MALE_LIFE))]);
 		});
 
 		test('`color` writes the labels in one color, which `fontStyle.fill` overrides', async () => {

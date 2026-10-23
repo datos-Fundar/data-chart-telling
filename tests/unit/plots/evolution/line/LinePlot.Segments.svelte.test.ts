@@ -3,10 +3,7 @@ import { describe, test, expect, vi } from 'vitest';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
-import {
-	FEMALE_LIFE_EXPECTANCY,
-	LIFE_EXPECTANCY
-} from '../../../../../stories/plots/evolution/line/data';
+import { FEMALE_LIFE, LIFE } from '$datasets';
 import { waitForSvg, countLinePaths, countDotMarks } from '../../_helpers/svg';
 
 // ── Areas: matching and continuity ────────────────────────────────────────────
@@ -16,12 +13,12 @@ describe('LinePlot - segments (areas)', () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
 			height: 300,
-			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }],
+			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }],
 			segments: {
 				female: [
 					{ areas: [{ x: { to: 2014 } }], styles: { stroke: { stroke: '#4f46e5' } } },
 					{
-						areas: [{ x: { from: 2014 } }],
+						areas: [{ x: { from: 1991 } }],
 						styles: { stroke: { stroke: '#4f46e5', strokeDasharray: '6 4' } }
 					}
 				]
@@ -37,8 +34,8 @@ describe('LinePlot - segments (areas)', () => {
 			width: 400,
 			height: 300,
 			series: [
-				{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY },
-				{ name: 'female-copy', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }
+				{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE },
+				{ name: 'female-copy', x: 'year', y: 'value', data: FEMALE_LIFE }
 			]
 		});
 		const svg = await waitForSvg(container);
@@ -50,7 +47,7 @@ describe('LinePlot - segments (areas)', () => {
 		await render(LinePlot, {
 			width: 400,
 			height: 300,
-			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }],
+			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }],
 			segments: {
 				female: [{ styles: {} }, { styles: {} }] // two catch-alls → ambiguous
 			} satisfies SegmentsConfig<LineSegmentStyle>
@@ -72,7 +69,7 @@ describe('LinePlot - segments (dots)', () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
 			height: 300,
-			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }],
+			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }],
 			segments: {
 				female: [{ styles: { stroke: { stroke: '#4f46e5' } } }]
 			} satisfies SegmentsConfig<LineSegmentStyle>
@@ -85,39 +82,39 @@ describe('LinePlot - segments (dots)', () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
 			height: 300,
-			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }],
+			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }],
 			segments: {
 				female: [{ styles: { dots: { dotRadius: 4 } } }]
 			} satisfies SegmentsConfig<LineSegmentStyle>
 		});
 		const svg = await waitForSvg(container);
-		expect(countDotMarks(svg)).toBe(FEMALE_LIFE_EXPECTANCY.length);
+		expect(countDotMarks(svg)).toBe(FEMALE_LIFE.length);
 	});
 
 	test('keeps all dots when the series is split into styled segments', async () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
 			height: 300,
-			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }],
+			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }],
 			segments: {
 				female: [
 					{ areas: [{ x: { to: 2014 } }], styles: { dots: { dotRadius: 4 } } },
 					{
-						areas: [{ x: { from: 2014 } }],
+						areas: [{ x: { from: 1991 } }],
 						styles: { stroke: { strokeDasharray: '5 5' }, dots: { dotRadius: 4 } }
 					}
 				]
 			} satisfies SegmentsConfig<LineSegmentStyle>
 		});
 		const svg = await waitForSvg(container);
-		expect(countDotMarks(svg)).toBe(FEMALE_LIFE_EXPECTANCY.length);
+		expect(countDotMarks(svg)).toBe(FEMALE_LIFE.length);
 	});
 
 	test('dots inherit the stroke color when dotFill is not specified', async () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
 			height: 300,
-			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }],
+			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }],
 			segments: {
 				female: [{ styles: { stroke: { stroke: '#dc2626' }, dots: { dotRadius: 4 } } }]
 			} satisfies SegmentsConfig<LineSegmentStyle>
@@ -132,7 +129,7 @@ describe('LinePlot - segments (dots)', () => {
 			const { container } = await render(LinePlot, {
 				width: 400,
 				height: 300,
-				series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }],
+				series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }],
 				segments: {
 					female: [{ styles: { dots: { dotRadius } } }]
 				} satisfies SegmentsConfig<LineSegmentStyle>
@@ -155,7 +152,7 @@ describe('LinePlot - segments (catch-all + area merging)', () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
 			height: 300,
-			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }],
+			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }],
 			segments: {
 				female: [
 					{ styles: { stroke: { stroke: '#e11d48' } } },
@@ -174,7 +171,7 @@ describe('LinePlot - segments (catch-all + area merging)', () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
 			height: 300,
-			data: LIFE_EXPECTANCY,
+			data: LIFE,
 			x: 'year',
 			y: 'value',
 			color: 'sex',
@@ -183,6 +180,6 @@ describe('LinePlot - segments (catch-all + area merging)', () => {
 			} satisfies SegmentsConfig<LineSegmentStyle>
 		});
 		const svg = await waitForSvg(container);
-		expect(countDotMarks(svg)).toBe(LIFE_EXPECTANCY.length);
+		expect(countDotMarks(svg)).toBe(LIFE.length);
 	});
 });

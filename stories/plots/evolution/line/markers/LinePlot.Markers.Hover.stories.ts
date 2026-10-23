@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { FEMALE_LIFE_EXPECTANCY, MALE_LIFE_EXPECTANCY, LIFE_EXPECTANCY } from '../data';
+import { FEMALE_LIFE, MALE_LIFE, LIFE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -54,7 +54,7 @@ export const Basic: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
@@ -76,7 +76,7 @@ export const WithoutLabels: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
@@ -99,7 +99,7 @@ export const WithoutRule: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
@@ -123,7 +123,7 @@ export const WithBothAxis: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
@@ -147,7 +147,7 @@ export const WithCustomRuleStyle: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
@@ -175,13 +175,13 @@ export const TwoSeries: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			},
 			{
 				name: 'male',
 				x: 'year',
 				y: 'value',
-				data: MALE_LIFE_EXPECTANCY
+				data: MALE_LIFE
 			}
 		],
 		markers: [
@@ -206,13 +206,13 @@ export const SeriesScoped: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			},
 			{
 				name: 'male',
 				x: 'year',
 				y: 'value',
-				data: MALE_LIFE_EXPECTANCY
+				data: MALE_LIFE
 			}
 		],
 		markers: [
@@ -230,7 +230,7 @@ export const SeriesScoped: Story = {
  */
 export const FromGroupedData: Story = {
 	args: {
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex',
@@ -248,7 +248,7 @@ export const FromGroupedData: Story = {
  */
 export const GroupedSeriesScoped: Story = {
 	args: {
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex',

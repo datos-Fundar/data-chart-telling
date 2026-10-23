@@ -4,12 +4,7 @@ import type { AxisBasedStylesConfig, GapsAwarePlotStylesConfig } from '$lib/type
 import type { GapsConfig } from '$lib/types/plots/gaps';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { LegendSection } from '$lib/types/layout/legend';
-import {
-	FEMALE_LIFE_EXPECTANCY,
-	MALE_LIFE_EXPECTANCY,
-	FEMALE_LIFE_EXPECTANCY_WITH_GAPS,
-	MALE_LIFE_EXPECTANCY_WITH_GAPS
-} from './data';
+import { FEMALE_LIFE, MALE_LIFE, FEMALE_LIFE_GAPS, MALE_LIFE_GAPS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // An interactive `legend` toggles each series: by default a toggled-off series
@@ -39,13 +34,13 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const SERIES = [
-	{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY },
-	{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY }
+	{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE },
+	{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE }
 ];
 
 const SERIES_WITH_GAPS = [
-	{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY_WITH_GAPS },
-	{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_EXPECTANCY_WITH_GAPS }
+	{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_GAPS },
+	{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE_GAPS }
 ];
 
 /** One interactive item per sex; `mode` sets what a toggled-off series does. */
@@ -80,6 +75,7 @@ export const LegendDisabledDimsLabel: Story = {
 	args: {
 		series: SERIES,
 		legend: sexLegend('dim'),
+		scales: { x: { nice: false } },
 		styles: { values: VALUE_LABELS } satisfies AxisBasedStylesConfig
 	}
 };
@@ -95,6 +91,7 @@ export const LegendDisabledDimsGapBridge: Story = {
 	args: {
 		series: SERIES_WITH_GAPS,
 		legend: sexLegend('dim'),
+		scales: { x: { nice: false } },
 		styles: {
 			gaps: { default: { middle: {} } } satisfies GapsConfig<LineSegmentStyle>
 		} satisfies GapsAwarePlotStylesConfig<LineSegmentStyle>
@@ -105,7 +102,8 @@ export const LegendDisabledDimsGapBridge: Story = {
 export const LegendOmitRescalesDomain: Story = {
 	args: {
 		series: SERIES,
-		legend: sexLegend('omit')
+		legend: sexLegend('omit'),
+		scales: { x: { nice: false } }
 	}
 };
 
@@ -117,7 +115,8 @@ export const LegendOmitRescalesDomain: Story = {
 export const LegendHideKeepsDomain: Story = {
 	args: {
 		series: SERIES,
-		legend: sexLegend('hide')
+		legend: sexLegend('hide'),
+		scales: { x: { nice: false } }
 	}
 };
 
@@ -130,6 +129,7 @@ export const LegendHideKeepsDomain: Story = {
 export const HoverIsolate: Story = {
 	args: {
 		series: SERIES,
+		scales: { x: { nice: false } },
 		styles: { values: { ...VALUE_LABELS, hoverIsolate: true } } satisfies AxisBasedStylesConfig
 	}
 };
@@ -145,6 +145,7 @@ export const HoverIsolate: Story = {
 export const HoverIsolateDimsGapBridge: Story = {
 	args: {
 		series: SERIES_WITH_GAPS,
+		scales: { x: { nice: false } },
 		styles: {
 			values: { ...VALUE_LABELS, hoverIsolate: true },
 			gaps: { default: { middle: {} } } satisfies GapsConfig<LineSegmentStyle>
@@ -157,6 +158,7 @@ export const LegendOmitDropsLabelAndBridge: Story = {
 	args: {
 		series: SERIES_WITH_GAPS,
 		legend: sexLegend('omit'),
+		scales: { x: { nice: false } },
 		styles: {
 			values: { ...VALUE_LABELS, hoverIsolate: true },
 			gaps: { default: { middle: {} } } satisfies GapsConfig<LineSegmentStyle>

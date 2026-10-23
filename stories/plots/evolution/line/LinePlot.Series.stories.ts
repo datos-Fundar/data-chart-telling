@@ -1,12 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import {
-	LIFE_EXPECTANCY,
-	MALE_LIFE_EXPECTANCY,
-	FEMALE_LIFE_EXPECTANCY,
-	type YearPoint
-} from './data';
+import { LIFE, MALE_LIFE, FEMALE_LIFE, type LifeRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -54,8 +49,8 @@ export const Default: Story = {
 				name: 'female_life_expectancy',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
-			} satisfies Series<YearPoint>
+				data: FEMALE_LIFE
+			} satisfies Series<LifeRow>
 		]
 	}
 };
@@ -72,14 +67,14 @@ export const TwoSeries: Story = {
 				name: 'female_life_expectancy',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
-			} satisfies Series<YearPoint>,
+				data: FEMALE_LIFE
+			} satisfies Series<LifeRow>,
 			{
 				name: 'male_life_expectancy',
 				x: 'year',
 				y: 'value',
-				data: MALE_LIFE_EXPECTANCY
-			} satisfies Series<YearPoint>
+				data: MALE_LIFE
+			} satisfies Series<LifeRow>
 		]
 	}
 };
@@ -96,7 +91,7 @@ export const TwoSeries: Story = {
  */
 export const TwoSeriesUsingDataAndGrouping: Story = {
 	args: {
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex'

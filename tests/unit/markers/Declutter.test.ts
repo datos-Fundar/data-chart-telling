@@ -155,3 +155,56 @@ describe('Declutter.buildLanes', () => {
 		});
 	});
 });
+
+describe('Declutter.buildLanes leader lines', () => {
+	type Item = { key: number; py: number };
+
+	/** Whether two leaders cross: each is a stub out to its lane, a run to the label's height, and a run in to the shared column. */
+	const crossing = (items: Item[], result: ReturnType<typeof Declutter.buildLanes>) => {
+		const leaders = items.map(({ key, py }) => {
+			const lane = result.get(key)!;
+			return { y1: py, y2: py + lane.extraDy, x: lane.laneReach, reach: lane.reach };
+		});
+		const pairs: [number, number][] = [];
+		for (const [a, i] of leaders.entries()) {
+			for (const [b, j] of leaders.entries()) {
+				if (a >= b) continue;
+				const span = (l: typeof i) => [Math.min(l.y1, l.y2), Math.max(l.y1, l.y2)];
+				const [lo, hi] = [span(i), span(j)];
+				const inside = (y: number, [from, to]: number[]) => y >= from && y <= to;
+				const stubCrosses = (stub: typeof i, other: typeof i, y: number) =>
+					stub.x > other.x && inside(y, span(other));
+				if (
+					stubCrosses(i, j, i.y1) ||
+					stubCrosses(j, i, j.y1) ||
+					(j.x > i.x && inside(i.y2, hi)) ||
+					(i.x > j.x && inside(j.y2, lo))
+				) {
+					pairs.push([a, b]);
+				}
+			}
+		}
+		return pairs;
+	};
+
+	it('keeps an isolated label below a cluster out of the cluster leaders', () => {
+		// Two pileups and a lone label far below them, at a font size big enough for the cluster to reach it.
+		const items = [459, 467, 472, 480, 516, 518, 521, 523, 538, 618].map((py, key) => ({
+			key,
+			py
+		}));
+		const result = Declutter.buildLanes({ items, dx: 8, fontSize: 18, geometry, bounds });
+		expect(crossing(items, result)).toEqual([]);
+	});
+
+	it('crosses no leaders for any spread of labels', () => {
+		let seed = 7;
+		const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+		for (let round = 0; round < 300; round++) {
+			const count = 2 + Math.floor(random() * 10);
+			const items = Array.from({ length: count }, (_, key) => ({ key, py: 20 + random() * 260 }));
+			const result = Declutter.buildLanes({ items, dx: 8, fontSize: 14, geometry, bounds });
+			expect(crossing(items, result)).toEqual([]);
+		}
+	});
+});

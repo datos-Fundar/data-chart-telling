@@ -1,13 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import RichTooltip from './RichTooltip.svelte';
-import {
-	FEMALE_LIFE_EXPECTANCY,
-	MALE_LIFE_EXPECTANCY,
-	LIFE_EXPECTANCY,
-	type YearPoint,
-	type LifeExpectancyPoint
-} from './data';
+import { FEMALE_LIFE, MALE_LIFE, LIFE, type LifeRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -60,13 +54,13 @@ export const BasicTooltip: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { year, value } = row as YearPoint;
+				const { year, value } = row as LifeRow;
 				return `${year}: ${value} yr`;
 			}
 		}
@@ -85,13 +79,13 @@ export const RichFormat: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { year, value } = row as YearPoint;
+				const { year, value } = row as LifeRow;
 				return `Year: ${year}\nLife expectancy: ${value.toFixed(1)} yr`;
 			}
 		}
@@ -109,13 +103,13 @@ export const ComputedFormat: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { year, value } = row as YearPoint;
+				const { year, value } = row as LifeRow;
 				const delta = (value - 80).toFixed(1);
 				const sign = value >= 80 ? '+' : '';
 				return `${year}: ${value.toFixed(1)} yr (${sign}${delta} vs 80)`;
@@ -136,19 +130,19 @@ export const TwoSeries: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			},
 			{
 				name: 'male',
 				x: 'year',
 				y: 'value',
-				data: MALE_LIFE_EXPECTANCY
+				data: MALE_LIFE
 			}
 		],
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { year, value } = row as YearPoint;
+				const { year, value } = row as LifeRow;
 				return `${year}: ${value.toFixed(1)} yr`;
 			}
 		}
@@ -169,20 +163,20 @@ export const SeriesFiltered: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			},
 			{
 				name: 'male',
 				x: 'year',
 				y: 'value',
-				data: MALE_LIFE_EXPECTANCY
+				data: MALE_LIFE
 			}
 		],
 		tooltip: {
 			sync: false,
 			series: ['female'],
 			format: (row) => {
-				const { year, value } = row as YearPoint;
+				const { year, value } = row as LifeRow;
 				return `Female: ${value.toFixed(1)} yr (${year})`;
 			}
 		}
@@ -191,19 +185,19 @@ export const SeriesFiltered: Story = {
 
 /**
  * Two series from grouped data - `data / x / y / color` auto-creates one
- * series per unique `color` value. The row type is `LifeExpectancyPoint`,
+ * series per unique `color` value. The row type is `LifeRow`,
  * which carries the `sex` field so the format can include it directly.
  */
 export const TwoSeriesFromGroupedData: Story = {
 	args: {
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex',
 		tooltip: {
 			sync: false,
 			format: (row) => {
-				const { sex, year, value } = row as LifeExpectancyPoint;
+				const { sex, year, value } = row as LifeRow;
 				return `${sex} (${year}): ${value.toFixed(1)} yr`;
 			}
 		}
@@ -216,7 +210,7 @@ export const TwoSeriesFromGroupedData: Story = {
  */
 export const GroupedDataSeriesFiltered: Story = {
 	args: {
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex',
@@ -224,7 +218,7 @@ export const GroupedDataSeriesFiltered: Story = {
 			sync: false,
 			series: ['female'],
 			format: (row) => {
-				const { year, value } = row as LifeExpectancyPoint;
+				const { year, value } = row as LifeRow;
 				return `Female (${year}): ${value.toFixed(1)} yr`;
 			}
 		}
@@ -261,7 +255,7 @@ export const CustomAnchor: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		tooltip: {
@@ -269,7 +263,7 @@ export const CustomAnchor: Story = {
 			anchorX: 'left',
 			anchorY: 'top',
 			format: (row) => {
-				const { year, value } = row as YearPoint;
+				const { year, value } = row as LifeRow;
 				return `${year}: ${value.toFixed(1)} yr`;
 			}
 		}

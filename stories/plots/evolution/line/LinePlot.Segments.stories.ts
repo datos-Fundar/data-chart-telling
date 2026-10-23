@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { SegmentsConfig } from '$lib/types/plots/props';
-import { FEMALE_LIFE_EXPECTANCY, LIFE_EXPECTANCY } from './data';
+import { FEMALE_LIFE, LIFE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -47,9 +47,9 @@ type Story = StoryObj<typeof meta>;
 /**
  * Simplest `default` key: one Segment with one Area.
  *
- * The area covers x ∈ [2016, 2020]. Data points outside the area (2008-2014)
+ * The area covers x ∈ [2001, 2019]. Data points outside the area (1947-1991)
  * are rendered with the default palette style - no explicit catch-all needed.
- * The engine inserts a bridge point at 2016 so the lines connect without a gap.
+ * The engine inserts a bridge point at 2001 so the lines connect without a gap.
  *
  * Use the **Stroke** controls in the panel to explore all StrokeStyle
  * properties live without editing code.
@@ -62,7 +62,7 @@ export const DashedSegmentInRange: any = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		// Extra args wired through render - not LinePlot props
@@ -110,7 +110,7 @@ export const DashedSegmentInRange: any = {
 			segments: {
 				default: [
 					{
-						areas: [{ x: { from: 2016, to: 2020 } }],
+						areas: [{ x: { from: 2001, to: 2019 } }],
 						styles: {
 							stroke: {
 								stroke: args.stroke,
@@ -128,10 +128,10 @@ export const DashedSegmentInRange: any = {
 };
 
 /**
- * One Segment with two Areas: x ∈ [2010, 2012] and x ∈ [2016, 2020].
+ * One Segment with two Areas: x ∈ [1972, 1980] and x ∈ [2001, 2019].
  *
  * A single Segment applies one shared style to every area it lists.
- * Data between the two ranges (2014) is left unstyled.
+ * Data between the two ranges (1991) is left unstyled.
  */
 export const MultipleAreasOneSegment: Story = {
 	args: {
@@ -140,13 +140,13 @@ export const MultipleAreasOneSegment: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		segments: {
 			default: [
 				{
-					areas: [{ x: { from: 2010, to: 2012 } }, { x: { from: 2016, to: 2020 } }],
+					areas: [{ x: { from: 1972, to: 1980 } }, { x: { from: 2001, to: 2019 } }],
 					styles: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.7 } }
 				}
 			]
@@ -157,10 +157,10 @@ export const MultipleAreasOneSegment: Story = {
 /**
  * One Segment, two Areas - the second area adds a Y constraint.
  *
- * The first area matches x ∈ [2010, 2012] (any Y).
- * The second matches x ∈ [2015, 2020] AND y ∈ [83.5, 84], which in this
- * dataset narrows to the 2018 and 2020 points (83.7 and 83.9).
- * The 2016 point (83.4) falls just outside the Y bound and is not matched.
+ * The first area matches x ∈ [1972, 1980] (any Y).
+ * The second matches x ∈ [1996, 2019] AND y ∈ [78, 81], which in this
+ * dataset narrows to the 2009 and 2019 points (78.8 and 80.2).
+ * The 2001 point (77.5) falls just outside the Y bound and is not matched.
  * Both areas still share the same stroke style.
  */
 export const MultipleAreasWithYConstraint: Story = {
@@ -170,15 +170,15 @@ export const MultipleAreasWithYConstraint: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		segments: {
 			default: [
 				{
 					areas: [
-						{ x: { from: 2010, to: 2012 } },
-						{ x: { from: 2015, to: 2020 }, y: { from: 83.5, to: 84 } }
+						{ x: { from: 1972, to: 1980 } },
+						{ x: { from: 1996, to: 2019 }, y: { from: 78, to: 81 } }
 					],
 					styles: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.7 } }
 				}
@@ -190,8 +190,8 @@ export const MultipleAreasWithYConstraint: Story = {
 /**
  * Two Segments with different styles, each targeting a different Area.
  *
- * - Segment 1: x ∈ [2010, 2012] - dashed with reduced opacity.
- * - Segment 2: x ∈ [2015, 2020] AND y ∈ [83.5, 84] - a different color and tighter dash.
+ * - Segment 1: x ∈ [1972, 1980] - dashed with reduced opacity.
+ * - Segment 2: x ∈ [1996, 2019] AND y ∈ [78, 81] - a different color and tighter dash.
  *
  * Segments are drawn in list order; later ones render on top of earlier ones.
  */
@@ -202,17 +202,17 @@ export const TwoSegmentsDifferentStyles: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		segments: {
 			default: [
 				{
-					areas: [{ x: { from: 2010, to: 2012 } }],
+					areas: [{ x: { from: 1972, to: 1980 } }],
 					styles: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.5 } }
 				},
 				{
-					areas: [{ x: { from: 2015, to: 2020 }, y: { from: 83.5, to: 84 } }],
+					areas: [{ x: { from: 1996, to: 2019 }, y: { from: 78, to: 81 } }],
 					styles: { stroke: { stroke: 'tomato', strokeDasharray: '3 3', strokeWidth: 2.5 } }
 				}
 			]
@@ -224,26 +224,26 @@ export const TwoSegmentsDifferentStyles: Story = {
  * Same two-segment structure, now with two series (female and male).
  *
  * `default` segments apply identically to every series in the plot.
- * Segment 1 (x range only) visibly styles both lines at 2010-2012.
- * Segment 2 (x AND y ∈ [83.5, 84]) only matches female's values at that range
- * (83.7, 83.9); male's values there are 78-79 and fall outside the Y bound -
+ * Segment 1 (x range only) visibly styles both lines at 1972-1980.
+ * Segment 2 (x AND y ∈ [78, 81]) only matches female's values at that range
+ * (78.8, 80.2); male's values there are 72-74 and fall outside the Y bound -
  * so the tomato style naturally appears only on the female line, even though
  * the segment is global.
  */
 export const TwoSegmentsOnAllSeries: Story = {
 	args: {
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex',
 		segments: {
 			default: [
 				{
-					areas: [{ x: { from: 2010, to: 2012 } }],
+					areas: [{ x: { from: 1972, to: 1980 } }],
 					styles: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.5 } }
 				},
 				{
-					areas: [{ x: { from: 2015, to: 2020 }, y: { from: 83.5, to: 84 } }],
+					areas: [{ x: { from: 1996, to: 2019 }, y: { from: 78, to: 81 } }],
 					styles: { stroke: { stroke: 'tomato', strokeDasharray: '3 3', strokeWidth: 2.5 } }
 				}
 			]
@@ -263,18 +263,18 @@ export const TwoSegmentsOnAllSeries: Story = {
  */
 export const SegmentsOnOneSeriesOnly: Story = {
 	args: {
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex',
 		segments: {
 			female: [
 				{
-					areas: [{ x: { from: 2010, to: 2012 } }],
+					areas: [{ x: { from: 1972, to: 1980 } }],
 					styles: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.5 } }
 				},
 				{
-					areas: [{ x: { from: 2015, to: 2020 }, y: { from: 83.5, to: 84 } }],
+					areas: [{ x: { from: 1996, to: 2019 }, y: { from: 78, to: 81 } }],
 					styles: { stroke: { stroke: 'tomato', strokeDasharray: '3 3', strokeWidth: 2.5 } }
 				}
 			]
@@ -295,7 +295,7 @@ export const WithDots: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		segments: {
@@ -316,7 +316,7 @@ export const WithDots: Story = {
  */
 export const TwoSeriesWithDifferentDots: Story = {
 	args: {
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex',
@@ -341,7 +341,7 @@ export const TwoSeriesWithDifferentDots: Story = {
 
 /**
  * One series split into solid and dashed segments,
- * with circle dots before 2015 and triangle dots after.
+ * with circle dots before 1996 and triangle dots after.
  */
 export const DashedSegmentWithDots: Story = {
 	args: {
@@ -350,17 +350,17 @@ export const DashedSegmentWithDots: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		segments: {
 			female: [
 				{
-					areas: [{ x: { to: 2015 } }],
+					areas: [{ x: { to: 1996 } }],
 					styles: { dots: { dotRadius: 8, dotSymbol: 'circle' } }
 				},
 				{
-					areas: [{ x: { from: 2015 } }],
+					areas: [{ x: { from: 1996 } }],
 					styles: {
 						stroke: { strokeDasharray: '6 4', strokeOpacity: 0.6 },
 						dots: { dotRadius: 8, dotSymbol: 'triangle' }
@@ -381,7 +381,7 @@ export const CustomDotsWithStroke: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		segments: {
@@ -414,7 +414,7 @@ export const CustomDotsWithStroke: Story = {
  * is evaluated **last**, so area-specific segments always win regardless of
  * list position. Here the catch-all sets a muted baseline color (yellow /
  * lightblue) and area-specific segments replace both the stroke color and add
- * dot symbols for x ∈ [2010, 2012] and x ∈ [2016, 2018]. Points outside
+ * dot symbols for x ∈ [1972, 1980] and x ∈ [2001, 2009]. Points outside
  * those ranges fall through to the catch-all: muted line, no dots.
  *
  * Because each area segment explicitly carries a `stroke` override, the line
@@ -424,7 +424,7 @@ export const CustomDotsWithStroke: Story = {
  */
 export const CatchAllAsDefaultStyle: Story = {
 	args: {
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex',
@@ -432,22 +432,22 @@ export const CatchAllAsDefaultStyle: Story = {
 			female: [
 				{ styles: { stroke: { stroke: 'lightpink' } } },
 				{
-					areas: [{ x: { from: 2010, to: 2012 } }],
+					areas: [{ x: { from: 1972, to: 1980 } }],
 					styles: { stroke: { stroke: 'red' }, dots: { dotRadius: 5, dotSymbol: 'circle' } }
 				},
 				{
-					areas: [{ x: { from: 2016, to: 2018 } }],
+					areas: [{ x: { from: 2001, to: 2009 } }],
 					styles: { stroke: { stroke: 'red' }, dots: { dotRadius: 5, dotSymbol: 'triangle' } }
 				}
 			],
 			male: [
 				{ styles: { stroke: { stroke: 'lightblue' } } },
 				{
-					areas: [{ x: { from: 2010, to: 2012 } }],
+					areas: [{ x: { from: 1972, to: 1980 } }],
 					styles: { stroke: { stroke: 'blue' }, dots: { dotRadius: 5, dotSymbol: 'circle' } }
 				},
 				{
-					areas: [{ x: { from: 2016, to: 2018 } }],
+					areas: [{ x: { from: 2001, to: 2009 } }],
 					styles: { stroke: { stroke: 'blue' }, dots: { dotRadius: 5, dotSymbol: 'triangle' } }
 				}
 			]
@@ -474,7 +474,7 @@ export const CatchAllAsDefaultStyle: Story = {
  */
 export const SeparationOfConcerns: Story = {
 	args: {
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex',
@@ -483,11 +483,11 @@ export const SeparationOfConcerns: Story = {
 			male: [{ styles: { stroke: { stroke: 'lightblue' } } }],
 			default: [
 				{
-					areas: [{ x: { from: 2010, to: 2012 } }],
+					areas: [{ x: { from: 1972, to: 1980 } }],
 					styles: { dots: { dotRadius: 5, dotSymbol: 'circle' } }
 				},
 				{
-					areas: [{ x: { from: 2016, to: 2018 } }],
+					areas: [{ x: { from: 2001, to: 2009 } }],
 					styles: { dots: { dotRadius: 5, dotSymbol: 'triangle' } }
 				}
 			]
@@ -513,7 +513,7 @@ export const SeparationOfConcerns: Story = {
  */
 export const SharedDotsByTimePeriod: Story = {
 	args: {
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex',
@@ -522,15 +522,15 @@ export const SharedDotsByTimePeriod: Story = {
 			male: [{ styles: { stroke: { stroke: 'steelblue' } } }],
 			default: [
 				{
-					areas: [{ x: { to: 2012 } }],
+					areas: [{ x: { to: 1980 } }],
 					styles: { dots: { dotRadius: 5, dotSymbol: 'circle' } }
 				},
 				{
-					areas: [{ x: { from: 2012, to: 2015 } }],
+					areas: [{ x: { from: 1980, to: 1996 } }],
 					styles: { dots: { dotRadius: 5, dotSymbol: 'triangle' } }
 				},
 				{
-					areas: [{ x: { from: 2015 } }],
+					areas: [{ x: { from: 1996 } }],
 					styles: { dots: { dotRadius: 5, dotSymbol: 'square' } }
 				}
 			]

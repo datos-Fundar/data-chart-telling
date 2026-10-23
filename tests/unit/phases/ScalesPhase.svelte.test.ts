@@ -145,14 +145,14 @@ describe('ScalesPhase - what a kind fits and adds', () => {
 		expect(build(kind, { ...props, height: 900 }).y?.domain).toEqual([0, 100]);
 	});
 
-	test('`scales.<axis>.niceTolerance` sets how far past a tick still counts as on it', () => {
+	test('`scales.<axis>.nice.tolerance` sets how far past a tick still counts as on it', () => {
 		const rows = [
 			{ c: 1, g: 'a', v: 60.1 },
 			{ c: 1, g: 'b', v: 40.1 }
 		];
 		const kind = { scales: { zero: ['y' as const] } };
 		const props = { data: rows, grouping: 'g', transforms: [{ type: 'stackY' }] };
-		expect(build(kind, { ...props, scales: { y: { niceTolerance: 0 } } }).y?.domain).toEqual([
+		expect(build(kind, { ...props, scales: { y: { nice: { tolerance: 0 } } } }).y?.domain).toEqual([
 			0, 120
 		]);
 	});

@@ -2,16 +2,13 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import {
-	FEMALE_LIFE_EXPECTANCY,
-	MALE_LIFE_EXPECTANCY
-} from '../../../../../../stories/plots/evolution/line/data';
+import { FEMALE_LIFE, MALE_LIFE } from '$datasets';
 import { waitForSvg, countDifferencePaths } from '../../../_helpers/svg';
 
-const COMPARISON = FEMALE_LIFE_EXPECTANCY.map((d, i) => ({
+const COMPARISON = FEMALE_LIFE.map((d, i) => ({
 	year: d.year,
 	female: d.value,
-	male: MALE_LIFE_EXPECTANCY[i].value
+	male: MALE_LIFE[i].value
 }));
 
 describe('LinePlot - markers.difference', () => {

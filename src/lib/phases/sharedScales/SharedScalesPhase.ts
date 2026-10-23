@@ -16,7 +16,7 @@ import type {
 	SharedAxisValues,
 	SharedScalesOptions
 } from '$lib/types/phases';
-import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
+import type { AxisBasedScalesConfig, NiceOption } from '$lib/types/layout/scales';
 
 /** A channel slices can share a domain on. */
 type SharedChannel = AxisChannelName | 'color';
@@ -34,7 +34,7 @@ type SharedScalesState = FacetStageState & {
 	axes?: PlotAxes;
 	processedData?: ProcessedData;
 	markers?: object[];
-	scales?: Partial<Record<AxisChannelName, { niceTolerance?: number; sort?: unknown }>>;
+	scales?: Partial<Record<AxisChannelName, { nice?: NiceOption; sort?: unknown }>>;
 	sharedScales?: Record<string, AxisBasedScalesConfig<never>>;
 };
 
@@ -106,7 +106,7 @@ export class SharedScalesPhase<TState extends SharedScalesState, TCtx> implement
 			return SharedScalesPhase.buildSharedAxisScale(
 				values,
 				channel,
-				state.scales?.[channel]?.niceTolerance
+				NiceTicks.toleranceOf(state.scales?.[channel]?.nice)
 			);
 		};
 

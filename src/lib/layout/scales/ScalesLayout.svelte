@@ -20,7 +20,8 @@
 		numericMargins,
 		scales,
 		edgeDomains = undefined,
-		tickValues = undefined
+		tickValues = undefined,
+		fittedAxes = undefined
 	}: {
 		data: TData[];
 		getX: (d: TData) => AxisValue;
@@ -36,6 +37,8 @@
 		edgeDomains?: Map<'x' | 'y', [number, number]>;
 		/** The labels a category axis writes, when it leaves some out for want of room. */
 		tickValues?: Partial<Record<'x' | 'y', string[]>>;
+		/** The axes whose domain the plot kind fit itself, which the author did not pin. */
+		fittedAxes?: string[];
 	} = $props();
 
 	const cfg = $derived(getConfiguration());
@@ -144,7 +147,7 @@
 			scale?.ticks != null ||
 			scale?.tickSpacing != null ||
 			scale?.interval != null ||
-			scale?.domain != null
+			(scale?.domain != null && !fittedAxes?.includes(axis))
 		)
 			return undefined;
 		if (type != null && isDiscreteType(type)) return undefined;

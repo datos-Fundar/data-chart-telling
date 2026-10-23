@@ -19,6 +19,8 @@
 		hoverRows?: unknown[];
 		/** The plot's x/y/r/length scales, and the scales a marker without its own inherits. */
 		scales?: object;
+		/** The axes whose domain the plot kind fit itself rather than the author pinned. */
+		fittedAxes?: string[];
 		/** What the plot's position channels are and which way it runs, for what draws inside it. */
 		axes?: PlotAxes;
 		/** Every marker the pipeline resolved. */
@@ -350,6 +352,7 @@
 				scales={layoutScales}
 				{edgeDomains}
 				{tickValues}
+				fittedAxes={state.fittedAxes}
 			/>
 		{/if}
 		<GeometryLayout

@@ -2,12 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import {
-	FEMALE_LIFE_EXPECTANCY,
-	FEMALE_LIFE_EXPECTANCY_SINCE_1947,
-	LIFE_EXPECTANCY,
-	type YearPoint
-} from './data';
+import { FEMALE_LIFE, LIFE, type LifeRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -57,20 +52,20 @@ export const Default: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
-			} satisfies Series<YearPoint>
+				data: FEMALE_LIFE
+			} satisfies Series<LifeRow>
 		]
 	}
 };
 
 /**
- * Constrained Y domain - tightens the visible range to [78, 85], which is
- * narrower than the auto-fitted range (the 2008 value sits at 77.9 so
- * auto-fit adds space below it). All data points lie within [78, 85], so
- * no line is clipped at the frame boundary.
+ * Constrained Y domain - sets the visible range to [55, 85], which is
+ * wider than the auto-fitted range, so there is space above and below
+ * the line. All data points lie within [55, 85], so no line is clipped at
+ * the frame boundary.
  *
- * Compare with `Default` to see how the trend appears more spread out when
- * the Y range is reduced.
+ * Compare with `Default` to see how the trend appears flatter when
+ * the Y range is widened.
  */
 export const CustomYDomain: Story = {
 	args: {
@@ -79,19 +74,19 @@ export const CustomYDomain: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
-			} satisfies Series<YearPoint>
+				data: FEMALE_LIFE
+			} satisfies Series<LifeRow>
 		],
 		scales: {
-			y: { domain: [78, 85] }
+			y: { domain: [55, 85] }
 		} satisfies AxisBasedScalesConfig
 	}
 };
 
 /**
  * Constrained X domain - restricts both the visible range and the series
- * data to 2010-2020. The data is filtered to match the domain so the line
- * starts cleanly at the first in-range point (2010) rather than entering
+ * data to 1972-2019. The data is filtered to match the domain so the line
+ * starts cleanly at the first in-range point (1972) rather than entering
  * the frame at an interpolated position from an earlier out-of-range point.
  */
 export const CustomXDomain: Story = {
@@ -101,11 +96,11 @@ export const CustomXDomain: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY.filter((d) => d.year >= 2010 && d.year <= 2020)
-			} satisfies Series<YearPoint>
+				data: FEMALE_LIFE.filter((d) => d.year >= 1972 && d.year <= 2019)
+			} satisfies Series<LifeRow>
 		],
 		scales: {
-			x: { domain: [2010, 2020] }
+			x: { domain: [1972, 2019] }
 		} satisfies AxisBasedScalesConfig
 	}
 };
@@ -122,8 +117,8 @@ export const WithAxisLabels: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
-			} satisfies Series<YearPoint>
+				data: FEMALE_LIFE
+			} satisfies Series<LifeRow>
 		],
 		scales: {
 			x: { label: 'Year' },
@@ -144,8 +139,8 @@ export const ReversedY: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
-			} satisfies Series<YearPoint>
+				data: FEMALE_LIFE
+			} satisfies Series<LifeRow>
 		],
 		scales: {
 			y: { reverse: true }
@@ -164,8 +159,8 @@ export const WithGrid: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
-			} satisfies Series<YearPoint>
+				data: FEMALE_LIFE
+			} satisfies Series<LifeRow>
 		],
 		scales: {
 			y: { grid: true }
@@ -185,11 +180,11 @@ export const CustomTicks: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
-			} satisfies Series<YearPoint>
+				data: FEMALE_LIFE
+			} satisfies Series<LifeRow>
 		],
 		scales: {
-			x: { ticks: [2008, 2012, 2016, 2020] }
+			x: { ticks: [1950, 1970, 1990, 2010] }
 		} satisfies AxisBasedScalesConfig
 	}
 };
@@ -205,8 +200,8 @@ export const CustomTickFormat: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
-			} satisfies Series<YearPoint>
+				data: FEMALE_LIFE
+			} satisfies Series<LifeRow>
 		],
 		scales: {
 			y: {
@@ -227,8 +222,8 @@ export const RotatedXTicks: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
-			} satisfies Series<YearPoint>
+				data: FEMALE_LIFE
+			} satisfies Series<LifeRow>
 		],
 		scales: {
 			x: {
@@ -250,8 +245,8 @@ export const ZeroAnchoredY: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
-			} satisfies Series<YearPoint>
+				data: FEMALE_LIFE
+			} satisfies Series<LifeRow>
 		],
 		scales: {
 			y: { zero: true }
@@ -265,12 +260,12 @@ export const ZeroAnchoredY: Story = {
  */
 export const CombinedOverrides: Story = {
 	args: {
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex',
 		scales: {
-			x: { label: 'Year', ticks: [2008, 2012, 2016, 2020], grid: false },
+			x: { label: 'Year', ticks: [1950, 1970, 1990, 2010], grid: false },
 			y: { label: 'Life expectancy (years)', domain: [60, 90], grid: true }
 		} satisfies AxisBasedScalesConfig
 	}
@@ -450,8 +445,8 @@ export const VerticalYLabelTop: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
-			} satisfies Series<YearPoint>
+				data: FEMALE_LIFE
+			} satisfies Series<LifeRow>
 		],
 		scales: {
 			y: { label: 'Life expectancy (years)', labelOrientation: 'vertical', labelPosition: 'top' }
@@ -473,8 +468,8 @@ export const VerticalYLabelMiddle: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
-			} satisfies Series<YearPoint>
+				data: FEMALE_LIFE
+			} satisfies Series<LifeRow>
 		],
 		scales: {
 			y: { label: 'Life expectancy (years)', labelOrientation: 'vertical' }
@@ -497,8 +492,8 @@ export const GridOnlyNoTickMarks: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
-			} satisfies Series<YearPoint>
+				data: FEMALE_LIFE
+			} satisfies Series<LifeRow>
 		],
 		scales: {
 			y: { grid: true, tickSize: 0 }
@@ -518,8 +513,8 @@ export const DottedGrid: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
-			} satisfies Series<YearPoint>
+				data: FEMALE_LIFE
+			} satisfies Series<LifeRow>
 		],
 		scales: {
 			y: { grid: { strokeDasharray: '2 3', strokeOpacity: 0.5 } }
@@ -534,8 +529,8 @@ const SINCE_1947 = [
 		name: 'female',
 		x: 'year',
 		y: 'value',
-		data: FEMALE_LIFE_EXPECTANCY_SINCE_1947
-	} satisfies Series<YearPoint>
+		data: FEMALE_LIFE
+	} satisfies Series<LifeRow>
 ];
 
 /**

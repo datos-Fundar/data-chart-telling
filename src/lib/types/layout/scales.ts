@@ -116,8 +116,18 @@ export type BinnedScaleType = (typeof BINNED_SCALE_TYPES)[number];
  */
 export type EdgeTickCollision = 'drop-nice' | 'drop-edge' | 'extend';
 
+/**
+ * Whether a continuous axis rounds its domain out to round numbers. As an
+ * object, it does, and `tolerance` is how far past a tick, as a share of the
+ * step, the data may end and still stay on it (default `0.05`; `0` rounds like d3).
+ */
+export type NiceOption = boolean | { tolerance?: number };
+
 /** Whether an axis adds ticks at the data's first and last values, and what it does when one crowds a nice tick. */
 export type EdgeTicksOptions = { enabled: boolean; collision: EdgeTickCollision };
+
+/** A scale's `edgeTicks`: `true` or `false`, or an object that turns them on with its own `collision`. */
+export type EdgeTicksOption = boolean | Partial<Omit<EdgeTicksOptions, 'enabled'>>;
 
 /**
  * A category axis ordered by what each category holds: `'value'` by its value
@@ -159,9 +169,8 @@ export type AxisScale<TData = Record<string, unknown>> = {
 	titleFontSize?: number;
 	interval?: string | number;
 	clamp?: boolean;
-	nice?: boolean;
-	niceTolerance?: number;
-	edgeTicks?: boolean | { collision?: EdgeTickCollision };
+	nice?: NiceOption;
+	edgeTicks?: EdgeTicksOption;
 	zero?: boolean;
 	round?: boolean;
 	percent?: boolean;

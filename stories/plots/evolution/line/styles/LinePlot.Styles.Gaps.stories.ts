@@ -3,15 +3,11 @@ import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { GapsConfig } from '$lib/types/plots/gaps';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { EasingName } from '$lib/types/misc/easing';
-import {
-	FEMALE_LIFE_EXPECTANCY_WITH_GAPS,
-	MALE_LIFE_EXPECTANCY_WITH_GAPS,
-	MALE_LIFE_EXPECTANCY
-} from '../data';
+import { FEMALE_LIFE_GAPS, MALE_LIFE_GAPS, MALE_LIFE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
-// `FEMALE_LIFE_EXPECTANCY_WITH_GAPS` - the same series every other LinePlot
+// `FEMALE_LIFE_GAPS` - the same series every other LinePlot
 // story already uses - has three holes, all `value: null` (the same
 // convention svelteplot's own Line mark already uses to break a line): the
 // first year (start), one internal year (middle), and the last year (end).
@@ -27,7 +23,7 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
-		series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY_WITH_GAPS }]
+		series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_GAPS }]
 	},
 	argTypes: {
 		width: {
@@ -73,8 +69,8 @@ export const NoGapsConfigured: Story = {
 // exactly like `segments`' own `default` key.
 
 /**
- * `middle` bridges the internal outage (2012, bounded by real readings at
- * 2010 and 2014) between its two real boundary points. No target needs to
+ * `middle` bridges the internal outage (1980, bounded by real readings at
+ * 1972 and 1991) between its two real boundary points. No target needs to
  * be configured - both ends of an internal gap are real data, so the bridge
  * is fully determined by the data itself. Default style: the series' own
  * colour, dashed and slightly muted.
@@ -89,14 +85,14 @@ export const MiddleGapFilled: Story = {
  * `start`/`end` gaps have only one real boundary, so filling them is opt-in:
  * without an explicit `x` target, extrapolating past the real data would
  * imply a measurement that doesn't exist. Here both ends are configured to
- * extend two years past the real domain (2006 and 2022), holding the
+ * extend past the data (1940 and 2025), holding the
  * nearest real value flat (no `y` given).
  */
 export const LeadingAndTrailingGapsOptIn: Story = {
 	args: {
 		styles: {
 			gaps: {
-				default: { start: { x: 2006 }, end: { x: 2022 } }
+				default: { start: { x: 1940 }, end: { x: 2025 } }
 			} satisfies GapsConfig<LineSegmentStyle>
 		}
 	}
@@ -116,14 +112,14 @@ export const AllThreeZonesDistinctStyles: Story = {
 			gaps: {
 				default: {
 					start: {
-						x: 2006,
+						x: 1940,
 						style: { stroke: { stroke: '#9333ea', strokeDasharray: '1 4', strokeLinecap: 'round' } }
 					},
 					middle: {
 						style: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.7 } }
 					},
 					end: {
-						x: 2022,
+						x: 2025,
 						style: { stroke: { strokeWidth: 1.5, strokeOpacity: 0.4, strokeDasharray: '2 3' } }
 					}
 				}
@@ -146,7 +142,7 @@ export const DotsAtBridgeEndpoints: Story = {
 			gaps: {
 				default: {
 					middle: { style: { dots: { dotRadius: 5, dotSymbol: 'circle' } } },
-					end: { x: 2022, style: { dots: { dotRadius: 5, dotSymbol: 'triangle' } } }
+					end: { x: 2025, style: { dots: { dotRadius: 5, dotSymbol: 'triangle' } } }
 				}
 			} satisfies GapsConfig<LineSegmentStyle>
 		}
@@ -213,9 +209,9 @@ const FEMALE_AND_MALE_NO_GAPS = [
 		name: 'female',
 		x: 'year' as const,
 		y: 'value' as const,
-		data: FEMALE_LIFE_EXPECTANCY_WITH_GAPS
+		data: FEMALE_LIFE_GAPS
 	},
-	{ name: 'male', x: 'year' as const, y: 'value' as const, data: MALE_LIFE_EXPECTANCY }
+	{ name: 'male', x: 'year' as const, y: 'value' as const, data: MALE_LIFE }
 ];
 
 const FEMALE_AND_MALE_BOTH_WITH_GAPS = [
@@ -223,9 +219,9 @@ const FEMALE_AND_MALE_BOTH_WITH_GAPS = [
 		name: 'female',
 		x: 'year' as const,
 		y: 'value' as const,
-		data: FEMALE_LIFE_EXPECTANCY_WITH_GAPS
+		data: FEMALE_LIFE_GAPS
 	},
-	{ name: 'male', x: 'year' as const, y: 'value' as const, data: MALE_LIFE_EXPECTANCY_WITH_GAPS }
+	{ name: 'male', x: 'year' as const, y: 'value' as const, data: MALE_LIFE_GAPS }
 ];
 
 /**
@@ -259,7 +255,7 @@ export const DefaultWithPerSeriesOverride: Story = {
 		series: FEMALE_AND_MALE_BOTH_WITH_GAPS,
 		styles: {
 			gaps: {
-				default: { start: { x: 2006 }, middle: {}, end: { x: 2022 } },
+				default: { start: { x: 1940 }, middle: {}, end: { x: 2025 } },
 				female: { middle: { style: { stroke: { stroke: '#16a34a', strokeDasharray: '2 3' } } } }
 			} satisfies GapsConfig<LineSegmentStyle>
 		}

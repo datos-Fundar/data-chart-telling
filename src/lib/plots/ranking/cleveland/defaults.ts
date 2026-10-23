@@ -22,13 +22,15 @@ function fitInterval<TData extends Record<string, unknown>>(
 ): Partial<Record<'x' | 'y', Partial<AxisScale<TData>>>> {
 	const axis = PlotAxes.valueOf(state);
 	const scale = state.scales[axis];
-	if (scale?.domain != null || scale?.ticks != null || scale?.nice != null) return {};
+	if (scale?.domain != null || scale?.ticks != null || typeof scale?.nice === 'boolean') return {};
 	const { entries } = ClevelandRanges.of(state, fromBaseline, {}, true);
 	if (entries.length === 0) return {};
 	const lo = Math.min(...entries.map((entry) => entry.from));
 	const hi = Math.max(...entries.map((entry) => entry.to));
 	if (!(hi > lo)) return {};
-	return { [axis]: { domain: NiceTicks.fit(state, axis, lo, hi, scale?.niceTolerance) } };
+	return {
+		[axis]: { domain: NiceTicks.fit(state, axis, lo, hi, NiceTicks.toleranceOf(scale?.nice)) }
+	};
 }
 
 /**
