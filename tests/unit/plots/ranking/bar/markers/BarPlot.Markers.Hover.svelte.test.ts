@@ -254,7 +254,7 @@ describe('BarPlot - markers.hover areaX/areaY', () => {
 		});
 		const area = svg.querySelector('rect.hover-area')!;
 		expect(area.getAttribute('fill')).toBe('#94a3b8');
-		expect(area.getAttribute('fill-opacity')).toBe('0.25');
+		expect(area.getAttribute('fill-opacity')).toBe('0.4');
 	});
 
 	test('an area override changes the rendered fill', async () => {

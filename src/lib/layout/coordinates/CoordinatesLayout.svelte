@@ -149,6 +149,7 @@
 		transition: () => cameraConfig?.transition
 	});
 	const cameraTransform = $derived(cameraTransformTween.current ?? { x: 0, y: 0, k: 1 });
+	const clipId = `geo-frame-clip-${Math.random().toString(36).slice(2, 9)}`;
 </script>
 
 {#key remountKey}
@@ -174,12 +175,18 @@
 				onFit={(fit) => (cameraFit = fit)}
 			/>
 		{/if}
-		<g transform="translate({cameraTransform.x}, {cameraTransform.y}) scale({cameraTransform.k})">
-			<g
-				transform="translate({geoZoom.transform.x}, {geoZoom.transform.y}) scale({geoZoom.transform
-					.k})"
-			>
-				{@render children()}
+		<!-- What a zoom or a camera pushes past the plot's box is cut there, so it never covers the legend or the chrome around it. -->
+		<defs>
+			<clipPath id={clipId}><rect x="0" y="0" {width} {height} /></clipPath>
+		</defs>
+		<g clip-path="url(#{clipId})">
+			<g transform="translate({cameraTransform.x}, {cameraTransform.y}) scale({cameraTransform.k})">
+				<g
+					transform="translate({geoZoom.transform.x}, {geoZoom.transform.y}) scale({geoZoom
+						.transform.k})"
+				>
+					{@render children()}
+				</g>
 			</g>
 		</g>
 	</Plot>

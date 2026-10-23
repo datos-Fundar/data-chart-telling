@@ -82,15 +82,19 @@ export const LinearLinks: Story = {
 
 /**
  * Spherical links on an orthographic globe - the geodesic curvature is most
- * visually obvious on a hemisphere view. `coordinates.zoom: true` also enables
- * drag-to-rotate here (orthographic-specific: dragging spins the globe
- * instead of panning it, since panning a globe within its own frame isn't
- * useful) - drag the canvas below to see a route's great-circle arc land
+ * visually obvious on a hemisphere view. `coordinates.rotate: true` enables
+ * drag-to-rotate (dragging spins the globe instead of panning it, since
+ * panning a globe within its own frame isn't useful), and `zoom: true` the
+ * wheel zoom - drag the canvas below to see a route's great-circle arc land
  * correctly wherever the globe is currently facing.
  */
 export const OnOrthographicGlobe: Story = {
 	args: {
-		coordinates: { projection: { type: 'orthographic', rotate: [60, -10] }, zoom: true },
+		coordinates: {
+			projection: { type: 'orthographic', rotate: [60, -10] },
+			zoom: true,
+			rotate: true
+		},
 		markers: [
 			{ type: 'sphere', behind: true, styles: { fill: '#f8fafc', stroke: 'currentColor' } },
 			{ type: 'graticule', behind: true, styles: { stroke: '#e2e8f0' } },

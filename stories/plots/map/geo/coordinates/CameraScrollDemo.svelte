@@ -15,7 +15,6 @@
 		return {
 			camera: {
 				target: settledOnB || inTransition ? SCENE_B : SCENE_A,
-				zoom: 2,
 				padding: 32,
 				transition: inTransition
 					? { progress, easing: 'quadOut' }
