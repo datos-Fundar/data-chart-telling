@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import { createRawSnippet } from 'svelte';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
-import { facetGroups } from '../../data/facet-groups';
+import { facetCountries } from '../../data/facet-countries';
 
 /** `facet: { mode: 'carousel' }` - `visible` facets show at a time; swipe/drag to browse the rest. */
 const meta = {
@@ -12,10 +12,10 @@ const meta = {
 	args: {
 		width: 720,
 		height: 480,
-		x: 'category',
-		y: 'value',
-		data: facetGroups(6),
-		facet: { by: 'group', columns: 3, mode: 'carousel', visible: 1 }
+		x: 'year',
+		y: 'gdp',
+		data: facetCountries(6),
+		facet: { by: 'country', columns: 3, mode: 'carousel', visible: 1 }
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 400, max: 1000, step: 20 } },
@@ -33,14 +33,14 @@ export const OneVisible: Story = {};
 
 /** Two facets visible at once. */
 export const TwoVisible: Story = {
-	args: { facet: { by: 'group', columns: 3, mode: 'carousel', visible: 2 } }
+	args: { facet: { by: 'country', columns: 3, mode: 'carousel', visible: 2 } }
 };
 
 /** Fully custom `indicator` snippet replacing the default badge. */
 export const CustomIndicator: Story = {
 	args: {
 		facet: {
-			by: 'group',
+			by: 'country',
 			columns: 3,
 			mode: 'carousel',
 			visible: 1,
