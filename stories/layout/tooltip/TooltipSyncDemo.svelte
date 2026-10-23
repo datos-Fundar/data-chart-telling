@@ -13,7 +13,7 @@
 	import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 	import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 	import type { HoverStrategy } from '$lib/types/layout/hover';
-	import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
+	import { ARGENTINA_CHILE_TRENDS, type CountryTrendRow } from '$datasets';
 	import {
 		AGE_GROUPS,
 		AGE_SHARES,
@@ -100,24 +100,24 @@
 		<LinePlot
 			width={760}
 			height={440}
-			title="GDP vs. Employment by region"
+			title="GDP per capita vs. population by country"
 			subtitle="Strategy: {strategy} · Sync: {sync ? 'on' : 'off'}"
-			data={TIME_SERIES}
+			data={ARGENTINA_CHILE_TRENDS}
 			x="year"
 			y="value"
-			color={'metric' as keyof SeriesPoint}
+			color={'metric' as keyof CountryTrendRow}
 			legend={[
 				{
 					type: 'discrete',
 					title: 'Indicator',
 					columns: 2,
 					items: [
-						{ name: 'GDP', symbol: 'line' },
-						{ name: 'Employment', symbol: 'line' }
+						{ name: 'GDP per capita', symbol: 'line' },
+						{ name: 'Population', symbol: 'line' }
 					]
 				}
 			]}
-			facet={{ by: 'region' as keyof SeriesPoint, columns: 2 }}
+			facet={{ by: 'country' as keyof CountryTrendRow, columns: 2 }}
 			tooltip={{ strategy, sync }}
 			markers={[{ type: 'hover' }]}
 		/>

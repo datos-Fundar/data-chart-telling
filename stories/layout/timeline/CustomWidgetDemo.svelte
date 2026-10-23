@@ -1,7 +1,7 @@
 <script lang="ts">
 	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 	import CustomWidget from './CustomWidget.svelte';
-	import { TIME_SERIES } from '../../data/time-series';
+	import { ARGENTINA_CHILE_TRENDS } from '$datasets';
 </script>
 
 {#snippet widget()}
@@ -17,11 +17,11 @@
 	width={760}
 	height={380}
 	title="Your own widget"
-	data={TIME_SERIES.filter((d) => d.metric === 'GDP')}
+	data={ARGENTINA_CHILE_TRENDS.filter((d) => d.metric === 'GDP per capita')}
 	x="year"
 	y="value"
-	color="region"
-	scales={{ x: { domain: [2018, 2022] }, y: { domain: [0, 100] } }}
+	color="country"
+	scales={{ x: { domain: [1987, 2007] }, y: { domain: [0, 250] } }}
 	footer={widget}
 	timeline={{ accessor: 'year', type: 'player', filterMode: 'upTo', player: { controls: [] } }}
 />

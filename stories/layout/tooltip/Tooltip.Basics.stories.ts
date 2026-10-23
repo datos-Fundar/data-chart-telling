@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
-import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
+import { ARGENTINA_CHILE_TRENDS, type CountryTrendRow } from '$datasets';
 
 /**
  * `tooltip` enables the floating HTML label; `markers` opts into the in-SVG
@@ -10,7 +10,7 @@ const meta = {
 	title: 'Layout/Tooltip/Basics',
 	component: LinePlot,
 	tags: ['autodocs'],
-	args: { width: 680, height: 400, data: TIME_SERIES, x: 'year', y: 'value' },
+	args: { width: 680, height: 400, data: ARGENTINA_CHILE_TRENDS, x: 'year', y: 'value' },
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 1000, step: 20 } },
 		height: { control: { type: 'range', min: 240, max: 700, step: 20 } },
@@ -31,10 +31,10 @@ type Story = StoryObj<typeof meta>;
 /** A single grouped line chart with `tooltip` + the hover marker. */
 export const Basic: Story = {
 	args: {
-		title: 'GDP vs. Employment',
+		title: 'GDP per capita vs. population',
 		subtitle: 'Hover over the lines',
-		data: TIME_SERIES.filter((d) => d.region === 'North'),
-		color: 'metric' as keyof SeriesPoint,
+		data: ARGENTINA_CHILE_TRENDS.filter((d) => d.country === 'Argentina'),
+		color: 'metric' as keyof CountryTrendRow,
 		tooltip: true,
 		markers: [{ type: 'hover' }]
 	}
@@ -44,8 +44,8 @@ export const Basic: Story = {
 export const TooltipOnly: Story = {
 	args: {
 		title: 'Tooltip only (no marker)',
-		data: TIME_SERIES.filter((d) => d.region === 'North'),
-		color: 'metric' as keyof SeriesPoint,
+		data: ARGENTINA_CHILE_TRENDS.filter((d) => d.country === 'Argentina'),
+		color: 'metric' as keyof CountryTrendRow,
 		tooltip: true
 	}
 };
@@ -54,8 +54,8 @@ export const TooltipOnly: Story = {
 export const MarkerOnly: Story = {
 	args: {
 		title: 'Marker only (no tooltip)',
-		data: TIME_SERIES.filter((d) => d.region === 'North'),
-		color: 'metric' as keyof SeriesPoint,
+		data: ARGENTINA_CHILE_TRENDS.filter((d) => d.country === 'Argentina'),
+		color: 'metric' as keyof CountryTrendRow,
 		markers: [{ type: 'hover' }]
 	}
 };

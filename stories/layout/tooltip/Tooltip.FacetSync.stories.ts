@@ -7,7 +7,7 @@ import FacetSyncBarUnrelatedOrderDemo, {
 	type GroupValue
 } from './FacetSyncBarUnrelatedOrderDemo.svelte';
 import { renderSource } from '../../common/docsSource';
-import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
+import { ARGENTINA_CHILE_TRENDS, type CountryTrendRow } from '$datasets';
 import {
 	AGE_GROUPS,
 	AGE_SHARES,
@@ -21,7 +21,7 @@ const meta = {
 	title: 'Layout/Tooltip/FacetSync',
 	component: LinePlot,
 	tags: ['autodocs'],
-	args: { width: 680, height: 400, data: TIME_SERIES, x: 'year', y: 'value' },
+	args: { width: 680, height: 400, data: ARGENTINA_CHILE_TRENDS, x: 'year', y: 'value' },
 	argTypes: {
 		width: { control: false },
 		height: { control: false },
@@ -48,9 +48,9 @@ type Story = StoryObj<typeof meta>;
 export const MultiFacetBroadcast: Story = {
 	args: {
 		title: 'Tooltip on every synced facet',
-		subtitle: 'Hover over one region - the other also shows its tooltip',
-		color: 'metric' as keyof SeriesPoint,
-		facet: { by: 'region' as keyof SeriesPoint, columns: 2 },
+		subtitle: 'Hover over one country - the other also shows its tooltip',
+		color: 'metric' as keyof CountryTrendRow,
+		facet: { by: 'country' as keyof CountryTrendRow, columns: 2 },
 		tooltip: { strategy: 'x', sync: true },
 		markers: [{ type: 'hover' }]
 	}
@@ -63,9 +63,9 @@ export const FacetSyncLine: StoryObj = {
 		docs: {
 			source: {
 				code: renderSource('LinePlot', {
-					title: 'GDP vs. Employment by region',
+					title: 'GDP per capita vs. population by country',
 					subtitle: 'Strategy: x · Sync: on',
-					data: TIME_SERIES,
+					data: ARGENTINA_CHILE_TRENDS,
 					x: 'year',
 					y: 'value',
 					color: 'metric',
@@ -75,12 +75,12 @@ export const FacetSyncLine: StoryObj = {
 							title: 'Indicator',
 							columns: 2,
 							items: [
-								{ name: 'GDP', symbol: 'line' },
-								{ name: 'Employment', symbol: 'line' }
+								{ name: 'GDP per capita', symbol: 'line' },
+								{ name: 'Population', symbol: 'line' }
 							]
 						}
 					],
-					facet: { by: 'region', columns: 2 },
+					facet: { by: 'country', columns: 2 },
 					tooltip: { strategy: 'x', sync: true },
 					markers: [{ type: 'hover' }]
 				})

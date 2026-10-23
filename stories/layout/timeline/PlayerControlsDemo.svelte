@@ -1,8 +1,8 @@
 <script lang="ts">
 	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
-	import { TIME_SERIES } from '../../data/time-series';
+	import { ARGENTINA_CHILE_TRENDS } from '$datasets';
 
-	const data = TIME_SERIES.filter((d) => d.metric === 'GDP');
+	const data = ARGENTINA_CHILE_TRENDS.filter((d) => d.metric === 'GDP per capita');
 </script>
 
 <!--
@@ -17,8 +17,8 @@
 		{data}
 		x="year"
 		y="value"
-		color="region"
-		scales={{ x: { domain: [2018, 2022] }, y: { domain: [0, 100] } }}
+		color="country"
+		scales={{ x: { domain: [1987, 2007] }, y: { domain: [0, 250] } }}
 		timeline={{
 			accessor: 'year',
 			type: 'player',
@@ -37,8 +37,8 @@
 		{data}
 		x="year"
 		y="value"
-		color="region"
-		scales={{ x: { domain: [2018, 2022] }, y: { domain: [0, 100] } }}
+		color="country"
+		scales={{ x: { domain: [1987, 2007] }, y: { domain: [0, 250] } }}
 		legend
 		order={['title', 'timeline', 'legend', 'plot']}
 		timeline={{

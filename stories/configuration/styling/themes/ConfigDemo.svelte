@@ -4,7 +4,7 @@
 	import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 	import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 	import { THEMES, type ThemeName } from '$lib/configuration/themes';
-	import { TIME_SERIES, type SeriesPoint } from '../../../data/time-series';
+	import { ARGENTINA_CHILE_TRENDS, type CountryTrendRow } from '$datasets';
 	import { PENGUIN_COUNTS, type PenguinSpeciesCount } from '$datasets';
 
 	let active = $state<ThemeName>('Default');
@@ -24,7 +24,7 @@
 	});
 
 	const maxCount = Math.max(...PENGUIN_COUNTS.map((d) => d.count));
-	const lineData = TIME_SERIES.filter((d) => d.region === 'North');
+	const lineData = ARGENTINA_CHILE_TRENDS.filter((d) => d.country === 'Argentina');
 </script>
 
 <div class="demo">
@@ -46,21 +46,21 @@
 		<LinePlot
 			width={460}
 			height={360}
-			title="GDP vs. Employment"
+			title="GDP per capita vs. population"
 			subtitle="Theme: {active}"
 			caption="The configuration is global and reactive."
 			data={lineData}
 			x="year"
 			y="value"
-			color={'metric' as keyof SeriesPoint}
+			color={'metric' as keyof CountryTrendRow}
 			legend={[
 				{
 					type: 'discrete',
 					title: 'Indicator',
 					columns: 2,
 					items: [
-						{ name: 'GDP', label: 'GDP', symbol: 'line' },
-						{ name: 'Employment', label: 'Employment', symbol: 'line' }
+						{ name: 'GDP per capita', label: 'GDP per capita', symbol: 'line' },
+						{ name: 'Population', label: 'Population', symbol: 'line' }
 					]
 				}
 			]}

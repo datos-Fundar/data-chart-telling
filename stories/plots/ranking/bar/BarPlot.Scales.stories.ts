@@ -7,7 +7,7 @@ import {
 	LIFE_EXPECTANCY_BY_PROVINCE,
 	type ProvincePoint
 } from './data';
-import { TIME_SERIES } from '../../../data/time-series';
+import { ARGENTINA_CHILE_TRENDS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -352,7 +352,7 @@ export const HorizontalStackedSeries: Story = {
 	}
 };
 
-const YEARLY_VALUES = TIME_SERIES.filter((d) => d.region === 'South');
+const YEARLY_VALUES = ARGENTINA_CHILE_TRENDS.filter((d) => d.country === 'Chile');
 
 /**
  * Numeric categories, like years. With both `x` and `y` numeric, nothing in

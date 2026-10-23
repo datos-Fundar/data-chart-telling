@@ -2,7 +2,7 @@
 	import PlotComposer from '$lib/layout/composer/PlotComposer.svelte';
 	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
-	import { TIME_SERIES } from '../../../data/time-series';
+	import { ARGENTINA_CHILE_TRENDS } from '$datasets';
 	import { AGE_SHARES } from '$datasets';
 </script>
 
@@ -13,11 +13,11 @@
 	subtitle="inset: left 0.62, bottom 0.5, right 0.98, top 0.98"
 >
 	<LinePlot
-		data={TIME_SERIES.filter((d) => d.region === 'North')}
+		data={ARGENTINA_CHILE_TRENDS.filter((d) => d.country === 'Argentina')}
 		x="year"
 		y="value"
 		color="metric"
-		scales={{ y: { domain: [0, 160] } }}
+		scales={{ y: { domain: [0, 250] } }}
 	/>
 	<BarPlot
 		inset={{ left: 0.62, bottom: 0.5, right: 0.98, top: 0.98 }}

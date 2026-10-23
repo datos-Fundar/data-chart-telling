@@ -1,6 +1,6 @@
 <script lang="ts">
 	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
-	import { TIME_SERIES } from '../../data/time-series';
+	import { ARGENTINA_CHILE_TRENDS } from '$datasets';
 
 	/**
 	 * `header` and `footer` snippets draw arbitrary markup in place of the
@@ -9,7 +9,7 @@
 	 * take part in `order` like any other block: `header` and `footer` are its
 	 * items, with a divider under the header and another above the footer.
 	 */
-	const data = TIME_SERIES.filter((d) => d.region === 'North');
+	const data = ARGENTINA_CHILE_TRENDS.filter((d) => d.country === 'Argentina');
 </script>
 
 <LinePlot
@@ -24,8 +24,8 @@
 			type: 'discrete',
 			title: 'Indicator',
 			items: [
-				{ name: 'GDP', symbol: 'line' },
-				{ name: 'Employment', symbol: 'line' }
+				{ name: 'GDP per capita', symbol: 'line' },
+				{ name: 'Population', symbol: 'line' }
 			],
 			columns: 2
 		}
@@ -38,10 +38,10 @@
 				<h3
 					style="margin:0 0 0.3rem; font-size:1.5rem; font-weight:600; line-height:1.2; color:#2563eb;"
 				>
-					GDP vs. Employment
+					GDP per capita vs. population
 				</h3>
 				<span style="font-size:1rem; color:color-mix(in srgb, currentColor 70%, transparent);">
-					North region, 2018-2022
+					Argentina, 1987-2007 (index, 1987 = 100)
 				</span>
 			</div>
 
