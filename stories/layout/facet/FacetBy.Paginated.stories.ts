@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import { createRawSnippet } from 'svelte';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import FacetThemeDemo from './FacetThemeDemo.svelte';
-import { facetCountries } from '../../data/facet-countries';
+import { diverseCountries } from '$datasets';
 
 /** `facet: { mode: 'paginated' }` - pages through the grid in fixed-size chunks with prev/next controls. */
 const meta = {
@@ -15,7 +15,7 @@ const meta = {
 		height: 480,
 		x: 'year',
 		y: 'gdp',
-		data: facetCountries(9),
+		data: diverseCountries(9),
 		facet: { by: 'country', columns: 2, mode: 'paginated', pageSize: 4 }
 	},
 	argTypes: {

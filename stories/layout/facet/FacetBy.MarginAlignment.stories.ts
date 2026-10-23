@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
-import { POPULATION_COUNTRIES } from '../../data/facet-countries';
+import { COUNTRIES_SPANNING_POPULATION } from '$datasets';
 
 /**
  * Facets line up on their own: each column shares its widest left margin and
@@ -29,7 +29,7 @@ type Story = StoryObj<typeof meta>;
 /** Vertical bars, one country per facet, each fitting its own value axis. */
 export const Bars: Story = {
 	args: {
-		data: POPULATION_COUNTRIES,
+		data: COUNTRIES_SPANNING_POPULATION,
 		x: 'year',
 		y: 'population',
 		facet: { by: 'country', columns: 3, scales: 'free-y' }
@@ -43,7 +43,7 @@ export const Lines: StoryObj<typeof LinePlot> = {
 	args: {
 		width: 900,
 		height: 420,
-		data: POPULATION_COUNTRIES,
+		data: COUNTRIES_SPANNING_POPULATION,
 		x: 'year',
 		y: 'population',
 		facet: { by: 'country', columns: 3, scales: 'free-y' }

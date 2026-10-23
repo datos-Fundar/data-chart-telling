@@ -2,6 +2,8 @@
 // National censuses 1991-2022, plus the city's official projections for 2023-2040.
 // Share of the city's population, in percent.
 
+// ── Pyramid: every year, by age group and sex ───────────────────────────────
+
 export type AgeRow = { year: number; ageGroup: string; sex: 'Female' | 'Male'; share: number };
 
 /** Every year, one row per age group and sex, for a pyramid. */
@@ -802,12 +804,14 @@ export const POPULATION_BY_AGE: AgeRow[] = [
 
 export const AGE_GROUPS = [...new Set(POPULATION_BY_AGE.map(({ ageGroup }) => ageGroup))];
 
+// ── The 2022 census ─────────────────────────────────────────────────────────
+
 /** The 2022 census alone. */
 export const POPULATION_BY_AGE_AT_2022: AgeRow[] = POPULATION_BY_AGE.filter(
 	({ year }) => year === 2022
 );
-/** One broad age group's share of the population in a year. */
-export type AgeShareRow = { year: number; ageGroup: string; share: number };
+
+// ── Shares by sex ───────────────────────────────────────────────────────────
 
 /** The same census data over the years, grouped by age: the share of each sex. */
 export type SexShareRow = { year: number; sex: string; share: number };
@@ -822,6 +826,11 @@ export const SEX_SHARES: SexShareRow[] = [
 	{ year: 2022, sex: 'Female', share: 53.8 },
 	{ year: 2022, sex: 'Male', share: 46.2 }
 ];
+
+// ── Shares by broad age group ───────────────────────────────────────────────
+
+/** One broad age group's share of the population in a year. */
+export type AgeShareRow = { year: number; ageGroup: string; share: number };
 
 const BROAD_AGE_GROUPS: [string, string[]][] = [
 	['0-14', ['0-4', '5-9', '10-14']],

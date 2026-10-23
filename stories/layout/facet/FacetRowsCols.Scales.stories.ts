@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
-import { ARGENTINA_CHILE_TRENDS } from '$datasets';
-import { IRIS_LONG } from '$datasets';
+import { ARGENTINA_CHILE_TRENDS, IRIS_LONG } from '$datasets';
 
 /**
  * A plot's own `facet` prop as a `rows` × `cols` grid: one facet per

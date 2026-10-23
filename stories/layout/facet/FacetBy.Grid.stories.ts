@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
-import { facetCountries } from '../../data/facet-countries';
+import { diverseCountries } from '$datasets';
 
 /**
  * `facet: { by, columns }` - every facet renders at once, arranged in a
@@ -26,7 +26,7 @@ type Story = StoryObj<typeof meta>;
 /** Two countries, two columns - side by side. */
 export const TwoSideBySide: Story = {
 	args: {
-		data: facetCountries(2),
+		data: diverseCountries(2),
 		facet: { by: 'country', columns: 2 }
 	}
 };
@@ -34,7 +34,7 @@ export const TwoSideBySide: Story = {
 /** Two countries, one column - stacked vertically. */
 export const TwoStacked: Story = {
 	args: {
-		data: facetCountries(2),
+		data: diverseCountries(2),
 		facet: { by: 'country', columns: 1 }
 	}
 };
@@ -42,7 +42,7 @@ export const TwoStacked: Story = {
 /** Four countries in a 2×2 grid. */
 export const Four: Story = {
 	args: {
-		data: facetCountries(4),
+		data: diverseCountries(4),
 		facet: { by: 'country', columns: 2 }
 	}
 };
@@ -50,7 +50,7 @@ export const Four: Story = {
 /** Six countries in a 3×2 grid. */
 export const Six: Story = {
 	args: {
-		data: facetCountries(6),
+		data: diverseCountries(6),
 		facet: { by: 'country', columns: 3 }
 	}
 };
@@ -58,7 +58,7 @@ export const Six: Story = {
 /** Nine countries in a 3×3 grid. */
 export const Nine: Story = {
 	args: {
-		data: facetCountries(9),
+		data: diverseCountries(9),
 		facet: { by: 'country', columns: 3 }
 	}
 };
@@ -66,7 +66,7 @@ export const Nine: Story = {
 /** Nine countries in a 3×3 grid. */
 export const OuterAxes: Story = {
 	args: {
-		data: facetCountries(9),
+		data: diverseCountries(9),
 		facet: { by: 'country', columns: 3, axes: 'outer' }
 	}
 };

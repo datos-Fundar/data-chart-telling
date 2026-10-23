@@ -1,3 +1,4 @@
+export * from './argentina-chile-trends';
 export * from './commodity-prices';
 export * from './countries-over-time';
 export * from './daily-temperature';
@@ -8,5 +9,6 @@ export * from './iris-flower';
 export * from './life-expectancy';
 export * from './penguins';
 export * from './population-by-age';
+export * from './population-by-age-with-gaps';
 export * from './province-life-expectancy';
 export * from './weather-stations';

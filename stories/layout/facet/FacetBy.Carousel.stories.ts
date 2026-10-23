@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import { createRawSnippet } from 'svelte';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
-import { facetCountries } from '../../data/facet-countries';
+import { diverseCountries } from '$datasets';
 
 /** `facet: { mode: 'carousel' }` - `visible` facets show at a time; swipe/drag to browse the rest. */
 const meta = {
@@ -14,7 +14,7 @@ const meta = {
 		height: 480,
 		x: 'year',
 		y: 'gdp',
-		data: facetCountries(6),
+		data: diverseCountries(6),
 		facet: { by: 'country', columns: 3, mode: 'carousel', visible: 1 }
 	},
 	argTypes: {

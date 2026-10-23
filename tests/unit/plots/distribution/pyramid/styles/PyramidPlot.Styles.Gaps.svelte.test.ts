@@ -6,7 +6,7 @@ import type { GapsConfig } from '$lib/types/plots/gaps';
 import type { GapsAwarePlotStylesConfig } from '$lib/types/layout/styles';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import { POPULATION_BY_AGE } from '$datasets';
-import { FEMALE_2022_WITH_GAPS } from '../../../../../../stories/data/population-gaps';
+import { FEMALE_2022_WITH_GAPS } from '$datasets';
 import { waitForSvg, countBarRects, countTextLabels } from '../../../_helpers/svg';
 
 // A series' `x`/`y` are the visual axes, like the top-level props: `x` the magnitude, `y` the category.

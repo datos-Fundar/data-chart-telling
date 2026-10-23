@@ -2,8 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 import type { GapsConfig } from '$lib/types/plots/gaps';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
-import { AGE_GROUPS, POPULATION_BY_AGE } from '$datasets';
-import { FEMALE_2022_WITH_GAPS } from '../../../../data/population-gaps';
+import { AGE_GROUPS, POPULATION_BY_AGE, FEMALE_2022_WITH_GAPS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 

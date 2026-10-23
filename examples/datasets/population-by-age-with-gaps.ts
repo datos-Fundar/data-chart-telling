@@ -1,4 +1,7 @@
-import { AGE_GROUPS, POPULATION_BY_AGE_AT_2022, type AgeRow } from '$datasets';
+// ── Population of Buenos Aires City by age, with gaps ───────────────────────
+// The 2022 census female series with holes, to demonstrate gap filling.
+
+import { AGE_GROUPS, POPULATION_BY_AGE_AT_2022, type AgeRow } from './population-by-age';
 
 export type AgeRowWithGaps = Omit<AgeRow, 'year' | 'share'> & { share: number | null };
 

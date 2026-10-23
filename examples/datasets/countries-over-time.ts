@@ -345,32 +345,24 @@ export const COUNTRIES_AT_2007: CountryYearRow[] = COUNTRIES_OVER_TIME.filter(
 	({ year }) => year === 2007
 );
 
-/** One country's GDP per capita or population, one row per year. */
-export type CountryTrendRow = {
-	year: number;
-	country: string;
-	metric: string;
-	value: number;
-};
+/** Countries from every continent, so any prefix of the list is a varied set. */
+const DIVERSE_COUNTRIES = [
+	'Argentina',
+	'Norway',
+	'Nigeria',
+	'Japan',
+	'Brazil',
+	'Germany',
+	'India',
+	'Kenya',
+	'Mexico'
+];
 
-/** Argentina and Chile's GDP per capita and population, as an index with 1987 = 100 so both metrics share one axis. */
-export const ARGENTINA_CHILE_TRENDS: CountryTrendRow[] = ['Argentina', 'Chile'].flatMap(
-	(country) => {
-		const rows = COUNTRIES_OVER_TIME.filter((row) => row.country === country);
-		const [first] = rows;
-		return rows.flatMap(({ year, gdp, population }) => [
-			{
-				year,
-				country,
-				metric: 'GDP per capita',
-				value: Math.round((gdp / first.gdp) * 100)
-			},
-			{
-				year,
-				country,
-				metric: 'Population',
-				value: Math.round((population / first.population) * 100)
-			}
-		]);
-	}
+/** The rows of the first `count` countries of a varied selection, one group each. */
+export const diverseCountries = (count: number) =>
+	COUNTRIES_OVER_TIME.filter(({ country }) => DIVERSE_COUNTRIES.slice(0, count).includes(country));
+
+/** Countries whose population differs by orders of magnitude, from a few millions to over a billion. */
+export const COUNTRIES_SPANNING_POPULATION = COUNTRIES_OVER_TIME.filter(({ country }) =>
+	['Norway', 'Argentina', 'Germany', 'Brazil', 'India', 'China'].includes(country)
 );
