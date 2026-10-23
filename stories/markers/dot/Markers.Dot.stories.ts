@@ -4,7 +4,7 @@ import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES } from '$datasets/world-countries';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
-import { WEATHER_STATIONS, type WeatherStation } from '$datasets';
+import { WEATHER_STATIONS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `dot` marker (svelteplot's own `Dot`) - one point mark per row of its own
@@ -127,13 +127,14 @@ export const SizedByTemperature: GeoPlotStory = {
 	args: {
 		...GEO_PLOT_ARGS,
 		styles: { fill: '#e2e8f0', stroke: '#94a3b8' },
+		scales: { r: { domain: [5, 25], range: [3, 12] } },
 		markers: [
 			{
 				type: 'dot',
 				data: WEATHER_STATIONS,
 				x: 'lon',
 				y: 'lat',
-				r: (d) => (d as WeatherStation).tempC / 2,
+				r: 'tempC',
 				styles: { dotFill: '#f97316', dotFillOpacity: 0.7, dotStroke: '#c2410c' }
 			}
 		] satisfies GeoMarkersConfig[]

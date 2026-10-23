@@ -82,3 +82,35 @@ describe('Figure legend', () => {
 		});
 	});
 });
+
+describe('Figure legend - size channel title', () => {
+	const ScatterPlot = import('$lib/plots/correlation/scatter/Plot.svelte');
+	const points = ROWS.map((row) => ({ ...row, weight: row.value * 10 }));
+
+	test('a named function sizing the dots titles the size legend', async () => {
+		const { default: Scatter } = await ScatterPlot;
+		const weightRatio = (row: { weight: number; year: number }) => row.weight / row.year;
+		const { container } = await render(Scatter, {
+			width: 500,
+			height: 300,
+			data: points,
+			x: 'year',
+			y: 'value',
+			r: weightRatio
+		} as never);
+		await vi.waitFor(() => expect(legendText(container)).toContain('Weight ratio'));
+	});
+
+	test('a field key sizing the dots titles it with the field, written as a label', async () => {
+		const { default: Scatter } = await ScatterPlot;
+		const { container } = await render(Scatter, {
+			width: 500,
+			height: 300,
+			data: points,
+			x: 'year',
+			y: 'value',
+			r: 'weight'
+		} as never);
+		await vi.waitFor(() => expect(legendText(container)).toContain('Weight'));
+	});
+});

@@ -59,6 +59,11 @@ export class LegendChannels {
 		return typeof channel === 'string' ? channel : ChannelName.of(channel, property);
 	}
 
+	/** A plot channel's name: its field key, or the name of the function that computes it. */
+	static #sourceTitle(source: unknown, property: string): string | undefined {
+		return typeof source === 'string' ? source : ChannelName.of(source, property);
+	}
+
 	/** `marker`'s rows read through `channel` (a field or a function), without the missing and non-finite ones. */
 	static #values(marker: LegendSource, channel: unknown): unknown[] {
 		if (channel === undefined || channel === null || typeof channel === 'number') return [];
@@ -239,7 +244,9 @@ export class LegendChannels {
 		);
 		if (values.length === 0) return [];
 		const { filled, color, symbol } = LegendChannels.look(sized);
-		const source = plot.channels?.r?.source ?? LegendChannels.#title(sized[0].r, 'r');
+		const source =
+			LegendChannels.#sourceTitle(plot.channels?.r?.source, 'r') ??
+			LegendChannels.#title(sized[0].r, 'r');
 		return [
 			{
 				type: 'size',
@@ -271,7 +278,8 @@ export class LegendChannels {
 		const shapeOf = resolveSymbolScale(config, domain, getConfiguration().symbols);
 		const { filled, color } = LegendChannels.look(shaped);
 		const source =
-			plot.channels?.symbol?.source ?? LegendChannels.#title(shaped[0].symbol, 'symbol');
+			LegendChannels.#sourceTitle(plot.channels?.symbol?.source, 'symbol') ??
+			LegendChannels.#title(shaped[0].symbol, 'symbol');
 		return [
 			{
 				type: 'symbol',

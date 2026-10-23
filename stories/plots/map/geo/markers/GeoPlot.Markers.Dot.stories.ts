@@ -3,7 +3,7 @@ import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES } from '$datasets/world-countries';
 import { countryPopulation } from '../channels';
-import { WEATHER_STATIONS, type WeatherStation } from '$datasets';
+import { WEATHER_STATIONS } from '$datasets';
 
 // `x`/`y`/`value` below use the field-key shorthand (`'lon'` instead of
 // `(d) => (d as WeatherStation).lon`) - see `DotMarkerConfig`'s own doc.
@@ -54,13 +54,14 @@ export const Basic: Story = {
 export const SizedByTemperature: Story = {
 	args: {
 		styles: { fill: '#e2e8f0', stroke: '#94a3b8' },
+		scales: { r: { domain: [5, 25], range: [3, 12] } },
 		markers: [
 			{
 				type: 'dot',
 				data: WEATHER_STATIONS,
 				x: 'lon',
 				y: 'lat',
-				r: (d) => (d as WeatherStation).tempC,
+				r: 'tempC',
 				styles: { dotFill: '#f97316', dotFillOpacity: 0.7, dotStroke: '#c2410c' }
 			}
 		] satisfies GeoMarkersConfig[]
@@ -76,13 +77,14 @@ export const SizedByTemperature: Story = {
 export const ColoredByTemperature: Story = {
 	args: {
 		styles: { stroke: '#94a3b8' },
+		scales: { r: { domain: [5, 25], range: [3, 12] } },
 		markers: [
 			{
 				type: 'dot',
 				data: WEATHER_STATIONS,
 				x: 'lon',
 				y: 'lat',
-				r: (d) => (d as WeatherStation).tempC,
+				r: 'tempC',
 				color: 'tempC',
 				scales: { color: { scheme: ['#3b82f6', '#dc2626'] } },
 				styles: { dotStroke: '#1e293b' }

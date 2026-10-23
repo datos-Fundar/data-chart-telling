@@ -37,7 +37,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Weight per centimeter of height: the bubbles' size, which is not a position on either axis. */
+/** Weight per centimeter of height: the bubbles' size, which is not a position on either axis. Passed by name, so the size legend is titled with it. */
 const weightPerCentimeter = (row: HeightRow) => row.weight / row.height;
 
 /**
@@ -51,7 +51,7 @@ const bubbles = (transforms: MarkerTransform[]): Story['args'] => ({
 	x: 'height',
 	y: 'weight',
 	color: 'group',
-	r: (d: Record<string, unknown>) => weightPerCentimeter(d as HeightRow),
+	r: weightPerCentimeter as (row: Record<string, unknown>) => number,
 	scales: {
 		x: { label: 'Height (cm)' },
 		y: { label: 'Weight (kg)' }

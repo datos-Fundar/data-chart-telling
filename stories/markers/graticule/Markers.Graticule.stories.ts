@@ -137,6 +137,7 @@ export const WithEarthquakeDots: GeoPlotStory = {
 	args: {
 		...GEO_PLOT_ARGS,
 		data: WORLD_COUNTRIES,
+		scales: { r: { domain: [6, 9], range: [2, 14] } },
 		coordinates: {
 			projection: { type: 'orthographic', rotate: [65, 15] },
 			zoom: true,
@@ -158,7 +159,7 @@ export const WithEarthquakeDots: GeoPlotStory = {
 				data: EARTHQUAKES,
 				x: 'lon',
 				y: 'lat',
-				r: (d) => ((d as { magnitude: number }).magnitude - 5.5) * 3,
+				r: 'magnitude',
 				styles: { dotFill: '#dc2626', dotFillOpacity: 0.6, dotStroke: '#7f1d1d' }
 			}
 		] satisfies GeoMarkersConfig[]

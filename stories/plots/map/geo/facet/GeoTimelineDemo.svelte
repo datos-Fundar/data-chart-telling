@@ -50,7 +50,7 @@
 			featureId={(f) => String(f.properties?.nombre)}
 			color={provincePopulation}
 			excludeParts={isAntarcticPart}
-			scales={{ color: { scheme: 'blues' } }}
+			scales={{ color: { scheme: 'blues' }, r: { domain: [5, 25], range: [3, 12] } }}
 			coordinates={{ projection: { type: 'mercator', domain: 'data' } }}
 			markers={[
 				{
@@ -58,7 +58,7 @@
 					data: READINGS.filter((d) => d.lon > -75 && d.lat < -20),
 					x: 'lon',
 					y: 'lat',
-					r: (d) => (d as { tempC: number }).tempC / 4,
+					r: 'tempC',
 					styles: { dotFill: '#dc2626' }
 				}
 			]}
