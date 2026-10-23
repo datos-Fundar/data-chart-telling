@@ -41,12 +41,15 @@ export type DotRangeStyling = {
 export type DividerLineStyle = 'solid' | 'dashed' | 'dotted' | 'double';
 
 export type PlotStylesConfig = {
-	// ── Base ──────────────────────────────────────────────────────────────────
+	// ── General look ────────────────────────────────────────────────────────────
+
 	font: string;
 	color: string;
 	background: string;
+	title: TextStyle;
+	subtitle: TextStyle;
+	caption: TextStyle;
 
-	// ── Spacing / padding ───────────────────────────────────────────────────────
 	spacing: {
 		headerPadding: string;
 		legendPadding: string;
@@ -54,7 +57,6 @@ export type PlotStylesConfig = {
 		bleed: string;
 	};
 
-	// ── Divider ─────────────────────────────────────────────────────────────────
 	/** The line every `'divider'` in a plot's chrome `order` draws. */
 	divider: {
 		color: string;
@@ -65,7 +67,6 @@ export type PlotStylesConfig = {
 		margin: string;
 	};
 
-	// ── Chrome ──────────────────────────────────────────────────────────────────
 	/** What a plot's or composer's chrome draws around it. */
 	chrome: {
 		/** The blocks, top to bottom, when a figure doesn't set its own `order` - see {@link PlotChromeEntry}. */
@@ -74,12 +75,57 @@ export type PlotStylesConfig = {
 		rowGap: string;
 	};
 
-	// ── Text blocks ─────────────────────────────────────────────────────────────
-	title: TextStyle;
-	subtitle: TextStyle;
-	caption: TextStyle;
+	/** Discrete categorical palette (grouped series). */
+	palette: string[];
 
-	// ── Legend ──────────────────────────────────────────────────────────────────
+	/** Default shape cycle for the `symbol` channel, in order. */
+	symbols: SymbolType[];
+
+	/** Continuous gradient endpoints + on-cell label colour, plus the default opacity-channel range. */
+	continuous: { min: string; max: string; labelColor: string; opacityRange: [number, number] };
+
+	/**
+	 * Per-side plot margin. `'auto'` (the default) lets svelteplot size that
+	 * side to fit whatever it actually renders there - tick labels, an axis
+	 * title, rotated ticks - instead of clipping content or leaving unused
+	 * space. A number pins that side exactly, opting out of auto-sizing.
+	 */
+	margins: {
+		top: number | 'auto';
+		right: number | 'auto';
+		bottom: number | 'auto';
+		left: number | 'auto';
+	};
+
+	/** Marker clipping to the plot's inner frame (see `FrameClip`). */
+	frameClip: {
+		/**
+		 * How far (px) a clipped mark may reach past the frame before it's cut,
+		 * so strokes and labels on the edge aren't shaved off. A number sets all
+		 * four sides; a string takes CSS shorthand px values for 1-4 sides, e.g.
+		 * `'4px'`, `'4px 8px'`, `'0 8px 4px'`, `'0 8px 4px 2px'`.
+		 */
+		tolerance: number | string;
+	};
+
+	// ── Features ────────────────────────────────────────────────────────────────
+
+	axis: {
+		color: string;
+		fontSize: number;
+		labelFontSize: number;
+		titleFontSize: number;
+		xTickSize: number;
+		yTickSize: number;
+		xTickPadding: number;
+		yTickPadding: number;
+		grid: boolean;
+		locale: string;
+		compactDisplay: 'short' | 'long';
+		edgeTicks: { x: EdgeTicksOptions; y: EdgeTicksOptions };
+		autoRotate: boolean;
+	};
+
 	legend: {
 		font: string;
 		size: string;
@@ -170,24 +216,6 @@ export type PlotStylesConfig = {
 		};
 	};
 
-	// ── Axes (consumed by plots) ────────────────────────────────────────────────
-	axis: {
-		color: string;
-		fontSize: number;
-		labelFontSize: number;
-		titleFontSize: number;
-		xTickSize: number;
-		yTickSize: number;
-		xTickPadding: number;
-		yTickPadding: number;
-		grid: boolean;
-		locale: string;
-		compactDisplay: 'short' | 'long';
-		edgeTicks: { x: EdgeTicksOptions; y: EdgeTicksOptions };
-		autoRotate: boolean;
-	};
-
-	// ── Tooltip ─────────────────────────────────────────────────────────────────
 	tooltip: {
 		background: string;
 		color: string;
@@ -197,175 +225,33 @@ export type PlotStylesConfig = {
 		border: string;
 	};
 
-	// ── Plot geometry / colour ──────────────────────────────────────────────────
 	/**
-	 * Per-side plot margin. `'auto'` (the default) lets svelteplot size that
-	 * side to fit whatever it actually renders there - tick labels, an axis
-	 * title, rotated ticks - instead of clipping content or leaving unused
-	 * space. A number pins that side exactly, opting out of auto-sizing.
+	 * In-SVG hover highlight: crosshair rule, dot + value label, and the area
+	 * highlight - a restyled feature on `GeoPlot`, or an `areaX`/`areaY` band
+	 * on an axis-based plot's band scale.
 	 */
-	margins: {
-		top: number | 'auto';
-		right: number | 'auto';
-		bottom: number | 'auto';
-		left: number | 'auto';
-	};
-	/** Marker clipping to the plot's inner frame (see `FrameClip`). */
-	frameClip: {
-		/**
-		 * How far (px) a clipped mark may reach past the frame before it's cut,
-		 * so strokes and labels on the edge aren't shaved off. A number sets all
-		 * four sides; a string takes CSS shorthand px values for 1-4 sides, e.g.
-		 * `'4px'`, `'4px 8px'`, `'0 8px 4px'`, `'0 8px 4px 2px'`.
-		 */
-		tolerance: number | string;
-	};
-	/** Discrete categorical palette (grouped series). */
-	palette: string[];
-	/** Default shape cycle for the `symbol` channel, in order. */
-	symbols: SymbolType[];
-	/** Continuous gradient endpoints + on-cell label colour, plus the default opacity-channel range. */
-	continuous: { min: string; max: string; labelColor: string; opacityRange: [number, number] };
-	/** Default line geometry. */
-	line: {
-		/** Curve of every line that sets none (`styles.curve`, a segment's `curve`): `'auto'` joins the points with straight segments, or along the great circle on a projected map. */
-		curve: CurveName | 'auto';
-		strokeWidth: number;
-		dotRadius: number;
-		/**
-		 * Default gap-fill bridge styling (`LinePlot`'s `styles.gaps`) - the
-		 * fallback merged under whatever a gap zone's own `style` sets, the
-		 * same way `hover.rule`/`hover.dot` back every hover marker's style.
-		 */
-		gap: { stroke: StrokeStyle; dots: DotStyle };
-	};
-	/** Default text-marker behavior. */
-	text: {
-		/** Geometry and connector of a decluttered text marker (`declutter`) - e.g. LinePlot's end-of-line value labels. */
-		declutter: {
-			/** Shortest lane's distance (px) from the point before a connector bends. */
-			elbowGap: number;
-			/** Extra distance (px) each further lane sits out from the last. */
-			laneStep: number;
-			/** Clearance (px) between the outermost lane and the label text. */
-			labelGap: number;
-			/** Default connector stroke. */
-			connector: StrokeStyle;
+	hover: { rule: StrokeStyle; dot: DotStyle; font: FontStyle; area: AreaStyle };
+
+	facet: {
+		/** Position badge shown in `carousel`/`paginated` facet modes. */
+		indicator: {
+			background: string;
+			color: string;
+			fontSize: string;
+			padding: string;
+			radius: string;
+		};
+		/** Prev/next buttons shown in `paginated` facet mode. */
+		navButton: {
+			background: string;
+			color: string;
+			/** Button diameter (width and height). */
+			size: string;
+			fontSize: string;
+			disabledOpacity: number;
 		};
 	};
-	/** Default bar-mark styling. */
-	bar: {
-		/** Default gap-fill styling (`BarPlot`'s `styles.gaps`) - the fallback merged under whatever a gap zone's own `style` sets. */
-		gap: AreaStyle;
-		/** Gap (0-1) between the bars of side-by-side series within one category, as a fraction of each bar's slice. */
-		seriesPadding: number;
-		/** Fallback gap (0-1) *between* category groups on BarPlot's own category axis, when a plot doesn't set its own `scales.x/y.paddingInner`. */
-		paddingInner: number;
-		/** Fallback gap (0-1) before the first and after the last category group on BarPlot's own category axis, when a plot doesn't set its own `scales.x/y.paddingOuter`. */
-		paddingOuter: number;
-	};
-	/** Default pyramid-bar styling. */
-	pyramid: {
-		/** Default gap-fill styling (`PyramidPlot`'s `styles.gaps`) - the fallback merged under whatever a gap zone's own `style` sets. */
-		gap: AreaStyle;
-	};
-	/** Default area-plot styling. */
-	area: {
-		/** Fill opacity of every area marker that sets none of its own. */
-		fillOpacity: number;
-	};
-	/** Default sparkline styling: a thin line, and the dot on its last point. */
-	sparkline: {
-		strokeWidth: number;
-		dotRadius: number;
-	};
-	/** Default slope-plot styling: a line and a dot per series between the positions of its category axis. */
-	slope: {
-		strokeWidth: number;
-		dotRadius: number;
-		/** Space (0-1, as a fraction of the step between positions) left outside the first and last position; the labels' margins grow beyond it. */
-		padding: number;
-	};
-	/** Default histogram styling. */
-	histogram: {
-		/** Pixels taken off each side of every bar, so neighbouring bars leave a gap of twice this. */
-		inset: number;
-		/** Fill opacity of every bar, so a grouped histogram's bars behind another group's still show. */
-		fillOpacity: number;
-	};
-	/** Default density-plot styling. */
-	density: {
-		/** Fill opacity of every area, so a grouped density's curves behind another group's still show. */
-		fillOpacity: number;
-		/** Stroke width of every curve drawn as a line. */
-		strokeWidth: number;
-	};
-	/** Default violin-plot styling. */
-	violin: {
-		/** Fill opacity of every violin that sets none of its own. */
-		fillOpacity: number;
-		/** Fallback gap (0-1) between the violins of neighbouring categories, when a plot doesn't set its own `scales.x/y.paddingInner`. */
-		paddingInner: number;
-		/** Fallback gap (0-1) before the first and after the last violin, when a plot doesn't set its own `scales.x/y.paddingOuter`. */
-		paddingOuter: number;
-		/** Width (px) of the box inside each violin. */
-		boxWidth: number;
-	};
-	/** Default box-plot styling. */
-	box: {
-		/** Fill opacity of every box that sets none of its own. */
-		fillOpacity: number;
-		/** Fallback gap (0-1) between the boxes of neighbouring categories, when a plot doesn't set its own `scales.x/y.paddingInner`. */
-		paddingInner: number;
-		/** Fallback gap (0-1) before the first and after the last box, when a plot doesn't set its own `scales.x/y.paddingOuter`. */
-		paddingOuter: number;
-	};
-	/** Default lollipop-plot styling. */
-	lollipop: DotRangeStyling;
-	/** Default dumbbell-plot styling. */
-	dumbbell: DotRangeStyling;
-	/** Default Cleveland-plot styling. */
-	cleveland: DotRangeStyling;
-	/** Default forest-plot styling: the dot is the estimate, the stem its interval. */
-	forest: DotRangeStyling;
-	/** Default bullet-plot styling: a bar over graded ranges, with a tick at its target. */
-	bullet: {
-		/** The bar's thickness (px) across its category band. */
-		barThickness: number;
-		/** The thickness (px) of the bands that grade the value. */
-		rangeWidth: number;
-		/** The colors of those bands, from the smallest to the largest; the last one repeats if there are more bands. */
-		rangeColors: string[];
-		/** The length (px) and thickness of the target tick. */
-		targetLength: number;
-		targetWidth: number;
-		/** The target tick's color; the axis color when unset. */
-		targetColor?: string;
-		/** Padding between category bands, as fractions (0-1) of a band. */
-		paddingInner: number;
-		paddingOuter: number;
-	};
-	/** What `styles.connector` falls back to on the plots that join dots (lollipop, dumbbell, Cleveland). */
-	connector: {
-		/** The colors of a connector colored `{ by: 'sign' }`: where the value rose, fell, or did not move. */
-		sign: { positive: string; negative: string; zero: string };
-		/** The ramp of a connector colored `{ by: 'length' }`: from the shortest to the longest. */
-		lengthScheme: string[];
-		/** The ramp of a connector colored `{ by: 'difference' }`: falling, still, rising, meeting at 0. */
-		differenceScheme: string[];
-		/** Opacity (0-1) of the part of a connector outside the stretch between its `from` and `to` dots. */
-		outsideOpacity: number;
-		/** A connector drawn as an arrow (`styles.connector.arrow`): its thickness, and the length (px) and angle (degrees) of its head. */
-		arrow: { width: number; headLength: number; headAngle: number };
-		/** The length (px) of the caps a connector draws at its ends (`styles.connector.caps`). */
-		capLength: number;
-		/** Font size of a connector's label, in px. */
-		labelFontSize: number;
-		/** Gap, in px, between a connector and its label when it is written beside it. */
-		labelGap: number;
-	};
-	/** Default scatter point geometry. */
-	scatter: { dotRadius: number };
+
 	/** Timeline gutter styling. */
 	timeline: {
 		axisColor: string;
@@ -428,12 +314,26 @@ export type PlotStylesConfig = {
 			};
 		};
 	};
-	/**
-	 * In-SVG hover highlight: crosshair rule, dot + value label, and the area
-	 * highlight - a restyled feature on `GeoPlot`, or an `areaX`/`areaY` band
-	 * on an axis-based plot's band scale.
-	 */
-	hover: { rule: StrokeStyle; dot: DotStyle; font: FontStyle; area: AreaStyle };
+
+	/** What `styles.connector` falls back to on the plots that join dots (lollipop, dumbbell, Cleveland). */
+	connector: {
+		/** The colors of a connector colored `{ by: 'sign' }`: where the value rose, fell, or did not move. */
+		sign: { positive: string; negative: string; zero: string };
+		/** The ramp of a connector colored `{ by: 'length' }`: from the shortest to the longest. */
+		lengthScheme: string[];
+		/** The ramp of a connector colored `{ by: 'difference' }`: falling, still, rising, meeting at 0. */
+		differenceScheme: string[];
+		/** Opacity (0-1) of the part of a connector outside the stretch between its `from` and `to` dots. */
+		outsideOpacity: number;
+		/** A connector drawn as an arrow (`styles.connector.arrow`): its thickness, and the length (px) and angle (degrees) of its head. */
+		arrow: { width: number; headLength: number; headAngle: number };
+		/** The length (px) of the caps a connector draws at its ends (`styles.connector.caps`). */
+		capLength: number;
+		/** Font size of a connector's label, in px. */
+		labelFontSize: number;
+		/** Gap, in px, between a connector and its label when it is written beside it. */
+		labelGap: number;
+	};
 
 	/** The `delta` marker's label offset and anchor, per axis the delta is taken on. A marker's own `text` wins. */
 	delta: {
@@ -443,25 +343,144 @@ export type PlotStylesConfig = {
 		>;
 	};
 
-	// ── Facet (small multiples) ──────────────────────────────────────────────────
-	facet: {
-		/** Position badge shown in `carousel`/`paginated` facet modes. */
-		indicator: {
-			background: string;
-			color: string;
-			fontSize: string;
-			padding: string;
-			radius: string;
+	/** Default text-marker behavior. */
+	text: {
+		/** Geometry and connector of a decluttered text marker (`declutter`) - e.g. LinePlot's end-of-line value labels. */
+		declutter: {
+			/** Shortest lane's distance (px) from the point before a connector bends. */
+			elbowGap: number;
+			/** Extra distance (px) each further lane sits out from the last. */
+			laneStep: number;
+			/** Clearance (px) between the outermost lane and the label text. */
+			labelGap: number;
+			/** Default connector stroke. */
+			connector: StrokeStyle;
 		};
-		/** Prev/next buttons shown in `paginated` facet mode. */
-		navButton: {
-			background: string;
-			color: string;
-			/** Button diameter (width and height). */
-			size: string;
-			fontSize: string;
-			disabledOpacity: number;
-		};
+	};
+
+	// ── Plot kinds ──────────────────────────────────────────────────────────────
+
+	/** Default area-plot styling. */
+	area: {
+		/** Fill opacity of every area marker that sets none of its own. */
+		fillOpacity: number;
+	};
+
+	/** Default bar-mark styling. */
+	bar: {
+		/** Default gap-fill styling (`BarPlot`'s `styles.gaps`) - the fallback merged under whatever a gap zone's own `style` sets. */
+		gap: AreaStyle;
+		/** Gap (0-1) between the bars of side-by-side series within one category, as a fraction of each bar's slice. */
+		seriesPadding: number;
+		/** Fallback gap (0-1) *between* category groups on BarPlot's own category axis, when a plot doesn't set its own `scales.x/y.paddingInner`. */
+		paddingInner: number;
+		/** Fallback gap (0-1) before the first and after the last category group on BarPlot's own category axis, when a plot doesn't set its own `scales.x/y.paddingOuter`. */
+		paddingOuter: number;
+	};
+
+	/** Default box-plot styling. */
+	box: {
+		/** Fill opacity of every box that sets none of its own. */
+		fillOpacity: number;
+		/** Fallback gap (0-1) between the boxes of neighbouring categories, when a plot doesn't set its own `scales.x/y.paddingInner`. */
+		paddingInner: number;
+		/** Fallback gap (0-1) before the first and after the last box, when a plot doesn't set its own `scales.x/y.paddingOuter`. */
+		paddingOuter: number;
+	};
+
+	/** Default bullet-plot styling: a bar over graded ranges, with a tick at its target. */
+	bullet: {
+		/** The bar's thickness (px) across its category band. */
+		barThickness: number;
+		/** The thickness (px) of the bands that grade the value. */
+		rangeWidth: number;
+		/** The colors of those bands, from the smallest to the largest; the last one repeats if there are more bands. */
+		rangeColors: string[];
+		/** The length (px) and thickness of the target tick. */
+		targetLength: number;
+		targetWidth: number;
+		/** The target tick's color; the axis color when unset. */
+		targetColor?: string;
+		/** Padding between category bands, as fractions (0-1) of a band. */
+		paddingInner: number;
+		paddingOuter: number;
+	};
+
+	/** Default Cleveland-plot styling. */
+	cleveland: DotRangeStyling;
+
+	/** Default density-plot styling. */
+	density: {
+		/** Fill opacity of every area, so a grouped density's curves behind another group's still show. */
+		fillOpacity: number;
+		/** Stroke width of every curve drawn as a line. */
+		strokeWidth: number;
+	};
+
+	/** Default dumbbell-plot styling. */
+	dumbbell: DotRangeStyling;
+
+	/** Default forest-plot styling: the dot is the estimate, the stem its interval. */
+	forest: DotRangeStyling;
+
+	/** Default histogram styling. */
+	histogram: {
+		/** Pixels taken off each side of every bar, so neighbouring bars leave a gap of twice this. */
+		inset: number;
+		/** Fill opacity of every bar, so a grouped histogram's bars behind another group's still show. */
+		fillOpacity: number;
+	};
+
+	/** Default line geometry. */
+	line: {
+		/** Curve of every line that sets none (`styles.curve`, a segment's `curve`): `'auto'` joins the points with straight segments, or along the great circle on a projected map. */
+		curve: CurveName | 'auto';
+		strokeWidth: number;
+		dotRadius: number;
+		/**
+		 * Default gap-fill bridge styling (`LinePlot`'s `styles.gaps`) - the
+		 * fallback merged under whatever a gap zone's own `style` sets, the
+		 * same way `hover.rule`/`hover.dot` back every hover marker's style.
+		 */
+		gap: { stroke: StrokeStyle; dots: DotStyle };
+	};
+
+	/** Default lollipop-plot styling. */
+	lollipop: DotRangeStyling;
+
+	/** Default pyramid-bar styling. */
+	pyramid: {
+		/** Default gap-fill styling (`PyramidPlot`'s `styles.gaps`) - the fallback merged under whatever a gap zone's own `style` sets. */
+		gap: AreaStyle;
+	};
+
+	/** Default scatter point geometry. */
+	scatter: { dotRadius: number };
+
+	/** Default slope-plot styling: a line and a dot per series between the positions of its category axis. */
+	slope: {
+		strokeWidth: number;
+		dotRadius: number;
+		/** Space (0-1, as a fraction of the step between positions) left outside the first and last position; the labels' margins grow beyond it. */
+		padding: number;
+	};
+
+	/** Default sparkline styling: a thin line, and the dot on its last point. */
+	sparkline: {
+		strokeWidth: number;
+		dotRadius: number;
+	};
+
+	/** Default violin-plot styling. */
+	violin: {
+		/** Fill opacity of every violin that sets none of its own. */
+		fillOpacity: number;
+		/** Fallback gap (0-1) between the violins of neighbouring categories, when a plot doesn't set its own `scales.x/y.paddingInner`. */
+		paddingInner: number;
+		/** Fallback gap (0-1) before the first and after the last violin, when a plot doesn't set its own `scales.x/y.paddingOuter`. */
+		paddingOuter: number;
+		/** Width (px) of the box inside each violin. */
+		boxWidth: number;
 	};
 };
 
