@@ -4,8 +4,7 @@ import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import { resolveOpacityScale } from '$lib/utils/opacity';
-import type { ArgentinaProvinceProps } from '../../../../stories/plots/map/geo/data';
-import { ARGENTINA_PROVINCES } from '../../../../stories/plots/map/geo/data';
+import { type ArgentinaProvinceProps, ARGENTINA_PROVINCES } from '$datasets/argentina-provinces';
 import { COUNTRIES_AT_2007 } from '$datasets';
 import { waitForSvg, countCells, countGeoPaths } from '../../plots/_helpers/svg';
 

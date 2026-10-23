@@ -3,7 +3,7 @@ import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import GeoTimelineDemo from './GeoTimelineDemo.svelte';
 import GeoTimelineDemoSource from './GeoTimelineDemo.svelte?raw';
 import { demoSource } from '../../../../common/docsSource';
-import { WORLD_COUNTRIES } from '../data';
+import { WORLD_COUNTRIES } from '$datasets/world-countries';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
 import { gdpPerPerson } from '../channels';
 

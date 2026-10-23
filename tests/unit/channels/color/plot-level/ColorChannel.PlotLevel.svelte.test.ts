@@ -2,8 +2,7 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
-import type { ArgentinaProvinceProps } from '../../../../../stories/plots/map/geo/data';
-import { ARGENTINA_PROVINCES } from '../../../../../stories/plots/map/geo/data';
+import { type ArgentinaProvinceProps, ARGENTINA_PROVINCES } from '$datasets/argentina-provinces';
 import { PENGUIN_COUNTS } from '$datasets';
 import { waitForSvg, countCells, countGeoPaths } from '../../../plots/_helpers/svg';
 

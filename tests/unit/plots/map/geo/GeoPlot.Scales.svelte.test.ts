@@ -2,7 +2,7 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoProjectionName } from '$lib/types/layout/coordinates';
-import { WORLD_COUNTRIES } from '../../../../../stories/plots/map/geo/data';
+import { WORLD_COUNTRIES } from '$datasets/world-countries';
 import { waitForSvg, countGeoPaths } from '../../_helpers/svg';
 
 describe('GeoPlot - projections', () => {

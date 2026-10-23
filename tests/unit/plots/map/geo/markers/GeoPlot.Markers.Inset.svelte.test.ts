@@ -2,10 +2,7 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import {
-	ARGENTINA_PROVINCES,
-	type ArgentinaProvinceProps
-} from '../../../../../../stories/plots/map/geo/data';
+import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '$datasets/argentina-provinces';
 import { waitForSvg } from '../../../_helpers/svg';
 
 function countInsetPaths(svg: SVGElement): number {

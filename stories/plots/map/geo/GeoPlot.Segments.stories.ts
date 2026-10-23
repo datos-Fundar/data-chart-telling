@@ -3,7 +3,7 @@ import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { SegmentsConfig } from '$lib/types/plots/props';
 import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
-import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from './data';
+import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '$datasets/argentina-provinces';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // GeoPlot's `segments` uses the same `Segments`/`Segment` types every other

@@ -2,12 +2,9 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
-import {
-	ARGENTINA_PROVINCES,
-	CABA_COMUNAS,
-	AMBA_PARTIDOS,
-	type ArgentinaProvinceProps
-} from '../data';
+import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '$datasets/argentina-provinces';
+import { CABA_COMUNAS } from '$datasets/caba-comunas';
+import { AMBA_PARTIDOS } from '$datasets/amba-partidos';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `inset` renders a small, independently-projected map panel anchored to a

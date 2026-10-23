@@ -3,7 +3,7 @@
 	import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 	import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 	import { PENGUIN_COUNTS } from '$datasets';
-	import { ARGENTINA_PROVINCES } from '../../../plots/map/geo/data';
+	import { ARGENTINA_PROVINCES } from '$datasets/argentina-provinces';
 	import { provincePopulation } from '../../../plots/map/geo/channels';
 </script>
 

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { WORLD_COUNTRIES } from '../../plots/map/geo/data';
+import { WORLD_COUNTRIES } from '$datasets/world-countries';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import { WEATHER_STATIONS, type WeatherStation, FEMALE_LIFE, type LifeRow } from '$datasets';

@@ -44,6 +44,13 @@
 		"docs",
 		"!docs/images",
 		"examples",
+		"!examples/geo",
+		"!examples/datasets/amba-partidos.ts",
+		"!examples/datasets/argentina-provinces.ts",
+		"!examples/datasets/caba-comunas.ts",
+		"!examples/datasets/usa-country.ts",
+		"!examples/datasets/world-countries.ts",
+		"!examples/datasets/world-countries-topology.ts",
 		"llms.txt",
 		"llms-full.txt"
 	],

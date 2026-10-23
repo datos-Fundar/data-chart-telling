@@ -26,7 +26,7 @@
 
 <script lang="ts">
 	import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
-	import { WORLD_COUNTRIES } from '../data';
+	import { WORLD_COUNTRIES } from '$datasets/world-countries';
 
 	/** `transition.progress` scrubbed from scroll position: settled on scene A, a transition band, then settled on B. */
 	let { width = 940, height = 500 }: { width?: number; height?: number } = $props();

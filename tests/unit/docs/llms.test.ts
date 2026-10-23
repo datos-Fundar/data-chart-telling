@@ -35,8 +35,9 @@ describe('llms.txt', () => {
 	});
 
 	test('lists every example', () => {
+		// `geo` holds the map boundaries the stories draw, left out of the package.
 		const examples = readdirSync(resolve(root, 'examples')).filter(
-			(f) => f !== 'LegendReader.svelte' && f !== 'TooltipCard.svelte'
+			(f) => f !== 'LegendReader.svelte' && f !== 'TooltipCard.svelte' && f !== 'geo'
 		);
 		for (const file of examples) expect(index, file).toContain(`./examples/${file}`);
 	});

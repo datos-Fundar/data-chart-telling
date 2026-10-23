@@ -1,24 +1,27 @@
 <script lang="ts">
 	import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 	import Scrubber from '../../../../common/Scrubber.svelte';
-	import { ARGENTINA_PROVINCES } from '../data';
+	import { ARGENTINA_PROVINCES } from '$datasets/argentina-provinces';
 	import type { GeoFeature } from '$lib/types/plots/data/geo';
 	import { provincePopulation } from '../channels';
-	import { WEATHER_STATIONS } from '$datasets';
+	import { PROVINCE_POPULATION, WEATHER_STATIONS_OVER_TIME } from '$datasets';
 
 	const YEARS = [2010, 2015, 2020, 2025];
 
 	// Long format: each province's geometry repeated once per year, with that
-	// year's (illustrative) population growth in its properties.
-	const PROVINCES_BY_YEAR = YEARS.flatMap((year, i) =>
+	// year's population in its properties.
+	const POPULATION_BY_YEAR = new Map(
+		PROVINCE_POPULATION.filter(({ year }) => YEARS.includes(year)).map(
+			({ province, year, population }) => [`${province}|${year}`, population]
+		)
+	);
+	const PROVINCES_BY_YEAR = YEARS.flatMap((year) =>
 		ARGENTINA_PROVINCES.map((f) => ({
 			...f,
 			properties: {
 				...f.properties!,
 				year,
-				population: Math.round(
-					f.properties!.population * (0.85 + 0.05 * i + 0.01 * (f.properties!.nombre.length % 5))
-				)
+				population: POPULATION_BY_YEAR.get(`${f.properties!.nombre}|${year}`) ?? 0
 			}
 		}))
 	) as GeoFeature<Record<string, unknown>>[];
@@ -33,9 +36,7 @@
 	}
 
 	// Each station's reading per year - a marker's own rows slice by the same field.
-	const READINGS = YEARS.flatMap((year, i) =>
-		WEATHER_STATIONS.map((s, j) => ({ ...s, year, tempC: s.tempC + ((i + j) % 4) - 1 }))
-	);
+	const READINGS = WEATHER_STATIONS_OVER_TIME;
 </script>
 
 <Scrubber initial={0}>

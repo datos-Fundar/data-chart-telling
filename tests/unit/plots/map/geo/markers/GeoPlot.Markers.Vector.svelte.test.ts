@@ -2,7 +2,8 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { WORLD_COUNTRIES, POPULATION_SHIFT } from '../../../../../../stories/plots/map/geo/data';
+import { WORLD_COUNTRIES } from '$datasets/world-countries';
+import { WIND_VECTORS } from '$datasets';
 import { waitForSvg, countVectorMarks } from '../../../_helpers/svg';
 
 describe('GeoPlot - vector marker', () => {
@@ -15,7 +16,7 @@ describe('GeoPlot - vector marker', () => {
 			markers: [
 				{
 					type: 'vector',
-					data: POPULATION_SHIFT,
+					data: WIND_VECTORS,
 					x: 'lon',
 					y: 'lat',
 					length: 'magnitude',
@@ -24,7 +25,7 @@ describe('GeoPlot - vector marker', () => {
 			] satisfies GeoMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
-		expect(countVectorMarks(svg)).toBe(POPULATION_SHIFT.length);
+		expect(countVectorMarks(svg)).toBe(WIND_VECTORS.length);
 	});
 
 	test.each(['arrow', 'spike', 'arrow-filled'] as const)(
@@ -38,7 +39,7 @@ describe('GeoPlot - vector marker', () => {
 				markers: [
 					{
 						type: 'vector',
-						data: POPULATION_SHIFT,
+						data: WIND_VECTORS,
 						x: 'lon',
 						y: 'lat',
 						length: 'magnitude',
@@ -48,7 +49,7 @@ describe('GeoPlot - vector marker', () => {
 				] satisfies GeoMarkersConfig[]
 			});
 			const svg = await waitForSvg(container);
-			expect(countVectorMarks(svg)).toBe(POPULATION_SHIFT.length);
+			expect(countVectorMarks(svg)).toBe(WIND_VECTORS.length);
 		}
 	);
 });

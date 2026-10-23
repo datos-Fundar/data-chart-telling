@@ -20,7 +20,7 @@
 
 <script lang="ts">
 	import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
-	import { WORLD_COUNTRIES } from '../data';
+	import { WORLD_COUNTRIES } from '$datasets/world-countries';
 
 	/** A click swaps `camera.target`; `GeoPlot` auto-plays the move (no `transition.progress`). */
 	let {

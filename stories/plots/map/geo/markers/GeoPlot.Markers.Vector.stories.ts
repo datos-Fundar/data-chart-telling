@@ -1,12 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { WORLD_COUNTRIES, POPULATION_SHIFT } from '../data';
+import { isAntarcticPart, provinceName } from '../../../../common/argentinaMainland';
+import { ARGENTINA_PROVINCES } from '$datasets/argentina-provinces';
+import { WIND_VECTORS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `vector` places arrow/spike shapes at points - mirrors svelteplot's
-// `vector/shift-map` example: one arrow per capital, sized by magnitude and
-// oriented by direction.
+// `vector/shift-map` example: one arrow per city (here, its prevailing wind -
+// see `WIND_VECTORS`), sized by magnitude and oriented by direction.
 
 const meta = {
 	title: 'Plots/Map/GeoPlot/Markers/Vector',
@@ -15,8 +17,11 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: WORLD_COUNTRIES,
-		coordinates: { projection: 'mercator' },
+		data: ARGENTINA_PROVINCES,
+		featureId: provinceName,
+		excludeParts: isAntarcticPart,
+		coordinates: { projection: { type: 'mercator', domain: 'data' } },
+		scales: { length: { range: [10, 70] } },
 		styles: { fill: '#e2e8f0', stroke: '#94a3b8' }
 	},
 	argTypes: {
@@ -41,7 +46,7 @@ export const Basic: Story = {
 		markers: [
 			{
 				type: 'vector',
-				data: POPULATION_SHIFT,
+				data: WIND_VECTORS,
 				x: 'lon',
 				y: 'lat',
 				length: 'magnitude',
@@ -57,7 +62,7 @@ export const OpenArrow: Story = {
 		markers: [
 			{
 				type: 'vector',
-				data: POPULATION_SHIFT,
+				data: WIND_VECTORS,
 				x: 'lon',
 				y: 'lat',
 				length: 'magnitude',
@@ -74,7 +79,7 @@ export const SpikeShape: Story = {
 		markers: [
 			{
 				type: 'vector',
-				data: POPULATION_SHIFT,
+				data: WIND_VECTORS,
 				x: 'lon',
 				y: 'lat',
 				length: 'magnitude',
@@ -93,7 +98,7 @@ export const CustomFilledArrow: Story = {
 		markers: [
 			{
 				type: 'vector',
-				data: POPULATION_SHIFT,
+				data: WIND_VECTORS,
 				x: 'lon',
 				y: 'lat',
 				length: 'magnitude',

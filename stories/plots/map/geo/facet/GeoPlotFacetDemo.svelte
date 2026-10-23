@@ -1,7 +1,7 @@
 <script lang="ts">
 	import FacetLayout from '$lib/layout/facet/FacetLayout.svelte';
 	import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
-	import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '../data';
+	import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '$datasets/argentina-provinces';
 	import type { FacetColumns } from '$lib/types/layout/facet';
 
 	/**

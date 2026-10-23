@@ -3,7 +3,7 @@ import CameraTransitionDemo, { coordinatesForScene } from './CameraTransitionDem
 import CameraScrollDemo, { coordinatesForScroll } from './CameraScrollDemo.svelte';
 import CameraScrubberDemo, { coordinatesForProgress } from './CameraScrubberDemo.svelte';
 import { renderSource } from '../../../../common/docsSource';
-import { WORLD_COUNTRIES } from '../data';
+import { WORLD_COUNTRIES } from '$datasets/world-countries';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `coordinates.camera.transition` animates either auto-played over `duration`

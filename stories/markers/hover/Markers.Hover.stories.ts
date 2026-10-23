@@ -1,10 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import {
-	WORLD_COUNTRIES,
-	ARGENTINA_PROVINCES,
-	type ArgentinaProvinceProps
-} from '../../plots/map/geo/data';
+import { WORLD_COUNTRIES } from '$datasets/world-countries';
+import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '$datasets/argentina-provinces';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { FEMALE_LIFE, MALE_LIFE, LIFE } from '$datasets';

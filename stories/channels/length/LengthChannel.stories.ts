@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { WORLD_COUNTRIES, POPULATION_SHIFT } from '../../plots/map/geo/data';
+import { isAntarcticPart, provinceName } from '../../common/argentinaMainland';
+import { ARGENTINA_PROVINCES } from '$datasets/argentina-provinces';
+import { WIND_VECTORS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `length` sizes every vector by a per-row magnitude - see
@@ -19,13 +21,15 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: WORLD_COUNTRIES,
-		coordinates: { projection: 'mercator' },
+		data: ARGENTINA_PROVINCES,
+		featureId: provinceName,
+		excludeParts: isAntarcticPart,
+		coordinates: { projection: { type: 'mercator', domain: 'data' } },
 		styles: { fill: '#e2e8f0', stroke: '#94a3b8' },
 		markers: [
 			{
 				type: 'vector',
-				data: POPULATION_SHIFT,
+				data: WIND_VECTORS,
 				x: 'lon',
 				y: 'lat',
 				length: 'magnitude',
@@ -47,10 +51,21 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** No `scales.length` - svelteplot's own auto-fit pixel range, sized to the plot's own bounds. */
+/**
+ * `scales.length` maps a magnitude (the `length` field, here wind speed in km/h)
+ * to a vector's length in pixels, linearly. `domain` is the input side: the
+ * `[min, max]` magnitudes. `range` is the output side: the pixel lengths those
+ * two magnitudes get. Left out, the domain is the data's own extent and the
+ * range is svelteplot's auto-fit one, sized to the plot - the fastest wind gets
+ * the longest vector.
+ */
 export const Default: Story = {};
 
-/** `scales.length.range` sets an explicit `[min, max]` pixel length instead of svelteplot's auto-fit. */
+/**
+ * `range` sets the pixel lengths: the smallest magnitude in the domain is drawn
+ * `4` px long and the largest `60` px. The domain is still the data's own, so
+ * only the scale of the drawing changes, not which wind looks strongest.
+ */
 export const CustomRange: Story = {
 	args: {
 		scales: {
@@ -59,11 +74,17 @@ export const CustomRange: Story = {
 	}
 };
 
-/** `scales.length.domain` clamps the input range - rows below/above it render at the domain's own min/max length instead of their real, more extreme magnitude. */
+/**
+ * `domain` sets which magnitudes sit at the two ends of the range. Here `0` km/h
+ * is a zero-length vector and `40` km/h is `60` px, so a length means the same
+ * wind speed in every plot that uses this scale, whatever its own data holds.
+ * A magnitude past the domain is not clipped: it keeps going along the same
+ * line, longer than the range's end.
+ */
 export const CustomDomain: Story = {
 	args: {
 		scales: {
-			length: { domain: [0, 15], range: [4, 40] }
+			length: { domain: [0, 40], range: [0, 60] }
 		}
 	}
 };

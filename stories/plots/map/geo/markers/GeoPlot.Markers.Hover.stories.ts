@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
-import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '../data';
+import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '$datasets/argentina-provinces';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Defaults to `argentinaBicontinental` (see the `Scales`/`Styles` stories)

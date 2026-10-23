@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { CoordinatesConfig } from '$lib/types/layout/coordinates';
-import { WORLD_COUNTRIES } from '../data';
+import { WORLD_COUNTRIES } from '$datasets/world-countries';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `coordinates.camera` is GeoPlot's declarative "current viewpoint": a

@@ -5,11 +5,8 @@ import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import { resolveColorScale } from '$lib/utils/color';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import type { DotMarkerConfig } from '$lib/types/markers/basic';
-import type {
-	ArgentinaProvinceProps,
-	WorldCountryProps
-} from '../../../../../stories/plots/map/geo/data';
-import { ARGENTINA_PROVINCES, WORLD_COUNTRIES } from '../../../../../stories/plots/map/geo/data';
+import { type ArgentinaProvinceProps, ARGENTINA_PROVINCES } from '$datasets/argentina-provinces';
+import { type WorldCountryProps, WORLD_COUNTRIES } from '$datasets/world-countries';
 import { COUNTRIES_AT_2007, WEATHER_STATIONS } from '$datasets';
 import { waitForSvg, countGeoPaths, countDotMarks } from '../../../plots/_helpers/svg';
 

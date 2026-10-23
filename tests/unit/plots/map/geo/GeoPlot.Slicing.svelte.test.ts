@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
-import { ARGENTINA_PROVINCES } from '../../../../../stories/plots/map/geo/data';
+import { ARGENTINA_PROVINCES } from '$datasets/argentina-provinces';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
 
 const NORTH = ['Jujuy', 'Salta', 'Tucumán', 'Catamarca', 'Formosa', 'Chaco', 'Misiones'];

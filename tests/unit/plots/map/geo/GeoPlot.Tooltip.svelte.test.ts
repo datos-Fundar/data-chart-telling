@@ -3,7 +3,7 @@ import { describe, test, expect, vi } from 'vitest';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { ARGENTINA_PROVINCES } from '../../../../../stories/plots/map/geo/data';
+import { ARGENTINA_PROVINCES } from '$datasets/argentina-provinces';
 import { waitForSvg } from '../../_helpers/svg';
 
 const DATA_PROPS = {

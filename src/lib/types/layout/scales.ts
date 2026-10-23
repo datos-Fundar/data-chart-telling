@@ -71,8 +71,9 @@ export type RScaleConfig = {
 
 /** `length` (vector/spike magnitude) config - plot-level only. */
 export type LengthScaleConfig = {
+	/** Magnitudes mapped to the two ends of `range`, e.g. `[0, 40]`; values past them extend the line. Defaults to the data's extent. */
 	domain?: [number, number];
-	/** Pixel length range, e.g. `[0, 60]`. Defaults to svelteplot's own. */
+	/** Pixel lengths of the `domain`'s ends, e.g. `[0, 60]`. Defaults to svelteplot's own. */
 	range?: [number, number];
 };
 

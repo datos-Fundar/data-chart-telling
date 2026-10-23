@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { WORLD_COUNTRIES, FLIGHT_ROUTES } from '../data';
+import { WORLD_COUNTRIES } from '$datasets/world-countries';
+import { FLIGHT_ROUTES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `link` draws connections between point pairs - mirrors svelteplot's

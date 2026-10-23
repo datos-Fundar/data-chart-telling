@@ -20,7 +20,7 @@
 <script lang="ts">
 	import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 	import Scrubber from '../../../../common/Scrubber.svelte';
-	import { WORLD_COUNTRIES } from '../data';
+	import { WORLD_COUNTRIES } from '$datasets/world-countries';
 
 	/** `transition.progress` driven by a range input, standing in for scroll/a timeline/etc. */
 	let { width = 940, height = 500 }: { width?: number; height?: number } = $props();

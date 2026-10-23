@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { WORLD_COUNTRIES, EARTHQUAKES } from '../data';
+import { WORLD_COUNTRIES } from '$datasets/world-countries';
+import { EARTHQUAKES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `graticule` (lon/lat gridlines) and `sphere` (the outer globe outline) are
@@ -115,7 +116,7 @@ export const WithEarthquakeDots: Story = {
 				data: EARTHQUAKES,
 				x: 'lon',
 				y: 'lat',
-				r: (d) => Math.max(3, (d as { magnitude: number }).magnitude * 2),
+				r: (d) => ((d as { magnitude: number }).magnitude - 5.5) * 3,
 				styles: { dotFill: '#dc2626', dotFillOpacity: 0.6, dotStroke: '#7f1d1d' }
 			}
 		] satisfies GeoMarkersConfig[]

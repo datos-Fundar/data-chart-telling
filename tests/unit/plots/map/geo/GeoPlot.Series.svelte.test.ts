@@ -2,7 +2,7 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { Topology } from '$lib/types/plots/data/geo';
-import { ARGENTINA_PROVINCES } from '../../../../../stories/plots/map/geo/data';
+import { ARGENTINA_PROVINCES } from '$datasets/argentina-provinces';
 import { waitForSvg, countGeoPaths } from '../../_helpers/svg';
 
 describe('GeoPlot - data formats', () => {

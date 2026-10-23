@@ -1,5 +1,6 @@
 import type { GeoFeature } from '$lib/types/plots/data/geo';
-import type { ArgentinaProvinceProps, WorldCountryProps } from './data';
+import { type ArgentinaProvinceProps } from '$datasets/argentina-provinces';
+import { type WorldCountryProps } from '$datasets/world-countries';
 
 // Named on purpose: a plot titles its legend with the name of its `color` function.
 // They take a plain `GeoFeature`, so they fit any plot whatever its feature properties.

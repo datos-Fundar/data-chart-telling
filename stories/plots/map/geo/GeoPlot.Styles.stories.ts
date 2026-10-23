@@ -3,7 +3,7 @@ import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoStylesConfig } from '$lib/types/layout/styles';
 import type { CoordinatesConfig } from '$lib/types/layout/coordinates';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
-import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from './data';
+import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '$datasets/argentina-provinces';
 import { provincePopulation } from './channels';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────

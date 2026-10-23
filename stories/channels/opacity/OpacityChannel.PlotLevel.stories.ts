@@ -4,7 +4,7 @@ import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import { renderSource } from '../../common/docsSource';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { PENGUIN_COUNTS, WEATHER_STATIONS } from '$datasets';
-import { WORLD_COUNTRIES } from '../../plots/map/geo/data';
+import { WORLD_COUNTRIES } from '$datasets/world-countries';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `opacity` channel: a plot-level `opacity` accessor plus `scales.opacity`

@@ -4,7 +4,7 @@
 	import { makeColorScale } from '$lib/utils/color';
 	import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 	import TooltipCard from '../../../common/TooltipCard.svelte';
-	import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from './data';
+	import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '$datasets/argentina-provinces';
 	import type { GeoFeature } from '$lib/types/plots/data/geo';
 	import { provincePopulation } from './channels';
 

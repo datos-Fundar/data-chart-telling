@@ -4,7 +4,7 @@ import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { SegmentsConfig } from '$lib/types/plots/props';
 import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
-import { ARGENTINA_PROVINCES } from '../../../../../stories/plots/map/geo/data';
+import { ARGENTINA_PROVINCES } from '$datasets/argentina-provinces';
 import { waitForSvg, countGeoPaths } from '../../_helpers/svg';
 
 const DATA_PROPS = {

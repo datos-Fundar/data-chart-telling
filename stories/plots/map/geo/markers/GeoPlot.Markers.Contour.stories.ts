@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { WORLD_COUNTRIES, WORLD_TEMPERATURE } from '../data';
+import { WORLD_COUNTRIES } from '$datasets/world-countries';
+import { WORLD_TEMPERATURE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `contour` draws marching-squares contour lines/bands from a scalar field -
@@ -45,7 +46,7 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * Scatter-interpolation mode - `data` is a scatter of `x`/`y`/`value` rows
- * (here, a simulated world temperature grid - see `WORLD_TEMPERATURE`); the
+ * (here, the 2025 mean temperature on a world grid - see `WORLD_TEMPERATURE`); the
  * mark spatially interpolates over a grid before running marching squares.
  * `stroke: 'value'` maps each contour level through the plot's color scale.
  */
@@ -58,6 +59,7 @@ export const TemperatureBands: Story = {
 				x: 'lon',
 				y: 'lat',
 				value: 'tempC',
+				blur: 2,
 				thresholds: 9,
 				stroke: 'value',
 				styles: { strokeWidth: 1.5, strokeOpacity: 0.8 }
@@ -72,8 +74,8 @@ export const TemperatureBands: Story = {
  * puts the whole contour under the base map's own stroke-only coastlines
  * instead of over them, so the borders stay crisp on top of the coloring
  * rather than the fill covering them (markers otherwise always draw over
- * the base map, regardless of position in `markers` - see `GeoSphereMarkerConfig.
- * behind`'s doc comment for the same mechanism).
+ * the base map, regardless of position in `markers` - see `GeoSphereMarkerConfig`.
+ * `behind`'s doc comment for the same mechanism).
  */
 export const FilledBands: Story = {
 	args: {
@@ -104,6 +106,7 @@ export const ExplicitThresholds: Story = {
 				x: 'lon',
 				y: 'lat',
 				value: 'tempC',
+				blur: 2,
 				thresholds: [-20, -10, 0, 10, 20, 30],
 				stroke: 'value',
 				styles: { strokeWidth: 2 }

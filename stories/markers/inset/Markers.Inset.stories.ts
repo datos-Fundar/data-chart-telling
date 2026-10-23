@@ -1,13 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import {
-	WORLD_COUNTRIES,
-	type WorldCountryProps,
-	ARGENTINA_PROVINCES,
-	CABA_COMUNAS,
-	AMBA_PARTIDOS,
-	type ArgentinaProvinceProps
-} from '../../plots/map/geo/data';
+import { WORLD_COUNTRIES, type WorldCountryProps } from '$datasets/world-countries';
+import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '$datasets/argentina-provinces';
+import { CABA_COMUNAS } from '$datasets/caba-comunas';
+import { AMBA_PARTIDOS } from '$datasets/amba-partidos';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 

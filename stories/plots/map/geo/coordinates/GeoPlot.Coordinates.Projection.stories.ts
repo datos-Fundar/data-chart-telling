@@ -3,7 +3,9 @@ import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { CoordinatesConfig } from '$lib/types/layout/coordinates';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
-import { WORLD_COUNTRIES, ARGENTINA_PROVINCES, USA_COUNTRY } from '../data';
+import { WORLD_COUNTRIES } from '$datasets/world-countries';
+import { ARGENTINA_PROVINCES } from '$datasets/argentina-provinces';
+import { USA_COUNTRY } from '$datasets/usa-country';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `coordinates.projection` picks the map projection. One story per supported

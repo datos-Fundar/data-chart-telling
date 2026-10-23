@@ -2,12 +2,8 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import RichTooltip from './RichTooltip.svelte';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
-import {
-	ARGENTINA_PROVINCES,
-	CABA_COMUNAS,
-	type ArgentinaProvinceProps,
-	type CabaComunaProps
-} from './data';
+import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '$datasets/argentina-provinces';
+import { CABA_COMUNAS, type CabaComunaProps } from '$datasets/caba-comunas';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
