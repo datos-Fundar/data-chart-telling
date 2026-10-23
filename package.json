@@ -48,6 +48,7 @@
 		"!examples/datasets/amba-partidos.ts",
 		"!examples/datasets/argentina-provinces.ts",
 		"!examples/datasets/caba-comunas.ts",
+		"!examples/datasets/napoleons-rivers.ts",
 		"!examples/datasets/usa-country.ts",
 		"!examples/datasets/world-countries.ts",
 		"!examples/datasets/world-countries-topology.ts",

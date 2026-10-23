@@ -12,6 +12,7 @@ export * from './inflation-by-region';
 export * from './inflation-ranges';
 export * from './iris-flower';
 export * from './life-expectancy';
+export * from './napoleons-march';
 export * from './penguins';
 export * from './population-by-age';
 export * from './population-by-age-with-gaps';

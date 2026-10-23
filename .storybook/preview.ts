@@ -215,7 +215,7 @@ const preview: Preview = {
 					],
 					'Configuration',
 					'Composition',
-					['Chrome', 'Plot', 'PlotComposer']
+					['Chrome', 'PlotComposer', 'Custom Plots']
 				]
 			}
 		}
