@@ -59,6 +59,15 @@ export class LegendChannels {
 		return typeof channel === 'string' ? channel : ChannelName.of(channel, property);
 	}
 
+	/** The domain svelteplot sizes with: the configured one or the values' own, taken down to 0 unless `zero` is off. */
+	static #sizeDomain(
+		scale: { domain?: [number, number]; zero?: boolean } | undefined,
+		values: number[]
+	): [number, number] {
+		const [low, high] = scale?.domain ?? [Math.min(...values), Math.max(...values)];
+		return scale?.zero === false ? [low, high] : [Math.min(0, low), Math.max(0, high)];
+	}
+
 	/** A plot channel's name: its field key, or the name of the function that computes it. */
 	static #sourceTitle(source: unknown, property: string): string | undefined {
 		return typeof source === 'string' ? source : ChannelName.of(source, property);
@@ -252,7 +261,7 @@ export class LegendChannels {
 				type: 'size',
 				channel: 'r',
 				...(typeof source === 'string' ? { title: source } : {}),
-				domain: plot.scales?.r?.domain ?? [0, Math.max(...values)],
+				domain: LegendChannels.#sizeDomain(plot.scales?.r, values),
 				range: plot.scales?.r?.range ?? [0, 10],
 				...(color ? { color } : {}),
 				filled,

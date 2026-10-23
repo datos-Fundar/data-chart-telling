@@ -54,7 +54,7 @@ export const Basic: Story = {
 export const SizedByTemperature: Story = {
 	args: {
 		styles: { fill: '#e2e8f0', stroke: '#94a3b8' },
-		scales: { r: { domain: [5, 25], range: [3, 12] } },
+		scales: { r: { domain: [5, 25], zero: false, range: [3, 12] } },
 		markers: [
 			{
 				type: 'dot',
@@ -77,7 +77,7 @@ export const SizedByTemperature: Story = {
 export const ColoredByTemperature: Story = {
 	args: {
 		styles: { stroke: '#94a3b8' },
-		scales: { r: { domain: [5, 25], range: [3, 12] } },
+		scales: { r: { domain: [5, 25], zero: false, range: [3, 12] } },
 		markers: [
 			{
 				type: 'dot',

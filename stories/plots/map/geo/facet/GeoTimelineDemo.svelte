@@ -50,7 +50,7 @@
 			featureId={(f) => String(f.properties?.nombre)}
 			color={provincePopulation}
 			excludeParts={isAntarcticPart}
-			scales={{ color: { scheme: 'blues' }, r: { domain: [5, 25], range: [3, 12] } }}
+			scales={{ color: { scheme: 'blues' }, r: { domain: [5, 25], zero: false, range: [3, 12] } }}
 			coordinates={{ projection: { type: 'mercator', domain: 'data' } }}
 			markers={[
 				{

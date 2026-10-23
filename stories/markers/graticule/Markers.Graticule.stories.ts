@@ -137,7 +137,7 @@ export const WithEarthquakeDots: GeoPlotStory = {
 	args: {
 		...GEO_PLOT_ARGS,
 		data: WORLD_COUNTRIES,
-		scales: { r: { domain: [6, 9], range: [2, 14] } },
+		scales: { r: { domain: [6, 9], zero: false, range: [2, 14] } },
 		coordinates: {
 			projection: { type: 'orthographic', rotate: [65, 15] },
 			zoom: true,

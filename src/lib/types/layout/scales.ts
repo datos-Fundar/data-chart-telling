@@ -65,6 +65,8 @@ export type ChannelScalesConfig<TChannel extends IndependentChannelName = Indepe
 /** `r` (radius/size) config - plot-level only, consumed via {@link AxisBasedScalesConfig.r}. */
 export type RScaleConfig = {
 	domain?: [number, number];
+	/** Includes 0 in the domain, so a size is proportional to its value. On by default; `false` starts the domain at its lowest value, spreading out values that sit close together. */
+	zero?: boolean;
 	/** Pixel radius range, e.g. `[2, 20]`. Defaults to svelteplot's own. */
 	range?: [number, number];
 };

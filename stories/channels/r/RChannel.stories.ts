@@ -48,11 +48,29 @@ export const CustomRange: Story = {
 	}
 };
 
-/** `scales.r.domain` clamps the input range - countries below/above it render at the domain's own min/max radius instead of their real, more extreme population. */
+/**
+ * `scales.r.domain` sets the two values at the ends of `range`: here `0` is
+ * the smallest radius (3 px) and `200` the largest (20 px). A country past the
+ * domain isn't clipped: it draws larger than the range's end.
+ */
 export const CustomDomain: Story = {
 	args: {
 		scales: {
 			r: { domain: [0, 200], range: [3, 20] }
+		}
+	}
+};
+
+/**
+ * The domain always includes `0` by default, so a radius is proportional to
+ * its value. `zero: false` starts it at the lowest value instead - the
+ * smallest dot takes the range's start - which spreads out values that sit
+ * close together, at the cost of a dot no longer being proportional to its value.
+ */
+export const WithoutZero: Story = {
+	args: {
+		scales: {
+			r: { zero: false, range: [3, 20] }
 		}
 	}
 };

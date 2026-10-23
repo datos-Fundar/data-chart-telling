@@ -6,15 +6,14 @@ export type GeoZoomTransform = { x: number; y: number; k: number };
 
 /**
  * Wires drag-pan + scroll-zoom onto a DOM node via d3-zoom, exposing the
- * resulting transform as reactive Svelte state, applied by the caller as an
- * SVG `<g transform="translate(x,y) scale(k)">` wrapper.
+ * resulting transform as reactive Svelte state, which the caller applies to
+ * the plot's projection (see `ProjectionZoom`).
  *
  * `panEnabled`/`zoomEnabled` gate drag-translate and wheel/pinch-scale
  * independently, as separate `.filter()`s on the same underlying instance.
  *
- * Limitations: hover/tooltip hit-testing doesn't compensate for an active
- * transform. Touch pinch-to-zoom is gated by `panEnabled`, not `zoomEnabled`
- * (d3-zoom can't distinguish a pinch from a one-finger drag until underway).
+ * Touch pinch-to-zoom is gated by `panEnabled`, not `zoomEnabled` (d3-zoom
+ * can't distinguish a pinch from a one-finger drag until underway).
  */
 export function createGeoZoom(args: {
 	panEnabled: () => boolean;

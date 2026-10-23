@@ -95,7 +95,7 @@ export const SphereOutline: Story = {
 export const WithEarthquakeDots: Story = {
 	args: {
 		data: WORLD_COUNTRIES,
-		scales: { r: { domain: [6, 9], range: [2, 14] } },
+		scales: { r: { domain: [6, 8], zero: false, range: [3, 8] } },
 		coordinates: {
 			projection: { type: 'orthographic', rotate: [65, 15] },
 			zoom: true,

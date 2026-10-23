@@ -127,7 +127,7 @@ export const SizedByTemperature: GeoPlotStory = {
 	args: {
 		...GEO_PLOT_ARGS,
 		styles: { fill: '#e2e8f0', stroke: '#94a3b8' },
-		scales: { r: { domain: [5, 25], range: [3, 12] } },
+		scales: { r: { domain: [5, 25], zero: false, range: [3, 12] } },
 		markers: [
 			{
 				type: 'dot',

@@ -11,6 +11,7 @@
 		createCameraRotateTween
 	} from '$lib/layout/coordinates/camera.svelte';
 	import CameraFit from '$lib/layout/coordinates/CameraFit.svelte';
+	import ProjectionZoom from '$lib/layout/coordinates/ProjectionZoom.svelte';
 	import type { CoordinatesConfig } from '$lib/types/layout/coordinates';
 
 	type SveltePlotProps = ComponentProps<typeof Plot>;
@@ -19,8 +20,8 @@
 	 * Resolves the active coordinate system (a `d3-geo` projection) and owns
 	 * `<Plot>` itself, since `projection` must be known before it mounts.
 	 * Also owns pan/zoom/rotate gesture state and the declarative `camera`,
-	 * composed into the `<g>` transform wrapper (and, for `camera`/`rotate`
-	 * on `orthographic`, into the projection's own `rotate`). A no-op for
+	 * applied to the projection's output by `ProjectionZoom` (and, for
+	 * `camera`/`rotate` on `orthographic`, to the projection's own `rotate`). A no-op for
 	 * every plot kind but `GeoPlot`.
 	 */
 	let {
@@ -131,13 +132,17 @@
 	);
 	const rotateOverrideActive = $derived(cameraOrthoRotate != null || rotateEnabled);
 
+	/** Moving the view past the plot's box needs what is outside it drawn too: the frame clip would cut it at the unmoved box, so the plot's own clip does it instead. */
+	const movesView = $derived(zoomEnabled || panEnabled || cameraActive);
+
 	const finalProjection = $derived.by(() => {
-		if (!rotateOverrideActive) return resolvedProjection;
+		if (!rotateOverrideActive && !movesView) return resolvedProjection;
 		return {
 			...(typeof resolvedProjection === 'string'
 				? { type: resolvedProjection }
 				: resolvedProjection),
-			rotate: activeRotate
+			...(rotateOverrideActive ? { rotate: activeRotate } : {}),
+			...(movesView ? { clip: false } : {})
 		};
 	});
 
@@ -180,14 +185,9 @@
 			<clipPath id={clipId}><rect x="0" y="0" {width} {height} /></clipPath>
 		</defs>
 		<g clip-path="url(#{clipId})">
-			<g transform="translate({cameraTransform.x}, {cameraTransform.y}) scale({cameraTransform.k})">
-				<g
-					transform="translate({geoZoom.transform.x}, {geoZoom.transform.y}) scale({geoZoom
-						.transform.k})"
-				>
-					{@render children()}
-				</g>
-			</g>
+			<ProjectionZoom inner={geoZoom.transform} outer={cameraTransform}>
+				{@render children()}
+			</ProjectionZoom>
 		</g>
 	</Plot>
 {/key}
