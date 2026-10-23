@@ -1,8 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
-import type { CountryYearRow } from '$datasets';
-import { COUNTRIES_AT_2007 } from '$datasets';
+import { type CountryYearRow, COUNTRIES_AT_2007 } from '$datasets';
 import { waitForSvg } from '../../_helpers/svg';
 
 function noTooltipDom(container: Element) {

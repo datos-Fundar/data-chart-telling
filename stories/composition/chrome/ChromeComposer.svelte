@@ -27,7 +27,7 @@
 	height={480}
 	title="GDP per capita vs. population"
 	subtitle="Argentina vs Chile, 1987-2007 (index, 1987 = 100)"
-	caption="Source: synthetic demo data."
+	caption="Source: Gapminder."
 	{legend}
 	order={['divider', 'legend', 'caption', 'divider', 'plot', 'divider', 'title', 'subtitle']}
 	layout={{ columns: 2 }}

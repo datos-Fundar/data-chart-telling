@@ -1,8 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import { AGE_SHARES_BY_YEAR } from '$datasets';
-import { HEIGHT_DENSITY, MALE_HEIGHT_DENSITY, type HeightDensity } from '$datasets';
+import {
+	AGE_SHARES_BY_YEAR,
+	HEIGHT_DENSITY,
+	MALE_HEIGHT_DENSITY,
+	type HeightDensity
+} from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Every series gets its own filled area from zero up to its curve. Grouping by

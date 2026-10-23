@@ -2,8 +2,7 @@
 	import PlotComposer from '$lib/layout/composer/PlotComposer.svelte';
 	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
-	import { ARGENTINA_CHILE_TRENDS } from '$datasets';
-	import { AGE_SHARES } from '$datasets';
+	import { ARGENTINA_CHILE_TRENDS, AGE_SHARES } from '$datasets';
 </script>
 
 <PlotComposer

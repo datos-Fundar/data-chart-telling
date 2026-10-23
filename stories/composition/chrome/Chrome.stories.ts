@@ -45,7 +45,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const CAPTION = 'Source: synthetic demo data.';
+const CAPTION = 'Source: Gapminder.';
 
 /**
  * The default order: title and subtitle, a divider, the legend, the plot and

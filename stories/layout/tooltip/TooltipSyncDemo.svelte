@@ -13,10 +13,11 @@
 	import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 	import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 	import type { HoverStrategy } from '$lib/types/layout/hover';
-	import { ARGENTINA_CHILE_TRENDS, type CountryTrendRow } from '$datasets';
 	import {
+		ARGENTINA_CHILE_TRENDS,
 		AGE_GROUPS,
 		AGE_SHARES,
+		type CountryTrendRow,
 		type AgeRow,
 		type AgeShareRow,
 		type PenguinCount

@@ -7,8 +7,9 @@ import FacetSyncBarUnrelatedOrderDemo, {
 	type GroupValue
 } from './FacetSyncBarUnrelatedOrderDemo.svelte';
 import { renderSource } from '../../common/docsSource';
-import { ARGENTINA_CHILE_TRENDS, type CountryTrendRow } from '$datasets';
 import {
+	ARGENTINA_CHILE_TRENDS,
+	type CountryTrendRow,
 	AGE_GROUPS,
 	AGE_SHARES,
 	PENGUIN_COUNTS_BY_SEX,

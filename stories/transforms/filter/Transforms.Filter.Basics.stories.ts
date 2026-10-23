@@ -1,8 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { BUENOS_AIRES_TEMPERATURE, type DailyTemperature } from '$datasets';
-import { HEIGHTS, type HeightRow } from '$datasets';
+import {
+	BUENOS_AIRES_TEMPERATURE,
+	type DailyTemperature,
+	HEIGHTS,
+	type HeightRow
+} from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `filter` transform keeps only the rows its `filter` holds for: a per-row

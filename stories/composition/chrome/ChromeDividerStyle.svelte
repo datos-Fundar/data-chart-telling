@@ -58,7 +58,7 @@
 		height={440}
 		title="GDP per capita vs. population"
 		subtitle="Argentina, 1987-2007 (index, 1987 = 100)"
-		caption="Source: synthetic demo data."
+		caption="Source: Gapminder."
 		legend={[
 			{
 				type: 'discrete',

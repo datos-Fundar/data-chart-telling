@@ -4,8 +4,12 @@
 	import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 	import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 	import { THEMES, type ThemeName } from '$lib/configuration/themes';
-	import { ARGENTINA_CHILE_TRENDS, type CountryTrendRow } from '$datasets';
-	import { PENGUIN_COUNTS, type PenguinSpeciesCount } from '$datasets';
+	import {
+		ARGENTINA_CHILE_TRENDS,
+		type CountryTrendRow,
+		PENGUIN_COUNTS,
+		type PenguinSpeciesCount
+	} from '$datasets';
 
 	let active = $state<ThemeName>('Default');
 

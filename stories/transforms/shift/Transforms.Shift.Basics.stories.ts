@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { BUENOS_AIRES_TEMPERATURE } from '$datasets';
-import { HEIGHTS } from '$datasets';
+import { BUENOS_AIRES_TEMPERATURE, HEIGHTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `shiftX` transform moves every row's `x` by a fixed amount: a number, or a

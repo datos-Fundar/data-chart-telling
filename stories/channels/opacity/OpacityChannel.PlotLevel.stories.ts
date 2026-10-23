@@ -3,9 +3,8 @@ import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import { renderSource } from '../../common/docsSource';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { PENGUIN_COUNTS } from '$datasets';
+import { PENGUIN_COUNTS, WEATHER_STATIONS } from '$datasets';
 import { WORLD_COUNTRIES } from '../../plots/map/geo/data';
-import { WEATHER_STATIONS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `opacity` channel: a plot-level `opacity` accessor plus `scales.opacity`

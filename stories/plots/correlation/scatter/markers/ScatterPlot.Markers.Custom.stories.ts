@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import type { CountryYearRow } from '$datasets';
-import { COUNTRIES_AT_2007 } from '$datasets';
+import { type CountryYearRow, COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 

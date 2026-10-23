@@ -1,10 +1,8 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
-import type { CountryYearRow } from '$datasets';
+import { type CountryYearRow, COUNTRIES_AT_2007 } from '$datasets';
 import { waitForSvg, countDotMarks } from '../../_helpers/svg';
-
-import { COUNTRIES_AT_2007 } from '$datasets';
 
 describe('ScatterPlot - bubble sizing (r)', () => {
 	test('a constant r does not crash and keeps one dot per row', async () => {

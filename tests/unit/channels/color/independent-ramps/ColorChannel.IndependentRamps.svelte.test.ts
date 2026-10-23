@@ -10,9 +10,8 @@ import type {
 	WorldCountryProps
 } from '../../../../../stories/plots/map/geo/data';
 import { ARGENTINA_PROVINCES, WORLD_COUNTRIES } from '../../../../../stories/plots/map/geo/data';
-import { COUNTRIES_AT_2007 } from '$datasets';
+import { COUNTRIES_AT_2007, WEATHER_STATIONS } from '$datasets';
 import { waitForSvg, countGeoPaths, countDotMarks } from '../../../plots/_helpers/svg';
-import { WEATHER_STATIONS } from '$datasets';
 
 function fillsOf(svg: SVGElement, selector: string): string[] {
 	return Array.from(svg.querySelectorAll(selector)).map(
