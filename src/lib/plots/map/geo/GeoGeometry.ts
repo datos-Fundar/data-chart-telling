@@ -65,6 +65,16 @@ export class GeoGeometry {
 		}
 	}
 
+	/** The path between two points that changes longitude and latitude at a steady rate, the short way around: it keeps near its parallels where a great circle bends toward a pole. */
+	static parallelPath(from: LonLat, to: LonLat, steps = 64): LonLat[] {
+		const shift = ((((to[0] - from[0] + 180) % 360) + 360) % 360) - 180;
+		return Array.from({ length: steps + 1 }, (_, index) => {
+			const fraction = index / steps;
+			const lon = ((((from[0] + shift * fraction + 180) % 360) + 360) % 360) - 180;
+			return [lon, from[1] + (to[1] - from[1]) * fraction];
+		});
+	}
+
 	/**
 	 * The great-circle arc between two points, as `steps + 1` points. Drawn
 	 * through `Geo` because svelteplot's `Link` cannot read `x1`/`y1`/`x2`/`y2`

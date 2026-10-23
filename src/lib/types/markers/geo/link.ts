@@ -10,7 +10,9 @@ export type GeoLinkMarkerConfig<TRow extends Record<string, unknown> = Record<st
 	x2: Accessor<TRow, number>;
 	y2: Accessor<TRow, number>;
 	curve?: 'auto' | 'linear';
+	/** Lifts each arc off the map: a fraction of the radius on a globe, of the route's length on a flat map. A lifted arc keeps near its parallels instead of following the great circle. */
 	altitude?: number;
+	/** On a globe with `altitude`: `'ground'` cuts an arc where its ground track passes the horizon, `'globe'` only where the globe covers it. */
 	occlusion?: 'ground' | 'globe';
 	styles?: StrokeStyle;
 };

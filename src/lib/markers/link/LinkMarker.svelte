@@ -120,7 +120,9 @@
 						] as Point,
 						front: true
 					}))
-				: GeoGeometry.greatCircle(from, to, steps).map((point) => place(point));
+				: (altitude > 0 ? GeoGeometry.parallelPath : GeoGeometry.greatCircle)(from, to, steps).map(
+						(point) => place(point)
+					);
 		const chord = start && end ? Math.hypot(end[0] - start[0], end[1] - start[1]) : 0;
 
 		const runs: Point[][] = [];

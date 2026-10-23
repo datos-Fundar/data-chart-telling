@@ -330,3 +330,18 @@ describe('GeoGeometry.greatCircle', () => {
 		]);
 	});
 });
+
+describe('GeoGeometry.parallelPath', () => {
+	test('stays on the parallel between two points on it', () => {
+		const path = GeoGeometry.parallelPath([-70, -33], [151, -33], 10);
+		expect(path).toHaveLength(11);
+		for (const [, lat] of path) expect(lat).toBeCloseTo(-33);
+	});
+
+	test('goes the short way around the antimeridian', () => {
+		const path = GeoGeometry.parallelPath([170, 0], [-170, 10], 2);
+		expect(Math.abs(path[1][0])).toBeCloseTo(180);
+		expect(path[1][1]).toBeCloseTo(5);
+		expect(path[2][0]).toBeCloseTo(-170);
+	});
+});
