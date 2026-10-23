@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
-import { HEIGHT_DENSITY, type HeightDensity } from '../../../data/height-density';
+import { HEIGHT_DENSITY, type HeightDensity } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Hovering an area shows its nearest point's tooltip, through the same

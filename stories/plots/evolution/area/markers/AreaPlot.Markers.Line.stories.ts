@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { HEIGHT_DENSITY } from '../../../../data/height-density';
+import { HEIGHT_DENSITY } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // An AreaPlot's own default areas are the fill. A `line` marker adds a stroke

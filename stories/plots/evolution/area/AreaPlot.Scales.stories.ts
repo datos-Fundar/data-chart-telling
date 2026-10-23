@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import { HEIGHT_DENSITY } from '../../../data/height-density';
+import { HEIGHT_DENSITY } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -58,7 +58,7 @@ export const FixedYDomain: Story = {
 export const FixedXDomain: Story = {
 	args: {
 		scales: {
-			x: { domain: [150, 190] }
+			x: { domain: [140, 175] }
 		} satisfies AxisBasedScalesConfig
 	}
 };

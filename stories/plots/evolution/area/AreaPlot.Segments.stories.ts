@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
 import type { SegmentsConfig } from '$lib/types/plots/props';
 import type { AreaStyle } from '$lib/types/plots/styling';
-import { HEIGHT_DENSITY } from '../../../data/height-density';
+import { HEIGHT_DENSITY } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `segments` restyles part of a series' area: each segment's `areas` selects
@@ -36,11 +36,11 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** Men's tail above 185 cm in a stronger fill - the part of the curve past that height. */
+/** Men's tail above 170 cm in a stronger fill - the part of the curve past that height. */
 export const TailHighlight: Story = {
 	args: {
 		segments: {
-			male: [{ areas: [{ x: { from: 185 } }], styles: { fill: '#dc2626', fillOpacity: 0.6 } }]
+			male: [{ areas: [{ x: { from: 170 } }], styles: { fill: '#dc2626', fillOpacity: 0.6 } }]
 		} satisfies SegmentsConfig<AreaStyle>
 	}
 };
@@ -49,8 +49,8 @@ export const TailHighlight: Story = {
 export const SeriesSpecific: Story = {
 	args: {
 		segments: {
-			male: [{ areas: [{ x: { to: 165 } }], styles: { fill: '#0f766e' } }],
-			female: [{ areas: [{ x: { from: 165 } }], styles: { fill: '#f59e0b' } }]
+			male: [{ areas: [{ x: { to: 155 } }], styles: { fill: '#0f766e' } }],
+			female: [{ areas: [{ x: { from: 155 } }], styles: { fill: '#f59e0b' } }]
 		} satisfies SegmentsConfig<AreaStyle>
 	}
 };

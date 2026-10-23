@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { HEIGHT_DENSITY } from '../../../../data/height-density';
+import { HEIGHT_DENSITY } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `styles.frame` draws a border around the plot's own content, the same as

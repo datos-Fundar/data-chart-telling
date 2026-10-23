@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
 import { AGE_SHARES_BY_YEAR } from '$datasets';
-import { HEIGHT_DENSITY } from '../../../data/height-density';
+import { HEIGHT_DENSITY } from '$datasets';
 import type { LegendSection } from '$lib/types/layout/legend';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────

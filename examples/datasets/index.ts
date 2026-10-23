@@ -2,6 +2,7 @@ export * from './argentina-chile-trends';
 export * from './commodity-prices';
 export * from './countries-over-time';
 export * from './daily-temperature';
+export * from './height-density';
 export * from './heights';
 export * from './inflation-by-region';
 export * from './inflation-ranges';
