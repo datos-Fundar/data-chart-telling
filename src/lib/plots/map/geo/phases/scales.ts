@@ -1,7 +1,7 @@
 import { resolveColorScale } from '$lib/utils/color';
 import { resolveOpacityScale } from '$lib/utils/opacity';
 import { ContinuousDomain } from '$lib/utils/ContinuousDomain';
-import { resolveFeatureScales } from '$lib/plots/utils/geoSegments';
+import { GeoSegments } from '$lib/plots/map/geo/GeoSegments';
 import type { GeoPlotState, GeoPlotCtx } from '$lib/types/plots/map/geo/state';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
 
@@ -9,7 +9,7 @@ import type { GeoFeature } from '$lib/types/plots/data/geo';
  * GeoPlot's "scales" phase: each feature's own resolved color (mirrors
  * HeatmapPlot's own), with a per-feature override for whichever segment
  * (its `grouping` bucket, or itself by id) sets its own `scales.color` -
- * see `resolveFeatureScales`. A segment ramp's domain is built from just
+ * see `GeoSegments.scales`. A segment ramp's domain is built from just
  * the features that share its own key, so e.g. two grouping buckets each
  * get a ramp scaled to their own value range, not the whole dataset's.
  */
@@ -40,7 +40,7 @@ export function buildScales<TProps extends Record<string, unknown>>(
 
 	function segmentColorScaleFor(
 		key: string,
-		segScales: ReturnType<typeof resolveFeatureScales>
+		segScales: ReturnType<typeof GeoSegments.scales>
 	): ((v: number) => string) | null {
 		if (segmentScaleCache.has(key)) return segmentScaleCache.get(key)!;
 		const peers = grouping
@@ -71,7 +71,7 @@ export function buildScales<TProps extends Record<string, unknown>>(
 				if (v == null) return undefined;
 				const groupingValue = grouping?.(f);
 				const featureId = (f as GeoFeature<TProps> & { __id?: string }).__id ?? '';
-				const segScales = resolveFeatureScales(segments, featureId, groupingValue);
+				const segScales = GeoSegments.scales(segments, featureId, groupingValue);
 				if (segScales?.color) {
 					const scale = segmentColorScaleFor(groupingValue ?? featureId, segScales);
 					if (scale) return scale(v);
@@ -85,7 +85,7 @@ export function buildScales<TProps extends Record<string, unknown>>(
 		for (const f of features!) {
 			const featureId = (f as GeoFeature<TProps> & { __id?: string }).__id ?? '';
 			const groupingValue = grouping?.(f);
-			const segScales = resolveFeatureScales(segments, featureId, groupingValue);
+			const segScales = GeoSegments.scales(segments, featureId, groupingValue);
 			if (segScales?.color) segmentColorScaleFor(groupingValue ?? featureId, segScales);
 		}
 	}

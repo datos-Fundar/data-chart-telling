@@ -32,11 +32,11 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** Basic graticule - default 10° step lon/lat gridlines drawn over the base map. */
+/** Basic graticule - default 10° step lon/lat gridlines drawn behind the base map. */
 export const Basic: Story = {
 	args: {
 		data: WORLD_COUNTRIES,
-		markers: [{ type: 'graticule' }] satisfies GeoMarkersConfig[]
+		markers: [{ type: 'graticule', behind: true }] satisfies GeoMarkersConfig[]
 	}
 };
 
@@ -48,6 +48,7 @@ export const CustomStepAndStyle: Story = {
 		markers: [
 			{
 				type: 'graticule',
+				behind: true,
 				step: 20,
 				styles: { stroke: '#94a3b8', strokeOpacity: 0.5, strokeDasharray: '2 2' }
 			}
@@ -80,7 +81,7 @@ export const SphereOutline: Story = {
 				behind: true,
 				styles: { fill: '#eff6ff', stroke: 'currentColor', strokeWidth: 1 }
 			},
-			{ type: 'graticule', styles: { stroke: '#cbd5e1', strokeOpacity: 0.6 } }
+			{ type: 'graticule', behind: true, styles: { stroke: '#cbd5e1', strokeOpacity: 0.6 } }
 		] satisfies GeoMarkersConfig[]
 	}
 };
@@ -106,6 +107,7 @@ export const WithEarthquakeDots: Story = {
 			},
 			{
 				type: 'graticule',
+				behind: true,
 				styles: { stroke: '#e2e8f0' }
 			},
 			{

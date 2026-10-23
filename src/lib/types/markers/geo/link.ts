@@ -1,7 +1,7 @@
 import type { Accessor } from '$lib/types/plots/data/common';
 import type { StrokeStyle } from '$lib/types/plots/styling';
 
-/** Lines between point pairs (svelteplot's `Link`); `curve: 'auto'` traces great-circle arcs. */
+/** Lines between point pairs: `curve: 'auto'` traces great-circle arcs, `'linear'` joins their projected positions with a straight line. */
 export type GeoLinkMarkerConfig<TRow extends Record<string, unknown> = Record<string, unknown>> = {
 	type: 'link';
 	data: TRow[];
@@ -10,5 +10,7 @@ export type GeoLinkMarkerConfig<TRow extends Record<string, unknown> = Record<st
 	x2: Accessor<TRow, number>;
 	y2: Accessor<TRow, number>;
 	curve?: 'auto' | 'linear';
+	altitude?: number;
+	occlusion?: 'ground' | 'globe';
 	styles?: StrokeStyle;
 };

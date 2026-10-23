@@ -2,7 +2,7 @@
 	import { geoPath } from 'd3-geo';
 	import { buildInsetProjection } from './insetProjection';
 	import { insetBox } from './insetLayout';
-	import { filterGeometryParts } from '$lib/plots/utils/geoAccessors';
+	import { GeoGeometry } from '$lib/plots/map/geo/GeoGeometry';
 	import Tooltip from '$lib/layout/tooltip/Tooltip.svelte';
 	import type { GeoInsetMarkerConfig } from '$lib/types/markers/geo';
 	import type { GeoFeature } from '$lib/types/plots/data/geo';
@@ -65,7 +65,7 @@
 			if (!marker.featurePartsFilter) return matched;
 			const partsFilter = marker.featurePartsFilter;
 			return matched.flatMap((f) => {
-				const geometry = filterGeometryParts(f.geometry, (part) => partsFilter(part, f));
+				const geometry = GeoGeometry.filterParts(f.geometry, (part) => partsFilter(part, f));
 				return geometry ? [{ ...f, geometry }] : [];
 			});
 		}

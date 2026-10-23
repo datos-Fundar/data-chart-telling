@@ -1,5 +1,5 @@
 import { LegendState } from '$lib/layout/legend/LegendState.svelte';
-import { resolveFeatureStyle } from '$lib/plots/utils/geoSegments';
+import { GeoSegments } from '$lib/plots/map/geo/GeoSegments';
 import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
 import { DisabledStyle } from '$lib/layout/legend/DisabledStyle';
 import type { MarkerConfig } from '$lib/types/markers/all';
@@ -57,7 +57,7 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 
 	function getFeatureStyle(f: TaggedGeoFeature<TProps>): GeoSegmentStyle {
 		return rangeFilteredStyle(
-			resolveFeatureStyle<GeoSegmentStyle>(segments, f.__id, grouping?.(f)),
+			GeoSegments.style<GeoSegmentStyle>(segments, f.__id, grouping?.(f)),
 			f
 		);
 	}

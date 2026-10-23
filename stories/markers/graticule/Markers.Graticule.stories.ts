@@ -5,7 +5,7 @@ import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `graticule` marker (svelteplot's own `Graticule`) - lon/lat gridlines
-// drawn over the base map. Geo-only, so `GeoPlot` + `WORLD_COUNTRIES` stand
+// drawn over the base map, or behind it with `behind: true`. Geo-only, so `GeoPlot` + `WORLD_COUNTRIES` stand
 // in for the empty canvas the rest of `Markers/*` uses - see
 // the other stories in this file for it paired with `sphere` on an
 // orthographic globe.
@@ -40,7 +40,7 @@ export const Basic: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {
 		...GEO_PLOT_ARGS,
-		markers: [{ type: 'graticule' }] satisfies GeoMarkersConfig[]
+		markers: [{ type: 'graticule', behind: true }] satisfies GeoMarkersConfig[]
 	}
 };
 
@@ -56,6 +56,7 @@ export const CustomStyle: GeoPlotStory = {
 		markers: [
 			{
 				type: 'graticule',
+				behind: true,
 				step: 20,
 				styles: { stroke: '#94a3b8', strokeOpacity: 0.5, strokeDasharray: '2 2' }
 			}
@@ -65,13 +66,13 @@ export const CustomStyle: GeoPlotStory = {
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** Basic graticule - default 10° step lon/lat gridlines drawn over the base map. */
+/** Basic graticule - default 10° step lon/lat gridlines drawn behind the base map. */
 export const GraticuleOnly: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {
 		...GEO_PLOT_ARGS,
 		data: WORLD_COUNTRIES,
-		markers: [{ type: 'graticule' }] satisfies GeoMarkersConfig[]
+		markers: [{ type: 'graticule', behind: true }] satisfies GeoMarkersConfig[]
 	}
 };
 
@@ -85,6 +86,7 @@ export const CustomStepAndStyle: GeoPlotStory = {
 		markers: [
 			{
 				type: 'graticule',
+				behind: true,
 				step: 20,
 				styles: { stroke: '#94a3b8', strokeOpacity: 0.5, strokeDasharray: '2 2' }
 			}
@@ -119,7 +121,7 @@ export const SphereOutline: GeoPlotStory = {
 				behind: true,
 				styles: { fill: '#eff6ff', stroke: 'currentColor', strokeWidth: 1 }
 			},
-			{ type: 'graticule', styles: { stroke: '#cbd5e1', strokeOpacity: 0.6 } }
+			{ type: 'graticule', behind: true, styles: { stroke: '#cbd5e1', strokeOpacity: 0.6 } }
 		] satisfies GeoMarkersConfig[]
 	}
 };
@@ -147,6 +149,7 @@ export const WithEarthquakeDots: GeoPlotStory = {
 			},
 			{
 				type: 'graticule',
+				behind: true,
 				styles: { stroke: '#e2e8f0' }
 			},
 			{

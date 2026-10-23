@@ -1,9 +1,6 @@
 import { resolveAccessor } from '$lib/utils/accessors';
-import {
-	geometryCentroid,
-	filterGeometryParts,
-	defaultFeatureId
-} from '$lib/plots/utils/geoAccessors';
+import { GeoGeometry } from '$lib/plots/map/geo/GeoGeometry';
+import { GeoFeatures } from '$lib/plots/map/geo/GeoFeatures.svelte';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
 import type { GeoPlotState, TaggedGeoFeature } from '$lib/types/plots/map/geo/state';
 
@@ -17,19 +14,19 @@ export function buildData<TProps extends Record<string, unknown>>(
 	const { rawFeatures, featureId, excludeParts } = state;
 	const getFeatureId = featureId
 		? resolveAccessor<GeoFeature<TProps>>(featureId)
-		: defaultFeatureId<TProps>;
+		: GeoFeatures.defaultId<TProps>;
 
 	const allFeatures: TaggedGeoFeature<TProps>[] = rawFeatures.map((f) => {
-		const [cx, cy] = geometryCentroid(f.geometry);
+		const [cx, cy] = GeoGeometry.centroid(f.geometry);
 		return { ...f, __id: getFeatureId(f), __cx: cx, __cy: cy } as TaggedGeoFeature<TProps>;
 	});
 
 	const features: TaggedGeoFeature<TProps>[] = !excludeParts
 		? allFeatures
 		: allFeatures.flatMap((f) => {
-				const geometry = filterGeometryParts(f.geometry, (part) => !excludeParts(part, f));
+				const geometry = GeoGeometry.filterParts(f.geometry, (part) => !excludeParts(part, f));
 				if (!geometry) return [];
-				const [cx, cy] = geometryCentroid(geometry);
+				const [cx, cy] = GeoGeometry.centroid(geometry);
 				return [{ ...f, geometry, __cx: cx, __cy: cy } as TaggedGeoFeature<TProps>];
 			});
 

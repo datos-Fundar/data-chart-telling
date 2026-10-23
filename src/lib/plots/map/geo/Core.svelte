@@ -1,5 +1,5 @@
 <script lang="ts" generics="TProps extends Record<string, unknown>">
-	import { createGeoFeatures } from '$lib/plots/map/geo/features.svelte';
+	import { GeoFeatures } from '$lib/plots/map/geo/GeoFeatures.svelte';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 	import { ChannelName } from '$lib/plots/utils/ChannelName';
@@ -39,7 +39,7 @@
 	const cfg = $derived(getConfiguration());
 
 	// ── Resolve data: GeoJSON is synchronous, TopoJSON is converted async ────
-	const resolved = createGeoFeatures<TProps>(
+	const resolved = new GeoFeatures<TProps>(
 		() => data,
 		() => object
 	);

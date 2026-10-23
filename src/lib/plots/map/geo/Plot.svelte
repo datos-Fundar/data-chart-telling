@@ -4,7 +4,7 @@
 	import { merge } from '$lib/utils/merge';
 	import { buildGeoDefaults } from '$lib/plots/map/geo/defaults';
 	import { buildGeoSlicing } from '$lib/plots/map/geo/slices';
-	import { createGeoFeatures } from '$lib/plots/map/geo/features.svelte';
+	import { GeoFeatures } from '$lib/plots/map/geo/GeoFeatures.svelte';
 	import type { GeoPlotProps, GeoPlotCoreProps } from '$lib/types/plots/map/geo/props';
 	import type { GeoFeature } from '$lib/types/plots/data/geo';
 	import type { GeoScalesConfig } from '$lib/types/layout/coordinates';
@@ -40,7 +40,7 @@
 
 	const sliced = $derived(timeline != null || facet != null);
 	// Only resolved here when slicing; otherwise the core resolves `data` itself.
-	const resolved = createGeoFeatures<TProps>(
+	const resolved = new GeoFeatures<TProps>(
 		() => (sliced ? core.data : []),
 		() => core.object
 	);

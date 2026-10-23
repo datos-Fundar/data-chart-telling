@@ -74,7 +74,7 @@ export const LinearLinks: Story = {
 				x2: 'toLon',
 				y2: 'toLat',
 				curve: 'linear',
-				styles: { stroke: '#0891b2', strokeWidth: 1.5, strokeOpacity: 0.8 }
+				styles: { stroke: '#dc2626', strokeWidth: 1.5, strokeOpacity: 0.8 }
 			}
 		] satisfies GeoMarkersConfig[]
 	}
@@ -93,7 +93,7 @@ export const OnOrthographicGlobe: Story = {
 		coordinates: { projection: { type: 'orthographic', rotate: [60, -10] }, zoom: true },
 		markers: [
 			{ type: 'sphere', behind: true, styles: { fill: '#f8fafc', stroke: 'currentColor' } },
-			{ type: 'graticule', styles: { stroke: '#e2e8f0' } },
+			{ type: 'graticule', behind: true, styles: { stroke: '#e2e8f0' } },
 			{
 				type: 'link',
 				data: FLIGHT_ROUTES,
@@ -101,6 +101,68 @@ export const OnOrthographicGlobe: Story = {
 				y1: 'fromLat',
 				x2: 'toLon',
 				y2: 'toLat',
+				styles: { stroke: '#dc2626', strokeWidth: 1.5 }
+			}
+		] satisfies GeoMarkersConfig[]
+	}
+};
+
+/** `altitude` lifts each arc off the map: on a flat map it bows upward, by a fraction of the distance between the route's ends. */
+export const LiftedLinks: Story = {
+	args: {
+		coordinates: { projection: 'equal-earth' },
+		markers: [
+			{
+				type: 'link',
+				data: FLIGHT_ROUTES,
+				x1: 'fromLon',
+				y1: 'fromLat',
+				x2: 'toLon',
+				y2: 'toLat',
+				altitude: 0.25,
+				styles: { stroke: '#dc2626', strokeWidth: 1.5 }
+			}
+		] satisfies GeoMarkersConfig[]
+	}
+};
+
+/** On a globe `altitude` is a fraction of the radius: the arcs leave the surface at their ends and rise off it in between. */
+export const LiftedOnGlobe: Story = {
+	args: {
+		coordinates: { projection: { type: 'orthographic', rotate: [60, -10] }, rotate: true },
+		markers: [
+			{ type: 'sphere', behind: true, styles: { fill: '#f8fafc', stroke: 'currentColor' } },
+			{ type: 'graticule', behind: true, styles: { stroke: '#e2e8f0' } },
+			{
+				type: 'link',
+				data: FLIGHT_ROUTES,
+				x1: 'fromLon',
+				y1: 'fromLat',
+				x2: 'toLon',
+				y2: 'toLat',
+				altitude: 0.5,
+				styles: { stroke: '#dc2626', strokeWidth: 1.5 }
+			}
+		] satisfies GeoMarkersConfig[]
+	}
+};
+
+/** `occlusion: 'globe'` keeps each arc whole: it disappears only where the globe itself covers it, instead of being cut at the horizon as the globe turns. */
+export const LiftedWholeArcs: Story = {
+	args: {
+		coordinates: { projection: { type: 'orthographic', rotate: [60, -10] }, rotate: true },
+		markers: [
+			{ type: 'sphere', behind: true, styles: { fill: '#f8fafc', stroke: 'currentColor' } },
+			{ type: 'graticule', behind: true, styles: { stroke: '#e2e8f0' } },
+			{
+				type: 'link',
+				data: FLIGHT_ROUTES,
+				x1: 'fromLon',
+				y1: 'fromLat',
+				x2: 'toLon',
+				y2: 'toLat',
+				altitude: 0.25,
+				occlusion: 'globe',
 				styles: { stroke: '#dc2626', strokeWidth: 1.5 }
 			}
 		] satisfies GeoMarkersConfig[]
