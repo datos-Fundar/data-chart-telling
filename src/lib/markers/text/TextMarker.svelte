@@ -34,7 +34,12 @@
 	const text = $derived(marker.text ?? '');
 	const styles = $derived(marker.styles);
 
-	const displayData = $derived(data.length > 0 ? data : [{} as TData]);
+	// A label placed by a literal (or by the frame) draws once without rows; one placed by a field of its rows draws nothing.
+	const placedByRows = (position: unknown) =>
+		['string', 'function', 'symbol'].includes(typeof position);
+	const displayData = $derived(
+		data.length > 0 ? data : placedByRows(x) || placedByRows(y) ? [] : [{} as TData]
+	);
 	// Per-row accessors give literal values; an empty one takes the flat default.
 	const flatFill = $derived(styles?.fill ?? 'currentColor');
 	const fill = $derived.by(() => {
@@ -50,14 +55,29 @@
 	const fontWeight = $derived(styles?.fontWeight ?? 'normal');
 	const fontStyleProp = $derived(styles?.fontStyle ?? 'normal');
 	// An unresolved `'outside'` falls back to `'start'`.
-	const textAnchor = $derived<Exclude<TextAnchor, 'outside'>>(
-		styles?.textAnchor === 'outside' ? 'start' : (styles?.textAnchor ?? 'middle')
+	const anchorOf = (anchor: TextAnchor | undefined): Exclude<TextAnchor, 'outside'> =>
+		anchor === 'outside' ? 'start' : (anchor ?? 'middle');
+	const textAnchor = $derived(
+		anchorOf(
+			typeof marker.textAnchor === 'function'
+				? undefined
+				: (marker.textAnchor ?? styles?.textAnchor)
+		)
 	);
 	const lineAnchor = $derived(styles?.lineAnchor ?? 'middle');
 	// A label in a slice of its band sits off the band's middle, at its drawn width.
 	const nudge = $derived(BandNudge.of(plot.scales, marker.bandSlice));
-	const dx = $derived((styles?.dx ?? 0) + nudge.dx);
-	const dy = $derived((styles?.dy ?? 0) + nudge.dy);
+	// A per-row offset or anchor (a function of the row) is read where each label is drawn.
+	const staticOffset = (own: number | ((d: never) => number) | undefined, style = 0) =>
+		typeof own === 'function' ? 0 : (own ?? style);
+	const dx = $derived(staticOffset(marker.dx, styles?.dx) + nudge.dx);
+	const dy = $derived(staticOffset(marker.dy, styles?.dy) + nudge.dy);
+	const dxOf = (d: TData) => (typeof marker.dx === 'function' ? marker.dx(d) + nudge.dx : dx);
+	const dyOf = (d: TData) => (typeof marker.dy === 'function' ? marker.dy(d) + nudge.dy : dy);
+	const anchorAt = (d: TData) =>
+		typeof marker.textAnchor === 'function' ? anchorOf(marker.textAnchor(d)) : textAnchor;
+	// Under a map projection svelteplot ignores a label's `dx`/`dy`, so the offset is a translate of the label.
+	const projected = $derived(!!plot.scales.projection);
 
 	const declutter = $derived.by(() => {
 		if (!marker.declutter) return undefined;
@@ -73,7 +93,13 @@
 		};
 	});
 	const perRow = $derived(
-		!!declutter || !!marker.edgeAware || !!marker.onPointerEnter || !!marker.onPointerLeave
+		!!declutter ||
+			!!marker.edgeAware ||
+			!!marker.onPointerEnter ||
+			!!marker.onPointerLeave ||
+			typeof marker.dx === 'function' ||
+			typeof marker.dy === 'function' ||
+			typeof marker.textAnchor === 'function'
 	);
 	const dir = $derived(Math.sign(dx) || 1);
 
@@ -165,29 +191,31 @@
 	rowAnchor: typeof textAnchor,
 	rowLineAnchor: typeof lineAnchor
 )}
-	<Text
-		data={rows}
-		x={x ?? (marker.frameAnchor ? undefined : 0)}
-		y={y ?? (marker.frameAnchor ? undefined : 0)}
-		frameAnchor={marker.frameAnchor}
-		text={text ?? ''}
-		dx={rowDx}
-		dy={rowDy}
-		fill={fill as never}
-		fillOpacity={fillOpacity as never}
-		{fontSize}
-		{fontWeight}
-		textAnchor={rowAnchor}
-		lineAnchor={rowLineAnchor}
-		fontStyle={fontStyleProp}
-		lineHeight={styles?.lineHeight}
-		rotate={styles?.rotate}
-		stroke={styles?.stroke}
-		strokeWidth={styles?.strokeWidth}
-		paintOrder={styles?.paintOrder}
-		class={styles?.class}
-		textClass={styles?.textClass}
-	/>
+	<g transform={projected ? `translate(${rowDx},${rowDy})` : undefined}>
+		<Text
+			data={rows}
+			x={x ?? (marker.frameAnchor ? undefined : 0)}
+			y={y ?? (marker.frameAnchor ? undefined : 0)}
+			frameAnchor={marker.frameAnchor}
+			text={text ?? ''}
+			dx={projected ? 0 : rowDx}
+			dy={projected ? 0 : rowDy}
+			fill={fill as never}
+			fillOpacity={fillOpacity as never}
+			{fontSize}
+			{fontWeight}
+			textAnchor={rowAnchor}
+			lineAnchor={rowLineAnchor}
+			fontStyle={fontStyleProp}
+			lineHeight={styles?.lineHeight}
+			rotate={styles?.rotate}
+			stroke={styles?.stroke}
+			strokeWidth={styles?.strokeWidth}
+			paintOrder={styles?.paintOrder}
+			class={styles?.class}
+			textClass={styles?.textClass}
+		/>
+	</g>
 {/snippet}
 
 {#snippet labels()}
@@ -200,7 +228,7 @@
 			{@const placement = placements?.[i]}
 			{@const extraDy = lane?.extraDy ?? 0}
 			{@const laneDir = lane?.aligned ? lane.dir : dir}
-			{@const labelDx = lane?.aligned ? laneDir * lane.reach : dx}
+			{@const labelDx = lane?.aligned ? laneDir * lane.reach : dxOf(d)}
 			{#if declutter && points && (lane?.aligned || extraDy !== 0)}
 				{@const { px, py } = points[i]}
 				{@const laneX = lane?.aligned ? px + laneDir * lane.laneReach : px + labelDx}
@@ -234,8 +262,8 @@
 					{@render label(
 						[d],
 						labelDx,
-						dy + extraDy,
-						lane?.aligned && laneDir !== dir ? flipAnchor(textAnchor) : textAnchor,
+						dyOf(d) + extraDy,
+						lane?.aligned && laneDir !== dir ? flipAnchor(anchorAt(d)) : anchorAt(d),
 						lineAnchor
 					)}
 				{/if}

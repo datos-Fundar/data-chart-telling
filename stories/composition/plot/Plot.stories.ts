@@ -3,12 +3,14 @@ import Interchange from './Interchange.svelte';
 import MinardMapDemo from './MinardMapDemo.svelte';
 import MinardRainDemo from './MinardRainDemo.svelte';
 import MinardPlot from './MinardPlot.svelte';
+import MinardNative from './MinardNative.svelte';
 import InterchangeSource from './Interchange.svelte?raw';
 import MinardMapDemoSource from './MinardMapDemo.svelte?raw';
 import MinardMapSource from './MinardMap.svelte?raw';
 import MinardRainDemoSource from './MinardRainDemo.svelte?raw';
 import MinardRainSource from './MinardRain.svelte?raw';
 import MinardPlotSource from './MinardPlot.svelte?raw';
+import MinardNativeSource from './MinardNative.svelte?raw';
 import { demoSource } from '../../common/docsSource';
 
 /**
@@ -72,4 +74,15 @@ export const GradientLine: Story = {
 export const MinardFigure: Story = {
 	render: () => ({ Component: MinardPlot }),
 	parameters: demoSource(MinardPlotSource)
+};
+
+/**
+ * Minard's figure again, with this package's own plots and markers instead of
+ * hand-assembled svelteplot: a `GeoPlot` (`trail`, `line`, `dot` and `text`
+ * markers) over a `LinePlot`, one composer timeline. Compare with
+ * `MinardFigure` to see what the markers reach on their own.
+ */
+export const MinardNativePlots: Story = {
+	render: () => ({ Component: MinardNative }),
+	parameters: demoSource(MinardNativeSource)
 };

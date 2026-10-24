@@ -1,50 +1,10 @@
-<script module lang="ts">
-	import type { Margins as MarginsType } from '$lib/layout/margins/Margins';
-	import type { EdgeBox } from '$lib/types/layout/box';
-	import type { StylesLayoutConfig } from '$lib/types/layout/styles';
-	import type { HoverPosition } from '$lib/types/phases';
-	import type { HoverConfig as PlotHoverConfig } from '$lib/types/plots/props';
-
-	/**
-	 * What `BasePlotLayout` draws from: the end of a plot's pipeline. An axis
-	 * kind's state is one as is; GeoPlot builds its own.
-	 */
-	export type PlotLayoutState = {
-		/** What the pointer can match, and how the hover reads. */
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		hover?: PlotHoverConfig<any>;
-		/** Where each row sits, for hover matching and the plot's scales. */
-		hoverPosition?: HoverPosition;
-		/** The rows the plot draws and hovers over. */
-		hoverRows?: unknown[];
-		/** The plot's x/y/r/length scales, and the scales a marker without its own inherits. */
-		scales?: object;
-		/** The axes whose domain the plot kind fit itself rather than the author pinned. */
-		fittedAxes?: string[];
-		/** What the plot's position channels are and which way it runs, for what draws inside it. */
-		axes?: PlotAxes;
-		/** Every marker the pipeline resolved. */
-		markers?: object[];
-		/** All resolved series - axis kinds only. */
-		resolvedSeries?: object[];
-		/** Each series' color, by name - axis kinds only. */
-		colorForSeries?: (name: string) => string;
-		/** Per-series marker groups - axis kinds only. */
-		scopedGroups?: object[];
-		/** The plot's `styles`: its frame and, on a map, its tile layer. */
-		styles?: StylesLayoutConfig;
-		/** What an `'auto'` margin side reads as. Defaults to {@link Margins.AXIS_ESTIMATE}. */
-		marginEstimate?: MarginsType;
-		/** The plot's value labels, whose `reach` is the room the margins start from. */
-		valueLabels?: { reach: EdgeBox[] };
-	};
-</script>
-
 <script
 	lang="ts"
 	generics="TData extends Record<string, unknown>, TSeries extends Record<string, unknown> = TData"
 >
 	import { Margins } from '$lib/layout/margins/Margins';
+	import type { AxisScale } from '$lib/types/layout/scales';
+	import type { PlotLayoutState } from '$lib/types/layout/plot';
 	import { PlotMargins } from '$lib/layout/margins/PlotMargins.svelte';
 	import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 	import { onDestroy, untrack } from 'svelte';
@@ -62,7 +22,6 @@
 	import { PlotHover } from '$lib/layout/hover/PlotHover.svelte';
 	import { PlotContext } from '$lib/layout/plot/PlotContext';
 	import { TimelineState } from '$lib/layout/timeline/TimelineState.svelte';
-	import type { PlotAxes } from '$lib/phases/data/PlotAxes';
 	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 	import type { AxisValue } from '$lib/types/layout/mapping';
 	import type { CoordinatesConfig, GeoScalesConfig } from '$lib/types/layout/coordinates';
@@ -268,16 +227,33 @@
 	/** The domains `ScalesLayout` widens an axis to, for an edge tick's `'extend'` (see `EdgeTicks`). */
 	const edgeDomains = new SvelteMap<'x' | 'y', [number, number]>();
 
+	/** The title svelteplot would infer from rows, for a slice with none (it infers nothing then). */
+	function titleOfEmpty(axis: 'x' | 'y', scale: AxisScale<TData> | undefined): string | undefined {
+		const field = state.channels?.[axis]?.source;
+		if (data.length > 0 || typeof field !== 'string' || scale?.label !== undefined)
+			return undefined;
+		if (scale?.type === 'time' || scale?.type === 'utc') return undefined;
+		// `ScalesLayout` draws a vertical title.
+		if (scale?.labelOrientation === 'vertical') return undefined;
+		if (axis === 'y') return `${scale?.reverse ? '↓' : '↑'} ${field}`;
+		if (state.axes?.isDiscrete('x')) return field;
+		return scale?.reverse ? `← ${field}` : `${field} →`;
+	}
+
 	// `SveltePlotScale.build` already left only svelteplot's own scale options.
 	const resolvedX = $derived.by(() => {
 		const built = SveltePlotScale.build(layoutScales?.x, data, getX);
 		const domain = edgeDomains.get('x');
-		return (domain ? { ...built, domain, nice: false } : built) as SveltePlotProps['x'];
+		const label = titleOfEmpty('x', layoutScales?.x);
+		const out = domain ? { ...built, domain, nice: false } : built;
+		return (label ? { ...out, label } : out) as SveltePlotProps['x'];
 	});
 	const resolvedY = $derived.by(() => {
 		const built = SveltePlotScale.build(scales?.y, data, getY);
 		const domain = edgeDomains.get('y');
-		return (domain ? { ...built, domain, nice: false } : built) as SveltePlotProps['y'];
+		const label = titleOfEmpty('y', scales?.y);
+		const out = domain ? { ...built, domain, nice: false } : built;
+		return (label ? { ...out, label } : out) as SveltePlotProps['y'];
 	});
 	/** Threaded straight into svelteplot's own `r` scale option - see `RScaleConfig`'s own doc comment for why this isn't independently resolved like `color`. */
 	const resolvedR = $derived(scales?.r as SveltePlotProps['r']);
@@ -352,7 +328,7 @@
 				scales={layoutScales}
 				{edgeDomains}
 				{tickValues}
-				fittedAxes={state.fittedAxes}
+				{state}
 			/>
 		{/if}
 		<GeometryLayout

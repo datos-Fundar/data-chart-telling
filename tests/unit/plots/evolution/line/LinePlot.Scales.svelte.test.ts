@@ -107,6 +107,39 @@ describe('LinePlot - scales', () => {
 		expect(svg.querySelectorAll('g.grid-y line').length).toBe(0);
 	});
 
+	test('a plot with no rows keeps the axis titles its rows would have given', async () => {
+		const { container } = await render(LinePlot, {
+			width: 400,
+			height: 300,
+			data: [] as { year: number; value: number }[],
+			x: 'year',
+			y: 'value',
+			scales: { x: { domain: [1990, 2000] }, y: { domain: [0, 10] } }
+		});
+		const svg = await waitForSvg(container);
+		expect(svg.querySelector('.axis-y-title')?.textContent).toContain('value');
+		expect(svg.querySelector('.axis-x-title')?.textContent).toContain('year');
+	});
+
+	test('a plot with no rows still titles its vertical y axis, once', async () => {
+		const { container } = await render(LinePlot, {
+			width: 400,
+			height: 300,
+			data: [] as { year: number; value: number }[],
+			x: 'year',
+			y: 'value',
+			scales: {
+				x: { domain: [1990, 2000] },
+				y: { domain: [0, 10], labelOrientation: 'vertical' }
+			},
+			margins: { left: 60 }
+		});
+		const svg = await waitForSvg(container);
+		expect(svg.querySelector('.axis-y-title')).toBeFalsy();
+		const titles = [...svg.querySelectorAll('text')].filter((t) => t.textContent === 'value');
+		expect(titles.length).toBe(1);
+	});
+
 	test("a vertical custom y label suppresses svelteplot's own native title, instead of both rendering", async () => {
 		const { container } = await render(LinePlot, {
 			width: 400,

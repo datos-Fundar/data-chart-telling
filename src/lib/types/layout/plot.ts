@@ -1,7 +1,16 @@
 import type { Snippet } from 'svelte';
 import type { TimeValue } from '$lib/types/layout/timeline';
 import type { GridPlacement } from '$lib/types/layout/grid';
-import type { MarginConfig, TooltipConfig } from '$lib/types/plots/props';
+import type {
+	MarginConfig,
+	TooltipConfig,
+	HoverConfig as PlotHoverConfig
+} from '$lib/types/plots/props';
+import type { Margins as MarginsType } from '$lib/layout/margins/Margins';
+import type { EdgeBox } from '$lib/types/layout/box';
+import type { StylesLayoutConfig } from '$lib/types/layout/styles';
+import type { HoverPosition } from '$lib/types/phases';
+import type { PlotAxes } from '$lib/phases/data/PlotAxes';
 
 /** Where one cell sits among the slices: the timeline step and the facet it shows. */
 export type SlicePlace = {
@@ -41,4 +50,40 @@ export type PlotCoreBase = GridPlacement & {
 	markers?: { type: string }[];
 	scales?: object;
 	margins?: MarginConfig;
+};
+
+/**
+ * What `BasePlotLayout` draws from: the end of a plot's pipeline. An axis
+ * kind's state is one as is; GeoPlot builds its own.
+ */
+export type PlotLayoutState = {
+	/** What the pointer can match, and how the hover reads. */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	hover?: PlotHoverConfig<any>;
+	/** Where each row sits, for hover matching and the plot's scales. */
+	hoverPosition?: HoverPosition;
+	/** The rows the plot draws and hovers over. */
+	hoverRows?: unknown[];
+	/** The plot's x/y/r/length scales, and the scales a marker without its own inherits. */
+	scales?: object;
+	/** The axes whose domain the plot kind fit itself rather than the author pinned. */
+	fittedAxes?: string[];
+	/** What the plot's position channels are and which way it runs, for what draws inside it. */
+	axes?: PlotAxes;
+	/** The plot's channels as given, whose field titles an axis with no rows. */
+	channels?: Record<string, { source?: unknown } | undefined>;
+	/** Every marker the pipeline resolved. */
+	markers?: object[];
+	/** All resolved series - axis kinds only. */
+	resolvedSeries?: object[];
+	/** Each series' color, by name - axis kinds only. */
+	colorForSeries?: (name: string) => string;
+	/** Per-series marker groups - axis kinds only. */
+	scopedGroups?: object[];
+	/** The plot's `styles`: its frame and, on a map, its tile layer. */
+	styles?: StylesLayoutConfig;
+	/** What an `'auto'` margin side reads as. Defaults to {@link Margins.AXIS_ESTIMATE}. */
+	marginEstimate?: MarginsType;
+	/** The plot's value labels, whose `reach` is the room the margins start from. */
+	valueLabels?: { reach: EdgeBox[] };
 };

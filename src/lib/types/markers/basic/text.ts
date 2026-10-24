@@ -2,6 +2,7 @@ import type { FontStyle, StrokeStyle } from '$lib/types/plots/styling';
 import type { CommonMarkerConfig } from '$lib/types/markers/channels/commonMarkerConfig';
 import type { Margins } from '$lib/layout/margins/Margins';
 import type { BandSlice } from '$lib/types/layout/hover';
+import type { TextAnchor } from '$lib/types/plots/constants';
 
 /**
  * Spreads labels that would overlap apart vertically, all reaching out to one
@@ -29,6 +30,15 @@ export type TextMarkerConfig = {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	text: string | ((d: any) => string);
 	styles?: FontStyle;
+	/** The label's offset from its point, in pixels: a number, or a function of the row. Wins over `styles.dx`. Also applies on a map, where svelteplot itself would ignore it. */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	dx?: number | ((d: any) => number);
+	/** The label's vertical offset from its point, in pixels: a number, or a function of the row. Wins over `styles.dy`. */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	dy?: number | ((d: any) => number);
+	/** Which side of its point the text sits on: a value, or a function of the row. Wins over `styles.textAnchor`. */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	textAnchor?: TextAnchor | ((d: any) => TextAnchor);
 	/** Per-row fill, over `styles.fill`. */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	fill?: string | ((d: any) => string | undefined);

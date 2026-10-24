@@ -46,6 +46,36 @@ describe('GeoPlot - custom component marker', () => {
 		expect(countTextLabels(svg)).toBe(WEATHER_STATIONS.length);
 	});
 
+	test('offsets each text label by its own dx/dy under a projection', async () => {
+		const rows = [
+			{ name: 'above', dy: -20 },
+			{ name: 'below', dy: 20 }
+		];
+		const { container } = render(GeoPlot, {
+			width: 400,
+			height: 300,
+			data: WORLD_COUNTRIES,
+			coordinates: { projection: 'mercator' },
+			markers: [
+				{
+					type: 'text',
+					data: rows,
+					x: () => 0,
+					y: () => 0,
+					text: 'name',
+					dx: 10,
+					dy: (d: { dy: number }) => d.dy
+				}
+			] satisfies GeoMarkersConfig[]
+		});
+		const svg = await waitForSvg(container);
+		const label = (name: string) =>
+			Array.from(svg.querySelectorAll('text')).find((el) => el.textContent?.trim() === name)!;
+		const above = label('above').getBoundingClientRect();
+		const below = label('below').getBoundingClientRect();
+		expect(below.top - above.top).toBeCloseTo(40, 0);
+	});
+
 	test('falls back to the base map features when no `data` override is given', async () => {
 		const { container } = render(GeoPlot, {
 			width: 400,

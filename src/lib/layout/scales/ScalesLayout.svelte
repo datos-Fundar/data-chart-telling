@@ -9,6 +9,7 @@
 	import { DISCRETE_SCALE_TYPES } from '$lib/types/layout/scales';
 	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 	import type { AxisValue } from '$lib/types/layout/mapping';
+	import type { PlotLayoutState } from '$lib/types/layout/plot';
 
 	/** Axis ticks, titles and grid lines for the plot kinds with an x/y axis pair. */
 	let {
@@ -21,7 +22,7 @@
 		scales,
 		edgeDomains = undefined,
 		tickValues = undefined,
-		fittedAxes = undefined
+		state
 	}: {
 		data: TData[];
 		getX: (d: TData) => AxisValue;
@@ -37,9 +38,15 @@
 		edgeDomains?: Map<'x' | 'y', [number, number]>;
 		/** The labels a category axis writes, when it leaves some out for want of room. */
 		tickValues?: Partial<Record<'x' | 'y', string[]>>;
-		/** The axes whose domain the plot kind fit itself, which the author did not pin. */
-		fittedAxes?: string[];
+		/** The plot's state: its fitted axes and the y channel's field, which titles a vertical y axis with no rows. */
+		state: Pick<PlotLayoutState, 'fittedAxes' | 'channels'>;
 	} = $props();
+
+	const fittedAxes = $derived(state.fittedAxes);
+	const yField = $derived.by(() => {
+		const source = state.channels?.y?.source;
+		return typeof source === 'string' ? source : undefined;
+	});
 
 	const cfg = $derived(getConfiguration());
 	const plot = usePlot().svelteplot;
@@ -201,7 +208,8 @@
 	 */
 	const verticalYLabel = $derived.by(() => {
 		if (scales?.y?.labelOrientation !== 'vertical' || scales.y.label === false) return null;
-		const text = scales.y.label || plot.scales.y.autoTitle;
+		const text =
+			scales.y.label || plot.scales.y.autoTitle || (data.length === 0 ? yField : undefined);
 		if (!text) return null;
 		const position = scales.y.labelPosition ?? 'middle';
 		const x = yTitleFontSize;
