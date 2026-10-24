@@ -51,6 +51,7 @@ Markers draw in array order. Type a markers array with `satisfies AxisBasedMarke
 | `scales`                   | The marker's own `color`/`opacity`/`symbol` scales, independent of the plot's                                                                                                                   |
 | `transforms`, `statistics` | Derive rows for this marker ([Transforms](transforms-and-statistics.md))                                                                                                                        |
 | `clip`                     | Clip to the plot's frame                                                                                                                                                                        |
+| `dx`, `dy`                 | Move the marker this many pixels right and down, on a map too. A `dot`, `text` or `image` marker also takes a function of the row, to move each row on its own: `dy: (row) => row.side * 15`    |
 | `legend`                   | Name the marker on the automatic [legend](legend.md)                                                                                                                                            |
 
 Many markers also take channel fields (`color`, `fill`, `opacity`, `r`, `symbol`, `weight`, `x1`/`x2`/`y1`/`y2`) and a `styles` object (`StrokeStyle`, `AreaStyle`, `DotStyle` or `FontStyle` depending on the mark).

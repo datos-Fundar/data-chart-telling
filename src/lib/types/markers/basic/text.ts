@@ -1,5 +1,6 @@
 import type { FontStyle, StrokeStyle } from '$lib/types/plots/styling';
 import type { CommonMarkerConfig } from '$lib/types/markers/channels/commonMarkerConfig';
+import type { CommonMarkerConfigWithRowOffset } from '$lib/types/markers/channels/commonMarkerConfigWithRowOffset';
 import type { Margins } from '$lib/layout/margins/Margins';
 import type { BandSlice } from '$lib/types/layout/hover';
 import type { TextAnchor } from '$lib/types/plots/constants';
@@ -25,58 +26,54 @@ export type TextDeclutterConfig = {
 };
 
 /** A text label per row (svelteplot's `Text`), usable on any plot kind. */
-export type TextMarkerConfig = {
-	type: 'text';
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	text: string | ((d: any) => string);
-	styles?: FontStyle;
-	/** The label's offset from its point, in pixels: a number, or a function of the row. Wins over `styles.dx`. Also applies on a map, where svelteplot itself would ignore it. */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	dx?: number | ((d: any) => number);
-	/** The label's vertical offset from its point, in pixels: a number, or a function of the row. Wins over `styles.dy`. */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	dy?: number | ((d: any) => number);
-	/** Which side of its point the text sits on: a value, or a function of the row. Wins over `styles.textAnchor`. */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	textAnchor?: TextAnchor | ((d: any) => TextAnchor);
-	/** Per-row fill, over `styles.fill`. */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	fill?: string | ((d: any) => string | undefined);
-	/** Per-row fill opacity. */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	fillOpacity?: number | ((d: any) => number | undefined);
-	/** Spreads overlapping labels apart - see {@link TextDeclutterConfig}. `true` takes every default. */
-	declutter?: boolean | TextDeclutterConfig;
-	/**
-	 * Flips each label to the other side of its point (or nudges a centred one
-	 * back in) where its text would cross the plot's edge. `styles.textAnchor`/
-	 * `lineAnchor` are the preferred sides, `styles.dx`/`dy` the gap from the point.
-	 */
-	edgeAware?: boolean;
-	/** The slice of its category band each label sits in (a grouped bar's series); it is drawn off the band's middle, whatever the band's width. */
-	bandSlice?: BandSlice;
-	/** Where, in the plot's frame, a label sits on an axis it sets no position for: `{ type: 'text', x: 5, frameAnchor: 'top' }` is at the frame's top edge. */
-	frameAnchor?:
-		| 'top'
-		| 'bottom'
-		| 'left'
-		| 'right'
-		| 'top-left'
-		| 'top-right'
-		| 'bottom-left'
-		| 'bottom-right'
-		| 'middle';
-	/** Grows the plot's margins, on every side the author left open, so the labels fit. */
-	fitMargins?: boolean;
-	/** Reports how far the rendered labels reach past the plot's content box, in pixels, on each side. */
-	onOverflow?: (overflow: Margins) => void;
-	/** Fired when the pointer enters a row's label. */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	onPointerEnter?: (d: any) => void;
-	/** Fired when the pointer leaves a row's label. */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	onPointerLeave?: (d: any) => void;
-} & CommonMarkerConfig;
+export type TextMarkerConfig = CommonMarkerConfigWithRowOffset<
+	{
+		type: 'text';
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		text: string | ((d: any) => string);
+		styles?: FontStyle;
+		/** Which side of its point the text sits on: a value, or a function of the row. Wins over `styles.textAnchor`. */
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		textAnchor?: TextAnchor | ((d: any) => TextAnchor);
+		/** Per-row fill, over `styles.fill`. */
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		fill?: string | ((d: any) => string | undefined);
+		/** Per-row fill opacity. */
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		fillOpacity?: number | ((d: any) => number | undefined);
+		/** Spreads overlapping labels apart - see {@link TextDeclutterConfig}. `true` takes every default. */
+		declutter?: boolean | TextDeclutterConfig;
+		/**
+		 * Flips each label to the other side of its point (or nudges a centred one
+		 * back in) where its text would cross the plot's edge. `styles.textAnchor`/
+		 * `lineAnchor` are the preferred sides, `dx`/`dy` (else `styles.dx`/`dy`) the gap from the point.
+		 */
+		edgeAware?: boolean;
+		/** The slice of its category band each label sits in (a grouped bar's series); it is drawn off the band's middle, whatever the band's width. */
+		bandSlice?: BandSlice;
+		/** Where, in the plot's frame, a label sits on an axis it sets no position for: `{ type: 'text', x: 5, frameAnchor: 'top' }` is at the frame's top edge. */
+		frameAnchor?:
+			| 'top'
+			| 'bottom'
+			| 'left'
+			| 'right'
+			| 'top-left'
+			| 'top-right'
+			| 'bottom-left'
+			| 'bottom-right'
+			| 'middle';
+		/** Grows the plot's margins, on every side the author left open, so the labels fit. */
+		fitMargins?: boolean;
+		/** Reports how far the rendered labels reach past the plot's content box, in pixels, on each side. */
+		onOverflow?: (overflow: Margins) => void;
+		/** Fired when the pointer enters a row's label. */
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		onPointerEnter?: (d: any) => void;
+		/** Fired when the pointer leaves a row's label. */
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		onPointerLeave?: (d: any) => void;
+	} & CommonMarkerConfig
+>;
 
 /** Where one decluttered label goes - see `Declutter.buildLanes`. */
 export type LabelLane = {

@@ -3,6 +3,8 @@
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { BandNudge } from '$lib/markers/utils/BandNudge';
+	import { RowOffset } from '$lib/markers/utils/RowOffset';
+	import RowOffsetMarks from '$lib/markers/utils/RowOffsetMarks.svelte';
 	import { Declutter } from '$lib/markers/text/Declutter';
 	import { PlotMargins } from '$lib/layout/margins/PlotMargins.svelte';
 	import { Box } from '$lib/layout/margins/Box';
@@ -67,16 +69,14 @@
 	const lineAnchor = $derived(styles?.lineAnchor ?? 'middle');
 	// A label in a slice of its band sits off the band's middle, at its drawn width.
 	const nudge = $derived(BandNudge.of(plot.scales, marker.bandSlice));
-	// A per-row offset or anchor (a function of the row) is read where each label is drawn.
-	const staticOffset = (own: number | ((d: never) => number) | undefined, style = 0) =>
-		typeof own === 'function' ? 0 : (own ?? style);
-	const dx = $derived(staticOffset(marker.dx, styles?.dx) + nudge.dx);
-	const dy = $derived(staticOffset(marker.dy, styles?.dy) + nudge.dy);
-	const dxOf = (d: TData) => (typeof marker.dx === 'function' ? marker.dx(d) + nudge.dx : dx);
-	const dyOf = (d: TData) => (typeof marker.dy === 'function' ? marker.dy(d) + nudge.dy : dy);
+	// The fixed offset, which `declutter` and `edgeAware` place labels by; a function of the row moves each label after that, through `RowOffsetMarks`.
+	const fixedOffset = $derived(
+		RowOffset.whole(marker, { dx: styles?.dx ?? 0, dy: styles?.dy ?? 0 })
+	);
+	const dx = $derived(fixedOffset.dx + nudge.dx);
+	const dy = $derived(fixedOffset.dy + nudge.dy);
 	const anchorAt = (d: TData) =>
 		typeof marker.textAnchor === 'function' ? anchorOf(marker.textAnchor(d)) : textAnchor;
-	// Under a map projection svelteplot ignores a label's `dx`/`dy`, so the offset is a translate of the label.
 	const projected = $derived(!!plot.scales.projection);
 
 	const declutter = $derived.by(() => {
@@ -97,8 +97,6 @@
 			!!marker.edgeAware ||
 			!!marker.onPointerEnter ||
 			!!marker.onPointerLeave ||
-			typeof marker.dx === 'function' ||
-			typeof marker.dy === 'function' ||
 			typeof marker.textAnchor === 'function'
 	);
 	const dir = $derived(Math.sign(dx) || 1);
@@ -220,7 +218,11 @@
 
 {#snippet labels()}
 	{#if !perRow}
-		{@render label(displayData, dx, dy, textAnchor, lineAnchor)}
+		<RowOffsetMarks {marker} rows={displayData}>
+			{#snippet mark(rows)}
+				{@render label(rows, dx, dy, textAnchor, lineAnchor)}
+			{/snippet}
+		</RowOffsetMarks>
 	{:else if (!declutter && !marker.edgeAware) || points}
 		<!-- A decluttered or edge-aware label waits for both scales. -->
 		{#each displayData as d, i (i)}
@@ -228,7 +230,7 @@
 			{@const placement = placements?.[i]}
 			{@const extraDy = lane?.extraDy ?? 0}
 			{@const laneDir = lane?.aligned ? lane.dir : dir}
-			{@const labelDx = lane?.aligned ? laneDir * lane.reach : dxOf(d)}
+			{@const labelDx = lane?.aligned ? laneDir * lane.reach : dx}
 			{#if declutter && points && (lane?.aligned || extraDy !== 0)}
 				{@const { px, py } = points[i]}
 				{@const laneX = lane?.aligned ? px + laneDir * lane.laneReach : px + labelDx}
@@ -250,23 +252,27 @@
 				onpointerenter={marker.onPointerEnter && (() => marker.onPointerEnter?.(d))}
 				onpointerleave={marker.onPointerLeave && (() => marker.onPointerLeave?.(d))}
 			>
-				{#if placement}
-					{@render label(
-						[d],
-						placement.dx,
-						placement.dy + extraDy,
-						placement.textAnchor,
-						placement.lineAnchor
-					)}
-				{:else}
-					{@render label(
-						[d],
-						labelDx,
-						dyOf(d) + extraDy,
-						lane?.aligned && laneDir !== dir ? flipAnchor(anchorAt(d)) : anchorAt(d),
-						lineAnchor
-					)}
-				{/if}
+				<RowOffsetMarks {marker} rows={[d]}>
+					{#snippet mark(rows)}
+						{#if placement}
+							{@render label(
+								rows,
+								placement.dx,
+								placement.dy + extraDy,
+								placement.textAnchor,
+								placement.lineAnchor
+							)}
+						{:else}
+							{@render label(
+								rows,
+								labelDx,
+								dy + extraDy,
+								lane?.aligned && laneDir !== dir ? flipAnchor(anchorAt(d)) : anchorAt(d),
+								lineAnchor
+							)}
+						{/if}
+					{/snippet}
+				</RowOffsetMarks>
 			</g>
 		{/each}
 	{/if}

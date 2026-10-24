@@ -40,6 +40,7 @@
 	import ContourClipMarker from '$lib/markers/contour/ContourClipMarker.svelte';
 	import InsetMarker from '$lib/markers/inset/InsetMarker.svelte';
 	import FrameClip from '$lib/layout/geometry/FrameClip.svelte';
+	import MarkerOffset from '$lib/layout/geometry/MarkerOffset.svelte';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import { PlotMargins } from '$lib/layout/margins/PlotMargins.svelte';
@@ -128,7 +129,7 @@
 	}
 </script>
 
-{#snippet renderMarker(marker: MarkerConfig, rows: TData[] | TSeries[])}
+{#snippet drawMarker(marker: MarkerConfig, rows: TData[] | TSeries[])}
 	{#if marker.type === 'bar'}
 		<BarMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'line'}
@@ -232,6 +233,12 @@
 	{:else if marker.type === 'delta'}
 		<DeltaMarker {marker} data={seriesData} />
 	{/if}
+{/snippet}
+
+{#snippet renderMarker(marker: MarkerConfig, rows: TData[] | TSeries[])}
+	<MarkerOffset {marker}>
+		{@render drawMarker(marker, rows)}
+	</MarkerOffset>
 {/snippet}
 
 {#snippet renderScoped(marker: MarkerConfig, group: ScopedMarkerGroup<TSeries>)}
