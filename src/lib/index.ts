@@ -65,8 +65,8 @@ export {
 	contrastRatio
 } from './utils/color';
 export { Margins } from './layout/margins/Margins';
-export { resolveOpacityScale } from './utils/opacity';
-export { resolveSymbolScale } from './utils/symbol';
+export { resolveOpacityScale } from './utils/OpacityScale';
+export { resolveSymbolScale } from './utils/SymbolScale';
 export { Statistics } from './phases/statistics/Statistics';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -170,6 +170,7 @@ export type { HoverStrategy, HoverPoint, HoverDisplayPoint } from './types/layou
 export type {
 	PlotStylesConfig,
 	PlotStylesConfigInput,
+	PaletteInput,
 	DividerLineStyle,
 	TextStyle
 } from './types/configuration/styling';

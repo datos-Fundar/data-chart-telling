@@ -81,8 +81,19 @@ export type PlotStylesConfig = {
 	/** Default shape cycle for the `symbol` channel, in order. */
 	symbols: SymbolType[];
 
-	/** Continuous gradient endpoints + on-cell label colour, plus the default opacity-channel range. */
-	continuous: { min: string; max: string; labelColor: string; opacityRange: [number, number] };
+	/** The default continuous ramp, the on-cell label colour and the default opacity-channel range. */
+	continuous: {
+		/** The ramp's first color, when it is not a named `scheme`. */
+		min: string;
+		/** The ramp's last color, when it is not a named `scheme`. */
+		max: string;
+		/** A named d3-scale-chromatic ramp (`'viridis'`, `'blues'`...), over `min` and `max`. */
+		scheme?: string;
+		/** The part of `scheme` to use, as `[from, to]` fractions of it: `[0.2, 1]` skips the near-white start of `'blues'`. */
+		schemeRange?: [number, number];
+		labelColor: string;
+		opacityRange: [number, number];
+	};
 
 	/**
 	 * Per-side plot margin. `'auto'` (the default) lets svelteplot size that
@@ -484,8 +495,21 @@ export type PlotStylesConfig = {
 	};
 };
 
+/**
+ * A categorical palette as `setConfiguration` takes it: a list of colors, or the name of a
+ * d3-scale-chromatic scheme - a color list (`'dark2'`, `'tableau10'`...) or a ramp (`'viridis'`,
+ * `'blues'`...) - or one with its own `count` of colors (8 for a ramp) and `schemeRange`, the part of
+ * the ramp to spread them over (`[0.3, 1]` skips the near-white start of `'blues'`).
+ */
+export type PaletteInput =
+	| string[]
+	| string
+	| { scheme: string; count?: number; schemeRange?: [number, number] };
+
 /** Deep-partial input accepted by `setConfiguration`. */
-export type PlotStylesConfigInput = DeepPartial<PlotStylesConfig>;
+export type PlotStylesConfigInput = Omit<DeepPartial<PlotStylesConfig>, 'palette'> & {
+	palette?: PaletteInput;
+};
 
 type DeepPartial<T> = {
 	[K in keyof T]?: T[K] extends (infer U)[] ? U[] : T[K] extends object ? DeepPartial<T[K]> : T[K];

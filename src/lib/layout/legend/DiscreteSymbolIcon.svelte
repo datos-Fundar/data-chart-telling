@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { LegendItem } from '$lib/types/layout/legend';
 	import type { LineStyle } from '$lib/types/plots/constants';
-	import { SymbolPath } from '$lib/utils/symbol';
+	import { SymbolPath } from '$lib/utils/SymbolPath';
 
 	/**
 	 * The series' symbol/line-style icon, shared by both discrete item looks

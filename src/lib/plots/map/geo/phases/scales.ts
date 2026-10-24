@@ -1,5 +1,5 @@
-import { resolveColorScale } from '$lib/utils/color';
-import { resolveOpacityScale } from '$lib/utils/opacity';
+import { ColorRamp } from '$lib/utils/color';
+import { OpacityScale } from '$lib/utils/OpacityScale';
 import { ContinuousDomain } from '$lib/utils/ContinuousDomain';
 import { GeoSegments } from '$lib/plots/map/geo/GeoSegments';
 import type { GeoPlotState, GeoPlotCtx } from '$lib/types/plots/map/geo/state';
@@ -27,10 +27,7 @@ export function buildScales<TProps extends Record<string, unknown>>(
 	const effectiveDomain = valueDomain ? ContinuousDomain.ramp(valueDomain, range) : null;
 
 	const colorScale = effectiveDomain
-		? resolveColorScale({ ...scales.color, domain: effectiveDomain }, effectiveDomain, [
-				cfg.continuous.min,
-				cfg.continuous.max
-			])
+		? ColorRamp.continuous(cfg, scales.color, effectiveDomain)
 		: null;
 
 	// Per-segment-key ramp cache - built lazily, once per distinct grouping
@@ -48,11 +45,7 @@ export function buildScales<TProps extends Record<string, unknown>>(
 			: features!.filter((g) => (g as GeoFeature<TProps> & { __id?: string }).__id === key);
 		const vals = peers.map((g) => color?.(g)).filter((v): v is number => v != null);
 		const scale = vals.length
-			? resolveColorScale(
-					{ ...segScales?.color, domain: [Math.min(...vals), Math.max(...vals)] },
-					[Math.min(...vals), Math.max(...vals)],
-					[cfg.continuous.min, cfg.continuous.max]
-				)
+			? ColorRamp.continuous(cfg, segScales?.color, [Math.min(...vals), Math.max(...vals)])
 			: null;
 		segmentScaleCache.set(key, scale);
 		if (vals.length && segScales?.color) {
@@ -98,7 +91,7 @@ export function buildScales<TProps extends Record<string, unknown>>(
 		return vals.length ? [Math.min(...vals), Math.max(...vals)] : null;
 	})();
 	const opacityScale = opacityDomain
-		? resolveOpacityScale(scales.opacity, opacityDomain, cfg.continuous.opacityRange)
+		? OpacityScale.resolve(scales.opacity, opacityDomain, cfg.continuous.opacityRange)
 		: null;
 	const resolveOpacity = opacityScale
 		? (f: GeoFeature<TProps>) => {

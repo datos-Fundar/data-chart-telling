@@ -1,14 +1,14 @@
 <script lang="ts">
 	import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import { makeColorScale } from '$lib/utils/color';
+	import { ColorRamp } from '$lib/utils/color';
 	import TooltipCard from '../../../common/TooltipCard.svelte';
 	import { PENGUIN_COUNTS, type PenguinSpeciesCount } from '$datasets';
 
 	const cfg = getConfiguration();
 
 	const COLOR_DOMAIN: [number, number] = [0, 120];
-	const colorScale = makeColorScale(
+	const colorScale = ColorRamp.between(
 		COLOR_DOMAIN[0],
 		COLOR_DOMAIN[1],
 		cfg.continuous.min,

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import { makeColorScale } from '$lib/utils/color';
+	import { ColorRamp } from '$lib/utils/color';
 	import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 	import TooltipCard from '../../../common/TooltipCard.svelte';
 	import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '$datasets/argentina-provinces';
@@ -11,7 +11,7 @@
 	const cfg = getConfiguration();
 
 	const VALUE_DOMAIN: [number, number] = [190_000, 17_600_000];
-	const colorScale = makeColorScale(
+	const colorScale = ColorRamp.between(
 		VALUE_DOMAIN[0],
 		VALUE_DOMAIN[1],
 		cfg.continuous.min,

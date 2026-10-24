@@ -3,9 +3,9 @@ import { getConfiguration } from '$lib/configuration/config.svelte';
 import { ChannelName } from '$lib/plots/utils/ChannelName';
 import { MarkerKinds } from '$lib/markers/MarkerKinds';
 import { ContinuousDomain } from '$lib/utils/ContinuousDomain';
-import { resolveColorScale } from '$lib/utils/color';
-import { resolveOpacityScale } from '$lib/utils/opacity';
-import { resolveSymbolScale } from '$lib/utils/symbol';
+import { ColorRamp } from '$lib/utils/color';
+import { OpacityScale } from '$lib/utils/OpacityScale';
+import { SymbolScale } from '$lib/utils/SymbolScale';
 import type { SymbolType } from '$lib/types/plots/constants';
 import type { OpacityScaleConfig } from '$lib/types/layout/scales';
 import type { LegendEntry, LegendPlot, LegendSource } from '$lib/types/layout/legend';
@@ -170,7 +170,7 @@ export class LegendChannels {
 			return domain ? [LegendChannels.#scaleEntry(title, domain, scale)] : [];
 		}
 		const categories = [...new Set(values.map(String))];
-		const colorOf = resolveColorScale(scale, categories, getConfiguration().palette);
+		const colorOf = ColorRamp.resolve(scale, categories, getConfiguration().palette);
 		const mark = MarkerKinds.of(marker.type)?.legendSymbol;
 		return categories
 			.filter((name) => !taken.has(name))
@@ -184,7 +184,7 @@ export class LegendChannels {
 		color: string | undefined
 	): LegendEntry[] {
 		if (scale?.range !== undefined && !Array.isArray(scale.range)) return [];
-		const read = resolveOpacityScale(scale, domain, getConfiguration().continuous.opacityRange);
+		const read = OpacityScale.resolve(scale, domain, getConfiguration().continuous.opacityRange);
 		return [
 			{
 				type: 'opacity',
@@ -284,7 +284,7 @@ export class LegendChannels {
 			shaped.flatMap((marker) => LegendChannels.#values(marker, marker.symbol).map(String))
 		).filter((value, i, all) => all.indexOf(value) === i);
 		if (domain.length === 0) return [];
-		const shapeOf = resolveSymbolScale(config, domain, getConfiguration().symbols);
+		const shapeOf = SymbolScale.resolve(config, domain, getConfiguration().symbols);
 		const { filled, color } = LegendChannels.look(shaped);
 		const source =
 			LegendChannels.#sourceTitle(plot.channels?.symbol?.source, 'symbol') ??

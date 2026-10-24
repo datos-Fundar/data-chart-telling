@@ -1,5 +1,5 @@
-import { resolveColorScale } from '$lib/utils/color';
-import { resolveOpacityScale } from '$lib/utils/opacity';
+import { ColorRamp } from '$lib/utils/color';
+import { OpacityScale } from '$lib/utils/OpacityScale';
 import { ContinuousDomain } from '$lib/utils/ContinuousDomain';
 import { buildMarks, buildValueLabels } from '$lib/plots/correlation/heatmap/markers';
 import type { AxisPlotDefaults } from '$lib/types/phases';
@@ -30,11 +30,7 @@ function extendWithColorScales<TData extends Record<string, unknown>>(
 	// changes (resolved in the "markers" phase).
 	const effectiveDomain = ContinuousDomain.ramp(valueDomain, range);
 
-	const colorScale = resolveColorScale(
-		{ ...scales.color, domain: effectiveDomain },
-		effectiveDomain,
-		[cfg.continuous.min, cfg.continuous.max]
-	);
+	const colorScale = ColorRamp.continuous(cfg, scales.color, effectiveDomain);
 	const resolveColor = (row: TData) => colorScale(Number(colorAcc.accessor(row)));
 
 	const opacityAcc = channels!.opacity;
@@ -49,7 +45,7 @@ function extendWithColorScales<TData extends Record<string, unknown>>(
 						: [0, 1]
 					: [...new Set(rawVals.map(String))];
 				if (allNumeric && rawVals.length) opacityDomainOut = opacityDomain as [number, number];
-				const opacityScale = resolveOpacityScale(
+				const opacityScale = OpacityScale.resolve(
 					scales.opacity,
 					opacityDomain,
 					cfg.continuous.opacityRange

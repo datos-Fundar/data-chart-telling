@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { ContinuousLegendSection } from '$lib/types/layout/legend';
-	import { makeColorScale, resolveColorScale } from '$lib/utils/color';
+	import { ColorRamp } from '$lib/utils/color';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { AxisNumberFormat } from '$lib/layout/legend/AxisNumberFormat';
 	import { LegendState } from '$lib/layout/legend/LegendState.svelte';
@@ -81,16 +81,18 @@
 	);
 	const colorScale = $derived(
 		section.scheme !== undefined
-			? resolveColorScale({ scheme: section.scheme, pivot: section.pivot }, colorDomain, [
+			? ColorRamp.resolve({ scheme: section.scheme, pivot: section.pivot }, colorDomain, [
 					cfg.continuous.min,
 					cfg.continuous.max
 				])
-			: makeColorScale(
-					colorDomain[0],
-					colorDomain[1],
-					section.colorMin ?? cfg.continuous.min,
-					section.colorMax ?? cfg.continuous.max
-				)
+			: cfg.continuous.scheme && section.colorMin === undefined && section.colorMax === undefined
+				? ColorRamp.continuous(cfg, undefined, colorDomain)
+				: ColorRamp.between(
+						colorDomain[0],
+						colorDomain[1],
+						section.colorMin ?? cfg.continuous.min,
+						section.colorMax ?? cfg.continuous.max
+					)
 	);
 
 	const stops = $derived(

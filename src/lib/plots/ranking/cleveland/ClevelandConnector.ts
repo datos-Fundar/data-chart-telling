@@ -1,4 +1,4 @@
-import { resolveColorScale } from '$lib/utils/color';
+import { ColorRamp } from '$lib/utils/color';
 import type { ClevelandEntry, ClevelandPlotState } from '$lib/types/plots/ranking/cleveland/state';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type {
@@ -155,7 +155,7 @@ export class ClevelandConnector {
 		const lo = Math.min(...values);
 		const hi = Math.max(...values);
 		const diverging = by === 'difference' && config.scheme === undefined;
-		const scale = resolveColorScale(
+		const scale = ColorRamp.resolve(
 			{
 				...(diverging ? { scheme: defaults.differenceScheme, pivot: 0 } : {}),
 				...(by === 'length' && config.scheme === undefined

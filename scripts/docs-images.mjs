@@ -38,6 +38,7 @@ const server = await createServer({
 	resolve: {
 		alias: {
 			$lib: resolve(root, 'src/lib'),
+			$datasets: resolve(root, 'examples/datasets'),
 			'@fundar/data-chart-telling': resolve(root, 'src/lib/index.ts')
 		}
 	},

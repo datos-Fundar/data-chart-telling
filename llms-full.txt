@@ -61,7 +61,7 @@ Per kind: `BarPlot` x = category, y = value (swap for horizontal bars); `Pyramid
 
 1. `segments` is an object keyed by series name or `'default'`: `{ default: [{ areas: [{ x: { from, to } }], styles: { stroke: { strokeDasharray: '6 4' } } }] }`. A segment without `areas` is a baseline for everything; area-specific segments override it.
 2. The global configuration holds data (`setConfiguration(...)` is cloned); functions go in plot props such as `format` and `tickFormat`.
-3. A continuous color ramp is `scales.color.scheme: [colorA, colorB]` (or a named ramp such as `'blues'`); categorical colors come from `palette` or a `scheme` record.
+3. A continuous color ramp is `scales.color.scheme: [colorA, colorB]` (or a named ramp such as `'blues'`); categorical colors come from `palette` (a list of colors, or a scheme name such as `'viridis'` or `'dark2'` in `setConfiguration`) or a `scheme` record.
 4. `margins` at `'auto'` (the default) fit value labels and long tick text from the measured text, also when `scales.y.domain` is pinned. A fixed number sets the side exactly.
 5. `tooltip.sync: true` in a `facet` or `PlotComposer` shows the highlight in every panel: that is how panels compare the same x.
 6. On a BarPlot the tooltip triggers anywhere over a bar's whole band (and its series' slice, when grouped).

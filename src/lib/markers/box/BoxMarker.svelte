@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { BoxX, BoxY } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
-	import { contrastTextColor } from '$lib/utils/color';
+	import { CssColor } from '$lib/utils/color';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import type { BoxMarkerConfig } from '$lib/types/markers/common';
 
@@ -113,7 +113,7 @@
 		...placement?.shift
 	});
 	const tickMedianDefault = $derived({
-		...lineStyleDefaults(contrastTextColor(barFill)),
+		...lineStyleDefaults(CssColor.contrastText(barFill)),
 		...placement?.shift,
 		...(tickInset !== undefined ? { inset: tickInset } : {})
 	});

@@ -3,7 +3,7 @@ import { describe, test, expect } from 'vitest';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
-import { resolveOpacityScale } from '$lib/utils/opacity';
+import { OpacityScale } from '$lib/utils/OpacityScale';
 import { type ArgentinaProvinceProps, ARGENTINA_PROVINCES } from '$datasets/argentina-provinces';
 import { COUNTRIES_AT_2007 } from '$datasets';
 import { waitForSvg, countCells, countGeoPaths } from '../../plots/_helpers/svg';
@@ -36,7 +36,7 @@ describe('opacity channel - plot level (Heatmap)', () => {
 		const svg = await waitForSvg(container);
 		expect(countCells(svg)).toBe(DATA.length);
 
-		const scale = resolveOpacityScale({ domain: [0, 100], range: [0, 1] }, [0, 100], [0.2, 1]);
+		const scale = OpacityScale.resolve({ domain: [0, 100], range: [0, 1] }, [0, 100], [0.2, 1]);
 		const opacities = opacitiesOf(svg, 'g.cell rect');
 		// Bucketed + quantized to 1/32 steps - compare rounded to avoid flakiness.
 		expect(opacities.map((o) => Math.round(o * 32) / 32)).toEqual(

@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import SymbolSection from '$lib/layout/legend/SymbolSection.svelte';
-import { SymbolPath } from '$lib/utils/symbol';
+import { SymbolPath } from '$lib/utils/SymbolPath';
 
 describe('SymbolSection - each category next to its shape', () => {
 	test('one item per category, in the section color, outlined when not filled', async () => {

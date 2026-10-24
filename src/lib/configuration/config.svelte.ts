@@ -1,4 +1,5 @@
 import { merge } from '$lib/utils/merge';
+import { Palette } from '$lib/utils/color';
 import type {
 	PlotStylesConfig,
 	PlotStylesConfigInput,
@@ -72,11 +73,12 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		rowGap: '1rem'
 	},
 
-	// ColorBrewer Dark2 - qualitative, harmonious, and dark enough to read on white.
-	palette: ['#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02', '#a6761d', '#666666'],
+	// Tableau 10 - qualitative, with a muted blue first, and distinct enough to tell ten series apart.
+	palette: Palette.resolve('tableau10')!,
 
 	symbols: ['circle', 'square', 'triangle', 'diamond', 'star', 'cross'],
-	continuous: { min: '#f7fcfd', max: '#1b9e77', labelColor: '#111827', opacityRange: [0.2, 1] },
+	// A light tint of the palette's first color up to the color itself.
+	continuous: { min: '#eaf0f6', max: '#4e79a7', labelColor: '#111827', opacityRange: [0.2, 1] },
 	margins: { top: 'auto', right: 'auto', bottom: 'auto', left: 'auto' },
 	frameClip: { tolerance: 2 },
 
@@ -191,7 +193,7 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 
 	timeline: {
 		axisColor: 'currentColor',
-		activeColor: '#1b9e77',
+		activeColor: '#4e79a7',
 		thickness: 60,
 		gap: '12px',
 		rule: {
@@ -216,22 +218,22 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 			valueWidth: '3rem',
 			button: {
 				size: '2rem',
-				background: '#1b9e77',
+				background: '#4e79a7',
 				color: '#ffffff',
-				hoverBackground: '#0c4937',
+				hoverBackground: '#24384d',
 				radius: '999px'
 			},
 			track: {
 				height: '3px',
 				color: 'color-mix(in srgb, currentColor 25%, transparent)',
-				fillColor: '#1b9e77',
+				fillColor: '#4e79a7',
 				radius: '999px'
 			},
-			thumb: { size: '14px', color: '#1b9e77' },
+			thumb: { size: '14px', color: '#4e79a7' },
 			toggle: {
 				background: 'transparent',
 				color: 'currentColor',
-				activeBackground: '#1b9e77',
+				activeBackground: '#4e79a7',
 				activeColor: '#ffffff',
 				radius: '0.375rem',
 				fontSize: '0.75rem',
@@ -241,9 +243,9 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 	},
 
 	connector: {
-		sign: { positive: '#1b9e77', negative: '#d95f02', zero: '#9ca3af' },
+		sign: { positive: '#59a14f', negative: '#e15759', zero: '#9ca3af' },
 		lengthScheme: ['#d1d5db', '#374151'],
-		differenceScheme: ['#d95f02', '#e5e7eb', '#1b9e77'],
+		differenceScheme: ['#e15759', '#e5e7eb', '#59a14f'],
 		arrow: { width: 2, headLength: 8, headAngle: 60 },
 		capLength: 8,
 		outsideOpacity: 0.4,
@@ -356,9 +358,9 @@ export function getConfiguration(): PlotStylesConfig {
 	return current;
 }
 
-/** Deep-merge a partial override into the global configuration. Reactive. */
+/** Deep-merge a partial override into the global configuration - a `palette` may be a scheme name. Reactive. */
 export function setConfiguration(patch: PlotStylesConfigInput): PlotStylesConfig {
-	current = merge(current, patch);
+	current = merge(current, Palette.resolveIn(patch));
 	return current;
 }
 

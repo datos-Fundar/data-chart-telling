@@ -1,7 +1,7 @@
 import { resolveAccessor } from '$lib/utils/accessors';
-import { resolveColorScale } from '$lib/utils/color';
-import { resolveOpacityScale } from '$lib/utils/opacity';
-import { resolveSymbolScale } from '$lib/utils/symbol';
+import { ColorRamp } from '$lib/utils/color';
+import { OpacityScale } from '$lib/utils/OpacityScale';
+import { SymbolScale } from '$lib/utils/SymbolScale';
 import type { ChannelScalesConfig } from '$lib/types/layout/scales';
 import type { ProcessedData } from '$lib/types/phases';
 import type { SymbolType } from '$lib/types/plots/constants';
@@ -89,8 +89,9 @@ export class MarkerChannels {
 		const domain: [number, number] | string[] = allNumeric
 			? [Math.min(...rawVals.map(Number)), Math.max(...rawVals.map(Number))]
 			: [...new Set(rawVals.map(String))];
-		const defaultScheme = allNumeric ? [cfg.continuous.min, cfg.continuous.max] : cfg.palette;
-		const colorScale = resolveColorScale(scales?.color, domain, defaultScheme);
+		const colorScale = allNumeric
+			? ColorRamp.continuous(cfg, scales?.color, domain as [number, number])
+			: ColorRamp.resolve(scales?.color, domain, cfg.palette);
 		return (d: TData) => colorScale(colorFn(d));
 	}
 
@@ -118,7 +119,7 @@ export class MarkerChannels {
 			)
 		];
 		if (!domain.length) return undefined;
-		const scale = resolveSymbolScale(scales?.symbol, domain, cfg.symbols);
+		const scale = SymbolScale.resolve(scales?.symbol, domain, cfg.symbols);
 		return (d: TData) => scale(symbolFn(d));
 	}
 
@@ -158,7 +159,7 @@ export class MarkerChannels {
 			? [Math.min(...rawVals.map(Number)), Math.max(...rawVals.map(Number))]
 			: [...new Set(rawVals.map(String))];
 
-		const scale = resolveOpacityScale(scales?.opacity, domain, cfg.continuous.opacityRange);
+		const scale = OpacityScale.resolve(scales?.opacity, domain, cfg.continuous.opacityRange);
 
 		const buckets = new Map<number, TData[]>();
 		for (const d of data) {
