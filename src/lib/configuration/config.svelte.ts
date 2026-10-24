@@ -78,7 +78,7 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 	symbols: ['circle', 'square', 'triangle', 'diamond', 'star', 'cross'],
 	continuous: { min: '#f7fcfd', max: '#1b9e77', labelColor: '#111827', opacityRange: [0.2, 1] },
 	margins: { top: 'auto', right: 'auto', bottom: 'auto', left: 'auto' },
-	frameClip: { tolerance: 5 },
+	frameClip: { tolerance: 2 },
 
 	// ── Features ────────────────────────────────────────────────────────────────
 

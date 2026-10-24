@@ -2,12 +2,11 @@ import type { Meta } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { renderSource } from '../../common/docsSource';
-import { LIFE } from '$datasets';
-import { GOOGL_AUGUST_2026, AMZN_AUGUST_2026, type StockDay } from '../../data/stockPrices';
+import { LIFE, GOOGL_AUGUST_2026, AMZN_AUGUST_2026, type StockDay } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `x1`/`x2`/`y1`/`y2`: interval-position channels bound to the plot's shared
-// x/y scale. Two examples: a `bar` marker using `y1`/`y2` as plain field
+// x/y scale. Two examples: a `rect` marker using `y1`/`y2` as plain field
 // keys, and a `rect` marker using `x1`/`x2`/`y1`/`y2` as literal numbers.
 
 type PricedDay = StockDay & { company: 'GOOGL' | 'AMZN'; avg: number };
@@ -18,6 +17,12 @@ function withAvg(days: StockDay[], company: PricedDay['company']): PricedDay[] {
 
 const googl = withAvg(GOOGL_AUGUST_2026, 'GOOGL');
 const amzn = withAvg(AMZN_AUGUST_2026, 'AMZN');
+
+const DAY = 24 * 60 * 60 * 1000;
+
+/** A day's date moved `side` (-1 or 1) of a fraction of a day, to draw a bar of that width centered on it. */
+const around = (fraction: number, side: -1 | 1) => (d: PricedDay) =>
+	new Date(d.date.getTime() + side * fraction * DAY);
 
 const upDownScale = {
 	color: { domain: ['up', 'down'], scheme: { up: '#16a34a', down: '#dc2626' } }
@@ -52,7 +57,7 @@ const stockPriceProps = {
 	y: 'avg',
 	color: 'company',
 	scales: {
-		x: { tickRotate: -30, label: false },
+		x: { label: false },
 		color: {
 			scheme: { GOOGL: 'darkblue', AMZN: 'darkorange' }
 		}
@@ -68,29 +73,23 @@ const stockPriceProps = {
 	},
 	markers: [
 		{
-			type: 'bar',
-			role: 'segment',
-			isHorizontal: false,
-			x: 'date',
+			type: 'rect',
+			x1: around(0.04, -1),
+			x2: around(0.04, 1),
 			y1: 'low',
 			y2: 'high',
-			styles: { fill: 'black' },
-			insetLeft: 0.47,
-			insetRight: 0.47
+			styles: { fill: 'black' }
 		},
 		{
-			type: 'bar',
-			role: 'segment',
-			isHorizontal: false,
-			x: 'date',
+			type: 'rect',
+			x1: around(0.35, -1),
+			x2: around(0.35, 1),
 			y1: 'open',
 			y2: 'close',
 			color: (d: PricedDay) => {
 				return d.close >= d.open ? 'up' : 'down';
 			},
-			scales: upDownScale,
-			insetLeft: 0.35,
-			insetRight: 0.35
+			scales: upDownScale
 		}
 	] satisfies AxisBasedMarkersConfig[],
 	styles: {
@@ -102,11 +101,12 @@ const stockPriceProps = {
 };
 
 /**
- * A `bar` marker (`role: 'segment'`) using `y1`/`y2` as plain field keys -
- * two bars per category, each drawn from a different field pair.
+ * Candlesticks: a `rect` marker per day. Its height is `y1`/`y2` as plain field
+ * keys - the high-low wick from `low`/`high`, the body from `open`/`close` - and
+ * its width `x1`/`x2` as functions, a fraction of a day either side of the date.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const BarMarker: any = {
+export const Candlesticks: any = {
 	parameters: {
 		docs: { source: { code: renderSource('LinePlot', stockPriceProps) } }
 	},

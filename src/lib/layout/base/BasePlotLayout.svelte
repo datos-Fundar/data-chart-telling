@@ -136,7 +136,7 @@
 	});
 
 	/**
-	 * How the labels of the plot's category axes are laid out when they would not fit
+	 * How the labels of the plot's category axes (bands, or text laid out as points) are laid out when they would not fit
 	 * side by side, unless the author set a `tickRotate` of their own or turned
 	 * `axis.autoRotate` off: the x labels turn (45 degrees, else 90), and either
 	 * axis leaves some out when even that is not enough. Judged against the plot's
@@ -144,7 +144,10 @@
 	 * whatever the margins settle on.
 	 */
 	const tickLayout = $derived.by(() => {
-		const bands = state.axes?.bands ?? [];
+		// A kind's band axes, and any axis of text categories a line or scatter lays out as points.
+		const bands = (['x', 'y'] as const).filter(
+			(axis) => state.axes?.bands.includes(axis) || state.axes?.isDiscrete(axis)
+		);
 		if (!cfg.axis.autoRotate || bands.length === 0) return undefined;
 		const estimate = marginEstimate;
 		const categories = (axis: 'x' | 'y') => {

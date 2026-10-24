@@ -33,13 +33,16 @@ export class SveltePlotScale {
 			(scale?.type == null || SveltePlotScale.CONTINUOUS_NUMERIC_TYPES.has(scale.type)) &&
 			SveltePlotScale.#isNumeric(rows, getAxisValue);
 		const removesAxis = scale?.axisDisplay === 'none';
-		if (!sorted && !wantsNice && !removesAxis) return sorted;
+		// svelteplot treats a categorical axis told to be `nice` as linear, and draws nothing.
+		const dropsNice = scale?.nice != null && SveltePlotScale.#isCategorical(rows, getAxisValue);
+		if (!sorted && !wantsNice && !removesAxis && !dropsNice) return sorted;
 		const out: AxisScale<TData> & { axis?: false } = { ...sorted };
 		delete out.grid;
 		delete out.axisDisplay;
 		if (removesAxis) out.axis = false;
 		if (scale?.labelOrientation === 'vertical') out.label = false;
-		if (wantsNice || typeof scale?.nice === 'object') out.nice = true;
+		if (dropsNice) delete out.nice;
+		else if (wantsNice || typeof scale?.nice === 'object') out.nice = true;
 		return out;
 	}
 
@@ -68,6 +71,11 @@ export class SveltePlotScale {
 			out.push(row);
 		}
 		return out;
+	}
+
+	/** Whether the axis lays out text categories: any of its values is a string. */
+	static #isCategorical<TData>(rows: TData[], getAxisValue: (d: TData) => AxisValue): boolean {
+		return rows.some((row) => typeof getAxisValue(row) === 'string');
 	}
 
 	/** Whether the axis' values are numeric; `nice` on a categorical axis would make svelteplot treat it as linear. */

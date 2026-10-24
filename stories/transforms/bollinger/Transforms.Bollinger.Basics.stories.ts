@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { DAILY_TEMPERATURE, BUENOS_AIRES_TEMPERATURE } from '$datasets';
-import { GOOGL_AUGUST_2026 } from '../../data/stockPrices';
+import { DAILY_TEMPERATURE, BUENOS_AIRES_TEMPERATURE, GOOGL_AUGUST_2026 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `bollingerY` transform turns rows into Bollinger bands: a moving mean over
@@ -134,7 +133,7 @@ export const ByGroup: Story = {
 /** On a month of daily closing prices, a 5-day band: wide through the early-August drop, narrowing as the price settles. */
 export const StockPrices: Story = {
 	args: {
-		data: GOOGL_AUGUST_2026.map((d) => ({ ...d, date: new Date(d.date) })),
+		data: GOOGL_AUGUST_2026,
 		y: 'close',
 		segments: { default: [{ styles: { dotRadius: 3, dotFillOpacity: 0.7, dotStroke: 'none' } }] },
 		scales: {

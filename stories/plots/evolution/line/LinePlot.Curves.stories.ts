@@ -30,7 +30,8 @@ const meta = {
 		data: LIFE,
 		x: 'year',
 		y: 'value',
-		color: 'sex'
+		color: 'sex',
+		scales: { x: { nice: false } }
 	},
 	argTypes: {
 		width: {

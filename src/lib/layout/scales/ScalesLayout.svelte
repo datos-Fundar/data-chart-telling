@@ -22,7 +22,7 @@
 		scales,
 		edgeDomains = undefined,
 		tickValues = undefined,
-		state
+		state: plotState
 	}: {
 		data: TData[];
 		getX: (d: TData) => AxisValue;
@@ -42,9 +42,9 @@
 		state: Pick<PlotLayoutState, 'fittedAxes' | 'channels'>;
 	} = $props();
 
-	const fittedAxes = $derived(state.fittedAxes);
+	const fittedAxes = $derived(plotState.fittedAxes);
 	const yField = $derived.by(() => {
-		const source = state.channels?.y?.source;
+		const source = plotState.channels?.y?.source;
 		return typeof source === 'string' ? source : undefined;
 	});
 
@@ -242,6 +242,48 @@
 	$effect(() => () => {
 		$autoMarginLeft.delete(marginId);
 	});
+
+	// An x label centred on the domain's end reaches past the plot's right side; an `'auto'` right margin takes that much room.
+	let xAxisEl: SVGGElement | undefined = $state();
+	const { autoMarginRight } = getContext<{ autoMarginRight: Writable<Map<string, number>> }>(
+		'svelteplot/autoMargins'
+	);
+	const overhangId = `dct-x-tick-overhang-${Math.random().toString(36).slice(2)}`;
+	$effect(() => {
+		const el = xAxisEl;
+		// Read so a new axis, a new box or a new margin measures again.
+		void [scales?.x, xEdgeTicks, tickValues?.x, plot.options.marginLeft, plot.facetWidth];
+		if (!el) return;
+		let frame: number | undefined;
+		let cancelled = false;
+		const measure = () => {
+			if (cancelled) return;
+			const labels = el.querySelectorAll('g.tick text');
+			const last = labels.item(labels.length - 1);
+			const svg = el.ownerSVGElement;
+			const { marginLeft } = plot.options;
+			if (last && svg && Number.isFinite(marginLeft) && Number.isFinite(plot.facetWidth)) {
+				const edge = svg.getBoundingClientRect().left + Number(marginLeft) + plot.facetWidth;
+				const overhang = Math.max(0, Math.ceil(last.getBoundingClientRect().right - edge));
+				untrack(() => {
+					if (overhang === 0) $autoMarginRight.delete(overhangId);
+					else if ($autoMarginRight.get(overhangId) !== overhang)
+						$autoMarginRight.set(overhangId, overhang);
+				});
+			}
+		};
+		// Text measures right only once its fonts load.
+		(document.fonts?.ready ?? Promise.resolve()).then(() => {
+			if (!cancelled) frame = requestAnimationFrame(measure);
+		});
+		return () => {
+			cancelled = true;
+			if (frame !== undefined) cancelAnimationFrame(frame);
+		};
+	});
+	$effect(() => () => {
+		$autoMarginRight.delete(overhangId);
+	});
 </script>
 
 {#snippet axisX()}
@@ -257,9 +299,9 @@
 	/>
 {/snippet}
 {#if scales?.x?.axisDisplay === 'hidden'}
-	<g style:visibility="hidden">{@render axisX()}</g>
+	<g style:visibility="hidden" bind:this={xAxisEl}>{@render axisX()}</g>
 {:else if scales?.x?.axisDisplay !== 'none'}
-	{@render axisX()}
+	<g bind:this={xAxisEl}>{@render axisX()}</g>
 {/if}
 {#snippet axisY()}
 	<AxisY

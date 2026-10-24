@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
-import { GOOGL_AUGUST_2026 } from '../../../data/stockPrices';
+import { GOOGL_AUGUST_2026 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `statistics: [{ type: 'movingAverage' }]` has no dedicated svelteplot mark -

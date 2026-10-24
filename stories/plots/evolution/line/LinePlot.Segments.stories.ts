@@ -12,7 +12,8 @@ const meta = {
 	tags: ['autodocs'],
 	args: {
 		width: 940,
-		height: 400
+		height: 400,
+		scales: { x: { nice: false } }
 	},
 	argTypes: {
 		width: {
@@ -107,6 +108,7 @@ export const DashedSegmentInRange: any = {
 			series: args.series,
 			width: args.width,
 			height: args.height,
+			scales: { x: { nice: false } },
 			segments: {
 				default: [
 					{

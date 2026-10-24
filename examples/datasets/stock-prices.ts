@@ -1,7 +1,20 @@
-// Real daily open/high/low/close prices, August 2026 (source: Yahoo Finance).
-export type StockDay = { date: string; open: number; high: number; low: number; close: number };
+// ── Stock prices, August 2026 ───────────────────────────────────────────────
+// Yahoo Finance: the daily open, high, low and close prices of Alphabet
+// (GOOGL) and Amazon (AMZN) over the 21 trading days of August 2026.
 
-export const GOOGL_AUGUST_2026: StockDay[] = [
+export type StockDay = { date: Date; open: number; high: number; low: number; close: number };
+
+type RawDay = Omit<StockDay, 'date'> & { date: string };
+
+/** The `YYYY-MM-DD` days as local midnights, which a time axis puts on the day itself. */
+function toDays(days: RawDay[]): StockDay[] {
+	return days.map((day) => {
+		const [year, month, date] = day.date.split('-').map(Number);
+		return { ...day, date: new Date(year, month - 1, date) };
+	});
+}
+
+export const GOOGL_AUGUST_2026: StockDay[] = toDays([
 	{ date: '2026-08-03', open: 365.45, high: 376.69, low: 363.35, close: 373.51 },
 	{ date: '2026-08-04', open: 368.22, high: 380.52, low: 367.5, close: 377.65 },
 	{ date: '2026-08-05', open: 383.34, high: 384.48, low: 356.77, close: 362.43 },
@@ -23,9 +36,9 @@ export const GOOGL_AUGUST_2026: StockDay[] = [
 	{ date: '2026-08-27', open: 339.67, high: 341.69, low: 338.52, close: 340.65 },
 	{ date: '2026-08-28', open: 340.71, high: 349.14, low: 340.27, close: 346.59 },
 	{ date: '2026-08-31', open: 343.83, high: 344.59, low: 337.16, close: 339.35 }
-];
+]);
 
-export const AMZN_AUGUST_2026: StockDay[] = [
+export const AMZN_AUGUST_2026: StockDay[] = toDays([
 	{ date: '2026-08-03', open: 278.29, high: 287.2, low: 278.0, close: 284.02 },
 	{ date: '2026-08-04', open: 276.06, high: 281.07, low: 275.82, close: 277.42 },
 	{ date: '2026-08-05', open: 281.59, high: 282.79, low: 270.73, close: 272.65 },
@@ -47,4 +60,4 @@ export const AMZN_AUGUST_2026: StockDay[] = [
 	{ date: '2026-08-27', open: 259.23, high: 259.66, low: 255.02, close: 256.26 },
 	{ date: '2026-08-28', open: 258.32, high: 267.56, low: 257.78, close: 266.43 },
 	{ date: '2026-08-31', open: 263.83, high: 264.36, low: 257.12, close: 259.77 }
-];
+]);

@@ -15,7 +15,8 @@ const meta = {
 	tags: ['autodocs'],
 	args: {
 		width: 940,
-		height: 400
+		height: 400,
+		scales: { x: { nice: false } }
 	},
 	argTypes: {
 		width: {
@@ -94,7 +95,10 @@ export const XDeltaToBaseline: Story = {
 				text: { dx: 20, lineAnchor: 'middle' }
 			}
 		] satisfies AxisBasedMarkersConfig[],
-		scales: { y: { domain: [60, 85] } }
+		scales: {
+			x: { nice: false },
+			y: { domain: [60, 85] }
+		}
 	}
 };
 
@@ -127,7 +131,10 @@ export const XDeltaToAxisValue: Story = {
 				styles: { stroke: 'grey', strokeDasharray: '6 6' }
 			}
 		] satisfies AxisBasedMarkersConfig[],
-		scales: { y: { domain: [60, 85] } }
+		scales: {
+			x: { nice: false },
+			y: { domain: [60, 85] }
+		}
 	}
 };
 

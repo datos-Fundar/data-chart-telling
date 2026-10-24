@@ -17,6 +17,7 @@ export * from './penguins';
 export * from './population-by-age';
 export * from './population-by-age-with-gaps';
 export * from './province-population';
+export * from './stock-prices';
 export * from './weather-stations';
 export * from './weather-stations-over-time';
 export * from './wind-vectors';

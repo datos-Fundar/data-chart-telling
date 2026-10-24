@@ -17,7 +17,8 @@ const meta = {
 	tags: ['autodocs'],
 	args: {
 		width: 940,
-		height: 400
+		height: 400,
+		scales: { x: { nice: false } }
 	},
 	argTypes: {
 		width: {

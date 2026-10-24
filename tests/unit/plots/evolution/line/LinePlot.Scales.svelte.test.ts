@@ -140,6 +140,23 @@ describe('LinePlot - scales', () => {
 		expect(titles.length).toBe(1);
 	});
 
+	test('the last x tick label stays inside the plot when the axis is not nice', async () => {
+		const { container } = await render(LinePlot, {
+			width: 600,
+			height: 300,
+			series: SERIES,
+			scales: { x: { nice: false } } satisfies AxisBasedScalesConfig
+		});
+		const svg = await waitForSvg(container);
+		await new Promise((resolve) => setTimeout(resolve, 600));
+		const labels = [...svg.querySelectorAll('g.axis-x g.tick text')];
+		const last = labels.at(-1)!;
+		expect(last.textContent).toBe('2019');
+		expect(last.getBoundingClientRect().right).toBeLessThanOrEqual(
+			svg.getBoundingClientRect().right + 0.5
+		);
+	});
+
 	test("a vertical custom y label suppresses svelteplot's own native title, instead of both rendering", async () => {
 		const { container } = await render(LinePlot, {
 			width: 400,

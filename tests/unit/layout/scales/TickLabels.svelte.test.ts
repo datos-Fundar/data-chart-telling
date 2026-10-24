@@ -7,6 +7,7 @@ import {
 } from '$lib/configuration/config.svelte';
 import { TickLabels } from '$lib/layout/scales/TickLabels';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import DumbbellPlot from '$lib/plots/ranking/dumbbell/Plot.svelte';
 import { waitForSvg } from '../../plots/_helpers/svg';
 
@@ -111,5 +112,20 @@ describe('auto rotation of the category axis labels', () => {
 		expect(
 			rotations(await waitForSvg(view.container)).some((t) => /rotate\(-(45|90)\)/.test(t))
 		).toBe(true);
+	});
+
+	test('text laid out as points, on a line plot, does it too: its labels turn or thin out', async () => {
+		const days = Array.from({ length: 21 }, (_, i) => ({
+			day: `2026-08-${String(i + 3).padStart(2, '0')}`,
+			value: 300 + i
+		}));
+		const view = render(LinePlot, { data: days, x: 'day', y: 'value', width: 600, height: 300 });
+		const svg = await waitForSvg(view.container);
+		const labels = Array.from(svg.querySelectorAll('g.axis-x g.tick text'));
+		expect(labels.length).toBeGreaterThan(0);
+		const turned = labels.every((t) =>
+			/rotate\(-(45|90)\)/.test(t.getAttribute('transform') ?? '')
+		);
+		expect(turned || labels.length < days.length).toBe(true);
 	});
 });

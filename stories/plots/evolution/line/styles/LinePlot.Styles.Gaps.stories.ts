@@ -23,6 +23,7 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
+		scales: { x: { nice: false } },
 		series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_GAPS }]
 	},
 	argTypes: {
@@ -85,14 +86,14 @@ export const MiddleGapFilled: Story = {
  * `start`/`end` gaps have only one real boundary, so filling them is opt-in:
  * without an explicit `x` target, extrapolating past the real data would
  * imply a measurement that doesn't exist. Here both ends are configured to
- * extend past the data (1940 and 2025), holding the
+ * extend past the data (1947 and 2019), holding the
  * nearest real value flat (no `y` given).
  */
 export const LeadingAndTrailingGapsOptIn: Story = {
 	args: {
 		styles: {
 			gaps: {
-				default: { start: { x: 1940 }, end: { x: 2025 } }
+				default: { start: { x: 1947 }, end: { x: 2019 } }
 			} satisfies GapsConfig<LineSegmentStyle>
 		}
 	}
@@ -112,14 +113,14 @@ export const AllThreeZonesDistinctStyles: Story = {
 			gaps: {
 				default: {
 					start: {
-						x: 1940,
+						x: 1947,
 						style: { stroke: { stroke: '#9333ea', strokeDasharray: '1 4', strokeLinecap: 'round' } }
 					},
 					middle: {
 						style: { stroke: { strokeDasharray: '6 4', strokeOpacity: 0.7 } }
 					},
 					end: {
-						x: 2025,
+						x: 2019,
 						style: { stroke: { strokeWidth: 1.5, strokeOpacity: 0.4, strokeDasharray: '2 3' } }
 					}
 				}
@@ -142,7 +143,7 @@ export const DotsAtBridgeEndpoints: Story = {
 			gaps: {
 				default: {
 					middle: { style: { dots: { dotRadius: 5, dotSymbol: 'circle' } } },
-					end: { x: 2025, style: { dots: { dotRadius: 5, dotSymbol: 'triangle' } } }
+					end: { x: 2019, style: { dots: { dotRadius: 5, dotSymbol: 'triangle' } } }
 				}
 			} satisfies GapsConfig<LineSegmentStyle>
 		}
@@ -186,6 +187,7 @@ export const InterpolatedBridge: any = {
 			series: args.series,
 			width: args.width,
 			height: args.height,
+			scales: { x: { nice: false } },
 			styles: {
 				gaps: {
 					default: {
@@ -253,9 +255,10 @@ export const GapsOnOneSeriesOnly: Story = {
 export const DefaultWithPerSeriesOverride: Story = {
 	args: {
 		series: FEMALE_AND_MALE_BOTH_WITH_GAPS,
+		scales: { x: { nice: false } },
 		styles: {
 			gaps: {
-				default: { start: { x: 1940 }, middle: {}, end: { x: 2025 } },
+				default: { start: { x: 1947 }, middle: {}, end: { x: 2019 } },
 				female: { middle: { style: { stroke: { stroke: '#16a34a', strokeDasharray: '2 3' } } } }
 			} satisfies GapsConfig<LineSegmentStyle>
 		}

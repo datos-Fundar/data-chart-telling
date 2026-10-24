@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { GOOGL_AUGUST_2026 } from '../../../data/stockPrices';
+import { GOOGL_AUGUST_2026 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A marker's own `.statistics` fits against that marker's own `data`,

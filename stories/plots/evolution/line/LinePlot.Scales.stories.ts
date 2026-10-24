@@ -59,13 +59,13 @@ export const Default: Story = {
 };
 
 /**
- * Constrained Y domain - sets the visible range to [55, 85], which is
- * wider than the auto-fitted range, so there is space above and below
- * the line. All data points lie within [55, 85], so no line is clipped at
- * the frame boundary.
+ * Constrained Y domain - tightens the visible range to [78, 85], which is
+ * narrower than the auto-fitted range (the 2008 value sits at 77.9 so
+ * auto-fit adds space below it). All data points lie within [78, 85], so
+ * no line is clipped at the frame boundary.
  *
- * Compare with `Default` to see how the trend appears flatter when
- * the Y range is widened.
+ * Compare with `Default` to see how the trend appears more spread out when
+ * the Y range is reduced.
  */
 export const CustomYDomain: Story = {
 	args: {
@@ -78,15 +78,15 @@ export const CustomYDomain: Story = {
 			} satisfies Series<LifeRow>
 		],
 		scales: {
-			y: { domain: [55, 85] }
+			y: { domain: [78, 85] }
 		} satisfies AxisBasedScalesConfig
 	}
 };
 
 /**
  * Constrained X domain - restricts both the visible range and the series
- * data to 1972-2019. The data is filtered to match the domain so the line
- * starts cleanly at the first in-range point (1972) rather than entering
+ * data to 2010-2020. The data is filtered to match the domain so the line
+ * starts cleanly at the first in-range point (2010) rather than entering
  * the frame at an interpolated position from an earlier out-of-range point.
  */
 export const CustomXDomain: Story = {
@@ -96,11 +96,11 @@ export const CustomXDomain: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE.filter((d) => d.year >= 1972 && d.year <= 2019)
+				data: FEMALE_LIFE.filter((d) => d.year >= 2010 && d.year <= 2020)
 			} satisfies Series<LifeRow>
 		],
 		scales: {
-			x: { domain: [1972, 2019] }
+			x: { domain: [2010, 2020] }
 		} satisfies AxisBasedScalesConfig
 	}
 };
@@ -184,7 +184,7 @@ export const CustomTicks: Story = {
 			} satisfies Series<LifeRow>
 		],
 		scales: {
-			x: { ticks: [1950, 1970, 1990, 2010] }
+			x: { ticks: [2008, 2012, 2016, 2020] }
 		} satisfies AxisBasedScalesConfig
 	}
 };
@@ -265,7 +265,7 @@ export const CombinedOverrides: Story = {
 		y: 'value',
 		color: 'sex',
 		scales: {
-			x: { label: 'Year', ticks: [1950, 1970, 1990, 2010], grid: false },
+			x: { label: 'Year', ticks: [2008, 2012, 2016, 2020], grid: false },
 			y: { label: 'Life expectancy (years)', domain: [60, 90], grid: true }
 		} satisfies AxisBasedScalesConfig
 	}
@@ -532,6 +532,21 @@ const SINCE_1947 = [
 		data: FEMALE_LIFE
 	} satisfies Series<LifeRow>
 ];
+
+/**
+ * `nice: false` - the axis ends exactly where the data does (1947 to 2019)
+ * instead of rounding its domain out to the next round numbers, so the line
+ * fills the plot. The labels at both ends sit on the plot's edges, and the
+ * plot leaves room for the last one (2019) to fit.
+ *
+ * The edge ticks (see below) still add 1947 and 2019 beside the nice ticks.
+ */
+export const NotNice: Story = {
+	args: {
+		series: SINCE_1947,
+		scales: { x: { nice: false } } satisfies AxisBasedScalesConfig
+	}
+};
 
 /**
  * Edge ticks, the default: a continuous x axis adds a tick at the data's first

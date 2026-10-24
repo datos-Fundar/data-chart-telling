@@ -22,6 +22,7 @@
 	<LinePlot
 		width={950}
 		height={400}
+		scales={{ x: { nice: false } }}
 		series={[
 			{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE },
 			{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE }
