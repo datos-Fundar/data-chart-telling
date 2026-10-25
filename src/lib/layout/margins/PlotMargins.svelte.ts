@@ -264,10 +264,4 @@ export class PlotMargins {
 	place(size: Box, point: { x: number; y: number }, anchor: BoxAnchors): Box {
 		return size.placeNear(point, anchor, this.box);
 	}
-
-	/**
-	 * Changes whenever the labels' margins move after mount, which svelteplot
-	 * only takes on a remount. The same margins read back from `settle` keep it.
-	 */
-	readonly remountKey = $derived.by(() => JSON.stringify(this.#labels ?? null));
 }

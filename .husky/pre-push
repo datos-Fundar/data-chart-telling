@@ -1,2 +1,4 @@
-# The full test suite (node unit tests and browser component tests) before anything leaves the machine.
+# The full test suite (node unit tests and browser component tests) before anything leaves the machine,
+# then the local timing check (kept out of CI, where machine speed makes a time limit flaky).
 pnpm test
+pnpm test:perf

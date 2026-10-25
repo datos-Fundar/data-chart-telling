@@ -88,23 +88,15 @@ describe('ScatterPlot - frame overflow', () => {
 
 	test('growing the margin to fit an overflowing label never triggers a runaway effect loop', async () => {
 		// Regression test: `onOverflow` grows the plot's margin *after* mount,
-		// once a label is measured to overflow the frame - that live post-mount
-		// margin change has to reach svelteplot's own `<Plot>` through a forced
-		// remount (`PlotMargins.remountKey`, via
-		// `BasePlotLayout`'s `{#key}`), not as a reactive prop update on an
-		// already-mounted instance (see `BasePlotLayout`'s own doc comment for
-		// why). `Plot.svelte` here previously spread only
-		// only its margins, silently dropping that key -
-		// which fed the grown margin straight into svelteplot's live `<Plot>`,
-		// shrinking `plot.plotWidth`/`plotHeight` in place. That fed back into
+		// once a label is measured to overflow the frame. A grown margin that
+		// shrinks `plot.plotWidth`/`plotHeight` in place fed back into
 		// `Box.flipNear`'s flip decision (computed from those same
 		// live values), which could reposition a label enough to change its own
 		// measured overflow, growing the margin again - an effect that reads
 		// and writes the same state every cycle, tripping Svelte's
 		// `effect_update_depth_exceeded` guard. `COUNTRIES_AT_2007`' edge points are
-		// exactly what exercises this: without `PlotMargins.remountKey`, the loop (when
-		// present) fires within the first render, well inside the polling window
-		// below.
+		// exactly what exercises this: the loop (when present) fires within the
+		// first render, well inside the polling window below.
 		const errors: unknown[][] = [];
 		const spy = vi.spyOn(console, 'error').mockImplementation((...args) => {
 			errors.push(args);

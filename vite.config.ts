@@ -73,6 +73,28 @@ export default defineConfig({
 				}
 			},
 
+			// ── Local timing checks ──────────────────────────────────────────────────
+			// Run with: pnpm test:perf (kept out of `pnpm test` and CI: a time limit is flaky on a loaded machine)
+			...(coverageRun
+				? []
+				: [
+						{
+							plugins: [svelte({ preprocess: vitePreprocess() })],
+							resolve: { alias },
+							test: {
+								name: 'perf',
+								browser: {
+									enabled: true,
+									headless: true,
+									provider: playwright(),
+									instances: [{ browser: 'chromium' }]
+								},
+								include: ['tests/perf/**/*.perf.svelte.ts'],
+								maxWorkers: 1
+							}
+						} satisfies TestProjectConfiguration
+					]),
+
 			// ── Storybook stories as Vitest tests ────────────────────────────────────
 			// Run separately with: pnpm vitest --project=storybook
 			// (requires the Storybook dev server to boot internally via storybookTest)

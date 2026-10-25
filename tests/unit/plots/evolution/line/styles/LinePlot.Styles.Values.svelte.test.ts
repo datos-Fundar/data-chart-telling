@@ -59,8 +59,7 @@ describe('LinePlot - styles.values', () => {
 		// post-mount prop change - sending its own auto-margin sizing into a
 		// permanent one-pixel oscillation that kept re-triggering the overflow
 		// watcher forever, tripping Svelte's `effect_update_depth_exceeded`
-		// guard (see `PlotMargins.remountKey` doc comment for the
-		// actual fix). Only reproduced with an *explicit* margin already set on
+		// guard. Only reproduced with an *explicit* margin already set on
 		// another side (here `right`) alongside the auto-grown one; a bare
 		// `values.show` alone didn't trigger it.
 		const errors: unknown[][] = [];
@@ -95,8 +94,7 @@ describe('LinePlot - styles.values', () => {
 		// margins' own current size. Growing the margin to "fix" that only
 		// shifted the content box outward, so the next, still-empty measurement
 		// reported the same shape of overflow again - an unbounded loop, never
-		// an `effect_update_depth_exceeded` throw (each growth is a fresh
-		// `PlotMargins.remountKey` render, not a same-tick effect cycle) but visible as
+		// an `effect_update_depth_exceeded` throw but visible as
 		// the plot's scales never settling.
 		const errors: unknown[][] = [];
 		const spy = vi.spyOn(console, 'error').mockImplementation((...args) => {
@@ -123,9 +121,8 @@ describe('LinePlot - styles.values', () => {
 		expect(countTextLabels(svg)).toBe(0);
 
 		// Re-queries `container` (not a cached `svg`/`rect` reference) on every
-		// call: a margin-growth loop remounts the whole `<svg>` via
-		// svelteplot's remount on `PlotMargins.remountKey`, so a reference captured
-		// once would go stale and silently stop reflecting later remounts.
+		// call: a margin-growth loop would redraw the `<svg>`, so a
+		// reference captured once could go stale and stop reflecting later draws.
 		const frameWidth = () => Number(container.querySelector('rect.frame')?.getAttribute('width'));
 		const readings: number[] = [];
 		for (let i = 0; i < 5; i++) {

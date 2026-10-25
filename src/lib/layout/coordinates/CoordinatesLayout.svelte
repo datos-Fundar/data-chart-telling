@@ -36,7 +36,6 @@
 		locale = undefined,
 		data,
 		containerEl,
-		remountKey = undefined,
 		children
 	}: {
 		width: number;
@@ -54,8 +53,6 @@
 		/** Fed to `resolveProjection`'s `domain: 'data'` sentinel and to `coordinates.camera`'s `{features}` target resolution. */
 		data: TData[];
 		containerEl?: HTMLDivElement;
-		/** See `BasePlotLayout`'s own `remountKey` doc comment - forwarded verbatim to key svelteplot's `<Plot>` itself. */
-		remountKey?: string | number;
 		children: Snippet;
 	} = $props();
 
@@ -157,40 +154,38 @@
 	const clipId = `geo-frame-clip-${Math.random().toString(36).slice(2, 9)}`;
 </script>
 
-{#key remountKey}
-	<Plot
-		{width}
-		{height}
-		{margin}
-		{x}
-		{y}
-		{r}
-		{length}
-		{locale}
-		projection={finalProjection as SveltePlotProps['projection']}
-	>
-		{#if cameraActive && resolvedCameraTarget}
-			<CameraFit
-				target={resolvedCameraTarget}
-				anchor={cameraConfig?.anchor}
-				padding={cameraConfig?.padding}
-				zoom={cameraConfig?.zoom}
-				{width}
-				{height}
-				onFit={(fit) => (cameraFit = fit)}
-			/>
-		{/if}
-		<!-- What a zoom or a camera pushes past the plot's box is cut there, so it never covers the legend or the chrome around it. -->
-		<defs>
-			<clipPath id={clipId}><rect x="0" y="0" {width} {height} /></clipPath>
-		</defs>
-		<g clip-path="url(#{clipId})">
-			<ProjectionZoom inner={geoZoom.transform} outer={cameraTransform}>
-				{@render children()}
-			</ProjectionZoom>
-		</g>
-	</Plot>
-{/key}
+<Plot
+	{width}
+	{height}
+	{margin}
+	{x}
+	{y}
+	{r}
+	{length}
+	{locale}
+	projection={finalProjection as SveltePlotProps['projection']}
+>
+	{#if cameraActive && resolvedCameraTarget}
+		<CameraFit
+			target={resolvedCameraTarget}
+			anchor={cameraConfig?.anchor}
+			padding={cameraConfig?.padding}
+			zoom={cameraConfig?.zoom}
+			{width}
+			{height}
+			onFit={(fit) => (cameraFit = fit)}
+		/>
+	{/if}
+	<!-- What a zoom or a camera pushes past the plot's box is cut there, so it never covers the legend or the chrome around it. -->
+	<defs>
+		<clipPath id={clipId}><rect x="0" y="0" {width} {height} /></clipPath>
+	</defs>
+	<g clip-path="url(#{clipId})">
+		<ProjectionZoom inner={geoZoom.transform} outer={cameraTransform}>
+			{@render children()}
+		</ProjectionZoom>
+	</g>
+</Plot>
 
 <style>
 	:global(figure.svelteplot svg) {

@@ -316,7 +316,6 @@
 		locale={cfg.axis.locale}
 		{data}
 		{containerEl}
-		remountKey={plotMargins.remountKey}
 	>
 		<StylesLayout styles={state.styles} {width} {height} {numericMargins} />
 		<!-- Axes for every kind but GeoPlot. -->
