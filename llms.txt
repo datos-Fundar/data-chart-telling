@@ -1,6 +1,6 @@
 # @fundar/data-chart-telling
 
-> Svelte 5 plot components (line, area, bar, histogram, box, heatmap, pyramid, scatter, geo) built on svelteplot, with titles, legends, tooltips, facets, timelines and value labels built in. Plots take pixel `width`/`height`; hover and tooltips are switched on with `tooltip` and a `hover` marker.
+> Svelte 5 plot components (line, area, bar, density, histogram, box, violin, lollipop, dumbbell, cleveland, forest, bullet, slope, sparkline, heatmap, pyramid, scatter, geo) built on svelteplot, with titles, legends, tooltips, facets, timelines and value labels built in. Plots take pixel `width`/`height`; hover and tooltips are switched on with `tooltip` and a `hover` marker.
 
 Start with the full guide: it lists the mental model, the props every plot shares, the switches and the rules that matter. Runnable examples are type-checked, so copy them as a starting point.
 
@@ -12,11 +12,28 @@ Start with the full guide: it lists the mental model, the props every plot share
 
 - [Getting started](./docs/getting-started.md): install, first plot, sizing, data
 - [Concepts](./docs/concepts.md): plots, figures, rows and series, channels, shared props
-- [Plots](./docs/plots.md): the nine plot kinds
+- [Plots](./docs/plots.md): the plot kinds, one page each
+  - [LinePlot](./docs/plots/evolution/line.md)
+  - [AreaPlot](./docs/plots/evolution/area.md)
+  - [BarPlot](./docs/plots/ranking/bar.md)
+  - [DensityPlot](./docs/plots/distribution/density.md)
+  - [HistogramPlot](./docs/plots/distribution/histogram.md)
+  - [BoxPlot](./docs/plots/distribution/box.md)
+  - [ViolinPlot](./docs/plots/distribution/violin.md)
+  - [LollipopPlot](./docs/plots/ranking/lollipop.md)
+  - [DumbbellPlot](./docs/plots/ranking/dumbbell.md)
+  - [ForestPlot](./docs/plots/ranking/forest.md)
+  - [BulletPlot](./docs/plots/ranking/bullet.md)
+  - [SlopePlot](./docs/plots/evolution/slope.md)
+  - [SparklinePlot](./docs/plots/evolution/sparkline.md)
+  - [ClevelandPlot](./docs/plots/ranking/cleveland.md)
+  - [HeatmapPlot](./docs/plots/correlation/heatmap.md)
+  - [PyramidPlot](./docs/plots/distribution/pyramid.md)
+  - [ScatterPlot](./docs/plots/correlation/scatter.md)
 - [Scales](./docs/scales.md): axes and channel scales
 - [Styles and segments](./docs/styles-and-segments.md): value labels, frame, gaps, ranges of data
 - [Markers](./docs/markers.md): annotations, regions, hover highlight, custom components
-- [Transforms and statistics](./docs/transforms-and-statistics.md): stacking, binning, smoothing, regression
+- [Transforms and statistics](./docs/transforms-and-statistics.md): stacking, binning, smoothing, regression, and the statistics `regression`, `movingAverage`, `bollinger`, `density`, `density2d`, `box`, `deviation` with their options
 - [Tooltip and hover](./docs/tooltip-and-hover.md): tooltip options, hover marker, sync
 - [Legend](./docs/legend.md): automatic legend, toggling series, sections
 - [Timeline](./docs/timeline.md): player (default) and rule
@@ -45,7 +62,16 @@ Start with the full guide: it lists the mental model, the props every plot share
 - [Vertical bars grouped by color](./examples/GroupedBars.svelte)
 - [Horizontal bars](./examples/HorizontalBars.svelte)
 - [Overlapping histograms](./examples/Histogram.svelte)
+- [Density curves per group](./examples/Density.svelte)
 - [Box plots per group](./examples/Box.svelte)
+- [Violin plot of the iris species](./examples/Violin.svelte)
+- [Lollipop plot with value labels](./examples/Lollipop.svelte)
+- [Dumbbell plot of two series](./examples/Dumbbell.svelte)
+- [Forest plot of estimates with intervals](./examples/Forest.svelte)
+- [Bullet plot of a value against a target and ranges](./examples/Bullet.svelte)
+- [Slope plot of two moments](./examples/Slope.svelte)
+- [Sparkline per region](./examples/Sparkline.svelte)
+- [Cleveland dot plot of several series](./examples/Cleveland.svelte)
 - [Heatmap](./examples/Heatmap.svelte)
 - [Population pyramid](./examples/Pyramid.svelte)
 - [Scatter plot sized, colored and shaped by channels](./examples/Scatter.svelte)
@@ -54,6 +80,8 @@ Start with the full guide: it lists the mental model, the props every plot share
 - [Filling gaps of missing values](./examples/Gaps.svelte)
 - [Highlighting a range of one series](./examples/SegmentHighlight.svelte)
 - [Segments per series and shared rules](./examples/SegmentsBySeries.svelte)
+- [Step plot: a line plot with a step curve](./examples/LineStep.svelte)
+- [A step curve on one segment of a line](./examples/LineStepSegment.svelte)
 - [Segments on a heatmap](./examples/HeatmapSegments.svelte)
 - [Hover, rule and delta markers](./examples/Markers.svelte)
 - [Bars stacked with stackY](./examples/StackedBars.svelte)
@@ -65,7 +93,7 @@ Start with the full guide: it lists the mental model, the props every plot share
 - [Facets as a carousel](./examples/FacetsCarousel.svelte)
 - [Facets by rows and columns](./examples/FacetsRowsCols.svelte)
 - [Several plots in one figure](./examples/Composer.svelte)
-- [Shared example data](./examples/data.ts)
+- [Example datasets, one file each](./examples/datasets)
 
 ## Types
 

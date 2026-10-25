@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { MEASUREMENTS } from '../../data/measurements';
+import { HEIGHTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `bin` bins on `x` and `y` at once: each output row is one cell of a grid,
@@ -20,7 +20,7 @@ const meta = {
 		data: [],
 		x: 'x',
 		y: 'y',
-		scales: { x: { label: 'Value' }, y: { label: 'Weight' } }
+		scales: { x: { label: 'Height (cm)' }, y: { label: 'Weight (kg)' } }
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -38,14 +38,14 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** `fill: 'count'` on a `rect`: a 2D histogram of value against weight, darker where more rows fall. */
+/** `fill: 'count'` on a `rect`: a 2D histogram of height against weight, darker where more rows fall. */
 export const Heatmap: Story = {
 	args: {
 		markers: [
 			{
 				type: 'rect',
-				data: MEASUREMENTS,
-				x: 'value',
+				data: HEIGHTS,
+				x: 'height',
 				y: 'weight',
 				transforms: [{ type: 'bin', fill: 'count', thresholds: 15 }]
 			}
@@ -59,8 +59,8 @@ export const Interval: Story = {
 		markers: [
 			{
 				type: 'rect',
-				data: MEASUREMENTS,
-				x: 'value',
+				data: HEIGHTS,
+				x: 'height',
 				y: 'weight',
 				transforms: [{ type: 'bin', fill: 'count', interval: 5 }]
 			}
@@ -74,15 +74,15 @@ export const Bubbles: Story = {
 		markers: [
 			{
 				type: 'dot',
-				data: MEASUREMENTS,
-				x: 'value',
+				data: HEIGHTS,
+				x: 'height',
 				y: 'weight',
 				styles: { dotRadius: 1.5, dotFill: '#94a3b8', dotStroke: 'none' }
 			},
 			{
 				type: 'dot',
-				data: MEASUREMENTS,
-				x: 'value',
+				data: HEIGHTS,
+				x: 'height',
 				y: 'weight',
 				transforms: [{ type: 'bin', r: 'count', thresholds: 12 }],
 				styles: { dotFill: '#2563eb', dotFillOpacity: 0.45, dotStroke: '#1e3a8a' }

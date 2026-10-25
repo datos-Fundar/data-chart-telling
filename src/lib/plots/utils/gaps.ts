@@ -1,5 +1,5 @@
 import { seriesIdOf } from '$lib/utils/grouping';
-import { resolveAccessor } from './accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import { Interpolation } from '$lib/utils/Interpolation';
 import type { Series } from '$lib/types/plots/data/common';
 import type {

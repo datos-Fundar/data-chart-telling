@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import ComposerDemo from './ComposerDemo.svelte';
 import ComposerDemoSource from './ComposerDemo.svelte?raw';
 import { demoSource } from '../../../common/docsSource';
-import { FEMALE_LIFE_EXPECTANCY } from '../../../plots/line/data';
+import { FEMALE_LIFE } from '$datasets';
 import { AUTOMATIC_ARGS, LEGEND_ARG_TYPES } from './common';
 
 /**
@@ -18,7 +18,7 @@ import { AUTOMATIC_ARGS, LEGEND_ARG_TYPES } from './common';
  * - `false`: no legend;
  * - a list of sections: exactly those (see `Replace`);
  * - `{ items, sections }`: the automatic legend with those added (see `Add`);
- * - `{ series, color, opacity, size, symbol }`: the automatic legend with the
+ * - `{ series, color, opacity, r, symbol }`: the automatic legend with the
  *   section each channel draws adjusted (see `Expand`).
  *
  * The other stories in this folder: `Types` shows what the legend reads for
@@ -47,7 +47,7 @@ export const SingleSeries: Story = {
 	args: {
 		data: undefined,
 		color: undefined,
-		series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_EXPECTANCY }]
+		series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }]
 	}
 };
 

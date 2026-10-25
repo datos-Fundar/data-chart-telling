@@ -1,6 +1,8 @@
 <script lang="ts">
-	import BarPlot from '$lib/plots/bar/Plot.svelte';
-	import { REGION_SECTOR_BARS, type RegionSector } from '../../data/region-bars';
+	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+	import { POPULATION_BY_BROAD_AGE, type AgeRow } from '$datasets';
+
+	const DATA = POPULATION_BY_BROAD_AGE.filter((d) => d.year === 1991 || d.year === 2022);
 
 	type Orientation = 'vertical' | 'horizontal';
 
@@ -28,30 +30,33 @@
 		{#each ORIENTATIONS as o (o)}
 			<button class:active={orientation === o} onclick={() => (orientation = o)}>{o}</button>
 		{/each}
-		<span class="demo__hint">hover a segment - the same sector highlights in every region</span>
+		<span class="demo__hint">hover a segment - the same sex highlights in every census</span>
 	</div>
 
-	<BarPlot
-		width={760}
-		height={420}
-		title="Value by sector, faceted by region"
-		subtitle="Layout: {layout} · Orientation: {orientation} · Strategy: series · Sync: on"
-		data={REGION_SECTOR_BARS}
-		x={horizontal ? 'value' : ('region' as keyof RegionSector)}
-		y={horizontal ? ('region' as keyof RegionSector) : 'value'}
-		color={'sector' as keyof RegionSector}
-		transforms={layout === 'stacked' ? [{ type: horizontal ? 'stackX' : 'stackY' }] : []}
-		facet={{ by: 'region' as keyof RegionSector, columns: 2 }}
-		tooltip={{
-			strategy: 'series',
-			sync: true,
-			format: (row) => {
-				const { sector, value } = row as RegionSector;
-				return `${sector}: ${value}`;
-			}
-		}}
-		markers={[{ type: 'hover' }]}
-	/>
+	<!-- A bar plot reads `x`, `y` and `transforms` once, so a change of layout or orientation remounts it. -->
+	{#key layout + orientation}
+		<BarPlot
+			width={760}
+			height={420}
+			title="Population share by sex, faceted by census"
+			subtitle="Layout: {layout} · Orientation: {orientation} · Strategy: series · Sync: on"
+			data={DATA}
+			x={horizontal ? 'share' : ('ageGroup' as keyof AgeRow)}
+			y={horizontal ? ('ageGroup' as keyof AgeRow) : 'share'}
+			color={'sex' as keyof AgeRow}
+			transforms={layout === 'stacked' ? [{ type: horizontal ? 'stackX' : 'stackY' }] : []}
+			facet={{ by: 'year' as keyof AgeRow, columns: 2 }}
+			tooltip={{
+				strategy: 'series',
+				sync: true,
+				format: (row) => {
+					const { sex, share } = row as AgeRow;
+					return `${sex}: ${share}%`;
+				}
+			}}
+			markers={[{ type: 'hover' }]}
+		/>
+	{/key}
 </div>
 
 <style>

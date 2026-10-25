@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-	import { COUNTRIES } from '../../../plots/scatter/data';
+	import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+	import { COUNTRIES_AT_2007 } from '$datasets';
 </script>
 
 <!--
@@ -12,19 +12,19 @@
 		width={760}
 		height={360}
 		title="Sized dots"
-		data={COUNTRIES}
-		x="gdpPerCapita"
-		y="lifeExpectancy"
-		color="region"
+		data={COUNTRIES_AT_2007}
+		x="gdp"
+		y="life"
+		color="continent"
 		r="population"
 	/>
 	<ScatterPlot
 		width={760}
 		height={360}
 		title="Sized rings"
-		data={COUNTRIES}
-		x="gdpPerCapita"
-		y="lifeExpectancy"
+		data={COUNTRIES_AT_2007}
+		x="gdp"
+		y="life"
 		r="population"
 		segments={{
 			default: [{ styles: { dotFill: 'none', dotStroke: '#0f766e', dotStrokeWidth: 1.25 } }]
@@ -34,9 +34,9 @@
 		width={760}
 		height={360}
 		title="Sized stars"
-		data={COUNTRIES}
-		x="gdpPerCapita"
-		y="lifeExpectancy"
+		data={COUNTRIES_AT_2007}
+		x="gdp"
+		y="life"
 		r="population"
 		segments={{ default: [{ styles: { dotSymbol: 'star', dotFill: '#b45309' } }] }}
 	/>

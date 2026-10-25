@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { ContinuousLegendSection } from '$lib/types/layout/legend';
-	import { makeColorScale, resolveColorScale } from '$lib/utils/color';
+	import { ColorRamp } from '$lib/utils/color';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { AxisNumberFormat } from '$lib/layout/legend/AxisNumberFormat';
 	import { LegendState } from '$lib/layout/legend/LegendState.svelte';
@@ -10,6 +10,7 @@
 
 	const cfg = $derived(getConfiguration());
 	const gradientId = `dct-grad-${Math.random().toString(36).slice(2)}`;
+	const checkerId = `dct-checker-${Math.random().toString(36).slice(2)}`;
 	const barWidth = $derived(section.width ?? 170);
 
 	const fmt = $derived(section.format ?? AxisNumberFormat.of([section.min, section.max], cfg));
@@ -31,6 +32,7 @@
 	const svgHeight = $derived(cfg.legend.continuous.height);
 	const barHeight = $derived(cfg.legend.continuous.barHeight);
 	const barRadius = $derived(cfg.legend.continuous.barRadius);
+	const opacityLook = $derived(cfg.legend.continuous.opacity);
 
 	// Fill/opacity for the excluded-margin rects.
 	const excludedStyle = $derived.by((): { fill: string; opacity: number } => {
@@ -79,16 +81,18 @@
 	);
 	const colorScale = $derived(
 		section.scheme !== undefined
-			? resolveColorScale({ scheme: section.scheme, pivot: section.pivot }, colorDomain, [
+			? ColorRamp.resolve({ scheme: section.scheme, pivot: section.pivot }, colorDomain, [
 					cfg.continuous.min,
 					cfg.continuous.max
 				])
-			: makeColorScale(
-					colorDomain[0],
-					colorDomain[1],
-					section.colorMin ?? cfg.continuous.min,
-					section.colorMax ?? cfg.continuous.max
-				)
+			: cfg.continuous.scheme && section.colorMin === undefined && section.colorMax === undefined
+				? ColorRamp.continuous(cfg, undefined, colorDomain)
+				: ColorRamp.between(
+						colorDomain[0],
+						colorDomain[1],
+						section.colorMin ?? cfg.continuous.min,
+						section.colorMax ?? cfg.continuous.max
+					)
 	);
 
 	const stops = $derived(
@@ -98,7 +102,7 @@
 			return section.opacity
 				? {
 						offset: t * 100,
-						color: section.colorMin ?? 'currentColor',
+						color: section.colorMin ?? opacityLook.color,
 						opacity: section.opacity[0] + t * (section.opacity[1] - section.opacity[0])
 					}
 				: { offset: t * 100, color: colorScale(v), opacity: 1 };
@@ -203,7 +207,38 @@
 					<stop offset="{s.offset}%" stop-color={s.color} stop-opacity={s.opacity} />
 				{/each}
 			</linearGradient>
+			{#if section.opacity}
+				<pattern
+					id={checkerId}
+					width={opacityLook.checker.size * 2}
+					height={opacityLook.checker.size * 2}
+					patternUnits="userSpaceOnUse"
+				>
+					<rect width="100%" height="100%" fill={opacityLook.checker.light} />
+					<rect
+						width={opacityLook.checker.size}
+						height={opacityLook.checker.size}
+						fill={opacityLook.checker.dark}
+					/>
+					<rect
+						x={opacityLook.checker.size}
+						y={opacityLook.checker.size}
+						width={opacityLook.checker.size}
+						height={opacityLook.checker.size}
+						fill={opacityLook.checker.dark}
+					/>
+				</pattern>
+			{/if}
 		</defs>
+		{#if section.opacity}
+			<rect
+				x={handleBleed}
+				width={trackWidth}
+				height={barHeight}
+				rx={barRadius}
+				fill="url(#{checkerId})"
+			/>
+		{/if}
 		<rect
 			x={handleBleed}
 			width={trackWidth}

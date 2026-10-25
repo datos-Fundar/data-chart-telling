@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
-import { GOOGL_AUGUST_2026 } from '../../../data/stockPrices';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+import { GOOGL_AUGUST_2026 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `statistics: [{ type: 'bollinger' }]` resolves straight to svelteplot's own

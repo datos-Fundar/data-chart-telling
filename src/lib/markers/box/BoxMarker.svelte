@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { BoxX, BoxY } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
-	import { contrastTextColor } from '$lib/utils/color';
+	import { CssColor } from '$lib/utils/color';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import type { BoxMarkerConfig } from '$lib/types/markers/common';
 
@@ -18,6 +18,33 @@
 
 	const plot = usePlot();
 	const isHorizontal = $derived(plot.axes?.isHorizontal ?? false);
+	const BoxMark = $derived(isHorizontal ? BoxX : BoxY);
+
+	/**
+	 * With `thickness`, the box is that many pixels across, centered on the
+	 * marker's share of its category's band (`slot`), instead of filling the band:
+	 * the bar's insets and every sub-mark's offset follow it.
+	 */
+	const thickness = $derived(marker.thickness);
+	const slotIndex = $derived(marker.slot?.index ?? 0);
+	const slotCount = $derived(marker.slot?.count ?? 1);
+	const bandwidth = $derived.by(() => {
+		const scale = isHorizontal ? plot.svelteplot.scales.y : plot.svelteplot.scales.x;
+		return scale?.type === 'band' ? scale.fn.bandwidth() : 0;
+	});
+	const placement = $derived.by(() => {
+		if (thickness == null || !bandwidth) return undefined;
+		const share = bandwidth / slotCount;
+		const offset = share * slotIndex + share / 2 - bandwidth / 2;
+		const inset = Math.max(0, (bandwidth - thickness) / 2);
+		return {
+			inset,
+			side: isHorizontal
+				? { insetTop: inset, insetBottom: inset }
+				: { insetLeft: inset, insetRight: inset },
+			shift: isHorizontal ? { dy: offset } : { dx: offset }
+		};
+	});
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const data = $derived((marker.data ?? []) as any[]);
@@ -39,12 +66,15 @@
 			(typeof marker.bar === 'object' && marker.bar.fill != null
 				? (marker.bar.fill as string)
 				: undefined) ?? cfg.palette[0],
+		...placement?.side,
+		...placement?.shift,
 		...(typeof marker.bar === 'object' ? marker.bar : {})
 	});
 	const barFill = $derived(bar.fill as string);
 
 	/** `bar.insetLeft`/`insetRight` averaged into one symmetric value - a tick's own `inset` is a single number/percentage, not independent left/right. */
 	const tickInset = $derived.by(() => {
+		if (placement) return placement.inset;
 		const l = typeof bar.insetLeft === 'number' ? bar.insetLeft : undefined;
 		const r = typeof bar.insetRight === 'number' ? bar.insetRight : undefined;
 		if (l === undefined && r === undefined) return undefined;
@@ -77,14 +107,19 @@
 		return out;
 	}
 
-	const ruleDefault = $derived(lineStyleDefaults(barFill));
-	const dotDefault = $derived(fillStyleDefaults());
+	const ruleDefault = $derived({ ...lineStyleDefaults(barFill), ...placement?.shift });
+	const dotDefault: Record<string, unknown> = $derived({
+		...fillStyleDefaults(),
+		...placement?.shift
+	});
 	const tickMedianDefault = $derived({
-		...lineStyleDefaults(contrastTextColor(barFill)),
+		...lineStyleDefaults(CssColor.contrastText(barFill)),
+		...placement?.shift,
 		...(tickInset !== undefined ? { inset: tickInset } : {})
 	});
 	const tickMinMaxDefault = $derived({
 		...lineStyleDefaults(barFill),
+		...placement?.shift,
 		...(tickInset !== undefined ? { inset: tickInset } : {})
 	});
 
@@ -136,8 +171,4 @@
 	});
 </script>
 
-{#if isHorizontal}
-	<BoxX {data} x={marker.x} y={marker.y} sort={marker.sort} {...passthrough} />
-{:else}
-	<BoxY {data} x={marker.x} y={marker.y} sort={marker.sort} {...passthrough} />
-{/if}
+<BoxMark {data} x={marker.x} y={marker.y} sort={marker.sort} {...passthrough} />

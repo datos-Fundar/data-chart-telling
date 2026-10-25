@@ -22,6 +22,7 @@ import type {
 } from '$lib/types/layout/legend';
 
 const LEGEND_KEY = Symbol('dct-legend');
+const QUIET_KEY = Symbol('dct-legend-quiet');
 
 /**
  * A figure's legend, shared by every plot and legend under it: what the
@@ -48,6 +49,16 @@ export class LegendState {
 		const legend = new LegendState();
 		setContext(LEGEND_KEY, legend);
 		return legend;
+	}
+
+	/** Keeps the plots below out of the enclosing legend: they still follow its toggles, but add nothing to it. Call during component init. */
+	static silence(): void {
+		setContext(QUIET_KEY, true);
+	}
+
+	/** Whether the plots here are kept out of the enclosing legend (see {@link silence}). Call during component init. */
+	static isSilenced(): boolean {
+		return getContext<boolean | undefined>(QUIET_KEY) ?? false;
 	}
 
 	/** The enclosing figure's legend, or a private one for a legend drawn outside any. Call during component init. */
@@ -187,18 +198,20 @@ export class LegendState {
 				const { title, domain, range, color, filled, symbol } = entry;
 				ramps.push({
 					type: 'size',
+					channel: 'r',
 					title: title && format(title),
 					domain,
 					range,
 					color,
 					filled,
 					...(symbol ? { symbol } : {}),
-					...adjust('size', title)
+					...adjust('r', title)
 				} satisfies SizeLegendSection);
 			} else if (entry.type === 'symbol') {
 				const { title, items: shapes, color, filled } = entry;
 				ramps.push({
 					type: 'symbol',
+					channel: 'symbol',
 					title: title && format(title),
 					items: shapes,
 					color,
@@ -209,6 +222,7 @@ export class LegendState {
 				const { title, min, max, opacityMin, opacityMax, color } = entry;
 				ramps.push({
 					type: 'continuous',
+					channel: 'opacity',
 					title: title && format(title),
 					min,
 					max,
@@ -220,6 +234,7 @@ export class LegendState {
 				const { title, min, max, colorMin, colorMax, scheme, pivot } = entry;
 				const section = {
 					type: 'continuous',
+					channel: 'color',
 					title: title && format(title),
 					min,
 					max,
@@ -313,13 +328,19 @@ export class LegendState {
 	static entriesOf(plot: LegendPlot): LegendEntry[] {
 		const color = (name: string | undefined) =>
 			name !== undefined && name !== 'default' ? plot.colorForSeries?.(name) : undefined;
+		// A marker that is `legend: false` is decoration - a connector - and does not give the series its symbol.
 		const mark = plot.markers
-			?.map((marker) => MarkerKinds.of(marker.type)?.legendSymbol)
+			?.filter((marker) => marker.legend !== false)
+			.map((marker) => MarkerKinds.of(marker.type)?.legendSymbol)
 			.find((kind) => kind !== undefined);
 		const dots = LegendChannels.look(
 			(plot.markers ?? []).filter((marker) => marker.type === 'dot' && !marker.legend)
 		);
-		const series: LegendEntry[] = (plot.resolvedSeries ?? []).map((s) => ({
+		// A series with no rows draws nothing, so it has nothing to show.
+		const drawn = (plot.resolvedSeries ?? []).filter(
+			(s) => !Array.isArray(s.data) || s.data.length > 0
+		);
+		const series: LegendEntry[] = drawn.map((s) => ({
 			type: 'series',
 			name: s.name,
 			color: color(s.name),

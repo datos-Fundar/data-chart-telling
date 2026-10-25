@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
 	import type { LineSegmentStyle, SegmentsConfig } from '@fundar/data-chart-telling';
-	import { REGION_VALUES } from './data';
+	import { REGION_VALUES } from './datasets';
 
 	// `segments` maps a series name (or 'default' for all series) to its rules.
 	const segments = {

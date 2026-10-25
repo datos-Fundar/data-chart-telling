@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { GOOGL_AUGUST_2026, AMZN_AUGUST_2026 } from '../../data/stockPrices';
+import { GOOGL_AUGUST_2026, AMZN_AUGUST_2026 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `normalizeY` transform divides each group's `y` values by a `basis` of the
@@ -13,8 +13,8 @@ type Close = { date: Date; ticker: string; close: number };
 
 /** Both stocks' daily closes, one row per ticker per day. */
 const CLOSES: Close[] = [
-	...GOOGL_AUGUST_2026.map((d) => ({ date: new Date(d.date), ticker: 'GOOGL', close: d.close })),
-	...AMZN_AUGUST_2026.map((d) => ({ date: new Date(d.date), ticker: 'AMZN', close: d.close }))
+	...GOOGL_AUGUST_2026.map((d) => ({ date: d.date, ticker: 'GOOGL', close: d.close })),
+	...AMZN_AUGUST_2026.map((d) => ({ date: d.date, ticker: 'AMZN', close: d.close }))
 ];
 
 const meta = {
@@ -122,7 +122,7 @@ export const OnMarkers: Story = {
 		data: [],
 		color: undefined,
 		scales: {
-			x: { type: 'time', tickFormat: { month: 'short', day: 'numeric' } },
+			x: { type: 'time', tickFormat: { month: 'short', day: 'numeric' }, nice: false },
 			y: {
 				label: 'Close ÷ first close',
 				tickFormat: { minimumFractionDigits: 2, maximumFractionDigits: 2 }

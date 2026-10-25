@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { WORLD_COUNTRIES, POPULATION_SHIFT } from '../../plots/geo/data';
-import GeoPlot from '$lib/plots/geo/Plot.svelte';
+import { isAntarcticPart, provinceName } from '../../common/argentinaMainland';
+import { ARGENTINA_PROVINCES } from '$datasets/argentina-provinces';
+import { WIND_VECTORS } from '$datasets';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `vector` marker (svelteplot's own `Vector`) - an arrow/spike per row,
@@ -31,8 +33,11 @@ const renderGeoPlot: GeoPlotStory['render'] = (args) => ({ Component: GeoPlot, p
 const GEO_PLOT_ARGS = {
 	width: 940,
 	height: 500,
-	data: WORLD_COUNTRIES,
-	coordinates: { projection: 'mercator' },
+	data: ARGENTINA_PROVINCES,
+	featureId: provinceName,
+	excludeParts: isAntarcticPart,
+	coordinates: { projection: { type: 'mercator', domain: 'data' } },
+	scales: { length: { range: [10, 70] } },
 	styles: { fill: '#e2e8f0', stroke: '#94a3b8' }
 } satisfies GeoPlotStory['args'];
 
@@ -44,7 +49,7 @@ export const Basic: GeoPlotStory = {
 		markers: [
 			{
 				type: 'vector',
-				data: POPULATION_SHIFT,
+				data: WIND_VECTORS,
 				x: 'lon',
 				y: 'lat',
 				length: 'magnitude',
@@ -64,7 +69,7 @@ export const DefaultFilledArrows: GeoPlotStory = {
 		markers: [
 			{
 				type: 'vector',
-				data: POPULATION_SHIFT,
+				data: WIND_VECTORS,
 				x: 'lon',
 				y: 'lat',
 				length: 'magnitude',
@@ -82,7 +87,7 @@ export const OpenArrow: GeoPlotStory = {
 		markers: [
 			{
 				type: 'vector',
-				data: POPULATION_SHIFT,
+				data: WIND_VECTORS,
 				x: 'lon',
 				y: 'lat',
 				length: 'magnitude',
@@ -101,7 +106,7 @@ export const SpikeShape: GeoPlotStory = {
 		markers: [
 			{
 				type: 'vector',
-				data: POPULATION_SHIFT,
+				data: WIND_VECTORS,
 				x: 'lon',
 				y: 'lat',
 				length: 'magnitude',
@@ -122,7 +127,7 @@ export const CustomFilledArrow: GeoPlotStory = {
 		markers: [
 			{
 				type: 'vector',
-				data: POPULATION_SHIFT,
+				data: WIND_VECTORS,
 				x: 'lon',
 				y: 'lat',
 				length: 'magnitude',

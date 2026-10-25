@@ -1,11 +1,15 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import LinePlot from '$lib/plots/line/Plot.svelte';
-	import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+	import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 	import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 	import { THEMES, type ThemeName } from '$lib/configuration/themes';
-	import { TIME_SERIES, type SeriesPoint } from '../../../data/time-series';
-	import { HEAT_CELLS, type HeatCell } from '../../../data/heat-cells';
+	import {
+		ARGENTINA_CHILE_TRENDS,
+		type CountryTrendRow,
+		PENGUIN_COUNTS,
+		type PenguinSpeciesCount
+	} from '$datasets';
 
 	let active = $state<ThemeName>('Default');
 
@@ -23,9 +27,8 @@
 		return () => untrack(() => resetConfiguration());
 	});
 
-	const maxPct = Math.max(...HEAT_CELLS.map((d) => d.pct));
-	const lineData = TIME_SERIES.filter((d) => d.region === 'North');
-	const heatData = HEAT_CELLS.filter((d) => d.scenario === 'Baseline' && d.year === 2022);
+	const maxCount = Math.max(...PENGUIN_COUNTS.map((d) => d.count));
+	const lineData = ARGENTINA_CHILE_TRENDS.filter((d) => d.country === 'Argentina');
 </script>
 
 <div class="demo">
@@ -47,21 +50,21 @@
 		<LinePlot
 			width={460}
 			height={360}
-			title="GDP vs. Employment"
+			title="GDP per capita vs. population"
 			subtitle="Theme: {active}"
 			caption="The configuration is global and reactive."
 			data={lineData}
 			x="year"
 			y="value"
-			color={'metric' as keyof SeriesPoint}
+			color={'metric' as keyof CountryTrendRow}
 			legend={[
 				{
 					type: 'discrete',
 					title: 'Indicator',
 					columns: 2,
 					items: [
-						{ name: 'GDP', label: 'GDP', symbol: 'line' },
-						{ name: 'Employment', label: 'Employment', symbol: 'line' }
+						{ name: 'GDP per capita', label: 'GDP per capita', symbol: 'line' },
+						{ name: 'Population', label: 'Population', symbol: 'line' }
 					]
 				}
 			]}
@@ -69,26 +72,26 @@
 		<HeatmapPlot
 			width={460}
 			height={360}
-			title="Households by rooms"
+			title="Penguins by island"
 			subtitle="Theme: {active}"
 			caption="Same configuration system."
-			data={heatData}
-			x={'rooms' as keyof HeatCell}
-			y={'people' as keyof HeatCell}
-			color={'pct' as keyof HeatCell}
-			scales={{ x: { label: 'Rooms' }, y: { label: 'People' } }}
+			data={PENGUIN_COUNTS}
+			x={'island' as keyof PenguinSpeciesCount}
+			y={'species' as keyof PenguinSpeciesCount}
+			color={'count' as keyof PenguinSpeciesCount}
+			scales={{ x: { label: 'Island' }, y: { label: 'Species' } }}
 			legend={[
 				{
 					type: 'continuous',
-					title: 'Percentage',
+					title: 'Penguins',
 					min: 0,
-					max: maxPct,
-					ticks: [Math.round(maxPct * 0.5 * 1000) / 1000],
-					format: (v) => `${(v * 100).toFixed(0)}%`,
+					max: maxCount,
+					ticks: [Math.round(maxCount / 2)],
+					format: (v) => `${v}`,
 					width: 180
 				}
 			]}
-			styles={{ values: { format: (v) => `${(v * 100).toFixed(0)}%` } }}
+			styles={{ values: { format: (v) => `${v}` } }}
 		/>
 	</div>
 </div>

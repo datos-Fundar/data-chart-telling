@@ -10,6 +10,9 @@ export type TooltipAnchorX = 'left' | 'middle' | 'right';
 /** Preferred vertical placement of the tooltip, like {@link TooltipAnchorX}. Defaults to `'bottom'`. */
 export type TooltipAnchorY = 'top' | 'middle' | 'bottom';
 
+/** A matched row as a tooltip's `content` gets it: the row itself, plus `seriesColor`, the one the plot draws it in (unset on plots without series). */
+export type TooltipRow<TRow> = TRow & { seriesColor?: string };
+
 /** Author-facing tooltip option on the chart kinds. `true` = enable with defaults. */
 export type TooltipOptions<TRow extends Record<string, unknown>> = {
 	/** Matching strategy. Defaults to the chart kind's own default. */
@@ -20,8 +23,8 @@ export type TooltipOptions<TRow extends Record<string, unknown>> = {
 	format?: (row: TRow) => string;
 	/** Named subset of crossing series to include. Omitted = all matched. */
 	series?: string[];
-	/** Custom tooltip body; replaces `format` when given. */
-	content?: Snippet<[{ rows: TRow[] }]>;
+	/** Custom tooltip body; replaces `format` when given. Its rows carry a `seriesColor` - see {@link TooltipRow}. */
+	content?: Snippet<[{ rows: TooltipRow<TRow>[] }]>;
 	/** Preferred horizontal anchor - see {@link TooltipAnchorX}. */
 	anchorX?: TooltipAnchorX;
 	/** Preferred vertical anchor - see {@link TooltipAnchorY}. */

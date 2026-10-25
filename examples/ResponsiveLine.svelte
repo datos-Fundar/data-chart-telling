@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES } from './data';
+	import { REGION_VALUES } from './datasets';
 
 	// A plot draws at the pixel size it is given. To fill a container (or the
 	// window), bind its size and pass it down.

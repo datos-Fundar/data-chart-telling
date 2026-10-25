@@ -1,6 +1,6 @@
 import { Box } from '$lib/layout/margins/Box';
 import { PlotMargins } from '$lib/layout/margins/PlotMargins.svelte';
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import type { PlotAxes } from '$lib/phases/data/PlotAxes';

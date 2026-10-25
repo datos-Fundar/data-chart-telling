@@ -119,6 +119,8 @@ export type ContinuousInteractiveConfig = {
 export type ContinuousLegendSection = {
 	type: 'continuous';
 	title?: string;
+	/** The channel the section reads, which tells apart automatic sections that share a title. */
+	channel?: Exclude<LegendChannel, 'series'>;
 	columns?: number;
 	min: number;
 	max: number;
@@ -128,7 +130,7 @@ export type ContinuousLegendSection = {
 	scheme?: string | string[];
 	/** Splits an array `scheme` into two halves meeting at this value (diverging). */
 	pivot?: number;
-	/** Draws the bar in one color (`colorMin`, the text color by default) fading across this opacity range, instead of a color ramp. */
+	/** Draws the bar in one color (`colorMin`, `legend.continuous.opacity.color` by default) fading across this opacity range over a checkerboard, instead of a color ramp. */
 	opacity?: [number, number];
 	ticks?: number[];
 	width?: number;
@@ -144,6 +146,8 @@ export type ContinuousLegendSection = {
 export type SizeLegendSection = {
 	type: 'size';
 	title?: string;
+	/** The channel the section reads, which tells apart automatic sections that share a title. */
+	channel?: Exclude<LegendChannel, 'series'>;
 	columns?: number;
 	domain: [number, number];
 	range: [number, number];
@@ -167,6 +171,8 @@ export type SizeLegendSection = {
 export type SymbolLegendSection = {
 	type: 'symbol';
 	title?: string;
+	/** The channel the section reads, which tells apart automatic sections that share a title. */
+	channel?: Exclude<LegendChannel, 'series'>;
 	columns?: number;
 	/** Item flow direction, as in a discrete section. */
 	layout?: LegendItemsLayout;
@@ -263,8 +269,8 @@ export type LegendEntry =
  */
 export type MarkLegend = string | (Omit<LegendItem, 'name' | 'disabled'> & { label: string });
 
-/** What a legend reads each automatic section from: the series, or the channel a scale encodes. */
-export type LegendChannel = 'series' | 'color' | 'opacity' | 'size' | 'symbol';
+/** What a legend reads each automatic section from: the series, or the channel a scale encodes - named as the plot's own prop (`r` for sizes). */
+export type LegendChannel = 'series' | 'color' | 'opacity' | 'r' | 'symbol';
 
 /**
  * How to adjust one automatic section: its own configuration, minus what the
@@ -311,7 +317,7 @@ export type LegendExtension = {
 		ContinuousLegendSection,
 		'min' | 'max' | 'colorMin' | 'colorMax' | 'scheme' | 'pivot' | 'opacity' | 'interactive'
 	>;
-	size?: LegendOverride<SizeLegendSection, 'domain' | 'range' | 'color' | 'filled' | 'symbol'>;
+	r?: LegendOverride<SizeLegendSection, 'domain' | 'range' | 'color' | 'filled' | 'symbol'>;
 	symbol?: LegendOverride<SymbolLegendSection, 'items' | 'color' | 'filled'>;
 };
 
@@ -329,7 +335,7 @@ export type LegendSource = {
 		opacity?: OpacityScaleConfig;
 		symbol?: SymbolScaleConfig;
 	};
-	legend?: MarkLegend;
+	legend?: MarkLegend | false;
 	fill?: unknown;
 	stroke?: unknown;
 	styles?: {
@@ -344,12 +350,18 @@ export type LegendSource = {
 
 /** What a plot hands the legend to read its entries from. */
 export type LegendPlot = {
-	resolvedSeries?: { name: string }[];
+	resolvedSeries?: { name: string; data?: unknown[] }[];
 	colorForSeries?: (name: string) => string;
 	markers?: LegendSource[];
 	segments?: Record<string, LegendSource[] | undefined>;
 	/** The `[min, max]` a plot-level color ramp spans, when the plot has no `color` channel to read it from. */
 	colorDomain?: [number, number];
+	/** The ramps of the segments that set their own color scale, each over its own features' values. */
+	colorRamps?: {
+		name: string;
+		domain: [number, number];
+		scale: { scheme?: unknown; pivot?: number };
+	}[];
 	/** The `[min, max]` of a plot-level numeric `opacity` channel. */
 	opacityDomain?: [number, number];
 	channels?: {

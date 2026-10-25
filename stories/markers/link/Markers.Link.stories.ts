@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { WORLD_COUNTRIES, FLIGHT_ROUTES } from '../../plots/geo/data';
-import GeoPlot from '$lib/plots/geo/Plot.svelte';
+import { WORLD_COUNTRIES } from '$datasets/world-countries';
+import { FLIGHT_ROUTES } from '$datasets';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `link` marker (svelteplot's own `Link`) - a connection between two
@@ -102,7 +103,7 @@ export const LinearLinks: GeoPlotStory = {
 				x2: 'toLon',
 				y2: 'toLat',
 				curve: 'linear',
-				styles: { stroke: '#0891b2', strokeWidth: 1.5, strokeOpacity: 0.8 }
+				styles: { stroke: '#dc2626', strokeWidth: 1.5, strokeOpacity: 0.8 }
 			}
 		] satisfies GeoMarkersConfig[]
 	}
@@ -110,20 +111,24 @@ export const LinearLinks: GeoPlotStory = {
 
 /**
  * Spherical links on an orthographic globe - the geodesic curvature is most
- * visually obvious on a hemisphere view. `coordinates.zoom: true` also enables
- * drag-to-rotate here (orthographic-specific: dragging spins the globe
- * instead of panning it, since panning a globe within its own frame isn't
- * useful) - drag the canvas below to see a route's great-circle arc land
+ * visually obvious on a hemisphere view. `coordinates.rotate: true` enables
+ * drag-to-rotate (dragging spins the globe instead of panning it, since
+ * panning a globe within its own frame isn't useful), and `zoom: true` the
+ * wheel zoom - drag the canvas below to see a route's great-circle arc land
  * correctly wherever the globe is currently facing.
  */
 export const OnOrthographicGlobe: GeoPlotStory = {
 	render: renderGeoPlot,
 	args: {
 		...GEO_PLOT_ARGS,
-		coordinates: { projection: { type: 'orthographic', rotate: [60, -10] }, zoom: true },
+		coordinates: {
+			projection: { type: 'orthographic', rotate: [60, -10] },
+			zoom: true,
+			rotate: true
+		},
 		markers: [
 			{ type: 'sphere', behind: true, styles: { fill: '#f8fafc', stroke: 'currentColor' } },
-			{ type: 'graticule', styles: { stroke: '#e2e8f0' } },
+			{ type: 'graticule', behind: true, styles: { stroke: '#e2e8f0' } },
 			{
 				type: 'link',
 				data: FLIGHT_ROUTES,
@@ -131,6 +136,73 @@ export const OnOrthographicGlobe: GeoPlotStory = {
 				y1: 'fromLat',
 				x2: 'toLon',
 				y2: 'toLat',
+				styles: { stroke: '#dc2626', strokeWidth: 1.5 }
+			}
+		] satisfies GeoMarkersConfig[]
+	}
+};
+
+/** `altitude` lifts each arc off the map: on a flat map it bows upward, by a fraction of the distance between the route's ends. */
+export const LiftedLinks: GeoPlotStory = {
+	render: renderGeoPlot,
+	args: {
+		...GEO_PLOT_ARGS,
+		markers: [
+			{
+				type: 'link',
+				data: FLIGHT_ROUTES,
+				x1: 'fromLon',
+				y1: 'fromLat',
+				x2: 'toLon',
+				y2: 'toLat',
+				altitude: 0.25,
+				styles: { stroke: '#dc2626', strokeWidth: 1.5 }
+			}
+		] satisfies GeoMarkersConfig[]
+	}
+};
+
+/** On a globe `altitude` is a fraction of the radius: the arcs leave the surface at their ends and rise off it in between. */
+export const LiftedOnGlobe: GeoPlotStory = {
+	render: renderGeoPlot,
+	args: {
+		...GEO_PLOT_ARGS,
+		coordinates: { projection: { type: 'orthographic', rotate: [60, -10] }, rotate: true },
+		markers: [
+			{ type: 'sphere', behind: true, styles: { fill: '#f8fafc', stroke: 'currentColor' } },
+			{ type: 'graticule', behind: true, styles: { stroke: '#e2e8f0' } },
+			{
+				type: 'link',
+				data: FLIGHT_ROUTES,
+				x1: 'fromLon',
+				y1: 'fromLat',
+				x2: 'toLon',
+				y2: 'toLat',
+				altitude: 0.5,
+				styles: { stroke: '#dc2626', strokeWidth: 1.5 }
+			}
+		] satisfies GeoMarkersConfig[]
+	}
+};
+
+/** `occlusion: 'globe'` keeps each arc whole: it disappears only where the globe itself covers it, instead of being cut at the horizon as the globe turns. */
+export const LiftedWholeArcs: GeoPlotStory = {
+	render: renderGeoPlot,
+	args: {
+		...GEO_PLOT_ARGS,
+		coordinates: { projection: { type: 'orthographic', rotate: [60, -10] }, rotate: true },
+		markers: [
+			{ type: 'sphere', behind: true, styles: { fill: '#f8fafc', stroke: 'currentColor' } },
+			{ type: 'graticule', behind: true, styles: { stroke: '#e2e8f0' } },
+			{
+				type: 'link',
+				data: FLIGHT_ROUTES,
+				x1: 'fromLon',
+				y1: 'fromLat',
+				x2: 'toLon',
+				y2: 'toLat',
+				altitude: 0.25,
+				occlusion: 'globe',
 				styles: { stroke: '#dc2626', strokeWidth: 1.5 }
 			}
 		] satisfies GeoMarkersConfig[]

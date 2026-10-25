@@ -1,11 +1,11 @@
 <script lang="ts">
 	import PlotComposer from '$lib/layout/composer/PlotComposer.svelte';
-	import LinePlot from '$lib/plots/line/Plot.svelte';
-	import BarPlot from '$lib/plots/bar/Plot.svelte';
-	import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-	import { TIME_SERIES } from '../../../data/time-series';
-	import { REGION_BARS } from '../../../data/region-bars';
-	import { COUNTRIES } from '../../../plots/scatter/data';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+	import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+	import { COUNTRIES_OVER_TIME } from '$datasets';
+
+	const COUNTRIES_2007 = COUNTRIES_OVER_TIME.filter((d) => d.year === 2007);
 </script>
 
 <PlotComposer
@@ -13,18 +13,27 @@
 	height={560}
 	title="Three views, one figure"
 	subtitle="layout.areas: ['a a b', 'a a c'], tagged A, B, C"
-	caption="Source: synthetic demo data."
+	caption="Source: Gapminder."
 	tags="A"
 	layout={{ areas: ['a a b', 'a a c'] }}
 >
 	<LinePlot
 		area="a"
-		data={TIME_SERIES.filter((d) => d.region === 'North')}
+		data={COUNTRIES_OVER_TIME}
 		x="year"
-		y="value"
-		color="metric"
+		y="life"
+		color="continent"
+		transforms={[{ type: 'groupX', y: 'mean' }]}
 		tooltip
 	/>
-	<BarPlot area="b" data={REGION_BARS.filter((d) => d.year === 2022)} x="region" y="value" />
-	<ScatterPlot area="c" data={COUNTRIES} x="gdpPerCapita" y="lifeExpectancy" color="region" />
+	<BarPlot
+		area="b"
+		data={COUNTRIES_2007}
+		x="continent"
+		y="population"
+		color="continent"
+		transforms={[{ type: 'groupX', y: 'sum' }, { type: 'stackY' }]}
+		scales={{ x: { label: false } }}
+	/>
+	<ScatterPlot area="c" data={COUNTRIES_2007} x="gdp" y="life" color="continent" />
 </PlotComposer>

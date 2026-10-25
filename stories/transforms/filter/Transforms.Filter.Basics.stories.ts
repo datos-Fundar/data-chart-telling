@@ -1,8 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { BUENOS_AIRES_TEMPERATURE, type DailyTemperature } from '../../data/daily-temperature';
-import { MEASUREMENTS, type Measurement } from '../../data/measurements';
+import {
+	BUENOS_AIRES_TEMPERATURE,
+	type DailyTemperature,
+	HEIGHTS,
+	type HeightRow
+} from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `filter` transform keeps only the rows its `filter` holds for: a per-row
@@ -119,17 +123,17 @@ export const BeforeOrAfter: Story = {
 	}
 };
 
-/** Composed with a density: the filter picks group A first, so the estimate only sees its rows. */
+/** Composed with a density: the filter picks the female rows first, so the estimate only sees its rows. */
 export const BeforeADensity: Story = {
 	args: {
 		scales: { y: { label: 'Density' } },
 		markers: [
 			{
 				type: 'area',
-				data: MEASUREMENTS,
-				x: 'value',
+				data: HEIGHTS,
+				x: 'height',
 				transforms: [
-					{ type: 'filter', filter: (d: Measurement) => d.group === 'A' },
+					{ type: 'filter', filter: (d: HeightRow) => d.group === 'female' },
 					{ type: 'densityX' }
 				],
 				styles: { fill: '#0d9488', fillOpacity: 0.4 }

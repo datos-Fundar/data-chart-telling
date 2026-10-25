@@ -2,7 +2,7 @@
 	import Plot from '$lib/layout/plot/Plot.svelte';
 	import LineCore from '$lib/layout/plot/Core.svelte';
 	import { Pipeline } from '$lib/phases/Pipeline';
-	import { buildLineDefaults } from '$lib/plots/line/defaults';
+	import { buildLineDefaults } from '$lib/plots/evolution/line/defaults';
 	import type { FacetConfig } from '$lib/types/layout/facet';
 	import type { TimelineConfig } from '$lib/types/layout/timeline';
 

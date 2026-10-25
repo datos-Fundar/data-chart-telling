@@ -10,18 +10,20 @@ export class BollingerStatistic {
 	static build<T extends Record<string, unknown>>(
 		source: StatisticSource<T>,
 		config: Extract<StatisticConfig, { type: 'bollinger' }>
-	): BollingerMarkerConfig {
-		return {
-			type: 'bollinger',
-			data: source.data,
-			x: source.x,
-			y: source.y,
-			n: config.n,
-			k: config.k,
-			styles: {
-				...config.styles,
-				stroke: config.styles?.stroke ?? source.color ?? STATISTIC_FALLBACK_COLOR
+	): BollingerMarkerConfig[] {
+		return [
+			{
+				type: 'bollinger',
+				data: source.data,
+				x: source.x,
+				y: source.y,
+				n: config.n,
+				k: config.k,
+				styles: {
+					...config.styles,
+					stroke: config.styles?.stroke ?? source.color ?? STATISTIC_FALLBACK_COLOR
+				}
 			}
-		};
+		];
 	}
 }

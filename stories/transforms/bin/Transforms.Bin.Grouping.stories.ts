@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { MEASUREMENTS } from '../../data/measurements';
+import { HEIGHTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A bin runs per group: `z` splits the rows before they are binned, so each group
@@ -40,8 +40,8 @@ export const ByGroup: Story = {
 		markers: [
 			{
 				type: 'rect',
-				data: MEASUREMENTS,
-				x: 'value',
+				data: HEIGHTS,
+				x: 'height',
 				grouping: 'group',
 				color: 'group',
 				transforms: [{ type: 'binX', y: 'count', thresholds: 12 }]
@@ -56,15 +56,15 @@ export const SeparateMarkers: Story = {
 		markers: [
 			{
 				type: 'rect',
-				data: MEASUREMENTS.filter((d) => d.group === 'A'),
-				x: 'value',
+				data: HEIGHTS.filter((d) => d.group === 'female'),
+				x: 'height',
 				transforms: [{ type: 'binX', y: 'count', thresholds: 12 }],
 				styles: { fill: '#2563eb', fillOpacity: 0.6 }
 			},
 			{
 				type: 'rect',
-				data: MEASUREMENTS.filter((d) => d.group === 'B'),
-				x: 'value',
+				data: HEIGHTS.filter((d) => d.group === 'male'),
+				x: 'height',
 				transforms: [{ type: 'binX', y: 'count', thresholds: 12 }],
 				styles: { fill: '#dc2626', fillOpacity: 0.6 }
 			}

@@ -1,6 +1,6 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 
 type Row = { metric: string; year: number; value: number };
 const DATA: Row[] = ['GDP', 'Employment'].flatMap((metric, i) =>

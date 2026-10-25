@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES } from '../../plots/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `hull` marker (svelteplot's own `Hull`) - the convex hull around a
@@ -16,10 +16,10 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: COUNTRIES,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy',
-		color: 'region'
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life',
+		color: 'continent'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -42,8 +42,8 @@ export const Basic: Story = {
 			{
 				type: 'hull',
 				series: 'Americas',
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
+				x: 'gdp',
+				y: 'life',
 				styles: { fillOpacity: 0.12 }
 			}
 		] satisfies AxisBasedMarkersConfig[]
@@ -51,17 +51,17 @@ export const Basic: Story = {
 };
 
 /**
- * The plot's `color: 'region'` splits the hull per region: each hull inherits
- * that grouping and takes its region's palette color for fill and stroke, the
+ * The plot's `color: 'continent'` splits the hull per continent: each hull inherits
+ * that grouping and takes its continent's palette color for fill and stroke, the
  * same colors the scatter points use. No setting on the marker itself.
  */
-export const GroupedByRegion: Story = {
+export const GroupedByContinent: Story = {
 	args: {
 		markers: [
 			{
 				type: 'hull',
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
+				x: 'gdp',
+				y: 'life',
 				styles: { fillOpacity: 0.1 }
 			}
 		] satisfies AxisBasedMarkersConfig[]

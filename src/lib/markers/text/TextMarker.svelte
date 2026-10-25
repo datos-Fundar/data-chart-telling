@@ -3,6 +3,8 @@
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { BandNudge } from '$lib/markers/utils/BandNudge';
+	import { RowOffset } from '$lib/markers/utils/RowOffset';
+	import RowOffsetMarks from '$lib/markers/utils/RowOffsetMarks.svelte';
 	import { Declutter } from '$lib/markers/text/Declutter';
 	import { PlotMargins } from '$lib/layout/margins/PlotMargins.svelte';
 	import { Box } from '$lib/layout/margins/Box';
@@ -34,7 +36,12 @@
 	const text = $derived(marker.text ?? '');
 	const styles = $derived(marker.styles);
 
-	const displayData = $derived(data.length > 0 ? data : [{} as TData]);
+	// A label placed by a literal (or by the frame) draws once without rows; one placed by a field of its rows draws nothing.
+	const placedByRows = (position: unknown) =>
+		['string', 'function', 'symbol'].includes(typeof position);
+	const displayData = $derived(
+		data.length > 0 ? data : placedByRows(x) || placedByRows(y) ? [] : [{} as TData]
+	);
 	// Per-row accessors give literal values; an empty one takes the flat default.
 	const flatFill = $derived(styles?.fill ?? 'currentColor');
 	const fill = $derived.by(() => {
@@ -50,14 +57,27 @@
 	const fontWeight = $derived(styles?.fontWeight ?? 'normal');
 	const fontStyleProp = $derived(styles?.fontStyle ?? 'normal');
 	// An unresolved `'outside'` falls back to `'start'`.
-	const textAnchor = $derived<Exclude<TextAnchor, 'outside'>>(
-		styles?.textAnchor === 'outside' ? 'start' : (styles?.textAnchor ?? 'middle')
+	const anchorOf = (anchor: TextAnchor | undefined): Exclude<TextAnchor, 'outside'> =>
+		anchor === 'outside' ? 'start' : (anchor ?? 'middle');
+	const textAnchor = $derived(
+		anchorOf(
+			typeof marker.textAnchor === 'function'
+				? undefined
+				: (marker.textAnchor ?? styles?.textAnchor)
+		)
 	);
 	const lineAnchor = $derived(styles?.lineAnchor ?? 'middle');
 	// A label in a slice of its band sits off the band's middle, at its drawn width.
 	const nudge = $derived(BandNudge.of(plot.scales, marker.bandSlice));
-	const dx = $derived((styles?.dx ?? 0) + nudge.dx);
-	const dy = $derived((styles?.dy ?? 0) + nudge.dy);
+	// The fixed offset, which `declutter` and `edgeAware` place labels by; a function of the row moves each label after that, through `RowOffsetMarks`.
+	const fixedOffset = $derived(
+		RowOffset.whole(marker, { dx: styles?.dx ?? 0, dy: styles?.dy ?? 0 })
+	);
+	const dx = $derived(fixedOffset.dx + nudge.dx);
+	const dy = $derived(fixedOffset.dy + nudge.dy);
+	const anchorAt = (d: TData) =>
+		typeof marker.textAnchor === 'function' ? anchorOf(marker.textAnchor(d)) : textAnchor;
+	const projected = $derived(!!plot.scales.projection);
 
 	const declutter = $derived.by(() => {
 		if (!marker.declutter) return undefined;
@@ -67,11 +87,17 @@
 			elbowGap: own.elbowGap ?? defaults.elbowGap,
 			laneStep: own.laneStep ?? defaults.laneStep,
 			labelGap: own.labelGap ?? defaults.labelGap,
+			aligned: own.aligned,
+			flip: own.flip,
 			connector: { ...defaults.connector, ...own.connector }
 		};
 	});
 	const perRow = $derived(
-		!!declutter || !!marker.edgeAware || !!marker.onPointerEnter || !!marker.onPointerLeave
+		!!declutter ||
+			!!marker.edgeAware ||
+			!!marker.onPointerEnter ||
+			!!marker.onPointerLeave ||
+			typeof marker.textAnchor === 'function'
 	);
 	const dir = $derived(Math.sign(dx) || 1);
 
@@ -99,9 +125,13 @@
 		if ((!declutter && !marker.edgeAware) || !xScale || !yScale) return undefined;
 		const xOf = channel(x ?? 0);
 		const yOf = channel(y ?? 0);
+		// A band's position is its start; a mark sits at its middle.
+		const middle = (scale: typeof plot.scales.x) =>
+			scale?.type === 'band' ? scale.fn.bandwidth() / 2 : 0;
+		const [dx0, dy0] = [middle(plot.scales.x), middle(plot.scales.y)];
 		return displayData.map((d) => ({
-			px: Number(xScale(xOf(d) as never)),
-			py: Number(yScale(yOf(d) as never))
+			px: Number(xScale(xOf(d) as never)) + dx0,
+			py: Number(yScale(yOf(d) as never)) + dy0
 		}));
 	});
 
@@ -112,6 +142,8 @@
 					dx,
 					fontSize,
 					geometry: declutter,
+					forceAligned: declutter.aligned,
+					flip: declutter.flip,
 					bounds
 				})
 			: undefined
@@ -157,33 +189,40 @@
 	rowAnchor: typeof textAnchor,
 	rowLineAnchor: typeof lineAnchor
 )}
-	<Text
-		data={rows}
-		x={x ?? 0}
-		y={y ?? 0}
-		text={text ?? ''}
-		dx={rowDx}
-		dy={rowDy}
-		fill={fill as never}
-		fillOpacity={fillOpacity as never}
-		{fontSize}
-		{fontWeight}
-		textAnchor={rowAnchor}
-		lineAnchor={rowLineAnchor}
-		fontStyle={fontStyleProp}
-		lineHeight={styles?.lineHeight}
-		rotate={styles?.rotate}
-		stroke={styles?.stroke}
-		strokeWidth={styles?.strokeWidth}
-		paintOrder={styles?.paintOrder}
-		class={styles?.class}
-		textClass={styles?.textClass}
-	/>
+	<g transform={projected ? `translate(${rowDx},${rowDy})` : undefined}>
+		<Text
+			data={rows}
+			x={x ?? (marker.frameAnchor ? undefined : 0)}
+			y={y ?? (marker.frameAnchor ? undefined : 0)}
+			frameAnchor={marker.frameAnchor}
+			text={text ?? ''}
+			dx={projected ? 0 : rowDx}
+			dy={projected ? 0 : rowDy}
+			fill={fill as never}
+			fillOpacity={fillOpacity as never}
+			{fontSize}
+			{fontWeight}
+			textAnchor={rowAnchor}
+			lineAnchor={rowLineAnchor}
+			fontStyle={fontStyleProp}
+			lineHeight={styles?.lineHeight}
+			rotate={styles?.rotate}
+			stroke={styles?.stroke}
+			strokeWidth={styles?.strokeWidth}
+			paintOrder={styles?.paintOrder}
+			class={styles?.class}
+			textClass={styles?.textClass}
+		/>
+	</g>
 {/snippet}
 
 {#snippet labels()}
 	{#if !perRow}
-		{@render label(displayData, dx, dy, textAnchor, lineAnchor)}
+		<RowOffsetMarks {marker} rows={displayData}>
+			{#snippet mark(rows)}
+				{@render label(rows, dx, dy, textAnchor, lineAnchor)}
+			{/snippet}
+		</RowOffsetMarks>
 	{:else if (!declutter && !marker.edgeAware) || points}
 		<!-- A decluttered or edge-aware label waits for both scales. -->
 		{#each displayData as d, i (i)}
@@ -213,23 +252,27 @@
 				onpointerenter={marker.onPointerEnter && (() => marker.onPointerEnter?.(d))}
 				onpointerleave={marker.onPointerLeave && (() => marker.onPointerLeave?.(d))}
 			>
-				{#if placement}
-					{@render label(
-						[d],
-						placement.dx,
-						placement.dy + extraDy,
-						placement.textAnchor,
-						placement.lineAnchor
-					)}
-				{:else}
-					{@render label(
-						[d],
-						labelDx,
-						dy + extraDy,
-						lane?.aligned && laneDir !== dir ? flipAnchor(textAnchor) : textAnchor,
-						lineAnchor
-					)}
-				{/if}
+				<RowOffsetMarks {marker} rows={[d]}>
+					{#snippet mark(rows)}
+						{#if placement}
+							{@render label(
+								rows,
+								placement.dx,
+								placement.dy + extraDy,
+								placement.textAnchor,
+								placement.lineAnchor
+							)}
+						{:else}
+							{@render label(
+								rows,
+								labelDx,
+								dy + extraDy,
+								lane?.aligned && laneDir !== dir ? flipAnchor(anchorAt(d)) : anchorAt(d),
+								lineAnchor
+							)}
+						{/if}
+					{/snippet}
+				</RowOffsetMarks>
 			</g>
 		{/each}
 	{/if}

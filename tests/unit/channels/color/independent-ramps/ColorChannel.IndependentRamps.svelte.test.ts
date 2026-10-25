@@ -1,20 +1,13 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
-import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-import { resolveColorScale } from '$lib/utils/color';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import { ColorRamp } from '$lib/utils/color';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import type { DotMarkerConfig } from '$lib/types/markers/basic';
-import type {
-	ArgentinaProvinceProps,
-	WorldCountryProps
-} from '../../../../../stories/plots/geo/data';
-import {
-	ARGENTINA_PROVINCES,
-	WORLD_COUNTRIES,
-	WEATHER_STATIONS
-} from '../../../../../stories/plots/geo/data';
-import { COUNTRIES } from '../../../../../stories/plots/scatter/data';
+import { type ArgentinaProvinceProps, ARGENTINA_PROVINCES } from '$datasets/argentina-provinces';
+import { type WorldCountryProps, WORLD_COUNTRIES } from '$datasets/world-countries';
+import { COUNTRIES_AT_2007, WEATHER_STATIONS } from '$datasets';
 import { waitForSvg, countGeoPaths, countDotMarks } from '../../../plots/_helpers/svg';
 
 function fillsOf(svg: SVGElement, selector: string): string[] {
@@ -101,15 +94,15 @@ describe('color channel - independent ramps', () => {
 	});
 
 	test('ScatterPlot: base plot and marker dots each use their own color ramps independently', async () => {
-		const highGdpCountries = COUNTRIES.filter((d) => d.gdpPerCapita > 50);
+		const highGdpCountries = COUNTRIES_AT_2007.filter((d) => d.gdp > 30_000);
 		const { container } = render(ScatterPlot, {
 			width: 600,
 			height: 400,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
 			r: 6,
-			color: 'region',
+			color: 'continent',
 			scales: {
 				color: {
 					scheme: {
@@ -124,10 +117,10 @@ describe('color channel - independent ramps', () => {
 				{
 					type: 'dot',
 					data: highGdpCountries,
-					x: 'gdpPerCapita',
-					y: 'lifeExpectancy',
+					x: 'gdp',
+					y: 'life',
 					r: 10,
-					color: 'lifeExpectancy',
+					color: 'life',
 					scales: { color: { scheme: ['#cffafe', '#0d9488'] } },
 					styles: { dotStroke: '#0f172a', dotStrokeWidth: 2 }
 				}
@@ -160,10 +153,10 @@ describe('color channel - independent ramps: segment-scoped (GeoPlot)', () => {
 		// the segment's green→yellow ramp; Mendoza (not in the segment) reads
 		// the plot-level red→blue ramp, despite sharing the same `color` value.
 		expect(fillOf(svg, 'Córdoba')).toContain(
-			resolveColorScale({ scheme: ['#00ff00', '#ffff00'] }, [0, 10], [])(0)
+			ColorRamp.resolve({ scheme: ['#00ff00', '#ffff00'] }, [0, 10], [])(0)
 		);
 		expect(fillOf(svg, 'Mendoza')).toContain(
-			resolveColorScale({ scheme: ['#ff0000', '#0000ff'] }, [0, 10], [])(0)
+			ColorRamp.resolve({ scheme: ['#ff0000', '#0000ff'] }, [0, 10], [])(0)
 		);
 	});
 
@@ -192,7 +185,7 @@ describe('color channel - independent ramps: segment-scoped (GeoPlot)', () => {
 		// own two features) - under the whole dataset's domain ([0, 1e6], via
 		// Buenos Aires/Santa Fe) it would land at t≈0.0001, nowhere near pure
 		// black or white, so both endpoint checks together pin the domain down.
-		const segmentDomainColor = resolveColorScale(
+		const segmentDomainColor = ColorRamp.resolve(
 			{ scheme: ['#000000', '#ffffff'] },
 			[100, 200],
 			[]
@@ -200,7 +193,7 @@ describe('color channel - independent ramps: segment-scoped (GeoPlot)', () => {
 		expect(fillOf(svg, 'Córdoba')).toContain(segmentDomainColor);
 
 		// Mendoza (value 200) is the segment's own max → t=1 → pure white.
-		const segmentMaxColor = resolveColorScale(
+		const segmentMaxColor = ColorRamp.resolve(
 			{ scheme: ['#000000', '#ffffff'] },
 			[100, 200],
 			[]
@@ -223,10 +216,10 @@ describe('color channel - independent ramps: segment-scoped (GeoPlot)', () => {
 		const svg = await waitForSvg(container);
 
 		expect(fillOf(svg, 'Córdoba')).toContain(
-			resolveColorScale({ scheme: ['#00ff00', '#ffff00'] }, [0, 1], [])(0)
+			ColorRamp.resolve({ scheme: ['#00ff00', '#ffff00'] }, [0, 1], [])(0)
 		);
 		expect(fillOf(svg, 'Mendoza')).toContain(
-			resolveColorScale({ scheme: ['#ff0000', '#0000ff'] }, [0, 1], [])(0)
+			ColorRamp.resolve({ scheme: ['#ff0000', '#0000ff'] }, [0, 1], [])(0)
 		);
 	});
 });
@@ -248,7 +241,7 @@ describe('color channel - independent ramps: marker inherits the plot ramp when 
 			] satisfies GeoMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
-		const plotRampColor = resolveColorScale({ scheme: ['#ff0000', '#0000ff'] }, [0, 10], [])(0);
+		const plotRampColor = ColorRamp.resolve({ scheme: ['#ff0000', '#0000ff'] }, [0, 10], [])(0);
 		expect(dotFillOf(svg)).toContain(plotRampColor);
 	});
 
@@ -271,8 +264,8 @@ describe('color channel - independent ramps: marker inherits the plot ramp when 
 			] satisfies GeoMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
-		const markerRampColor = resolveColorScale({ scheme: ['#00ff00', '#ffff00'] }, [0, 10], [])(0);
-		const plotRampColor = resolveColorScale({ scheme: ['#ff0000', '#0000ff'] }, [0, 10], [])(0);
+		const markerRampColor = ColorRamp.resolve({ scheme: ['#00ff00', '#ffff00'] }, [0, 10], [])(0);
+		const plotRampColor = ColorRamp.resolve({ scheme: ['#ff0000', '#0000ff'] }, [0, 10], [])(0);
 		expect(dotFillOf(svg)).toContain(markerRampColor);
 		expect(dotFillOf(svg)).not.toContain(plotRampColor);
 	});

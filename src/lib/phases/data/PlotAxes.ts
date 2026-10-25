@@ -1,4 +1,4 @@
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import { DISCRETE_SCALE_TYPES, TEMPORAL_SCALE_TYPES } from '$lib/types/layout/scales';
 import type { AxisChannelName } from '$lib/types/layout/mapping';
@@ -79,6 +79,22 @@ export class PlotAxes {
 	/** The axis a plot without inferred axes sorts into: `x`. */
 	static categoryOf(state: { axes?: PlotAxes }): AxisChannelName {
 		return state.axes?.category ?? 'x';
+	}
+
+	/**
+	 * Where marks that rise from a baseline start along the value axis: zero,
+	 * or the nearest end of a pinned domain that leaves zero out.
+	 */
+	static baselineOf(state: {
+		axes?: PlotAxes;
+		scales: Partial<Record<AxisChannelName, { domain?: readonly unknown[] }>>;
+	}): number {
+		const domain = state.scales[PlotAxes.valueOf(state)]?.domain;
+		const lo = Number(domain?.[0]);
+		const hi = Number(domain?.[(domain?.length ?? 1) - 1]);
+		if (!domain || domain.length < 2 || Number.isNaN(lo) || Number.isNaN(hi)) return 0;
+		const [min, max] = [Math.min(lo, hi), Math.max(lo, hi)];
+		return min > 0 ? min : max < 0 ? max : 0;
 	}
 
 	/** The other position axis. */

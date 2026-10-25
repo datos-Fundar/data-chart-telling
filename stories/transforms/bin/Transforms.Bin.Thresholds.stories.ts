@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { MEASUREMENTS } from '../../data/measurements';
+import { HEIGHTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `thresholds` decides where the bins start and stop. A number asks for about
@@ -40,8 +40,8 @@ export const CountOfBins: Story = {
 		markers: [
 			{
 				type: 'rect',
-				data: MEASUREMENTS,
-				x: 'value',
+				data: HEIGHTS,
+				x: 'height',
 				transforms: [{ type: 'binX', y: 'count', thresholds: 6 }],
 				styles: { fill: '#2563eb', fillOpacity: 0.8 }
 			}
@@ -55,10 +55,10 @@ export const ExplicitEdges: Story = {
 		markers: [
 			{
 				type: 'rect',
-				data: MEASUREMENTS,
-				x: 'value',
+				data: HEIGHTS,
+				x: 'height',
 				transforms: [
-					{ type: 'binX', y: 'count', thresholds: [15, 25, 30, 35, 38, 42, 45, 50, 55] }
+					{ type: 'binX', y: 'count', thresholds: [135, 145, 150, 155, 160, 165, 175, 180] }
 				],
 				styles: { fill: '#2563eb', fillOpacity: 0.8 }
 			}
@@ -72,8 +72,8 @@ export const NamedGenerator: Story = {
 		markers: [
 			{
 				type: 'rect',
-				data: MEASUREMENTS,
-				x: 'value',
+				data: HEIGHTS,
+				x: 'height',
 				transforms: [{ type: 'binX', y: 'count', thresholds: 'sturges' }],
 				styles: { fill: '#2563eb', fillOpacity: 0.8 }
 			}
@@ -81,14 +81,14 @@ export const NamedGenerator: Story = {
 	}
 };
 
-/** `interval` fixes every bin's width: here one unit of `value` per bin. */
+/** `interval` fixes every bin's width: here two centimeters of `height` per bin. */
 export const FixedInterval: Story = {
 	args: {
 		markers: [
 			{
 				type: 'rect',
-				data: MEASUREMENTS,
-				x: 'value',
+				data: HEIGHTS,
+				x: 'height',
 				transforms: [{ type: 'binX', y: 'count', interval: 2 }],
 				styles: { fill: '#2563eb', fillOpacity: 0.8 }
 			}

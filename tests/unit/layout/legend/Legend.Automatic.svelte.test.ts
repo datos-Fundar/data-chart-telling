@@ -1,6 +1,6 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import { waitForSvg } from '../../plots/_helpers/svg';
 
 const ROWS = [
@@ -80,5 +80,37 @@ describe('Figure legend', () => {
 			expect(legendText(container)).toContain('Female, 2021 on');
 			expect(legendText(container)).toContain('Threshold');
 		});
+	});
+});
+
+describe('Figure legend - size channel title', () => {
+	const ScatterPlot = import('$lib/plots/correlation/scatter/Plot.svelte');
+	const points = ROWS.map((row) => ({ ...row, weight: row.value * 10 }));
+
+	test('a named function sizing the dots titles the size legend', async () => {
+		const { default: Scatter } = await ScatterPlot;
+		const weightRatio = (row: { weight: number; year: number }) => row.weight / row.year;
+		const { container } = await render(Scatter, {
+			width: 500,
+			height: 300,
+			data: points,
+			x: 'year',
+			y: 'value',
+			r: weightRatio
+		} as never);
+		await vi.waitFor(() => expect(legendText(container)).toContain('Weight ratio'));
+	});
+
+	test('a field key sizing the dots titles it with the field, written as a label', async () => {
+		const { default: Scatter } = await ScatterPlot;
+		const { container } = await render(Scatter, {
+			width: 500,
+			height: 300,
+			data: points,
+			x: 'year',
+			y: 'value',
+			r: 'weight'
+		} as never);
+		await vi.waitFor(() => expect(legendText(container)).toContain('Weight'));
 	});
 });

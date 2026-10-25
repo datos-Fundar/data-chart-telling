@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { DensityXTransform } from '$lib/types/transforms';
-import { MEASUREMENTS, type Measurement } from '../../data/measurements';
+import { HEIGHTS, type HeightRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The density transforms' options shape the estimate. `kernel` is the bump each
@@ -43,8 +43,8 @@ const curve = (
 	stroke: string
 ): AxisBasedMarkersConfig => ({
 	type: 'line',
-	data: MEASUREMENTS,
-	x: 'value',
+	data: HEIGHTS,
+	x: 'height',
 	transforms: [{ type: 'densityX', ...transform }],
 	styles: { stroke, strokeWidth: 2 }
 });
@@ -62,7 +62,7 @@ export const Kernels: Story = {
 	}
 };
 
-/** `bandwidth` 1 (blue) follows every bump in the sample, 3 (orange) shows the two groups, 10 (green) blurs them into one hill. */
+/** `bandwidth` 1 (blue) follows every bump in the sample, 3 (orange) smooths them into a single hill, 10 (green) flattens it. */
 export const Bandwidth: Story = {
 	args: {
 		markers: [
@@ -79,8 +79,8 @@ export const DefaultBandwidth: Story = {
 		markers: [
 			{
 				type: 'area',
-				data: MEASUREMENTS.filter((d) => d.group === 'A'),
-				x: 'value',
+				data: HEIGHTS.filter((d) => d.group === 'female'),
+				x: 'height',
 				transforms: [{ type: 'densityX' }],
 				styles: { fill: '#7c3aed', fillOpacity: 0.35 }
 			}
@@ -95,8 +95,8 @@ export const Trim: Story = {
 			curve({ bandwidth: 4 }, '#2563eb'),
 			{
 				type: 'area',
-				data: MEASUREMENTS,
-				x: 'value',
+				data: HEIGHTS,
+				x: 'height',
 				transforms: [{ type: 'densityX', bandwidth: 4, trim: true }],
 				styles: { fill: '#ea580c', fillOpacity: 0.3 }
 			}
@@ -111,8 +111,8 @@ export const Cumulative: Story = {
 		markers: [
 			{
 				type: 'line',
-				data: MEASUREMENTS,
-				x: 'value',
+				data: HEIGHTS,
+				x: 'height',
 				grouping: 'group',
 				color: 'group',
 				transforms: [{ type: 'densityX', cumulative: 1 }],
@@ -122,12 +122,12 @@ export const Cumulative: Story = {
 	}
 };
 
-/** `weight` makes each row count by its own `weight` (orange): the heavier rows of group B pull the estimate right of the plain count (blue). */
+/** `weight` makes each row count by its own `weight` (orange): the heavier rows, mostly male, pull the estimate right of the plain count (blue). */
 export const Weight: Story = {
 	args: {
 		markers: [
 			curve({ bandwidth: 3 }, '#2563eb'),
-			curve({ bandwidth: 3, weight: (d: Measurement) => d.weight ** 2 }, '#ea580c')
+			curve({ bandwidth: 3, weight: (d: HeightRow) => d.weight ** 2 }, '#ea580c')
 		]
 	}
 };

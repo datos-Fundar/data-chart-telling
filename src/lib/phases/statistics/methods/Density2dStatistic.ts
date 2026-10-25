@@ -10,18 +10,20 @@ export class Density2dStatistic {
 	static build<T extends Record<string, unknown>>(
 		source: StatisticSource<T>,
 		config: Extract<StatisticConfig, { type: 'density2d' }>
-	): DensityMarkerConfig {
-		return {
-			type: 'density',
-			data: source.data,
-			x: source.x,
-			y: source.y,
-			bandwidth: config.bandwidth,
-			thresholds: config.thresholds,
-			styles: {
-				...config.styles,
-				stroke: config.styles?.stroke ?? source.color ?? STATISTIC_FALLBACK_COLOR
+	): DensityMarkerConfig[] {
+		return [
+			{
+				type: 'density',
+				data: source.data,
+				x: source.x,
+				y: source.y,
+				bandwidth: config.bandwidth,
+				thresholds: config.thresholds,
+				styles: {
+					...config.styles,
+					stroke: config.styles?.stroke ?? source.color ?? STATISTIC_FALLBACK_COLOR
+				}
 			}
-		};
+		];
 	}
 }

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { DAILY_TEMPERATURE, type DailyTemperature } from '../../data/daily-temperature';
+import { DAILY_TEMPERATURE, type DailyTemperature } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `select` transform keeps one row per group: the first or the last, or the

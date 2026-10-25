@@ -9,14 +9,18 @@ import type {
 import type { HoverPosition } from '$lib/types/phases/hover/phase';
 import type { VisualGroup } from '$lib/types/plots/segments/config';
 import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
-import type { ChannelAccessors, ResolvedChannels } from '$lib/types/layout/mapping';
+import type {
+	AxisChannelName,
+	ChannelAccessors,
+	ResolvedChannels
+} from '$lib/types/layout/mapping';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
 import type { MarkerTransform } from '$lib/types/transforms';
 import type { ProcessedData, ProcessedRow } from '$lib/types/phases/transforms/phase';
 import type { FacetStageState } from '$lib/types/phases/facet/phase';
-import type { AxisBasedStylesConfig, ValuesStyle } from '$lib/types/layout/styles';
+import type { AxisBasedStylesConfig, ValuesStyle, ValueSelect } from '$lib/types/layout/styles';
 import type { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import type { PlotInteraction } from '$lib/layout/interaction/PlotInteraction.svelte';
 import type { PlotAxes } from '$lib/phases/data/PlotAxes';
@@ -38,12 +42,21 @@ export type AxisPlotState<
 	data?: TData[];
 	segments?: SegmentsConfig<TStyle>;
 	scales: AxisBasedScalesConfig<TData>;
+	/** The axes whose domain the "scales" phase left to the kind's own fit, not the author's `domain`. */
+	fittedAxes?: AxisChannelName[];
 	statistics?: StatisticConfig[];
 	transforms?: MarkerTransform[];
 	authorMarkers?: AxisBasedMarkersConfig[];
 	width: number;
 	height: number;
 	margins?: MarginConfig;
+	/** The interval a point stands for, on the plots that draw one (`ForestPlot`): its lower and upper end, or the half-width around it, each a field key or a function of the row. */
+	lower?: Accessor<TData, unknown>;
+	upper?: Accessor<TData, unknown>;
+	error?: Accessor<TData, unknown>;
+	/** What a bar is measured against, on the plots that draw it (`BulletPlot`): a target, and the upper bounds of the bands grading it. Each is a number, a field key or a function of the row. */
+	target?: unknown;
+	ranges?: unknown[];
 	/** The plot's `styles`, which `BasePlotLayout` draws its frame from. */
 	styles?: AxisBasedStylesConfig;
 	/** The plot's `styles.values`, which its "markers" phase turns into a value-label `text` marker. */
@@ -80,6 +93,10 @@ export type AxisPlotState<
 	// "transforms" phase output: what the plot's own marks draw, and the same rows split into their visual groups.
 	processedData?: ProcessedData;
 	processedGroups?: VisualGroup<Series<ProcessedRow>, TStyle>[];
+	/** The processed rows `styles.values` writes labels for, when the labels are on and the plot picks them. */
+	labelled?: ProcessedRow[];
+	/** What `styles.values.select` came to - the author's, else the plot's default. */
+	labelSelects?: ValueSelect[];
 
 	// "styles" phase output: `values` over the kind's own defaults.
 	valueLabels?: ValueLabels;

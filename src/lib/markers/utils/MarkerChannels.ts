@@ -1,7 +1,9 @@
-import { resolveColorScale } from '$lib/utils/color';
-import { resolveOpacityScale } from '$lib/utils/opacity';
-import { resolveSymbolScale } from '$lib/utils/symbol';
+import { resolveAccessor } from '$lib/utils/accessors';
+import { ColorRamp } from '$lib/utils/color';
+import { OpacityScale } from '$lib/utils/OpacityScale';
+import { SymbolScale } from '$lib/utils/SymbolScale';
 import type { ChannelScalesConfig } from '$lib/types/layout/scales';
+import type { ProcessedData } from '$lib/types/phases';
 import type { SymbolType } from '$lib/types/plots/constants';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 
@@ -13,6 +15,53 @@ export type OpacityBucket<TData> = { value: number; data: TData[] };
  * over its rows, shared by every marker kind that intersects `CommonMarkerConfig`.
  */
 export class MarkerChannels {
+	/**
+	 * The scales a marker with none of its own draws with: the plot's, except
+	 * a numeric color `domain` - it spans the plot's own values, so the
+	 * marker's own values would all land at one end of it. The scheme (and
+	 * pivot) carry over; the domain is read from the marker's own rows.
+	 */
+	static inheritScales(
+		own: ChannelScalesConfig | undefined,
+		plot: ChannelScalesConfig | undefined
+	): ChannelScalesConfig | undefined {
+		if (own || !plot?.color) return own ?? plot;
+		const { domain, ...color } = plot.color;
+		const numeric = Array.isArray(domain) && domain.every((v) => typeof v === 'number');
+		return { ...plot, color: numeric ? color : plot.color };
+	}
+
+	/** `markers`, each `dot` with no scales of its own carrying the plot's ({@link inheritScales}). */
+	static inheritAll<TMarker extends { type: string; scales?: ChannelScalesConfig }>(
+		markers: TMarker[],
+		plot: ChannelScalesConfig | undefined
+	): TMarker[] {
+		return markers.map((marker) =>
+			marker.type === 'dot' && !marker.scales
+				? { ...marker, scales: MarkerChannels.inheritScales(undefined, plot) }
+				: marker
+		);
+	}
+
+	/**
+	 * `markers`, each `bollinger` that draws the plot's own rows (it sets no `data`)
+	 * and no `x` or `y` of its own, reading the plot's: they are the same rows, so
+	 * the same channels place them.
+	 */
+	static inheritPosition<
+		TMarker extends { type: string; data?: unknown; x?: unknown; y?: unknown }
+	>(markers: TMarker[], processed: ProcessedData | undefined): TMarker[] {
+		if (!processed) return markers;
+		const read = (channel: unknown) =>
+			channel === undefined ? undefined : resolveAccessor(channel as never);
+		const plot = { x: read(processed.channels.x), y: read(processed.channels.y) };
+		return markers.map((marker) =>
+			marker.type === 'bollinger' && marker.data === undefined
+				? { ...marker, x: marker.x ?? plot.x, y: marker.y ?? plot.y }
+				: marker
+		);
+	}
+
 	/**
 	 * Resolves a `CommonMarkerConfig` pair into a per-row fill accessor, or
 	 * `undefined` when `color` is unset (caller falls back to its own flat
@@ -40,8 +89,9 @@ export class MarkerChannels {
 		const domain: [number, number] | string[] = allNumeric
 			? [Math.min(...rawVals.map(Number)), Math.max(...rawVals.map(Number))]
 			: [...new Set(rawVals.map(String))];
-		const defaultScheme = allNumeric ? [cfg.continuous.min, cfg.continuous.max] : cfg.palette;
-		const colorScale = resolveColorScale(scales?.color, domain, defaultScheme);
+		const colorScale = allNumeric
+			? ColorRamp.continuous(cfg, scales?.color, domain as [number, number])
+			: ColorRamp.resolve(scales?.color, domain, cfg.palette);
 		return (d: TData) => colorScale(colorFn(d));
 	}
 
@@ -69,7 +119,7 @@ export class MarkerChannels {
 			)
 		];
 		if (!domain.length) return undefined;
-		const scale = resolveSymbolScale(scales?.symbol, domain, cfg.symbols);
+		const scale = SymbolScale.resolve(scales?.symbol, domain, cfg.symbols);
 		return (d: TData) => scale(symbolFn(d));
 	}
 
@@ -109,7 +159,7 @@ export class MarkerChannels {
 			? [Math.min(...rawVals.map(Number)), Math.max(...rawVals.map(Number))]
 			: [...new Set(rawVals.map(String))];
 
-		const scale = resolveOpacityScale(scales?.opacity, domain, cfg.continuous.opacityRange);
+		const scale = OpacityScale.resolve(scales?.opacity, domain, cfg.continuous.opacityRange);
 
 		const buckets = new Map<number, TData[]>();
 		for (const d of data) {

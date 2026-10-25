@@ -1,22 +1,28 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
-import TooltipSyncDemo, { heatData, pyramidData } from './TooltipSyncDemo.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+import TooltipSyncDemo, { pyramidData } from './TooltipSyncDemo.svelte';
 import FacetSyncBarBySeriesDemo from './FacetSyncBarBySeriesDemo.svelte';
 import FacetSyncBarUnrelatedOrderDemo, {
 	UNRELATED_SORT_DATA,
 	type GroupValue
 } from './FacetSyncBarUnrelatedOrderDemo.svelte';
 import { renderSource } from '../../common/docsSource';
-import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
-import { REGION_BARS, REGION_SECTOR_BARS, type RegionSector } from '../../data/region-bars';
-import { AGE_GROUPS } from '../../data/population-pyramid';
+import {
+	ARGENTINA_CHILE_TRENDS,
+	type CountryTrendRow,
+	AGE_GROUPS,
+	AGE_SHARES,
+	PENGUIN_COUNTS_BY_SEX,
+	POPULATION_BY_BROAD_AGE,
+	type AgeRow
+} from '$datasets';
 
 /** `tooltip.sync: true` broadcasts the hover to every faceted panel with a match. */
 const meta = {
 	title: 'Layout/Tooltip/FacetSync',
 	component: LinePlot,
 	tags: ['autodocs'],
-	args: { width: 680, height: 400, data: TIME_SERIES, x: 'year', y: 'value' },
+	args: { width: 680, height: 400, data: ARGENTINA_CHILE_TRENDS, x: 'year', y: 'value' },
 	argTypes: {
 		width: { control: false },
 		height: { control: false },
@@ -43,9 +49,9 @@ type Story = StoryObj<typeof meta>;
 export const MultiFacetBroadcast: Story = {
 	args: {
 		title: 'Tooltip on every synced facet',
-		subtitle: 'Hover over one region - the other also shows its tooltip',
-		color: 'metric' as keyof SeriesPoint,
-		facet: { by: 'region' as keyof SeriesPoint, columns: 2 },
+		subtitle: 'Hover over one country - the other also shows its tooltip',
+		color: 'metric' as keyof CountryTrendRow,
+		facet: { by: 'country' as keyof CountryTrendRow, columns: 2 },
 		tooltip: { strategy: 'x', sync: true },
 		markers: [{ type: 'hover' }]
 	}
@@ -58,9 +64,9 @@ export const FacetSyncLine: StoryObj = {
 		docs: {
 			source: {
 				code: renderSource('LinePlot', {
-					title: 'GDP vs. Employment by region',
+					title: 'GDP per capita vs. population by country',
 					subtitle: 'Strategy: x · Sync: on',
-					data: TIME_SERIES,
+					data: ARGENTINA_CHILE_TRENDS,
 					x: 'year',
 					y: 'value',
 					color: 'metric',
@@ -70,12 +76,12 @@ export const FacetSyncLine: StoryObj = {
 							title: 'Indicator',
 							columns: 2,
 							items: [
-								{ name: 'GDP', symbol: 'line' },
-								{ name: 'Employment', symbol: 'line' }
+								{ name: 'GDP per capita', symbol: 'line' },
+								{ name: 'Population', symbol: 'line' }
 							]
 						}
 					],
-					facet: { by: 'region', columns: 2 },
+					facet: { by: 'country', columns: 2 },
 					tooltip: { strategy: 'x', sync: true },
 					markers: [{ type: 'hover' }]
 				})
@@ -84,19 +90,19 @@ export const FacetSyncLine: StoryObj = {
 	}
 };
 
-/** Faceted bar chart - `x` strategy highlights the same region across years. */
+/** Faceted bar chart - `x` strategy highlights the same age group across years. */
 export const FacetSyncBar: StoryObj = {
 	render: () => ({ Component: TooltipSyncDemo, props: { kind: 'bar' } }),
 	parameters: {
 		docs: {
 			source: {
 				code: renderSource('BarPlot', {
-					title: 'Value by region and year',
+					title: 'Population share by age group and year',
 					subtitle: 'Strategy: x · Sync: on',
-					data: REGION_BARS,
-					x: 'region',
-					y: 'value',
-					facet: { by: 'year', columns: 3 },
+					data: AGE_SHARES,
+					x: 'ageGroup',
+					y: 'share',
+					facet: { by: 'year', columns: 2 },
 					tooltip: { strategy: 'x', sync: true },
 					markers: [{ type: 'hover' }]
 				})
@@ -106,7 +112,7 @@ export const FacetSyncBar: StoryObj = {
 };
 
 /**
- * Faceted by the bar's own category - `'series'` syncs by sector instead of
+ * Faceted by census - `'series'` syncs by sex instead of
  * x/y. Toggle layout (stacked/grouped) and orientation to try every combo.
  */
 export const FacetSyncBarBySeries: StoryObj = {
@@ -115,18 +121,18 @@ export const FacetSyncBarBySeries: StoryObj = {
 		docs: {
 			source: {
 				code: renderSource('BarPlot', {
-					title: 'Value by sector, faceted by region',
+					title: 'Population share by sex, faceted by census',
 					subtitle: 'Strategy: series · Sync: on',
-					data: REGION_SECTOR_BARS,
-					x: 'region',
-					y: 'value',
-					color: 'sector',
+					data: POPULATION_BY_BROAD_AGE.filter((d) => d.year === 1991 || d.year === 2022),
+					x: 'ageGroup',
+					y: 'share',
+					color: 'sex',
 					transforms: [{ type: 'stackY' as const }],
-					facet: { by: 'region', columns: 2 },
+					facet: { by: 'year', columns: 2 },
 					tooltip: {
 						strategy: 'series',
 						sync: true,
-						format: (row: RegionSector) => `${row.sector}: ${row.value}`
+						format: (row: AgeRow) => `${row.sex}: ${row.share}%`
 					},
 					markers: [{ type: 'hover' }]
 				})
@@ -135,22 +141,22 @@ export const FacetSyncBarBySeries: StoryObj = {
 	}
 };
 
-/** Faceted heatmap - `punctual` strategy highlights the same cell in every scenario. */
+/** Faceted heatmap - `punctual` strategy highlights the same cell in every sex. */
 export const FacetSyncHeatmap: StoryObj = {
 	render: () => ({ Component: TooltipSyncDemo, props: { kind: 'heatmap' } }),
 	parameters: {
 		docs: {
 			source: {
 				code: renderSource('HeatmapPlot', {
-					title: 'Households by rooms (2022)',
+					title: 'Penguins by island and species',
 					subtitle: 'Strategy: punctual · Sync: on',
-					data: heatData,
-					x: 'rooms',
-					y: 'people',
-					color: 'pct',
-					scales: { x: { label: 'Rooms' }, y: { label: 'People' } },
-					styles: { values: { show: false, format: (v: number) => `${(v * 100).toFixed(0)}%` } },
-					facet: { by: 'scenario', columns: 2 },
+					data: PENGUIN_COUNTS_BY_SEX,
+					x: 'island',
+					y: 'species',
+					color: 'count',
+					scales: { x: { label: 'Island' }, y: { label: 'Species' } },
+					styles: { values: { show: false, format: (v: number) => `${v}` } },
+					facet: { by: 'sex', columns: 2 },
 					tooltip: { strategy: 'punctual', sync: true },
 					markers: [{ type: 'hover' }]
 				})
@@ -178,7 +184,7 @@ export const FacetSyncBarUnrelatedOrder: StoryObj = {
 					scales: {
 						y: { sort: (a: GroupValue, b: GroupValue) => a.value - b.value }
 					},
-					facet: { by: 'group', columns: 2 },
+					facet: { by: 'group', columns: 2, scales: 'free-y' },
 					tooltip: {
 						strategy: 'y',
 						sync: true,
@@ -202,7 +208,7 @@ export const FacetSyncPyramid: StoryObj = {
 					subtitle: 'Strategy: y · Sync: on',
 					data: pyramidData,
 					y: 'ageGroup',
-					x: 'pct',
+					x: 'share',
 					color: 'sex',
 					scales: {
 						y: { domain: AGE_GROUPS },

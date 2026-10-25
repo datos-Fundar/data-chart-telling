@@ -1,10 +1,10 @@
 <script lang="ts">
 	import PlotComposer from '$lib/layout/composer/PlotComposer.svelte';
-	import LinePlot from '$lib/plots/line/Plot.svelte';
-	import BarPlot from '$lib/plots/bar/Plot.svelte';
-	import { TIME_SERIES } from '../../data/time-series';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+	import { ARGENTINA_CHILE_TRENDS } from '$datasets';
 
-	const data = TIME_SERIES.filter((d) => d.metric === 'GDP');
+	const data = ARGENTINA_CHILE_TRENDS.filter((d) => d.metric === 'GDP per capita');
 </script>
 
 <!-- One player for every panel: the composer's `timeline` takes the same `type` and `player`. -->
@@ -13,7 +13,7 @@
 	height={480}
 	title="One player, two plots"
 	timeline={{
-		values: [2018, 2019, 2020, 2021, 2022],
+		values: [1987, 1992, 1997, 2002, 2007],
 		type: 'player',
 		player: { controls: ['play', 'value', 'slider', 'speed'], loop: true }
 	}}
@@ -23,15 +23,15 @@
 		{data}
 		x="year"
 		y="value"
-		color="region"
-		scales={{ x: { domain: [2018, 2022] }, y: { domain: [0, 100] } }}
+		color="country"
+		scales={{ x: { domain: [1987, 2007] }, y: { domain: [0, 250] } }}
 		timeline={{ accessor: 'year', filterMode: 'upTo' }}
 	/>
 	<BarPlot
 		{data}
-		x="region"
+		x="country"
 		y="value"
-		scales={{ y: { domain: [0, 100] } }}
+		scales={{ y: { domain: [0, 250] } }}
 		timeline={{ accessor: 'year' }}
 	/>
 </PlotComposer>

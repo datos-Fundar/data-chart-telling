@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import GeoPlot from '$lib/plots/geo/Plot.svelte';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { WORLD_COUNTRIES, WEATHER_STATIONS } from '../../../plots/geo/data';
-import { countryPopulation } from '../../../plots/geo/channels';
+import { WORLD_COUNTRIES } from '$datasets/world-countries';
+import { countryPopulation } from '../../../plots/map/geo/channels';
+import { WEATHER_STATIONS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `dot` marker's own `color` + `scales.color` is independent of the plot's

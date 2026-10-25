@@ -1,4 +1,4 @@
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import type { FacetConfig, FacetWrapConfig } from '$lib/types/layout/facet';
 import type { FacetPanel } from '$lib/types/phases/facet/phase';
 import type { Accessor } from '$lib/types/plots/data/common';

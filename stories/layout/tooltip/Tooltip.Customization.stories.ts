@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import CustomContentDemo from './CustomContentDemo.svelte';
-import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
+import { ARGENTINA_CHILE_TRENDS, type CountryTrendRow } from '$datasets';
 
 /** Custom tooltip text, anchor placement, and fully custom markup. */
 const meta = {
 	title: 'Layout/Tooltip/Customization',
 	component: LinePlot,
 	tags: ['autodocs'],
-	args: { width: 680, height: 400, data: TIME_SERIES, x: 'year', y: 'value' },
+	args: { width: 680, height: 400, data: ARGENTINA_CHILE_TRENDS, x: 'year', y: 'value' },
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 1000, step: 20 } },
 		height: { control: { type: 'range', min: 240, max: 700, step: 20 } },
@@ -30,13 +30,13 @@ type Story = StoryObj<typeof meta>;
 export const CustomFormat: Story = {
 	args: {
 		title: 'Custom format',
-		data: TIME_SERIES.filter((d) => d.region === 'North'),
-		color: 'metric' as keyof SeriesPoint,
+		data: ARGENTINA_CHILE_TRENDS.filter((d) => d.country === 'Argentina'),
+		color: 'metric' as keyof CountryTrendRow,
 		tooltip: {
 			strategy: 'x',
 			format: (row) => {
-				const r = row as unknown as SeriesPoint;
-				return `${r.metric} · ${r.year}\n$ ${r.value} M`;
+				const r = row as unknown as CountryTrendRow;
+				return `${r.metric} · ${r.year}\nIndex ${r.value}`;
 			}
 		},
 		markers: [{ type: 'hover' }]
@@ -52,8 +52,8 @@ export const CustomAnchor: Story = {
 	args: {
 		title: 'Custom anchor',
 		subtitle: 'The tooltip anchors above and to the left of the cursor',
-		data: TIME_SERIES.filter((d) => d.region === 'North'),
-		color: 'metric' as keyof SeriesPoint,
+		data: ARGENTINA_CHILE_TRENDS.filter((d) => d.country === 'Argentina'),
+		color: 'metric' as keyof CountryTrendRow,
 		tooltip: { strategy: 'x', anchorX: 'left', anchorY: 'top' },
 		markers: [{ type: 'hover' }]
 	}

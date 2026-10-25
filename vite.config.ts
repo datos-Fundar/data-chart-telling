@@ -10,6 +10,7 @@ const dirname =
 
 const alias = {
 	$lib: path.resolve(dirname, './src/lib'),
+	$datasets: path.resolve(dirname, './examples/datasets'),
 	'@fundar/data-chart-telling': path.resolve(dirname, './src/lib/index.ts')
 };
 
@@ -71,6 +72,28 @@ export default defineConfig({
 					maxWorkers: 1
 				}
 			},
+
+			// ── Local timing checks ──────────────────────────────────────────────────
+			// Run with: pnpm test:perf (kept out of `pnpm test` and CI: a time limit is flaky on a loaded machine)
+			...(coverageRun
+				? []
+				: [
+						{
+							plugins: [svelte({ preprocess: vitePreprocess() })],
+							resolve: { alias },
+							test: {
+								name: 'perf',
+								browser: {
+									enabled: true,
+									headless: true,
+									provider: playwright(),
+									instances: [{ browser: 'chromium' }]
+								},
+								include: ['tests/perf/**/*.perf.svelte.ts'],
+								maxWorkers: 1
+							}
+						} satisfies TestProjectConfiguration
+					]),
 
 			// ── Storybook stories as Vitest tests ────────────────────────────────────
 			// Run separately with: pnpm vitest --project=storybook

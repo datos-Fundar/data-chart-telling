@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import LinePlot from '$lib/plots/line/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 	import { resetConfiguration, setConfiguration } from '$lib/configuration/config.svelte';
-	import { TIME_SERIES } from '../../data/time-series';
+	import { ARGENTINA_CHILE_TRENDS } from '$datasets';
 
 	// Every size and color of the player is the configuration's `timeline.player`.
 	setConfiguration({
@@ -26,9 +26,9 @@
 	});
 	onDestroy(resetConfiguration);
 
-	const data = TIME_SERIES.filter((d) => d.metric === 'GDP');
+	const data = ARGENTINA_CHILE_TRENDS.filter((d) => d.metric === 'GDP per capita');
 	const scales = {
-		x: { domain: [2018, 2022] as [number, number] },
+		x: { domain: [1987, 2007] as [number, number] },
 		y: { domain: [0, 100] as [number, number] }
 	};
 </script>
@@ -40,7 +40,7 @@
 	{data}
 	x="year"
 	y="value"
-	color="region"
+	color="country"
 	{scales}
 	timeline={{
 		accessor: 'year',

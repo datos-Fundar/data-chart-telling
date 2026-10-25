@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { MarkerTransform } from '$lib/types/transforms';
-import { GOOGL_AUGUST_2026, type StockDay } from '../../data/stockPrices';
+import { GOOGL_AUGUST_2026, type StockDay } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `line` joins its rows in order, so reordering them redraws the path through

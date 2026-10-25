@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { MarkerTransform } from '$lib/types/transforms';
-import { REGION_CHANNEL_SALES } from '../../data/market-share';
+import { PENGUIN_COUNTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `stackMosaicX` lays out a mosaic (Marimekko) chart: each `x` category gets a
@@ -11,6 +11,9 @@ import { REGION_CHANNEL_SALES } from '../../data/market-share';
 // running totals, and every cell's `x1`/`x2`/`y1`/`y2` go to a `rect`.
 // `stackMosaicY` swaps the axes. `percentX`/`percentY` turn either axis into
 // fractions of the whole. `x`, `y` and `value` are field keys.
+
+/** The penguins of each species on each island; a species missing from an island leaves no cell. */
+const PENGUINS = PENGUIN_COUNTS.filter((d) => d.count > 0);
 
 const meta = {
 	title: 'Transforms/Stack/Mosaic',
@@ -22,7 +25,7 @@ const meta = {
 		data: [],
 		x: 'x',
 		y: 'y',
-		scales: { x: { label: 'Sales, by region' }, y: { label: 'Sales, by channel' } }
+		scales: { x: { label: 'Penguins, by island' }, y: { label: 'Penguins, by species' } }
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -38,24 +41,24 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** The mosaic's cells, colored by sales channel, each labelled with its sales - short enough to fit even the narrowest cell. */
+/** The mosaic's cells, colored by species, each labelled with its count - short enough to fit even the narrowest cell. */
 const mosaic = (transform: MarkerTransform): AxisBasedMarkersConfig[] => [
 	{
 		type: 'rect',
-		data: REGION_CHANNEL_SALES,
-		x: 'region',
-		y: 'channel',
-		color: 'channel',
+		data: PENGUINS,
+		x: 'island',
+		y: 'species',
+		color: 'species',
 		transforms: [transform],
 		insetRight: 1,
 		insetBottom: 1
 	},
 	{
 		type: 'text',
-		data: REGION_CHANNEL_SALES,
-		x: 'region',
-		y: 'channel',
-		text: (d: { sales: number }) => String(d.sales),
+		data: PENGUINS,
+		x: 'island',
+		y: 'species',
+		text: (d: { count: number }) => String(d.count),
 		transforms: [transform],
 		styles: { fontSize: 10, fill: 'white' }
 	}
@@ -63,30 +66,30 @@ const mosaic = (transform: MarkerTransform): AxisBasedMarkersConfig[] => [
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** Columns by region - Pampas, Cuyo, Patagonia, Northwest, left to right - each as wide as its sales; within each one, the channels' shares. */
+/** Columns by island - Biscoe, Dream, Torgersen, left to right - each as wide as its penguins; within each one, the species' shares. */
 export const MosaicX: Story = {
-	args: { markers: mosaic({ type: 'stackMosaicX', value: 'sales' }) }
+	args: { markers: mosaic({ type: 'stackMosaicX', value: 'count' }) }
 };
 
-/** `percentX` and `percentY`: both axes as fractions of the whole - region shares along `x`, channel shares within each region along `y`. */
+/** `percentX` and `percentY`: both axes as fractions of the whole - island shares along `x`, species shares within each island along `y`. */
 export const Percent: Story = {
 	args: {
 		scales: {
-			x: { label: 'Share of sales', tickFormat: { style: 'percent' } },
-			y: { label: 'Share of the region', tickFormat: { style: 'percent' } }
+			x: { label: 'Share of penguins', tickFormat: { style: 'percent' } },
+			y: { label: 'Share of the island', tickFormat: { style: 'percent' } }
 		},
-		markers: mosaic({ type: 'stackMosaicX', value: 'sales', percentX: true, percentY: true })
+		markers: mosaic({ type: 'stackMosaicX', value: 'count', percentX: true, percentY: true })
 	}
 };
 
-/** `stackMosaicY`: rows by region instead - Pampas at the bottom, Northwest at the top - each as tall as its sales, split along `x` by channel. */
+/** `stackMosaicY`: rows by island instead - Biscoe at the bottom, Torgersen at the top - each as tall as its penguins, split along `x` by species. */
 export const MosaicY: Story = {
 	args: {
-		scales: { x: { label: 'Sales, by channel' }, y: { label: 'Sales, by region' } },
-		markers: mosaic({ type: 'stackMosaicY', value: 'sales' }).map((marker) => ({
+		scales: { x: { label: 'Penguins, by species' }, y: { label: 'Penguins, by island' } },
+		markers: mosaic({ type: 'stackMosaicY', value: 'count' }).map((marker) => ({
 			...marker,
-			x: 'channel',
-			y: 'region'
+			x: 'species',
+			y: 'island'
 		}))
 	}
 };

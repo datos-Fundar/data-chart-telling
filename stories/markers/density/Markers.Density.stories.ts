@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES } from '../../plots/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `density` marker (svelteplot's own `Density`) - 2D kernel density
@@ -16,9 +16,9 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: COUNTRIES,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy'
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -40,8 +40,8 @@ export const Basic: Story = {
 		markers: [
 			{
 				type: 'density',
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
+				x: 'gdp',
+				y: 'life',
 				bandwidth: 28,
 				styles: { fill: 'density', strokeOpacity: 0 }
 			}
@@ -49,15 +49,15 @@ export const Basic: Story = {
 	}
 };
 
-/** The plot's `color: 'region'` estimates and draws a separate density surface per region, each in its region's color. */
-export const GroupedByRegion: Story = {
+/** The plot's `color: 'continent'` estimates and draws a separate density surface per continent, each in its continent's color. */
+export const GroupedByContinent: Story = {
 	args: {
-		color: 'region',
+		color: 'continent',
 		markers: [
 			{
 				type: 'density',
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
+				x: 'gdp',
+				y: 'life',
 				bandwidth: 24,
 				thresholds: 4,
 				styles: { fill: 'none', strokeOpacity: 0.6 }

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import BarPlot from '$lib/plots/bar/Plot.svelte';
-import { LIFE_EXPECTANCY_BY_PROVINCE } from '../../../plots/bar/data';
+import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+import { PROVINCE_VALUES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `color` channel: a plot-level `color` accessor plus `scales.color`
@@ -15,7 +15,7 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
-		data: LIFE_EXPECTANCY_BY_PROVINCE,
+		data: PROVINCE_VALUES,
 		x: 'province',
 		y: 'value'
 	},

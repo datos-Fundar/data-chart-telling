@@ -1,6 +1,6 @@
 <script lang="ts">
-	import BarPlot from '$lib/plots/bar/Plot.svelte';
-	import { TIME_SERIES } from '../../data/time-series';
+	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+	import { ARGENTINA_CHILE_TRENDS } from '$datasets';
 </script>
 
 <!--
@@ -10,10 +10,10 @@
 <BarPlot
 	width={760}
 	height={420}
-	title="GDP by region"
-	data={TIME_SERIES.filter((d) => d.metric === 'GDP')}
-	x="region"
+	title="GDP per capita by country"
+	data={ARGENTINA_CHILE_TRENDS.filter((d) => d.metric === 'GDP per capita')}
+	x="country"
 	y="value"
-	scales={{ y: { domain: [0, 100] } }}
+	scales={{ y: { domain: [0, 250] } }}
 	timeline={{ accessor: 'year' }}
 />

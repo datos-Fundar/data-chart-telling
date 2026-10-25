@@ -9,6 +9,7 @@ type NarrowableState = FacetStageState & {
 	groupedSeries?: { series: { panel?: string } }[];
 	processedData?: { data: Record<string | symbol, unknown>[] };
 	processedGroups?: { series: { panel?: string } }[];
+	labelled?: Record<string | symbol, unknown>[];
 };
 
 /** The field a processed row carries its facet panel under. */
@@ -85,6 +86,7 @@ export class FacetPanels {
 			scopedGroups: state.scopedGroups?.filter((g) => has(g.panel)),
 			groupedSeries: state.groupedSeries?.filter((g) => has(g.series.panel)),
 			processedGroups: state.processedGroups?.filter((g) => has(g.series.panel)),
+			labelled: state.labelled?.filter((row) => has(row[PANEL_KEY])),
 			processedData: state.processedData && {
 				...state.processedData,
 				data: state.processedData.data.filter((row) => has(row[PANEL_KEY]))

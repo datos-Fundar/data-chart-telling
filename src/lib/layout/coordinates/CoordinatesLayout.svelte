@@ -11,6 +11,7 @@
 		createCameraRotateTween
 	} from '$lib/layout/coordinates/camera.svelte';
 	import CameraFit from '$lib/layout/coordinates/CameraFit.svelte';
+	import ProjectionZoom from '$lib/layout/coordinates/ProjectionZoom.svelte';
 	import type { CoordinatesConfig } from '$lib/types/layout/coordinates';
 
 	type SveltePlotProps = ComponentProps<typeof Plot>;
@@ -19,8 +20,8 @@
 	 * Resolves the active coordinate system (a `d3-geo` projection) and owns
 	 * `<Plot>` itself, since `projection` must be known before it mounts.
 	 * Also owns pan/zoom/rotate gesture state and the declarative `camera`,
-	 * composed into the `<g>` transform wrapper (and, for `camera`/`rotate`
-	 * on `orthographic`, into the projection's own `rotate`). A no-op for
+	 * applied to the projection's output by `ProjectionZoom` (and, for
+	 * `camera`/`rotate` on `orthographic`, to the projection's own `rotate`). A no-op for
 	 * every plot kind but `GeoPlot`.
 	 */
 	let {
@@ -35,7 +36,6 @@
 		locale = undefined,
 		data,
 		containerEl,
-		remountKey = undefined,
 		children
 	}: {
 		width: number;
@@ -53,8 +53,6 @@
 		/** Fed to `resolveProjection`'s `domain: 'data'` sentinel and to `coordinates.camera`'s `{features}` target resolution. */
 		data: TData[];
 		containerEl?: HTMLDivElement;
-		/** See `BasePlotLayout`'s own `remountKey` doc comment - forwarded verbatim to key svelteplot's `<Plot>` itself. */
-		remountKey?: string | number;
 		children: Snippet;
 	} = $props();
 
@@ -131,13 +129,17 @@
 	);
 	const rotateOverrideActive = $derived(cameraOrthoRotate != null || rotateEnabled);
 
+	/** Moving the view past the plot's box needs what is outside it drawn too: the frame clip would cut it at the unmoved box, so the plot's own clip does it instead. */
+	const movesView = $derived(zoomEnabled || panEnabled || cameraActive);
+
 	const finalProjection = $derived.by(() => {
-		if (!rotateOverrideActive) return resolvedProjection;
+		if (!rotateOverrideActive && !movesView) return resolvedProjection;
 		return {
 			...(typeof resolvedProjection === 'string'
 				? { type: resolvedProjection }
 				: resolvedProjection),
-			rotate: activeRotate
+			...(rotateOverrideActive ? { rotate: activeRotate } : {}),
+			...(movesView ? { clip: false } : {})
 		};
 	});
 
@@ -149,41 +151,41 @@
 		transition: () => cameraConfig?.transition
 	});
 	const cameraTransform = $derived(cameraTransformTween.current ?? { x: 0, y: 0, k: 1 });
+	const clipId = `geo-frame-clip-${Math.random().toString(36).slice(2, 9)}`;
 </script>
 
-{#key remountKey}
-	<Plot
-		{width}
-		{height}
-		{margin}
-		{x}
-		{y}
-		{r}
-		{length}
-		{locale}
-		projection={finalProjection as SveltePlotProps['projection']}
-	>
-		{#if cameraActive && resolvedCameraTarget}
-			<CameraFit
-				target={resolvedCameraTarget}
-				anchor={cameraConfig?.anchor}
-				padding={cameraConfig?.padding}
-				zoom={cameraConfig?.zoom}
-				{width}
-				{height}
-				onFit={(fit) => (cameraFit = fit)}
-			/>
-		{/if}
-		<g transform="translate({cameraTransform.x}, {cameraTransform.y}) scale({cameraTransform.k})">
-			<g
-				transform="translate({geoZoom.transform.x}, {geoZoom.transform.y}) scale({geoZoom.transform
-					.k})"
-			>
-				{@render children()}
-			</g>
-		</g>
-	</Plot>
-{/key}
+<Plot
+	{width}
+	{height}
+	{margin}
+	{x}
+	{y}
+	{r}
+	{length}
+	{locale}
+	projection={finalProjection as SveltePlotProps['projection']}
+>
+	{#if cameraActive && resolvedCameraTarget}
+		<CameraFit
+			target={resolvedCameraTarget}
+			anchor={cameraConfig?.anchor}
+			padding={cameraConfig?.padding}
+			zoom={cameraConfig?.zoom}
+			{width}
+			{height}
+			onFit={(fit) => (cameraFit = fit)}
+		/>
+	{/if}
+	<!-- What a zoom or a camera pushes past the plot's box is cut there, so it never covers the legend or the chrome around it. -->
+	<defs>
+		<clipPath id={clipId}><rect x="0" y="0" {width} {height} /></clipPath>
+	</defs>
+	<g clip-path="url(#{clipId})">
+		<ProjectionZoom inner={geoZoom.transform} outer={cameraTransform}>
+			{@render children()}
+		</ProjectionZoom>
+	</g>
+</Plot>
 
 <style>
 	:global(figure.svelteplot svg) {

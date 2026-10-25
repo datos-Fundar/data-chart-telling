@@ -13,6 +13,10 @@ export type ColorScaleConfig = {
 	 * category → color map. Defaults to the theme's own 2-color ramp.
 	 */
 	scheme?: string | string[] | Record<string, string>;
+	/**
+	 * The part of a named `scheme` ramp to use, as `[from, to]` fractions of it (default `[0, 1]`). `[0.3, 1]` skips the near-white start of a sequential ramp such as `'blues'`, so its first color stays visible. Ignored for a literal `scheme`.
+	 */
+	schemeRange?: [number, number];
 	/** Splits an array `scheme` into two halves meeting at this domain value (diverging). Ignored for a `Record` scheme. */
 	pivot?: number;
 	/** Fallback color for a missing/unmapped value. Defaults to `'#ccc'`. */
@@ -61,14 +65,19 @@ export type ChannelScalesConfig<TChannel extends IndependentChannelName = Indepe
 /** `r` (radius/size) config - plot-level only, consumed via {@link AxisBasedScalesConfig.r}. */
 export type RScaleConfig = {
 	domain?: [number, number];
+	/** How a value maps to a radius. Defaults to svelteplot's `'sqrt'`, so an area is proportional to its value; `'linear'` makes the radius (a trail's half-width) proportional instead. */
+	type?: 'linear' | 'sqrt';
+	/** Includes 0 in the domain, so a size is proportional to its value. On by default; `false` starts the domain at its lowest value, spreading out values that sit close together. */
+	zero?: boolean;
 	/** Pixel radius range, e.g. `[2, 20]`. Defaults to svelteplot's own. */
 	range?: [number, number];
 };
 
 /** `length` (vector/spike magnitude) config - plot-level only. */
 export type LengthScaleConfig = {
+	/** Magnitudes mapped to the two ends of `range`, e.g. `[0, 40]`; values past them extend the line. Defaults to the data's extent. */
 	domain?: [number, number];
-	/** Pixel length range, e.g. `[0, 60]`. Defaults to svelteplot's own. */
+	/** Pixel lengths of the `domain`'s ends, e.g. `[0, 60]`. Defaults to svelteplot's own. */
 	range?: [number, number];
 };
 
@@ -112,8 +121,34 @@ export type BinnedScaleType = (typeof BINNED_SCALE_TYPES)[number];
  */
 export type EdgeTickCollision = 'drop-nice' | 'drop-edge' | 'extend';
 
+/**
+ * Whether a continuous axis rounds its domain out to round numbers. As an
+ * object, it does, and `tolerance` is how far past a tick, as a share of the
+ * step, the data may end and still stay on it (default `0.05`; `0` rounds like d3).
+ */
+export type NiceOption = boolean | { tolerance?: number };
+
 /** Whether an axis adds ticks at the data's first and last values, and what it does when one crowds a nice tick. */
 export type EdgeTicksOptions = { enabled: boolean; collision: EdgeTickCollision };
+
+/** A scale's `edgeTicks`: `true` or `false`, or an object that turns them on with its own `collision`. */
+export type EdgeTicksOption = boolean | Partial<Omit<EdgeTicksOptions, 'enabled'>>;
+
+/**
+ * A category axis ordered by what each category holds: `'value'` by its value
+ * in one `series` (or, without one, the sum of its values) and `'range'` by the
+ * spread between its lowest and its highest value (an interval's ends count, on the plots that have them). A category with nothing to
+ * sort by goes last.
+ */
+export type CategorySort = {
+	by: 'value' | 'range';
+	/** For `by: 'value'`: the series whose value orders the categories. */
+	series?: string;
+	/** Defaults to `'ascending'`. */
+	order?: 'ascending' | 'descending';
+	/** Sort within each series instead of across all of them: the series stay together, in the order they first appear. */
+	grouped?: boolean;
+};
 
 /**
  * Scale overrides for one plot axis - svelteplot's `ScaleOptions` and
@@ -139,16 +174,16 @@ export type AxisScale<TData = Record<string, unknown>> = {
 	titleFontSize?: number;
 	interval?: string | number;
 	clamp?: boolean;
-	nice?: boolean;
-	niceTolerance?: number;
-	edgeTicks?: boolean | { collision?: EdgeTickCollision };
+	nice?: NiceOption;
+	edgeTicks?: EdgeTicksOption;
 	zero?: boolean;
 	round?: boolean;
 	percent?: boolean;
 	align?: number;
 	base?: number;
 	constant?: number;
-	sort?: (a: TData, b: TData) => number;
+	/** The order of a category axis: a comparator of two rows (each category's first), or a {@link CategorySort} by what the categories hold. Ignored when `domain` is set. */
+	sort?: ((a: TData, b: TData) => number) | CategorySort;
 	grid?:
 		| boolean
 		| { stroke?: string; strokeWidth?: number; strokeOpacity?: number; strokeDasharray?: string };

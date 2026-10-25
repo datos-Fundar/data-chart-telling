@@ -6,13 +6,13 @@ A plot builds its legend from what it draws: its series, the scales its channels
 
 `legend` is unset or `true` for the automatic legend, `false` for none. The automatic legend can have these sections:
 
-| Section            | Appears when                    | Content                                    |
-| ------------------ | ------------------------------- | ------------------------------------------ |
-| series (discrete)  | the plot has several series     | one item per series, in its color and mark |
-| color (continuous) | `color` is a continuous value   | a ramp with its min and max                |
-| opacity            | `opacity` is a continuous value | a ramp fading across the opacity range     |
-| size               | `r` is mapped                   | a few dots at representative values        |
-| symbol             | `symbol` is mapped              | each category next to its shape            |
+| Section            | Appears when                    | Content                                                    |
+| ------------------ | ------------------------------- | ---------------------------------------------------------- |
+| series (discrete)  | the plot has several series     | one item per series, in its color and mark                 |
+| color (continuous) | `color` is a continuous value   | a ramp with its min and max                                |
+| opacity            | `opacity` is a continuous value | a bar fading across the opacity range, over a checkerboard |
+| size               | `r` is mapped                   | a few dots at representative values                        |
+| symbol             | `symbol` is mapped              | each category next to its shape                            |
 
 Segments and markers join the series section when they carry a `legend` label:
 
@@ -42,7 +42,7 @@ Items become clickable with `interactive` on the series section. `disabled` says
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES } from './data';
+	import { REGION_VALUES } from './datasets';
 	import LegendReader from './LegendReader.svelte';
 </script>
 
@@ -94,12 +94,12 @@ legend={{
 	series: { title: 'Division', layout: { type: 'flex' } },
 	color: { title: 'Temperature', interactive: { enabled: true } },
 	opacity: { title: 'Confidence' },
-	size: { title: 'Population' },
+	r: { title: 'Population' },
 	symbol: { title: 'Income group' }
 }}
 ```
 
-Each channel key adjusts the section that channel draws: any section field except what the plots compute (items, ranges, domains). An entry with `match` adjusts only the section whose title matches; a list of entries adjusts several.
+Each key is the name of the channel (the plot's own prop: `r` for the size section) and adjusts the section that channel draws: any section field except what the plots compute (items, ranges, domains). An entry with `match` adjusts only the section whose title matches; a list of entries adjusts several.
 
 ## Explicit sections
 
@@ -110,7 +110,7 @@ A list replaces the automatic legend with exactly those sections:
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES } from './data';
+	import { REGION_VALUES } from './datasets';
 </script>
 
 <!-- An explicit legend: a discrete section of toggles and a continuous ramp. -->
@@ -149,5 +149,7 @@ Section types:
 - `symbol` - `items` of `{ name, symbol }`, `color`, `filled`, `layout`.
 
 ## Placement and look
+
+An opacity section draws its bar as one color fading over a checkerboard, so it reads as transparency and not as a color ramp; the color is the marker's own when it has one, else `legend.continuous.opacity.color` (black by default), and `legend.continuous.opacity.checker` sets the squares.
 
 The legend is a chrome block: `order` places it (`'legend'`, or in a row with the plot). Its fonts, gaps, swatch size and the continuous bar's geometry are `legend.*` in the [configuration](theming.md). A paginated section's prev/next arrows are replaceable with a `navButton` snippet.

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import LinePlot from '$lib/plots/line/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 	import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
-	import { TIME_SERIES } from '../../data/time-series';
+	import { ARGENTINA_CHILE_TRENDS } from '$datasets';
 	import type { PlotStylesConfigInput } from '$lib/types/configuration/styling';
 
 	/**
@@ -40,7 +40,7 @@
 		return () => untrack(() => resetConfiguration());
 	});
 
-	const data = TIME_SERIES.filter((d) => d.region === 'North');
+	const data = ARGENTINA_CHILE_TRENDS.filter((d) => d.country === 'Argentina');
 </script>
 
 <div class="demo">
@@ -56,16 +56,16 @@
 	<LinePlot
 		width={680}
 		height={440}
-		title="GDP vs. Employment"
-		subtitle="North region, 2018-2022"
-		caption="Source: synthetic demo data."
+		title="GDP per capita vs. population"
+		subtitle="Argentina, 1987-2007 (index, 1987 = 100)"
+		caption="Source: Gapminder."
 		legend={[
 			{
 				type: 'discrete',
 				columns: 2,
 				items: [
-					{ name: 'GDP', symbol: 'line' },
-					{ name: 'Employment', symbol: 'line' }
+					{ name: 'GDP per capita', symbol: 'line' },
+					{ name: 'Population', symbol: 'line' }
 				]
 			}
 		]}

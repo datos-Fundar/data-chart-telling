@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES } from '../../plots/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `voronoi` (one polygon per point) and `voronoiMesh` (the whole diagram as a
@@ -16,9 +16,9 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: COUNTRIES,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy'
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -40,24 +40,24 @@ export const Cells: Story = {
 		markers: [
 			{
 				type: 'voronoi',
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
+				x: 'gdp',
+				y: 'life',
 				styles: { fillOpacity: 0.1 }
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
-/** Cells filled by region - `styles.fill` is left to the author, `color` only drives the stroke. */
-export const FilledByRegion: Story = {
+/** Cells filled by continent - `styles.fill` is left to the author, `color` only drives the stroke. */
+export const FilledByContinent: Story = {
 	args: {
-		color: 'region',
+		color: 'continent',
 		markers: [
 			{
 				type: 'voronoi',
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
-				color: 'region',
+				x: 'gdp',
+				y: 'life',
+				color: 'continent',
 				styles: { fill: '#888', fillOpacity: 0.08, strokeWidth: 1.5 }
 			}
 		] satisfies AxisBasedMarkersConfig[]
@@ -70,8 +70,8 @@ export const Mesh: Story = {
 		markers: [
 			{
 				type: 'voronoiMesh',
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
+				x: 'gdp',
+				y: 'life',
 				styles: { strokeOpacity: 0.5 }
 			}
 		] satisfies AxisBasedMarkersConfig[]

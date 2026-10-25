@@ -219,12 +219,20 @@ describe('LegendState - dot sizes', () => {
 		expect(legend.sections()).toEqual([
 			{
 				type: 'size',
+				channel: 'r',
 				title: 'Pop',
 				domain: [0, 2000],
 				range: [2, 20],
 				color: undefined,
 				filled: true
 			}
+		]);
+	});
+	test('the legend extension adjusts the size section under the name of its channel, `r`', () => {
+		const legend = new LegendState();
+		legend.register('p', LegendState.entriesOf(sized([{}])));
+		expect(legend.sections({ r: { title: 'People' } })).toMatchObject([
+			{ type: 'size', title: 'People' }
 		]);
 	});
 });
@@ -482,5 +490,23 @@ describe('LegendState - adjusting the automatic sections', () => {
 		});
 		const [both] = legend.sections({ color: { title: 'Group' }, series: { title: 'Mine' } });
 		expect(both).toMatchObject({ title: 'Mine' });
+	});
+});
+
+describe('LegendState - decorative markers', () => {
+	const plot = (rule: Record<string, unknown>) => ({
+		resolvedSeries: [{ name: 'a' }],
+		colorForSeries: () => 'teal',
+		markers: [
+			{ type: 'rule', ...rule },
+			{ type: 'dot', series: 'a' }
+		]
+	});
+
+	test('a marker that is `legend: false` does not give the series its symbol', () => {
+		const [line] = LegendState.entriesOf(plot({}) as never);
+		expect(line).toMatchObject({ type: 'series', mark: 'line' });
+		const [dot] = LegendState.entriesOf(plot({ legend: false }) as never);
+		expect(dot).toMatchObject({ type: 'series', mark: 'dot' });
 	});
 });

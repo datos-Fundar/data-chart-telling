@@ -1,4 +1,4 @@
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import type { AxisChannelName } from '$lib/types/layout/mapping';
 import type { ProcessedChannel, ProcessedData, ProcessedRow } from '$lib/types/phases';

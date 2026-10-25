@@ -12,7 +12,7 @@ Svelte 5 plot components on top of svelteplot. This file is checked against the 
 ## The mental model
 
 - A **plot** is one graph (axes + marks). Titles, subtitle, caption, legend, facets and a timeline are props of the plot itself.
-- Plots: `LinePlot AreaPlot BarPlot HistogramPlot BoxPlot HeatmapPlot PyramidPlot ScatterPlot GeoPlot`.
+- Plots: `LinePlot AreaPlot BarPlot DensityPlot HistogramPlot BoxPlot ViolinPlot LollipopPlot DumbbellPlot ClevelandPlot ForestPlot BulletPlot SlopePlot SparklinePlot HeatmapPlot PyramidPlot ScatterPlot GeoPlot`.
 - `PlotComposer` lays several plots out in one figure with shared hover, legend and timeline.
 - `width` and `height` are pixel numbers on a standalone plot. To fill a container or the window, bind its size (`examples/ResponsiveLine.svelte`) and render the plot once both are > 0.
 
@@ -38,17 +38,17 @@ Two ways to give data, one per plot:
 | `title` `subtitle` `caption` | Text chrome. `header` / `footer` snippets replace title+subtitle / caption. |
 | `legend` | unset/`true`: automatic legend; `false`: none; `{ series: { interactive: { enabled: true, disabled: { mode: 'omit' } } } }` adjusts a section. |
 | `order` | Chrome blocks top to bottom, e.g. `['title','subtitle','legend','plot','caption']`; rows as `'(plot, timeline)'`; `'divider'` between blocks. |
-| `scales` | Per channel: `{ x: { label, tickFormat, domain, type, ticks, grid, niceTolerance, edgeTicks }, y: {...}, color: { scheme, domain } }`. Stacked parts adding up to a hair past a tick (`100.2`) stay on it; `niceTolerance` (default `0.05` of a step) tunes that. A continuous x axis also ticks the data's first and last values (y too with `edgeTicks: true`); `edgeTicks: false` or `{ collision: 'drop-nice'\|'drop-edge'\|'extend' }` (global defaults: `axis.edgeTicks.x` / `.y`). |
-| `styles` | `{ values: {...}, frame: true, gaps: {...} }` (shape depends on the kind). |
+| `scales` | Per channel: `{ x: { label, tickFormat, domain, type, ticks, grid, nice, edgeTicks }, y: {...}, color: { scheme, domain } }`. Stacked parts adding up to a hair past a tick (`100.2`) stay on it; `nice: { tolerance }` (default `0.05` of a step) tunes that; `nice: false` keeps the domain on the data. A category axis whose labels do not fit turns them by itself (45, then 90 degrees, then writes every few); a `scales.x.tickRotate` (0 included) or `axis.autoRotate: false` opts out. `scales.x.sort: { by: 'range' | 'value', series?, order? }` orders categories by the gap between their dots or one series' value. A continuous x axis also ticks the data's first and last values (y too with `edgeTicks: true`); `edgeTicks: false` or `{ collision: 'drop-nice'\|'drop-edge'\|'extend' }` (global defaults: `axis.edgeTicks.x` / `.y`). |
+| `styles` | `{ values: {...}, frame: true, gaps: {...}, curve: ... }` (shape depends on the kind; `curve` is the line family's). |
 | `segments` | Style ranges of the data (rule 1 below). |
 | `markers` | Extra marks, an array of `{ type: '...', ... }`. |
 | `margins` | `{ top, right, bottom, left }`, each a number or `'auto'` (all `'auto'` by default). |
 | `tooltip` | `true` or `{ strategy, sync, format, content, series, anchorX, anchorY }`. The text lists matched rows highest value first; a `content` snippet gets them unsorted. |
-| `timeline` | `{ accessor: 'year' }` steps through the rows by a field, drawn as a player bar (default); `type: 'rule'` draws a rule beside the plot instead. The field may hold numbers, `Date`s or date strings (ISO, or any other with `dateFormat: 'DD/MM/YYYY'`); date steps read as dates, and reach `onvalue`, `player.format` and `useFigure().timeline` (`steps`, `value`, `seekValue`) as `Date`s. |
-| `facet` | `{ by: 'field', columns, gap, scales: 'shared'\|'free', mode: 'grid'\|'carousel'\|'paginated' }` or `{ rows, cols }`. |
-| `transforms` `statistics` | svelteplot transforms / derived summaries (regression, movingAverage, ...). |
+| `timeline` | `{ accessor: 'year' }` steps through the rows by a field, drawn as a player bar (default); `type: 'rule'` draws a rule beside the plot instead. The field may hold numbers, `Date`s or date strings (ISO, or any other with `dateFormat: 'DD/MM/YYYY'`); date steps read as dates, and reach `onvalue`, `player.format` and `useFigure().timeline` (`steps`, `value`, `seekValue`) as `Date`s. Other options: `progress` (position, `0`-`1`), `values` (the steps, when not every distinct value), `filterMode` (`'exact'` shows the current step's rows, `'upTo'` every row up to it; `LinePlot` defaults to `'upTo'`), `interpolate` (tween values between steps), `scales` (`'shared'` keeps both axes still across steps, `'free'` refits both to each step, `'free-x'`/`'free-y'` refit one and keep the other still), `onprogress`, `onvalue`, and a rule's `orientation`, `show` and `thickness`. |
+| `facet` | `{ by: 'field', columns, gap, scales: 'shared'\|'free'\|'free-x'\|'free-y', mode: 'grid'\|'carousel'\|'paginated' }` or `{ rows, cols }`. |
+| `transforms` `statistics` | svelteplot transforms / derived summaries. `statistics` is `[{ type, ...options, series?, pooled? }]` (per series by default, `series: ['a']` only those, `pooled: true` all rows at once; a marker's own `.statistics` runs over its own `data`). Types: `regression` (`regressionType`: `'linear'|'quad'|'poly'|'exp'|'log'|'pow'|'loess'`, `order`, `base`, `span`, `confidence`, `styles`), `movingAverage` (`k`, `reduce`, `styles`), `bollinger` (`n`, `k`, `styles`), `density` (`kernel`, `bandwidth`, `styles`), `density2d` (`bandwidth`, `thresholds`, `styles`), `box` (the `box` marker's options), `deviation` (a rule at an estimator and a band around it, along the plot's value axis: `estimator`: `'mean'|'median'|'midrange'`, `spread`: `'stdev'|'mad'`, `k`, `rule` and `band`: styles or `false`, each with an optional `label: true | { text, styles: FontStyle }`, the band's also `edge: 'lower'|'upper'` and `position: 'inside'|'outside'`)|'upper'`). |
 
-Per kind: `BarPlot` x = category, y = value (swap for horizontal bars); `PyramidPlot` mirrors two series around zero; `HeatmapPlot` colors cells by `color`; `HistogramPlot` bins one numeric field; `BoxPlot` x = category, y = value, one box per category (its tooltip row is the box summary: `min`, `p25`, `median`, `p75`, `max`, `count`, `outliers`); `ScatterPlot` takes `r` (size) and `symbol`; `GeoPlot` takes GeoJSON/TopoJSON in `data` and `coordinates` for the projection (`docs/geo.md`).
+Per kind: `BarPlot` x = category, y = value (swap for horizontal bars); `PyramidPlot` mirrors two series around zero; `HeatmapPlot` colors cells by `color`; `HistogramPlot` bins one numeric field; `DensityPlot` smooths one numeric field into a kernel density curve (`styles.mark: 'line'` draws a line instead of an area; a `densityX` transform sets `kernel` and `bandwidth`); `BoxPlot` x = category, y = value, one box per category (its tooltip row is the box summary: `min`, `p25`, `median`, `p75`, `max`, `count`, `outliers`); `ViolinPlot` x = category, y = value (swap for horizontal), the mirrored density of each category's values with a box inside (`styles`: `kernel`, `bandwidth`, `trim`, `scale: 'width'|'shared'`, `box: false | width`; its tooltip row is a box plot's); `LollipopPlot` x = category, y = value, one dot on a stem per category (stems start at zero, or at the nearest end of a pinned domain; `styles.values` labels each dot); `DumbbellPlot` x = category, y = value, `color`/`grouping` names exactly two series, joined by a connector per category (another count warns); `ClevelandPlot` is the same for any number of series, joined from the lowest to the highest (use `grouping` for a numeric series field; `styles.values.select` (`'first'|'last'|'min'|'max'` or a list), `series` and `color: 'series'` choose and color the labelled dots; `styles.connector` sets the connector's `width` (number or `'dots'` for a band), `color` (one, `{ by: 'sign' | 'difference' | 'length' }` or a function), `opacity`, `arrow` (draws the from-to stretch as an arrow), `outside` (the part past the from/to dots), `label` (centered on the from-to stretch) and the `from`/`to` series of its difference); `ForestPlot` x = value, y = category (or swapped), one dot per row on a stem spanning its interval given by `lower`/`upper` fields or an `error` either side (the value axis fits the intervals; `styles.connector.caps` toggles the end ticks, on by default); `BulletPlot` is a bar plot with a `target` (field, function or number: a tick across the band) and `ranges` (upper bounds, each a field, function or number: bands from the baseline, the smallest darkest) drawn around its thin bars (the value axis reaches them); `SlopePlot` x = category (its first and last positions are the two moments), y = value, a line with a dot on every point per series, its first and last labelled before and after it by `styles.values` (the value axis is hidden by default; `scales.y.axisDisplay: 'visible'` shows it); `SparklinePlot` is a small `LinePlot` with no axes and no legend (`legend` and `margins` bring them back), a dot on each series' last point and its value beside it (`styles.values` formats it or turns it off with `show: false`; `facet` makes one per category); `ScatterPlot` takes `r` (size) and `symbol`; `GeoPlot` takes GeoJSON/TopoJSON in `data` and `coordinates` for the projection (`docs/geo.md`).
 
 ## Switches
 
@@ -61,7 +61,7 @@ Per kind: `BarPlot` x = category, y = value (swap for horizontal bars); `Pyramid
 
 1. `segments` is an object keyed by series name or `'default'`: `{ default: [{ areas: [{ x: { from, to } }], styles: { stroke: { strokeDasharray: '6 4' } } }] }`. A segment without `areas` is a baseline for everything; area-specific segments override it.
 2. The global configuration holds data (`setConfiguration(...)` is cloned); functions go in plot props such as `format` and `tickFormat`.
-3. A continuous color ramp is `scales.color.scheme: [colorA, colorB]` (or a named ramp such as `'blues'`); categorical colors come from `palette` or a `scheme` record.
+3. A continuous color ramp is `scales.color.scheme: [colorA, colorB]` (or a named ramp such as `'blues'`); categorical colors come from `palette` (a list of colors, or a scheme name such as `'viridis'` or `'dark2'` in `setConfiguration`) or a `scheme` record.
 4. `margins` at `'auto'` (the default) fit value labels and long tick text from the measured text, also when `scales.y.domain` is pinned. A fixed number sets the side exactly.
 5. `tooltip.sync: true` in a `facet` or `PlotComposer` shows the highlight in every panel: that is how panels compare the same x.
 6. On a BarPlot the tooltip triggers anywhere over a bar's whole band (and its series' slice, when grouped).
@@ -80,12 +80,12 @@ Inside a plot's snippets (`header`, `footer`, tooltip `content`) or any child of
 - `timeline.steps`, `value`, `progress`, `playing`, `seek(p)`, `seekValue(v)`, `next()`, `previous()`, `play()`, `pause()`, `toggle()`, `setSpeed()`.
 - `hover.activeX`, `activeY`, `activeSeries`, `source`.
 
-The timeline is a player bar by default: `timeline={{ accessor: 'year', player: { controls: ['play','value','slider','speed','loop'], format, autoplay, loop, speed, stepDuration } }}`. `type: 'rule'` draws a guide beside the plot instead, driven by `progress` (a slider or scroll position of your own).
+The timeline is a player bar by default: `timeline={{ accessor: 'year', player: { controls: ['play','value','slider','speed','loop'], format, autoplay, loop, speed, stepDuration } }}`. `type: 'rule'` draws a guide beside the plot instead, driven by `progress` (a slider or scroll position of your own). `timeline.scales` decides what the axes do while it plays: `'shared'` (default) spans every step so they hold still, `'free'` refits both to the current step, and `'free-x'` / `'free-y'` refit one axis (e.g. a time axis that advances) and keep the other still; a pinned `scales.<axis>.domain` always wins.
 
 ## Markers
 
 Add with `markers={[{ type: '...' }]}`. For x/y plots:
-`area arrow bar bollinger box brush cell component delaunayLink delaunayMesh delta density difference dot hover hull image line raster rect regression rule text tick trail voronoi voronoiMesh waffle`.
+`area arrow bar bollinger box brush cell component delaunayLink delaunayMesh delta density difference dot hover hull image line raster rect regression rule text tick trail violin voronoi voronoiMesh waffle`.
 GeoPlot: `graticule sphere dot text vector link contour inset geo-hover geo-component`.
 
 - `delta` annotates the difference between two series at a position: `{ type: 'delta', axis: 'x', at: 2020, from: { type: 'series', series: 'A' }, to: { type: 'series', series: 'B' }, formatDiff: (d) => d.toFixed(1) }`.
@@ -100,7 +100,7 @@ GeoPlot: `graticule sphere dot text vector link contour inset geo-hover geo-comp
 
 ## Docs (in `docs/`)
 
-`getting-started.md`, `concepts.md`, `plots.md`, `scales.md`, `styles-and-segments.md`, `markers.md`, `transforms-and-statistics.md`, `tooltip-and-hover.md`, `legend.md`, `timeline.md`, `chrome.md`, `facets.md`, `composer.md`, `state.md`, `geo.md`, `theming.md`.
+`getting-started.md`, `concepts.md`, `plots.md` (an index: one page per plot kind in `plots/`), `scales.md`, `styles-and-segments.md`, `markers.md`, `transforms-and-statistics.md`, `tooltip-and-hover.md`, `legend.md`, `timeline.md`, `chrome.md`, `facets.md`, `composer.md`, `state.md`, `geo.md`, `theming.md`.
 
 ## Examples (in `examples/`, all runnable)
 
@@ -120,7 +120,16 @@ GeoPlot: `graticule sphere dot text vector link contour inset geo-hover geo-comp
 - `GroupedBars.svelte` - vertical bars grouped by color.
 - `HorizontalBars.svelte` - horizontal bars.
 - `Histogram.svelte` - overlapping histograms.
+- `Density.svelte` - density curves per group.
 - `Box.svelte` - box plots per group.
+- `Violin.svelte` - violin plot of the iris species.
+- `Lollipop.svelte` - lollipop plot with value labels.
+- `Dumbbell.svelte` - dumbbell plot of two series.
+- `Forest.svelte` - forest plot of estimates with intervals.
+- `Bullet.svelte` - bullet plot of a value against a target and ranges.
+- `Slope.svelte` - slope plot of each group's share between two censuses.
+- `Sparkline.svelte` - one sparkline per region.
+- `Cleveland.svelte` - Cleveland dot plot of several series.
 - `Heatmap.svelte` - heatmap.
 - `Pyramid.svelte` - population pyramid.
 - `Scatter.svelte` - scatter plot sized, colored and shaped by channels.
@@ -129,6 +138,8 @@ GeoPlot: `graticule sphere dot text vector link contour inset geo-hover geo-comp
 - `Gaps.svelte` - filling gaps of missing values.
 - `SegmentHighlight.svelte` - highlighting a range of one series.
 - `SegmentsBySeries.svelte` - segments per series and shared rules.
+- `LineStep.svelte` - step plot: a line plot with a step curve.
+- `LineStepSegment.svelte` - a step curve on one segment of a line.
 - `HeatmapSegments.svelte` - segments on a heatmap.
 - `Markers.svelte` - hover, rule and delta markers.
 - `StackedBars.svelte` - bars stacked with stackY.

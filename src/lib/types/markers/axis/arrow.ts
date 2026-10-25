@@ -12,5 +12,11 @@ export type ArrowMarkerConfig = {
 	insetStart?: number;
 	insetEnd?: number;
 	sweep?: 1 | 0 | -1 | '+x' | '-x' | '+y' | '-y';
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	stroke?: string | ((d: any) => string | undefined);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	strokeWidth?: string | ((d: any) => number);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	strokeOpacity?: string | ((d: any) => number);
 	styles?: StrokeStyle;
 } & CommonMarkerConfigWithInterval;

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { SvelteSet } from 'svelte/reactivity';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import { paletteColor } from '$lib/utils/color';
+	import { Palette } from '$lib/utils/color';
 	import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 	import { DisabledStyle } from '$lib/layout/legend/DisabledStyle';
 	import DiscreteBadgeItem from '$lib/layout/legend/DiscreteBadgeItem.svelte';
@@ -167,7 +167,7 @@
 		disabledStyle?.fill ??
 		disabledStyle?.stroke?.stroke ??
 		item.color ??
-		paletteColor(i, cfg.palette)}
+		Palette.at(i, cfg.palette)}
 	{@const itemOpacity = disabledStyle
 		? (disabledStyle.opacity ?? cfg.legend.disabledOpacity)
 		: (item.opacity ?? 1)}

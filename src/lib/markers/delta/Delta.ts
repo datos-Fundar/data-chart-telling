@@ -1,4 +1,4 @@
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import type { Series } from '$lib/types/plots/data/common';
 import type { DeltaConfig, DeltaTarget } from '$lib/types/markers/axis/delta';
 

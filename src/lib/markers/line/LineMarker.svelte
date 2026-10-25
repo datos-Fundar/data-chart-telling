@@ -21,6 +21,7 @@
 	x={marker.x}
 	y={marker.y}
 	z={marker.grouping}
+	curve={marker.curve ?? cfg.line.curve}
 	stroke={channelStroke ?? marker.styles?.stroke}
 	strokeWidth={marker.styles?.strokeWidth}
 	strokeOpacity={marker.styles?.strokeOpacity}

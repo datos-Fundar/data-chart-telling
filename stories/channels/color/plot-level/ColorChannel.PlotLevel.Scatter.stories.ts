@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-import { COUNTRIES } from '../../../plots/scatter/data';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `color` channel: a plot-level `color` accessor plus `scales.color`
 // drives every default mark's fill - here, ScatterPlot's own dots. This is the
-// discrete categorical case: `color` groups series by name (region), and
+// discrete categorical case: `color` groups series by name (continent), and
 // `scales.color` maps those category names to specific colors.
 
 const meta = {
@@ -15,9 +15,9 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: COUNTRIES,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy',
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life',
 		r: 6
 	},
 	argTypes: {
@@ -34,20 +34,20 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * `color: 'region'` groups the data by region (Americas, Europe, Asia, Africa)
+ * `color: 'continent'` groups the data by continent (Americas, Europe, Asia, Africa)
  * and feeds each series name into the plot's own `scales.color` ramp - the
- * default palette cycles through colors automatically for each region.
+ * default palette cycles through colors automatically for each continent.
  */
 export const Default: Story = {
 	args: {
-		color: 'region'
+		color: 'continent'
 	}
 };
 
-/** `scales.color.scheme` maps region names to specific colors, overriding the default palette. */
+/** `scales.color.scheme` maps continent names to specific colors, overriding the default palette. */
 export const CustomScheme: Story = {
 	args: {
-		color: 'region',
+		color: 'continent',
 		scales: {
 			color: {
 				scheme: {

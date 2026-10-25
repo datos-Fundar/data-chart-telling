@@ -1,9 +1,8 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { Box } from '$lib/layout/margins/Box';
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import { SERIES_ID_KEY, SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { seriesIdOf } from '$lib/utils/grouping';
-import { Transforms } from '$lib/phases/transforms/Transforms';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
@@ -14,7 +13,7 @@ import type { FontStyle, StrokeStyle } from '$lib/types/plots/styling';
 import type { TextAnchor, ValueAnchor } from '$lib/types/plots/constants';
 import type { BoxAnchors, EdgeBox } from '$lib/types/layout/box';
 import type { MarginSide } from '$lib/types/plots/props';
-import type { AxisPlotCtx, AxisPlotState, ProcessedRow } from '$lib/types/phases';
+import type { AxisPlotCtx, AxisPlotState, ProcessedData, ProcessedRow } from '$lib/types/phases';
 import type { TextMarkerConfig } from '$lib/types/markers/common';
 
 /**
@@ -26,12 +25,14 @@ import type { TextMarkerConfig } from '$lib/types/markers/common';
 export class ValueLabels {
 	readonly show: boolean;
 	readonly anchor: ValueAnchor;
-	readonly format: (value: number, seriesName: string) => string;
+	readonly format: (value: number, seriesName: string, row?: Record<string, unknown>) => string;
 	readonly hoverIsolate: boolean;
 	readonly font: FontStyle | undefined;
 	readonly fontSize: number;
 	/** The connectors of labels that had to move apart. */
 	readonly strokeStyle: StrokeStyle | undefined;
+	/** `'series'` writes each label in its series' color; any other CSS color writes them all in it. */
+	readonly color: 'series' | string | undefined;
 	/** How labels that would overlap move apart - the configuration's `text.declutter`. */
 	readonly declutter: PlotStylesConfig['text']['declutter'];
 	/** Where the labels are expected to sit: boxes around their points, on the edges those can reach. */
@@ -51,6 +52,7 @@ export class ValueLabels {
 		this.font = values?.fontStyle;
 		this.fontSize = typeof this.font?.fontSize === 'number' ? this.font.fontSize : 12;
 		this.strokeStyle = values?.strokeStyle;
+		this.color = values?.color;
 		this.declutter = cfg.text.declutter;
 		this.#cfg = cfg;
 		this.reach = (this.show && reach?.(this)) || [];
@@ -65,6 +67,20 @@ export class ValueLabels {
 	): ValueLabels {
 		const { reach } = options;
 		return new ValueLabels(values, cfg, options, reach && ((labels) => reach(labels, state)));
+	}
+
+	/** The configuration the labels were built under, for a plot kind's own label defaults. */
+	get config(): PlotStylesConfig {
+		return this.#cfg;
+	}
+
+	/**
+	 * The fill every label takes whatever its series: the author's own
+	 * `fontStyle.fill`, else a literal `color`. `undefined` leaves each label to
+	 * its plot's default (its series' color, or the axis').
+	 */
+	get fill(): string | undefined {
+		return this.font?.fill ?? (this.color === 'series' ? undefined : this.color);
 	}
 
 	/** One line of label text's height. */
@@ -180,14 +196,61 @@ export class ValueLabels {
 	 * (`filter` + `selectLast`, per series), at its top (a stacked row's
 	 * `y2`), labelled with its own value and placed by `anchor`. Labels that
 	 * would overlap fan out into a shared column (`declutter`), colored by the
-	 * segment the row falls in.
+	 * segment the row falls in. A plot that labels each end of its series apart
+	 * passes the `rows` and `anchor` of one end, and `lane` to route its labels
+	 * out to a lane whether or not they overlap (`flip: false` keeps one on the
+	 * left in the margin instead of flipping it over its points).
 	 */
 	atSeriesEnds<TData extends Record<string, unknown>>(
-		state: AxisPlotState<TData, object>
+		state: AxisPlotState<TData, object>,
+		end: {
+			rows?: ProcessedRow[];
+			anchor?: ValueAnchor;
+			lane?: boolean | { elbowGap: number };
+			flip?: boolean;
+		} = {}
+	): TextMarkerConfig[] {
+		if (end.rows) return this.#seriesEnds(state, end);
+		// A label on a series' first point would sit on its own line: it goes out to a lane instead.
+		const firsts = ValueLabels.#firstRows(state);
+		const labelled = state.labelled ?? [];
+		return [
+			...this.#seriesEnds(state, { rows: labelled.filter((row) => !firsts.has(row)) }),
+			...this.#seriesEnds(state, {
+				rows: labelled.filter((row) => firsts.has(row)),
+				lane: { elbowGap: ValueLabels.FIRST_LANE_GAP }
+			})
+		];
+	}
+
+	/** How far (px) a lane takes the label of a series' first point from it - clear of the line that leaves it. */
+	static readonly FIRST_LANE_GAP = 28;
+
+	/** The first row of every series that has more than one. */
+	static #firstRows(state: { processedData?: ProcessedData }): Set<ProcessedRow> {
+		const first = new Map<string, ProcessedRow>();
+		const counts = new Map<string, number>();
+		for (const row of state.processedData?.data ?? []) {
+			const id = String(row[SERIES_ID_KEY]);
+			if (!first.has(id)) first.set(id, row);
+			counts.set(id, (counts.get(id) ?? 0) + 1);
+		}
+		return new Set([...first].filter(([id]) => (counts.get(id) ?? 0) > 1).map(([, row]) => row));
+	}
+
+	#seriesEnds<TData extends Record<string, unknown>>(
+		state: AxisPlotState<TData, object>,
+		end: {
+			rows?: ProcessedRow[];
+			anchor?: ValueAnchor;
+			lane?: boolean | { elbowGap: number };
+			flip?: boolean;
+		}
 	): TextMarkerConfig[] {
 		const processed = state.processedData;
 		if (!processed) return [];
-		const { font, anchor, format } = this;
+		const { font, format } = this;
+		const anchor = end.anchor ?? this.anchor;
 		const position = ProcessedPositions.of(processed);
 		const topOf = (d: ProcessedRow) => position.y(d);
 		const nameOf = (d: ProcessedRow) => String(d[SERIES_KEY]);
@@ -203,36 +266,43 @@ export class ValueLabels {
 				state.colorForSeries?.(nameOf(d))
 			);
 		};
-		const marker = Transforms.resolve<TextMarkerConfig>(
-			{
-				type: 'text',
-				data: processed.data,
-				x: (processed.channels.x ?? position.x) as TextMarkerConfig['x'],
-				y: (processed.channels.y2 ?? processed.channels.y ?? topOf) as TextMarkerConfig['y'],
-				grouping: SERIES_ID_KEY,
-				transforms: [
-					{
-						type: 'filter',
-						filter: (d: ProcessedRow) => !isGapValue(valueOf(d)) && !isGapValue(topOf(d))
-					},
-					{ type: 'selectLast' }
-				],
-				text: (d: ProcessedRow) => format(Number(valueOf(d)), nameOf(d)),
-				styles: {
-					...font,
-					fontSize: font?.fontSize ?? 12,
-					dx: font?.dx ?? (anchor === 'start' ? 6 : anchor === 'end' ? -6 : 0),
-					dy: font?.dy ?? (anchor === 'outside' ? -8 : 0),
-					textAnchor:
-						this.textAnchor ?? (anchor === 'start' || anchor === 'end' ? anchor : 'middle'),
-					lineAnchor: font?.lineAnchor ?? (anchor === 'outside' ? 'bottom' : 'middle')
-				},
-				fill: font?.fill ? undefined : colorOf,
-				declutter: { connector: this.strokeStyle }
+		const marker: TextMarkerConfig = {
+			type: 'text',
+			// The rows the "transforms" phase picked for the labels: by default each series' last.
+			data: end.rows ?? state.labelled ?? [],
+			x: (processed.channels.x ?? position.x) as TextMarkerConfig['x'],
+			y: (processed.channels.y2 ?? processed.channels.y ?? topOf) as TextMarkerConfig['y'],
+			grouping: SERIES_ID_KEY,
+			text: (d: ProcessedRow) => format(Number(valueOf(d)), nameOf(d)),
+			styles: {
+				...font,
+				...(this.fill ? { fill: this.fill } : {}),
+				fontSize: font?.fontSize ?? 12,
+				dx: font?.dx ?? (anchor === 'start' ? 6 : anchor === 'end' ? -6 : 0),
+				dy: font?.dy ?? (anchor === 'outside' ? -8 : 0),
+				textAnchor: this.textAnchor ?? (anchor === 'start' || anchor === 'end' ? anchor : 'middle'),
+				lineAnchor: font?.lineAnchor ?? (anchor === 'outside' ? 'bottom' : 'middle')
 			},
-			processed.data
-		);
+			fill: this.fill ? undefined : colorOf,
+			declutter: {
+				connector: this.strokeStyle,
+				aligned: !!end.lane && (anchor === 'start' || anchor === 'end'),
+				elbowGap: typeof end.lane === 'object' ? end.lane.elbowGap : undefined,
+				flip: end.flip
+			}
+		};
 		return marker.data?.length ? [marker] : [];
+	}
+
+	/** The rows of a series-over-`x` plot that cannot be labelled: a gap, or a stack with no top. For the "transforms" phase's `labels.skip`. */
+	static skipGaps<TData extends Record<string, unknown>>(state: {
+		processedData?: ProcessedData;
+		resolvedSeries?: Series<TData>[];
+		axes?: PlotAxes;
+	}): (row: ProcessedRow) => boolean {
+		const valueOf = ValueLabels.valueOf(state);
+		const top = ProcessedPositions.of(state.processedData!).y;
+		return (row) => isGapValue(valueOf(row)) || isGapValue(top(row));
 	}
 
 	/**
@@ -244,10 +314,11 @@ export class ValueLabels {
 	 * every value.
 	 */
 	reachAtSeriesEnds<TData extends Record<string, unknown>>(
-		state: AxisPlotState<TData, object>
+		state: AxisPlotState<TData, object>,
+		anchor: ValueAnchor = this.anchor
 	): EdgeBox[] {
 		const series = state.resolvedSeries ?? [];
-		const { anchor, font, format } = this;
+		const { font, format } = this;
 		const dx =
 			typeof font?.dx === 'number' ? font.dx : anchor === 'start' ? 6 : anchor === 'end' ? -6 : 0;
 		const dy = typeof font?.dy === 'number' ? font.dy : anchor === 'outside' ? -8 : 0;
@@ -262,11 +333,19 @@ export class ValueLabels {
 		const { elbowGap, laneStep, labelGap } = this.declutter;
 		const lanes = elbowGap + (series.length - 1) * laneStep + labelGap;
 		const at = { x: series.length > 1 ? (Math.sign(dx) || 1) * lanes : dx, y: dy };
+		// Only a label that can sit at the plot's right end - any but a first point's - reaches that edge.
+		const selects = state.labelSelects ?? [];
+		const atRight = selects.length === 0 || selects.some((select) => select !== 'first');
+		// Likewise a label set before its point reaches the left edge only from a point that can sit there: any but a last one - or a last one that is also the first, of a series with a single point.
+		const atLeft =
+			selects.length === 0 ||
+			selects.some((select) => select !== 'last') ||
+			series.some((s) => s.data.length < 2);
 		const edges: MarginSide[] = [
 			'top',
 			'bottom',
-			...(dx < 0 ? (['left'] as const) : []),
-			...(dx >= 0 || series.length > 1 ? (['right'] as const) : [])
+			...(dx < 0 && atLeft ? (['left'] as const) : []),
+			...((dx >= 0 || series.length > 1) && atRight ? (['right'] as const) : [])
 		];
 
 		const texts: string[] = [];

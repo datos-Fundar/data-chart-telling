@@ -21,7 +21,7 @@
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { PRICES } from './data';
+	import { PRICES } from './datasets';
 </script>
 
 <!-- End-of-line value labels with a custom format and font size. -->
@@ -46,14 +46,17 @@
 
 ![End-of-line value labels](images/value-labels.png)
 
-| Field          | Meaning                                                                                                                                        |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `show`         | Draws the labels. Off by default, except on a heatmap                                                                                          |
-| `anchor`       | `'outside'`, `'start'`, `'middle'`, `'end'` - where a label sits on its mark                                                                   |
-| `format`       | `(value, seriesName) => string`                                                                                                                |
-| `hoverIsolate` | Hovering a label dims every other series                                                                                                       |
-| `fontStyle`    | Text style: `fontSize`, `fill`, `dx`, `dy`, `textAnchor`, `lineAnchor`, `rotate`, `class`, ... Overrides the anchor's placement field by field |
-| `strokeStyle`  | Style of the connector lines drawn from labels that had to move apart                                                                          |
+| Field          | Meaning                                                                                                                                                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `show`         | Draws the labels. Off by default, except on a heatmap                                                                                                                                                                     |
+| `anchor`       | `'outside'`, `'start'`, `'middle'`, `'end'` - where a label sits on its mark                                                                                                                                              |
+| `select`       | Which row of each group is labelled: `'first'`, `'last'`, `'min'`, `'max'`, or a list of them. A group is a series on a line or area plot (default `'last'`), a category on the plots that join dots (default: every dot) |
+| `series`       | Labels only these series, by name                                                                                                                                                                                         |
+| `color`        | `'series'` writes each label in its series' color; any other CSS color writes them all in it (`fontStyle.fill` wins)                                                                                                      |
+| `format`       | `(value, seriesName, row) => string`; `row` is the labelled row, for its other fields                                                                                                                                     |
+| `hoverIsolate` | Hovering a label dims every other series                                                                                                                                                                                  |
+| `fontStyle`    | Text style: `fontSize`, `fill`, `dx`, `dy`, `textAnchor`, `lineAnchor`, `rotate`, `class`, ... Overrides the anchor's placement field by field                                                                            |
+| `strokeStyle`  | Style of the connector lines drawn from labels that had to move apart                                                                                                                                                     |
 
 Where the labels go depends on the plot: the end of each series on a line or area plot, one per bar on a bar, pyramid or histogram, one per point on a scatter, one per cell on a heatmap. On lines, overlapping labels spread apart, share one column and are joined to their points by elbow connectors; the right margin grows to fit them when it is `'auto'`. The spread is tuned by `text.declutter` in the [configuration](theming.md).
 
@@ -70,14 +73,14 @@ A row whose value is `null`, `undefined` or `NaN` breaks a line. `styles.gaps` b
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { LIFE_GAPS } from './data';
+	import { FEMALE_LIFE_GAPS } from './datasets';
 </script>
 
 <!-- Missing values bridged: dashed in the middle, faded at the start, extended to the 2025 projection at the end. -->
 <LinePlot
 	width={720}
 	height={400}
-	series={[{ name: 'female', x: 'year', y: 'value', data: LIFE_GAPS }]}
+	series={[{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_GAPS }]}
 	scales={{ x: { edgeTicks: true }, y: { domain: [55, 85] } }}
 	styles={{
 		gaps: {
@@ -137,7 +140,7 @@ A baseline color with a highlighted range:
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES } from './data';
+	import { REGION_VALUES } from './datasets';
 
 	const gba = REGION_VALUES.filter((row) => row.region === 'GBA');
 </script>
@@ -170,7 +173,7 @@ Per-series colors, plus dots over a range shared by every series:
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { LIFE } from './data';
+	import { LIFE } from './datasets';
 </script>
 
 <!-- Segments per series name, plus `default` for rules shared by every series. -->
@@ -218,25 +221,25 @@ Heatmap columns and cells:
 ```svelte
 <script lang="ts">
 	import { HeatmapPlot } from '@fundar/data-chart-telling';
-	import { HOUSEHOLDS } from './data';
+	import { PENGUIN_COUNTS } from './datasets';
 </script>
 
-<!-- Segments on a heatmap: an outlined column and a filled block of overcrowded households. -->
+<!-- Segments on a heatmap: an outlined column and a filled block of cells. -->
 <HeatmapPlot
 	width={560}
 	height={360}
-	data={HOUSEHOLDS}
-	x="rooms"
-	y="people"
-	color="share"
+	data={PENGUIN_COUNTS}
+	x="island"
+	y="species"
+	color="count"
 	segments={{
 		default: [
 			{
-				areas: [{ x: { from: '1', to: '1' } }],
+				areas: [{ x: { from: 'Biscoe', to: 'Biscoe' } }],
 				styles: { stroke: '#f59e0b', strokeWidth: 2 }
 			},
 			{
-				areas: [{ x: { from: '1', to: '2' }, y: { from: '4', to: '5+' } }],
+				areas: [{ x: { from: 'Dream', to: 'Torgersen' }, y: { from: 'Chinstrap', to: 'Gentoo' } }],
 				styles: { fill: '#ef4444', fillOpacity: 0.8 }
 			}
 		]

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import BarPlot from '$lib/plots/bar/Plot.svelte';
-	import { facetGroups } from '../../data/facet-groups';
+	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+	import { diverseCountries } from '$datasets';
 	import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
 	import type { PlotStylesConfigInput } from '$lib/types/configuration/styling';
 
@@ -70,10 +70,10 @@
 	<BarPlot
 		width={720}
 		height={480}
-		data={facetGroups(9)}
-		x="category"
-		y="value"
-		facet={{ by: 'group', columns: 2, mode: 'paginated', pageSize: 4 }}
+		data={diverseCountries(9)}
+		x="year"
+		y="gdp"
+		facet={{ by: 'country', columns: 2, mode: 'paginated', pageSize: 4 }}
 	/>
 </div>
 

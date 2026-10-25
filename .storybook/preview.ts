@@ -58,50 +58,85 @@ const preview: Preview = {
 				order: [
 					'Plots',
 					[
-						'AreaPlot',
-						['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
-						'BarPlot',
-						['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip'],
-						'BoxPlot',
-						['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
-						'GeoPlot',
+						'Correlation',
 						[
-							'Series',
-							'Scales',
-							'Coordinates',
-							['Projection', 'Zoom', 'Pan', 'Rotate', 'Camera', 'CameraTransition'],
-							'Styles',
-							'Segments',
-							'Markers',
-							['Graticule', 'Dot', 'Vector', 'Link', 'Contour', 'Inset', 'Hover', 'Custom'],
-							'Tooltip'
+							'HeatmapPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip'],
+							'ScatterPlot',
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								'Segments',
+								'Bubble',
+								'Markers',
+								['Rules', 'Hover', 'Custom'],
+								'Tooltip'
+							]
 						],
-						'HeatmapPlot',
-						['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip'],
-						'HistogramPlot',
-						['Series', 'Scales', 'Tooltip', 'Transforms'],
-						'LinePlot',
+						'Distribution',
 						[
-							'Series',
-							'Scales',
-							'Styles',
-							'Segments',
-							'Markers',
-							['Rules', 'Deltas', 'Custom'],
-							'Tooltip'
+							'BoxPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							'DensityPlot',
+							['Series', 'Estimate', 'Scales', 'Styles', 'Tooltip'],
+							'HistogramPlot',
+							['Series', 'Scales', 'Tooltip', 'Transforms'],
+							'PyramidPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules'], 'Tooltip'],
+							'ViolinPlot',
+							['Series', 'Estimate', 'Styles', 'Tooltip']
 						],
-						'PyramidPlot',
-						['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules'], 'Tooltip'],
-						'ScatterPlot',
+						'Evolution',
 						[
-							'Series',
-							'Scales',
-							'Styles',
-							'Segments',
-							'Bubble',
-							'Markers',
-							['Rules', 'Hover', 'Custom'],
-							'Tooltip'
+							'AreaPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							'LinePlot',
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								'Segments',
+								'Curves',
+								'Markers',
+								['Rules', 'Deltas', 'Custom'],
+								'Tooltip'
+							],
+							'SlopePlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							'SparklinePlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							'StepPlot'
+						],
+						'Map',
+						[
+							'GeoPlot',
+							[
+								'Series',
+								'Scales',
+								'Coordinates',
+								['Projection', 'Zoom', 'Pan', 'Rotate', 'Camera', 'CameraTransition'],
+								'Styles',
+								'Segments',
+								'Markers',
+								['Graticule', 'Dot', 'Vector', 'Link', 'Contour', 'Inset', 'Hover', 'Custom'],
+								'Tooltip'
+							]
+						],
+						'Ranking',
+						[
+							'BarPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip'],
+							'BulletPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip'],
+							'ClevelandPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							'DumbbellPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							'ForestPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							'LollipopPlot',
+							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip']
 						]
 					],
 					'Channels',
@@ -115,12 +150,28 @@ const preview: Preview = {
 						'X1X2Y1Y2'
 					],
 					'Transforms',
-					['Bin', 'Stack'],
+					[
+						'Bin',
+						'Bollinger',
+						'Density',
+						'Filter',
+						'Group',
+						'Interval',
+						'Jitter',
+						'Map',
+						'Normalize',
+						'Select',
+						'Shift',
+						'Sort',
+						'Stack',
+						'Window'
+					],
 					'Markers',
 					[
 						'Area',
 						'Arrow',
 						'Bar',
+						'Bollinger',
 						'Box',
 						'Brush',
 						'Cell',
@@ -164,7 +215,7 @@ const preview: Preview = {
 					],
 					'Configuration',
 					'Composition',
-					['Chrome', 'Plot', 'PlotComposer']
+					['Chrome', 'PlotComposer', 'Custom Plots']
 				]
 			}
 		}

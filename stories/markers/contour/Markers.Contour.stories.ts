@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { WORLD_COUNTRIES, WORLD_TEMPERATURE } from '../../plots/geo/data';
-import GeoPlot from '$lib/plots/geo/Plot.svelte';
+import { WORLD_COUNTRIES } from '$datasets/world-countries';
+import { WORLD_TEMPERATURE } from '$datasets';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `contour` marker (svelteplot's own `Contour`) - marching-squares
@@ -51,6 +52,7 @@ export const Basic: GeoPlotStory = {
 				x: 'lon',
 				y: 'lat',
 				value: 'tempC',
+				blur: 2,
 				thresholds: 9,
 				stroke: 'value',
 				styles: { strokeWidth: 1.5, strokeOpacity: 0.8 }
@@ -63,7 +65,7 @@ export const Basic: GeoPlotStory = {
 
 /**
  * Scatter-interpolation mode - `data` is a scatter of `x`/`y`/`value` rows
- * (here, a simulated world temperature grid - see `WORLD_TEMPERATURE`); the
+ * (here, the 2025 mean temperature on a world grid - see `WORLD_TEMPERATURE`); the
  * mark spatially interpolates over a grid before running marching squares.
  * `stroke: 'value'` maps each contour level through the plot's color scale.
  */
@@ -78,6 +80,7 @@ export const TemperatureBands: GeoPlotStory = {
 				x: 'lon',
 				y: 'lat',
 				value: 'tempC',
+				blur: 2,
 				thresholds: 9,
 				stroke: 'value',
 				styles: { strokeWidth: 1.5, strokeOpacity: 0.8 }
@@ -128,6 +131,7 @@ export const ExplicitThresholds: GeoPlotStory = {
 				x: 'lon',
 				y: 'lat',
 				value: 'tempC',
+				blur: 2,
 				thresholds: [-20, -10, 0, 10, 20, 30],
 				stroke: 'value',
 				styles: { strokeWidth: 2 }
@@ -192,3 +196,40 @@ export const ClippedToOcean: GeoPlotStory = {
 		] satisfies GeoMarkersConfig[]
 	}
 };
+
+// ── Interpolation ─────────────────────────────────────────────────────────────
+
+/** The same scatter drawn with one `interpolate` mode - how the grid is filled in between the samples before the contours are traced. */
+const interpolated = (
+	interpolate: 'none' | 'nearest' | 'barycentric' | 'random-walk'
+): GeoPlotStory => ({
+	render: renderGeoPlot,
+	args: {
+		...GEO_PLOT_ARGS,
+		markers: [
+			{
+				type: 'contour',
+				interpolate,
+				data: WORLD_TEMPERATURE,
+				x: 'lon',
+				y: 'lat',
+				value: 'tempC',
+				thresholds: 10,
+				fill: 'value',
+				styles: { fillOpacity: 0.6, strokeOpacity: 0 }
+			}
+		] satisfies GeoMarkersConfig[]
+	}
+});
+
+/** `'none'` leaves the grid empty between samples, so a sparse scatter like this one traces no contours at all - it is for data that already is a dense grid. */
+export const InterpolateNone: GeoPlotStory = interpolated('none');
+
+/** `'nearest'` (the default for a scatter) gives each cell its closest sample's value: flat patches with abrupt edges. */
+export const InterpolateNearest: GeoPlotStory = interpolated('nearest');
+
+/** `'barycentric'` blends the three samples around each cell (a Delaunay triangulation): smooth, continuous bands. */
+export const InterpolateBarycentric: GeoPlotStory = interpolated('barycentric');
+
+/** `'random-walk'` fills each cell by a random walk to the samples: smooth overall, but the contours come out noticeably rougher and noisier. */
+export const InterpolateRandomWalk: GeoPlotStory = interpolated('random-walk');

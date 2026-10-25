@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { LIFE_GAPS } from './data';
+	import { FEMALE_LIFE_GAPS } from './datasets';
 </script>
 
 <!-- Missing values bridged: dashed in the middle, faded at the start, extended to the 2025 projection at the end. -->
 <LinePlot
 	width={720}
 	height={400}
-	series={[{ name: 'female', x: 'year', y: 'value', data: LIFE_GAPS }]}
+	series={[{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE_GAPS }]}
 	scales={{ x: { edgeTicks: true }, y: { domain: [55, 85] } }}
 	styles={{
 		gaps: {

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-import { COUNTRIES } from '../../plots/scatter/data';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `symbol` channel: a categorical shape mapping, independent of `color`.
@@ -16,11 +16,11 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: COUNTRIES,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy',
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life',
 		r: 6,
-		color: 'region'
+		color: 'continent'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -36,14 +36,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * `symbol: 'region'` gives every region its own shape, on top of `color`
+ * `symbol: 'continent'` gives every continent its own shape, on top of `color`
  * already grouping by the same field - shape becomes a second, redundant-but-
  * legible encoding of the same category (useful for grayscale/print, or
  * alongside a colorblind-unfriendly palette).
  */
 export const Default: Story = {
 	args: {
-		symbol: 'region'
+		symbol: 'continent'
 	}
 };
 
@@ -54,7 +54,7 @@ export const Default: Story = {
  */
 export const CustomShapes: Story = {
 	args: {
-		symbol: 'region',
+		symbol: 'continent',
 		scales: {
 			symbol: { range: ['diamond', 'star', 'cross'] }
 		}

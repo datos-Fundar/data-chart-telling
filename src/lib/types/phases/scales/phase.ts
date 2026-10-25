@@ -6,6 +6,9 @@ import type { AxisScale } from '$lib/types/layout/scales';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyAxisScale = AxisScale<any>;
 
+/** What a kind fits to an axis: scale options, and whether its `domain` is one it computed (so the author did not pin it). */
+export type AxisFit = Partial<AnyAxisScale> & { fitted?: true };
+
 /**
  * What differs between plots in the shared "scales" stage. The stage lays out
  * every category axis the kind asks for as a band and grows an unpinned
@@ -22,7 +25,7 @@ export type ScalesStageOptions<TState, TCtx> = {
 	/** The kind's own options for an axis, by name or by role, under the author's `scales`: padding, label anchor, tick format. */
 	defaults?: (state: TState, ctx: TCtx) => Partial<Record<AxisRef, AnyAxisScale>>;
 	/** The options the kind fits to its own marks on an axis the author left unpinned - a niced value axis, a domain padded for its dots. */
-	fit?: (state: TState, ctx: TCtx) => Partial<Record<AxisChannelName, Partial<AnyAxisScale>>>;
+	fit?: (state: TState, ctx: TCtx) => Partial<Record<AxisChannelName, AxisFit>>;
 	/** The kind's own extra "scales" output, once every scale is in place. */
 	extend?: (state: TState, ctx: TCtx) => TState;
 };

@@ -24,23 +24,30 @@ export class Declutter {
 		geometry: { elbowGap: number; laneStep: number; labelGap: number };
 		/** The content box's left/top/bottom edges (px). */
 		bounds: { left: number; top: number; bottom: number };
+		/** Aligns the labels on the shared column even when none of them overlaps. */
+		forceAligned?: boolean;
+		/** Lets a leftward fan with no room flip right. Defaults to `true`. */
+		flip?: boolean;
 	}): Map<K, LabelLane> {
-		const { items, dx, fontSize, geometry, bounds } = args;
+		const { items, dx, fontSize, geometry, bounds, forceAligned, flip = true } = args;
 		const lanes = new Map<K, LabelLane>();
-		if (items.length < 2) return lanes;
+		if (items.length < 2 && !forceAligned) return lanes;
 
 		const sorted = [...items].sort((a, b) => a.py - b.py);
 		const originals = sorted.map((item) => item.py);
 		const minGap = Math.max(16, fontSize * 1.4);
-		const { finals, connected } = Declutter.#spread(originals, minGap, [bounds.top, bounds.bottom]);
+		const { finals, connected } =
+			sorted.length > 1
+				? Declutter.#spread(originals, minGap, [bounds.top, bounds.bottom])
+				: { finals: originals, connected: [] };
 		const ranks = Declutter.#assignLanes(originals, finals, connected);
 
-		const aligned = ranks.some((r) => r.runSize > 1);
+		const aligned = !!forceAligned || ranks.some((r) => r.runSize > 1);
 		const lanesUsed = aligned ? Math.max(...ranks.map((r) => r.runSize)) : 1;
 		const reach = geometry.elbowGap + (lanesUsed - 1) * geometry.laneStep + geometry.labelGap;
 
 		let dir = Math.sign(dx) || 1;
-		if (aligned && dir === -1) {
+		if (aligned && dir === -1 && flip) {
 			// Unknown room (no x position yet) counts as none: flipping right is never wrong.
 			const rooms = sorted.flatMap((item) => (item.px == null ? [] : [item.px - bounds.left]));
 			if ((rooms.length > 0 ? Math.min(...rooms) : -Infinity) < reach) dir = 1;
@@ -177,11 +184,26 @@ export class Declutter {
 		for (const [start, end] of Declutter.#runs(connected)) {
 			const runSize = end - start + 1;
 			if (runSize < 2) continue;
-			const order = Array.from({ length: runSize }, (_, k) => start + k).sort((a, b) => {
-				const aNearer = saferNearer(a, b);
-				if (aNearer !== saferNearer(b, a)) return aNearer ? -1 : 1;
-				return distance(b) - distance(a);
-			});
+			const members = Array.from({ length: runSize }, (_, k) => start + k);
+			// The pairs the geometry decides: `before` holds the members that must take a nearer lane than each key.
+			const before = new Map(members.map((k) => [k, new Set<number>()]));
+			for (const i of members) {
+				for (const j of members) {
+					if (i !== j && saferNearer(i, j) && !saferNearer(j, i)) before.get(j)!.add(i);
+				}
+			}
+			// Nearest lane first, each member only once everything that must precede it has a lane; the one that traveled furthest goes first among the free ones.
+			const order: number[] = [];
+			const placed = new Set<number>();
+			while (order.length < runSize) {
+				const left = members.filter((k) => !placed.has(k));
+				const free = left.filter((k) => [...before.get(k)!].every((i) => placed.has(i)));
+				const next = (free.length ? free : left).reduce((best, k) =>
+					distance(k) > distance(best) ? k : best
+				);
+				order.push(next);
+				placed.add(next);
+			}
 			order.forEach((k, rank) => {
 				out[k] = { rank, runSize };
 			});

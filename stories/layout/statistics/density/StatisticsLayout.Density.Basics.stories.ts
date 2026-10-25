@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import AreaPlot from '$lib/plots/area/Plot.svelte';
-import { COUNTRIES } from '../../../plots/scatter/data';
+import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `statistics: [{ type: 'density' }]` is a 1D kernel density over the plot's
@@ -9,7 +9,7 @@ import { COUNTRIES } from '../../../plots/scatter/data';
 // shares the plot's `y` scale, so the host here plots every row at `y = 0` -
 // a rug along the baseline that the density curve rises above.
 
-const rugData = COUNTRIES.map((d) => ({ ...d, rug: 0 }));
+const rugData = COUNTRIES_AT_2007.map((d) => ({ ...d, rug: 0 }));
 
 const meta = {
 	title: 'Layout/Statistics/Density/Basics',
@@ -19,7 +19,7 @@ const meta = {
 		width: 940,
 		height: 360,
 		data: rugData,
-		x: 'lifeExpectancy',
+		x: 'life',
 		y: 'rug'
 	},
 	argTypes: {
@@ -63,10 +63,10 @@ export const CustomStyle: Story = {
 	}
 };
 
-/** Per-region densities: `color` splits the rows into series, and the statistic follows that grouping, drawing one curve per region in that region's color. */
-export const PerRegion: Story = {
+/** Per-continent densities: `color` splits the rows into series, and the statistic follows that grouping, drawing one curve per continent in that continent's color. */
+export const PerContinent: Story = {
 	args: {
-		color: 'region',
+		color: 'continent',
 		statistics: [{ type: 'density', bandwidth: 2, styles: { fillOpacity: 0.15 } }]
 	}
 };

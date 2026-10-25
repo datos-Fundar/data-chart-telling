@@ -1,5 +1,5 @@
 <script lang="ts">
-	import LinePlot from '$lib/plots/line/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 	import type { FacetConfig } from '$lib/types/layout/facet';
 
 	type Row = { region: string; sex: 'male' | 'female'; year: number; value: number };

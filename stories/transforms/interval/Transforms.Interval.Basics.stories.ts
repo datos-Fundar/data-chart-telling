@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { BUENOS_AIRES_TEMPERATURE } from '../../data/daily-temperature';
-import { SURVEY_ANSWERS } from '../../data/survey-ratings';
+import { BUENOS_AIRES_TEMPERATURE, HEIGHTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // An `intervalX` transform widens each row's `x` into the interval around it:
@@ -97,18 +96,18 @@ export const IntervalY: Story = {
 	}
 };
 
-/** A numeric interval: respondents counted per decade of age, each bar ten years wide. */
+/** A numeric interval: people counted per five kilograms of weight, each bar five wide. */
 export const Numeric: Story = {
 	args: {
-		scales: { x: { label: 'Age' }, y: { label: 'Respondents' } },
+		scales: { x: { label: 'Weight (kg)' }, y: { label: 'People' } },
 		markers: [
 			{
 				type: 'rect',
-				data: SURVEY_ANSWERS,
-				x: 'age',
+				data: HEIGHTS,
+				x: 'weight',
 				transforms: [
-					{ type: 'groupX', y: 'count', interval: 10 },
-					{ type: 'intervalX', interval: 10 }
+					{ type: 'groupX', y: 'count', interval: 5 },
+					{ type: 'intervalX', interval: 5 }
 				],
 				styles: { fill: '#ea580c' }
 			}

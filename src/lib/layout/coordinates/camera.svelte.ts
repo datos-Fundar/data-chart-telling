@@ -28,6 +28,11 @@ function tweenState<T>(args: {
 	let to: T | undefined;
 	let raf: number | undefined;
 
+	function stop() {
+		if (raf != null) cancelAnimationFrame(raf);
+		raf = undefined;
+	}
+
 	function setCurrent(value: T) {
 		current = value;
 		lastValue = value;
@@ -50,12 +55,8 @@ function tweenState<T>(args: {
 			to = target;
 		}
 
-		if (raf != null) {
-			cancelAnimationFrame(raf);
-			raf = undefined;
-		}
-
 		if (progress != null) {
+			stop();
 			setCurrent(
 				args.lerp(
 					from!,
@@ -67,7 +68,10 @@ function tweenState<T>(args: {
 			return;
 		}
 
+		// A rerun with the same target (the caller rebuilds `transition` on every
+		// render) leaves a tween in flight alone.
 		if (!changed) return;
+		stop();
 		const duration = Math.max(0, transition?.duration ?? 750);
 		const easing = Interpolation.buildEasing(transition?.easing);
 		const startFrom = from!;
@@ -80,11 +84,10 @@ function tweenState<T>(args: {
 			raf = t < 1 ? requestAnimationFrame(tick) : undefined;
 		}
 		raf = requestAnimationFrame(tick);
-
-		return () => {
-			if (raf != null) cancelAnimationFrame(raf);
-		};
 	});
+
+	// Only leaving the page stops a tween the effect above started.
+	$effect(() => stop);
 
 	return {
 		get current() {

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ticks } from 'd3-array';
 	import type { SizeLegendSection } from '$lib/types/layout/legend';
-	import { SymbolPath } from '$lib/utils/symbol';
+	import { SymbolPath } from '$lib/utils/SymbolPath';
 	import { AxisNumberFormat } from '$lib/layout/legend/AxisNumberFormat';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 

@@ -23,6 +23,7 @@
 	import RasterMarker from '$lib/markers/raster/RasterMarker.svelte';
 	import TickMarker from '$lib/markers/tick/TickMarker.svelte';
 	import TrailMarker from '$lib/markers/trail/TrailMarker.svelte';
+	import ViolinMarker from '$lib/markers/violin/ViolinMarker.svelte';
 	import WaffleMarker from '$lib/markers/waffle/WaffleMarker.svelte';
 	import DotMarker from '$lib/markers/dot/DotMarker.svelte';
 	import TextMarker from '$lib/markers/text/TextMarker.svelte';
@@ -39,6 +40,7 @@
 	import ContourClipMarker from '$lib/markers/contour/ContourClipMarker.svelte';
 	import InsetMarker from '$lib/markers/inset/InsetMarker.svelte';
 	import FrameClip from '$lib/layout/geometry/FrameClip.svelte';
+	import MarkerOffset from '$lib/layout/geometry/MarkerOffset.svelte';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import { PlotMargins } from '$lib/layout/margins/PlotMargins.svelte';
@@ -48,7 +50,6 @@
 	import type { PlotHover } from '$lib/layout/hover/PlotHover.svelte';
 	import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
 	import type { GeoFeature } from '$lib/types/plots/data/geo';
-	import type { ChannelScalesConfig } from '$lib/types/layout/scales';
 	import { MarkerGrouping } from '$lib/phases/statistics/MarkerGrouping';
 	import { FrameClipping } from '$lib/layout/geometry/FrameClipping';
 
@@ -75,7 +76,6 @@
 		markers = [],
 		seriesData = [],
 		scopedGroups = [],
-		channelScales = undefined,
 		ctrl,
 		numericMargins,
 		data = [],
@@ -91,8 +91,6 @@
 		seriesData?: Series<TSeries>[];
 		/** One entry per series that can own a `series`-scoped marker. Same `TSeries` as `seriesData`. */
 		scopedGroups?: ScopedMarkerGroup<TSeries>[];
-		/** This plot kind's own `color`/`grouping` channel config - the fallback a marker's own `scales` inherits when it sets none of its own. */
-		channelScales?: ChannelScalesConfig;
 		/** `BasePlotLayout`'s own hover controller. */
 		ctrl: PlotHover<TData>;
 		/** The plot's own resolved margins - places the content box an `inset` marker needs. */
@@ -122,7 +120,8 @@
 		const scope = scopedSeriesOf(marker);
 		if (scope) return `${scope}-${marker.type}-${i}`;
 		if (marker.type === 'rule') {
-			const v = typeof marker.value === 'function' ? i : marker.value;
+			// A rule over rows (`data`) has no value of its own to tell it from another one.
+			const v = typeof marker.value === 'function' || marker.data ? i : marker.value;
 			return `rule-${marker.axis}-${v}`;
 		}
 		if (marker.type === 'bar') return `bar-${marker.role}-${i}`;
@@ -130,7 +129,7 @@
 	}
 </script>
 
-{#snippet renderMarker(marker: MarkerConfig, rows: TData[] | TSeries[])}
+{#snippet drawMarker(marker: MarkerConfig, rows: TData[] | TSeries[])}
 	{#if marker.type === 'bar'}
 		<BarMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'line'}
@@ -173,12 +172,12 @@
 		<TickMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'trail'}
 		<TrailMarker marker={{ ...marker, data: marker.data ?? rows }} />
+	{:else if marker.type === 'violin'}
+		<ViolinMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'waffle'}
 		<WaffleMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'dot'}
-		<DotMarker
-			marker={{ ...marker, data: marker.data ?? rows, scales: marker.scales ?? channelScales }}
-		/>
+		<DotMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'text'}
 		<TextMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'rule'}
@@ -234,6 +233,12 @@
 	{:else if marker.type === 'delta'}
 		<DeltaMarker {marker} data={seriesData} />
 	{/if}
+{/snippet}
+
+{#snippet renderMarker(marker: MarkerConfig, rows: TData[] | TSeries[])}
+	<MarkerOffset {marker}>
+		{@render drawMarker(marker, rows)}
+	</MarkerOffset>
 {/snippet}
 
 {#snippet renderScoped(marker: MarkerConfig, group: ScopedMarkerGroup<TSeries>)}

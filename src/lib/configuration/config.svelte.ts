@@ -1,4 +1,5 @@
 import { merge } from '$lib/utils/merge';
+import { Palette } from '$lib/utils/color';
 import type {
 	PlotStylesConfig,
 	PlotStylesConfigInput,
@@ -25,9 +26,20 @@ const text = (over: Partial<TextStyle>): TextStyle => ({
 });
 
 export const DEFAULT_CONFIG: PlotStylesConfig = {
+	// ── General look ────────────────────────────────────────────────────────────
+
 	font: 'inherit',
 	color: 'currentColor',
 	background: 'transparent',
+	title: text({ size: '1.5rem', weight: 500, leading: '1.2' }),
+
+	subtitle: text({
+		size: '1rem',
+		weight: 400,
+		color: 'color-mix(in srgb, currentColor 85%, transparent)'
+	}),
+
+	caption: text({ size: '0.75rem', color: 'color-mix(in srgb, currentColor 75%, transparent)' }),
 
 	spacing: {
 		headerPadding: '0.5rem 0',
@@ -61,13 +73,35 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		rowGap: '1rem'
 	},
 
-	title: text({ size: '1.5rem', weight: 500, leading: '1.2' }),
-	subtitle: text({
-		size: '1rem',
-		weight: 400,
-		color: 'color-mix(in srgb, currentColor 85%, transparent)'
-	}),
-	caption: text({ size: '0.75rem', color: 'color-mix(in srgb, currentColor 75%, transparent)' }),
+	// Tableau 10 - qualitative, with a muted blue first, and distinct enough to tell ten series apart.
+	palette: Palette.resolve('tableau10')!,
+
+	symbols: ['circle', 'square', 'triangle', 'diamond', 'star', 'cross'],
+	// A light tint of the palette's first color up to the color itself.
+	continuous: { min: '#eaf0f6', max: '#4e79a7', labelColor: '#111827', opacityRange: [0.2, 1] },
+	margins: { top: 'auto', right: 'auto', bottom: 'auto', left: 'auto' },
+	frameClip: { tolerance: 2 },
+
+	// ── Features ────────────────────────────────────────────────────────────────
+
+	axis: {
+		color: 'currentColor',
+		fontSize: 14,
+		labelFontSize: 14,
+		titleFontSize: 14,
+		xTickSize: 5,
+		yTickSize: 5,
+		xTickPadding: 10,
+		yTickPadding: 10,
+		grid: false,
+		locale: 'es-AR',
+		compactDisplay: 'short',
+		edgeTicks: {
+			x: { enabled: true, collision: 'drop-nice' },
+			y: { enabled: false, collision: 'drop-nice' }
+		},
+		autoRotate: true
+	},
 
 	legend: {
 		font: 'inherit',
@@ -93,6 +127,10 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 			height: 20,
 			barHeight: 12,
 			barRadius: 2,
+			opacity: {
+				color: '#000',
+				checker: { size: 4, light: '#fff', dark: '#d4d4d8' }
+			},
 			// A slim vertical bar handle, taller than the 12px gradient track.
 			handle: {
 				width: '6px',
@@ -120,24 +158,6 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		}
 	},
 
-	axis: {
-		color: 'currentColor',
-		fontSize: 14,
-		labelFontSize: 14,
-		titleFontSize: 14,
-		xTickSize: 5,
-		yTickSize: 5,
-		xTickPadding: 10,
-		yTickPadding: 10,
-		grid: false,
-		locale: 'es-AR',
-		compactDisplay: 'short',
-		edgeTicks: {
-			x: { enabled: true, collision: 'drop-nice' },
-			y: { enabled: false, collision: 'drop-nice' }
-		}
-	},
-
 	tooltip: {
 		background: '#111827',
 		color: '#ffffff',
@@ -147,42 +167,33 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		border: 'none'
 	},
 
-	margins: { top: 'auto', right: 'auto', bottom: 'auto', left: 'auto' },
-	frameClip: { tolerance: 5 },
-	// ColorBrewer Dark2 - qualitative, harmonious, and dark enough to read on white.
-	palette: ['#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02', '#a6761d', '#666666'],
-	symbols: ['circle', 'square', 'triangle', 'diamond', 'star', 'cross'],
-	continuous: { min: '#f7fcfd', max: '#1b9e77', labelColor: '#111827', opacityRange: [0.2, 1] },
-	line: {
-		strokeWidth: 3,
-		dotRadius: 4,
-		gap: {
-			stroke: { strokeOpacity: 0.6, strokeDasharray: '4 4' },
-			dots: {}
+	hover: {
+		rule: { stroke: '#e6580d', strokeOpacity: 0.35, strokeWidth: 1.5, strokeDasharray: '4 4' },
+		dot: { dotRadius: 5, dotFill: 'currentColor' },
+		font: { fill: 'currentColor', fontSize: 12, dy: -18 },
+		area: { fill: '#94a3b8', fillOpacity: 0.4 }
+	},
+
+	facet: {
+		indicator: {
+			background: '#111827',
+			color: '#ffffff',
+			fontSize: '0.8125rem',
+			padding: '0.125rem 0.5rem',
+			radius: '999px'
+		},
+		navButton: {
+			background: '#111827',
+			color: '#ffffff',
+			size: '2rem',
+			fontSize: '1.1rem',
+			disabledOpacity: 0.3
 		}
 	},
-	text: {
-		declutter: {
-			elbowGap: 10,
-			laneStep: 7,
-			labelGap: 6,
-			connector: { stroke: '#94a3b8', strokeWidth: 0.5 }
-		}
-	},
-	bar: {
-		gap: { fillOpacity: 0.5 },
-		seriesPadding: 0.2,
-		paddingInner: 0.15,
-		paddingOuter: 0.15
-	},
-	pyramid: { gap: { fillOpacity: 0.5 } },
-	area: { fillOpacity: 0.6 },
-	histogram: { inset: 1, fillOpacity: 1 },
-	box: { fillOpacity: 0.9, paddingInner: 0.4, paddingOuter: 0.2 },
-	scatter: { dotRadius: 5 },
+
 	timeline: {
 		axisColor: 'currentColor',
-		activeColor: '#1b9e77',
+		activeColor: '#4e79a7',
 		thickness: 60,
 		gap: '12px',
 		rule: {
@@ -207,22 +218,22 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 			valueWidth: '3rem',
 			button: {
 				size: '2rem',
-				background: '#1b9e77',
+				background: '#4e79a7',
 				color: '#ffffff',
-				hoverBackground: '#0c4937',
+				hoverBackground: '#24384d',
 				radius: '999px'
 			},
 			track: {
 				height: '3px',
 				color: 'color-mix(in srgb, currentColor 25%, transparent)',
-				fillColor: '#1b9e77',
+				fillColor: '#4e79a7',
 				radius: '999px'
 			},
-			thumb: { size: '14px', color: '#1b9e77' },
+			thumb: { size: '14px', color: '#4e79a7' },
 			toggle: {
 				background: 'transparent',
 				color: 'currentColor',
-				activeBackground: '#1b9e77',
+				activeBackground: '#4e79a7',
 				activeColor: '#ffffff',
 				radius: '0.375rem',
 				fontSize: '0.75rem',
@@ -230,12 +241,18 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 			}
 		}
 	},
-	hover: {
-		rule: { stroke: '#e6580d', strokeOpacity: 0.35, strokeWidth: 1.5, strokeDasharray: '4 4' },
-		dot: { dotRadius: 5, dotFill: 'currentColor' },
-		font: { fill: 'currentColor', fontSize: 12, dy: -18 },
-		area: { fill: '#94a3b8', fillOpacity: 0.25 }
+
+	connector: {
+		sign: { positive: '#59a14f', negative: '#e15759', zero: '#9ca3af' },
+		lengthScheme: ['#d1d5db', '#374151'],
+		differenceScheme: ['#e15759', '#e5e7eb', '#59a14f'],
+		arrow: { width: 2, headLength: 8, headAngle: 60 },
+		capLength: 8,
+		outsideOpacity: 0.4,
+		labelFontSize: 11,
+		labelGap: 4
 	},
+
 	// Beside a vertical delta (taken on x), above a horizontal one (on y).
 	delta: {
 		text: {
@@ -243,22 +260,93 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 			y: { dx: 0, dy: -10, lineAnchor: 'middle', textAnchor: 'middle' }
 		}
 	},
-	facet: {
-		indicator: {
-			background: '#111827',
-			color: '#ffffff',
-			fontSize: '0.8125rem',
-			padding: '0.125rem 0.5rem',
-			radius: '999px'
-		},
-		navButton: {
-			background: '#111827',
-			color: '#ffffff',
-			size: '2rem',
-			fontSize: '1.1rem',
-			disabledOpacity: 0.3
+
+	text: {
+		declutter: {
+			elbowGap: 10,
+			laneStep: 7,
+			labelGap: 6,
+			connector: { stroke: '#94a3b8', strokeWidth: 0.5 }
 		}
-	}
+	},
+
+	// ── Plot kinds ──────────────────────────────────────────────────────────────
+
+	area: { fillOpacity: 0.6 },
+
+	bar: {
+		gap: { fillOpacity: 0.5 },
+		seriesPadding: 0.2,
+		paddingInner: 0.15,
+		paddingOuter: 0.15
+	},
+
+	box: { fillOpacity: 0.9, paddingInner: 0.4, paddingOuter: 0.2 },
+
+	bullet: {
+		barThickness: 10,
+		rangeWidth: 28,
+		rangeColors: ['#9ca3af', '#d1d5db', '#eceff3'],
+		targetLength: 22,
+		targetWidth: 3,
+		paddingInner: 0.4,
+		paddingOuter: 0.3
+	},
+
+	cleveland: {
+		dotRadius: 5,
+		stemWidth: 5,
+		connectorColor: '#9ca3af',
+		labelGap: 10,
+		paddingInner: 0.5,
+		paddingOuter: 0.5
+	},
+
+	density: { fillOpacity: 0.6, strokeWidth: 2 },
+
+	dumbbell: {
+		dotRadius: 6,
+		stemWidth: 'dots',
+		connectorColor: '#9ca3af',
+		labelGap: 10,
+		paddingInner: 0.5,
+		paddingOuter: 0.5
+	},
+
+	forest: {
+		dotRadius: 5,
+		stemWidth: 2,
+		caps: true,
+		labelGap: 10,
+		paddingInner: 0.5,
+		paddingOuter: 0.5
+	},
+
+	histogram: { inset: 1, fillOpacity: 1 },
+
+	line: {
+		curve: 'auto',
+		strokeWidth: 3,
+		dotRadius: 4,
+		gap: {
+			stroke: { strokeOpacity: 0.6, strokeDasharray: '4 4' },
+			dots: {}
+		}
+	},
+
+	lollipop: {
+		dotRadius: 6,
+		stemWidth: 2,
+		labelGap: 10,
+		paddingInner: 0.5,
+		paddingOuter: 0.5
+	},
+
+	pyramid: { gap: { fillOpacity: 0.5 } },
+	scatter: { dotRadius: 5 },
+	slope: { strokeWidth: 2, dotRadius: 5, padding: 0 },
+	sparkline: { strokeWidth: 1.5, dotRadius: 3 },
+	violin: { fillOpacity: 0.6, paddingInner: 0.2, paddingOuter: 0.2, boxWidth: 8 }
 };
 
 // ── Reactive store ──────────────────────────────────────────────────────────
@@ -270,9 +358,9 @@ export function getConfiguration(): PlotStylesConfig {
 	return current;
 }
 
-/** Deep-merge a partial override into the global configuration. Reactive. */
+/** Deep-merge a partial override into the global configuration - a `palette` may be a scheme name. Reactive. */
 export function setConfiguration(patch: PlotStylesConfigInput): PlotStylesConfig {
-	current = merge(current, patch);
+	current = merge(current, Palette.resolveIn(patch));
 	return current;
 }
 
@@ -299,6 +387,10 @@ export function configToCssVars(c: PlotStylesConfig): Record<string, string> {
 		'--dct-fg': c.color,
 		'--dct-bg': c.background,
 
+		...t('title', c.title),
+		...t('subtitle', c.subtitle),
+		...t('caption', c.caption),
+
 		'--dct-header-pad': c.spacing.headerPadding,
 		'--dct-legend-pad': c.spacing.legendPadding,
 		'--dct-caption-pad': c.spacing.captionPadding,
@@ -310,9 +402,11 @@ export function configToCssVars(c: PlotStylesConfig): Record<string, string> {
 		'--dct-divider-margin': c.divider.margin,
 		'--dct-row-gap': c.chrome.rowGap,
 
-		...t('title', c.title),
-		...t('subtitle', c.subtitle),
-		...t('caption', c.caption),
+		'--dct-heat-min': c.continuous.min,
+		'--dct-heat-max': c.continuous.max,
+		'--dct-heat-text': c.continuous.labelColor,
+
+		'--dct-axis-color': c.axis.color,
 
 		'--dct-legend-font': c.legend.font,
 		'--dct-legend-size': c.legend.size,
@@ -344,14 +438,24 @@ export function configToCssVars(c: PlotStylesConfig): Record<string, string> {
 		'--dct-continuous-label-weight': String(c.legend.continuous.label.weight),
 		'--dct-continuous-label-overlap-rotate': c.legend.continuous.label.overlap.rotate,
 
-		'--dct-axis-color': c.axis.color,
-
 		'--dct-tooltip-bg': c.tooltip.background,
 		'--dct-tooltip-color': c.tooltip.color,
 		'--dct-tooltip-size': c.tooltip.fontSize,
 		'--dct-tooltip-pad': c.tooltip.padding,
 		'--dct-tooltip-radius': c.tooltip.radius,
 		'--dct-tooltip-border': c.tooltip.border,
+
+		'--dct-facet-indicator-bg': c.facet.indicator.background,
+		'--dct-facet-indicator-color': c.facet.indicator.color,
+		'--dct-facet-indicator-size': c.facet.indicator.fontSize,
+		'--dct-facet-indicator-pad': c.facet.indicator.padding,
+		'--dct-facet-indicator-radius': c.facet.indicator.radius,
+
+		'--dct-facet-nav-bg': c.facet.navButton.background,
+		'--dct-facet-nav-color': c.facet.navButton.color,
+		'--dct-facet-nav-btn-size': c.facet.navButton.size,
+		'--dct-facet-nav-font-size': c.facet.navButton.fontSize,
+		'--dct-facet-nav-disabled-opacity': String(c.facet.navButton.disabledOpacity),
 
 		'--dct-timeline-axis': c.timeline.axisColor,
 		'--dct-timeline-active': c.timeline.activeColor,
@@ -382,23 +486,7 @@ export function configToCssVars(c: PlotStylesConfig): Record<string, string> {
 		'--dct-player-toggle-active-color': c.timeline.player.toggle.activeColor,
 		'--dct-player-toggle-radius': c.timeline.player.toggle.radius,
 		'--dct-player-toggle-size': c.timeline.player.toggle.fontSize,
-		'--dct-player-toggle-pad': c.timeline.player.toggle.padding,
-
-		'--dct-heat-min': c.continuous.min,
-		'--dct-heat-max': c.continuous.max,
-		'--dct-heat-text': c.continuous.labelColor,
-
-		'--dct-facet-indicator-bg': c.facet.indicator.background,
-		'--dct-facet-indicator-color': c.facet.indicator.color,
-		'--dct-facet-indicator-size': c.facet.indicator.fontSize,
-		'--dct-facet-indicator-pad': c.facet.indicator.padding,
-		'--dct-facet-indicator-radius': c.facet.indicator.radius,
-
-		'--dct-facet-nav-bg': c.facet.navButton.background,
-		'--dct-facet-nav-color': c.facet.navButton.color,
-		'--dct-facet-nav-btn-size': c.facet.navButton.size,
-		'--dct-facet-nav-font-size': c.facet.navButton.fontSize,
-		'--dct-facet-nav-disabled-opacity': String(c.facet.navButton.disabledOpacity)
+		'--dct-player-toggle-pad': c.timeline.player.toggle.padding
 	};
 }
 

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import PlotComposer from '$lib/layout/composer/PlotComposer.svelte';
-	import LinePlot from '$lib/plots/line/Plot.svelte';
-	import BarPlot from '$lib/plots/bar/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 	import Scrubber from '../../../common/Scrubber.svelte';
-	import { TIME_SERIES } from '../../../data/time-series';
+	import { ARGENTINA_CHILE_TRENDS } from '$datasets';
 
-	const YEARS = [2018, 2019, 2020, 2021, 2022];
+	const YEARS = [1987, 1992, 1997, 2002, 2007];
 </script>
 
 <Scrubber>
@@ -19,18 +19,18 @@
 			layout={{ columns: 2, widths: [3, 2] }}
 		>
 			<LinePlot
-				data={TIME_SERIES.filter((d) => d.metric === 'GDP')}
+				data={ARGENTINA_CHILE_TRENDS.filter((d) => d.metric === 'GDP per capita')}
 				x="year"
 				y="value"
-				color="region"
-				scales={{ x: { domain: [2018, 2022] }, y: { domain: [0, 100] } }}
+				color="country"
+				scales={{ x: { domain: [1987, 2007] }, y: { domain: [0, 250] } }}
 				timeline={{ accessor: 'year' }}
 			/>
 			<BarPlot
-				data={TIME_SERIES.filter((d) => d.metric === 'GDP')}
-				x="region"
+				data={ARGENTINA_CHILE_TRENDS.filter((d) => d.metric === 'GDP per capita')}
+				x="country"
 				y="value"
-				scales={{ y: { domain: [0, 100] } }}
+				scales={{ y: { domain: [0, 250] } }}
 				timeline={{ accessor: 'year' }}
 			/>
 		</PlotComposer>

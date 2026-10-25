@@ -1,7 +1,7 @@
 <script lang="ts">
-	import LinePlot from '$lib/plots/line/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 	import FigureReadout from './FigureReadout.svelte';
-	import { LIFE_EXPECTANCY } from '../../plots/line/data';
+	import { LIFE } from '$datasets';
 </script>
 
 {#snippet footer()}
@@ -12,10 +12,11 @@
 	width={720}
 	height={360}
 	title="Life expectancy at birth"
-	data={LIFE_EXPECTANCY}
+	data={LIFE}
 	x="year"
 	y="value"
 	color="sex"
 	tooltip
 	{footer}
+	scales={{ x: { nice: false } }}
 />

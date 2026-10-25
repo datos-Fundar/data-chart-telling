@@ -9,6 +9,7 @@
 	import { DISCRETE_SCALE_TYPES } from '$lib/types/layout/scales';
 	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 	import type { AxisValue } from '$lib/types/layout/mapping';
+	import type { PlotLayoutState } from '$lib/types/layout/plot';
 
 	/** Axis ticks, titles and grid lines for the plot kinds with an x/y axis pair. */
 	let {
@@ -19,7 +20,9 @@
 		height,
 		numericMargins,
 		scales,
-		edgeDomains = undefined
+		edgeDomains = undefined,
+		tickValues = undefined,
+		state: plotState
 	}: {
 		data: TData[];
 		getX: (d: TData) => AxisValue;
@@ -33,7 +36,17 @@
 		 * `'extend'` resolved a collision (see `EdgeTicks`), for the plot to give its scale.
 		 */
 		edgeDomains?: Map<'x' | 'y', [number, number]>;
+		/** The labels a category axis writes, when it leaves some out for want of room. */
+		tickValues?: Partial<Record<'x' | 'y', string[]>>;
+		/** The plot's state: its fitted axes and the y channel's field, which titles a vertical y axis with no rows. */
+		state: Pick<PlotLayoutState, 'fittedAxes' | 'channels'>;
 	} = $props();
+
+	const fittedAxes = $derived(plotState.fittedAxes);
+	const yField = $derived.by(() => {
+		const source = plotState.channels?.y?.source;
+		return typeof source === 'string' ? source : undefined;
+	});
 
 	const cfg = $derived(getConfiguration());
 	const plot = usePlot().svelteplot;
@@ -101,6 +114,8 @@
 		if (!extent) return undefined;
 		const [lo, hi] = extent;
 		if (!Number.isInteger(lo) || !Number.isInteger(hi)) return undefined;
+		const numbers = values.filter((v): v is number => typeof v === 'number');
+		if (numbers.length === 0 || !numbers.every(Number.isInteger)) return undefined;
 		return hi - lo < NiceTicks.count(span, spacing, min) ? 1 : undefined;
 	}
 
@@ -139,7 +154,7 @@
 			scale?.ticks != null ||
 			scale?.tickSpacing != null ||
 			scale?.interval != null ||
-			scale?.domain != null
+			(scale?.domain != null && !fittedAxes?.includes(axis))
 		)
 			return undefined;
 		if (type != null && isDiscreteType(type)) return undefined;
@@ -179,6 +194,12 @@
 		});
 	});
 
+	/** A turned label is written on one line: the axis does not wrap it. */
+	const turned = $derived(scales?.x?.tickRotate ? { wordwrap: false } : {}) as Record<
+		string,
+		unknown
+	>;
+
 	const yTitleFontSize = $derived(scales?.y?.titleFontSize ?? cfg.axis.titleFontSize);
 
 	/**
@@ -187,7 +208,8 @@
 	 */
 	const verticalYLabel = $derived.by(() => {
 		if (scales?.y?.labelOrientation !== 'vertical' || scales.y.label === false) return null;
-		const text = scales.y.label || plot.scales.y.autoTitle;
+		const text =
+			scales.y.label || plot.scales.y.autoTitle || (data.length === 0 ? yField : undefined);
 		if (!text) return null;
 		const position = scales.y.labelPosition ?? 'middle';
 		const x = yTitleFontSize;
@@ -220,11 +242,54 @@
 	$effect(() => () => {
 		$autoMarginLeft.delete(marginId);
 	});
+
+	// An x label centred on the domain's end reaches past the plot's right side; an `'auto'` right margin takes that much room.
+	let xAxisEl: SVGGElement | undefined = $state();
+	const { autoMarginRight } = getContext<{ autoMarginRight: Writable<Map<string, number>> }>(
+		'svelteplot/autoMargins'
+	);
+	const overhangId = `dct-x-tick-overhang-${Math.random().toString(36).slice(2)}`;
+	$effect(() => {
+		const el = xAxisEl;
+		// Read so a new axis, a new box or a new margin measures again.
+		void [scales?.x, xEdgeTicks, tickValues?.x, plot.options.marginLeft, plot.facetWidth];
+		if (!el) return;
+		let frame: number | undefined;
+		let cancelled = false;
+		const measure = () => {
+			if (cancelled) return;
+			const labels = el.querySelectorAll('g.tick text');
+			const last = labels.item(labels.length - 1);
+			const svg = el.ownerSVGElement;
+			const { marginLeft } = plot.options;
+			if (last && svg && Number.isFinite(marginLeft) && Number.isFinite(plot.facetWidth)) {
+				const edge = svg.getBoundingClientRect().left + Number(marginLeft) + plot.facetWidth;
+				const overhang = Math.max(0, Math.ceil(last.getBoundingClientRect().right - edge));
+				untrack(() => {
+					if (overhang === 0) $autoMarginRight.delete(overhangId);
+					else if ($autoMarginRight.get(overhangId) !== overhang)
+						$autoMarginRight.set(overhangId, overhang);
+				});
+			}
+		};
+		// Text measures right only once its fonts load.
+		(document.fonts?.ready ?? Promise.resolve()).then(() => {
+			if (!cancelled) frame = requestAnimationFrame(measure);
+		});
+		return () => {
+			cancelled = true;
+			if (frame !== undefined) cancelAnimationFrame(frame);
+		};
+	});
+	$effect(() => () => {
+		$autoMarginRight.delete(overhangId);
+	});
 </script>
 
 {#snippet axisX()}
 	<AxisX
-		ticks={xEdgeTicks?.ticks}
+		ticks={(xEdgeTicks?.ticks ?? tickValues?.x) as string[] | undefined}
+		{...turned}
 		tickCount={xTickCount}
 		interval={xTickInterval}
 		tickSize={scales?.x?.tickSize ?? cfg.axis.xTickSize}
@@ -234,13 +299,13 @@
 	/>
 {/snippet}
 {#if scales?.x?.axisDisplay === 'hidden'}
-	<g style:visibility="hidden">{@render axisX()}</g>
+	<g style:visibility="hidden" bind:this={xAxisEl}>{@render axisX()}</g>
 {:else if scales?.x?.axisDisplay !== 'none'}
-	{@render axisX()}
+	<g bind:this={xAxisEl}>{@render axisX()}</g>
 {/if}
 {#snippet axisY()}
 	<AxisY
-		ticks={yEdgeTicks?.ticks}
+		ticks={(yEdgeTicks?.ticks ?? tickValues?.y) as string[] | undefined}
 		tickCount={yTickCount}
 		interval={yTickInterval}
 		tickSize={scales?.y?.tickSize ?? cfg.axis.yTickSize}

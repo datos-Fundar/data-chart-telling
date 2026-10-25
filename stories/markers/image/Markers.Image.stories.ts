@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { COUNTRIES } from '../../plots/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // An `image` marker (svelteplot's own `Image`) - one image centered on each
@@ -9,7 +9,7 @@ import { COUNTRIES } from '../../plots/scatter/data';
 // pixels (default 20), `r` a per-row circular clip radius that overrides both.
 // The demo art is generated inline as data URIs so the story needs no network.
 
-const REGION_COLORS: Record<string, string> = {
+const CONTINENT_COLORS: Record<string, string> = {
 	Americas: '#ef4444',
 	Europe: '#3b82f6',
 	Asia: '#eab308',
@@ -17,11 +17,11 @@ const REGION_COLORS: Record<string, string> = {
 };
 
 /** A small badge SVG (colored disc + initial) as a data URI. */
-const badge = (d: { country: string; region: string }) =>
+const badge = (d: { country: string; continent: string }) =>
 	'data:image/svg+xml;utf8,' +
 	encodeURIComponent(
 		`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">` +
-			`<circle cx="20" cy="20" r="19" fill="${REGION_COLORS[d.region]}"/>` +
+			`<circle cx="20" cy="20" r="19" fill="${CONTINENT_COLORS[d.continent]}"/>` +
 			`<text x="20" y="27" font-size="20" font-family="sans-serif" font-weight="700" text-anchor="middle" fill="#fff">${d.country[0]}</text>` +
 			`</svg>`
 	);
@@ -33,9 +33,9 @@ const meta = {
 	args: {
 		width: 940,
 		height: 500,
-		data: COUNTRIES,
-		x: 'gdpPerCapita',
-		y: 'lifeExpectancy'
+		data: COUNTRIES_AT_2007,
+		x: 'gdp',
+		y: 'life'
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -54,9 +54,7 @@ type Story = StoryObj<typeof meta>;
 /** A per-row `src`, at the default 20px size. */
 export const Basic: Story = {
 	args: {
-		markers: [
-			{ type: 'image', x: 'gdpPerCapita', y: 'lifeExpectancy', src: badge }
-		] satisfies AxisBasedMarkersConfig[]
+		markers: [{ type: 'image', x: 'gdp', y: 'life', src: badge }] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -66,8 +64,8 @@ export const SizedWithTitle: Story = {
 		markers: [
 			{
 				type: 'image',
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
+				x: 'gdp',
+				y: 'life',
 				src: badge,
 				width: 32,
 				height: 32,
@@ -83,8 +81,8 @@ export const ClippedByRadius: Story = {
 		markers: [
 			{
 				type: 'image',
-				x: 'gdpPerCapita',
-				y: 'lifeExpectancy',
+				x: 'gdp',
+				y: 'life',
 				src: badge,
 				r: 'population'
 			}

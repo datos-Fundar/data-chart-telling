@@ -1,5 +1,6 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { NiceTicks } from '$lib/layout/scales/NiceTicks';
+import { CategoryOrder } from '$lib/phases/scales/CategoryOrder';
 import { ScalesPhase } from '$lib/phases/scales/ScalesPhase';
 import { Pipeline } from '$lib/phases/Pipeline';
 import { PANEL_KEY, FacetPanels } from '$lib/phases/facet/FacetPanels';
@@ -15,7 +16,7 @@ import type {
 	SharedAxisValues,
 	SharedScalesOptions
 } from '$lib/types/phases';
-import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
+import type { AxisBasedScalesConfig, NiceOption } from '$lib/types/layout/scales';
 
 /** A channel slices can share a domain on. */
 type SharedChannel = AxisChannelName | 'color';
@@ -33,7 +34,7 @@ type SharedScalesState = FacetStageState & {
 	axes?: PlotAxes;
 	processedData?: ProcessedData;
 	markers?: object[];
-	scales?: Partial<Record<AxisChannelName, { niceTolerance?: number }>>;
+	scales?: Partial<Record<AxisChannelName, { nice?: NiceOption; sort?: unknown }>>;
 	sharedScales?: Record<string, AxisBasedScalesConfig<never>>;
 };
 
@@ -75,7 +76,11 @@ export class SharedScalesPhase<TState extends SharedScalesState, TCtx> implement
 		// A symmetric axis has no domain but the one the kind's "scales" phase gives it.
 		const fromPhase = new Set<SharedChannel>([
 			...(this.#options?.fromScalesPhase ?? []),
-			...this.#scales.symmetricAxes(state)
+			...this.#scales.symmetricAxes(state),
+			// A category axis ordered by what its categories hold takes the order the "scales" phase reads off every row.
+			...(state.axes?.bands ?? []).filter((axis) =>
+				CategoryOrder.isDeclarative(state.scales?.[axis]?.sort)
+			)
 		]);
 		const layout = {
 			band: [...(state.axes?.bands ?? [])],
@@ -101,7 +106,7 @@ export class SharedScalesPhase<TState extends SharedScalesState, TCtx> implement
 			return SharedScalesPhase.buildSharedAxisScale(
 				values,
 				channel,
-				state.scales?.[channel]?.niceTolerance
+				NiceTicks.toleranceOf(state.scales?.[channel]?.nice)
 			);
 		};
 

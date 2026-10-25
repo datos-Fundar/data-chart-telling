@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-	import { COUNTRIES } from '../../../plots/scatter/data';
+	import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+	import { COUNTRIES_AT_2007 } from '$datasets';
 </script>
 
 <!--
@@ -12,22 +12,18 @@
 		width={760}
 		height={360}
 		title="A numeric color: a ramp"
-		data={COUNTRIES}
-		x="gdpPerCapita"
-		y="lifeExpectancy"
-		markers={[
-			{ type: 'dot', data: COUNTRIES, x: 'gdpPerCapita', y: 'lifeExpectancy', color: 'population' }
-		]}
+		data={COUNTRIES_AT_2007}
+		x="gdp"
+		y="life"
+		markers={[{ type: 'dot', data: COUNTRIES_AT_2007, x: 'gdp', y: 'life', color: 'population' }]}
 	/>
 	<ScatterPlot
 		width={760}
 		height={360}
 		title="A categorical color: an item per category"
-		data={COUNTRIES}
-		x="gdpPerCapita"
-		y="lifeExpectancy"
-		markers={[
-			{ type: 'dot', data: COUNTRIES, x: 'gdpPerCapita', y: 'lifeExpectancy', color: 'region' }
-		]}
+		data={COUNTRIES_AT_2007}
+		x="gdp"
+		y="life"
+		markers={[{ type: 'dot', data: COUNTRIES_AT_2007, x: 'gdp', y: 'life', color: 'continent' }]}
 	/>
 </div>

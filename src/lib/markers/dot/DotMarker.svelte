@@ -2,7 +2,8 @@
 	import { Dot } from 'svelteplot';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
-	import { resolveAccessor } from '$lib/plots/utils/accessors';
+	import { resolveAccessor } from '$lib/utils/accessors';
+	import RowOffsetMarks from '$lib/markers/utils/RowOffsetMarks.svelte';
 	import type { DotMarkerConfig } from '$lib/types/markers/common';
 
 	/**
@@ -69,34 +70,30 @@
 	const strokeDasharray = $derived(styles?.dotStrokeDasharray);
 </script>
 
+{#snippet dots(rows: TData[], fillOpacity: number)}
+	<RowOffsetMarks {marker} {rows}>
+		{#snippet mark(own)}
+			<Dot
+				data={own}
+				x={x ?? 0}
+				y={y ?? 0}
+				{r}
+				{fill}
+				{fillOpacity}
+				{stroke}
+				{strokeWidth}
+				{strokeOpacity}
+				{strokeDasharray}
+				{symbol}
+			/>
+		{/snippet}
+	</RowOffsetMarks>
+{/snippet}
+
 {#if opacityBuckets}
 	{#each opacityBuckets as bucket (bucket.value)}
-		<Dot
-			data={bucket.data}
-			x={x ?? 0}
-			y={y ?? 0}
-			{r}
-			{fill}
-			fillOpacity={bucket.value}
-			{stroke}
-			{strokeWidth}
-			{strokeOpacity}
-			{strokeDasharray}
-			{symbol}
-		/>
+		{@render dots(bucket.data, bucket.value)}
 	{/each}
 {:else}
-	<Dot
-		data={displayData}
-		x={x ?? 0}
-		y={y ?? 0}
-		{r}
-		{fill}
-		fillOpacity={flatFillOpacity}
-		{stroke}
-		{strokeWidth}
-		{strokeOpacity}
-		{strokeDasharray}
-		{symbol}
-	/>
+	{@render dots(displayData, flatFillOpacity)}
 {/if}

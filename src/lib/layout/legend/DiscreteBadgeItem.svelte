@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { contrastTextColor } from '$lib/utils/color';
+	import { CssColor } from '$lib/utils/color';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { LegendText } from '$lib/layout/legend/LegendText';
 	import DiscreteSymbolIcon from '$lib/layout/legend/DiscreteSymbolIcon.svelte';
@@ -24,7 +24,7 @@
 		omitMode?: boolean;
 	} = $props();
 	const cfg = $derived(getConfiguration());
-	const textColor = $derived(contrastTextColor(color));
+	const textColor = $derived(CssColor.contrastText(color));
 </script>
 
 <span class="dct-discrete__badge" style:background={color} style:color={textColor}>

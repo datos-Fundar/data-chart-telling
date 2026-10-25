@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Frame } from 'svelteplot';
 	import TileLayer from '$lib/layout/styles/TileLayer.svelte';
-	import { geometryLonLatBounds } from '$lib/plots/utils/geoAccessors';
+	import { GeoGeometry } from '$lib/plots/map/geo/GeoGeometry';
 	import type { StylesLayoutConfig } from '$lib/types/layout/styles';
 
 	/**
@@ -36,7 +36,7 @@
 		let minLat = Infinity;
 		let maxLat = -Infinity;
 		for (const f of features) {
-			const b = geometryLonLatBounds(f.geometry);
+			const b = GeoGeometry.lonLatBounds(f.geometry);
 			if (!b) continue;
 			if (b[0] < minLon) minLon = b[0];
 			if (b[2] > maxLon) maxLon = b[2];

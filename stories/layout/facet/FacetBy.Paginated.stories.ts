@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import { createRawSnippet } from 'svelte';
-import BarPlot from '$lib/plots/bar/Plot.svelte';
+import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import FacetThemeDemo from './FacetThemeDemo.svelte';
-import { facetGroups } from '../../data/facet-groups';
+import { diverseCountries } from '$datasets';
 
 /** `facet: { mode: 'paginated' }` - pages through the grid in fixed-size chunks with prev/next controls. */
 const meta = {
@@ -13,10 +13,10 @@ const meta = {
 	args: {
 		width: 720,
 		height: 480,
-		x: 'category',
-		y: 'value',
-		data: facetGroups(9),
-		facet: { by: 'group', columns: 2, mode: 'paginated', pageSize: 4 }
+		x: 'year',
+		y: 'gdp',
+		data: diverseCountries(9),
+		facet: { by: 'country', columns: 2, mode: 'paginated', pageSize: 4 }
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 400, max: 1000, step: 20 } },
@@ -37,7 +37,7 @@ export const Default: Story = {};
  * whole chart area rather than being sized as if it were one of a 5-row grid.
  */
 export const SingleFacet: Story = {
-	args: { facet: { by: 'group', columns: 3, mode: 'paginated', pageSize: 1 } }
+	args: { facet: { by: 'country', columns: 3, mode: 'paginated', pageSize: 1 } }
 };
 
 /**
@@ -46,7 +46,7 @@ export const SingleFacet: Story = {
  */
 export const NavBelow: Story = {
 	args: {
-		facet: { by: 'group', columns: 3, mode: 'paginated', pageSize: 1, navLayout: 'below' }
+		facet: { by: 'country', columns: 3, mode: 'paginated', pageSize: 1, navLayout: 'below' }
 	}
 };
 
@@ -54,7 +54,7 @@ export const NavBelow: Story = {
 export const CustomButtons: Story = {
 	args: {
 		facet: {
-			by: 'group',
+			by: 'country',
 			columns: 2,
 			mode: 'paginated',
 			pageSize: 4,

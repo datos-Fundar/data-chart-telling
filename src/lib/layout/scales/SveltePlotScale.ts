@@ -16,8 +16,8 @@ export class SveltePlotScale {
 
 	/**
 	 * The scale without what the package handles itself - `grid`, `axisDisplay`
-	 * and a vertical `label`, which `ScalesLayout` draws, and `niceTolerance`,
-	 * which the "scales" phase applies - with a custom `sort` resolved into a
+	 * and a vertical `label`, which `ScalesLayout` draws, and a `nice` object's `tolerance`,
+	 * which the "scales" phase applies (svelteplot is told plain `nice: true`) - with a custom `sort` resolved into a
 	 * `domain`, and `nice: true` on an unpinned numeric axis.
 	 */
 	static build<TData>(
@@ -33,14 +33,16 @@ export class SveltePlotScale {
 			(scale?.type == null || SveltePlotScale.CONTINUOUS_NUMERIC_TYPES.has(scale.type)) &&
 			SveltePlotScale.#isNumeric(rows, getAxisValue);
 		const removesAxis = scale?.axisDisplay === 'none';
-		if (!sorted && !wantsNice && !removesAxis) return sorted;
+		// svelteplot treats a categorical axis told to be `nice` as linear, and draws nothing.
+		const dropsNice = scale?.nice != null && SveltePlotScale.#isCategorical(rows, getAxisValue);
+		if (!sorted && !wantsNice && !removesAxis && !dropsNice) return sorted;
 		const out: AxisScale<TData> & { axis?: false } = { ...sorted };
 		delete out.grid;
 		delete out.axisDisplay;
-		delete out.niceTolerance;
 		if (removesAxis) out.axis = false;
 		if (scale?.labelOrientation === 'vertical') out.label = false;
-		if (wantsNice) out.nice = true;
+		if (dropsNice) delete out.nice;
+		else if (wantsNice || typeof scale?.nice === 'object') out.nice = true;
 		return out;
 	}
 
@@ -51,7 +53,7 @@ export class SveltePlotScale {
 		getAxisValue: (d: TData) => AxisValue
 	): AxisScale<TData> | undefined {
 		const sort = scale?.sort;
-		if (!sort || scale?.domain) return scale;
+		if (typeof sort !== 'function' || scale?.domain) return scale;
 		const reps = SveltePlotScale.#uniqueRows(rows, getAxisValue);
 		if (reps.length === 0 || !reps.every((r) => typeof getAxisValue(r) === 'string')) return scale;
 		const domain = [...reps].sort(sort).map(getAxisValue);
@@ -69,6 +71,11 @@ export class SveltePlotScale {
 			out.push(row);
 		}
 		return out;
+	}
+
+	/** Whether the axis lays out text categories: any of its values is a string. */
+	static #isCategorical<TData>(rows: TData[], getAxisValue: (d: TData) => AxisValue): boolean {
+		return rows.some((row) => typeof getAxisValue(row) === 'string');
 	}
 
 	/** Whether the axis' values are numeric; `nice` on a categorical axis would make svelteplot treat it as linear. */

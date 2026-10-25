@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import AreaPlot from '$lib/plots/area/Plot.svelte';
-import { ENERGY_MIX } from '../../data/energy-mix';
+import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
+import { AGE_SHARES_BY_YEAR } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `stackY` stacks a plot's series on the y axis: each group starts where the one
@@ -15,10 +15,10 @@ const meta = {
 	args: {
 		width: 940,
 		height: 460,
-		data: ENERGY_MIX,
+		data: AGE_SHARES_BY_YEAR,
 		x: 'year',
 		y: 'share',
-		color: 'source',
+		color: 'ageGroup',
 		segments: { default: [{ styles: { fillOpacity: 0.85 } }] }
 	},
 	argTypes: {

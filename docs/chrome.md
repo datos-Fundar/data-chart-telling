@@ -7,7 +7,7 @@ The chrome is everything a figure draws around its plot: title, subtitle, legend
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { PRICES } from './data';
+	import { PRICES } from './datasets';
 </script>
 
 <!-- A plot carries its own chrome: title, subtitle, legend and caption. -->
@@ -70,7 +70,7 @@ A `header` takes the place of `title` and `subtitle`, and a `footer` the place o
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { PRICES } from './data';
+	import { PRICES } from './datasets';
 </script>
 
 <!-- `order` places the chrome blocks; `divider` draws a rule between them. -->

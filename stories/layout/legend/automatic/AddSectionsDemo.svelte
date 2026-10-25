@@ -1,6 +1,6 @@
 <script lang="ts">
-	import AreaPlot from '$lib/plots/area/Plot.svelte';
-	import { HEIGHT_DENSITY } from '../../../data/height-density';
+	import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
+	import { HEIGHT_DENSITY } from '$datasets';
 </script>
 
 <!-- `sections` adds whole sections after the automatic ones - here, a titled note. -->

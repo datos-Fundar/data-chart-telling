@@ -1,4 +1,3 @@
-export type { MarkerCurveName } from './axis/curveName';
 export * from './axis/line';
 export * from './axis/bar';
 export * from './axis/cell';
@@ -21,6 +20,7 @@ export * from './axis/raster';
 export * from './axis/tick';
 export * from './axis/trail';
 export * from './axis/waffle';
+export * from './axis/violin';
 export * from './axis/rule';
 export * from './axis/hover';
 export * from './axis/component';

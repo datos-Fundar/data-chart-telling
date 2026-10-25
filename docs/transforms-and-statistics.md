@@ -11,7 +11,7 @@ Both derive rows from the data before drawing. A **transform** reshapes the rows
 ```svelte
 <script lang="ts">
 	import { BarPlot } from '@fundar/data-chart-telling';
-	import { SEX_SHARES } from './data';
+	import { SEX_SHARES } from './datasets';
 </script>
 
 <!-- Each sex's share of the population per census, stacked with `stackY` so a bar adds up to 100%. -->
@@ -35,7 +35,7 @@ Both derive rows from the data before drawing. A **transform** reshapes the rows
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { PRICES } from './data';
+	import { PRICES } from './datasets';
 </script>
 
 <!-- A 6-month moving average, run on the plot's rows. -->
@@ -82,14 +82,14 @@ Bar stacking is always `stackY`, also for horizontal bars. A transform on a `His
 ```svelte
 <script lang="ts">
 	import { ScatterPlot } from '@fundar/data-chart-telling';
-	import { COUNTRIES } from './data';
+	import { COUNTRIES_AT_2007 } from './datasets';
 </script>
 
 <!-- A linear regression with its 95% confidence band. -->
 <ScatterPlot
 	width={720}
 	height={400}
-	data={COUNTRIES}
+	data={COUNTRIES_AT_2007}
 	x="gdp"
 	y="life"
 	statistics={[{ type: 'regression', regressionType: 'linear', confidence: 0.95 }]}
@@ -100,14 +100,15 @@ Bar stacking is always `stackY`, also for horizontal bars. A transform on a `His
 
 ![A scatter plot with a regression line and confidence band](images/regression.png)
 
-| `type`          | Draws                                                | Options                                                                                                                                                           |
-| --------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `regression`    | A fitted curve with a confidence band                | `regressionType` (`'linear'`, `'quad'`, `'poly'`, `'exp'`, `'log'`, `'pow'`, `'loess'`), `order`, `base`, `span`, `confidence` (`false` omits the band), `styles` |
-| `movingAverage` | A smoothed line                                      | `k` (required), `reduce`, `styles`                                                                                                                                |
-| `bollinger`     | Moving average and a band of `k` standard deviations | `n`, `k`, `styles`                                                                                                                                                |
-| `density`       | A 1D density curve over `x`                          | `kernel`, `bandwidth`, `styles`                                                                                                                                   |
-| `density2d`     | 2D density contour bands                             | `bandwidth`, `thresholds`, `styles`                                                                                                                               |
-| `box`           | A box plot per category                              | the options of the [`box` marker](markers.md)                                                                                                                     |
+| `type`          | Draws                                                                    | Options                                                                                                                                                                                                                                                                                                                                      |
+| --------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `regression`    | A fitted curve with a confidence band                                    | `regressionType` (`'linear'`, `'quad'`, `'poly'`, `'exp'`, `'log'`, `'pow'`, `'loess'`), `order`, `base`, `span`, `confidence` (`false` omits the band), `styles`                                                                                                                                                                            |
+| `movingAverage` | A smoothed line                                                          | `k` (required), `reduce`, `styles`                                                                                                                                                                                                                                                                                                           |
+| `bollinger`     | Moving average and a band of `k` standard deviations                     | `n`, `k`, `styles`                                                                                                                                                                                                                                                                                                                           |
+| `density`       | A 1D density curve over `x`                                              | `kernel`, `bandwidth`, `styles`                                                                                                                                                                                                                                                                                                              |
+| `density2d`     | 2D density contour bands                                                 | `bandwidth`, `thresholds`, `styles`                                                                                                                                                                                                                                                                                                          |
+| `box`           | A box plot per category                                                  | the options of the [`box` marker](markers.md)                                                                                                                                                                                                                                                                                                |
+| `deviation`     | A rule at an estimator and a band around it, along the plot's value axis | `estimator` (`'mean'`, `'median'`, `'midrange'`), `spread` (`'stdev'`, `'mad'`), `k` (band half-width in spreads, default 1), `rule` and `band` (styles, or `false` to omit), each with a `label` (`true`, or `{ text, styles }` with a `FontStyle`; the band's also `edge` (`'lower'`, `'upper'`) and `position` (`'inside'`, `'outside'`)) |
 
 Which series a statistic runs over:
 

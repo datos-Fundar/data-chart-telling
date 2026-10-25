@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import ChromeHeaderFooter from './ChromeHeaderFooter.svelte';
 import ChromeDividerStyle from './ChromeDividerStyle.svelte';
 import ChromeComposer from './ChromeComposer.svelte';
@@ -7,7 +7,7 @@ import ChromeHeaderFooterSource from './ChromeHeaderFooter.svelte?raw';
 import ChromeDividerStyleSource from './ChromeDividerStyle.svelte?raw';
 import ChromeComposerSource from './ChromeComposer.svelte?raw';
 import { demoSource } from '../../common/docsSource';
-import { TIME_SERIES } from '../../data/time-series';
+import { ARGENTINA_CHILE_TRENDS } from '$datasets';
 
 /**
  * What's drawn around a plot: `title`, `subtitle`, `caption`, a `legend`,
@@ -24,7 +24,7 @@ const meta = {
 	args: {
 		width: 680,
 		height: 440,
-		data: TIME_SERIES.filter((d) => d.region === 'North'),
+		data: ARGENTINA_CHILE_TRENDS.filter((d) => d.country === 'Argentina'),
 		x: 'year',
 		y: 'value',
 		color: 'metric'
@@ -45,7 +45,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const CAPTION = 'Source: synthetic demo data.';
+const CAPTION = 'Source: Gapminder.';
 
 /**
  * The default order: title and subtitle, a divider, the legend, the plot and
@@ -53,8 +53,8 @@ const CAPTION = 'Source: synthetic demo data.';
  */
 export const Default: Story = {
 	args: {
-		title: 'GDP vs. Employment',
-		subtitle: 'North region, 2018-2022',
+		title: 'GDP per capita vs. population',
+		subtitle: 'Argentina, 1987-2007 (index, 1987 = 100)',
 		caption: CAPTION
 	}
 };
@@ -76,8 +76,8 @@ export const NoHeadingNoDivider: Story = {
  */
 export const ManyDividers: Story = {
 	args: {
-		title: 'GDP vs. Employment',
-		subtitle: 'North region, 2018-2022',
+		title: 'GDP per capita vs. population',
+		subtitle: 'Argentina, 1987-2007 (index, 1987 = 100)',
 		caption: CAPTION,
 		order: ['title', 'subtitle', 'divider', 'legend', 'divider', 'plot', 'divider', 'caption']
 	}
@@ -86,8 +86,8 @@ export const ManyDividers: Story = {
 /** `order` moves the plot to the top and the heading below it, with a divider between them. */
 export const CustomOrder: Story = {
 	args: {
-		title: 'GDP vs. Employment',
-		subtitle: 'North region, 2018-2022',
+		title: 'GDP per capita vs. population',
+		subtitle: 'Argentina, 1987-2007 (index, 1987 = 100)',
 		caption: CAPTION,
 		order: ['title', 'subtitle', 'divider', 'caption', 'divider', 'plot', 'divider', 'legend']
 	}
@@ -99,8 +99,8 @@ export const CustomOrder: Story = {
  */
 export const LeaveBlocksOut: Story = {
 	args: {
-		title: 'GDP vs. Employment',
-		subtitle: 'North region, 2018-2022',
+		title: 'GDP per capita vs. population',
+		subtitle: 'Argentina, 1987-2007 (index, 1987 = 100)',
 		caption: CAPTION,
 		order: ['title', 'divider', 'caption']
 	}
@@ -115,8 +115,8 @@ export const LeaveBlocksOut: Story = {
  */
 export const Rows: Story = {
 	args: {
-		title: 'GDP vs. Employment',
-		subtitle: 'North region, 2018-2022',
+		title: 'GDP per capita vs. population',
+		subtitle: 'Argentina, 1987-2007 (index, 1987 = 100)',
 		caption: CAPTION,
 		order: ['title', 'subtitle', 'divider', '(legend, caption)', 'plot']
 	}
@@ -129,8 +129,8 @@ export const Rows: Story = {
  */
 export const PlotInARow: Story = {
 	args: {
-		title: 'GDP vs. Employment',
-		subtitle: 'North region, 2018-2022',
+		title: 'GDP per capita vs. population',
+		subtitle: 'Argentina, 1987-2007 (index, 1987 = 100)',
 		caption: CAPTION,
 		legend: { series: { title: 'Indicators', layout: { type: 'vertical' } } },
 		order: ['title', 'subtitle', 'divider', '(plot, legend)', 'caption']
@@ -144,8 +144,8 @@ export const PlotInARow: Story = {
  */
 export const AutomaticLegendInOrder: Story = {
 	args: {
-		title: 'GDP vs. Employment',
-		subtitle: 'North region, 2018-2022',
+		title: 'GDP per capita vs. population',
+		subtitle: 'Argentina, 1987-2007 (index, 1987 = 100)',
 		order: ['title', 'subtitle', 'divider', 'plot', 'legend']
 	}
 };

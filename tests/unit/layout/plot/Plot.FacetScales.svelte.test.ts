@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
-import BarPlot from '$lib/plots/bar/Plot.svelte';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 
 type Row = { region: string; sex: string; category: string; value: number };
 

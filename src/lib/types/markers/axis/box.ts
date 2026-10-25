@@ -12,4 +12,6 @@ export type BoxMarkerConfig = {
 	dot?: Record<string, unknown>;
 	tickMedian?: boolean | Record<string, unknown>;
 	tickMinMax?: boolean | Record<string, unknown>;
+	thickness?: number;
+	slot?: { index: number; count: number };
 } & CommonMarkerConfig;

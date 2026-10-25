@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { RuleX, RuleY } from 'svelteplot';
 	import type { AxisValue } from '$lib/types/layout/mapping';
+	import { RowStroke } from '$lib/markers/utils/RowStroke';
 	import type { RuleMarkerConfig } from '$lib/types/markers/common';
 
 	/**
@@ -29,6 +30,11 @@
 	 * single synthetic `{v: value}` row.
 	 */
 	const position = $derived(data ? value : (d: { v: AxisValue }) => d.v);
+
+	/** Each row's own stroke, over the marker's `styles`. */
+	const row = $derived(
+		RowStroke.of(marker, styles, { stroke: 'currentColor', strokeWidth: 1, strokeOpacity: 1 })
+	);
 </script>
 
 <RuleMark
@@ -40,8 +46,8 @@
 	{...axis === 'x'
 		? { insetTop: marker.insetTop, insetBottom: marker.insetBottom }
 		: { insetLeft: marker.insetLeft, insetRight: marker.insetRight }}
-	stroke={styles?.stroke ?? 'currentColor'}
-	strokeWidth={styles?.strokeWidth ?? 1}
-	strokeOpacity={styles?.strokeOpacity ?? 1}
+	stroke={row.stroke}
+	strokeWidth={row.strokeWidth}
+	strokeOpacity={row.strokeOpacity}
 	strokeDasharray={styles?.strokeDasharray}
 />

@@ -1,0 +1,120 @@
+import { render } from 'vitest-browser-svelte';
+import { describe, test, expect, vi } from 'vitest';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
+import { waitForSvg } from '../../_helpers/svg';
+
+import { COUNTRIES_AT_2007 } from '$datasets';
+
+// Regression coverage for two related plot-frame overflow bugs: a
+// large-radius dot at the domain edge (fixed via the scatter scales fit)
+// and a value label offset past the frame (fixed via the edge-aware anchor
+// flip in Box.flipNear) - both computed up front rather than
+// registered into svelteplot's own shared margin-auto-sizing context, which
+// can spike CPU/memory into unresponsiveness when many `<Plot>` instances
+// mount/unmount together (e.g. a multi-story docs page → single story).
+
+describe('ScatterPlot - frame overflow', () => {
+	test('a large bubble radius at the domain edge stays within the plot box', async () => {
+		const { container } = await render(ScatterPlot, {
+			width: 400,
+			height: 300,
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
+			r: 30
+		});
+		const svg = await waitForSvg(container);
+		const svgBox = svg.getBoundingClientRect();
+		const dots = svg.querySelectorAll('g.dot path');
+		expect(dots.length).toBe(COUNTRIES_AT_2007.length);
+		for (const dot of dots) {
+			const box = (dot as SVGGraphicsElement).getBoundingClientRect();
+			expect(box.left).toBeGreaterThanOrEqual(svgBox.left - 1);
+			expect(box.right).toBeLessThanOrEqual(svgBox.right + 1);
+			expect(box.top).toBeGreaterThanOrEqual(svgBox.top - 1);
+			expect(box.bottom).toBeLessThanOrEqual(svgBox.bottom + 1);
+		}
+	});
+
+	test('value labels at the domain edge stay within the plot box', async () => {
+		const { container } = await render(ScatterPlot, {
+			width: 400,
+			height: 300,
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
+			styles: { values: { show: true } } satisfies AxisBasedStylesConfig
+		});
+		const svg = await waitForSvg(container);
+		const svgBox = svg.getBoundingClientRect();
+		const labels = svg.querySelectorAll('g.text text');
+		expect(labels.length).toBe(COUNTRIES_AT_2007.length);
+		for (const label of labels) {
+			const box = (label as SVGGraphicsElement).getBoundingClientRect();
+			expect(box.left).toBeGreaterThanOrEqual(svgBox.left - 1);
+			expect(box.right).toBeLessThanOrEqual(svgBox.right + 1);
+		}
+	});
+
+	// The edge-aware flip decides whether a label fits using a measured (not
+	// estimated-from-character-count) text width. A run of wide glyphs like
+	// "M"/"W" is exactly where a character-count estimate under-measures the
+	// most - wide enough here that even the flip can't fully avoid overflow
+	// for every point, so `onOverflow`'s margin growth (see the runaway-loop
+	// test below) does the rest; the settle wait matches that test's.
+	test('a wide-glyph label at the domain edge still ends up within the plot box', async () => {
+		const { container } = await render(ScatterPlot, {
+			width: 400,
+			height: 300,
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
+			styles: {
+				values: { show: true, format: () => 'MMMMMMMMMM' }
+			} satisfies AxisBasedStylesConfig
+		});
+		const svg = await waitForSvg(container);
+		await new Promise((r) => setTimeout(r, 800));
+		const svgBox = svg.getBoundingClientRect();
+		const labels = svg.querySelectorAll('g.text text');
+		expect(labels.length).toBe(COUNTRIES_AT_2007.length);
+		for (const label of labels) {
+			const box = (label as SVGGraphicsElement).getBoundingClientRect();
+			expect(box.left).toBeGreaterThanOrEqual(svgBox.left - 1);
+			expect(box.right).toBeLessThanOrEqual(svgBox.right + 1);
+		}
+	});
+
+	test('growing the margin to fit an overflowing label never triggers a runaway effect loop', async () => {
+		// Regression test: `onOverflow` grows the plot's margin *after* mount,
+		// once a label is measured to overflow the frame. A grown margin that
+		// shrinks `plot.plotWidth`/`plotHeight` in place fed back into
+		// `Box.flipNear`'s flip decision (computed from those same
+		// live values), which could reposition a label enough to change its own
+		// measured overflow, growing the margin again - an effect that reads
+		// and writes the same state every cycle, tripping Svelte's
+		// `effect_update_depth_exceeded` guard. `COUNTRIES_AT_2007`' edge points are
+		// exactly what exercises this: the loop (when present) fires within the
+		// first render, well inside the polling window below.
+		const errors: unknown[][] = [];
+		const spy = vi.spyOn(console, 'error').mockImplementation((...args) => {
+			errors.push(args);
+		});
+		try {
+			await render(ScatterPlot, {
+				width: 400,
+				height: 300,
+				data: COUNTRIES_AT_2007,
+				x: 'gdp',
+				y: 'life',
+				styles: { values: { show: true } } satisfies AxisBasedStylesConfig
+			});
+			await new Promise((r) => setTimeout(r, 800));
+		} finally {
+			spy.mockRestore();
+		}
+		const messages = errors.map((args) => args.map(String).join(' ')).join('\n');
+		expect(messages).not.toMatch(/effect_update_depth_exceeded/);
+	});
+});

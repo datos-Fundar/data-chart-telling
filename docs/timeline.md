@@ -7,7 +7,7 @@
 ```svelte
 <script lang="ts">
 	import { BarPlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES } from './data';
+	import { REGION_VALUES } from './datasets';
 </script>
 
 <!--
@@ -43,7 +43,7 @@
 | `values`                           | The steps, when not every distinct value of `accessor` - read like `accessor`'s values                                                                                                                                                                                          |
 | `filterMode`                       | `'exact'` shows the rows of the current step; `'upTo'` shows every row up to it (a cumulative reveal). `LinePlot` defaults to `'upTo'`                                                                                                                                          |
 | `interpolate`                      | Tween values between steps so a scrub is smooth: `true`, or `{ key, value, create, progressEasing, segmentEasing }`. Line and bar plots default to interpolating their value channel                                                                                            |
-| `scales`                           | `'shared'` (default): axes span every step, so they hold still while scrubbing; `'free'` refits them to each step                                                                                                                                                               |
+| `scales`                           | `'shared'` (default): axes span every step, so they hold still while scrubbing; `'free'` refits both to each step; `'free-x'` / `'free-y'` refit one and keep the other still                                                                                                   |
 | `onprogress`, `onvalue`            | Called with the new position (`0`-`1`) and with the step it lands on - a `Date` on a timeline of dates, else the number                                                                                                                                                         |
 | `orientation`, `show`, `thickness` | A rule's direction (`'vertical'` default, beside the plot; `'horizontal'`), visibility and size                                                                                                                                                                                 |
 
@@ -90,7 +90,7 @@ Defaults for `controls`, `speeds` and `stepDuration` come from `timeline.player`
 ```svelte
 <script lang="ts">
 	import { LinePlot } from '@fundar/data-chart-telling';
-	import { REGION_VALUES } from './data';
+	import { REGION_VALUES } from './datasets';
 
 	// A rule has no controls of its own: the page moves it through `progress` (0 to 1).
 	// One step per year; a line plot shows every row up to the current step.

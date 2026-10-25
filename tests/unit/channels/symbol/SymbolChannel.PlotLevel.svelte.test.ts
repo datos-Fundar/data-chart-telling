@@ -1,8 +1,8 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, afterEach } from 'vitest';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
-import { COUNTRIES } from '../../../../stories/plots/scatter/data';
+import { COUNTRIES_AT_2007 } from '$datasets';
 import { waitForSvg } from '../../plots/_helpers/svg';
 
 function shapesOf(svg: SVGElement): string[] {
@@ -14,10 +14,10 @@ describe('symbol channel - plot level (Scatter)', () => {
 		const { container } = render(ScatterPlot, {
 			width: 600,
 			height: 400,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
-			symbol: 'region',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
+			symbol: 'continent',
 			scales: {
 				symbol: {
 					domain: ['Americas', 'Europe', 'Asia'],
@@ -27,16 +27,16 @@ describe('symbol channel - plot level (Scatter)', () => {
 		});
 		const svg = await waitForSvg(container);
 		const shapes = shapesOf(svg);
-		expect(shapes.length).toBe(COUNTRIES.length);
+		expect(shapes.length).toBe(COUNTRIES_AT_2007.length);
 
-		// Every row of the same region must render the identical shape path,
-		// and at least two distinct regions must render different shapes.
-		const byRegion = new Map<string, Set<string>>();
-		COUNTRIES.forEach((c, i) => {
-			if (!byRegion.has(c.region)) byRegion.set(c.region, new Set());
-			byRegion.get(c.region)!.add(shapes[i]);
+		// Every row of the same continent must render the identical shape path,
+		// and at least two distinct continents must render different shapes.
+		const byContinent = new Map<string, Set<string>>();
+		COUNTRIES_AT_2007.forEach((c, i) => {
+			if (!byContinent.has(c.continent)) byContinent.set(c.continent, new Set());
+			byContinent.get(c.continent)!.add(shapes[i]);
 		});
-		for (const shapeSet of byRegion.values()) {
+		for (const shapeSet of byContinent.values()) {
 			expect(shapeSet.size).toBe(1);
 		}
 		expect(new Set(shapes).size).toBeGreaterThan(1);
@@ -46,9 +46,9 @@ describe('symbol channel - plot level (Scatter)', () => {
 		const { container } = render(ScatterPlot, {
 			width: 600,
 			height: 400,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy'
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life'
 		});
 		const svg = await waitForSvg(container);
 		expect(new Set(shapesOf(svg)).size).toBe(1);
@@ -66,11 +66,11 @@ describe('symbol channel - plot level (Scatter)', () => {
 		const { container } = render(ScatterPlot, {
 			width: 600,
 			height: 400,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
-			color: 'region',
-			symbol: 'region',
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
+			color: 'continent',
+			symbol: 'continent',
 			scales: { symbol: { range: ['triangle', 'circle', 'square'] } }
 		});
 		const svg = await waitForSvg(container);

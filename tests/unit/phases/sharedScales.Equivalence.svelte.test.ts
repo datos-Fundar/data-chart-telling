@@ -7,13 +7,22 @@ import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import type { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { MarkerAxisValues } from '$lib/phases/scales/MarkerAxisValues';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
-import { buildLineDefaults } from '$lib/plots/line/defaults';
-import { buildAreaDefaults } from '$lib/plots/area/defaults';
-import { buildBarDefaults } from '$lib/plots/bar/defaults';
-import { buildScatterDefaults } from '$lib/plots/scatter/defaults';
-import { buildHistogramDefaults } from '$lib/plots/histogram/defaults';
-import { buildHeatmapDefaults } from '$lib/plots/heatmap/defaults';
-import { buildBoxDefaults } from '$lib/plots/box/defaults';
+import { buildLineDefaults } from '$lib/plots/evolution/line/defaults';
+import { buildAreaDefaults } from '$lib/plots/evolution/area/defaults';
+import { buildBarDefaults } from '$lib/plots/ranking/bar/defaults';
+import { buildScatterDefaults } from '$lib/plots/correlation/scatter/defaults';
+import { buildHistogramDefaults } from '$lib/plots/distribution/histogram/defaults';
+import { buildDensityDefaults } from '$lib/plots/distribution/density/defaults';
+import { buildHeatmapDefaults } from '$lib/plots/correlation/heatmap/defaults';
+import { buildViolinDefaults } from '$lib/plots/distribution/violin/defaults';
+import { buildBoxDefaults } from '$lib/plots/distribution/box/defaults';
+import { buildLollipopDefaults } from '$lib/plots/ranking/lollipop/defaults';
+import { buildDumbbellDefaults } from '$lib/plots/ranking/dumbbell/defaults';
+import { buildClevelandDefaults } from '$lib/plots/ranking/cleveland/defaults';
+import { buildBulletDefaults } from '$lib/plots/ranking/bullet/defaults';
+import { buildSlopeDefaults } from '$lib/plots/evolution/slope/defaults';
+import { buildSparklineDefaults } from '$lib/plots/evolution/sparkline/defaults';
+import { buildForestDefaults } from '$lib/plots/ranking/forest/defaults';
 import type { AxisPipelineProps } from '$lib/phases/Pipeline';
 import type { SharedAxisValues } from '$lib/types/phases';
 import type { FacetConfig } from '$lib/types/layout/facet';
@@ -79,6 +88,51 @@ const CASES: Case[] = [
 	{
 		name: 'box',
 		kind: buildBoxDefaults<Row>(),
+		props: { x: 'sector', y: 'valor', color: 'sector' }
+	},
+	{
+		name: 'lollipop',
+		kind: buildLollipopDefaults<Row>(),
+		props: { x: 'sector', y: 'valor', color: 'sector' }
+	},
+	{
+		name: 'dumbbell',
+		kind: buildDumbbellDefaults<Row>(),
+		props: { x: 'anio', y: 'valor', color: 'sector' }
+	},
+	{
+		name: 'cleveland',
+		kind: buildClevelandDefaults<Row>(),
+		props: { x: 'anio', y: 'valor', color: 'sector' }
+	},
+	{
+		name: 'forest',
+		kind: buildForestDefaults<Row>(),
+		props: { x: 'sector', y: 'valor', color: 'sector', lower: 'valor', upper: 'valor' }
+	},
+	{
+		name: 'bullet',
+		kind: buildBulletDefaults<Row>(),
+		props: { x: 'sector', y: 'valor', color: 'sector', target: 'valor', ranges: [100] }
+	},
+	{
+		name: 'slope',
+		kind: buildSlopeDefaults<Row>(),
+		props: { x: 'anio', y: 'valor', color: 'sector' }
+	},
+	{
+		name: 'sparkline',
+		kind: buildSparklineDefaults<Row>(),
+		props: { x: 'anio', y: 'valor', color: 'sector' }
+	},
+	{
+		name: 'density',
+		kind: buildDensityDefaults<Row>(),
+		props: { x: 'valor', color: 'sector' }
+	},
+	{
+		name: 'violin',
+		kind: buildViolinDefaults<Row>(),
 		props: { x: 'sector', y: 'valor', color: 'sector' }
 	}
 ];

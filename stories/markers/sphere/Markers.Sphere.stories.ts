@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import GeoPlot from '$lib/plots/geo/Plot.svelte';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { WORLD_COUNTRIES } from '../../plots/geo/data';
+import { WORLD_COUNTRIES } from '$datasets/world-countries';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `sphere` marker (svelteplot's own `Sphere`) - the outer globe outline,

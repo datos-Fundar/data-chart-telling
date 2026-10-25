@@ -4,7 +4,7 @@ import type { StatisticConfig } from '$lib/types/layout/statistics';
 import type { MarkerTransform } from '$lib/types/transforms';
 import type { MarkLegend } from '$lib/types/layout/legend';
 
-/** Props every marker kind shares: rows, grouping, series scope, position, statistics, transforms. */
+/** Props every marker kind shares: rows, grouping, series scope, position, offset, statistics, transforms. */
 export type CommonMarkerConfig = {
 	data?: Record<string, unknown>[];
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,8 +23,12 @@ export type CommonMarkerConfig = {
 	scales?: ChannelScalesConfig;
 	statistics?: StatisticConfig[];
 	transforms?: MarkerTransform[];
+	/** Moves the marker this many pixels right, after it is placed. Also applies on a map, where svelteplot itself ignores it. */
+	dx?: number;
+	/** Moves the marker this many pixels down, after it is placed. */
+	dy?: number;
 	/** Clips the marker to the plot's frame. Unset, its kind's default applies. */
 	clip?: boolean;
-	/** Names the marker on its plot's automatic legend - see {@link MarkLegend}. */
-	legend?: MarkLegend;
+	/** Names the marker on its plot's automatic legend - see {@link MarkLegend}. `false` keeps a decorative marker out of it, and out of how the plot's series look there. */
+	legend?: MarkLegend | false;
 };

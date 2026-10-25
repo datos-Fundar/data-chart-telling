@@ -2,11 +2,13 @@ import { describe, test, expect } from 'vitest';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
 import { Pipeline } from '$lib/phases/Pipeline';
 import { GAP_KIND, GAP_VALUE } from '$lib/phases/transforms/TransformsPhase';
-import { resolveAccessor } from '$lib/plots/utils/accessors';
-import { buildBarDefaults } from '$lib/plots/bar/defaults';
-import { buildLineDefaults } from '$lib/plots/line/defaults';
-import { buildPyramidDefaults } from '$lib/plots/pyramid/defaults';
+import { resolveAccessor } from '$lib/utils/accessors';
+import { buildBarDefaults } from '$lib/plots/ranking/bar/defaults';
+import { buildLineDefaults } from '$lib/plots/evolution/line/defaults';
+import { buildPyramidDefaults } from '$lib/plots/distribution/pyramid/defaults';
+import { buildClevelandDefaults } from '$lib/plots/ranking/cleveland/defaults';
 import type { AxisPlotDefaults, ProcessedData, ProcessedRow } from '$lib/types/phases';
+import type { ValueSelect } from '$lib/types/layout/styles';
 
 type Row = Record<string, unknown>;
 
@@ -82,5 +84,119 @@ describe('TransformsPhase - gaps a plot fills', () => {
 			styles: { gaps: GAPS }
 		});
 		expect(line.data.some((row) => row[GAP_VALUE] !== undefined)).toBe(false);
+	});
+});
+
+describe('TransformsPhase - the rows the value labels are written for', () => {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const labelledOf = (kind: AxisPlotDefaults<any, any>, props: Row) => {
+		const state = Pipeline.ofAxisKind(kind).run(
+			{ width: 400, height: 300, scales: {}, segments: {}, markers: [], ...props },
+			{ cfg: DEFAULT_CONFIG }
+		) as unknown as { labelled?: ProcessedRow[]; labelSelects?: ValueSelect[] };
+		return state;
+	};
+	const line = [
+		{ t: 1, v: 5, g: 'a' },
+		{ t: 2, v: 9, g: 'a' },
+		{ t: 3, v: 7, g: 'a' },
+		{ t: 1, v: 2, g: 'b' },
+		{ t: 2, v: 1, g: 'b' }
+	];
+	const values = (rows?: ProcessedRow[]) => rows?.map((row) => row.v);
+
+	test('none while the labels are off', () => {
+		expect(
+			labelledOf(buildLineDefaults<Row>(), { data: line, x: 't', y: 'v', color: 'g' }).labelled
+		).toBeUndefined();
+	});
+
+	test("a line labels each series' last point unless `select` says otherwise", () => {
+		const props = { data: line, x: 't', y: 'v', color: 'g' };
+		const state = labelledOf(buildLineDefaults<Row>(), {
+			...props,
+			styles: { values: { show: true } }
+		});
+		expect(values(state.labelled)).toEqual([7, 1]);
+		expect(state.labelSelects).toEqual(['last']);
+		const picked = (select: unknown) =>
+			values(
+				labelledOf(buildLineDefaults<Row>(), {
+					...props,
+					styles: { values: { show: true, select } }
+				}).labelled
+			);
+		expect(picked('first')).toEqual([5, 2]);
+		expect(picked('max')).toEqual([9, 2]);
+		expect(picked('min')).toEqual([5, 1]);
+	});
+
+	test("a list is the union of its selectors, each row once, in the rows' own order", () => {
+		const picked = values(
+			labelledOf(buildLineDefaults<Row>(), {
+				data: line,
+				x: 't',
+				y: 'v',
+				color: 'g',
+				styles: { values: { show: true, select: ['last', 'max', 'first', 'max'] } }
+			}).labelled
+		);
+		expect(picked).toEqual([5, 9, 7, 2, 1]);
+	});
+
+	test('`series` keeps only the rows of those series', () => {
+		const state = labelledOf(buildLineDefaults<Row>(), {
+			data: line,
+			x: 't',
+			y: 'v',
+			color: 'g',
+			styles: { values: { show: true, series: 'b' } }
+		});
+		expect(values(state.labelled)).toEqual([1]);
+	});
+
+	test('the Cleveland family groups by category instead, and leaves out a row with no value', () => {
+		const rows = [
+			{ c: 'a', v: 1, g: 'x' },
+			{ c: 'a', v: 4, g: 'y' },
+			{ c: 'b', v: null, g: 'x' },
+			{ c: 'b', v: 6, g: 'y' }
+		];
+		const state = labelledOf(buildClevelandDefaults<Row>(), {
+			data: rows,
+			x: 'c',
+			y: 'v',
+			color: 'g',
+			styles: { values: { show: true, select: 'first' } }
+		});
+		// The first dot of each category: the second one's first has no value, so its `y` is.
+		expect(values(state.labelled)).toEqual([1, 6]);
+	});
+
+	test('with a facet, each panel picks its own rows', () => {
+		const faceted = line
+			.map((row) => ({ ...row, p: 'one' }))
+			.concat(line.map((row) => ({ ...row, v: row.v + 10, p: 'two' })));
+		const props = {
+			width: 400,
+			height: 300,
+			scales: {},
+			segments: {},
+			markers: [],
+			data: faceted,
+			x: 't',
+			y: 'v',
+			color: 'g',
+			styles: { values: { show: true } }
+		};
+		const state = Pipeline.ofAxisKind(buildLineDefaults<Row>()).runData(
+			props,
+			faceted,
+			{ by: 'p' } as never,
+			null,
+			DEFAULT_CONFIG
+		) as unknown as { labelled?: ProcessedRow[] };
+		// A series' last point in each of the two panels, not just in the last one.
+		expect(values(state.labelled)?.sort((a, b) => Number(a) - Number(b))).toEqual([1, 7, 11, 17]);
 	});
 });

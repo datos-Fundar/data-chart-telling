@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import BarPlot from '$lib/plots/bar/Plot.svelte';
-import LinePlot from '$lib/plots/line/Plot.svelte';
-import { PROVINCE_BARS, PROVINCE_LINES } from '../../data/facet-groups';
+import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+import { COUNTRIES_SPANNING_POPULATION } from '$datasets';
 
 /**
  * Facets line up on their own: each column shares its widest left margin and
  * each row its tallest top and bottom, so every plot area starts at the same
  * place even when the axes need very different room - here, value axes
- * spanning five to five million (`scales: 'free-y'`).
+ * spanning a few million to over a billion people (`scales: 'free-y'`).
  */
 const meta = {
 	title: 'Layout/Facets/MarginAlignment',
@@ -26,26 +26,26 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Vertical bars, one province per facet, each fitting its own value axis. */
+/** Vertical bars, one country per facet, each fitting its own value axis. */
 export const Bars: Story = {
 	args: {
-		data: PROVINCE_BARS,
-		x: 'category',
-		y: 'value',
-		facet: { by: 'province', columns: 3, scales: 'free-y' }
+		data: COUNTRIES_SPANNING_POPULATION,
+		x: 'year',
+		y: 'population',
+		facet: { by: 'country', columns: 3, scales: 'free-y' }
 	}
 };
 
-/** Lines over the same magnitudes - every facet's plot area starts at the same x. */
+/** Lines over the same populations - every facet's plot area starts at the same x. */
 export const Lines: StoryObj<typeof LinePlot> = {
 	parameters: { docs: { source: { name: 'LinePlot' } } },
 	render: (args) => ({ Component: LinePlot, props: args }),
 	args: {
 		width: 900,
 		height: 420,
-		data: PROVINCE_LINES,
+		data: COUNTRIES_SPANNING_POPULATION,
 		x: 'year',
-		y: 'value',
-		facet: { by: 'province', columns: 3, scales: 'free-y' }
+		y: 'population',
+		facet: { by: 'country', columns: 3, scales: 'free-y' }
 	}
 };

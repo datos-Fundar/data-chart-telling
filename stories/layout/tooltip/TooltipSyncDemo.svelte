@@ -1,24 +1,27 @@
 <script module lang="ts">
-	import { HEAT_CELLS } from '../../data/heat-cells';
-	import { POPULATION_PYRAMID } from '../../data/population-pyramid';
+	import { PENGUIN_COUNTS_BY_SEX, POPULATION_BY_AGE } from '$datasets';
 
 	/** Filtered data reused by the story's docs source override, see `stories/common/docsSource.ts`. */
-	export const heatData = HEAT_CELLS.filter((d) => d.year === 2022);
-	export const pyramidData = POPULATION_PYRAMID.filter((d) =>
+	export const pyramidData = POPULATION_BY_AGE.filter((d) =>
 		[1991, 2022, 2030, 2040].includes(d.year)
 	);
 </script>
 
 <script lang="ts">
-	import LinePlot from '$lib/plots/line/Plot.svelte';
-	import BarPlot from '$lib/plots/bar/Plot.svelte';
-	import HeatmapPlot from '$lib/plots/heatmap/Plot.svelte';
-	import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+	import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
+	import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 	import type { HoverStrategy } from '$lib/types/layout/hover';
-	import { TIME_SERIES, type SeriesPoint } from '../../data/time-series';
-	import type { HeatCell } from '../../data/heat-cells';
-	import { REGION_BARS, type RegionYear } from '../../data/region-bars';
-	import { AGE_GROUPS, type PopulationRow } from '../../data/population-pyramid';
+	import {
+		ARGENTINA_CHILE_TRENDS,
+		AGE_GROUPS,
+		AGE_SHARES,
+		type CountryTrendRow,
+		type AgeRow,
+		type AgeShareRow,
+		type PenguinCount
+	} from '$datasets';
 
 	const { kind = 'line' }: { kind?: 'line' | 'heatmap' | 'bar' | 'pyramid' } = $props();
 
@@ -48,15 +51,15 @@
 		<HeatmapPlot
 			width={760}
 			height={460}
-			title="Households by rooms (2022)"
+			title="Penguins by island and species"
 			subtitle="Strategy: {strategy} · Sync: {sync ? 'on' : 'off'}"
-			data={heatData}
-			x={'rooms' as keyof HeatCell}
-			y={'people' as keyof HeatCell}
-			color={'pct' as keyof HeatCell}
-			scales={{ x: { label: 'Rooms' }, y: { label: 'People' } }}
-			styles={{ values: { show: false, format: (v) => `${(v * 100).toFixed(0)}%` } }}
-			facet={{ by: 'scenario' as keyof HeatCell, columns: 2 }}
+			data={PENGUIN_COUNTS_BY_SEX}
+			x={'island' as keyof PenguinCount}
+			y={'species' as keyof PenguinCount}
+			color={'count' as keyof PenguinCount}
+			scales={{ x: { label: 'Island' }, y: { label: 'Species' } }}
+			styles={{ values: { show: false, format: (v) => `${v}` } }}
+			facet={{ by: 'sex' as keyof PenguinCount, columns: 2 }}
 			tooltip={{ strategy, sync }}
 			markers={[{ type: 'hover' }]}
 		/>
@@ -64,12 +67,12 @@
 		<BarPlot
 			width={760}
 			height={420}
-			title="Value by region and year"
+			title="Population share by age group and year"
 			subtitle="Strategy: {strategy} · Sync: {sync ? 'on' : 'off'}"
-			data={REGION_BARS}
-			x={'region' as keyof RegionYear}
-			y="value"
-			facet={{ by: 'year' as keyof RegionYear, columns: 3 }}
+			data={AGE_SHARES}
+			x={'ageGroup' as keyof AgeShareRow}
+			y="share"
+			facet={{ by: 'year' as keyof AgeShareRow, columns: 2 }}
 			tooltip={{ strategy, sync }}
 			markers={[{ type: 'hover' }]}
 		/>
@@ -80,9 +83,9 @@
 			title="Population pyramid by year"
 			subtitle="Strategy: {strategy} · Sync: {sync ? 'on' : 'off'}"
 			data={pyramidData}
-			y={'ageGroup' as keyof PopulationRow}
-			x={'pct' as keyof PopulationRow}
-			color={'sex' as keyof PopulationRow}
+			y={'ageGroup' as keyof AgeRow}
+			x={'share' as keyof AgeRow}
+			color={'sex' as keyof AgeRow}
 			scales={{
 				y: { domain: AGE_GROUPS },
 				color: { scheme: { Female: '#d6336c', Male: '#1971c2' } }
@@ -90,7 +93,7 @@
 			styles={{
 				values: { format: (v) => `${v.toFixed(1)}%` }
 			}}
-			facet={{ by: 'year' as keyof PopulationRow, columns: 2 }}
+			facet={{ by: 'year' as keyof AgeRow, columns: 2 }}
 			tooltip={{ strategy, sync }}
 			markers={[{ type: 'hover' }]}
 		/>
@@ -98,24 +101,24 @@
 		<LinePlot
 			width={760}
 			height={440}
-			title="GDP vs. Employment by region"
+			title="GDP per capita vs. population by country"
 			subtitle="Strategy: {strategy} · Sync: {sync ? 'on' : 'off'}"
-			data={TIME_SERIES}
+			data={ARGENTINA_CHILE_TRENDS}
 			x="year"
 			y="value"
-			color={'metric' as keyof SeriesPoint}
+			color={'metric' as keyof CountryTrendRow}
 			legend={[
 				{
 					type: 'discrete',
 					title: 'Indicator',
 					columns: 2,
 					items: [
-						{ name: 'GDP', symbol: 'line' },
-						{ name: 'Employment', symbol: 'line' }
+						{ name: 'GDP per capita', symbol: 'line' },
+						{ name: 'Population', symbol: 'line' }
 					]
 				}
 			]}
-			facet={{ by: 'region' as keyof SeriesPoint, columns: 2 }}
+			facet={{ by: 'country' as keyof CountryTrendRow, columns: 2 }}
 			tooltip={{ strategy, sync }}
 			markers={[{ type: 'hover' }]}
 		/>

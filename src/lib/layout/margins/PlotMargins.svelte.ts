@@ -34,6 +34,8 @@ export type PlotMarginsInputs = {
 	scales: () => Partial<Record<AxisChannelName, Pick<AxisScale, 'tickRotate'>>> | undefined;
 	/** The tick labels' font size. */
 	tickFontSize: () => number;
+	/** How wide the widest tick label of an axis is, where the plot measured it: a rotated axis takes room for that, not for a guessed width. */
+	tickWidth?: () => Partial<Record<AxisChannelName, number | undefined>>;
 	/** Receives the margins the labels settled on - the plot's bindable `margins`. */
 	settle?: (margins: MarginConfig) => void;
 };
@@ -209,17 +211,18 @@ export class PlotMargins {
 	/**
 	 * How much more room (or less) each axis' rotated tick labels take across
 	 * it, on its side. An x label stands as tall as its text, a y label as wide;
-	 * rotated, it reaches across by its turned box. A label is taken as twice
-	 * as wide as its font size.
+	 * rotated, it reaches across by its turned box.
 	 */
 	readonly #tickRoom = $derived.by(() => {
 		const scales = this.#inputs.scales();
 		const height = this.#inputs.tickFontSize();
-		const width = 2 * height;
+		const measured = this.#inputs.tickWidth?.();
 		const room: Partial<Record<MarginSide, number>> = {};
 		for (const axis of ['x', 'y'] as const) {
 			const degrees = scales?.[axis]?.tickRotate;
 			if (!degrees) continue;
+			// A label is taken as twice as wide as its font size, unless the plot measured it.
+			const width = measured?.[axis] || 2 * height;
 			const rad = (degrees * Math.PI) / 180;
 			const [across, along] = axis === 'x' ? [height, width] : [width, height];
 			const turned = Math.abs(Math.cos(rad)) * across + Math.abs(Math.sin(rad)) * along;
@@ -261,10 +264,4 @@ export class PlotMargins {
 	place(size: Box, point: { x: number; y: number }, anchor: BoxAnchors): Box {
 		return size.placeNear(point, anchor, this.box);
 	}
-
-	/**
-	 * Changes whenever the labels' margins move after mount, which svelteplot
-	 * only takes on a remount. The same margins read back from `settle` keep it.
-	 */
-	readonly remountKey = $derived.by(() => JSON.stringify(this.#labels ?? null));
 }

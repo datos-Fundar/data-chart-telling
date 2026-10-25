@@ -16,7 +16,7 @@ export class DensityStatistic {
 	static build<T extends Record<string, unknown>>(
 		source: StatisticSource<T>,
 		config: DensityStatisticOptions
-	): AreaMarkerConfig {
+	): AreaMarkerConfig[] {
 		const result = Transforms.run({
 			type: 'densityX',
 			data: source.data,
@@ -24,15 +24,17 @@ export class DensityStatistic {
 			kernel: config.kernel,
 			bandwidth: config.bandwidth
 		});
-		return {
-			type: 'area',
-			data: result.data as Record<string, unknown>[],
-			x: result.x as AreaMarkerConfig['x'],
-			y: result.y as AreaMarkerConfig['y'],
-			styles: {
-				...config.styles,
-				fill: config.styles?.fill ?? source.color ?? STATISTIC_FALLBACK_COLOR
+		return [
+			{
+				type: 'area',
+				data: result.data as Record<string, unknown>[],
+				x: result.x as AreaMarkerConfig['x'],
+				y: result.y as AreaMarkerConfig['y'],
+				styles: {
+					...config.styles,
+					fill: config.styles?.fill ?? source.color ?? STATISTIC_FALLBACK_COLOR
+				}
 			}
-		};
+		];
 	}
 }

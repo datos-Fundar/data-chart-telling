@@ -1,5 +1,5 @@
 <script lang="ts">
-	import BarPlot from '$lib/plots/bar/Plot.svelte';
+	import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 
 	const REGIONS = ['North', 'Center', 'South'];
 	const MONTHS = Array.from({ length: 12 }, (_, monthIndex) => Date.UTC(2024, monthIndex, 1));

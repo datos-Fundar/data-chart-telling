@@ -1,6 +1,6 @@
 <script lang="ts">
-	import AreaPlot from '$lib/plots/area/Plot.svelte';
-	import { HEIGHT_DENSITY } from '../../../data/height-density';
+	import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
+	import { HEIGHT_DENSITY } from '$datasets';
 </script>
 
 <!--
@@ -17,16 +17,16 @@
 	color="sex"
 	segments={{
 		female: [
-			{ areas: [{ x: { from: 165 } }], styles: { fill: '#f6c26b' }, legend: 'female > 165 cm' }
+			{ areas: [{ x: { from: 155 } }], styles: { fill: '#f6c26b' }, legend: 'female > 155 cm' }
 		]
 	}}
 	markers={[
 		{
 			type: 'rule',
 			axis: 'x',
-			value: 165,
+			value: 155,
 			styles: { stroke: '#64748b', strokeDasharray: '4 3' },
-			legend: { label: '165 cm threshold', lineStyle: 'dashed' }
+			legend: { label: '155 cm threshold', lineStyle: 'dashed' }
 		}
 	]}
 />

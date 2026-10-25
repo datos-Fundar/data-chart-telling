@@ -1,11 +1,11 @@
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { ChannelName } from '$lib/plots/utils/ChannelName';
 import { MarkerKinds } from '$lib/markers/MarkerKinds';
 import { ContinuousDomain } from '$lib/utils/ContinuousDomain';
-import { resolveColorScale } from '$lib/utils/color';
-import { resolveOpacityScale } from '$lib/utils/opacity';
-import { resolveSymbolScale } from '$lib/utils/symbol';
+import { ColorRamp } from '$lib/utils/color';
+import { OpacityScale } from '$lib/utils/OpacityScale';
+import { SymbolScale } from '$lib/utils/SymbolScale';
 import type { SymbolType } from '$lib/types/plots/constants';
 import type { OpacityScaleConfig } from '$lib/types/layout/scales';
 import type { LegendEntry, LegendPlot, LegendSource } from '$lib/types/layout/legend';
@@ -21,6 +21,7 @@ export class LegendChannels {
 		const taken = new Set((plot.resolvedSeries ?? []).map((s) => s.name));
 		return [
 			...LegendChannels.#plotColor(plot),
+			...LegendChannels.#segmentColors(plot),
 			...markers.flatMap((marker) => LegendChannels.#markerColor(marker, taken)),
 			...LegendChannels.#plotOpacity(plot),
 			...markers.flatMap((marker) => LegendChannels.#markerOpacity(marker, plot)),
@@ -56,6 +57,20 @@ export class LegendChannels {
 	/** What a channel is called on a legend: its field, or the name of the function that computes it. */
 	static #title(channel: unknown, property: string): string | undefined {
 		return typeof channel === 'string' ? channel : ChannelName.of(channel, property);
+	}
+
+	/** The domain svelteplot sizes with: the configured one or the values' own, taken down to 0 unless `zero` is off. */
+	static #sizeDomain(
+		scale: { domain?: [number, number]; zero?: boolean } | undefined,
+		values: number[]
+	): [number, number] {
+		const [low, high] = scale?.domain ?? [Math.min(...values), Math.max(...values)];
+		return scale?.zero === false ? [low, high] : [Math.min(0, low), Math.max(0, high)];
+	}
+
+	/** A plot channel's name: its field key, or the name of the function that computes it. */
+	static #sourceTitle(source: unknown, property: string): string | undefined {
+		return typeof source === 'string' ? source : ChannelName.of(source, property);
 	}
 
 	/** `marker`'s rows read through `channel` (a field or a function), without the missing and non-finite ones. */
@@ -128,6 +143,18 @@ export class LegendChannels {
 		];
 	}
 
+	/** One continuous ramp per segment that sets its own, over the values of just its own features. */
+	static #segmentColors(plot: LegendPlot): LegendEntry[] {
+		const source = plot.channels?.color?.source;
+		return (plot.colorRamps ?? []).map(({ name, domain, scale }) =>
+			LegendChannels.#scaleEntry(
+				typeof source === 'string' ? `${source} (${name})` : name,
+				domain,
+				scale
+			)
+		);
+	}
+
 	/**
 	 * A marker's `color` channel: a continuous scale for numbers; for
 	 * categories, one item each in the color the marker draws it, unless a
@@ -143,7 +170,7 @@ export class LegendChannels {
 			return domain ? [LegendChannels.#scaleEntry(title, domain, scale)] : [];
 		}
 		const categories = [...new Set(values.map(String))];
-		const colorOf = resolveColorScale(scale, categories, getConfiguration().palette);
+		const colorOf = ColorRamp.resolve(scale, categories, getConfiguration().palette);
 		const mark = MarkerKinds.of(marker.type)?.legendSymbol;
 		return categories
 			.filter((name) => !taken.has(name))
@@ -157,7 +184,7 @@ export class LegendChannels {
 		color: string | undefined
 	): LegendEntry[] {
 		if (scale?.range !== undefined && !Array.isArray(scale.range)) return [];
-		const read = resolveOpacityScale(scale, domain, getConfiguration().continuous.opacityRange);
+		const read = OpacityScale.resolve(scale, domain, getConfiguration().continuous.opacityRange);
 		return [
 			{
 				type: 'opacity',
@@ -172,13 +199,20 @@ export class LegendChannels {
 		];
 	}
 
-	/** The plot's own numeric `opacity` channel, over the `opacityDomain` it hands over. */
+	/**
+	 * The plot's own numeric `opacity` channel, over the `opacityDomain` it hands
+	 * over, in its series' color - unless a `color` channel colors the marks, and
+	 * no one color stands for them.
+	 */
 	static #plotOpacity(plot: LegendPlot): LegendEntry[] {
 		if (!plot.opacityDomain) return [];
 		const source = plot.channels?.opacity?.source;
 		const name = plot.resolvedSeries?.[0]?.name;
+		const colored = plot.channels?.color?.source !== undefined || !!plot.colorDomain;
 		const color =
-			name !== undefined && name !== 'default' ? plot.colorForSeries?.(name) : undefined;
+			!colored && name !== undefined && name !== 'default'
+				? plot.colorForSeries?.(name)
+				: undefined;
 		return LegendChannels.#opacityEntry(
 			typeof source === 'string' ? source : undefined,
 			plot.opacityDomain,
@@ -219,13 +253,15 @@ export class LegendChannels {
 		);
 		if (values.length === 0) return [];
 		const { filled, color, symbol } = LegendChannels.look(sized);
-		const source = plot.channels?.r?.source ?? LegendChannels.#title(sized[0].r, 'r');
+		const source =
+			LegendChannels.#sourceTitle(plot.channels?.r?.source, 'r') ??
+			LegendChannels.#title(sized[0].r, 'r');
 		return [
 			{
 				type: 'size',
 				channel: 'r',
 				...(typeof source === 'string' ? { title: source } : {}),
-				domain: plot.scales?.r?.domain ?? [0, Math.max(...values)],
+				domain: LegendChannels.#sizeDomain(plot.scales?.r, values),
 				range: plot.scales?.r?.range ?? [0, 10],
 				...(color ? { color } : {}),
 				filled,
@@ -248,10 +284,11 @@ export class LegendChannels {
 			shaped.flatMap((marker) => LegendChannels.#values(marker, marker.symbol).map(String))
 		).filter((value, i, all) => all.indexOf(value) === i);
 		if (domain.length === 0) return [];
-		const shapeOf = resolveSymbolScale(config, domain, getConfiguration().symbols);
+		const shapeOf = SymbolScale.resolve(config, domain, getConfiguration().symbols);
 		const { filled, color } = LegendChannels.look(shaped);
 		const source =
-			plot.channels?.symbol?.source ?? LegendChannels.#title(shaped[0].symbol, 'symbol');
+			LegendChannels.#sourceTitle(plot.channels?.symbol?.source, 'symbol') ??
+			LegendChannels.#title(shaped[0].symbol, 'symbol');
 		return [
 			{
 				type: 'symbol',

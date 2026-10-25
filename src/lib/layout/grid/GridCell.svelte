@@ -96,14 +96,12 @@
 		</div>
 	{/if}
 	{#if ready && layout && layout.box.width > 0 && layout.box.height > 0}
-		{#key JSON.stringify(layout.box.margins ?? null)}
-			{@render children({
-				width: layout.box.width,
-				height: layout.box.height,
-				margins: layout.box.margins,
-				edges: layout.edges
-			})}
-		{/key}
+		{@render children({
+			width: layout.box.width,
+			height: layout.box.height,
+			margins: layout.box.margins,
+			edges: layout.edges
+		})}
 	{/if}
 </div>
 

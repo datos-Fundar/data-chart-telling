@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import PyramidPlot from '$lib/plots/pyramid/Plot.svelte';
-import { AGE_GROUPS, POPULATION_PYRAMID } from '../../../data/population-pyramid';
+import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
+import { AGE_GROUPS, POPULATION_BY_AGE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `color` channel: a plot-level `color` accessor plus `scales.color`
@@ -15,8 +15,8 @@ const meta = {
 	args: {
 		width: 940,
 		height: 520,
-		data: POPULATION_PYRAMID.filter((d) => d.year === 2022),
-		x: 'pct',
+		data: POPULATION_BY_AGE.filter((d) => d.year === 2022),
+		x: 'share',
 		y: 'ageGroup'
 	},
 	argTypes: {

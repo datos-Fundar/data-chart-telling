@@ -1,6 +1,6 @@
 import { buildSeries } from '$lib/utils/grouping';
-import { resolveColorScale } from '$lib/utils/color';
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { ColorRamp } from '$lib/utils/color';
+import { resolveAccessor } from '$lib/utils/accessors';
 import { buildGroupedSeries, buildScopedMarkerGroups } from '$lib/plots/utils/segments';
 import { buildGapFillMaps, isGapValue } from '$lib/plots/utils/gaps';
 import { FacetPanels } from '$lib/phases/facet/FacetPanels';
@@ -46,7 +46,7 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 			given: { x: state.x !== undefined, y: state.y !== undefined },
 			discrete: options.discreteAxes
 		});
-		const colorForSeries = resolveColorScale(
+		const colorForSeries = ColorRamp.resolve(
 			scales.color,
 			(options.colorOrder ? options.colorOrder(fullSeries) : fullSeries).map((s) => s.name),
 			ctx.cfg.palette

@@ -2,6 +2,38 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] - 2026-10-24
+
+### Added
+
+- `LollipopPlot`, a dot on a stem for the value of each category.
+- `DumbbellPlot`, two series joined by a connector for each category.
+- `ClevelandPlot`, any number of series per category joined from the lowest to the highest value, with connectors you can color, turn into arrows and sort by series value or range.
+- `ForestPlot`, a dot per row on a stem spanning its confidence interval.
+- `BulletPlot`, a bar against a target tick and shaded qualitative ranges.
+- `SlopePlot`, the change of each series between two moments, labelled at both ends.
+- `SparklinePlot`, a small axisless line with a dot and a label on its last point.
+- `DensityPlot`, a kernel density curve of one numeric field, and `ViolinPlot`, the mirrored density of each category with a box inside.
+- Step lines through `styles.curve: 'step'`, `'step-after'` or `'step-before'` on `LinePlot`.
+- A `deviation` statistic that draws an estimator of the values and a band around it, with optional labels.
+- `styles.values.select` chooses which points get a value label (`'first'`, `'last'`, `'min'`, `'max'` or a list), for line, area and Cleveland-family plots.
+- The size channel (`r`) works on the dots of the Cleveland family, and its automatic legend is configured under the `r` key.
+- Every marker takes `dx` and `dy` to move it a number of pixels, on a map too, and `dot`, `text` and `image` markers also take a function of the row to move each row on its own.
+- `setConfiguration({ palette })` takes the name of a d3-scale-chromatic scheme (`'viridis'`, `'dark2'`...) or `{ scheme, count, schemeRange }` instead of just a list of colors.
+- `continuous.scheme` and `continuous.schemeRange` in the configuration set the default continuous ramp by the name of a d3-scale-chromatic ramp, as an alternative to its `min` and `max` colors.
+- Tick labels turn or thin out on small plots when they would not fit, and the last label of an axis that is not rounded to nice values stays inside the plot.
+- A timeline can free one axis at a time (`scales: 'free-x'` or `'free-y'`) while the other keeps its shared domain.
+- `link` markers on a map can lift their arcs off the surface (`altitude`) and cut them where a globe hides them (`occlusion`).
+
+### Changed
+
+- The default palette is Tableau 10, and the default continuous ramp, the timeline and player accents and the connector colors follow it.
+
+### Fixed
+
+- The example datasets moved out of the stories into `examples/datasets`, where real data replaces the synthetic rows and the docs, examples and stories all read the same files.
+- The Minard map of Napoleon's march is rebuilt with `GeoPlot` and `LinePlot` markers instead of a hand-assembled svelteplot chart.
+
 ## [1.1.0] - 2026-10-20
 
 ### Added

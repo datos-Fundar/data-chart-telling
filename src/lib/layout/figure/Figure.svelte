@@ -90,6 +90,8 @@
 	// svelte-ignore state_referenced_locally
 	const ownLegend = (legend !== undefined && legend !== false) || !outer;
 	const legendState = ownLegend ? LegendState.provide() : outer!;
+	// svelte-ignore state_referenced_locally
+	if (outer && legend === false) LegendState.silence();
 
 	/** What the figure adds to its automatic legend, when `legend` is `{ items, sections }`. */
 	const extension = $derived(

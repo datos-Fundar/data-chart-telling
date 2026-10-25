@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { BarPlot } from '@fundar/data-chart-telling';
-	import { SEX_SHARES } from './data';
+	import { SEX_SHARES } from './datasets';
 </script>
 
 <!-- Each sex's share of the population per census, stacked with `stackY` so a bar adds up to 100%. -->

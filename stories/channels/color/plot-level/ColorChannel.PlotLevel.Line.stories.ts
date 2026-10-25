@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
-import { LIFE_EXPECTANCY } from '../../../plots/line/data';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+import { LIFE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `color` channel: a plot-level `color` accessor plus `scales.color`
@@ -15,7 +15,7 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value'
 	},

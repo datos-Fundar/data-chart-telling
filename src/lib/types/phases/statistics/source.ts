@@ -1,4 +1,4 @@
-import type { AxisValue } from '$lib/types/layout/mapping';
+import type { AxisChannelName, AxisValue } from '$lib/types/layout/mapping';
 
 /**
  * Resolved `{data, x, y}` input a statistic computes over - a marker's own
@@ -11,6 +11,8 @@ export type StatisticSource<T extends Record<string, unknown> = Record<string, u
 	x: string | ((d: any) => AxisValue);
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	y: string | ((d: any) => AxisValue);
+	/** The axis the plot measures along, which a statistic of the values (`deviation`) reads. Defaults to `y`. */
+	axis?: AxisChannelName;
 	/** Fallback stroke for the derived marker, used when its own `styles.stroke` is unset - typically the source series' own color. */
 	color?: string;
 };

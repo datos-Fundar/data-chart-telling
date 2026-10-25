@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { TransformReducer } from '$lib/types/transforms';
-import { BUENOS_AIRES_TEMPERATURE, DAILY_TEMPERATURE } from '../../data/daily-temperature';
+import { BUENOS_AIRES_TEMPERATURE, DAILY_TEMPERATURE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A group's reducer turns each group's values into one: by name (`count`, `sum`,

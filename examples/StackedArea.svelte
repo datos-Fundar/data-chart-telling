@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { AreaPlot } from '@fundar/data-chart-telling';
-	import { AGE_SHARES } from './data';
+	import { AGE_SHARES } from './datasets';
 </script>
 
 <!-- Each age group's share of the population, stacked with `stackY` so the bands add up to 100%. -->

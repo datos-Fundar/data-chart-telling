@@ -1,19 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import {
-	WORLD_COUNTRIES,
-	ARGENTINA_PROVINCES,
-	type ArgentinaProvinceProps
-} from '../../plots/geo/data';
+import { WORLD_COUNTRIES } from '$datasets/world-countries';
+import { ARGENTINA_PROVINCES, type ArgentinaProvinceProps } from '$datasets/argentina-provinces';
 import { argentinaBicontinental } from '$lib/layout/coordinates/projections/argentina';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import {
-	FEMALE_LIFE_EXPECTANCY,
-	MALE_LIFE_EXPECTANCY,
-	LIFE_EXPECTANCY
-} from '../../plots/line/data';
-import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import LinePlot from '$lib/plots/line/Plot.svelte';
+import { FEMALE_LIFE, MALE_LIFE, LIFE } from '$datasets';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `geo-hover` marker - the in-map hover highlight, restyling whichever
@@ -58,7 +51,8 @@ const GEO_PLOT_ARGS_2 = {
 } satisfies GeoPlotStory['args'];
 const LINE_PLOT_ARGS = {
 	width: 940,
-	height: 400
+	height: 400,
+	scales: { x: { nice: false } }
 } satisfies LinePlotStory['args'];
 
 /** Hover a country - it gets a neutral translucent fill (the shared `hover.area` theme default). Matching follows the browser's own SVG hit-testing. */
@@ -122,7 +116,7 @@ export const TimeSeries: LinePlotStory = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
@@ -146,7 +140,7 @@ export const WithoutLabels: LinePlotStory = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
@@ -171,7 +165,7 @@ export const WithoutRule: LinePlotStory = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
@@ -197,7 +191,7 @@ export const WithBothAxis: LinePlotStory = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
@@ -223,7 +217,7 @@ export const WithCustomRuleStyle: LinePlotStory = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			}
 		],
 		markers: [
@@ -253,13 +247,13 @@ export const TwoSeries: LinePlotStory = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			},
 			{
 				name: 'male',
 				x: 'year',
 				y: 'value',
-				data: MALE_LIFE_EXPECTANCY
+				data: MALE_LIFE
 			}
 		],
 		markers: [
@@ -286,13 +280,13 @@ export const SeriesScoped: LinePlotStory = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE_EXPECTANCY
+				data: FEMALE_LIFE
 			},
 			{
 				name: 'male',
 				x: 'year',
 				y: 'value',
-				data: MALE_LIFE_EXPECTANCY
+				data: MALE_LIFE
 			}
 		],
 		markers: [
@@ -312,7 +306,7 @@ export const FromGroupedData: LinePlotStory = {
 	render: renderLinePlot,
 	args: {
 		...LINE_PLOT_ARGS,
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex',
@@ -332,7 +326,7 @@ export const GroupedSeriesScoped: LinePlotStory = {
 	render: renderLinePlot,
 	args: {
 		...LINE_PLOT_ARGS,
-		data: LIFE_EXPECTANCY,
+		data: LIFE,
 		x: 'year',
 		y: 'value',
 		color: 'sex',

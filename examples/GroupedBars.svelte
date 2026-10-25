@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { BarPlot } from '@fundar/data-chart-telling';
-	import { PROVINCE_VALUES } from './data';
+	import { PROVINCE_VALUES } from './datasets';
 </script>
 
 <!-- Vertical bars, grouped by `color`. -->

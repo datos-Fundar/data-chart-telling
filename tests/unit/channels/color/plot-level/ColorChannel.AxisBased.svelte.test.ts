@@ -1,11 +1,9 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
-import BarPlot from '$lib/plots/bar/Plot.svelte';
-import ScatterPlot from '$lib/plots/scatter/Plot.svelte';
-import LinePlot from '$lib/plots/line/Plot.svelte';
-import { LIFE_EXPECTANCY_BY_PROVINCE } from '../../../../../stories/plots/bar/data';
-import { COUNTRIES } from '../../../../../stories/plots/scatter/data';
-import { LIFE_EXPECTANCY } from '../../../../../stories/plots/line/data';
+import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
+import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+import { COUNTRIES_AT_2007, LIFE, PROVINCE_VALUES } from '$datasets';
 import { waitForSvg } from '../../../plots/_helpers/svg';
 
 // Plots using categorical color channels (discrete series grouping) can be
@@ -17,7 +15,7 @@ describe('color channel - axis-based plots', () => {
 		const { container } = render(BarPlot, {
 			width: 600,
 			height: 300,
-			data: LIFE_EXPECTANCY_BY_PROVINCE,
+			data: PROVINCE_VALUES,
 			x: 'province',
 			y: 'value',
 			color: 'sex'
@@ -33,10 +31,10 @@ describe('color channel - axis-based plots', () => {
 		const { container } = render(ScatterPlot, {
 			width: 600,
 			height: 400,
-			data: COUNTRIES,
-			x: 'gdpPerCapita',
-			y: 'lifeExpectancy',
-			color: 'region'
+			data: COUNTRIES_AT_2007,
+			x: 'gdp',
+			y: 'life',
+			color: 'continent'
 		});
 		const svg = await waitForSvg(container);
 		// Verify that the plot rendered (at least the SVG element is present)
@@ -48,7 +46,7 @@ describe('color channel - axis-based plots', () => {
 		const { container } = render(LinePlot, {
 			width: 600,
 			height: 300,
-			data: LIFE_EXPECTANCY,
+			data: LIFE,
 			x: 'year',
 			y: 'value',
 			color: 'sex'

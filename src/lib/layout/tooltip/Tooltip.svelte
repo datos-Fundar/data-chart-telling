@@ -1,7 +1,7 @@
 <script lang="ts" generics="TRow extends Record<string, unknown>">
 	import type { Snippet } from 'svelte';
 	import { TooltipState } from '$lib/layout/tooltip/TooltipState.svelte';
-	import type { TooltipAnchorX, TooltipAnchorY } from '$lib/types/layout/tooltip';
+	import type { TooltipAnchorX, TooltipAnchorY, TooltipRow } from '$lib/types/layout/tooltip';
 
 	/**
 	 * A plot's floating tooltip at `(x, y)`, inside a `position: relative`
@@ -28,13 +28,13 @@
 		visible: boolean;
 		x: number;
 		y: number;
-		/** Every row the hover matched. */
-		rows: TRow[];
+		/** Every row the hover matched, with the color the plot draws it in. */
+		rows: TooltipRow<TRow>[];
 		format: (row: TRow) => string;
 		/** The order the `format` text reads the rows in. Unset, as matched. */
 		sort?: (a: TRow, b: TRow) => number;
 		/** Custom tooltip body, given every row; replaces the `format` text and the default box. */
-		content?: Snippet<[{ rows: TRow[] }]>;
+		content?: Snippet<[{ rows: TooltipRow<TRow>[] }]>;
 		/** Box the tooltip must stay within. Defaults to its plot's box. */
 		bounds?: { width: number; height: number };
 		/** Preferred horizontal side of the point. Defaults to `'right'`. */

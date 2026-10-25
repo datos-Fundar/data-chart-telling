@@ -1,10 +1,11 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
-import GeoPlot from '$lib/plots/geo/Plot.svelte';
-import { resolveOpacityScale } from '$lib/utils/opacity';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
+import { OpacityScale } from '$lib/utils/OpacityScale';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import { WORLD_COUNTRIES, WEATHER_STATIONS } from '../../../../stories/plots/geo/data';
+import { WORLD_COUNTRIES } from '$datasets/world-countries';
 import { waitForSvg } from '../../plots/_helpers/svg';
+import { WEATHER_STATIONS } from '$datasets';
 
 function dotOpacitiesOf(svg: SVGElement): number[] {
 	return Array.from(svg.querySelectorAll('g.dot path')).map((el) => {
@@ -37,7 +38,7 @@ describe('opacity channel - marker level (dot)', () => {
 		const opacities = dotOpacitiesOf(svg);
 		expect(opacities.length).toBe(WEATHER_STATIONS.length);
 
-		const scale = resolveOpacityScale({ domain: [-10, 30], range: [0.1, 1] }, [-10, 30], [0.2, 1]);
+		const scale = OpacityScale.resolve({ domain: [-10, 30], range: [0.1, 1] }, [-10, 30], [0.2, 1]);
 		const expected = new Set(WEATHER_STATIONS.map((s) => Math.round(scale(s.tempC) * 32) / 32));
 		const rendered = new Set(opacities.map((o) => Math.round(o * 32) / 32));
 		expect(rendered).toEqual(expected);

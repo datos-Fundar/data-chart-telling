@@ -1,6 +1,6 @@
 <script lang="ts" generics="TRow extends Record<string, unknown>">
 	import { untrack } from 'svelte';
-	import { resolveAccessor } from '$lib/plots/utils/accessors';
+	import { resolveAccessor } from '$lib/utils/accessors';
 	import TimelineFrame from '$lib/layout/timeline/TimelineFrame.svelte';
 	import { TimelineSteps } from '$lib/layout/timeline/TimelineSteps';
 	import { TimelineTime } from '$lib/layout/timeline/TimelineTime';

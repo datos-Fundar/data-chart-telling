@@ -1,4 +1,4 @@
-import { resolveAccessor } from '$lib/plots/utils/accessors';
+import { resolveAccessor } from '$lib/utils/accessors';
 import type { ResolvedChannels } from '$lib/types/layout/mapping';
 import type {
 	AxisPlotState,

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import LinePlot from '$lib/plots/line/Plot.svelte';
-	import { TIME_SERIES } from '../../data/time-series';
+	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+	import { ARGENTINA_CHILE_TRENDS } from '$datasets';
 
 	let progress = $state(0);
 	// A step: a number here (a year), a `Date` on a timeline of dates.
@@ -17,11 +17,11 @@
 <LinePlot
 	width={760}
 	height={340}
-	data={TIME_SERIES.filter((d) => d.metric === 'GDP')}
+	data={ARGENTINA_CHILE_TRENDS.filter((d) => d.metric === 'GDP per capita')}
 	x="year"
 	y="value"
-	color="region"
-	scales={{ x: { domain: [2018, 2022] }, y: { domain: [0, 100] } }}
+	color="country"
+	scales={{ x: { domain: [1987, 2007] }, y: { domain: [0, 250] } }}
 	timeline={{
 		accessor: 'year',
 		type: 'player',
