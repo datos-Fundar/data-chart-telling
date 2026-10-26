@@ -59,10 +59,9 @@ export const Default: Story = {
 };
 
 /**
- * Constrained Y domain - tightens the visible range to [78, 85], which is
- * narrower than the auto-fitted range (the 2008 value sits at 77.9 so
- * auto-fit adds space below it). All data points lie within [78, 85], so
- * no line is clipped at the frame boundary.
+ * Constrained Y domain - fixes the visible range to [60, 81], narrower than
+ * the auto-fitted one. The data spans 61.4 to 80.2, so all points lie within
+ * the domain and no line is clipped at the frame boundary.
  *
  * Compare with `Default` to see how the trend appears more spread out when
  * the Y range is reduced.
@@ -78,15 +77,15 @@ export const CustomYDomain: Story = {
 			} satisfies Series<LifeRow>
 		],
 		scales: {
-			y: { domain: [78, 85] }
+			y: { domain: [60, 81] }
 		} satisfies AxisBasedScalesConfig
 	}
 };
 
 /**
  * Constrained X domain - restricts both the visible range and the series
- * data to 2010-2020. The data is filtered to match the domain so the line
- * starts cleanly at the first in-range point (2010) rather than entering
+ * data to 2000-2020. The data is filtered to match the domain so the line
+ * starts cleanly at the first in-range point (2001) rather than entering
  * the frame at an interpolated position from an earlier out-of-range point.
  */
 export const CustomXDomain: Story = {
@@ -96,11 +95,11 @@ export const CustomXDomain: Story = {
 				name: 'female',
 				x: 'year',
 				y: 'value',
-				data: FEMALE_LIFE.filter((d) => d.year >= 2010 && d.year <= 2020)
+				data: FEMALE_LIFE.filter((d) => d.year >= 2000 && d.year <= 2020)
 			} satisfies Series<LifeRow>
 		],
 		scales: {
-			x: { domain: [2010, 2020] }
+			x: { domain: [2000, 2020] }
 		} satisfies AxisBasedScalesConfig
 	}
 };
@@ -184,7 +183,7 @@ export const CustomTicks: Story = {
 			} satisfies Series<LifeRow>
 		],
 		scales: {
-			x: { ticks: [2008, 2012, 2016, 2020] }
+			x: { ticks: [1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020] }
 		} satisfies AxisBasedScalesConfig
 	}
 };
@@ -265,8 +264,8 @@ export const CombinedOverrides: Story = {
 		y: 'value',
 		color: 'sex',
 		scales: {
-			x: { label: 'Year', ticks: [2008, 2012, 2016, 2020], grid: false },
-			y: { label: 'Life expectancy (years)', domain: [60, 90], grid: true }
+			x: { label: 'Year', ticks: [1950, 1960, 1970, 1980, 1990, 2000, 2010, 2019], grid: false },
+			y: { label: 'Life expectancy (years)', domain: [55, 85], grid: true }
 		} satisfies AxisBasedScalesConfig
 	}
 };
