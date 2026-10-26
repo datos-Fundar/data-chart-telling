@@ -243,16 +243,19 @@
 		return scale?.reverse ? `← ${field}` : `${field} →`;
 	}
 
-	// `SveltePlotScale.build` already left only svelteplot's own scale options.
+	// `SveltePlotScale.build` already left only svelteplot's own scale options. Its
+	// axes are measured with the estimated margins, so the domains it nices hold whatever the margins settle on.
 	const resolvedX = $derived.by(() => {
-		const built = SveltePlotScale.build(layoutScales?.x, data, getX);
+		const span = width - marginEstimate.left - marginEstimate.right;
+		const built = SveltePlotScale.build(layoutScales?.x, data, getX, { axis: 'x', span });
 		const domain = edgeDomains.get('x');
 		const label = titleOfEmpty('x', layoutScales?.x);
 		const out = domain ? { ...built, domain, nice: false } : built;
 		return (label ? { ...out, label } : out) as SveltePlotProps['x'];
 	});
 	const resolvedY = $derived.by(() => {
-		const built = SveltePlotScale.build(scales?.y, data, getY);
+		const span = height - marginEstimate.top - marginEstimate.bottom;
+		const built = SveltePlotScale.build(scales?.y, data, getY, { axis: 'y', span });
 		const domain = edgeDomains.get('y');
 		const label = titleOfEmpty('y', scales?.y);
 		const out = domain ? { ...built, domain, nice: false } : built;
