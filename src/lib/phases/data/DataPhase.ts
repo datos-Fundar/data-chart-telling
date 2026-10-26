@@ -35,7 +35,7 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 	run = (state: TState, ctx: TCtx): TState => {
 		const options = this.#options;
 		const { series, data, segments, scales } = state;
-		const { connect = true, color: segmentColor } = options.segments ?? {};
+		const { connect = true, gather = false, color: segmentColor } = options.segments ?? {};
 
 		const seriesGrouping = DataPhase.#buildGrouping(state);
 		const built: Series[] = series ?? buildSeries(data ?? [], state.x, state.y, seriesGrouping);
@@ -56,7 +56,7 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 				? FacetPanels.splitSeries(fullSeries, state.panels, state.panelOf)
 				: fullSeries;
 		const resolvedSeries = ctx.interaction?.legend?.withoutOmitted(panelSeries) ?? panelSeries;
-		const groupedSeries = buildGroupedSeries(resolvedSeries, segments, connect);
+		const groupedSeries = buildGroupedSeries(resolvedSeries, segments, connect, gather);
 		const scopedGroups = buildScopedMarkerGroups({
 			groupedSeries,
 			segments,

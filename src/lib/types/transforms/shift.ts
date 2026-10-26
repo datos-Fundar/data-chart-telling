@@ -10,6 +10,8 @@ export type ShiftAmount = number | string;
  * `shiftX` as a marker transform: moves every row's `x` by `by`. Given one
  * amount per channel (`{ x1: '-1 week', x2: '+1 week' }`), it also widens a
  * point into an interval, each channel taken from `x` when the marker has none of its own.
+ * On a category axis, a number moves each row across its band by that many
+ * bands instead, as a `dot` marker draws it.
  */
 export type ShiftXTransform = {
 	type: 'shiftX';

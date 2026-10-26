@@ -84,6 +84,18 @@ const preview: Preview = {
 							['Series', 'Scales', 'Tooltip', 'Transforms'],
 							'PyramidPlot',
 							['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules'], 'Tooltip'],
+							'RaincloudPlot',
+							[
+								'Series',
+								'Estimate',
+								'Box',
+								'Rain',
+								'Scales',
+								'Styles',
+								'Segments',
+								'Legend',
+								'Tooltip'
+							],
 							'ViolinPlot',
 							['Series', 'Estimate', 'Styles', 'Tooltip']
 						],

@@ -74,3 +74,12 @@ export const WideBox: Story = {
 		styles: { box: 16 } satisfies ViolinPlotStylesConfig
 	}
 };
+
+/** An object picks the box's parts: here, no whiskers, with caps and the values past them. */
+export const BoxParts: Story = {
+	args: {
+		styles: {
+			box: { whiskers: false, caps: true, outliers: true }
+		} satisfies ViolinPlotStylesConfig
+	}
+};

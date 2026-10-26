@@ -15,6 +15,7 @@ import { buildHistogramDefaults } from '$lib/plots/distribution/histogram/defaul
 import { buildDensityDefaults } from '$lib/plots/distribution/density/defaults';
 import { buildHeatmapDefaults } from '$lib/plots/correlation/heatmap/defaults';
 import { buildViolinDefaults } from '$lib/plots/distribution/violin/defaults';
+import { buildRaincloudDefaults } from '$lib/plots/distribution/raincloud/defaults';
 import { buildBoxDefaults } from '$lib/plots/distribution/box/defaults';
 import { buildLollipopDefaults } from '$lib/plots/ranking/lollipop/defaults';
 import { buildDumbbellDefaults } from '$lib/plots/ranking/dumbbell/defaults';
@@ -133,6 +134,11 @@ const CASES: Case[] = [
 	{
 		name: 'violin',
 		kind: buildViolinDefaults<Row>(),
+		props: { x: 'sector', y: 'valor', color: 'sector' }
+	},
+	{
+		name: 'raincloud',
+		kind: buildRaincloudDefaults<Row>(),
 		props: { x: 'sector', y: 'valor', color: 'sector' }
 	}
 ];

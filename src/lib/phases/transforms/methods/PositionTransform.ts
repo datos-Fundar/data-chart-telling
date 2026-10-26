@@ -2,6 +2,7 @@ import { intervalX, intervalY, jitterX, jitterY, shiftX, shiftY } from 'sveltepl
 import { POSITION_CHANNEL_KEYS } from '$lib/types/transforms/common';
 import { INTERVAL_CHANNEL_KEYS } from '$lib/types/transforms/interval';
 import { AnchorBar } from '$lib/phases/transforms/methods/AnchorBar';
+import { BandOffset } from '$lib/phases/transforms/methods/BandOffset';
 import type { Row, TransformAdapter } from '$lib/types/phases/transforms/adapter';
 
 /** Interval, jitter and shift transforms, by axis. */
@@ -34,26 +35,60 @@ export class PositionTransform {
 
 	static readonly jitterX: TransformAdapter = {
 		channelKeys: POSITION_CHANNEL_KEYS,
-		run: (channels, options) =>
-			jitterX(channels as never, PositionTransform.#jitterOptions(options, 'x') as never) as Row
+		run: PositionTransform.#runJitter(jitterX, 'x')
 	};
 
 	static readonly jitterY: TransformAdapter = {
 		channelKeys: POSITION_CHANNEL_KEYS,
-		run: (channels, options) =>
-			jitterY(channels as never, PositionTransform.#jitterOptions(options, 'y') as never) as Row
+		run: PositionTransform.#runJitter(jitterY, 'y')
 	};
 
-	// svelteplot takes the amount itself as the second argument, not an options object.
 	static readonly shiftX: TransformAdapter = {
 		channelKeys: POSITION_CHANNEL_KEYS,
-		run: (channels, options) => shiftX(channels as never, options.by as never) as Row
+		run: PositionTransform.#runShift(shiftX, 'x')
 	};
 
 	static readonly shiftY: TransformAdapter = {
 		channelKeys: POSITION_CHANNEL_KEYS,
-		run: (channels, options) => shiftY(channels as never, options.by as never) as Row
+		run: PositionTransform.#runShift(shiftY, 'y')
 	};
+
+	/** Runs a jitter transform: through svelteplot on numbers and dates, across the band on categories. */
+	static #runJitter(
+		transform: typeof jitterX | typeof jitterY,
+		axis: 'x' | 'y'
+	): TransformAdapter['run'] {
+		return (channels, options) => {
+			if (BandOffset.isCategorical(channels.data as Row[], channels[axis])) {
+				const source = PositionTransform.#source(options, axis);
+				return BandOffset.add(channels, axis, BandOffset.noise(options, source));
+			}
+			return transform(
+				channels as never,
+				PositionTransform.#jitterOptions(options, axis) as never
+			) as Row;
+		};
+	}
+
+	/**
+	 * Runs a shift transform: through svelteplot, which takes the amount itself as
+	 * its second argument, or across the band by `by` bands on categories.
+	 */
+	static #runShift(
+		transform: typeof shiftX | typeof shiftY,
+		axis: 'x' | 'y'
+	): TransformAdapter['run'] {
+		return (channels, options) => {
+			if (
+				typeof options.by === 'number' &&
+				BandOffset.isCategorical(channels.data as Row[], channels[axis])
+			) {
+				const by = options.by;
+				return BandOffset.add(channels, axis, () => by);
+			}
+			return transform(channels as never, options.by as never) as Row;
+		};
+	}
 
 	/**
 	 * Runs an interval transform. svelteplot reads `interval` next to the channels,
@@ -77,13 +112,19 @@ export class PositionTransform {
 	 */
 	static #jitterOptions(options: Row, axis: 'x' | 'y') {
 		const distribution = (options.distribution as string | undefined) ?? 'uniform';
-		const defaultSeed =
-			axis === 'x' ? PositionTransform.DEFAULT_SEED : PositionTransform.DEFAULT_SEED + 1;
-		const source =
-			(options.source as (() => number) | undefined) ??
-			PositionTransform.seededRandom((options.seed as number | undefined) ?? defaultSeed);
+		const source = PositionTransform.#source(options, axis);
 		return distribution === 'normal'
 			? { type: 'normal', std: options.std, source }
 			: { type: 'uniform', width: options.width, source };
+	}
+
+	/** The jitter's own `source`, or a PRNG seeded by its `seed` or the axis' default one. */
+	static #source(options: Row, axis: 'x' | 'y'): () => number {
+		const defaultSeed =
+			axis === 'x' ? PositionTransform.DEFAULT_SEED : PositionTransform.DEFAULT_SEED + 1;
+		return (
+			(options.source as (() => number) | undefined) ??
+			PositionTransform.seededRandom((options.seed as number | undefined) ?? defaultSeed)
+		);
 	}
 }

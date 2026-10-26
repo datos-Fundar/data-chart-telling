@@ -10,9 +10,11 @@ import type { BoxSummaryRow } from '$lib/types/plots/distribution/box/state';
 import type { ViolinPlotState, ViolinPlotCtx } from '$lib/types/plots/distribution/violin/state';
 
 /**
- * The value axis fit to the values the violins are drawn from, when the author leaves it unpinned: no svelteplot mark reads them, so nothing else sets its domain.
+ * The value axis fit to the values the violins are drawn from, when the author leaves it unpinned: no svelteplot mark reads them, so nothing else sets its domain. Shared with every plot drawn from `violin` markers.
  */
-function fitValueDomain<TData extends Record<string, unknown>>(state: ViolinPlotState<TData>) {
+export function fitValueDomain<TData extends Record<string, unknown>>(
+	state: ViolinPlotState<TData>
+) {
 	const axis = PlotAxes.valueOf(state);
 	const scale = state.scales[axis];
 	if (scale?.domain != null || scale?.ticks != null || typeof scale?.nice === 'boolean') return {};
@@ -41,7 +43,11 @@ export function buildViolinDefaults<TData extends Record<string, unknown>>(): Ax
 	return {
 		data: {
 			discreteAxes: 1,
-			segments: { color: (style: AreaStyle | undefined) => style?.fill, connect: false }
+			segments: {
+				color: (style: AreaStyle | undefined) => style?.fill,
+				connect: false,
+				gather: true
+			}
 		},
 		scales: {
 			bandOrder: 'data',

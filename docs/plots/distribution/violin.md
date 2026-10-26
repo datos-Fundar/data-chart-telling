@@ -31,5 +31,5 @@ Draws, for each category, the density estimate of its values mirrored around the
 - `styles.kernel` and `styles.bandwidth` set the estimate; Silverman's rule picks each violin's bandwidth when unset.
 - `styles.trim` (default `true`) cuts each violin at its values' own extent. With `false` the tails fade out past it, beyond what the value axis reaches.
 - `styles.scale: 'shared'` draws every violin on one density scale, so their areas compare; the default gives each the same full width.
-- `styles.box: false` leaves the inner box out, and a number sets its width in pixels.
+- `styles.box: false` leaves the inner box out, and a number sets its width in pixels. An object sets its `width` and which parts show: `quartiles`, `median` and `whiskers` (on by default), `caps` and `outliers` (off).
 - Hovering a violin reads the same summary as a box plot: quartiles, whisker ends and the values past them.

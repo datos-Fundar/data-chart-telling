@@ -73,7 +73,8 @@ export function validateSegments<TStyle>(segments: SegmentsConfig<TStyle>): void
 function resolveSeriesSegments<S extends Series<any>, TStyle>(
 	series: S,
 	segs: Segment<TStyle>[],
-	connect: boolean
+	connect: boolean,
+	gather: boolean
 ): VisualSegment<S['data'][number], TStyle>[] {
 	if (!segs.length) {
 		return [{ data: series.data, styles: {} as TStyle, scales: undefined }];
@@ -110,14 +111,15 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
 
 	// Group consecutive data points into runs by their matched segment index.
 	// Each run becomes its own visual segment (mark), preventing Observable Plot
-	// from drawing lines across non-contiguous areas of the same Segment.
+	// from drawing lines across non-contiguous areas of the same Segment. With
+	// `gather`, each segment index is one run of every row it matched, in order.
 	type Run = { data: DataPoint[]; segIdx: number };
 	const runs: Run[] = [];
 	for (let i = 0; i < series.data.length; i++) {
 		const idx = matchIdx[i];
-		const last = runs[runs.length - 1];
-		if (last && last.segIdx === idx) {
-			last.data.push(series.data[i]);
+		const own = gather ? runs.find((run) => run.segIdx === idx) : runs[runs.length - 1];
+		if (own && own.segIdx === idx) {
+			own.data.push(series.data[i]);
 		} else {
 			runs.push({ data: [series.data[i]], segIdx: idx });
 		}
@@ -199,6 +201,10 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
  * itself defaults `TStyle` to {@link LineSegmentStyle}. Discrete marks (bar,
  * pyramid) have no gap to bridge; pass `connect: false` so boundary rows
  * aren't duplicated as an extra, separately-styled mark.
+ *
+ * `gather` makes each segment's rows one visual segment wherever they fall,
+ * for a mark that summarizes a category's rows (box, violin), whose rows need
+ * not come in order. It implies no `connect`.
  */
 /** A position channel's accessor, reading nothing when the series doesn't set it. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -213,14 +219,16 @@ export function buildGroupedSeries<
 >(
 	seriesList: S[],
 	segments: SegmentsConfig<TStyle> = {},
-	connect = true
+	connect = true,
+	gather = false
 ): VisualGroup<S, TStyle>[] {
 	return seriesList.map((s) => ({
 		series: s,
 		visualSegments: resolveSeriesSegments<S, TStyle>(
 			s,
 			resolveSegmentsForSeries(segments, s.name),
-			connect
+			connect && !gather,
+			gather
 		)
 	}));
 }

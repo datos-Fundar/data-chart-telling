@@ -10,6 +10,7 @@ import HistogramPlot from '$lib/plots/distribution/histogram/Plot.svelte';
 import DensityPlot from '$lib/plots/distribution/density/Plot.svelte';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import ViolinPlot from '$lib/plots/distribution/violin/Plot.svelte';
+import RaincloudPlot from '$lib/plots/distribution/raincloud/Plot.svelte';
 import BoxPlot from '$lib/plots/distribution/box/Plot.svelte';
 import LollipopPlot from '$lib/plots/ranking/lollipop/Plot.svelte';
 import DumbbellPlot from '$lib/plots/ranking/dumbbell/Plot.svelte';
@@ -112,6 +113,18 @@ const KINDS: Kind[] = [
 	{
 		name: 'ViolinPlot',
 		Plot: ViolinPlot,
+		props: {
+			data: CATEGORIES.flatMap((d) => [0, 1, 2, 3].map((k) => ({ ...d, y: d.y + k }))),
+			x: 'x',
+			y: 'y'
+		},
+		numericX: false,
+		plotStatistics: true,
+		stackable: false
+	},
+	{
+		name: 'RaincloudPlot',
+		Plot: RaincloudPlot,
 		props: {
 			data: CATEGORIES.flatMap((d) => [0, 1, 2, 3].map((k) => ({ ...d, y: d.y + k }))),
 			x: 'x',

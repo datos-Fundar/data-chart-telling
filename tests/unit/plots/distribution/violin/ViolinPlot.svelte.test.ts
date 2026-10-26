@@ -38,6 +38,17 @@ describe('ViolinPlot', () => {
 		expect(svg.querySelectorAll(BARS)).toHaveLength(0);
 	});
 
+	test('`styles.box` as an object hides the parts it turns off', async () => {
+		const { container } = render(ViolinPlot, {
+			...base,
+			styles: { box: { whiskers: false, quartiles: false } }
+		});
+		const svg = await waitForSvg(container);
+		const style = (selector: string) => getComputedStyle(svg.querySelector(selector)!);
+		expect(style(BARS).fillOpacity).toBe('0');
+		expect(style('g.rule-x line, g.rule-y line').strokeOpacity).toBe('0');
+	});
+
 	test('series share each category band side by side', async () => {
 		const { container } = render(ViolinPlot, { ...base, grouping: 'group' });
 		const svg = await waitForSvg(container);

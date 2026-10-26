@@ -25,7 +25,11 @@ export function buildBoxDefaults<TData extends Record<string, unknown>>(): AxisP
 	return {
 		data: {
 			discreteAxes: 1,
-			segments: { color: (style: AreaStyle | undefined) => style?.fill, connect: false }
+			segments: {
+				color: (style: AreaStyle | undefined) => style?.fill,
+				connect: false,
+				gather: true
+			}
 		},
 		scales: {
 			bandOrder: 'data',

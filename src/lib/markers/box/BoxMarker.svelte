@@ -22,7 +22,7 @@
 
 	/**
 	 * With `thickness`, the box is that many pixels across, centered on the
-	 * marker's share of its category's band (`slot`), instead of filling the band:
+	 * marker's share of its category's band (`slot`), or moved off it by `center`, instead of filling the band:
 	 * the bar's insets and every sub-mark's offset follow it.
 	 */
 	const thickness = $derived(marker.thickness);
@@ -35,7 +35,7 @@
 	const placement = $derived.by(() => {
 		if (thickness == null || !bandwidth) return undefined;
 		const share = bandwidth / slotCount;
-		const offset = share * slotIndex + share / 2 - bandwidth / 2;
+		const offset = share * slotIndex + share / 2 - bandwidth / 2 + (marker.center ?? 0) * share;
 		const inset = Math.max(0, (bandwidth - thickness) / 2);
 		return {
 			inset,

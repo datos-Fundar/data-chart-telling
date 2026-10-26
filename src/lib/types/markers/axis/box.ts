@@ -14,4 +14,6 @@ export type BoxMarkerConfig = {
 	tickMinMax?: boolean | Record<string, unknown>;
 	thickness?: number;
 	slot?: { index: number; count: number };
+	/** With `thickness`, where across its share of the band the box sits: a fraction from -0.5 (its start) to 0.5 (its end). Defaults to 0, the middle. */
+	center?: number;
 } & CommonMarkerConfig;

@@ -482,6 +482,21 @@ export type PlotStylesConfig = {
 		dotRadius: number;
 	};
 
+	/** Default raincloud-plot styling. */
+	raincloud: {
+		/** Fill opacity of every cloud that sets none of its own. */
+		fillOpacity: number;
+		/** Fallback gap (0-1) between the rainclouds of neighbouring categories, when a plot doesn't set its own `scales.x/y.paddingInner`. */
+		paddingInner: number;
+		/** Fallback gap (0-1) before the first and after the last raincloud, when a plot doesn't set its own `scales.x/y.paddingOuter`. */
+		paddingOuter: number;
+		/** Width (px) of the box. */
+		boxWidth: number;
+		/** Radius (px) of every dot of the rain. */
+		dotRadius: number;
+		/** Fill opacity of every dot of the rain. */
+		dotOpacity: number;
+	};
 	/** Default violin-plot styling. */
 	violin: {
 		/** Fill opacity of every violin that sets none of its own. */

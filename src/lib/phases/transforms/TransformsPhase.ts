@@ -15,6 +15,7 @@ import type {
 	ProcessedChannelName,
 	ProcessedData,
 	ProcessedRow,
+	SegmentsStageOptions,
 	TransformsStageOptions,
 	TransformsStageState
 } from '$lib/types/phases';
@@ -53,12 +54,15 @@ export class TransformsPhase<
 > implements PhaseStage<TState, TCtx> {
 	readonly phase = 'transforms' as const;
 	readonly #options: TransformsStageOptions<TState, TCtx>;
-	readonly #connect: boolean;
+	readonly #segments: SegmentsStageOptions;
 
-	/** `connect`: whether a series' visual segments bridge into each other, as the kind's "data" phase splits them. */
-	constructor(options: TransformsStageOptions<TState, TCtx> = {}, connect = true) {
+	/** `segments`: how a series splits into visual segments, as the kind's "data" phase splits them. */
+	constructor(
+		options: TransformsStageOptions<TState, TCtx> = {},
+		segments: SegmentsStageOptions = {}
+	) {
 		this.#options = options;
-		this.#connect = connect;
+		this.#segments = segments;
 	}
 
 	run = (state: TState, ctx: TCtx): TState => {
@@ -137,7 +141,7 @@ export class TransformsPhase<
 		const processedGroups =
 			this.#options.groups === 'runs'
 				? TransformsPhase.#buildRuns(state)
-				: TransformsPhase.#buildGroups(state, this.#connect);
+				: TransformsPhase.#buildGroups(state, this.#segments);
 		return { ...state, processedGroups, ...this.#labelled(state) };
 	}
 
@@ -193,7 +197,7 @@ export class TransformsPhase<
 	 */
 	static #buildGroups<TStyle>(
 		state: TransformsStageState & { segments?: SegmentsConfig<TStyle> },
-		connect: boolean
+		{ connect = true, gather = false }: SegmentsStageOptions
 	): VisualGroup<Series<ProcessedRow>, TStyle>[] {
 		const { data } = state.processedData!;
 		const series = (state.resolvedSeries ?? []).map((s) =>
@@ -203,7 +207,12 @@ export class TransformsPhase<
 				data.filter((row) => row[SERIES_ID_KEY] === seriesIdOf(s))
 			)
 		);
-		return buildGroupedSeries<Series<ProcessedRow>, TStyle>(series, state.segments, connect);
+		return buildGroupedSeries<Series<ProcessedRow>, TStyle>(
+			series,
+			state.segments,
+			connect,
+			gather
+		);
 	}
 
 	/**

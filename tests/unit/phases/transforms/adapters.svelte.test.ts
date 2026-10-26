@@ -125,6 +125,30 @@ describe('position', () => {
 		const out = run([{ type: 'shiftY', by: 100 }]);
 		expect(valuesOf(out, 'y', 'A')).toEqual([110, 120, 130, 140]);
 	});
+
+	test('jitterX on categories keeps them and spreads each row across its band, seeded', () => {
+		const a = run([{ type: 'jitterX', width: 0.2 }], { type: 'dot', x: 'g', y: 'v' });
+		expect(a.x).toBe('g');
+		const offsets = valuesOf(a, 'bandOffsetX') as number[];
+		expect(offsets.every((o) => Math.abs(o) <= 0.2)).toBe(true);
+		expect(new Set(offsets).size).toBe(rows.length);
+		const b = run([{ type: 'jitterX', width: 0.2 }], { type: 'dot', x: 'g', y: 'v' });
+		expect(valuesOf(b, 'bandOffsetX')).toEqual(offsets);
+	});
+
+	test('shiftX on categories adds its amount, in bands, to each row’s spot', () => {
+		const jittered = run([{ type: 'jitterX', width: 0.1 }], { type: 'dot', x: 'g', y: 'v' });
+		const shifted = run(
+			[
+				{ type: 'jitterX', width: 0.1 },
+				{ type: 'shiftX', by: -0.3 }
+			],
+			{ type: 'dot', x: 'g', y: 'v' }
+		);
+		const before = valuesOf(jittered, 'bandOffsetX') as number[];
+		const after = valuesOf(shifted, 'bandOffsetX') as number[];
+		after.forEach((o, i) => expect(o).toBeCloseTo(before[i] - 0.3));
+	});
 });
 
 describe('order', () => {

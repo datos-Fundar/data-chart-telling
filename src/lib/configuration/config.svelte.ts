@@ -344,6 +344,14 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 
 	pyramid: { gap: { fillOpacity: 0.5 } },
 	scatter: { dotRadius: 5 },
+	raincloud: {
+		fillOpacity: 0.6,
+		paddingInner: 0.2,
+		paddingOuter: 0.2,
+		boxWidth: 8,
+		dotRadius: 2.5,
+		dotOpacity: 0.7
+	},
 	slope: { strokeWidth: 2, dotRadius: 5, padding: 0 },
 	sparkline: { strokeWidth: 1.5, dotRadius: 3 },
 	violin: { fillOpacity: 0.6, paddingInner: 0.2, paddingOuter: 0.2, boxWidth: 8 }

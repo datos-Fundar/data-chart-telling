@@ -9,6 +9,7 @@ import { buildDensityDefaults } from '$lib/plots/distribution/density/defaults';
 import { buildHeatmapDefaults } from '$lib/plots/correlation/heatmap/defaults';
 import { buildPyramidDefaults } from '$lib/plots/distribution/pyramid/defaults';
 import { buildViolinDefaults } from '$lib/plots/distribution/violin/defaults';
+import { buildRaincloudDefaults } from '$lib/plots/distribution/raincloud/defaults';
 import { buildBoxDefaults } from '$lib/plots/distribution/box/defaults';
 import { buildLollipopDefaults } from '$lib/plots/ranking/lollipop/defaults';
 import { buildDumbbellDefaults } from '$lib/plots/ranking/dumbbell/defaults';
@@ -36,8 +37,9 @@ export const [
 	SlopeCore,
 	SparklineCore,
 	DensityCore,
-	ViolinCore
-] = Array(17).fill(GenericCore);
+	ViolinCore,
+	RaincloudCore
+] = Array(18).fill(GenericCore);
 
 export type Row = { year: number; region: string; sector: string; value: number };
 
@@ -190,6 +192,12 @@ export const CASES: Case[] = [
 		name: 'violin',
 		Core: ViolinCore,
 		buildDefaults: buildViolinDefaults,
+		core: { ...BOX, x: 'sector', y: 'value', color: 'sector' }
+	},
+	{
+		name: 'raincloud',
+		Core: RaincloudCore,
+		buildDefaults: buildRaincloudDefaults,
 		core: { ...BOX, x: 'sector', y: 'value', color: 'sector' }
 	}
 ];

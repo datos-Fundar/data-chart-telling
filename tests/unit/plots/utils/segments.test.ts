@@ -108,6 +108,32 @@ describe('buildGroupedSeries - segment continuity', () => {
 
 // ── Style pass-through ─────────────────────────────────────────────────────────
 
+describe('buildGroupedSeries - gather', () => {
+	// Categories that come interleaved, as rows a summarizing mark (box, violin) reads in any order.
+	const ROWS = ['a', 'b', 'a', 'b', 'a'].map((c, i) => ({ c, v: i }));
+	const BY_CATEGORY: Series<(typeof ROWS)[number]> = { name: 's', x: 'c', y: 'v', data: ROWS };
+	const SEGMENTS = { s: [{ areas: [{ x: { from: 'b', to: 'b' } }], styles: { fill: 'red' } }] };
+
+	test('without it, a segment splits into one visual segment per run of consecutive rows', () => {
+		const [group] = buildGroupedSeries([BY_CATEGORY], SEGMENTS, false);
+		expect(group.visualSegments).toHaveLength(5);
+	});
+
+	test('with it, each segment gathers every row it matches, in order', () => {
+		const [group] = buildGroupedSeries([BY_CATEGORY], SEGMENTS, false, true);
+		expect(group.visualSegments.map((s) => s.data.map((r) => r.v))).toEqual([
+			[0, 2, 4],
+			[1, 3]
+		]);
+		expect(group.visualSegments[1].styles).toEqual({ fill: 'red' });
+	});
+
+	test('it never bridges, even with connect', () => {
+		const [group] = buildGroupedSeries([BY_CATEGORY], SEGMENTS, true, true);
+		expect(group.visualSegments).toHaveLength(2);
+	});
+});
+
 describe('buildGroupedSeries - style pass-through', () => {
 	test('area segment style is passed through to the visual segment', () => {
 		const style: LineSegmentStyle = { stroke: { stroke: '#ff0000', strokeWidth: 3 } };

@@ -15,6 +15,7 @@ export { default as HistogramPlot } from './plots/distribution/histogram/Plot.sv
 export { default as LinePlot } from './plots/evolution/line/Plot.svelte';
 export { default as LollipopPlot } from './plots/ranking/lollipop/Plot.svelte';
 export { default as PyramidPlot } from './plots/distribution/pyramid/Plot.svelte';
+export { default as RaincloudPlot } from './plots/distribution/raincloud/Plot.svelte';
 export { default as ScatterPlot } from './plots/correlation/scatter/Plot.svelte';
 export { default as SlopePlot } from './plots/evolution/slope/Plot.svelte';
 export { default as SparklinePlot } from './plots/evolution/sparkline/Plot.svelte';

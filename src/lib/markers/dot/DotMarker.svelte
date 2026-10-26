@@ -4,6 +4,7 @@
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { resolveAccessor } from '$lib/utils/accessors';
 	import RowOffsetMarks from '$lib/markers/utils/RowOffsetMarks.svelte';
+	import { usePlot } from '$lib/layout/plot/usePlot';
 	import type { DotMarkerConfig } from '$lib/types/markers/common';
 
 	/**
@@ -68,6 +69,43 @@
 	const strokeWidth = $derived(styles?.dotStrokeWidth ?? 1);
 	const strokeOpacity = $derived(styles?.dotStrokeOpacity ?? 1);
 	const strokeDasharray = $derived(styles?.dotStrokeDasharray);
+
+	const plot = usePlot();
+	const isHorizontal = $derived(plot.axes?.isHorizontal ?? false);
+
+	/**
+	 * A row's spot across its band on `axis` (its `bandOffsetX`/`bandOffsetY`, in
+	 * bands, as a jitter or shift on a category axis writes it), within the
+	 * marker's `slot` share of the band - on the plot's category axis - in pixels.
+	 * It reads the band's width only when called: svelteplot recomputes its
+	 * scales when a mark's options change, so an offset rebuilt from the scales
+	 * would never settle.
+	 */
+	function across(axis: 'x' | 'y') {
+		const accessor = axis === 'x' ? marker.bandOffsetX : marker.bandOffsetY;
+		const slot = (axis === 'y') === isHorizontal ? marker.slot : undefined;
+		if (accessor === undefined && slot === undefined) return undefined;
+		const offset = accessor === undefined ? () => 0 : resolveAccessor(accessor as never);
+		const count = slot?.count ?? 1;
+		const index = slot?.index ?? 0;
+		return (row: TData) => {
+			const scale = plot.svelteplot.scales[axis];
+			if (scale?.type !== 'band') return 0;
+			const bandwidth = scale.fn.bandwidth();
+			const share = bandwidth / count;
+			return share * index + share / 2 - bandwidth / 2 + Number(offset(row as never) ?? 0) * share;
+		};
+	}
+	const bandShift = $derived(
+		Object.fromEntries(
+			(
+				[
+					['dx', across('x')],
+					['dy', across('y')]
+				] as const
+			).filter(([, fn]) => fn)
+		)
+	);
 </script>
 
 {#snippet dots(rows: TData[], fillOpacity: number)}
@@ -85,6 +123,7 @@
 				{strokeOpacity}
 				{strokeDasharray}
 				{symbol}
+				{...bandShift}
 			/>
 		{/snippet}
 	</RowOffsetMarks>

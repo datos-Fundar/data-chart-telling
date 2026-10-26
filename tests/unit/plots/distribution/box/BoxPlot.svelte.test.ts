@@ -105,6 +105,21 @@ describe('BoxPlot', () => {
 		expect(Number(getComputedStyle(boxRects(own)[0]).fillOpacity)).toBeCloseTo(0.3);
 	});
 
+	test('a segment gathers its category’s rows into one box, whatever order they come in', async () => {
+		const interleaved = rows.map((_, i) => rows[i % 2 === 0 ? i / 2 : 11 + (i - 1) / 2]);
+		const { container } = render(BoxPlot, {
+			width: 400,
+			height: 300,
+			data: interleaved,
+			x: 'c',
+			y: 'v',
+			segments: { default: [{ areas: [{ x: { from: 'b', to: 'b' } }], styles: { fill: 'red' } }] }
+		});
+		const svg = await waitForSvg(container);
+		expect(countBoxMarks(svg)).toBe(2);
+		expect(boxRects(svg)).toHaveLength(2);
+	});
+
 	test('the value axis fits the values without reaching for zero', async () => {
 		const { container } = render(BoxPlot, {
 			width: 400,

@@ -9,7 +9,7 @@
 	/**
 	 * Renders one `'violin'` marker: for each category of its rows, the density
 	 * curve mirrored around the middle of the category's band, or of the share of
-	 * it the marker's `slot` takes. The curve is drawn on the plot's own scales;
+	 * it the marker's `slot` takes, or on one `side` of it only. The curve is drawn on the plot's own scales;
 	 * the plot's axes say which of `x`/`y` holds the category.
 	 */
 	let { marker }: { marker: ViolinMarkerConfig } = $props();
@@ -52,9 +52,12 @@
 			const center = start + share * slotIndex + share / 2;
 			const full = marker.peak ?? Math.max(...profile.curve.map((p) => p.density));
 			const half = (density: number) => (full > 0 ? (density / full) * (share / 2) : 0);
-			const side = (sign: 1 | -1) =>
+			const side = (sign: 1 | -1 | 0) =>
 				profile.curve.map((p) => point(center + sign * half(p.density), at(p.value)));
-			const outline = [...side(-1), ...side(1).reverse()];
+			const outline = [
+				...side(marker.side === 'end' ? 0 : -1),
+				...side(marker.side === 'start' ? 0 : 1).reverse()
+			];
 			return [outline.map(([x, y], i) => `${i ? 'L' : 'M'}${x},${y}`).join('') + 'Z'];
 		});
 	});

@@ -2,7 +2,7 @@ export type { PlotPhase, PhaseStage } from './stage';
 export type { AxisPlotState, AxisPlotCtx } from './state';
 export type { AxisPlotKind, AxisPlotDefaults, SharedScalesOptions } from './kind';
 export type { DataRunState } from './pipeline';
-export type { DataStageOptions } from './data/phase';
+export type { DataStageOptions, SegmentsStageOptions } from './data/phase';
 export type { MappingStageOptions } from './mapping/phase';
 export type {
 	ProcessedRow,

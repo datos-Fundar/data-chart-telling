@@ -8,6 +8,8 @@ export type SegmentsStageOptions = {
 	color?: (style: any) => string | undefined;
 	/** Whether adjacent visual segments share their boundary row - a continuous mark (line, area) does. Defaults to `true`. */
 	connect?: boolean;
+	/** Whether each segment's rows form one visual segment wherever they fall - a mark that summarizes a category's rows (box, violin) does - instead of one per run of consecutive rows. Defaults to `false`. */
+	gather?: boolean;
 };
 
 /**

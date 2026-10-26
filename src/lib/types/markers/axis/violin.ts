@@ -19,5 +19,7 @@ export type ViolinMarkerConfig = {
 	peak?: number;
 	/** The share of each band the violin takes, when several series sit side by side: its index among `count`. */
 	slot?: { index: number; count: number };
+	/** Draws only one half of the violin, toward the start (left or top) or the end (right or bottom) of its band. Defaults to `'both'`. */
+	side?: 'both' | 'start' | 'end';
 	styles?: AreaStyle;
 } & CommonMarkerConfig;
