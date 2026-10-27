@@ -10,6 +10,7 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/datos-Fundar/data-chart-telling?label=Latest%20Release&display_name=tag&logo=github&logoColor=white)](https://github.com/datos-Fundar/data-chart-telling/releases/latest)
 ![GitHub License](https://img.shields.io/github/license/datos-Fundar/data-chart-telling?label=License&logo=github&logoColor=white)
 [![CI](https://img.shields.io/github/actions/workflow/status/datos-Fundar/data-chart-telling/ci.yml?branch=main&label=CI&logo=githubactions&logoColor=white)](https://github.com/datos-Fundar/data-chart-telling/actions/workflows/ci.yml)
+[![Storybook](https://img.shields.io/badge/Storybook-live-FF4785?logo=storybook&logoColor=white)](https://datos-fundar.github.io/data-chart-telling/)
 [![CodeQL](https://img.shields.io/github/actions/workflow/status/datos-Fundar/data-chart-telling/codeql.yml?branch=main&label=CodeQL&logo=github&logoColor=white)](https://github.com/datos-Fundar/data-chart-telling/actions/workflows/codeql.yml)
 
 ## Introduction
@@ -150,7 +151,7 @@ Start with the concepts; the rest is organised by what you want a plot to do.
 | [Architecture](docs/architecture.md)                           | How a plot is assembled, for contributors                                                    |
 | [Development](docs/development.md)                             | Building, testing, Storybook and publishing                                                  |
 
-Working examples live in [examples/](examples/); the Storybook (`pnpm storybook`) shows every option live.
+Working examples live in [examples/](examples/); the [online Storybook](https://datos-fundar.github.io/data-chart-telling/) (or `pnpm storybook` locally) shows every option live.
 
 ## For LLMs and coding agents
 
