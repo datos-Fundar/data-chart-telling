@@ -112,6 +112,18 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		titleWeight: 500,
 		gap: '0.5rem 2rem',
 		swatchSize: '0.9rem',
+		icon: {
+			rounded: false,
+			marks: {
+				line: 'line',
+				dot: 'circle',
+				area: 'square',
+				bar: 'square',
+				cell: 'square',
+				rect: 'square',
+				geo: 'square'
+			}
+		},
 		disabledOpacity: 0.12,
 		pretty: true,
 		seriesTitle: { enabled: true, text: 'Series' },

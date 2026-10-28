@@ -404,11 +404,9 @@ export class LegendState {
 			...(entry.label ? { label: entry.label } : {}),
 			color: entry.color,
 			...(entry.filled === false ? { filled: false } : {}),
-			...(entry.symbol || entry.mark === 'dot'
-				? { symbol: entry.symbol ?? 'circle' }
-				: entry.mark === 'line'
-					? { symbol: 'line' as const, lineStyle: entry.lineStyle ?? 'solid' }
-					: {})
+			...(entry.mark ? { mark: entry.mark } : {}),
+			...(entry.symbol ? { symbol: entry.symbol } : {}),
+			...(entry.mark === 'line' ? { lineStyle: entry.lineStyle ?? 'solid' } : {})
 		};
 	}
 }

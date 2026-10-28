@@ -94,7 +94,7 @@ GeoPlot: `graticule sphere dot text vector link contour inset geo-hover geo-comp
 
 ## Theming and locale
 
-- `setConfiguration(partial)` deep-merges global defaults (colors, fonts, spacing, legend, tooltip, timeline); `resetConfiguration()` restores them. Inside an `$effect`, wrap the call in `untrack`.
+- `setConfiguration(partial)` deep-merges global defaults (colors, fonts, spacing, legend, tooltip, timeline); `resetConfiguration()` restores them. Legend series icons: `legend.icon.rounded` (default `false`) and `legend.icon.marks` (shape per mark: `line`, `dot`, `area`, `bar`, `cell`, `rect`, `geo`; a symbol or `'line'`). Inside an `$effect`, wrap the call in `untrack`.
 - `THEMES` has `Default Editorial Dark Compact`: `setConfiguration(THEMES.Editorial)`.
 - Number and date text follows `axis.locale` (default `'es-AR'`) in the configuration; per axis, `tickFormat: (d) => new Intl.NumberFormat('en-US').format(d)` or an `Intl.*FormatOptions` object.
 

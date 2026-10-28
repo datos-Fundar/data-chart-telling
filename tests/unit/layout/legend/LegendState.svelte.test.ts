@@ -93,8 +93,8 @@ describe('LegendState - what the plots draw', () => {
 			type: 'discrete',
 			title: 'Series',
 			items: [
-				{ name: 'A', color: 'color-A', symbol: 'circle' },
-				{ name: 'B', color: 'color-B', symbol: 'line', lineStyle: 'solid' }
+				{ name: 'A', color: 'color-A', mark: 'dot' },
+				{ name: 'B', color: 'color-B', mark: 'line', lineStyle: 'solid' }
 			]
 		});
 		expect(continuous).toMatchObject({ type: 'continuous', min: 0, max: 10 });

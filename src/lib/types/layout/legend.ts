@@ -37,6 +37,8 @@ export type LegendItem = {
 	name: string;
 	label?: string;
 	color?: string;
+	/** How the series draws; with no `symbol`, `legend.icon.marks` picks the icon from it. */
+	mark?: LegendMark;
 	symbol?: SymbolType;
 	/** Whether the symbol is filled, or drawn as an outline. Defaults to `true`. */
 	filled?: boolean;
