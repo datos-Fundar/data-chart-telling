@@ -3,7 +3,7 @@ import type { Snippet } from 'svelte';
 import type { TooltipOptions, TooltipProp } from '$lib/types/layout/tooltip';
 import type { HoverPoint, HoverStrategy } from '$lib/types/layout/hover';
 import type { LegendExtension, LegendSection } from '$lib/types/layout/legend';
-import type { FacetConfig } from '$lib/types/layout/facet';
+import type { FacetConfig, FacetScoped } from '$lib/types/layout/facet';
 import type { GridPlacement } from '$lib/types/layout/grid';
 import type { TimelineConfig } from '$lib/types/layout/timeline';
 import type { Segment } from '$lib/types/plots/segments/config';
@@ -16,8 +16,11 @@ import type { MarkerTransform } from '$lib/types/transforms';
  * styles shape ({@link AxisBasedStylesConfig}, `GeoStylesConfig`, …). */
 export type StylesConfig<TStyles extends object> = TStyles;
 
-/** The `markers` prop accepted by every plot kind - a list of that kind's own marker union. */
-export type MarkersConfig<TMarker> = TMarker[];
+/**
+ * The `markers` prop accepted by every plot kind - a list of that kind's own marker union, each of
+ * which can be limited to some facet panels with `facet`.
+ */
+export type MarkersConfig<TMarker> = (TMarker & FacetScoped)[];
 
 /**
  * The `segments` prop - series name (or `'default'`) to its {@link Segment}s.

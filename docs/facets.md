@@ -106,6 +106,53 @@ The data phases (grouping, transforms, statistics, shared scales) run once for a
 
 ![Panels for each combination of region and sector](images/facets-rows-cols.png)
 
+## Markers and segments in some panels
+
+Every panel draws the plot's `markers` and `segments`. Add `facet` to one to limit it to the panels it names: the value of its `by` field, or a list of them. Without `facet` it applies to every panel, as before.
+
+<!-- example: examples/FacetsScoped.svelte -->
+
+```svelte
+<script lang="ts">
+	import { LinePlot } from '@fundar/data-chart-telling';
+	import { REGION_VALUES } from './datasets';
+
+	// Each region's value split into two sectors.
+	const SECTORS = [
+		{ sector: 'Goods', share: 0.8 },
+		{ sector: 'Services', share: 1.4 }
+	];
+	const rows = REGION_VALUES.flatMap((row) =>
+		SECTORS.map(({ sector, share }) => ({ ...row, sector, value: row.value * share }))
+	);
+</script>
+
+<!-- One panel per region. `facet` on a marker or a segment limits it to the panels it names: the rule is drawn in GBA only, and Services is dashed in Cuyo only. -->
+<LinePlot
+	width={900}
+	height={360}
+	data={rows}
+	x="date"
+	y="value"
+	color="sector"
+	facet={{ by: 'region', columns: 3 }}
+	markers={[{ type: 'rule', axis: 'y', value: 10, facet: 'GBA' }]}
+	segments={{ Services: [{ facet: 'Cuyo', styles: { stroke: { strokeDasharray: '4 4' } } }] }}
+/>
+```
+
+<!-- /example -->
+
+![Markers and segments in some panels](images/facets-scoped.png)
+
+| `facet`                              | Applies to                                                                                                                                  |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| _not set_                            | Every panel, and a plot with no facet                                                                                                       |
+| `'GBA'` or `['GBA', 'Cuyo']`         | The panels with that `by` value (numbers and booleans match the text they print as)                                                         |
+| `{ row: 'GBA' }`, `{ col: 'Goods' }` | In a `rows`/`cols` grid, the panels with that row or column value; `{ row, col }` takes both, and a side left out matches every value of it |
+
+A marker or a segment that names a facet is not drawn by a plot that has none. It works on every plot kind: a `GeoPlot` map takes it the same way, on top of slicing its marker rows by the facet field.
+
 ## Alignment
 
 Panels line up: each plot reports the margins it settled on, and once all have, every column and row pins its widest ones, so the plot areas align whatever their tick labels need.

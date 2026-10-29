@@ -85,6 +85,10 @@ Many markers also take channel fields (`color`, `fill`, `opacity`, `r`, `symbol`
 | `hover`                                                  | The in-plot hover highlight (see below)                                                                                                                                             |
 | `component`                                              | Your own Svelte component (see below)                                                                                                                                               |
 
+## Markers in some facets
+
+On a plot with a [`facet`](facets.md#markers-and-segments-in-some-panels), every marker is drawn in every panel. A marker takes `facet`, a panel's value or a list of them, to be drawn only in the panels it names.
+
 ## Hover highlight
 
 `{ type: 'hover' }` draws a crosshair, a dot and a label at the hovered point. It makes the plot hoverable on its own; add `tooltip` for a floating box too. Fields: `strategy`, `sync`, `ruleX`, `ruleY`, `areaX`, `areaY` (a band highlight on band scales), `showLabels`, `format`, and the styles `rule`, `area`, `dot`, `text`. See [Tooltip and hover](tooltip-and-hover.md).

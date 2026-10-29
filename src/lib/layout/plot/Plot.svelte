@@ -18,6 +18,7 @@
 	import { merge } from '$lib/utils/merge';
 	import { Pipeline } from '$lib/phases/Pipeline';
 	import { Slice } from '$lib/layout/plot/Slice';
+	import { FacetScope } from '$lib/layout/facet/scope';
 	import type { TooltipProp } from '$lib/types/layout/tooltip';
 	import type { MarginConfig, PlotChromeConfig } from '$lib/types/plots/props';
 	import type { PlotCellContext, PlotCellSnippet, PlotCoreBase } from '$lib/types/layout/plot';
@@ -153,6 +154,24 @@
 		return rest;
 	}
 
+	/**
+	 * The props of the core that draws the slice `ctx`: the kind's `slice`, or the plot's own, with the
+	 * `markers` and `segments` that name a facet left to the panels they name. The data phases already
+	 * handed them to their panels; this is for the cores that read them from their own props.
+	 */
+	function coreProps(ctx: PlotCellContext<TRow, TScales>) {
+		const props = (slice ?? buildSliceProps)(ctx) as Record<string, unknown>;
+		const { markers, segments } = props as {
+			markers?: object[];
+			segments?: Record<string, object[]>;
+		};
+		return {
+			...props,
+			...(markers ? { markers: FacetScope.scope(markers, ctx.facet) } : {}),
+			...(segments ? { segments: FacetScope.scopeSegments(segments, ctx.facet) } : {})
+		};
+	}
+
 	function buildSliceProps(ctx: PlotCellContext<TRow, TScales>) {
 		return {
 			...core,
@@ -172,9 +191,9 @@
 	{#if cell}
 		{@render cell(ctx)}
 	{:else if Core && sliced}
-		<Core {...(slice ?? buildSliceProps)(ctx)} {pipeline} />
+		<Core {...coreProps(ctx)} {pipeline} />
 	{:else if Core}
-		<Core {...withoutMargins((slice ?? buildSliceProps)(ctx))} bind:margins {pipeline} />
+		<Core {...withoutMargins(coreProps(ctx))} bind:margins {pipeline} />
 	{/if}
 {/snippet}
 
@@ -194,6 +213,7 @@
 			panel: panels
 				? FacetPanels.buildPanelState(panels, slicing.panelKey(place) ?? '')
 				: undefined,
+			facet: place,
 			keep: slicing.keep({ time, facet: place })
 		})}
 	</HoverScope>
