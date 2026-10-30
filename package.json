@@ -1,6 +1,6 @@
 {
 	"name": "@fundar/data-chart-telling",
-	"version": "1.3.0",
+	"version": "1.4.0",
 	"description": "Declarative charts, maps and small multiples for Svelte, built on svelteplot.",
 	"license": "MIT",
 	"author": "Ezequiel Puerta",
