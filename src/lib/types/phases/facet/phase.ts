@@ -13,4 +13,8 @@ export type FacetStageState = {
 	panels?: FacetPanel[];
 	/** The panel a row belongs to: its own panel tag, or its facet values. `undefined` for a row no panel shows. */
 	panelOf?: (row: Record<string | symbol, unknown>) => string | undefined;
+	/** The plot's `segments`. The phase moves those that name a facet to the panels they name, or drops them without panels. */
+	segments?: Record<string, object[]>;
+	/** The plot's own markers. The phase tags those that name a facet with the panels they name, or drops them without panels. */
+	authorMarkers?: object[];
 };

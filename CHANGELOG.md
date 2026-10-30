@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.0] - 2026-10-30
+
+### Added
+
+- `legend.icon` in the configuration sets the icon a discrete legend item draws for its series: `rounded` softens its corners, and `marks` picks the shape by how the series draws (`line`, `dot`, `area`, `bar`, `cell`, `rect` or `geo`), unless the series sets its own `symbol`. A legend item can name its `mark` to choose from it.
+- A `rule` marker takes a list as its `value`, and a `delta` marker a list as its `at`: one line, or one delta, at each position, all with the same style, instead of one marker for each. A delta's `line`, `text` and `dot` can be functions of the position, to style each one on its own.
+- `facet` on a marker or a segment limits it to some facet panels, on every plot kind: a `by` value, a list of them, or `{ row, col }` in a `rows`/`cols` grid. Without it a marker or a segment is drawn in every panel, as before, and a plot with no facet leaves out whatever names one.
+
+### Fixed
+
+- Automatic margins reserve what a plot needs without taking its drawing area: the label of the top y tick is no longer cut off, since an `'auto'` top margin now leaves room for half its height, and margins that grow to fit labels stop growing once they would leave the plot less than a quarter of its box, which kept svelteplot from drawing marks with negative sizes on small plots.
+
 ## [1.2.0] - 2026-10-24
 
 ### Added
@@ -28,6 +40,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Changed
 
 - The default palette is Tableau 10, and the default continuous ramp, the timeline and player accents and the connector colors follow it.
+- Plots draw faster: a plot in a facet, a grid or a composer no longer remounts its svelteplot chart each time the margins its labels need settle after mount. `pnpm test:perf` checks that every plot kind draws all the panels of a facet grid within a time budget; it runs before a push but not in CI, where the speed of the machine makes a time limit flaky.
 
 ### Fixed
 

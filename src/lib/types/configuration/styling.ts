@@ -1,6 +1,7 @@
 import type { StrokeStyle, DotStyle, FontStyle, AreaStyle } from '$lib/types/plots/styling';
 import type { LineAnchor, SymbolType, TextAnchor } from '$lib/types/plots/constants';
 import type { PlotChromeEntry } from '$lib/types/plots/props';
+import type { LegendMark } from '$lib/types/layout/legend';
 import type { EdgeTicksOptions } from '$lib/types/layout/scales';
 import type { CurveName } from '$lib/types/layout/styles/curve';
 
@@ -148,6 +149,13 @@ export type PlotStylesConfig = {
 		gap: string;
 		/** swatch square size */
 		swatchSize: string;
+		/** The icon a discrete legend item draws for its series. */
+		icon: {
+			/** Draws the icons with rounded corners. */
+			rounded: boolean;
+			/** The shape a series icon takes by how the series draws, unless the series sets its own `symbol`. */
+			marks: Record<LegendMark, SymbolType>;
+		};
 		/** Fallback opacity for a legend-disabled series/value when a section doesn't set its own style. */
 		disabledOpacity: number;
 		/**

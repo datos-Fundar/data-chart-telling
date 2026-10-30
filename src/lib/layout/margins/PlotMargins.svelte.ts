@@ -196,8 +196,47 @@ export class PlotMargins {
 			const grown = growth[side] > 0 ? estimate[side] + growth[side] : undefined;
 			if (held !== undefined || grown !== undefined) out[side] = Math.max(held ?? 0, grown ?? 0);
 		}
+		for (const [a, b, extent] of [
+			['left', 'right', width],
+			['top', 'bottom', height]
+		] as const) {
+			PlotMargins.#keepContent(out, [a, b], extent, author, estimate);
+		}
 		return out;
 	});
+
+	/** The share of a box's extent its margins always leave to the plot's own area. */
+	static readonly #MIN_CONTENT = 0.25;
+
+	/**
+	 * Cuts the growth of two opposite sides of `out`, in proportion, until they
+	 * leave the plot's area its minimum share of `extent` - a negative area makes
+	 * svelteplot draw marks with negative sizes. A side never goes below the
+	 * estimate, and a side the author fixed is left alone.
+	 */
+	static #keepContent(
+		out: Partial<Record<MarginSide, number>>,
+		sides: [MarginSide, MarginSide],
+		extent: number,
+		author: MarginConfig | undefined,
+		estimate: Margins
+	): void {
+		const fixed = (side: MarginSide) => {
+			const own = author?.[side];
+			return typeof own === 'number' ? own : estimate[side];
+		};
+		const used = (side: MarginSide) => out[side] ?? fixed(side);
+		const over = used(sides[0]) + used(sides[1]) - extent * (1 - PlotMargins.#MIN_CONTENT);
+		const room = sides.map((side) =>
+			out[side] === undefined ? 0 : Math.max(0, out[side] - estimate[side])
+		);
+		const total = room[0] + room[1];
+		if (over <= 0 || total <= 0) return;
+		const cut = Math.min(over, total);
+		sides.forEach((side, i) => {
+			if (out[side] !== undefined) out[side] -= (cut * room[i]) / total;
+		});
+	}
 
 	/** The author's margins, with the room labels need. */
 	readonly #labels = $derived.by((): MarginConfig | undefined => {

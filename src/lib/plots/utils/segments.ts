@@ -1,5 +1,7 @@
 import { resolveAccessor } from '$lib/utils/accessors';
 import { merge } from '$lib/utils/merge';
+import { seriesIdOf } from '$lib/utils/grouping';
+import { FacetPanels } from '$lib/phases/facet/FacetPanels';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { Series } from '$lib/types/plots/data/common';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
@@ -13,14 +15,25 @@ const DEFAULT_KEY = 'default';
  * Returns the flat {@link Segment} list for one series.
  * Series-specific segments are added before `'default'` segments so that
  * series-specific catch-alls win over default catch-alls on tie-breaks.
+ * A series split by facet panel also reads the segments its panel was given
+ * for it - under its id - and for every series of the panel - under the
+ * panel's own `'default'` - ahead of the plot's own, as the more specific.
  */
 export function resolveSegmentsForSeries<TStyle>(
 	segments: SegmentsConfig<TStyle>,
-	seriesName: string
+	series: Pick<Series, 'name' | 'id' | 'panel'>
 ): Segment<TStyle>[] {
-	const specific = segments[seriesName] ?? [];
-	const defaults = segments[DEFAULT_KEY] ?? [];
-	return [...specific, ...defaults];
+	const noPanel = series.panel === undefined;
+	const own = noPanel ? [] : (segments[seriesIdOf(series)] ?? []);
+	const panelDefaults = noPanel
+		? []
+		: (segments[FacetPanels.buildSeriesId(series.panel!, DEFAULT_KEY)] ?? []);
+	return [
+		...own,
+		...(segments[series.name] ?? []),
+		...panelDefaults,
+		...(segments[DEFAULT_KEY] ?? [])
+	];
 }
 
 /** Returns true when `xVal` falls inside any of a segment's x ranges. */
@@ -219,7 +232,7 @@ export function buildGroupedSeries<
 		series: s,
 		visualSegments: resolveSeriesSegments<S, TStyle>(
 			s,
-			resolveSegmentsForSeries(segments, s.name),
+			resolveSegmentsForSeries(segments, s),
 			connect
 		)
 	}));
@@ -249,7 +262,7 @@ export function buildScopedMarkerGroups<
 	return groupedSeries.map((group, seriesIndex) => {
 		const defaultColor = colorFor(group.series, seriesIndex);
 		const xFor = readChannel(group.series.x);
-		const segs = resolveSegmentsForSeries(segments, group.series.name);
+		const segs = resolveSegmentsForSeries(segments, group.series);
 		return {
 			name: group.series.name,
 			...(group.series.id !== undefined ? { id: group.series.id } : {}),

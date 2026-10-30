@@ -2,12 +2,19 @@ import type { AxisValue } from '$lib/types/layout/mapping';
 import type { StrokeStyle } from '$lib/types/plots/styling';
 import type { CommonMarkerConfigWithInterval } from '$lib/types/markers/channels/commonMarkerConfigWithInterval';
 
-/** A vertical or horizontal reference line, or one line per row when `data` is given. */
+/**
+ * A vertical or horizontal reference line, one line per row when `data` is given, or one per value
+ * when `value` is a list - all with the same style.
+ */
 export type RuleMarkerConfig = {
 	type: 'rule';
 	axis: 'x' | 'y';
+	/**
+	 * Where the line goes along `axis`. A list draws a line at each value (without `data`); with `data`,
+	 * a field key or a function of the row gives each row's own.
+	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	value: AxisValue | string | ((d: any) => AxisValue);
+	value: AxisValue | string | (AxisValue | string)[] | ((d: any) => AxisValue);
 	inset?: number;
 	insetTop?: number;
 	insetBottom?: number;

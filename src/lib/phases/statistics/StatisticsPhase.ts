@@ -30,12 +30,21 @@ export class StatisticsPhase<TState extends StatisticsStageState> implements Pha
 	run = (state: TState): TState => {
 		if (!state.panels) return { ...state, markers: this.#resolve(state) };
 		const markers = state.panels.flatMap((panel) =>
-			this.#resolve(FacetPanels.narrowToPanel(state, panel.key)).map(
+			this.#resolve(this.#ownTo(FacetPanels.narrowToPanel(state, panel.key), panel.key)).map(
 				(marker) => ({ ...marker, [PANEL_KEY]: panel.key }) as unknown as AxisBasedMarkersConfig
 			)
 		);
 		return { ...state, markers };
 	};
+
+	/** `state` with the author's markers that the "facet" phase tagged for another panel left out. */
+	#ownTo(state: TState, panel: string): TState {
+		const authorMarkers = state.authorMarkers?.filter((marker) => {
+			const tagged = (marker as Record<string, unknown>)[PANEL_KEY];
+			return tagged === undefined || tagged === panel;
+		});
+		return { ...state, authorMarkers };
+	}
 
 	#resolve(state: TState): AxisBasedMarkersConfig[] {
 		const options = this.#options;

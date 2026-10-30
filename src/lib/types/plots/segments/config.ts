@@ -3,6 +3,7 @@ import type { AxisValue } from '$lib/types/layout/mapping';
 import type { Series } from '$lib/types/plots/data/common';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { MarkLegend } from '$lib/types/layout/legend';
+import type { FacetScoped } from '$lib/types/layout/facet';
 
 /** A half-open interval on one axis. Both bounds are inclusive; omit either to leave that end open. */
 export type Range = {
@@ -25,7 +26,8 @@ export type Area = {
 
 /**
  * One styled rule for a plot. A data point (or cell) is styled when it falls
- * inside **any** of the listed `areas`. Omitting `areas` (or passing an empty
+ * inside **any** of the listed `areas`. With a `facet`, the rule exists only in
+ * the facet panels it names. Omitting `areas` (or passing an empty
  * array) makes the segment a catch-all that matches every data point - useful
  * as a baseline style. `TStyle` is the per-mark shape ({@link LineSegmentStyle},
  * {@link BarSegmentStyle}, {@link CellSegmentStyle}, …).
@@ -34,7 +36,7 @@ export type Area = {
  * priority, regardless of their position in the list. A catch-all placed first
  * therefore acts as a fallback baseline that area-specific segments override.
  */
-export type Segment<TStyle> = {
+export type Segment<TStyle> = FacetScoped & {
 	areas?: Area[];
 	scales?: ChannelScalesConfig;
 	styles?: TStyle;

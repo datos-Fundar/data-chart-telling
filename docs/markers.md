@@ -58,32 +58,60 @@ Many markers also take channel fields (`color`, `fill`, `opacity`, `r`, `symbol`
 
 ## Catalog for axis-based plots
 
-| `type`                                                   | Draws                                                                                                                                                                               |
-| -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `dot`                                                    | A point per row; `r`, `color`, `symbol`, `styles` (`DotStyle`)                                                                                                                      |
-| `text`                                                   | A label per row; `text` (string or function), `styles` (`FontStyle`), `declutter`, `edgeAware`, `fitMargins`                                                                        |
-| `line`                                                   | A line through the rows                                                                                                                                                             |
-| `rule`                                                   | A reference line: `axis: 'x' \| 'y'`, `value` (or a function with `data`), `styles`; with `data`, `stroke`, `strokeWidth` and `strokeOpacity` also take a field or function per row |
-| `tick`                                                   | A short tick per row along one axis                                                                                                                                                 |
-| `bar`                                                    | A bar; `rect`, `cell`: rectangles and heatmap cells                                                                                                                                 |
-| `rect`                                                   | A rectangle from `x1`/`x2`/`y1`/`y2`; `interval` turns `x`/`y` into ranges                                                                                                          |
-| `area`                                                   | A filled area under a curve, or between `y1` and `y2`; `curve`                                                                                                                      |
-| `difference`                                             | The area between two series, colored by which one is on top                                                                                                                         |
-| `arrow`                                                  | An arrow from `x1,y1` to `x2,y2`; `bend`, `headAngle`, `headLength`; with `data`, `stroke`, `strokeWidth` and `strokeOpacity` also take a field or function per row                 |
-| `trail`                                                  | A variable-width ribbon along a path, its width set by `r`                                                                                                                          |
-| `delta`                                                  | The distance between two series (or a series and a fixed value) at a position, as a line and a label                                                                                |
-| `hull`                                                   | The convex hull around a cluster of points                                                                                                                                          |
-| `density`                                                | 2D density contour bands                                                                                                                                                            |
-| `box`                                                    | A box plot; sub-marks styled through `bar`, `rule`, `dot`, `tickMedian`, `tickMinMax`; `thickness` sets its width in pixels, `slot` its share of a band                             |
-| `violin`                                                 | A violin per category of its rows: the mirrored density of `y` (or `x`), `kernel`, `bandwidth`, `trim`, `peak`, `slot`; add a narrow `box` over the same rows for the box inside    |
-| `regression`, `bollinger`                                | A fitted curve, a moving-average band                                                                                                                                               |
-| `waffle`                                                 | The value as a grid of unit squares; `unit`, `multiple`, `gap`                                                                                                                      |
-| `voronoi`, `voronoiMesh`, `delaunayLink`, `delaunayMesh` | Voronoi cells and Delaunay triangulation                                                                                                                                            |
-| `image`                                                  | An image per row; `src`, `width`, `height`                                                                                                                                          |
-| `raster`                                                 | A field sampled over a rectangle, drawn to a canvas                                                                                                                                 |
-| `brush`                                                  | A drag-to-select rectangle with `onbrushstart`, `onbrush`, `onbrushend`                                                                                                             |
-| `hover`                                                  | The in-plot hover highlight (see below)                                                                                                                                             |
-| `component`                                              | Your own Svelte component (see below)                                                                                                                                               |
+| `type`                                                   | Draws                                                                                                                                                                                                            |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dot`                                                    | A point per row; `r`, `color`, `symbol`, `styles` (`DotStyle`)                                                                                                                                                   |
+| `text`                                                   | A label per row; `text` (string or function), `styles` (`FontStyle`), `declutter`, `edgeAware`, `fitMargins`                                                                                                     |
+| `line`                                                   | A line through the rows                                                                                                                                                                                          |
+| `rule`                                                   | A reference line: `axis: 'x' \| 'y'`, `value` (a list draws a line at each, or a function with `data`), `styles`; with `data`, `stroke`, `strokeWidth` and `strokeOpacity` also take a field or function per row |
+| `tick`                                                   | A short tick per row along one axis                                                                                                                                                                              |
+| `bar`                                                    | A bar; `rect`, `cell`: rectangles and heatmap cells                                                                                                                                                              |
+| `rect`                                                   | A rectangle from `x1`/`x2`/`y1`/`y2`; `interval` turns `x`/`y` into ranges                                                                                                                                       |
+| `area`                                                   | A filled area under a curve, or between `y1` and `y2`; `curve`                                                                                                                                                   |
+| `difference`                                             | The area between two series, colored by which one is on top                                                                                                                                                      |
+| `arrow`                                                  | An arrow from `x1,y1` to `x2,y2`; `bend`, `headAngle`, `headLength`; with `data`, `stroke`, `strokeWidth` and `strokeOpacity` also take a field or function per row                                              |
+| `trail`                                                  | A variable-width ribbon along a path, its width set by `r`                                                                                                                                                       |
+| `delta`                                                  | The distance between two series (or a series and a fixed value) at a position - or at each of a list of them, `at: [1980, 2000]` - as a line and a label                                                         |
+| `hull`                                                   | The convex hull around a cluster of points                                                                                                                                                                       |
+| `density`                                                | 2D density contour bands                                                                                                                                                                                         |
+| `box`                                                    | A box plot; sub-marks styled through `bar`, `rule`, `dot`, `tickMedian`, `tickMinMax`; `thickness` sets its width in pixels, `slot` its share of a band                                                          |
+| `violin`                                                 | A violin per category of its rows: the mirrored density of `y` (or `x`), `kernel`, `bandwidth`, `trim`, `peak`, `slot`; add a narrow `box` over the same rows for the box inside                                 |
+| `regression`, `bollinger`                                | A fitted curve, a moving-average band                                                                                                                                                                            |
+| `waffle`                                                 | The value as a grid of unit squares; `unit`, `multiple`, `gap`                                                                                                                                                   |
+| `voronoi`, `voronoiMesh`, `delaunayLink`, `delaunayMesh` | Voronoi cells and Delaunay triangulation                                                                                                                                                                         |
+| `image`                                                  | An image per row; `src`, `width`, `height`                                                                                                                                                                       |
+| `raster`                                                 | A field sampled over a rectangle, drawn to a canvas                                                                                                                                                              |
+| `brush`                                                  | A drag-to-select rectangle with `onbrushstart`, `onbrush`, `onbrushend`                                                                                                                                          |
+| `hover`                                                  | The in-plot hover highlight (see below)                                                                                                                                                                          |
+| `component`                                              | Your own Svelte component (see below)                                                                                                                                                                            |
+
+## Markers in some facets
+
+On a plot with a [`facet`](facets.md#markers-and-segments-in-some-panels), every marker is drawn in every panel. A marker takes `facet`, a panel's value or a list of them, to be drawn only in the panels it names.
+
+## Several positions at once
+
+A `rule` takes a list as its `value`, and a `delta` a list as its `at`. One marker then draws one line, or one delta, at each position, all with the same style and the same ends - instead of one marker for each.
+
+```ts
+markers={[
+	// A rule at each of the three years.
+	{ type: 'rule', axis: 'x', value: [1991, 2001, 2010], styles: { strokeDasharray: '4 4' } },
+	// The gap between the two series at each of the three.
+	{ type: 'delta', axis: 'x', at: [1991, 2001, 2010], from: { type: 'series', series: 'female' }, to: { type: 'series', series: 'male' } }
+]}
+```
+
+A delta's `line`, `text` and `dot` can be functions of the position, to style each one on its own - a label to the left of the last one, say, so it stays inside the plot:
+
+```ts
+{
+	type: 'delta', axis: 'x', at: [1991, 2001, 2022], from: { type: 'series', series: 'female' }, to: { type: 'series', series: 'male' },
+	text: (at) => (at === 2022 ? { dx: -20, textAnchor: 'end' } : { dx: 20 })
+}
+```
+
+Every other marker draws from `data` rows, one mark per row, so it already takes many positions.
 
 ## Hover highlight
 

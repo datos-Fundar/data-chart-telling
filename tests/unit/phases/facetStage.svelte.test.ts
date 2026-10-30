@@ -194,3 +194,75 @@ describe('the pipeline over every panel at once', () => {
 		expect(out.processedData!.data.some((row) => PANEL_KEY in row)).toBe(false);
 	});
 });
+
+describe('FacetPhase - segments and markers that name a facet', () => {
+	const stylesOf = (out: State, panel: string, name: string) =>
+		out
+			.groupedSeries!.find((g) => g.series.panel === panel && g.series.name === name)!
+			.visualSegments.map((segment) => segment.styles);
+
+	test('a segment that names a panel styles only the series of that panel', () => {
+		const out = run({
+			segments: { Agro: [{ facet: 'Norte', styles: { fill: 'red' } }] } as never
+		});
+		expect(stylesOf(out, 'Norte', 'Agro')).toEqual([{ fill: 'red' }]);
+		expect(stylesOf(out, 'Sur', 'Agro')).toEqual([{}]);
+		expect(stylesOf(out, 'Norte', 'Industria')).toEqual([{}]);
+	});
+
+	test('a `default` segment that names a panel styles every series of that panel', () => {
+		const out = run({
+			segments: { default: [{ facet: 'Sur', styles: { fill: 'blue' } }] } as never
+		});
+		expect(stylesOf(out, 'Sur', 'Agro')).toEqual([{ fill: 'blue' }]);
+		expect(stylesOf(out, 'Sur', 'Industria')).toEqual([{ fill: 'blue' }]);
+		expect(stylesOf(out, 'Norte', 'Agro')).toEqual([{}]);
+	});
+
+	test('a segment names panels by `row` and `col` in a grid', () => {
+		const out = run({
+			facet: { rows: 'region', cols: 'sector' },
+			segments: { default: [{ facet: { col: 'Agro' }, styles: { fill: 'green' } }] } as never
+		});
+		const green = out.groupedSeries!.filter((g) => g.visualSegments[0].styles.fill === 'green');
+		expect(out.groupedSeries).toHaveLength(4);
+		expect(green.map((g) => g.series.name)).toEqual(['Agro', 'Agro']);
+	});
+
+	test('a marker that names a panel is drawn in that panel only, without its `facet`', () => {
+		const rule = { type: 'rule', axis: 'y', value: 1, facet: 'Sur' } as AxisBasedMarkersConfig;
+		const out = run({ authorMarkers: [rule] });
+		const rules = out.markers!.filter((m) => m.type === 'rule') as unknown as Record<
+			string,
+			unknown
+		>[];
+		expect(rules.map((m) => m[PANEL_KEY])).toEqual(['Sur']);
+		expect(rules.some((m) => 'facet' in m)).toBe(false);
+	});
+
+	test('a marker that names no panel is drawn in every one', () => {
+		const rule = { type: 'rule', axis: 'y', value: 1 } as AxisBasedMarkersConfig;
+		const out = run({ authorMarkers: [rule] });
+		const rules = out.markers!.filter((m) => m.type === 'rule') as unknown as Record<
+			string,
+			unknown
+		>[];
+		expect(rules.map((m) => m[PANEL_KEY])).toEqual(['Norte', 'Sur']);
+	});
+
+	test('a plot with no facet leaves out what names one', () => {
+		const out = run({
+			facet: undefined,
+			authorMarkers: [
+				{ type: 'rule', axis: 'y', value: 1, facet: 'Sur' },
+				{ type: 'rule', axis: 'y', value: 2 }
+			] as AxisBasedMarkersConfig[],
+			segments: { Agro: [{ facet: 'Norte', styles: { fill: 'red' } }] } as never
+		});
+		const rules = out.markers!.filter((m) => m.type === 'rule') as unknown as { value: number }[];
+		expect(rules.map((m) => m.value)).toEqual([2]);
+		expect(
+			out.groupedSeries!.find((g) => g.series.name === 'Agro')!.visualSegments[0].styles
+		).toEqual({});
+	});
+});

@@ -243,6 +243,27 @@
 		$autoMarginLeft.delete(marginId);
 	});
 
+	// The top y tick's label is centered on the plot's top edge, so it reaches
+	// half its height above it - more than svelteplot's own 5px `'auto'` top margin.
+	const { autoMarginTop } = getContext<{ autoMarginTop: Writable<Map<string, number>> }>(
+		'svelteplot/autoMargins'
+	);
+	const tickMarginId = `dct-y-tick-${Math.random().toString(36).slice(2)}`;
+	$effect(() => {
+		const wanted =
+			(scales?.y?.axisDisplay ?? 'visible') === 'visible'
+				? Math.ceil(cfg.axis.fontSize / 2) + 2
+				: undefined;
+		untrack(() => {
+			if (wanted === undefined) $autoMarginTop.delete(tickMarginId);
+			else if ($autoMarginTop.get(tickMarginId) !== wanted)
+				$autoMarginTop.set(tickMarginId, wanted);
+		});
+	});
+	$effect(() => () => {
+		$autoMarginTop.delete(tickMarginId);
+	});
+
 	// An x label centred on the domain's end reaches past the plot's right side; an `'auto'` right margin takes that much room.
 	let xAxisEl: SVGGElement | undefined = $state();
 	const { autoMarginRight } = getContext<{ autoMarginRight: Writable<Map<string, number>> }>(

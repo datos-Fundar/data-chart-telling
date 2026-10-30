@@ -27,7 +27,7 @@ import type { EdgeBox } from '$lib/types/layout/box';
 
 /** Where a label sits from its dot, and how its text anchors there. */
 type Place = { dx: number; dy: number; textAnchor: TextAnchor; lineAnchor: LineAnchor };
-type Channel = RuleMarkerConfig['value'];
+type Channel = Exclude<RuleMarkerConfig['value'], unknown[]>;
 type ValueChannel = RuleMarkerConfig['x2'];
 
 /** The messages already warned about, so a plot that redraws warns once. */

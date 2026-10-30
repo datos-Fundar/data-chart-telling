@@ -34,6 +34,8 @@ export type PlotCellContext<
 	scales?: TScales;
 	/** This slice's facet panel, as a {@link Pipeline.runData} over every panel resolved it. */
 	panel?: object;
+	/** Where this slice sits among the facet panels - `undefined` when the plot has no facet. */
+	facet?: NonNullable<SlicePlace['facet']>;
 	/** Whether any row - the plot's own or a marker's - belongs in this slice; rows without a slicing field belong in all. */
 	keep: (row: TRow) => boolean;
 };

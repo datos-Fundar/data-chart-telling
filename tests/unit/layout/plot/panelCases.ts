@@ -214,15 +214,17 @@ export const ALIGN_DELAY = 150;
 /** A CPU-starved CI runner renders these grids slowly, so the default test timeout is too short. */
 export const SLOW_TEST = 90_000;
 
-/** Waits for `count` plots, then for their markup to hold still past the grid's alignment delay. */
+/** Waits for `count` plots, then for their markup to hold still well past the grid's alignment delay (a starved runner can fire it late). */
 export async function settled(container: Element, count: number): Promise<string> {
 	await vi.waitFor(() => expect(container.querySelectorAll('.dct-plot svg').length).toBe(count));
 	let last = '';
 	await vi.waitFor(
 		async () => {
 			last = svgMarkup(container);
-			await new Promise((r) => setTimeout(r, ALIGN_DELAY + 100));
-			expect(svgMarkup(container)).toBe(last);
+			for (let i = 0; i < 3; i++) {
+				await new Promise((r) => setTimeout(r, ALIGN_DELAY + 100));
+				expect(svgMarkup(container)).toBe(last);
+			}
 		},
 		{ timeout: 30000, interval: 60 }
 	);

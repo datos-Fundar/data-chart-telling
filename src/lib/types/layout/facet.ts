@@ -43,6 +43,27 @@ export type FacetCellSnippet<TRow extends Record<string, unknown>> = Snippet<
 	[FacetCellContext<TRow>]
 >;
 
+/** A facet value as the panel's label reads it: a number or a boolean matches by the text it prints as. */
+export type FacetValue = string | number | boolean;
+
+/**
+ * The facet panels a segment or a marker applies to. A value, or a list of them, names panels by their
+ * label - the `by` value; in a `rows`/`cols` grid, `{ row, col }` name the panels by the grid's own
+ * values, and a side left out matches every value of it.
+ */
+export type FacetTarget =
+	| FacetValue
+	| FacetValue[]
+	| { row?: FacetValue | FacetValue[]; col?: FacetValue | FacetValue[] };
+
+/**
+ * A segment or a marker that can be limited to some facet panels. Without `facet` it applies to every
+ * panel, as before; with it, only to the panels it names - and to none of a plot that has no facet.
+ */
+export type FacetScoped = {
+	facet?: FacetTarget;
+};
+
 export type FacetIndicatorContext = { current: number; total: number };
 export type FacetIndicatorSnippet = Snippet<[FacetIndicatorContext]>;
 

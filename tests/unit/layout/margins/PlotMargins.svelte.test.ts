@@ -46,6 +46,20 @@ describe('PlotMargins - label growth', () => {
 		await vi.waitFor(() => expect(right(container)).toBeLessThan(150));
 	});
 
+	test('opposite sides together always leave the plot area a share of the box', async () => {
+		let margins!: PlotMargins;
+		const { container } = await render(PlotMarginsProbe, {
+			width: 110,
+			onReady: (m) => (margins = m)
+		});
+		margins.reportOverflow(Margins.of({ left: 90, right: 99 }));
+		await vi.waitFor(() => expect(right(container)).toBeGreaterThan(20));
+		const left = Number(probe(container).getAttribute('data-left'));
+		expect(left + right(container)).toBeLessThanOrEqual(110 * 0.75 + 0.001);
+		expect(left).toBeGreaterThanOrEqual(40);
+		expect(right(container)).toBeGreaterThanOrEqual(20);
+	});
+
 	test('never grows a side the author set', async () => {
 		let margins!: PlotMargins;
 		const { container } = await render(PlotMarginsProbe, {
