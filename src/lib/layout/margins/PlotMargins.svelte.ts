@@ -60,6 +60,8 @@ export class PlotMargins {
 	#measured = $state.raw(Margins.ZERO);
 	/** The sides the labels settled on, as last handed to `settle`. */
 	#settled: Partial<Record<MarginSide, number>> | undefined;
+	/** What svelteplot's own `<Plot>` lays the plot out by, once {@link follow} is handed it. */
+	#plot = $state.raw<{ options: Record<string, unknown> } | undefined>();
 
 	constructor(inputs: PlotMarginsInputs) {
 		this.#inputs = inputs;
@@ -90,9 +92,12 @@ export class PlotMargins {
 
 	/**
 	 * Measures `el`'s rendered box once its readings settle - again whenever
-	 * the content box or `deps` change - and reports how far it reaches past
-	 * the content box: to `onOverflow`, and, when `grow` holds, into the room
-	 * the margins grow by. Call during component init.
+	 * the plot's area or `deps` change - and reports how far it reaches past
+	 * that area: to `onOverflow`, and, when `grow` holds, into the room the
+	 * margins grow by. The area is where svelteplot draws the marks (see
+	 * {@link follow}), not the {@link contentBox}'s estimate: an `'auto'` side
+	 * is only its estimate until svelteplot sizes its axes, and what a label
+	 * reaches past that is no overflow. Call during component init.
 	 */
 	watch(
 		el: () => SVGGraphicsElement | undefined,
@@ -104,7 +109,7 @@ export class PlotMargins {
 	): void {
 		$effect(() => {
 			const element = el();
-			const bounds = this.contentBox;
+			const bounds = this.#plotArea ?? this.contentBox;
 			options.deps?.();
 			if (!element) return;
 
@@ -153,10 +158,12 @@ export class PlotMargins {
 
 	/**
 	 * Follows the margins svelteplot settles on - `plot` is its `usePlot()`,
-	 * only readable inside its `<Plot>` - and reports them to the enclosing
-	 * aligned grid cell, if any. Call during the init of a component inside it.
+	 * only readable inside its `<Plot>` - to measure against the area they
+	 * leave ({@link watch}), and reports them to the enclosing aligned grid
+	 * cell, if any. Call during the init of a component inside it.
 	 */
 	follow(plot: { options: Record<string, unknown> }): void {
+		this.#plot = plot;
 		const cell = this.#cell;
 		if (!cell) return;
 		$effect(() => {
@@ -295,6 +302,26 @@ export class PlotMargins {
 
 	/** The plot's own area, in pixels: what its margins leave inside its box. */
 	readonly contentBox = $derived.by(() => this.numeric.contentBox(this.box.width, this.box.height));
+
+	/**
+	 * The plot's own area as svelteplot lays it out, by the margins it settled on, or `undefined` until
+	 * the plot is followed. {@link contentBox} reads an `'auto'` side as its estimate, which is not where
+	 * svelteplot draws the marks until its axes are sized.
+	 */
+	readonly #plotArea = $derived.by((): Box | undefined => {
+		const options = this.#plot?.options;
+		if (!options) return undefined;
+		const sides = [
+			options.marginTop,
+			options.marginRight,
+			options.marginBottom,
+			options.marginLeft
+		];
+		if (sides.some((side) => typeof side !== 'number' || !Number.isFinite(side))) return undefined;
+		const [top, right, bottom, left] = sides as number[];
+		const { width, height } = this.#inputs.size();
+		return new Margins(top, right, bottom, left).contentBox(width, height);
+	});
 
 	/**
 	 * Where something of `size` sits next to `point`, on its preferred side

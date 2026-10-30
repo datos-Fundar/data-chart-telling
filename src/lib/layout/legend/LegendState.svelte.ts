@@ -1,5 +1,5 @@
 import { getContext, setContext, untrack } from 'svelte';
-import { SvelteMap } from 'svelte/reactivity';
+import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { MarkerKinds } from '$lib/markers/MarkerKinds';
 import { LegendChannels } from '$lib/layout/legend/LegendChannels';
@@ -38,6 +38,8 @@ export class LegendState {
 	/** The narrowed range of the first interactive continuous section, or `null`. */
 	range = $state<LegendRange | null>(null);
 	readonly #sources = new SvelteMap<unknown, LegendEntry[]>();
+	/** What {@link setOff} last turned off, to turn back on what it no longer lists. */
+	#managed = new SvelteMap<string, LegendDisabledAction>();
 
 	/** The enclosing figure's legend, or `null` outside one. Call during component init. */
 	static current(): LegendState | null {
@@ -93,6 +95,61 @@ export class LegendState {
 	toggle(series: string, action: LegendDisabledAction): void {
 		if (this.isOff(series)) this.turnOn(series);
 		else this.turnOff(series, action);
+	}
+
+	/**
+	 * What `extension`'s `off` and `highlight` turn off, by series name: `off`
+	 * as listed, and every other series the plots draw for a `highlight`.
+	 */
+	offTargets(
+		extension: Pick<LegendExtension, 'off' | 'highlight'> | undefined
+	): Map<string, LegendDisabledAction> {
+		const targets = new SvelteMap<string, LegendDisabledAction>();
+		if (extension?.highlight !== undefined) {
+			const kept = new SvelteSet([extension.highlight].flat());
+			for (const entry of this.entries) {
+				if (entry.type === 'series' && !kept.has(entry.name))
+					targets.set(entry.name, { mode: 'dim' });
+			}
+		}
+		const off = extension?.off;
+		const listed = Array.isArray(off)
+			? off.map((name) => [name, undefined] as const)
+			: Object.entries(off ?? {});
+		for (const [name, what] of listed) {
+			targets.set(
+				name,
+				typeof what === 'number'
+					? { mode: 'dim', style: { opacity: what } }
+					: (what ?? { mode: 'dim' })
+			);
+		}
+		return targets;
+	}
+
+	/**
+	 * Turns off exactly `targets`, turning back on what an earlier call turned
+	 * off and this one leaves out. A series the reader turned off, or turned
+	 * off any other way, is left alone.
+	 */
+	setOff(targets: Map<string, LegendDisabledAction>): void {
+		untrack(() => {
+			const ours = (name: string) => {
+				const current = this.actionOf(name);
+				const set = this.#managed.get(name);
+				return current && set && JSON.stringify(current) === JSON.stringify(set);
+			};
+			for (const name of this.#managed.keys()) {
+				if (!targets.has(name) && ours(name)) this.turnOn(name);
+			}
+			for (const [name, action] of targets) {
+				if (this.isOff(name) && !ours(name)) continue;
+				if (ours(name) && JSON.stringify(this.#managed.get(name)) === JSON.stringify(action))
+					continue;
+				this.turnOff(name, action);
+			}
+			this.#managed = new SvelteMap(targets);
+		});
 	}
 
 	/** Whether any series is off with `'omit'` - which changes the plot's own rows, not just how they draw. */

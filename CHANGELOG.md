@@ -2,6 +2,16 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.4.0] - 2026-10-30
+
+### Added
+
+- `legend.off` in the automatic legend's configuration turns series off from code, as if the reader had clicked them: a list of names (dimmed), or a map to an opacity or to a `dim`, `hide` or `omit` action; a series left out is turned back on. `legend.highlight` is its inverse, keeping the series it names and dimming the rest. A plot with facets can dim a series exactly when no panel shows it.
+
+### Fixed
+
+- Value labels that fit margins measure what reaches past the plot against the area svelteplot lays the plot out by, not against the estimate an `'auto'` margin has until its axes are sized. A label inside the plot could read as overflow in that moment and grow the margins for good, so the same plot drew with different margins from one render to the next.
+
 ## [1.3.0] - 2026-10-30
 
 ### Added

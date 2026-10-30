@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import ExpandSeriesDemo from './ExpandSeriesDemo.svelte';
 import ExpandSeriesDemoSource from './ExpandSeriesDemo.svelte?raw';
+import OffFromCodeDemo from './OffFromCodeDemo.svelte';
+import OffFromCodeDemoSource from './OffFromCodeDemo.svelte?raw';
 import ExpandColorDemo from './ExpandColorDemo.svelte';
 import ExpandColorDemoSource from './ExpandColorDemo.svelte?raw';
 import ExpandMatchDemo from './ExpandMatchDemo.svelte';
@@ -51,6 +53,19 @@ export default meta;
 export const InteractiveSeries: StoryObj = {
 	render: () => ({ Component: ExpandSeriesDemo }),
 	parameters: demoSource(ExpandSeriesDemoSource)
+};
+
+/**
+ * `off` turns series off from code, as a click on the legend would: a list of
+ * names dims them, a map gives each its own opacity or action (`dim`, `hide`
+ * or `omit`). `highlight` is its inverse - it keeps a series on and dims all
+ * the others. Both follow the value they are given, so a button (or a
+ * scrolly step) can drive them: the series fades in the plot and in the
+ * legend together.
+ */
+export const OffAndHighlightFromCode: StoryObj = {
+	render: () => ({ Component: OffFromCodeDemo }),
+	parameters: demoSource(OffFromCodeDemoSource)
 };
 
 /**

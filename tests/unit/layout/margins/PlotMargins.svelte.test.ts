@@ -89,6 +89,33 @@ describe('PlotMargins - label growth', () => {
 	});
 });
 
+describe('PlotMargins - watched labels', () => {
+	// Inside the area svelteplot draws by (margins of 5), but past the 'auto' estimate (20 top, 40 left).
+	const label = { x: 10, y: 10, width: 20, height: 20 };
+	const settleTime = () => new Promise((r) => setTimeout(r, 300));
+
+	test('a label inside the followed plot area is no overflow, whatever the estimate says', async () => {
+		const plot = { options: { marginTop: 5, marginRight: 5, marginBottom: 5, marginLeft: 5 } };
+		const { container } = await render(PlotMarginsProbe, {
+			width: 1000,
+			plot,
+			label,
+			onReady: () => {}
+		});
+		await settleTime();
+		expect(Number(probe(container).getAttribute('data-left'))).toBe(0);
+	});
+
+	test('without a followed plot it is measured against the estimate', async () => {
+		const { container } = await render(PlotMarginsProbe, { width: 1000, label, onReady: () => {} });
+		await vi.waitFor(() =>
+			expect(Number(probe(container).getAttribute('data-left'))).toBeGreaterThan(
+				Margins.AXIS_ESTIMATE.left
+			)
+		);
+	});
+});
+
 describe('PlotMargins - reserved boxes', () => {
 	test('keeps the room a box takes past the edges its point can sit on, and only those', async () => {
 		const label = Box.size(40, 12).beside({ x: 6, y: 0 }, { x: 'after', y: 'middle' });

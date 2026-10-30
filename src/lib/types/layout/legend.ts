@@ -311,6 +311,20 @@ export type ColorOverride = Omit<
  * ramp `interactive`, and only its first ramp is.
  */
 export type LegendExtension = {
+	/**
+	 * Series to turn off from code, as if the reader had clicked them: a list
+	 * of names (each dimmed, to `legend.disabledOpacity`), or a name → what
+	 * turning it off does map - an opacity to dim to, or a full
+	 * {@link LegendDisabledAction} (`dim`, `hide` or `omit`). It follows the
+	 * value it is given: a series left out is turned back on. One the reader
+	 * turned off themselves is left as it is.
+	 */
+	off?: string[] | Record<string, number | LegendDisabledAction>;
+	/**
+	 * The series to keep on: every other series is dimmed, the inverse of
+	 * listing the rest in `off`. An entry of `off` for a series wins.
+	 */
+	highlight?: string | string[];
 	items?: LegendItem[];
 	sections?: LegendSection[];
 	series?: Omit<DiscreteLegendSection, 'type' | 'items'>;
