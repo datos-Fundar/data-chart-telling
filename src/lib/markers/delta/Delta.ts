@@ -1,6 +1,13 @@
 import { resolveAccessor } from '$lib/utils/accessors';
 import type { Series } from '$lib/types/plots/data/common';
-import type { DeltaConfig, DeltaTarget } from '$lib/types/markers/axis/delta';
+import type { AxisValue } from '$lib/types/layout/mapping';
+import type {
+	DeltaConfig,
+	DeltaMarkerConfig,
+	DeltaPointConfig,
+	DeltaTarget,
+	PerPosition
+} from '$lib/types/markers/axis/delta';
 
 /** A delta, measured: where it sits (`at`), its two ends and what lies between. */
 export type ResolvedDelta = {
@@ -18,6 +25,23 @@ export type ResolvedDelta = {
  * it crosses that position, interpolated linearly between its two nearest points.
  */
 export class Delta {
+	/**
+	 * The deltas a marker draws: one for its `at`, or one for each position of a list, each with the
+	 * `line`, `text` and `dot` its style functions give for that position.
+	 */
+	static points(marker: DeltaMarkerConfig): DeltaPointConfig[] {
+		const positions = Array.isArray(marker.at) ? marker.at : [marker.at];
+		const own = <T>(style: PerPosition<T> | undefined, at: AxisValue): T | undefined =>
+			typeof style === 'function' ? (style as (at: AxisValue) => T)(at) : style;
+		return positions.map((at) => ({
+			...marker,
+			at,
+			line: own(marker.line, at),
+			text: own(marker.text, at),
+			dot: own(marker.dot, at)
+		}));
+	}
+
 	/** The delta `config` asks for over `allSeries`, or `undefined` while an end has no value there. */
 	static build<T extends Record<string, unknown>>(
 		axis: 'x' | 'y',

@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- A `rule` marker takes a list as its `value`, and a `delta` marker a list as its `at`: one line, or one delta, at each position, all with the same style, instead of one marker for each. A delta's `line`, `text` and `dot` can be functions of the position, to style each one on its own.
 - `facet` on a marker or a segment limits it to some facet panels, on every plot kind: a `by` value, a list of them, or `{ row, col }` in a `rows`/`cols` grid. Without it a marker or a segment is drawn in every panel, as before, and a plot with no facet leaves out whatever names one.
 
 ## [1.2.0] - 2026-10-24

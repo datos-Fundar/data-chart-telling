@@ -50,6 +50,22 @@ export const Basic: LinePlotStory = {
 	}
 };
 
+/** A list as `value` - a line at each, all with the same style, from a single marker. */
+export const ManyValues: LinePlotStory = {
+	render: renderLinePlot,
+	args: {
+		...LINE_PLOT_ARGS,
+		markers: [
+			{
+				type: 'rule',
+				axis: 'x',
+				value: [2, 5, 8],
+				styles: { stroke: 'crimson', strokeDasharray: '4 4' }
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};
+
 /** `data` + a field-key `value` - one horizontal line per row, from a single marker. */
 export const MultipleFromData: LinePlotStory = {
 	render: renderLinePlot,

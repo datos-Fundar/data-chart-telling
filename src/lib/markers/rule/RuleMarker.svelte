@@ -6,7 +6,7 @@
 
 	/**
 	 * A single vertical (`axis: 'x'`) or horizontal (`axis: 'y'`) reference
-	 * line - or, with `data`, one line per row. Shared by author-configured
+	 * line - or, with `data`, one line per row, or, with a list as `value`, one per value. Shared by author-configured
 	 * `'rule'` markers and `HoverMarker`'s crosshair (which always calls it
 	 * with a literal `value` and no `data`). Falls back to `'currentColor'`/`1`
 	 * when the caller supplies no style. See `RuleMarkerConfig`'s own doc
@@ -21,7 +21,10 @@
 	const styles = $derived(marker.styles);
 
 	const RuleMark = $derived(axis === 'x' ? RuleX : RuleY);
-	const rows = $derived(data ?? [{ v: value }]);
+	/** Without `data`, one row per position: a list of values draws a line at each. */
+	const rows = $derived(
+		data ?? (Array.isArray(value) ? value : [value]).map((v) => ({ v: v as AxisValue }))
+	);
 	/**
 	 * With `data`, `value` is forwarded raw (a field key resolves per row via
 	 * svelteplot's own `resolve()`, same as every other mark, and lets its

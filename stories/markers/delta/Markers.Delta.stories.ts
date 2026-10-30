@@ -71,6 +71,57 @@ export const XDeltaBetweenTwoSeries: Story = {
 };
 
 /**
+ * A list as `at` - a delta at each position, between the same two series and with the same style, from
+ * a single marker.
+ */
+export const XDeltaAtSeveralPositions: Story = {
+	args: {
+		data: LIFE,
+		x: 'year',
+		y: 'value',
+		color: 'sex',
+		scales: { x: { nice: false } },
+		markers: [
+			{
+				type: 'delta',
+				axis: 'x',
+				at: [1980, 2000, 2020],
+				from: { type: 'series', series: 'female' },
+				to: { type: 'series', series: 'male' },
+				line: { stroke: 'grey', strokeDasharray: '6 6' },
+				formatDiff: (d) => d.toFixed(0)
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};
+
+/**
+ * `text` (and `line` and `dot`) as a function of the position - each delta styled on its own: here the
+ * last label sits to the left of its line.
+ */
+export const XDeltaStyledByPosition: Story = {
+	args: {
+		data: LIFE,
+		x: 'year',
+		y: 'value',
+		color: 'sex',
+		scales: { x: { nice: false } },
+		markers: [
+			{
+				type: 'delta',
+				axis: 'x',
+				at: [1980, 2000, 2020],
+				from: { type: 'series', series: 'female' },
+				to: { type: 'series', series: 'male' },
+				line: { stroke: 'grey', strokeDasharray: '6 6' },
+				text: (at) => (at === 2020 ? { dx: -12, textAnchor: 'end' } : { dx: 12 }),
+				formatDiff: (d) => d.toFixed(0)
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};
+
+/**
  * Delta from a series down to the Y=0 baseline (no `to` target).
  * Useful for labelling the absolute value of a series at a point.
  */

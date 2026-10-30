@@ -89,8 +89,8 @@ Add with `markers={[{ type: '...' }]}`. For x/y plots:
 `area arrow bar bollinger box brush cell component delaunayLink delaunayMesh delta density difference dot hover hull image line raster rect regression rule text tick trail violin voronoi voronoiMesh waffle`.
 GeoPlot: `graticule sphere dot text vector link contour inset geo-hover geo-component`.
 
-- `delta` annotates the difference between two series at a position: `{ type: 'delta', axis: 'x', at: 2020, from: { type: 'series', series: 'A' }, to: { type: 'series', series: 'B' }, formatDiff: (d) => d.toFixed(1) }`.
-- `rule` (`axis`, `value`), `text` (`text`), `dot` annotate; `component` mounts your own Svelte component inside the plot (it can call `usePlot()`).
+- `delta` annotates the difference between two series at a position: `{ type: 'delta', axis: 'x', at: 2020, from: { type: 'series', series: 'A' }, to: { type: 'series', series: 'B' }, formatDiff: (d) => d.toFixed(1) }`; `at` can be a list of positions, one delta at each (`at: [1991, 2001]`), and `line`, `text` and `dot` can be functions of the position (`text: (at) => at === 2022 ? { dx: -20, textAnchor: 'end' } : { dx: 20 }`).
+- `rule` (`axis`, `value`; a list draws a line at each), `text` (`text`), `dot` annotate; `component` mounts your own Svelte component inside the plot (it can call `usePlot()`).
 - Each plot kind types its own marker union (`AxisBasedMarkersConfig`, `GeoMarkersConfig`); `satisfies` on a markers array gives completion.
 
 ## Theming and locale
