@@ -22,6 +22,54 @@ describe('LegendState - what the reader turned off', () => {
 	});
 });
 
+describe('LegendState - turned off from code', () => {
+	const run = (legend: LegendState, extension: Parameters<LegendState['offTargets']>[0]) =>
+		legend.setOff(legend.offTargets(extension));
+
+	test('a list dims, a map sets an opacity or a whole action', () => {
+		const legend = new LegendState();
+		run(legend, { off: ['A'] });
+		expect(legend.actionOf('A')).toEqual({ mode: 'dim' });
+		run(legend, { off: { A: 0.1, B: { mode: 'omit' } } });
+		expect(legend.actionOf('A')).toEqual({ mode: 'dim', style: { opacity: 0.1 } });
+		expect(legend.actionOf('B')).toEqual({ mode: 'omit' });
+	});
+
+	test('follows the value: a series it no longer lists is back on', () => {
+		const legend = new LegendState();
+		run(legend, { off: { A: 0.1, B: 0.2 } });
+		run(legend, { off: { B: 0.3 } });
+		expect(legend.isOff('A')).toBe(false);
+		expect(legend.actionOf('B')).toEqual({ mode: 'dim', style: { opacity: 0.3 } });
+		run(legend, undefined);
+		expect(legend.isOff('B')).toBe(false);
+	});
+
+	test('leaves alone a series the reader turned off', () => {
+		const legend = new LegendState();
+		legend.turnOff('A', { mode: 'hide' });
+		run(legend, { off: ['A'] });
+		expect(legend.actionOf('A')).toEqual({ mode: 'hide' });
+		run(legend, { off: [] });
+		expect(legend.actionOf('A')).toEqual({ mode: 'hide' });
+	});
+
+	test('highlight dims every other series, and an `off` of its own wins', () => {
+		const legend = new LegendState();
+		legend.register(
+			'p',
+			['A', 'B', 'C'].map((name) => ({ type: 'series' as const, name, color: name }))
+		);
+		run(legend, { highlight: 'A', off: { C: { mode: 'omit' } } });
+		expect(legend.isOff('A')).toBe(false);
+		expect(legend.actionOf('B')).toEqual({ mode: 'dim' });
+		expect(legend.actionOf('C')).toEqual({ mode: 'omit' });
+		run(legend, { highlight: ['A', 'B'] });
+		expect(legend.isOff('B')).toBe(false);
+		expect(legend.actionOf('C')).toEqual({ mode: 'dim' });
+	});
+});
+
 describe('LegendState - a series that is off stays listed', () => {
 	const series = (...names: string[]) =>
 		names.map((name) => ({ type: 'series' as const, name, color: `color-${name}` }));

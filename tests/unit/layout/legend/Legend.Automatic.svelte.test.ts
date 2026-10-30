@@ -28,6 +28,20 @@ describe('Figure legend', () => {
 		await vi.waitFor(() => expect(legendText(container)).toContain('Female'));
 	});
 
+	test('`legend.off` fades the series it lists, and follows the value', async () => {
+		const opacities = (container: Element) =>
+			[...container.querySelectorAll<HTMLElement>('.dct-discrete__item')].map(
+				(el) => el.style.opacity
+			);
+		const { container, rerender } = await render(LinePlot, {
+			...props,
+			legend: { off: { female: 0.2 } }
+		} as never);
+		await vi.waitFor(() => expect(opacities(container)).toContain('0.2'));
+		await rerender({ ...props, legend: { off: {} } } as never);
+		await vi.waitFor(() => expect(opacities(container)).not.toContain('0.2'));
+	});
+
 	test('`legend: false` shows none', async () => {
 		const { container } = await render(LinePlot, { ...props, legend: false } as never);
 		await waitForSvg(container);

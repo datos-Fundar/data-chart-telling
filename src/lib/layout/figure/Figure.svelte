@@ -98,6 +98,11 @@
 		legend && typeof legend === 'object' && !Array.isArray(legend) ? legend : undefined
 	);
 
+	const offTargets = $derived(legendState.offTargets(extension));
+	$effect(() => {
+		legendState.setOff(offTargets);
+	});
+
 	/** What the legend shows: the author's sections, the ones its plots read as (with `extension`), or none. */
 	const legendMode = $derived(
 		Array.isArray(legend)
