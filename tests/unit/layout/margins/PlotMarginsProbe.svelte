@@ -9,13 +9,17 @@
 	 * label growth), `author` is its author margins, and its labels' margins
 	 * and resolved config are exposed for a test to read back. `onReady` hands
 	 * out the instance once, so a test reports overflow imperatively, the way
-	 * a label's DOM measurement does - outside the reactive graph.
+	 * a label's DOM measurement does - outside the reactive graph. `plot`, if
+	 * given, is followed as svelteplot's plot, and `label` a rectangle (in
+	 * px of the box) watched for overflow the way a value label is.
 	 */
 	let {
 		width,
 		author,
 		scales,
 		reserve = [],
+		plot,
+		label,
 		onReady,
 		onSettle
 	}: {
@@ -23,6 +27,8 @@
 		author?: MarginConfig;
 		scales?: Partial<Record<'x' | 'y', { tickRotate?: number }>>;
 		reserve?: EdgeBox[];
+		plot?: { options: Record<string, unknown> };
+		label?: { x: number; y: number; width: number; height: number };
 		onReady: (margins: PlotMargins) => void;
 		onSettle?: (margins: MarginConfig) => void;
 	} = $props();
@@ -39,10 +45,21 @@
 		settle: (m) => onSettle?.(m)
 	});
 
+	let labelEl = $state<SVGGraphicsElement>();
+	// svelte-ignore state_referenced_locally
+	if (plot) margins.follow(plot);
+	margins.watch(() => labelEl, { grow: () => true });
+
 	// svelte-ignore state_referenced_locally
 	onReady(margins);
 </script>
 
+{#if label}
+	<svg {width} height={width}>
+		<rect bind:this={labelEl} x={label.x} y={label.y} width={label.width} height={label.height}
+		></rect>
+	</svg>
+{/if}
 <div
 	data-testid="probe"
 	data-right={margins.config.right}
