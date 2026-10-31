@@ -2,6 +2,16 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.5.0] - 2026-10-31
+
+### Changed
+
+- Zooming or panning a map no longer re-projects every feature on each wheel tick or drag move. The features already drawn are carried to the new view with an SVG transform and the projection is moved, and the features redrawn, once the view has been still for 120 ms. A map of 6,000 features goes from about 340 ms to about 50 ms per wheel tick. Strokes and dots are briefly scaled while the view moves.
+
+### Fixed
+
+- A series' catch-all segments that name different facets, or a facet next to the unscoped one, no longer log the warning for two catch-alls: they do not compete.
+
 ## [1.4.0] - 2026-10-30
 
 ### Added
