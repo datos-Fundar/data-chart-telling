@@ -64,12 +64,21 @@ function areaMatchesXY(xVal: AxisValue, yVal: AxisValue, area: Area): boolean {
 
 /**
  * Warns about obvious configuration mistakes: multiple catch-all segments
- * (no `areas`) in the same series list. Since catch-alls are evaluated last
- * and in order, only the first one can ever match; later ones are dead code.
+ * (no `areas`) in the same series list that reach the same facet panels.
+ * Since catch-alls are evaluated last and in order, only the first one can
+ * ever match; later ones are dead code. A catch-all that names a `facet`
+ * does not compete with one for another panel, nor with the unscoped one,
+ * which it overrides in its own panels.
  */
 export function validateSegments<TStyle>(segments: SegmentsConfig<TStyle>): void {
 	const check = (label: string, segs: Segment<TStyle>[]) => {
-		const catchAlls = segs.filter((s) => !s.areas || s.areas.length === 0).length;
+		const perScope = new Map<string, number>();
+		for (const seg of segs) {
+			if (seg.areas && seg.areas.length > 0) continue;
+			const scope = JSON.stringify((seg as { facet?: unknown }).facet ?? null);
+			perScope.set(scope, (perScope.get(scope) ?? 0) + 1);
+		}
+		const catchAlls = Math.max(0, ...perScope.values());
 		if (catchAlls > 1) {
 			console.warn(
 				`segments ${label}: ${catchAlls} entries have no areas - ` +

@@ -287,6 +287,25 @@ describe('validateSegments', () => {
 		expect(warn).toHaveBeenCalledWith(expect.stringContaining('no areas'));
 	});
 
+	test('does not warn for catch-alls that name different facets, or one facet over the unscoped one', () => {
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+		validateSegments({
+			a: [{ styles: {} }, { facet: 'Mujeres', styles: {} }, { facet: 'Varones', styles: {} }]
+		});
+		expect(warn).not.toHaveBeenCalled();
+	});
+
+	test('warns for two catch-alls that name the same facet', () => {
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+		validateSegments({
+			a: [
+				{ facet: 'Mujeres', styles: {} },
+				{ facet: 'Mujeres', styles: {} }
+			]
+		});
+		expect(warn).toHaveBeenCalledWith(expect.stringContaining('no areas'));
+	});
+
 	test('warning message includes the series name', () => {
 		const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 		validateSegments({ mySeries: [{ styles: {} }, { styles: {} }] });

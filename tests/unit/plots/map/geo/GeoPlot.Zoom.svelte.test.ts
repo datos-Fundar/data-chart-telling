@@ -14,6 +14,8 @@ async function drawn(k: number) {
 		markers: [{ type: 'dot', data: WEATHER_STATIONS, x: 'lon', y: 'lat', r: 6 }]
 	} as never);
 	const svg = await waitForSvg(container);
+	// The map is redrawn for a zoom once the view has been still for a moment
+	await new Promise((resolve) => setTimeout(resolve, 300));
 	const dot = svg.querySelector('g.dot path, path.dot, [class*=dot] path') as SVGGraphicsElement;
 	const country = svg.querySelector('g[clip-path] path') as SVGGraphicsElement;
 	return { dot: dot.getBBox(), countryWidth: country.getBBox().width };

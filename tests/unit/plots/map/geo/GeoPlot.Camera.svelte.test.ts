@@ -3,9 +3,16 @@ import { describe, test, expect, vi } from 'vitest';
 import CameraTransitionDemo from '../../../../../stories/plots/map/geo/coordinates/CameraTransitionDemo.svelte';
 import CameraScrollDemo from '../../../../../stories/plots/map/geo/coordinates/CameraScrollDemo.svelte';
 
-/** Where the camera has put the map: the outline of the first feature it draws, which moves with it. */
-const cameraTransform = (container: Element) =>
-	container.querySelector('svg g[clip-path] path')?.getAttribute('d');
+/**
+ * Where the camera has put the map: the outline of the first feature it draws, and the transform
+ * carrying the drawn features to the view while it moves (the outline is only redrawn once it settles).
+ */
+const cameraTransform = (container: Element) => {
+	const path = container.querySelector('svg g[clip-path] path');
+	if (!path) return undefined;
+	const carry = path.closest('g[clip-path] > g')?.getAttribute('transform') ?? '';
+	return `${carry}|${path.getAttribute('d')}`;
+};
 
 const settle = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
