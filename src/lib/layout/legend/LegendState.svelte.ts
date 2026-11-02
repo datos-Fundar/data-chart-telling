@@ -239,7 +239,8 @@ export class LegendState {
 	 * scale, each titled by its field name (see `legend.pretty`);
 	 * then `extension.sections`. A lone series, with nothing else to tell it
 	 * from, shows no discrete section; with other sections beside it, the
-	 * discrete one is titled `legend.seriesTitle`. A section whose adjustment sets
+	 * discrete one is titled `legend.seriesTitle`. `extension.removeItems` leaves
+	 * automatic items out of it by name. A section whose adjustment sets
 	 * `enabled: false` is left out.
 	 */
 	sections(extension?: LegendExtension): LegendSection[] {
@@ -248,8 +249,10 @@ export class LegendState {
 		const format = (title: string) => LegendText.of(title, cfg);
 		const adjust = (channel: Exclude<LegendChannel, 'series'>, title: string | undefined) =>
 			LegendState.#adjustment(extension?.[channel], title, format);
+		const removed = new SvelteSet(extension?.removeItems);
 		const items: LegendItem[] = [];
 		const ramps: LegendSection[] = [];
+		let named = false;
 		let interactive = false;
 		for (const entry of entries) {
 			if (entry.type === 'size') {
@@ -308,12 +311,13 @@ export class LegendState {
 					interactive = true;
 				}
 				ramps.push(section);
-			} else {
+			} else if (!removed.has(entry.name)) {
 				items.push(LegendState.#itemOf(entry));
+				if (entry.type === 'mark') named = true;
 			}
 		}
 		items.push(...(extension?.items ?? []));
-		const named = entries.some((entry) => entry.type === 'mark') || !!extension?.items?.length;
+		named ||= !!extension?.items?.length;
 		const others = [...ramps, ...(extension?.sections ?? [])];
 		const title = cfg.legend.seriesTitle.enabled && others.length > 0;
 		const discrete: LegendSection[] =

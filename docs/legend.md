@@ -110,6 +110,14 @@ legend={{ series: { enabled: false } }}                       // no series secti
 legend={{ color: { match: 'temperature', enabled: false } }}  // not that ramp
 ```
 
+### Removing items
+
+`removeItems` takes automatic items out of the series section by name - a series, or a segment or marker by the label it names itself with. A name nothing carries is ignored, and items added with `items` stay:
+
+```ts
+legend={{ removeItems: ['2017/18'] }}
+```
+
 ### Turning series off from code
 
 `off` turns series off as if the reader had clicked them, without a click: a list of names (each dimmed, to `legend.disabledOpacity`), or a name → opacity or name → action map, where an action is the same `{ mode: 'dim' | 'hide' | 'omit' }` a toggle does. `highlight` is its inverse: it keeps the series it names on and dims all the others. An `off` entry for a series wins over `highlight`.

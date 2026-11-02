@@ -330,6 +330,7 @@ export type LegendExtension = {
 	 */
 	highlight?: string | string[];
 	items?: LegendItem[];
+	removeItems?: string[];
 	sections?: LegendSection[];
 	series?: Omit<DiscreteLegendSection, 'type' | 'items'>;
 	color?: ColorOverride | ColorOverride[];

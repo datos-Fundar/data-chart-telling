@@ -594,6 +594,45 @@ describe('LegendState - leaving a section off', () => {
 	});
 });
 
+describe('LegendState - removing items', () => {
+	const register = (legend: LegendState) =>
+		legend.register('p', [
+			{ type: 'series', name: 'base', color: 'c-base' },
+			{ type: 'mark', name: 'A', color: 'c-a' },
+			{ type: 'mark', name: 'B', color: 'c-b' }
+		]);
+	const names = (legend: LegendState, extension?: Parameters<LegendState['sections']>[0]) =>
+		legend
+			.sections(extension)
+			.flatMap((s) => (s.type === 'discrete' ? s.items.map((item) => item.name) : []));
+
+	test('an item named in `removeItems` is left out, the rest stay in order', () => {
+		const legend = new LegendState();
+		register(legend);
+		expect(names(legend)).toEqual(['base', 'A', 'B']);
+		expect(names(legend, { removeItems: ['base'] })).toEqual(['A', 'B']);
+		expect(names(legend, { removeItems: ['A', 'B'] })).toEqual([]);
+	});
+
+	test('a name nothing carries is ignored, and added items are never removed', () => {
+		const legend = new LegendState();
+		register(legend);
+		expect(names(legend, { removeItems: ['nothing'] })).toEqual(['base', 'A', 'B']);
+		expect(names(legend, { items: [{ name: 'extra' }], removeItems: ['base', 'extra'] })).toEqual([
+			'A',
+			'B',
+			'extra'
+		]);
+	});
+
+	test('a lone series with its marks removed shows no section; a lone mark does', () => {
+		const legend = new LegendState();
+		register(legend);
+		expect(names(legend, { removeItems: ['A', 'B'] })).toEqual([]);
+		expect(names(legend, { removeItems: ['base', 'B'] })).toEqual(['A']);
+	});
+});
+
 describe('LegendState - decorative markers', () => {
 	const plot = (rule: Record<string, unknown>) => ({
 		resolvedSeries: [{ name: 'a' }],
