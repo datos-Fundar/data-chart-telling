@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.6.1] - 2026-11-02
+
+### Fixed
+
+- A `delta` marker at a `Date` position no longer turns a date `x` axis into a numeric one: it drew its dots, line and label at the position as a number, which svelteplot read next to the dates of the data as a linear scale, and the axis showed milliseconds.
+
 ## [1.6.0] - 2026-11-02
 
 ### Added
