@@ -26,7 +26,7 @@
 		return clampRange ? Math.max(clampRange[0], Math.min(clampRange[1], v)) : v;
 	}
 
-	function pt(fixed: number, varying: number) {
+	function pt(fixed: number | Date, varying: number) {
 		return marker.axis === 'x' ? { x: fixed, y: varying } : { x: varying, y: fixed };
 	}
 
@@ -44,7 +44,7 @@
 		if (!resolved) return null;
 		const fromVis = clamp(resolved.from ?? 0);
 		const toVis = clamp(resolved.to ?? 0);
-		const at = resolved.at ?? 0;
+		const at = marker.at instanceof Date ? new Date(resolved.at ?? 0) : (resolved.at ?? 0);
 		return {
 			fromPt: pt(at, fromVis),
 			toPt: pt(at, toVis),
