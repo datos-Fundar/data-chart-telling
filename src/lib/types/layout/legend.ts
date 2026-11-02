@@ -97,6 +97,7 @@ export type DiscreteInteractiveConfig = {
 
 export type DiscreteLegendSection = {
 	type: 'discrete';
+	enabled?: boolean;
 	title?: string;
 	items: LegendItem[];
 	columns?: number;
@@ -120,6 +121,7 @@ export type ContinuousInteractiveConfig = {
 
 export type ContinuousLegendSection = {
 	type: 'continuous';
+	enabled?: boolean;
 	title?: string;
 	/** The channel the section reads, which tells apart automatic sections that share a title. */
 	channel?: Exclude<LegendChannel, 'series'>;
@@ -147,6 +149,7 @@ export type ContinuousLegendSection = {
  */
 export type SizeLegendSection = {
 	type: 'size';
+	enabled?: boolean;
 	title?: string;
 	/** The channel the section reads, which tells apart automatic sections that share a title. */
 	channel?: Exclude<LegendChannel, 'series'>;
@@ -172,6 +175,7 @@ export type SizeLegendSection = {
  */
 export type SymbolLegendSection = {
 	type: 'symbol';
+	enabled?: boolean;
 	title?: string;
 	/** The channel the section reads, which tells apart automatic sections that share a title. */
 	channel?: Exclude<LegendChannel, 'series'>;
@@ -294,7 +298,7 @@ export type ColorOverride = Omit<
 	ContinuousLegendSection,
 	'type' | 'min' | 'max' | 'colorMin' | 'colorMax' | 'scheme' | 'pivot' | 'opacity' | 'interactive'
 > &
-	Pick<DiscreteLegendSection, 'layout' | 'navButton'> & {
+	Pick<DiscreteLegendSection, 'layout' | 'navButton' | 'enabled'> & {
 		interactive?: ContinuousInteractiveConfig & DiscreteInteractiveConfig;
 		/** Adjusts only the continuous section titled so. */
 		match?: string;

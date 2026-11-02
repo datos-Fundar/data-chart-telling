@@ -21,7 +21,8 @@
 			data: COUNTRIES_AT_2007,
 			x: 'gdp',
 			y: 'life',
-			color: 'life'
+			color: 'life',
+			scales: { color: { scheme: 'warm' } }
 		}
 	]}
 	legend={{
