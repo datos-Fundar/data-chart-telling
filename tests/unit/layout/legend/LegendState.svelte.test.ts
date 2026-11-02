@@ -541,6 +541,59 @@ describe('LegendState - adjusting the automatic sections', () => {
 	});
 });
 
+describe('LegendState - leaving a section off', () => {
+	const rows = [
+		{ v: 1, group: 'a' },
+		{ v: 9, group: 'b' }
+	];
+	const register = (legend: LegendState) =>
+		legend.register(
+			'p',
+			LegendState.entriesOf({
+				resolvedSeries: [{ name: 'a' }, { name: 'b' }],
+				colorForSeries: (name) => `c-${name}`,
+				markers: [{ type: 'rect', data: rows, color: 'v' }]
+			})
+		);
+
+	test('`series.enabled: false` drops the series section and keeps the others', () => {
+		const legend = new LegendState();
+		register(legend);
+		expect(legend.sections().map((s) => s.type)).toEqual(['discrete', 'continuous']);
+		expect(legend.sections({ series: { enabled: false } }).map((s) => s.type)).toEqual([
+			'continuous'
+		]);
+	});
+
+	test('the series section loses its title along with its neighbours', () => {
+		const legend = new LegendState();
+		register(legend);
+		const [only] = legend.sections({ series: { enabled: false } });
+		expect(only).toMatchObject({ type: 'continuous', title: 'V' });
+	});
+
+	test('any channel key can leave its section off, and `enabled: true` keeps it', () => {
+		const legend = new LegendState();
+		register(legend);
+		expect(legend.sections({ color: { enabled: false, match: 'v' } }).map((s) => s.type)).toEqual([
+			'discrete'
+		]);
+		expect(legend.sections({ series: { enabled: true } }).map((s) => s.type)).toEqual([
+			'discrete',
+			'continuous'
+		]);
+	});
+
+	test('an extra section can be switched off too', () => {
+		const legend = new LegendState();
+		register(legend);
+		const sections = legend.sections({
+			sections: [{ type: 'discrete', enabled: false, items: [{ name: 'x' }] }]
+		});
+		expect(sections.map((s) => s.type)).toEqual(['discrete', 'continuous']);
+	});
+});
+
 describe('LegendState - decorative markers', () => {
 	const plot = (rule: Record<string, unknown>) => ({
 		resolvedSeries: [{ name: 'a' }],

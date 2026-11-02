@@ -10,6 +10,8 @@ import ExpandMatchDemo from './ExpandMatchDemo.svelte';
 import ExpandMatchDemoSource from './ExpandMatchDemo.svelte?raw';
 import ExpandSizeSymbolDemo from './ExpandSizeSymbolDemo.svelte';
 import ExpandSizeSymbolDemoSource from './ExpandSizeSymbolDemo.svelte?raw';
+import DisabledSectionsDemo from './DisabledSectionsDemo.svelte';
+import DisabledSectionsDemoSource from './DisabledSectionsDemo.svelte?raw';
 import ExpandComposerDemo from './ExpandComposerDemo.svelte';
 import ExpandComposerDemoSource from './ExpandComposerDemo.svelte?raw';
 import { demoSource } from '../../../common/docsSource';
@@ -89,6 +91,18 @@ export const InteractiveColorRamp: StoryObj = {
 export const SeveralRampsWithMatch: StoryObj = {
 	render: () => ({ Component: ExpandMatchDemo }),
 	parameters: demoSource(ExpandMatchDemoSource)
+};
+
+/**
+ * Every section takes `enabled`, on unless set: `enabled: false` leaves a
+ * section off the legend and the others stay. Here two markers color by
+ * different fields, so there are two ramps, and the one titled `life` is
+ * disabled. `series: { enabled: false }` does the same for the series
+ * section.
+ */
+export const DisabledSection: StoryObj = {
+	render: () => ({ Component: DisabledSectionsDemo }),
+	parameters: demoSource(DisabledSectionsDemoSource)
 };
 
 /**

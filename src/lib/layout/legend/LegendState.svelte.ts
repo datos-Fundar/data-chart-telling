@@ -239,7 +239,8 @@ export class LegendState {
 	 * scale, each titled by its field name (see `legend.pretty`);
 	 * then `extension.sections`. A lone series, with nothing else to tell it
 	 * from, shows no discrete section; with other sections beside it, the
-	 * discrete one is titled `legend.seriesTitle`.
+	 * discrete one is titled `legend.seriesTitle`. A section whose adjustment sets
+	 * `enabled: false` is left out.
 	 */
 	sections(extension?: LegendExtension): LegendSection[] {
 		const entries = this.entries;
@@ -327,7 +328,7 @@ export class LegendState {
 						} satisfies DiscreteLegendSection
 					]
 				: [];
-		return [...discrete, ...others];
+		return [...discrete, ...others].filter((section) => section.enabled !== false);
 	}
 
 	/** What `override` changes in the section titled `title`: the entries that match it, in order, merged. */

@@ -101,6 +101,15 @@ legend={{
 
 Each key is the name of the channel (the plot's own prop: `r` for the size section) and adjusts the section that channel draws: any section field except what the plots compute (items, ranges, domains). An entry with `match` adjusts only the section whose title matches; a list of entries adjusts several.
 
+### Leaving a section disabled
+
+Every section takes `enabled`, on unless set. `enabled: false` leaves that section off the legend, while the others stay:
+
+```ts
+legend={{ series: { enabled: false } }}                       // no series section
+legend={{ color: { match: 'temperature', enabled: false } }}  // not that ramp
+```
+
 ### Turning series off from code
 
 `off` turns series off as if the reader had clicked them, without a click: a list of names (each dimmed, to `legend.disabledOpacity`), or a name → opacity or name → action map, where an action is the same `{ mode: 'dim' | 'hide' | 'omit' }` a toggle does. `highlight` is its inverse: it keeps the series it names on and dims all the others. An `off` entry for a series wins over `highlight`.
