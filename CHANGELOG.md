@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.6.0] - 2026-11-02
+
+### Added
+
+- Every legend section takes `enabled`, on unless set: `legend: { series: { enabled: false } }` leaves the series section off the automatic legend, and `color`, `opacity`, `r` and `symbol` (with a `match`, to pick one of several) do the same for theirs. A section added through `legend.sections` takes it too.
+
 ## [1.5.0] - 2026-10-31
 
 ### Changed
