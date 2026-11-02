@@ -273,7 +273,7 @@ export class ValueLabels {
 			x: (processed.channels.x ?? position.x) as TextMarkerConfig['x'],
 			y: (processed.channels.y2 ?? processed.channels.y ?? topOf) as TextMarkerConfig['y'],
 			grouping: SERIES_ID_KEY,
-			text: (d: ProcessedRow) => format(Number(valueOf(d)), nameOf(d)),
+			text: (d: ProcessedRow) => format(Number(valueOf(d)), nameOf(d), d),
 			styles: {
 				...font,
 				...(this.fill ? { fill: this.fill } : {}),

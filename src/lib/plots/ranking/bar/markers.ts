@@ -160,7 +160,7 @@ export function buildValueLabels<TData extends Record<string, unknown>>(
 					? { x: position, y: geometry.categoryOf }
 					: { x: geometry.categoryOf, y: position }),
 				bandSlice: geometry.sliceOf(s.name),
-				text: (d: ProcessedRow) => format(Number(valueOf(d)), s.name),
+				text: (d: ProcessedRow) => format(Number(valueOf(d)), s.name, d),
 				styles: {
 					...font,
 					fill: font?.fill ?? ctx.cfg.axis.color,

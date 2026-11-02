@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.8.1] - 2026-11-02
+
+### Fixed
+
+- `styles.values.format` gets the labelled row as its third argument on `BarPlot`, `PyramidPlot`, `HistogramPlot`, `ScatterPlot` and the end-of-line labels of `LinePlot` and `AreaPlot`, as its documentation says; only `ClevelandPlot` did. A format that returns no text for some rows - the only way to label some pieces of a stacked bar and not others - had no row to decide by.
+
 ## [1.8.0] - 2026-11-02
 
 ### Added
