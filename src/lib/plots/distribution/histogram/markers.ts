@@ -59,7 +59,7 @@ export function buildValueLabels<TData extends Record<string, unknown>>(
 			[binned]: position[binned] as TextMarkerConfig['x'],
 			[value]: along as TextMarkerConfig['y'],
 			transforms: [{ type: 'filter', filter: (d: ProcessedRow) => countOf(d) > 0 }],
-			text: (d: ProcessedRow) => format(countOf(d), nameOf(d)),
+			text: (d: ProcessedRow) => format(countOf(d), nameOf(d), d),
 			styles: {
 				...font,
 				fill: font?.fill ?? ctx.cfg.axis.color,

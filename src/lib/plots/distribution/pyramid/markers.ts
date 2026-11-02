@@ -85,7 +85,7 @@ export function buildValueLabels<TData extends Record<string, unknown>>(
 				data,
 				[valueAxis]: at,
 				[categoryAxis]: series[categoryAxis] as TextMarkerConfig['y'],
-				text: (d: ProcessedRow) => format(magnitude(d), series.name),
+				text: (d: ProcessedRow) => format(magnitude(d), series.name, d),
 				styles: {
 					...font,
 					fill: font?.fill ?? ctx.cfg.axis.color,
