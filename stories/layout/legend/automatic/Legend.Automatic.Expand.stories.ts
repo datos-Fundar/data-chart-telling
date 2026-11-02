@@ -10,6 +10,8 @@ import ExpandMatchDemo from './ExpandMatchDemo.svelte';
 import ExpandMatchDemoSource from './ExpandMatchDemo.svelte?raw';
 import ExpandSizeSymbolDemo from './ExpandSizeSymbolDemo.svelte';
 import ExpandSizeSymbolDemoSource from './ExpandSizeSymbolDemo.svelte?raw';
+import RemoveItemsDemo from './RemoveItemsDemo.svelte';
+import RemoveItemsDemoSource from './RemoveItemsDemo.svelte?raw';
 import DisabledSectionsDemo from './DisabledSectionsDemo.svelte';
 import DisabledSectionsDemoSource from './DisabledSectionsDemo.svelte?raw';
 import ExpandComposerDemo from './ExpandComposerDemo.svelte';
@@ -113,6 +115,16 @@ export const DisabledSection: StoryObj = {
 export const SizeAndSymbol: StoryObj = {
 	render: () => ({ Component: ExpandSizeSymbolDemo }),
 	parameters: demoSource(ExpandSizeSymbolDemoSource)
+};
+
+/**
+ * `removeItems` takes automatic items out of the series section by name: here
+ * the two series, so the legend lists only the segment and the marker that name
+ * themselves. Items added with `items` stay.
+ */
+export const RemoveItems: StoryObj = {
+	render: () => ({ Component: RemoveItemsDemo }),
+	parameters: demoSource(RemoveItemsDemoSource)
 };
 
 /**

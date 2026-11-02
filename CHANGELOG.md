@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.7.0] - 2026-11-02
+
+### Added
+
+- `legend.removeItems` leaves automatic items out of the series section by name: a series, or a segment or marker that names itself. A plot that colors its marks through `segments` with a `legend` of their own can list only those, without the one series they come from.
+
 ## [1.6.1] - 2026-11-02
 
 ### Fixed
