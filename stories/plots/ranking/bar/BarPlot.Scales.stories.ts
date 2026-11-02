@@ -384,3 +384,43 @@ export const NumericCategoriesHorizontal: Story = {
 		scales: { y: { type: 'band' } }
 	}
 };
+
+const SPENDING_BY_CATEGORY = [
+	{ category: 'Vivienda y servicios', share: 18.2 },
+	{ category: 'Alimentos y bebidas no alcohólicas', share: 17.1 },
+	{ category: 'Transporte y comunicaciones', share: 11.4 },
+	{ category: 'Salud', share: 8.7 },
+	{ category: 'Educación y cultura', share: 4.7 }
+];
+
+/**
+ * Category names too long for one line. `scales.<axis>.lines` writes each label
+ * on up to that many lines, split at its spaces so the lines are as even as they
+ * can be: the labels stay short and upright, and the bars keep their width. The
+ * left margin of a `y` axis grows to the widest line.
+ */
+export const WrappedAxisLabels: Story = {
+	args: {
+		data: SPENDING_BY_CATEGORY,
+		x: 'share',
+		y: 'category',
+		width: 600,
+		scales: { y: { lines: 2 } }
+	}
+};
+
+/**
+ * The same on the category axis of vertical bars, which would otherwise turn its
+ * labels to fit them. A label of one word stays on one line, and a `tickFormat`
+ * is applied before the split - `tickFormat` can also give the lines itself, as a
+ * list of strings or a text with line breaks, to split them where you choose.
+ */
+export const WrappedAxisLabelsVertical: Story = {
+	args: {
+		data: SPENDING_BY_CATEGORY,
+		x: 'category',
+		y: 'share',
+		width: 600,
+		scales: { x: { lines: 2 } }
+	}
+};

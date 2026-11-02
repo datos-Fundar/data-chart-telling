@@ -201,6 +201,7 @@ export type AxisScale<TData = Record<string, unknown>> = {
 	tickSize?: number;
 	tickPadding?: number;
 	tickRotate?: number;
+	lines?: number;
 	tickFormat?:
 		| false
 		| Intl.NumberFormatOptions

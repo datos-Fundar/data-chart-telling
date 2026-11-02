@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.8.0] - 2026-11-02
+
+### Added
+
+- `scales.x.lines` and `scales.y.lines` write each label of a category axis on up to that many lines, split at its spaces so the lines are as even as they can be, and keep the `x` labels upright instead of turning them. A `tickFormat` is applied first.
+- A band `y` axis whose `scales.y.tickFormat` gives a label on several lines (a list of strings, or a text with line breaks) writes it on those lines, and its left margin grows to the widest one. svelteplot's own axis joined the lines with spaces, so only the `x` axis could wrap its labels.
+
 ## [1.7.0] - 2026-11-02
 
 ### Added
