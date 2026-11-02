@@ -6,6 +6,8 @@
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { NiceTicks } from '$lib/layout/scales/NiceTicks';
 	import { EdgeTicks } from '$lib/layout/scales/EdgeTicks';
+	import { TickLines } from '$lib/layout/scales/TickLines';
+	import MultilineYTicks from '$lib/layout/scales/MultilineYTicks.svelte';
 	import { DISCRETE_SCALE_TYPES } from '$lib/types/layout/scales';
 	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 	import type { AxisValue } from '$lib/types/layout/mapping';
@@ -200,6 +202,18 @@
 		unknown
 	>;
 
+	/**
+	 * The labels of a band y axis whose `tickFormat` writes some on several lines. svelteplot's axis joins the
+	 * lines of a label with spaces, so such an axis hides its labels and `MultilineYTicks` draws them.
+	 */
+	const multilineY = $derived.by(() => {
+		const format = scales?.y?.tickFormat;
+		if (typeof format !== 'function' || plot.scales.y.type !== 'band') return undefined;
+		const ticks: unknown[] = tickValues?.y ?? plot.scales.y.fn?.domain?.() ?? [];
+		const lines = TickLines.ofTicks(ticks, format);
+		return TickLines.isMultiline(lines) ? { ticks, lines } : undefined;
+	});
+
 	const yTitleFontSize = $derived(scales?.y?.titleFontSize ?? cfg.axis.titleFontSize);
 
 	/**
@@ -327,6 +341,7 @@
 {#snippet axisY()}
 	<AxisY
 		ticks={(yEdgeTicks?.ticks ?? tickValues?.y) as string[] | undefined}
+		tickFormat={multilineY ? () => '' : undefined}
 		tickCount={yTickCount}
 		interval={yTickInterval}
 		tickSize={scales?.y?.tickSize ?? cfg.axis.yTickSize}
@@ -339,6 +354,15 @@
 	<g style:visibility="hidden">{@render axisY()}</g>
 {:else if scales?.y?.axisDisplay !== 'none'}
 	{@render axisY()}
+	{#if multilineY}
+		<MultilineYTicks
+			ticks={multilineY.ticks}
+			lines={multilineY.lines}
+			tickSize={scales?.y?.tickSize ?? cfg.axis.yTickSize}
+			tickPadding={scales?.y?.tickPadding ?? cfg.axis.yTickPadding}
+			fontSize={cfg.axis.fontSize}
+		/>
+	{/if}
 {/if}
 {#if verticalYLabel && (scales?.y?.axisDisplay ?? 'visible') === 'visible'}
 	<text

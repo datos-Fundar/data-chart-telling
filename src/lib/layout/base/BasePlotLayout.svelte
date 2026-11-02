@@ -14,6 +14,7 @@
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { SveltePlotScale } from '$lib/layout/scales/SveltePlotScale';
 	import { TickLabels } from '$lib/layout/scales/TickLabels';
+	import { TickLines } from '$lib/layout/scales/TickLines';
 	import ScalesLayout from '$lib/layout/scales/ScalesLayout.svelte';
 	import GeometryLayout from '$lib/layout/geometry/GeometryLayout.svelte';
 	import CoordinatesLayout from '$lib/layout/coordinates/CoordinatesLayout.svelte';
@@ -160,7 +161,12 @@
 			x?: ReturnType<typeof TickLabels.layout>;
 			y?: { every: number; values: string[] };
 		} = {};
-		if (bands.includes('x') && scales?.x?.tickRotate === undefined) {
+		// Labels split in lines are meant to stay upright, so they are not judged by how long one line would be.
+		if (
+			bands.includes('x') &&
+			scales?.x?.tickRotate === undefined &&
+			!((scales?.x?.lines ?? 1) > 1)
+		) {
 			out.x = TickLabels.layout(
 				categories('x'),
 				width - estimate.left - estimate.right,
@@ -180,11 +186,19 @@
 		}
 		return out;
 	});
-	/** `scales` with the rotation the tick layout chose for the x labels. */
+	/** An axis' scale with its labels split in the `lines` it asks for, as a `tickFormat` that gives them. */
+	function withLines<TScale extends AxisScale<TData> | undefined>(scale: TScale): TScale {
+		if (!scale?.lines || scale.lines < 2) return scale;
+		const { lines, tickFormat, ...rest } = scale;
+		const format = typeof tickFormat === 'function' ? tickFormat : undefined;
+		return { ...rest, tickFormat: TickLines.wrapped(format, lines) } as TScale;
+	}
+	/** `scales` with the rotation the tick layout chose for the x labels, and the labels split in lines. */
 	const layoutScales = $derived.by(() => {
+		if (scales === undefined) return scales;
 		const rotate = tickLayout?.x?.rotate;
-		if (!rotate || scales === undefined) return scales;
-		return { ...scales, x: { ...scales.x, tickRotate: rotate } };
+		const x = withLines(rotate ? { ...scales.x, tickRotate: rotate } : scales.x);
+		return { ...scales, ...(x ? { x } : {}), ...(scales.y ? { y: withLines(scales.y) } : {}) };
 	});
 	/** The category labels a crowded axis still writes: one in every few. */
 	const tickValues = $derived.by(() => {
@@ -252,9 +266,9 @@
 		return (label ? { ...out, label } : out) as SveltePlotProps['x'];
 	});
 	const resolvedY = $derived.by(() => {
-		const built = SveltePlotScale.build(scales?.y, data, getY);
+		const built = SveltePlotScale.build(layoutScales?.y, data, getY);
 		const domain = edgeDomains.get('y');
-		const label = titleOfEmpty('y', scales?.y);
+		const label = titleOfEmpty('y', layoutScales?.y);
 		const out = domain ? { ...built, domain, nice: false } : built;
 		return (label ? { ...out, label } : out) as SveltePlotProps['y'];
 	});
