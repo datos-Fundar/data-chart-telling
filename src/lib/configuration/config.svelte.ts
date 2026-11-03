@@ -160,11 +160,10 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 			label: {
 				rotate: '0deg',
 				size: '0.875rem',
-				weight: 600,
+				weight: 400,
 				overlap: {
 					enabled: true,
-					margin: 4,
-					rotate: '90deg'
+					margin: 4
 				}
 			}
 		}
@@ -448,7 +447,6 @@ export function configToCssVars(c: PlotStylesConfig): Record<string, string> {
 		'--dct-continuous-label-rotate': c.legend.continuous.label.rotate,
 		'--dct-continuous-label-size': c.legend.continuous.label.size,
 		'--dct-continuous-label-weight': String(c.legend.continuous.label.weight),
-		'--dct-continuous-label-overlap-rotate': c.legend.continuous.label.overlap.rotate,
 
 		'--dct-tooltip-bg': c.tooltip.background,
 		'--dct-tooltip-color': c.tooltip.color,

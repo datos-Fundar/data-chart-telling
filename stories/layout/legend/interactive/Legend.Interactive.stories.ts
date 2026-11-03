@@ -122,6 +122,12 @@ export const InteractiveDiscreteBadgeCustomCss: StoryObj = {
  * at each edge. `mode: 'filter'` (the default) keeps the gradient's original
  * min/max - narrowing the range only excludes values, it never recolors
  * what's left.
+ *
+ * Drag one handle toward the other: once their labels would touch, the label
+ * of the handle that still rests on its end of the domain is hidden and the
+ * moving one stays horizontal and writes both values ("18% – 20%"), kept
+ * inside the legend's width. Drag back and the hidden one returns. If both
+ * handles have been moved, the one moved last keeps its label.
  */
 export const InteractiveContinuousFilter: Story = {
 	args: {
@@ -142,7 +148,7 @@ export const InteractiveContinuousFilter: Story = {
 	}
 };
 
-/** Same drag interaction, but `mode: 'rescale'` reprojects the ramp onto the narrowed range. */
+/** Same drag interaction (and the same merged label when the handles meet), but `mode: 'rescale'` reprojects the ramp onto the narrowed range. */
 export const InteractiveContinuousRescale: Story = {
 	args: {
 		sections: [

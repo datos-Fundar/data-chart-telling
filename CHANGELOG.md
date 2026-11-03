@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.9.0] - 2026-11-03
+
+### Changed
+
+- A continuous legend no longer lets its labels touch. Its edge labels (the two ends of the domain) are always written; a tick label is left out, with its mark, when it comes within `legend.continuous.label.overlap.margin` px of an edge label or of a tick before it (weighed from the low end up). Before, a tick near an end was written over it.
+- In the interactive continuous legend, handle labels that meet no longer turn vertical: the label of the handle that rests on the domain's end is hidden, and the moving one stays horizontal and writes both values (`18% – 20%`) until they part. That label follows its handle but is kept inside the legend's width. If both or neither rest on an end, the one moved last stays.
+
+- `legend.continuous.label.weight` (`--dct-continuous-label-weight`) styles every label of a continuous legend - the edges, the ticks and the interactive handles - and defaults to `400`. It styled only the handle labels, at `600`, so an interactive legend wrote its values in bold and a plain one did not. Set it to `600` to keep the old look of the handles.
+
+### Removed
+
+- `legend.continuous.label.overlap.rotate` and its CSS variable `--dct-continuous-label-overlap-rotate`: there is no vertical label to rotate any more. `overlap.enabled` and `overlap.margin` stay, and now govern both behaviours above.
+
 ## [1.8.1] - 2026-11-02
 
 ### Fixed

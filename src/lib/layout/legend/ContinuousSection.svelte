@@ -51,12 +51,41 @@
 				}))
 	);
 
+	// ── Labels that would touch ───────────────────────────────────────────────
+	// The edge labels (the domain's two ends) are always written. A tick label stays only if it clears them and
+	// every tick kept before it, by `overlap.margin` px; ticks are weighed from the low end up.
+	const overlapLook = $derived(cfg.legend.continuous.label.overlap);
+	let edgeWidths = $state({ start: 0, end: 0 });
+	let tickWidths = $state<Record<number, number>>({});
+
+	const hiddenTicks = $derived.by((): number[] => {
+		const hidden: number[] = [];
+		if (isInteractive || !overlapLook.enabled) return hidden;
+		const margin = overlapLook.margin;
+		const taken: [number, number][] = [
+			[0, edgeWidths.start],
+			[barWidth - edgeWidths.end, barWidth]
+		];
+		for (const tick of [...tickPositions].sort((a, b) => a.t - b.t)) {
+			const half = (tickWidths[tick.v] ?? 0) / 2;
+			const from = trackX(tick.t) - half;
+			const to = trackX(tick.t) + half;
+			if (taken.some(([start, end]) => from < end + margin && to > start - margin))
+				hidden.push(tick.v);
+			else taken.push([from, to]);
+		}
+		return hidden;
+	});
+
 	// ── Drag-to-narrow-margins ────────────────────────────────────────────────
 	const interaction = LegendState.ensure();
 
 	// Seeded once from the section's bounds.
 	let lo = $state(untrack(() => section.min));
 	let hi = $state(untrack(() => section.max));
+
+	// The handle moved last, which keeps its label when the two labels meet and one has to go.
+	let lastDragged = $state<'lo' | 'hi' | null>(null);
 
 	// Whether each handle was dragged; an untouched one follows the section's bounds.
 	let loAdjusted = $state(false);
@@ -150,6 +179,7 @@
 			event.preventDefault();
 			if (which === 'lo') loAdjusted = true;
 			else hiAdjusted = true;
+			lastDragged = which;
 			const target = event.currentTarget as SVGElement;
 			target.setPointerCapture(event.pointerId);
 			const startX = event.clientX;
@@ -190,12 +220,40 @@
 
 	let loLabelWidth = $state(0);
 	let hiLabelWidth = $state(0);
+	let mergedLabelWidth = $state(0);
 
 	const labelsOverlap = $derived(
 		isInteractive &&
-			cfg.legend.continuous.label.overlap.enabled &&
-			(hiT - loT) * trackWidth - loLabelWidth - hiLabelWidth <
-				cfg.legend.continuous.label.overlap.margin
+			overlapLook.enabled &&
+			(hiT - loT) * trackWidth - loLabelWidth - hiLabelWidth < overlapLook.margin
+	);
+
+	// When the handle labels meet, the one whose handle still sits on the domain's end gives way and the moving
+	// one stays, horizontal, and writes both values ("18% – 20%"). If both or neither sit on an end, the one moved
+	// last stays.
+	const hiddenHandle = $derived.by((): 'lo' | 'hi' | null => {
+		if (!labelsOverlap) return null;
+		const loOnEnd = lo <= section.min;
+		const hiOnEnd = hi >= section.max;
+		if (loOnEnd !== hiOnEnd) return loOnEnd ? 'lo' : 'hi';
+		return lastDragged === 'lo' ? 'hi' : 'lo';
+	});
+	const survivingHandle = $derived(
+		hiddenHandle === null ? null : hiddenHandle === 'lo' ? 'hi' : 'lo'
+	);
+	const mergedLabel = $derived(`${fmt(lo)} – ${fmt(hi)}`);
+
+	// Where each handle label is anchored: at its handle, except the merged one, which follows its handle but is
+	// kept inside the legend's width, growing inward from the end it sits at.
+	const loLabelLeft = $derived(
+		survivingHandle === 'lo'
+			? Math.max(0, Math.min(trackX(loT), barWidth - mergedLabelWidth))
+			: trackX(loT)
+	);
+	const hiLabelLeft = $derived(
+		survivingHandle === 'hi'
+			? Math.min(barWidth, Math.max(trackX(hiT), mergedLabelWidth))
+			: trackX(hiT)
 	);
 </script>
 
@@ -247,7 +305,9 @@
 			fill="url(#{gradientId})"
 		/>
 		{#each tickPositions as tick (tick.v)}
-			<rect class="dct-continuous__tick-mark" x={trackX(tick.t)} y={barHeight} />
+			{#if !hiddenTicks.includes(tick.v)}
+				<rect class="dct-continuous__tick-mark" x={trackX(tick.t)} y={barHeight} />
+			{/if}
 		{/each}
 
 		{#if isInteractive}
@@ -329,21 +389,36 @@
 				>{fmt(hi)}</span
 			>
 			<span
+				class="dct-continuous__tick-measure"
+				aria-hidden="true"
+				bind:clientWidth={mergedLabelWidth}>{mergedLabel}</span
+			>
+			<span
 				class="dct-continuous__tick dct-continuous__tick--handle-lo"
-				class:dct-continuous__tick--vertical={labelsOverlap}
-				style:left="{trackX(loT)}px">{fmt(lo)}</span
+				class:dct-continuous__tick--hidden={hiddenHandle === 'lo'}
+				style:left="{loLabelLeft}px">{survivingHandle === 'lo' ? mergedLabel : fmt(lo)}</span
 			>
 			<span
 				class="dct-continuous__tick dct-continuous__tick--handle-hi"
-				class:dct-continuous__tick--vertical={labelsOverlap}
-				style:left="{trackX(hiT)}px">{fmt(hi)}</span
+				class:dct-continuous__tick--hidden={hiddenHandle === 'hi'}
+				style:left="{hiLabelLeft}px">{survivingHandle === 'hi' ? mergedLabel : fmt(hi)}</span
 			>
 		{:else}
-			<span class="dct-continuous__edge dct-continuous__edge--start">{fmt(section.min)}</span>
+			<span
+				class="dct-continuous__edge dct-continuous__edge--start"
+				bind:clientWidth={edgeWidths.start}>{fmt(section.min)}</span
+			>
 			{#each tickPositions as tick (tick.v)}
-				<span class="dct-continuous__tick" style:left="{trackX(tick.t)}px">{tick.label}</span>
+				<span
+					class="dct-continuous__tick"
+					class:dct-continuous__tick--hidden={hiddenTicks.includes(tick.v)}
+					style:left="{trackX(tick.t)}px"
+					bind:clientWidth={tickWidths[tick.v]}>{tick.label}</span
+				>
 			{/each}
-			<span class="dct-continuous__edge dct-continuous__edge--end">{fmt(section.max)}</span>
+			<span class="dct-continuous__edge dct-continuous__edge--end" bind:clientWidth={edgeWidths.end}
+				>{fmt(section.max)}</span
+			>
 		{/if}
 	</div>
 </div>
@@ -358,6 +433,7 @@
 		position: relative;
 		height: 1rem;
 		font-size: var(--dct-continuous-label-size, 0.875rem);
+		font-weight: var(--dct-continuous-label-weight, 400);
 		user-select: none;
 	}
 	.dct-continuous__edge {
@@ -376,10 +452,6 @@
 		transform: translateX(-50%) rotate(var(--dct-continuous-label-rotate, 0deg));
 	}
 	/* Anchored outward so the label grows into the bar. */
-	.dct-continuous__tick--handle-lo,
-	.dct-continuous__tick--handle-hi {
-		font-weight: var(--dct-continuous-label-weight, 600);
-	}
 	.dct-continuous__tick--handle-lo {
 		transform: rotate(var(--dct-continuous-label-rotate, 0deg));
 	}
@@ -392,13 +464,10 @@
 		position: absolute;
 		visibility: hidden;
 		white-space: nowrap;
-		font-weight: var(--dct-continuous-label-weight, 600);
 	}
-	/* Handle labels that would collide read top to bottom, pivoting on their anchor. */
-	.dct-continuous__tick--handle-lo.dct-continuous__tick--vertical,
-	.dct-continuous__tick--handle-hi.dct-continuous__tick--vertical {
-		transform-origin: left bottom;
-		transform: rotate(var(--dct-continuous-label-overlap-rotate, 90deg));
+	/* A label that would touch another keeps its place, so its width stays measured, and is not drawn. */
+	.dct-continuous__tick--hidden {
+		visibility: hidden;
 	}
 	/* Tick mark below the bar at each non-interactive tick's position. */
 	.dct-continuous__tick-mark {
