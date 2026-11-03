@@ -124,35 +124,34 @@ The text blocks map `title`, `subtitle` and `caption` to `--dct-{block}-{font|si
 
 ### legend
 
-| CSS variable                            | Config path                              |
-| --------------------------------------- | ---------------------------------------- |
-| `--dct-legend-font`                     | `legend.font`                            |
-| `--dct-legend-size`                     | `legend.size`                            |
-| `--dct-legend-weight`                   | `legend.weight`                          |
-| `--dct-legend-color`                    | `legend.color`                           |
-| `--dct-legend-title-size`               | `legend.titleSize`                       |
-| `--dct-legend-title-weight`             | `legend.titleWeight`                     |
-| `--dct-legend-gap`                      | `legend.gap`                             |
-| `--dct-legend-swatch`                   | `legend.swatchSize`                      |
-| `--dct-legend-size-gap`                 | `legend.sizeScale.gap`                   |
-| `--dct-legend-nav-bg`                   | `legend.navButton.background`            |
-| `--dct-legend-nav-color`                | `legend.navButton.color`                 |
-| `--dct-legend-nav-size`                 | `legend.navButton.size`                  |
-| `--dct-legend-nav-font-size`            | `legend.navButton.fontSize`              |
-| `--dct-legend-nav-disabled-opacity`     | `legend.navButton.disabledOpacity`       |
-| `--dct-continuous-handle-width`         | `legend.continuous.handle.width`         |
-| `--dct-continuous-handle-height`        | `legend.continuous.handle.height`        |
-| `--dct-continuous-handle-radius`        | `legend.continuous.handle.radius`        |
-| `--dct-continuous-handle-fill`          | `legend.continuous.handle.fill`          |
-| `--dct-continuous-handle-stroke`        | `legend.continuous.handle.stroke`        |
-| `--dct-continuous-handle-stroke-width`  | `legend.continuous.handle.strokeWidth`   |
-| `--dct-continuous-tick-color`           | `legend.continuous.tick.color`           |
-| `--dct-continuous-tick-width`           | `legend.continuous.tick.width`           |
-| `--dct-continuous-tick-length`          | `legend.continuous.tick.length`          |
-| `--dct-continuous-label-rotate`         | `legend.continuous.label.rotate`         |
-| `--dct-continuous-label-size`           | `legend.continuous.label.size`           |
-| `--dct-continuous-label-weight`         | `legend.continuous.label.weight`         |
-| `--dct-continuous-label-overlap-rotate` | `legend.continuous.label.overlap.rotate` |
+| CSS variable                           | Config path                            |
+| -------------------------------------- | -------------------------------------- |
+| `--dct-legend-font`                    | `legend.font`                          |
+| `--dct-legend-size`                    | `legend.size`                          |
+| `--dct-legend-weight`                  | `legend.weight`                        |
+| `--dct-legend-color`                   | `legend.color`                         |
+| `--dct-legend-title-size`              | `legend.titleSize`                     |
+| `--dct-legend-title-weight`            | `legend.titleWeight`                   |
+| `--dct-legend-gap`                     | `legend.gap`                           |
+| `--dct-legend-swatch`                  | `legend.swatchSize`                    |
+| `--dct-legend-size-gap`                | `legend.sizeScale.gap`                 |
+| `--dct-legend-nav-bg`                  | `legend.navButton.background`          |
+| `--dct-legend-nav-color`               | `legend.navButton.color`               |
+| `--dct-legend-nav-size`                | `legend.navButton.size`                |
+| `--dct-legend-nav-font-size`           | `legend.navButton.fontSize`            |
+| `--dct-legend-nav-disabled-opacity`    | `legend.navButton.disabledOpacity`     |
+| `--dct-continuous-handle-width`        | `legend.continuous.handle.width`       |
+| `--dct-continuous-handle-height`       | `legend.continuous.handle.height`      |
+| `--dct-continuous-handle-radius`       | `legend.continuous.handle.radius`      |
+| `--dct-continuous-handle-fill`         | `legend.continuous.handle.fill`        |
+| `--dct-continuous-handle-stroke`       | `legend.continuous.handle.stroke`      |
+| `--dct-continuous-handle-stroke-width` | `legend.continuous.handle.strokeWidth` |
+| `--dct-continuous-tick-color`          | `legend.continuous.tick.color`         |
+| `--dct-continuous-tick-width`          | `legend.continuous.tick.width`         |
+| `--dct-continuous-tick-length`         | `legend.continuous.tick.length`        |
+| `--dct-continuous-label-rotate`        | `legend.continuous.label.rotate`       |
+| `--dct-continuous-label-size`          | `legend.continuous.label.size`         |
+| `--dct-continuous-label-weight`        | `legend.continuous.label.weight`       |
 
 ### axis
 

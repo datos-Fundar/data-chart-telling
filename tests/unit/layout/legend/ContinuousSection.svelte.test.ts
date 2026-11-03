@@ -218,3 +218,136 @@ describe('ContinuousSection - the numbers at its edges', () => {
 		}
 	});
 });
+
+describe('ContinuousSection - labels that would touch', () => {
+	const labels = (container: Element, selector: string) =>
+		[...container.querySelectorAll(selector)].map((el) => ({
+			text: el.textContent?.trim(),
+			visible: getComputedStyle(el).visibility !== 'hidden'
+		}));
+
+	test('a tick label too close to an edge label gives way to it, and the ticks that clear them stay', async () => {
+		const section: ContinuousLegendSection = {
+			type: 'continuous',
+			min: 25,
+			max: 73,
+			width: 170,
+			ticks: [30, 40, 50, 60, 70]
+		};
+		const { container } = await render(ContinuousSection, { section });
+
+		await vi.waitFor(() => {
+			const ticks = labels(container, '.dct-continuous__tick');
+			expect(ticks.find((t) => t.text === '30')?.visible).toBe(false);
+			expect(ticks.find((t) => t.text === '70')?.visible).toBe(false);
+			expect(ticks.find((t) => t.text === '50')?.visible).toBe(true);
+		});
+		// The edges are always written, and a hidden tick leaves no mark below the bar.
+		expect(labels(container, '.dct-continuous__edge').every((e) => e.visible)).toBe(true);
+		expect(container.querySelectorAll('.dct-continuous__tick-mark').length).toBeLessThan(5);
+	});
+
+	test('ticks that touch each other keep the lower one; a wide enough bar keeps them all', async () => {
+		const crowded: ContinuousLegendSection = {
+			type: 'continuous',
+			min: 0,
+			max: 100,
+			width: 120,
+			ticks: [40, 45, 50, 55, 60]
+		};
+		const { container, rerender } = await render(ContinuousSection, { section: crowded });
+		await vi.waitFor(() => {
+			const ticks = labels(container, '.dct-continuous__tick');
+			expect(ticks.find((t) => t.text === '40')?.visible).toBe(true);
+			expect(ticks.find((t) => t.text === '45')?.visible).toBe(false);
+		});
+
+		await rerender({ section: { ...crowded, width: 600 } });
+		await vi.waitFor(() => {
+			expect(labels(container, '.dct-continuous__tick').every((t) => t.visible)).toBe(true);
+		});
+	});
+
+	test('ticks that are far enough apart are all written', async () => {
+		const section: ContinuousLegendSection = {
+			type: 'continuous',
+			min: 0,
+			max: 100,
+			width: 200,
+			ticks: [25, 50, 75]
+		};
+		const { container } = await render(ContinuousSection, { section });
+		await vi.waitFor(() => {
+			expect(labels(container, '.dct-continuous__tick').every((t) => t.visible)).toBe(true);
+		});
+	});
+
+	test('when the handle labels meet, the one on the domain end hides and the moving one stays horizontal until they part', async () => {
+		const section: ContinuousLegendSection = {
+			type: 'continuous',
+			min: 0,
+			max: 100,
+			width: 200,
+			interactive: { enabled: true }
+		};
+		const { container } = await render(ContinuousSection, { section });
+		const handles = () => ({
+			lo: container.querySelector('.dct-continuous__tick--handle-lo')!,
+			hi: container.querySelector('.dct-continuous__tick--handle-hi')!
+		});
+		const visible = (el: Element) => getComputedStyle(el).visibility !== 'hidden';
+
+		const lo = await vi.waitFor(() => {
+			const el = container.querySelector('rect[aria-label="Lower bound"]');
+			if (!el) throw new Error('lo handle not yet rendered');
+			return el;
+		});
+
+		// Drag the lower handle almost onto the upper one, which rests on the domain's end.
+		await dragBy(lo, 190);
+		await vi.waitFor(() => {
+			expect(visible(handles().hi)).toBe(false);
+			expect(visible(handles().lo)).toBe(true);
+			expect(getComputedStyle(handles().lo).transform).not.toContain('matrix(0');
+		});
+		// The label that stays writes both values, and stays inside the legend's width.
+		expect(handles().lo.textContent).toMatch(/^\s*\d+ – 100\s*$/);
+		const legend = container.querySelector('.dct-continuous__labels')!.getBoundingClientRect();
+		const label = handles().lo.getBoundingClientRect();
+		expect(label.left).toBeGreaterThanOrEqual(legend.left - 0.5);
+		expect(label.right).toBeLessThanOrEqual(legend.right + 0.5);
+
+		// Pull it back: the upper label comes back.
+		await dragBy(container.querySelector('rect[aria-label="Lower bound"]')!, -150);
+		await vi.waitFor(() => {
+			expect(visible(handles().hi)).toBe(true);
+			expect(visible(handles().lo)).toBe(true);
+		});
+		expect(handles().lo.textContent).not.toContain('–');
+	});
+
+	test('the merged label of a moving upper handle grows inward and stays inside the legend', async () => {
+		const section: ContinuousLegendSection = {
+			type: 'continuous',
+			min: 0,
+			max: 100,
+			width: 200,
+			interactive: { enabled: true }
+		};
+		const { container } = await render(ContinuousSection, { section });
+		const hi = await vi.waitFor(() => {
+			const el = container.querySelector('rect[aria-label="Upper bound"]');
+			if (!el) throw new Error('hi handle not yet rendered');
+			return el;
+		});
+		await dragBy(hi, -195);
+		const label = await vi.waitFor(() => {
+			const el = container.querySelector('.dct-continuous__tick--handle-hi')!;
+			if (!el.textContent?.includes('–')) throw new Error('labels not merged yet');
+			return el;
+		});
+		const legend = container.querySelector('.dct-continuous__labels')!.getBoundingClientRect();
+		expect(label.getBoundingClientRect().left).toBeGreaterThanOrEqual(legend.left - 0.5);
+		expect(label.getBoundingClientRect().right).toBeLessThanOrEqual(legend.right + 0.5);
+	});
+});

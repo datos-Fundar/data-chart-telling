@@ -220,16 +220,14 @@ export type PlotStylesConfig = {
 				rotate: string;
 				/** font-size of the tick/edge/handle labels. */
 				size: string;
-				/** font-weight of the draggable lo/hi handle labels. */
+				/** font-weight of every label: the edges, the ticks and the draggable lo/hi handles. */
 				weight: number | string;
-				/** Interactive-mode-only: the lo/hi handle labels flip to read top-to-bottom once dragging brings them too close to read side by side. */
+				/** Labels that would touch are thinned out: a tick label gives way to an edge label and to the ticks before it, and, in the interactive mode, the lo/hi handle label of a handle that rests on the domain's end gives way to the moving one. */
 				overlap: {
-					/** Whether the flip-to-vertical behavior is active at all; false always keeps both labels horizontal, however close together. */
+					/** Whether labels are thinned out at all; false always writes every label, however close together. */
 					enabled: boolean;
-					/** How many px of horizontal slack the two labels need between them before they're considered overlapping (and flipped). */
+					/** How many px of horizontal slack two labels need between them before they are considered touching. */
 					margin: number;
-					/** Rotation magnitude applied once overlapping - lo rotates by this amount, hi by its negation, so both still grow inward toward the bar instead of off its edges. */
-					rotate: string;
 				};
 			};
 		};
