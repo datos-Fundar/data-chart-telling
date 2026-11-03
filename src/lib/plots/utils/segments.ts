@@ -94,11 +94,20 @@ export function validateSegments<TStyle>(segments: SegmentsConfig<TStyle>): void
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function resolveSeriesSegments<S extends Series<any>, TStyle>(
 	series: S,
-	segs: Segment<TStyle>[],
-	connect: boolean
+	segmentsOfSeries: Segment<TStyle>[],
+	connect: boolean,
+	base?: TStyle
 ): VisualSegment<S['data'][number], TStyle>[] {
+	// The style every segment is drawn over: each one's own wins, field by field.
+	const baseStyle = (base ?? {}) as TStyle;
+	const segs = base
+		? segmentsOfSeries.map((seg) => ({
+				...seg,
+				styles: merge(base as object, (seg.styles ?? {}) as object) as TStyle
+			}))
+		: segmentsOfSeries;
 	if (!segs.length) {
-		return [{ data: series.data, styles: {} as TStyle, scales: undefined }];
+		return [{ data: series.data, styles: baseStyle, scales: undefined }];
 	}
 
 	const getX = readChannel(series.x);
@@ -150,9 +159,8 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
 	// Dots are excluded to avoid duplicate marks at the shared boundary points.
 	const catchAll = segs.find((s) => !s.areas || s.areas.length === 0);
 	const connectorStyle: TStyle = (() => {
-		if (!catchAll?.styles) return {} as TStyle;
-		const rest = { ...(catchAll.styles as Record<string, unknown>) };
-		delete rest.dots;
+		const rest = { ...((catchAll?.styles ?? baseStyle) as Record<string, unknown>) };
+		delete rest.dot;
 		return rest as TStyle;
 	})();
 
@@ -163,17 +171,33 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
 	for (let r = 0; r < runs.length; r++) {
 		const run = runs[r];
 		if (run.segIdx === -1) {
-			// Unmatched run: for a continuous mark (line), insert bridge points so
-			// it connects to adjacent user segments without a visual gap. Discrete
-			// marks (bar, pyramid) have no such gap to bridge - bridging would just
+			// Unmatched run: drawn with its own rows only. For a continuous mark
+			// (line), line-only connectors join it to the adjacent user segments
+			// without a visual gap, like those between two user segments, so no
+			// neighbor's boundary row is drawn - or dotted - twice. Discrete marks
+			// (bar, pyramid) have no such gap to bridge - bridging would just
 			// duplicate the neighboring runs' boundary rows as an extra, wrongly
 			// styled mark at that same category.
-			const bridged: DataPoint[] = [...run.data];
+			defaultVisual.push({ data: run.data, styles: baseStyle, scales: undefined });
 			if (connect) {
-				if (r > 0) bridged.unshift(runs[r - 1].data[runs[r - 1].data.length - 1]);
-				if (r < runs.length - 1) bridged.push(runs[r + 1].data[0]);
+				const first = run.data[0];
+				const last = run.data[run.data.length - 1];
+				if (r > 0) {
+					const before = runs[r - 1].data;
+					connectors.push({
+						data: [before[before.length - 1], first],
+						styles: connectorStyle,
+						scales: undefined
+					});
+				}
+				if (r < runs.length - 1) {
+					connectors.push({
+						data: [last, runs[r + 1].data[0]],
+						styles: connectorStyle,
+						scales: undefined
+					});
+				}
 			}
-			defaultVisual.push({ data: bridged, styles: {} as TStyle, scales: undefined });
 		} else {
 			const seg = segs[run.segIdx];
 			const segStyle = seg.styles ?? ({} as TStyle);
@@ -235,14 +259,16 @@ export function buildGroupedSeries<
 >(
 	seriesList: S[],
 	segments: SegmentsConfig<TStyle> = {},
-	connect = true
+	connect = true,
+	baseFor?: (seriesName: string) => TStyle | undefined
 ): VisualGroup<S, TStyle>[] {
 	return seriesList.map((s) => ({
 		series: s,
 		visualSegments: resolveSeriesSegments<S, TStyle>(
 			s,
 			resolveSegmentsForSeries(segments, s),
-			connect
+			connect,
+			baseFor?.(s.name)
 		)
 	}));
 }
@@ -266,12 +292,15 @@ export function buildScopedMarkerGroups<
 	segments?: SegmentsConfig<TStyle>;
 	colorFor: (series: S, seriesIndex: number) => string;
 	segmentColorFor: (styles: TStyle | undefined, defaultColor: string) => string;
+	/** The style each series' segments are drawn over, as `buildGroupedSeries` takes it. */
+	baseFor?: (seriesName: string) => TStyle | undefined;
 }): ScopedMarkerGroup<TData>[] {
-	const { groupedSeries, segments = {}, colorFor, segmentColorFor } = args;
+	const { groupedSeries, segments = {}, colorFor, segmentColorFor, baseFor } = args;
 	return groupedSeries.map((group, seriesIndex) => {
 		const defaultColor = colorFor(group.series, seriesIndex);
 		const xFor = readChannel(group.series.x);
 		const segs = resolveSegmentsForSeries(segments, group.series);
+		const base = baseFor?.(group.series.name);
 		return {
 			name: group.series.name,
 			...(group.series.id !== undefined ? { id: group.series.id } : {}),
@@ -280,7 +309,10 @@ export function buildScopedMarkerGroups<
 			color: defaultColor,
 			segments: segs.map((seg) => ({
 				match: (row: TData) => matchesSegmentX(xFor(row) as AxisValue, seg),
-				color: segmentColorFor(seg.styles, defaultColor)
+				color: segmentColorFor(
+					base ? (merge(base as object, (seg.styles ?? {}) as object) as TStyle) : seg.styles,
+					defaultColor
+				)
 			}))
 		};
 	});

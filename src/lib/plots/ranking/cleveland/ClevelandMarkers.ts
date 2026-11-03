@@ -209,7 +209,7 @@ export class ClevelandMarkers {
 			const disabled = interaction?.dotsFor(name);
 			return group.visualSegments.map((segment): DotMarkerConfig => {
 				const stem = segment.styles.stroke;
-				const dot = segment.styles.dots;
+				const dot = segment.styles.dot;
 				return {
 					type: 'dot',
 					series: name,

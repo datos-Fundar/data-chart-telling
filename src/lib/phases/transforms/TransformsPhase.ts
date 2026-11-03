@@ -203,7 +203,12 @@ export class TransformsPhase<
 				data.filter((row) => row[SERIES_ID_KEY] === seriesIdOf(s))
 			)
 		);
-		return buildGroupedSeries<Series<ProcessedRow>, TStyle>(series, state.segments, connect);
+		return buildGroupedSeries<Series<ProcessedRow>, TStyle>(
+			series,
+			state.segments,
+			connect,
+			state.segmentBase
+		);
 	}
 
 	/**
@@ -225,7 +230,12 @@ export class TransformsPhase<
 			if (last && seriesIdOf(last) === seriesIdOf(source)) last.data.push(row);
 			else runs.push(TransformsPhase.#processedSeries(state, source, [row]));
 		}
-		return buildGroupedSeries<Series<ProcessedRow>, TStyle>(runs, state.segments, false);
+		return buildGroupedSeries<Series<ProcessedRow>, TStyle>(
+			runs,
+			state.segments,
+			false,
+			state.segmentBase
+		);
 	}
 
 	/**

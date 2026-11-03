@@ -103,6 +103,25 @@ A row whose value is `null`, `undefined` or `NaN` breaks a line. `styles.gaps` b
 - On bar plots only the presence of `x` matters.
 - Unset styles fall back to `line.gap`, `bar.gap` and `pyramid.gap` in the [configuration](theming.md).
 
+### Basic styles
+
+`styles.stroke`, `styles.dot` and `styles.area` set the style every series is drawn with, so `segments` are left for what only part of a series looks like. Each takes a style as it is, or a function of the series' name returning one (`undefined` leaves that series as it is):
+
+```svelte
+<LinePlot
+	styles={{
+		stroke: (name) =>
+			name === 'male' ? { strokeWidth: 2, strokeOpacity: 0.5 } : { strokeWidth: 4 },
+		dot: { dotRadius: 3 }
+	}}
+	...
+/>
+```
+
+- A plot uses the ones its own marks are made of and ignores the rest, so one `styles` can be shared between plots. `LinePlot` draws `stroke` (the line) and `dot` (a dot on every point of every series; unset, a series has none but those a segment gives it).
+- A series keeps the color of the `color` scale unless the style sets its own.
+- A segment's own style wins over them, field by field, and what a legend turned off dims over both - so a `legend.off` fades a series without `segments` repeating its opacity.
+
 ## Segments
 
 `segments` separates data ranges from their styling. It is an object: each key is a series name (a feature id for `GeoPlot`), or `'default'`, mapped to a list of segments.
@@ -125,7 +144,7 @@ The style shape depends on the plot:
 
 | Plot                        | Style type                         | Fields                                         |
 | --------------------------- | ---------------------------------- | ---------------------------------------------- |
-| `LinePlot`                  | `LineSegmentStyle`                 | `stroke` (line style), `dots` (dot style)      |
+| `LinePlot`                  | `LineSegmentStyle`                 | `stroke` (line style), `dot` (dot style)       |
 | `AreaPlot`, `HistogramPlot` | `AreaStyle`                        | `fill`, `fillOpacity`, `stroke`, ...           |
 | `BarPlot`, `PyramidPlot`    | `BarSegmentStyle` (`AreaStyle`)    | `fill`, `fillOpacity`, `stroke`, ...           |
 | `HeatmapPlot`               | `CellSegmentStyle` (`AreaStyle`)   | `fill`, `fillOpacity`, `stroke`, `strokeWidth` |
@@ -192,7 +211,7 @@ Per-series colors, plus dots over a range shared by every series:
 		default: [
 			{
 				areas: [{ x: { from: 1965, to: 1980 } }],
-				styles: { dots: { dotRadius: 5, dotSymbol: 'circle' } }
+				styles: { dot: { dotRadius: 5, dotSymbol: 'circle' } }
 			}
 		]
 	}}

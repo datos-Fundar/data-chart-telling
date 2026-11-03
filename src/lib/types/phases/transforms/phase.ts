@@ -33,6 +33,9 @@ export type ProcessedData = {
 export type TransformsStageState = {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	resolvedSeries?: Series<any>[];
+	/** The style every segment of a series is drawn over, which the processed groups are cut with too. */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	segmentBase?: (series: string) => any;
 	axes?: PlotAxes;
 	/** Each series' gap fills, by series id: the value each missing row is drawn at. */
 	gapFillMaps?: Map<string, Map<unknown, { value: number; kind: string }>>;

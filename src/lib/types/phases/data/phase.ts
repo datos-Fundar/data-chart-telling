@@ -1,5 +1,6 @@
 import type { Series } from '$lib/types/plots/data/common';
 import type { DiscreteAxesCount } from '$lib/types/phases/data/axes';
+import type { BasicStylesShape } from '$lib/types/layout/styles';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /** How a plot kind's own mark splits into visual segments. */
@@ -8,6 +9,8 @@ export type SegmentsStageOptions = {
 	color?: (style: any) => string | undefined;
 	/** Whether adjacent visual segments share their boundary row - a continuous mark (line, area) does. Defaults to `true`. */
 	connect?: boolean;
+	/** The basic styles (`styles.stroke`, `styles.dot`, `styles.area`) this kind's segment style is made of, which every segment of a series is drawn over. A segment's own style wins over them, field by field. Left out, the kind draws none of them. */
+	base?: BasicStylesShape;
 };
 
 /**

@@ -174,15 +174,15 @@ describe('buildGroupedSeries - catch-all style merging', () => {
 		const segments: SegmentsConfig<LineSegmentStyle> = {
 			a: [
 				{ styles: { stroke: { stroke: 'red' } } }, // catch-all
-				{ areas: [{ x: { from: 2, to: 4 } }], styles: { dots: { dotRadius: 5 } } } // dots only
+				{ areas: [{ x: { from: 2, to: 4 } }], styles: { dot: { dotRadius: 5 } } } // dots only
 			]
 		};
 		const groups = buildGroupedSeries([SERIES], segments);
 		const areaSeg = groups[0].visualSegments.find(
-			(s) => s.data.some((d) => d.x === 3) && s.styles.dots !== undefined
+			(s) => s.data.some((d) => d.x === 3) && s.styles.dot !== undefined
 		);
 		expect(areaSeg?.styles.stroke?.stroke).toBe('red');
-		expect(areaSeg?.styles.dots?.dotRadius).toBe(5);
+		expect(areaSeg?.styles.dot?.dotRadius).toBe(5);
 	});
 
 	test('area segment stroke overrides catch-all stroke', () => {
@@ -201,7 +201,7 @@ describe('buildGroupedSeries - catch-all style merging', () => {
 		const segments: SegmentsConfig<LineSegmentStyle> = {
 			a: [
 				{ styles: { stroke: { stroke: 'red' } } }, // catch-all
-				{ areas: [{ x: { from: 2, to: 4 } }], styles: { dots: { dotRadius: 5 } } }
+				{ areas: [{ x: { from: 2, to: 4 } }], styles: { dot: { dotRadius: 5 } } }
 			]
 		};
 		const groups = buildGroupedSeries([SERIES], segments);
@@ -212,57 +212,57 @@ describe('buildGroupedSeries - catch-all style merging', () => {
 
 	test('no catch-all → area segment style is used unchanged', () => {
 		const segments: SegmentsConfig<LineSegmentStyle> = {
-			a: [{ areas: [{ x: { from: 2, to: 4 } }], styles: { dots: { dotRadius: 5 } } }]
+			a: [{ areas: [{ x: { from: 2, to: 4 } }], styles: { dot: { dotRadius: 5 } } }]
 		};
 		const groups = buildGroupedSeries([SERIES], segments);
 		const areaSeg = groups[0].visualSegments.find((s) => s.data.some((d) => d.x === 3));
-		expect(areaSeg?.styles).toEqual({ dots: { dotRadius: 5 } });
+		expect(areaSeg?.styles).toEqual({ dot: { dotRadius: 5 } });
 	});
 
 	test('default key catch-all merges into area segments for all series', () => {
 		const segments: SegmentsConfig<LineSegmentStyle> = {
 			default: [
 				{ styles: { stroke: { stroke: 'green' } } }, // default catch-all
-				{ areas: [{ x: { from: 2, to: 4 } }], styles: { dots: { dotRadius: 8 } } }
+				{ areas: [{ x: { from: 2, to: 4 } }], styles: { dot: { dotRadius: 8 } } }
 			]
 		};
 		const groups = buildGroupedSeries([SERIES, SERIES_B], segments);
 		for (const group of groups) {
 			const areaSeg = group.visualSegments.find(
-				(s) => s.data.some((d) => d.x === 3) && s.styles.dots !== undefined
+				(s) => s.data.some((d) => d.x === 3) && s.styles.dot !== undefined
 			);
 			expect(areaSeg?.styles.stroke?.stroke).toBe('green');
-			expect(areaSeg?.styles.dots?.dotRadius).toBe(8);
+			expect(areaSeg?.styles.dot?.dotRadius).toBe(8);
 		}
 	});
 
 	test('series catch-all merges with default area segment', () => {
 		const segments: SegmentsConfig<LineSegmentStyle> = {
 			a: [{ styles: { stroke: { stroke: 'tomato' } } }],
-			default: [{ areas: [{ x: { from: 2, to: 4 } }], styles: { dots: { dotRadius: 6 } } }]
+			default: [{ areas: [{ x: { from: 2, to: 4 } }], styles: { dot: { dotRadius: 6 } } }]
 		};
 		const groups = buildGroupedSeries([SERIES], segments);
 		const areaSeg = groups[0].visualSegments.find(
-			(s) => s.data.some((d) => d.x === 3) && s.styles.dots !== undefined
+			(s) => s.data.some((d) => d.x === 3) && s.styles.dot !== undefined
 		);
 		expect(areaSeg?.styles.stroke?.stroke).toBe('tomato');
-		expect(areaSeg?.styles.dots?.dotRadius).toBe(6);
+		expect(areaSeg?.styles.dot?.dotRadius).toBe(6);
 	});
 
 	test('area dots key replaces catch-all dots key entirely', () => {
 		const segments: SegmentsConfig<LineSegmentStyle> = {
 			a: [
-				{ styles: { stroke: { stroke: 'purple' }, dots: { dotRadius: 3 } } }, // catch-all with dots
-				{ areas: [{ x: { from: 2, to: 4 } }], styles: { dots: { dotRadius: 10 } } } // override dots
+				{ styles: { stroke: { stroke: 'purple' }, dot: { dotRadius: 3 } } }, // catch-all with dots
+				{ areas: [{ x: { from: 2, to: 4 } }], styles: { dot: { dotRadius: 10 } } } // override dots
 			]
 		};
 		const groups = buildGroupedSeries([SERIES], segments);
 		const areaSeg = groups[0].visualSegments.find(
-			(s) => s.data.some((d) => d.x === 3) && s.styles.dots?.dotRadius === 10
+			(s) => s.data.some((d) => d.x === 3) && s.styles.dot?.dotRadius === 10
 		);
 		// Area's dots replace catch-all's dots; stroke falls through from catch-all.
 		expect(areaSeg?.styles.stroke?.stroke).toBe('purple');
-		expect(areaSeg?.styles.dots?.dotRadius).toBe(10);
+		expect(areaSeg?.styles.dot?.dotRadius).toBe(10);
 	});
 });
 

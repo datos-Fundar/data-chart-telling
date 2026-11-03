@@ -64,7 +64,7 @@ export const HighlightedSeries: Story = {
 				{
 					styles: {
 						stroke: { strokeOpacity: 0.25 },
-						dots: { dotFillOpacity: 0.25, dotStrokeOpacity: 0.25 }
+						dot: { dotFillOpacity: 0.25, dotStrokeOpacity: 0.25 }
 					}
 				}
 			]

@@ -81,6 +81,8 @@ export type AxisPlotState<
 	/** Every series name, before legend-omitted ones are dropped, so colors stay put. */
 	allSeriesNames?: string[];
 	groupedSeries?: VisualGroup<TSeries, TStyle>[];
+	/** The style every segment of a series is drawn over (see `SegmentsStageOptions.base`), which the "transforms" phase cuts its own groups with too. */
+	segmentBase?: (series: string) => TStyle | undefined;
 	flat?: TRow[];
 	scopedGroups?: ScopedMarkerGroup<TData>[];
 	colorForSeries?: (name: string) => string;

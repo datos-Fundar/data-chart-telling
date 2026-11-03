@@ -52,7 +52,7 @@ export function buildClevelandDefaults<TData extends Record<string, unknown>>(
 			discreteAxes: 1,
 			segments: {
 				color: (style: LineSegmentStyle | undefined) =>
-					style?.dots?.dotFill ?? style?.stroke?.stroke,
+					style?.dot?.dotFill ?? style?.stroke?.stroke,
 				connect: false
 			}
 		},

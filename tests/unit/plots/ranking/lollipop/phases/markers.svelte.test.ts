@@ -75,9 +75,7 @@ describe('LollipopPlot markers', () => {
 			x: 'c',
 			y: 'v',
 			segments: {
-				default: [
-					{ areas: [{ x: { from: 'b1', to: 'b2' } }], styles: { dots: { dotFill: 'red' } } }
-				]
+				default: [{ areas: [{ x: { from: 'b1', to: 'b2' } }], styles: { dot: { dotFill: 'red' } } }]
 			}
 		});
 		const red = dots.find((d) => d.styles?.dotFill === 'red')!;

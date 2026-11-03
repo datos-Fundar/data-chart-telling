@@ -6,7 +6,7 @@ import { PROVINCE_VALUES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `segments` restyles some of a series' dots: each segment's `areas` selects the
-// categories it covers, and its `dots` style just those dots. Ungrouped rows form
+// categories it covers, and its `dot` style just those dots. Ungrouped rows form
 // the `default` series.
 
 const meta = {
@@ -43,7 +43,7 @@ export const Outlined: Story = {
 			default: [
 				{
 					areas: [{ x: { from: 'Chubut', to: 'Chubut' } }],
-					styles: { dots: { dotStroke: '#111827', dotStrokeWidth: 2 } }
+					styles: { dot: { dotStroke: '#111827', dotStrokeWidth: 2 } }
 				}
 			]
 		} satisfies SegmentsConfig<LineSegmentStyle>
@@ -60,7 +60,7 @@ export const Larger: Story = {
 						{ x: { from: 'Córdoba', to: 'Córdoba' } },
 						{ x: { from: 'Mendoza', to: 'Mendoza' } }
 					],
-					styles: { dots: { dotRadius: 9 } }
+					styles: { dot: { dotRadius: 9 } }
 				}
 			]
 		} satisfies SegmentsConfig<LineSegmentStyle>

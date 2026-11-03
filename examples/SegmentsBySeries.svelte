@@ -18,7 +18,7 @@
 		default: [
 			{
 				areas: [{ x: { from: 1965, to: 1980 } }],
-				styles: { dots: { dotRadius: 5, dotSymbol: 'circle' } }
+				styles: { dot: { dotRadius: 5, dotSymbol: 'circle' } }
 			}
 		]
 	}}

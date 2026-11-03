@@ -42,7 +42,7 @@ type Story = StoryObj<typeof meta>;
 export const Highlighted: Story = {
 	args: {
 		segments: {
-			'65+': [{ styles: { stroke: { strokeWidth: 5 }, dots: { dotRadius: 8 } } }]
+			'65+': [{ styles: { stroke: { strokeWidth: 5 }, dot: { dotRadius: 8 } } }]
 		} satisfies SegmentsConfig<LineSegmentStyle>
 	}
 };

@@ -21,7 +21,7 @@ const SERIES: Series<{ x: number; y: number | null }> = {
 	y: 'y',
 	data: DATA
 };
-const GAPS: GapsConfig<LineSegmentStyle> = { default: { middle: { style: { dots: {} } } } };
+const GAPS: GapsConfig<LineSegmentStyle> = { default: { middle: { style: { dot: {} } } } };
 
 function build(disabledStroke?: object, disabledDots?: object) {
 	return buildGapMarkers({

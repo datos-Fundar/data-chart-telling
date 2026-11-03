@@ -341,7 +341,7 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		dotRadius: 4,
 		gap: {
 			stroke: { strokeOpacity: 0.6, strokeDasharray: '4 4' },
-			dots: {}
+			dot: {}
 		}
 	},
 
