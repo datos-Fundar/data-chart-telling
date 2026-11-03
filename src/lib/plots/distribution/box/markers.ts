@@ -22,7 +22,14 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		const disabled = ctx.interaction?.fillFor(name);
 		return group.visualSegments.map((seg): BoxMarkerConfig => {
 			const { stroke, strokeWidth, strokeOpacity, borderRadius } = seg.styles;
-			const outline = { stroke, strokeWidth, strokeOpacity, borderRadius };
+			const fill = disabled?.fill ?? seg.styles.fill ?? state.colorForSeries!(name);
+			// An outline asked for without a color is the fill's.
+			const outline = {
+				stroke: stroke ?? (strokeWidth !== undefined ? fill : undefined),
+				strokeWidth,
+				strokeOpacity,
+				borderRadius
+			};
 			return {
 				type: 'box',
 				series: name,
@@ -32,7 +39,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 				bar: {
 					// The box's own outline, from its segment; unset fields stay svelteplot's.
 					...Object.fromEntries(Object.entries(outline).filter(([, v]) => v !== undefined)),
-					fill: disabled?.fill ?? seg.styles.fill ?? state.colorForSeries!(name),
+					fill,
 					fillOpacity: disabled?.fillOpacity ?? seg.styles.fillOpacity ?? cfg.box.fillOpacity
 				}
 			};

@@ -59,7 +59,11 @@ export function buildBarDefaults<TData extends Record<string, unknown>>(): AxisP
 	return {
 		data: {
 			discreteAxes: 1,
-			segments: { color: (style: BarSegmentStyle | undefined) => style?.fill, connect: false }
+			segments: {
+				color: (style: BarSegmentStyle | undefined) => style?.fill,
+				connect: false,
+				base: { flat: 'area' }
+			}
 		},
 		scales: {
 			zero: ['value'],

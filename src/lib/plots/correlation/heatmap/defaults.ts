@@ -79,7 +79,7 @@ export function buildHeatmapDefaults<TData extends Record<string, unknown>>(): A
 	HeatmapPlotCtx
 > {
 	return {
-		data: { discreteAxes: 2 },
+		data: { discreteAxes: 2, segments: { base: { flat: 'area' } } },
 		mapping: {
 			// A heatmap with no `color` still reads one per cell, as nothing.
 			extend: (state) => ({

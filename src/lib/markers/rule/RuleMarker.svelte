@@ -53,4 +53,6 @@
 	strokeWidth={row.strokeWidth}
 	strokeOpacity={row.strokeOpacity}
 	strokeDasharray={styles?.strokeDasharray}
+	strokeLinecap={styles?.strokeLinecap}
+	strokeLinejoin={styles?.strokeLinejoin}
 />

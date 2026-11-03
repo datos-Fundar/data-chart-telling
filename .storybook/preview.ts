@@ -53,90 +53,259 @@ const preview: Preview = {
 		},
 
 		options: {
-			// Unlisted stories fall back to alphabetical order.
+			// What an `order` leaves out, or lists only as `'*'`, is sorted alphabetically.
 			storySort: {
+				method: 'alphabetical',
 				order: [
 					'Plots',
 					[
 						'Correlation',
 						[
 							'HeatmapPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip'],
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							],
 							'ScatterPlot',
 							[
 								'Series',
 								'Scales',
 								'Styles',
+								['Basic', '*'],
 								'Segments',
-								'Bubble',
 								'Markers',
-								['Rules', 'Hover', 'Custom'],
-								'Tooltip'
+								['*'],
+								'Tooltip',
+								'*'
 							]
 						],
 						'Distribution',
 						[
 							'BoxPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							],
 							'DensityPlot',
-							['Series', 'Estimate', 'Scales', 'Styles', 'Tooltip'],
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							],
 							'HistogramPlot',
-							['Series', 'Scales', 'Tooltip', 'Transforms'],
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							],
 							'PyramidPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules'], 'Tooltip'],
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							],
 							'ViolinPlot',
-							['Series', 'Estimate', 'Styles', 'Tooltip']
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							]
 						],
 						'Evolution',
 						[
 							'AreaPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							],
 							'LinePlot',
 							[
 								'Series',
 								'Scales',
 								'Styles',
+								['Basic', '*'],
 								'Segments',
-								'Curves',
 								'Markers',
-								['Rules', 'Deltas', 'Custom'],
-								'Tooltip'
+								['*'],
+								'Tooltip',
+								'*'
 							],
 							'SlopePlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							],
 							'SparklinePlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
-							'StepPlot'
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							],
+							'StepPlot',
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							]
 						],
 						'Map',
 						[
 							'GeoPlot',
+							// Every plot kind lists its sections the same way: series, scales, styles (`Basic` first, then
+							// the others alphabetically), segments, markers (alphabetically), tooltip, and whatever else it
+							// has (estimate, legend, curves...) alphabetically. Its coordinates also have an order of their own.
 							[
 								'Series',
 								'Scales',
-								'Coordinates',
-								['Projection', 'Zoom', 'Pan', 'Rotate', 'Camera', 'CameraTransition'],
 								'Styles',
+								['Basic', '*'],
 								'Segments',
 								'Markers',
-								['Graticule', 'Dot', 'Vector', 'Link', 'Contour', 'Inset', 'Hover', 'Custom'],
-								'Tooltip'
+								['*'],
+								'Tooltip',
+								'Coordinates',
+								['Projection', 'Zoom', 'Pan', 'Rotate', 'Camera', 'CameraTransition'],
+								'*'
 							]
 						],
 						'Ranking',
 						[
 							'BarPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip'],
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							],
 							'BulletPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', ['Rules', 'Hover'], 'Tooltip'],
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							],
 							'ClevelandPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							],
 							'DumbbellPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							],
 							'ForestPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip'],
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							],
 							'LollipopPlot',
-							['Series', 'Scales', 'Styles', 'Segments', 'Markers', 'Tooltip']
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							]
 						]
 					],
 					'Channels',

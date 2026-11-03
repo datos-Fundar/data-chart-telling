@@ -118,7 +118,18 @@ A row whose value is `null`, `undefined` or `NaN` breaks a line. `styles.gaps` b
 />
 ```
 
-- A plot uses the ones its own marks are made of and ignores the rest, so one `styles` can be shared between plots. `LinePlot` draws `stroke` (the line) and `dot` (a dot on every point of every series; unset, a series has none but those a segment gives it).
+- A plot uses the ones its own marks are made of and ignores the rest, so one `styles` can be shared between plots:
+
+  | Plot                                                                                                                       | Uses                                                           |
+  | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+  | `LinePlot`, `SlopePlot`, `SparklinePlot`                                                                                   | `stroke` (the line), `dot` (a dot on every point; unset, none) |
+  | `AreaPlot`, `BarPlot`, `BulletPlot`, `PyramidPlot`, `HistogramPlot`, `BoxPlot`, `DensityPlot`, `ViolinPlot`, `HeatmapPlot` | `area`                                                         |
+  | `ScatterPlot`                                                                                                              | `dot`                                                          |
+  | `LollipopPlot`, `DumbbellPlot`, `ClevelandPlot`, `ForestPlot`                                                              | `stroke` (the stems and connectors), `dot`                     |
+
+  `GeoPlot` has styles of its own and uses none of them.
+
+- On the plots with connectors, `styles.stroke` (or a segment's `stroke`) styles the stems and connectors: width, color, opacity, dashes and line caps and joins. What the author sets for a connector wins over it: a segment's `stroke` wins over `styles.connector`, which wins over `styles.stroke`. A function of the series styles only the connector of a lone dot, which has a series; the connector of several dots takes a style as it is.
 - A series keeps the color of the `color` scale unless the style sets its own.
 - A segment's own style wins over them, field by field, and what a legend turned off dims over both - so a `legend.off` fades a series without `segments` repeating its opacity.
 

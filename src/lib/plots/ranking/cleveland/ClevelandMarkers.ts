@@ -4,6 +4,7 @@ import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { ClevelandRanges } from '$lib/plots/ranking/cleveland/ClevelandRanges';
 import { ClevelandConnector } from '$lib/plots/ranking/cleveland/ClevelandConnector';
+import { BasicStyles } from '$lib/layout/styles/BasicStyles';
 import type {
 	ClevelandPlotState,
 	ClevelandPlotCtx,
@@ -21,7 +22,8 @@ import type {
 } from '$lib/types/markers/common';
 import type { ProcessedRow } from '$lib/types/phases';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
-import type { ConnectorRange } from '$lib/types/layout/styles';
+import type { StrokeStyle } from '$lib/types/plots/styling';
+import type { BasicStylesConfig, ConnectorRange } from '$lib/types/layout/styles';
 import type { TextAnchor, LineAnchor } from '$lib/types/plots/constants';
 import type { EdgeBox } from '$lib/types/layout/box';
 
@@ -85,15 +87,21 @@ export class ClevelandMarkers {
 		const size = state.channels?.r;
 		const dotRadius = typeof size === 'number' ? size : style.dotRadius;
 		const neutral = style.connectorColor ?? cfg.axis.color;
+		// `styles.stroke` is the connectors' look below everything the author sets for them: a segment's
+		// stroke wins over `styles.connector`, which wins over it. A function of the series styles only
+		// the connector of a lone dot, which has a series; the connector of several dots has none.
+		const baseStroke = (state.styles as BasicStylesConfig | undefined)?.stroke;
 		const looks = ranges.entries.map((entry) => {
 			const range = connector.rangeOf(entry);
 			const owner = range.series === undefined ? undefined : segmentOf.get(entry.dots[0].row);
 			const stem = owner?.styles.stroke;
+			const base = BasicStyles.read(baseStroke, range.series);
 			const disabled = owner && interaction?.strokeFor(owner.series);
 			const strokeWidth =
 				disabled?.strokeWidth ??
 				stem?.strokeWidth ??
 				connector.width(range, dotRadius) ??
+				base?.strokeWidth ??
 				(style.stemWidth === 'dots' ? dotRadius * 2 : style.stemWidth);
 			// The stretch between the `from` and `to` dots, in the connector's look...
 			const [start, end] = range.span ?? [entry.from, entry.to];
@@ -107,10 +115,15 @@ export class ClevelandMarkers {
 					disabled?.stroke ??
 					stem?.stroke ??
 					connector.color(range) ??
+					base?.stroke ??
 					(owner ? state.colorForSeries!(owner.series) : neutral),
 				strokeWidth,
 				strokeOpacity:
-					disabled?.strokeOpacity ?? stem?.strokeOpacity ?? connector.opacity(range) ?? 1
+					disabled?.strokeOpacity ??
+					stem?.strokeOpacity ??
+					connector.opacity(range) ??
+					base?.strokeOpacity ??
+					1
 			};
 			// ...as an arrow from one dot to the other, when the connector asks for one...
 			const arrow = connector.arrow;
@@ -147,14 +160,24 @@ export class ClevelandMarkers {
 				// A stretch drawn as an arrow is not one of the lines.
 				rows: drawn ? beyond : [span, ...beyond],
 				arrow: drawn,
-				dash: disabled?.strokeDasharray ?? stem?.strokeDasharray
+				// What a stroke draws all of a marker's rows alike with, which a marker takes once for them.
+				pattern: ClevelandMarkers.#pattern(
+					disabled?.strokeDasharray ?? stem?.strokeDasharray ?? base?.strokeDasharray,
+					disabled?.strokeLinecap ?? stem?.strokeLinecap ?? base?.strokeLinecap,
+					disabled?.strokeLinejoin ?? stem?.strokeLinejoin ?? base?.strokeLinejoin
+				)
 			};
 		});
-		// One rule marker per dash pattern, which a marker takes once for all its rows.
-		const byDash = new Map<string | undefined, typeof looks>();
-		for (const look of looks) byDash.set(look.dash, [...(byDash.get(look.dash) ?? []), look]);
-		const rules = [...byDash].map(
-			([dash, group]): RuleMarkerConfig => ({
+		// One rule marker per dash, cap and join pattern, which a marker takes once for all its rows.
+		const byPattern = new Map<string, { pattern: StrokeStyle; looks: typeof looks }>();
+		for (const look of looks) {
+			const key = JSON.stringify(look.pattern);
+			const group = byPattern.get(key) ?? { pattern: look.pattern, looks: [] };
+			group.looks.push(look);
+			byPattern.set(key, group);
+		}
+		const rules = [...byPattern.values()].map(
+			({ pattern, looks: group }): RuleMarkerConfig => ({
 				type: 'rule',
 				// A connector is not what the series look like: its dots are.
 				legend: false,
@@ -165,35 +188,37 @@ export class ClevelandMarkers {
 				stroke: 'stroke',
 				strokeWidth: 'strokeWidth',
 				strokeOpacity: 'strokeOpacity',
-				...(dash ? { styles: { strokeDasharray: dash } } : {})
+				...(Object.keys(pattern).length > 0 ? { styles: pattern } : {})
 			})
 		);
 
-		// The arrows, one marker per dash pattern like the lines, each from its `from` dot to its `to` dot.
+		// The arrows, one marker per pattern like the lines, each from its `from` dot to its `to` dot.
 		const head = connector.arrow;
-		const arrows = [...byDash].flatMap(([dash, group]): ArrowMarkerConfig[] => {
-			const rows = group.flatMap((look) => (look.arrow ? [look.arrow] : []));
-			if (rows.length === 0 || !head) return [];
-			return [
-				{
-					type: 'arrow',
-					legend: false,
-					data: rows,
-					...(isHorizontal
-						? { x1: 'start', x2: 'end', y1: 'category', y2: 'category' }
-						: { y1: 'start', y2: 'end', x1: 'category', x2: 'category' }),
-					headLength: head.headLength,
-					headAngle: head.headAngle,
-					// The shaft starts and ends at the edge of its dots, not under them.
-					insetStart: dotRadius,
-					insetEnd: dotRadius,
-					stroke: 'stroke',
-					strokeWidth: 'strokeWidth',
-					strokeOpacity: 'strokeOpacity',
-					...(dash ? { styles: { strokeDasharray: dash } } : {})
-				}
-			];
-		});
+		const arrows = [...byPattern.values()].flatMap(
+			({ pattern, looks: group }): ArrowMarkerConfig[] => {
+				const rows = group.flatMap((look) => (look.arrow ? [look.arrow] : []));
+				if (rows.length === 0 || !head) return [];
+				return [
+					{
+						type: 'arrow',
+						legend: false,
+						data: rows,
+						...(isHorizontal
+							? { x1: 'start', x2: 'end', y1: 'category', y2: 'category' }
+							: { y1: 'start', y2: 'end', x1: 'category', x2: 'category' }),
+						headLength: head.headLength,
+						headAngle: head.headAngle,
+						// The shaft starts and ends at the edge of its dots, not under them.
+						insetStart: dotRadius,
+						insetEnd: dotRadius,
+						stroke: 'stroke',
+						strokeWidth: 'strokeWidth',
+						strokeOpacity: 'strokeOpacity',
+						...(Object.keys(pattern).length > 0 ? { styles: pattern } : {})
+					}
+				];
+			}
+		);
 
 		// Caps: a tick across each end of a connector, in its look - one marker per look, which a marker takes once for all its ticks.
 		const capLength = connector.caps(style.caps);
@@ -236,6 +261,19 @@ export class ClevelandMarkers {
 			...this.#connectorLabels(state, ctx, connector, looks, isHorizontal)
 		];
 	};
+
+	/** The dash, cap and join a connector is drawn with, leaving out what is not set. */
+	static #pattern(
+		strokeDasharray: StrokeStyle['strokeDasharray'],
+		strokeLinecap: StrokeStyle['strokeLinecap'],
+		strokeLinejoin: StrokeStyle['strokeLinejoin']
+	): StrokeStyle {
+		return {
+			...(strokeDasharray ? { strokeDasharray } : {}),
+			...(strokeLinecap ? { strokeLinecap } : {}),
+			...(strokeLinejoin ? { strokeLinejoin } : {})
+		};
+	}
 
 	/** The caps of the connectors: a tick at each end of those that have a length, one marker per stroke look. */
 	#caps(

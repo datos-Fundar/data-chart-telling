@@ -10,7 +10,7 @@ import { FEMALE_LIFE, MALE_LIFE } from '$datasets';
 // segment sets wins over these, field by field, and a series a legend turned off dims over both.
 
 const meta = {
-	title: 'Plots/Evolution/LinePlot/Styles/Line',
+	title: 'Plots/Evolution/LinePlot/Styles/Basic',
 	component: LinePlot,
 	tags: ['autodocs'],
 	args: {

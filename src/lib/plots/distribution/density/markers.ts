@@ -33,6 +33,10 @@ export function buildMarks<TData extends Record<string, unknown>>(
 						strokeDasharray: disabledStroke?.strokeDasharray ?? seg.styles.strokeDasharray
 					}
 				: {
+						// An outline asked for without a color is the fill's.
+						...(seg.styles.strokeWidth !== undefined
+							? { stroke: disabledFill?.fill ?? color }
+							: {}),
 						...seg.styles,
 						fill: disabledFill?.fill ?? color,
 						fillOpacity:

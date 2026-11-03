@@ -98,6 +98,8 @@ export function buildMarks<TData extends Record<string, unknown>>(
 
 	const rects = (state.processedGroups ?? []).flatMap((group) => {
 		const disabled = ctx.interaction?.fillFor(group.series.name);
+		// A stroke the segment sets is not a reason to lose the series' fill, as the marker would take it for the color.
+		const color = state.colorForSeries!(group.series.name);
 		return group.visualSegments.map((seg) =>
 			Transforms.finish(
 				{
@@ -107,9 +109,15 @@ export function buildMarks<TData extends Record<string, unknown>>(
 					...channels,
 					...options,
 					styles: {
+						// An outline asked for without a color is the fill's.
+						...(seg.styles.strokeWidth !== undefined
+							? { stroke: disabled?.fill ?? seg.styles.fill ?? color }
+							: {}),
+						...seg.styles,
+						fill: disabled?.fill ?? seg.styles.fill ?? color,
 						fillOpacity: disabled?.fillOpacity ?? seg.styles.fillOpacity ?? fillOpacity,
-						...(seg.styles.fill !== undefined ? { fill: seg.styles.fill } : {}),
-						...(disabled?.fill !== undefined ? { fill: disabled.fill } : {})
+						// A dimmed series fades its outline with its fill.
+						...(disabled?.fillOpacity !== undefined ? { strokeOpacity: disabled.fillOpacity } : {})
 					}
 				},
 				transforms

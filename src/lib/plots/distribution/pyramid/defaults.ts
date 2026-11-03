@@ -34,7 +34,11 @@ export function buildPyramidDefaults<TData extends Record<string, unknown>>(): A
 	return {
 		data: {
 			discreteAxes: 1,
-			segments: { color: (style: BarSegmentStyle | undefined) => style?.fill, connect: false },
+			segments: {
+				color: (style: BarSegmentStyle | undefined) => style?.fill,
+				connect: false,
+				base: { flat: 'area' }
+			},
 			orderSeries: (series: Series[], state) => {
 				const sorted = [...series].sort(byName).map((s) => s.name);
 				const reversed = state.scales.grouping?.reverse ?? false;

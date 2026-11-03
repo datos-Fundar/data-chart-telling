@@ -157,8 +157,17 @@ export function buildMarks<TData extends Record<string, unknown>>(
 				data: realData,
 				...span(processedCategory, signed),
 				styles: {
+					// An outline asked for without a color is the fill's.
+					...(seg.styles.strokeWidth !== undefined
+						? { stroke: disabledFill?.fill ?? seg.styles.fill ?? defaultColor }
+						: {}),
+					...seg.styles,
 					fill: disabledFill?.fill ?? seg.styles.fill ?? defaultColor,
-					fillOpacity: disabledFill?.fillOpacity ?? seg.styles.fillOpacity ?? 1
+					fillOpacity: disabledFill?.fillOpacity ?? seg.styles.fillOpacity ?? 1,
+					// A dimmed series fades its outline with its fill.
+					...(disabledFill?.fillOpacity !== undefined
+						? { strokeOpacity: disabledFill.fillOpacity }
+						: {})
 				}
 			});
 		}

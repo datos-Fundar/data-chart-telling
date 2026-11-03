@@ -53,7 +53,9 @@ export function buildClevelandDefaults<TData extends Record<string, unknown>>(
 			segments: {
 				color: (style: LineSegmentStyle | undefined) =>
 					style?.dot?.dotFill ?? style?.stroke?.stroke,
-				connect: false
+				connect: false,
+				// The stem's `styles.stroke` is not a segment's: a connector the author styles wins over it (see `ClevelandMarkers`).
+				base: { nested: ['dot'] }
 			}
 		},
 		scales: {

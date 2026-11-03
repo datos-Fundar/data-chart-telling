@@ -18,7 +18,7 @@ export class BasicStyles {
 		return (name) => {
 			const picked = Object.fromEntries(
 				keys.flatMap((key) => {
-					const style = BasicStyles.#read(styles[key] as PerSeries<object> | undefined, name);
+					const style = BasicStyles.read(styles[key] as PerSeries<object> | undefined, name);
 					return style ? [[key, style]] : [];
 				})
 			);
@@ -27,10 +27,12 @@ export class BasicStyles {
 		};
 	}
 
-	static #read<TStyle extends object>(
+	/** A style as it is, or what its function says of the series named `name`; a function has nothing to say without a name. */
+	static read<TStyle extends object>(
 		style: PerSeries<TStyle> | undefined,
-		name: string
+		name: string | undefined
 	): TStyle | undefined {
-		return typeof style === 'function' ? style(name) : style;
+		if (typeof style !== 'function') return style;
+		return name === undefined ? undefined : style(name);
 	}
 }

@@ -6,7 +6,7 @@ import { COUNTRIES_AT_2007 } from '$datasets';
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-	title: 'Plots/Correlation/ScatterPlot/Styles',
+	title: 'Plots/Correlation/ScatterPlot/Styles/Values',
 	component: ScatterPlot,
 	tags: ['autodocs'],
 	args: {
