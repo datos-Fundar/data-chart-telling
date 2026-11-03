@@ -10,7 +10,9 @@ export function buildAreaDefaults<TData extends Record<string, unknown>>(): Axis
 	AreaPlotCtx
 > {
 	return {
-		data: { segments: { color: (style: AreaStyle | undefined) => style?.fill } },
+		data: {
+			segments: { color: (style: AreaStyle | undefined) => style?.fill, base: { flat: 'area' } }
+		},
 		statistics: { inheritPositions: true },
 		scales: { zero: ['y'] },
 		transforms: { labels: { select: 'last', skip: ValueLabels.skipGaps } },

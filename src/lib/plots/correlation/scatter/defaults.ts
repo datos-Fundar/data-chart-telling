@@ -84,7 +84,8 @@ export function buildScatterDefaults<TData extends Record<string, unknown>>(): A
 		data: {
 			segments: {
 				color: (style: ScatterSegmentStyle | undefined) => style?.dotFill,
-				connect: false
+				connect: false,
+				base: { flat: 'dot' }
 			}
 		},
 		transforms: { groups: 'runs' },

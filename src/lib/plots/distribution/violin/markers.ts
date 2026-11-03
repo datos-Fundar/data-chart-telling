@@ -64,6 +64,10 @@ export function buildMarks<TData extends Record<string, unknown>>(
 				peak,
 				slot: { index, count: groups.length },
 				styles: {
+					// An outline asked for without a color is the fill's.
+					...(seg.styles.strokeWidth !== undefined
+						? { stroke: disabled?.fill ?? seg.styles.fill ?? state.colorForSeries!(name) }
+						: {}),
 					...seg.styles,
 					fill: disabled?.fill ?? seg.styles.fill ?? state.colorForSeries!(name),
 					fillOpacity: disabled?.fillOpacity ?? seg.styles.fillOpacity ?? cfg.violin.fillOpacity

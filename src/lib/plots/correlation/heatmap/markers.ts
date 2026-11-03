@@ -1,6 +1,8 @@
 import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import { DisabledStyle } from '$lib/layout/legend/DisabledStyle';
 import { resolveAccessor } from '$lib/utils/accessors';
+import { merge } from '$lib/utils/merge';
+import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 
 import type { ProcessedChannel } from '$lib/types/phases';
 import type { AxisValue } from '$lib/types/layout/mapping';
@@ -127,9 +129,11 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		return { ...base, ...DisabledStyle.fill(range.disabledStyle) };
 	}
 
+	// `styles.area`, as the cell's series sets it: what every cell is drawn with, under its segments.
 	function getCellStyle(d: TData): CellSegmentStyle {
+		const base: CellSegmentStyle | undefined = state.segmentBase?.(String(d[SERIES_KEY]));
 		return rangeFilteredStyle(
-			segStyleMap.get(`${String(getX(d))}::${String(getY(d))}`) ?? {},
+			merge(base ?? {}, segStyleMap.get(`${String(getX(d))}::${String(getY(d))}`)),
 			Number(getColor(d))
 		);
 	}

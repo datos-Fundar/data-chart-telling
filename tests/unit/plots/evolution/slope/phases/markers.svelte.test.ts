@@ -52,7 +52,7 @@ describe('SlopePlot markers', () => {
 	test("a segment's own dots and stroke win over the defaults", () => {
 		const { lines, dots } = run({
 			...props,
-			segments: { a: [{ styles: { dots: { dotRadius: 9 }, stroke: { strokeWidth: 4 } } }] }
+			segments: { a: [{ styles: { dot: { dotRadius: 9 }, stroke: { strokeWidth: 4 } } }] }
 		});
 		expect(dots.map((d) => d.styles?.dotRadius).sort()).toEqual([
 			DEFAULT_CONFIG.slope.dotRadius,

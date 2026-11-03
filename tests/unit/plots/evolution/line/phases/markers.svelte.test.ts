@@ -37,15 +37,15 @@ describe('buildLineMarkers - geometry', () => {
 		expect(markers[0].type).toBe('line');
 	});
 
-	test('emits no dot marker when the segment has no style.dots', () => {
+	test('emits no dot marker when the segment has no style.dot', () => {
 		const markers = buildLine();
 		expect(markers.some((m) => m.type === 'dot')).toBe(false);
 	});
 
-	test('emits a dot marker right after the line one when style.dots is set', () => {
+	test('emits a dot marker right after the line one when style.dot is set', () => {
 		const groupedSeries = buildGroupedSeries<Series<{ x: number; y: number }>, LineSegmentStyle>(
 			[SERIES],
-			{ default: [{ styles: { dots: {} } }] }
+			{ default: [{ styles: { dot: {} } }] }
 		);
 		const markers = buildLine({ groupedSeries });
 		expect(markers.map((m) => m.type)).toEqual(['line', 'dot']);

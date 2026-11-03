@@ -6,7 +6,7 @@ import { PENGUIN_COUNTS } from '$datasets';
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta = {
-	title: 'Plots/Correlation/HeatmapPlot/Styles',
+	title: 'Plots/Correlation/HeatmapPlot/Styles/Values',
 	component: HeatmapPlot,
 	tags: ['autodocs'],
 	args: {

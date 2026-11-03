@@ -37,20 +37,27 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		dimmed ? { opacity: () => name, scales: { opacity: opacityScale } } : {};
 
 	const areas = (state.processedGroups ?? []).flatMap((group) =>
-		group.visualSegments.map((seg) =>
-			Transforms.finish(
+		group.visualSegments.map((seg) => {
+			// A stroke the segment sets is not a reason to lose the series' fill, as the marker would take it for the color.
+			const fill = seg.styles.fill ?? state.colorForSeries!(group.series.name);
+			return Transforms.finish(
 				{
 					type: 'area',
 					series: group.series.name,
 					data: seg.data,
 					...channels,
 					...options,
-					styles: seg.styles,
+					styles: {
+						// An outline asked for without a color is the fill's.
+						...(seg.styles.strokeWidth !== undefined ? { stroke: fill } : {}),
+						...seg.styles,
+						fill
+					},
 					...dimByName(group.series.name)
 				},
 				transforms
-			)
-		)
+			);
+		})
 	) as unknown as AxisBasedMarkersConfig[];
 
 	return areas;

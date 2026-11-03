@@ -40,17 +40,17 @@ export class DisabledStyle {
 		};
 	}
 
-	static dots(disabled: LegendDisabledStyle | undefined): DotStyle | undefined {
+	static dot(disabled: LegendDisabledStyle | undefined): DotStyle | undefined {
 		if (!disabled) return undefined;
 		return {
-			dotRadius: disabled.dots?.dotRadius,
-			dotFill: disabled.dots?.dotFill,
-			dotFillOpacity: disabled.dots?.dotFillOpacity ?? disabled.opacity,
-			dotSymbol: disabled.dots?.dotSymbol,
-			dotStroke: disabled.dots?.dotStroke,
-			dotStrokeWidth: disabled.dots?.dotStrokeWidth,
-			dotStrokeOpacity: disabled.dots?.dotStrokeOpacity ?? disabled.opacity,
-			dotStrokeDasharray: disabled.dots?.dotStrokeDasharray
+			dotRadius: disabled.dot?.dotRadius,
+			dotFill: disabled.dot?.dotFill,
+			dotFillOpacity: disabled.dot?.dotFillOpacity ?? disabled.opacity,
+			dotSymbol: disabled.dot?.dotSymbol,
+			dotStroke: disabled.dot?.dotStroke,
+			dotStrokeWidth: disabled.dot?.dotStrokeWidth,
+			dotStrokeOpacity: disabled.dot?.dotStrokeOpacity ?? disabled.opacity,
+			dotStrokeDasharray: disabled.dot?.dotStrokeDasharray
 		};
 	}
 

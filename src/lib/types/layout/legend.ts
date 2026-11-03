@@ -17,7 +17,7 @@ export type LegendSectionType = 'discrete' | 'continuous' | 'size' | 'symbol';
 export type LegendDisabledStyle = {
 	opacity?: number;
 	stroke?: StrokeStyle;
-	dots?: DotStyle;
+	dot?: DotStyle;
 	fill?: string;
 	fillOpacity?: number;
 };

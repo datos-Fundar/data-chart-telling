@@ -288,7 +288,7 @@ export const SegmentsOnOneSeriesOnly: Story = {
 
 /**
  * Single series with circular dots at each data point.
- * Dots appear when the `dots` object is present in the segment style.
+ * Dots appear when the `dot` object is present in the segment style.
  */
 export const WithDots: Story = {
 	args: {
@@ -304,7 +304,7 @@ export const WithDots: Story = {
 			female: [
 				{
 					styles: {
-						dots: { dotRadius: 8, dotSymbol: 'circle' }
+						dot: { dotRadius: 8, dotSymbol: 'circle' }
 					}
 				}
 			]
@@ -326,14 +326,14 @@ export const TwoSeriesWithDifferentDots: Story = {
 			female: [
 				{
 					styles: {
-						dots: { dotRadius: 8, dotSymbol: 'circle', dotStrokeWidth: 2 }
+						dot: { dotRadius: 8, dotSymbol: 'circle', dotStrokeWidth: 2 }
 					}
 				}
 			],
 			male: [
 				{
 					styles: {
-						dots: { dotRadius: 8, dotSymbol: 'square', dotStrokeWidth: 2 }
+						dot: { dotRadius: 8, dotSymbol: 'square', dotStrokeWidth: 2 }
 					}
 				}
 			]
@@ -359,13 +359,13 @@ export const DashedSegmentWithDots: Story = {
 			female: [
 				{
 					areas: [{ x: { to: 1996 } }],
-					styles: { dots: { dotRadius: 8, dotSymbol: 'circle' } }
+					styles: { dot: { dotRadius: 8, dotSymbol: 'circle' } }
 				},
 				{
 					areas: [{ x: { from: 1996 } }],
 					styles: {
 						stroke: { strokeDasharray: '6 4', strokeOpacity: 0.6 },
-						dots: { dotRadius: 8, dotSymbol: 'triangle' }
+						dot: { dotRadius: 8, dotSymbol: 'triangle' }
 					}
 				}
 			]
@@ -390,7 +390,7 @@ export const CustomDotsWithStroke: Story = {
 			female: [
 				{
 					styles: {
-						dots: {
+						dot: {
 							dotRadius: 12,
 							dotSymbol: 'circle',
 							dotFill: 'yellow',
@@ -435,22 +435,22 @@ export const CatchAllAsDefaultStyle: Story = {
 				{ styles: { stroke: { stroke: 'lightpink' } } },
 				{
 					areas: [{ x: { from: 1972, to: 1980 } }],
-					styles: { stroke: { stroke: 'red' }, dots: { dotRadius: 5, dotSymbol: 'circle' } }
+					styles: { stroke: { stroke: 'red' }, dot: { dotRadius: 5, dotSymbol: 'circle' } }
 				},
 				{
 					areas: [{ x: { from: 2001, to: 2009 } }],
-					styles: { stroke: { stroke: 'red' }, dots: { dotRadius: 5, dotSymbol: 'triangle' } }
+					styles: { stroke: { stroke: 'red' }, dot: { dotRadius: 5, dotSymbol: 'triangle' } }
 				}
 			],
 			male: [
 				{ styles: { stroke: { stroke: 'lightblue' } } },
 				{
 					areas: [{ x: { from: 1972, to: 1980 } }],
-					styles: { stroke: { stroke: 'blue' }, dots: { dotRadius: 5, dotSymbol: 'circle' } }
+					styles: { stroke: { stroke: 'blue' }, dot: { dotRadius: 5, dotSymbol: 'circle' } }
 				},
 				{
 					areas: [{ x: { from: 2001, to: 2009 } }],
-					styles: { stroke: { stroke: 'blue' }, dots: { dotRadius: 5, dotSymbol: 'triangle' } }
+					styles: { stroke: { stroke: 'blue' }, dot: { dotRadius: 5, dotSymbol: 'triangle' } }
 				}
 			]
 		} satisfies SegmentsConfig<LineSegmentStyle>
@@ -486,11 +486,11 @@ export const SeparationOfConcerns: Story = {
 			default: [
 				{
 					areas: [{ x: { from: 1972, to: 1980 } }],
-					styles: { dots: { dotRadius: 5, dotSymbol: 'circle' } }
+					styles: { dot: { dotRadius: 5, dotSymbol: 'circle' } }
 				},
 				{
 					areas: [{ x: { from: 2001, to: 2009 } }],
-					styles: { dots: { dotRadius: 5, dotSymbol: 'triangle' } }
+					styles: { dot: { dotRadius: 5, dotSymbol: 'triangle' } }
 				}
 			]
 		} satisfies SegmentsConfig<LineSegmentStyle>
@@ -525,15 +525,15 @@ export const SharedDotsByTimePeriod: Story = {
 			default: [
 				{
 					areas: [{ x: { to: 1980 } }],
-					styles: { dots: { dotRadius: 5, dotSymbol: 'circle' } }
+					styles: { dot: { dotRadius: 5, dotSymbol: 'circle' } }
 				},
 				{
 					areas: [{ x: { from: 1980, to: 1996 } }],
-					styles: { dots: { dotRadius: 5, dotSymbol: 'triangle' } }
+					styles: { dot: { dotRadius: 5, dotSymbol: 'triangle' } }
 				},
 				{
 					areas: [{ x: { from: 1996 } }],
-					styles: { dots: { dotRadius: 5, dotSymbol: 'square' } }
+					styles: { dot: { dotRadius: 5, dotSymbol: 'square' } }
 				}
 			]
 		} satisfies SegmentsConfig<LineSegmentStyle>

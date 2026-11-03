@@ -132,7 +132,7 @@ export const AllThreeZonesDistinctStyles: Story = {
 // ── Dots at the bridge endpoints ──────────────────────────────────────────────
 
 /**
- * Setting `style.dots` on a zone marks its bridge's two endpoints - mirrors
+ * Setting `style.dot` on a zone marks its bridge's two endpoints - mirrors
  * how a `LineSegmentStyle` adds dots anywhere else in the plot. Dots are
  * drawn only at the run's real/target endpoints, not along every sampled
  * bridge point.
@@ -142,8 +142,8 @@ export const DotsAtBridgeEndpoints: Story = {
 		styles: {
 			gaps: {
 				default: {
-					middle: { style: { dots: { dotRadius: 5, dotSymbol: 'circle' } } },
-					end: { x: 2019, style: { dots: { dotRadius: 5, dotSymbol: 'triangle' } } }
+					middle: { style: { dot: { dotRadius: 5, dotSymbol: 'circle' } } },
+					end: { x: 2019, style: { dot: { dotRadius: 5, dotSymbol: 'triangle' } } }
 				}
 			} satisfies GapsConfig<LineSegmentStyle>
 		}
@@ -193,7 +193,7 @@ export const InterpolatedBridge: any = {
 					default: {
 						middle: {
 							interpolate: args.interpolate as EasingName,
-							style: { stroke: { strokeDasharray: '6 4' }, dots: { dotRadius: 4 } }
+							style: { stroke: { strokeDasharray: '6 4' }, dot: { dotRadius: 4 } }
 						}
 					}
 				} satisfies GapsConfig<LineSegmentStyle>

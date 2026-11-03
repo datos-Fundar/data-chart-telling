@@ -41,7 +41,11 @@ export function buildViolinDefaults<TData extends Record<string, unknown>>(): Ax
 	return {
 		data: {
 			discreteAxes: 1,
-			segments: { color: (style: AreaStyle | undefined) => style?.fill, connect: false }
+			segments: {
+				color: (style: AreaStyle | undefined) => style?.fill,
+				connect: false,
+				base: { flat: 'area' }
+			}
 		},
 		scales: {
 			bandOrder: 'data',

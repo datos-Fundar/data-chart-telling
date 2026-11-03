@@ -2,6 +2,20 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.10.0] - 2026-11-03
+
+### Added
+
+- `styles.stroke`, `styles.dot` and `styles.area` on every axis-based plot: the style every series is drawn with, each as it is or as a function of the series' name. A plot uses the ones its own marks are made of and ignores the rest: `stroke` and `dot` on `LinePlot`, `SlopePlot`, `SparklinePlot` and the plots with connectors (`LollipopPlot`, `DumbbellPlot`, `ClevelandPlot`, `ForestPlot`); `area` on `AreaPlot`, `BarPlot`, `BulletPlot`, `PyramidPlot`, `HistogramPlot`, `BoxPlot`, `DensityPlot`, `ViolinPlot` and `HeatmapPlot`; `dot` on `ScatterPlot`. A segment's own style wins over them field by field, a connector styled with `styles.connector` wins over `styles.stroke`, and the connectors of those plots - and their arrows - take its dashes and line caps and joins (`strokeDasharray`, `strokeLinecap`, `strokeLinejoin`) from it or from a segment, and a series a legend turned off dims over all of them. Before, restyling every series - or one of them - took a `segments` entry per series.
+
+### Fixed
+
+- The outline an area style sets - `stroke`, `strokeWidth`, `strokeOpacity`, `strokeDasharray` and `borderRadius` - reaches the bars of `BarPlot`, `BulletPlot` and `PyramidPlot` and the bins of `HistogramPlot`, whether it comes from a segment or from `styles.area`. These plots read only the fill of a segment's style, so the rest was ignored; a series a legend dims fades its outline with its fill.
+
+### Changed
+
+- **Breaking:** the dots of a line's style are `dot`, not `dots`, so they read like `styles.dot`: `LineSegmentStyle.dots` (in `segments` and in the `styles.gaps` zones), the legend's `LegendDisabledStyle.dots` and `line.gap.dots` in the configuration. Rename them where they are set.
+
 ## [1.9.0] - 2026-11-03
 
 ### Changed

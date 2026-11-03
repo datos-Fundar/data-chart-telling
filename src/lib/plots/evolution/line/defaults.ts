@@ -10,7 +10,12 @@ export function buildLineDefaults<TData extends Record<string, unknown>>(): Axis
 	LinePlotCtx
 > {
 	return {
-		data: { segments: { color: (style: LineSegmentStyle | undefined) => style?.stroke?.stroke } },
+		data: {
+			segments: {
+				color: (style: LineSegmentStyle | undefined) => style?.stroke?.stroke,
+				base: { nested: ['stroke', 'dot'] }
+			}
+		},
 		statistics: {
 			// An unscoped marker takes the line's own stroke when its first segment restyles it,
 			// else the first series' color.

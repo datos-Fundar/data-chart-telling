@@ -35,5 +35,5 @@ One value per category, drawn as a dot on a thin stem that rises from the baseli
 - The value axis reaches zero, where the stems start; pinning `scales.y.domain` moves the baseline to the nearest end of it, and a negative value hangs below zero.
 - `scales.x.paddingInner` / `paddingOuter` set the room around each lollipop; the defaults, with the dot radius and the stem width (a thin 2 px line), come from `lollipop` in the [configuration](../../theming.md).
 - `styles.values` writes each value just past its dot.
-- `segments` restyle whole categories: `styles: { stroke: {...}, dots: {...} }` restyle their stems and dots (`areas: [{ x: { from: 'Salta', to: 'Salta' } }]`).
+- `segments` restyle whole categories: `styles: { stroke: {...}, dot: {...} }` restyle their stems and dots (`areas: [{ x: { from: 'Salta', to: 'Salta' } }]`).
 - The tooltip reads one lollipop at a time, along the category axis.

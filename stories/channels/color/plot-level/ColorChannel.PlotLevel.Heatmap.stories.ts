@@ -5,7 +5,7 @@ import { PENGUIN_COUNTS } from '$datasets';
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // The `color` channel: a plot-level `color` accessor plus `scales.color`
 // drives every default mark's fill - here, HeatmapPlot's own cells. See
-// `Plots/HeatmapPlot/Styles` for the full set of ramp options; this page
+// `Plots/Correlation/HeatmapPlot/Styles/Values` for the full set of ramp options; this page
 // exists to show the channel concept itself, independent of any one plot kind.
 
 const meta = {

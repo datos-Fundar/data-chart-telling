@@ -114,14 +114,14 @@ describe('LinePlot - gaps (styling)', () => {
 		expect(countDotMarks(svg)).toBe(0);
 	});
 
-	test('draws a dot at each of the bridge run endpoints when `dots` is set', async () => {
+	test('draws a dot at each of the bridge run endpoints when `dot` is set', async () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
 			height: 300,
 			series: [FEMALE],
 			styles: {
 				gaps: {
-					default: { middle: { style: { dots: { dotRadius: 4 } } } }
+					default: { middle: { style: { dot: { dotRadius: 4 } } } }
 				} satisfies GapsConfig<LineSegmentStyle>
 			}
 		});
@@ -262,15 +262,15 @@ describe('LinePlot - gaps (cfg.line.gap)', () => {
 		expect(styles.some((s) => s.includes('2, 2') || s.includes('2 2'))).toBe(false);
 	});
 
-	test('`cfg.line.gap.dots` supplies default dot geometry once a zone opts in with `style.dots`', async () => {
-		setConfiguration({ line: { gap: { dots: { dotRadius: 9 } } } });
+	test('`cfg.line.gap.dot` supplies default dot geometry once a zone opts in with `style.dot`', async () => {
+		setConfiguration({ line: { gap: { dot: { dotRadius: 9 } } } });
 		const { container } = await render(LinePlot, {
 			width: 400,
 			height: 300,
 			series: [FEMALE],
 			styles: {
 				gaps: {
-					default: { middle: { style: { dots: {} } } }
+					default: { middle: { style: { dot: {} } } }
 				} satisfies GapsConfig<LineSegmentStyle>
 			}
 		});

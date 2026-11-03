@@ -459,7 +459,7 @@ export type PlotStylesConfig = {
 		 * fallback merged under whatever a gap zone's own `style` sets, the
 		 * same way `hover.rule`/`hover.dot` back every hover marker's style.
 		 */
-		gap: { stroke: StrokeStyle; dots: DotStyle };
+		gap: { stroke: StrokeStyle; dot: DotStyle };
 	};
 
 	/** Default lollipop-plot styling. */

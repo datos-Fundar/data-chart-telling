@@ -130,7 +130,7 @@ describe('ClevelandPlot markers', () => {
 			x: 'c',
 			y: 'v',
 			segments: {
-				default: [{ areas: [{ x: { from: 'b', to: 'b' } }], styles: { dots: { dotFill: 'red' } } }]
+				default: [{ areas: [{ x: { from: 'b', to: 'b' } }], styles: { dot: { dotFill: 'red' } } }]
 			}
 		});
 		const red = dots.filter((d) => d.styles?.dotFill === 'red');

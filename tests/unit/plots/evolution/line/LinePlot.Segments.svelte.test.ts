@@ -65,7 +65,7 @@ describe('LinePlot - segments (areas)', () => {
 // ── Dots ──────────────────────────────────────────────────────────────────────
 
 describe('LinePlot - segments (dots)', () => {
-	test('does not render dots when the style has no `dots` key', async () => {
+	test('does not render dots when the style has no `dot` key', async () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
 			height: 300,
@@ -78,13 +78,13 @@ describe('LinePlot - segments (dots)', () => {
 		expect(countDotMarks(svg)).toBe(0);
 	});
 
-	test('renders one dot per data point when `dots` is present', async () => {
+	test('renders one dot per data point when `dot` is present', async () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
 			height: 300,
 			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }],
 			segments: {
-				female: [{ styles: { dots: { dotRadius: 4 } } }]
+				female: [{ styles: { dot: { dotRadius: 4 } } }]
 			} satisfies SegmentsConfig<LineSegmentStyle>
 		});
 		const svg = await waitForSvg(container);
@@ -98,10 +98,10 @@ describe('LinePlot - segments (dots)', () => {
 			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }],
 			segments: {
 				female: [
-					{ areas: [{ x: { to: 2014 } }], styles: { dots: { dotRadius: 4 } } },
+					{ areas: [{ x: { to: 2014 } }], styles: { dot: { dotRadius: 4 } } },
 					{
 						areas: [{ x: { from: 1991 } }],
-						styles: { stroke: { strokeDasharray: '5 5' }, dots: { dotRadius: 4 } }
+						styles: { stroke: { strokeDasharray: '5 5' }, dot: { dotRadius: 4 } }
 					}
 				]
 			} satisfies SegmentsConfig<LineSegmentStyle>
@@ -116,7 +116,7 @@ describe('LinePlot - segments (dots)', () => {
 			height: 300,
 			series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }],
 			segments: {
-				female: [{ styles: { stroke: { stroke: '#dc2626' }, dots: { dotRadius: 4 } } }]
+				female: [{ styles: { stroke: { stroke: '#dc2626' }, dot: { dotRadius: 4 } } }]
 			} satisfies SegmentsConfig<LineSegmentStyle>
 		});
 		const svg = await waitForSvg(container);
@@ -131,7 +131,7 @@ describe('LinePlot - segments (dots)', () => {
 				height: 300,
 				series: [{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE }],
 				segments: {
-					female: [{ styles: { dots: { dotRadius } } }]
+					female: [{ styles: { dot: { dotRadius } } }]
 				} satisfies SegmentsConfig<LineSegmentStyle>
 			});
 			const svg = await waitForSvg(container);
@@ -156,7 +156,7 @@ describe('LinePlot - segments (catch-all + area merging)', () => {
 			segments: {
 				female: [
 					{ styles: { stroke: { stroke: '#e11d48' } } },
-					{ areas: [{ x: { from: 2016 } }], styles: { dots: { dotRadius: 5 } } }
+					{ areas: [{ x: { from: 2016 } }], styles: { dot: { dotRadius: 5 } } }
 				]
 			} satisfies SegmentsConfig<LineSegmentStyle>
 		});
@@ -176,7 +176,7 @@ describe('LinePlot - segments (catch-all + area merging)', () => {
 			y: 'value',
 			color: 'sex',
 			segments: {
-				default: [{ styles: { dots: { dotRadius: 4 } } }]
+				default: [{ styles: { dot: { dotRadius: 4 } } }]
 			} satisfies SegmentsConfig<LineSegmentStyle>
 		});
 		const svg = await waitForSvg(container);

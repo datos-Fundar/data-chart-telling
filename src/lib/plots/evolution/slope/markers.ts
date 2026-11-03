@@ -32,7 +32,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 			styles: {
 				...segment.styles,
 				stroke: { strokeWidth: slope.strokeWidth, ...segment.styles.stroke },
-				dots: { dotRadius: slope.dotRadius, ...segment.styles.dots }
+				dot: { dotRadius: slope.dotRadius, ...segment.styles.dot }
 			}
 		}))
 	}));

@@ -8,7 +8,7 @@ const FEMALE = PROVINCE_VALUES.filter((row) => row.sex === 'female');
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `segments` restyles some of a series' lollipops: each segment's `areas`
-// selects the categories it covers, and its `stroke` and `dots` style just
+// selects the categories it covers, and its `stroke` and `dot` style just
 // those stems and dots. Ungrouped rows form the `default` series.
 
 const meta = {
@@ -45,7 +45,7 @@ export const HighlightOne: Story = {
 			default: [
 				{
 					areas: [{ x: { from: 'Salta', to: 'Salta' } }],
-					styles: { stroke: { stroke: '#dc2626' }, dots: { dotFill: '#dc2626' } }
+					styles: { stroke: { stroke: '#dc2626' }, dot: { dotFill: '#dc2626' } }
 				}
 			]
 		} satisfies SegmentsConfig<LineSegmentStyle>
@@ -64,7 +64,7 @@ export const Hollow: Story = {
 					],
 					styles: {
 						stroke: { strokeDasharray: '4 3' },
-						dots: { dotFill: 'white', dotStroke: '#2563eb', dotStrokeWidth: 2 }
+						dot: { dotFill: 'white', dotStroke: '#2563eb', dotStrokeWidth: 2 }
 					}
 				}
 			]

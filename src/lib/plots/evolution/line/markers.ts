@@ -17,7 +17,7 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 /**
  * Every `'line'` (+ `'dot'`, where a segment's style asks for them) marker
  * for one LinePlot render: one `'line'` marker per visual segment, plus a
- * `'dot'` marker right after it when that segment sets `style.dots`.
+ * `'dot'` marker right after it when that segment sets `style.dot`.
  */
 export function buildLineMarkers<TData extends Record<string, unknown>>(args: {
 	groupedSeries: VisualGroup<Series<TData>, LineSegmentStyle>[];
@@ -46,7 +46,7 @@ export function buildLineMarkers<TData extends Record<string, unknown>>(args: {
 
 		for (const seg of group.visualSegments) {
 			const strokeStyle = seg.styles.stroke;
-			const dotStyle = seg.styles.dots;
+			const dotStyle = seg.styles.dot;
 			markers.push({
 				type: 'line',
 				data: seg.data,
@@ -100,7 +100,7 @@ const gx = (p: GapPoint) => p.x;
 const gy = (p: GapPoint) => p.y;
 
 /**
- * One `'line'` (+ `'dot'`, when its zone sets `style.dots`) marker per
+ * One `'line'` (+ `'dot'`, when its zone sets `style.dot`) marker per
  * detected, configured gap run across every series - the interpolated
  * bridge drawn over a missing-data hole. `gaps` is resolved per series the
  * same way `segments` is (a named entry, falling back to `'default'` at
@@ -137,7 +137,7 @@ export function buildGapMarkers<TData extends Record<string, unknown>>(args: {
 
 		for (const run of runs) {
 			const strokeStyle = run.zone.style?.stroke;
-			const dotStyle = run.zone.style?.dots;
+			const dotStyle = run.zone.style?.dot;
 
 			markers.push({
 				type: 'line',
@@ -171,7 +171,7 @@ export function buildGapMarkers<TData extends Record<string, unknown>>(args: {
 			});
 
 			if (!dotStyle) continue;
-			const dotDefaults = gapDefaults.dots;
+			const dotDefaults = gapDefaults.dot;
 			const endpoints = [run.points[0], run.points[run.points.length - 1]];
 			markers.push({
 				type: 'dot',

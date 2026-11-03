@@ -3,6 +3,7 @@ import { ColorRamp } from '$lib/utils/color';
 import { resolveAccessor } from '$lib/utils/accessors';
 import { buildGroupedSeries, buildScopedMarkerGroups } from '$lib/plots/utils/segments';
 import { buildGapFillMaps, isGapValue } from '$lib/plots/utils/gaps';
+import { BasicStyles } from '$lib/layout/styles/BasicStyles';
 import { FacetPanels } from '$lib/phases/facet/FacetPanels';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { Accessor, Series } from '$lib/types/plots/data/common';
@@ -56,10 +57,12 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 				? FacetPanels.splitSeries(fullSeries, state.panels, state.panelOf)
 				: fullSeries;
 		const resolvedSeries = ctx.interaction?.legend?.withoutOmitted(panelSeries) ?? panelSeries;
-		const groupedSeries = buildGroupedSeries(resolvedSeries, segments, connect);
+		const baseFor = BasicStyles.of(state.styles, options.segments?.base);
+		const groupedSeries = buildGroupedSeries(resolvedSeries, segments, connect, baseFor);
 		const scopedGroups = buildScopedMarkerGroups({
 			groupedSeries,
 			segments,
+			baseFor,
 			colorFor: (s) => colorForSeries(s.name),
 			segmentColorFor: (style, defaultColor) => segmentColor?.(style) ?? defaultColor
 		});
@@ -75,6 +78,7 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 			seriesGrouping,
 			allSeriesNames: fullSeries.map((s) => s.name),
 			groupedSeries,
+			segmentBase: baseFor,
 			flat: resolvedSeries.flatMap((s) => s.data),
 			scopedGroups,
 			colorForSeries,

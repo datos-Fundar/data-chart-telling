@@ -30,7 +30,13 @@ export function buildDensityDefaults<TData extends Record<string, unknown>>(): A
 	DensityPlotCtx
 > {
 	return {
-		data: { segments: { color: (style: AreaStyle | undefined) => style?.fill, connect: false } },
+		data: {
+			segments: {
+				color: (style: AreaStyle | undefined) => style?.fill,
+				connect: false,
+				base: { flat: 'area' }
+			}
+		},
 		transforms: {
 			transforms: (state) => mergeDensity(state.transforms ?? [], state.axes?.isHorizontal ?? false)
 		},

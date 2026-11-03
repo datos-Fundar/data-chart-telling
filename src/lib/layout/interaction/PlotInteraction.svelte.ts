@@ -59,7 +59,7 @@ export class PlotInteraction {
 
 	/** `series`' dots while dimmed. */
 	dotsFor(series: string): DotStyle | undefined {
-		return DisabledStyle.dots(this.dimmed(series));
+		return DisabledStyle.dot(this.dimmed(series));
 	}
 
 	/** Isolates `series` - every other one dims - or ends it with `null`. */
