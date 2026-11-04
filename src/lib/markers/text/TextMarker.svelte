@@ -6,13 +6,16 @@
 	import { RowOffset } from '$lib/markers/utils/RowOffset';
 	import RowOffsetMarks from '$lib/markers/utils/RowOffsetMarks.svelte';
 	import { Declutter } from '$lib/markers/text/Declutter';
+	import { NumberFormat } from '$lib/utils/NumberFormat';
 	import { PlotMargins } from '$lib/layout/margins/PlotMargins.svelte';
 	import { Box } from '$lib/layout/margins/Box';
 	import type { TextMarkerConfig } from '$lib/types/markers/common';
 	import type { TextAnchor } from '$lib/types/plots/constants';
 
 	/**
-	 * Renders one `'text'` marker. `x`/`y` also accept a literal number or Date.
+	 * Renders one `'text'` marker. `x`/`y` also accept a literal number or Date. A number its `text`
+	 * gives - a number, a numeric field of the rows, a function's result - is written as the marker's
+	 * `decimals`, `prefix`, `suffix` and `signDisplay` (over the configuration's `numbers`) ask.
 	 * A marker that declutters, flips at the edges or listens to the pointer
 	 * draws one label per row, inside the plot's content box. With
 	 * `fitMargins`, the plot's margins grow until the labels fit.
@@ -34,6 +37,7 @@
 	const x = $derived(marker.x);
 	const y = $derived(marker.y);
 	const text = $derived(marker.text ?? '');
+	const numberText = $derived(NumberFormat.of(NumberFormat.displayOf(marker), cfg));
 	const styles = $derived(marker.styles);
 
 	// A label placed by a literal (or by the frame) draws once without rows; one placed by a field of its rows draws nothing.
@@ -109,8 +113,19 @@
 		return () => value;
 	}
 
+	/** What a row's `text` comes to: a function's result, a field of the row, else the text itself. */
+	function valueOf(d: TData): unknown {
+		if (typeof text === 'function') return text(d);
+		if (typeof text === 'string' && typeof d === 'object' && d !== null && text in d) {
+			return (d as Record<string, unknown>)[text];
+		}
+		return text;
+	}
+
+	/** A row's text, a number written as the marker asks. */
 	function textOf(d: TData): string {
-		return typeof text === 'function' ? text(d) : text;
+		const value = valueOf(d);
+		return typeof value === 'number' ? numberText(value) : String(value ?? '');
 	}
 
 	function opacityOf(d: TData): number | undefined {
@@ -195,7 +210,10 @@
 			x={x ?? (marker.frameAnchor ? undefined : 0)}
 			y={y ?? (marker.frameAnchor ? undefined : 0)}
 			frameAnchor={marker.frameAnchor}
-			text={text ?? ''}
+			text={((d: TData) => {
+				const value = valueOf(d);
+				return typeof value === 'number' ? numberText(value) : value;
+			}) as (d: TData) => string}
 			dx={projected ? 0 : rowDx}
 			dy={projected ? 0 : rowDy}
 			fill={fill as never}
@@ -278,7 +296,7 @@
 	{/if}
 {/snippet}
 
-{#if text}
+{#if text !== ''}
 	{#if measured}
 		<g bind:this={groupEl}>{@render labels()}</g>
 	{:else}

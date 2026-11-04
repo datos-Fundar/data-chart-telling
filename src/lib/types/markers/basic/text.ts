@@ -4,6 +4,7 @@ import type { CommonMarkerConfigWithRowOffset } from '$lib/types/markers/channel
 import type { Margins } from '$lib/layout/margins/Margins';
 import type { BandSlice } from '$lib/types/layout/hover';
 import type { TextAnchor } from '$lib/types/plots/constants';
+import type { NumberDisplay } from '$lib/types/layout/numbers';
 
 /**
  * Spreads labels that would overlap apart vertically, all reaching out to one
@@ -29,8 +30,13 @@ export type TextDeclutterConfig = {
 export type TextMarkerConfig = CommonMarkerConfigWithRowOffset<
 	{
 		type: 'text';
+		/**
+		 * What each label says: a text; a number; the name of a field of the rows (a number there reads as a number); or a function of
+		 * the row giving a text or a number. A number is written as {@link NumberDisplay} asks - this marker's own
+		 * `decimals`, `prefix`, `suffix` and `signDisplay`, over the configuration's `numbers`.
+		 */
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		text: string | ((d: any) => string);
+		text: string | number | ((d: any) => string | number);
 		styles?: FontStyle;
 		/** Which side of its point the text sits on: a value, or a function of the row. Wins over `styles.textAnchor`. */
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -72,7 +78,8 @@ export type TextMarkerConfig = CommonMarkerConfigWithRowOffset<
 		/** Fired when the pointer leaves a row's label. */
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		onPointerLeave?: (d: any) => void;
-	} & CommonMarkerConfig
+	} & NumberDisplay &
+		CommonMarkerConfig
 >;
 
 /** Where one decluttered label goes - see `Declutter.buildLanes`. */

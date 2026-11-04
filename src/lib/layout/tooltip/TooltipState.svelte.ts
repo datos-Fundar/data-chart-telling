@@ -90,9 +90,10 @@ export class TooltipState {
 		};
 	}
 
-	/** A value as plain text: a date as a locale date, anything else as itself. */
-	static value(value: unknown): string {
-		return value instanceof Date ? value.toLocaleDateString() : String(value);
+	/** A value as plain text: a date as a locale date, a number as `number` writes it (when given), anything else as itself. */
+	static value(value: unknown, number?: (value: number) => string): string {
+		if (value instanceof Date) return value.toLocaleDateString();
+		return number && typeof value === 'number' ? number(value) : String(value);
 	}
 
 	/**
@@ -100,30 +101,36 @@ export class TooltipState {
 	 * plot groups its rows; then where it sits - `category: value` when one
 	 * axis is a band of categories (the row's own value, as its series reads
 	 * it), else `x: y` as the transforms left them; then the value its color
-	 * shows, when that is a number (a heatmap's cells).
+	 * shows, when that is a number (a heatmap's cells). With `number`, the values - the one on the value axis
+	 * (the plot's `y` when neither axis holds categories) and the color's - read as it writes them.
 	 */
-	static default(state: {
-		processedData?: ProcessedData;
-		resolvedSeries?: Series<Record<string, unknown>>[];
-		channels?: {
-			grouping?: unknown;
-			color?: { accessor: (row: never) => unknown; source?: unknown };
-		};
-		axes?: PlotAxes;
-	}): (row: ProcessedRow) => string {
+	static default(
+		state: {
+			processedData?: ProcessedData;
+			resolvedSeries?: Series<Record<string, unknown>>[];
+			channels?: {
+				grouping?: unknown;
+				color?: { accessor: (row: never) => unknown; source?: unknown };
+			};
+			axes?: PlotAxes;
+		},
+		number?: (value: number) => string
+	): (row: ProcessedRow) => string {
 		const processed = state.processedData;
 		if (!processed) return () => '';
 		const x = TooltipState.#axisText(processed, 'x');
 		const y = TooltipState.#axisText(processed, 'y');
+		// With no band axis, the value is the y.
+		const valueY = TooltipState.#axisText(processed, 'y', number);
 		const bandX = state.axes?.bands.includes('x') ?? false;
 		const bandY = state.axes?.bands.includes('y') ?? false;
 		const valueOf = ValueLabels.valueOf(state);
 		const position: (row: ProcessedRow) => string =
 			bandX && !bandY
-				? (row) => `${x(row)}: ${TooltipState.value(valueOf(row))}`
+				? (row) => `${x(row)}: ${TooltipState.value(valueOf(row), number)}`
 				: bandY && !bandX
-					? (row) => `${y(row)}: ${TooltipState.value(valueOf(row))}`
-					: (row) => `${x(row)}: ${y(row)}`;
+					? (row) => `${y(row)}: ${TooltipState.value(valueOf(row), number)}`
+					: (row) => `${x(row)}: ${valueY(row)}`;
 		const grouped = state.channels?.grouping !== undefined;
 		const color = state.channels?.color;
 		const colorName = typeof color?.source === 'string' ? color.source : 'color';
@@ -132,7 +139,7 @@ export class TooltipState {
 			lines.push(position(row));
 			const shown = color?.accessor(row as never);
 			if (typeof shown === 'number' && Number.isFinite(shown)) {
-				lines.push(`${colorName}: ${TooltipState.value(shown)}`);
+				lines.push(`${colorName}: ${TooltipState.value(shown, number)}`);
 			}
 			return lines.join('\n');
 		};
@@ -142,14 +149,18 @@ export class TooltipState {
 	 * How one axis reads on a processed row: its own channel, else the range
 	 * the transforms gave it - a stack's own share (`2 - 1`), any other span as `1-2`.
 	 */
-	static #axisText(processed: ProcessedData, axis: AxisChannelName): (row: ProcessedRow) => string {
+	static #axisText(
+		processed: ProcessedData,
+		axis: AxisChannelName,
+		number?: (value: number) => string
+	): (row: ProcessedRow) => string {
 		const { channels, transforms } = processed;
 		const read = (channel: ProcessedChannel) =>
 			resolveAccessor(channel as never) as (row: ProcessedRow) => unknown;
 		const point = channels[axis];
 		if (point !== undefined) {
 			const value = read(point);
-			return (row) => TooltipState.value(value(row));
+			return (row) => TooltipState.value(value(row), number);
 		}
 		const low = channels[`${axis}1`];
 		const high = channels[`${axis}2`];
@@ -157,8 +168,9 @@ export class TooltipState {
 		const from = read(low);
 		const to = read(high);
 		if (transforms.some((t) => t.type === STACKS[axis])) {
-			return (row) => TooltipState.value(Number(to(row)) - Number(from(row)));
+			return (row) => TooltipState.value(Number(to(row)) - Number(from(row)), number);
 		}
-		return (row) => `${TooltipState.value(from(row))}-${TooltipState.value(to(row))}`;
+		return (row) =>
+			`${TooltipState.value(from(row), number)}-${TooltipState.value(to(row), number)}`;
 	}
 }

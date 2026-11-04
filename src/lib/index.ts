@@ -80,6 +80,7 @@ export type {
 	ChannelAccessors
 } from './types/layout/mapping';
 export type { AxisScale, AxisBasedScalesConfig, ChannelScalesConfig } from './types/layout/scales';
+export type { NumberDisplay } from './types/layout/numbers';
 export type { Accessor, Series, SeriesProps, DataProps } from './types/plots/data/common';
 export type {
 	BasePlotProps,

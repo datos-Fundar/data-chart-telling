@@ -49,12 +49,12 @@ describe('rule marker with a list of values', () => {
 describe('delta marker with a list of positions', () => {
 	test('draws a delta at each position, in order, between the same two series', async () => {
 		const { deltaLabels } = await draw([{ type: 'delta', at: [2005, 2015], ...BETWEEN }]);
-		expect(deltaLabels).toEqual(['7.5', '12.5']);
+		expect(deltaLabels).toEqual(['7,5', '12,5']);
 	});
 
 	test('a single position still draws one delta', async () => {
 		const { deltaLabels, deltaDots } = await draw([{ type: 'delta', at: 2005, ...BETWEEN }]);
-		expect(deltaLabels).toEqual(['7.5']);
+		expect(deltaLabels).toEqual(['7,5']);
 		expect(deltaDots).toBeGreaterThanOrEqual(2);
 	});
 

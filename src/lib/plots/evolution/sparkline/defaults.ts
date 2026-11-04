@@ -24,7 +24,7 @@ export function buildSparklineDefaults<TData extends Record<string, unknown>>():
 			values: {
 				...line.styles?.values,
 				show: true,
-				format: (value) => `${value}`
+				format: (value, _name, number) => number(value)
 			}
 		},
 		markers: { marks: buildMarks, valueLabels: line.markers.valueLabels }

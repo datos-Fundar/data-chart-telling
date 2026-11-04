@@ -84,6 +84,8 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 
 	// ── Features ────────────────────────────────────────────────────────────────
 
+	numbers: {},
+
 	axis: {
 		color: 'currentColor',
 		fontSize: 14,

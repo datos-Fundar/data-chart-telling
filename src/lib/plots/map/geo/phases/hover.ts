@@ -1,5 +1,6 @@
 import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import { HoverSettings } from '$lib/layout/hover/HoverSettings';
+import { NumberFormat } from '$lib/utils/NumberFormat';
 import type { GeoPlotState, GeoPlotCtx, TaggedGeoFeature } from '$lib/types/plots/map/geo/state';
 
 /** Whether a pointer event is over an `inset` marker's panel, which has its own hover. */
@@ -32,7 +33,8 @@ export function buildHover<TProps extends Record<string, unknown>>(
 			label,
 			defaultStrategy: 'punctual',
 			// Match the feature under the cursor, not the nearest centroid.
-			pointMatching: 'contains'
+			pointMatching: 'contains',
+			number: NumberFormat.of(NumberFormat.displayOf(tooltip), ctx.cfg)
 		}),
 		// A map has no axes for a crosshair: 'punctual' only means an exact match.
 		strategy: 'punctual' as const,

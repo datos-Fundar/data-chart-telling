@@ -29,7 +29,7 @@ export function buildLineDefaults<TData extends Record<string, unknown>>(): Axis
 		styles: {
 			values: {
 				anchor: 'start',
-				format: (v, name) => `${name} - ${v}`,
+				format: (v, name, number) => `${name} - ${number(v)}`,
 				reach: (labels, state) => labels.reachAtSeriesEnds(state)
 			}
 		},

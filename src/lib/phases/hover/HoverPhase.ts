@@ -2,6 +2,7 @@ import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { GAP_VALUE, SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { HoverSettings } from '$lib/layout/hover/HoverSettings';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
+import { NumberFormat } from '$lib/utils/NumberFormat';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { HoverDisplayPoint, HoverPoint } from '$lib/types/layout/hover';
@@ -79,7 +80,8 @@ export class HoverPhase<
 			points: points as HoverPoint<Row>[],
 			label: label as (row: Row) => string,
 			defaultStrategy: options.strategy ?? HoverSettings.strategyOf(state.axes),
-			pointMatching: options.pointMatching
+			pointMatching: options.pointMatching,
+			number: NumberFormat.of(NumberFormat.displayOf(state.tooltip), ctx.cfg)
 		});
 		const hitAreas = options.hitAreas?.(state, hover as never, ctx) ?? [];
 		return {

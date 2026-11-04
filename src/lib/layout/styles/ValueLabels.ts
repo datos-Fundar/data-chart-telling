@@ -5,6 +5,7 @@ import { SERIES_ID_KEY, SERIES_KEY } from '$lib/phases/transforms/TransformsPhas
 import { seriesIdOf } from '$lib/utils/grouping';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
+import { NumberFormat } from '$lib/utils/NumberFormat';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { ValuesStyle } from '$lib/types/layout/styles';
 import type { ValueLabelsOptions } from '$lib/types/phases/styles/phase';
@@ -47,7 +48,12 @@ export class ValueLabels {
 	) {
 		this.show = values?.show ?? options.show ?? false;
 		this.anchor = values?.anchor ?? options.anchor ?? 'outside';
-		this.format = values?.format ?? options.format ?? ((v: number) => `${v}`);
+		// The value as the display fields ask (else as it is), which a plot kind's own text builds on.
+		const number =
+			NumberFormat.maybe(NumberFormat.displayOf(values), cfg) ?? ((v: number) => `${v}`);
+		const kindFormat = options.format;
+		this.format =
+			values?.format ?? (kindFormat ? (v, name) => kindFormat(v, name, number) : (v) => number(v));
 		this.hoverIsolate = values?.hoverIsolate ?? false;
 		this.font = values?.fontStyle;
 		this.fontSize = typeof this.font?.fontSize === 'number' ? this.font.fontSize : 12;
