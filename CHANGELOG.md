@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.15.0] - 2026-11-04
+
+### Fixed
+
+- A bar plot's value labels follow the bars that go below zero (or left of it): `'outside'` puts a label beyond its bar's tip on that side - to the left of a horizontal bar, under a vertical one - and the plot's margins make room for it. On a horizontal bar `'start'` is its left end and `'end'` its right one, both inside, and `'middle'` is its centre (it sat on the tip); a vertical bar's anchors are as they were.
+
 ## [1.14.0] - 2026-11-04
 
 ### Added

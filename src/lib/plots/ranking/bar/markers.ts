@@ -114,64 +114,73 @@ export function buildValueLabels<TData extends Record<string, unknown>>(
 	const { font, anchor, format } = labels;
 	const valueOf = ValueLabels.valueOf(state);
 
-	const top = (d: ProcessedRow) => geometry.spanOf(d)?.[1] ?? 0;
-	const position = geometry.stacked
-		? (d: ProcessedRow) => {
-				const [from, to] = geometry.spanOf(d) ?? [0, 0];
-				return (from + to) / 2;
-			}
-		: anchor === 'middle' && !isHorizontal
-			? (d: ProcessedRow) => top(d) / 2
-			: anchor === 'end'
-				? () => 0
-				: top;
-	// Outward from the bar's top along the value axis: up for a vertical bar, right for a horizontal one.
-	const outward = anchor === 'outside' ? 6 : anchor === 'start' ? -4 : anchor === 'end' ? 4 : 0;
-	const textAnchor =
-		labels.textAnchor ??
-		(isHorizontal
-			? anchor === 'outside' || anchor === 'end'
-				? 'start'
-				: anchor === 'start'
-					? 'end'
-					: 'middle'
-			: 'middle');
-	const lineAnchor =
-		font?.lineAnchor ??
-		(isHorizontal
-			? 'middle'
-			: anchor === 'outside' || anchor === 'end'
-				? 'bottom'
-				: anchor === 'start'
-					? 'top'
-					: 'middle');
+	const spanOf = (d: ProcessedRow): [number, number] => geometry.spanOf(d) ?? [0, 0];
+	const lowOf = (d: ProcessedRow) => Math.min(...spanOf(d));
+	const highOf = (d: ProcessedRow) => Math.max(...spanOf(d));
+	const below = (d: ProcessedRow) => Number(valueOf(d)) < 0;
+
+	/**
+	 * Where a label sits on its bar and which way it reads from there, per anchor and orientation. A stacked
+	 * bar's label is centred on its segment. Otherwise, on a horizontal bar `'start'` is its left end and
+	 * `'end'` its right one (both inside), and on a vertical bar `'start'` is its top end and `'end'` its
+	 * bottom one, whatever the sign of the value; `'middle'` is its centre, and `'outside'` is beyond its tip
+	 * - to the right or above a bar from zero up, to the left or below one from zero down.
+	 */
+	type Place = {
+		at: (d: ProcessedRow) => number;
+		/** Along the value axis, `+1` (right or down) or `-1` (left or up), the label's side of its point. */
+		side: 1 | -1 | 0;
+	};
+	const place = (negative: boolean): Place => {
+		const mid = (d: ProcessedRow) => (lowOf(d) + highOf(d)) / 2;
+		if (geometry.stacked) return { at: mid, side: 0 };
+		if (anchor === 'middle') return { at: mid, side: 0 };
+		if (anchor === 'outside')
+			return isHorizontal
+				? { at: negative ? lowOf : highOf, side: negative ? -1 : 1 }
+				: { at: negative ? lowOf : highOf, side: negative ? 1 : -1 };
+		if (anchor === 'start') return isHorizontal ? { at: lowOf, side: 1 } : { at: highOf, side: 1 };
+		return isHorizontal ? { at: highOf, side: -1 } : { at: lowOf, side: -1 };
+	};
+	const gap = anchor === 'outside' ? 6 : 4;
 
 	const labelled = processedData.data.filter(
 		(d) => d[GAP_VALUE] === undefined && geometry.spanOf(d) !== undefined
 	);
 	return (state.resolvedSeries ?? []).flatMap((s): TextMarkerConfig[] => {
-		const data = labelled.filter((d) => d[SERIES_ID_KEY] === seriesIdOf(s));
-		if (data.length === 0) return [];
-		return [
-			{
-				type: 'text',
-				data,
-				...(isHorizontal
-					? { x: position, y: geometry.categoryOf }
-					: { x: geometry.categoryOf, y: position }),
-				bandSlice: geometry.sliceOf(s.name),
-				text: (d: ProcessedRow) => format(Number(valueOf(d)), s.name, d),
-				styles: {
-					...font,
-					fill: font?.fill ?? ctx.cfg.axis.color,
-					fontSize: font?.fontSize ?? 12,
-					dx: font?.dx ?? (isHorizontal ? outward : 0),
-					dy: font?.dy ?? (isHorizontal ? 0 : -outward),
-					textAnchor,
-					lineAnchor
+		const own = labelled.filter((d) => d[SERIES_ID_KEY] === seriesIdOf(s));
+		// Only a label beyond the tip turns with the sign of its value.
+		const turns = !geometry.stacked && anchor === 'outside';
+		return (turns ? [false, true] : [false]).flatMap((negative): TextMarkerConfig[] => {
+			const data = turns ? own.filter((d) => below(d) === negative) : own;
+			if (data.length === 0) return [];
+			const { at, side } = place(negative);
+			// A horizontal label reads away from its point to `side`; a vertical one sits on the far side of it.
+			const textAnchor =
+				labels.textAnchor ??
+				(isHorizontal ? (side === 1 ? 'start' : side === -1 ? 'end' : 'middle') : 'middle');
+			const lineAnchor =
+				font?.lineAnchor ??
+				(isHorizontal ? 'middle' : side === 1 ? 'top' : side === -1 ? 'bottom' : 'middle');
+			return [
+				{
+					type: 'text',
+					data,
+					...(isHorizontal ? { x: at, y: geometry.categoryOf } : { x: geometry.categoryOf, y: at }),
+					bandSlice: geometry.sliceOf(s.name),
+					text: (d: ProcessedRow) => format(Number(valueOf(d)), s.name, d),
+					styles: {
+						...font,
+						fill: font?.fill ?? ctx.cfg.axis.color,
+						fontSize: font?.fontSize ?? 12,
+						dx: font?.dx ?? (isHorizontal ? side * gap : 0),
+						dy: font?.dy ?? (isHorizontal ? 0 : side * gap),
+						textAnchor,
+						lineAnchor
+					}
 				}
-			}
-		];
+			];
+		});
 	});
 }
 

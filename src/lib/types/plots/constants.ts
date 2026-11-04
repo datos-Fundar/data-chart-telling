@@ -8,6 +8,11 @@
  *   of a pyramid bar from zero, right of a line's last point).
  * - `'middle'` - centred on the mark.
  * - `'end'` - at the baseline/zero end of the mark.
+ *
+ * On a bar plot the anchors read as the bars are drawn, whatever the sign of the value: `'outside'` is
+ * beyond the tip (left of a horizontal bar below zero, under a vertical one), `'start'` the left end of a
+ * horizontal bar or the top end of a vertical one, `'end'` the right or bottom end, both inside, and
+ * `'middle'` the centre.
  */
 export type ValueAnchor = 'outside' | 'start' | 'middle' | 'end';
 

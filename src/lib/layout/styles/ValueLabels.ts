@@ -124,23 +124,35 @@ export class ValueLabels {
 		return { box, edges };
 	}
 
-	/** Each series' value farthest from zero, read on `valueAxis` - the widest label it can show. */
+	/**
+	 * Each series' value farthest from zero, read on `valueAxis` - the widest label it can show. With `'both'`,
+	 * the farthest above zero and the farthest below it, whichever the series has.
+	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	extremes<S extends Series<any>>(
 		series: S[],
-		valueAxis: 'x' | 'y' = 'y'
+		valueAxis: 'x' | 'y' = 'y',
+		sides: 'farthest' | 'both' = 'farthest'
 	): { series: S; value: number }[] {
 		return series.flatMap((s) => {
 			const accessor = s[valueAxis];
 			if (accessor === undefined) return [];
 			const y = resolveAccessor(accessor);
 			let extreme: number | undefined;
+			let lowest: number | undefined;
+			let highest: number | undefined;
 			for (const d of s.data) {
 				const v = Number(y(d));
-				if (!Number.isNaN(v) && (extreme === undefined || Math.abs(v) > Math.abs(extreme)))
-					extreme = v;
+				if (Number.isNaN(v)) continue;
+				if (extreme === undefined || Math.abs(v) > Math.abs(extreme)) extreme = v;
+				if (v < 0 && (lowest === undefined || v < lowest)) lowest = v;
+				if (v >= 0 && (highest === undefined || v > highest)) highest = v;
 			}
-			return extreme === undefined ? [] : [{ series: s, value: extreme }];
+			if (extreme === undefined) return [];
+			if (sides === 'farthest') return [{ series: s, value: extreme }];
+			return [lowest, highest].flatMap((value) =>
+				value === undefined ? [] : [{ series: s, value }]
+			);
 		});
 	}
 
