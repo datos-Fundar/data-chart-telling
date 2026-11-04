@@ -63,7 +63,7 @@ export const XDeltaBetweenTwoSeries: Story = {
 				at: 2009,
 				from: { type: 'series', series: 'female' },
 				to: { type: 'series', series: 'male' },
-				line: { stroke: 'grey', strokeDasharray: '6 6' },
+				stroke: { stroke: 'grey', strokeDasharray: '6 6' },
 				formatDiff: (d) => d.toFixed(0)
 			}
 		] satisfies AxisBasedMarkersConfig[]
@@ -88,7 +88,7 @@ export const XDeltaAtSeveralPositions: Story = {
 				at: [1980, 2000, 2020],
 				from: { type: 'series', series: 'female' },
 				to: { type: 'series', series: 'male' },
-				line: { stroke: 'grey', strokeDasharray: '6 6' },
+				stroke: { stroke: 'grey', strokeDasharray: '6 6' },
 				formatDiff: (d) => d.toFixed(0)
 			}
 		] satisfies AxisBasedMarkersConfig[]
@@ -113,7 +113,7 @@ export const XDeltaStyledByPosition: Story = {
 				at: [1980, 2000, 2020],
 				from: { type: 'series', series: 'female' },
 				to: { type: 'series', series: 'male' },
-				line: { stroke: 'grey', strokeDasharray: '6 6' },
+				stroke: { stroke: 'grey', strokeDasharray: '6 6' },
 				text: (at) => (at === 2020 ? { dx: -12, textAnchor: 'end' } : { dx: 12 }),
 				formatDiff: (d) => d.toFixed(0)
 			}
@@ -286,7 +286,7 @@ export const YDeltaToAxisValue: Story = {
 				at: 75,
 				from: { type: 'series', series: 'female' },
 				to: { type: 'axis', value: 2001 },
-				line: { strokeDasharray: '6 4' },
+				stroke: { strokeDasharray: '6 4' },
 				formatDiff: (d) => `${d.toFixed(1)} yr`
 			}
 		] satisfies AxisBasedMarkersConfig[]

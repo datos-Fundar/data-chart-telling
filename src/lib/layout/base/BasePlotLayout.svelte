@@ -238,7 +238,8 @@
 		scales: () => scales,
 		axes: () => state.axes,
 		data: () => data,
-		size: () => ({ width, height })
+		size: () => ({ width, height }),
+		colorForSeries: () => state.colorForSeries
 	});
 
 	/** The domains `ScalesLayout` widens an axis to, for an edge tick's `'extend'` (see `EdgeTicks`). */

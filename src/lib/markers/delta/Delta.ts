@@ -27,7 +27,7 @@ export type ResolvedDelta = {
 export class Delta {
 	/**
 	 * The deltas a marker draws: one for its `at`, or one for each position of a list, each with the
-	 * `line`, `text` and `dot` its style functions give for that position.
+	 * `stroke`, `text` and `dot` its style functions give for that position.
 	 */
 	static points(marker: DeltaMarkerConfig): DeltaPointConfig[] {
 		const positions = Array.isArray(marker.at) ? marker.at : [marker.at];
@@ -36,7 +36,7 @@ export class Delta {
 		return positions.map((at) => ({
 			...marker,
 			at,
-			line: own(marker.line, at),
+			stroke: own(marker.stroke, at),
 			text: own(marker.text, at),
 			dot: own(marker.dot, at)
 		}));

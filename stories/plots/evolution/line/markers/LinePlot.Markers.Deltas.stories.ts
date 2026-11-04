@@ -63,7 +63,7 @@ export const XDeltaBetweenTwoSeries: Story = {
 				at: 2009,
 				from: { type: 'series', series: 'female' },
 				to: { type: 'series', series: 'male' },
-				line: { stroke: 'grey', strokeDasharray: '6 6' },
+				stroke: { stroke: 'grey', strokeDasharray: '6 6' },
 				formatDiff: (d) => d.toFixed(0),
 				text: { dx: 12, lineAnchor: 'middle' }
 			}
@@ -248,7 +248,7 @@ export const YDeltaToAxisValue: Story = {
 				at: 75,
 				from: { type: 'series', series: 'female' },
 				to: { type: 'axis', value: 2010 },
-				line: { strokeDasharray: '6 4' },
+				stroke: { strokeDasharray: '6 4' },
 				formatDiff: (d) => `${d.toFixed(1)} yr`,
 				text: { dy: -10, lineAnchor: 'middle' }
 			},

@@ -11,7 +11,7 @@ export type DeltaConfig = {
 	from: DeltaTarget;
 	to?: DeltaTarget;
 	formatDiff?: (diff: number) => string;
-	line?: StrokeStyle;
+	stroke?: StrokeStyle;
 	text?: FontStyle;
 	dot?: DotStyle;
 };
@@ -28,12 +28,12 @@ export type PerPosition<T> = T | ((at: AxisValue) => T);
 
 /**
  * A delta annotation between two points on a line chart. `at` can be a list of positions: one delta is
- * drawn at each, with the same ends. `line`, `text` and `dot` can be functions of the position, to style
+ * drawn at each, with the same ends. `stroke`, `text` and `dot` can be functions of the position, to style
  * each delta on its own - a label to the left of the last one, say, so it stays inside the plot.
  */
-export type DeltaMarkerConfig = Omit<DeltaPointConfig, 'at' | 'line' | 'text' | 'dot'> & {
+export type DeltaMarkerConfig = Omit<DeltaPointConfig, 'at' | 'stroke' | 'text' | 'dot'> & {
 	at: AxisValue | AxisValue[];
-	line?: PerPosition<StrokeStyle>;
+	stroke?: PerPosition<StrokeStyle>;
 	text?: PerPosition<FontStyle>;
 	dot?: PerPosition<DotStyle>;
 };

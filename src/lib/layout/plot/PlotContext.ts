@@ -17,6 +17,8 @@ export type PlotContextParts<T extends Record<string, unknown>> = {
 	axes: () => PlotAxes | undefined;
 	data: () => T[];
 	size: () => { width: number; height: number };
+	/** Each series' color, by name - axis kinds only. */
+	colorForSeries?: () => ((name: string) => string) | undefined;
 };
 
 /**
@@ -61,6 +63,10 @@ export class PlotContext<T extends Record<string, unknown> = Record<string, unkn
 
 	get data(): T[] {
 		return this.#parts.data();
+	}
+
+	get colorForSeries(): ((name: string) => string) | undefined {
+		return this.#parts.colorForSeries?.();
 	}
 
 	get width(): number {
