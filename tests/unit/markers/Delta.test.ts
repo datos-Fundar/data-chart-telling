@@ -36,11 +36,11 @@ describe('Delta.points', () => {
 			...BASE,
 			at: [2005, 2015],
 			text: (at) => (at === 2015 ? { dx: -20, textAnchor: 'end' } : { dx: 20 }),
-			line: (at) => ({ stroke: at === 2005 ? 'red' : 'blue' }),
+			stroke: (at) => ({ stroke: at === 2005 ? 'red' : 'blue' }),
 			dot: (at) => ({ dotRadius: Number(at) - 2000 })
 		});
 		expect(points.map((point) => point.text)).toEqual([{ dx: 20 }, { dx: -20, textAnchor: 'end' }]);
-		expect(points.map((point) => point.line?.stroke)).toEqual(['red', 'blue']);
+		expect(points.map((point) => point.stroke?.stroke)).toEqual(['red', 'blue']);
 		expect(points.map((point) => point.dot?.dotRadius)).toEqual([5, 15]);
 	});
 
@@ -52,7 +52,7 @@ describe('Delta.points', () => {
 	test('a style left out stays out', () => {
 		const [point] = Delta.points({ ...BASE, at: 2010 });
 		expect(point.text).toBeUndefined();
-		expect(point.line).toBeUndefined();
+		expect(point.stroke).toBeUndefined();
 		expect(point.dot).toBeUndefined();
 	});
 });

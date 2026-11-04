@@ -6,7 +6,7 @@
 
 	/**
 	 * A delta annotation: one at `marker.at`, or, when it is a list, one at each position - all with the
-	 * same ends. `line`, `text` and `dot` can be functions of the position.
+	 * same ends. `stroke`, `text` and `dot` can be functions of the position.
 	 */
 	let { marker, data = [] }: { marker: DeltaMarkerConfig; data?: Series<TData>[] } = $props();
 

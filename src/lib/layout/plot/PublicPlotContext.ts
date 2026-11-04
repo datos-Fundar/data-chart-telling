@@ -292,6 +292,11 @@ export class PublicPlotContext<T extends Record<string, unknown> = Record<string
 		return this.#context.data;
 	}
 
+	/** The color a series is drawn in, by its name - `undefined` for a plot with no series (a map). */
+	get colorForSeries(): ((name: string) => string) | undefined {
+		return this.#context.colorForSeries;
+	}
+
 	get width(): number {
 		return this.#context.width;
 	}

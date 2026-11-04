@@ -3,12 +3,15 @@
 	import DotMarker from '$lib/markers/dot/DotMarker.svelte';
 	import TextMarker from '$lib/markers/text/TextMarker.svelte';
 	import { Delta } from '$lib/markers/delta/Delta';
+	import { usePlot } from '$lib/layout/plot/usePlot';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import type { Series } from '$lib/types/plots/data/common';
 	import type { DeltaPointConfig } from '$lib/types/markers/axis/delta';
 
 	/** One delta, at the one position `marker.at` names. See {@link DeltaMarker} for a list of them. */
 	let { marker, data = [] }: { marker: DeltaPointConfig; data?: Series<TData>[] } = $props();
+
+	const plot = usePlot();
 
 	const resolved = $derived(Delta.build(marker.axis, data, marker));
 	const label = $derived(getConfiguration().delta.text[marker.axis]);
@@ -54,13 +57,22 @@
 		};
 	});
 
-	const dotStyles = $derived({
-		dotRadius: 4,
-		dotFill: marker.line?.stroke,
-		dotStroke: marker.line?.stroke,
-		dotStrokeWidth: 2,
-		...marker.dot
-	});
+	/**
+	 * The dot of one end: in the delta's own `stroke` when it sets one, else in the color of the series the end
+	 * measures - an axis end has none, and takes the dot's default. `dot` wins over both.
+	 */
+	function dotStyles(target: DeltaPointConfig['from'] | undefined) {
+		const color =
+			marker.stroke?.stroke ??
+			(target?.type === 'series' ? plot.colorForSeries?.(target.series) : undefined);
+		return {
+			dotRadius: 4,
+			dotFill: color,
+			dotStroke: color,
+			dotStrokeWidth: 2,
+			...marker.dot
+		};
+	}
 </script>
 
 {#if coords}
@@ -68,14 +80,18 @@
 		data={coords.lineData}
 		x={(p) => p.x}
 		y={(p) => p.y}
-		stroke={marker.line?.stroke ?? 'currentColor'}
-		strokeWidth={marker.line?.strokeWidth ?? 2}
-		strokeOpacity={marker.line?.strokeOpacity ?? 0.8}
-		strokeDasharray={marker.line?.strokeDasharray ?? '6 6'}
-		strokeLinecap={marker.line?.strokeLinecap ?? 'round'}
+		stroke={marker.stroke?.stroke ?? 'currentColor'}
+		strokeWidth={marker.stroke?.strokeWidth ?? 2}
+		strokeOpacity={marker.stroke?.strokeOpacity ?? 0.8}
+		strokeDasharray={marker.stroke?.strokeDasharray ?? '6 6'}
+		strokeLinecap={marker.stroke?.strokeLinecap ?? 'round'}
 	/>
-	<DotMarker marker={{ type: 'dot', x: coords.fromPt.x, y: coords.fromPt.y, styles: dotStyles }} />
-	<DotMarker marker={{ type: 'dot', x: coords.toPt.x, y: coords.toPt.y, styles: dotStyles }} />
+	<DotMarker
+		marker={{ type: 'dot', x: coords.fromPt.x, y: coords.fromPt.y, styles: dotStyles(marker.from) }}
+	/>
+	<DotMarker
+		marker={{ type: 'dot', x: coords.toPt.x, y: coords.toPt.y, styles: dotStyles(marker.to) }}
+	/>
 	<TextMarker
 		marker={{
 			type: 'text',
@@ -86,7 +102,7 @@
 				fontWeight: 'bold',
 				fontSize: 14,
 				textAnchor: label.textAnchor,
-				fill: marker.line?.stroke ?? 'currentColor',
+				fill: marker.stroke?.stroke ?? 'currentColor',
 				...marker.text,
 				dx: marker.text?.dx ?? label.dx,
 				dy: marker.text?.dy ?? label.dy,

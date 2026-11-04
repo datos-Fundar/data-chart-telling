@@ -102,7 +102,7 @@ markers={[
 ]}
 ```
 
-A delta's `line`, `text` and `dot` can be functions of the position, to style each one on its own - a label to the left of the last one, say, so it stays inside the plot:
+A delta's `stroke`, `text` and `dot` can be functions of the position, to style each one on its own - a label to the left of the last one, say, so it stays inside the plot:
 
 ```ts
 {

@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.11.0] - 2026-11-04
+
+### Changed
+
+- The dots of a `delta` take the color of the series their end measures, as the plot draws it. Before, they took the line's `stroke` and, with none set, a neutral color. The line's `stroke` still wins when it is set, and the delta's own `dot` wins over both; an end on an axis keeps the neutral color. `usePlot()` now also gives `colorForSeries`.
+- **Breaking:** a delta's line is styled with `stroke`, not `line`, like the rest of the styles (`DeltaMarkerConfig.line`, also as a function of the position). Rename it where it is set.
+
 ## [1.10.0] - 2026-11-03
 
 ### Added
