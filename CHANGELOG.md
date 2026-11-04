@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.12.0] - 2026-11-04
+
+### Added
+
+- `labels` on a discrete legend section (`legend.series.labels`, or on an explicit section): `prefix`, `suffix` and `replace` rewrite the label of every item - to add a unit (`' years'`) or shorten a word (`{ Quintile: 'Q' }`, or `[[/^Quartile /, 'Q: ']]`) - without removing the automatic items to write them again. The names are left as they are, so turning series off still goes by them.
+
 ## [1.11.0] - 2026-11-04
 
 ### Changed

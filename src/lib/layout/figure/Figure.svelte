@@ -13,6 +13,7 @@
 	} from '$lib/configuration/config.svelte';
 	import { HoverState } from '$lib/layout/hover/HoverState.svelte';
 	import { LegendState } from '$lib/layout/legend/LegendState.svelte';
+	import { LegendLabels } from '$lib/layout/legend/LegendLabels';
 	import type { HoverStrategy } from '$lib/types/layout/hover';
 	import type { FigureBoxProps, PlotChromeConfig } from '$lib/types/plots/props';
 	import type { PlotBoxSnippet } from '$lib/types/layout/figure';
@@ -112,11 +113,14 @@
 				: 'auto'
 	);
 	const sections = $derived(
-		legendMode === 'explicit'
-			? legendState.colorize(legend as LegendSection[])
-			: legendMode === 'auto'
-				? legendState.sections(extension)
-				: []
+		LegendLabels.apply(
+			legendMode === 'explicit'
+				? legendState.colorize(legend as LegendSection[])
+				: legendMode === 'auto'
+					? legendState.sections(extension)
+					: [],
+			cfg
+		)
 	);
 
 	/**

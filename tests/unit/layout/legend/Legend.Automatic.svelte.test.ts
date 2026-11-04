@@ -28,6 +28,25 @@ describe('Figure legend', () => {
 		await vi.waitFor(() => expect(legendText(container)).toContain('Female'));
 	});
 
+	test('`legend.series.labels` rewrites the automatic labels and keeps the names', async () => {
+		const { container } = await render(LinePlot, {
+			...props,
+			legend: {
+				off: { female: 0.2 },
+				series: { labels: { replace: { Female: 'F' }, suffix: ' years' } }
+			}
+		} as never);
+		await vi.waitFor(() => {
+			expect(legendText(container)).toContain('F years');
+			expect(legendText(container)).toContain('Male years');
+		});
+		// The series is still turned off by its name, not by its new label.
+		const fades = [...container.querySelectorAll<HTMLElement>('.dct-discrete__item')].map(
+			(el) => el.style.opacity
+		);
+		expect(fades).toContain('0.2');
+	});
+
 	test('`legend.off` fades the series it lists, and follows the value', async () => {
 		const opacities = (container: Element) =>
 			[...container.querySelectorAll<HTMLElement>('.dct-discrete__item')].map(
