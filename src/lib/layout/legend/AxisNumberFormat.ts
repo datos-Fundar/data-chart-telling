@@ -1,5 +1,6 @@
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
-import type { NumberFormat } from '$lib/utils/NumberFormat';
+import { NumberFormat } from '$lib/utils/NumberFormat';
+import type { NumberDisplay } from '$lib/types/layout/numbers';
 
 /** Numbers as the plots' axes write them, by `axis.locale` and `axis.compactDisplay`. */
 export class AxisNumberFormat {
@@ -20,6 +21,35 @@ export class AxisNumberFormat {
 			...(signDisplay ? { signDisplay } : {})
 		} as Intl.NumberFormatOptions);
 		return (value) => format.format(value);
+	}
+
+	/**
+	 * How a legend section writes its values: as its `decimals`, `prefix`, `suffix` and `signDisplay` ask, else as the
+	 * axes write theirs over `domain` - the configuration's `numbers.decimals` does not reach it. Its own `format`
+	 * writes by hand instead: it gets that writer as its second argument, and a number it returns is written by it.
+	 */
+	static legend(
+		section: NumberDisplay & {
+			format?: (v: number, number: (v: number) => string) => string | number;
+		},
+		domain: [number, number],
+		cfg: Pick<PlotStylesConfig, 'axis'>
+	): (value: number) => string {
+		const display = NumberFormat.displayOf(section);
+		const { prefix = '', suffix = '' } = display;
+		let number: (value: number) => string;
+		if (display.decimals !== undefined) {
+			number = NumberFormat.of(display, { ...cfg, numbers: {} });
+		} else {
+			const write = AxisNumberFormat.of(domain, cfg, NumberFormat.sign(display));
+			number = (value) => `${prefix}${write(value)}${suffix}`;
+		}
+		const { format } = section;
+		if (!format) return number;
+		return (value) => {
+			const written = format(value, number);
+			return typeof written === 'number' ? number(written) : written;
+		};
 	}
 
 	/** Whether ticks across `domain` read compact. */

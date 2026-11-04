@@ -187,8 +187,8 @@ A list replaces the automatic legend with exactly those sections:
 Section types:
 
 - `discrete` - `items` (`name`, `label`, `color`, `symbol`, `filled`, `opacity`, `lineStyle`), `columns`, `layout` (`{ type: 'vertical' }`, `{ type: 'horizontal', maxRows }` paginated, `{ type: 'flex' }`), `interactive`, `navButton`.
-- `continuous` - `min`, `max`, `colorMin`, `colorMax`, `scheme`, `pivot`, `opacity`, `ticks`, `width`, `format`, `interactive`.
-- `size` - `domain`, `range`, `values`, `color`, `filled`, `symbol`, `format`.
+- `continuous` - `min`, `max`, `colorMin`, `colorMax`, `scheme`, `pivot`, `opacity`, `ticks`, `width`, `decimals`, `prefix`, `suffix`, `signDisplay`, `format`, `interactive`.
+- `size` - `domain`, `range`, `values`, `color`, `filled`, `symbol`, `decimals`, `prefix`, `suffix`, `signDisplay`, `format`.
 - `symbol` - `items` of `{ name, symbol }`, `color`, `filled`, `layout`.
 
 ## Placement and look

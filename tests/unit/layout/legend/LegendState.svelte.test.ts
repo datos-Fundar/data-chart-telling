@@ -1,6 +1,7 @@
 import { describe, test, expect, afterEach } from 'vitest';
 import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import { LegendText } from '$lib/layout/legend/LegendText';
+import type { ContinuousLegendSection } from '$lib/types/layout/legend';
 import { resetConfiguration, setConfiguration } from '$lib/configuration/config.svelte';
 
 describe('LegendState - what the reader turned off', () => {
@@ -496,7 +497,7 @@ describe('LegendState - adjusting the automatic sections', () => {
 		});
 		expect(series).toMatchObject({ type: 'discrete', columns: 3 });
 		expect(v).toMatchObject({ type: 'continuous', title: 'V' });
-		expect((v as { format: (n: number) => string }).format(1)).toBe('<1>');
+		expect((v as ContinuousLegendSection).format!(1, String)).toBe('<1>');
 	});
 
 	test('an entry without match adjusts every section of its channel', () => {

@@ -15,7 +15,7 @@
 	let { section }: { section: SizeLegendSection } = $props();
 
 	const cfg = $derived(getConfiguration());
-	const fmt = $derived(section.format ?? AxisNumberFormat.of(section.domain, cfg));
+	const fmt = $derived(AxisNumberFormat.legend(section, section.domain, cfg));
 	/** A value's radius: `domain` onto `range` on a square-root scale. */
 	function radius(value: number): number {
 		const [d0, d1] = section.domain.map(Math.sqrt);

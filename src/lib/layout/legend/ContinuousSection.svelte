@@ -13,7 +13,7 @@
 	const checkerId = `dct-checker-${Math.random().toString(36).slice(2)}`;
 	const barWidth = $derived(section.width ?? 170);
 
-	const fmt = $derived(section.format ?? AxisNumberFormat.of([section.min, section.max], cfg));
+	const fmt = $derived(AxisNumberFormat.legend(section, [section.min, section.max], cfg));
 	const isInteractive = $derived(section.interactive?.enabled ?? false);
 
 	// How far the default handle bleeds past its 0/1 track position, so the

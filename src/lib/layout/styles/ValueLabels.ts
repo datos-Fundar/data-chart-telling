@@ -52,8 +52,11 @@ export class ValueLabels {
 		const number =
 			NumberFormat.maybe(NumberFormat.displayOf(values), cfg) ?? ((v: number) => `${v}`);
 		const kindFormat = options.format;
-		this.format =
-			values?.format ?? (kindFormat ? (v, name) => kindFormat(v, name, number) : (v) => number(v));
+		this.format = values?.format
+			? (v, name, row) => values.format!(v, name, row, number)
+			: kindFormat
+				? (v, name) => kindFormat(v, name, number)
+				: (v) => number(v);
 		this.hoverIsolate = values?.hoverIsolate ?? false;
 		this.font = values?.fontStyle;
 		this.fontSize = typeof this.font?.fontSize === 'number' ? this.font.fontSize : 12;
