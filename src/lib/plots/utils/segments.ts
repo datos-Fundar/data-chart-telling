@@ -158,11 +158,36 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
 	// the default palette color when the user has set a baseline via catch-all.
 	// Dots are excluded to avoid duplicate marks at the shared boundary points.
 	const catchAll = segs.find((s) => !s.areas || s.areas.length === 0);
-	const connectorStyle: TStyle = (() => {
-		const rest = { ...((catchAll?.styles ?? baseStyle) as Record<string, unknown>) };
+	const withoutDots = (style: TStyle): TStyle => {
+		const rest = { ...(style as Record<string, unknown>) };
 		delete rest.dot;
 		return rest as TStyle;
-	})();
+	};
+	const connectorStyle: TStyle = withoutDots((catchAll?.styles ?? baseStyle) as TStyle);
+	// A segment's style as its own run is drawn with: an area segment over the catch-all's.
+	const styleOf = (idx: number): TStyle => {
+		const seg = segs[idx];
+		const own = seg.styles ?? ({} as TStyle);
+		const isAreaSpecific = seg.areas != null && seg.areas.length > 0;
+		return isAreaSpecific && catchAll?.styles
+			? (merge(catchAll.styles as object, own as object) as TStyle)
+			: own;
+	};
+	// The line that joins two runs is drawn as the first area segment that covers both of its ends - a dashed
+	// projection that starts at the last observed year also dashes the piece leaving it, even where a faded
+	// range that ends there owns that year's point. Where none does, it is the catch-all's.
+	const covers = (idx: number, row: DataPoint) => {
+		const areas = segs[idx].areas;
+		return (
+			areas != null &&
+			areas.length > 0 &&
+			areas.some((area) => areaMatchesXY(getX(row) as AxisValue, getY(row) as AxisValue, area))
+		);
+	};
+	const joining = (from: DataPoint, to: DataPoint): TStyle => {
+		const covering = evalOrder.find(({ i }) => covers(i, from) && covers(i, to));
+		return covering ? withoutDots(styleOf(covering.i)) : connectorStyle;
+	};
 
 	const defaultVisual: VisualSegment<DataPoint, TStyle>[] = [];
 	const connectors: VisualSegment<DataPoint, TStyle>[] = [];
@@ -193,7 +218,7 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
 				if (r < runs.length - 1) {
 					connectors.push({
 						data: [last, runs[r + 1].data[0]],
-						styles: connectorStyle,
+						styles: joining(last, runs[r + 1].data[0]),
 						scales: undefined
 					});
 				}
@@ -221,7 +246,7 @@ function resolveSeriesSegments<S extends Series<any>, TStyle>(
 			if (connect && nextRun && nextRun.segIdx !== -1) {
 				connectors.push({
 					data: [run.data[run.data.length - 1], nextRun.data[0]],
-					styles: connectorStyle,
+					styles: joining(run.data[run.data.length - 1], nextRun.data[0]),
 					scales: undefined
 				});
 			}

@@ -106,6 +106,58 @@ describe('buildGroupedSeries - segment continuity', () => {
 	});
 });
 
+describe('buildGroupedSeries - connector style', () => {
+	const connectorBetween = (
+		groups: ReturnType<typeof buildGroupedSeries>,
+		from: number,
+		to: number
+	) =>
+		groups[0].visualSegments.find(
+			(s) => s.data.length === 2 && s.data[0].x === from && s.data[1].x === to
+		);
+
+	test('the piece leaving the last point of a faded range is dashed by a dashed range that starts there', () => {
+		const groups = buildGroupedSeries([SERIES], {
+			a: [
+				{ areas: [{ x: { to: 3 } }], styles: { stroke: { strokeOpacity: 0.1 } } },
+				{ areas: [{ x: { from: 3 } }], styles: { stroke: { strokeDasharray: '6 6' } } }
+			]
+		});
+		expect(connectorBetween(groups, 3, 4)?.styles).toEqual({ stroke: { strokeDasharray: '6 6' } });
+	});
+
+	test('a connector has no dots of its own', () => {
+		const groups = buildGroupedSeries([SERIES], {
+			a: [
+				{ areas: [{ x: { to: 3 } }], styles: { stroke: { strokeOpacity: 0.1 } } },
+				{
+					areas: [{ x: { from: 3 } }],
+					styles: { stroke: { strokeDasharray: '6 6' }, dot: { dotRadius: 5 } }
+				}
+			]
+		});
+		expect(connectorBetween(groups, 3, 4)?.styles).toEqual({ stroke: { strokeDasharray: '6 6' } });
+	});
+
+	test('the piece reaching the first point of a dashed range stays as the plain line', () => {
+		const groups = buildGroupedSeries([SERIES], {
+			a: [{ areas: [{ x: { from: 4 } }], styles: { stroke: { strokeDasharray: '6 6' } } }]
+		});
+		expect(connectorBetween(groups, 3, 4)?.styles).toEqual({});
+	});
+
+	test("a piece no area covers both ends of is drawn as the catch-all's", () => {
+		const groups = buildGroupedSeries([SERIES], {
+			a: [
+				{ styles: { stroke: { stroke: 'grey' }, dot: { dotRadius: 2 } } },
+				{ areas: [{ x: { to: 3 } }], styles: { stroke: { stroke: 'red' } } },
+				{ areas: [{ x: { from: 4 } }], styles: { stroke: { stroke: 'blue' } } }
+			]
+		});
+		expect(connectorBetween(groups, 3, 4)?.styles).toEqual({ stroke: { stroke: 'grey' } });
+	});
+});
+
 // ── Style pass-through ─────────────────────────────────────────────────────────
 
 describe('buildGroupedSeries - style pass-through', () => {

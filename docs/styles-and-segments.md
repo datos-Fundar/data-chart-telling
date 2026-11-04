@@ -148,6 +148,7 @@ type Range = { from?: AxisValue; to?: AxisValue }; // inclusive on both ends
 - A segment applies to a data point (or heatmap cell) inside **any** of its `areas`.
 - An `Area` limits by `x`, `y` or both; leaving one out leaves that axis open.
 - A segment without `areas` is a **catch-all**: it matches every point, is evaluated last, and is overridden by any area-specific segment. A catch-all placed first is a baseline that highlighted ranges override.
+- On a line, the piece that joins two runs of a series is drawn as the first area segment that covers both of its ends (its stroke, not its dots): a dashed range that starts at a year dashes the piece leaving it, even where a faded range ending there owns that year's point. One no area covers both ends of is drawn as the catch-all.
 - `'default'` applies to every series; a named key applies to that series only, and wins over `'default'` where both match.
 - `legend` names the segment on the automatic [legend](legend.md).
 - `facet` limits the segment to the [facet panels](facets.md#markers-and-segments-in-some-panels) it names - a `by` value or a list of them. Without it the segment applies to every panel.

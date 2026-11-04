@@ -8,6 +8,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - A bar plot's value labels follow the bars that go below zero (or left of it): `'outside'` puts a label beyond its bar's tip on that side - to the left of a horizontal bar, under a vertical one - and the plot's margins make room for it. On a horizontal bar `'start'` is its left end and `'end'` its right one, both inside, and `'middle'` is its centre (it sat on the tip); a vertical bar's anchors are as they were.
 
+### Changed
+
+- On a line, the piece that joins two runs of a series is drawn as the first area segment that covers both of its ends - so a dashed projection that starts at the last observed year dashes the piece leaving that year, even where a faded range that ends there owns the point. It was always the catch-all's stroke, which left a solid piece at the start of the projection. A piece no area covers both ends of keeps the catch-all's stroke.
+
 ## [1.14.0] - 2026-11-04
 
 ### Added
