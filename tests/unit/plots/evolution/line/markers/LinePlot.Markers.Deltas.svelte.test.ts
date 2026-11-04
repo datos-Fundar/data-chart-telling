@@ -84,6 +84,29 @@ describe('LinePlot - markers.deltas', () => {
 		expect(svg.querySelector('g.text text')?.textContent).toBe(expected);
 	});
 
+	test('a number returned by formatDiff is written as the display fields ask', async () => {
+		const { container } = await render(LinePlot, {
+			width: 400,
+			height: 300,
+			series: [FEMALE, MALE],
+			markers: [
+				{
+					type: 'delta',
+					axis: 'x',
+					at: 2019,
+					from: { type: 'series', series: 'female' },
+					to: { type: 'series', series: 'male' },
+					formatDiff: () => 12.34,
+					decimals: 1,
+					signDisplay: 'always',
+					suffix: ' %'
+				}
+			] satisfies AxisBasedMarkersConfig[]
+		});
+		const svg = await waitForSvg(container);
+		expect(svg.querySelector('g.text text')?.textContent).toBe('+12,3 %');
+	});
+
 	test('without a `to` target, the delta compares against the Y=0 baseline', async () => {
 		const { container } = await render(LinePlot, {
 			width: 400,

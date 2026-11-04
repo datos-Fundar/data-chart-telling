@@ -41,7 +41,12 @@ export type ValuesStyle = NumberDisplay & {
 	 */
 	color?: 'series' | (string & {});
 	/** A label's text, in place of the value as `decimals`, `prefix`, `suffix` and `signDisplay` write it, from its row's own value (a histogram bin's count) and its series - and, on the plots that label one row each, that row, for the other fields of the data. */
-	format?: (value: number, seriesName: string, row?: Record<string, unknown>) => string;
+	format?: (
+		value: number,
+		seriesName: string,
+		row?: Record<string, unknown>,
+		number?: (value: number) => string
+	) => string;
 	/** Hovering a label dims every other series, like toggling them off in the legend. */
 	hoverIsolate?: boolean;
 	fontStyle?: FontStyle;

@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.14.0] - 2026-11-04
+
+### Added
+
+- The `hover` marker takes `decimals`, `prefix`, `suffix` and `signDisplay` for its label, and its `format` gets a second argument, `number`, that writes a value as they ask. With `numbers.decimals` set, its label is written with that count.
+- The `format` of `styles.values` gets `number` as its fourth argument, to write a value as the display fields ask while choosing which labels to show.
+- A `delta`'s `formatDiff` can return a number: it is written as the marker's display fields ask.
+
 ## [1.13.0] - 2026-11-04
 
 ### Added

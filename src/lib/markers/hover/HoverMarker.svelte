@@ -5,6 +5,7 @@
 	import RuleMarker from '$lib/markers/rule/RuleMarker.svelte';
 	import BarMarker from '$lib/markers/bar/BarMarker.svelte';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
+	import { NumberFormat } from '$lib/utils/NumberFormat';
 	import { BandNudge } from '$lib/markers/utils/BandNudge';
 	import type { BandSlice } from '$lib/types/layout/hover';
 	import type { HoverMarkerConfig } from '$lib/types/markers/common';
@@ -47,6 +48,10 @@
 			| 'area'
 			| 'dot'
 			| 'text'
+			| 'decimals'
+			| 'prefix'
+			| 'suffix'
+			| 'signDisplay'
 		>;
 		activePoint?: HoverDisplayPoint | null;
 		impliesCrosshairX?: boolean;
@@ -111,6 +116,16 @@
 	const areaY = $derived(marker.areaY === true ? (activePoint?.y ?? null) : null);
 	const showLabels = $derived(marker.showLabels ?? true);
 	const format = $derived(marker.format);
+	/** The hovered value as the marker's display fields ask; `undefined` while nothing does, so the plot's own label stays. */
+	const numberOf = $derived(NumberFormat.maybe(NumberFormat.displayOf(marker), cfg));
+	const number = $derived(numberOf ?? NumberFormat.of(undefined, cfg));
+	const labelOf = (d: HoverDisplayPoint): string => {
+		if (format) return format(d, number);
+		const value = Number(d.label);
+		return numberOf && d.label !== undefined && d.label !== '' && Number.isFinite(value)
+			? numberOf(value)
+			: (d.label ?? '');
+	};
 	const ruleStyle = $derived(marker.rule);
 	const areaStyle = $derived({ ...cfg.hover.area, ...marker.area });
 	const dotStyle = $derived(marker.dot);
@@ -242,7 +257,7 @@
 						data: [point],
 						x: (d: HoverDisplayPoint) => d.x,
 						y: (d: HoverDisplayPoint) => d.y,
-						text: (d: HoverDisplayPoint) => (format ? format(d) : (d.label ?? '')),
+						text: labelOf,
 						styles: resolveFontStyle(point)
 					}}
 				/>

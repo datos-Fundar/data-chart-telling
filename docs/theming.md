@@ -80,7 +80,7 @@ The same four fields set it where a plot needs something else, in `axis.locale`:
 | `suffix`      | Text after the number, spaces included: `' %'`                                                                                |
 | `signDisplay` | `'auto'` (default) writes only a minus, `'always'` also a plus on a positive number (never on zero), `'never'` no sign at all |
 
-They are fields of `scales.x` and `scales.y` (the ticks), of `tooltip`, of `styles.values` (value labels), and of a `text` and a `delta` marker. A tooltip writes the value on the plot's value axis - the `x` of horizontal bars - and a heatmap's color value; a `text` marker writes a number that its `text` gives (see [Markers](markers.md#numbers-in-text-and-delta-markers)).
+They are fields of `scales.x` and `scales.y` (the ticks), of `tooltip`, of `styles.values` (value labels), of a `hover` marker (its label), and of a `text` and a `delta` marker. A tooltip writes the value on the plot's value axis - the `x` of horizontal bars - and a heatmap's color value; a `text` marker writes a number that its `text` gives (see [Markers](markers.md#numbers-in-text-and-delta-markers)).
 
 A `scales` axis keeps its automatic ticks (abbreviated when they span orders of magnitude) unless it sets `decimals`: `numbers.decimals` does not reach the ticks, since a fixed count would write `5,0` for `5` on every axis. `prefix` and `suffix` alone keep the automatic format. An axis with its own `tickFormat` or `percent` ignores them.
 

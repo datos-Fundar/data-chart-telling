@@ -48,7 +48,7 @@ A `text` marker's `text` is a string, a number, the name of a field of its rows,
 { type: 'text', data: rows, x: 'year', y: 'share', text: 'share', decimals: 1, suffix: ' %' }
 ```
 
-A `delta` writes its distance the same way, with one decimal unless `decimals` or `numbers.decimals` says otherwise. `formatDiff` writes it by hand instead.
+A `delta` writes its distance the same way, with one decimal unless `decimals` or `numbers.decimals` says otherwise. `formatDiff` writes it by hand instead: a string it returns is shown as it is, and a number (a percentage of a baseline, say) is written as the display fields ask.
 
 ## Fields every marker shares
 
@@ -125,7 +125,7 @@ Every other marker draws from `data` rows, one mark per row, so it already takes
 
 ## Hover highlight
 
-`{ type: 'hover' }` draws a crosshair, a dot and a label at the hovered point. It makes the plot hoverable on its own; add `tooltip` for a floating box too. Fields: `strategy`, `sync`, `ruleX`, `ruleY`, `areaX`, `areaY` (a band highlight on band scales), `showLabels`, `format`, and the styles `rule`, `area`, `dot`, `text`. See [Tooltip and hover](tooltip-and-hover.md).
+`{ type: 'hover' }` draws a crosshair, a dot and a label at the hovered point. It makes the plot hoverable on its own; add `tooltip` for a floating box too. Fields: `strategy`, `sync`, `ruleX`, `ruleY`, `areaX`, `areaY` (a band highlight on band scales), `showLabels`, `format`, the number fields `decimals`, `prefix`, `suffix` and `signDisplay` (they write the label's value; `format` gets a `number` function that does the same), and the styles `rule`, `area`, `dot`, `text`. See [Tooltip and hover](tooltip-and-hover.md).
 
 ## Custom components
 

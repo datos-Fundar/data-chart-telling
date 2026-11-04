@@ -14,8 +14,8 @@ export type DeltaConfig = NumberDisplay & {
 	at: AxisValue;
 	from: DeltaTarget;
 	to?: DeltaTarget;
-	/** The distance's text, in place of the number as the display fields above write it. */
-	formatDiff?: (diff: number) => string;
+	/** The distance's text, in place of the distance. A number it returns is written as the display fields above ask (a percentage of a baseline, say); a string is shown as it is. */
+	formatDiff?: (diff: number) => string | number;
 	stroke?: StrokeStyle;
 	text?: FontStyle;
 	dot?: DotStyle;
