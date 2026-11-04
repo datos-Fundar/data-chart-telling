@@ -80,16 +80,38 @@ export function buildBarDefaults<TData extends Record<string, unknown>>(): AxisP
 					const axis = PlotAxes.valueOf(state) as 'x' | 'y';
 					if (ProcessedPositions.span(state.processedData!, axis).stacked) return [];
 					if (!state.axes?.isHorizontal) {
-						const at = { y: -labels.offset('y') };
-						return [labels.edgeBox('0', { x: 'middle', y: 'before' }, at, ['top'])];
+						const offset = labels.offset('y');
+						const boxes = [
+							labels.edgeBox('0', { x: 'middle', y: 'before' }, { y: -offset }, ['top'])
+						];
+						// A bar below zero has its label under its tip.
+						const hasNegative = labels
+							.extremes(state.resolvedSeries ?? [], PlotAxes.valueOf(state), 'both')
+							.some(({ value }) => value < 0);
+						if (hasNegative)
+							boxes.push(
+								labels.edgeBox('0', { x: 'middle', y: 'after' }, { y: offset }, ['bottom'])
+							);
+						return boxes;
 					}
-					const at = { x: labels.offset('x') };
+					// A bar below zero reaches out to the left, with its label turned that way.
+					const offset = labels.offset('x');
 					return labels
-						.extremes(state.resolvedSeries ?? [], PlotAxes.valueOf(state))
+						.extremes(state.resolvedSeries ?? [], PlotAxes.valueOf(state), 'both')
 						.map(({ series, value }) =>
-							labels.edgeBox(labels.format(value, series.name), { x: 'after', y: 'middle' }, at, [
-								'right'
-							])
+							value < 0
+								? labels.edgeBox(
+										labels.format(value, series.name),
+										{ x: 'before', y: 'middle' },
+										{ x: -offset },
+										['left']
+									)
+								: labels.edgeBox(
+										labels.format(value, series.name),
+										{ x: 'after', y: 'middle' },
+										{ x: offset },
+										['right']
+									)
 						);
 				}
 			}
