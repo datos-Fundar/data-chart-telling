@@ -118,6 +118,18 @@ legend={{ color: { match: 'temperature', enabled: false } }}  // not that ramp
 legend={{ removeItems: ['2017/18'] }}
 ```
 
+### Rewriting the labels
+
+`labels` on a discrete section rewrites the label of every item without writing the items again - to add a unit or shorten a word. Each is optional; `replace` goes first, then `prefix` and `suffix` go around the result. An item is rewritten from the text it would show: its `label`, else its name as the legend writes it.
+
+```ts
+legend={{ series: { labels: { suffix: ' years' } } }}                       // 25-29 → 25-29 years
+legend={{ series: { labels: { replace: { Quintile: 'Q' }, suffix: '%' } } }} // Quintile 1 → Q 1%
+legend={{ series: { labels: { replace: [[/^Quartile /, 'Q: ']] } } }}        // Quartile 3 → Q: 3 (a pattern, in order)
+```
+
+`replace` is a record of text → replacement (every match; a text with spaces or dashes is a quoted key, `{ 'Quintile ': 'Q: ' }`), or a list of `[pattern, replacement]` pairs where the pattern may be a regular expression. The names are left as they are, so `off` and the toggles still go by them. An explicit section takes `labels` too.
+
 ### Turning series off from code
 
 `off` turns series off as if the reader had clicked them, without a click: a list of names (each dimmed, to `legend.disabledOpacity`), or a name → opacity or name → action map, where an action is the same `{ mode: 'dim' | 'hide' | 'omit' }` a toggle does. `highlight` is its inverse: it keeps the series it names on and dims all the others. An `off` entry for a series wins over `highlight`.

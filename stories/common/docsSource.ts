@@ -1,11 +1,18 @@
 function isPrimitive(v: unknown): boolean {
-	return v === null || typeof v !== 'object';
+	return v === null || typeof v !== 'object' || v instanceof RegExp;
 }
 
 // Arrays longer than this are previewed as their first few items + an
 // ellipsis marker instead of being fully stringified, applied recursively.
 const MAX_ARRAY_PREVIEW = 3;
 const ARRAY_PREVIEW_COUNT = 1;
+
+/** A key as an object literal writes it: bare when it is an identifier, else quoted (`'Quintile 1'`, `'a-b'`). */
+function key(name: string): string {
+	return /^[A-Za-z_$][\w$]*$/.test(name)
+		? name
+		: `'${name.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
+}
 
 function serialize(v: unknown, depth = 0): string {
 	const pad = '  '.repeat(depth);
@@ -19,6 +26,8 @@ function serialize(v: unknown, depth = 0): string {
 		if (src.includes('\n')) return fn.displayName || fn.__name || fn.name || 'Component';
 		return src;
 	}
+
+	if (v instanceof RegExp) return String(v);
 
 	if (typeof v === 'string') return `'${v}'`;
 	if (typeof v === 'number' || typeof v === 'boolean') return String(v);
@@ -42,10 +51,10 @@ function serialize(v: unknown, depth = 0): string {
 		const entries = Object.entries(v as Record<string, unknown>);
 		if (entries.length === 0) return '{}';
 		if (entries.every(([, val]) => isPrimitive(val))) {
-			return `{ ${entries.map(([k, val]) => `${k}: ${serialize(val)}`).join(', ')} }`;
+			return `{ ${entries.map(([k, val]) => `${key(k)}: ${serialize(val)}`).join(', ')} }`;
 		}
 		const lines = entries
-			.map(([k, val]) => `${inner}${k}: ${serialize(val, depth + 1)}`)
+			.map(([k, val]) => `${inner}${key(k)}: ${serialize(val, depth + 1)}`)
 			.join(',\n');
 		return `{\n${lines}\n${pad}}`;
 	}
