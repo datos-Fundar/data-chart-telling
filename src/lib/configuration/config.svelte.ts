@@ -209,6 +209,7 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		activeColor: '#4e79a7',
 		thickness: 60,
 		gap: '12px',
+		snap: 1e-4,
 		rule: {
 			fontSize: 12,
 			activeFontSize: 20,

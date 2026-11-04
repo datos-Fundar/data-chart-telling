@@ -282,6 +282,12 @@ export type PlotStylesConfig = {
 		thickness: number;
 		/** Space between a plot (or a composition's panels) and its timeline, as a CSS length. */
 		gap: string;
+		/**
+		 * How close to the first or last step a tweened timeline counts as being at it, as a fraction of its span.
+		 * A scrubber that stops a hair short of `0` or `1` - a scrolled step ends at `0.97`, whose eased time is a
+		 * hair short of the end - still shows the last row, and a marker placed on it. `0` turns it off.
+		 */
+		snap: number;
 		/** The `'rule'` timeline beside a plot: a line with its steps written along it. */
 		rule: {
 			/** Font size of the steps, in px. */

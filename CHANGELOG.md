@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.16.0] - 2026-11-04
+
+### Fixed
+
+- A timeline tweened with `interpolate` is at its last step once `progress` comes within `timeline.snap` (default `1e-4`, a ten-thousandth of the span; `0` turns it off) of it. A scrubber that stops a hair short of `1` - a scrolled step ends at `0.97` - drew the line all the way to the end with its easing, but left out the last row: its dot, and a marker like a `delta` placed on it.
+
 ## [1.15.0] - 2026-11-04
 
 ### Fixed

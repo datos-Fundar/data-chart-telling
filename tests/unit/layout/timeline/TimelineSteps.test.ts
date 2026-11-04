@@ -46,6 +46,15 @@ describe('TimelineSteps', () => {
 		expect(steps.nearest(2018.6)).toBe(2019);
 	});
 
+	it('is at the last step once progress comes within a hair of it', () => {
+		const quartOut = (t: number) => 1 - (1 - t) ** 4;
+		expect(steps.timeAt(0.97, quartOut, 1e-4)).toBe(2020);
+		expect(steps.timeAt(0.5, quartOut, 1e-4)).toBeLessThan(2020);
+		expect(steps.timeAt(0.97, (t) => t, 1e-4)).toBeLessThan(2020);
+		// Off, unless asked for: the eased time is a hair short of the end.
+		expect(steps.timeAt(0.97, quartOut)).toBeLessThan(2020);
+	});
+
 	it('matches a row at a step, or up to it', () => {
 		expect(TimelineSteps.matches(2019, 2019)).toBe(true);
 		expect(TimelineSteps.matches(2018, 2019)).toBe(false);
