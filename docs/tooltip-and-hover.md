@@ -43,6 +43,8 @@ A plot becomes interactive when it is given a `tooltip`, a `{ type: 'hover' }` m
 | `series`             | Only these series appear in the tooltip                                                                                                                                                                                                                                                                                                                            |
 | `anchorX`, `anchorY` | Preferred side of the cursor: `'left' \| 'middle' \| 'right'` (default `'right'`) and `'top' \| 'middle' \| 'bottom'` (default `'bottom'`). It moves to the other side when it would overflow                                                                                                                                                                      |
 
+`decimals`, `prefix`, `suffix` and `signDisplay` ([Number format](theming.md#number-format)) write the value the default text shows - the one on the value axis, the `x` of horizontal bars - and a heatmap's color value. A custom `format` gets a second argument, `number`, that writes a number the same way: `format: (row, number) => `${row.region}: ${number(row.value)}``.
+
 <!-- example: examples/CustomTooltip.svelte -->
 
 ```svelte

@@ -1,4 +1,5 @@
 import type { SymbolType } from '$lib/types/plots/constants';
+import type { NumberDisplay } from '$lib/types/layout/numbers';
 import type { AxisChannelName, IndependentChannelName } from '$lib/types/layout/mapping';
 
 // ── Per-consumer channels: each consumer resolves its own ramp ───────────────
@@ -152,10 +153,12 @@ export type CategorySort = {
 
 /**
  * Scale overrides for one plot axis - svelteplot's `ScaleOptions` and
- * `XScaleOptions`, plus this package's own fields. `TData` is the row type
+ * `XScaleOptions`, plus this package's own fields. `decimals`, `prefix`, `suffix` and `signDisplay` write the
+ * ticks of a numeric axis ({@link NumberDisplay}); they are ignored when `tickFormat` or `percent` is set. Without `decimals`
+ * the ticks keep their automatic format, abbreviated when they span orders of magnitude. `TData` is the row type
  * {@link AxisScale.sort} compares.
  */
-export type AxisScale<TData = Record<string, unknown>> = {
+export type AxisScale<TData = Record<string, unknown>> = NumberDisplay & {
 	type?:
 		| 'auto'
 		| ContinuousScaleType

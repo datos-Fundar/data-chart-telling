@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.13.0] - 2026-11-04
+
+### Added
+
+- `decimals`, `prefix`, `suffix` and `signDisplay` (`'auto'`, `'always'` or `'never'`) write the numbers a plot shows, in `axis.locale`: on `scales.x` and `scales.y` (the ticks), `tooltip`, `styles.values` (value labels), and the `text` and `delta` markers. `'always'` writes a plus on positives, never on zero. `numbers.decimals` in the configuration sets the count everywhere but the ticks, which keep their automatic format unless `scales` sets `decimals`. A tooltip writes the value on the plot's value axis - the `x` of horizontal bars, not only the `y` - and a heatmap's color value.
+- A `text` marker's `text` can be a number, the name of a numeric field of the rows, or a function giving a number, besides a string: a number is written as the marker's display fields ask.
+- A tooltip's `format` gets a second argument, `number`, that writes a number as the tooltip's display fields ask. The `format` of a plot kind's value labels (`ValueLabelsOptions.format`) gets it too.
+
+### Changed
+
+- A `delta` writes its distance in `axis.locale` (`12,3`), not with a dot (`12.3`), and with the configuration's `numbers.decimals` when set. One decimal remains the default.
+
 ## [1.12.0] - 2026-11-04
 
 ### Added

@@ -122,6 +122,12 @@ export type PlotStylesConfig = {
 
 	// ── Features ────────────────────────────────────────────────────────────────
 
+	/** How numbers read wherever a plot writes one, other than the automatic ticks. */
+	numbers: {
+		/** Exactly this many decimals in tooltips, value labels and text and delta markers. Unset (the default), as many as each number needs. An axis' ticks keep their automatic format unless `scales` sets `decimals`. */
+		decimals?: number;
+	};
+
 	axis: {
 		color: string;
 		fontSize: number;

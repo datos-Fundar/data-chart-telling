@@ -63,7 +63,7 @@ export type HoverConfig<TRow extends Record<string, unknown>> = {
 	/** Resolved sync flag for the *local* hover store (ignored once a shared store is in scope). */
 	sync?: boolean;
 	/** The resolved tooltip: its `format`, and the order its text reads the rows in (a `content` snippet gets them as matched). */
-	tooltip?: TooltipConfig<TRow> & {
+	tooltip?: Omit<TooltipConfig<TRow>, 'format'> & {
 		format: (row: TRow) => string;
 		sort?: (a: TRow, b: TRow) => number;
 	};

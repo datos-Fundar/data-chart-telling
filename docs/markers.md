@@ -40,6 +40,16 @@
 
 Markers draw in array order. Type a markers array with `satisfies AxisBasedMarkersConfig[]` (or `GeoMarkersConfig[]`) to get completion.
 
+### Numbers in `text` and `delta` markers
+
+A `text` marker's `text` is a string, a number, the name of a field of its rows, or a function of the row giving a string or a number. A number - given, read from a field, or returned - is written as the marker's own `decimals`, `prefix`, `suffix` and `signDisplay` ask ([Number format](theming.md#number-format)); a string is drawn as it is.
+
+```ts
+{ type: 'text', data: rows, x: 'year', y: 'share', text: 'share', decimals: 1, suffix: ' %' }
+```
+
+A `delta` writes its distance the same way, with one decimal unless `decimals` or `numbers.decimals` says otherwise. `formatDiff` writes it by hand instead.
+
 ## Fields every marker shares
 
 | Field                      | Meaning                                                                                                                                                                                         |

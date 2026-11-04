@@ -16,6 +16,22 @@ const cameraTransform = (container: Element) => {
 
 const settle = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/**
+ * The camera's view once it has settled somewhere other than `from`: the outline is redrawn and nothing carries
+ * it any more. A fixed wait is not enough - on a loaded machine the camera has not left where it was drawn, or
+ * is still on its way, and the view read then is not the one it ends on.
+ */
+const settled = async (container: Element, from?: string) => {
+	await vi.waitFor(
+		() => {
+			const view = cameraTransform(container);
+			expect(view?.startsWith('|') && view !== from).toBe(true);
+		},
+		{ timeout: 8000 }
+	);
+	return cameraTransform(container);
+};
+
 describe('GeoPlot - camera', () => {
 	test('a new target flies there over the transition and settles on it', async () => {
 		const { container } = render(CameraTransitionDemo, { duration: 400 } as never);
@@ -39,15 +55,15 @@ describe('GeoPlot - camera', () => {
 		const { container } = render(CameraScrollDemo, { height: 300 } as never);
 		const track = container.querySelector('.scroll-track') as HTMLElement;
 		await vi.waitFor(() => expect(cameraTransform(container)).toBeTruthy());
-		await settle(300);
-		const start = cameraTransform(container);
+		// The map is first drawn whole, and the camera flies from there to the first scene.
+		const drawn = cameraTransform(container);
+		const start = await settled(container, drawn);
 
 		track.scrollTop = track.scrollHeight;
-		await settle(500);
-		const far = cameraTransform(container);
+		const far = await settled(container, start);
 		expect(far).not.toBe(start);
 
 		track.scrollTop = 0;
-		await vi.waitFor(() => expect(cameraTransform(container)).toBe(start), { timeout: 3000 });
+		await vi.waitFor(() => expect(cameraTransform(container)).toBe(start), { timeout: 8000 });
 	});
 });

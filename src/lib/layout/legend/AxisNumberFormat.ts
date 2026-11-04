@@ -1,4 +1,5 @@
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
+import type { NumberFormat } from '$lib/utils/NumberFormat';
 
 /** Numbers as the plots' axes write them, by `axis.locale` and `axis.compactDisplay`. */
 export class AxisNumberFormat {
@@ -9,12 +10,14 @@ export class AxisNumberFormat {
 	 */
 	static of(
 		domain: [number, number],
-		cfg: Pick<PlotStylesConfig, 'axis'>
+		cfg: Pick<PlotStylesConfig, 'axis'>,
+		signDisplay?: ReturnType<typeof NumberFormat.sign>
 	): (value: number) => string {
 		const format = new Intl.NumberFormat(cfg.axis.locale, {
 			...(AxisNumberFormat.compact(domain) ? { notation: 'compact' } : {}),
 			useGrouping: 'min2',
-			compactDisplay: cfg.axis.compactDisplay
+			compactDisplay: cfg.axis.compactDisplay,
+			...(signDisplay ? { signDisplay } : {})
 		} as Intl.NumberFormatOptions);
 		return (value) => format.format(value);
 	}

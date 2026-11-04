@@ -29,7 +29,7 @@ export function buildSlopeDefaults<TData extends Record<string, unknown>>(): Axi
 		styles: {
 			values: {
 				anchor: 'start',
-				format: (v, name) => `${name} - ${v}`
+				format: (v, name, number) => `${name} - ${number(v)}`
 			}
 		},
 		markers: { marks: buildMarks, valueLabels: buildValueLabels }

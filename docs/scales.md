@@ -67,6 +67,8 @@ A category axis can be ordered by what its categories hold, without writing a co
 
 Number and date text defaults follow `axis.locale` and `axis.compactDisplay` in the [configuration](theming.md#locale).
 
+A numeric axis takes `prefix`, `suffix`, `decimals` and `signDisplay` to write its ticks (`suffix: '%'`, `prefix: 'US$ '`) without a `tickFormat`; see [Number format](theming.md#number-format). A `tickFormat` of its own wins over them.
+
 ## Color
 
 `scales.color` configures the `color` channel (and a choropleth on a map).

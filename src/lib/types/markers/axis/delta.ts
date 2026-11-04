@@ -1,15 +1,20 @@
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { DotStyle, FontStyle, StrokeStyle } from '$lib/types/plots/styling';
+import type { NumberDisplay } from '$lib/types/layout/numbers';
 
 /** Which endpoint a delta measures from or to: a named series, or a fixed axis value. */
 export type DeltaTarget = { type: 'series'; series: string } | { type: 'axis'; value?: number };
 
-/** Distance between two points on a line chart, along one axis. */
-export type DeltaConfig = {
+/**
+ * Distance between two points on a line chart, along one axis. The distance reads as {@link NumberDisplay}
+ * asks - `decimals` (default one), `prefix`, `suffix` and `signDisplay` - unless `formatDiff` writes it.
+ */
+export type DeltaConfig = NumberDisplay & {
 	axis: 'x' | 'y';
 	at: AxisValue;
 	from: DeltaTarget;
 	to?: DeltaTarget;
+	/** The distance's text, in place of the number as the display fields above write it. */
 	formatDiff?: (diff: number) => string;
 	stroke?: StrokeStyle;
 	text?: FontStyle;

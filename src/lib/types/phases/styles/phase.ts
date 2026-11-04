@@ -8,8 +8,8 @@ export type ValueLabelsOptions<TState> = {
 	show?: boolean;
 	/** Where a label sits when `styles.values.anchor` is unset. Defaults to `'outside'`. */
 	anchor?: ValueAnchor;
-	/** A label's text when `styles.values.format` is unset. Defaults to the bare value. */
-	format?: (value: number, seriesName: string) => string;
+	/** A label's text when `styles.values.format` is unset. Defaults to the bare value. `number` writes a value as the plot's `styles.values` display fields (`decimals`, `prefix`, `suffix`, `signDisplay`) ask. */
+	format?: (value: number, seriesName: string, number: (value: number) => string) => string;
 	/**
 	 * Where the labels are expected to sit, from the whole data: boxes around
 	 * the points they label, on the plot edges those points can reach (see

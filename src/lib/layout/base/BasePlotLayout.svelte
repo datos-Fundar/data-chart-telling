@@ -15,6 +15,7 @@
 	import { SveltePlotScale } from '$lib/layout/scales/SveltePlotScale';
 	import { TickLabels } from '$lib/layout/scales/TickLabels';
 	import { TickLines } from '$lib/layout/scales/TickLines';
+	import { TickNumbers } from '$lib/layout/scales/TickNumbers';
 	import ScalesLayout from '$lib/layout/scales/ScalesLayout.svelte';
 	import GeometryLayout from '$lib/layout/geometry/GeometryLayout.svelte';
 	import CoordinatesLayout from '$lib/layout/coordinates/CoordinatesLayout.svelte';
@@ -197,8 +198,10 @@
 	const layoutScales = $derived.by(() => {
 		if (scales === undefined) return scales;
 		const rotate = tickLayout?.x?.rotate;
-		const x = withLines(rotate ? { ...scales.x, tickRotate: rotate } : scales.x);
-		return { ...scales, ...(x ? { x } : {}), ...(scales.y ? { y: withLines(scales.y) } : {}) };
+		const written = (scale: AxisScale<TData> | undefined) =>
+			withLines(TickNumbers.apply(scale as AxisScale<never> | undefined, cfg) as typeof scale);
+		const x = written(rotate ? { ...scales.x, tickRotate: rotate } : scales.x);
+		return { ...scales, ...(x ? { x } : {}), ...(scales.y ? { y: written(scales.y) } : {}) };
 	});
 	/** The category labels a crowded axis still writes: one in every few. */
 	const tickValues = $derived.by(() => {

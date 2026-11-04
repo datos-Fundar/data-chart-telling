@@ -52,8 +52,10 @@ export class HoverSettings<TRow extends Record<string, unknown>> {
 		label: (row: TRow) => string;
 		defaultStrategy: HoverStrategy;
 		pointMatching?: PointMatchingStrategy;
+		number?: (value: number) => string;
 	}): HoverConfig<TRow> {
 		const { tooltip, format, sort, markers, points, label, defaultStrategy, pointMatching } = args;
+		const number = args.number ?? String;
 		const settings = new HoverSettings(tooltip, markers, defaultStrategy);
 		return {
 			active: settings.active,
@@ -63,7 +65,7 @@ export class HoverSettings<TRow extends Record<string, unknown>> {
 			sync: settings.sync,
 			tooltip: tooltip && {
 				...tooltip,
-				format: tooltip.format ?? format,
+				format: tooltip.format ? (row: TRow) => tooltip.format!(row, number) : format,
 				...(sort ? { sort } : {})
 			},
 			...(pointMatching ? { pointMatching } : {})

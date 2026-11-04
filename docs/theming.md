@@ -63,6 +63,27 @@ setConfiguration({ axis: { locale: 'en-US', compactDisplay: 'long' } });
 
 `axis.locale` updates plots already on screen. `axis.compactDisplay` is read when a plot mounts, so a later change shows on the next mount.
 
+## Number format
+
+`numbers.decimals` fixes how many decimals the numbers a plot writes have: tooltips, value labels, `text` and `delta` markers. Unset (the default), each number has as many as it needs.
+
+```ts
+setConfiguration({ numbers: { decimals: 1 } }); // 12 reads as 12,0
+```
+
+The same four fields set it where a plot needs something else, in `axis.locale`:
+
+| Field         | Meaning                                                                                                                       |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `decimals`    | Exactly this many decimals, over `numbers.decimals`                                                                           |
+| `prefix`      | Text before the number, spaces included: `'US$ '`                                                                             |
+| `suffix`      | Text after the number, spaces included: `' %'`                                                                                |
+| `signDisplay` | `'auto'` (default) writes only a minus, `'always'` also a plus on a positive number (never on zero), `'never'` no sign at all |
+
+They are fields of `scales.x` and `scales.y` (the ticks), of `tooltip`, of `styles.values` (value labels), and of a `text` and a `delta` marker. A tooltip writes the value on the plot's value axis - the `x` of horizontal bars - and a heatmap's color value; a `text` marker writes a number that its `text` gives (see [Markers](markers.md#numbers-in-text-and-delta-markers)).
+
+A `scales` axis keeps its automatic ticks (abbreviated when they span orders of magnitude) unless it sets `decimals`: `numbers.decimals` does not reach the ticks, since a fixed count would write `5,0` for `5` on every axis. `prefix` and `suffix` alone keep the automatic format. An axis with its own `tickFormat` or `percent` ignores them.
+
 ## Edge ticks
 
 `axis.edgeTicks.x` and `axis.edgeTicks.y` (`{ enabled, collision }`, on for x and off for y, both `'drop-nice'`) add a tick at the data's first and last values beside the nice ones, on a continuous axis whose other axis is continuous too, so a reader sees where the data starts and ends. When one lands too close to a nice tick for both labels, `collision` picks what gives way: `'drop-nice'` keeps the data's tick, `'drop-edge'` keeps the nice one, `'extend'` widens the axis to the next nice tick past the data.

@@ -14,7 +14,8 @@
 	const plot = usePlot();
 
 	const resolved = $derived(Delta.build(marker.axis, data, marker));
-	const label = $derived(getConfiguration().delta.text[marker.axis]);
+	const cfg = $derived(getConfiguration());
+	const label = $derived(cfg.delta.text[marker.axis]);
 	const lineAnchor = $derived(marker.text?.lineAnchor ?? label.lineAnchor);
 
 	const clampRange = $derived.by((): [number, number] | undefined => {
@@ -97,7 +98,11 @@
 			type: 'text',
 			x: coords.textPt.x,
 			y: coords.textPt.y,
-			text: (marker.formatDiff ?? ((v: number) => v.toFixed(1)))(coords.diff),
+			text: marker.formatDiff ? marker.formatDiff(coords.diff) : coords.diff,
+			decimals: marker.decimals ?? cfg.numbers.decimals ?? 1,
+			prefix: marker.prefix,
+			suffix: marker.suffix,
+			signDisplay: marker.signDisplay,
 			styles: {
 				fontWeight: 'bold',
 				fontSize: 14,

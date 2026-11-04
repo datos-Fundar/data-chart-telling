@@ -1,5 +1,6 @@
 import type { ValueAnchor } from '$lib/types/plots/constants';
 import type { FontStyle, StrokeStyle } from '$lib/types/plots/styling';
+import type { NumberDisplay } from '$lib/types/layout/numbers';
 
 /**
  * Which of a group's rows get a value label: its first or last, or the one
@@ -20,7 +21,7 @@ export type ValueSelect = 'first' | 'last' | 'min' | 'max';
  * provided - mirrors {@link DeltaConfig}'s `fontStyle`/`strokeStyle` split, so
  * label text and connector-line styling never mix into one flat bag of props.
  */
-export type ValuesStyle = {
+export type ValuesStyle = NumberDisplay & {
 	/** Whether the labels are drawn. Off by default, except on a heatmap. */
 	show?: boolean;
 	/** Where each label sits on its mark - see {@link ValueAnchor}. */
@@ -39,7 +40,7 @@ export type ValuesStyle = {
 	 * CSS color writes them all in it. `fontStyle.fill` wins when it is set.
 	 */
 	color?: 'series' | (string & {});
-	/** A label's text, from its row's own value (a histogram bin's count) and its series - and, on the plots that label one row each, that row, for the other fields of the data. */
+	/** A label's text, in place of the value as `decimals`, `prefix`, `suffix` and `signDisplay` write it, from its row's own value (a histogram bin's count) and its series - and, on the plots that label one row each, that row, for the other fields of the data. */
 	format?: (value: number, seriesName: string, row?: Record<string, unknown>) => string;
 	/** Hovering a label dims every other series, like toggling them off in the legend. */
 	hoverIsolate?: boolean;

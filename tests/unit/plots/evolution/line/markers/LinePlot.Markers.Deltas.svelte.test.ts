@@ -55,7 +55,9 @@ describe('LinePlot - markers.deltas', () => {
 		const svg = await waitForSvg(container);
 		const female2019 = FEMALE_LIFE.find((d) => d.year === 2019)!.value;
 		const male2019 = MALE_LIFE.find((d) => d.year === 2019)!.value;
-		const expectedDiff = Math.abs(male2019 - female2019).toFixed(1);
+		const expectedDiff = Math.abs(male2019 - female2019)
+			.toFixed(1)
+			.replace('.', ',');
 		expect(svg.querySelector('g.text text')?.textContent).toBe(expectedDiff);
 	});
 
@@ -98,7 +100,9 @@ describe('LinePlot - markers.deltas', () => {
 		});
 		const svg = await waitForSvg(container);
 		const female2019 = FEMALE_LIFE.find((d) => d.year === 2019)!.value;
-		expect(svg.querySelector('g.text text')?.textContent).toBe(female2019.toFixed(1));
+		expect(svg.querySelector('g.text text')?.textContent).toBe(
+			female2019.toFixed(1).replace('.', ',')
+		);
 	});
 });
 
