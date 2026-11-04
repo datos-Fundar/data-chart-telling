@@ -1,6 +1,7 @@
 import type { Snippet } from 'svelte';
 import type { SymbolType, LineStyle } from '$lib/types/plots/constants';
 import type { StrokeStyle, DotStyle } from '$lib/types/plots/styling';
+import type { NumberDisplay } from '$lib/types/layout/numbers';
 import type {
 	ColorScaleConfig,
 	OpacityScaleConfig,
@@ -136,7 +137,11 @@ export type ContinuousInteractiveConfig = {
 	handle?: LegendHandleSnippet;
 };
 
-export type ContinuousLegendSection = {
+/**
+ * A continuous color or opacity scale. Its values read as {@link NumberDisplay} asks - with `decimals`, exactly
+ * that many; without, as the axes write theirs - unless `format` writes them.
+ */
+export type ContinuousLegendSection = NumberDisplay & {
 	type: 'continuous';
 	enabled?: boolean;
 	title?: string;
@@ -155,7 +160,8 @@ export type ContinuousLegendSection = {
 	opacity?: [number, number];
 	ticks?: number[];
 	width?: number;
-	format?: (v: number) => string;
+	/** A value's text, in place of the value. A number it returns (`v * 100` for a share kept as a ratio) is written as the display fields above ask; a string is shown as it is. `number` writes a value that way by hand. */
+	format?: (v: number, number: (v: number) => string) => string | number;
 	interactive?: ContinuousInteractiveConfig;
 };
 
@@ -164,7 +170,7 @@ export type ContinuousLegendSection = {
  * the radius each value draws at, its value under each. `domain` maps to
  * `range` (px) on a square-root scale, so a dot's area follows its value.
  */
-export type SizeLegendSection = {
+export type SizeLegendSection = NumberDisplay & {
 	type: 'size';
 	enabled?: boolean;
 	title?: string;
@@ -181,8 +187,8 @@ export type SizeLegendSection = {
 	filled?: boolean;
 	/** The dots' shape. Defaults to `'circle'`. */
 	symbol?: SymbolType;
-	/** How each value reads. Defaults to the axes' own format (`axis.locale`, `axis.compactDisplay`). */
-	format?: (v: number) => string;
+	/** How each value reads, in place of the display fields' format (which defaults to the axes' own: `axis.locale`, `axis.compactDisplay`). A number it returns is written as those fields ask; `number` does the same by hand. */
+	format?: (v: number, number: (v: number) => string) => string | number;
 };
 
 /**
