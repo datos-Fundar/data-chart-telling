@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Arrow } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import { RowStroke } from '$lib/markers/utils/RowStroke';
@@ -12,6 +13,7 @@
 	 * last, so such an arrow is placed in pixels instead.
 	 */
 	let { marker }: { marker: ArrowMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const plot = usePlot().svelteplot;
 	const data = $derived(marker.data ?? []);
@@ -51,6 +53,7 @@
 </script>
 
 <Arrow
+	{...events.props}
 	data={placed}
 	x1={onBand ? own('__x1') : marker.x1}
 	y1={onBand ? own('__y1') : marker.y1}

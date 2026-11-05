@@ -3,9 +3,10 @@ import type { AxisValue } from '$lib/types/layout/mapping';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
 import type { MarkerTransform } from '$lib/types/transforms';
 import type { MarkLegend } from '$lib/types/layout/legend';
+import type { CommonMarkerEvents } from '$lib/types/markers/channels/commonMarkerEvents';
 
 /** Props every marker kind shares: rows, grouping, series scope, position, offset, statistics, transforms. */
-export type CommonMarkerConfig = {
+export type CommonMarkerConfig = CommonMarkerEvents & {
 	data?: Record<string, unknown>[];
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	grouping?: string | ((d: any) => unknown);

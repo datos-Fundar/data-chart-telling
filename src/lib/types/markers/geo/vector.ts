@@ -1,8 +1,9 @@
+import type { CommonMarkerEvents } from '$lib/types/markers/channels/commonMarkerEvents';
 import type { Accessor } from '$lib/types/plots/data/common';
 
 /** Arrows or spikes at points (svelteplot's `Vector`). */
 export type GeoVectorMarkerConfig<TRow extends Record<string, unknown> = Record<string, unknown>> =
-	{
+	CommonMarkerEvents & {
 		type: 'vector';
 		data: TRow[];
 		x: Accessor<TRow, number>;

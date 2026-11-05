@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Geo } from 'svelteplot';
 	import { geoPath } from 'd3-geo';
 	import { resolveAccessor } from '$lib/utils/accessors';
@@ -14,6 +15,7 @@
 	 * projected positions.
 	 */
 	let { marker }: { marker: GeoLinkMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	type Point = [number, number];
 	const STEPS = 64;
@@ -181,6 +183,7 @@
 {:else}
 	<!-- No `fill` prop: svelteplot treats any string as scale-worthy unless it's a real CSS color, so a literal `'none'` would run through the color scale instead of staying unfilled. Omitting it leaves svelteplot's own unfilled default in place. -->
 	<Geo
+		{...events.props}
 		class="link"
 		data={arcFeatures}
 		stroke={marker.styles?.stroke ?? 'currentColor'}

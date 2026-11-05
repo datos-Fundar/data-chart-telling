@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- Every marker takes handlers for the pointer (`onclick`, `onpointerenter`, `onpointerleave`, `onpointermove`...), called with the event and the row of the shape. They are the props svelteplot documents on all its marks, passed on by every marker that draws one (not `brush`, `hover`, `inset`, `delta` or the map's `features`); svelteplot's code wires them up on `Rect`, `Bar`, `Cell`, `Area`, `Arrow`, `Dot`, `Trail`, `Vector`, `Line`, `Link`, `DelaunayLink` and `Voronoi` so far, and the rest will follow it. `rect`'s `styles.borderRadius` rounds its corners.
+
 ## [1.15.0] - 2026-11-04
 
 ### Fixed

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { BollingerX, BollingerY } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
@@ -18,6 +19,7 @@
 	 * the plot gives that group unless `styles` sets one.
 	 */
 	let { marker }: { marker: BollingerMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const plot = usePlot();
 	const isHorizontal = $derived(plot.axes?.isHorizontal ?? false);
@@ -47,6 +49,7 @@
 {#each groups as group (group.key)}
 	{@const color = marker.grouping ? groupFill?.(group.rows[0]) : undefined}
 	<BollingerMark
+		{...events.props}
 		data={group.rows}
 		x={marker.x}
 		y={marker.y}

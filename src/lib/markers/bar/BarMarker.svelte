@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { BarX, BarY } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import { PlotContext } from '$lib/layout/plot/PlotContext';
@@ -12,6 +13,7 @@
 	 * one segment), or `role: 'highlight'` (visible area highlight).
 	 */
 	let { marker }: { marker: BarMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const cfg = $derived(getConfiguration());
 	const data = $derived(marker.data ?? []);
@@ -47,6 +49,7 @@
 		marker.thickness != null ? Math.max(0, (bandwidth - marker.thickness) / 2) : undefined}
 	{#if marker.isHorizontal}
 		<BarX
+			{...events.props}
 			{data}
 			y={marker.y}
 			x1={marker.x1}
@@ -64,6 +67,7 @@
 		/>
 	{:else}
 		<BarY
+			{...events.props}
 			{data}
 			x={marker.x}
 			y1={marker.y1}

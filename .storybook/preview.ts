@@ -372,6 +372,7 @@ const preview: Preview = {
 					],
 					'Layout',
 					[
+						'Events',
 						'Facets',
 						['Grid', 'MarginAlignment', 'Paginated', 'Carousel', 'RowsAndCols'],
 						'Legend',

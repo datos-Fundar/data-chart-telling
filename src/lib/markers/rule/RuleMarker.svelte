@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { RuleX, RuleY } from 'svelteplot';
 	import type { AxisValue } from '$lib/types/layout/mapping';
 	import { RowStroke } from '$lib/markers/utils/RowStroke';
@@ -14,6 +15,7 @@
 	 * straight through to svelteplot's own `RuleX`/`RuleY`.
 	 */
 	const { marker }: { marker: RuleMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const axis = $derived(marker.axis);
 	const data = $derived(marker.data);
@@ -41,6 +43,7 @@
 </script>
 
 <RuleMark
+	{...events.props}
 	data={rows}
 	{...axis === 'x'
 		? { x: position, y1: marker.y1, y2: marker.y2 }

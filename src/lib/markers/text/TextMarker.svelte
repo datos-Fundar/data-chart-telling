@@ -1,4 +1,5 @@
 <script lang="ts" generics="TData = Record<string, unknown>">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Text } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
@@ -21,6 +22,7 @@
 	 * `fitMargins`, the plot's margins grow until the labels fit.
 	 */
 	const { marker }: { marker: TextMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	// A text's anchors as the side of its point it sits on, and back.
 	const TEXT_SIDES = { start: 'after', middle: 'middle', end: 'before' } as const;
@@ -206,6 +208,7 @@
 )}
 	<g transform={projected ? `translate(${rowDx},${rowDy})` : undefined}>
 		<Text
+			{...events.props}
 			data={rows}
 			x={x ?? (marker.frameAnchor ? undefined : 0)}
 			y={y ?? (marker.frameAnchor ? undefined : 0)}

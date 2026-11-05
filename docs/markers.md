@@ -127,6 +127,30 @@ Every other marker draws from `data` rows, one mark per row, so it already takes
 
 `{ type: 'hover' }` draws a crosshair, a dot and a label at the hovered point. It makes the plot hoverable on its own; add `tooltip` for a floating box too. Fields: `strategy`, `sync`, `ruleX`, `ruleY`, `areaX`, `areaY` (a band highlight on band scales), `showLabels`, `format`, the number fields `decimals`, `prefix`, `suffix` and `signDisplay` (they write the label's value; `format` gets a `number` function that does the same), and the styles `rule`, `area`, `dot`, `text`. See [Tooltip and hover](tooltip-and-hover.md).
 
+## Events
+
+Every marker takes handlers for the pointer:
+
+```svelte
+<LinePlot
+	...
+	markers={[
+		{
+			type: 'rect',
+			data: eras,
+			x1: 'from',
+			x2: 'to',
+			y1: 0,
+			y2: 100,
+			onclick: (event, era) => select(era)
+		}
+	]}
+/>
+```
+
+- `onclick`, `ondblclick`, `oncontextmenu`, `onpointerdown`, `onpointerup`, `onpointerenter`, `onpointerleave`, `onpointermove`, `onmouseenter` and `onmouseleave` are called with the event, the row the shape draws and its index.
+- Every marker that draws a svelteplot shape takes them (`brush`, `hover`, `inset`, `delta` and the map's `features` and `geo-hover` have events of their own). svelteplot documents them on all its marks, but its code wires them up on some only today: `rect`, `bar`, `cell`, `area`, `arrow`, `dot`, `trail`, `vector`, `link`, `line`, `delaunayLink` and `voronoi`. On the others they do nothing yet.
+
 ## Custom components
 
 `{ type: 'component', component: MyMark, props: { ... } }` mounts a Svelte component inside the plot's SVG. It can read the plot it is in with [`usePlot()`](state.md), so it can draw from the plot's scales, margins, hover and rows.

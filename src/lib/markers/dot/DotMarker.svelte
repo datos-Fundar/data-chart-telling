@@ -1,4 +1,5 @@
 <script lang="ts" generics="TData = Record<string, unknown>">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Dot } from 'svelteplot';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
@@ -12,6 +13,7 @@
 	 * `DeltaMarker` that place a dot at a computed point.
 	 */
 	const { marker }: { marker: DotMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const data = $derived((marker.data ?? []) as TData[]);
 	const x = $derived(marker.x);
@@ -74,6 +76,7 @@
 	<RowOffsetMarks {marker} {rows}>
 		{#snippet mark(own)}
 			<Dot
+				{...events.props}
 				data={own}
 				x={x ?? 0}
 				y={y ?? 0}

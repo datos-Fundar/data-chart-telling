@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Raster } from 'svelteplot';
 	import type { RasterMarkerConfig } from '$lib/types/markers/common';
 
@@ -8,11 +9,13 @@
 	 * so it is forwarded as `null` rather than an empty array.
 	 */
 	let { marker }: { marker: RasterMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const data = $derived(marker.data?.length ? marker.data : null);
 </script>
 
 <Raster
+	{...events.props}
 	{data}
 	x={marker.x}
 	y={marker.y}

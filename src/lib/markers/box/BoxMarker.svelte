@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { BoxX, BoxY } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import { CssColor } from '$lib/utils/color';
@@ -15,6 +16,7 @@
 	 * from `bar`.
 	 */
 	let { marker }: { marker: BoxMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const plot = usePlot();
 	const isHorizontal = $derived(plot.axes?.isHorizontal ?? false);
@@ -171,4 +173,4 @@
 	});
 </script>
 
-<BoxMark {data} x={marker.x} y={marker.y} sort={marker.sort} {...passthrough} />
+<BoxMark {...events.props} {data} x={marker.x} y={marker.y} sort={marker.sort} {...passthrough} />

@@ -2,6 +2,7 @@
 	import { Rect } from 'svelteplot';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import type { RectMarkerConfig } from '$lib/types/markers/common';
 
 	/** Renders one `'rect'` marker as a `<Rect>` call - an arbitrary rectangle, unlike `BarMarker`'s category-band-anchored bar. */
@@ -13,6 +14,8 @@
 	const opacityBuckets = $derived(
 		MarkerChannels.buildOpacityBuckets(data, marker.opacity, marker.scales, cfg)
 	);
+
+	const events = MarkerEvents.use(() => marker);
 </script>
 
 {#if opacityBuckets}
@@ -36,6 +39,8 @@
 			strokeWidth={marker.styles?.strokeWidth}
 			strokeOpacity={marker.styles?.strokeOpacity}
 			strokeDasharray={marker.styles?.strokeDasharray}
+			borderRadius={marker.styles?.borderRadius}
+			{...events.props}
 		/>
 	{/each}
 {:else}
@@ -58,5 +63,7 @@
 		strokeWidth={marker.styles?.strokeWidth}
 		strokeOpacity={marker.styles?.strokeOpacity}
 		strokeDasharray={marker.styles?.strokeDasharray}
+		borderRadius={marker.styles?.borderRadius}
+		{...events.props}
 	/>
 {/if}
