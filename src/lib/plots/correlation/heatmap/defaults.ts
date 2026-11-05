@@ -1,7 +1,7 @@
 import { ColorRamp } from '$lib/utils/color';
 import { OpacityScale } from '$lib/utils/OpacityScale';
 import { ContinuousDomain } from '$lib/utils/ContinuousDomain';
-import { buildMarks, buildValueLabels } from '$lib/plots/correlation/heatmap/markers';
+import { buildMarks } from '$lib/plots/correlation/heatmap/markers';
 import type { AxisPlotDefaults } from '$lib/types/phases';
 import type { HeatmapPlotState, HeatmapPlotCtx } from '$lib/types/plots/correlation/heatmap/state';
 
@@ -98,7 +98,7 @@ export function buildHeatmapDefaults<TData extends Record<string, unknown>>(): A
 			extend: extendWithColorScales
 		},
 		styles: { values: { show: true } },
-		markers: { marks: buildMarks, valueLabels: buildValueLabels },
+		markers: { marks: buildMarks },
 		hover: {
 			// A hovered cell reads as its formatted value.
 			label: (state) => {

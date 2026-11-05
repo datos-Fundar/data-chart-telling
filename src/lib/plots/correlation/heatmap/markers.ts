@@ -7,9 +7,8 @@ import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import type { ProcessedChannel } from '$lib/types/phases';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
-import type { CellMarkerConfig, TextMarkerConfig } from '$lib/types/markers/common';
+import type { CellMarkerConfig } from '$lib/types/markers/common';
 import type { HeatmapPlotState, HeatmapPlotCtx } from '$lib/types/plots/correlation/heatmap/state';
-import type { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 /** A processed channel as a per-row function. */
@@ -23,42 +22,6 @@ type StyleGroup<TData> = { styles: CellSegmentStyle; opacity: number | undefined
 const OPACITY_STEPS = 32;
 
 /**
- * HeatmapPlot's `styles.values` as one `'text'` marker over the same cells
- * the plot draws, each labelled with its own value and centred on it. Shown
- * by default.
- */
-export function buildValueLabels<TData extends Record<string, unknown>>(
-	labels: ValueLabels,
-	state: HeatmapPlotState<TData>,
-	ctx: HeatmapPlotCtx
-): TextMarkerConfig[] {
-	const { processedData } = state;
-	if (!processedData?.data.length) return [];
-	const { font, format } = labels;
-	const getColor = state.channels!.color.accessor;
-	return [
-		{
-			type: 'text',
-			data: processedData.data,
-			// Read like the cells read them, so the labels add no axis title the cells don't.
-			x: readChannel<TData>(processedData.channels.x),
-			y: readChannel<TData>(processedData.channels.y),
-			text: (d: TData) => format(Number(getColor(d)), ''),
-			styles: {
-				...font,
-				fill: font?.fill ?? ctx.cfg.continuous.labelColor,
-				fontSize: font?.fontSize ?? 12,
-				fontWeight: font?.fontWeight ?? 600,
-				dx: font?.dx ?? 0,
-				dy: font?.dy ?? 0,
-				textAnchor: labels.textAnchor ?? 'middle',
-				lineAnchor: font?.lineAnchor ?? 'middle'
-			}
-		}
-	];
-}
-
-/**
  * HeatmapPlot's "markers" phase: one `'cell'` marker per resolved-style
  * bucket - svelteplot's opacity/numeric scale machinery requires
  * `fillOpacity`/`strokeWidth` to be constant per mark instance, unlike
@@ -70,6 +33,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 ): AxisBasedMarkersConfig[] {
 	const { segments, channels, resolveColor, resolveOpacity } = state;
 	const { range } = ctx;
+	const labels = state.valueLabels?.show ? state.valueLabels : undefined;
 	const getColor = channels!.color.accessor;
 
 	// The cells are the rows the "transforms" phase left, placed by its channels.
@@ -170,7 +134,12 @@ export function buildMarks<TData extends Record<string, unknown>>(
 			strokeDasharray: group.styles.strokeDasharray,
 			borderRadius: group.styles.borderRadius,
 			inset: 0.5
-		}
+		},
+		// Each cell writes its own value, in the middle of it.
+		label: labels?.shapeLabel(ctx, (d) => labels.format(Number(getColor(d as TData)), ''), {
+			fill: ctx.cfg.continuous.labelColor,
+			fontWeight: 600
+		})
 	}));
 
 	return markers;

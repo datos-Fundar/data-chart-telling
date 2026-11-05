@@ -100,19 +100,16 @@ export const AnchorOutside: Story = {
 	}
 };
 
-/**
- * Anchor `'end'` - the label appears at the end of the bar (top),
- * useful when labels need to be directly on the bar.
- */
-export const AnchorEnd: Story = {
+/** Anchor `'top'` - inside each bar, at its top end. */
+export const AnchorTop: Story = {
 	args: {
 		series: [FEMALE],
 		styles: {
 			values: {
 				show: true,
-				anchor: 'end',
+				anchor: 'top',
 				format: (v: number) => `${v.toFixed(1)} yr`,
-				fontStyle: { dy: -10 }
+				fontStyle: { fill: 'white' }
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -135,19 +132,16 @@ export const AnchorMiddle: Story = {
 	}
 };
 
-/**
- * Anchor `'start'` - text appears at the start of the bar (bottom),
- * useful for showing baseline values.
- */
-export const AnchorStart: Story = {
+/** Anchor `'bottom'` - inside each bar, at its bottom end, useful for showing baseline values. */
+export const AnchorBottom: Story = {
 	args: {
 		series: [FEMALE],
 		styles: {
 			values: {
 				show: true,
-				anchor: 'start',
+				anchor: 'bottom',
 				format: (v: number) => `${v.toFixed(1)} yr`,
-				fontStyle: { dy: 10 }
+				fontStyle: { fill: 'white' }
 			}
 		} satisfies AxisBasedStylesConfig
 	}

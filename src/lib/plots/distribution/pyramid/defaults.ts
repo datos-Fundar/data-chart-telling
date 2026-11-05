@@ -1,6 +1,6 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
-import { buildMarks, buildValueLabels } from '$lib/plots/distribution/pyramid/markers';
+import { buildMarks } from '$lib/plots/distribution/pyramid/markers';
 import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { seriesIdOf } from '$lib/utils/grouping';
 import { isGapValue } from '$lib/plots/utils/gaps';
@@ -62,7 +62,7 @@ export function buildPyramidDefaults<TData extends Record<string, unknown>>(): A
 			values: {
 				// A label past its bar's end reaches out on its own side, the longest bar's to the edge.
 				reach: (labels, state) => {
-					if (labels.anchor === 'middle' || labels.anchor === 'end') return [];
+					if (labels.anchor !== 'outside') return [];
 					const axis = PlotAxes.valueOf(state);
 					const isHorizontal = state.axes?.isHorizontal ?? true;
 					const offset = labels.offset(axis);
@@ -86,7 +86,7 @@ export function buildPyramidDefaults<TData extends Record<string, unknown>>(): A
 				}
 			}
 		},
-		markers: { marks: buildMarks, valueLabels: buildValueLabels },
+		markers: { marks: buildMarks },
 		hover: {
 			// A bar sits at its signed magnitude - below or left of the baseline on the first
 			// side - and its category, and reads as its magnitude.

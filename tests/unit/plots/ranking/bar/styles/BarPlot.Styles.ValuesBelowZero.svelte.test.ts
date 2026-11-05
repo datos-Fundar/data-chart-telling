@@ -25,7 +25,13 @@ async function layout(horizontal: boolean, anchor: ValueAnchor, fontStyle?: obje
 		styles: { values: { show: true, anchor, ...(fontStyle ? { fontStyle } : {}) } }
 	});
 	const svg = await waitForSvg(container);
-	const bars = Array.from(svg.querySelectorAll('g.bar-x rect, g.bar-y rect'));
+	// The bars as the page lays them out by category, whatever order their markers draw them in: a label that follows the
+	// sign of its value is a marker of its own for the bars above zero and the ones below it.
+	const bars = Array.from(svg.querySelectorAll('g.bar-x rect, g.bar-y rect')).sort((a, b) =>
+		horizontal
+			? a.getBoundingClientRect().top - b.getBoundingClientRect().top
+			: a.getBoundingClientRect().left - b.getBoundingClientRect().left
+	);
 	const labels = Array.from(svg.querySelectorAll('g.text text'));
 	const bar = (cat: string) => boxOf(bars[DATA.findIndex((d) => d.cat === cat)]);
 	const label = (text: string) => labels.find((t) => t.textContent === text)!;
@@ -60,26 +66,48 @@ describe.each([
 		}
 	});
 
-	test("'start' puts each label inside its bar, at its left (top) end", async () => {
-		const { down, up } = await layout(horizontal, 'start');
-		for (const { bar, label } of [down, up]) {
-			expect(at(label, bar)).toBeGreaterThan(0);
-			expect(at(label, bar)).toBeLessThan(0.5);
+	/** The ends of the bar as the page draws them: its left and right on a horizontal one, its top and bottom on a vertical one. */
+	const [first, last] = (horizontal ? ['left', 'right'] : ['top', 'bottom']) as [
+		ValueAnchor,
+		ValueAnchor
+	];
+
+	test(
+		"'" +
+			first +
+			"' and '" +
+			last +
+			"' put each label inside its bar, at that end, whatever the sign",
+		async () => {
+			for (const [anchor, inFirstHalf] of [
+				[first, true],
+				[last, false]
+			] as const) {
+				const { down, up } = await layout(horizontal, anchor);
+				for (const { bar, label } of [down, up]) {
+					expect(at(label, bar) < 0.5).toBe(inFirstHalf);
+					expect(at(label, bar)).toBeGreaterThan(0);
+					expect(at(label, bar)).toBeLessThan(1);
+				}
+			}
 		}
+	);
+
+	test("'tip' puts each label at the end of its bar away from zero, and 'base' at the end on zero", async () => {
+		// The bar above zero runs to the right (up), the one below it to the left (down).
+		const upIsLast = horizontal;
+		const tip = await layout(horizontal, 'tip');
+		expect(at(tip.up.label, tip.up.bar) > 0.5).toBe(upIsLast);
+		expect(at(tip.down.label, tip.down.bar) > 0.5).toBe(!upIsLast);
+		const base = await layout(horizontal, 'base');
+		expect(at(base.up.label, base.up.bar) > 0.5).toBe(!upIsLast);
+		expect(at(base.down.label, base.down.bar) > 0.5).toBe(upIsLast);
 	});
 
 	test("'middle' centres each label on its bar", async () => {
 		const { down, up } = await layout(horizontal, 'middle');
 		for (const { bar, label } of [down, up]) {
 			expect(Math.abs(centre(label, axis) - centre(bar, axis))).toBeLessThan(3);
-		}
-	});
-
-	test("'end' puts each label inside its bar, at its right (bottom) end", async () => {
-		const { down, up } = await layout(horizontal, 'end');
-		for (const { bar, label } of [down, up]) {
-			expect(at(label, bar)).toBeGreaterThan(0.5);
-			expect(at(label, bar)).toBeLessThan(1);
 		}
 	});
 });
@@ -89,5 +117,17 @@ describe('BarPlot - values textAnchor', () => {
 		const { down, up } = await layout(true, 'outside', { textAnchor: 'middle' });
 		expect(down.el.style.textAnchor).toBe('middle');
 		expect(up.el.style.textAnchor).toBe('middle');
+	});
+});
+
+describe('BarPlot - values in the corner of a bar', () => {
+	test("'top-left' puts each label inside its bar, in its top left corner", async () => {
+		const { down, up } = await layout(false, 'top-left');
+		for (const { bar, label } of [down, up]) {
+			expect(label.left).toBeGreaterThanOrEqual(bar.left);
+			expect(label.left - bar.left).toBeLessThan((bar.right - bar.left) / 2);
+			expect(label.top).toBeGreaterThanOrEqual(bar.top);
+			expect(label.top - bar.top).toBeLessThan(12);
+		}
 	});
 });

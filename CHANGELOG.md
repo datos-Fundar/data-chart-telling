@@ -14,6 +14,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- The value labels of `BarPlot`, `BulletPlot`, `PyramidPlot`, `HistogramPlot` and `HeatmapPlot` are the `label` of their own shapes (`bar`, `rect`, `cell`), so they fit them: a label that does not fit is written smaller, cut short, or left out. On those plots `styles.values.anchor` takes the anchors of a shape's label - `'middle'`, `'top'`, `'bottom'`, `'left'`, `'right'`, the corners (`'top-left'`...), and `'tip'` and `'base'`, the end of a bar away from zero and the one on it, on either side of zero - and `'outside'`, beyond the tip, which stays the default. `'start'` and `'end'` are gone from them (they were the top and bottom of the page, or the left and right, whatever the sign); the plots that label a point or the end of a line keep them. `fontStyle.dx` and `dy` now push a label from its anchor rather than replace its gap. A label with `hoverIsolate` still dims the other series and a dimmed series dims its labels. `LabelAnchor` is one type for the anchors of a text marker's `frameAnchor`, a shape's `label` and the plots' `anchor`.
+
 - Everything a marker is drawn with now goes in its `styles`, which takes a function of the row for any field: the `stroke`, `strokeWidth` and `strokeOpacity` of `rule` and `arrow` (they took a field key or a function beside `styles`), the `fill` and `fillOpacity` of `text` and the `fill` of `cell`, and the insets - `inset`, `insetLeft`, `insetRight`, `insetTop` and `insetBottom` of `rect`, `bar`, `cell` and `rule`, `inset`, `insetStart` and `insetEnd` of `arrow`. The field keys they took stay, now in `styles`: `styles: { stroke: 'color' }`.
 
 ## [1.15.0] - 2026-11-04

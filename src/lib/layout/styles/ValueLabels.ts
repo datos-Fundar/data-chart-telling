@@ -11,11 +11,12 @@ import type { ValuesStyle } from '$lib/types/layout/styles';
 import type { ValueLabelsOptions } from '$lib/types/phases/styles/phase';
 import type { Series } from '$lib/types/plots/data/common';
 import type { FontStyle, StrokeStyle } from '$lib/types/plots/styling';
-import type { TextAnchor, ValueAnchor } from '$lib/types/plots/constants';
+import type { LabelAnchor, TextAnchor, ValueAnchor } from '$lib/types/plots/constants';
 import type { BoxAnchors, EdgeBox } from '$lib/types/layout/box';
 import type { MarginSide } from '$lib/types/plots/props';
 import type { AxisPlotCtx, AxisPlotState, ProcessedData, ProcessedRow } from '$lib/types/phases';
 import type { TextMarkerConfig } from '$lib/types/markers/common';
+import type { TextLabelConfig } from '$lib/types/markers/basic/text';
 
 /**
  * A plot's value labels: the author's `styles.values` over the plot kind's
@@ -191,6 +192,79 @@ export class ValueLabels {
 				: undefined,
 			onpointerleave: isolate ? () => interaction.isolate(null) : undefined
 		};
+	}
+
+	/**
+	 * Where in a bar a label goes, from the `anchor` of `styles.values`: its `label` anchor, and whether it is beyond
+	 * the bar. `negative` tells a bar that runs to the left (or down) from its base from one that runs right (or up),
+	 * which `'tip'`, `'base'` and `'outside'` follow; the others are the edges of the page. A `stacked` bar's label is
+	 * always in the middle. An anchor the shapes do not read (`'start'`, `'end'`) is taken for `'outside'`, the default.
+	 */
+	static boxAnchor(
+		anchor: ValueAnchor,
+		shape: { isHorizontal: boolean; negative?: boolean; stacked?: boolean }
+	): { anchor: LabelAnchor; outside?: boolean } {
+		if (shape.stacked || anchor === 'middle') return { anchor: 'middle' };
+		// A place in the shape as it is drawn on the page, which no sign moves.
+		if (
+			anchor !== 'outside' &&
+			anchor !== 'start' &&
+			anchor !== 'end' &&
+			anchor !== 'tip' &&
+			anchor !== 'base'
+		) {
+			return { anchor };
+		}
+		const [tip, base] = shape.isHorizontal
+			? shape.negative
+				? (['left', 'right'] as const)
+				: (['right', 'left'] as const)
+			: shape.negative
+				? (['bottom', 'top'] as const)
+				: (['top', 'bottom'] as const);
+		if (anchor === 'base') return { anchor: base };
+		return anchor === 'tip' ? { anchor: tip } : { anchor: tip, outside: true };
+	}
+
+	/** Whether a label at `anchor` goes to one side or the other of a bar with the sign of its value. */
+	static followsSign(anchor: ValueAnchor): boolean {
+		return anchor === 'outside' || anchor === 'tip' || anchor === 'base';
+	}
+
+	/**
+	 * The `label` the shapes of a plot kind write their value in: this plot's `styles.values` over the `defaults` the kind
+	 * sets, with what every label shares ({@link hooks}) - its dimming and isolating of a series. A label inside its shape
+	 * never reaches out of the plot, so only one `outside` has the margins grow to hold it.
+	 */
+	shapeLabel(
+		ctx: AxisPlotCtx,
+		text: (row: ProcessedRow) => string,
+		defaults: {
+			fill?: string;
+			fontSize?: number;
+			fontWeight?: FontStyle['fontWeight'];
+			anchor?: LabelAnchor;
+			outside?: boolean;
+			gap?: number;
+		} = {}
+	): TextLabelConfig {
+		const { fitMargins, styles: shared, ...events } = this.hooks(ctx);
+		const { font } = this;
+		return {
+			...events,
+			text,
+			anchor: defaults.anchor,
+			outside: defaults.outside,
+			gap: defaults.gap,
+			fitMargins: defaults.outside ? fitMargins : undefined,
+			styles: {
+				...shared,
+				...font,
+				fill: font?.fill ?? defaults.fill,
+				fontSize: font?.fontSize ?? defaults.fontSize ?? 12,
+				fontWeight: font?.fontWeight ?? defaults.fontWeight
+			}
+		} as TextLabelConfig;
 	}
 
 	/**

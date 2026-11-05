@@ -1,10 +1,5 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
-import {
-	buildMarks,
-	buildValueLabels,
-	buildHitAreas,
-	buildBarGeometry
-} from '$lib/plots/ranking/bar/markers';
+import { buildMarks, buildHitAreas, buildBarGeometry } from '$lib/plots/ranking/bar/markers';
 import { NiceTicks } from '$lib/layout/scales/NiceTicks';
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
@@ -116,7 +111,7 @@ export function buildBarDefaults<TData extends Record<string, unknown>>(): AxisP
 				}
 			}
 		},
-		markers: { marks: buildMarks, valueLabels: buildValueLabels },
+		markers: { marks: buildMarks },
 		hover: {
 			// Each bar matched by its own band (see `buildHitAreas`); a grouped bar's dot is
 			// drawn in its series' slice of the band.

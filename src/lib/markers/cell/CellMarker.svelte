@@ -1,5 +1,4 @@
 <script lang="ts">
-	import MarkerLabel from '$lib/markers/utils/MarkerLabel.svelte';
 	import { RowStyle } from '$lib/markers/utils/RowStyle';
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Cell } from 'svelteplot';
@@ -30,5 +29,3 @@
 	borderRadius={RowStyle.field(marker.styles?.borderRadius)}
 	inset={RowStyle.field(marker.styles?.inset) ?? 0.5}
 />
-
-<MarkerLabel {marker} />

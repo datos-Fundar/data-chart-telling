@@ -6,7 +6,7 @@ import { resolveGapAreaStyle } from '$lib/plots/utils/gaps';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
-import type { BarMarkerConfig, TextMarkerConfig } from '$lib/types/markers/common';
+import type { BarMarkerConfig } from '$lib/types/markers/common';
 import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/ranking/bar/state';
 import type { ProcessedRow } from '$lib/types/phases';
 import type { AxisValue } from '$lib/types/layout/mapping';
@@ -95,96 +95,6 @@ type CategoryChannel = BarMarkerConfig['x'];
 type ValueChannel = BarMarkerConfig['x2'];
 
 /**
- * BarPlot's `styles.values` as one `'text'` marker per series, over the same
- * processed rows its bars draw (gap rows never get a label). `anchor` places
- * each label along its bar: past its top (`'outside'`), just inside it
- * (`'start'`), at its base (`'end'`), or centred (`'middle'`); a stacked bar's
- * label always sits at the middle of its own span. A grouped bar's label
- * shifts with its series' slice of the band.
- */
-export function buildValueLabels<TData extends Record<string, unknown>>(
-	labels: ValueLabels,
-	state: BarPlotState<TData>,
-	ctx: BarPlotCtx
-): TextMarkerConfig[] {
-	const { processedData } = state;
-	const isHorizontal = state.axes?.isHorizontal ?? false;
-	if (!processedData) return [];
-	const geometry = buildBarGeometry(state, ctx.cfg.bar.seriesPadding);
-	const { font, anchor, format } = labels;
-	const valueOf = ValueLabels.valueOf(state);
-
-	const spanOf = (d: ProcessedRow): [number, number] => geometry.spanOf(d) ?? [0, 0];
-	const lowOf = (d: ProcessedRow) => Math.min(...spanOf(d));
-	const highOf = (d: ProcessedRow) => Math.max(...spanOf(d));
-	const below = (d: ProcessedRow) => Number(valueOf(d)) < 0;
-
-	/**
-	 * Where a label sits on its bar and which way it reads from there, per anchor and orientation. A stacked
-	 * bar's label is centred on its segment. Otherwise, on a horizontal bar `'start'` is its left end and
-	 * `'end'` its right one (both inside), and on a vertical bar `'start'` is its top end and `'end'` its
-	 * bottom one, whatever the sign of the value; `'middle'` is its centre, and `'outside'` is beyond its tip
-	 * - to the right or above a bar from zero up, to the left or below one from zero down.
-	 */
-	type Place = {
-		at: (d: ProcessedRow) => number;
-		/** Along the value axis, `+1` (right or down) or `-1` (left or up), the label's side of its point. */
-		side: 1 | -1 | 0;
-	};
-	const place = (negative: boolean): Place => {
-		const mid = (d: ProcessedRow) => (lowOf(d) + highOf(d)) / 2;
-		if (geometry.stacked) return { at: mid, side: 0 };
-		if (anchor === 'middle') return { at: mid, side: 0 };
-		if (anchor === 'outside')
-			return isHorizontal
-				? { at: negative ? lowOf : highOf, side: negative ? -1 : 1 }
-				: { at: negative ? lowOf : highOf, side: negative ? 1 : -1 };
-		if (anchor === 'start') return isHorizontal ? { at: lowOf, side: 1 } : { at: highOf, side: 1 };
-		return isHorizontal ? { at: highOf, side: -1 } : { at: lowOf, side: -1 };
-	};
-	const gap = anchor === 'outside' ? 6 : 4;
-
-	const labelled = processedData.data.filter(
-		(d) => d[GAP_VALUE] === undefined && geometry.spanOf(d) !== undefined
-	);
-	return (state.resolvedSeries ?? []).flatMap((s): TextMarkerConfig[] => {
-		const own = labelled.filter((d) => d[SERIES_ID_KEY] === seriesIdOf(s));
-		// Only a label beyond the tip turns with the sign of its value.
-		const turns = !geometry.stacked && anchor === 'outside';
-		return (turns ? [false, true] : [false]).flatMap((negative): TextMarkerConfig[] => {
-			const data = turns ? own.filter((d) => below(d) === negative) : own;
-			if (data.length === 0) return [];
-			const { at, side } = place(negative);
-			// A horizontal label reads away from its point to `side`; a vertical one sits on the far side of it.
-			const textAnchor =
-				labels.textAnchor ??
-				(isHorizontal ? (side === 1 ? 'start' : side === -1 ? 'end' : 'middle') : 'middle');
-			const lineAnchor =
-				font?.lineAnchor ??
-				(isHorizontal ? 'middle' : side === 1 ? 'top' : side === -1 ? 'bottom' : 'middle');
-			return [
-				{
-					type: 'text',
-					data,
-					...(isHorizontal ? { x: at, y: geometry.categoryOf } : { x: geometry.categoryOf, y: at }),
-					bandSlice: geometry.sliceOf(s.name),
-					text: (d: ProcessedRow) => format(Number(valueOf(d)), s.name, d),
-					styles: {
-						...font,
-						fill: font?.fill ?? ctx.cfg.axis.color,
-						fontSize: font?.fontSize ?? 12,
-						dx: font?.dx ?? (isHorizontal ? side * gap : 0),
-						dy: font?.dy ?? (isHorizontal ? 0 : side * gap),
-						textAnchor,
-						lineAnchor
-					}
-				}
-			];
-		});
-	});
-}
-
-/**
  * BarPlot's "markers" phase: visible `role: 'segment'` bars - real data plus
  * gap fills - drawing the rows the "transforms" phase left, prepended onto
  * whatever the "statistics" phase already put in `state.markers`, and its
@@ -213,11 +123,33 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		(geometry.stacked || channel === undefined ? top : channel) as ValueChannel;
 	const gapValue = valueOf(channels[valueAxis]);
 
+	// What each bar writes in itself: its value, anchored along the bar by `anchor` - past its tip
+	// (`'outside'`), just inside it (`'start'`), at its base (`'end'`) or in the middle. A stacked bar's
+	// label is always in the middle of its segment.
+	const labels = state.valueLabels?.show ? state.valueLabels : undefined;
+	const valueRead = ValueLabels.valueOf(state);
+	const turns = !!labels && !geometry.stacked && ValueLabels.followsSign(labels.anchor);
+	const labelAnchor = (negative: boolean) =>
+		ValueLabels.boxAnchor(labels?.anchor ?? 'outside', {
+			isHorizontal,
+			negative,
+			stacked: geometry.stacked
+		});
+	const labelFor = (name: string, slice: BandSlice | undefined, negative: boolean) =>
+		labels && {
+			...labels.shapeLabel(ctx, (d) => labels.format(Number(valueRead(d)), name, d), {
+				fill: ctx.cfg.axis.color,
+				...labelAnchor(negative)
+			}),
+			bandSlice: slice
+		};
+
 	function makeMarker(
 		data: ProcessedRow[],
 		slice: BandSlice | undefined,
 		value: ValueChannel,
-		styles: BarSegmentStyle
+		styles: BarSegmentStyle,
+		label?: BarMarkerConfig['label']
 	): BarMarkerConfig | null {
 		if (data.length === 0) return null;
 		const from = (geometry.stacked ? bottom : geometry.baseline) as ValueChannel;
@@ -227,6 +159,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 			isHorizontal,
 			data,
 			styles,
+			...(label ? { label } : {}),
 			...(isHorizontal
 				? { y: category, x1: from, x2: value }
 				: { x: category, y1: from, y2: value })
@@ -253,7 +186,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 
 		for (const seg of group.visualSegments) {
 			const fill = disabledFill?.fill ?? seg.styles.fill ?? defaultColor;
-			const marker = makeMarker(seg.data.filter(isReal), slice, valueOf(group.series[valueAxis]), {
+			const styles: BarSegmentStyle = {
 				// An outline asked for without a color is the fill's.
 				...(seg.styles.strokeWidth !== undefined ? { stroke: fill } : {}),
 				...seg.styles,
@@ -263,8 +196,20 @@ export function buildMarks<TData extends Record<string, unknown>>(
 				...(disabledFill?.fillOpacity !== undefined
 					? { strokeOpacity: disabledFill.fillOpacity }
 					: {})
-			});
-			if (marker) segmentMarkers.push(marker);
+			};
+			const real = seg.data.filter(isReal);
+			const value = valueOf(group.series[valueAxis]);
+			// A label past the tip turns with the sign of its value, so the bars below zero are a marker of their own.
+			const parts = turns
+				? [false, true].map((negative) => ({
+						negative,
+						rows: real.filter((row) => Number(valueRead(row)) < 0 === negative)
+					}))
+				: [{ negative: false, rows: real }];
+			for (const { negative, rows } of parts) {
+				const marker = makeMarker(rows, slice, value, styles, labelFor(name, slice, negative));
+				if (marker) segmentMarkers.push(marker);
+			}
 		}
 
 		const id = seriesIdOf(group.series);

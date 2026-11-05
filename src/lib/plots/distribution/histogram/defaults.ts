@@ -1,4 +1,4 @@
-import { buildMarks, buildValueLabels } from '$lib/plots/distribution/histogram/markers';
+import { buildMarks } from '$lib/plots/distribution/histogram/markers';
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { resolveAccessor } from '$lib/utils/accessors';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
@@ -79,7 +79,7 @@ export function buildHistogramDefaults<TData extends Record<string, unknown>>():
 				}
 			}
 		},
-		markers: { marks: buildMarks, valueLabels: buildValueLabels },
+		markers: { marks: buildMarks },
 		hover: {
 			// A hovered bin is labelled with its count, and reads as its row plus its count,
 			// the edges it spans and its series.

@@ -1,5 +1,6 @@
 import type { TextMarkerConfig } from '$lib/types/markers/common';
-import type { LabelAnchor, TextLabelConfig } from '$lib/types/markers/basic/text';
+import type { TextLabelConfig } from '$lib/types/markers/basic/text';
+import type { LabelAnchor } from '$lib/types/plots/constants';
 
 /** Where a row's edge along an axis is: a field of the rows, the symbol a transform keyed it by, a function of the row, or a literal. */
 type Edge = unknown;
@@ -169,7 +170,26 @@ export class BoxLabel {
 	}
 
 	/** A rectangle: the box is between its edges. */
-	static #edges({ x1, x2, y1, y2 }: Labelled) {
+	static #edges({ x, y, x1, x2, y1, y2 }: Labelled) {
+		// A side with a value and no start, next to one with both its edges, runs from zero to it, as a bar does.
+		if (
+			y1 === undefined &&
+			y2 === undefined &&
+			y !== undefined &&
+			x1 !== undefined &&
+			x2 !== undefined
+		) {
+			[y1, y2] = [0, y];
+		}
+		if (
+			x1 === undefined &&
+			x2 === undefined &&
+			x !== undefined &&
+			y1 !== undefined &&
+			y2 !== undefined
+		) {
+			[x1, x2] = [0, x];
+		}
 		if ([x1, x2, y1, y2].some((edge) => edge === undefined)) return undefined;
 		const [left, right, top, bottom] = [x1, x2, y1, y2].map(read);
 		const size: BoxSizer = (row, scales) => {

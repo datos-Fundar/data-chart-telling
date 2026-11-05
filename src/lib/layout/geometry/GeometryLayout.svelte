@@ -39,6 +39,7 @@
 	import ContourMarker from '$lib/markers/contour/ContourMarker.svelte';
 	import ContourClipMarker from '$lib/markers/contour/ContourClipMarker.svelte';
 	import InsetMarker from '$lib/markers/inset/InsetMarker.svelte';
+	import MarkerLabel from '$lib/markers/utils/MarkerLabel.svelte';
 	import FrameClip from '$lib/layout/geometry/FrameClip.svelte';
 	import MarkerOffset from '$lib/layout/geometry/MarkerOffset.svelte';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
@@ -297,5 +298,18 @@
 		</FrameClip>
 	{:else if groupByName.has(scope)}
 		{@render renderScoped(marker, groupByName.get(scope)!)}
+	{/if}
+{/each}
+
+<!--
+	The labels the shapes write in themselves, after every marker - the hover's hit areas too, which are the last of them -
+	so a label that listens for the pointer is not covered, and one outside its shape is not clipped with it.
+-->
+{#each markers as marker, i (markerKey(marker, i))}
+	{@const scope = scopedSeriesOf(marker)}
+	{#if 'label' in marker && marker.label && (scope === undefined || groupByName.has(scope))}
+		<MarkerOffset {marker}>
+			<MarkerLabel marker={{ ...marker, data: marker.data ?? data }} />
+		</MarkerOffset>
 	{/if}
 {/each}

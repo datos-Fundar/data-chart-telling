@@ -1,5 +1,4 @@
 <script lang="ts">
-	import MarkerLabel from '$lib/markers/utils/MarkerLabel.svelte';
 	import { RowStyle } from '$lib/markers/utils/RowStyle';
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { WaffleX, WaffleY } from 'svelteplot';
@@ -39,5 +38,3 @@
 	strokeWidth={RowStyle.field(marker.styles?.strokeWidth)}
 	strokeOpacity={RowStyle.opacity(marker.styles?.strokeOpacity)}
 />
-
-<MarkerLabel {marker} />

@@ -55,5 +55,5 @@ Bars where one axis holds the categories and the other the values. Categories on
 - Several series sharing a category sit side by side, each in its slice of the category band. The gap between them is `bar.seriesPadding` in the configuration.
 - `transforms={[{ type: 'stackY' }]}` stacks the series instead. Stacking is always `stackY`, also for horizontal bars, because the value channel is the one stacked.
 - `scales.x.paddingInner` / `paddingOuter` set the spacing between category bands.
-- `styles.values.show` labels each bar; `styles.values.anchor` places the label (`'outside'`, `'start'`, `'middle'`, `'end'`).
+- `styles.values.show` labels each bar; `styles.values.anchor` places the label (`'outside'`, `'middle'`, `'top'`, `'bottom'`, `'left'`, `'right'`, a corner such as `'top-left'`, or `'tip'` and `'base'`, the ends of the bar away from zero and on it).
 - The tooltip triggers anywhere over a bar's whole band, not just over the visible bar.
