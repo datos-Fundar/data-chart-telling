@@ -16,7 +16,9 @@ export type ChannelValue = {
 	 * Splits `data` into one series per distinct value - the structural
 	 * grouping key. Defaults to `color` when omitted, so a single `color`
 	 * accessor groups *and* colors series; pass both to split by one field
-	 * while coloring by another.
+	 * while coloring by another. A list is one grouping of several levels, outermost
+	 * first: a plot that nests (a treemap) nests by them, any other splits by their
+	 * combination.
 	 */
 	grouping: unknown;
 	/**

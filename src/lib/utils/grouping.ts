@@ -2,6 +2,34 @@ import { resolveAccessor } from '$lib/utils/accessors';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { Series, Accessor } from '$lib/types/plots/data/common';
 
+/** A `grouping` as the plot takes it: one accessor, or a list of them - its levels, outermost first. */
+export type GroupingProp<TRow extends Record<string, unknown>> =
+	| Accessor<TRow, unknown>
+	| readonly Accessor<TRow, unknown>[];
+
+/** Whether a `grouping` is a list of levels (`Array.isArray` does not narrow a readonly one). */
+const isList = <TRow extends Record<string, unknown>>(
+	grouping: GroupingProp<TRow> | undefined
+): grouping is readonly Accessor<TRow, unknown>[] => Array.isArray(grouping);
+
+/** The separator between the levels of a combined grouping key. */
+const LEVEL_SEPARATOR = ' · ';
+
+/**
+ * A `grouping` as the one key the plot's rows split into series by: a single accessor as it is, a list
+ * of them as the key their levels make together (`'Terciarias · Resto'`). A plot that nests its levels
+ * (a treemap) reads the list itself.
+ */
+export function groupingKey<TRow extends Record<string, unknown>>(
+	grouping: GroupingProp<TRow> | undefined
+): Accessor<TRow, unknown> | undefined {
+	if (!isList(grouping)) return grouping;
+	if (grouping.length === 0) return undefined;
+	if (grouping.length === 1) return grouping[0];
+	const levels = grouping.map((level) => resolveAccessor<TRow>(level));
+	return (row: TRow) => levels.map((read) => String(read(row))).join(LEVEL_SEPARATOR);
+}
+
 /**
  * Splits rows into ordered groups keyed by the stringified accessor value.
  * Insertion order of first appearance is preserved, which keeps colours stable

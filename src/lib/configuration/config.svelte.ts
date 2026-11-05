@@ -204,6 +204,15 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		}
 	},
 
+	treemap: {
+		stroke: '#ffffff',
+		strokeWidth: 1.5,
+		labelColor: '#ffffff',
+		fontSize: 12,
+		padding: 4,
+		lineHeight: 1.2
+	},
+
 	timeline: {
 		axisColor: 'currentColor',
 		activeColor: '#4e79a7',

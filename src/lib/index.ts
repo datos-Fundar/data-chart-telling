@@ -18,6 +18,7 @@ export { default as PyramidPlot } from './plots/distribution/pyramid/Plot.svelte
 export { default as ScatterPlot } from './plots/correlation/scatter/Plot.svelte';
 export { default as SlopePlot } from './plots/evolution/slope/Plot.svelte';
 export { default as SparklinePlot } from './plots/evolution/sparkline/Plot.svelte';
+export { default as TreemapPlot } from './plots/part-of-a-whole/treemap/Plot.svelte';
 export { default as ViolinPlot } from './plots/distribution/violin/Plot.svelte';
 
 // ── Composition ─────────────────────────────────────────────────────────────
@@ -81,6 +82,13 @@ export type {
 } from './types/layout/mapping';
 export type { AxisScale, AxisBasedScalesConfig, ChannelScalesConfig } from './types/layout/scales';
 export type { NumberDisplay } from './types/layout/numbers';
+export type {
+	TreemapPlotProps,
+	TreemapDataProps,
+	TreemapTooltipTile
+} from './types/plots/part-of-a-whole/treemap/props';
+export type { TreemapTile } from './types/transforms/treemap';
+export type { GroupingProp } from './utils/grouping';
 export type { Accessor, Series, SeriesProps, DataProps } from './types/plots/data/common';
 export type {
 	BasePlotProps,

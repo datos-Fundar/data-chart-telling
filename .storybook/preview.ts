@@ -232,6 +232,21 @@ const preview: Preview = {
 								'*'
 							]
 						],
+						'Part of a whole',
+						[
+							'TreemapPlot',
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							]
+						],
 						'Ranking',
 						[
 							'BarPlot',

@@ -8,6 +8,8 @@ import type { CommonMarkerConfigWithInterval } from '$lib/types/markers/channels
 export type RectMarkerConfig = {
 	type: 'rect';
 	interval?: number | string;
+	/** Makes the rectangle a hit area of the plot's hover: the pointer entering it hovers its `data` rows, as it does for a bar's band. */
+	hover?: boolean;
 	styles?: PerRow<AreaStyle & InsetStyle>;
 } & CommonMarkerConfigWithArea &
 	CommonMarkerConfigWithColor &

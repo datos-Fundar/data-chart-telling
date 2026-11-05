@@ -1,4 +1,5 @@
 import type { AxisValue, AxisChannelName, ChannelAccessors } from '$lib/types/layout/mapping';
+import type { GroupingProp } from '$lib/utils/grouping';
 
 /**
  * A field key or accessor function. Mirrors the shorthand used across plots
@@ -47,5 +48,7 @@ export type SeriesProps<T extends Record<string, unknown>> = {
 export type DataProps<T extends Record<string, unknown>> = {
 	series?: never;
 	data: T[];
-} & ChannelAccessors<T> &
+	/** The levels rows split into series by - a field key, a function, or a list of them (see {@link ChannelValue}'s `grouping`). */
+	grouping?: GroupingProp<T>;
+} & Omit<ChannelAccessors<T>, 'grouping'> &
 	Required<Pick<ChannelAccessors<T>, AxisChannelName>>;

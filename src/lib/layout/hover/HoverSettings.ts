@@ -53,8 +53,20 @@ export class HoverSettings<TRow extends Record<string, unknown>> {
 		defaultStrategy: HoverStrategy;
 		pointMatching?: PointMatchingStrategy;
 		number?: (value: number) => string;
+		/** What a plot kind knows of a row, the third argument of the author's own `format`. */
+		context?: (row: TRow) => unknown;
 	}): HoverConfig<TRow> {
-		const { tooltip, format, sort, markers, points, label, defaultStrategy, pointMatching } = args;
+		const {
+			tooltip,
+			format,
+			sort,
+			markers,
+			points,
+			label,
+			defaultStrategy,
+			pointMatching,
+			context
+		} = args;
 		const number = args.number ?? String;
 		const settings = new HoverSettings(tooltip, markers, defaultStrategy);
 		return {
@@ -65,7 +77,14 @@ export class HoverSettings<TRow extends Record<string, unknown>> {
 			sync: settings.sync,
 			tooltip: tooltip && {
 				...tooltip,
-				format: tooltip.format ? (row: TRow) => tooltip.format!(row, number) : format,
+				format: tooltip.format
+					? (row: TRow) =>
+							(tooltip.format as (row: TRow, number: unknown, context: unknown) => string)(
+								row,
+								number,
+								context?.(row)
+							)
+					: format,
 				...(sort ? { sort } : {})
 			},
 			...(pointMatching ? { pointMatching } : {})

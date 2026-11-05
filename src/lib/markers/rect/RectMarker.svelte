@@ -4,6 +4,7 @@
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
+	import { PlotContext } from '$lib/layout/plot/PlotContext';
 	import type { RectMarkerConfig } from '$lib/types/markers/common';
 
 	/** Renders one `'rect'` marker as a `<Rect>` call - an arbitrary rectangle, unlike `BarMarker`'s category-band-anchored bar. */
@@ -17,6 +18,23 @@
 	);
 
 	const events = MarkerEvents.use(() => marker);
+	const hover = PlotContext.current()?.hover;
+	/** The marker's handlers, and with `hover` the plot's hover too: entering the rectangle hovers its rows. */
+	const handlers = $derived.by(() => {
+		const own = events.props;
+		if (!marker.hover) return own;
+		return {
+			...own,
+			onpointerenter: (event: Event, row: unknown, index: number) => {
+				own.onpointerenter?.(event, row, index);
+				hover?.onPointer((marker.data ?? []) as Record<string, unknown>[]);
+			},
+			onpointerleave: (event: Event, row: unknown, index: number) => {
+				own.onpointerleave?.(event, row, index);
+				hover?.onLeave();
+			}
+		};
+	});
 </script>
 
 {#if opacityBuckets}
@@ -41,7 +59,7 @@
 			strokeOpacity={RowStyle.opacity(marker.styles?.strokeOpacity)}
 			strokeDasharray={marker.styles?.strokeDasharray}
 			borderRadius={RowStyle.field(marker.styles?.borderRadius)}
-			{...events.props}
+			{...handlers}
 		/>
 	{/each}
 {:else}
@@ -65,6 +83,6 @@
 		strokeOpacity={RowStyle.opacity(marker.styles?.strokeOpacity)}
 		strokeDasharray={marker.styles?.strokeDasharray}
 		borderRadius={RowStyle.field(marker.styles?.borderRadius)}
-		{...events.props}
+		{...handlers}
 	/>
 {/if}

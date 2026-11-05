@@ -39,13 +39,13 @@ A **channel** maps a field of each row to a visual property. Each channel takes 
 | ---------- | ----------------------------------------------------------- | ---------------------- |
 | `x`, `y`   | Position on the horizontal and vertical axis                | `scales.x`, `scales.y` |
 | `color`    | A color: categorical (one per value) or continuous (a ramp) | `scales.color`         |
-| `grouping` | Which series the row belongs to                             | `scales.grouping`      |
+| `grouping` | Which series the row belongs to (a list: its levels)        | `scales.grouping`      |
 | `opacity`  | A fill or stroke opacity                                    | `scales.opacity`       |
 | `symbol`   | A marker shape (categorical)                                | `scales.symbol`        |
 | `r`        | A dot radius, scaled so that area follows the value         | `scales.r`             |
 | `length`   | A vector or spike length                                    | `scales.length`        |
 
-`grouping` splits `data` into series. When it is unset, `color` groups too, so one accessor both separates and colors the series - the usual case. Pass both to group by one field and color by another:
+`grouping` splits `data` into series. A list of fields is one grouping of several levels, outermost first: a plot that nests its rows ([TreemapPlot](plots/part-of-a-whole/treemap.md)) nests them by those levels, and any other splits them by the combination of the levels (`['region', 'sex']` is one series per region and sex). When it is unset, `color` groups too, so one accessor both separates and colors the series - the usual case. Pass both to group by one field and color by another:
 
 ```svelte
 <ScatterPlot data={rows} x="gdp" y="life" grouping="country" color="temperature" {width} {height} />

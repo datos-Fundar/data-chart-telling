@@ -81,7 +81,8 @@ export class HoverPhase<
 			label: label as (row: Row) => string,
 			defaultStrategy: options.strategy ?? HoverSettings.strategyOf(state.axes),
 			pointMatching: options.pointMatching,
-			number: NumberFormat.of(NumberFormat.displayOf(state.tooltip), ctx.cfg)
+			number: NumberFormat.of(NumberFormat.displayOf(state.tooltip), ctx.cfg),
+			context: options.context?.(state) as ((row: Row) => unknown) | undefined
 		});
 		const hitAreas = options.hitAreas?.(state, hover as never, ctx) ?? [];
 		return {

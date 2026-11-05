@@ -10,6 +10,7 @@ import { MarkersPhase } from '$lib/phases/markers/MarkersPhase';
 import { TooltipPhase } from '$lib/phases/tooltip/TooltipPhase';
 import { HoverPhase } from '$lib/phases/hover/HoverPhase';
 import { HoverSettings } from '$lib/layout/hover/HoverSettings';
+import { groupingKey, type GroupingProp } from '$lib/utils/grouping';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type {
 	AxisPlotState,
@@ -39,7 +40,7 @@ export type AxisPipelineProps<TData extends Record<string, unknown>> = {
 	data?: TData[];
 	x?: Accessor<TData, unknown>;
 	y?: Accessor<TData, unknown>;
-	grouping?: Accessor<TData, unknown>;
+	grouping?: GroupingProp<TData>;
 	color?: Accessor<TData, unknown>;
 	opacity?: unknown;
 	r?: unknown;
@@ -313,7 +314,7 @@ export class Pipeline<TState, TCtx = unknown> {
 			data: rows as TData[] | undefined,
 			x: props.x,
 			y: props.y,
-			grouping: props.grouping,
+			grouping: groupingKey(props.grouping),
 			color: props.color,
 			opacity: props.opacity,
 			r: props.r,

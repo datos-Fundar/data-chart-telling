@@ -275,6 +275,22 @@ export type PlotStylesConfig = {
 		};
 	};
 
+	/** The tiles of a `TreemapPlot` and the labels written on them. */
+	treemap: {
+		/** The line between tiles. */
+		stroke: string;
+		/** Its width, in px. */
+		strokeWidth: number;
+		/** The color of a tile's label. */
+		labelColor: string;
+		/** Font size of a tile's label, in px. */
+		fontSize: number;
+		/** The room kept between a tile's edge and its label, in px. */
+		padding: number;
+		/** Line height of a tile's label, as a multiple of its font size. */
+		lineHeight: number;
+	};
+
 	/** Timeline gutter styling. */
 	timeline: {
 		axisColor: string;

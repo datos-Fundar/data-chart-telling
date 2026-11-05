@@ -121,12 +121,12 @@ A row whose value is `null`, `undefined` or `NaN` breaks a line. `styles.gaps` b
 
 - A plot uses the ones its own marks are made of and ignores the rest, so one `styles` can be shared between plots:
 
-  | Plot                                                                                                                       | Uses                                                           |
-  | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-  | `LinePlot`, `SlopePlot`, `SparklinePlot`                                                                                   | `stroke` (the line), `dot` (a dot on every point; unset, none) |
-  | `AreaPlot`, `BarPlot`, `BulletPlot`, `PyramidPlot`, `HistogramPlot`, `BoxPlot`, `DensityPlot`, `ViolinPlot`, `HeatmapPlot` | `area`                                                         |
-  | `ScatterPlot`                                                                                                              | `dot`                                                          |
-  | `LollipopPlot`, `DumbbellPlot`, `ClevelandPlot`, `ForestPlot`                                                              | `stroke` (the stems and connectors), `dot`                     |
+  | Plot                                                                                                                                      | Uses                                                           |
+  | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+  | `LinePlot`, `SlopePlot`, `SparklinePlot`                                                                                                  | `stroke` (the line), `dot` (a dot on every point; unset, none) |
+  | `AreaPlot`, `BarPlot`, `BulletPlot`, `PyramidPlot`, `HistogramPlot`, `BoxPlot`, `DensityPlot`, `ViolinPlot`, `HeatmapPlot`, `TreemapPlot` | `area`                                                         |
+  | `ScatterPlot`                                                                                                                             | `dot`                                                          |
+  | `LollipopPlot`, `DumbbellPlot`, `ClevelandPlot`, `ForestPlot`                                                                             | `stroke` (the stems and connectors), `dot`                     |
 
   `GeoPlot` has styles of its own and uses none of them.
 
@@ -161,6 +161,7 @@ The style shape depends on the plot:
 | `AreaPlot`, `HistogramPlot` | `AreaStyle`                        | `fill`, `fillOpacity`, `stroke`, ...           |
 | `BarPlot`, `PyramidPlot`    | `BarSegmentStyle` (`AreaStyle`)    | `fill`, `fillOpacity`, `stroke`, ...           |
 | `HeatmapPlot`               | `CellSegmentStyle` (`AreaStyle`)   | `fill`, `fillOpacity`, `stroke`, `strokeWidth` |
+| `TreemapPlot`               | `BarSegmentStyle` (`AreaStyle`)    | `fill`, `fillOpacity`, `stroke`, ...           |
 | `ScatterPlot`               | `ScatterSegmentStyle` (`DotStyle`) | dot fill, stroke, radius, symbol               |
 | `GeoPlot`                   | `GeoSegmentStyle`                  | `fill`, `fillOpacity`, `stroke`, `strokeWidth` |
 

@@ -19,13 +19,19 @@ export type TooltipRow<TRow> = TRow & { seriesColor?: string };
  * `suffix` and `signDisplay` write the value the default text shows - the one on the plot's value axis (the
  * x of a horizontal bar chart), and a heatmap's color value - and the numbers a custom `format` writes with its `number`.
  */
-export type TooltipOptions<TRow extends Record<string, unknown>> = NumberDisplay & {
+export type TooltipOptions<
+	TRow extends Record<string, unknown>,
+	TContext = never
+> = NumberDisplay & {
 	/** Matching strategy. Defaults to the chart kind's own default. */
 	strategy?: HoverStrategy;
 	/** Highlight the hovered point in every synced plot too. Defaults to `false`. */
 	sync?: boolean;
-	/** Custom tooltip text for a row (supports `\n`). Defaults per chart kind. `number` writes a value as the display fields above ask. */
-	format?: (row: TRow, number: (value: number) => string) => string;
+	/**
+	 * Custom tooltip text for a row (supports `\n`). Defaults per chart kind. `number` writes a value as the display
+	 * fields above ask. A plot kind may give a third argument, what it knows of the row: a treemap's tile.
+	 */
+	format?: (row: TRow, number: (value: number) => string, context: TContext) => string;
 	/** Named subset of crossing series to include. Omitted = all matched. */
 	series?: string[];
 	/** Custom tooltip body; replaces `format` when given. Its rows carry a `seriesColor` - see {@link TooltipRow}. */
@@ -37,4 +43,6 @@ export type TooltipOptions<TRow extends Record<string, unknown>> = NumberDisplay
 };
 
 /** Either a bare on/off flag or the full option object. */
-export type TooltipProp<TRow extends Record<string, unknown>> = boolean | TooltipOptions<TRow>;
+export type TooltipProp<TRow extends Record<string, unknown>, TContext = never> =
+	| boolean
+	| TooltipOptions<TRow, TContext>;
