@@ -333,6 +333,7 @@ const preview: Preview = {
 						'Shift',
 						'Sort',
 						'Stack',
+						'Treemap',
 						'Window'
 					],
 					'Markers',
