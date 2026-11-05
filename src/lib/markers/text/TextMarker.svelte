@@ -1,4 +1,5 @@
 <script lang="ts" generics="TData = Record<string, unknown>">
+	import { RowStyle } from '$lib/markers/utils/RowStyle';
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Text } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
@@ -49,15 +50,16 @@
 		data.length > 0 ? data : placedByRows(x) || placedByRows(y) ? [] : [{} as TData]
 	);
 	// Per-row accessors give literal values; an empty one takes the flat default.
-	const flatFill = $derived(styles?.fill ?? 'currentColor');
 	const fill = $derived.by(() => {
-		const own = marker.fill;
-		if (typeof own !== 'function') return own ?? flatFill;
-		return { value: (d: TData) => own(d) ?? flatFill, scale: null };
+		const own = styles?.fill;
+		if (typeof own !== 'function') return RowStyle.of(own, displayData) ?? 'currentColor';
+		return { value: (d: TData) => own(d) ?? 'currentColor', scale: null };
 	});
 	const fillOpacity = $derived.by(() => {
-		const own = marker.fillOpacity;
-		return typeof own === 'function' ? { value: (d: TData) => own(d) ?? 1, scale: null } : own;
+		const own = styles?.fillOpacity;
+		return typeof own === 'function'
+			? { value: (d: TData) => own(d) ?? 1, scale: null }
+			: RowStyle.opacity(own);
 	});
 	const fontSize = $derived(styles?.fontSize ?? 12);
 	const fontWeight = $derived(styles?.fontWeight ?? 'normal');
@@ -99,11 +101,7 @@
 		};
 	});
 	const perRow = $derived(
-		!!declutter ||
-			!!marker.edgeAware ||
-			!!marker.onPointerEnter ||
-			!!marker.onPointerLeave ||
-			typeof marker.textAnchor === 'function'
+		!!declutter || !!marker.edgeAware || events.any || typeof marker.textAnchor === 'function'
 	);
 	const dir = $derived(Math.sign(dx) || 1);
 
@@ -131,8 +129,9 @@
 	}
 
 	function opacityOf(d: TData): number | undefined {
-		const value = marker.fillOpacity;
-		return typeof value === 'function' ? value(d) : value;
+		const value = styles?.fillOpacity;
+		if (typeof value === 'function') return value(d);
+		return typeof value === 'string' ? (d as Record<string, number>)[value] : value;
 	}
 
 	/** Each row's pixel position, once both scales resolve. */
@@ -190,10 +189,10 @@
 	let groupEl: SVGGElement | undefined = $state();
 
 	// The plot measures what it draws: how far it reaches out, and with `fitMargins` its margins grow to fit it.
-	const measured = $derived(!!plotMargins && (!!marker.onOverflow || !!marker.fitMargins));
+	const measured = $derived(!!plotMargins && (!!marker.onoverflow || !!marker.fitMargins));
 	plotMargins?.watch(() => (measured ? groupEl : undefined), {
 		grow: () => !!marker.fitMargins,
-		onOverflow: (overflow) => marker.onOverflow?.(overflow),
+		onoverflow: (overflow) => marker.onoverflow?.(overflow),
 		// The box isn't tracked reactively: a new layout measures again.
 		deps: () => [marker, points]
 	});
@@ -208,7 +207,6 @@
 )}
 	<g transform={projected ? `translate(${rowDx},${rowDy})` : undefined}>
 		<Text
-			{...events.props}
 			data={rows}
 			x={x ?? (marker.frameAnchor ? undefined : 0)}
 			y={y ?? (marker.frameAnchor ? undefined : 0)}
@@ -228,8 +226,8 @@
 			fontStyle={fontStyleProp}
 			lineHeight={styles?.lineHeight}
 			rotate={styles?.rotate}
-			stroke={styles?.stroke}
-			strokeWidth={styles?.strokeWidth}
+			stroke={RowStyle.of(styles?.stroke, rows)}
+			strokeWidth={RowStyle.field(styles?.strokeWidth)}
 			paintOrder={styles?.paintOrder}
 			class={styles?.class}
 			textClass={styles?.textClass}
@@ -268,11 +266,7 @@
 				/>
 			{/if}
 			<!-- svelteplot's Text never wires pointer handlers to its DOM node; a wrapping <g> catches them. -->
-			<g
-				role="presentation"
-				onpointerenter={marker.onPointerEnter && (() => marker.onPointerEnter?.(d))}
-				onpointerleave={marker.onPointerLeave && (() => marker.onPointerLeave?.(d))}
-			>
+			<g role="presentation" {...events.forRow(d, i)}>
 				<RowOffsetMarks {marker} rows={[d]}>
 					{#snippet mark(rows)}
 						{#if placement}

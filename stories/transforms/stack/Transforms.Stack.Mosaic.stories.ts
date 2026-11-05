@@ -50,8 +50,7 @@ const mosaic = (transform: MarkerTransform): AxisBasedMarkersConfig[] => [
 		y: 'species',
 		color: 'species',
 		transforms: [transform],
-		insetRight: 1,
-		insetBottom: 1
+		styles: { insetRight: 1, insetBottom: 1 }
 	},
 	{
 		type: 'text',

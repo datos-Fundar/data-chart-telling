@@ -185,10 +185,12 @@ export class ClevelandMarkers {
 				data: group.flatMap((look) => look.rows),
 				value: 'category',
 				...(isHorizontal ? { x1: 'from', x2: 'to' } : { y1: 'from', y2: 'to' }),
-				stroke: 'stroke',
-				strokeWidth: 'strokeWidth',
-				strokeOpacity: 'strokeOpacity',
-				...(Object.keys(pattern).length > 0 ? { styles: pattern } : {})
+				styles: {
+					...pattern,
+					stroke: 'stroke',
+					strokeWidth: 'strokeWidth',
+					strokeOpacity: 'strokeOpacity'
+				}
 			})
 		);
 
@@ -209,12 +211,14 @@ export class ClevelandMarkers {
 						headLength: head.headLength,
 						headAngle: head.headAngle,
 						// The shaft starts and ends at the edge of its dots, not under them.
-						insetStart: dotRadius,
-						insetEnd: dotRadius,
-						stroke: 'stroke',
-						strokeWidth: 'strokeWidth',
-						strokeOpacity: 'strokeOpacity',
-						...(Object.keys(pattern).length > 0 ? { styles: pattern } : {})
+						styles: {
+							...pattern,
+							insetStart: dotRadius,
+							insetEnd: dotRadius,
+							stroke: 'stroke',
+							strokeWidth: 'strokeWidth',
+							strokeOpacity: 'strokeOpacity'
+						}
 					}
 				];
 			}

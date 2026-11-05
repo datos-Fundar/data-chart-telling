@@ -173,21 +173,23 @@ export class ValueLabels {
 	 */
 	hooks(
 		ctx: AxisPlotCtx
-	): Pick<TextMarkerConfig, 'fillOpacity' | 'fitMargins' | 'onPointerEnter' | 'onPointerLeave'> {
+	): Pick<TextMarkerConfig, 'fitMargins' | 'onpointerenter' | 'onpointerleave' | 'styles'> {
 		const interaction = ctx.interaction;
 		const seriesOf = (d: ProcessedRow) =>
 			d?.[SERIES_KEY] === undefined ? undefined : String(d[SERIES_KEY]);
 		const isolate = this.hoverIsolate && interaction;
 		return {
 			fitMargins: true,
-			fillOpacity: (d: ProcessedRow) => {
-				const series = seriesOf(d);
-				return series === undefined ? undefined : interaction?.fillFor(series)?.fillOpacity;
+			styles: {
+				fillOpacity: (d: ProcessedRow) => {
+					const series = seriesOf(d);
+					return series === undefined ? 1 : (interaction?.fillFor(series)?.fillOpacity ?? 1);
+				}
 			},
-			onPointerEnter: isolate
-				? (d: ProcessedRow) => interaction.isolate(seriesOf(d) ?? null)
+			onpointerenter: isolate
+				? (_event: Event, d: ProcessedRow) => interaction.isolate(seriesOf(d) ?? null)
 				: undefined,
-			onPointerLeave: isolate ? () => interaction.isolate(null) : undefined
+			onpointerleave: isolate ? () => interaction.isolate(null) : undefined
 		};
 	}
 
@@ -297,14 +299,13 @@ export class ValueLabels {
 			text: (d: ProcessedRow) => format(Number(valueOf(d)), nameOf(d), d),
 			styles: {
 				...font,
-				...(this.fill ? { fill: this.fill } : {}),
+				fill: this.fill ?? ((d: ProcessedRow) => colorOf(d) ?? 'currentColor'),
 				fontSize: font?.fontSize ?? 12,
 				dx: font?.dx ?? (anchor === 'start' ? 6 : anchor === 'end' ? -6 : 0),
 				dy: font?.dy ?? (anchor === 'outside' ? -8 : 0),
 				textAnchor: this.textAnchor ?? (anchor === 'start' || anchor === 'end' ? anchor : 'middle'),
 				lineAnchor: font?.lineAnchor ?? (anchor === 'outside' ? 'bottom' : 'middle')
 			},
-			fill: this.fill ? undefined : colorOf,
 			declutter: {
 				connector: this.strokeStyle,
 				aligned: !!end.lane && (anchor === 'start' || anchor === 'end'),

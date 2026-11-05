@@ -91,9 +91,7 @@ export const CustomStyle: Story = {
 				x: 'category',
 				y1: 0,
 				y2: 'value',
-				insetLeft: 0.2,
-				insetRight: 0.2,
-				styles: { fill: '#7c3aed', fillOpacity: 0.7 }
+				styles: { insetLeft: 0.2, insetRight: 0.2, fill: '#7c3aed', fillOpacity: 0.7 }
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

@@ -11,7 +11,7 @@
 	let locked = $state<string | undefined>();
 </script>
 
-<!-- An era is a rectangle behind the lines: double-clicking it locks it. -->
+<!-- An era is a rectangle behind the lines: double-clicking it locks it, and `fillOpacity` is a function of the row so that only that era darkens. -->
 <LinePlot
 	width={760}
 	height={340}
@@ -28,9 +28,13 @@
 			x2: 'to',
 			y1: 50,
 			y2: 85,
-			insetLeft: 2,
-			insetRight: 2,
-			styles: { fill: 'steelblue', fillOpacity: 0.12 },
+			// A style can be a function of the row: only the locked era is darker.
+			styles: {
+				insetLeft: 2,
+				insetRight: 2,
+				fill: 'steelblue',
+				fillOpacity: (era) => (era.name === locked ? 0.55 : 0.12)
+			},
 			ondblclick: (_event, era) => (locked = locked === era.name ? undefined : era.name)
 		}
 	]}

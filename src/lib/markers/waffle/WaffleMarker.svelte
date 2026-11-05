@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { RowStyle } from '$lib/markers/utils/RowStyle';
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { WaffleX, WaffleY } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
@@ -30,10 +31,10 @@
 	multiple={marker.multiple}
 	gap={marker.gap}
 	round={marker.round}
-	borderRadius={marker.styles?.borderRadius}
+	borderRadius={RowStyle.field(marker.styles?.borderRadius)}
 	{fill}
-	fillOpacity={marker.styles?.fillOpacity}
-	stroke={marker.styles?.stroke}
-	strokeWidth={marker.styles?.strokeWidth}
-	strokeOpacity={marker.styles?.strokeOpacity}
+	fillOpacity={RowStyle.opacity(marker.styles?.fillOpacity)}
+	stroke={RowStyle.of(marker.styles?.stroke, data)}
+	strokeWidth={RowStyle.field(marker.styles?.strokeWidth)}
+	strokeOpacity={RowStyle.opacity(marker.styles?.strokeOpacity)}
 />

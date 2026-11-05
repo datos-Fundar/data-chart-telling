@@ -30,9 +30,7 @@
 				x2: 'to',
 				y1: 50,
 				y2: 85,
-				insetLeft: 2,
-				insetRight: 2,
-				styles: { fill: 'seagreen', fillOpacity: 0.12 },
+				styles: { insetLeft: 2, insetRight: 2, fill: 'seagreen', fillOpacity: 0.12 },
 				oncontextmenu: (event, era) => {
 					event.preventDefault();
 					// The menu sits in the wrapper (a docs page moves `fixed` elements with its own transforms),

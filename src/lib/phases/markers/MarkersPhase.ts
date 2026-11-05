@@ -31,9 +31,10 @@ export class MarkersPhase<
 		const labels = state.valueLabels;
 		const valueLabels: AxisBasedMarkersConfig[] =
 			labels?.show && options.valueLabels
-				? options
-						.valueLabels(labels, state, ctx)
-						.map((marker) => ({ ...labels.hooks(ctx), ...marker }))
+				? options.valueLabels(labels, state, ctx).map((marker): AxisBasedMarkersConfig => {
+						const { styles, ...hooks } = labels.hooks(ctx);
+						return { ...hooks, ...marker, styles: { ...styles, ...marker.styles } } as never;
+					})
 				: [];
 		return {
 			...state,

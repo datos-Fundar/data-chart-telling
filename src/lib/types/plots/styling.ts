@@ -66,3 +66,26 @@ export type AreaStyle = {
 	strokeDasharray?: string | LineStyle;
 	borderRadius?: number;
 };
+
+/** How far a shape is pulled in from its edges, in pixels (a bar's, as a fraction of its band): `inset` on all sides, or each side's own. */
+export type InsetStyle = {
+	inset?: number;
+	insetTop?: number;
+	insetRight?: number;
+	insetBottom?: number;
+	insetLeft?: number;
+};
+
+/** How far a shape with a direction (an arrow) is pulled in from its ends, in pixels: `inset` at both, or `insetStart` and `insetEnd` each. */
+export type DirectedInsetStyle = { inset?: number; insetStart?: number; insetEnd?: number };
+
+/**
+ * A style as a value, or as a function of the row a shape draws - a different value for each one.
+ * A number can also be the name of a field of the rows; so can a color, when the rows have a field
+ * of that name.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RowValue<T> = T | (T extends number ? string : never) | ((row: any) => T);
+
+/** A style whose every field can be a function of the row ({@link RowValue}). */
+export type PerRow<TStyle> = { [K in keyof TStyle]?: RowValue<NonNullable<TStyle[K]>> };

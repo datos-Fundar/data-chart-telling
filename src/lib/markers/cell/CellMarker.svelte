@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { RowStyle } from '$lib/markers/utils/RowStyle';
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Cell } from 'svelteplot';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
@@ -19,12 +20,12 @@
 	{data}
 	x={marker.x}
 	y={marker.y}
-	fill={channelFill ?? marker.fill}
-	fillOpacity={marker.styles?.fillOpacity ?? 1}
-	stroke={marker.styles?.stroke}
-	strokeWidth={marker.styles?.strokeWidth ?? 0}
-	strokeOpacity={marker.styles?.strokeOpacity}
+	fill={channelFill ?? RowStyle.of(marker.styles?.fill, data)}
+	fillOpacity={RowStyle.opacity(marker.styles?.fillOpacity) ?? 1}
+	stroke={RowStyle.of(marker.styles?.stroke, data)}
+	strokeWidth={RowStyle.field(marker.styles?.strokeWidth) ?? 0}
+	strokeOpacity={RowStyle.opacity(marker.styles?.strokeOpacity)}
 	strokeDasharray={marker.styles?.strokeDasharray}
-	borderRadius={marker.styles?.borderRadius}
-	inset={marker.inset ?? 0.5}
+	borderRadius={RowStyle.field(marker.styles?.borderRadius)}
+	inset={RowStyle.field(marker.styles?.inset) ?? 0.5}
 />

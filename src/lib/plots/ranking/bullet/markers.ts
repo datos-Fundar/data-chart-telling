@@ -86,8 +86,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 						data: rows,
 						value: 'category',
 						...(isHorizontal ? { x1: 'from', x2: 'to' } : { y1: 'from', y2: 'to' }),
-						stroke: 'stroke',
-						styles: { strokeWidth: rangeWidth }
+						styles: { stroke: 'stroke', strokeWidth: rangeWidth }
 					}
 				];
 

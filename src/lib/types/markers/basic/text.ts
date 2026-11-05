@@ -1,4 +1,4 @@
-import type { FontStyle, StrokeStyle } from '$lib/types/plots/styling';
+import type { FontStyle, StrokeStyle, PerRow } from '$lib/types/plots/styling';
 import type { CommonMarkerConfig } from '$lib/types/markers/channels/commonMarkerConfig';
 import type { CommonMarkerConfigWithRowOffset } from '$lib/types/markers/channels/commonMarkerConfigWithRowOffset';
 import type { Margins } from '$lib/layout/margins/Margins';
@@ -27,6 +27,12 @@ export type TextDeclutterConfig = {
 };
 
 /** A text label per row (svelteplot's `Text`), usable on any plot kind. */
+/** The text styles that can be a function of the row. */
+type TextRowStyleKey = 'fill' | 'stroke' | 'strokeWidth' | 'fontWeight' | 'fontStyle';
+
+/** The text styles that can be a function of the row. */
+type TextRowStyle = Pick<FontStyle, TextRowStyleKey> & { fillOpacity?: number };
+
 export type TextMarkerConfig = CommonMarkerConfigWithRowOffset<
 	{
 		type: 'text';
@@ -37,16 +43,14 @@ export type TextMarkerConfig = CommonMarkerConfigWithRowOffset<
 		 */
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		text: string | number | ((d: any) => string | number);
-		styles?: FontStyle;
+		/**
+		 * How the labels are drawn. `fill`, `fillOpacity`, `stroke`, `strokeWidth`, `fontWeight` and `fontStyle` can each be a function of the row;
+		 * the rest place and measure the labels, so they are the same for all of them.
+		 */
+		styles?: PerRow<TextRowStyle> & Omit<FontStyle, TextRowStyleKey>;
 		/** Which side of its point the text sits on: a value, or a function of the row. Wins over `styles.textAnchor`. */
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		textAnchor?: TextAnchor | ((d: any) => TextAnchor);
-		/** Per-row fill, over `styles.fill`. */
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		fill?: string | ((d: any) => string | undefined);
-		/** Per-row fill opacity. */
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		fillOpacity?: number | ((d: any) => number | undefined);
 		/** Spreads overlapping labels apart - see {@link TextDeclutterConfig}. `true` takes every default. */
 		declutter?: boolean | TextDeclutterConfig;
 		/**
@@ -71,13 +75,7 @@ export type TextMarkerConfig = CommonMarkerConfigWithRowOffset<
 		/** Grows the plot's margins, on every side the author left open, so the labels fit. */
 		fitMargins?: boolean;
 		/** Reports how far the rendered labels reach past the plot's content box, in pixels, on each side. */
-		onOverflow?: (overflow: Margins) => void;
-		/** Fired when the pointer enters a row's label. */
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		onPointerEnter?: (d: any) => void;
-		/** Fired when the pointer leaves a row's label. */
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		onPointerLeave?: (d: any) => void;
+		onoverflow?: (overflow: Margins) => void;
 	} & NumberDisplay &
 		CommonMarkerConfig
 >;

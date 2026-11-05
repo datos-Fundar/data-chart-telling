@@ -180,9 +180,11 @@
 			isHorizontal: false,
 			data: [],
 			category: areaX,
-			insetLeft: activePoint?.areaInset?.start,
-			insetRight: activePoint?.areaInset?.end,
-			styles: areaStyle
+			styles: {
+				...areaStyle,
+				insetLeft: activePoint?.areaInset?.start,
+				insetRight: activePoint?.areaInset?.end
+			}
 		}}
 	/>
 {/if}
@@ -195,9 +197,11 @@
 			isHorizontal: true,
 			data: [],
 			category: areaY,
-			insetTop: activePoint?.areaInset?.start,
-			insetBottom: activePoint?.areaInset?.end,
-			styles: areaStyle
+			styles: {
+				...areaStyle,
+				insetTop: activePoint?.areaInset?.start,
+				insetBottom: activePoint?.areaInset?.end
+			}
 		}}
 	/>
 {/if}

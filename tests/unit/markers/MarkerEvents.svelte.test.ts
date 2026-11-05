@@ -74,3 +74,33 @@ describe.each(Object.keys(MARKERS))('%s marker - events', (kind) => {
 		for (const [, row] of onclick.mock.calls) expect(row).toMatchObject({ year: 1950, value: 70 });
 	});
 });
+
+describe('text marker - events', () => {
+	test('calls a handler with the event, the row and its index', async () => {
+		const onclick = vi.fn();
+		const { container } = await render(LinePlot, {
+			width: 500,
+			height: 320,
+			series: SERIES,
+			markers: [
+				{
+					type: 'text',
+					data: [ROW],
+					x: 'from',
+					y: 'value',
+					text: 'Label',
+					styles: { fill: 'tomato' },
+					onclick
+				} as AxisBasedMarkersConfig
+			]
+		});
+		const svg = await waitForSvg(container);
+		await expect.poll(() => tomato(svg)).not.toBeNull();
+		tomato(svg)!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+		expect(onclick).toHaveBeenCalledTimes(1);
+		const [event, row, index] = onclick.mock.calls[0];
+		expect(event).toBeInstanceOf(MouseEvent);
+		expect(row).toMatchObject({ year: 1950 });
+		expect(index).toBe(0);
+	});
+});

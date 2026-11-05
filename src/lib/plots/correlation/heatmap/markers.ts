@@ -161,16 +161,16 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		data: group.data,
 		x: getX,
 		y: getY,
-		fill: (d: TData) => group.styles.fill ?? resolveColor!(d),
 		styles: {
+			fill: (d: TData) => group.styles.fill ?? resolveColor!(d),
 			fillOpacity: group.styles.fillOpacity ?? group.opacity ?? 1,
 			stroke: group.styles.stroke,
 			strokeWidth: group.styles.strokeWidth ?? 0,
 			strokeOpacity: group.styles.strokeOpacity,
 			strokeDasharray: group.styles.strokeDasharray,
-			borderRadius: group.styles.borderRadius
-		},
-		inset: 0.5
+			borderRadius: group.styles.borderRadius,
+			inset: 0.5
+		}
 	}));
 
 	return markers;

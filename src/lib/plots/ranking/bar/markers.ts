@@ -233,11 +233,9 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		};
 		if (slice) {
 			if (isHorizontal) {
-				marker.insetTop = slice.start;
-				marker.insetBottom = slice.end;
+				marker.styles = { ...marker.styles, insetTop: slice.start, insetBottom: slice.end };
 			} else {
-				marker.insetLeft = slice.start;
-				marker.insetRight = slice.end;
+				marker.styles = { ...marker.styles, insetLeft: slice.start, insetRight: slice.end };
 			}
 		}
 		return marker;

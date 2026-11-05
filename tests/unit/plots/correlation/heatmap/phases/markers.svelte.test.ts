@@ -87,7 +87,9 @@ describe('buildMarkers - segment catch-all vs area-specific priority', () => {
 		});
 		const cellA = markers.find((m) => (m.data as Row[]).some((d) => d.col === 'A'))!;
 		expect(cellA.styles?.fillOpacity).toBe(0.5);
-		expect((cellA.fill as (d: Row) => string)({ row: 'X', col: 'A', value: 10 })).toBe('red');
+		expect((cellA.styles?.fill as (d: Row) => string)({ row: 'X', col: 'A', value: 10 })).toBe(
+			'red'
+		);
 	});
 });
 
@@ -114,7 +116,7 @@ describe('buildMarkers - legend range dimming', () => {
 describe('buildMarkers - fill', () => {
 	test('falls back to resolveColor(row) when the segment sets no literal fill', () => {
 		const [marker] = build();
-		const fill = marker.fill as (d: Row) => string;
+		const fill = marker.styles?.fill as (d: Row) => string;
 		expect(fill({ row: 'X', col: 'A', value: 10 })).toBe('cold');
 		expect(fill({ row: 'Y', col: 'B', value: 20 })).toBe('hot');
 	});
