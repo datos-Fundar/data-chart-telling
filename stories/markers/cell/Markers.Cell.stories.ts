@@ -82,3 +82,19 @@ export const CustomStyle: Story = {
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+/** `label` writes a text in each cell, fitted to the cell - see `Markers/Rect` for what fitting does. */
+export const Label: Story = {
+	args: {
+		markers: [
+			{
+				type: 'cell',
+				data: CELLS,
+				x: 'col',
+				y: 'row',
+				styles: { fill: (d: { value: number }) => colorFor(d.value) },
+				label: { text: 'value', styles: { fill: 'white', fontSize: 16 } }
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

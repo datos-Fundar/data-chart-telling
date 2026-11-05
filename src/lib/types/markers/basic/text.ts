@@ -26,7 +26,33 @@ export type TextDeclutterConfig = {
 	connector?: StrokeStyle;
 };
 
-/** A text label per row (svelteplot's `Text`), usable on any plot kind. */
+/** Where a row's `x1`, `x2`, `y1` and `y2` are: a field of the rows, the symbol a transform keyed it by, or a function of the row. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type FitChannel = string | symbol | ((d: any) => unknown);
+
+/**
+ * What a label is fitted to: the rectangle its row spans, from `x1` to `x2` along the x axis and from `y1` to `y2`
+ * along the y - a tile of a `treemap` transform, say. A label too big for it is written smaller, down to
+ * `minFontSize`; at that size, broken into as many lines as the box holds and cut short with an ellipsis; and
+ * when almost none of it would show, as its `fallback`. A label with no room for even that is left out.
+ */
+export type TextFitConfig = {
+	/** The edges of a box of your own. A marker that draws a shape for each label gives its own, and these are left out. */
+	x1?: FitChannel;
+	x2?: FitChannel;
+	y1?: FitChannel;
+	y2?: FitChannel;
+	/** Pixels left free inside each edge of the box. Defaults to the configuration's `text.label.padding`, `4`. */
+	padding?: number;
+	/** The smallest size a label is written at, in px. Defaults to the configuration's `text.label.minFontSize`, `8`. */
+	minFontSize?: number;
+	/** The fewest letters worth writing when a text is cut short; under them the `fallback` is written. Defaults to the configuration's `text.label.minLetters`, `3`. */
+	minLetters?: number;
+	/** What to write when the text does not fit, cut short or not - a value alone, say; a number is written as the marker's `decimals` and the rest ask. */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	fallback?: string | number | ((d: any) => string | number);
+};
+
 /** The text styles that can be a function of the row. */
 type TextRowStyleKey = 'fill' | 'stroke' | 'strokeWidth' | 'fontWeight' | 'fontStyle';
 
@@ -53,6 +79,8 @@ export type TextMarkerConfig = CommonMarkerConfigWithRowOffset<
 		textAnchor?: TextAnchor | ((d: any) => TextAnchor);
 		/** Spreads overlapping labels apart - see {@link TextDeclutterConfig}. `true` takes every default. */
 		declutter?: boolean | TextDeclutterConfig;
+		/** Writes each label to fit its box - see {@link TextFitConfig}. `true` takes every default. */
+		fit?: boolean | TextFitConfig;
 		/**
 		 * Flips each label to the other side of its point (or nudges a centred one
 		 * back in) where its text would cross the plot's edge. `styles.textAnchor`/
@@ -79,6 +107,37 @@ export type TextMarkerConfig = CommonMarkerConfigWithRowOffset<
 	} & NumberDisplay &
 		CommonMarkerConfig
 >;
+
+/** A `text` marker as a shape's `label`: all of it but what the shape sets - its `type`, its rows and the label's position. */
+export type TextLabelConfig = Omit<
+	TextMarkerConfig,
+	'type' | 'data' | 'x' | 'y' | 'frameAnchor'
+> & {
+	/**
+	 * Where in its shape the label sits: its `'middle'` (the default), against one of its edges (`'top'`, `'bottom'`,
+	 * `'left'`, `'right'`) or in one of its corners (`'top-left'`...). The label's `dx` and `dy` move it from there.
+	 */
+	anchor?: LabelAnchor;
+	/**
+	 * Puts a label anchored to an edge beyond that edge, outside the shape, instead of inside it. A label out there is not
+	 * fitted to the shape, and with `fitMargins` the plot's margins grow to hold it.
+	 */
+	outside?: boolean;
+	/** Pixels between the label and the edge it is anchored to. Defaults to the configuration's `text.label.gap`, `4`. */
+	gap?: number;
+};
+
+/** Where a label sits in its shape - see {@link TextLabelConfig}. */
+export type LabelAnchor =
+	| 'middle'
+	| 'top'
+	| 'bottom'
+	| 'left'
+	| 'right'
+	| 'top-left'
+	| 'top-right'
+	| 'bottom-left'
+	| 'bottom-right';
 
 /** Where one decluttered label goes - see `Declutter.buildLanes`. */
 export type LabelLane = {

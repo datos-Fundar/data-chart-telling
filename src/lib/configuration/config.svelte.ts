@@ -275,6 +275,7 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 	},
 
 	text: {
+		label: { gap: 4, padding: 4, minFontSize: 8, minLetters: 3 },
 		declutter: {
 			elbowGap: 10,
 			laneStep: 7,

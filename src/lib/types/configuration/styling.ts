@@ -368,6 +368,17 @@ export type PlotStylesConfig = {
 
 	/** Default text-marker behavior. */
 	text: {
+		/** Defaults of the `label` a shape writes in itself (`rect`, `cell`, `bar`, `waffle`), each overridden by the label's own `gap` and `fit`. */
+		label: {
+			/** Pixels between a label and the edge it is anchored to. */
+			gap: number;
+			/** Pixels a fitted label keeps free inside each edge of its shape. */
+			padding: number;
+			/** The smallest size a fitted label is written at, in px. */
+			minFontSize: number;
+			/** The fewest letters worth writing when a fitted label is cut short; under them its `fallback` is written. */
+			minLetters: number;
+		};
 		/** Geometry and connector of a decluttered text marker (`declutter`) - e.g. LinePlot's end-of-line value labels. */
 		declutter: {
 			/** Shortest lane's distance (px) from the point before a connector bends. */

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import MarkerLabel from '$lib/markers/utils/MarkerLabel.svelte';
 	import { RowStyle } from '$lib/markers/utils/RowStyle';
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { BarX, BarY } from 'svelteplot';
@@ -168,3 +169,5 @@
 		{/if}
 	{/if}
 {/if}
+
+<MarkerLabel {marker} />

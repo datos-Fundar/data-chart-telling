@@ -3,6 +3,7 @@
 	import { Rect } from 'svelteplot';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
+	import MarkerLabel from '$lib/markers/utils/MarkerLabel.svelte';
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import type { RectMarkerConfig } from '$lib/types/markers/common';
 
@@ -68,3 +69,5 @@
 		{...events.props}
 	/>
 {/if}
+
+<MarkerLabel {marker} />

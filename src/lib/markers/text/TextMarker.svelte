@@ -8,10 +8,13 @@
 	import { RowOffset } from '$lib/markers/utils/RowOffset';
 	import RowOffsetMarks from '$lib/markers/utils/RowOffsetMarks.svelte';
 	import { Declutter } from '$lib/markers/text/Declutter';
+	import { SvelteMap } from 'svelte/reactivity';
+	import { TextFit, type FittedText } from '$lib/markers/text/TextFit';
 	import { NumberFormat } from '$lib/utils/NumberFormat';
 	import { PlotMargins } from '$lib/layout/margins/PlotMargins.svelte';
 	import { Box } from '$lib/layout/margins/Box';
 	import type { TextMarkerConfig } from '$lib/types/markers/common';
+	import type { BoxChannels, BoxSizer } from '$lib/markers/utils/BoxLabel';
 	import type { TextAnchor } from '$lib/types/plots/constants';
 
 	/**
@@ -22,7 +25,7 @@
 	 * draws one label per row, inside the plot's content box. With
 	 * `fitMargins`, the plot's margins grow until the labels fit.
 	 */
-	const { marker }: { marker: TextMarkerConfig } = $props();
+	const { marker, box }: { marker: TextMarkerConfig; box?: BoxChannels | BoxSizer } = $props();
 	const events = MarkerEvents.use(() => marker);
 
 	// A text's anchors as the side of its point it sits on, and back.
@@ -128,6 +131,97 @@
 		return typeof value === 'number' ? numberText(value) : String(value ?? '');
 	}
 
+	/** The pixel size of the box a row's label is fitted to - from the edges it names, or measured by the shape it labels. */
+	const boxSizeOf = $derived.by(() => {
+		const fit = marker.fit === true ? {} : marker.fit;
+		if (!fit) return undefined;
+		const own = typeof box === 'function' ? undefined : box;
+		const [x1, x2, y1, y2] = [
+			fit.x1 ?? own?.x1,
+			fit.x2 ?? own?.x2,
+			fit.y1 ?? own?.y1,
+			fit.y2 ?? own?.y2
+		];
+		const xScale = plot.scales.x?.fn;
+		const yScale = plot.scales.y?.fn;
+		if (![x1, x2, y1, y2].includes(undefined)) {
+			if (!xScale || !yScale) return undefined;
+			const [left, right, top, bottom] = [x1, x2, y1, y2].map(channel);
+			const span = (
+				scale: typeof xScale,
+				from: (d: TData) => unknown,
+				to: (d: TData) => unknown,
+				d: TData
+			) => Math.abs(Number(scale(to(d) as never)) - Number(scale(from(d) as never)));
+			return (d: TData) => ({
+				width: span(xScale, left, right, d),
+				height: span(yScale, top, bottom, d)
+			});
+		}
+		return typeof box === 'function' ? (d: TData) => box(d, plot.scales as never) : undefined;
+	});
+
+	/**
+	 * What each label is written as and at, fitted to its box (`fit`), less the padding. A label with no room is left
+	 * out, with `undefined`; one with no box to measure is written as it is.
+	 */
+	const fitted = $derived.by(() => {
+		const fit = marker.fit === true ? {} : marker.fit;
+		if (!fit || !boxSizeOf) return undefined;
+		const padding = fit.padding ?? cfg.text.label.padding;
+		const measure = (text: string, size: number) => Box.ofText(text, size, cfg).width;
+		const fallback = fit.fallback;
+		const fallbackOf = (d: TData) => {
+			// As `text` is: a function's result, a field of the row, else the text itself.
+			const value =
+				typeof fallback === 'function'
+					? fallback(d)
+					: typeof fallback === 'string' && typeof d === 'object' && d !== null && fallback in d
+						? (d as Record<string, unknown>)[fallback]
+						: fallback;
+			return typeof value === 'number' ? numberText(value) : String(value);
+		};
+		// Built whole inside this derivation and never changed after it, so it has nothing to react to.
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const out = new Map<TData, FittedText | undefined>();
+		for (const d of displayData) {
+			const size = boxSizeOf(d);
+			out.set(
+				d,
+				size
+					? TextFit.fit({
+							text: textOf(d),
+							fallback: fallback === undefined ? undefined : fallbackOf(d),
+							width: size.width - 2 * padding,
+							height: size.height - 2 * padding,
+							fontSize,
+							minFontSize: fit.minFontSize ?? cfg.text.label.minFontSize,
+							lineHeight: styles?.lineHeight ?? 1.2,
+							minLetters: fit.minLetters ?? cfg.text.label.minLetters,
+							measure
+						})
+					: { text: textOf(d), fontSize }
+			);
+		}
+		return out;
+	});
+	/** `rows` by the size their labels are written at: svelteplot takes one size for a mark, and a function of the row sets its scales off in a loop. */
+	function sizeGroups(rows: TData[]): { size: number; rows: TData[]; texts?: string[] }[] {
+		if (!fitted) return [{ size: fontSize, rows }];
+		const bySize = new SvelteMap<number, { rows: TData[]; texts: string[] }>();
+		for (const d of rows) {
+			const own = fitted.get(d);
+			const group = bySize.get(own?.fontSize ?? fontSize) ?? { rows: [], texts: [] };
+			group.rows.push(d);
+			group.texts.push(own?.text ?? '');
+			bySize.set(own?.fontSize ?? fontSize, group);
+		}
+		return [...bySize].map(([size, group]) => ({ size, ...group }));
+	}
+
+	/** The rows with room for a label. */
+	const shown = $derived(fitted ? displayData.filter((d) => fitted.get(d)) : displayData);
+
 	function opacityOf(d: TData): number | undefined {
 		const value = styles?.fillOpacity;
 		if (typeof value === 'function') return value(d);
@@ -206,38 +300,41 @@
 	rowLineAnchor: typeof lineAnchor
 )}
 	<g transform={projected ? `translate(${rowDx},${rowDy})` : undefined}>
-		<Text
-			data={rows}
-			x={x ?? (marker.frameAnchor ? undefined : 0)}
-			y={y ?? (marker.frameAnchor ? undefined : 0)}
-			frameAnchor={marker.frameAnchor}
-			text={((d: TData) => {
-				const value = valueOf(d);
-				return typeof value === 'number' ? numberText(value) : value;
-			}) as (d: TData) => string}
-			dx={projected ? 0 : rowDx}
-			dy={projected ? 0 : rowDy}
-			fill={fill as never}
-			fillOpacity={fillOpacity as never}
-			{fontSize}
-			{fontWeight}
-			textAnchor={rowAnchor}
-			lineAnchor={rowLineAnchor}
-			fontStyle={fontStyleProp}
-			lineHeight={styles?.lineHeight}
-			rotate={styles?.rotate}
-			stroke={RowStyle.of(styles?.stroke, rows)}
-			strokeWidth={RowStyle.field(styles?.strokeWidth)}
-			paintOrder={styles?.paintOrder}
-			class={styles?.class}
-			textClass={styles?.textClass}
-		/>
+		{#each sizeGroups(rows) as group (group.size)}
+			<Text
+				data={group.rows}
+				x={x ?? (marker.frameAnchor ? undefined : 0)}
+				y={y ?? (marker.frameAnchor ? undefined : 0)}
+				frameAnchor={marker.frameAnchor}
+				text={((d: TData, index: number) => {
+					if (group.texts) return group.texts[index];
+					const value = valueOf(d);
+					return typeof value === 'number' ? numberText(value) : value;
+				}) as (d: TData) => string}
+				dx={projected ? 0 : rowDx}
+				dy={projected ? 0 : rowDy}
+				fill={fill as never}
+				fillOpacity={fillOpacity as never}
+				fontSize={group.size}
+				{fontWeight}
+				textAnchor={rowAnchor}
+				lineAnchor={rowLineAnchor}
+				fontStyle={fontStyleProp}
+				lineHeight={styles?.lineHeight}
+				rotate={styles?.rotate}
+				stroke={RowStyle.of(styles?.stroke, rows)}
+				strokeWidth={RowStyle.field(styles?.strokeWidth)}
+				paintOrder={styles?.paintOrder}
+				class={styles?.class}
+				textClass={styles?.textClass}
+			/>
+		{/each}
 	</g>
 {/snippet}
 
 {#snippet labels()}
 	{#if !perRow}
-		<RowOffsetMarks {marker} rows={displayData}>
+		<RowOffsetMarks {marker} rows={shown}>
 			{#snippet mark(rows)}
 				{@render label(rows, dx, dy, textAnchor, lineAnchor)}
 			{/snippet}
@@ -245,50 +342,52 @@
 	{:else if (!declutter && !marker.edgeAware) || points}
 		<!-- A decluttered or edge-aware label waits for both scales. -->
 		{#each displayData as d, i (i)}
-			{@const lane = lanes?.get(i)}
-			{@const placement = placements?.[i]}
-			{@const extraDy = lane?.extraDy ?? 0}
-			{@const laneDir = lane?.aligned ? lane.dir : dir}
-			{@const labelDx = lane?.aligned ? laneDir * lane.reach : dx}
-			{#if declutter && points && (lane?.aligned || extraDy !== 0)}
-				{@const { px, py } = points[i]}
-				{@const laneX = lane?.aligned ? px + laneDir * lane.laneReach : px + labelDx}
-				{@const connector = declutter.connector}
-				<path
-					d={`M ${px} ${py} H ${laneX} V ${py + extraDy} H ${px + labelDx}`}
-					fill="none"
-					stroke={connector.stroke}
-					stroke-width={connector.strokeWidth}
-					stroke-opacity={connector.strokeOpacity ?? opacityOf(d) ?? 1}
-					stroke-dasharray={connector.strokeDasharray}
-					stroke-linecap={connector.strokeLinecap ?? 'square'}
-					stroke-linejoin={connector.strokeLinejoin ?? 'miter'}
-				/>
+			{#if !fitted || fitted.get(d)}
+				{@const lane = lanes?.get(i)}
+				{@const placement = placements?.[i]}
+				{@const extraDy = lane?.extraDy ?? 0}
+				{@const laneDir = lane?.aligned ? lane.dir : dir}
+				{@const labelDx = lane?.aligned ? laneDir * lane.reach : dx}
+				{#if declutter && points && (lane?.aligned || extraDy !== 0)}
+					{@const { px, py } = points[i]}
+					{@const laneX = lane?.aligned ? px + laneDir * lane.laneReach : px + labelDx}
+					{@const connector = declutter.connector}
+					<path
+						d={`M ${px} ${py} H ${laneX} V ${py + extraDy} H ${px + labelDx}`}
+						fill="none"
+						stroke={connector.stroke}
+						stroke-width={connector.strokeWidth}
+						stroke-opacity={connector.strokeOpacity ?? opacityOf(d) ?? 1}
+						stroke-dasharray={connector.strokeDasharray}
+						stroke-linecap={connector.strokeLinecap ?? 'square'}
+						stroke-linejoin={connector.strokeLinejoin ?? 'miter'}
+					/>
+				{/if}
+				<!-- svelteplot's Text never wires pointer handlers to its DOM node; a wrapping <g> catches them. -->
+				<g role="presentation" {...events.forRow(d, i)}>
+					<RowOffsetMarks {marker} rows={[d]}>
+						{#snippet mark(rows)}
+							{#if placement}
+								{@render label(
+									rows,
+									placement.dx,
+									placement.dy + extraDy,
+									placement.textAnchor,
+									placement.lineAnchor
+								)}
+							{:else}
+								{@render label(
+									rows,
+									labelDx,
+									dy + extraDy,
+									lane?.aligned && laneDir !== dir ? flipAnchor(anchorAt(d)) : anchorAt(d),
+									lineAnchor
+								)}
+							{/if}
+						{/snippet}
+					</RowOffsetMarks>
+				</g>
 			{/if}
-			<!-- svelteplot's Text never wires pointer handlers to its DOM node; a wrapping <g> catches them. -->
-			<g role="presentation" {...events.forRow(d, i)}>
-				<RowOffsetMarks {marker} rows={[d]}>
-					{#snippet mark(rows)}
-						{#if placement}
-							{@render label(
-								rows,
-								placement.dx,
-								placement.dy + extraDy,
-								placement.textAnchor,
-								placement.lineAnchor
-							)}
-						{:else}
-							{@render label(
-								rows,
-								labelDx,
-								dy + extraDy,
-								lane?.aligned && laneDir !== dir ? flipAnchor(anchorAt(d)) : anchorAt(d),
-								lineAnchor
-							)}
-						{/if}
-					{/snippet}
-				</RowOffsetMarks>
-			</g>
 		{/each}
 	{/if}
 {/snippet}

@@ -96,3 +96,21 @@ export const CustomStyle: Story = {
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+/** `label` writes a text in the middle of each bar, fitted to it - see `Markers/Rect` for what fitting does. */
+export const Label: Story = {
+	args: {
+		markers: [
+			{
+				type: 'bar',
+				role: 'segment',
+				isHorizontal: false,
+				data: BARS,
+				x: 'category',
+				y1: 0,
+				y2: 'value',
+				label: { text: 'value', styles: { fill: 'white', fontSize: 16 } }
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};
