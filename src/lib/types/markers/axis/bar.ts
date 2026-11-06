@@ -1,5 +1,6 @@
 import type { AxisValue } from '$lib/types/layout/mapping';
-import type { AreaStyle } from '$lib/types/plots/styling';
+import type { AreaStyle, PerRow, InsetStyle } from '$lib/types/plots/styling';
+import type { CommonMarkerConfigWithLabel } from '$lib/types/markers/channels/commonMarkerConfigWithLabel';
 import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/commonMarkerConfigWithColor';
 import type { CommonMarkerConfigWithInterval } from '$lib/types/markers/channels/commonMarkerConfigWithInterval';
 
@@ -8,13 +9,9 @@ export type BarMarkerConfig = {
 	type: 'bar';
 	role: 'segment' | 'hitArea' | 'highlight';
 	isHorizontal: boolean;
-	insetTop?: number;
-	insetBottom?: number;
-	insetLeft?: number;
-	insetRight?: number;
 	thickness?: number;
-	styles?: AreaStyle;
+	styles?: PerRow<AreaStyle> & InsetStyle;
 	category?: AxisValue;
-	hover?: boolean;
 } & CommonMarkerConfigWithColor &
-	CommonMarkerConfigWithInterval;
+	CommonMarkerConfigWithInterval &
+	CommonMarkerConfigWithLabel;

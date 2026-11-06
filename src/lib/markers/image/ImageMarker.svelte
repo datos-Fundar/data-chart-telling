@@ -1,10 +1,12 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Image } from 'svelteplot';
 	import RowOffsetMarks from '$lib/markers/utils/RowOffsetMarks.svelte';
 	import type { ImageMarkerConfig } from '$lib/types/markers/common';
 
 	/** Renders one `'image'` marker as `<Image>` - an image centered on each row's `x`/`y`. */
 	let { marker }: { marker: ImageMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const data = $derived(marker.data ?? []);
 </script>
@@ -12,6 +14,7 @@
 <RowOffsetMarks {marker} rows={data}>
 	{#snippet mark(rows)}
 		<Image
+			{...events.props}
 			data={rows}
 			x={marker.x}
 			y={marker.y}

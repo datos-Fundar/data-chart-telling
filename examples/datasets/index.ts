@@ -5,6 +5,7 @@ export * from './commodity-prices';
 export * from './countries-over-time';
 export * from './daily-temperature';
 export * from './earthquakes';
+export * from './economic-activity';
 export * from './flight-routes';
 export * from './height-density';
 export * from './heights';

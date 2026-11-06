@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Trail } from 'svelteplot';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
@@ -6,6 +7,7 @@
 
 	/** Renders one `'trail'` marker as `<Trail>` - a ribbon whose width follows `r`. */
 	let { marker }: { marker: TrailMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const cfg = $derived(getConfiguration());
 	const data = $derived(marker.data ?? []);
@@ -13,6 +15,7 @@
 </script>
 
 <Trail
+	{...events.props}
 	{data}
 	x={marker.x}
 	y={marker.y}

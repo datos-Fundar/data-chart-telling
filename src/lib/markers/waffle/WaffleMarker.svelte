@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { RowStyle } from '$lib/markers/utils/RowStyle';
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { WaffleX, WaffleY } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
@@ -7,6 +9,7 @@
 
 	/** Renders one `'waffle'` marker as `<WaffleX>` or `<WaffleY>`, picked from the way the plot runs (`usePlot().axes`). */
 	let { marker }: { marker: WaffleMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const plot = usePlot();
 	const isHorizontal = $derived(plot.axes?.isHorizontal ?? false);
@@ -19,6 +22,7 @@
 </script>
 
 <WaffleMark
+	{...events.props}
 	{data}
 	x={marker.x}
 	y={marker.y}
@@ -27,10 +31,10 @@
 	multiple={marker.multiple}
 	gap={marker.gap}
 	round={marker.round}
-	borderRadius={marker.styles?.borderRadius}
+	borderRadius={RowStyle.field(marker.styles?.borderRadius)}
 	{fill}
-	fillOpacity={marker.styles?.fillOpacity}
-	stroke={marker.styles?.stroke}
-	strokeWidth={marker.styles?.strokeWidth}
-	strokeOpacity={marker.styles?.strokeOpacity}
+	fillOpacity={RowStyle.opacity(marker.styles?.fillOpacity)}
+	stroke={RowStyle.of(marker.styles?.stroke, data)}
+	strokeWidth={RowStyle.field(marker.styles?.strokeWidth)}
+	strokeOpacity={RowStyle.opacity(marker.styles?.strokeOpacity)}
 />

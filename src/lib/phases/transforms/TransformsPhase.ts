@@ -63,7 +63,13 @@ export class TransformsPhase<
 
 	run = (state: TState, ctx: TCtx): TState => {
 		const options = this.#options;
-		const series = (state.resolvedSeries ?? []) as Series[];
+		const visible = (state.resolvedSeries ?? []) as Series[];
+		// An omitted part of a whole is laid out with the rest, so they keep their places; it is dropped after.
+		const removed = state.removedSeries;
+		const kept =
+			options.keepsOmitted && removed?.mode === 'omit' ? (removed.series as Series[]) : [];
+		const series = [...visible, ...kept];
+		const omittedIds = new Set(kept.map(seriesIdOf));
 		// A gap `styles.gaps` fills carries its filled value and kind, and reads at that value.
 		const fillsOf = (s: Series) => state.gapFillMaps?.get(seriesIdOf(s));
 		const data: ProcessedRow[] = series.flatMap((s) =>
@@ -86,16 +92,23 @@ export class TransformsPhase<
 			const read = resolveAccessor(own as never) as (row: ProcessedRow) => unknown;
 			shared[valueAxis] = (row: ProcessedRow) => row[GAP_VALUE] ?? read(row);
 		}
-		const { x, y } = shared;
 		const transforms = options.transforms
 			? options.transforms(state, ctx)
 			: (state.transforms ?? []);
+		const rescaled = TransformsPhase.#rescaled(state, transforms, shared, valueAxis);
+		if (rescaled) shared[valueAxis] = rescaled;
+		const { x, y } = shared;
 
 		if (!transforms.length) {
 			const channels = Object.fromEntries(
 				Object.entries({ x, y }).filter(([, channel]) => channel !== undefined)
 			) as ProcessedData['channels'];
-			const processedData: ProcessedData = { data, channels, options: {}, transforms };
+			const processedData: ProcessedData = {
+				data: data.filter((row) => !omittedIds.has(row[SERIES_ID_KEY] as string)),
+				channels,
+				options: {},
+				transforms
+			};
 			return this.#withGroups({ ...state, processedData });
 		}
 
@@ -113,7 +126,9 @@ export class TransformsPhase<
 		}
 		// An aggregating transform (bin, group) keeps only its `z`, the series id: put the name back.
 		const nameById = new Map(series.map((s) => [seriesIdOf(s), s.name]));
-		const rows = out.data as ProcessedRow[];
+		const rows = (out.data as ProcessedRow[]).filter(
+			(row) => !omittedIds.has(row[SERIES_ID_KEY] as string)
+		);
 		for (const row of rows) {
 			if (row[SERIES_KEY] === undefined && row[SERIES_ID_KEY] !== undefined) {
 				row[SERIES_KEY] = nameById.get(row[SERIES_ID_KEY] as string);
@@ -178,6 +193,50 @@ export class TransformsPhase<
 		return {
 			labelled: processed.data.filter((row) => labelled.has(row)),
 			labelSelects: ValueSelection.selectors(select)
+		};
+	}
+
+	/**
+	 * The value channel of a stack whose legend rescales some of its series: each visible row's value scaled by
+	 * how much of its category's total (in its facet panel) those series took, so the visible parts make the
+	 * whole the category had. `undefined` for a plot that stacks nothing on its value axis, or rescales nothing.
+	 */
+	static #rescaled(
+		state: TransformsStageState,
+		transforms: { type: string }[],
+		shared: Partial<Record<'x' | 'y', ProcessedChannel>>,
+		valueAxis: 'x' | 'y'
+	): ((row: ProcessedRow) => unknown) | undefined {
+		const removed = state.removedSeries;
+		const rescaled = removed?.mode === 'rescale' ? (removed.series as Series[]) : [];
+		const stack = valueAxis === 'y' ? 'stackY' : 'stackX';
+		const own = shared[valueAxis];
+		const category = shared[valueAxis === 'y' ? 'x' : 'y'];
+		if (!rescaled.length || own === undefined || category === undefined) return undefined;
+		if (!transforms.some((t) => t.type === stack)) return undefined;
+		const value = resolveAccessor(own as never) as (row: ProcessedRow) => unknown;
+		const categoryOf = resolveAccessor(category as never) as (row: ProcessedRow) => unknown;
+		const keyOf = (row: ProcessedRow, panel: unknown) => JSON.stringify([panel, categoryOf(row)]);
+		const totals = (series: Series[]) => {
+			const sums = new Map<string, number>();
+			for (const s of series) {
+				for (const row of s.data as ProcessedRow[]) {
+					const amount = Number(value(row));
+					if (!Number.isFinite(amount)) continue;
+					const key = keyOf(row, s.panel);
+					sums.set(key, (sums.get(key) ?? 0) + amount);
+				}
+			}
+			return sums;
+		};
+		const visible = (state.resolvedSeries ?? []) as Series[];
+		const shown = totals(visible);
+		const whole = totals([...visible, ...rescaled]);
+		return (row) => {
+			const amount = Number(value(row));
+			const key = keyOf(row, row[PANEL_KEY]);
+			const part = shown.get(key) ?? 0;
+			return part === 0 ? amount : (amount * (whole.get(key) ?? part)) / part;
 		};
 	}
 

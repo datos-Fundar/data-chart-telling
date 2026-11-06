@@ -54,8 +54,7 @@ export const Default: Story = {
 				x: (d) => (d as ProvinceRow).province,
 				y1: () => 0,
 				y2: (d) => (d as ProvinceRow).value,
-				insetLeft: 0.3,
-				insetRight: 0.3,
+				styles: { insetLeft: 0.3, insetRight: 0.3 },
 				color: 'value'
 			}
 		] satisfies AxisBasedMarkersConfig[]
@@ -73,8 +72,7 @@ export const CustomScheme: Story = {
 				x: (d) => (d as ProvinceRow).province,
 				y1: () => 0,
 				y2: (d) => (d as ProvinceRow).value,
-				insetLeft: 0.3,
-				insetRight: 0.3,
+				styles: { insetLeft: 0.3, insetRight: 0.3 },
 				color: 'value',
 				scales: { color: { domain: [70, 85], scheme: 'viridis' } }
 			}

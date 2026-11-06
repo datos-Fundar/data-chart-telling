@@ -8,7 +8,7 @@
 	/**
 	 * The `interactive.legendStyle: 'badge'` item look: a pill with the series
 	 * color, symbol icon, label, and a toggle icon - an eye (crossed out when
-	 * `disabled`) for `'dim'` and `'hide'`, or a plus/cross pair for `'omit'`.
+	 * `disabled`) for `'dim'` and `'hide'`, or a plus/cross pair for `'omit'` and `'rescale'`.
 	 */
 	let {
 		item,

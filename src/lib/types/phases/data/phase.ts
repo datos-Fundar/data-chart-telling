@@ -27,6 +27,11 @@ export type DataStageOptions<TState, TCtx> = {
 	orderSeries?: (series: Series<any>[], state: TState) => Series<any>[];
 	/** The order colors are assigned in. Defaults to the series' own order. */
 	colorOrder?: (series: Series<any>[]) => Series<any>[];
+	/**
+	 * Whether the kind draws the levels of its `grouping` itself (a treemap's nesting): its series are then
+	 * the outermost level's values, not every level's together.
+	 */
+	nested?: boolean;
 	/** The plot's own extra "data" output, once the shared one is in place. */
 	extend?: (state: TState, ctx: TCtx) => TState;
 };

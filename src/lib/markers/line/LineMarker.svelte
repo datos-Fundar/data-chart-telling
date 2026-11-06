@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Line } from 'svelteplot';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
@@ -10,6 +11,7 @@
 	 * its color, so each `grouping`'s line takes its group's color.
 	 */
 	let { marker }: { marker: LineMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const cfg = $derived(getConfiguration());
 	const data = $derived(marker.data ?? []);
@@ -17,6 +19,7 @@
 </script>
 
 <Line
+	{...events.props}
 	{data}
 	x={marker.x}
 	y={marker.y}

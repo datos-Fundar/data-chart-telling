@@ -1,4 +1,9 @@
-import type { AxisValue, AxisChannelName, ChannelAccessors } from '$lib/types/layout/mapping';
+import type {
+	AxisValue,
+	AxisChannelName,
+	ChannelAccessors,
+	ChannelName
+} from '$lib/types/layout/mapping';
 
 /**
  * A field key or accessor function. Mirrors the shorthand used across plots
@@ -31,7 +36,7 @@ export type Series<T extends Record<string, unknown> = Record<string, unknown>> 
 type SeriesChannelName = AxisChannelName | 'color' | 'grouping';
 
 /**
- * Pre-built series. Mutually exclusive with {@link DataProps} - takes
+ * Pre-built series. Mutually exclusive with the data props ({@link DualAxisDataProps}...) - takes
  * precedence when both could apply. Any channel a series doesn't carry
  * itself is still a plot-level prop.
  */
@@ -40,12 +45,36 @@ export type SeriesProps<T extends Record<string, unknown>> = {
 	data?: never;
 } & { [K in SeriesChannelName]?: never } & Omit<ChannelAccessors<T>, SeriesChannelName>;
 
+/** The channels of `TRequired` as required props. */
+type RequiredChannels<T extends Record<string, unknown>, TRequired extends ChannelName> = Required<
+	Pick<ChannelAccessors<T>, TRequired>
+>;
+
 /**
- * Flat rows to group into series, as an alternative to {@link SeriesProps}.
- * Takes every channel; `x`/`y` are required.
+ * Flat rows to group into series, as an alternative to {@link SeriesProps}, on a plot with no axes (a treemap):
+ * every channel but the position ones. `TRequired` names the channels the plot cannot draw without. The base of
+ * {@link SingleAxisDataProps} and {@link DualAxisDataProps}.
  */
-export type DataProps<T extends Record<string, unknown>> = {
+export type NonAxisDataProps<
+	T extends Record<string, unknown>,
+	TRequired extends Exclude<ChannelName, AxisChannelName> = never
+> = {
 	series?: never;
 	data: T[];
-} & ChannelAccessors<T> &
-	Required<Pick<ChannelAccessors<T>, AxisChannelName>>;
+	x?: never;
+	y?: never;
+} & Omit<ChannelAccessors<T>, AxisChannelName> &
+	RequiredChannels<T, TRequired>;
+
+/** Flat rows on one axis (a histogram): `x`, or `y` alone, besides every other channel. */
+export type SingleAxisDataProps<
+	T extends Record<string, unknown>,
+	TRequired extends Exclude<ChannelName, AxisChannelName> = never
+> = Omit<NonAxisDataProps<T, TRequired>, AxisChannelName> &
+	((RequiredChannels<T, 'x'> & { y?: never }) | (RequiredChannels<T, 'y'> & { x?: never }));
+
+/** Flat rows on both axes: `x` and `y`, besides every other channel. */
+export type DualAxisDataProps<
+	T extends Record<string, unknown>,
+	TRequired extends Exclude<ChannelName, AxisChannelName> = never
+> = Omit<NonAxisDataProps<T, TRequired>, AxisChannelName> & RequiredChannels<T, AxisChannelName>;

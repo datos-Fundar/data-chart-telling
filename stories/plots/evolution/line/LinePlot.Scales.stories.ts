@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import { FEMALE_LIFE, LIFE, type LifeRow } from '$datasets';
+import { FEMALE_LIFE, LIFE, diverseCountries, type LifeRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -608,5 +608,21 @@ export const EdgeTicksOnY: Story = {
 	args: {
 		series: SINCE_1947,
 		scales: { y: { edgeTicks: true } } satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * A `grouping` of two levels splits the rows by both - a line per country, named `'Americas.Argentina'` - and
+ * `scales.color.depth: 2` colors them as a hierarchy: each continent its own color, and its countries tones of it.
+ * `legend.series.labels` leaves the continent out of the entries.
+ */
+export const HierarchicalColors: Story = {
+	args: {
+		data: diverseCountries(8),
+		x: 'year',
+		y: 'life',
+		grouping: 'continent.country',
+		scales: { color: { depth: 2 } } satisfies AxisBasedScalesConfig,
+		legend: { series: { labels: { replace: [[/^[^.]+\./, '']] } } }
 	}
 };

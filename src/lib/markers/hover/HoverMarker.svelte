@@ -114,6 +114,18 @@
 	// areaX/areaY have no implied default - always off unless explicitly set.
 	const areaX = $derived(marker.areaX === true ? (activePoint?.x ?? null) : null);
 	const areaY = $derived(marker.areaY === true ? (activePoint?.y ?? null) : null);
+	/**
+	 * The part of the band an area covers: the active point's own slice (a grouped bar's series), or the whole
+	 * band while the hover matches more than one point in that category, as its dots do.
+	 */
+	const areaInsetOf = (axis: 'x' | 'y'): BandSlice | undefined => {
+		const at = activePoint?.[axis];
+		const key = (value: unknown) => (value instanceof Date ? +value : value);
+		const shared = data.filter((point) => key(point[axis]) === key(at)).length > 1;
+		return shared ? undefined : activePoint?.areaInset;
+	};
+	const areaInsetX = $derived(areaX != null ? areaInsetOf('x') : undefined);
+	const areaInsetY = $derived(areaY != null ? areaInsetOf('y') : undefined);
 	const showLabels = $derived(marker.showLabels ?? true);
 	const format = $derived(marker.format);
 	/** The hovered value as the marker's display fields ask; `undefined` while nothing does, so the plot's own label stays. */
@@ -180,9 +192,11 @@
 			isHorizontal: false,
 			data: [],
 			category: areaX,
-			insetLeft: activePoint?.areaInset?.start,
-			insetRight: activePoint?.areaInset?.end,
-			styles: areaStyle
+			styles: {
+				...areaStyle,
+				insetLeft: areaInsetX?.start,
+				insetRight: areaInsetX?.end
+			}
 		}}
 	/>
 {/if}
@@ -195,9 +209,11 @@
 			isHorizontal: true,
 			data: [],
 			category: areaY,
-			insetTop: activePoint?.areaInset?.start,
-			insetBottom: activePoint?.areaInset?.end,
-			styles: areaStyle
+			styles: {
+				...areaStyle,
+				insetTop: areaInsetY?.start,
+				insetBottom: areaInsetY?.end
+			}
 		}}
 	/>
 {/if}

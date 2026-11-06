@@ -39,11 +39,11 @@ export const ShowValues: Story = {
 	}
 };
 
-/** `anchor: 'start'` puts each count just inside the top of its bar, here in white to read against it. */
-export const AnchorStart: Story = {
+/** `anchor: 'top'` puts each count just inside the top of its bar, here in white to read against it. */
+export const AnchorTop: Story = {
 	args: {
 		styles: {
-			values: { show: true, anchor: 'start', fontStyle: { fill: 'white', fontWeight: 'bold' } }
+			values: { show: true, anchor: 'top', fontStyle: { fill: 'white', fontWeight: 'bold' } }
 		} satisfies AxisBasedStylesConfig
 	}
 };
@@ -57,11 +57,11 @@ export const AnchorMiddle: Story = {
 	}
 };
 
-/** `anchor: 'end'` puts each count at the base of its bar. */
-export const AnchorEnd: Story = {
+/** `anchor: 'bottom'` puts each count at the base of its bar. */
+export const AnchorBottom: Story = {
 	args: {
 		styles: {
-			values: { show: true, anchor: 'end', fontStyle: { fill: 'white' } }
+			values: { show: true, anchor: 'bottom', fontStyle: { fill: 'white' } }
 		} satisfies AxisBasedStylesConfig
 	}
 };

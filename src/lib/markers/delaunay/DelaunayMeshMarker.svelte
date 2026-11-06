@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { DelaunayMesh } from 'svelteplot';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
@@ -6,6 +7,7 @@
 
 	/** Renders one `'delaunayMesh'` marker as `<DelaunayMesh>` - the Delaunay triangulation as a single mesh. */
 	let { marker }: { marker: DelaunayMeshMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const cfg = $derived(getConfiguration());
 	const data = $derived(marker.data ?? []);
@@ -13,6 +15,7 @@
 </script>
 
 <DelaunayMesh
+	{...events.props}
 	{data}
 	x={marker.x}
 	y={marker.y}

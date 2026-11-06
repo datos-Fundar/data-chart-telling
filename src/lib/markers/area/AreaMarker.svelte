@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { AreaX, AreaY } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
@@ -12,6 +13,7 @@
 	 * a band, the area runs from zero up to its own value.
 	 */
 	let { marker }: { marker: AreaMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const plot = usePlot();
 	const isHorizontal = $derived(plot.axes?.isHorizontal ?? false);
@@ -36,6 +38,7 @@
 
 {#snippet area(rows: typeof data, fillOpacity: number | undefined)}
 	<AreaMark
+		{...events.props}
 		data={rows}
 		x={marker.x}
 		y={marker.y}

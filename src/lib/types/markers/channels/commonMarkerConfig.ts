@@ -3,9 +3,10 @@ import type { AxisValue } from '$lib/types/layout/mapping';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
 import type { MarkerTransform } from '$lib/types/transforms';
 import type { MarkLegend } from '$lib/types/layout/legend';
+import type { CommonMarkerEvents } from '$lib/types/markers/channels/commonMarkerEvents';
 
 /** Props every marker kind shares: rows, grouping, series scope, position, offset, statistics, transforms. */
-export type CommonMarkerConfig = {
+export type CommonMarkerConfig = CommonMarkerEvents & {
 	data?: Record<string, unknown>[];
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	grouping?: string | ((d: any) => unknown);
@@ -31,4 +32,6 @@ export type CommonMarkerConfig = {
 	clip?: boolean;
 	/** Names the marker on its plot's automatic legend - see {@link MarkLegend}. `false` keeps a decorative marker out of it, and out of how the plot's series look there. */
 	legend?: MarkLegend | false;
+	/** Makes the marker a hit area of the plot's hover: the pointer entering any of its shapes hovers its `data` rows. */
+	hover?: boolean;
 };

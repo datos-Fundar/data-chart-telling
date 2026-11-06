@@ -205,3 +205,29 @@ export const ProportionOfTheWhole: Story = {
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+/** `label` writes a text in the middle of each waffle, fitted to it - see `Markers/Rect` for what fitting does. */
+export const Label: Story = {
+	args: {
+		markers: [
+			{
+				type: 'waffle',
+				data: COUNTS,
+				x: 'region',
+				y: 'count',
+				multiple: 10,
+				unit: 1,
+				label: {
+					text: 'count',
+					styles: {
+						fill: 'white',
+						fontSize: 16,
+						stroke: 'black',
+						strokeWidth: 3,
+						paintOrder: 'stroke'
+					}
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

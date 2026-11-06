@@ -232,6 +232,21 @@ const preview: Preview = {
 								'*'
 							]
 						],
+						'Part of a whole',
+						[
+							'TreemapPlot',
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							]
+						],
 						'Ranking',
 						[
 							'BarPlot',
@@ -333,6 +348,7 @@ const preview: Preview = {
 						'Shift',
 						'Sort',
 						'Stack',
+						'Treemap',
 						'Window'
 					],
 					'Markers',
@@ -372,6 +388,7 @@ const preview: Preview = {
 					],
 					'Layout',
 					[
+						'Events',
 						'Facets',
 						['Grid', 'MarginAlignment', 'Paginated', 'Carousel', 'RowsAndCols'],
 						'Legend',

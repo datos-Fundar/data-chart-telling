@@ -91,9 +91,25 @@ export const CustomStyle: Story = {
 				x: 'category',
 				y1: 0,
 				y2: 'value',
-				insetLeft: 0.2,
-				insetRight: 0.2,
-				styles: { fill: '#7c3aed', fillOpacity: 0.7 }
+				styles: { insetLeft: 0.2, insetRight: 0.2, fill: '#7c3aed', fillOpacity: 0.7 }
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};
+
+/** `label` writes a text in the middle of each bar, fitted to it - see `Markers/Rect` for what fitting does. */
+export const Label: Story = {
+	args: {
+		markers: [
+			{
+				type: 'bar',
+				role: 'segment',
+				isHorizontal: false,
+				data: BARS,
+				x: 'category',
+				y1: 0,
+				y2: 'value',
+				label: { text: 'value', styles: { fill: 'white', fontSize: 16 } }
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

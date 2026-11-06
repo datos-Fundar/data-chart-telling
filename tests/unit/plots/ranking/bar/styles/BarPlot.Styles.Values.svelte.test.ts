@@ -81,7 +81,9 @@ describe('BarPlot - styles.values', () => {
 				styles: { values: { show: true, anchor } } satisfies AxisBasedStylesConfig
 			});
 			const svg = await waitForSvg(container);
-			return svg.querySelector('g.text text')?.getAttribute('transform');
+			// A label is moved by the group around it, so where it is on the page is what tells the anchors apart.
+			await new Promise((resolve) => setTimeout(resolve, 100));
+			return String(Math.round(svg.querySelector('g.text text')!.getBoundingClientRect().top));
 		}
 		const outside = await firstLabelY('outside');
 		const middle = await firstLabelY('middle');

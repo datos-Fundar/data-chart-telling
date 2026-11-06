@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { RowStyle } from '$lib/markers/utils/RowStyle';
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Arrow } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import { RowStroke } from '$lib/markers/utils/RowStroke';
@@ -12,11 +14,12 @@
 	 * last, so such an arrow is placed in pixels instead.
 	 */
 	let { marker }: { marker: ArrowMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const plot = usePlot().svelteplot;
 	const data = $derived(marker.data ?? []);
-	/** Each row's own stroke, over the marker's `styles`. */
-	const row = $derived(RowStroke.of(marker, marker.styles, { stroke: 'currentColor' }));
+	/** Each row's stroke: the marker's `styles`, which can be functions of the row. */
+	const row = $derived(RowStroke.of(marker.styles, data, { stroke: 'currentColor' }));
 
 	type Row = Record<string, unknown>;
 	type Channel = string | number | ((d: never) => unknown) | undefined;
@@ -51,6 +54,7 @@
 </script>
 
 <Arrow
+	{...events.props}
 	data={placed}
 	x1={onBand ? own('__x1') : marker.x1}
 	y1={onBand ? own('__y1') : marker.y1}
@@ -59,9 +63,9 @@
 	bend={marker.bend}
 	headAngle={marker.headAngle ?? 60}
 	headLength={marker.headLength ?? 8}
-	inset={marker.inset ?? 0}
-	insetStart={marker.insetStart}
-	insetEnd={marker.insetEnd}
+	inset={RowStyle.field(marker.styles?.inset) ?? 0}
+	insetStart={RowStyle.field(marker.styles?.insetStart)}
+	insetEnd={RowStyle.field(marker.styles?.insetEnd)}
 	sweep={marker.sweep}
 	stroke={row.stroke}
 	strokeWidth={row.strokeWidth}

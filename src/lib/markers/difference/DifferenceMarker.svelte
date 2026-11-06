@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { DifferenceY } from 'svelteplot';
 	import type { DifferenceMarkerConfig } from '$lib/types/markers/common';
 
@@ -9,11 +10,13 @@
 	 * would erase them - each default is restated here instead.
 	 */
 	let { marker }: { marker: DifferenceMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const data = $derived(marker.data ?? []);
 </script>
 
 <DifferenceY
+	{...events.props}
 	{data}
 	x={marker.x}
 	x1={marker.x1}

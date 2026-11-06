@@ -130,7 +130,6 @@ describe('ColorRamp.resolve', () => {
 const ends = {
 	min: '#000000',
 	max: '#ffffff',
-	labelColor: '#111',
 	opacityRange: [0.2, 1] as [number, number]
 };
 const rgb = (color: string) => color.match(/\d+/g)!.slice(0, 3).map(Number);

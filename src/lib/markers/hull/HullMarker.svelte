@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Hull } from 'svelteplot';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
@@ -6,6 +7,7 @@
 
 	/** Renders one `'hull'` marker as `<Hull>` - the convex hull around a cluster of points. */
 	let { marker }: { marker: HullMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const cfg = $derived(getConfiguration());
 	const data = $derived(marker.data ?? []);
@@ -13,6 +15,7 @@
 </script>
 
 <Hull
+	{...events.props}
 	{data}
 	x={marker.x}
 	y={marker.y}

@@ -27,12 +27,18 @@ export type LegendDisabledStyle = {
  * What a legend toggle does to a series once it's off: `'dim'` dims it in
  * place (styled by `style`), `'hide'` makes it fully transparent while the
  * axes keep its range, `'omit'` removes it from the plot entirely, rescaling
- * the axes to what's left.
+ * the axes to what's left - the other series keep their values, and a part of
+ * a whole (a treemap's tile) its share and its place. `'rescale'` removes it
+ * too, and the parts left make the whole again: a stack's visible parts are
+ * scaled up to the total each category had, and a treemap's tiles are laid out
+ * and given their shares anew, as the new 100%. On a plot of no parts it is an
+ * `'omit'`.
  */
 export type LegendDisabledAction =
 	| { mode: 'dim'; style?: LegendDisabledStyle }
 	| { mode: 'hide' }
-	| { mode: 'omit' };
+	| { mode: 'omit' }
+	| { mode: 'rescale' };
 
 export type LegendItem = {
 	name: string;

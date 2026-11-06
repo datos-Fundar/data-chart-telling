@@ -71,11 +71,14 @@ Items become clickable with `interactive` on the series section. `disabled` says
 
 ![Legend items as toggles](images/legend-toggle.png)
 
-| `disabled.mode`   | A hidden series...                                                                    |
-| ----------------- | ------------------------------------------------------------------------------------- |
-| `'dim'` (default) | stays, faded (`style` sets how: opacity, fill, ...; default `legend.disabledOpacity`) |
-| `'hide'`          | becomes transparent, the axes keep its range                                          |
-| `'omit'`          | is removed and the axes refit to the rest                                             |
+| `disabled.mode`   | A hidden series...                                                                     |
+| ----------------- | -------------------------------------------------------------------------------------- |
+| `'dim'` (default) | stays, faded (`style` sets how: opacity, fill, ...; default `legend.disabledOpacity`)  |
+| `'hide'`          | becomes transparent, the axes keep its range                                           |
+| `'omit'`          | is removed and the axes refit to the rest; a part of a whole keeps its share and place |
+| `'rescale'`       | is removed, and the parts left make the whole again (see below)                        |
+
+A plot uses one mode for all its series. `'omit'` and `'rescale'` differ on a plot of parts of a whole. With `'omit'` the other parts keep their values: a stack closes over the hidden series and its top drops, and a [treemap](plots/part-of-a-whole/treemap.md)'s tiles keep their place and their share of the whole economy, leaving the room empty. With `'rescale'` the parts left are the new 100%: each category of a stack (`stackY`/`stackX`) is scaled back up to the total it had, and a treemap's tiles fill the plot again, each share of what is left. On any other plot, `'rescale'` is an `'omit'`.
 
 `interactive.legendStyle` is `'badge'` (default: pills filled with the series color and an eye toggle) or `'basic'` (swatches). `showIcon` toggles the symbol in a badge.
 

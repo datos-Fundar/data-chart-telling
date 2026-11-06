@@ -1,4 +1,4 @@
-import type { DotStyle } from '$lib/types/plots/styling';
+import type { DotStyle, PerRow } from '$lib/types/plots/styling';
 import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/commonMarkerConfigWithColor';
 import type { CommonMarkerConfigWithRadius } from '$lib/types/markers/channels/commonMarkerConfigWithRadius';
 import type { CommonMarkerConfigWithRowOffset } from '$lib/types/markers/channels/commonMarkerConfigWithRowOffset';
@@ -8,7 +8,7 @@ import type { CommonMarkerConfigWithSymbol } from '$lib/types/markers/channels/c
 export type DotMarkerConfig = CommonMarkerConfigWithRowOffset<
 	{
 		type: 'dot';
-		styles?: DotStyle;
+		styles?: PerRow<DotStyle>;
 	} & CommonMarkerConfigWithRadius &
 		CommonMarkerConfigWithColor &
 		CommonMarkerConfigWithSymbol

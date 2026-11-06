@@ -71,8 +71,8 @@ export const CustomValueFormat: Story = {
 };
 
 /**
- * Value labels anchored inside - displays values at the end of bars but
- * positioned inside rather than outside, useful for dense pyramids.
+ * Value labels anchored inside - `anchor: 'base'` writes each value inside its bar, at the baseline;
+ * `'tip'` would write it inside the end, and `'outside'` (the default) beyond it. Useful for dense pyramids.
  */
 export const LabelsInside: Story = {
 	args: {
@@ -84,7 +84,7 @@ export const LabelsInside: Story = {
 		styles: {
 			values: {
 				show: true,
-				anchor: 'end',
+				anchor: 'base',
 				format: (v: number) => `${v.toFixed(1)}%`,
 				fontStyle: { fill: '#ffffff', fontWeight: 'bold' }
 			}

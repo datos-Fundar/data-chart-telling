@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Density } from 'svelteplot';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
@@ -17,6 +18,7 @@
 	 * class-based scoping every other marker kind gets from svelteplot itself.
 	 */
 	let { marker }: { marker: DensityMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const data = $derived(marker.data ?? []);
 	const cfg = $derived(getConfiguration());
@@ -47,6 +49,7 @@
 
 {#each groups as group, i (i)}
 	<Density
+		{...events.props}
 		data={group.rows}
 		class="density"
 		x={marker.x}

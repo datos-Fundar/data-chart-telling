@@ -78,7 +78,7 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 
 	symbols: ['circle', 'square', 'triangle', 'diamond', 'star', 'cross'],
 	// A light tint of the palette's first color up to the color itself.
-	continuous: { min: '#eaf0f6', max: '#4e79a7', labelColor: '#111827', opacityRange: [0.2, 1] },
+	continuous: { min: '#eaf0f6', max: '#4e79a7', opacityRange: [0.2, 1] },
 	margins: { top: 'auto', right: 'auto', bottom: 'auto', left: 'auto' },
 	frameClip: { tolerance: 2 },
 
@@ -204,6 +204,14 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		}
 	},
 
+	treemap: {
+		stroke: '#ffffff',
+		strokeWidth: 1.5,
+		fontSize: 12,
+		padding: 4,
+		lineHeight: 1.2
+	},
+
 	timeline: {
 		axisColor: 'currentColor',
 		activeColor: '#4e79a7',
@@ -276,6 +284,7 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 	},
 
 	text: {
+		label: { gap: 4, padding: 4, minFontSize: 8, minLetters: 3, contrast: ['#ffffff', '#111827'] },
 		declutter: {
 			elbowGap: 10,
 			laneStep: 7,
@@ -416,10 +425,6 @@ export function configToCssVars(c: PlotStylesConfig): Record<string, string> {
 		'--dct-divider-margin': c.divider.margin,
 		'--dct-row-gap': c.chrome.rowGap,
 
-		'--dct-heat-min': c.continuous.min,
-		'--dct-heat-max': c.continuous.max,
-		'--dct-heat-text': c.continuous.labelColor,
-
 		'--dct-axis-color': c.axis.color,
 
 		'--dct-legend-font': c.legend.font,
@@ -501,6 +506,15 @@ export function configToCssVars(c: PlotStylesConfig): Record<string, string> {
 		'--dct-player-toggle-size': c.timeline.player.toggle.fontSize,
 		'--dct-player-toggle-pad': c.timeline.player.toggle.padding
 	};
+}
+
+/**
+ * A CSS-vars record as one rule on the document root, with no specificity (`:where(:root)`): every element inherits
+ * them, and any rule of the author's that sets one - on a wrapping element too - wins over it.
+ */
+export function cssVarsRule(vars: Record<string, string>): string {
+	// A value never closes the `<style>` it is written in.
+	return `:where(:root){${cssVarsStyle(vars).replace(/</g, '')}}`;
 }
 
 /** Serialize a CSS-vars record into a `style` attribute string. */

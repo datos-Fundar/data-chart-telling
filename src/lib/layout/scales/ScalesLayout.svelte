@@ -371,7 +371,7 @@
 		transform="rotate(-90, {verticalYLabel.x}, {verticalYLabel.y})"
 		text-anchor={verticalYLabel.anchor}
 		font-size={yTitleFontSize}
-		fill={cfg.axis.color}
+		fill="currentColor"
 		opacity="0.8">{verticalYLabel.text}</text
 	>
 {/if}

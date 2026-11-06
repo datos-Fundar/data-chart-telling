@@ -55,9 +55,8 @@ export const Default: Story = {
 				type: 'cell',
 				x: (d) => (d as PenguinSpeciesCount).island,
 				y: (d) => (d as PenguinSpeciesCount).species,
-				fill: () => '#e5e7eb',
-				color: 'count',
-				inset: 0.5
+				styles: { fill: () => '#e5e7eb', inset: 0.5 },
+				color: 'count'
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
@@ -71,10 +70,9 @@ export const CustomScheme: Story = {
 				type: 'cell',
 				x: (d) => (d as PenguinSpeciesCount).island,
 				y: (d) => (d as PenguinSpeciesCount).species,
-				fill: () => '#e5e7eb',
+				styles: { fill: () => '#e5e7eb', inset: 0.5 },
 				color: 'count',
-				scales: { color: { domain: [0, 120], scheme: 'viridis' } },
-				inset: 0.5
+				scales: { color: { domain: [0, 120], scheme: 'viridis' } }
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

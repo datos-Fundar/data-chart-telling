@@ -152,14 +152,31 @@ export class LegendState {
 		});
 	}
 
-	/** Whether any series is off with `'omit'` - which changes the plot's own rows, not just how they draw. */
+	/** Whether any series is off with `'omit'` or `'rescale'` - which change the plot's own rows, not just how they draw. */
 	get omits(): boolean {
-		return [...this.disabled.values()].some((action) => action.mode === 'omit');
+		return [...this.disabled.values()].some(LegendState.#removes);
 	}
 
-	/** `series` without those turned off with `'omit'`. */
+	/** `series` without those turned off with `'omit'` or `'rescale'`. */
 	withoutOmitted<S extends { name: string }>(series: S[]): S[] {
-		return series.filter((s) => this.actionOf(s.name)?.mode !== 'omit');
+		return series.filter((s) => !LegendState.#removes(this.actionOf(s.name)));
+	}
+
+	/**
+	 * The series of `series` taken out of the plot's rows, and how: `'omit'` or `'rescale'` - one mode for every
+	 * series of a plot, as its legend sets it. `undefined` while none is.
+	 */
+	removed<S extends { name: string }>(
+		series: S[]
+	): { mode: 'omit' | 'rescale'; series: S[] } | undefined {
+		const off = series.filter((s) => LegendState.#removes(this.actionOf(s.name)));
+		if (!off.length) return undefined;
+		return { mode: this.actionOf(off[0].name)!.mode as 'omit' | 'rescale', series: off };
+	}
+
+	/** Whether `action` takes a series out of the plot's rows. */
+	static #removes(action: LegendDisabledAction | undefined): boolean {
+		return action?.mode === 'omit' || action?.mode === 'rescale';
 	}
 
 	/**

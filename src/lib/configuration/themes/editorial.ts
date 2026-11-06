@@ -8,7 +8,7 @@ export const EDITORIAL_THEME: PlotStylesConfigInput = {
 	subtitle: { color: '#8a6d3b', size: '1.05rem' },
 	caption: { color: '#8a6d3b' },
 	palette: ['#9b2226', '#606c38', '#6a4c93', '#ee9b00', '#005f73'],
-	continuous: { min: '#fff3e0', max: '#bb3e03', labelColor: '#2b2118' },
+	continuous: { min: '#fff3e0', max: '#bb3e03' },
 	axis: { color: '#8a6d3b', fontSize: 13, xTickSize: 6, yTickSize: 6 },
 	line: { strokeWidth: 5, dotRadius: 5 },
 	timeline: { activeColor: '#bb3e03', axisColor: '#8a6d3b', thickness: 60 },

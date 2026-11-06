@@ -1,5 +1,5 @@
-import { buildSeries } from '$lib/utils/grouping';
-import { ColorRamp } from '$lib/utils/color';
+import { buildSeries, Grouping } from '$lib/utils/grouping';
+import { ColorRamp, ColorTones } from '$lib/utils/color';
 import { resolveAccessor } from '$lib/utils/accessors';
 import { buildGroupedSeries, buildScopedMarkerGroups } from '$lib/plots/utils/segments';
 import { buildGapFillMaps, isGapValue } from '$lib/plots/utils/gaps';
@@ -38,7 +38,7 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 		const { series, data, segments, scales } = state;
 		const { connect = true, color: segmentColor } = options.segments ?? {};
 
-		const seriesGrouping = DataPhase.#buildGrouping(state);
+		const seriesGrouping = DataPhase.#buildGrouping(state, options.nested);
 		const built: Series[] = series ?? buildSeries(data ?? [], state.x, state.y, seriesGrouping);
 		const fullSeries = options.orderSeries ? options.orderSeries(built, state) : built;
 		const axes = PlotAxes.build({
@@ -47,16 +47,24 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 			given: { x: state.x !== undefined, y: state.y !== undefined },
 			discrete: options.discreteAxes
 		});
-		const colorForSeries = ColorRamp.resolve(
+		const seriesColors = ColorRamp.resolve(
 			scales.color,
 			(options.colorOrder ? options.colorOrder(fullSeries) : fullSeries).map((s) => s.name),
 			ctx.cfg.palette
 		);
+		const colorForPath = series ? undefined : DataPhase.#buildPathColors(state, ctx);
+		// A plot that splits its series by every level colors each one by its path; a nested one by its outermost.
+		const colorForSeries =
+			colorForPath && !options.nested
+				? DataPhase.#byPath(state, colorForPath, seriesColors)
+				: seriesColors;
 		const panelSeries =
 			state.panels && state.panelOf && !series
 				? FacetPanels.splitSeries(fullSeries, state.panels, state.panelOf)
 				: fullSeries;
-		const resolvedSeries = ctx.interaction?.legend?.withoutOmitted(panelSeries) ?? panelSeries;
+		const legend = ctx.interaction?.legend;
+		const resolvedSeries = legend?.withoutOmitted(panelSeries) ?? panelSeries;
+		const removedSeries = legend?.removed(panelSeries);
 		const baseFor = BasicStyles.of(state.styles, options.segments?.base);
 		const groupedSeries = buildGroupedSeries(resolvedSeries, segments, connect, baseFor);
 		const scopedGroups = buildScopedMarkerGroups({
@@ -75,6 +83,7 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 			...state,
 			axes,
 			resolvedSeries,
+			...(removedSeries ? { removedSeries } : {}),
 			seriesGrouping,
 			allSeriesNames: fullSeries.map((s) => s.name),
 			groupedSeries,
@@ -82,21 +91,72 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 			flat: resolvedSeries.flatMap((s) => s.data),
 			scopedGroups,
 			colorForSeries,
+			...(colorForPath ? { colorForPath } : {}),
 			...(gapFillMaps ? { gapFillMaps } : {})
 		} as TState;
 		return options.extend ? options.extend(next, ctx) : next;
 	};
 
 	/**
-	 * The key a plot's rows split into series by: its `grouping`, or its `color`
-	 * when that names categories. A numeric `color` is a continuous value (a
-	 * heatmap's cells), so it colors rows without grouping them.
+	 * The color of a path of the plot's `grouping` levels, when `scales.color.depth` reaches past the outermost
+	 * one: each outermost value its categorical color, and every path down to `depth` a tone of it (see
+	 * {@link ColorTones.hierarchy}). `undefined` for a grouping of one level, or a depth of 1.
+	 */
+	static #buildPathColors(
+		state: AnyAxisState,
+		ctx: AxisPlotCtx
+	): ((path: readonly string[]) => string) | undefined {
+		const depth = state.scales.color?.depth ?? 1;
+		const rows = state.data ?? [];
+		const levels = Grouping.levels(state.grouping, rows).map((level) =>
+			resolveAccessor(level as never)
+		) as ((row: unknown) => unknown)[];
+		if (depth <= 1 || levels.length <= 1) return undefined;
+		const paths = rows.map((row) => levels.map((read) => String(read(row))));
+		const outermost = [...new Set(paths.map((path) => path[0]))];
+		const colorOf = ColorRamp.resolve(state.scales.color, outermost, ctx.cfg.palette);
+		return ColorTones.hierarchy(paths, depth, (value) => colorOf(value));
+	}
+
+	/** A series' color as the color of its path - its name is the key its levels make together. */
+	static #byPath(
+		state: AnyAxisState,
+		colorForPath: (path: readonly string[]) => string,
+		fallback: (name: string) => string
+	): (name: string) => string {
+		const rows = state.data ?? [];
+		const key = resolveAccessor(Grouping.key(state.grouping, rows) as never) as (
+			row: unknown
+		) => unknown;
+		const levels = Grouping.levels(state.grouping, rows).map((level) =>
+			resolveAccessor(level as never)
+		) as ((row: unknown) => unknown)[];
+		const pathOf = new Map<string, string[]>();
+		for (const row of rows) {
+			const name = String(key(row));
+			if (!pathOf.has(name))
+				pathOf.set(
+					name,
+					levels.map((read) => String(read(row)))
+				);
+		}
+		return (name) => {
+			const path = pathOf.get(name);
+			return path ? colorForPath(path) : fallback(name);
+		};
+	}
+
+	/**
+	 * The key a plot's rows split into series by: its `grouping` (its levels together, or the outermost
+	 * one alone for a `nested` kind), or its `color` when that names categories. A numeric `color` is a
+	 * continuous value (a heatmap's cells), so it colors rows without grouping them.
 	 */
 	static #buildGrouping(
-		state: Pick<AnyAxisState, 'grouping' | 'color' | 'data'>
+		state: Pick<AnyAxisState, 'grouping' | 'color' | 'data'>,
+		nested = false
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	): Accessor<any, unknown> | undefined {
-		if (state.grouping !== undefined) return state.grouping;
+		if (state.grouping !== undefined) return Grouping.key(state.grouping, state.data, nested);
 		const color = state.color;
 		if (color === undefined || !state.data) return color;
 		const read = resolveAccessor(color as never) as (row: unknown) => unknown;

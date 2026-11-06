@@ -1,20 +1,30 @@
 /**
- * Unified positional anchor for value labels across all plot kinds.
- *
- * - `'outside'` - beyond the tip of the mark (above a vertical bar, to the
- *   far end of a horizontal bar or line). This is the only value with no
- *   direct svelteplot equivalent; the plot computes dx/dy internally.
- * - `'start'` - at the tip of the mark, just inside (top of a bar, far end
- *   of a pyramid bar from zero, right of a line's last point).
- * - `'middle'` - centred on the mark.
- * - `'end'` - at the baseline/zero end of the mark.
- *
- * On a bar plot the anchors read as the bars are drawn, whatever the sign of the value: `'outside'` is
- * beyond the tip (left of a horizontal bar below zero, under a vertical one), `'start'` the left end of a
- * horizontal bar or the top end of a vertical one, `'end'` the right or bottom end, both inside, and
- * `'middle'` the centre.
+ * Where something sits in a box, in a frame or on a shape: its middle, against one of its edges as they are drawn on
+ * the page, or in one of its corners. The anchors of a text marker's `frameAnchor`, and of a shape's `label`.
  */
-export type ValueAnchor = 'outside' | 'start' | 'middle' | 'end';
+export type LabelAnchor =
+	| 'middle'
+	| 'top'
+	| 'bottom'
+	| 'left'
+	| 'right'
+	| 'top-left'
+	| 'top-right'
+	| 'bottom-left'
+	| 'bottom-right';
+
+/**
+ * Where a value label sits on its mark. Two vocabularies share the type, one per family of plots:
+ *
+ * - The plots that label a point or the end of a line (`LinePlot`, `AreaPlot`, `SlopePlot`, `ScatterPlot`...) read
+ *   the side of the point its text is written on: `'start'` after it (right of a line's last point), `'end'` before
+ *   it, `'middle'` on it and `'outside'` beyond it.
+ * - The plots that label a shape (`BarPlot`, `BulletPlot`, `PyramidPlot`, `HistogramPlot`) read where in it the
+ *   label is. Inside the shape: a {@link LabelAnchor} - its `'middle'`, an edge as it is drawn on the page
+ *   (`'top'`, `'left'`...) or a corner (`'top-left'`...) - or, whichever side of zero the value is, the end of the bar
+ *   away from zero, `'tip'`, or the one at zero, `'base'`. Beyond the tip, outside the shape: `'outside'`.
+ */
+export type ValueAnchor = LabelAnchor | 'outside' | 'start' | 'end' | 'tip' | 'base';
 
 /**
  * Shared by two unrelated renderers: a `dot` mark's own point shape

@@ -2,6 +2,7 @@
 	import { Plot, RuleX, RuleY, Text } from 'svelteplot';
 	import { TimelineSteps } from '$lib/layout/timeline/TimelineSteps';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
+	import ConfigVars from '$lib/configuration/ConfigVars.svelte';
 	import type { Orientation, TimeValue } from '$lib/types/layout/timeline';
 
 	/**
@@ -54,6 +55,9 @@
 	);
 </script>
 
+<!-- Its colors are the configuration's, with or without a figure around it. -->
+<ConfigVars />
+
 <!-- Drawn with the configuration's font even outside a figure's chrome, which would hand it down. -->
 <div style="display: contents" style:font-family={config.font}>
 	<Plot
@@ -89,7 +93,7 @@
 			{...textOffset}
 			fontSize={rule.activeFontSize}
 			fontWeight={rule.activeFontWeight}
-			fill={getConfiguration().timeline.activeColor}
+			fill="var(--dct-timeline-active, currentColor)"
 		/>
 	</Plot>
 </div>

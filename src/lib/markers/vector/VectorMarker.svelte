@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Vector } from 'svelteplot';
 	import type { GeoVectorMarkerConfig } from '$lib/types/markers/geo';
 
@@ -10,12 +11,14 @@
 	 * shape actually draws with, matching svelteplot's own convention.
 	 */
 	let { marker }: { marker: GeoVectorMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const shape = $derived(marker.shape ?? 'arrow-filled');
 	const isFilledShape = $derived(shape === 'arrow-filled');
 </script>
 
 <Vector
+	{...events.props}
 	data={marker.data}
 	x={marker.x}
 	y={marker.y}

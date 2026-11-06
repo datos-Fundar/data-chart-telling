@@ -5,6 +5,7 @@ import type {
 	PhaseStage
 } from '$lib/types/phases';
 import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
+import { MarkerStyles } from '$lib/phases/markers/MarkerStyles';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 /**
@@ -12,7 +13,7 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
  * plot kind's own marks, then what the "statistics" phase left in
  * `state.markers` (the author's markers and the plot's statistics), then its
  * value labels when `styles.values.show` turns them on, each with what every
- * label shares ({@link ValueLabels.hooks}).
+ * label shares ({@link ValueLabels.hooks}), and every style as svelteplot reads it ({@link MarkerStyles}).
  */
 export class MarkersPhase<
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,18 +32,22 @@ export class MarkersPhase<
 		const labels = state.valueLabels;
 		const valueLabels: AxisBasedMarkersConfig[] =
 			labels?.show && options.valueLabels
-				? options
-						.valueLabels(labels, state, ctx)
-						.map((marker) => ({ ...labels.hooks(ctx), ...marker }))
+				? options.valueLabels(labels, state, ctx).map((marker): AxisBasedMarkersConfig => {
+						const { styles, ...hooks } = labels.hooks(ctx);
+						return { ...hooks, ...marker, styles: { ...styles, ...marker.styles } } as never;
+					})
 				: [];
 		return {
 			...state,
-			markers: MarkerChannels.inheritPosition(
-				MarkerChannels.inheritAll(
-					[...options.marks(state, ctx), ...(state.markers ?? []), ...valueLabels],
-					state.scales as never
+			markers: MarkerStyles.resolveAll(
+				MarkerChannels.inheritPosition(
+					MarkerChannels.inheritAll(
+						[...options.marks(state, ctx), ...(state.markers ?? []), ...valueLabels],
+						state.scales as never
+					),
+					state.processedData
 				),
-				state.processedData
+				{ cfg: ctx.cfg, rows: state.processedData?.data }
 			)
 		};
 	};

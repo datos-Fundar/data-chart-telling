@@ -1,12 +1,15 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Graticule } from 'svelteplot';
 	import type { GeoGraticuleMarkerConfig } from '$lib/types/markers/geo';
 
 	/** Renders one `'graticule'` marker - longitude/latitude gridlines. */
 	let { marker }: { marker: GeoGraticuleMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 </script>
 
 <Graticule
+	{...events.props}
 	step={marker.step}
 	stepX={marker.stepX}
 	stepY={marker.stepY}

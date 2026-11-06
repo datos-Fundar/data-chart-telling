@@ -1,4 +1,6 @@
 <script lang="ts" generics="TData = Record<string, unknown>">
+	import { RowStyle } from '$lib/markers/utils/RowStyle';
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Dot } from 'svelteplot';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
@@ -12,12 +14,12 @@
 	 * `DeltaMarker` that place a dot at a computed point.
 	 */
 	const { marker }: { marker: DotMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const data = $derived((marker.data ?? []) as TData[]);
 	const x = $derived(marker.x);
 	const y = $derived(marker.y);
 	const rProp = $derived(marker.r);
-	const fillProp = $derived(marker.fill);
 	const color = $derived(marker.color ? resolveAccessor(marker.color) : undefined);
 	const opacityProp = $derived(marker.opacity ? resolveAccessor(marker.opacity) : undefined);
 	const symbolProp = $derived(marker.symbol ? resolveAccessor(marker.symbol) : undefined);
@@ -61,12 +63,14 @@
 	 * `'none'` is handed over as unset, which svelteplot draws as no paint.
 	 */
 	const paint = <T,>(value: T): T | undefined => (value === 'none' ? undefined : value);
-	const fill = $derived(paint(resolvedFill ?? fillProp ?? styles?.dotFill ?? 'currentColor'));
-	const flatFillOpacity = $derived(styles?.dotFillOpacity ?? 1);
+	const fill = $derived(
+		paint(resolvedFill ?? RowStyle.of(styles?.dotFill, displayData) ?? 'currentColor')
+	);
+	const flatFillOpacity = $derived(RowStyle.opacity(styles?.dotFillOpacity) ?? 1);
 	const symbol = $derived(resolvedSymbolFn ?? styles?.dotSymbol ?? 'circle');
-	const stroke = $derived(paint(styles?.dotStroke ?? 'currentColor'));
-	const strokeWidth = $derived(styles?.dotStrokeWidth ?? 1);
-	const strokeOpacity = $derived(styles?.dotStrokeOpacity ?? 1);
+	const stroke = $derived(paint(RowStyle.of(styles?.dotStroke, displayData) ?? 'currentColor'));
+	const strokeWidth = $derived(RowStyle.field(styles?.dotStrokeWidth) ?? 1);
+	const strokeOpacity = $derived(RowStyle.opacity(styles?.dotStrokeOpacity) ?? 1);
 	const strokeDasharray = $derived(styles?.dotStrokeDasharray);
 </script>
 
@@ -74,6 +78,7 @@
 	<RowOffsetMarks {marker} {rows}>
 		{#snippet mark(own)}
 			<Dot
+				{...events.props}
 				data={own}
 				x={x ?? 0}
 				y={y ?? 0}

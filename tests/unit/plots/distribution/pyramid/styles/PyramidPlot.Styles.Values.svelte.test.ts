@@ -56,14 +56,14 @@ describe('PyramidPlot - styles.values', () => {
 				styles: { values: { show: true, anchor } } satisfies AxisBasedStylesConfig
 			});
 			const svg = await waitForSvg(container);
-			return svg.querySelector('g.text text')?.getAttribute('transform');
+			// A label is moved by the group around it, so where it is on the page is what tells the anchors apart.
+			await new Promise((resolve) => setTimeout(resolve, 100));
+			return String(Math.round(svg.querySelector('g.text text')!.getBoundingClientRect().left));
 		}
 		const outside = await firstLabelTransform('outside');
 		const middle = await firstLabelTransform('middle');
-		const end = await firstLabelTransform('end');
-		expect(outside).toBeTruthy();
-		expect(middle).toBeTruthy();
-		expect(end).toBeTruthy();
-		expect(new Set([outside, middle, end]).size).toBe(3);
+		const tip = await firstLabelTransform('tip');
+		const base = await firstLabelTransform('base');
+		expect(new Set([outside, middle, tip, base]).size).toBe(4);
 	});
 });

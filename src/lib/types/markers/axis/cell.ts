@@ -1,11 +1,12 @@
-import type { AreaStyle } from '$lib/types/plots/styling';
+import type { AreaStyle, PerRow, InsetStyle } from '$lib/types/plots/styling';
 import type { CommonMarkerConfigWithArea } from '$lib/types/markers/channels/commonMarkerConfigWithArea';
+import type { CommonMarkerConfigWithLabel } from '$lib/types/markers/channels/commonMarkerConfigWithLabel';
 import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/commonMarkerConfigWithColor';
 
-/** A heatmap cell mark; `fill` is always set per row. */
+/** A heatmap cell mark; its `fill` is set per row, by `color` or `styles.fill`. */
 export type CellMarkerConfig = {
 	type: 'cell';
-	styles?: AreaStyle;
-	inset?: number;
+	styles?: PerRow<AreaStyle & Pick<InsetStyle, 'inset'>>;
 } & CommonMarkerConfigWithColor &
-	Required<Pick<CommonMarkerConfigWithArea, 'fill'>>;
+	CommonMarkerConfigWithArea &
+	CommonMarkerConfigWithLabel;

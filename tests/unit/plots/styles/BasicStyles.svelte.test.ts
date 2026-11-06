@@ -261,10 +261,19 @@ describe('styles on the plots with connectors', () => {
 	});
 
 	describe('dashes and caps', () => {
+		/** The dashes and caps of a connector's `styles`, without the stroke each row gives itself, or the arrow's insets. */
+		const patternOf = (styles: Row = {}) =>
+			Object.fromEntries(
+				Object.entries(styles).filter(
+					([key]) =>
+						!['stroke', 'strokeWidth', 'strokeOpacity', 'insetStart', 'insetEnd'].includes(key)
+				)
+			);
+
 		const patterns = (defaults: Defaults, props: Row) =>
 			run(defaults, { data: rows, x: 'c', y: 'v', color: 'g', ...props })
 				.markers.filter((m): m is RuleMarkerConfig => m.type === 'rule')
-				.map((m) => m.styles ?? {});
+				.map((m) => patternOf(m.styles));
 
 		test('styles.stroke draws every connector dashed and capped', () => {
 			expect(
@@ -317,7 +326,7 @@ describe('styles on the plots with connectors', () => {
 				}
 			});
 			const arrow = markers.find((m) => m.type === 'arrow') as { styles?: Row } | undefined;
-			expect(arrow?.styles).toEqual({ strokeDasharray: '3 3', strokeLinecap: 'round' });
+			expect(patternOf(arrow?.styles)).toEqual({ strokeDasharray: '3 3', strokeLinecap: 'round' });
 		});
 	});
 

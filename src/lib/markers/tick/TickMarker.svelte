@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { RowStyle } from '$lib/markers/utils/RowStyle';
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { TickX, TickY } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
@@ -7,6 +9,7 @@
 
 	/** Renders one `'tick'` marker as `<TickX>` or `<TickY>`, picked from the way the plot runs (`usePlot().axes`). */
 	let { marker }: { marker: TickMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const plot = usePlot();
 	const isHorizontal = $derived(plot.axes?.isHorizontal ?? false);
@@ -15,7 +18,9 @@
 	const cfg = $derived(getConfiguration());
 	const data = $derived(marker.data ?? []);
 	const channelStroke = $derived(MarkerChannels.buildFill(data, marker.color, marker.scales, cfg));
-	const stroke = $derived(channelStroke ?? marker.styles?.stroke ?? 'currentColor');
+	const stroke = $derived(
+		channelStroke ?? RowStyle.of(marker.styles?.stroke, data) ?? 'currentColor'
+	);
 
 	/**
 	 * A tick across a band axis spans the whole band, whatever `tickLength` says -
@@ -33,14 +38,15 @@
 </script>
 
 <TickMark
+	{...events.props}
 	{data}
 	x={marker.x}
 	y={marker.y}
 	tickLength={marker.tickLength}
 	{...insetProps}
 	{stroke}
-	strokeWidth={marker.styles?.strokeWidth}
-	strokeOpacity={marker.styles?.strokeOpacity}
+	strokeWidth={RowStyle.field(marker.styles?.strokeWidth)}
+	strokeOpacity={RowStyle.opacity(marker.styles?.strokeOpacity)}
 	strokeDasharray={marker.styles?.strokeDasharray}
 	strokeLinecap={marker.styles?.strokeLinecap}
 />

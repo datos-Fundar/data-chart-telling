@@ -56,7 +56,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 	const rangeColors = own.ranges?.colors ?? configured.rangeColors;
 	const rangeWidth = own.ranges?.width ?? configured.rangeWidth;
 	const target = {
-		color: own.target?.color ?? configured.targetColor ?? ctx.cfg.axis.color,
+		color: own.target?.color ?? configured.targetColor ?? 'currentColor',
 		width: own.target?.width ?? configured.targetWidth,
 		length: own.target?.length ?? configured.targetLength
 	};
@@ -86,8 +86,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 						data: rows,
 						value: 'category',
 						...(isHorizontal ? { x1: 'from', x2: 'to' } : { y1: 'from', y2: 'to' }),
-						stroke: 'stroke',
-						styles: { strokeWidth: rangeWidth }
+						styles: { stroke: 'stroke', strokeWidth: rangeWidth }
 					}
 				];
 

@@ -7,6 +7,7 @@ import { isGapValue } from '$lib/plots/utils/gaps';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { HoverDisplayPoint, HoverPoint } from '$lib/types/layout/hover';
 import type { TooltipConfig } from '$lib/types/plots/props';
+import type { TooltipContext } from '$lib/types/layout/tooltip';
 import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import type {
 	AxisPlotCtx,
@@ -81,7 +82,8 @@ export class HoverPhase<
 			label: label as (row: Row) => string,
 			defaultStrategy: options.strategy ?? HoverSettings.strategyOf(state.axes),
 			pointMatching: options.pointMatching,
-			number: NumberFormat.of(NumberFormat.displayOf(state.tooltip), ctx.cfg)
+			number: NumberFormat.of(NumberFormat.displayOf(state.tooltip), ctx.cfg),
+			context: HoverPhase.#contextOf(options.context?.(state) as ((row: Row) => object) | undefined)
 		});
 		const hitAreas = options.hitAreas?.(state, hover as never, ctx) ?? [];
 		return {
@@ -135,6 +137,14 @@ export class HoverPhase<
 					...decorate?.(row)
 				};
 			});
+	}
+
+	/** What the plot knows of a hovered row: its series, and whatever its kind adds. */
+	static #contextOf(kind: ((row: Row) => object) | undefined): (row: Row) => TooltipContext {
+		return (row) => {
+			const series = row[SERIES_KEY];
+			return { ...(typeof series === 'string' ? { series } : {}), ...kind?.(row) };
+		};
 	}
 
 	/**

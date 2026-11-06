@@ -74,7 +74,8 @@
 		slice?: (cell: PlotCellContext<TRow, TScales>) => TCore;
 		cell?: PlotCellSnippet<TRow, TScales>;
 		margins?: MarginConfig;
-		tooltip?: TooltipProp<TRow>;
+		/** The plot's `tooltip`, whose `format` gets whatever context its kind gives. */
+		tooltip?: TooltipProp<TRow, never>;
 		/** The rows `timeline` and `facet` slice. Defaults to `core.data`. */
 		data?: TRow[];
 		width?: number;
@@ -89,7 +90,8 @@
 	const pipeline = $derived(defaults ? Pipeline.of(defaults()) : undefined);
 	const hoverSettings = $derived(
 		new HoverSettings(
-			tooltip,
+			// A kind's own context reaches `format` as the hover phase gives it.
+			tooltip as TooltipProp<TRow> | undefined,
 			markers ?? core?.markers,
 			pipeline?.hoverStrategy(core ?? {}, cfg) ?? 'x'
 		)

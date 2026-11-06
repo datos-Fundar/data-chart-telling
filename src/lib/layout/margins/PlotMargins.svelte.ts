@@ -93,7 +93,7 @@ export class PlotMargins {
 	/**
 	 * Measures `el`'s rendered box once its readings settle - again whenever
 	 * the plot's area or `deps` change - and reports how far it reaches past
-	 * that area: to `onOverflow`, and, when `grow` holds, into the room the
+	 * that area: to `onoverflow`, and, when `grow` holds, into the room the
 	 * margins grow by. The area is where svelteplot draws the marks (see
 	 * {@link follow}), not the {@link contentBox}'s estimate: an `'auto'` side
 	 * is only its estimate until svelteplot sizes its axes, and what a label
@@ -103,7 +103,7 @@ export class PlotMargins {
 		el: () => SVGGraphicsElement | undefined,
 		options: {
 			grow?: () => boolean;
-			onOverflow?: (overflow: Margins) => void;
+			onoverflow?: (overflow: Margins) => void;
 			deps?: () => unknown;
 		}
 	): void {
@@ -133,7 +133,7 @@ export class PlotMargins {
 					frame = requestAnimationFrame(measure);
 					return;
 				}
-				options.onOverflow?.(overflow);
+				options.onoverflow?.(overflow);
 				if (options.grow?.()) this.reportOverflow(overflow);
 			};
 			// Text measures right only once its fonts load.

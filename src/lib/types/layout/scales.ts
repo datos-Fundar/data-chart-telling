@@ -22,6 +22,12 @@ export type ColorScaleConfig = {
 	pivot?: number;
 	/** Fallback color for a missing/unmapped value. Defaults to `'#ccc'`. */
 	unknown?: string;
+	/**
+	 * With a `grouping` of several levels (`'sector.kind.branch'`), the level its colors reach: `1` (the default)
+	 * gives each outermost value its color, and a deeper one gives each value down to that level a tone of its
+	 * outermost value's color - `2` a tone per kind within its sector's color. Ignored by a continuous ramp.
+	 */
+	depth?: number;
 };
 
 /** How groups sharing the same `grouping`/`color` value are ordered: `reverse` flips which sorts first (e.g. PyramidPlot's left/right sides). */

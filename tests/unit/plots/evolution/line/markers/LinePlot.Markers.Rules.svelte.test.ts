@@ -143,7 +143,7 @@ describe('LinePlot - markers.rules', () => {
 				height: 300,
 				series: [FEMALE],
 				markers: [
-					{ type: 'rule', axis: 'y', value: 80, inset: 60 }
+					{ type: 'rule', axis: 'y', value: 80, styles: { inset: 60 } }
 				] satisfies AxisBasedMarkersConfig[]
 			})
 		).container;

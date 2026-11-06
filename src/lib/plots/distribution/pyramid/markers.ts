@@ -1,13 +1,12 @@
+import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { resolveAccessor } from '$lib/utils/accessors';
-import { SERIES_ID_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { seriesIdOf } from '$lib/utils/grouping';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { isGapValue, resolveGapAreaStyle } from '$lib/plots/utils/gaps';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
-import type { BarMarkerConfig, TextMarkerConfig } from '$lib/types/markers/common';
-import type { ProcessedRow } from '$lib/types/phases';
+import type { BarMarkerConfig } from '$lib/types/markers/common';
 import type { DiscreteGapFill } from '$lib/types/plots/gaps';
 import type {
 	PyramidPlotState,
@@ -15,7 +14,6 @@ import type {
 	PyramidSeries
 } from '$lib/types/plots/distribution/pyramid/state';
 import type { AxisValue } from '$lib/types/layout/mapping';
-import type { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 const GAP_KINDS = ['start', 'middle', 'end'] as const;
@@ -28,76 +26,6 @@ function signFor<TData extends Record<string, unknown>>(
 	magnitude: number
 ): number {
 	return s.side === 'left' ? -magnitude : magnitude;
-}
-
-/**
- * PyramidPlot's `styles.values` as one `'text'` marker per series, over the
- * same processed rows its bars draw (gap rows never get a label), mirrored to
- * its own side of the shared zero baseline. `anchor` places each label along
- * its bar: past its end (`'outside'`/`'start'`), at the baseline (`'end'`),
- * or centred (`'middle'`). On a vertical pyramid the sides run down and up.
- */
-export function buildValueLabels<TData extends Record<string, unknown>>(
-	labels: ValueLabels,
-	state: PyramidPlotState<TData>,
-	ctx: PyramidPlotCtx
-): TextMarkerConfig[] {
-	const { processedData } = state;
-	if (!processedData) return [];
-	const { font, anchor, format } = labels;
-	const categoryAxis = PlotAxes.categoryOf(state);
-	const valueAxis = PlotAxes.valueOf(state);
-	const isHorizontal = state.axes?.isHorizontal ?? true;
-
-	return (state.processedGroups ?? []).flatMap(({ series }): TextMarkerConfig[] => {
-		const id = seriesIdOf(series);
-		const side = state.resolvedSeries!.find((s) => seriesIdOf(s) === id)!.side;
-		const isLeft = side === 'left';
-		const getMagnitude = resolveAccessor(series[valueAxis]!);
-		const magnitude = (d: ProcessedRow) => Math.abs(Number(getMagnitude(d)));
-		const signed = (d: ProcessedRow) => (isLeft ? -magnitude(d) : magnitude(d));
-		const data = processedData.data.filter(
-			(d) => d[SERIES_ID_KEY] === id && !isGapValue(getMagnitude(d))
-		);
-		if (data.length === 0) return [];
-		const outward = isLeft ? -1 : 1;
-		const at =
-			anchor === 'middle' ? (d: ProcessedRow) => signed(d) / 2 : anchor === 'end' ? 0 : signed;
-		const shift = anchor === 'middle' ? 0 : outward * (anchor === 'end' ? 4 : 6);
-		// Away from the baseline: left/right on a horizontal pyramid, down/up on a vertical one.
-		const awayAnchor = isHorizontal
-			? anchor === 'middle'
-				? 'middle'
-				: isLeft
-					? 'end'
-					: 'start'
-			: 'middle';
-		const awayLine = isHorizontal
-			? 'middle'
-			: anchor === 'middle'
-				? 'middle'
-				: isLeft
-					? 'top'
-					: 'bottom';
-		return [
-			{
-				type: 'text',
-				data,
-				[valueAxis]: at,
-				[categoryAxis]: series[categoryAxis] as TextMarkerConfig['y'],
-				text: (d: ProcessedRow) => format(magnitude(d), series.name, d),
-				styles: {
-					...font,
-					fill: font?.fill ?? ctx.cfg.axis.color,
-					fontSize: font?.fontSize ?? 12,
-					dx: font?.dx ?? (isHorizontal ? shift : 0),
-					dy: font?.dy ?? (isHorizontal ? 0 : -shift),
-					textAnchor: labels.textAnchor ?? awayAnchor,
-					lineAnchor: font?.lineAnchor ?? awayLine
-				}
-			} as TextMarkerConfig
-		];
-	});
 }
 
 /**
@@ -117,6 +45,13 @@ export function buildMarks<TData extends Record<string, unknown>>(
 	const categoryAxis = PlotAxes.categoryOf(state);
 	const valueAxis = PlotAxes.valueOf(state);
 	const isHorizontal = state.axes?.isHorizontal ?? true;
+	const labels = state.valueLabels?.show ? state.valueLabels : undefined;
+	/**
+	 * Where a series' labels sit on its bars, which run out from the shared baseline to its own side: left and right
+	 * of it on a horizontal pyramid, down and up on a vertical one.
+	 */
+	const anchorOf = (side: 'left' | 'right') =>
+		ValueLabels.boxAnchor(labels?.anchor ?? 'outside', { isHorizontal, negative: side === 'left' });
 	/** One bar's own channels: its category, and its span from the baseline to its signed value. */
 	const span = (category: unknown, to: unknown) =>
 		({
@@ -156,6 +91,17 @@ export function buildMarks<TData extends Record<string, unknown>>(
 				role: 'segment',
 				data: realData,
 				...span(processedCategory, signed),
+				// Each bar writes its own magnitude, on its side of the baseline.
+				...(labels
+					? {
+							label: labels.shapeLabel(
+								ctx,
+								(d) =>
+									labels.format(Math.abs(Number(getMagnitude(d as TData))), group.series.name, d),
+								{ fill: 'currentColor', ...anchorOf(group.series.side) }
+							)
+						}
+					: {}),
 				styles: {
 					// An outline asked for without a color is the fill's.
 					...(seg.styles.strokeWidth !== undefined

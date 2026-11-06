@@ -6,11 +6,8 @@
 	import TimelineRule from '$lib/layout/timeline/TimelineRule.svelte';
 	import { TimelineState } from '$lib/layout/timeline/TimelineState.svelte';
 	import { GridCellsRegistry } from '$lib/layout/grid/GridCellsRegistry.svelte';
-	import {
-		getConfiguration,
-		configToCssVars,
-		cssVarsStyle
-	} from '$lib/configuration/config.svelte';
+	import ConfigVars from '$lib/configuration/ConfigVars.svelte';
+	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { HoverState } from '$lib/layout/hover/HoverState.svelte';
 	import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 	import { LegendLabels } from '$lib/layout/legend/LegendLabels';
@@ -165,17 +162,13 @@
 			plot={body}
 		/>
 	{:else}
-		<!-- No chrome means no container to stamp the `--dct-*` vars that facet and timeline chrome read. -->
-		<div
-			style={cssVarsStyle(configToCssVars(cfg))}
-			style:font-family="var(--dct-font, inherit)"
-			style:width="{w}px"
-			style:height="{h}px"
-		>
+		<div style:font-family="var(--dct-font, inherit)" style:width="{w}px" style:height="{h}px">
 			{@render body({ width: w, height: h })}
 		</div>
 	{/if}
 {/snippet}
+
+<ConfigVars />
 
 {#if grid}
 	<GridCell class="dct-grid-cell--figure" {area} {inset}>

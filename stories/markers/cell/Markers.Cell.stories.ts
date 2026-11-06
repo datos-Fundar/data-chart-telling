@@ -56,7 +56,7 @@ export const Basic: Story = {
 				data: CELLS,
 				x: 'col',
 				y: 'row',
-				fill: (d: { value: number }) => colorFor(d.value)
+				styles: { fill: (d: { value: number }) => colorFor(d.value) }
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
@@ -71,9 +71,29 @@ export const CustomStyle: Story = {
 				data: CELLS,
 				x: 'col',
 				y: 'row',
-				fill: (d: { value: number }) => colorFor(d.value),
-				inset: 4,
-				styles: { stroke: '#4c1d95', strokeWidth: 1, borderRadius: 6 }
+				styles: {
+					fill: (d: { value: number }) => colorFor(d.value),
+					inset: 4,
+					stroke: '#4c1d95',
+					strokeWidth: 1,
+					borderRadius: 6
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};
+
+/** `label` writes a text in each cell, fitted to the cell - see `Markers/Rect` for what fitting does. */
+export const Label: Story = {
+	args: {
+		markers: [
+			{
+				type: 'cell',
+				data: CELLS,
+				x: 'col',
+				y: 'row',
+				styles: { fill: (d: { value: number }) => colorFor(d.value) },
+				label: { text: 'value', styles: { fill: 'white', fontSize: 16 } }
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

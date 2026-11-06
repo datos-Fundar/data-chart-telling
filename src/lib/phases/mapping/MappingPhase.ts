@@ -43,7 +43,8 @@ export class MappingPhase<
 			opacity: MappingPhase.#channel(state.opacity),
 			symbol: MappingPhase.#channel(state.symbol),
 			r: size(state.r),
-			length: size(state.length)
+			length: size(state.length),
+			value: MappingPhase.#channel(state.value)
 		} as ResolvedChannels<Record<string, unknown>>;
 
 		const next = { ...state, channels } as TState;

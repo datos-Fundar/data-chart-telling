@@ -1,3 +1,4 @@
+import { MarkerStyles } from '$lib/phases/markers/MarkerStyles';
 import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import { GeoSegments } from '$lib/plots/map/geo/GeoSegments';
 import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
@@ -93,7 +94,7 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 		data: group.data,
 		fill: (d) => group.style.fill ?? resolveBaseFill(d as TaggedGeoFeature<TProps>),
 		fillOpacity: group.style.fillOpacity ?? group.opacity ?? fillOpacity ?? 1,
-		stroke: group.style.stroke ?? stroke ?? cfg.axis.color,
+		stroke: group.style.stroke ?? stroke ?? 'currentColor',
 		strokeWidth: group.style.strokeWidth ?? strokeWidth ?? 0.5,
 		hover: hoverable,
 		onclick: onFeatureClick ? (e, d) => onFeatureClick(d as TaggedGeoFeature<TProps>, e) : undefined
@@ -105,9 +106,12 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 		(m): m is GeoHoverMarkerConfig => m.type === 'geo-hover'
 	);
 
-	const markers: MarkerConfig[] = MarkerChannels.inheritAll(
-		[...behindMarkers, ...featureMarkers, ...frontMarkers, ...(hoverMarker ? [hoverMarker] : [])],
-		state.scales as never
+	const markers: MarkerConfig[] = MarkerStyles.resolveAll(
+		MarkerChannels.inheritAll(
+			[...behindMarkers, ...featureMarkers, ...frontMarkers, ...(hoverMarker ? [hoverMarker] : [])],
+			state.scales as never
+		),
+		{ cfg: ctx.cfg }
 	);
 
 	return { ...state, markers, styleGroups };

@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
 import { AGE_SHARES_BY_YEAR, HEIGHT_DENSITY } from '$datasets';
-import type { LegendSection } from '$lib/types/layout/legend';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// Each grouped area shows in the legend under its group's name and color.
-// Clicking a legend entry toggles that area on and off: by default it dims,
-// or with `interactive.disabled: { mode: 'omit' }` it is removed entirely.
+// Each grouped area shows in the automatic legend under its group's name and color.
+// With `legend.series.interactive`, clicking an entry toggles that area on and off: by default it dims,
+// or with `interactive.disabled: { mode: 'omit' }` it is removed entirely, and with
+// `{ mode: 'rescale' }` removed while the rest of a stack makes its whole again.
 
 const meta = {
 	title: 'Plots/Evolution/AreaPlot/Legend',
@@ -30,40 +30,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * One interactive item per sex; `mode` sets what a toggled-off area does.
- * Items follow the data's own series order (male first), since a legend item
- * takes its color from its position in this list.
- */
-function sexLegend(mode: 'dim' | 'hide' | 'omit'): LegendSection[] {
-	return [
-		{
-			type: 'discrete',
-			title: 'Sex',
-			interactive: { enabled: true, ...(mode !== 'dim' ? { disabled: { mode } } : {}) },
-			items: [
-				{ name: 'male', label: 'Male', symbol: 'square' },
-				{ name: 'female', label: 'Female', symbol: 'square' }
-			]
-		}
-	];
-}
-
-/** One interactive item per age group, in the data's own series order. */
-function ageLegend(mode: 'dim' | 'hide' | 'omit'): LegendSection[] {
-	return [
-		{
-			type: 'discrete',
-			title: 'Age group',
-			interactive: { enabled: true, ...(mode !== 'dim' ? { disabled: { mode } } : {}) },
-			items: ['0-14', '15-29', '30-44', '45-64', '65+'].map((name) => ({
-				name,
-				symbol: 'square' as const
-			}))
-		}
-	];
-}
-
-/**
  * Clicking a legend entry dims that area instead of hiding it: its fill fades
  * to the legend's disabled opacity while the other area keeps its color. Here
  * the two sexes overlap, so the dimmed one stays readable behind the other.
@@ -74,7 +40,7 @@ export const LegendDisabledDimsArea: Story = {
 		x: 'height',
 		y: 'density',
 		color: 'sex',
-		legend: sexLegend('dim')
+		legend: { series: { title: 'Sex', interactive: { enabled: true } } }
 	}
 };
 
@@ -85,7 +51,7 @@ export const LegendOmitRescalesDomain: Story = {
 		x: 'height',
 		y: 'density',
 		color: 'sex',
-		legend: sexLegend('omit')
+		legend: { series: { title: 'Sex', interactive: { enabled: true, disabled: { mode: 'omit' } } } }
 	}
 };
 
@@ -101,7 +67,7 @@ export const LegendDisabledDimsStacked: Story = {
 		color: 'ageGroup',
 		transforms: [{ type: 'stackY' }],
 		scales: { y: { domain: [0, 100] } },
-		legend: ageLegend('dim')
+		legend: { series: { title: 'Age group', interactive: { enabled: true } } }
 	}
 };
 
@@ -117,7 +83,9 @@ export const LegendHideKeepsStack: Story = {
 		y: 'share',
 		color: 'ageGroup',
 		transforms: [{ type: 'stackY' }],
-		legend: ageLegend('hide')
+		legend: {
+			series: { title: 'Age group', interactive: { enabled: true, disabled: { mode: 'hide' } } }
+		}
 	}
 };
 
@@ -132,6 +100,26 @@ export const LegendOmitRescalesStack: Story = {
 		y: 'share',
 		color: 'ageGroup',
 		transforms: [{ type: 'stackY' }],
-		legend: ageLegend('omit')
+		legend: {
+			series: { title: 'Age group', interactive: { enabled: true, disabled: { mode: 'omit' } } }
+		}
+	}
+};
+
+/**
+ * Stacked, `interactive.disabled: { mode: 'rescale' }` removes a toggled-off age group and scales the others up to
+ * the whole each year had: the stack still reaches 100%, each band now a share of the groups left. Compare with
+ * `LegendOmitRescalesStack`, where the top drops to what the remaining groups add up to.
+ */
+export const LegendRescaleKeepsWhole: Story = {
+	args: {
+		data: AGE_SHARES_BY_YEAR,
+		x: 'year',
+		y: 'share',
+		color: 'ageGroup',
+		transforms: [{ type: 'stackY' }],
+		legend: {
+			series: { title: 'Age group', interactive: { enabled: true, disabled: { mode: 'rescale' } } }
+		}
 	}
 };

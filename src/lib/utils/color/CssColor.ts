@@ -15,18 +15,8 @@ export class CssColor {
 
 	/** Parses any CSS color syntax (hex, rgb(), oklch(), named colors, hsl(), ...) into an `[r, g, b]` (0-255) triple, or `null` if it can't be resolved. */
 	static parse(color: string): Rgb | null {
-		const hex = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(color.trim());
-		if (hex) {
-			const digits =
-				hex[1].length === 3
-					? hex[1]
-							.split('')
-							.map((c) => c + c)
-							.join('')
-					: hex[1];
-			const num = parseInt(digits, 16);
-			return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
-		}
+		const hex = CssColor.#hex(color);
+		if (hex) return [hex[0], hex[1], hex[2]];
 		const rgb = /^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)/i.exec(color);
 		if (rgb) return [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])];
 
@@ -55,30 +45,86 @@ export class CssColor {
 		return (Math.max(lA, lB) + 0.05) / (Math.min(lA, lB) + 0.05);
 	}
 
+	/** The WCAG 2 AA contrast ratio for normal text. */
+	static readonly AA = 4.5;
+
 	/**
-	 * The `candidates` entry with the highest WCAG contrast ratio against
-	 * `background`. Defaults to plain white/black; pass a grayscale or other
-	 * palette to widen the choice. Falls back to the first candidate when
-	 * `background` can't be parsed.
+	 * The `candidates` entry with the highest WCAG contrast ratio against an opaque `background`. Defaults to plain
+	 * white/black; pass a grayscale or other palette to widen the choice. When none reaches `minRatio` (WCAG AA for
+	 * normal text by default), white or black is taken instead, whichever reads better - one of them always reaches
+	 * 4.5 on an opaque color. Falls back to the first candidate when `background` can't be parsed.
 	 */
-	static contrastText(background: string, candidates: string[] = ['#ffffff', '#000000']): string {
+	static contrastText(
+		background: string,
+		candidates: string[] = ['#ffffff', '#000000'],
+		minRatio: number = CssColor.AA
+	): string {
+		const best = (colors: string[]) =>
+			colors.reduce(
+				(top, color) => {
+					const ratio = CssColor.contrastRatio(background, color);
+					return ratio > top.ratio ? { color, ratio } : top;
+				},
+				{ color: colors[0], ratio: -Infinity }
+			);
 		if (candidates.length === 0) return '#000000';
-		let best = candidates[0];
-		let bestRatio = -Infinity;
-		for (const candidate of candidates) {
-			const ratio = CssColor.contrastRatio(background, candidate);
-			if (ratio > bestRatio) {
-				bestRatio = ratio;
-				best = candidate;
-			}
-		}
-		return best;
+		const own = best(candidates);
+		if (own.ratio >= minRatio) return own.color;
+		const plain = best(['#ffffff', '#000000']);
+		return plain.ratio > own.ratio ? plain.color : own.color;
+	}
+
+	/** The opacity of a CSS color, from 0 to 1: its alpha (`rgba()`, `#rrggbbaa`...), 0 for `transparent`, else 1. */
+	static alpha(color: string): number {
+		const trimmed = CssColor.resolve(color).trim();
+		if (trimmed === 'transparent') return 0;
+		const hex = CssColor.#hex(trimmed);
+		if (hex) return hex[3];
+		const own = /^(?:rgba?|hsla?|oklch|oklab|lab|lch)\(([^)]*)\)$/i.exec(trimmed);
+		if (!own) return 1;
+		const parts = own[1].split(/[\s,/]+/).filter(Boolean);
+		const slashed = own[1].includes('/');
+		const value = slashed || parts.length === 4 ? parts.at(-1) : undefined;
+		if (value === undefined) return 1;
+		const alpha = value.endsWith('%') ? Number(value.slice(0, -1)) / 100 : Number(value);
+		return Number.isFinite(alpha) ? Math.max(0, Math.min(1, alpha)) : 1;
+	}
+
+	/**
+	 * The opaque color `color` is seen as, drawn at `opacity` (times its own alpha) over `backdrop`, as a browser
+	 * blends it. A backdrop that is not opaque counts as white, the page under it. `color` as it is when unreadable.
+	 */
+	static composite(color: string, opacity = 1, backdrop = '#ffffff'): string {
+		const own = CssColor.parse(CssColor.resolve(color));
+		if (!own) return color;
+		const alpha = Math.max(0, Math.min(1, CssColor.alpha(color) * opacity));
+		if (alpha >= 1) return `rgb(${own.join(', ')})`;
+		const under =
+			CssColor.alpha(backdrop) >= 1 ? CssColor.parse(CssColor.resolve(backdrop)) : undefined;
+		const base = under ?? [255, 255, 255];
+		const mixed = own.map((c, i) => Math.round(c * alpha + base[i] * (1 - alpha)));
+		return `rgb(${mixed.join(', ')})`;
+	}
+
+	/** A hex color's `[r, g, b]` (0-255) and alpha (0-1), in its 3, 4, 6 or 8 digit form. */
+	static #hex(color: string): [number, number, number, number] | null {
+		const match = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.exec(color.trim());
+		if (!match) return null;
+		const digits =
+			match[1].length <= 4
+				? match[1]
+						.split('')
+						.map((c) => c + c)
+						.join('')
+				: match[1];
+		const byte = (i: number) => parseInt(digits.slice(i, i + 2), 16);
+		return [byte(0), byte(2), byte(4), digits.length === 8 ? byte(6) / 255 : 1];
 	}
 
 	static #luminance([r, g, b]: Rgb): number {
 		const [rs, gs, bs] = [r, g, b].map((c) => {
 			const s = c / 255;
-			return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+			return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
 		});
 		return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
 	}

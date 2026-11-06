@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { RowStyle } from '$lib/markers/utils/RowStyle';
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { RuleX, RuleY } from 'svelteplot';
 	import type { AxisValue } from '$lib/types/layout/mapping';
 	import { RowStroke } from '$lib/markers/utils/RowStroke';
@@ -14,6 +16,7 @@
 	 * straight through to svelteplot's own `RuleX`/`RuleY`.
 	 */
 	const { marker }: { marker: RuleMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const axis = $derived(marker.axis);
 	const data = $derived(marker.data);
@@ -34,21 +37,28 @@
 	 */
 	const position = $derived(data ? value : (d: { v: AxisValue }) => d.v);
 
-	/** Each row's own stroke, over the marker's `styles`. */
+	/** Each row's stroke: the marker's `styles`, which can be functions of the row. */
 	const row = $derived(
-		RowStroke.of(marker, styles, { stroke: 'currentColor', strokeWidth: 1, strokeOpacity: 1 })
+		RowStroke.of(styles, rows, { stroke: 'currentColor', strokeWidth: 1, strokeOpacity: 1 })
 	);
 </script>
 
 <RuleMark
+	{...events.props}
 	data={rows}
 	{...axis === 'x'
 		? { x: position, y1: marker.y1, y2: marker.y2 }
 		: { y: position, x1: marker.x1, x2: marker.x2 }}
-	inset={marker.inset}
+	inset={RowStyle.field(marker.styles?.inset)}
 	{...axis === 'x'
-		? { insetTop: marker.insetTop, insetBottom: marker.insetBottom }
-		: { insetLeft: marker.insetLeft, insetRight: marker.insetRight }}
+		? {
+				insetTop: RowStyle.field(marker.styles?.insetTop),
+				insetBottom: RowStyle.field(marker.styles?.insetBottom)
+			}
+		: {
+				insetLeft: RowStyle.field(marker.styles?.insetLeft),
+				insetRight: RowStyle.field(marker.styles?.insetRight)
+			}}
 	stroke={row.stroke}
 	strokeWidth={row.strokeWidth}
 	strokeOpacity={row.strokeOpacity}

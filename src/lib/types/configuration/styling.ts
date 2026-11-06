@@ -82,7 +82,7 @@ export type PlotStylesConfig = {
 	/** Default shape cycle for the `symbol` channel, in order. */
 	symbols: SymbolType[];
 
-	/** The default continuous ramp, the on-cell label colour and the default opacity-channel range. */
+	/** The default continuous ramp and the default opacity-channel range. */
 	continuous: {
 		/** The ramp's first color, when it is not a named `scheme`. */
 		min: string;
@@ -92,7 +92,6 @@ export type PlotStylesConfig = {
 		scheme?: string;
 		/** The part of `scheme` to use, as `[from, to]` fractions of it: `[0.2, 1]` skips the near-white start of `'blues'`. */
 		schemeRange?: [number, number];
-		labelColor: string;
 		opacityRange: [number, number];
 	};
 
@@ -275,6 +274,20 @@ export type PlotStylesConfig = {
 		};
 	};
 
+	/** The tiles of a `TreemapPlot` and the labels written on them. */
+	treemap: {
+		/** The line between tiles. */
+		stroke: string;
+		/** Its width, in px. */
+		strokeWidth: number;
+		/** Font size of a tile's label, in px. */
+		fontSize: number;
+		/** The room kept between a tile's edge and its label, in px. */
+		padding: number;
+		/** Line height of a tile's label, as a multiple of its font size. */
+		lineHeight: number;
+	};
+
 	/** Timeline gutter styling. */
 	timeline: {
 		axisColor: string;
@@ -374,6 +387,19 @@ export type PlotStylesConfig = {
 
 	/** Default text-marker behavior. */
 	text: {
+		/** Defaults of the `label` a shape writes in itself (`rect`, `cell`, `bar`, `waffle`), each overridden by the label's own `gap` and `fit`. */
+		label: {
+			/** Pixels between a label and the edge it is anchored to. */
+			gap: number;
+			/** Pixels a fitted label keeps free inside each edge of its shape. */
+			padding: number;
+			/** The smallest size a fitted label is written at, in px. */
+			minFontSize: number;
+			/** The fewest letters worth writing when a fitted label is cut short; under them its `fallback` is written. */
+			minLetters: number;
+			/** The colors a label inside its shape is written in: the one that reads best on the shape's color. A label's own `fill` wins. */
+			contrast: string[];
+		};
 		/** Geometry and connector of a decluttered text marker (`declutter`) - e.g. LinePlot's end-of-line value labels. */
 		declutter: {
 			/** Shortest lane's distance (px) from the point before a connector bends. */

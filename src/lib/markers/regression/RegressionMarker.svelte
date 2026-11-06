@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { RegressionX, RegressionY } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import type { RegressionMarkerConfig } from '$lib/types/markers/common';
@@ -18,6 +19,7 @@
 	 * active, never exposed as its own style option.
 	 */
 	let { marker }: { marker: RegressionMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 
 	const plot = usePlot();
 	const isHorizontal = $derived(plot.axes?.isHorizontal ?? false);
@@ -27,6 +29,7 @@
 </script>
 
 <RegressionMark
+	{...events.props}
 	{data}
 	x={marker.x}
 	y={marker.y}

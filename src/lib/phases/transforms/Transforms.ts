@@ -7,6 +7,7 @@ import { NormalizeTransform } from '$lib/phases/transforms/methods/NormalizeTran
 import { PositionTransform } from '$lib/phases/transforms/methods/PositionTransform';
 import { OrderTransform } from '$lib/phases/transforms/methods/OrderTransform';
 import { GroupTransform } from '$lib/phases/transforms/methods/GroupTransform';
+import { TreemapTransform } from '$lib/phases/transforms/methods/TreemapTransform';
 import type { Row, TransformAdapter } from '$lib/types/phases/transforms/adapter';
 
 /** Each transform type's adapter: its channels, how it runs, and its own fixes. */
@@ -50,7 +51,8 @@ const ADAPTERS: Record<MarkerTransform['type'], TransformAdapter> = {
 	groupX: GroupTransform.x,
 	groupY: GroupTransform.y,
 	groupZ: GroupTransform.z,
-	group: GroupTransform.grid
+	group: GroupTransform.grid,
+	treemap: TreemapTransform.adapter
 };
 
 /** Runs a marker's or a plot's transforms through svelteplot, one type's adapter at a time. */

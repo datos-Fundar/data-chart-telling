@@ -1,3 +1,4 @@
+import type { CommonMarkerEvents } from '$lib/types/markers/channels/commonMarkerEvents';
 import type { Accessor } from '$lib/types/plots/data/common';
 
 /**
@@ -6,7 +7,7 @@ import type { Accessor } from '$lib/types/plots/data/common';
  * pass `value` as an `(x, y) => number` sampler.
  */
 export type GeoContourMarkerConfig<TRow extends Record<string, unknown> = Record<string, unknown>> =
-	{
+	CommonMarkerEvents & {
 		type: 'contour';
 		data?: TRow[];
 		x?: Accessor<TRow, number>;

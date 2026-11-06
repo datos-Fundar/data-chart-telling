@@ -1,16 +1,43 @@
 import { vi } from 'vitest';
 
-/** Waits until the plot's own <svg> (else any) is present in the container - not a legend icon's. */
+/** The plot's own <svg> (else any) in the container - not a legend icon's. */
+const plotSvg = (container: Element): SVGElement | null =>
+	container.querySelector<SVGElement>('.dct-plot svg') ??
+	container.querySelector<SVGElement>('svg');
+
+/** Resolves after `count` animation frames. */
+const frames = async (count: number) => {
+	for (let i = 0; i < count; i++) await new Promise((resolve) => requestAnimationFrame(resolve));
+};
+
+/** How many frames the markup must hold still at first, and at most, and how long to wait overall. */
+const SETTLE = { from: 2, upTo: 32, timeout: 3000 };
+
+/**
+ * Waits until the plot's own <svg> is present in the container, then until its markup holds still: a plot
+ * lays itself out again once its margins and legend are measured, which a loaded runner does late, and a
+ * shape measured or sent a pointer event before that may be stale or replaced. A plot that is already
+ * still costs a couple of frames; each change doubles the quiet spell the next check asks for, so only a plot
+ * that keeps moving waits longer - never past `SETTLE.timeout` (an animation never settles).
+ */
 export async function waitForSvg(container: Element): Promise<SVGElement> {
-	let svg: SVGElement | null = null;
 	await vi.waitFor(
 		() => {
-			svg = container.querySelector('.dct-plot svg') ?? container.querySelector('svg');
-			if (!svg) throw new Error('SVG not yet rendered');
+			if (!plotSvg(container)) throw new Error('SVG not yet rendered');
 		},
 		{ timeout: 3000, interval: 50 }
 	);
-	return svg!;
+	const started = performance.now();
+	let spell = SETTLE.from;
+	let last = plotSvg(container)?.outerHTML;
+	while (performance.now() - started < SETTLE.timeout) {
+		await frames(spell);
+		const now = plotSvg(container)?.outerHTML;
+		if (now === last) break;
+		last = now;
+		spell = Math.min(spell * 2, SETTLE.upTo);
+	}
+	return plotSvg(container)!;
 }
 
 // svelteplot wraps each mark kind in its own <g class="…">; scoping by that

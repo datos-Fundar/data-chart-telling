@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Contour } from 'svelteplot';
 	import type { GeoContourMarkerConfig } from '$lib/types/markers/geo';
 
@@ -8,10 +9,12 @@
 	 * - this component only draws the contour itself.
 	 */
 	let { marker }: { marker: GeoContourMarkerConfig } = $props();
+	const events = MarkerEvents.use(() => marker);
 </script>
 
 <!-- No `?? 'none'` fallback: an unset `fill` should leave svelteplot's own default (`fill="none"`) in place, not run the literal string `'none'` through the color scale. -->
 <Contour
+	{...events.props}
 	class="contour"
 	data={marker.data}
 	x={marker.x}

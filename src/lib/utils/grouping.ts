@@ -1,6 +1,43 @@
 import { resolveAccessor } from '$lib/utils/accessors';
-import type { AxisValue } from '$lib/types/layout/mapping';
+import type { AxisValue, GroupingAccessor } from '$lib/types/layout/mapping';
 import type { Series, Accessor } from '$lib/types/plots/data/common';
+
+/**
+ * A plot's `grouping`, read into its levels. A dotted name is a field of the rows when they have one by that
+ * name, and the fields of its levels otherwise. Rows grouped by several levels make one key of them, dotted
+ * too (`'Tertiary.Finance'`), which is how `segments` names them.
+ */
+export class Grouping {
+	/** The separator between the levels of a grouping, and of the key they make together. */
+	static readonly SEPARATOR = '.';
+
+	/** The levels `grouping` names, outermost first: none when it is unset. */
+	static levels<TRow extends Record<string, unknown>>(
+		grouping: GroupingAccessor<TRow> | undefined,
+		rows: readonly TRow[] = []
+	): Accessor<TRow, unknown>[] {
+		if (grouping === undefined) return [];
+		if (typeof grouping !== 'string' || !grouping.includes(Grouping.SEPARATOR)) return [grouping];
+		if (rows.some((row) => grouping in row)) return [grouping];
+		return grouping.split(Grouping.SEPARATOR) as (keyof TRow & string)[];
+	}
+
+	/**
+	 * The key rows split into series by: a single level as it is - a field stays its name - and several as
+	 * the key their values make together. `nested` takes the outermost level alone, for a plot that draws
+	 * the inner ones itself (a treemap).
+	 */
+	static key<TRow extends Record<string, unknown>>(
+		grouping: GroupingAccessor<TRow> | undefined,
+		rows: readonly TRow[] = [],
+		nested = false
+	): Accessor<TRow, unknown> | undefined {
+		const levels = Grouping.levels(grouping, rows);
+		if (levels.length <= 1 || nested) return levels[0];
+		const reads = levels.map((level) => resolveAccessor<TRow>(level));
+		return (row: TRow) => reads.map((read) => String(read(row))).join(Grouping.SEPARATOR);
+	}
+}
 
 /**
  * Splits rows into ordered groups keyed by the stringified accessor value.

@@ -30,7 +30,7 @@ export type Topology = {
 };
 
 /**
- * Data contract for GeoPlot - the geo analog of {@link DataProps}/{@link SeriesProps}
+ * Data contract for GeoPlot - the geo analog of {@link DualAxisDataProps}/{@link SeriesProps}
  * (`$lib/types/plots/data/common`). There's no x/y axis pair for geographic data:
  * `data` IS the map.
  */

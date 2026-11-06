@@ -392,7 +392,7 @@ describe('ClevelandPlot markers', () => {
 				styles: { connector: { arrow: true, from: 'lo', to: 'mid' } }
 			});
 			expect(arrows).toHaveLength(1);
-			const [{ data, headLength, headAngle, insetStart, insetEnd }] = arrows;
+			const [{ data, headLength, headAngle, styles }] = arrows;
 			// `a`: lo 1 to mid 5 - the arrow - and 5-9 beyond it, a line; `b` has no mid, so no arrow.
 			expect(data).toEqual([
 				expect.objectContaining({
@@ -405,7 +405,7 @@ describe('ClevelandPlot markers', () => {
 			expect(headLength).toBe(DEFAULT_CONFIG.connector.arrow.headLength);
 			expect(headAngle).toBe(DEFAULT_CONFIG.connector.arrow.headAngle);
 			// The shaft stops at the edge of the dots.
-			expect([insetStart, insetEnd]).toEqual([
+			expect([styles?.insetStart, styles?.insetEnd]).toEqual([
 				DEFAULT_CONFIG.cleveland.dotRadius,
 				DEFAULT_CONFIG.cleveland.dotRadius
 			]);

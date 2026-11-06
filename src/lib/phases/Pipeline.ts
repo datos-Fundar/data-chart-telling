@@ -27,7 +27,7 @@ import type { FacetConfig } from '$lib/types/layout/facet';
 import type { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import type { HoverStrategy } from '$lib/types/layout/hover';
 import type { Accessor } from '$lib/types/plots/data/common';
-import type { ChannelName, ResolvedChannel } from '$lib/types/layout/mapping';
+import type { ChannelName, GroupingAccessor, ResolvedChannel } from '$lib/types/layout/mapping';
 import { PlotInteraction } from '$lib/layout/interaction/PlotInteraction.svelte';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
 import type { PlotAxes } from '$lib/phases/data/PlotAxes';
@@ -39,7 +39,7 @@ export type AxisPipelineProps<TData extends Record<string, unknown>> = {
 	data?: TData[];
 	x?: Accessor<TData, unknown>;
 	y?: Accessor<TData, unknown>;
-	grouping?: Accessor<TData, unknown>;
+	grouping?: GroupingAccessor<TData>;
 	color?: Accessor<TData, unknown>;
 	opacity?: unknown;
 	r?: unknown;
@@ -49,6 +49,7 @@ export type AxisPipelineProps<TData extends Record<string, unknown>> = {
 	error?: Accessor<TData, unknown>;
 	target?: unknown;
 	ranges?: unknown[];
+	value?: Accessor<TData, unknown>;
 	segments?: unknown;
 	styles?: { gaps?: unknown; values?: unknown };
 	scales?: object;
@@ -323,6 +324,7 @@ export class Pipeline<TState, TCtx = unknown> {
 			error: props.error,
 			target: props.target,
 			ranges: props.ranges,
+			value: props.value,
 			segments: props.segments ?? {},
 			styles: props.styles,
 			gaps: props.styles?.gaps,
