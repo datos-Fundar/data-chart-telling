@@ -12,9 +12,9 @@ describe('Timeline (rule)', () => {
 		setConfiguration({ timeline: { activeColor: '#e6580d' } });
 		const { container } = render(Timeline, { ...props, orientation: 'vertical' });
 		const current = [...container.querySelectorAll('text')].find((t) => t.textContent === '2020')!;
-		await expect.poll(() => current.style.fill).toBe('rgb(230, 88, 13)');
+		await expect.poll(() => getComputedStyle(current).fill).toBe('rgb(230, 88, 13)');
 		setConfiguration({ timeline: { activeColor: '#0f766e' } });
-		await expect.poll(() => current.style.fill).toBe('rgb(15, 118, 110)');
+		await expect.poll(() => getComputedStyle(current).fill).toBe('rgb(15, 118, 110)');
 	});
 
 	test("reads its sizes and opacities from the configuration's `timeline.rule`", async () => {

@@ -2,11 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { PlotBoxSnippet } from '$lib/types/layout/figure';
 	import type { PlotChromeEntry, PlotChromeItem } from '$lib/types/plots/props';
-	import {
-		getConfiguration,
-		configToCssVars,
-		cssVarsStyle
-	} from '$lib/configuration/config.svelte';
+	import { getConfiguration } from '$lib/configuration/config.svelte';
 
 	/**
 	 * A figure's chrome - a plot's or a composer's - drawn by its `Figure`. It owns the fixed footprint (`width`/`height`),
@@ -175,10 +171,6 @@
 
 	let bodyWidth = $state(0);
 	let bodyHeight = $state(0);
-
-	// Stamp every `--dct-*` custom property on the root so the scoped styles below
-	// (and any nested plot/legend/timeline) resolve them from the live config.
-	const themeStyle = $derived(cssVarsStyle(configToCssVars(getConfiguration())));
 </script>
 
 {#snippet cell(block: Cell)}
@@ -217,7 +209,7 @@
 	{/if}
 {/snippet}
 
-<div class="dct-figure-chrome" style={themeStyle} style:width="{width}px" style:height="{height}px">
+<div class="dct-figure-chrome" style:width="{width}px" style:height="{height}px">
 	{#each blocks as block (block.key)}
 		{#if block.type === 'divider'}
 			<hr class="dct-figure-chrome__divider" />

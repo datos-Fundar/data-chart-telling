@@ -317,7 +317,7 @@
 <div
 	class="dct-plot"
 	bind:this={containerEl}
-	style:color={cfg.axis.color}
+	style:color={`var(--dct-axis-color, ${cfg.axis.color})`}
 	style:touch-action={touchAction}
 	onpointermove={hover.active ? onMove : undefined}
 	onpointerleave={hover.active ? ctrl.onLeave : undefined}

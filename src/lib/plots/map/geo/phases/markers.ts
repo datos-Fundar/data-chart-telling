@@ -94,7 +94,7 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 		data: group.data,
 		fill: (d) => group.style.fill ?? resolveBaseFill(d as TaggedGeoFeature<TProps>),
 		fillOpacity: group.style.fillOpacity ?? group.opacity ?? fillOpacity ?? 1,
-		stroke: group.style.stroke ?? stroke ?? cfg.axis.color,
+		stroke: group.style.stroke ?? stroke ?? 'currentColor',
 		strokeWidth: group.style.strokeWidth ?? strokeWidth ?? 0.5,
 		hover: hoverable,
 		onclick: onFeatureClick ? (e, d) => onFeatureClick(d as TaggedGeoFeature<TProps>, e) : undefined

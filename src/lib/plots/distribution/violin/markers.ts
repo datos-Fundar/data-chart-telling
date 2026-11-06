@@ -46,7 +46,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 			: typeof styles?.box === 'number'
 				? styles.box
 				: cfg.violin.boxWidth;
-	const ink = cfg.axis.color;
+	const ink = 'currentColor';
 
 	const violins = groups.flatMap((group, index) => {
 		const name = group.series.name;

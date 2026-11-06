@@ -48,6 +48,7 @@ export {
 	resetConfiguration,
 	configToCssVars,
 	cssVarsStyle,
+	cssVarsRule,
 	DEFAULT_CONFIG
 } from './configuration/config.svelte';
 export { THEMES } from './configuration/themes';

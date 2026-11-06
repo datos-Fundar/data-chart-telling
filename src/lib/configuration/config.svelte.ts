@@ -507,6 +507,15 @@ export function configToCssVars(c: PlotStylesConfig): Record<string, string> {
 	};
 }
 
+/**
+ * A CSS-vars record as one rule on the document root, with no specificity (`:where(:root)`): every element inherits
+ * them, and any rule of the author's that sets one - on a wrapping element too - wins over it.
+ */
+export function cssVarsRule(vars: Record<string, string>): string {
+	// A value never closes the `<style>` it is written in.
+	return `:where(:root){${cssVarsStyle(vars).replace(/</g, '')}}`;
+}
+
 /** Serialize a CSS-vars record into a `style` attribute string. */
 export function cssVarsStyle(vars: Record<string, string>): string {
 	return Object.entries(vars)

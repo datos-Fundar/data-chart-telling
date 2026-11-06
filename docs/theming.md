@@ -99,7 +99,7 @@ A plot overrides it with `scales.x.edgeTicks` or `scales.y.edgeTicks` (see [Scal
 
 ## CSS variables
 
-Some fields reach the DOM as CSS custom properties, which every figure sets on its root element and the components read with a fallback. Those can also be overridden with plain CSS on a wrapping element for a one-off, non-reactive tweak:
+Some fields reach the DOM as CSS custom properties, which the components read with a fallback. The configuration sets them once on the document root, as a rule with no specificity (`:where(:root)`), so plain CSS of your own overrides them - on a wrapping element, for one dashboard, or anywhere else:
 
 ```css
 .my-dashboard {

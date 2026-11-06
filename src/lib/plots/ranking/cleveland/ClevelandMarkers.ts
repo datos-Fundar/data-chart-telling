@@ -86,7 +86,7 @@ export class ClevelandMarkers {
 		// color and its segment's style; the legend dims it with the series.
 		const size = state.channels?.r;
 		const dotRadius = typeof size === 'number' ? size : style.dotRadius;
-		const neutral = style.connectorColor ?? cfg.axis.color;
+		const neutral = style.connectorColor ?? 'currentColor';
 		// `styles.stroke` is the connectors' look below everything the author sets for them: a segment's
 		// stroke wins over `styles.connector`, which wins over it. A function of the series styles only
 		// the connector of a lone dot, which has a series; the connector of several dots has none.
@@ -348,7 +348,7 @@ export class ClevelandMarkers {
 				text: 'text',
 				styles: {
 					...font,
-					fill: font?.fill ?? ctx.cfg.axis.color,
+					fill: font?.fill ?? 'currentColor',
 					fontSize: font?.fontSize ?? ctx.cfg.connector.labelFontSize,
 					dx: font?.dx ?? at.dx,
 					dy: font?.dy ?? at.dy,
@@ -400,7 +400,7 @@ export class ClevelandMarkers {
 		const fillOf = (series: string) =>
 			labels.fill ??
 			(labels.color === 'series' ? state.colorForSeries!(series) : undefined) ??
-			ctx.cfg.axis.color;
+			'currentColor';
 		const names =
 			labels.color === 'series' && !labels.fill
 				? (state.resolvedSeries ?? []).map((s) => s.name)

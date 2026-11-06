@@ -16,8 +16,7 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
  */
 export function buildValueLabels<TData extends Record<string, unknown>>(
 	labels: ValueLabels,
-	state: ScatterPlotState<TData>,
-	ctx: ScatterPlotCtx
+	state: ScatterPlotState<TData>
 ): TextMarkerConfig[] {
 	const { processedData } = state;
 	if (!processedData?.data.length) return [];
@@ -34,7 +33,7 @@ export function buildValueLabels<TData extends Record<string, unknown>>(
 			text: (d: ProcessedRow) => format(Number(valueOf(d)), nameOf(d), d),
 			styles: {
 				...font,
-				fill: font?.fill ?? ctx.cfg.axis.color,
+				fill: font?.fill ?? 'currentColor',
 				fontSize: font?.fontSize ?? 11,
 				fontWeight: font?.fontWeight ?? 500,
 				dx: font?.dx ?? 8,

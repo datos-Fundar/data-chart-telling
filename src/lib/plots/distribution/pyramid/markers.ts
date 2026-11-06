@@ -98,7 +98,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 								ctx,
 								(d) =>
 									labels.format(Math.abs(Number(getMagnitude(d as TData))), group.series.name, d),
-								{ fill: ctx.cfg.axis.color, ...anchorOf(group.series.side) }
+								{ fill: 'currentColor', ...anchorOf(group.series.side) }
 							)
 						}
 					: {}),

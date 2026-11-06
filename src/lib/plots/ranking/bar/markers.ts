@@ -138,7 +138,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 	const labelFor = (name: string, slice: BandSlice | undefined, negative: boolean) =>
 		labels && {
 			...labels.shapeLabel(ctx, (d) => labels.format(Number(valueRead(d)), name, d), {
-				fill: ctx.cfg.axis.color,
+				fill: 'currentColor',
 				...labelAnchor(negative)
 			}),
 			bandSlice: slice

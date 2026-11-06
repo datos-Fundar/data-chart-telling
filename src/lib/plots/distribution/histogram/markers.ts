@@ -39,7 +39,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		countRead ? Number(countRead(d)) : Number(position[value](d)) - Number(bottomOf(d));
 	const labelFor = (name: string) =>
 		labels?.shapeLabel(ctx, (d) => (countOf(d) > 0 ? labels.format(countOf(d), name, d) : ''), {
-			fill: ctx.cfg.axis.color,
+			fill: 'currentColor',
 			...ValueLabels.boxAnchor(labels.anchor, { isHorizontal: value === 'x' })
 		});
 
