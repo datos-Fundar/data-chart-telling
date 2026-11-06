@@ -275,7 +275,8 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		labelGap: 4
 	},
 
-	// Beside a vertical delta (taken on x), above a horizontal one (on y).
+	band: { fill: '#94a3b8', fillOpacity: 0.25 },
+
 	delta: {
 		text: {
 			x: { dx: 12, dy: 0, lineAnchor: 'middle', textAnchor: 'start' },

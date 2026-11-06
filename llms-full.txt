@@ -86,7 +86,7 @@ The timeline is a player bar by default: `timeline={{ accessor: 'year', player: 
 ## Markers
 
 Add with `markers={[{ type: '...' }]}`. For x/y plots:
-`area arrow bar bollinger box brush cell component delaunayLink delaunayMesh delta density difference dot hover hull image line raster rect regression rule text tick trail violin voronoi voronoiMesh waffle`.
+`area arrow band bar bollinger box brush cell component delaunayLink delaunayMesh delta density difference dot hover hull image line raster rect regression rule text tick trail violin voronoi voronoiMesh waffle`.
 GeoPlot: `graticule sphere dot text vector link contour inset geo-hover geo-component`.
 
 - `delta` annotates the difference between two series at a position: `{ type: 'delta', axis: 'x', at: 2020, from: { type: 'series', series: 'A' }, to: { type: 'series', series: 'B' }, formatDiff: (d) => d.toFixed(1) }`; `at` can be a list of positions, one delta at each (`at: [1991, 2001]`), and `line`, `text` and `dot` can be functions of the position (`text: (at) => at === 2022 ? { dx: -20, textAnchor: 'end' } : { dx: 20 }`).

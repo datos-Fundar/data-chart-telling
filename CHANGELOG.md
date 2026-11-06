@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- A `band` marker: the band of a category on a band scale, across the whole of the other axis - `{ type: 'band', axis: 'x', value: 'Salta' }`. `value` is a category or a list of them, or with `data` a field key or a function of the row; rows that name the same category draw one band. `slice` fills part of it, as the fractions of its width left out at each end (a grouped bar's series), and a band several rows share fills what all of their slices do. `styles` take `AreaStyle`, each field a value or a function of the row, over the configuration's new `band` (`{ fill: '#94a3b8', fillOpacity: 0.25 }`). It takes the pointer only with a handler of its own, and draws nothing on an axis that is not a band scale.
+
 ## [1.17.0] - 2026-11-06
 
 ### Added

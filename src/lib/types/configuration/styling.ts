@@ -377,6 +377,9 @@ export type PlotStylesConfig = {
 		labelGap: number;
 	};
 
+	/** The `band` marker's style, under its own `styles`. */
+	band: AreaStyle;
+
 	/** The `delta` marker's label offset and anchor, per axis the delta is taken on. A marker's own `text` wins. */
 	delta: {
 		text: Record<

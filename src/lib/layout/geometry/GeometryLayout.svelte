@@ -28,6 +28,7 @@
 	import DotMarker from '$lib/markers/dot/DotMarker.svelte';
 	import TextMarker from '$lib/markers/text/TextMarker.svelte';
 	import RuleMarker from '$lib/markers/rule/RuleMarker.svelte';
+	import BandMarker from '$lib/markers/band/BandMarker.svelte';
 	import HoverMarker from '$lib/markers/hover/HoverMarker.svelte';
 	import GeoHoverMarker from '$lib/markers/geo/GeoHoverMarker.svelte';
 	import DeltaMarker from '$lib/markers/delta/DeltaMarker.svelte';
@@ -210,6 +211,8 @@
 		<TextMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'rule'}
 		<RuleMarker {marker} />
+	{:else if marker.type === 'band'}
+		<BandMarker {marker} />
 	{:else if marker.type === 'geo'}
 		<GeoFeaturesMarker {marker} />
 	{:else if marker.type === 'graticule'}

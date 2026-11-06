@@ -11,6 +11,7 @@ export class MarkerKinds {
 	static readonly traits = {
 		area: { clip: true, drawsRows: true, legendSymbol: 'area' },
 		arrow: { clip: false, drawsRows: true },
+		band: { clip: true, drawsRows: false, legendSymbol: 'rect' },
 		bar: { clip: true, drawsRows: true, legendSymbol: 'bar' },
 		bollinger: { clip: true, drawsRows: true, legendSymbol: 'line' },
 		brush: { clip: false, drawsRows: false },
