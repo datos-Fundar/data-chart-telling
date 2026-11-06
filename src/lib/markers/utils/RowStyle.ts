@@ -21,6 +21,23 @@ export class RowStyle {
 		return style as T | undefined;
 	}
 
+	/**
+	 * The color each row is drawn with, as {@link of} reads `style`: a function of the row, the field of the rows a
+	 * string names, else the color itself. `undefined` when there is no color to read.
+	 */
+	static colorOf(
+		style: unknown,
+		rows?: readonly unknown[]
+	): ((row: unknown) => string | undefined) | undefined {
+		if (typeof style === 'function') return (row) => (style as (row: unknown) => string)(row);
+		if (typeof style !== 'string') return undefined;
+		if (RowStyle.#isField(style, rows)) {
+			const read = RowStyle.#read(style);
+			return (row) => read(row as Record<string, unknown>) as string | undefined;
+		}
+		return () => style;
+	}
+
 	/** An opacity: a number as it is, a string the field of the rows it names, a function of the row; the last two with no scale. */
 	static opacity(style: number | string | ((row: never) => number) | undefined) {
 		if (typeof style === 'function') return { value: style, scale: null } as never;

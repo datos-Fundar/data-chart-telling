@@ -234,7 +234,8 @@ export class ValueLabels {
 	/**
 	 * The `label` the shapes of a plot kind write their value in: this plot's `styles.values` over the `defaults` the kind
 	 * sets, with what every label shares ({@link hooks}) - its dimming and isolating of a series. A label inside its shape
-	 * never reaches out of the plot, so only one `outside` has the margins grow to hold it.
+	 * never reaches out of the plot, so only one `outside` has the margins grow to hold it; and it takes the default
+	 * `fill` only `outside`, for inside it is written in the color that contrasts with its shape.
 	 */
 	shapeLabel(
 		ctx: AxisPlotCtx,
@@ -260,7 +261,8 @@ export class ValueLabels {
 			styles: {
 				...shared,
 				...font,
-				fill: font?.fill ?? defaults.fill,
+				// Inside its shape, a label unset is written in the color that reads best on it.
+				fill: font?.fill ?? (defaults.outside ? defaults.fill : undefined),
 				fontSize: font?.fontSize ?? defaults.fontSize ?? 12,
 				fontWeight: font?.fontWeight ?? defaults.fontWeight
 			}

@@ -33,6 +33,9 @@ export type ProcessedData = {
 export type TransformsStageState = {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	resolvedSeries?: Series<any>[];
+	/** The series the legend took out of the rows, and how. */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	removedSeries?: { mode: 'omit' | 'rescale'; series: Series<any>[] };
 	/** The style every segment of a series is drawn over, which the processed groups are cut with too. */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	segmentBase?: (series: string) => any;
@@ -56,6 +59,12 @@ export type TransformsStageState = {
 export type TransformsStageOptions<TState extends TransformsStageState, TCtx> = {
 	/** The transforms to run. Defaults to the plot's own `transforms`. */
 	transforms?: (state: TState, ctx: TCtx) => MarkerTransform[];
+	/**
+	 * Whether a series the legend omits keeps its part of the whole (a treemap's tile): the transforms run over
+	 * its rows too, so every other part keeps its share and its place, and its own rows are dropped after.
+	 * Unset, an omitted series is not there for the transforms at all (a stack closes over it).
+	 */
+	keepsOmitted?: boolean;
 	/**
 	 * How the processed rows split into `processedGroups`: one group per series
 	 * (the default), or `'runs'` of consecutive rows from the same series, in

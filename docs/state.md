@@ -7,7 +7,7 @@ A plot's state - its hover, legend, timeline, margins, scales, rows and size - c
 Works anywhere inside a figure, including the `header`, `footer` and `content` snippets of a plot or composer. It returns:
 
 - `hover` - `activeX`, `activeY`, `activeSeries`, `strategy`, `sync`, `source` (the id of the plot owning the hover).
-- `legend` (or `null`) - `entries`, `range`, `off` (names of hidden series), `isOff(name)`, `turnOff(name, action)`, `turnOn(name)`, `toggle(name, action)`. `action` is `{ mode: 'dim' | 'hide' | 'omit' }`; `'omit'` removes the series and refits the axes.
+- `legend` (or `null`) - `entries`, `range`, `off` (names of hidden series), `isOff(name)`, `turnOff(name, action)`, `turnOn(name)`, `toggle(name, action)`. `action` is `{ mode: 'dim' | 'hide' | 'omit' | 'rescale' }`; `'omit'` removes the series and refits the axes, and `'rescale'` also makes the parts left of a whole (a stack, a treemap) the new 100%.
 - `timeline` (or `null`) - `enabled`, `steps`, `value`, `index`, `progress`, `playing`, `loop`, `speed`, `speeds`, `controls`, and `seek`, `seekIndex`, `seekValue`, `next`, `previous`, `play`, `pause`, `toggle`, `setLoop`, `setSpeed`, `cycleSpeed`. On a timeline of dates, `steps` and `value` are `Date`s and `seekValue` takes a `Date` or a date string.
 
 A footer that toggles series through the legend:

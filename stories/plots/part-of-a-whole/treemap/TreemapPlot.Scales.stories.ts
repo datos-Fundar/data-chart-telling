@@ -65,3 +65,41 @@ export const ColorPalette: Story = {
 		} satisfies AxisBasedScalesConfig
 	}
 };
+
+/**
+ * `scales.color.depth: 2` colors down to the second level: every sector keeps its color, and each kind of activity
+ * under it takes a tone of that color, so the tiles of one kind read together inside their sector.
+ */
+export const ColorsByKind: Story = {
+	args: {
+		...BASE,
+		grouping: 'sector.kind.branch',
+		scales: { color: { depth: 2 } } satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * `scales.color.depth: 3` reaches the leaves: every branch takes its own tone of its sector's color, the tones of
+ * one kind next to each other. The legend still lists the sectors, in their own colors.
+ */
+export const ColorsByBranch: Story = {
+	args: {
+		...BASE,
+		grouping: 'sector.kind.branch',
+		scales: { color: { depth: 3 } } satisfies AxisBasedScalesConfig
+	}
+};
+
+/** The tones follow the sectors' own colors, whatever `scheme` gives them. */
+export const TonesOfAScheme: Story = {
+	args: {
+		...BASE,
+		grouping: 'sector.kind.branch',
+		scales: {
+			color: {
+				depth: 3,
+				scheme: { Primary: '#7cb342', Secondary: '#5c6bc0', Tertiary: '#ef6c00' }
+			}
+		} satisfies AxisBasedScalesConfig
+	}
+};

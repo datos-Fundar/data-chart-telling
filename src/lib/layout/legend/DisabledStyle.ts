@@ -7,7 +7,7 @@ import type { DotStyle, StrokeStyle } from '$lib/types/plots/styling';
  * a call site slots it in as one more `??` layer ahead of its own style chain.
  */
 export class DisabledStyle {
-	/** The style `action` draws a mark with - `'hide'` and `'omit'` are fully transparent. */
+	/** The style `action` draws a mark with - `'hide'`, `'omit'` and `'rescale'` are fully transparent. */
 	static of(
 		action: LegendDisabledAction | undefined,
 		fallbackOpacity: number

@@ -161,7 +161,7 @@
 {#snippet discreteItem(item: LegendItem, i: number)}
 	{@const action = interaction.actionOf(item.name)}
 	{@const isDisabled = action != null}
-	{@const omitMode = (action ?? disabledAction).mode === 'omit'}
+	{@const omitMode = ['omit', 'rescale'].includes((action ?? disabledAction).mode)}
 	{@const disabledStyle = DisabledStyle.ofItem(action, cfg.legend.disabledOpacity)}
 	{@const color =
 		disabledStyle?.fill ??

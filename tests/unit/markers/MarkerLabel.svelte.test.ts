@@ -84,4 +84,50 @@ describe('markers with a label', () => {
 		await new Promise((resolve) => setTimeout(resolve, 150));
 		expect(written(svg)).toEqual([]);
 	});
+	test('a label inside its shape with no fill of its own contrasts with each shape', async () => {
+		const svg = await draw(HeatmapPlot as never, {
+			data: [],
+			x: 'col',
+			y: 'row',
+			markers: [
+				{
+					type: 'cell',
+					data: [
+						{ col: 'Mon', row: 'AM', value: 3, tone: '#1f2a44' },
+						{ col: 'Tue', row: 'AM', value: 7, tone: '#f4f1de' }
+					],
+					x: 'col',
+					y: 'row',
+					styles: { fill: 'tone' },
+					label: { text: 'value' }
+				}
+			] satisfies AxisBasedMarkersConfig[]
+		});
+		const fillOf = (text: string) =>
+			[...svg.querySelectorAll<SVGTextElement>('g.text text')].find(
+				(t) => t.textContent?.trim() === text
+			)?.style.fill;
+		await expect.poll(() => fillOf('3')).toBe('rgb(255, 255, 255)');
+		await expect.poll(() => fillOf('7')).toBe('rgb(17, 24, 39)');
+	});
+
+	test('a faded shape is read as it is seen: blended with the background', async () => {
+		const svg = await draw(HeatmapPlot as never, {
+			data: [],
+			x: 'col',
+			y: 'row',
+			markers: [
+				{
+					type: 'cell',
+					data: [{ col: 'Mon', row: 'AM', value: 3 }],
+					x: 'col',
+					y: 'row',
+					styles: { fill: '#1f2a44', fillOpacity: 0.15 },
+					label: { text: 'value' }
+				}
+			] satisfies AxisBasedMarkersConfig[]
+		});
+		const fill = () => svg.querySelector<SVGTextElement>('g.text text')?.style.fill;
+		await expect.poll(fill).toBe('rgb(17, 24, 39)');
+	});
 });

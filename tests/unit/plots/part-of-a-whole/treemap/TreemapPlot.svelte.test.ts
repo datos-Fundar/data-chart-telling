@@ -328,3 +328,84 @@ describe('TreemapPlot - hovering a tile', () => {
 			.toContain('42,1%');
 	});
 });
+
+describe('TreemapPlot - colors down the levels', () => {
+	const deep = { ...props, grouping: 'sector.kind.branch' } as const;
+
+	test('scales.color.depth 2 gives each kind a tone of its sector, depth 3 each branch', async () => {
+		const fills = async (depth: number) => {
+			const { container } = await render(TreemapPlot, { ...deep, scales: { color: { depth } } });
+			const svg = await waitForSvg(container);
+			await expect.poll(() => tiles(svg).length).toBe(ROWS.length);
+			return new Set(tiles(svg).map((t) => styleOf(t).fill)).size;
+		};
+		expect(await fills(1)).toBe(3);
+		// Terciarias has one kind (servicios), as does each other sector: three tones, one per sector.
+		expect(await fills(2)).toBe(3);
+		expect(await fills(3)).toBe(ROWS.length);
+	});
+});
+
+describe('TreemapPlot - a sector taken out by the legend', () => {
+	/** The share written on the tile whose label starts with `word` - a long name takes several lines. */
+	const shareOf = (svg: SVGElement, word: string) =>
+		labels(svg)
+			.find((lines) => lines[0]?.startsWith(word))
+			?.at(-1);
+
+	test("'omit' keeps every other tile's share of the whole", async () => {
+		const { container } = await render(TreemapPlot, {
+			...props,
+			legend: { off: { Terciarias: { mode: 'omit' } } }
+		});
+		const svg = await waitForSvg(container);
+		await expect.poll(() => tiles(svg).length).toBe(4);
+		// 3 of 49,94 is 6,0%, as with every sector on.
+		await expect.poll(() => shareOf(svg, 'Fabricación de sustancias')).toBe('6,0%');
+	});
+
+	test("'hide' makes its tiles and their labels transparent, in place", async () => {
+		const { container } = await render(TreemapPlot, {
+			...props,
+			legend: { off: { Terciarias: { mode: 'hide' } } }
+		});
+		const svg = await waitForSvg(container);
+		await expect.poll(() => tiles(svg).length).toBe(ROWS.length);
+		const hidden = tiles(svg).filter((t) => styleOf(t).fillOpacity === '0');
+		expect(hidden).toHaveLength(3);
+		const resto = Array.from(svg.querySelectorAll('g.text text')).find((t) =>
+			t.textContent?.startsWith('Resto')
+		);
+		// The opacity is on each line of the label.
+		const lines = Array.from(resto!.querySelectorAll('tspan'));
+		expect(lines.length).toBeGreaterThan(0);
+		expect(lines.every((line) => styleOf(line).fillOpacity === '0')).toBe(true);
+	});
+
+	test("'rescale' makes the sectors left the new whole", async () => {
+		const { container } = await render(TreemapPlot, {
+			...props,
+			legend: { off: { Terciarias: { mode: 'rescale' } } }
+		});
+		const svg = await waitForSvg(container);
+		await expect.poll(() => tiles(svg).length).toBe(4);
+		// 3 of the 5,94 left is 50,5%.
+		await expect.poll(() => shareOf(svg, 'Fabricación de sustancias')).toBe('50,5%');
+	});
+});
+
+describe('TreemapPlot - an interactive automatic legend', () => {
+	test("clicking a sector with 'rescale' makes the others the new whole", async () => {
+		const { container } = await render(TreemapPlot, {
+			...props,
+			legend: { series: { interactive: { enabled: true, disabled: { mode: 'rescale' } } } }
+		});
+		const svg = await waitForSvg(container);
+		await expect.poll(() => tiles(svg).length).toBe(ROWS.length);
+		const item = Array.from(container.querySelectorAll<HTMLElement>('.dct-discrete__item')).find(
+			(el) => el.textContent?.includes('Terciarias')
+		)!;
+		item.click();
+		await expect.poll(() => tiles(svg).length).toBe(4);
+	});
+});

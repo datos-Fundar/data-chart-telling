@@ -76,6 +76,8 @@ export type AxisPlotState<
 	/** What each position channel is, which one holds the categories, and which way the plot runs. */
 	axes?: PlotAxes;
 	resolvedSeries?: TSeries[];
+	/** The series the legend took out of the rows, and how (`'omit'` or `'rescale'`): a part of a whole still reads its whole from them. */
+	removedSeries?: { mode: 'omit' | 'rescale'; series: TSeries[] };
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	seriesGrouping?: Accessor<any, unknown>;
 	/** Every series name, before legend-omitted ones are dropped, so colors stay put. */
@@ -86,6 +88,8 @@ export type AxisPlotState<
 	flat?: TRow[];
 	scopedGroups?: ScopedMarkerGroup<TData>[];
 	colorForSeries?: (name: string) => string;
+	/** The color of a path of the `grouping` levels, outermost first, while `scales.color.depth` reaches past the outermost (see `ColorTones.hierarchy`). */
+	colorForPath?: (path: readonly string[]) => string;
 	/** A discrete mark's gap fills, per series id: the value each missing row is drawn at. */
 	gapFillMaps?: Map<string, Map<TData, DiscreteGapFill<TStyle>>>;
 

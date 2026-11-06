@@ -46,7 +46,8 @@ export class MarkersPhase<
 						state.scales as never
 					),
 					state.processedData
-				)
+				),
+				{ cfg: ctx.cfg, rows: state.processedData?.data }
 			)
 		};
 	};

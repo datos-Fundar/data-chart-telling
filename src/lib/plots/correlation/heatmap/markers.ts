@@ -137,7 +137,6 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		},
 		// Each cell writes its own value, in the middle of it.
 		label: labels?.shapeLabel(ctx, (d) => labels.format(Number(getColor(d as TData)), ''), {
-			fill: ctx.cfg.continuous.labelColor,
 			fontWeight: 600
 		})
 	}));

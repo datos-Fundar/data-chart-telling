@@ -346,6 +346,11 @@ describe('LegendText - names as the legend shows them', () => {
 		expect(LegendText.humanize('female')).toBe('Female');
 	});
 
+	test('the levels of a series grouped by several are made words each', () => {
+		expect(LegendText.humanize('Americas.Argentina')).toBe('Americas.Argentina');
+		expect(LegendText.humanize('north_east.ruralArea')).toBe('North east.Rural area');
+	});
+
 	test('legend.pretty off shows names as they are', () => {
 		expect(LegendText.of('gdp_per_capita', { legend: { pretty: false } } as never)).toBe(
 			'gdp_per_capita'

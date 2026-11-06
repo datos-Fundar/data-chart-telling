@@ -110,7 +110,8 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 		MarkerChannels.inheritAll(
 			[...behindMarkers, ...featureMarkers, ...frontMarkers, ...(hoverMarker ? [hoverMarker] : [])],
 			state.scales as never
-		)
+		),
+		{ cfg: ctx.cfg }
 	);
 
 	return { ...state, markers, styleGroups };

@@ -105,7 +105,7 @@ function buildMarks<TData extends Record<string, unknown>>(
 			ctx,
 			(row) => `${tileOf(row).name}
 ${shareText(row, series)}`,
-			{ fill: look.labelColor, fontSize: look.fontSize }
+			{ fontSize: look.fontSize }
 		);
 		return {
 			...shape,
@@ -117,16 +117,20 @@ ${shareText(row, series)}`,
 	return (state.processedGroups ?? []).flatMap((group) => {
 		const series = group.series.name;
 		const dimmed = ctx.interaction?.fillFor(series);
-		const color = state.colorForSeries!(series);
+		const seriesColor = state.colorForSeries!(series);
+		/** A tile's color: its series', or a tone of it by its path while `scales.color.depth` asks for one. */
+		const colorOf = (row: ProcessedRow) =>
+			state.colorForPath ? state.colorForPath(tileOf(row).path) : seriesColor;
 		return group.visualSegments.flatMap((segment) => {
-			const styled = new Map<string, { keys: string[]; rows: ProcessedRow[] }>();
+			const styled = new Map<string, { keys: string[]; color: string; rows: ProcessedRow[] }>();
 			for (const row of segment.data as ProcessedRow[]) {
 				const keys = pathKeysOf(state, row);
-				const id = keys.join('|');
-				const bucket = styled.get(id) ?? styled.set(id, { keys, rows: [] }).get(id)!;
+				const color = colorOf(row);
+				const id = JSON.stringify([keys, color]);
+				const bucket = styled.get(id) ?? styled.set(id, { keys, color, rows: [] }).get(id)!;
 				bucket.rows.push(row);
 			}
-			return [...styled.values()].map(({ keys, rows }): RectMarkerConfig => {
+			return [...styled.values()].map(({ keys, color, rows }): RectMarkerConfig => {
 				const style: BarSegmentStyle = Object.assign(
 					{},
 					segment.styles,
@@ -167,7 +171,8 @@ export function buildTreemapDefaults<TData extends Record<string, unknown>>(): A
 			nested: true,
 			segments: { color: (style) => style?.fill, connect: false, base: { flat: 'area' } }
 		},
-		transforms: { transforms: buildTransforms },
+		// An omitted sector keeps its tiles' room, and every other tile its share; a rescaled one does not.
+		transforms: { transforms: buildTransforms, keepsOmitted: true },
 		scales: {
 			defaults: () => ({
 				x: { axisDisplay: 'none', grid: false },

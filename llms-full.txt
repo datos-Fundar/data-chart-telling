@@ -77,7 +77,7 @@ Inside a plot's snippets (`header`, `footer`, tooltip `content`) or any child of
 
 - `useFigure()` returns `{ hover, legend, timeline }` for the whole figure.
 - `usePlot()` returns the same plus `margins`, `scales`, `axes`, `data`, `width`, `height`, `svelteplot` (inside a plot, e.g. a `component` marker).
-- `legend.off` (names of hidden series), `legend.isOff(name)`, `legend.toggle(name, action)`, `turnOff`, `turnOn`. `action` is `{ mode: 'dim' | 'hide' | 'omit' }`; `'omit'` removes the series and refits the axes, so the visible domain follows `legend.off`.
+- `legend.off` (names of hidden series), `legend.isOff(name)`, `legend.toggle(name, action)`, `turnOff`, `turnOn`. `action` is `{ mode: 'dim' | 'hide' | 'omit' | 'rescale' }`; `'omit'` removes the series and refits the axes, and `'rescale'` also makes the parts left of a whole (a stack, a treemap) the new 100%, so the visible domain follows `legend.off`.
 - `timeline.steps`, `value`, `progress`, `playing`, `seek(p)`, `seekValue(v)`, `next()`, `previous()`, `play()`, `pause()`, `toggle()`, `setSpeed()`.
 - `hover.activeX`, `activeY`, `activeSeries`, `source`.
 

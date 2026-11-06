@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import TreemapPlot from '$lib/plots/part-of-a-whole/treemap/Plot.svelte';
-import type { LegendSection } from '$lib/types/layout/legend';
 import { ACTIVITY_BRANCHES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -62,21 +61,46 @@ export const SectorOff: Story = {
 	}
 };
 
-/** Interactive entries: click one to dim its tiles. */
-export const InteractiveLegend: Story = {
+/**
+ * The automatic legend made interactive: click a sector to turn it off. By default it dims - its tiles stay where
+ * they are, faded, with their labels.
+ */
+export const InteractiveDim: Story = {
 	args: {
 		...BASE,
-		legend: [
-			{
-				type: 'discrete',
-				title: 'Sector',
-				interactive: { enabled: true },
-				items: [
-					{ name: 'Primary', symbol: 'square' },
-					{ name: 'Secondary', symbol: 'square' },
-					{ name: 'Tertiary', symbol: 'square' }
-				]
-			}
-		] satisfies LegendSection[]
+		legend: { series: { interactive: { enabled: true } } }
+	}
+};
+
+/**
+ * `disabled: { mode: 'omit' }` takes a sector out: its tiles are gone, and the rest keep their place and their
+ * share of the whole economy - the room it took stays empty.
+ */
+export const InteractiveOmit: Story = {
+	args: {
+		...BASE,
+		legend: { series: { interactive: { enabled: true, disabled: { mode: 'omit' } } } }
+	}
+};
+
+/**
+ * `disabled: { mode: 'rescale' }` takes a sector out and makes the rest the new whole: the tiles fill the plot
+ * again, and each share is of what is left - turn Tertiary off and Chemicals goes from 3.8% to 29.2%.
+ */
+export const InteractiveRescale: Story = {
+	args: {
+		...BASE,
+		legend: { series: { interactive: { enabled: true, disabled: { mode: 'rescale' } } } }
+	}
+};
+
+/**
+ * `disabled: { mode: 'hide' }` makes a sector's tiles fully transparent, labels included. The other tiles keep their
+ * place and their share, as with `'omit'`.
+ */
+export const InteractiveHide: Story = {
+	args: {
+		...BASE,
+		legend: { series: { interactive: { enabled: true, disabled: { mode: 'hide' } } } }
 	}
 };

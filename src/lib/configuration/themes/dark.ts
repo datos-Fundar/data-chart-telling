@@ -11,7 +11,7 @@ export const DARK_THEME: PlotStylesConfigInput = {
 	caption: { color: '#94a3b8' },
 	legend: { gap: '0.5rem 1.5rem', swatchSize: '1rem' },
 	palette: ['#38bdf8', '#f472b6', '#a3e635', '#fbbf24', '#c084fc'],
-	continuous: { min: '#1e293b', max: '#38bdf8', labelColor: '#e5e7eb' },
+	continuous: { min: '#1e293b', max: '#38bdf8' },
 	axis: { color: '#94a3b8', fontSize: 13, xTickSize: 6, yTickSize: 6 },
 	tooltip: { background: '#e5e7eb', color: '#0f172a' },
 	facet: {

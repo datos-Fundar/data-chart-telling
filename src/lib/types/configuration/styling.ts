@@ -82,7 +82,7 @@ export type PlotStylesConfig = {
 	/** Default shape cycle for the `symbol` channel, in order. */
 	symbols: SymbolType[];
 
-	/** The default continuous ramp, the on-cell label colour and the default opacity-channel range. */
+	/** The default continuous ramp and the default opacity-channel range. */
 	continuous: {
 		/** The ramp's first color, when it is not a named `scheme`. */
 		min: string;
@@ -92,7 +92,6 @@ export type PlotStylesConfig = {
 		scheme?: string;
 		/** The part of `scheme` to use, as `[from, to]` fractions of it: `[0.2, 1]` skips the near-white start of `'blues'`. */
 		schemeRange?: [number, number];
-		labelColor: string;
 		opacityRange: [number, number];
 	};
 
@@ -281,8 +280,6 @@ export type PlotStylesConfig = {
 		stroke: string;
 		/** Its width, in px. */
 		strokeWidth: number;
-		/** The color of a tile's label. */
-		labelColor: string;
 		/** Font size of a tile's label, in px. */
 		fontSize: number;
 		/** The room kept between a tile's edge and its label, in px. */
@@ -394,6 +391,8 @@ export type PlotStylesConfig = {
 			minFontSize: number;
 			/** The fewest letters worth writing when a fitted label is cut short; under them its `fallback` is written. */
 			minLetters: number;
+			/** The colors a label inside its shape is written in: the one that reads best on the shape's color. A label's own `fill` wins. */
+			contrast: string[];
 		};
 		/** Geometry and connector of a decluttered text marker (`declutter`) - e.g. LinePlot's end-of-line value labels. */
 		declutter: {

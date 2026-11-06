@@ -27,7 +27,7 @@ A part-to-whole made of rectangles: each row is a tile whose **area** is its `va
 ![A treemap of branches of activity, sized by value and colored by sector](../../images/treemap.png)
 
 - A row without a positive `value` has no tile.
-- `grouping` is the **whole path** of a tile, its fields joined by dots, outermost first: `grouping="sector.kind.branch"` nests the tiles by sector, then by kind, and names each one after its branch. A function is a single level. Rows with the same path are one tile, their values added up, so `grouping="sector"` alone makes three big tiles. The outermost level colors the tiles and is what the [legend](../../legend.md) lists; `scales.color` sets the colors, as in any plot. Without `grouping`, `color` groups the tiles, as it groups the series of any plot.
+- `grouping` is the **whole path** of a tile, its fields joined by dots, outermost first: `grouping="sector.kind.branch"` nests the tiles by sector, then by kind, and names each one after its branch. A function is a single level. Rows with the same path are one tile, their values added up, so `grouping="sector"` alone makes three big tiles. The outermost level colors the tiles and is what the [legend](../../legend.md) lists; `scales.color` sets the colors, as in any plot. Without `grouping`, `color` groups the tiles, as it groups the series of any plot. `scales.color.depth` colors deeper levels as tones of their sector's color: `2` a tone per kind, `3` per branch (see [Scales](../../scales.md#color)).
 - How a rectangle is split among its tiles is an option of the plot's own `treemap` transform: `transforms={[{ type: 'treemap', tile: 'binary' }]}` sets it over the one the plot builds from `value` and `grouping`. `tile` is `'squarify'` (the default, which keeps them close to squares), `'binary'`, `'slice'`, `'dice'` or `'sliceDice'`.
 - Tiles have no axes.
 
@@ -44,7 +44,7 @@ Each tile is labelled with its name and its **share of the whole**, in percent, 
 
 ## Style
 
-`styles.area` styles every tile - `fillOpacity`, `stroke`, `strokeWidth`, `strokeDasharray`, `borderRadius` - over the color of its group (a `fill` there wins over it). A group turned off in the [legend](../../legend.md) dims its tiles and their labels.
+`styles.area` styles every tile - `fillOpacity`, `stroke`, `strokeWidth`, `strokeDasharray`, `borderRadius` - over the color of its group (a `fill` there wins over it). A group turned off in the [legend](../../legend.md) dims its tiles and their labels. With `disabled: { mode: 'omit' }` its tiles are gone and the rest keep their place and share, and with `{ mode: 'rescale' }` the rest fill the plot as the new whole, each share of what is left.
 
 ## Segments
 

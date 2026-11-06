@@ -60,4 +60,59 @@ describe('CssColor.contrastText', () => {
 		// (contrast ~8.3:1 vs ~2.5:1 for white).
 		expect(CssColor.contrastText('oklch(70% 0.135 153.45)')).toBe('#000000');
 	});
+	test('falls back to white or black when no candidate reaches WCAG AA', () => {
+		// Neither white nor #111827 (both ~4.2:1) reaches 4.5:1 on this green; black does (~4.9:1).
+		const green = '#009000';
+		expect(CssColor.contrastRatio(green, '#ffffff')).toBeLessThan(CssColor.AA);
+		expect(CssColor.contrastText(green, ['#ffffff', '#111827'])).toBe('#000000');
+	});
+
+	test('keeps a candidate that reaches the ratio asked for', () => {
+		expect(CssColor.contrastText('#f4f1de', ['#ffffff', '#111827'])).toBe('#111827');
+		expect(CssColor.contrastText('#009000', ['#ffffff', '#777777'], 3)).toBe('#ffffff');
+	});
+
+	test('white or black reaches AA on every opaque color', () => {
+		for (let v = 0; v < 256; v += 5) {
+			for (const rgb of [
+				[v, v, v],
+				[v, 0, 0],
+				[0, v, 0],
+				[0, 0, v],
+				[v, v, 0],
+				[255, v, v]
+			]) {
+				const color = `rgb(${rgb.join(', ')})`;
+				const text = CssColor.contrastText(color, ['#ffffff', '#111827']);
+				expect(CssColor.contrastRatio(color, text)).toBeGreaterThanOrEqual(CssColor.AA);
+			}
+		}
+	});
+});
+
+describe('CssColor.alpha', () => {
+	test('reads the alpha of rgba(), the slash syntax and 8 digit hex', () => {
+		expect(CssColor.alpha('rgba(0, 0, 0, 0.25)')).toBe(0.25);
+		expect(CssColor.alpha('rgb(0 0 0 / 40%)')).toBe(0.4);
+		expect(CssColor.alpha('#00000080')).toBeCloseTo(0.5, 2);
+		expect(CssColor.alpha('transparent')).toBe(0);
+		expect(CssColor.alpha('#123456')).toBe(1);
+		expect(CssColor.alpha('rgb(1, 2, 3)')).toBe(1);
+	});
+});
+
+describe('CssColor.composite', () => {
+	test('an opaque color is itself', () => {
+		expect(CssColor.composite('#1f2a44')).toBe('rgb(31, 42, 68)');
+	});
+
+	test('a see-through color blends with its backdrop', () => {
+		expect(CssColor.composite('#000000', 0.5, '#ffffff')).toBe('rgb(128, 128, 128)');
+		expect(CssColor.composite('rgba(0, 0, 0, 0.5)', 1, '#ffffff')).toBe('rgb(128, 128, 128)');
+		expect(CssColor.composite('#ffffff', 0.5, '#000000')).toBe('rgb(128, 128, 128)');
+	});
+
+	test('a backdrop that is not opaque counts as white', () => {
+		expect(CssColor.composite('#000000', 0.5, 'transparent')).toBe('rgb(128, 128, 128)');
+	});
 });

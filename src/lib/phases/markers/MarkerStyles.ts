@@ -1,9 +1,14 @@
+import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
+import { RowStyle } from '$lib/markers/utils/RowStyle';
+import { CssColor } from '$lib/utils/color/CssColor';
+import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { LineStyle } from '$lib/types/plots/constants';
 
 /**
  * A plot's markers with their styles as svelteplot reads them, before any is drawn: a named line style
  * (`strokeDasharray: 'dashed'`) is the SVG dash pattern it stands for, wherever in a marker's config it is
- * set - its `styles`, a label's, a part's (a box's whiskers). A marker component draws what it is given.
+ * set - its `styles`, a label's, a part's (a box's whiskers) - and a label inside its shape with no `fill` of its
+ * own is written in the color that reads best on the shape's. A marker component draws what it is given.
  */
 export class MarkerStyles {
 	/** The SVG dash pattern each named line style stands for; a solid line has none. */
@@ -20,9 +25,68 @@ export class MarkerStyles {
 	/** Fields that hold rows rather than config, which are never walked. */
 	static readonly #ROW_KEYS = new Set(['data', 'features']);
 
-	/** Every marker of `markers`, resolved. A marker with nothing to resolve is kept as it is. */
-	static resolveAll<T>(markers: T[]): T[] {
-		return markers.map((marker) => MarkerStyles.#walk(marker) as T);
+	/**
+	 * Every marker of `markers`, resolved. A marker with nothing to resolve is kept as it is. `rows` are what a
+	 * marker with no `data` of its own draws.
+	 */
+	static resolveAll<T>(markers: T[], plot: { cfg?: PlotStylesConfig; rows?: unknown[] } = {}): T[] {
+		return markers.map((marker) => MarkerStyles.#contrasted(MarkerStyles.#walk(marker), plot) as T);
+	}
+
+	/** The marker with its label inside its shape written in the candidate that reads best on each row's color. */
+	static #contrasted(marker: unknown, plot: { cfg?: PlotStylesConfig; rows?: unknown[] }): unknown {
+		const { cfg } = plot;
+		if (!cfg || !MarkerStyles.#isPlain(marker)) return marker;
+		const label = marker.label as { outside?: boolean; styles?: { fill?: unknown } } | undefined;
+		if (!MarkerStyles.#isPlain(label) || label.outside || label.styles?.fill !== undefined) {
+			return marker;
+		}
+		const colorOf = MarkerStyles.#shapeColor(
+			marker,
+			(marker.data as unknown[]) ?? plot.rows ?? [],
+			cfg
+		);
+		if (!colorOf) return marker;
+		const candidates = cfg.text.label.contrast;
+		const opacityOf = MarkerStyles.#opacity(
+			(marker.styles as { fillOpacity?: unknown } | undefined)?.fillOpacity
+		);
+		// What the label is read on: the shape's color, blended with the plot's background as far as it is see-through.
+		const fill = (row: unknown) => {
+			const color = colorOf(row);
+			if (!color) return undefined;
+			const seen = CssColor.composite(color, opacityOf(row), cfg.background);
+			return CssColor.contrastText(seen, candidates);
+		};
+		return { ...marker, label: { ...label, styles: { ...label.styles, fill } } };
+	}
+
+	/** The opacity each row's shape is drawn with: a number, the field of the rows a string names, a function of the row. */
+	static #opacity(style: unknown): (row: unknown) => number {
+		const read =
+			typeof style === 'function'
+				? (row: unknown) => (style as (row: unknown) => unknown)(row)
+				: typeof style === 'string'
+					? (row: unknown) => (row as Record<string, unknown> | undefined)?.[style]
+					: () => style;
+		return (row) => {
+			const value = Number(read(row) ?? 1);
+			return Number.isFinite(value) ? value : 1;
+		};
+	}
+
+	/** The color each row's shape is drawn with: the marker's `color` channel, else its `styles.fill`. */
+	static #shapeColor(
+		marker: Record<string, unknown>,
+		rows: unknown[],
+		cfg: PlotStylesConfig
+	): ((row: unknown) => string | undefined) | undefined {
+		const fill = (marker.styles as { fill?: unknown } | undefined)?.fill;
+		return (
+			MarkerChannels.buildFill(rows, marker.color as never, marker.scales as never, cfg) ??
+			RowStyle.colorOf(fill, rows) ??
+			(marker.type === 'waffle' ? () => cfg.palette[0] : undefined)
+		);
 	}
 
 	/** A dash pattern for `style`: a named line style's, any other as it is; a function of the row gives each row's. */

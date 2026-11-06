@@ -80,8 +80,11 @@ A numeric axis takes `prefix`, `suffix`, `decimals` and `signDisplay` to write i
 | `schemeRange` | The part of a named `scheme` to use, as `[from, to]` fractions of it (default `[0, 1]`): `[0.3, 1]` skips the near-white start of a ramp like `'blues'`                                        |
 | `pivot`       | Splits an array `scheme` into two halves meeting at this value (a diverging ramp)                                                                                                              |
 | `unknown`     | Color of a value outside the mapping (default `#ccc`)                                                                                                                                          |
+| `depth`       | With a `grouping` of several levels, the level the colors reach (default `1`, a color per outermost value); deeper, each value down to it takes a tone of its outermost value's color          |
 
 A continuous ramp is set with `scheme: [colorA, colorB]`. Categorical colors come from the configuration's `palette` unless `scheme` is a category-to-color record. Series that follow one another (years, say) read better on a named sequential ramp, which is sampled across the series in order: `scheme: 'blues', schemeRange: [0.3, 1]`.
+
+With `grouping: 'sector.kind.branch'`, `depth: 2` keeps each sector's color and gives every kind under it a tone of it; `depth: 3` gives every branch its own tone, those of one kind next to each other. A plot that splits its series by every level (a line per `'continent.country'`) colors them the same way, and a [treemap](plots/part-of-a-whole/treemap.md), which nests them, colors its tiles. The tones are `ColorTones` (`colorTones(color, count)` and `hierarchicalColors(paths, depth, colorOf)` in the package), for any page of your own that colors a hierarchy.
 
 A marker can carry its own `scales.color`, independent of the plot's, so two ramps can coexist in one plot.
 
