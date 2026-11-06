@@ -48,11 +48,17 @@ export class TimelineSteps {
 		return values[Math.min(values.length - 1, Math.max(0, index))];
 	}
 
-	/** The continuous time `progress` is at across the steps, eased - `0` without steps. */
-	timeAt(progress: number, easing: EasingFn): number {
+	/**
+	 * The continuous time `progress` is at across the steps, eased - `0` without steps. Within `snap` (a fraction
+	 * of the span) of the last step it is at it: a scrubber that stops a hair short of `1` (a scrolled step's
+	 * last position, say) still shows everything, with an eased tail that long gone to the end.
+	 */
+	timeAt(progress: number, easing: EasingFn, snap = 0): number {
 		const { first, last } = this;
 		if (first === undefined || last === undefined) return 0;
-		return first + (last - first) * easing(progress);
+		const span = last - first;
+		const time = first + span * easing(progress);
+		return last - time < span * snap ? last : time;
 	}
 
 	/** The step closest to `time`, or `undefined` without steps. */

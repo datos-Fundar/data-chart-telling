@@ -34,6 +34,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - Everything a marker is drawn with now goes in its `styles`, which takes a function of the row for any field: the `stroke`, `strokeWidth` and `strokeOpacity` of `rule` and `arrow` (they took a field key or a function beside `styles`), the `fill` and `fillOpacity` of `text` and the `fill` of `cell`, and the insets - `inset`, `insetLeft`, `insetRight`, `insetTop` and `insetBottom` of `rect`, `bar`, `cell` and `rule`, `inset`, `insetStart` and `insetEnd` of `arrow`. The field keys they took stay, now in `styles`: `styles: { stroke: 'color' }`.
 
+## [1.16.0] - 2026-11-04
+
+### Fixed
+
+- A timeline tweened with `interpolate` is at its last step once `progress` comes within `timeline.snap` (default `1e-4`, a ten-thousandth of the span; `0` turns it off) of it. A scrubber that stops a hair short of `1` - a scrolled step ends at `0.97` - drew the line all the way to the end with its easing, but left out the last row: its dot, and a marker like a `delta` placed on it.
+
 ## [1.15.0] - 2026-11-04
 
 ### Fixed

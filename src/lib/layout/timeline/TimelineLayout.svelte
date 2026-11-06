@@ -2,6 +2,7 @@
 	import { untrack } from 'svelte';
 	import { resolveAccessor } from '$lib/utils/accessors';
 	import TimelineFrame from '$lib/layout/timeline/TimelineFrame.svelte';
+	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { TimelineSteps } from '$lib/layout/timeline/TimelineSteps';
 	import { TimelineTime } from '$lib/layout/timeline/TimelineTime';
 	import { Interpolation } from '$lib/utils/Interpolation';
@@ -82,7 +83,9 @@
 	const segmentEasingFn = $derived(Interpolation.buildEasing(interpolate?.segmentEasing));
 
 	/** Continuous scrub position across the full step domain - only meaningful when `interpolate` is set. */
-	const currentTime = $derived(steps.timeAt(progress, progressEasingFn));
+	const currentTime = $derived(
+		steps.timeAt(progress, progressEasingFn, getConfiguration().timeline.snap)
+	);
 
 	const selectedValue = $derived(
 		(interpolate ? steps.nearest(currentTime) : steps.at(progress)) ?? 0
