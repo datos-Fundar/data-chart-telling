@@ -31,7 +31,7 @@ type Story = StoryObj<typeof meta>;
 const BASE = {
 	data: ACTIVITY_BRANCHES,
 	value: 'value',
-	grouping: ['sector', 'branch']
+	grouping: 'sector.branch'
 } as const;
 
 // ── Stories ───────────────────────────────────────────────────────────────────

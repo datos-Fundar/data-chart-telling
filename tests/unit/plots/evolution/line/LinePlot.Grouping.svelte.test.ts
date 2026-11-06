@@ -9,7 +9,7 @@ const DATA = ['CABA', 'GBA'].flatMap((region) =>
 	)
 );
 
-describe('LinePlot - grouping as a list', () => {
+describe('LinePlot - grouping by several levels', () => {
 	test('a single field splits the rows into one line per value', async () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
@@ -23,14 +23,14 @@ describe('LinePlot - grouping as a list', () => {
 		expect(countLinePaths(svg)).toBe(2);
 	});
 
-	test('a list of fields splits them by the combination of the levels', async () => {
+	test('a dotted name splits them by the combination of its levels', async () => {
 		const { container } = await render(LinePlot, {
 			width: 400,
 			height: 300,
 			data: DATA,
 			x: 'year',
 			y: 'value',
-			grouping: ['region', 'sex']
+			grouping: 'region.sex'
 		});
 		const svg = await waitForSvg(container);
 		expect(countLinePaths(svg)).toBe(4);

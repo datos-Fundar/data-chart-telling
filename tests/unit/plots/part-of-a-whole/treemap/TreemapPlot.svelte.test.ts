@@ -2,7 +2,7 @@ import { render } from 'vitest-browser-svelte';
 import { describe, expect, test } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import TreemapPlot from '$lib/plots/part-of-a-whole/treemap/Plot.svelte';
-import type { TreemapTooltipTile } from '$lib/types/plots/part-of-a-whole/treemap/props';
+import type { TreemapTooltipContext } from '$lib/types/plots/part-of-a-whole/treemap/props';
 import { waitForSvg } from '../../_helpers/svg';
 
 type Row = { sector: string; branch: string; kind: string; value: number };
@@ -37,7 +37,7 @@ const props = {
 	height: 500,
 	data: ROWS,
 	value: 'value',
-	grouping: ['sector', 'branch']
+	grouping: 'sector.branch'
 } as const;
 
 const rects = (svg: SVGElement) =>
@@ -71,7 +71,7 @@ describe('TreemapPlot', () => {
 	test('names a tile by the last level of its grouping, and nests them by all', async () => {
 		const { container } = await render(TreemapPlot, {
 			...props,
-			grouping: ['sector', 'kind', 'branch']
+			grouping: 'sector.kind.branch'
 		});
 		const svg = await waitForSvg(container);
 		await expect.poll(() => tiles(svg).length).toBe(ROWS.length);
@@ -85,10 +85,46 @@ describe('TreemapPlot', () => {
 		await expect.poll(() => labels(svg).flat().includes('Terciarias')).toBe(true);
 	});
 
+	test('groups by color when grouping is unset, as every plot does', async () => {
+		const { container } = await render(TreemapPlot, {
+			width: 800,
+			height: 500,
+			data: ROWS,
+			value: 'value',
+			color: 'sector'
+		});
+		const svg = await waitForSvg(container);
+		await expect.poll(() => tiles(svg).length).toBe(3);
+		expect(new Set(tiles(svg).map((t) => styleOf(t).fill)).size).toBe(3);
+	});
+
+	test('takes a grouping function as a single level', async () => {
+		const { container } = await render(TreemapPlot, {
+			...props,
+			grouping: (row: Record<string, unknown>) => String(row.sector).toUpperCase()
+		});
+		const svg = await waitForSvg(container);
+		await expect.poll(() => tiles(svg).length).toBe(3);
+		await expect.poll(() => labels(svg).flat().includes('TERCIARIAS')).toBe(true);
+	});
+
+	test('takes the options of its own treemap transform: tile', async () => {
+		const { container } = await render(TreemapPlot, {
+			...props,
+			grouping: 'sector',
+			transforms: [{ type: 'treemap', tile: 'dice' }]
+		});
+		const svg = await waitForSvg(container);
+		await expect.poll(() => tiles(svg).length).toBe(3);
+		// 'dice' sets the tiles side by side: every one spans the whole height.
+		const heights = new Set(tiles(svg).map((t) => Math.round(t.getBoundingClientRect().height)));
+		expect(heights.size).toBe(1);
+	});
+
 	test('colors the tiles by the outermost grouping level, one color per group', async () => {
 		const { container } = await render(TreemapPlot, {
 			...props,
-			grouping: ['sector', 'kind', 'branch']
+			grouping: 'sector.kind.branch'
 		});
 		const svg = await waitForSvg(container);
 		await expect.poll(() => tiles(svg).length).toBe(ROWS.length);
@@ -176,6 +212,18 @@ describe('TreemapPlot', () => {
 		expect(opacities.filter((o) => o === '1')).toHaveLength(ROWS.length - 3);
 	});
 
+	test('draws a named dash style as its dash pattern', async () => {
+		const { container } = await render(TreemapPlot, {
+			...props,
+			styles: { area: { strokeDasharray: 'dashed' } }
+		});
+		const svg = await waitForSvg(container);
+		await expect.poll(() => tiles(svg).length).toBe(ROWS.length);
+		expect(new Set(tiles(svg).map((t) => styleOf(t).strokeDasharray))).toEqual(
+			new Set(['6px, 4px'])
+		);
+	});
+
 	test("styles a group's tiles by its segment, over styles.area and under nothing else", async () => {
 		const { container } = await render(TreemapPlot, {
 			...props,
@@ -202,7 +250,7 @@ describe('TreemapPlot', () => {
 describe('TreemapPlot - segments by the path of a tile', () => {
 	const GOLD = 'rgb(255, 215, 0)';
 	const GREEN = 'rgb(0, 128, 0)';
-	const deep = { ...props, grouping: ['sector', 'kind', 'branch'] };
+	const deep = { ...props, grouping: 'sector.kind.branch' };
 
 	test("'Sector.kind' styles the tiles under that kind, over the sector's segment", async () => {
 		const { container } = await render(TreemapPlot, {
@@ -252,12 +300,12 @@ describe('TreemapPlot - hovering a tile', () => {
 		expect(container.querySelector('.dct-tooltip')?.textContent).toContain('42,1%');
 	});
 
-	test("gives a tooltip's format the tile as its third argument, with the share computed", async () => {
+	test("gives a tooltip's format the share of the tile in its context, and its series", async () => {
 		const { container } = await render(TreemapPlot, {
 			...props,
 			tooltip: {
-				format: (_row: unknown, _number: unknown, tile: TreemapTooltipTile) =>
-					`${tile.path.join(' > ')} = ${tile.share.toFixed(0)}`
+				format: (row: Record<string, unknown>, _number: unknown, context: TreemapTooltipContext) =>
+					`${context.series} > ${row.branch} = ${row.value} = ${context.share.toFixed(0)}`
 			}
 		});
 		const svg = await waitForSvg(container);
@@ -265,7 +313,7 @@ describe('TreemapPlot - hovering a tile', () => {
 		await userEvent.hover(page.elementLocator(biggest(svg)));
 		await expect
 			.poll(() => container.querySelector('.dct-tooltip')?.textContent)
-			.toContain('Terciarias > Resto = 42');
+			.toContain('Terciarias > Resto = 21 = 42');
 	});
 
 	test('reads the same when the values are percentages already', async () => {

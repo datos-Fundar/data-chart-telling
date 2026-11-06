@@ -36,15 +36,19 @@ describe.each([['vertical', false] as const, ['horizontal', true] as const])(
 			for (let i = 0; i < 2; i++) {
 				hitRects[i].dispatchEvent(new PointerEvent('pointerenter'));
 				hitRects[i].dispatchEvent(new PointerEvent('pointermove', { bubbles: true }));
-				await vi.waitFor(() => expect(svg.querySelector('g.dot path, g.dot circle')).toBeTruthy());
-				const dotBox = svg.querySelector('g.dot path, g.dot circle')!.getBoundingClientRect();
-				const dotCenter = horizontal
-					? (dotBox.top + dotBox.bottom) / 2
-					: (dotBox.left + dotBox.right) / 2;
 				const ownBar = barRects[i];
 				const ownRange = horizontal ? [ownBar.top, ownBar.bottom] : [ownBar.left, ownBar.right];
-				expect(dotCenter).toBeGreaterThanOrEqual(ownRange[0] - 1);
-				expect(dotCenter).toBeLessThanOrEqual(ownRange[1] + 1);
+				// Read inside the wait: the previous hover's dot may still be drawn for a frame.
+				await vi.waitFor(() => {
+					const dot = svg.querySelector('g.dot path, g.dot circle');
+					expect(dot).toBeTruthy();
+					const dotBox = dot!.getBoundingClientRect();
+					const dotCenter = horizontal
+						? (dotBox.top + dotBox.bottom) / 2
+						: (dotBox.left + dotBox.right) / 2;
+					expect(dotCenter).toBeGreaterThanOrEqual(ownRange[0] - 1);
+					expect(dotCenter).toBeLessThanOrEqual(ownRange[1] + 1);
+				});
 			}
 		});
 	}

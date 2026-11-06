@@ -31,7 +31,7 @@ type Story = StoryObj<typeof meta>;
 const BASE = {
 	data: ACTIVITY_BRANCHES,
 	value: 'value',
-	grouping: ['sector', 'branch']
+	grouping: 'sector.branch'
 } as const;
 
 /** The same branches with their value as a percentage of the whole already. */
@@ -46,9 +46,9 @@ export const BasicTooltip: Story = {
 };
 
 /**
- * `format` receives the hovered row, `number` - which writes a value as the tooltip's `decimals`, `prefix`,
- * `suffix` and `signDisplay` ask - and the `tile`: its `name`, its `path` through the `grouping` levels, its
- * summed `value` and its `share` of the whole, from 0 to 100.
+ * `format` receives the hovered row - a tile's row, whose `value` is the tile's sum - then `number`, which writes
+ * a value as the tooltip's `decimals`, `prefix`, `suffix` and `signDisplay` ask, and the `context`: the tile's
+ * `series` (its outermost level) and its `share` of the whole, from 0 to 100.
  */
 export const CustomFormat: Story = {
 	args: {
@@ -56,8 +56,8 @@ export const CustomFormat: Story = {
 		tooltip: {
 			decimals: 0,
 			suffix: ' %',
-			format: (_row, number, tile) =>
-				`${tile.path.join(' › ')}\n${tile.value.toLocaleString()} M - ${number(tile.share)} of the whole`
+			format: (row, number, context) =>
+				`${context.series} › ${row.branch}\n${Number(row.value).toLocaleString()} M - ${number(context.share)} of the whole`
 		}
 	}
 };
@@ -70,7 +70,8 @@ export const ShareIsComputed: Story = {
 	args: {
 		...BASE,
 		tooltip: {
-			format: (_row, _number, tile) => `${tile.name}: ${tile.share.toFixed(1)}% of the economy`
+			format: (row, _number, context) =>
+				`${row.branch}: ${context.share.toFixed(1)}% of the economy`
 		}
 	}
 };
@@ -83,17 +84,17 @@ export const PrecomputedPercentages: Story = {
 	args: {
 		...BASE,
 		data: PERCENTAGES,
-		tooltip: { format: (_row, _number, tile) => `${tile.name}: ${tile.share.toFixed(1)}%` }
+		tooltip: { format: (row, _number, context) => `${row.branch}: ${context.share.toFixed(1)}%` }
 	}
 };
 
-/** Every row is its own tooltip, so a nested treemap reads the same, with the path of the tile. */
+/** Every row is its own tooltip, so a nested treemap reads the same, with the fields of each level. */
 export const NestedTooltip: Story = {
 	args: {
 		...BASE,
-		grouping: ['sector', 'kind', 'branch'],
+		grouping: 'sector.kind.branch',
 		tooltip: {
-			format: (_row, _number, tile) => `${tile.path.slice(0, -1).join(' › ')}\n${tile.name}`
+			format: (row) => `${row.sector} › ${row.kind}\n${row.branch}`
 		}
 	}
 };

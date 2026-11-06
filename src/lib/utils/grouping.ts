@@ -1,33 +1,42 @@
 import { resolveAccessor } from '$lib/utils/accessors';
-import type { AxisValue } from '$lib/types/layout/mapping';
+import type { AxisValue, GroupingAccessor } from '$lib/types/layout/mapping';
 import type { Series, Accessor } from '$lib/types/plots/data/common';
 
-/** A `grouping` as the plot takes it: one accessor, or a list of them - its levels, outermost first. */
-export type GroupingProp<TRow extends Record<string, unknown>> =
-	| Accessor<TRow, unknown>
-	| readonly Accessor<TRow, unknown>[];
-
-/** Whether a `grouping` is a list of levels (`Array.isArray` does not narrow a readonly one). */
-const isList = <TRow extends Record<string, unknown>>(
-	grouping: GroupingProp<TRow> | undefined
-): grouping is readonly Accessor<TRow, unknown>[] => Array.isArray(grouping);
-
-/** The separator between the levels of a combined grouping key. */
-const LEVEL_SEPARATOR = ' · ';
-
 /**
- * A `grouping` as the one key the plot's rows split into series by: a single accessor as it is, a list
- * of them as the key their levels make together (`'Terciarias · Resto'`). A plot that nests its levels
- * (a treemap) reads the list itself.
+ * A plot's `grouping`, read into its levels. A dotted name is a field of the rows when they have one by that
+ * name, and the fields of its levels otherwise. Rows grouped by several levels make one key of them, dotted
+ * too (`'Tertiary.Finance'`), which is how `segments` names them.
  */
-export function groupingKey<TRow extends Record<string, unknown>>(
-	grouping: GroupingProp<TRow> | undefined
-): Accessor<TRow, unknown> | undefined {
-	if (!isList(grouping)) return grouping;
-	if (grouping.length === 0) return undefined;
-	if (grouping.length === 1) return grouping[0];
-	const levels = grouping.map((level) => resolveAccessor<TRow>(level));
-	return (row: TRow) => levels.map((read) => String(read(row))).join(LEVEL_SEPARATOR);
+export class Grouping {
+	/** The separator between the levels of a grouping, and of the key they make together. */
+	static readonly SEPARATOR = '.';
+
+	/** The levels `grouping` names, outermost first: none when it is unset. */
+	static levels<TRow extends Record<string, unknown>>(
+		grouping: GroupingAccessor<TRow> | undefined,
+		rows: readonly TRow[] = []
+	): Accessor<TRow, unknown>[] {
+		if (grouping === undefined) return [];
+		if (typeof grouping !== 'string' || !grouping.includes(Grouping.SEPARATOR)) return [grouping];
+		if (rows.some((row) => grouping in row)) return [grouping];
+		return grouping.split(Grouping.SEPARATOR) as (keyof TRow & string)[];
+	}
+
+	/**
+	 * The key rows split into series by: a single level as it is - a field stays its name - and several as
+	 * the key their values make together. `nested` takes the outermost level alone, for a plot that draws
+	 * the inner ones itself (a treemap).
+	 */
+	static key<TRow extends Record<string, unknown>>(
+		grouping: GroupingAccessor<TRow> | undefined,
+		rows: readonly TRow[] = [],
+		nested = false
+	): Accessor<TRow, unknown> | undefined {
+		const levels = Grouping.levels(grouping, rows);
+		if (levels.length <= 1 || nested) return levels[0];
+		const reads = levels.map((level) => resolveAccessor<TRow>(level));
+		return (row: TRow) => reads.map((read) => String(read(row))).join(Grouping.SEPARATOR);
+	}
 }
 
 /**

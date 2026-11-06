@@ -36,7 +36,7 @@ type Story = StoryObj<typeof meta>;
 const BASE = {
 	data: ACTIVITY_BRANCHES,
 	value: 'value',
-	grouping: ['sector', 'branch']
+	grouping: 'sector.branch'
 } as const;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
@@ -123,7 +123,7 @@ export const OverStylesArea: Story = {
 export const StyleAKindOfActivity: Story = {
 	args: {
 		...BASE,
-		grouping: ['sector', 'kind', 'branch'],
+		grouping: 'sector.kind.branch',
 		segments: {
 			default: [{ styles: { fillOpacity: 0.3 } }],
 			Tertiary: [{ styles: { fillOpacity: 0.6 } }],
@@ -136,7 +136,7 @@ export const StyleAKindOfActivity: Story = {
 export const StyleOneBranch: Story = {
 	args: {
 		...BASE,
-		grouping: ['sector', 'kind', 'branch'],
+		grouping: 'sector.kind.branch',
 		segments: {
 			'Tertiary.Finance': [{ styles: { stroke: 'gold', strokeWidth: 3 } }],
 			'Tertiary.Finance.Insurance': [{ styles: { stroke: 'midnightblue', strokeWidth: 4 } }]

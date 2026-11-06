@@ -12,7 +12,6 @@ export type BarMarkerConfig = {
 	thickness?: number;
 	styles?: PerRow<AreaStyle> & InsetStyle;
 	category?: AxisValue;
-	hover?: boolean;
 } & CommonMarkerConfigWithColor &
 	CommonMarkerConfigWithInterval &
 	CommonMarkerConfigWithLabel;

@@ -32,7 +32,7 @@ type Story = StoryObj<typeof meta>;
 const BASE = {
 	data: ACTIVITY_BRANCHES,
 	value: 'value',
-	grouping: ['sector', 'branch']
+	grouping: 'sector.branch'
 } as const;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
@@ -47,11 +47,12 @@ export const Default: Story = {
 };
 
 /**
- * `grouping` as a list is the whole path of a tile, outermost level first: here sector, kind of activity and
- * branch. The last level names the tile, and the outermost still colors the tiles and fills the legend.
+ * `grouping` with its levels joined by dots is the whole path of a tile, outermost level first: here sector, kind
+ * of activity and branch. The last level names the tile, and the outermost still colors the tiles and fills the
+ * legend.
  */
-export const GroupingAsAList: Story = {
-	args: { ...BASE, grouping: ['sector', 'kind', 'branch'] }
+export const NestedLevels: Story = {
+	args: { ...BASE, grouping: 'sector.kind.branch' }
 };
 
 /**
@@ -62,36 +63,47 @@ export const OnlySectors: Story = {
 	args: { ...BASE, grouping: 'sector' }
 };
 
-/** `value` and the levels of `grouping` can be functions of the row. Here a tile's area is its value in billions of Argentinean pesos. */
+/**
+ * `value` and `grouping` can be functions of the row - a function is a single level, which the rows need not
+ * have as a field. Here a tile's area is its value in billions of Argentinean pesos, and the branches add up to
+ * two tiles: the goods the primary and secondary sectors make, and the services of the tertiary one.
+ */
 export const UsingFunctions: Story = {
 	args: {
 		data: ACTIVITY_BRANCHES,
 		value: (row) => Number(row.value) / 1000,
-		grouping: [(row) => String(row.sector).toUpperCase(), (row) => String(row.branch).toUpperCase()]
+		grouping: (row) => (row.sector === 'Tertiary' ? 'Services' : 'Goods')
 	}
 };
 
+// How a rectangle is split among its tiles is an option of the plot's `treemap` transform: a `treemap` entry in
+// `transforms` sets it, over the one the plot builds from its `value` and `grouping`.
+
 /** `tile: 'squarify'` (the default) keeps tiles close to squares. */
 export const SquarifiedTiling: Story = {
-	args: { ...BASE, tile: 'squarify' }
+	args: { ...BASE, transforms: [{ type: 'treemap', tile: 'squarify' }] }
 };
 
 /** `tile: 'slice'` stacks a rectangle's tiles in rows. */
 export const SliceTiling: Story = {
-	args: { ...BASE, tile: 'slice' }
+	args: { ...BASE, transforms: [{ type: 'treemap', tile: 'slice' }] }
 };
 
 /** `tile: 'dice'` sets them side by side. */
 export const DiceTiling: Story = {
-	args: { ...BASE, tile: 'dice' }
+	args: { ...BASE, transforms: [{ type: 'treemap', tile: 'dice' }] }
 };
 
 /** `tile: 'sliceDice'` alternates rows and columns by level. */
 export const SliceDiceTiling: Story = {
-	args: { ...BASE, grouping: ['sector', 'kind', 'branch'], tile: 'sliceDice' }
+	args: {
+		...BASE,
+		grouping: 'sector.kind.branch',
+		transforms: [{ type: 'treemap', tile: 'sliceDice' }]
+	}
 };
 
 /** `tile: 'binary'` splits each rectangle in two halves of about the same value. */
 export const BinaryTiling: Story = {
-	args: { ...BASE, tile: 'binary' }
+	args: { ...BASE, transforms: [{ type: 'treemap', tile: 'binary' }] }
 };

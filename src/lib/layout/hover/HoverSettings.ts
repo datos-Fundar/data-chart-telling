@@ -1,4 +1,4 @@
-import type { TooltipProp } from '$lib/types/layout/tooltip';
+import type { TooltipContext, TooltipProp } from '$lib/types/layout/tooltip';
 import type { HoverPoint, HoverStrategy } from '$lib/types/layout/hover';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { HoverConfig, PointMatchingStrategy, TooltipConfig } from '$lib/types/plots/props';
@@ -53,8 +53,8 @@ export class HoverSettings<TRow extends Record<string, unknown>> {
 		defaultStrategy: HoverStrategy;
 		pointMatching?: PointMatchingStrategy;
 		number?: (value: number) => string;
-		/** What a plot kind knows of a row, the third argument of the author's own `format`. */
-		context?: (row: TRow) => unknown;
+		/** What the plot knows of a row, the third argument of the author's own `format` - see {@link TooltipContext}. */
+		context?: (row: TRow) => TooltipContext;
 	}): HoverConfig<TRow> {
 		const {
 			tooltip,
@@ -79,10 +79,10 @@ export class HoverSettings<TRow extends Record<string, unknown>> {
 				...tooltip,
 				format: tooltip.format
 					? (row: TRow) =>
-							(tooltip.format as (row: TRow, number: unknown, context: unknown) => string)(
+							(tooltip.format as (row: TRow, number: unknown, context: TooltipContext) => string)(
 								row,
 								number,
-								context?.(row)
+								context?.(row) ?? {}
 							)
 					: format,
 				...(sort ? { sort } : {})

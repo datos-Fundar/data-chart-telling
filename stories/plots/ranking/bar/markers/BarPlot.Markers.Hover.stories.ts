@@ -248,8 +248,9 @@ export const GroupedSeries: Story = {
 };
 
 /**
- * `areaX: true` on `'grouped'` series - the highlight narrows to the
- * hovered series' own bar, not the whole two-bar group.
+ * `areaX: true` on `'grouped'` series - the hover matches every series of the
+ * category, so the highlight covers the whole two-bar group, as the dots mark
+ * both bars.
  */
 export const GroupedSeriesWithHighlightArea: Story = {
 	args: {
@@ -269,7 +270,7 @@ export const GroupedSeriesWithHighlightArea: Story = {
 
 /**
  * `areaY: true` on `'grouped'` series, horizontal orientation - the
- * highlight narrows to the hovered series' own bar, same as
+ * highlight covers the whole group, same as
  * `GroupedSeriesWithHighlightArea` but on the other axis.
  */
 export const GroupedSeriesWithHighlightAreaHorizontal: Story = {

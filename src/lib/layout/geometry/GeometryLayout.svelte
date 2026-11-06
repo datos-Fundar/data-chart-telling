@@ -47,6 +47,7 @@
 	import { PlotMargins } from '$lib/layout/margins/PlotMargins.svelte';
 	import type { Series } from '$lib/types/plots/data/common';
 	import type { MarkerConfig } from '$lib/types/markers/all';
+	import type { CommonMarkerEvents } from '$lib/types/markers/channels/commonMarkerEvents';
 	import type { TooltipAnchorX, TooltipAnchorY } from '$lib/types/layout/tooltip';
 	import type { PlotHover } from '$lib/layout/hover/PlotHover.svelte';
 	import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
@@ -127,6 +128,32 @@
 		}
 		if (marker.type === 'bar') return `bar-${marker.role}-${i}`;
 		return `${marker.type}-${i}`;
+	}
+
+	/**
+	 * A marker with `hover: true`, with the plot's hover added to its own pointer handlers: entering or moving
+	 * over any of its shapes hovers its rows - as they are drawn now, should the plot have been laid out again
+	 * under a resting pointer - and leaving it ends the hover.
+	 */
+	function withHover(marker: MarkerConfig, rows: TData[] | TSeries[]): MarkerConfig {
+		if (!('hover' in marker) || marker.hover !== true) return marker;
+		const own = marker as CommonMarkerEvents & { data?: unknown[] };
+		const hovered = (own.data ?? rows) as TData[];
+		return {
+			...marker,
+			onpointerenter: (event: Event, row: unknown, index: number) => {
+				own.onpointerenter?.(event, row, index);
+				ctrl.onPointer(hovered);
+			},
+			onpointerleave: (event: Event, row: unknown, index: number) => {
+				own.onpointerleave?.(event, row, index);
+				ctrl.onLeave();
+			},
+			onpointermove: (event: Event, row: unknown, index: number) => {
+				own.onpointermove?.(event, row, index);
+				ctrl.onPointer(hovered);
+			}
+		} as MarkerConfig;
 	}
 </script>
 
@@ -238,7 +265,7 @@
 
 {#snippet renderMarker(marker: MarkerConfig, rows: TData[] | TSeries[])}
 	<MarkerOffset {marker}>
-		{@render drawMarker(marker, rows)}
+		{@render drawMarker(withHover(marker, rows), rows)}
 	</MarkerOffset>
 {/snippet}
 

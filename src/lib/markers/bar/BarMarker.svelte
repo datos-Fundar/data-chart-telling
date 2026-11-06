@@ -3,7 +3,6 @@
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { BarX, BarY } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
-	import { PlotContext } from '$lib/layout/plot/PlotContext';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import type { BarMarkerConfig } from '$lib/types/markers/common';
@@ -23,13 +22,6 @@
 	const channelFill = $derived(MarkerChannels.buildFill(data, marker.color, marker.scales, cfg));
 
 	const plot = usePlot().svelteplot;
-	const hover = PlotContext.current()?.hover;
-	const enter = $derived(
-		marker.hover
-			? () => hover?.onPointer((marker.data ?? []) as Record<string, unknown>[])
-			: undefined
-	);
-	const leave = $derived(marker.hover ? hover?.onLeave : undefined);
 	function categoryScaleFor(isHorizontal: boolean) {
 		return isHorizontal ? plot.scales.y : plot.scales.x;
 	}
@@ -102,7 +94,6 @@
 			<!-- The band runs the plot's whole value axis, so the pointer needn't be over the bar. -->
 			{@const [rangeMin, rangeMax] = valueExtentFor(marker.isHorizontal)}
 			{#if marker.isHorizontal}
-				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<rect
 					class="dct-hit-area"
 					x={rangeMin + insetLeft}
@@ -110,11 +101,9 @@
 					width={Math.max(0, rangeMax - rangeMin - insetLeft - insetRight)}
 					height={Math.max(0, bandwidth - insetTop - insetBottom)}
 					fill="transparent"
-					onpointerenter={enter}
-					onpointerleave={leave}
+					{...events.forRow(data[0], 0)}
 				/>
 			{:else}
-				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<rect
 					class="dct-hit-area"
 					x={bandStart + insetLeft}
@@ -122,8 +111,7 @@
 					width={Math.max(0, bandwidth - insetLeft - insetRight)}
 					height={Math.max(0, rangeMax - rangeMin - insetTop - insetBottom)}
 					fill="transparent"
-					onpointerenter={enter}
-					onpointerleave={leave}
+					{...events.forRow(data[0], 0)}
 				/>
 			{/if}
 		{:else}

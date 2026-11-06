@@ -18,7 +18,7 @@ A part-to-whole made of rectangles: each row is a tile whose **area** is its `va
 	height={440}
 	data={ACTIVITY_BRANCHES}
 	value="value"
-	grouping={['sector', 'branch']}
+	grouping="sector.branch"
 />
 ```
 
@@ -27,9 +27,9 @@ A part-to-whole made of rectangles: each row is a tile whose **area** is its `va
 ![A treemap of branches of activity, sized by value and colored by sector](../../images/treemap.png)
 
 - A row without a positive `value` has no tile.
-- `grouping` takes a field, a function, or a **list** of them - the **whole path** of a tile, outermost first: `grouping={['sector', 'kind', 'branch']}` nests the tiles by sector, then by kind, and names each one after its branch. Rows with the same path are one tile, their values added up, so `grouping="sector"` alone makes three big tiles. The outermost level colors the tiles and is what the [legend](../../legend.md) lists (`scales.color` sets the colors, as in any plot).
-- `tile` picks how a rectangle is split among its tiles: `'squarify'` (the default, which keeps them close to squares), `'binary'`, `'slice'`, `'dice'` or `'sliceDice'`.
-- Tiles have no axes, and the plot has no `timeline` or `facet`.
+- `grouping` is the **whole path** of a tile, its fields joined by dots, outermost first: `grouping="sector.kind.branch"` nests the tiles by sector, then by kind, and names each one after its branch. A function is a single level. Rows with the same path are one tile, their values added up, so `grouping="sector"` alone makes three big tiles. The outermost level colors the tiles and is what the [legend](../../legend.md) lists; `scales.color` sets the colors, as in any plot. Without `grouping`, `color` groups the tiles, as it groups the series of any plot.
+- How a rectangle is split among its tiles is an option of the plot's own `treemap` transform: `transforms={[{ type: 'treemap', tile: 'binary' }]}` sets it over the one the plot builds from `value` and `grouping`. `tile` is `'squarify'` (the default, which keeps them close to squares), `'binary'`, `'slice'`, `'dice'` or `'sliceDice'`.
+- Tiles have no axes.
 
 ## Labels
 
@@ -55,7 +55,7 @@ Each tile is labelled with its name and its **share of the whole**, in percent, 
 <TreemapPlot
 	{data}
 	value="value"
-	grouping={['sector', 'kind', 'branch']}
+	grouping="sector.kind.branch"
 	segments={{
 		default: [{ styles: { fillOpacity: 0.25 } }],
 		Tertiary: [{ styles: { fillOpacity: 0.6 } }],
@@ -66,4 +66,4 @@ Each tile is labelled with its name and its **share of the whole**, in percent, 
 
 ## Hover and tooltip
 
-Hovering a tile matches it alone - an invisible `rect` over each tile drives the plot's hover - and `tooltip` shows its name and share. `tooltip.format(row, number, tile)` writes it by hand, and `tile` is what the library knows of the hovered tile: its `name`, its `path` through the levels, its summed `value` and its `share` of the whole, from 0 to 100. The share is worked out from the values, in whatever unit they are, so a dataset whose `value` is a percentage already reads the same.
+Hovering a tile matches it alone - an invisible `rect` over each tile drives the plot's hover - and `tooltip` shows its name and share. `tooltip.format(row, number, context)` writes it by hand: `row` is the tile's row, with the fields of every level and its summed `value`, and `context` what the library works out about it - its `series` (the outermost level) and its `share` of the whole, from 0 to 100. The share is worked out from the values, in whatever unit they are, so a dataset whose `value` is a percentage already reads the same.

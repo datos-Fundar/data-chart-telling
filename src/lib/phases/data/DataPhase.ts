@@ -1,4 +1,4 @@
-import { buildSeries } from '$lib/utils/grouping';
+import { buildSeries, Grouping } from '$lib/utils/grouping';
 import { ColorRamp } from '$lib/utils/color';
 import { resolveAccessor } from '$lib/utils/accessors';
 import { buildGroupedSeries, buildScopedMarkerGroups } from '$lib/plots/utils/segments';
@@ -38,7 +38,7 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 		const { series, data, segments, scales } = state;
 		const { connect = true, color: segmentColor } = options.segments ?? {};
 
-		const seriesGrouping = DataPhase.#buildGrouping(state);
+		const seriesGrouping = DataPhase.#buildGrouping(state, options.nested);
 		const built: Series[] = series ?? buildSeries(data ?? [], state.x, state.y, seriesGrouping);
 		const fullSeries = options.orderSeries ? options.orderSeries(built, state) : built;
 		const axes = PlotAxes.build({
@@ -88,15 +88,16 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 	};
 
 	/**
-	 * The key a plot's rows split into series by: its `grouping`, or its `color`
-	 * when that names categories. A numeric `color` is a continuous value (a
-	 * heatmap's cells), so it colors rows without grouping them.
+	 * The key a plot's rows split into series by: its `grouping` (its levels together, or the outermost
+	 * one alone for a `nested` kind), or its `color` when that names categories. A numeric `color` is a
+	 * continuous value (a heatmap's cells), so it colors rows without grouping them.
 	 */
 	static #buildGrouping(
-		state: Pick<AnyAxisState, 'grouping' | 'color' | 'data'>
+		state: Pick<AnyAxisState, 'grouping' | 'color' | 'data'>,
+		nested = false
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	): Accessor<any, unknown> | undefined {
-		if (state.grouping !== undefined) return state.grouping;
+		if (state.grouping !== undefined) return Grouping.key(state.grouping, state.data, nested);
 		const color = state.color;
 		if (color === undefined || !state.data) return color;
 		const read = resolveAccessor(color as never) as (row: unknown) => unknown;

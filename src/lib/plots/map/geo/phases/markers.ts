@@ -1,3 +1,4 @@
+import { MarkerStyles } from '$lib/phases/markers/MarkerStyles';
 import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import { GeoSegments } from '$lib/plots/map/geo/GeoSegments';
 import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
@@ -105,9 +106,11 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 		(m): m is GeoHoverMarkerConfig => m.type === 'geo-hover'
 	);
 
-	const markers: MarkerConfig[] = MarkerChannels.inheritAll(
-		[...behindMarkers, ...featureMarkers, ...frontMarkers, ...(hoverMarker ? [hoverMarker] : [])],
-		state.scales as never
+	const markers: MarkerConfig[] = MarkerStyles.resolveAll(
+		MarkerChannels.inheritAll(
+			[...behindMarkers, ...featureMarkers, ...frontMarkers, ...(hoverMarker ? [hoverMarker] : [])],
+			state.scales as never
+		)
 	);
 
 	return { ...state, markers, styleGroups };

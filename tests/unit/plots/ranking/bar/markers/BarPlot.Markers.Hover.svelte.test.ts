@@ -310,4 +310,29 @@ describe('BarPlot - markers.hover areaX/areaY', () => {
 			expect(countHoverAreas(svg)).toBeGreaterThan(0);
 		});
 	});
+
+	test('covers the whole group of a grouped bar chart when the hover matches every series of it', async () => {
+		const grouped = (strategy: 'x' | 'series') =>
+			render(BarPlot, {
+				width: 400,
+				height: 300,
+				data: PROVINCE_VALUES,
+				x: 'province',
+				y: 'value',
+				color: 'sex',
+				tooltip: { strategy },
+				markers: [{ type: 'hover', areaX: true }] satisfies AxisBasedMarkersConfig[]
+			});
+		const widthOfArea = async (strategy: 'x' | 'series') => {
+			const { container } = await grouped(strategy);
+			const svg = await waitForSvg(container);
+			hoverFirstCategory(svg);
+			await vi.waitFor(() => expect(countHoverAreas(svg)).toBe(1));
+			return Number(svg.querySelector('rect.hover-area')!.getAttribute('width'));
+		};
+		// `'x'` matches both series of the category; `'series'` only the hovered one, whose slice it narrows to.
+		const whole = await widthOfArea('x');
+		const own = await widthOfArea('series');
+		expect(whole).toBeGreaterThan(own * 1.5);
+	});
 });

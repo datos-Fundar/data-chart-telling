@@ -39,8 +39,8 @@ export type HoverStageOptions<TState, TCtx = unknown> = {
 	/** Invisible markers that drive the plot's hover themselves (a bar's band), given its resolved hover config. */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	hitAreas?: (state: TState, hover: HoverConfig<any>, ctx: TCtx) => { type: string }[];
-	/** What the plot kind knows of a row, which an author's own tooltip `format` gets as its third argument. */
-	context?: (state: TState) => (row: never) => unknown;
+	/** What the kind knows of a row beyond its series, which an author's own tooltip `format` gets in its third argument. */
+	context?: (state: TState) => (row: never) => object;
 	/** How a pointer event resolves to a candidate. Defaults to the nearest one. */
 	pointMatching?: PointMatchingStrategy;
 };

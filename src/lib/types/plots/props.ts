@@ -1,6 +1,6 @@
 import type { Pipeline } from '$lib/phases/Pipeline';
 import type { Snippet } from 'svelte';
-import type { TooltipOptions, TooltipProp } from '$lib/types/layout/tooltip';
+import type { TooltipContext, TooltipOptions, TooltipProp } from '$lib/types/layout/tooltip';
 import type { HoverPoint, HoverStrategy } from '$lib/types/layout/hover';
 import type { LegendExtension, LegendSection } from '$lib/types/layout/legend';
 import type { FacetConfig, FacetScoped } from '$lib/types/layout/facet';
@@ -237,7 +237,10 @@ export type PlotCoreProps<
  */
 export type FigureBoxProps = GridPlacement & { width?: number; height?: number };
 
-/** A plot component's public props: its core props, chrome, `timeline`, `facet` and an author-facing `tooltip`. */
+/**
+ * A plot component's public props: its core props, chrome, `timeline`, `facet` and an author-facing `tooltip`,
+ * whose `format` gets the kind's `TTooltipContext`.
+ */
 export type BasePlotProps<
 	TDataContract,
 	TRow extends Record<string, unknown>,
@@ -245,7 +248,8 @@ export type BasePlotProps<
 	TSegmentStyle extends object,
 	TMarker,
 	TScales extends ScalesConfig<TRow>,
-	TCoordinates = undefined
+	TCoordinates = undefined,
+	TTooltipContext extends TooltipContext = TooltipContext
 > = TDataContract &
 	Omit<
 		PlotCommonProps<TStyles, TSegmentStyle, TMarker, TScales, TCoordinates>,
@@ -253,7 +257,7 @@ export type BasePlotProps<
 	> &
 	FigureBoxProps &
 	PlotChromeProps & {
-		tooltip?: TooltipProp<TRow>;
+		tooltip?: TooltipProp<TRow, TTooltipContext>;
 		timeline?: TimelineConfig<TRow>;
 		facet?: FacetConfig<TRow>;
 	};

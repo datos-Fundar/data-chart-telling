@@ -78,18 +78,24 @@ export type {
 	AxisChannelName,
 	IndependentChannelName,
 	SizeChannelName,
-	ChannelAccessors
+	ChannelAccessors,
+	GroupingAccessor
 } from './types/layout/mapping';
 export type { AxisScale, AxisBasedScalesConfig, ChannelScalesConfig } from './types/layout/scales';
 export type { NumberDisplay } from './types/layout/numbers';
 export type {
 	TreemapPlotProps,
-	TreemapDataProps,
-	TreemapTooltipTile
+	TreemapTooltipContext
 } from './types/plots/part-of-a-whole/treemap/props';
 export type { TreemapTile } from './types/transforms/treemap';
-export type { GroupingProp } from './utils/grouping';
-export type { Accessor, Series, SeriesProps, DataProps } from './types/plots/data/common';
+export type {
+	Accessor,
+	Series,
+	SeriesProps,
+	NonAxisDataProps,
+	SingleAxisDataProps,
+	DualAxisDataProps
+} from './types/plots/data/common';
 export type {
 	BasePlotProps,
 	PlotCoreProps,

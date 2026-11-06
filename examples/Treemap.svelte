@@ -9,5 +9,5 @@
 	height={440}
 	data={ACTIVITY_BRANCHES}
 	value="value"
-	grouping={['sector', 'branch']}
+	grouping="sector.branch"
 />

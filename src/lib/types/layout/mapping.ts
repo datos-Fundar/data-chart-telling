@@ -16,9 +16,9 @@ export type ChannelValue = {
 	 * Splits `data` into one series per distinct value - the structural
 	 * grouping key. Defaults to `color` when omitted, so a single `color`
 	 * accessor groups *and* colors series; pass both to split by one field
-	 * while coloring by another. A list is one grouping of several levels, outermost
-	 * first: a plot that nests (a treemap) nests by them, any other splits by their
-	 * combination.
+	 * while coloring by another. A dotted name (`'sector.branch'`) groups by several
+	 * levels, outermost first: a plot that nests (a treemap) nests by them, any other
+	 * splits by their combination - see {@link GroupingAccessor}.
 	 */
 	grouping: unknown;
 	/**
@@ -38,6 +38,8 @@ export type ChannelValue = {
 	r: number;
 	/** Vector/spike magnitude - a literal number is a fixed pixel length. Configure via `scales.length`. */
 	length: number;
+	/** What a row amounts to as a part of a whole: a treemap tile's area. A plot without parts ignores it. */
+	value: number;
 };
 
 /** Every channel a plot maps from its rows. */
@@ -55,11 +57,20 @@ export type IndependentChannelName = 'color' | 'grouping' | 'opacity' | 'symbol'
 /** The size channels, which also take a literal number as a fixed pixel size that bypasses their scale. */
 export type SizeChannelName = 'r' | 'length';
 
-/** Every channel as a plot prop: a field key or accessor function (or a literal size, for a size channel). */
+/**
+ * What a plot's rows group by: a field, the fields of several levels joined by dots (`'sector.branch'`,
+ * outermost first), or a function of the row. A dotted name is a field when the rows have one by that name.
+ */
+export type GroupingAccessor<TData> =
+	| (keyof TData & string)
+	| `${keyof TData & string}.${string}`
+	| ((row: TData) => unknown);
+
+/** Every channel as a plot prop: a field key or accessor function (or a literal size, for a size channel); `grouping` also takes levels - see {@link GroupingAccessor}. */
 export type ChannelAccessors<TData extends Record<string, unknown>> = {
-	[K in keyof ChannelValue]?:
-		| Accessor<TData, ChannelValue[K]>
-		| (K extends SizeChannelName ? number : never);
+	[K in keyof ChannelValue]?: K extends 'grouping'
+		? GroupingAccessor<TData>
+		: Accessor<TData, ChannelValue[K]> | (K extends SizeChannelName ? number : never);
 };
 
 /** One channel's own resolved data accessor - mirrors svelteplot's own `ChannelAccessor`. */

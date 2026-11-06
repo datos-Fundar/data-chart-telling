@@ -92,7 +92,7 @@ export class StatisticsPhase<TState extends StatisticsStageState> implements Pha
 			}),
 			...Statistics.expandMarkers(
 				AuthorMarkers.prepare(positioned, {
-					grouping: inheritGrouping ? state.grouping : undefined,
+					grouping: inheritGrouping ? state.seriesGrouping : undefined,
 					color: inheritGrouping ? state.color : undefined,
 					defaultColor,
 					flat,

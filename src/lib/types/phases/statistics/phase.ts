@@ -15,7 +15,8 @@ import type { PlotAxes } from '$lib/phases/data/PlotAxes';
 export type StatisticsStageState = Pick<FacetStageState, 'panels'> & {
 	x?: Accessor<any, AxisValue>;
 	y?: Accessor<any, AxisValue>;
-	grouping?: Accessor<any, unknown>;
+	/** The key the "data" phase split the rows into series by, which an author marker inherits. */
+	seriesGrouping?: Accessor<any, unknown>;
 	color?: Accessor<any, unknown>;
 	statistics?: StatisticConfig[];
 	authorMarkers?: AxisBasedMarkersConfig[];
