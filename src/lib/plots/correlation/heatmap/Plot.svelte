@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import { buildHeatmapDefaults } from '$lib/plots/correlation/heatmap/defaults';
 	import type {
 		HeatmapPlotProps,
@@ -44,7 +44,7 @@
 	});
 </script>
 
-<Plot
+<AbstractPlot
 	core={core as HeatmapPlotCoreProps<TData>}
 	defaults={buildHeatmapDefaults}
 	bind:margins

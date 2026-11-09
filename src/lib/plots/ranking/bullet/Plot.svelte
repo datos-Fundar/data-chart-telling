@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import { buildBulletDefaults } from '$lib/plots/ranking/bullet/defaults';
 	import type { BulletPlotProps, BulletPlotCoreProps } from '$lib/types/plots/ranking/bullet/props';
 
@@ -25,7 +25,7 @@
 	}: BulletPlotProps<TData> = $props();
 </script>
 
-<Plot
+<AbstractPlot
 	core={core as BulletPlotCoreProps<TData>}
 	defaults={buildBulletDefaults}
 	bind:margins

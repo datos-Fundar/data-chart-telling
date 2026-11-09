@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import { buildSparklineDefaults } from '$lib/plots/evolution/sparkline/defaults';
 	import type {
 		SparklinePlotProps,
@@ -28,7 +28,7 @@
 	}: SparklinePlotProps<TData> = $props();
 </script>
 
-<Plot
+<AbstractPlot
 	core={core as SparklinePlotCoreProps<TData>}
 	defaults={buildSparklineDefaults}
 	bind:margins

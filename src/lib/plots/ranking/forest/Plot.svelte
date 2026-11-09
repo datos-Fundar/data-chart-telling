@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import { buildForestDefaults } from '$lib/plots/ranking/forest/defaults';
 	import type { ForestPlotProps, ForestPlotCoreProps } from '$lib/types/plots/ranking/forest/props';
 
@@ -25,7 +25,7 @@
 	}: ForestPlotProps<TData> = $props();
 </script>
 
-<Plot
+<AbstractPlot
 	core={core as ForestPlotCoreProps<TData>}
 	defaults={buildForestDefaults}
 	bind:margins

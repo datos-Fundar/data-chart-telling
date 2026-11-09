@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import { buildAreaDefaults } from '$lib/plots/evolution/area/defaults';
 	import type { AreaPlotProps, AreaPlotCoreProps } from '$lib/types/plots/evolution/area/props';
 
@@ -25,7 +25,7 @@
 	}: AreaPlotProps<TData> = $props();
 </script>
 
-<Plot
+<AbstractPlot
 	core={core as AreaPlotCoreProps<TData>}
 	defaults={buildAreaDefaults}
 	bind:margins

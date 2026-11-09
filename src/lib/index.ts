@@ -27,7 +27,8 @@ export { default as PlotComposer } from './layout/composer/PlotComposer.svelte';
 export { default as GridCell } from './layout/grid/GridCell.svelte';
 
 // The generic plot, to build your own plot kind: wrap it with your kind's core and defaults.
-export { default as Plot } from './layout/plot/Plot.svelte';
+export { default as Plot } from './plots/generic/Plot.svelte';
+export { default as AbstractPlot } from './layout/plot/AbstractPlot.svelte';
 export { default as BasePlotLayout } from './layout/base/BasePlotLayout.svelte';
 export { usePlot, useFigure } from './layout/plot/usePlot';
 // What a plot knows of each row it draws, which every format reads.
@@ -96,6 +97,7 @@ export type {
 	TreemapTooltipContext
 } from './types/plots/part-of-a-whole/treemap/props';
 export type { TreemapTile } from './types/transforms/treemap';
+export type { GenericPlotProps, GenericDataProps } from './types/plots/generic/props';
 export type {
 	Accessor,
 	Series,

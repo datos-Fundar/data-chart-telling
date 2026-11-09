@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import { buildDumbbellDefaults } from '$lib/plots/ranking/dumbbell/defaults';
 	import type {
 		DumbbellPlotProps,
@@ -28,7 +28,7 @@
 	}: DumbbellPlotProps<TData> = $props();
 </script>
 
-<Plot
+<AbstractPlot
 	core={core as DumbbellPlotCoreProps<TData>}
 	defaults={buildDumbbellDefaults}
 	bind:margins

@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import { buildPyramidDefaults } from '$lib/plots/distribution/pyramid/defaults';
 	import type {
 		PyramidPlotProps,
@@ -27,7 +27,7 @@
 	}: PyramidPlotProps<TData> = $props();
 </script>
 
-<Plot
+<AbstractPlot
 	core={core as PyramidPlotCoreProps<TData>}
 	defaults={buildPyramidDefaults}
 	bind:margins
