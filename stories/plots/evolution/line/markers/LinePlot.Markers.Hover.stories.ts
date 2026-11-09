@@ -44,12 +44,12 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Basic hover marker - an in-SVG dot and value label appear at the nearest
- * point as the cursor moves over the line. A dashed vertical rule (ruleX)
- * is drawn by default. No floating HTML tooltip is involved.
+ * The plot's own hover, with a tooltip: a dashed crosshair along `x` at the hovered year, and a dot and the
+ * value on the line.
  */
 export const Basic: Story = {
 	args: {
+		tooltip: true,
 		series: [
 			{
 				name: 'female',
@@ -67,7 +67,7 @@ export const Basic: Story = {
 };
 
 /**
- * Dot only - `showLabels: false` suppresses the value label next to the dot,
+ * Dot only - `front: [{ type: 'dot' }]` keeps the dot and drops the value label next to it,
  * leaving just the position indicator and the crosshair rule.
  */
 export const WithoutLabels: Story = {
@@ -80,17 +80,12 @@ export const WithoutLabels: Story = {
 				data: FEMALE_LIFE
 			}
 		],
-		markers: [
-			{
-				type: 'hover',
-				showLabels: false
-			}
-		] satisfies AxisBasedMarkersConfig[]
+		markers: [{ type: 'hover', front: [{ type: 'dot' }] }] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
 /**
- * Dot and label only - `ruleX: false` hides the vertical crosshair rule,
+ * Dot and label only - `back: []` hides the vertical crosshair rule,
  * so only the dot and its label are drawn on hover.
  */
 export const WithoutRule: Story = {
@@ -103,19 +98,14 @@ export const WithoutRule: Story = {
 				data: FEMALE_LIFE
 			}
 		],
-		markers: [
-			{
-				type: 'hover',
-				ruleX: false
-			}
-		] satisfies AxisBasedMarkersConfig[]
+		markers: [{ type: 'hover', back: [] }] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
 /**
- * Both crosshair rules - `ruleX: true` (default) and `ruleY: true` together
+ * Both crosshair rules - a `rule` along `x` and one along `y` in `back` together
  * draw a full crosshair: a vertical rule at the hovered x and a horizontal
- * rule at the hovered y. Omitting `ruleY` leaves only the vertical rule.
+ * rule at the hovered y. Leaving the `y` one out leaves only the vertical rule.
  */
 export const WithBothAxis: Story = {
 	args: {
@@ -130,15 +120,17 @@ export const WithBothAxis: Story = {
 		markers: [
 			{
 				type: 'hover',
-				ruleX: true,
-				ruleY: true
+				back: [
+					{ type: 'rule', axis: 'x', points: 'active' },
+					{ type: 'rule', axis: 'y', points: 'active' }
+				]
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
 /**
- * Custom rule style - `rule` overrides the crosshair stroke individually.
+ * Custom rule style - the `styles` of a `rule` in `back` set the crosshair stroke individually.
  * Here the rule is rendered in red with a solid line and higher opacity.
  */
 export const WithCustomRuleStyle: Story = {
@@ -154,12 +146,19 @@ export const WithCustomRuleStyle: Story = {
 		markers: [
 			{
 				type: 'hover',
-				rule: {
-					stroke: '#e63946',
-					strokeOpacity: 0.7,
-					strokeWidth: 2,
-					strokeDasharray: '6 3'
-				}
+				back: [
+					{
+						type: 'rule',
+						axis: 'x',
+						points: 'active',
+						styles: {
+							stroke: '#e63946',
+							strokeOpacity: 0.7,
+							strokeWidth: 2,
+							strokeDasharray: '6 3'
+						}
+					}
+				]
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

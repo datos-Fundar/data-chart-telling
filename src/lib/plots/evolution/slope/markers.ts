@@ -6,7 +6,7 @@ import type { ValueAnchor } from '$lib/types/plots/constants';
 import type { EdgeBox } from '$lib/types/layout/box';
 import type { CurveAwarePlotStylesConfig } from '$lib/types/layout/styles';
 import type { AxisBasedMarkersConfig, TextMarkerConfig } from '$lib/types/markers/common';
-import type { SlopePlotState, SlopePlotCtx } from '$lib/types/plots/evolution/slope/state';
+import type { SlopePlotState, SlopePlotEnv } from '$lib/types/plots/evolution/slope/state';
 
 /** The anchor of the labels at the plot's start: the mirror of the end's, so `'start'` always reads outward. */
 function startAnchor(anchor: ValueAnchor): ValueAnchor {
@@ -22,7 +22,7 @@ const keyOf = (value: unknown) => (value instanceof Date ? value.getTime() : val
  */
 export function buildMarks<TData extends Record<string, unknown>>(
 	state: SlopePlotState<TData>,
-	ctx: SlopePlotCtx
+	env: SlopePlotEnv
 ): AxisBasedMarkersConfig[] {
 	const { slope } = getConfiguration();
 	const groups = (state.processedGroups ?? []).map((group) => ({
@@ -39,8 +39,8 @@ export function buildMarks<TData extends Record<string, unknown>>(
 	return buildLineMarkers({
 		groupedSeries: groups,
 		colorFor: state.colorForSeries!,
-		disabledStrokeFor: (name) => ctx.interaction?.strokeFor(name),
-		disabledDotsFor: (name) => ctx.interaction?.dotsFor(name),
+		disabledStrokeFor: (name) => env.interaction?.strokeFor(name),
+		disabledDotsFor: (name) => env.interaction?.dotsFor(name),
 		curve: (state.styles as CurveAwarePlotStylesConfig | undefined)?.curve
 	});
 }

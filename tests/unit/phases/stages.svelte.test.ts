@@ -6,18 +6,18 @@ import { runStages } from '../plots/_helpers/stages';
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
 type State = { log: string[] };
-type Ctx = { tag: string };
+type Env = { tag: string };
 
-function stage(phase: PhaseStage<State, Ctx>['phase'], label: string): PhaseStage<State, Ctx> {
+function stage(phase: PhaseStage<State, Env>['phase'], label: string): PhaseStage<State, Env> {
 	return {
 		phase,
-		run: (state, ctx) => ({ log: [...state.log, `${label}:${ctx.tag}`] })
+		run: (state, env) => ({ log: [...state.log, `${label}:${env.tag}`] })
 	};
 }
 
 describe('Pipeline', () => {
 	test('runs stages in Pipeline.ORDER, ignoring the order they were passed in', () => {
-		const stages: PhaseStage<State, Ctx>[] = [
+		const stages: PhaseStage<State, Env>[] = [
 			stage('facet', 'facet'),
 			stage('tooltip', 'tooltip'),
 			stage('markers', 'markers'),
@@ -43,7 +43,7 @@ describe('Pipeline', () => {
 	});
 
 	test('preserves declaration order between stages that share a phase', () => {
-		const stages: PhaseStage<State, Ctx>[] = [
+		const stages: PhaseStage<State, Env>[] = [
 			stage('markers', 'second'),
 			stage('markers', 'first')
 		];
@@ -55,7 +55,7 @@ describe('Pipeline', () => {
 
 	test('an empty stage list returns the input state unchanged', () => {
 		const input: State = { log: [] };
-		expect(runStages(new Pipeline<State, Ctx>([]), input, { tag: 'x' })).toEqual(input);
+		expect(runStages(new Pipeline<State, Env>([]), input, { tag: 'x' })).toEqual(input);
 	});
 
 	test('covers every PlotPhase in Pipeline.ORDER exactly once', () => {

@@ -9,7 +9,7 @@ import {
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import type {
 	HistogramPlotState,
-	HistogramPlotCtx
+	HistogramPlotEnv
 } from '$lib/types/plots/distribution/histogram/state';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
@@ -30,7 +30,7 @@ type Rect = {
 	styles: { fillOpacity: number };
 };
 
-const CTX = { cfg: DEFAULT_CONFIG } as HistogramPlotCtx;
+const ENV = { cfg: DEFAULT_CONFIG } as HistogramPlotEnv;
 
 const rows: Row[] = [
 	{ v: 1, g: 'A' },
@@ -62,8 +62,8 @@ function flatState(overrides: Partial<HistogramPlotState<Row>> = {}): HistogramP
 }
 
 /** Runs "transforms" → "scales" → "markers", the phases after "data". */
-function run(state: HistogramPlotState<Row>, ctx: HistogramPlotCtx = CTX) {
-	return buildMarkers(buildScales(buildTransforms(state, ctx)), ctx);
+function run(state: HistogramPlotState<Row>, env: HistogramPlotEnv = ENV) {
+	return buildMarkers(buildScales(buildTransforms(state, env)), env);
 }
 
 const rects = (state: HistogramPlotState<Row>) =>
@@ -111,7 +111,7 @@ describe('buildTransforms', () => {
 	test('bins every series in one pass, each bin keeping its series', () => {
 		const state = buildTransforms(
 			flatState({ transforms: [{ type: 'binX', thresholds: [0, 10, 20] }] }),
-			CTX
+			ENV
 		);
 		const series = state.processedData!.data.map((r) => r[SERIES_KEY]).sort();
 		// A: [0,10) and [10,20); B: [0,10) and [10,20)
@@ -141,7 +141,7 @@ describe('buildMarkers', () => {
 describe('buildScales', () => {
 	test("the bins' edges set x; y, the count, runs from zero to the tallest bin", () => {
 		const state = buildScales(
-			buildTransforms(flatState({ transforms: [{ type: 'binX', thresholds: [0, 10, 20] }] }), CTX)
+			buildTransforms(flatState({ transforms: [{ type: 'binX', thresholds: [0, 10, 20] }] }), ENV)
 		);
 		const [xLo, xHi] = state.scales.x?.domain as [number, number];
 		expect(xLo).toBeLessThanOrEqual(1);
@@ -159,7 +159,7 @@ describe('buildScales', () => {
 			x: 'a',
 			y: 'b'
 		} as unknown as AxisBasedMarkersConfig;
-		const state = buildScales(buildTransforms(flatState({ markers: [rule] }), CTX));
+		const state = buildScales(buildTransforms(flatState({ markers: [rule] }), ENV));
 		const [xLo, xHi] = state.scales.x?.domain as [number, number];
 		const [yLo, yHi] = state.scales.y?.domain as [number, number];
 		expect(xLo).toBeLessThanOrEqual(1);
@@ -176,7 +176,7 @@ describe('buildScales', () => {
 			y: 'b'
 		} as unknown as AxisBasedMarkersConfig;
 		const state = buildScales(
-			buildTransforms(flatState({ markers: [line], scales: { y: { domain: [0, 10] } } }), CTX)
+			buildTransforms(flatState({ markers: [line], scales: { y: { domain: [0, 10] } } }), ENV)
 		);
 		expect(state.scales.y?.domain).toEqual([0, 10]);
 	});
@@ -212,7 +212,7 @@ describe('histogram segments', () => {
 
 	test('a segment’s fillOpacity styles the bars of every series it covers', () => {
 		const state = run(
-			buildData(input({ segments: { default: [{ styles: { fillOpacity: 0.4 } }] } }), CTX)
+			buildData(input({ segments: { default: [{ styles: { fillOpacity: 0.4 } }] } }), ENV)
 		);
 		const bars = rects(state);
 		expect(bars.map((b) => b.series).sort()).toEqual(['A', 'B']);
@@ -220,7 +220,7 @@ describe('histogram segments', () => {
 	});
 
 	test('without segments, bars keep the configured opacity', () => {
-		const bars = rects(run(buildData(input(), CTX)));
+		const bars = rects(run(buildData(input(), ENV)));
 		expect(bars).toHaveLength(2);
 		expect(bars.every((b) => b.styles.fillOpacity === 1)).toBe(true);
 	});

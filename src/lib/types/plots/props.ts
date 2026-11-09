@@ -1,3 +1,4 @@
+import type { HoverLook } from '$lib/types/markers/common';
 import type { Pipeline } from '$lib/phases/Pipeline';
 import type { Snippet } from 'svelte';
 import type { TooltipContext, TooltipOptions, TooltipProp } from '$lib/types/layout/tooltip';
@@ -73,6 +74,8 @@ export type HoverConfig<TRow extends Record<string, unknown>> = {
 	pointMatching?: PointMatchingStrategy;
 	/** Forces the crosshair rule(s) a `hover` marker draws off entirely, overriding whatever `strategy` implies. */
 	crosshair?: boolean;
+	/** The plot kind's own hover under the strategy in force, which an author's `hover` marker is laid over as it is drawn. */
+	look?: (strategy: HoverStrategy) => HoverLook;
 };
 
 /** The `scales` prop of any plot kind. */

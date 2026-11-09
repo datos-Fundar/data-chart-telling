@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
 import { buildGroupedSeries } from '$lib/plots/utils/segments';
-import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/correlation/scatter/state';
+import type { ScatterPlotState, ScatterPlotEnv } from '$lib/types/plots/correlation/scatter/state';
 import type { Series } from '$lib/types/plots/data/common';
 import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
@@ -22,7 +22,7 @@ const SERIES: Series<Row> = { name: 'a', x: 'x', y: 'y', data: DATA };
 
 function build(
 	overrides: Partial<ScatterPlotState<Row>> = {},
-	ctxOverrides: Partial<ScatterPlotCtx> = {}
+	envOverrides: Partial<ScatterPlotEnv> = {}
 ) {
 	const state: ScatterPlotState<Row> = {
 		segments: {},
@@ -35,14 +35,14 @@ function build(
 		colorForSeries: () => 'blue',
 		...overrides
 	};
-	const ctx: ScatterPlotCtx = {
+	const env: ScatterPlotEnv = {
 		cfg: { scatter: { dotRadius: 4 } } as PlotStylesConfig,
-		...ctxOverrides
+		...envOverrides
 	};
 	// No `authorMarkers`/`statistics` given, so the real output is exactly
 	// this phase's own dots - narrowed back from the state's broader
 	// accumulating `markers` union.
-	return buildMarkers(new TransformsPhase<typeof state>().run(state, ctx), ctx)
+	return buildMarkers(new TransformsPhase<typeof state>().run(state, env), env)
 		.markers as DotMarkerConfig[];
 }
 

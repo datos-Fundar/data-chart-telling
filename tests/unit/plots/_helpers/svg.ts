@@ -66,11 +66,10 @@ export function countCells(svg: SVGElement): number {
 	return svg.querySelectorAll('g.cell rect').length;
 }
 
-// HoverMarker's optional `areaX`/`areaY` highlight - a plain `<rect>`
-// tagged with this class (see `BarMarker.svelte`'s `role: 'highlight'`),
-// distinct from a bar/pyramid plot's own `g.bar-y rect`/`g.bar-x rect` marks.
+// The bands a `band` marker draws - a bar plot's hover draws one behind the hovered
+// category - distinct from a bar/pyramid plot's own `g.bar-y rect`/`g.bar-x rect` marks.
 export function countHoverAreas(svg: SVGElement): number {
-	return svg.querySelectorAll('rect.hover-area').length;
+	return svg.querySelectorAll('g.band rect').length;
 }
 
 // GeoPlot's base map, `graticule`, and `sphere` markers all render through

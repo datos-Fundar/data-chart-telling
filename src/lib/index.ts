@@ -30,6 +30,12 @@ export { default as GridCell } from './layout/grid/GridCell.svelte';
 export { default as Plot } from './layout/plot/Plot.svelte';
 export { default as BasePlotLayout } from './layout/base/BasePlotLayout.svelte';
 export { usePlot, useFigure } from './layout/plot/usePlot';
+// What a plot knows of each row it draws, which every format reads.
+export { RowContext } from './phases/context/RowContext';
+export type { PlotRowContext, KindRowContext } from './types/layout/context';
+export type { ContextStageOptions } from './types/phases/context/phase';
+export type { BoxRowContext, BoxSummary } from './types/plots/distribution/box/props';
+export type { HistogramRowContext } from './types/plots/distribution/histogram/props';
 export type {
 	PublicPlotContext,
 	PublicFigureContext,
@@ -86,6 +92,7 @@ export type { AxisScale, AxisBasedScalesConfig, ChannelScalesConfig } from './ty
 export type { NumberDisplay } from './types/layout/numbers';
 export type {
 	TreemapPlotProps,
+	TreemapRowContext,
 	TreemapTooltipContext
 } from './types/plots/part-of-a-whole/treemap/props';
 export type { TreemapTile } from './types/transforms/treemap';
@@ -128,7 +135,13 @@ export type {
 export type { Range, Area, Segment } from './types/plots/segments/config';
 export type { SymbolType } from './types/plots/constants';
 export type { FontStyle, StrokeStyle, DotStyle, AreaStyle } from './types/plots/styling';
-export type { AxisBasedMarkersConfig, BrushSelection } from './types/markers/common';
+export type {
+	AxisBasedMarkersConfig,
+	BrushSelection,
+	HoverMarkerConfig,
+	HoverShapeStyle,
+	HoverLayerMarker
+} from './types/markers/common';
 export type { StatisticConfig } from './types/layout/statistics';
 export type * from './types/transforms';
 export type { GeoFeature, GeoJsonInput, GeoDataProps, Topology } from './types/plots/data/geo';

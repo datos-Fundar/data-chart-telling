@@ -1,16 +1,18 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { GAP_VALUE, SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { HoverSettings } from '$lib/layout/hover/HoverSettings';
+import { RowContext } from '$lib/phases/context/RowContext';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { NumberFormat } from '$lib/utils/NumberFormat';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { HoverDisplayPoint, HoverPoint } from '$lib/types/layout/hover';
 import type { TooltipConfig } from '$lib/types/plots/props';
-import type { TooltipContext } from '$lib/types/layout/tooltip';
 import { LegendState } from '$lib/layout/legend/LegendState.svelte';
+import { HoverDefaults } from '$lib/layout/hover/HoverDefaults';
+import type { HoverStrategy } from '$lib/types/layout/hover';
 import type {
-	AxisPlotCtx,
+	AxisPlotEnv,
 	AxisPlotState,
 	HoverPosition,
 	HoverStageOptions,
@@ -32,16 +34,16 @@ type Row = Record<string, unknown>;
  */
 export class HoverPhase<
 	TState extends AnyAxisState,
-	TCtx extends AxisPlotCtx
-> implements PhaseStage<TState, TCtx> {
+	TEnv extends AxisPlotEnv
+> implements PhaseStage<TState, TEnv> {
 	readonly phase = 'hover' as const;
-	readonly #options: HoverStageOptions<TState, TCtx>;
+	readonly #options: HoverStageOptions<TState, TEnv>;
 
-	constructor(options: HoverStageOptions<TState, TCtx> = {}) {
+	constructor(options: HoverStageOptions<TState, TEnv> = {}) {
 		this.#options = options;
 	}
 
-	run = (state: TState, ctx: TCtx): TState => {
+	run = (state: TState, env: TEnv): TState => {
 		const options = this.#options;
 		const valueAxis = PlotAxes.valueOf(state);
 		const raw =
@@ -53,21 +55,24 @@ export class HoverPhase<
 			options.position || state.axes?.isDiscrete(valueAxis)
 				? raw
 				: { ...raw, [valueAxis]: (row: never) => Number(raw[valueAxis](row)) };
+		// A row's label is the value its context gives it, else its value channel's.
 		const label =
 			options.label?.(state) ??
-			((row: never) => String(state.channels![valueAxis].accessor(row as Row)));
+			((row: never) => {
+				const { value } = RowContext.of(row);
+				return String(value ?? state.channels![valueAxis].accessor(row as Row));
+			});
 		const processed: ProcessedData = options.rows
 			? { ...state.processedData!, data: options.rows(state) }
 			: state.processedData!;
 		const points = HoverPhase.buildProcessedHoverPoints<Row>({
 			processed,
 			colorFor: state.colorForSeries!,
-			legendInteraction: ctx.interaction?.legend,
+			legendInteraction: env.interaction?.legend,
 			label: label as (row: Row) => string,
 			position,
-			include: HoverPhase.#hoverable(state, ctx, raw, valueAxis),
-			row: options.row?.(state) as ((row: Row) => Row) | undefined,
-			decorate: options.decorate?.(state, ctx) as
+			include: HoverPhase.#hoverable(state, env, raw, valueAxis),
+			decorate: options.decorate?.(state, env) as
 				| ((row: Row) => Partial<HoverDisplayPoint>)
 				| undefined
 		});
@@ -82,13 +87,19 @@ export class HoverPhase<
 			label: label as (row: Row) => string,
 			defaultStrategy: options.strategy ?? HoverSettings.strategyOf(state.axes),
 			pointMatching: options.pointMatching,
-			number: NumberFormat.of(NumberFormat.displayOf(state.tooltip), ctx.cfg),
-			context: HoverPhase.#contextOf(options.context?.(state) as ((row: Row) => object) | undefined)
+			number: NumberFormat.of(NumberFormat.displayOf(state.tooltip), env.cfg)
 		});
-		const hitAreas = options.hitAreas?.(state, hover as never, ctx) ?? [];
+		const hitAreas = options.hitAreas?.(state, hover as never, env) ?? [];
+		const own = options.marker?.(state, env);
+		const look =
+			typeof own === 'function'
+				? own
+				: own
+					? () => own
+					: (strategy: HoverStrategy) => HoverDefaults.of(strategy, hover.crosshair);
 		return {
 			...state,
-			hover,
+			hover: { ...hover, look },
 			hoverPosition: position,
 			hoverRows: processed.data,
 			...(hitAreas.length > 0 ? { markers: [...(state.markers ?? []), ...hitAreas] } : {})
@@ -98,7 +109,8 @@ export class HoverPhase<
 	/**
 	 * Hover candidates for a plot's own processed rows: each visible row at its
 	 * position (a stacked row's top, a bin's centre), in its series' color. A
-	 * series the legend turned off is left out, as is any row `include` rejects.
+	 * series the legend hides, omits or rescales away is left out (a dimmed one
+	 * stays), as is any row `include` rejects.
 	 */
 	static buildProcessedHoverPoints<TRow extends Record<string, unknown>>(args: {
 		processed: ProcessedData;
@@ -106,14 +118,12 @@ export class HoverPhase<
 		legendInteraction?: LegendState | null;
 		label: (row: TRow) => string;
 		include?: (row: TRow) => boolean;
-		/** The row a hovered point reads as, e.g. with derived fields added. Defaults to the processed row. */
-		row?: (row: TRow) => TRow;
 		/** Fields to add to (or replace on) each point. */
 		decorate?: (row: TRow) => Partial<HoverDisplayPoint>;
 		/** Where a row sits, as is. Defaults to its processed position, with `y` as a number. */
 		position?: HoverPosition;
 	}): HoverPoint<TRow>[] {
-		const { processed, colorFor, legendInteraction, label, include, row: rowOf, decorate } = args;
+		const { processed, colorFor, legendInteraction, label, include, decorate } = args;
 		const processedPosition = ProcessedPositions.of(processed);
 		const position = args.position ?? {
 			x: processedPosition.x,
@@ -122,7 +132,7 @@ export class HoverPhase<
 		const x = position.x as (row: ProcessedRow) => unknown;
 		const y = position.y as (row: ProcessedRow) => unknown;
 		return processed.data
-			.filter((d: ProcessedRow) => !legendInteraction?.isOff(d[SERIES_KEY] as string))
+			.filter((d: ProcessedRow) => !legendInteraction?.isUnhoverable(d[SERIES_KEY] as string))
 			.filter((d) => !include || include(d as TRow))
 			.map((d) => {
 				const row = d as TRow;
@@ -130,21 +140,14 @@ export class HoverPhase<
 				return {
 					x: x(d) as AxisValue,
 					y: y(d) as AxisValue,
-					row: rowOf ? rowOf(row) : row,
+					row,
+					context: RowContext.of(row),
 					label: label(row),
 					series: seriesName,
 					color: colorFor(seriesName),
 					...decorate?.(row)
 				};
 			});
-	}
-
-	/** What the plot knows of a hovered row: its series, and whatever its kind adds. */
-	static #contextOf(kind: ((row: Row) => object) | undefined): (row: Row) => TooltipContext {
-		return (row) => {
-			const series = row[SERIES_KEY];
-			return { ...(typeof series === 'string' ? { series } : {}), ...kind?.(row) };
-		};
 	}
 
 	/**
@@ -154,11 +157,11 @@ export class HoverPhase<
 	 */
 	static #hoverable(
 		state: AnyAxisState,
-		ctx: AxisPlotCtx,
+		env: AxisPlotEnv,
 		position: HoverPosition,
 		valueAxis: 'x' | 'y'
 	): (row: Row) => boolean {
-		const range = ctx.interaction?.legend?.range;
+		const range = env.interaction?.legend?.range;
 		const color = state.channels?.color?.accessor;
 		return (row) => {
 			if (isGapValue(position[valueAxis](row as never)) || row[GAP_VALUE] !== undefined)

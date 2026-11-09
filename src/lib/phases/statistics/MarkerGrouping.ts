@@ -114,23 +114,4 @@ export class MarkerGrouping {
 			return Object.keys(updates).length ? ({ ...m, ...updates } as TMarker) : marker;
 		});
 	}
-
-	/**
-	 * Gives a scoped hover marker its series color through its own `dot` and
-	 * `text` styles, the way `withSeriesColor` does for other markers. A style the
-	 * marker sets itself keeps its own color.
-	 */
-	static withHoverSeriesColor<T extends { dot?: object; text?: object }>(
-		marker: T,
-		color: string | undefined
-	): T {
-		if (!color) return marker;
-		const dot = (marker.dot ?? {}) as { dotFill?: string; dotStroke?: string };
-		const text = (marker.text ?? {}) as { fill?: string };
-		return {
-			...marker,
-			dot: { ...dot, dotFill: dot.dotFill ?? color, dotStroke: dot.dotStroke ?? color },
-			text: { ...text, fill: text.fill ?? color }
-		};
-	}
 }

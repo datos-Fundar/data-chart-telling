@@ -2,7 +2,7 @@ import { resolveAccessor } from '$lib/utils/accessors';
 import type { ResolvedChannels } from '$lib/types/layout/mapping';
 import type {
 	AxisPlotState,
-	AxisPlotCtx,
+	AxisPlotEnv,
 	MappingStageOptions,
 	PhaseStage
 } from '$lib/types/phases';
@@ -20,16 +20,16 @@ type AnyAxisState = AxisPlotState<any, any, any, any>;
  */
 export class MappingPhase<
 	TState extends AnyAxisState,
-	TCtx extends AxisPlotCtx
-> implements PhaseStage<TState, TCtx> {
+	TEnv extends AxisPlotEnv
+> implements PhaseStage<TState, TEnv> {
 	readonly phase = 'mapping' as const;
-	readonly #options: MappingStageOptions<TState, TCtx>;
+	readonly #options: MappingStageOptions<TState, TEnv>;
 
-	constructor(options: MappingStageOptions<TState, TCtx> = {}) {
+	constructor(options: MappingStageOptions<TState, TEnv> = {}) {
 		this.#options = options;
 	}
 
-	run = (state: TState, ctx: TCtx): TState => {
+	run = (state: TState, env: TEnv): TState => {
 		const first = state.resolvedSeries?.[0];
 		const identity = { accessor: (d: unknown) => d };
 		const size = (value: unknown) =>
@@ -48,7 +48,7 @@ export class MappingPhase<
 		} as ResolvedChannels<Record<string, unknown>>;
 
 		const next = { ...state, channels } as TState;
-		return this.#options.extend ? this.#options.extend(next, ctx) : next;
+		return this.#options.extend ? this.#options.extend(next, env) : next;
 	};
 
 	/** A channel prop resolved to a row accessor, keeping it as `source`, or left out when unset. */

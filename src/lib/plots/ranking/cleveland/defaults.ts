@@ -1,4 +1,5 @@
 import { ClevelandMarkers } from '$lib/plots/ranking/cleveland/ClevelandMarkers';
+import { HoverDefaults } from '$lib/layout/hover/HoverDefaults';
 import { ClevelandRanges } from '$lib/plots/ranking/cleveland/ClevelandRanges';
 import { NiceTicks } from '$lib/layout/scales/NiceTicks';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
@@ -8,7 +9,7 @@ import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type {
 	ClevelandOptions,
 	ClevelandPlotState,
-	ClevelandPlotCtx
+	ClevelandPlotEnv
 } from '$lib/types/plots/ranking/cleveland/state';
 
 /**
@@ -45,7 +46,7 @@ function fitInterval<TData extends Record<string, unknown>>(
  */
 export function buildClevelandDefaults<TData extends Record<string, unknown>>(
 	options: ClevelandOptions = { name: 'ClevelandPlot', config: 'cleveland' }
-): AxisPlotDefaults<ClevelandPlotState<TData>, ClevelandPlotCtx> {
+): AxisPlotDefaults<ClevelandPlotState<TData>, ClevelandPlotEnv> {
 	const markers = new ClevelandMarkers(options);
 	return {
 		data: {
@@ -66,16 +67,18 @@ export function buildClevelandDefaults<TData extends Record<string, unknown>>(
 			fit: options.interval
 				? (state) => fitInterval(state, options.fromBaseline ?? false)
 				: undefined,
-			defaults: (_state, ctx) => ({
+			defaults: (_state, env) => ({
 				category: {
-					paddingInner: ctx.cfg[options.config].paddingInner,
-					paddingOuter: ctx.cfg[options.config].paddingOuter
+					paddingInner: env.cfg[options.config].paddingInner,
+					paddingOuter: env.cfg[options.config].paddingOuter
 				}
 			})
 		},
 		// A dot is labelled by what its category's dots say: the first, the highest... of each.
 		transforms: { labels: { group: 'category', skip: ClevelandRanges.skipGaps } },
 		styles: { values: { reach: markers.reach } },
-		markers: { marks: markers.marks, valueLabels: markers.valueLabels }
+		markers: { marks: markers.marks, valueLabels: markers.valueLabels },
+		// A rule along the value axis at the hovered dot, and a dot and a label on each one of its category.
+		hover: { marker: (state) => HoverDefaults.valueRule(PlotAxes.valueOf(state)) }
 	};
 }

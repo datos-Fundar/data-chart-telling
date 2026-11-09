@@ -5,9 +5,9 @@ import { PANEL_KEY, FacetPanels } from '$lib/phases/facet/FacetPanels';
 import { SERIES_ID_KEY, SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { buildLineDefaults } from '$lib/plots/evolution/line/defaults';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
-import type { AxisPlotState, AxisPlotCtx } from '$lib/types/phases';
+import type { AxisPlotState, AxisPlotEnv } from '$lib/types/phases';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import type { LinePlotCtx, LinePlotState } from '$lib/types/plots/evolution/line/state';
+import type { LinePlotEnv, LinePlotState } from '$lib/types/plots/evolution/line/state';
 import { runStages } from '../plots/_helpers/stages';
 
 type Row = { anio: number; region: string; sector: string; valor: number };
@@ -24,7 +24,7 @@ const ROWS: Row[] = [
 	{ anio: 2023, region: 'Sur', sector: 'Industria', valor: 6 }
 ];
 
-const CTX: AxisPlotCtx = { cfg: DEFAULT_CONFIG };
+const ENV: AxisPlotEnv = { cfg: DEFAULT_CONFIG };
 
 function state(overrides: Partial<State> = {}): State {
 	return {
@@ -43,9 +43,9 @@ function state(overrides: Partial<State> = {}): State {
 /** The whole shared pipeline, with a kind that draws nothing of its own. */
 function run(overrides: Partial<State> = {}): State {
 	return runStages(
-		Pipeline.ofAxisKind<State, AxisPlotCtx>({ markers: { marks: () => [] } }),
+		Pipeline.ofAxisKind<State, AxisPlotEnv>({ markers: { marks: () => [] } }),
 		state(overrides),
-		CTX
+		ENV
 	);
 }
 
@@ -101,9 +101,9 @@ describe('the pipeline over every panel at once', () => {
 		const sur = out.resolvedSeries!.filter((s) => s.panel === 'Sur').map((s) => s.name);
 		expect(sur).toEqual(['Industria']);
 		const alone = runStages(
-			Pipeline.ofAxisKind<State, AxisPlotCtx>({ markers: { marks: () => [] } }),
+			Pipeline.ofAxisKind<State, AxisPlotEnv>({ markers: { marks: () => [] } }),
 			state({ data: withoutSurAgro.filter((r) => r.region === 'Sur'), facet: undefined }),
-			CTX
+			ENV
 		);
 		// On its own, Sur's only series takes the first palette color; across panels it keeps Industria's.
 		expect(out.colorForSeries!('Industria')).toBe(DEFAULT_CONFIG.palette[1]);
@@ -170,11 +170,11 @@ describe('the pipeline over every panel at once', () => {
 	});
 
 	test('line value labels keep one label per series in every panel', () => {
-		const lineCtx: LinePlotCtx = { cfg: DEFAULT_CONFIG };
+		const lineEnv: LinePlotEnv = { cfg: DEFAULT_CONFIG };
 		const out = runStages(
 			Pipeline.ofAxisKind(buildLineDefaults<Row>()),
 			{ ...state(), values: { show: true } } as LinePlotState<Row>,
-			lineCtx
+			lineEnv
 		);
 		const label = out.markers!.find((m) => m.type === 'text') as {
 			data: Record<string | symbol, unknown>[];

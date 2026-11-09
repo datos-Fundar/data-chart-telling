@@ -42,6 +42,7 @@ Works inside a plot - in a [`component` marker](markers.md#custom-components), w
 
 - `hover.points`, `hover.activePoint`, `hover.tooltip` (`visible`, `position`, `rows`) for this plot;
 - `margins`, `scales`, `axes`, `data`, `width`, `height`;
+- `contextOf(row)` - what the plot knows of one of its rows (see [Row context](#row-context));
 - `svelteplot` - svelteplot's own `usePlot()` state for this plot.
 
 ```svelte
@@ -65,6 +66,38 @@ Works inside a plot - in a [`component` marker](markers.md#custom-components), w
 	markers={[{ type: 'hover' }, { type: 'component', component: HoverReadout }]}
 />
 ```
+
+## Row context
+
+A plot works out a context for every row it draws, once, as it reads its data: the `series` the row is drawn in, its `x` and `y` (its own values, not a stack's running total, or where the plot's transforms put it), the `value` it shows on the value axis, the `row` itself, and whatever the plot kind works out for it. Everything that writes about a row reads the same context, so a value the plot computes - a tile's share, a density's estimate, a bin's count - is there to read without working it out again:
+
+- `tooltip.format(row, number, context)`;
+- `styles.values.format(value, number, context)`;
+- the `hover` marker's points (`point.context`), in its `format` and in its `back` and `front` markers;
+- `usePlot().contextOf(row)` in a `component` marker, and `RowContext.of(row)` anywhere, from a row the plot drew or a copy of it (the one a mark's accessor gets).
+
+What each plot kind adds:
+
+| Plot                    | `value`                               | Also                                                                            |
+| ----------------------- | ------------------------------------- | ------------------------------------------------------------------------------- |
+| Most plots              | the row's own value                   | -                                                                               |
+| `DensityPlot`           | the estimated density                 | `x` (or `y` when horizontal) is the point it is estimated at                    |
+| `HistogramPlot`         | the bin's count                       | `count`, `from`, `to` (the bin's edges)                                         |
+| `BoxPlot`, `ViolinPlot` | the value (a hovered box: its median) | the box's `category`, `min`, `p25`, `median`, `p75`, `max`, `count`, `outliers` |
+| `TreemapPlot`           | the tile's summed value               | `name`, `path`, `share` (0 to 100); no `x` or `y`                               |
+| `HeatmapPlot`           | the cell's color value                | -                                                                               |
+
+```svelte
+<HistogramPlot
+	data={ages}
+	x="age"
+	tooltip={{
+		format: (_row, number, context) => `${context.from}-${context.to}: ${number(context.count)}`
+	}}
+/>
+```
+
+The types are `PlotRowContext`, and per kind `TreemapRowContext`, `HistogramRowContext` and `BoxRowContext`.
 
 ## When to use them
 

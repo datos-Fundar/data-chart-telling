@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { stageOf } from '../../../_helpers/stages';
 import { buildPyramidDefaults } from '$lib/plots/distribution/pyramid/defaults';
-import type { PyramidPlotState, PyramidPlotCtx } from '$lib/types/plots/distribution/pyramid/state';
+import type { PyramidPlotState, PyramidPlotEnv } from '$lib/types/plots/distribution/pyramid/state';
 import type { Series } from '$lib/types/plots/data/common';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 
@@ -14,7 +14,7 @@ const buildData = stageOf(buildPyramidDefaults<Row>(), 'data');
 // x (magnitude)/y (category) prop names.
 type Row = { ageGroup: string; pct: number | null };
 
-const CTX: PyramidPlotCtx = {
+const ENV: PyramidPlotEnv = {
 	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as PlotStylesConfig
 };
 
@@ -32,7 +32,7 @@ function build(overrides: Partial<PyramidPlotState<Row>> = {}) {
 		height: 300,
 		...overrides
 	};
-	return buildData(state, CTX);
+	return buildData(state, ENV);
 }
 
 // ── Side assignment ───────────────────────────────────────────────────────────
@@ -76,7 +76,7 @@ describe('buildData - series resolution', () => {
 			width: 400,
 			height: 300
 		};
-		const result = stageOf(buildPyramidDefaults<GroupedRow>(), 'data')(state, CTX);
+		const result = stageOf(buildPyramidDefaults<GroupedRow>(), 'data')(state, ENV);
 		expect(result.resolvedSeries!.map((s) => s.name).sort()).toEqual(['Female', 'Male']);
 	});
 });

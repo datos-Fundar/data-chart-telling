@@ -1,6 +1,6 @@
 import { buildClevelandDefaults } from '$lib/plots/ranking/cleveland/defaults';
 import type { AxisPlotDefaults } from '$lib/types/phases';
-import type { DumbbellPlotState, DumbbellPlotCtx } from '$lib/types/plots/ranking/dumbbell/state';
+import type { DumbbellPlotState, DumbbellPlotEnv } from '$lib/types/plots/ranking/dumbbell/state';
 
 /**
  * DumbbellPlot on the shared pipeline: a ClevelandPlot of exactly two series,
@@ -10,7 +10,7 @@ import type { DumbbellPlotState, DumbbellPlotCtx } from '$lib/types/plots/rankin
  */
 export function buildDumbbellDefaults<TData extends Record<string, unknown>>(): AxisPlotDefaults<
 	DumbbellPlotState<TData>,
-	DumbbellPlotCtx
+	DumbbellPlotEnv
 > {
 	return buildClevelandDefaults<TData>({
 		name: 'DumbbellPlot',

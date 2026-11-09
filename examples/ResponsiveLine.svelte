@@ -23,7 +23,9 @@
 				x: { label: 'Month' },
 				y: { label: 'Inflation (%)' }
 			}}
-			styles={{ values: { show: true, format: (v, name) => `${name}: ${v}` } }}
+			styles={{
+				values: { show: true, format: (v, _number, context) => `${context.series}: ${v}` }
+			}}
 			margins={{ right: 'auto' }}
 		/>
 	{/if}

@@ -36,24 +36,28 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** The default hover marker: a dot and value label at the nearest position, with a dashed rule. */
+/**
+ * The plot's own hover, with a tooltip: a rule along the value axis at the point under the pointer, and a
+ * dot and the value on each line - a crosshair across its two positions would say little.
+ */
 export const Basic: Story = {
 	args: {
+		tooltip: true,
 		markers: [{ type: 'hover' }] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
-/** `showLabels: false` leaves the dots and the rule. */
+/** `front: [{ type: 'dot' }]` leaves the dots and the rule. */
 export const WithoutLabels: Story = {
 	args: {
-		markers: [{ type: 'hover', showLabels: false }] satisfies AxisBasedMarkersConfig[]
+		markers: [{ type: 'hover', front: [{ type: 'dot' }] }] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
-/** `ruleX: false` hides the rule, leaving the dots and their labels. */
+/** `back: []` hides the rule, leaving the dots and their labels. */
 export const WithoutRule: Story = {
 	args: {
-		markers: [{ type: 'hover', ruleX: false }] satisfies AxisBasedMarkersConfig[]
+		markers: [{ type: 'hover', back: [] }] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -61,6 +65,6 @@ export const WithoutRule: Story = {
 export const WithValues: Story = {
 	args: {
 		styles: { values: { show: true } },
-		markers: [{ type: 'hover', showLabels: false }] satisfies AxisBasedMarkersConfig[]
+		markers: [{ type: 'hover', front: [{ type: 'dot' }] }] satisfies AxisBasedMarkersConfig[]
 	}
 };

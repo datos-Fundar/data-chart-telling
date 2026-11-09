@@ -86,7 +86,7 @@ export type GeoPlotState<TProps extends Record<string, unknown>> = {
 };
 
 /** The environment every GeoPlot phase reads from, alongside the growing state. */
-export type GeoPlotCtx<TProps extends Record<string, unknown>> = {
+export type GeoPlotEnv<TProps extends Record<string, unknown>> = {
 	cfg: PlotStylesConfig;
 	range: GeoRangeFilter | null | undefined;
 	fill?: string;

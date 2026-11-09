@@ -6,7 +6,7 @@ import type { GeoPlotState, TaggedGeoFeature } from '$lib/types/plots/map/geo/st
 
 /**
  * GeoPlot's "data" phase: every feature tagged with its resolved id/centroid,
- * then reduced by `excludeParts`. Reads no ctx.
+ * then reduced by `excludeParts`. Reads no env.
  */
 export function buildData<TProps extends Record<string, unknown>>(
 	state: GeoPlotState<TProps>

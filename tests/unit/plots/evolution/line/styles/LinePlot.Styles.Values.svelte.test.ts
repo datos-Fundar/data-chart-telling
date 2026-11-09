@@ -40,7 +40,10 @@ describe('LinePlot - styles.values', () => {
 			height: 300,
 			series: [FEMALE],
 			styles: {
-				values: { show: true, format: (v, name) => `${name} → ${v.toFixed(1)} yr` }
+				values: {
+					show: true,
+					format: (v, _number, context) => `${context.series} → ${v.toFixed(1)} yr`
+				}
 			} satisfies AxisBasedStylesConfig,
 			margins: { right: 120 }
 		});
@@ -234,7 +237,7 @@ describe('LinePlot - styles.values', () => {
 			height: 300,
 			series: [FEMALE, MALE],
 			styles: {
-				values: { show: true, format: (v, name) => `${name} (${v})` }
+				values: { show: true, format: (v, _number, context) => `${context.series} (${v})` }
 			} satisfies AxisBasedStylesConfig,
 			margins: { right: 80 }
 		});

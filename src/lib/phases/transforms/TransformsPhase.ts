@@ -49,19 +49,19 @@ const NOT_OPTIONS = new Set(['data', 'z', 'grouping', 'transforms', 'sort', 'fil
  */
 export class TransformsPhase<
 	TState extends TransformsStageState,
-	TCtx = unknown
-> implements PhaseStage<TState, TCtx> {
+	TEnv = unknown
+> implements PhaseStage<TState, TEnv> {
 	readonly phase = 'transforms' as const;
-	readonly #options: TransformsStageOptions<TState, TCtx>;
+	readonly #options: TransformsStageOptions<TState, TEnv>;
 	readonly #connect: boolean;
 
 	/** `connect`: whether a series' visual segments bridge into each other, as the kind's "data" phase splits them. */
-	constructor(options: TransformsStageOptions<TState, TCtx> = {}, connect = true) {
+	constructor(options: TransformsStageOptions<TState, TEnv> = {}, connect = true) {
 		this.#options = options;
 		this.#connect = connect;
 	}
 
-	run = (state: TState, ctx: TCtx): TState => {
+	run = (state: TState, env: TEnv): TState => {
 		const options = this.#options;
 		const visible = (state.resolvedSeries ?? []) as Series[];
 		// An omitted part of a whole is laid out with the rest, so they keep their places; it is dropped after.
@@ -93,7 +93,7 @@ export class TransformsPhase<
 			shared[valueAxis] = (row: ProcessedRow) => row[GAP_VALUE] ?? read(row);
 		}
 		const transforms = options.transforms
-			? options.transforms(state, ctx)
+			? options.transforms(state, env)
 			: (state.transforms ?? []);
 		const rescaled = TransformsPhase.#rescaled(state, transforms, shared, valueAxis);
 		if (rescaled) shared[valueAxis] = rescaled;

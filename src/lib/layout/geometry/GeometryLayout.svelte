@@ -55,6 +55,14 @@
 	import type { GeoFeature } from '$lib/types/plots/data/geo';
 	import { MarkerGrouping } from '$lib/phases/statistics/MarkerGrouping';
 	import { FrameClipping } from '$lib/layout/geometry/FrameClipping';
+	import { HoverShapes, type HoverShapesReach } from '$lib/layout/hover/HoverShapes';
+	import { PlotInteraction } from '$lib/layout/interaction/PlotInteraction.svelte';
+	import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
+	import { HoverLayers, type HoverPointGroup } from '$lib/layout/hover/HoverLayers';
+	import { BandNudge } from '$lib/markers/utils/BandNudge';
+	import { PointPixel } from '$lib/markers/utils/PointPixel';
+	import { HoverDefaults } from '$lib/layout/hover/HoverDefaults';
+	import type { HoverMarkerConfig } from '$lib/types/markers/common';
 
 	/**
 	 * Renders every marker in `markers`, in array order, each delegated to the
@@ -108,9 +116,137 @@
 	} = $props();
 
 	const cfg = $derived(getConfiguration());
+	const interaction = PlotInteraction.current(() => cfg);
+
+	/**
+	 * The markers, each `hover` one laid over the plot kind's own hover under the strategy in force - read as they
+	 * are drawn, so a strategy changed while the plot is shown changes what the hover draws.
+	 */
+	const drawn = $derived.by(() => {
+		const look = ctrl.look;
+		return markers.map((marker) =>
+			marker.type === 'hover'
+				? (HoverDefaults.merge(look, marker as HoverMarkerConfig) as MarkerConfig)
+				: marker
+		);
+	});
+
+	/** The look the hover markers give the shapes linked to the hover. */
+	const shapes = $derived(new HoverShapes(drawn));
+	const reach: HoverShapesReach = {
+		roleOf: (row, series) => ctrl.roleOf(row as TData, series),
+		dimmed: (row) => {
+			const series = row[SERIES_KEY];
+			return typeof series === 'string' && interaction.fillFor(series) !== undefined;
+		},
+		get cfg() {
+			return cfg;
+		}
+	};
 
 	// Mounted inside svelteplot's `<Plot>`, the one place the margins it settles on can be read.
-	PlotMargins.current()?.follow(usePlot().svelteplot);
+	const svelteplot = usePlot().svelteplot;
+	PlotMargins.current()?.follow(svelteplot);
+
+	/**
+	 * The points a hover marker draws over: every matched one; with `series`, that series' only, in its color -
+	 * or with `scope: 'segment'`, each segment's, in the segment's. The first is the active one of a series.
+	 */
+	function hoverGroupsOf(marker: HoverMarkerConfig): HoverPointGroup[] {
+		const points = ctrl.points;
+		if (points.length === 0) return [];
+		const nearest = JSON.parse(nearestKey || '{}') as {
+			all?: number;
+			bySeries?: Record<string, number>;
+		};
+		const scope = marker.series;
+		if (!scope) {
+			const active = nearest.all !== undefined ? points[nearest.all] : undefined;
+			return [{ key: '', points, active: active ?? ctrl.activePoint }];
+		}
+		const under = nearest.bySeries?.[scope];
+		const activeOf = (list: typeof points) =>
+			(under !== undefined && list.find((p) => p.row === points[under].row)) || list[0] || null;
+		const group = groupByName.get(scope);
+		if (!group) return [];
+		const own = points.filter((p) => p.series === scope);
+		const colored = (list: typeof own, color: string | undefined) =>
+			color ? list.map((p) => ({ ...p, color })) : list;
+		if (marker.scope !== 'segment') {
+			const seriesPoints = colored(own, group.segments[0]?.color ?? group.color);
+			return [{ key: scope, points: seriesPoints, active: activeOf(seriesPoints) }];
+		}
+		return group.segments.map((seg, i) => {
+			// p.row (TData) is always a superset of TSeries in practice, not provable across two independent generics.
+			const segPoints = colored(
+				own.filter((p) => seg.match(p.row as unknown as TSeries)),
+				seg.color
+			);
+			return { key: `${scope}-${i}`, points: segPoints, active: activeOf(segPoints) };
+		});
+	}
+
+	/**
+	 * The hovered point under the pointer: of all of them, and of each series - the nearest to the pointer, not the
+	 * first the strategy matched, so a crosshair at it follows the pointer across the series of a category. Kept as
+	 * text, so the hover's markers are built again only when it changes, not at every move of the pointer.
+	 */
+	const nearestKey = $derived.by(() => {
+		const cursor = ctrl.cursor;
+		const points = ctrl.points;
+		if (!cursor || points.length === 0) return '';
+		const all = PointPixel.nearest(svelteplot.scales, points, cursor);
+		const bySeries: Record<string, number> = {};
+		for (const series of new Set(points.map((p) => p.series))) {
+			if (series == null) continue;
+			const indexes = points.flatMap((p, i) => (p.series === series ? [i] : []));
+			const nearest = PointPixel.nearest(
+				svelteplot.scales,
+				indexes.map((i) => points[i]),
+				cursor
+			);
+			if (nearest >= 0) bySeries[series] = indexes[nearest];
+		}
+		return JSON.stringify({ all: all >= 0 ? all : undefined, bySeries });
+	});
+
+	/** The markers `marker`'s `layer` draws, over each group of the points it draws over. */
+	function hoverPartsOf(marker: HoverMarkerConfig, layer: 'back' | 'front', index: number) {
+		return hoverGroupsOf(marker).flatMap((group) =>
+			HoverLayers.parts(
+				marker,
+				layer,
+				{
+					...group,
+					points: HoverLayers.labelled(group.points, marker, cfg),
+					active: group.active && HoverLayers.labelled([group.active], marker, cfg)[0]
+				},
+				cfg
+			).map((part) => ({ ...part, key: `${index}-${part.key}` }))
+		);
+	}
+
+	/**
+	 * What each hover marker draws, behind and in front, built once per hover - not as it is drawn, where reading
+	 * the scales would build its markers anew whenever svelteplot settles them, and settle them again.
+	 */
+	const hoverLayers = $derived(
+		new Map(
+			drawn.flatMap((marker, index) =>
+				marker.type === 'hover'
+					? [
+							[
+								index,
+								{
+									back: hoverPartsOf(marker as HoverMarkerConfig, 'back', index),
+									front: hoverPartsOf(marker as HoverMarkerConfig, 'front', index)
+								}
+							] as const
+						]
+					: []
+			)
+		)
+	);
 
 	const scopedSeriesOf = (marker: MarkerConfig): string | undefined =>
 		'series' in marker && typeof marker.series === 'string' && marker.series
@@ -132,19 +268,20 @@
 	}
 
 	/**
-	 * A marker with `hover: true`, with the plot's hover added to its own pointer handlers: entering or moving
-	 * over any of its shapes hovers its rows - as they are drawn now, should the plot have been laid out again
-	 * under a resting pointer - and leaving it ends the hover.
+	 * A marker with `hover: true` or `'trigger'`, with the plot's hover added to its own pointer handlers: entering or
+	 * moving over one of its shapes hovers that shape's row, and leaving it ends the hover.
 	 */
 	function withHover(marker: MarkerConfig, rows: TData[] | TSeries[]): MarkerConfig {
-		if (!('hover' in marker) || marker.hover !== true) return marker;
+		if (!('hover' in marker) || (marker.hover !== true && marker.hover !== 'trigger'))
+			return marker;
 		const own = marker as CommonMarkerEvents & { data?: unknown[] };
-		const hovered = (own.data ?? rows) as TData[];
+		// The row of the shape under the pointer - a copy svelteplot hands over, which the hover finds by its place.
+		const hovered = (row: unknown) => [(row ?? (own.data ?? rows)[0]) as TData];
 		return {
 			...marker,
 			onpointerenter: (event: Event, row: unknown, index: number) => {
 				own.onpointerenter?.(event, row, index);
-				ctrl.onPointer(hovered);
+				ctrl.onPointer(hovered(row));
 			},
 			onpointerleave: (event: Event, row: unknown, index: number) => {
 				own.onpointerleave?.(event, row, index);
@@ -152,7 +289,7 @@
 			},
 			onpointermove: (event: Event, row: unknown, index: number) => {
 				own.onpointermove?.(event, row, index);
-				ctrl.onPointer(hovered);
+				ctrl.onPointer(hovered(row));
 			}
 		} as MarkerConfig;
 	}
@@ -250,15 +387,6 @@
 		<marker.component {...marker.props} data={marker.data ?? seriesData} />
 	{:else if marker.type === 'geo-component'}
 		<marker.component {...marker.props} data={marker.data ?? rows} />
-	{:else if marker.type === 'hover'}
-		<HoverMarker
-			{marker}
-			data={ctrl.points}
-			activePoint={ctrl.activePoint}
-			impliesCrosshairX={ctrl.impliesCrosshairX}
-			impliesCrosshairY={ctrl.impliesCrosshairY}
-			onActivePointPixel={ctrl.reportActivePointPixel}
-		/>
 	{:else if marker.type === 'geo-hover'}
 		<GeoHoverMarker {marker} data={ctrl.points} />
 	{:else if marker.type === 'delta'}
@@ -267,41 +395,16 @@
 {/snippet}
 
 {#snippet renderMarker(marker: MarkerConfig, rows: TData[] | TSeries[])}
-	<MarkerOffset {marker}>
-		{@render drawMarker(withHover(marker, rows), rows)}
-	</MarkerOffset>
+	<!-- In parts the hover styles alike, while it restyles the marker's shapes. -->
+	{#each shapes.split(withHover(marker, rows), rows, reach) as part (part.key)}
+		<MarkerOffset marker={part.marker}>
+			{@render drawMarker(part.marker, rows)}
+		</MarkerOffset>
+	{/each}
 {/snippet}
 
 {#snippet renderScoped(marker: MarkerConfig, group: ScopedMarkerGroup<TSeries>)}
-	{#if marker.type === 'hover'}
-		{@const seriesPoints = ctrl.points.filter((p) => p.series === group.name)}
-		{#if marker.scope === 'segment'}
-			{#each group.segments as seg, segIdx (`${group.name}-hover-segment-${segIdx}`)}
-				<!-- p.row (TData) is always a superset of TSeries in practice, not provable across two independent generics. -->
-				{@const segPoints = seriesPoints.filter((p) => seg.match(p.row as unknown as TSeries))}
-				{#if segPoints.length > 0}
-					<HoverMarker
-						marker={MarkerGrouping.withHoverSeriesColor(marker, seg.color)}
-						data={segPoints}
-						activePoint={segPoints[0] ?? null}
-						impliesCrosshairX={ctrl.impliesCrosshairX}
-						impliesCrosshairY={ctrl.impliesCrosshairY}
-					/>
-				{/if}
-			{/each}
-		{:else}
-			<HoverMarker
-				marker={MarkerGrouping.withHoverSeriesColor(
-					marker,
-					group.segments[0]?.color ?? group.color
-				)}
-				data={seriesPoints}
-				activePoint={seriesPoints[0] ?? null}
-				impliesCrosshairX={ctrl.impliesCrosshairX}
-				impliesCrosshairY={ctrl.impliesCrosshairY}
-			/>
-		{/if}
-	{:else if marker.type === 'component'}
+	{#if marker.type === 'component'}
 		{#if marker.scope === 'segment'}
 			{#each group.segments as seg, segIdx (`${group.name}-component-segment-${segIdx}`)}
 				{@const segmentData = group.data.filter((row) => seg.match(row))}
@@ -319,10 +422,35 @@
 	{/if}
 {/snippet}
 
-<!-- Every marker in array order, so a later one always draws on top. -->
+{#snippet renderHoverLayer(index: number, layer: 'back' | 'front')}
+	{#each hoverLayers.get(index)?.[layer] ?? [] as part (part.key)}
+		<!-- A point in a slice of its band (a grouped bar's series) is drawn in the middle of it. -->
+		{@const nudge = BandNudge.of(svelteplot.scales, part.slice)}
+		<g transform="translate({nudge.dx}, {nudge.dy})">
+			<FrameClip clip={FrameClipping.isClipped(part.marker)}>
+				{@render renderMarker(part.marker as MarkerConfig, data)}
+			</FrameClip>
+		</g>
+	{/each}
+{/snippet}
+
+<!-- What the hover draws behind the plot's shapes, before any of them. -->
+{#each [...hoverLayers.keys()] as index (index)}
+	{@render renderHoverLayer(index, 'back')}
+{/each}
+
+<!-- Every marker in array order, so a later one always draws on top; a hover marker draws its front markers. -->
 {#each markers as marker, i (markerKey(marker, i))}
 	{@const scope = scopedSeriesOf(marker)}
-	{#if scope === undefined}
+	{#if marker.type === 'hover'}
+		{#if scope === undefined}
+			<HoverMarker
+				activePoint={ctrl.activePoint}
+				onActivePointPixel={ctrl.reportActivePointPixel}
+			/>
+		{/if}
+		{@render renderHoverLayer(i, 'front')}
+	{:else if scope === undefined}
 		<FrameClip clip={FrameClipping.isClipped(marker)}>
 			{@render renderMarker(marker, data)}
 		</FrameClip>
@@ -338,8 +466,11 @@
 {#each markers as marker, i (markerKey(marker, i))}
 	{@const scope = scopedSeriesOf(marker)}
 	{#if 'label' in marker && marker.label && (scope === undefined || groupByName.has(scope))}
-		<MarkerOffset {marker}>
-			<MarkerLabel marker={{ ...marker, data: marker.data ?? data }} />
-		</MarkerOffset>
+		<!-- Split as the shapes are, so a label reads on its shape's color under the hover. -->
+		{#each shapes.split(marker, data, reach) as part (part.key)}
+			<MarkerOffset marker={part.marker}>
+				<MarkerLabel marker={{ ...part.marker, data: part.marker.data ?? data }} />
+			</MarkerOffset>
+		{/each}
 	{/if}
 {/each}

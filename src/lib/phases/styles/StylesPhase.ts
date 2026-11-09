@@ -1,5 +1,5 @@
 import { ValueLabels } from '$lib/layout/styles/ValueLabels';
-import type { AxisPlotState, AxisPlotCtx, PhaseStage } from '$lib/types/phases';
+import type { AxisPlotState, AxisPlotEnv, PhaseStage } from '$lib/types/phases';
 import type { StylesStageOptions } from '$lib/types/phases/styles/phase';
 
 /**
@@ -10,8 +10,8 @@ import type { StylesStageOptions } from '$lib/types/phases/styles/phase';
 export class StylesPhase<
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	TState extends AxisPlotState<any, any, any, any>,
-	TCtx extends AxisPlotCtx
-> implements PhaseStage<TState, TCtx> {
+	TEnv extends AxisPlotEnv
+> implements PhaseStage<TState, TEnv> {
 	readonly phase = 'styles' as const;
 	readonly #options: StylesStageOptions<TState>;
 
@@ -19,8 +19,8 @@ export class StylesPhase<
 		this.#options = options;
 	}
 
-	run = (state: TState, ctx: TCtx): TState => ({
+	run = (state: TState, env: TEnv): TState => ({
 		...state,
-		valueLabels: ValueLabels.build(state.values, ctx.cfg, this.#options.values ?? {}, state)
+		valueLabels: ValueLabels.build(state.values, env.cfg, this.#options.values ?? {}, state)
 	});
 }

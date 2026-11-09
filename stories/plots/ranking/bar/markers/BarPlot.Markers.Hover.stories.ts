@@ -43,12 +43,12 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Basic hover marker - an in-SVG dot and value label appear at the nearest
- * bar as the cursor moves over the plot. A dashed vertical rule (ruleX) is
- * drawn by default. No floating HTML tooltip is involved.
+ * The plot's own hover, with a tooltip: the hovered province's band behind its bar, in the configuration's
+ * neutral gray `hover.area`.
  */
 export const Basic: Story = {
 	args: {
+		tooltip: true,
 		series: [
 			{
 				name: 'female',
@@ -66,7 +66,7 @@ export const Basic: Story = {
 };
 
 /**
- * Dot only - `showLabels: false` suppresses the value label next to the dot,
+ * Dot only - `front: [{ type: 'dot' }]` keeps the dot and drops the value label next to it,
  * leaving just the position indicator and the crosshair rule.
  */
 export const WithoutLabels: Story = {
@@ -82,14 +82,15 @@ export const WithoutLabels: Story = {
 		markers: [
 			{
 				type: 'hover',
-				showLabels: false
+				back: [{ type: 'rule', axis: 'x', points: 'active' }],
+				front: [{ type: 'dot' }]
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
 /**
- * Dot and label only - `ruleX: false` hides the vertical crosshair rule, so
+ * Dot and label only - `back: []` hides the vertical crosshair rule, so
  * only the dot and its label are drawn on hover.
  */
 export const WithoutRule: Story = {
@@ -103,16 +104,13 @@ export const WithoutRule: Story = {
 			}
 		],
 		markers: [
-			{
-				type: 'hover',
-				ruleX: false
-			}
+			{ type: 'hover', back: [], front: [{ type: 'dot' }, { type: 'text' }] }
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
 /**
- * Both crosshair rules - `ruleX: true` (default) and `ruleY: true` together
+ * Both crosshair rules - a `rule` along `x` and one along `y` in `back` together
  * draw a full crosshair: a vertical rule at the hovered province and a
  * horizontal rule at the hovered value.
  */
@@ -129,15 +127,18 @@ export const WithBothAxis: Story = {
 		markers: [
 			{
 				type: 'hover',
-				ruleX: true,
-				ruleY: true
+				back: [
+					{ type: 'rule', axis: 'x', points: 'active' },
+					{ type: 'rule', axis: 'y', points: 'active' }
+				],
+				front: [{ type: 'dot' }, { type: 'text' }]
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
 /**
- * Custom rule style - `rule` overrides the crosshair stroke individually.
+ * Custom rule style - the `styles` of a `rule` in `back` set the crosshair stroke individually.
  * Here the rule is rendered in red with a solid line and higher opacity.
  */
 export const WithCustomRuleStyle: Story = {
@@ -153,12 +154,20 @@ export const WithCustomRuleStyle: Story = {
 		markers: [
 			{
 				type: 'hover',
-				rule: {
-					stroke: '#e63946',
-					strokeOpacity: 0.7,
-					strokeWidth: 2,
-					strokeDasharray: '6 3'
-				}
+				back: [
+					{
+						type: 'rule',
+						axis: 'x',
+						points: 'active',
+						styles: {
+							stroke: '#e63946',
+							strokeOpacity: 0.7,
+							strokeWidth: 2,
+							strokeDasharray: '6 3'
+						}
+					}
+				],
+				front: [{ type: 'dot' }, { type: 'text' }]
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
@@ -187,9 +196,16 @@ export const TwoSeries: Story = {
 		markers: [
 			{
 				type: 'hover',
-				text: {
-					dy: -10
-				}
+				back: [{ type: 'rule', axis: 'x', points: 'active' }],
+				front: [
+					{ type: 'dot' },
+					{
+						type: 'text',
+						styles: {
+							dy: -10
+						}
+					}
+				]
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
@@ -230,8 +246,8 @@ export const SeriesScoped: Story = {
 /**
  * Hover marker on `'grouped'` series - `data / x / y / color` auto-creates one
  * series per unique `color` value, and the unscoped hover marker responds to
- * all of them. The dot, label, and crosshair rule land on each series' own
- * bar slice, not the shared category center.
+ * all of them. A dot and a label in `front` land on each series' own bar
+ * slice, not the shared category center, over the band the plot draws behind.
  */
 export const GroupedSeries: Story = {
 	args: {
@@ -241,14 +257,15 @@ export const GroupedSeries: Story = {
 		color: 'sex',
 		markers: [
 			{
-				type: 'hover'
+				type: 'hover',
+				front: [{ type: 'dot' }, { type: 'text' }]
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
 /**
- * `areaX: true` on `'grouped'` series - the hover matches every series of the
+ * A `band` along `x` on `'grouped'` series - the hover matches every series of the
  * category, so the highlight covers the whole two-bar group, as the dots mark
  * both bars.
  */
@@ -261,15 +278,15 @@ export const GroupedSeriesWithHighlightArea: Story = {
 		markers: [
 			{
 				type: 'hover',
-				areaX: true,
-				ruleX: false
+				back: [{ type: 'band', axis: 'x' }],
+				front: [{ type: 'dot' }, { type: 'text' }]
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
 /**
- * `areaY: true` on `'grouped'` series, horizontal orientation - the
+ * A `band` along `y` on `'grouped'` series, horizontal orientation - the
  * highlight covers the whole group, same as
  * `GroupedSeriesWithHighlightArea` but on the other axis.
  */
@@ -282,8 +299,8 @@ export const GroupedSeriesWithHighlightAreaHorizontal: Story = {
 		markers: [
 			{
 				type: 'hover',
-				areaY: true,
-				ruleY: false
+				back: [{ type: 'band', axis: 'y' }],
+				front: [{ type: 'dot' }, { type: 'text' }]
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
@@ -303,19 +320,20 @@ export const StackedSeries: Story = {
 		transforms: [{ type: 'stackY' as const }],
 		markers: [
 			{
-				type: 'hover'
+				type: 'hover',
+				front: [{ type: 'dot' }, { type: 'text' }]
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
 /**
- * `areaY: true` - a translucent area the height of the hovered province's
- * own row (its band width plus 2px), spanning the full plot width,
+ * A `band` along `y` - a translucent area the height of the hovered province's
+ * own row (its band width), spanning the full plot width,
  * replacing the thin crosshair rule with a highlight closer to how a
  * hovered row often reads in a horizontal bar chart. Defaults to a neutral
- * gray, overridable via `area` (see `WithCustomHighlightArea`) or the
- * `hover.area` theme config.
+ * gray, overridable via the band's `styles` (see `WithCustomHighlightArea`) or
+ * the `hover.area` theme config.
  */
 export const WithHighlightArea: Story = {
 	args: {
@@ -330,17 +348,21 @@ export const WithHighlightArea: Story = {
 		markers: [
 			{
 				type: 'hover',
-				areaY: true
+				back: [
+					{ type: 'band', axis: 'y' },
+					{ type: 'rule', axis: 'y', points: 'active' }
+				],
+				front: [{ type: 'dot' }, { type: 'text' }]
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
 /**
- * `area` overrides the highlight area's color/opacity; its thickness is
- * always sized to the hovered bar's own width plus 2px. `areaX`/`areaY` and
- * the crosshair rule are independent and can be combined; here the rule is
- * turned off so the area is the only highlight.
+ * A band's `styles` set the highlight area's color/opacity; its thickness is
+ * always the hovered bar's band. A `band` and a crosshair `rule` are
+ * independent markers in `back` and can be combined; here there is no rule,
+ * so the band is the only highlight.
  */
 export const WithCustomHighlightArea: Story = {
 	args: {
@@ -355,12 +377,17 @@ export const WithCustomHighlightArea: Story = {
 		markers: [
 			{
 				type: 'hover',
-				areaX: true,
-				ruleX: false,
-				area: {
-					fill: '#0891b2',
-					fillOpacity: 0.18
-				}
+				back: [
+					{
+						type: 'band',
+						axis: 'x',
+						styles: {
+							fill: '#0891b2',
+							fillOpacity: 0.18
+						}
+					}
+				],
+				front: [{ type: 'dot' }, { type: 'text' }]
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

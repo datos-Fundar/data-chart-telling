@@ -1,6 +1,7 @@
 import type { Snippet } from 'svelte';
 import type { HoverStrategy } from '$lib/types/layout/hover';
 import type { NumberDisplay } from '$lib/types/layout/numbers';
+import type { PlotRowContext } from '$lib/types/layout/context';
 
 /**
  * Preferred horizontal placement of the tooltip beside the cursor; it moves
@@ -14,15 +15,8 @@ export type TooltipAnchorY = 'top' | 'middle' | 'bottom';
 /** A matched row as a tooltip's `content` gets it: the row itself, plus `seriesColor`, the one the plot draws it in (unset on plots without series). */
 export type TooltipRow<TRow> = TRow & { seriesColor?: string };
 
-/**
- * What a plot knows of a hovered row beyond its own fields, the third argument of a tooltip's `format`:
- * the series it is drawn in, on the plots that have series. A plot kind that works out more about a row
- * gives a type that extends this one.
- */
-export type TooltipContext = {
-	/** The name of the series the row is drawn in. */
-	series?: string;
-};
+/** What a plot knows of a hovered row, the third argument of a tooltip's `format` - see {@link PlotRowContext}. */
+export type TooltipContext = PlotRowContext;
 
 /**
  * Author-facing tooltip option on the chart kinds. `true` = enable with defaults. `decimals`, `prefix`,
@@ -39,7 +33,8 @@ export type TooltipOptions<
 	sync?: boolean;
 	/**
 	 * Custom tooltip text for a row (supports `\n`). Defaults per chart kind. `number` writes a value as the display
-	 * fields above ask, and `context` is what the plot knows of the row - see {@link TooltipContext}.
+	 * fields above ask, and `context` is what the plot knows of the row: its series, `x`, `y`, the value it shows and
+	 * whatever its kind works out (a tile's share, a box's quartiles) - see {@link PlotRowContext}.
 	 */
 	format?: (row: TRow, number: (value: number) => string, context: TContext) => string;
 	/** Named subset of crossing series to include. Omitted = all matched. */

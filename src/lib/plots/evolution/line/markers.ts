@@ -8,7 +8,7 @@ import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { VisualGroup } from '$lib/types/plots/segments/config';
 import type { StrokeStyle, DotStyle } from '$lib/types/plots/styling';
 import type { LineMarkerConfig, DotMarkerConfig } from '$lib/types/markers/common';
-import type { LinePlotState, LinePlotCtx } from '$lib/types/plots/evolution/line/state';
+import type { LinePlotState, LinePlotEnv } from '$lib/types/plots/evolution/line/state';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { CurveName } from '$lib/types/layout/styles/curve';
 import type { CurveAwarePlotStylesConfig } from '$lib/types/layout/styles';
@@ -233,11 +233,11 @@ export function buildGapMarkers<TData extends Record<string, unknown>>(args: {
  */
 export function buildMarks<TData extends Record<string, unknown>>(
 	state: LinePlotState<TData>,
-	ctx: LinePlotCtx
+	env: LinePlotEnv
 ): AxisBasedMarkersConfig[] {
 	const { colorForSeries, gaps } = state;
-	const disabledStrokeFor = (name: string) => ctx.interaction?.strokeFor(name);
-	const disabledDotsFor = (name: string) => ctx.interaction?.dotsFor(name);
+	const disabledStrokeFor = (name: string) => env.interaction?.strokeFor(name);
+	const disabledDotsFor = (name: string) => env.interaction?.dotsFor(name);
 	const groups = state.processedGroups ?? [];
 
 	const lineMarkers = buildLineMarkers({

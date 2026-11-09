@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { stageOf } from '../../../_helpers/stages';
 import { buildLineDefaults } from '$lib/plots/evolution/line/defaults';
-import type { LinePlotState, LinePlotCtx } from '$lib/types/plots/evolution/line/state';
+import type { LinePlotState, LinePlotEnv } from '$lib/types/plots/evolution/line/state';
 import type { Series } from '$lib/types/plots/data/common';
 import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
@@ -36,11 +36,11 @@ function build(overrides: Partial<LinePlotState<Row>> = {}, legendInteraction?: 
 		height: 300,
 		...overrides
 	};
-	const ctx: LinePlotCtx = {
+	const env: LinePlotEnv = {
 		cfg: FAKE_CFG,
 		interaction: new PlotInteraction(() => FAKE_CFG, { legend: legendInteraction })
 	};
-	return buildData(state, ctx);
+	return buildData(state, env);
 }
 
 describe('buildData - series resolution', () => {

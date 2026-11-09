@@ -1,10 +1,11 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
+import { HoverDefaults } from '$lib/layout/hover/HoverDefaults';
 import { buildMarks, buildValueLabels } from '$lib/plots/correlation/scatter/markers';
 import { Margins } from '$lib/layout/margins/Margins';
 import { MarkerAxisValues } from '$lib/phases/scales/MarkerAxisValues';
 import type { AxisFit, AxisPlotDefaults } from '$lib/types/phases';
 import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
-import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/correlation/scatter/state';
+import type { ScatterPlotState, ScatterPlotEnv } from '$lib/types/plots/correlation/scatter/state';
 
 /** Stand-in max render radius for a channel-bound `r` (svelteplot's own auto sqrt scale). */
 const AUTO_SCALED_RADIUS_ESTIMATE = 20;
@@ -35,7 +36,7 @@ function paddedDomain(
  */
 function fitDomains<TData extends Record<string, unknown>>(
 	state: ScatterPlotState<TData>,
-	ctx: ScatterPlotCtx
+	env: ScatterPlotEnv
 ): Partial<Record<'x' | 'y', AxisFit>> {
 	const { scales, channels, groupedSeries } = state;
 	const processed = state.processedData!;
@@ -54,11 +55,11 @@ function fitDomains<TData extends Record<string, unknown>>(
 				: Math.max(
 						0,
 						...groupedSeries!.flatMap((group) =>
-							group.visualSegments.map((seg) => seg.styles.dotRadius ?? ctx.cfg.scatter.dotRadius)
+							group.visualSegments.map((seg) => seg.styles.dotRadius ?? env.cfg.scatter.dotRadius)
 						)
 					);
 	if (radius <= 0 && !extra.x.length && !extra.y.length) return {};
-	const box = Margins.resolve({ ...ctx.cfg.margins, ...state.margins }).contentBox(
+	const box = Margins.resolve({ ...env.cfg.margins, ...state.margins }).contentBox(
 		state.width,
 		state.height
 	);
@@ -78,7 +79,7 @@ function fitDomains<TData extends Record<string, unknown>>(
 /** ScatterPlot on the shared pipeline: discrete dots, its own radius-padded scales, and its own markers. Its plot defaults to: hover the exact point. */
 export function buildScatterDefaults<TData extends Record<string, unknown>>(): AxisPlotDefaults<
 	ScatterPlotState<TData>,
-	ScatterPlotCtx
+	ScatterPlotEnv
 > {
 	return {
 		data: {
@@ -93,6 +94,11 @@ export function buildScatterDefaults<TData extends Record<string, unknown>>(): A
 		markers: { marks: buildMarks, valueLabels: buildValueLabels },
 		hover: {
 			strategy: 'punctual',
+			// A crosshair through the hovered point, and its label - the point is a dot already.
+			marker: () => ({
+				back: [HoverDefaults.rule('x'), HoverDefaults.rule('y')],
+				front: [HoverDefaults.text()]
+			}),
 			label: (state) => {
 				const { x, y } = state.channels!;
 				return (row: never) => `${x.accessor(row)}, ${y.accessor(row)}`;

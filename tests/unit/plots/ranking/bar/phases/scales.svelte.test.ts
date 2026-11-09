@@ -17,7 +17,7 @@ const HORIZONTAL = new PlotAxes({
 	orientation: 'horizontal',
 	bands: ['y']
 });
-import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/ranking/bar/state';
+import type { BarPlotState, BarPlotEnv } from '$lib/types/plots/ranking/bar/state';
 import type { Series } from '$lib/types/plots/data/common';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 
@@ -26,7 +26,7 @@ import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 type Row = { category: string; value: number };
 
 const PADDING = { inner: 0.2, outer: 0.1 };
-const CTX: BarPlotCtx = {
+const ENV: BarPlotEnv = {
 	cfg: {
 		bar: { paddingInner: PADDING.inner, paddingOuter: PADDING.outer, seriesPadding: 0.1 },
 		margins: { top: 20, right: 20, bottom: 30, left: 40 }
@@ -63,7 +63,7 @@ function build(overrides: Partial<BarPlotState<Row>> = {}) {
 		gapFillMaps: new Map(),
 		...overrides
 	};
-	return buildScales(buildTransforms(state, CTX), CTX).scales;
+	return buildScales(buildTransforms(state, ENV), ENV).scales;
 }
 
 // ── Categorical sentinel ──────────────────────────────────────────────────────

@@ -33,28 +33,27 @@ type Story = StoryObj<typeof meta>;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Basic hover marker - an in-SVG dot and value label appear at the nearest
- * point as the cursor moves over the plot. No crosshair rule is drawn by
- * default: scatter's `'punctual'` strategy matches a single point, not a
- * shared x/y value, so a rule has nothing meaningful to line up against.
+ * The plot's own hover, with a tooltip: a crosshair along both axes through the hovered point, and its
+ * value - the point is a dot already.
  */
 export const Basic: Story = {
 	args: {
+		tooltip: true,
 		markers: [{ type: 'hover' }] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
-/** `showLabels: false` keeps just the highlight dot, no text next to it. */
+/** `front: [{ type: 'dot' }]` keeps just the highlight dot, no text next to it. */
 export const WithoutLabels: Story = {
 	args: {
-		markers: [{ type: 'hover', showLabels: false }] satisfies AxisBasedMarkersConfig[]
+		markers: [{ type: 'hover', front: [{ type: 'dot' }] }] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
-/** `ruleX`/`ruleY` opt back into crosshair rules at the hovered point's own coordinates. */
+/** A `rule` along each axis in `back` draws crosshair rules at the hovered point's own coordinates. */
 export const WithCrosshair: Story = {
 	args: {
-		markers: [{ type: 'hover', ruleX: true, ruleY: true }] satisfies AxisBasedMarkersConfig[]
+		markers: [{ type: 'hover' }] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
@@ -64,8 +63,13 @@ export const WithCustomStyle: Story = {
 		markers: [
 			{
 				type: 'hover',
-				dot: { dotFill: '#dc2626', dotRadius: 10, dotStrokeOpacity: 1, dotStroke: '#7f1d1d' },
-				text: { fill: '#7f1d1d', fontWeight: 'bold', fontSize: 14 }
+				front: [
+					{
+						type: 'dot',
+						styles: { dotFill: '#dc2626', dotRadius: 10, dotStrokeOpacity: 1, dotStroke: '#7f1d1d' }
+					},
+					{ type: 'text', styles: { fill: '#7f1d1d', fontWeight: 'bold', fontSize: 14 } }
+				]
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

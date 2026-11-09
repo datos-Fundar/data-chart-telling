@@ -8,7 +8,7 @@ import type { ProcessedChannel } from '$lib/types/phases';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
 import type { CellMarkerConfig } from '$lib/types/markers/common';
-import type { HeatmapPlotState, HeatmapPlotCtx } from '$lib/types/plots/correlation/heatmap/state';
+import type { HeatmapPlotState, HeatmapPlotEnv } from '$lib/types/plots/correlation/heatmap/state';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 /** A processed channel as a per-row function. */
@@ -29,10 +29,10 @@ const OPACITY_STEPS = 32;
  */
 export function buildMarks<TData extends Record<string, unknown>>(
 	state: HeatmapPlotState<TData>,
-	ctx: HeatmapPlotCtx
+	env: HeatmapPlotEnv
 ): AxisBasedMarkersConfig[] {
 	const { segments, channels, resolveColor, resolveOpacity } = state;
-	const { range } = ctx;
+	const { range } = env;
 	const labels = state.valueLabels?.show ? state.valueLabels : undefined;
 	const getColor = channels!.color.accessor;
 
@@ -135,8 +135,9 @@ export function buildMarks<TData extends Record<string, unknown>>(
 			borderRadius: group.styles.borderRadius,
 			inset: 0.5
 		},
+		hover: 'style',
 		// Each cell writes its own value, in the middle of it.
-		label: labels?.shapeLabel(ctx, (d) => labels.format(Number(getColor(d as TData)), ''), {
+		label: labels?.shapeLabel(env, (d) => labels.format(Number(getColor(d as TData)), d), {
 			fontWeight: 600
 		})
 	}));

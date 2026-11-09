@@ -2,11 +2,13 @@ import { usePlot as usePlotFromSvelteplot } from 'svelteplot';
 import { HoverState } from '$lib/layout/hover/HoverState.svelte';
 import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import { PlotContext } from '$lib/layout/plot/PlotContext';
+import { RowContext } from '$lib/phases/context/RowContext';
 import { TimelineState } from '$lib/layout/timeline/TimelineState.svelte';
 import type { PlotHover } from '$lib/layout/hover/PlotHover.svelte';
 import type { Margins } from '$lib/layout/margins/Margins';
 import type { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { AxisValue } from '$lib/types/layout/mapping';
+import type { PlotRowContext } from '$lib/types/layout/context';
 import type { HoverPoint, HoverStrategy } from '$lib/types/layout/hover';
 import type { PlayerControl, TimeInput, TimelineStep } from '$lib/types/layout/timeline';
 import type { LegendDisabledAction, LegendEntry, LegendRange } from '$lib/types/layout/legend';
@@ -290,6 +292,14 @@ export class PublicPlotContext<T extends Record<string, unknown> = Record<string
 	/** The rows the plot draws and hovers over. */
 	get data(): T[] {
 		return this.#context.data;
+	}
+
+	/**
+	 * What the plot knows of one of the rows it draws (or a copy of it, as a mark's accessor gets it): its series,
+	 * where it sits, the value it shows and whatever the plot kind works out for it - see {@link PlotRowContext}.
+	 */
+	contextOf<TContext extends PlotRowContext<T> = PlotRowContext<T>>(row: unknown): TContext {
+		return RowContext.of<TContext>(row);
 	}
 
 	/** The color a series is drawn in, by its name - `undefined` for a plot with no series (a map). */

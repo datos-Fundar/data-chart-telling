@@ -20,7 +20,7 @@ One line per series. Rows with a missing value (`null`, `undefined`, `NaN`) brea
 	x="date"
 	y="index"
 	color="commodity"
-	styles={{ values: { show: true, format: (v, name) => `${name}: ${v}` } }}
+	styles={{ values: { show: true, format: (v, _number, context) => `${context.series}: ${v}` } }}
 />
 ```
 

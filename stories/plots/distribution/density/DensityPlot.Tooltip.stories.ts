@@ -1,3 +1,4 @@
+import type { PlotRowContext } from '$lib/types/layout/context';
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import DensityPlot from '$lib/plots/distribution/density/Plot.svelte';
 import { HEIGHTS } from '$datasets';
@@ -39,11 +40,14 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** The value under the pointer and the curve's density there. */
+/**
+ * The value under the pointer and the curve's density there, from the row's context: the plot estimates them, so
+ * they are no fields of the data.
+ */
 const TOOLTIP = {
 	sync: false,
-	format: (row: Record<string, unknown>) =>
-		`${Number(row.x).toFixed(1)}: ${Number(row.y).toFixed(3)}`
+	format: (_row: Record<string, unknown>, _number: unknown, context: PlotRowContext) =>
+		`${Number(context.x).toFixed(1)}: ${Number(context.value).toFixed(3)}`
 };
 
 /** A tooltip along the curve: hover to read its density. */

@@ -1,10 +1,11 @@
 import { buildMarks } from '$lib/plots/evolution/sparkline/markers';
+import { HoverDefaults } from '$lib/layout/hover/HoverDefaults';
 import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { buildLineDefaults } from '$lib/plots/evolution/line/defaults';
 import type { AxisPlotDefaults } from '$lib/types/phases';
 import type {
 	SparklinePlotState,
-	SparklinePlotCtx
+	SparklinePlotEnv
 } from '$lib/types/plots/evolution/sparkline/state';
 
 /**
@@ -13,20 +14,22 @@ import type {
  */
 export function buildSparklineDefaults<TData extends Record<string, unknown>>(): AxisPlotDefaults<
 	SparklinePlotState<TData>,
-	SparklinePlotCtx
+	SparklinePlotEnv
 > {
 	const line = buildLineDefaults<TData>();
 	return {
-		...(line as AxisPlotDefaults<SparklinePlotState<TData>, SparklinePlotCtx>),
+		...(line as AxisPlotDefaults<SparklinePlotState<TData>, SparklinePlotEnv>),
 		transforms: { labels: { select: 'last', skip: ValueLabels.skipGaps, show: true } },
 		scales: { defaults: () => ({ x: { axisDisplay: 'none' }, y: { axisDisplay: 'none' } }) },
 		styles: {
 			values: {
 				...line.styles?.values,
 				show: true,
-				format: (value, _name, number) => number(value)
+				format: (value, number) => number(value)
 			}
 		},
-		markers: { marks: buildMarks, valueLabels: line.markers.valueLabels }
+		markers: { marks: buildMarks, valueLabels: line.markers.valueLabels },
+		// Small and bare: a dot on the hovered point, and nothing else.
+		hover: { ...line.hover, marker: () => ({ back: [], front: [HoverDefaults.dot()] }) }
 	};
 }

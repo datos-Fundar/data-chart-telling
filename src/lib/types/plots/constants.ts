@@ -46,11 +46,9 @@ export type FontWeight = 'normal' | 'bold' | number;
 export type FontStyleKeyword = 'normal' | 'italic';
 
 /**
- * Horizontal text anchor. `'outside'` is only meaningful where the consuming
- * mark resolves it per-point from a signed x value (currently `HoverMarker`
- * only) - it anchors the label away from zero: `'start'` (extending right)
- * for a positive x, `'end'` (extending left) for negative. Elsewhere it's
- * treated the same as `'start'`.
+ * Horizontal text anchor. `'outside'` leaves the side to the mark that writes
+ * the label, where it picks one per point (a Cleveland plot's labels take
+ * their own); elsewhere it's treated the same as `'start'`.
  */
 export type TextAnchor = 'start' | 'middle' | 'end' | 'outside';
 

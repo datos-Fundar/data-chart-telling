@@ -1,3 +1,4 @@
+import type { PlotRowContext } from '$lib/types/layout/context';
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
@@ -28,8 +29,12 @@ describe('BarPlot - the row a value label is written from', () => {
 				values: {
 					show: true,
 					anchor: 'middle',
-					format: (value: number, series: string, row?: Record<string, unknown>) => {
-						calls.push({ value, series, row });
+					format: (
+						value: number,
+						_number: unknown,
+						{ series, row }: { series?: string; row?: Record<string, unknown> }
+					) => {
+						calls.push({ value, series: series!, row });
 						return `${value}`;
 					}
 				}
@@ -52,8 +57,8 @@ describe('BarPlot - the row a value label is written from', () => {
 				values: {
 					show: true,
 					anchor: 'middle',
-					format: (value: number, _series: string, row?: Record<string, unknown>) =>
-						row?.bar === 'Q1' && row?.group === 'housing' ? `${value} %` : ''
+					format: (value: number, _number: unknown, context: PlotRowContext) =>
+						context.row?.bar === 'Q1' && context.row?.group === 'housing' ? `${value} %` : ''
 				}
 			}
 		} as never);

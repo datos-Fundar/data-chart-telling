@@ -1,7 +1,7 @@
 import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import { HoverSettings } from '$lib/layout/hover/HoverSettings';
 import { NumberFormat } from '$lib/utils/NumberFormat';
-import type { GeoPlotState, GeoPlotCtx, TaggedGeoFeature } from '$lib/types/plots/map/geo/state';
+import type { GeoPlotState, GeoPlotEnv, TaggedGeoFeature } from '$lib/types/plots/map/geo/state';
 
 /** Whether a pointer event is over an `inset` marker's panel, which has its own hover. */
 export function isOverInset(e: PointerEvent): boolean {
@@ -15,10 +15,10 @@ export function isOverInset(e: PointerEvent): boolean {
  */
 export function buildHover<TProps extends Record<string, unknown>>(
 	state: GeoPlotState<TProps>,
-	ctx: GeoPlotCtx<TProps>
+	env: GeoPlotEnv<TProps>
 ): GeoPlotState<TProps> {
 	const { color, tooltip, authoredMarkers } = state;
-	const { range } = ctx;
+	const { range } = env;
 	const features = state.features!;
 	const label = (f: TaggedGeoFeature<TProps>) => f.__id;
 	const points = features
@@ -34,7 +34,7 @@ export function buildHover<TProps extends Record<string, unknown>>(
 			defaultStrategy: 'punctual',
 			// Match the feature under the cursor, not the nearest centroid.
 			pointMatching: 'contains',
-			number: NumberFormat.of(NumberFormat.displayOf(tooltip), ctx.cfg)
+			number: NumberFormat.of(NumberFormat.displayOf(tooltip), env.cfg)
 		}),
 		// A map has no axes for a crosshair: 'punctual' only means an exact match.
 		strategy: 'punctual' as const,

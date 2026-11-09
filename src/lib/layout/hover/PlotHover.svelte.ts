@@ -1,6 +1,8 @@
+import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { HoverState } from '$lib/layout/hover/HoverState.svelte';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { HoverPoint } from '$lib/types/layout/hover';
+import type { HoverLook } from '$lib/types/markers/common';
 import type { HoverConfig } from '$lib/types/plots/props';
 
 /** What a plot's hover is built from, each read reactively. */
@@ -64,6 +66,52 @@ export class PlotHover<T extends Record<string, unknown>> {
 		return this.state.match(this.#inputs.hover().points);
 	});
 
+	/** A row's place, as a key: its x, y and series. */
+	static #keyOf(x: unknown, y: unknown, series: unknown): string {
+		const plain = (value: unknown) => (value instanceof Date ? +value : value);
+		return JSON.stringify([plain(x), plain(y), series ?? null]);
+	}
+
+	// The rows the hover can reach, and the matched ones: by identity, and by their place. Built whole
+	// inside this derivation and never changed after it, so they have nothing to react to.
+	readonly #reach = $derived.by(() => {
+		const points = this.#inputs.hover().points;
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const matched = new Set<HoverPoint<T>>(this.#matched);
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const byRow = new Map<unknown, HoverPoint<T>>(points.map((p) => [p.row, p]));
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const byPlace = new Map<string, HoverPoint<T>>(
+			points.map((p) => [PlotHover.#keyOf(p.x, p.y, p.series), p])
+		);
+		return { matched, byRow, byPlace };
+	});
+
+	/**
+	 * How the hover reaches `row`: `'active'` while it is matched, `'other'` while it can be hovered but is not,
+	 * `null` while nothing is hovered here or it is no row the hover can reach (one the legend hides). A row is
+	 * found by identity, else by its x, y and `series`. `series` narrows the active rows to that series.
+	 */
+	roleOf(row: T, series?: string): 'active' | 'other' | null {
+		const { matched, byRow, byPlace } = this.#reach;
+		if (matched.size === 0) return null;
+		const point = byRow.get(row) ?? this.#placed(byPlace, row);
+		if (!point) return null;
+		return matched.has(point) && (series === undefined || point.series === series)
+			? 'active'
+			: 'other';
+	}
+
+	/** The point at `row`'s place: of its own series, else of none (a heatmap's cell). */
+	#placed(byPlace: Map<string, HoverPoint<T>>, row: T): HoverPoint<T> | undefined {
+		const x = this.#inputs.getX()(row);
+		const y = this.#inputs.getY()(row);
+		const series = (row as Record<string, unknown>)[SERIES_KEY];
+		return (
+			byPlace.get(PlotHover.#keyOf(x, y, series)) ?? byPlace.get(PlotHover.#keyOf(x, y, undefined))
+		);
+	}
+
 	/** The matched points the tooltip reads: only the tooltip's `series`, when it names some. */
 	readonly matchedRows = $derived.by((): HoverPoint<T>[] => {
 		const series = this.#inputs.hover().tooltip?.series;
@@ -73,13 +121,14 @@ export class PlotHover<T extends Record<string, unknown>> {
 
 	/** The points the hover marker highlights. */
 	readonly points = $derived(
-		this.#matched.map(({ x, y, label, series, color, areaInset, row }) => ({
+		this.#matched.map(({ x, y, label, series, color, areaInset, context, row }) => ({
 			x,
 			y,
 			label,
 			series,
 			color,
 			areaInset,
+			context,
 			row
 		}))
 	);
@@ -101,6 +150,14 @@ export class PlotHover<T extends Record<string, unknown>> {
 		);
 	});
 
+	/**
+	 * The plot kind's own hover under the strategy in force - the figure's, which a composer or a scrolly step can
+	 * change while the plot is shown - for an author's `hover` marker to be laid over.
+	 */
+	get look(): HoverLook {
+		return this.#inputs.hover().look?.(this.state.strategy) ?? {};
+	}
+
 	/** Whether a crosshair rule runs across x - the strategy's, unless the config turns them off. */
 	get impliesCrosshairX(): boolean {
 		return this.#inputs.hover().crosshair !== false && this.state.crosshairX;
@@ -109,6 +166,11 @@ export class PlotHover<T extends Record<string, unknown>> {
 	/** Whether a crosshair rule runs across y. */
 	get impliesCrosshairY(): boolean {
 		return this.#inputs.hover().crosshair !== false && this.state.crosshairY;
+	}
+
+	/** The pointer's position in the plot's box, while it is over this plot. */
+	get cursor(): { x: number; y: number } | null {
+		return this.#cursor;
 	}
 
 	/** Whether the tooltip shows: under the cursor in the owning plot, in every synced one. */

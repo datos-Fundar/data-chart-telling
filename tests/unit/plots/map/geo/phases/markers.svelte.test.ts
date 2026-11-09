@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { buildMarkers } from '$lib/plots/map/geo/phases/markers';
-import type { GeoPlotState, GeoPlotCtx, TaggedGeoFeature } from '$lib/types/plots/map/geo/state';
+import type { GeoPlotState, GeoPlotEnv, TaggedGeoFeature } from '$lib/types/plots/map/geo/state';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { GeoFeaturesMarkerConfig } from '$lib/types/markers/geo';
 
@@ -20,14 +20,14 @@ function feature(id: string, pop: number): TaggedGeoFeature<Props> {
 	} as unknown as TaggedGeoFeature<Props>;
 }
 
-const CTX: GeoPlotCtx<Props> = {
+const ENV: GeoPlotEnv<Props> = {
 	cfg: { palette: ['red'], axis: { color: '#333' } } as unknown as PlotStylesConfig,
 	range: undefined
 };
 
 function build(
 	overrides: Partial<GeoPlotState<Props>> = {},
-	ctxOverrides: Partial<GeoPlotCtx<Props>> = {}
+	envOverrides: Partial<GeoPlotEnv<Props>> = {}
 ) {
 	const state: GeoPlotState<Props> = {
 		rawFeatures: [],
@@ -39,7 +39,7 @@ function build(
 		features: [feature('a', 10)],
 		...overrides
 	};
-	return buildMarkers(state, { ...CTX, ...ctxOverrides });
+	return buildMarkers(state, { ...ENV, ...envOverrides });
 }
 
 describe('buildMarkers - style grouping', () => {
@@ -67,7 +67,7 @@ describe('buildMarkers - base fill resolution', () => {
 		expect(marker.fill(feature('a', 10))).toBe('color-10');
 	});
 
-	test('falls back to ctx.fill, then cfg.palette[0], when no resolveColor', () => {
+	test('falls back to env.fill, then cfg.palette[0], when no resolveColor', () => {
 		const { markers } = build({}, { fill: 'steelblue' });
 		const [marker] = markers!.filter((m) => m.type === 'geo') as GeoFeaturesMarkerConfig[];
 		expect(marker.fill(feature('a', 10))).toBe('steelblue');

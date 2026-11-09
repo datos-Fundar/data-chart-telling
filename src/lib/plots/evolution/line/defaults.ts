@@ -2,12 +2,12 @@ import { buildMarks } from '$lib/plots/evolution/line/markers';
 import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import type { AxisPlotDefaults } from '$lib/types/phases';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
-import type { LinePlotState, LinePlotCtx } from '$lib/types/plots/evolution/line/state';
+import type { LinePlotState, LinePlotEnv } from '$lib/types/plots/evolution/line/state';
 
 /** LinePlot on the shared pipeline: continuous segments colored by their stroke, and its own markers. Its plot defaults to: hover along x, cumulative timeline tweening `y` per series. */
 export function buildLineDefaults<TData extends Record<string, unknown>>(): AxisPlotDefaults<
 	LinePlotState<TData>,
-	LinePlotCtx
+	LinePlotEnv
 > {
 	return {
 		data: {
@@ -29,7 +29,7 @@ export function buildLineDefaults<TData extends Record<string, unknown>>(): Axis
 		styles: {
 			values: {
 				anchor: 'start',
-				format: (v, name, number) => `${name} - ${number(v)}`,
+				format: (v, number, context) => `${context.series} - ${number(v)}`,
 				reach: (labels, state) => labels.reachAtSeriesEnds(state)
 			}
 		},

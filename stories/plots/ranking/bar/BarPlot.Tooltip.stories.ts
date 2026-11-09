@@ -266,7 +266,7 @@ export const HorizontalStackedTooltip: Story = {
 			}
 		},
 		transforms: [{ type: 'stackX' as const }],
-		markers: [{ type: 'hover', showLabels: false }]
+		markers: [{ type: 'hover' }]
 	}
 };
 

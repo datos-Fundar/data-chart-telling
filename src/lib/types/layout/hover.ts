@@ -1,3 +1,4 @@
+import type { PlotRowContext } from '$lib/types/layout/context';
 import type { AxisValue } from '$lib/types/layout/mapping';
 
 /**
@@ -39,6 +40,8 @@ export type HoverDisplayPoint = {
 	color?: string;
 	/** A 'grouped' series' own slice of the category band, as start/end fractions (0-1) of the whole band. `undefined` means the whole band. */
 	areaInset?: BandSlice;
+	/** What the plot knows of the point's row: its series, where it sits, its value and whatever its kind works out - see {@link PlotRowContext}. */
+	context?: PlotRowContext;
 };
 
 /** A candidate point for hover matching/highlighting - also carries its source row. */

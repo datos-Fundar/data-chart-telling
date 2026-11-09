@@ -1,3 +1,4 @@
+import type { PlotRowContext } from '$lib/types/layout/context';
 import { describe, test, expect } from 'vitest';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
 import { Pipeline } from '$lib/phases/Pipeline';
@@ -182,7 +183,8 @@ describe('ClevelandPlot markers', () => {
 					values: {
 						show: true,
 						select: 'last',
-						format: (v: number, name: string, row?: Row) => `${row?.c}/${name}: ${v}`
+						format: (v: number, _number: unknown, context: PlotRowContext) =>
+							`${(context.row as Row | undefined)?.c}/${context.series}: ${v}`
 					}
 				}
 			});

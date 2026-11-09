@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { stageOf } from '../../../_helpers/stages';
 import { buildScatterDefaults } from '$lib/plots/correlation/scatter/defaults';
-import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/correlation/scatter/state';
+import type { ScatterPlotState, ScatterPlotEnv } from '$lib/types/plots/correlation/scatter/state';
 import type { Series } from '$lib/types/plots/data/common';
 import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
@@ -45,11 +45,11 @@ function build(
 		height: 300,
 		...overrides
 	};
-	const ctx: ScatterPlotCtx = {
+	const env: ScatterPlotEnv = {
 		cfg: FAKE_CFG,
 		interaction: new PlotInteraction(() => FAKE_CFG, { legend: legendInteraction })
 	};
-	return buildData(state, ctx) as ResolvedData;
+	return buildData(state, env) as ResolvedData;
 }
 
 // ── Series resolution ─────────────────────────────────────────────────────────

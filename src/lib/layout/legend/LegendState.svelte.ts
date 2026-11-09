@@ -78,6 +78,12 @@ export class LegendState {
 		return this.disabled.has(series);
 	}
 
+	/** Whether `series` is out of the hover: turned off any way but `'dim'`, which leaves it drawn and hoverable. */
+	isUnhoverable(series: string): boolean {
+		const action = this.disabled.get(series);
+		return action !== undefined && action.mode !== 'dim';
+	}
+
 	/** What turning `series` off does, while it is off. */
 	actionOf(series: string): LegendDisabledAction | undefined {
 		return this.disabled.get(series);

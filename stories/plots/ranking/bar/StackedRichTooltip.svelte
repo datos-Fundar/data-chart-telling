@@ -36,7 +36,7 @@
 			color: { scheme: 'RdBu' }
 		} satisfies AxisBasedScalesConfig}
 		transforms={[{ type: 'stackX' }]}
-		markers={[{ type: 'hover', showLabels: false }]}
+		markers={[{ type: 'hover' }]}
 		tooltip={{
 			sync: false,
 			format: (row) => {

@@ -49,13 +49,13 @@ type SharedScalesState = FacetStageState & {
  * can't happen there. Without options, a kind still shares its domains: it just
  * has no bands and nothing that starts from zero.
  */
-export class SharedScalesPhase<TState extends SharedScalesState, TCtx> implements PhaseStage<
+export class SharedScalesPhase<TState extends SharedScalesState, TEnv> implements PhaseStage<
 	TState,
-	TCtx
+	TEnv
 > {
 	readonly phase = 'sharedScales' as const;
 	readonly #options: SharedScalesOptions | undefined;
-	readonly #kindScales: Pipeline<TState, TCtx>;
+	readonly #kindScales: Pipeline<TState, TEnv>;
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	readonly #scales: ScalesPhase<any, any>;
@@ -67,10 +67,10 @@ export class SharedScalesPhase<TState extends SharedScalesState, TCtx> implement
 	) {
 		this.#options = options;
 		this.#scales = scales;
-		this.#kindScales = new Pipeline<TState, TCtx>([scales as PhaseStage<TState, TCtx>]);
+		this.#kindScales = new Pipeline<TState, TEnv>([scales as PhaseStage<TState, TEnv>]);
 	}
 
-	run = (state: TState, ctx: TCtx): TState => {
+	run = (state: TState, env: TEnv): TState => {
 		const facet = state.facet as FacetConfig<Record<string, unknown>> | undefined;
 		const panels = facet ? (state.panels ?? []) : [];
 		// A symmetric axis has no domain but the one the kind's "scales" phase gives it.
@@ -93,7 +93,7 @@ export class SharedScalesPhase<TState extends SharedScalesState, TCtx> implement
 		const domainOver = (channel: SharedChannel, members: string[] | undefined): SharedScale => {
 			if (fromPhase.has(channel)) {
 				const scoped = members ? FacetPanels.narrowToPanels(state, members) : state;
-				const scales = (this.#kindScales.run(scoped, ctx) as { scales?: unknown }).scales as
+				const scales = (this.#kindScales.run(scoped, env) as { scales?: unknown }).scales as
 					| Record<string, { domain?: unknown[] } | undefined>
 					| undefined;
 				const domain = scales?.[channel]?.domain;

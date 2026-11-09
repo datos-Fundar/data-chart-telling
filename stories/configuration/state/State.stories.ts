@@ -5,6 +5,9 @@ import HoverReadoutSource from './HoverReadout.svelte?raw';
 import UseFigureDemo from './UseFigureDemo.svelte';
 import UseFigureDemoSource from './UseFigureDemo.svelte?raw';
 import FigureReadoutSource from './FigureReadout.svelte?raw';
+import RowContextDemo from './RowContextDemo.svelte';
+import RowContextDemoSource from './RowContextDemo.svelte?raw';
+import ContextReadoutSource from './ContextReadout.svelte?raw';
 import { demoSource } from '../../common/docsSource';
 
 /**
@@ -51,5 +54,17 @@ export const UseFigure: Story = {
 	render: () => ({ Component: UseFigureDemo }),
 	parameters: demoSource(
 		`${UseFigureDemoSource}\n\n<!-- FigureReadout.svelte -->\n${FigureReadoutSource}`
+	)
+};
+
+/**
+ * The context of each row a plot draws - its series, `x`, `y`, value and what the plot works out for it, here a
+ * bin's `count`, `from` and `to` - read the same way by the tooltip's and the value labels' `format`, and by a
+ * `component` marker through `usePlot().contextOf(row)`.
+ */
+export const RowContext: Story = {
+	render: () => ({ Component: RowContextDemo }),
+	parameters: demoSource(
+		`${RowContextDemoSource}\n\n<!-- ContextReadout.svelte -->\n${ContextReadoutSource}`
 	)
 };

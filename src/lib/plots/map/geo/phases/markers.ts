@@ -15,7 +15,7 @@ import type {
 import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
 import type {
 	GeoPlotState,
-	GeoPlotCtx,
+	GeoPlotEnv,
 	GeoStyleGroup,
 	TaggedGeoFeature
 } from '$lib/types/plots/map/geo/state';
@@ -43,11 +43,11 @@ function isBehindMarker(
  */
 export function buildMarkers<TProps extends Record<string, unknown>>(
 	state: GeoPlotState<TProps>,
-	ctx: GeoPlotCtx<TProps>
+	env: GeoPlotEnv<TProps>
 ): GeoPlotState<TProps> {
 	const { features, segments, authoredMarkers, color, grouping, resolveColor, resolveOpacity } =
 		state;
-	const { range, fill, fillOpacity, stroke, strokeWidth, cfg, onFeatureClick } = ctx;
+	const { range, fill, fillOpacity, stroke, strokeWidth, cfg, onFeatureClick } = env;
 	const OPACITY_STEPS = 32;
 
 	function rangeFilteredStyle(base: GeoSegmentStyle, f: TaggedGeoFeature<TProps>): GeoSegmentStyle {
@@ -111,7 +111,7 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 			[...behindMarkers, ...featureMarkers, ...frontMarkers, ...(hoverMarker ? [hoverMarker] : [])],
 			state.scales as never
 		),
-		{ cfg: ctx.cfg }
+		{ cfg: env.cfg }
 	);
 
 	return { ...state, markers, styleGroups };

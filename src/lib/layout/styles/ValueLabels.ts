@@ -6,6 +6,8 @@ import { seriesIdOf } from '$lib/utils/grouping';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { NumberFormat } from '$lib/utils/NumberFormat';
+import { RowContext } from '$lib/phases/context/RowContext';
+import type { PlotRowContext } from '$lib/types/layout/context';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { ValuesStyle } from '$lib/types/layout/styles';
 import type { ValueLabelsOptions } from '$lib/types/phases/styles/phase';
@@ -14,7 +16,7 @@ import type { FontStyle, StrokeStyle } from '$lib/types/plots/styling';
 import type { LabelAnchor, TextAnchor, ValueAnchor } from '$lib/types/plots/constants';
 import type { BoxAnchors, EdgeBox } from '$lib/types/layout/box';
 import type { MarginSide } from '$lib/types/plots/props';
-import type { AxisPlotCtx, AxisPlotState, ProcessedData, ProcessedRow } from '$lib/types/phases';
+import type { AxisPlotEnv, AxisPlotState, ProcessedData, ProcessedRow } from '$lib/types/phases';
 import type { TextMarkerConfig } from '$lib/types/markers/common';
 import type { TextLabelConfig } from '$lib/types/markers/basic/text';
 
@@ -27,7 +29,12 @@ import type { TextLabelConfig } from '$lib/types/markers/basic/text';
 export class ValueLabels {
 	readonly show: boolean;
 	readonly anchor: ValueAnchor;
-	readonly format: (value: number, seriesName: string, row?: Record<string, unknown>) => string;
+	/**
+	 * A label's text for `value`: the author's `format`, else the kind's, else the value as the display fields ask.
+	 * `row` is the row it labels, whose context the format reads; `series` names its series where there is no row
+	 * (a label measured ahead of the rows).
+	 */
+	readonly format: (value: number, row?: object, series?: string) => string;
 	readonly hoverIsolate: boolean;
 	readonly font: FontStyle | undefined;
 	readonly fontSize: number;
@@ -52,12 +59,10 @@ export class ValueLabels {
 		// The value as the display fields ask (else as it is), which a plot kind's own text builds on.
 		const number =
 			NumberFormat.maybe(NumberFormat.displayOf(values), cfg) ?? ((v: number) => `${v}`);
-		const kindFormat = options.format;
-		this.format = values?.format
-			? (v, name, row) => values.format!(v, name, row, number)
-			: kindFormat
-				? (v, name) => kindFormat(v, name, number)
-				: (v) => number(v);
+		const own = values?.format ?? options.format;
+		this.format = own
+			? (v, row, series) => own(v, number, ValueLabels.contextOf(row, series))
+			: (v) => number(v);
 		this.hoverIsolate = values?.hoverIsolate ?? false;
 		this.font = values?.fontStyle;
 		this.fontSize = typeof this.font?.fontSize === 'number' ? this.font.fontSize : 12;
@@ -66,6 +71,12 @@ export class ValueLabels {
 		this.declutter = cfg.text.declutter;
 		this.#cfg = cfg;
 		this.reach = (this.show && reach?.(this)) || [];
+	}
+
+	/** The context a label's `format` reads: its row's, with `series` when the row gives none. */
+	static contextOf(row: object | undefined, series?: string): PlotRowContext {
+		const context = RowContext.of(row);
+		return context.series === undefined && series !== undefined ? { ...context, series } : context;
 	}
 
 	/** A plot's value labels: `values` over `options`, the kind's own defaults, their reach read off `state`. */
@@ -173,9 +184,9 @@ export class ValueLabels {
 	 * isolates that series. A row without a series gets the margins only.
 	 */
 	hooks(
-		ctx: AxisPlotCtx
+		env: AxisPlotEnv
 	): Pick<TextMarkerConfig, 'fitMargins' | 'onpointerenter' | 'onpointerleave' | 'styles'> {
-		const interaction = ctx.interaction;
+		const interaction = env.interaction;
 		const seriesOf = (d: ProcessedRow) =>
 			d?.[SERIES_KEY] === undefined ? undefined : String(d[SERIES_KEY]);
 		const isolate = this.hoverIsolate && interaction;
@@ -238,7 +249,7 @@ export class ValueLabels {
 	 * `fill` only `outside`, for inside it is written in the color that contrasts with its shape.
 	 */
 	shapeLabel(
-		ctx: AxisPlotCtx,
+		env: AxisPlotEnv,
 		text: (row: ProcessedRow) => string,
 		defaults: {
 			fill?: string;
@@ -249,7 +260,7 @@ export class ValueLabels {
 			gap?: number;
 		} = {}
 	): TextLabelConfig {
-		const { fitMargins, styles: shared, ...events } = this.hooks(ctx);
+		const { fitMargins, styles: shared, ...events } = this.hooks(env);
 		const { font } = this;
 		return {
 			...events,
@@ -372,7 +383,7 @@ export class ValueLabels {
 			x: (processed.channels.x ?? position.x) as TextMarkerConfig['x'],
 			y: (processed.channels.y2 ?? processed.channels.y ?? topOf) as TextMarkerConfig['y'],
 			grouping: SERIES_ID_KEY,
-			text: (d: ProcessedRow) => format(Number(valueOf(d)), nameOf(d), d),
+			text: (d: ProcessedRow) => format(Number(valueOf(d)), d, nameOf(d)),
 			styles: {
 				...font,
 				fill: this.fill ?? ((d: ProcessedRow) => colorOf(d) ?? 'currentColor'),
@@ -451,14 +462,15 @@ export class ValueLabels {
 		if (domain && domain.length >= 2) {
 			const lo = Number(domain[0]);
 			const hi = Number(domain[domain.length - 1]);
-			for (const s of series) texts.push(format(lo, s.name), format(hi, s.name));
+			for (const s of series)
+				texts.push(format(lo, undefined, s.name), format(hi, undefined, s.name));
 		} else {
 			for (const s of series) {
 				if (s.y === undefined) continue;
 				const y = resolveAccessor(s.y);
 				for (const d of s.data) {
 					const v = Number(y(d));
-					if (!Number.isNaN(v)) texts.push(format(v, s.name));
+					if (!Number.isNaN(v)) texts.push(format(v, undefined, s.name));
 				}
 			}
 		}

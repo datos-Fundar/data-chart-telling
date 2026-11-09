@@ -137,7 +137,27 @@ markers={[
 
 ## Hover highlight
 
-`{ type: 'hover' }` draws a crosshair, a dot and a label at the hovered point. It makes the plot hoverable on its own; add `tooltip` for a floating box too. Fields: `strategy`, `sync`, `ruleX`, `ruleY`, `areaX`, `areaY` (a band highlight on band scales), `showLabels`, `format`, the number fields `decimals`, `prefix`, `suffix` and `signDisplay` (they write the label's value; `format` gets a `number` function that does the same), and the styles `rule`, `area`, `dot`, `text`. See [Tooltip and hover](tooltip-and-hover.md).
+`{ type: 'hover' }` draws the plot's own hover: a crosshair, a dot and a label at the hovered point on most plots, the hovered category's band on a bar plot. It makes the plot hoverable on its own; add `tooltip` for a floating box too. Fields: `strategy`, `sync`, `series`, `scope`; `back` and `front`, the markers it draws behind the plot's shapes and in front of them, over the hovered points (they replace the plot's); `active` and `others`, which restyle the hovered shapes and the rest; and `format` and the number fields `decimals`, `prefix`, `suffix` and `signDisplay`, which write each point's label. See [Tooltip and hover](tooltip-and-hover.md#in-plot-hover).
+
+```ts
+// A crosshair only at the hovered point, and its value in bold, without a dot.
+{ type: 'hover', back: [{ type: 'rule', axis: 'x', points: 'active' }], front: [{ type: 'text', styles: { fontWeight: 'bold' } }] }
+```
+
+Every marker takes `hover`, which links it to the plot's hover:
+
+- `'trigger'` makes it a hit area: the pointer over one of its shapes hovers that shape's row.
+- `'style'` has its shapes take the hover marker's `active` and `others`.
+- `true` does both.
+
+```ts
+markers={[
+	{ type: 'hover', active: { stroke: 'black', strokeWidth: 2 }, others: { fillOpacity: 0.3 } },
+	{ type: 'rect', data: eras, x1: 'from', x2: 'to', y1: 0, y2: 100, hover: true }
+]}
+```
+
+A plot's own shapes are linked already where its kind does it: the tiles, cells, bars, bins and dots of `TreemapPlot`, `HeatmapPlot`, `BarPlot`, `BulletPlot`, `PyramidPlot`, `HistogramPlot`, `ScatterPlot` and the Cleveland family. The `Layout/Hover` stories show every feature of the hover on every plot kind.
 
 ## Styles that depend on the row
 

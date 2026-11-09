@@ -6,7 +6,7 @@ import { PlotAxes } from '$lib/phases/data/PlotAxes';
 
 import type {
 	HistogramPlotState,
-	HistogramPlotCtx
+	HistogramPlotEnv
 } from '$lib/types/plots/distribution/histogram/state';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { ProcessedRow } from '$lib/types/phases';
@@ -19,10 +19,10 @@ import type { ProcessedRow } from '$lib/types/phases';
  */
 export function buildMarks<TData extends Record<string, unknown>>(
 	state: HistogramPlotState<TData>,
-	ctx: HistogramPlotCtx
+	env: HistogramPlotEnv
 ): AxisBasedMarkersConfig[] {
 	const { channels, options, transforms } = state.processedData!;
-	const fillOpacity = ctx.cfg.histogram.fillOpacity;
+	const fillOpacity = env.cfg.histogram.fillOpacity;
 
 	// Each bin writes its own count, along its bar: past its top (`'outside'`), against an edge, at its tip or its
 	// base - upward, or rightward on a horizontal histogram. A bin with nothing in it writes nothing.
@@ -38,13 +38,13 @@ export function buildMarks<TData extends Record<string, unknown>>(
 	const countOf = (d: ProcessedRow) =>
 		countRead ? Number(countRead(d)) : Number(position[value](d)) - Number(bottomOf(d));
 	const labelFor = (name: string) =>
-		labels?.shapeLabel(ctx, (d) => (countOf(d) > 0 ? labels.format(countOf(d), name, d) : ''), {
+		labels?.shapeLabel(env, (d) => (countOf(d) > 0 ? labels.format(countOf(d), d, name) : ''), {
 			fill: 'currentColor',
 			...ValueLabels.boxAnchor(labels.anchor, { isHorizontal: value === 'x' })
 		});
 
 	const rects = (state.processedGroups ?? []).flatMap((group) => {
-		const disabled = ctx.interaction?.fillFor(group.series.name);
+		const disabled = env.interaction?.fillFor(group.series.name);
 		// A stroke the segment sets is not a reason to lose the series' fill, as the marker would take it for the color.
 		const color = state.colorForSeries!(group.series.name);
 		return group.visualSegments.map((seg) =>
@@ -53,6 +53,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 					type: 'rect',
 					series: group.series.name,
 					data: seg.data,
+					hover: 'style',
 					...(labels ? { label: labelFor(group.series.name) } : {}),
 					...channels,
 					...options,

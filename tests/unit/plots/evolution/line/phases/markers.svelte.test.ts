@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest';
 import { buildLineMarkers } from '$lib/plots/evolution/line/markers';
 import { TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
 import { buildGroupedSeries } from '$lib/plots/utils/segments';
-import type { LinePlotState, LinePlotCtx } from '$lib/types/plots/evolution/line/state';
+import type { LinePlotState, LinePlotEnv } from '$lib/types/plots/evolution/line/state';
 import type { Series } from '$lib/types/plots/data/common';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { LineMarkerConfig } from '$lib/types/markers/common';
@@ -69,7 +69,7 @@ describe('buildLineMarkers - style resolution', () => {
 
 // ── buildMarkers (the real phase, combining line + gap markers) ──────────────
 
-const CTX: LinePlotCtx = { cfg: { line: {} } as PlotStylesConfig };
+const ENV: LinePlotEnv = { cfg: { line: {} } as PlotStylesConfig };
 
 function buildPhase(overrides: Partial<LinePlotState<{ x: number; y: number | null }>> = {}) {
 	const groupedSeries = buildGroupedSeries<
@@ -87,7 +87,7 @@ function buildPhase(overrides: Partial<LinePlotState<{ x: number; y: number | nu
 		colorForSeries: () => 'blue',
 		...overrides
 	};
-	return buildMarkers(new TransformsPhase<typeof state>().run(state, CTX), CTX).markers!;
+	return buildMarkers(new TransformsPhase<typeof state>().run(state, ENV), ENV).markers!;
 }
 
 describe('buildMarkers - combines line and gap markers', () => {

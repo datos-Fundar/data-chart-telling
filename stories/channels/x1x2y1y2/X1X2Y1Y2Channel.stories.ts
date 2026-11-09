@@ -1,4 +1,5 @@
 import type { Meta } from '@storybook/svelte-vite';
+import type { PlotRowContext } from '$lib';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { renderSource } from '../../common/docsSource';
@@ -95,7 +96,8 @@ const stockPriceProps = {
 	styles: {
 		values: {
 			show: true,
-			format: (v: number, name: string) => `${name} - ${v.toFixed(2)} USD`
+			format: (v: number, _number: unknown, context: PlotRowContext) =>
+				`${context.series} - ${v.toFixed(2)} USD`
 		}
 	}
 };

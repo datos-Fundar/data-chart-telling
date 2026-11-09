@@ -60,19 +60,23 @@ describe('HoverPhase - which rows can be hovered', () => {
 		expect(unfilled.hover.points.map((p) => p.x)).toEqual(['A', 'C']);
 	});
 
-	test('a series the legend turned off is left out', () => {
-		const legend = new LegendState();
-		legend.turnOff('b', { mode: 'dim' });
+	test('a series the legend hides is left out, a dimmed one stays', () => {
 		const data = [
 			{ x: 1, y: 1, g: 'a' },
 			{ x: 1, y: 2, g: 'b' }
 		];
-		const { hover } = hoverOf(
-			buildLineDefaults<Row>(),
-			{ data, x: 'x', y: 'y', color: 'g' },
-			legend
-		);
-		expect(hover.points.map((p) => p.series)).toEqual(['a']);
+		const seriesWith = (mode: 'dim' | 'hide') => {
+			const legend = new LegendState();
+			legend.turnOff('b', { mode });
+			const { hover } = hoverOf(
+				buildLineDefaults<Row>(),
+				{ data, x: 'x', y: 'y', color: 'g' },
+				legend
+			);
+			return hover.points.map((p) => p.series);
+		};
+		expect(seriesWith('hide')).toEqual(['a']);
+		expect(seriesWith('dim')).toEqual(['a', 'b']);
 	});
 
 	test('while the legend narrows a continuous color, a row outside its range is left out', () => {
@@ -154,15 +158,17 @@ describe('HoverPhase - where a candidate sits', () => {
 		expect(hover.points.map((p) => p.y)).toEqual(['0-4']);
 	});
 
-	test('a histogram bin reads as its row plus its count and edges', () => {
+	test('a histogram bin carries its count and edges in its context', () => {
 		const data = [{ v: 1 }, { v: 2 }, { v: 12 }];
 		const props = { data, x: 'v', transforms: [{ type: 'binX', thresholds: [0, 10, 20] }] };
 		const { hover } = hoverOf(buildHistogramDefaults<Row>(), props);
 		expect(hover.strategy).toBe('x');
-		expect(hover.points.map((p) => [p.label, p.row.from, p.row.to])).toEqual([
+		const contexts = hover.points.map((p) => p.context as Record<string, unknown>);
+		expect(contexts.map((c) => [String(c.count), c.from, c.to])).toEqual([
 			['2', 1, 10],
 			['1', 10, 12]
 		]);
+		expect(hover.points.map((p) => p.label)).toEqual(['2', '1']);
 		const horizontal = hoverOf(buildHistogramDefaults<Row>(), {
 			data,
 			y: 'v',

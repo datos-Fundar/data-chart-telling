@@ -1,4 +1,5 @@
 import { render } from 'vitest-browser-svelte';
+import type { PlotRowContext } from '$lib';
 import { describe, test, expect, afterEach, vi } from 'vitest';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
@@ -284,7 +285,8 @@ describe('BarPlot - gaps (hover-isolate dimming)', () => {
 				values: {
 					show: true,
 					hoverIsolate: true,
-					format: (v: number, name: string) => `${name}: ${v}`
+					format: (v: number, _number: unknown, context: PlotRowContext) =>
+						`${context.series}: ${v}`
 				},
 				gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle>
 			}

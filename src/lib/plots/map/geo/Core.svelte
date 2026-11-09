@@ -7,7 +7,7 @@
 	import BasePlotLayout from '$lib/layout/base/BasePlotLayout.svelte';
 	import type { GeoPlotCoreProps } from '$lib/types/plots/map/geo/props';
 	import type { CoordinatesConfig } from '$lib/types/layout/coordinates';
-	import type { GeoPlotState, GeoPlotCtx } from '$lib/types/plots/map/geo/state';
+	import type { GeoPlotState, GeoPlotEnv } from '$lib/types/plots/map/geo/state';
 
 	/**
 	 * A map from GeoJSON or TopoJSON. `segments` styles features by id,
@@ -76,7 +76,7 @@
 		y: { domain: [90, -90] }
 	});
 
-	const ctx = $derived<GeoPlotCtx<TProps>>({
+	const env = $derived<GeoPlotEnv<TProps>>({
 		cfg,
 		range,
 		fill: styles.fill,
@@ -103,7 +103,7 @@
 				height,
 				margins
 			},
-			ctx
+			env
 		) as GeoPlotState<TProps>
 	);
 

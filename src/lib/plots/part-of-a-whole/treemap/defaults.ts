@@ -1,4 +1,6 @@
 import { TREEMAP_ROW } from '$lib/phases/transforms/methods/TreemapTransform';
+import { HoverDefaults } from '$lib/layout/hover/HoverDefaults';
+import { RowContext } from '$lib/phases/context/RowContext';
 import { NumberFormat } from '$lib/utils/NumberFormat';
 import { Grouping } from '$lib/utils/grouping';
 import { getConfiguration } from '$lib/configuration/config.svelte';
@@ -8,9 +10,10 @@ import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { MarkerTransform } from '$lib/types/transforms';
 import type { TreemapTransform } from '$lib/types/transforms/treemap';
 import type { GroupingAccessor } from '$lib/types/layout/mapping';
+import type { TreemapRowContext } from '$lib/types/plots/part-of-a-whole/treemap/props';
 import type {
 	TreemapPlotState,
-	TreemapPlotCtx
+	TreemapPlotEnv
 } from '$lib/types/plots/part-of-a-whole/treemap/state';
 
 /** A share is written with one decimal unless the author or the configuration's `numbers.decimals` says otherwise. */
@@ -27,14 +30,23 @@ function shareDisplay(values: TreemapPlotState<never>['values']) {
 	return { ...NumberFormat.displayOf(values), suffix: values?.suffix ?? '%' };
 }
 
-/** A tile's name, path and share (from `0` to `100`), as the transform left them on its row. */
-function tileOf(row: ProcessedRow) {
+/**
+ * What a treemap knows of a tile, as the transform left it on its row: its name, path, summed value and share
+ * (from `0` to `100`). The tiles sit in a unit square, so they have no `x` or `y` to read.
+ */
+function tileOf(row: ProcessedRow): Omit<TreemapRowContext, 'series' | 'row'> {
 	return {
 		name: String(row[TREEMAP_ROW.name] ?? ''),
 		path: (row[TREEMAP_ROW.path] as string[] | undefined) ?? [],
-		share: Number(row[TREEMAP_ROW.share]) * 100
+		value: Number(row[TREEMAP_ROW.value]),
+		share: Number(row[TREEMAP_ROW.share]) * 100,
+		x: undefined,
+		y: undefined
 	};
 }
+
+/** A tile's context, as the "context" phase left it on its row. */
+const contextOf = (row: ProcessedRow) => RowContext.of<TreemapRowContext>(row);
 
 /**
  * The plot's tiles: a `treemap` of its `value`, nested by the levels of its `grouping` (its `color` when unset,
@@ -72,7 +84,7 @@ function pathKeysOf<TData extends Record<string, unknown>>(
 	state: TreemapPlotState<TData>,
 	row: ProcessedRow
 ): string[] {
-	const { path } = tileOf(row);
+	const { path } = contextOf(row);
 	return path
 		.slice(1)
 		.map((_, i) => path.slice(0, i + 2).join(Grouping.SEPARATOR))
@@ -83,44 +95,46 @@ function pathKeysOf<TData extends Record<string, unknown>>(
  * The tiles as `rect` markers, each with a `label`: the name of the tile over its share, fitted to it. A series'
  * tiles take its style - its color, under `styles.area` and the segments keyed by it (and `default`) - and the
  * segments keyed by a tile's path restyle it, so the tiles split into one marker per style. The legend's dimming
- * goes over all of them.
+ * goes over all of them, and the hover marker's `active` and `others` over the tiles it reaches.
  */
 function buildMarks<TData extends Record<string, unknown>>(
 	state: TreemapPlotState<TData>,
-	ctx: TreemapPlotCtx
+	env: TreemapPlotEnv
 ): AxisBasedMarkersConfig[] {
 	if (!state.processedData?.data.length) return [];
-	const look = ctx.cfg.treemap;
+	const look = env.cfg.treemap;
 	const edges = edgesOf(state);
 	const labels = state.valueLabels?.show ? state.valueLabels : undefined;
-	const number = NumberFormat.of(shareDisplay(state.values), ctx.cfg, SHARE_DECIMALS);
-	const shareText = (row: ProcessedRow, series: string) => {
-		const { share } = tileOf(row);
-		return state.values?.format ? state.values.format(share, series, row, number) : number(share);
+	const number = NumberFormat.of(shareDisplay(state.values), env.cfg, SHARE_DECIMALS);
+	const shareText = (row: ProcessedRow) => {
+		const context = contextOf(row);
+		return state.values?.format
+			? state.values.format(context.share, number, context)
+			: number(context.share);
 	};
 
 	/** The label of a series' tiles: the name over the share, fitted - or the share alone where the name does not fit. */
-	const labelOf = (labels: NonNullable<typeof state.valueLabels>, series: string) => {
+	const labelOf = (labels: NonNullable<typeof state.valueLabels>) => {
 		const shape = labels.shapeLabel(
-			ctx,
-			(row) => `${tileOf(row).name}
-${shareText(row, series)}`,
+			env,
+			(row) => `${contextOf(row).name}
+${shareText(row)}`,
 			{ fontSize: look.fontSize }
 		);
 		return {
 			...shape,
 			styles: { lineHeight: look.lineHeight, ...shape.styles },
-			fit: { padding: look.padding, fallback: (row: ProcessedRow) => shareText(row, series) }
+			fit: { padding: look.padding, fallback: (row: ProcessedRow) => shareText(row) }
 		};
 	};
 
 	return (state.processedGroups ?? []).flatMap((group) => {
 		const series = group.series.name;
-		const dimmed = ctx.interaction?.fillFor(series);
+		const dimmed = env.interaction?.fillFor(series);
 		const seriesColor = state.colorForSeries!(series);
 		/** A tile's color: its series', or a tone of it by its path while `scales.color.depth` asks for one. */
 		const colorOf = (row: ProcessedRow) =>
-			state.colorForPath ? state.colorForPath(tileOf(row).path) : seriesColor;
+			state.colorForPath ? state.colorForPath(contextOf(row).path) : seriesColor;
 		return group.visualSegments.flatMap((segment) => {
 			const styled = new Map<string, { keys: string[]; color: string; rows: ProcessedRow[] }>();
 			for (const row of segment.data as ProcessedRow[]) {
@@ -147,7 +161,8 @@ ${shareText(row, series)}`,
 						stroke: style.stroke ?? look.stroke,
 						strokeWidth: style.strokeWidth ?? look.strokeWidth
 					},
-					label: labels && labelOf(labels, series)
+					label: labels && labelOf(labels),
+					hover: 'style'
 				} as RectMarkerConfig;
 			});
 		});
@@ -163,7 +178,7 @@ ${shareText(row, series)}`,
  */
 export function buildTreemapDefaults<TData extends Record<string, unknown>>(): AxisPlotDefaults<
 	TreemapPlotState<TData>,
-	TreemapPlotCtx
+	TreemapPlotEnv
 > {
 	return {
 		data: {
@@ -173,6 +188,8 @@ export function buildTreemapDefaults<TData extends Record<string, unknown>>(): A
 		},
 		// An omitted sector keeps its tiles' room, and every other tile its share; a rescaled one does not.
 		transforms: { transforms: buildTransforms, keepsOmitted: true },
+		// A tile's name, path, value and share, for its label, its tooltip and its hover.
+		context: () => tileOf as (row: never) => object,
 		scales: {
 			defaults: () => ({
 				x: { axisDisplay: 'none', grid: false },
@@ -186,6 +203,8 @@ export function buildTreemapDefaults<TData extends Record<string, unknown>>(): A
 			strategy: 'punctual',
 			// A tile is hovered through its own hit area, not through whichever point the pointer is nearest.
 			pointMatching: 'contains',
+			// A tile has no axes for a crosshair, and writes its own label: its hover only restyles the tiles.
+			marker: (_state, env) => HoverDefaults.shapes(env.cfg),
 			hitAreas: (state, hover) =>
 				(hover.points as { row: ProcessedRow }[]).map(
 					({ row }) =>
@@ -194,7 +213,7 @@ export function buildTreemapDefaults<TData extends Record<string, unknown>>(): A
 							data: [row],
 							...edgesOf(state),
 							styles: { fill: 'transparent' },
-							hover: hover.active
+							hover: hover.active && 'trigger'
 						}) as RectMarkerConfig
 				),
 			format: (state) => {
@@ -204,13 +223,11 @@ export function buildTreemapDefaults<TData extends Record<string, unknown>>(): A
 					SHARE_DECIMALS
 				);
 				return ((row: ProcessedRow) => {
-					const tile = tileOf(row);
+					const tile = contextOf(row);
 					return `${tile.name}: ${number(tile.share)}`;
 				}) as (row: never) => string;
 			},
-			label: () => ((row: ProcessedRow) => tileOf(row).name) as (row: never) => string,
-			context: () =>
-				((row: ProcessedRow) => ({ share: tileOf(row).share })) as (row: never) => object
+			label: () => ((row: ProcessedRow) => contextOf(row).name) as (row: never) => string
 		}
 	};
 }

@@ -252,7 +252,14 @@ export type PlotStylesConfig = {
 	 * highlight - a restyled feature on `GeoPlot`, or an `areaX`/`areaY` band
 	 * on an axis-based plot's band scale.
 	 */
-	hover: { rule: StrokeStyle; dot: DotStyle; font: FontStyle; area: AreaStyle };
+	hover: {
+		rule: StrokeStyle;
+		dot: DotStyle;
+		font: FontStyle;
+		area: AreaStyle;
+		/** How a hovered shape looks on a plot whose hover only restyles its shapes (a treemap's tile, a heatmap's cell). */
+		active: StrokeStyle;
+	};
 
 	facet: {
 		/** Position badge shown in `carousel`/`paginated` facet modes. */

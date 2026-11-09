@@ -1,4 +1,5 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
+import { HoverDefaults } from '$lib/layout/hover/HoverDefaults';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { buildMarks } from '$lib/plots/distribution/pyramid/markers';
 import { ValueLabels } from '$lib/layout/styles/ValueLabels';
@@ -11,7 +12,7 @@ import type { Series } from '$lib/types/plots/data/common';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type {
 	PyramidPlotState,
-	PyramidPlotCtx,
+	PyramidPlotEnv,
 	PyramidSeries
 } from '$lib/types/plots/distribution/pyramid/state';
 
@@ -29,7 +30,7 @@ const byName = <S extends { name: string }>(a: S, b: S) => a.name.localeCompare(
  */
 export function buildPyramidDefaults<TData extends Record<string, unknown>>(): AxisPlotDefaults<
 	PyramidPlotState<TData>,
-	PyramidPlotCtx
+	PyramidPlotEnv
 > {
 	return {
 		data: {
@@ -68,7 +69,7 @@ export function buildPyramidDefaults<TData extends Record<string, unknown>>(): A
 					const offset = labels.offset(axis);
 					return labels.extremes(state.resolvedSeries ?? [], axis).map(({ series, value }) => {
 						const left = series.side === 'left';
-						const text = labels.format(Math.abs(value), series.name);
+						const text = labels.format(Math.abs(value), undefined, series.name);
 						return isHorizontal
 							? labels.edgeBox(
 									text,
@@ -88,6 +89,8 @@ export function buildPyramidDefaults<TData extends Record<string, unknown>>(): A
 		},
 		markers: { marks: buildMarks },
 		hover: {
+			// The hovered age group's band behind its bars, across both sides.
+			marker: (state) => HoverDefaults.behindBand(PlotAxes.other(PlotAxes.valueOf(state))),
 			// A bar sits at its signed magnitude - below or left of the baseline on the first
 			// side - and its category, and reads as its magnitude.
 			position: (state) => {

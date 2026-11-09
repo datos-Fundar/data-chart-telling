@@ -1,5 +1,5 @@
 import { buildMarks } from '$lib/plots/distribution/histogram/markers';
-import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
+import { HoverDefaults } from '$lib/layout/hover/HoverDefaults';
 import { resolveAccessor } from '$lib/utils/accessors';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { AxisPlotDefaults, ProcessedChannel, ProcessedRow } from '$lib/types/phases';
@@ -8,7 +8,7 @@ import type { BinXTransform, BinYTransform, MarkerTransform } from '$lib/types/t
 import type { AreaStyle } from '$lib/types/plots/styling';
 import type {
 	HistogramPlotState,
-	HistogramPlotCtx
+	HistogramPlotEnv
 } from '$lib/types/plots/distribution/histogram/state';
 
 /** One processed channel's value on a row - `undefined` for a channel the transforms didn't set. */
@@ -45,7 +45,7 @@ function mergeBin(own: MarkerTransform[], cfg: PlotStylesConfig, horizontal: boo
  */
 export function buildHistogramDefaults<TData extends Record<string, unknown>>(): AxisPlotDefaults<
 	HistogramPlotState<TData>,
-	HistogramPlotCtx
+	HistogramPlotEnv
 > {
 	return {
 		data: {
@@ -56,8 +56,24 @@ export function buildHistogramDefaults<TData extends Record<string, unknown>>():
 			}
 		},
 		transforms: {
-			transforms: (state, ctx) =>
-				mergeBin(state.transforms ?? [], ctx.cfg, state.axes?.isHorizontal ?? false)
+			transforms: (state, env) =>
+				mergeBin(state.transforms ?? [], env.cfg, state.axes?.isHorizontal ?? false)
+		},
+		// A bin's count and the edges it spans, for its label, its tooltip and its hover.
+		context: (state) => {
+			const { channels } = state.processedData!;
+			const value = PlotAxes.valueOf(state);
+			const binned = PlotAxes.other(value);
+			const [count, from, to] = [
+				channels[value],
+				channels[`${binned}1`],
+				channels[`${binned}2`]
+			].map(readChannel);
+			return ((row: ProcessedRow) => ({
+				count: Number(count(row)),
+				from: Number(from(row)),
+				to: Number(to(row))
+			})) as (row: never) => object;
 		},
 		scales: { zero: ['value'] },
 		styles: {
@@ -81,29 +97,9 @@ export function buildHistogramDefaults<TData extends Record<string, unknown>>():
 		},
 		markers: { marks: buildMarks },
 		hover: {
-			// A hovered bin is labelled with its count, and reads as its row plus its count,
-			// the edges it spans and its series.
-			label: (state) => {
-				const count = readChannel(state.processedData!.channels[PlotAxes.valueOf(state)]);
-				return ((row: ProcessedRow) => String(Number(count(row)))) as (row: never) => string;
-			},
-			row: (state) => {
-				const { channels } = state.processedData!;
-				const value = PlotAxes.valueOf(state);
-				const binned = PlotAxes.other(value);
-				const [count, from, to] = [
-					channels[value],
-					channels[`${binned}1`],
-					channels[`${binned}2`]
-				].map(readChannel);
-				return ((row: ProcessedRow) => ({
-					...row,
-					count: Number(count(row)),
-					from: Number(from(row)),
-					to: Number(to(row)),
-					group: row[SERIES_KEY]
-				})) as (row: never) => unknown;
-			}
+			// The hovered bin's span behind its bar, the whole height of the plot: a bin is no band of a category.
+			marker: (state) =>
+				HoverDefaults.behindSpan(PlotAxes.other(PlotAxes.valueOf(state)), 'from', 'to')
 		}
 	};
 }

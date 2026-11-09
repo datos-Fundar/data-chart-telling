@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
+import type { PlotRowContext } from '$lib';
 import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import { AGE_SHARES_BY_YEAR } from '$datasets';
@@ -51,7 +52,10 @@ export const Stacked: Story = {
 	args: {
 		transforms: [{ type: 'stackY' }],
 		styles: {
-			values: { show: true, format: (v: number, name: string) => `${name} ${v}%` }
+			values: {
+				show: true,
+				format: (v: number, _number: unknown, context: PlotRowContext) => `${context.series} ${v}%`
+			}
 		} satisfies AxisBasedStylesConfig
 	}
 };
@@ -60,7 +64,10 @@ export const Stacked: Story = {
 export const CustomFormat: Story = {
 	args: {
 		styles: {
-			values: { show: true, format: (v: number, name: string) => `${name}: ${v}%` }
+			values: {
+				show: true,
+				format: (v: number, _number: unknown, context: PlotRowContext) => `${context.series}: ${v}%`
+			}
 		} satisfies AxisBasedStylesConfig
 	}
 };
@@ -71,7 +78,7 @@ export const CustomConnector: Story = {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number, name: string) => `${name} ${v}%`,
+				format: (v: number, _number: unknown, context: PlotRowContext) => `${context.series} ${v}%`,
 				strokeStyle: { stroke: '#7c3aed', strokeWidth: 1, strokeDasharray: '2 2' }
 			}
 		} satisfies AxisBasedStylesConfig
@@ -85,7 +92,7 @@ export const HoverIsolate: Story = {
 			values: {
 				show: true,
 				hoverIsolate: true,
-				format: (v: number, name: string) => `${name} ${v}%`
+				format: (v: number, _number: unknown, context: PlotRowContext) => `${context.series} ${v}%`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
