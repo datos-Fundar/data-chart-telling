@@ -73,14 +73,29 @@ describe('StatisticsPhase', () => {
 		expect((plain.markers![0] as { color?: unknown }).color).toBeUndefined();
 	});
 
-	test('inheritPositions gives a line/area/dot marker the plot x/y, and only those kinds', () => {
+	test("a marker of a positioned kind takes the plot's x/y on each axis it leaves unset", () => {
 		const line = { type: 'line', data: rows } as unknown as AxisBasedMarkersConfig;
+		const density = { type: 'density', x: 'v' } as unknown as AxisBasedMarkersConfig;
+		const band = { type: 'difference', y1: 'a', y2: 'b' } as unknown as AxisBasedMarkersConfig;
 		const rule = { type: 'rule', y: 3 } as unknown as AxisBasedMarkersConfig;
-		const out = new StatisticsPhase({ inheritPositions: true }).run(
-			state({ authorMarkers: [line, rule] })
-		);
+		const out = new StatisticsPhase().run(state({ authorMarkers: [line, density, band, rule] }));
 		expect(out.markers![0]).toMatchObject({ x: 'x', y: 'y' });
-		expect(out.markers![1]).not.toHaveProperty('x');
+		expect(out.markers![1]).toMatchObject({ x: 'v', y: 'y' });
+		expect(out.markers![2]).toMatchObject({ x: 'x' });
+		expect(out.markers![2]).not.toHaveProperty('y');
+		expect(out.markers![3]).not.toHaveProperty('x');
+	});
+
+	test("a marker takes the plot's opacity, symbol and r where its kind has them and it sets none", () => {
+		const dot = { type: 'dot', data: rows, r: 4 } as unknown as AxisBasedMarkersConfig;
+		const area = { type: 'area', data: rows } as unknown as AxisBasedMarkersConfig;
+		const out = new StatisticsPhase().run(
+			state({ opacity: 'o', symbol: 's', r: 'size', authorMarkers: [dot, area] } as never)
+		);
+		expect(out.markers![0]).toMatchObject({ opacity: 'o', symbol: 's', r: 4 });
+		expect(out.markers![1]).toMatchObject({ opacity: 'o' });
+		expect(out.markers![1]).not.toHaveProperty('symbol');
+		expect(out.markers![1]).not.toHaveProperty('r');
 	});
 
 	test('no statistics and no author markers leaves an empty list', () => {

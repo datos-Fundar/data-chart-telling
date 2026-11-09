@@ -18,6 +18,10 @@ export type StatisticsStageState = Pick<FacetStageState, 'panels'> & {
 	/** The key the "data" phase split the rows into series by, which an author marker inherits. */
 	seriesGrouping?: Accessor<any, unknown>;
 	color?: Accessor<any, unknown>;
+	opacity?: Accessor<any, unknown>;
+	symbol?: Accessor<any, unknown>;
+	r?: number | Accessor<any, number>;
+	length?: number | Accessor<any, number>;
 	statistics?: StatisticConfig[];
 	authorMarkers?: AxisBasedMarkersConfig[];
 	resolvedSeries?: Series<any>[];
@@ -43,6 +47,4 @@ export type StatisticsStageOptions<TState extends StatisticsStageState> = {
 	 * default; off for a plot whose `color` is a value channel, not a group.
 	 */
 	inheritGrouping?: boolean;
-	/** Whether a line/area/dot author marker with no `x`/`y` takes the plot's own. */
-	inheritPositions?: boolean;
 };

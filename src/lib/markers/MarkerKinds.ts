@@ -1,7 +1,9 @@
 import type { MarkerConfig } from '$lib/types/markers/all';
-import type { MarkerTraits } from '$lib/types/markers/traits';
+import type { InheritedChannel, MarkerTraits } from '$lib/types/markers/traits';
 
 type Kind = MarkerConfig['type'];
+
+const SCALED: InheritedChannel[] = ['color', 'opacity', 'symbol', 'r', 'length'];
 
 /**
  * Every marker kind's traits, in one row each. Typed over every kind, so a
@@ -9,19 +11,36 @@ type Kind = MarkerConfig['type'];
  */
 export class MarkerKinds {
 	static readonly traits = {
-		area: { clip: true, drawsRows: true, legendSymbol: 'area' },
+		area: {
+			inherits: ['x', 'y', 'grouping', 'color', 'opacity'],
+			clip: true,
+			drawsRows: true,
+			legendSymbol: 'area'
+		},
 		arrow: { clip: false, drawsRows: true },
 		band: { clip: true, drawsRows: false, legendSymbol: 'rect' },
 		bar: {
+			inherits: ['x', 'y', 'color'],
 			clip: true,
 			drawsRows: true,
 			legendSymbol: 'bar',
 			labels: { default: 'box', box: 'band' }
 		},
-		bollinger: { clip: true, drawsRows: true, legendSymbol: 'line' },
+		bollinger: {
+			inherits: ['x', 'y'],
+			clip: true,
+			drawsRows: true,
+			legendSymbol: 'line'
+		},
 		brush: { clip: false, drawsRows: false },
-		box: { clip: true, drawsRows: true, legendSymbol: 'bar' },
+		box: {
+			inherits: ['x', 'y'],
+			clip: true,
+			drawsRows: true,
+			legendSymbol: 'bar'
+		},
 		cell: {
+			inherits: ['x', 'y', 'color', 'opacity'],
 			clip: true,
 			drawsRows: true,
 			legendSymbol: 'cell',
@@ -29,40 +48,110 @@ export class MarkerKinds {
 		},
 		component: { clip: false, drawsRows: false },
 		contour: { clip: false, drawsRows: false },
-		delaunayLink: { clip: true, drawsRows: true },
-		delaunayMesh: { clip: true, drawsRows: true },
+		delaunayLink: {
+			inherits: ['x', 'y', 'grouping', 'color'],
+			clip: true,
+			drawsRows: true
+		},
+		delaunayMesh: {
+			inherits: ['x', 'y', 'grouping', 'color'],
+			clip: true,
+			drawsRows: true
+		},
 		delta: { clip: false, drawsRows: false },
-		density: { clip: true, drawsRows: true, legendSymbol: 'area' },
-		difference: { clip: true, drawsRows: true, legendSymbol: 'area' },
-		dot: { clip: false, drawsRows: true, legendSymbol: 'dot' },
+		density: {
+			inherits: ['x', 'y', 'grouping', 'color'],
+			clip: true,
+			drawsRows: true,
+			legendSymbol: 'area'
+		},
+		difference: {
+			inherits: ['x', 'y'],
+			clip: true,
+			drawsRows: true,
+			legendSymbol: 'area'
+		},
+		dot: {
+			inherits: ['x', 'y', 'color', 'opacity', 'symbol', 'r'],
+			clip: false,
+			drawsRows: true,
+			legendSymbol: 'dot'
+		},
 		geo: { clip: false, drawsRows: false },
 		'geo-component': { clip: false, drawsRows: true },
 		'geo-hover': { clip: false, drawsRows: false },
 		graticule: { clip: false, drawsRows: false },
 		hover: { clip: false, drawsRows: false },
-		hull: { clip: true, drawsRows: true, legendSymbol: 'area' },
-		image: { clip: false, drawsRows: true },
+		hull: {
+			inherits: ['x', 'y', 'grouping', 'color'],
+			clip: true,
+			drawsRows: true,
+			legendSymbol: 'area'
+		},
+		image: {
+			inherits: ['x', 'y'],
+			clip: false,
+			drawsRows: true
+		},
 		inset: { clip: false, drawsRows: false },
-		line: { clip: true, drawsRows: true, legendSymbol: 'line' },
+		line: {
+			inherits: ['x', 'y', 'grouping', 'color'],
+			clip: true,
+			drawsRows: true,
+			legendSymbol: 'line'
+		},
 		link: { clip: false, drawsRows: false },
 		raster: { clip: true, drawsRows: true },
 		rect: {
+			inherits: ['x', 'y', 'color', 'opacity'],
 			clip: true,
 			drawsRows: true,
 			legendSymbol: 'rect',
 			labels: { default: 'box', box: 'edges' }
 		},
-		regression: { clip: true, drawsRows: true, legendSymbol: 'line' },
+		regression: {
+			inherits: ['x', 'y'],
+			clip: true,
+			drawsRows: true,
+			legendSymbol: 'line'
+		},
 		rule: { clip: true, drawsRows: false, legendSymbol: 'line' },
 		sphere: { clip: false, drawsRows: false },
-		text: { clip: false, drawsRows: true },
-		tick: { clip: true, drawsRows: true },
-		trail: { clip: true, drawsRows: true, legendSymbol: 'line' },
-		vector: { clip: false, drawsRows: false },
-		violin: { clip: true, drawsRows: true, legendSymbol: 'area' },
-		voronoi: { clip: true, drawsRows: true },
-		voronoiMesh: { clip: true, drawsRows: true },
+		text: {
+			inherits: ['x', 'y'],
+			clip: false,
+			drawsRows: true
+		},
+		tick: {
+			inherits: ['color'],
+			clip: true,
+			drawsRows: true
+		},
+		trail: {
+			inherits: ['x', 'y', 'grouping', 'color', 'opacity', 'r'],
+			clip: true,
+			drawsRows: true,
+			legendSymbol: 'line'
+		},
+		vector: { inherits: ['length'], clip: false, drawsRows: false },
+		violin: {
+			inherits: ['x', 'y'],
+			clip: true,
+			drawsRows: true,
+			legendSymbol: 'area'
+		},
+		voronoi: {
+			inherits: ['x', 'y', 'grouping', 'color'],
+			clip: true,
+			drawsRows: true
+		},
+		voronoiMesh: {
+			inherits: ['x', 'y', 'grouping', 'color'],
+			clip: true,
+			drawsRows: true
+		},
 		waffle: {
+			inherits: ['x', 'y', 'color'],
 			clip: true,
 			drawsRows: true,
 			labels: { default: 'box', box: 'band' }
@@ -74,5 +163,14 @@ export class MarkerKinds {
 		return type !== undefined && type in MarkerKinds.traits
 			? MarkerKinds.traits[type as Kind]
 			: undefined;
+	}
+
+	static inherits(type: string | undefined, channel: InheritedChannel): boolean {
+		return MarkerKinds.of(type)?.inherits?.includes(channel) ?? false;
+	}
+
+	/** Whether the kind takes the plot's scales: it inherits a channel that has one. */
+	static inheritsScales(type: string | undefined): boolean {
+		return SCALED.some((channel) => MarkerKinds.inherits(type, channel));
 	}
 }

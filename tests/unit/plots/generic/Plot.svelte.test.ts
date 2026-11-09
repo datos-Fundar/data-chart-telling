@@ -39,6 +39,16 @@ describe('Plot', () => {
 		await expect.poll(() => texts(svg)).toEqual(expect.arrayContaining(['4', '6', '5']));
 	});
 
+	test("a density without a position of its own takes the plot's", async () => {
+		const svg = await draw({
+			data: ROWS,
+			x: 'year',
+			y: 'high',
+			markers: [{ type: 'density' }]
+		});
+		await expect.poll(() => svg.querySelectorAll('g.density path').length).toBeGreaterThan(0);
+	});
+
 	test('takes chrome as any plot does', async () => {
 		const { container } = await render(Plot, {
 			width: 400,
