@@ -7,6 +7,7 @@ import type { HeatmapPlotState, HeatmapPlotEnv } from '$lib/types/plots/correlat
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { CellMarkerConfig } from '$lib/types/markers/common';
 import { stageOf } from '../../../_helpers/stages';
+import { MarkerLabels } from '$lib/markers/labels/MarkerLabels';
 
 /** The kind's "markers" stage: its own marks, the state's markers, then its value labels. */
 const buildMarkers = stageOf(buildHeatmapDefaults<Row>(), 'markers');
@@ -125,7 +126,7 @@ describe('buildMarkers - fill', () => {
 describe('buildMarkers - value labels', () => {
 	/** The label each cell marker carries. */
 	const labels = (markers: ReturnType<typeof buildAll>) =>
-		markers.flatMap((m) => (m.type === 'cell' && m.label ? [m.label] : []));
+		markers.flatMap((m) => (m.type === 'cell' ? MarkerLabels.list(m) : []));
 	const textOf = (label: { text: unknown }, d: Row) => (label.text as (d: Row) => string)(d);
 
 	test('every cell is labelled with its own value by default, by the cell that draws it', () => {
@@ -135,7 +136,11 @@ describe('buildMarkers - value labels', () => {
 			FLAT.length
 		);
 		const written = markers.flatMap((m) =>
-			m.type === 'cell' && m.label ? (m.data ?? []).map((d) => textOf(m.label!, d as Row)) : []
+			m.type === 'cell'
+				? MarkerLabels.list(m).flatMap((label) =>
+						(m.data ?? []).map((d) => textOf(label, d as Row))
+					)
+				: []
 		);
 		expect(written.sort()).toEqual(['10', '20']);
 	});

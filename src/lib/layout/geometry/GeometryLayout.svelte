@@ -40,7 +40,7 @@
 	import ContourMarker from '$lib/markers/contour/ContourMarker.svelte';
 	import ContourClipMarker from '$lib/markers/contour/ContourClipMarker.svelte';
 	import InsetMarker from '$lib/markers/inset/InsetMarker.svelte';
-	import MarkerLabel from '$lib/markers/utils/MarkerLabel.svelte';
+	import MarkerLabel from '$lib/markers/labels/MarkerLabel.svelte';
 	import FrameClip from '$lib/layout/geometry/FrameClip.svelte';
 	import MarkerOffset from '$lib/layout/geometry/MarkerOffset.svelte';
 	import { getConfiguration } from '$lib/configuration/config.svelte';

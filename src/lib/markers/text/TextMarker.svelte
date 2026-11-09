@@ -14,7 +14,7 @@
 	import { PlotMargins } from '$lib/layout/margins/PlotMargins.svelte';
 	import { Box } from '$lib/layout/margins/Box';
 	import type { TextMarkerConfig } from '$lib/types/markers/common';
-	import type { BoxChannels, BoxSizer } from '$lib/markers/utils/BoxLabel';
+	import type { BoxChannels, BoxSizer } from '$lib/types/markers/labels/box';
 	import type { TextAnchor } from '$lib/types/plots/constants';
 
 	/**

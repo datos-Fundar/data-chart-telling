@@ -18,7 +18,7 @@ import type { BoxAnchors, EdgeBox } from '$lib/types/layout/box';
 import type { MarginSide } from '$lib/types/plots/props';
 import type { AxisPlotEnv, AxisPlotState, ProcessedData, ProcessedRow } from '$lib/types/phases';
 import type { TextMarkerConfig } from '$lib/types/markers/common';
-import type { TextLabelConfig } from '$lib/types/markers/basic/text';
+import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
 
 /**
  * A plot's value labels: the author's `styles.values` over the plot kind's
@@ -259,7 +259,7 @@ export class ValueLabels {
 			outside?: boolean;
 			gap?: number;
 		} = {}
-	): TextLabelConfig {
+	): BoxLabelConfig {
 		const { fitMargins, styles: shared, ...events } = this.hooks(env);
 		const { font } = this;
 		return {
@@ -277,7 +277,7 @@ export class ValueLabels {
 				fontSize: font?.fontSize ?? defaults.fontSize ?? 12,
 				fontWeight: font?.fontWeight ?? defaults.fontWeight
 			}
-		} as TextLabelConfig;
+		} as BoxLabelConfig;
 	}
 
 	/**

@@ -1,4 +1,5 @@
 import type { LegendMark } from '$lib/types/layout/legend';
+import type { MarkerLabelTraits } from '$lib/types/markers/labels/common';
 
 /** What the rest of the system needs to know about a marker kind, declared once per kind in `MarkerKinds`. */
 export type MarkerTraits = {
@@ -20,4 +21,6 @@ export type MarkerTraits = {
 	 * dot, an area, a bar... A marker without one shows as a plain swatch.
 	 */
 	legendSymbol?: LegendMark;
+	/** The labels the marker can write over its shapes; none without it. */
+	labels?: MarkerLabelTraits;
 };

@@ -12,11 +12,21 @@ export class MarkerKinds {
 		area: { clip: true, drawsRows: true, legendSymbol: 'area' },
 		arrow: { clip: false, drawsRows: true },
 		band: { clip: true, drawsRows: false, legendSymbol: 'rect' },
-		bar: { clip: true, drawsRows: true, legendSymbol: 'bar' },
+		bar: {
+			clip: true,
+			drawsRows: true,
+			legendSymbol: 'bar',
+			labels: { default: 'box', box: 'band' }
+		},
 		bollinger: { clip: true, drawsRows: true, legendSymbol: 'line' },
 		brush: { clip: false, drawsRows: false },
 		box: { clip: true, drawsRows: true, legendSymbol: 'bar' },
-		cell: { clip: true, drawsRows: true, legendSymbol: 'cell' },
+		cell: {
+			clip: true,
+			drawsRows: true,
+			legendSymbol: 'cell',
+			labels: { default: 'box', box: 'cell' }
+		},
 		component: { clip: false, drawsRows: false },
 		contour: { clip: false, drawsRows: false },
 		delaunayLink: { clip: true, drawsRows: true },
@@ -36,7 +46,12 @@ export class MarkerKinds {
 		line: { clip: true, drawsRows: true, legendSymbol: 'line' },
 		link: { clip: false, drawsRows: false },
 		raster: { clip: true, drawsRows: true },
-		rect: { clip: true, drawsRows: true, legendSymbol: 'rect' },
+		rect: {
+			clip: true,
+			drawsRows: true,
+			legendSymbol: 'rect',
+			labels: { default: 'box', box: 'edges' }
+		},
 		regression: { clip: true, drawsRows: true, legendSymbol: 'line' },
 		rule: { clip: true, drawsRows: false, legendSymbol: 'line' },
 		sphere: { clip: false, drawsRows: false },
@@ -47,7 +62,11 @@ export class MarkerKinds {
 		violin: { clip: true, drawsRows: true, legendSymbol: 'area' },
 		voronoi: { clip: true, drawsRows: true },
 		voronoiMesh: { clip: true, drawsRows: true },
-		waffle: { clip: true, drawsRows: true }
+		waffle: {
+			clip: true,
+			drawsRows: true,
+			labels: { default: 'box', box: 'band' }
+		}
 	} satisfies Record<Kind, MarkerTraits>;
 
 	/** The traits of a marker kind, or `undefined` for a type no kind declares. */

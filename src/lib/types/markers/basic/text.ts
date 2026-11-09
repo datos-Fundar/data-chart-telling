@@ -99,25 +99,6 @@ export type TextMarkerConfig = CommonMarkerConfigWithRowOffset<
 		CommonMarkerConfig
 >;
 
-/** A `text` marker as a shape's `label`: all of it but what the shape sets - its `type`, its rows and the label's position. */
-export type TextLabelConfig = Omit<
-	TextMarkerConfig,
-	'type' | 'data' | 'x' | 'y' | 'frameAnchor'
-> & {
-	/**
-	 * Where in its shape the label sits: its `'middle'` (the default), against one of its edges (`'top'`, `'bottom'`,
-	 * `'left'`, `'right'`) or in one of its corners (`'top-left'`...). The label's `dx` and `dy` move it from there.
-	 */
-	anchor?: LabelAnchor;
-	/**
-	 * Puts a label anchored to an edge beyond that edge, outside the shape, instead of inside it. A label out there is not
-	 * fitted to the shape, and with `fitMargins` the plot's margins grow to hold it.
-	 */
-	outside?: boolean;
-	/** Pixels between the label and the edge it is anchored to. Defaults to the configuration's `text.label.gap`, `4`. */
-	gap?: number;
-};
-
 export type { LabelAnchor };
 
 /** Where one decluttered label goes - see `Declutter.buildLanes`. */

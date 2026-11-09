@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- A marker's `label` can be a list of labels, each written over its shapes on its own: `label: [{ text: 'value', anchor: 'top' }, { text: 'name', anchor: 'bottom' }]`. A label takes a `layout`, how it is laid out on its shape; `'box'`, the box each row's shape spans, is the one there is, and the one a `rect`, `cell`, `bar` or `waffle` takes by default.
+
 ## [1.18.0] - 2026-11-09
 
 ### Added

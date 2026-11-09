@@ -130,4 +130,31 @@ describe('markers with a label', () => {
 		const fill = () => svg.querySelector<SVGTextElement>('g.text text')?.style.fill;
 		await expect.poll(fill).toBe('rgb(17, 24, 39)');
 	});
+
+	test('a marker writes each label of a list, the ones on its shape contrasting with it', async () => {
+		const svg = await draw(HeatmapPlot as never, {
+			data: [],
+			x: 'col',
+			y: 'row',
+			markers: [
+				{
+					type: 'cell',
+					data: [{ col: 'Mon', row: 'AM', value: 3, name: 'Monday' }],
+					x: 'col',
+					y: 'row',
+					styles: { fill: '#1f2a44' },
+					label: [
+						{ text: 'value', anchor: 'top' },
+						{ text: 'name', anchor: 'bottom', styles: { fill: 'white' } }
+					]
+				}
+			] satisfies AxisBasedMarkersConfig[]
+		});
+		const fillOf = (text: string) =>
+			[...svg.querySelectorAll<SVGTextElement>('g.text text')].find(
+				(t) => t.textContent?.trim() === text
+			)?.style.fill;
+		await expect.poll(() => fillOf('3')).toBe('rgb(255, 255, 255)');
+		await expect.poll(() => fillOf('Monday')).toBe('white');
+	});
 });
