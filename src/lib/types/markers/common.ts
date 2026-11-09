@@ -22,6 +22,7 @@ export * from './axis/trail';
 export * from './axis/waffle';
 export * from './axis/violin';
 export * from './axis/rule';
+export * from './axis/band';
 export * from './axis/hover';
 export * from './axis/component';
 export * from './axis/axisBasedMarkersConfig';

@@ -1,5 +1,5 @@
 export type { PlotPhase, PhaseStage } from './stage';
-export type { AxisPlotState, AxisPlotCtx } from './state';
+export type { AxisPlotState, AxisPlotEnv } from './state';
 export type { AxisPlotKind, AxisPlotDefaults, SharedScalesOptions } from './kind';
 export type { DataRunState } from './pipeline';
 export type { DataStageOptions } from './data/phase';
@@ -12,6 +12,7 @@ export type {
 	TransformsStageState,
 	TransformsStageOptions
 } from './transforms/phase';
+export type { ContextStageOptions } from './context/phase';
 export type { StatisticsStageState, StatisticsStageOptions } from './statistics/phase';
 export type { SharedAxisValues } from './sharedScales/phase';
 export type { AxisFit, ScalesStageOptions } from './scales/phase';

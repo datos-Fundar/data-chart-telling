@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
+import type { PlotRowContext } from '$lib';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
@@ -76,7 +77,8 @@ export const LegendDisabledDimsLabels: Story = {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number, name: string) => `${name} (${v.toFixed(1)})`
+				format: (v: number, _number: unknown, context: PlotRowContext) =>
+					`${context.series} (${v.toFixed(1)})`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -125,7 +127,8 @@ export const HoverIsolate: Story = {
 			values: {
 				show: true,
 				hoverIsolate: true,
-				format: (v: number, name: string) => `${name} (${v.toFixed(1)})`
+				format: (v: number, _number: unknown, context: PlotRowContext) =>
+					`${context.series} (${v.toFixed(1)})`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -140,7 +143,8 @@ export const LegendOmitDropsLabelsHoverIsolatesRest: Story = {
 			values: {
 				show: true,
 				hoverIsolate: true,
-				format: (v: number, name: string) => `${name} (${v.toFixed(1)})`
+				format: (v: number, _number: unknown, context: PlotRowContext) =>
+					`${context.series} (${v.toFixed(1)})`
 			}
 		} satisfies AxisBasedStylesConfig
 	}

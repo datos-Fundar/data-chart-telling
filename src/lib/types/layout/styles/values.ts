@@ -1,6 +1,7 @@
 import type { ValueAnchor } from '$lib/types/plots/constants';
 import type { FontStyle, StrokeStyle } from '$lib/types/plots/styling';
 import type { NumberDisplay } from '$lib/types/layout/numbers';
+import type { PlotRowContext } from '$lib/types/layout/context';
 
 /**
  * Which of a group's rows get a value label: its first or last, or the one
@@ -40,13 +41,13 @@ export type ValuesStyle = NumberDisplay & {
 	 * CSS color writes them all in it. `fontStyle.fill` wins when it is set.
 	 */
 	color?: 'series' | (string & {});
-	/** A label's text, in place of the value as `decimals`, `prefix`, `suffix` and `signDisplay` write it, from its row's own value (a histogram bin's count) and its series - and, on the plots that label one row each, that row, for the other fields of the data. */
-	format?: (
-		value: number,
-		seriesName: string,
-		row?: Record<string, unknown>,
-		number?: (value: number) => string
-	) => string;
+	/**
+	 * A label's text, in place of the value as `decimals`, `prefix`, `suffix` and `signDisplay` write it: from the
+	 * value it shows (a histogram bin's count, a tile's share), `number`, which writes a value as those fields ask,
+	 * and `context`, what the plot knows of the labelled row - its `series`, `x`, `y`, whatever its kind works out
+	 * and, where the label has one, the `row` itself, for the other fields of the data (see {@link PlotRowContext}).
+	 */
+	format?: (value: number, number: (value: number) => string, context: PlotRowContext) => string;
 	/** Hovering a label dims every other series, like toggling them off in the legend. */
 	hoverIsolate?: boolean;
 	fontStyle?: FontStyle;

@@ -1,5 +1,6 @@
 import type { HoverDisplayPoint, HoverStrategy } from '$lib/types/layout/hover';
 import type { HoverConfig, PointMatchingStrategy } from '$lib/types/plots/props';
+import type { HoverLook } from '$lib/types/markers/common';
 
 /** Where a row sits for hover matching and the hover controller: its `x` and `y`. */
 export type HoverPosition = {
@@ -13,7 +14,7 @@ export type HoverPosition = {
  * row or a cell outside the legend's range can't), the rows themselves and
  * their series' colors - the stage reads off the plot's own state.
  */
-export type HoverStageOptions<TState, TCtx = unknown> = {
+export type HoverStageOptions<TState, TEnv = unknown> = {
 	/**
 	 * The hover strategy, when the plot's axes don't say it: along the axis
 	 * that isn't measured, or `'punctual'` with both axes holding categories.
@@ -29,18 +30,20 @@ export type HoverStageOptions<TState, TCtx = unknown> = {
 	position?: (state: TState) => HoverPosition;
 	/** The short label drawn next to a hovered row. Defaults to its value. */
 	label?: (state: TState) => (row: never) => string;
-	/** What a hovered row reads as, e.g. with derived fields added. Defaults to the processed row. */
-	row?: (state: TState) => (row: never) => unknown;
 	/** Fields a candidate carries besides its place, label and series color (a grouped bar's `dx`/`dy`). */
 	decorate?: (
 		state: TState,
-		ctx: TCtx
+		env: TEnv
 	) => (row: never) => Partial<Omit<HoverDisplayPoint, 'x' | 'y' | 'label'>>;
 	/** Invisible markers that drive the plot's hover themselves (a bar's band), given its resolved hover config. */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	hitAreas?: (state: TState, hover: HoverConfig<any>, ctx: TCtx) => { type: string }[];
-	/** What the kind knows of a row beyond its series, which an author's own tooltip `format` gets in its third argument. */
-	context?: (state: TState) => (row: never) => object;
+	hitAreas?: (state: TState, hover: HoverConfig<any>, env: TEnv) => { type: string }[];
 	/** How a pointer event resolves to a candidate. Defaults to the nearest one. */
 	pointMatching?: PointMatchingStrategy;
+	/**
+	 * The kind's own hover, which an author's `hover` marker is laid over - one look, or one for each strategy, as
+	 * the strategy in force can change while the plot is shown (a composer's, a scrolly step's). Defaults to a
+	 * crosshair along the axes the strategy matches along, and a dot and a label on each point.
+	 */
+	marker?: (state: TState, env: TEnv) => HoverLook | ((strategy: HoverStrategy) => HoverLook);
 };

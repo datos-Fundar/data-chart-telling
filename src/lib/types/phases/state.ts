@@ -125,7 +125,7 @@ export type AxisPlotState<
 };
 
 /** The environment every axis-based plot's phases read from, alongside the growing state. */
-export type AxisPlotCtx = {
+export type AxisPlotEnv = {
 	cfg: PlotStylesConfig;
 	/** The legend's toggles and the figure's hover, read for one plot: which series show and how each dims. */
 	interaction?: PlotInteraction;

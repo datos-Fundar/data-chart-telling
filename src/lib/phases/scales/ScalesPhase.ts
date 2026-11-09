@@ -8,7 +8,7 @@ import { DISCRETE_SCALE_TYPES } from '$lib/types/layout/scales';
 import type { AxisChannelName } from '$lib/types/layout/mapping';
 import type { AxisScale } from '$lib/types/layout/scales';
 import type { AxisRef } from '$lib/types/phases/data/axes';
-import type { AxisPlotState, AxisPlotCtx, PhaseStage, ScalesStageOptions } from '$lib/types/phases';
+import type { AxisPlotState, AxisPlotEnv, PhaseStage, ScalesStageOptions } from '$lib/types/phases';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyAxisState = AxisPlotState<any, any, any, any>;
@@ -41,12 +41,12 @@ function numeric(values: unknown[]): number[] | undefined {
  */
 export class ScalesPhase<
 	TState extends AnyAxisState,
-	TCtx extends AxisPlotCtx
-> implements PhaseStage<TState, TCtx> {
+	TEnv extends AxisPlotEnv
+> implements PhaseStage<TState, TEnv> {
 	readonly phase = 'scales' as const;
-	readonly #options: ScalesStageOptions<TState, TCtx>;
+	readonly #options: ScalesStageOptions<TState, TEnv>;
 
-	constructor(options: ScalesStageOptions<TState, TCtx> = {}) {
+	constructor(options: ScalesStageOptions<TState, TEnv> = {}) {
 		this.#options = options;
 	}
 
@@ -65,10 +65,10 @@ export class ScalesPhase<
 		return this.#options.bandOrder === 'data';
 	}
 
-	run = (state: TState, ctx: TCtx): TState => {
+	run = (state: TState, env: TEnv): TState => {
 		const options = this.#options;
 		const { axes, processedData, markers = [] } = state;
-		const defaults = options.defaults?.(state, ctx) ?? {};
+		const defaults = options.defaults?.(state, env) ?? {};
 		const symmetric = new Set(this.symmetricAxes(state));
 		const zero = new Set(this.zeroAxes(state));
 		const scales = { ...state.scales } as Record<AxisChannelName, AnyAxisScale | undefined>;
@@ -95,7 +95,7 @@ export class ScalesPhase<
 			}
 		}
 
-		const fitted = options.fit?.({ ...state, scales } as TState, ctx) ?? {};
+		const fitted = options.fit?.({ ...state, scales } as TState, env) ?? {};
 		const fittedAxes: AxisChannelName[] = [];
 		for (const axis of AXES) {
 			if (!fitted[axis]) continue;
@@ -131,7 +131,7 @@ export class ScalesPhase<
 		}
 
 		const next = { ...state, scales, ...(fittedAxes.length ? { fittedAxes } : {}) } as TState;
-		return options.extend ? options.extend(next, ctx) : next;
+		return options.extend ? options.extend(next, env) : next;
 	};
 
 	/** A category axis as a band scale: the kind's options under the author's, in the order the kind asks for. */

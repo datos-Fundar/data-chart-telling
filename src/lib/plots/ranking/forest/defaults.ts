@@ -1,6 +1,6 @@
 import { buildClevelandDefaults } from '$lib/plots/ranking/cleveland/defaults';
 import type { AxisPlotDefaults } from '$lib/types/phases';
-import type { ForestPlotState, ForestPlotCtx } from '$lib/types/plots/ranking/forest/state';
+import type { ForestPlotState, ForestPlotEnv } from '$lib/types/plots/ranking/forest/state';
 
 /**
  * ForestPlot on the shared pipeline: a ClevelandPlot whose dot is an estimate
@@ -12,7 +12,7 @@ import type { ForestPlotState, ForestPlotCtx } from '$lib/types/plots/ranking/fo
  */
 export function buildForestDefaults<TData extends Record<string, unknown>>(): AxisPlotDefaults<
 	ForestPlotState<TData>,
-	ForestPlotCtx
+	ForestPlotEnv
 > {
 	return buildClevelandDefaults<TData>({
 		name: 'ForestPlot',

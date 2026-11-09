@@ -47,12 +47,12 @@
 
 	const cfg = $derived(getConfiguration());
 	const interaction = PlotInteraction.current(() => cfg);
-	const ctx = $derived({ cfg, interaction, range: interaction.legend?.range });
+	const env = $derived({ cfg, interaction, range: interaction.legend?.range });
 
 	const plotState = $derived(
 		pipeline!.run(
 			{ ...rest, width, height, styles, segments, markers, scales, margins },
-			ctx,
+			env,
 			panelState
 		)
 	);

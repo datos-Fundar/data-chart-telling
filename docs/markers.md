@@ -74,6 +74,7 @@ Many markers also take channel fields (`color`, `fill`, `opacity`, `r`, `symbol`
 | `text`                                                   | A label per row; `text` (string or function), `styles` (`FontStyle`), `declutter`, `edgeAware`, `fitMargins`, `fit`                                                                                 |
 | `line`                                                   | A line through the rows                                                                                                                                                                             |
 | `rule`                                                   | A reference line: `axis: 'x' \| 'y'`, `value` (a list draws a line at each, or a function with `data`), `styles` (`StrokeStyle`, and `inset`, `insetTop`, ... to pull it in from its ends)          |
+| `band`                                                   | The band of a category across the whole other axis: `axis: 'x' \| 'y'`, `value` (a list, or a function with `data`), `slice`, `styles` (`AreaStyle`). Only on a band scale                          |
 | `tick`                                                   | A short tick per row along one axis                                                                                                                                                                 |
 | `bar`                                                    | A bar; `rect`, `cell`: rectangles and heatmap cells                                                                                                                                                 |
 | `rect`                                                   | A rectangle from `x1`/`x2`/`y1`/`y2`; `interval` turns `x`/`y` into ranges; `styles` (`AreaStyle`, and `inset`, `insetLeft`, ...); `label`, a text in each (`cell`, `bar` and `waffle` take it too) |
@@ -101,7 +102,7 @@ On a plot with a [`facet`](facets.md#markers-and-segments-in-some-panels), every
 
 ## Several positions at once
 
-A `rule` takes a list as its `value`, and a `delta` a list as its `at`. One marker then draws one line, or one delta, at each position, all with the same style and the same ends - instead of one marker for each.
+A `rule` and a `band` take a list as their `value`, and a `delta` a list as its `at`. One marker then draws one line, or one delta, at each position, all with the same style and the same ends - instead of one marker for each.
 
 ```ts
 markers={[
@@ -123,9 +124,40 @@ A delta's `stroke`, `text` and `dot` can be functions of the position, to style 
 
 Every other marker draws from `data` rows, one mark per row, so it already takes many positions.
 
+## Bands
+
+`{ type: 'band', axis: 'x', value: 'Salta' }` fills the band of a category on a band scale, across the whole of the other axis: a column behind a bar plot's bars, a row across a horizontal one. With `data`, `value` is a field key or a function of the row, and the rows that name the same category draw one band. `slice` fills part of the band, as the fractions of its width left out at its start and its end (`{ start: 0.5, end: 0 }` is its second half), or a function of the row for each one's; a band several rows share fills what all of their slices do. `styles` take `AreaStyle`, each field a value or a function of the row, over `band` in the [configuration](theming.md). A band takes the pointer only with a handler of its own (`onclick`...), so one behind a plot's shapes leaves them their hover. On an axis that is not a band scale it draws nothing.
+
+```ts
+markers={[
+	// The two provinces of the story, behind their bars.
+	{ type: 'band', axis: 'x', value: ['Salta', 'Jujuy'], styles: { fill: '#fde68a', fillOpacity: 0.5 } }
+]}
+```
+
 ## Hover highlight
 
-`{ type: 'hover' }` draws a crosshair, a dot and a label at the hovered point. It makes the plot hoverable on its own; add `tooltip` for a floating box too. Fields: `strategy`, `sync`, `ruleX`, `ruleY`, `areaX`, `areaY` (a band highlight on band scales), `showLabels`, `format`, the number fields `decimals`, `prefix`, `suffix` and `signDisplay` (they write the label's value; `format` gets a `number` function that does the same), and the styles `rule`, `area`, `dot`, `text`. See [Tooltip and hover](tooltip-and-hover.md).
+`{ type: 'hover' }` draws the plot's own hover: a crosshair, a dot and a label at the hovered point on most plots, the hovered category's band on a bar plot. It makes the plot hoverable on its own; add `tooltip` for a floating box too. Fields: `strategy`, `sync`, `series`, `scope`; `back` and `front`, the markers it draws behind the plot's shapes and in front of them, over the hovered points (they replace the plot's); `active` and `others`, which restyle the hovered shapes and the rest; and `format` and the number fields `decimals`, `prefix`, `suffix` and `signDisplay`, which write each point's label. See [Tooltip and hover](tooltip-and-hover.md#in-plot-hover).
+
+```ts
+// A crosshair only at the hovered point, and its value in bold, without a dot.
+{ type: 'hover', back: [{ type: 'rule', axis: 'x', points: 'active' }], front: [{ type: 'text', styles: { fontWeight: 'bold' } }] }
+```
+
+Every marker takes `hover`, which links it to the plot's hover:
+
+- `'trigger'` makes it a hit area: the pointer over one of its shapes hovers that shape's row.
+- `'style'` has its shapes take the hover marker's `active` and `others`.
+- `true` does both.
+
+```ts
+markers={[
+	{ type: 'hover', active: { stroke: 'black', strokeWidth: 2 }, others: { fillOpacity: 0.3 } },
+	{ type: 'rect', data: eras, x1: 'from', x2: 'to', y1: 0, y2: 100, hover: true }
+]}
+```
+
+A plot's own shapes are linked already where its kind does it: the tiles, cells, bars, bins and dots of `TreemapPlot`, `HeatmapPlot`, `BarPlot`, `BulletPlot`, `PyramidPlot`, `HistogramPlot`, `ScatterPlot` and the Cleveland family. The `Layout/Hover` stories show every feature of the hover on every plot kind.
 
 ## Styles that depend on the row
 

@@ -1,4 +1,4 @@
-import type { BoxPlotState, BoxPlotCtx } from '$lib/types/plots/distribution/box/state';
+import type { BoxPlotState, BoxPlotEnv } from '$lib/types/plots/distribution/box/state';
 import type { AxisBasedMarkersConfig, BoxMarkerConfig } from '$lib/types/markers/common';
 
 /**
@@ -12,14 +12,14 @@ import type { AxisBasedMarkersConfig, BoxMarkerConfig } from '$lib/types/markers
  */
 export function buildMarks<TData extends Record<string, unknown>>(
 	state: BoxPlotState<TData>,
-	ctx: BoxPlotCtx
+	env: BoxPlotEnv
 ): AxisBasedMarkersConfig[] {
 	const { channels } = state.processedData!;
-	const { cfg } = ctx;
+	const { cfg } = env;
 
 	return (state.processedGroups ?? []).flatMap((group) => {
 		const name = group.series.name;
-		const disabled = ctx.interaction?.fillFor(name);
+		const disabled = env.interaction?.fillFor(name);
 		return group.visualSegments.map((seg): BoxMarkerConfig => {
 			const { stroke, strokeWidth, strokeOpacity, borderRadius } = seg.styles;
 			const fill = disabled?.fill ?? seg.styles.fill ?? state.colorForSeries!(name);

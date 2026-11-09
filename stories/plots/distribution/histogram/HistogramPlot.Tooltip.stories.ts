@@ -1,3 +1,4 @@
+import type { HistogramRowContext } from '$lib/types/plots/distribution/histogram/props';
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HistogramPlot from '$lib/plots/distribution/histogram/Plot.svelte';
 import { HEIGHTS } from '$datasets';
@@ -40,13 +41,17 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** The bin's edges and count, and its group when the histogram is grouped. */
+/** The bin's edges and count, from its context, and its group when the histogram is grouped. */
 const TOOLTIP = {
 	sync: false,
-	format: (row: Record<string, unknown>) => {
-		const range = `${Number(row.from).toFixed(1)} to ${Number(row.to).toFixed(1)}`;
-		const group = row.group === undefined ? '' : ` · ${String(row.group)}`;
-		return `${range}: ${String(row.count)} rows${group}`;
+	format: (
+		_row: Record<string, unknown>,
+		_number: unknown,
+		{ from, to, count, series }: HistogramRowContext
+	) => {
+		const range = `${from.toFixed(1)} to ${to.toFixed(1)}`;
+		const group = series === undefined ? '' : ` · ${series}`;
+		return `${range}: ${count} rows${group}`;
 	}
 };
 

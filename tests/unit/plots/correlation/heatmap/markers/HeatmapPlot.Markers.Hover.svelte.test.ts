@@ -12,7 +12,7 @@ const DATA_PROPS = {
 	color: 'count' as const
 };
 
-// Both of a heatmap's axes are band scales, so `areaX`/`areaY` (unlike on a
+// Both of a heatmap's axes are band scales, so a band along each (unlike on a
 // bar/pyramid chart, which only ever has one) can render together as a
 // crosshair-shaped pair of highlight areas around the hovered cell.
 // svelteplot's <Pointer> matches heatmap cells by nearest-point distance
@@ -20,25 +20,36 @@ const DATA_PROPS = {
 // test for why that makes simulating a real hover here impractical) - these
 // tests exercise the marker's static (no-hover) baseline and its
 // configuration surface only.
-describe('HeatmapPlot - markers.hover areaX/areaY', () => {
-	test('renders with areaX/areaY configured and shows no highlight before any hover', async () => {
-		const { container } = await render(HeatmapPlot, {
-			width: 400,
-			height: 300,
-			...DATA_PROPS,
-			markers: [{ type: 'hover', areaX: true, areaY: true }] satisfies AxisBasedMarkersConfig[]
-		});
-		const svg = await waitForSvg(container);
-		expect(countHoverAreas(svg)).toBe(0);
-	});
-
-	test('does not crash with an explicit area', async () => {
+describe('HeatmapPlot - markers.hover bands', () => {
+	test('renders with a band along each axis and shows no highlight before any hover', async () => {
 		const { container } = await render(HeatmapPlot, {
 			width: 400,
 			height: 300,
 			...DATA_PROPS,
 			markers: [
-				{ type: 'hover', areaX: true, areaY: true, area: { fill: '#e11d48' } }
+				{
+					type: 'hover',
+					back: [
+						{ type: 'band', axis: 'x', value: (p) => p.x },
+						{ type: 'band', axis: 'y', value: (p) => p.y }
+					]
+				}
+			] satisfies AxisBasedMarkersConfig[]
+		});
+		const svg = await waitForSvg(container);
+		expect(countHoverAreas(svg)).toBe(0);
+	});
+
+	test('does not crash with a styled band', async () => {
+		const { container } = await render(HeatmapPlot, {
+			width: 400,
+			height: 300,
+			...DATA_PROPS,
+			markers: [
+				{
+					type: 'hover',
+					back: [{ type: 'band', axis: 'x', value: (p) => p.x, styles: { fill: '#e11d48' } }]
+				}
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);

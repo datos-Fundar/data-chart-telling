@@ -1,13 +1,12 @@
 import { buildMarks } from '$lib/plots/distribution/violin/markers';
+import { HoverDefaults } from '$lib/layout/hover/HoverDefaults';
 import { BoxSummaries } from '$lib/plots/distribution/box/BoxSummaries';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { NiceTicks } from '$lib/layout/scales/NiceTicks';
-import { TooltipState } from '$lib/layout/tooltip/TooltipState.svelte';
 import type { AxisPlotDefaults } from '$lib/types/phases';
 import type { AreaStyle } from '$lib/types/plots/styling';
-import type { BoxSummaryRow } from '$lib/types/plots/distribution/box/state';
-import type { ViolinPlotState, ViolinPlotCtx } from '$lib/types/plots/distribution/violin/state';
+import type { ViolinPlotState, ViolinPlotEnv } from '$lib/types/plots/distribution/violin/state';
 
 /**
  * The value axis fit to the values the violins are drawn from, when the author leaves it unpinned: no svelteplot mark reads them, so nothing else sets its domain.
@@ -36,7 +35,7 @@ function fitValueDomain<TData extends Record<string, unknown>>(state: ViolinPlot
  */
 export function buildViolinDefaults<TData extends Record<string, unknown>>(): AxisPlotDefaults<
 	ViolinPlotState<TData>,
-	ViolinPlotCtx
+	ViolinPlotEnv
 > {
 	return {
 		data: {
@@ -50,24 +49,22 @@ export function buildViolinDefaults<TData extends Record<string, unknown>>(): Ax
 		scales: {
 			bandOrder: 'data',
 			fit: (state) => fitValueDomain(state),
-			defaults: (_state, ctx) => ({
+			defaults: (_state, env) => ({
 				category: {
-					paddingInner: ctx.cfg.violin.paddingInner,
-					paddingOuter: ctx.cfg.violin.paddingOuter
+					paddingInner: env.cfg.violin.paddingInner,
+					paddingOuter: env.cfg.violin.paddingOuter
 				}
 			})
 		},
+		// Each value's box: its quartiles and whiskers, worked out once for its tooltip and hover to read.
+		context: (state) => BoxSummaries.context(state) as (row: never) => object | undefined,
 		markers: { marks: buildMarks },
 		hover: {
+			// The hovered category's band behind its shape.
+			marker: (state) => HoverDefaults.behindBand(PlotAxes.other(PlotAxes.valueOf(state))),
 			rows: BoxSummaries.of,
 			position: BoxSummaries.position,
-			label: () => ((row: BoxSummaryRow) => String(row.median)) as (row: never) => string,
-			format: (state) => BoxSummaries.format(state) as (row: never) => string,
-			sort: () =>
-				TooltipState.descending((row: BoxSummaryRow) => row.median) as (
-					a: never,
-					b: never
-				) => number
+			format: (state) => BoxSummaries.format(state) as (row: never) => string
 		}
 	};
 }

@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { stageOf } from '../../../_helpers/stages';
 import { buildBarDefaults } from '$lib/plots/ranking/bar/defaults';
-import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/ranking/bar/state';
+import type { BarPlotState, BarPlotEnv } from '$lib/types/plots/ranking/bar/state';
 import type { Series } from '$lib/types/plots/data/common';
 import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
@@ -46,11 +46,11 @@ function build(
 		height: 300,
 		...overrides
 	};
-	const ctx: BarPlotCtx = {
+	const env: BarPlotEnv = {
 		cfg: FAKE_CFG,
 		interaction: new PlotInteraction(() => FAKE_CFG, { legend: legendInteraction })
 	};
-	return buildData(state, ctx) as ResolvedData;
+	return buildData(state, env) as ResolvedData;
 }
 
 // ── Series resolution ─────────────────────────────────────────────────────────

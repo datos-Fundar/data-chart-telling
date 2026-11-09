@@ -7,7 +7,7 @@ import { PlotAxes } from '$lib/phases/data/PlotAxes';
 
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { BarMarkerConfig } from '$lib/types/markers/common';
-import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/ranking/bar/state';
+import type { BarPlotState, BarPlotEnv } from '$lib/types/plots/ranking/bar/state';
 import type { ProcessedRow } from '$lib/types/phases';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { BandSlice, HoverPoint } from '$lib/types/layout/hover';
@@ -69,9 +69,9 @@ export function buildHitAreas<TData extends Record<string, unknown>>(
 	state: BarPlotState<TData>,
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	hover: HoverConfig<any>,
-	ctx: BarPlotCtx
+	env: BarPlotEnv
 ): BarMarkerConfig[] {
-	const { categoryOf, sliceOf } = buildBarGeometry(state, ctx.cfg.bar.seriesPadding);
+	const { categoryOf, sliceOf } = buildBarGeometry(state, env.cfg.bar.seriesPadding);
 	const isHorizontal = state.axes?.isHorizontal ?? false;
 	return (hover.points as HoverPoint<Row>[]).map(({ row, series }) => {
 		const slice = series === undefined ? undefined : sliceOf(series);
@@ -81,7 +81,7 @@ export function buildHitAreas<TData extends Record<string, unknown>>(
 			isHorizontal,
 			data: [row],
 			category: categoryOf(row as ProcessedRow),
-			hover: hover.active,
+			hover: hover.active && 'trigger',
 			...(slice
 				? isHorizontal
 					? { insetTop: slice.start, insetBottom: slice.end }
@@ -102,12 +102,12 @@ type ValueChannel = BarMarkerConfig['x2'];
  */
 export function buildMarks<TData extends Record<string, unknown>>(
 	state: BarPlotState<TData>,
-	ctx: BarPlotCtx
+	env: BarPlotEnv
 ): AxisBasedMarkersConfig[] {
 	const { gapFillMaps, colorForSeries, processedData } = state;
 	const isHorizontal = state.axes?.isHorizontal ?? false;
 	const [categoryAxis, valueAxis] = isHorizontal ? (['y', 'x'] as const) : (['x', 'y'] as const);
-	const geometry = buildBarGeometry(state, ctx.cfg.bar.seriesPadding);
+	const geometry = buildBarGeometry(state, env.cfg.bar.seriesPadding);
 	const { channels } = processedData!;
 	const gapDefaults = getConfiguration().bar.gap;
 
@@ -137,7 +137,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		});
 	const labelFor = (name: string, slice: BandSlice | undefined, negative: boolean) =>
 		labels && {
-			...labels.shapeLabel(ctx, (d) => labels.format(Number(valueRead(d)), name, d), {
+			...labels.shapeLabel(env, (d) => labels.format(Number(valueRead(d)), d, name), {
 				fill: 'currentColor',
 				...labelAnchor(negative)
 			}),
@@ -159,6 +159,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 			isHorizontal,
 			data,
 			styles,
+			hover: 'style',
 			...(label ? { label } : {}),
 			...(isHorizontal
 				? { y: category, x1: from, x2: value }
@@ -182,7 +183,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		const name = group.series.name;
 		const slice = geometry.sliceOf(name);
 		const defaultColor = colorForSeries!(name);
-		const disabledFill = ctx.interaction?.fillFor(name);
+		const disabledFill = env.interaction?.fillFor(name);
 
 		for (const seg of group.visualSegments) {
 			const fill = disabledFill?.fill ?? seg.styles.fill ?? defaultColor;

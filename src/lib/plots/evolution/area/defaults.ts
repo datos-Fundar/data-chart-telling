@@ -2,12 +2,12 @@ import { buildMarks } from '$lib/plots/evolution/area/markers';
 import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import type { AxisPlotDefaults } from '$lib/types/phases';
 import type { AreaStyle } from '$lib/types/plots/styling';
-import type { AreaPlotState, AreaPlotCtx } from '$lib/types/plots/evolution/area/state';
+import type { AreaPlotState, AreaPlotEnv } from '$lib/types/plots/evolution/area/state';
 
 /** AreaPlot on the shared pipeline: areas from a zero baseline, author markers taking the plot's `x`/`y`, and its own markers. Its plot defaults to: hover along x, cumulative timeline tweening `y` per series. */
 export function buildAreaDefaults<TData extends Record<string, unknown>>(): AxisPlotDefaults<
 	AreaPlotState<TData>,
-	AreaPlotCtx
+	AreaPlotEnv
 > {
 	return {
 		data: {
@@ -19,7 +19,7 @@ export function buildAreaDefaults<TData extends Record<string, unknown>>(): Axis
 		styles: {
 			values: {
 				anchor: 'start',
-				format: (v, name, number) => `${name} - ${number(v)}`,
+				format: (v, number, context) => `${context.series} - ${number(v)}`,
 				reach: (labels, state) => labels.reachAtSeriesEnds(state)
 			}
 		},

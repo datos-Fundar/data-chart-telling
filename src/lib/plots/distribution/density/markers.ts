@@ -1,5 +1,5 @@
 import { Transforms } from '$lib/phases/transforms/Transforms';
-import type { DensityPlotState, DensityPlotCtx } from '$lib/types/plots/distribution/density/state';
+import type { DensityPlotState, DensityPlotEnv } from '$lib/types/plots/distribution/density/state';
 import type { DensityPlotStylesConfig } from '$lib/types/plots/distribution/density/props';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
@@ -11,17 +11,17 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
  */
 export function buildMarks<TData extends Record<string, unknown>>(
 	state: DensityPlotState<TData>,
-	ctx: DensityPlotCtx
+	env: DensityPlotEnv
 ): AxisBasedMarkersConfig[] {
 	const { channels, options, transforms } = state.processedData!;
-	const { cfg } = ctx;
+	const { cfg } = env;
 	const styles = state.styles as DensityPlotStylesConfig | undefined;
 	const asLine = styles?.mark === 'line';
 
 	return (state.processedGroups ?? []).flatMap((group) => {
 		const name = group.series.name;
-		const disabledFill = ctx.interaction?.fillFor(name);
-		const disabledStroke = ctx.interaction?.strokeFor(name);
+		const disabledFill = env.interaction?.fillFor(name);
+		const disabledStroke = env.interaction?.strokeFor(name);
 		return group.visualSegments.map((seg) => {
 			const color = seg.styles.fill ?? state.colorForSeries!(name);
 			const style = asLine

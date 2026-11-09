@@ -252,7 +252,14 @@ export type PlotStylesConfig = {
 	 * highlight - a restyled feature on `GeoPlot`, or an `areaX`/`areaY` band
 	 * on an axis-based plot's band scale.
 	 */
-	hover: { rule: StrokeStyle; dot: DotStyle; font: FontStyle; area: AreaStyle };
+	hover: {
+		rule: StrokeStyle;
+		dot: DotStyle;
+		font: FontStyle;
+		area: AreaStyle;
+		/** How a hovered shape looks on a plot whose hover only restyles its shapes (a treemap's tile, a heatmap's cell). */
+		active: StrokeStyle;
+	};
 
 	facet: {
 		/** Position badge shown in `carousel`/`paginated` facet modes. */
@@ -376,6 +383,9 @@ export type PlotStylesConfig = {
 		/** Gap, in px, between a connector and its label when it is written beside it. */
 		labelGap: number;
 	};
+
+	/** The `band` marker's style, under its own `styles`. */
+	band: AreaStyle;
 
 	/** The `delta` marker's label offset and anchor, per axis the delta is taken on. A marker's own `text` wins. */
 	delta: {

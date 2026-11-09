@@ -4,7 +4,7 @@ import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { buildGroupedSeries } from '$lib/plots/utils/segments';
 import type {
 	PyramidPlotState,
-	PyramidPlotCtx,
+	PyramidPlotEnv,
 	PyramidSeries
 } from '$lib/types/plots/distribution/pyramid/state';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
@@ -21,7 +21,7 @@ const buildMarkers = stageOf(buildPyramidDefaults<Row>(), 'markers');
 
 type Row = { ageGroup: string; pct: number | null };
 
-const CTX: PyramidPlotCtx = {
+const ENV: PyramidPlotEnv = {
 	cfg: { palette: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] } as PlotStylesConfig
 };
 
@@ -31,7 +31,7 @@ function series(name: string, side: 'left' | 'right', data: Row[]): PyramidSerie
 
 function build(
 	overrides: Partial<PyramidPlotState<Row>> = {},
-	ctxOverrides: Partial<PyramidPlotCtx> = {}
+	envOverrides: Partial<PyramidPlotEnv> = {}
 ) {
 	const groupedSeries =
 		overrides.groupedSeries ??
@@ -59,8 +59,8 @@ function build(
 	// No `authorMarkers`/`statistics` given, so the real output is exactly
 	// this phase's own segment/gap-fill bars - narrowed back from the state's
 	// broader accumulating `markers` union.
-	const ctx = { ...CTX, ...ctxOverrides };
-	return buildMarkers(new TransformsPhase<typeof state>().run(state, ctx), ctx)
+	const env = { ...ENV, ...envOverrides };
+	return buildMarkers(new TransformsPhase<typeof state>().run(state, env), env)
 		.markers as BarMarkerConfig[];
 }
 

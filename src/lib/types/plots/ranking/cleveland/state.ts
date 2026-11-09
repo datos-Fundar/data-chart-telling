@@ -1,4 +1,4 @@
-import type { AxisPlotState, AxisPlotCtx, ProcessedRow } from '$lib/types/phases';
+import type { AxisPlotState, AxisPlotEnv, ProcessedRow } from '$lib/types/phases';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 
 /** ClevelandPlot's pipeline state (shared by its wrappers): the shared axis-based state, with no extras of its own. */
@@ -8,7 +8,7 @@ export type ClevelandPlotState<TData extends Record<string, unknown>> = AxisPlot
 >;
 
 /** The environment every ClevelandPlot phase reads from, alongside the growing state. */
-export type ClevelandPlotCtx = AxisPlotCtx;
+export type ClevelandPlotEnv = AxisPlotEnv;
 
 /** The configuration blocks the Cleveland-style plots draw their defaults from: one per plot. */
 export type ClevelandConfigKey = 'lollipop' | 'dumbbell' | 'cleveland' | 'forest';

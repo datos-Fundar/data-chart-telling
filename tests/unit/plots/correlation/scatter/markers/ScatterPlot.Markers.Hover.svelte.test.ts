@@ -38,7 +38,7 @@ describe('ScatterPlot - markers.hover', () => {
 		expect(svg).toBeTruthy();
 	});
 
-	test('does not crash with custom dot/font style overrides', async () => {
+	test('does not crash with a dot and a label of its own in front', async () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
@@ -48,8 +48,10 @@ describe('ScatterPlot - markers.hover', () => {
 			markers: [
 				{
 					type: 'hover',
-					dot: { dotRadius: 10, dotFill: '#dc2626' },
-					text: { fontSize: 14 }
+					front: [
+						{ type: 'dot', styles: { dotRadius: 10, dotFill: '#dc2626' } },
+						{ type: 'text', text: (p) => p.label, styles: { fontSize: 14 } }
+					]
 				}
 			] satisfies AxisBasedMarkersConfig[]
 		});
@@ -57,14 +59,22 @@ describe('ScatterPlot - markers.hover', () => {
 		expect(svg).toBeTruthy();
 	});
 
-	test('does not crash with ruleX/ruleY explicitly enabled', async () => {
+	test('does not crash with a crosshair along each axis', async () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
 			data: COUNTRIES_AT_2007,
 			x: 'gdp',
 			y: 'life',
-			markers: [{ type: 'hover', ruleX: true, ruleY: true }] satisfies AxisBasedMarkersConfig[]
+			markers: [
+				{
+					type: 'hover',
+					back: [
+						{ type: 'rule', axis: 'x', value: (p) => p.x, points: 'active' },
+						{ type: 'rule', axis: 'y', value: (p) => p.y, points: 'active' }
+					]
+				}
+			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
 		expect(svg).toBeTruthy();

@@ -1,6 +1,6 @@
 import { Transforms } from '$lib/phases/transforms/Transforms';
 
-import type { AreaPlotState, AreaPlotCtx } from '$lib/types/plots/evolution/area/state';
+import type { AreaPlotState, AreaPlotEnv } from '$lib/types/plots/evolution/area/state';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 /**
@@ -16,19 +16,19 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
  */
 export function buildMarks<TData extends Record<string, unknown>>(
 	state: AreaPlotState<TData>,
-	ctx: AreaPlotCtx
+	env: AreaPlotEnv
 ): AxisBasedMarkersConfig[] {
 	const { resolvedSeries = [] } = state;
 	const { channels, options, transforms } = state.processedData!;
-	const { cfg } = ctx;
+	const { cfg } = env;
 
 	// A fill opacity per series name, for the dim: a legend-off series fades to
 	// the legend's disabled opacity, every other one keeps the area default.
 	const fillOpacityOf = (name: string) => {
-		const off = ctx.interaction?.dimmed(name);
+		const off = env.interaction?.dimmed(name);
 		return off ? (off.opacity ?? cfg.legend.disabledOpacity) : cfg.area.fillOpacity;
 	};
-	const dimmed = resolvedSeries.some((s) => ctx.interaction?.dimmed(s.name));
+	const dimmed = resolvedSeries.some((s) => env.interaction?.dimmed(s.name));
 	const opacityScale = {
 		range: Object.fromEntries(resolvedSeries.map((s) => [s.name, fillOpacityOf(s.name)]))
 	};

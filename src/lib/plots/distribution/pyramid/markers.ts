@@ -10,7 +10,7 @@ import type { BarMarkerConfig } from '$lib/types/markers/common';
 import type { DiscreteGapFill } from '$lib/types/plots/gaps';
 import type {
 	PyramidPlotState,
-	PyramidPlotCtx,
+	PyramidPlotEnv,
 	PyramidSeries
 } from '$lib/types/plots/distribution/pyramid/state';
 import type { AxisValue } from '$lib/types/layout/mapping';
@@ -38,7 +38,7 @@ function signFor<TData extends Record<string, unknown>>(
  */
 export function buildMarks<TData extends Record<string, unknown>>(
 	state: PyramidPlotState<TData>,
-	ctx: PyramidPlotCtx
+	env: PyramidPlotEnv
 ): AxisBasedMarkersConfig[] {
 	const { groupedSeries, gapFillMaps } = state;
 	const gapDefaults = getConfiguration().pyramid.gap;
@@ -75,7 +75,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		// practice, just not provably so to TypeScript here.
 		const category = group.series[categoryAxis] as string | ((d: TData) => AxisValue);
 		const defaultColor = state.colorForSeries!(group.series.name);
-		const disabledFill = ctx.interaction?.fillFor(group.series.name);
+		const disabledFill = env.interaction?.fillFor(group.series.name);
 		const processed = processedGroups.get(seriesIdOf(group.series));
 		const processedCategory = processed?.series[categoryAxis] as string | ((d: TData) => AxisValue);
 		const getMagnitude = resolveAccessor(
@@ -90,14 +90,15 @@ export function buildMarks<TData extends Record<string, unknown>>(
 				type: 'bar',
 				role: 'segment',
 				data: realData,
+				hover: 'style',
 				...span(processedCategory, signed),
 				// Each bar writes its own magnitude, on its side of the baseline.
 				...(labels
 					? {
 							label: labels.shapeLabel(
-								ctx,
+								env,
 								(d) =>
-									labels.format(Math.abs(Number(getMagnitude(d as TData))), group.series.name, d),
+									labels.format(Math.abs(Number(getMagnitude(d as TData))), d, group.series.name),
 								{ fill: 'currentColor', ...anchorOf(group.series.side) }
 							)
 						}

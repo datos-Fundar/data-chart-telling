@@ -4,10 +4,10 @@ import type { CommonMarkerConfigWithLabel } from '$lib/types/markers/channels/co
 import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/commonMarkerConfigWithColor';
 import type { CommonMarkerConfigWithInterval } from '$lib/types/markers/channels/commonMarkerConfigWithInterval';
 
-/** A bar mark; `role` tells a visible segment from the hover hit area and highlight. */
+/** A bar mark; `role` tells a visible segment from the hover hit area. */
 export type BarMarkerConfig = {
 	type: 'bar';
-	role: 'segment' | 'hitArea' | 'highlight';
+	role: 'segment' | 'hitArea';
 	isHorizontal: boolean;
 	thickness?: number;
 	styles?: PerRow<AreaStyle> & InsetStyle;

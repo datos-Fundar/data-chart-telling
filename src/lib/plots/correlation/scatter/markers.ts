@@ -1,7 +1,7 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 
-import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/correlation/scatter/state';
+import type { ScatterPlotState, ScatterPlotEnv } from '$lib/types/plots/correlation/scatter/state';
 import type { DotMarkerConfig, TextMarkerConfig } from '$lib/types/markers/common';
 import type { ProcessedRow } from '$lib/types/phases';
 import type { AxisValue } from '$lib/types/layout/mapping';
@@ -30,7 +30,7 @@ export function buildValueLabels<TData extends Record<string, unknown>>(
 			data: processedData.data,
 			x: position.x as TextMarkerConfig['x'],
 			y: position.y as TextMarkerConfig['y'],
-			text: (d: ProcessedRow) => format(Number(valueOf(d)), nameOf(d), d),
+			text: (d: ProcessedRow) => format(Number(valueOf(d)), d, nameOf(d)),
 			styles: {
 				...font,
 				fill: font?.fill ?? 'currentColor',
@@ -55,10 +55,10 @@ export function buildValueLabels<TData extends Record<string, unknown>>(
  */
 export function buildMarks<TData extends Record<string, unknown>>(
 	state: ScatterPlotState<TData>,
-	ctx: ScatterPlotCtx
+	env: ScatterPlotEnv
 ): AxisBasedMarkersConfig[] {
 	const { channels, colorForSeries, scales, flat } = state;
-	const { cfg, interaction } = ctx;
+	const { cfg, interaction } = env;
 	const r = channels!.r;
 	const rFn = r === undefined || typeof r === 'number' ? r : r.accessor;
 	const opacityFn = channels!.opacity?.accessor;
@@ -116,6 +116,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 			markers.push({
 				type: 'dot',
 				data: seg.data,
+				hover: 'style',
 				// Forwarded raw (a field key or function, whatever `series.x`/`.y`
 				// is) rather than pre-resolved into a closure - `DotMarker.svelte`
 				// and svelteplot's own `resolve()` already handle a field-key

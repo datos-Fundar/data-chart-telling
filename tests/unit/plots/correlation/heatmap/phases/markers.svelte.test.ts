@@ -3,7 +3,7 @@ import { TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
 import { StylesPhase } from '$lib/phases/styles/StylesPhase';
 import { buildHeatmapDefaults } from '$lib/plots/correlation/heatmap/defaults';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
-import type { HeatmapPlotState, HeatmapPlotCtx } from '$lib/types/plots/correlation/heatmap/state';
+import type { HeatmapPlotState, HeatmapPlotEnv } from '$lib/types/plots/correlation/heatmap/state';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { CellMarkerConfig } from '$lib/types/markers/common';
 import { stageOf } from '../../../_helpers/stages';
@@ -20,14 +20,14 @@ const FLAT: Row[] = [
 	{ row: 'Y', col: 'B', value: 20 }
 ];
 
-const CTX: HeatmapPlotCtx = {
+const ENV: HeatmapPlotEnv = {
 	cfg: { ...DEFAULT_CONFIG, continuous: { min: '#000000', max: '#ffffff' } } as PlotStylesConfig,
 	range: undefined
 };
 
 function buildAll(
 	overrides: Partial<HeatmapPlotState<Row>> = {},
-	ctxOverrides: Partial<HeatmapPlotCtx> = {}
+	envOverrides: Partial<HeatmapPlotEnv> = {}
 ) {
 	const state: HeatmapPlotState<Row> = {
 		segments: {},
@@ -44,11 +44,11 @@ function buildAll(
 		resolveColor: (row) => (row.value >= 15 ? 'hot' : 'cold'),
 		...overrides
 	};
-	const ctx = { ...CTX, ...ctxOverrides };
-	const styles = new StylesPhase<typeof state, HeatmapPlotCtx>(buildHeatmapDefaults<Row>().styles)
+	const env = { ...ENV, ...envOverrides };
+	const styles = new StylesPhase<typeof state, HeatmapPlotEnv>(buildHeatmapDefaults<Row>().styles)
 		.run;
 	return (
-		buildMarkers(styles(new TransformsPhase<typeof state>().run(state, ctx), ctx), ctx).markers ??
+		buildMarkers(styles(new TransformsPhase<typeof state>().run(state, env), env), env).markers ??
 		[]
 	);
 }

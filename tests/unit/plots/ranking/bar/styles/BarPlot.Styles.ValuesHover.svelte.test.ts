@@ -1,4 +1,5 @@
 import { render } from 'vitest-browser-svelte';
+import type { PlotRowContext } from '$lib';
 import { describe, test, expect, vi } from 'vitest';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import { FEMALE_PROVINCE_VALUES, MALE_PROVINCE_VALUES } from '$datasets';
@@ -23,7 +24,8 @@ describe('BarPlot - the labels of its bars, hovered', () => {
 				values: {
 					show: true,
 					hoverIsolate: true,
-					format: (value: number, series: string) => `${series} ${value}`
+					format: (value: number, _number: unknown, context: PlotRowContext) =>
+						`${context.series} ${value}`
 				}
 			}
 		});

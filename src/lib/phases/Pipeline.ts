@@ -2,6 +2,7 @@ import { FacetPhase } from '$lib/phases/facet/FacetPhase';
 import { DataPhase } from '$lib/phases/data/DataPhase';
 import { MappingPhase } from '$lib/phases/mapping/MappingPhase';
 import { TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
+import { ContextPhase } from '$lib/phases/context/ContextPhase';
 import { StatisticsPhase } from '$lib/phases/statistics/StatisticsPhase';
 import { ScalesPhase } from '$lib/phases/scales/ScalesPhase';
 import { SharedScalesPhase } from '$lib/phases/sharedScales/SharedScalesPhase';
@@ -13,7 +14,7 @@ import { HoverSettings } from '$lib/layout/hover/HoverSettings';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type {
 	AxisPlotState,
-	AxisPlotCtx,
+	AxisPlotEnv,
 	AxisPlotKind,
 	AxisPlotDefaults,
 	DataRunState,
@@ -92,7 +93,7 @@ export type PipelineOptions<TState> = {
  * Stages declared out of phase order still run in it - with a warning, once,
  * since the declared order would otherwise read as the one that runs.
  */
-export class Pipeline<TState, TCtx = unknown> {
+export class Pipeline<TState, TEnv = unknown> {
 	/**
 	 * The phases that work on the plot's rows - everything before its scales,
 	 * plus the domains its slices share - in order. They run once over every
@@ -103,6 +104,7 @@ export class Pipeline<TState, TCtx = unknown> {
 		'data',
 		'mapping',
 		'transforms',
+		'context',
 		'statistics',
 		'sharedScales'
 	];
@@ -122,12 +124,12 @@ export class Pipeline<TState, TCtx = unknown> {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static #axisKinds = new WeakMap<object, Pipeline<any, any>>();
 
-	readonly stages: readonly PhaseStage<TState, TCtx>[];
+	readonly stages: readonly PhaseStage<TState, TEnv>[];
 	readonly #options: PipelineOptions<TState>;
-	#data: PhaseStage<TState, TCtx>[] | undefined;
-	#panel: PhaseStage<TState, TCtx>[] | undefined;
+	#data: PhaseStage<TState, TEnv>[] | undefined;
+	#panel: PhaseStage<TState, TEnv>[] | undefined;
 
-	constructor(stages: PhaseStage<TState, TCtx>[], options: PipelineOptions<TState> = {}) {
+	constructor(stages: PhaseStage<TState, TEnv>[], options: PipelineOptions<TState> = {}) {
 		const rank = (phase: PlotPhase) => Pipeline.ORDER.indexOf(phase);
 		const ordered = [...stages].sort((a, b) => rank(a.phase) - rank(b.phase));
 		if (ordered.some((stage, i) => stage !== stages[i])) {
@@ -145,26 +147,27 @@ export class Pipeline<TState, TCtx = unknown> {
 	 * from a core's props. Built once per kind object.
 	 */
 	/* eslint-disable @typescript-eslint/no-explicit-any */
-	static ofAxisKind<TState extends AxisPlotState<any, any, any, any>, TCtx extends AxisPlotCtx>(
-		kind: AxisPlotKind<TState, TCtx> & Pick<AxisPlotDefaults<any, any>, 'timeline'>
-	): Pipeline<TState, TCtx> {
+	static ofAxisKind<TState extends AxisPlotState<any, any, any, any>, TEnv extends AxisPlotEnv>(
+		kind: AxisPlotKind<TState, TEnv> & Pick<AxisPlotDefaults<any, any>, 'timeline'>
+	): Pipeline<TState, TEnv> {
 		/* eslint-enable @typescript-eslint/no-explicit-any */
 		const cached = Pipeline.#axisKinds.get(kind);
 		if (cached) return cached;
-		const scales = new ScalesPhase<TState, TCtx>(kind.scales);
-		const pipeline = new Pipeline<TState, TCtx>(
+		const scales = new ScalesPhase<TState, TEnv>(kind.scales);
+		const pipeline = new Pipeline<TState, TEnv>(
 			[
 				new FacetPhase<TState>(),
-				new DataPhase<TState, TCtx>(kind.data),
-				new MappingPhase<TState, TCtx>(kind.mapping),
-				new TransformsPhase<TState, TCtx>(kind.transforms, kind.data?.segments?.connect),
+				new DataPhase<TState, TEnv>(kind.data),
+				new MappingPhase<TState, TEnv>(kind.mapping),
+				new TransformsPhase<TState, TEnv>(kind.transforms, kind.data?.segments?.connect),
+				new ContextPhase<TState, TEnv>(kind.context),
 				new StatisticsPhase<TState>(kind.statistics),
-				new SharedScalesPhase<TState, TCtx>(kind.sharedScales, scales),
+				new SharedScalesPhase<TState, TEnv>(kind.sharedScales, scales),
 				scales,
-				new StylesPhase<TState, TCtx>(kind.styles),
-				new MarkersPhase<TState, TCtx>(kind.markers),
+				new StylesPhase<TState, TEnv>(kind.styles),
+				new MarkersPhase<TState, TEnv>(kind.markers),
 				new TooltipPhase<TState>(),
-				new HoverPhase<TState, TCtx>(kind.hover)
+				new HoverPhase<TState, TEnv>(kind.hover)
 			],
 			{
 				seed: (props, rows) => Pipeline.#axisSeed(props, rows) as TState,
@@ -186,7 +189,7 @@ export class Pipeline<TState, TCtx = unknown> {
 	}
 
 	/** The stage of `phase`, if the pipeline has one. */
-	stage(phase: PlotPhase): PhaseStage<TState, TCtx> | undefined {
+	stage(phase: PlotPhase): PhaseStage<TState, TEnv> | undefined {
 		return this.stages.find((stage) => stage.phase === phase);
 	}
 
@@ -196,11 +199,11 @@ export class Pipeline<TState, TCtx = unknown> {
 	 * {@link runData}), only the stages after the data phases, over that state
 	 * with the input's own props (its box, margins and scales) on top.
 	 */
-	run = (input: unknown, ctx: TCtx, panelState?: object): TState => {
+	run = (input: unknown, env: TEnv, panelState?: object): TState => {
 		const seed = this.#seed(input);
-		if (!panelState) return Pipeline.#through(this.stages, seed, ctx);
+		if (!panelState) return Pipeline.#through(this.stages, seed, env);
 		this.#panel ??= this.stages.filter((stage) => !Pipeline.DATA_PHASES.includes(stage.phase));
-		return Pipeline.#through(this.#panel, { ...panelState, ...seed } as TState, ctx);
+		return Pipeline.#through(this.#panel, { ...panelState, ...seed } as TState, env);
 	};
 
 	/** Whether the pipeline has data phases to run once over every facet panel ({@link runData}). */
@@ -225,7 +228,7 @@ export class Pipeline<TState, TCtx = unknown> {
 		return Pipeline.#through(
 			this.#data,
 			seed,
-			Pipeline.#ctxFor<TCtx>(cfg, legendInteraction)
+			Pipeline.#envFor<TEnv>(cfg, legendInteraction)
 		) as DataRunState;
 	}
 
@@ -238,7 +241,7 @@ export class Pipeline<TState, TCtx = unknown> {
 		const fixed = this.#options.hoverStrategy;
 		if (fixed !== undefined) return fixed;
 		const upToData = this.stages.filter((s) => s.phase === 'data');
-		const state = Pipeline.#through(upToData, this.#seed(props), Pipeline.#ctxFor<TCtx>(cfg, null));
+		const state = Pipeline.#through(upToData, this.#seed(props), Pipeline.#envFor<TEnv>(cfg, null));
 		return HoverSettings.strategyOf((state as { axes?: PlotAxes }).axes);
 	}
 
@@ -264,7 +267,7 @@ export class Pipeline<TState, TCtx = unknown> {
 		const state = Pipeline.#through(
 			upToMapping,
 			this.#seed(props),
-			Pipeline.#ctxFor<TCtx>(cfg, null)
+			Pipeline.#envFor<TEnv>(cfg, null)
 		) as { channels?: Record<string, unknown>; axes?: PlotAxes };
 		const channel = (ref: ChannelName | AxisRole) => {
 			const name = ref === 'value' || ref === 'category' ? state.axes?.[ref] : ref;
@@ -290,12 +293,12 @@ export class Pipeline<TState, TCtx = unknown> {
 	}
 
 	/** `stages` over `state`, in order. */
-	static #through<S, C>(stages: readonly PhaseStage<S, C>[], state: S, ctx: C): S {
-		return stages.reduce((acc, stage) => stage.run(acc, ctx), state);
+	static #through<S, C>(stages: readonly PhaseStage<S, C>[], state: S, env: C): S {
+		return stages.reduce((acc, stage) => stage.run(acc, env), state);
 	}
 
 	/** The context a plot-level run reads, outside any core: the configuration and the legend. */
-	static #ctxFor<C>(cfg: PlotStylesConfig, legendInteraction: LegendState | null): C {
+	static #envFor<C>(cfg: PlotStylesConfig, legendInteraction: LegendState | null): C {
 		const interaction = new PlotInteraction(() => cfg, { legend: legendInteraction });
 		return { cfg, interaction } as C;
 	}

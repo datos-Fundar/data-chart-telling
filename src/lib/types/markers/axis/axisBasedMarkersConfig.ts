@@ -23,6 +23,7 @@ import type { TrailMarkerConfig } from './trail';
 import type { WaffleMarkerConfig } from './waffle';
 import type { ViolinMarkerConfig } from './violin';
 import type { RuleMarkerConfig } from './rule';
+import type { BandMarkerConfig } from './band';
 import type { HoverMarkerConfig } from './hover';
 import type { CustomComponentMarkerConfig } from './component';
 import type { DeltaMarkerConfig } from './delta';
@@ -54,6 +55,7 @@ export type AxisBasedMarkersConfig =
 	| WaffleMarkerConfig
 	| ViolinMarkerConfig
 	| RuleMarkerConfig
+	| BandMarkerConfig
 	| HoverMarkerConfig
 	| CustomComponentMarkerConfig
 	| DeltaMarkerConfig;

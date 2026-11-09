@@ -40,15 +40,13 @@ const SERIES = [
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * Basic hover marker - a dot appears on the hovered cell as the cursor moves
- * over the plot, along with a full crosshair (both `ruleX` and `ruleY` are
- * implied by the heatmap's `'punctual'` hover strategy) and a value label,
- * on by default like every other plot kind. Since heatmap cells already show
- * their value permanently, the label next to the hover dot duplicates it -
- * see `WithoutLabels` to turn it off. No floating HTML tooltip is involved.
+ * The plot's own hover, with a tooltip: the hovered cell outlined, in the configuration's `hover.active`.
+ * A cell writes its own value, so the hover draws no crosshair, dot or label - `active` and `others` restyle
+ * the cells (see `Layout/Hover/Active and others`).
  */
 export const Basic: Story = {
 	args: {
+		tooltip: true,
 		series: SERIES,
 		markers: [
 			{
@@ -59,7 +57,7 @@ export const Basic: Story = {
 };
 
 /**
- * Without labels - `showLabels: false` turns off the hover marker's own
+ * Without labels - `front: [{ type: 'dot' }]` drops the hover marker's own
  * value label, the recommended setting for heatmaps specifically: each
  * cell already shows its value permanently, so the hover dot's own label
  * would just duplicate it right next to it.
@@ -67,68 +65,49 @@ export const Basic: Story = {
 export const WithoutLabels: Story = {
 	args: {
 		series: SERIES,
-		markers: [
-			{
-				type: 'hover',
-				showLabels: false
-			}
-		] satisfies AxisBasedMarkersConfig[]
+		markers: [{ type: 'hover', front: [{ type: 'dot' }] }] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
 /**
- * No crosshair - `ruleX: false` and `ruleY: false` suppress both rules the
+ * No crosshair - `back: []` drops both rules the
  * `'punctual'` strategy implies by default, leaving just the hover dot.
  */
 export const WithoutRules: Story = {
 	args: {
 		series: SERIES,
-		markers: [
-			{
-				type: 'hover',
-				ruleX: false,
-				ruleY: false
-			}
-		] satisfies AxisBasedMarkersConfig[]
+		markers: [{ type: 'hover', back: [] }] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
 /**
- * Row rule only - `ruleX: false` keeps just the horizontal (`ruleY`) rule,
+ * Row rule only - a single `rule` along `y` in `back` keeps just the horizontal rule,
  * highlighting the hovered cell's species row without the vertical island rule.
  */
 export const RowRuleOnly: Story = {
 	args: {
 		series: SERIES,
 		markers: [
-			{
-				type: 'hover',
-				ruleX: false,
-				ruleY: true
-			}
+			{ type: 'hover', back: [{ type: 'rule', axis: 'y', points: 'active' }] }
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
 /**
- * Column rule only - `ruleY: false` keeps just the vertical (`ruleX`) rule,
+ * Column rule only - a single `rule` along `x` in `back` keeps just the vertical rule,
  * highlighting the hovered cell's island column without the horizontal species rule.
  */
 export const ColumnRuleOnly: Story = {
 	args: {
 		series: SERIES,
 		markers: [
-			{
-				type: 'hover',
-				ruleX: true,
-				ruleY: false
-			}
+			{ type: 'hover', back: [{ type: 'rule', axis: 'x', points: 'active' }] }
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
 /**
- * Custom rule style - `rule` overrides the crosshair stroke. Here the
+ * Custom rule style - the `styles` of a `rule` in `back` set the crosshair stroke. Here the
  * rules render in red with a solid line and higher opacity.
  */
 export const WithCustomRuleStyle: Story = {
@@ -137,29 +116,51 @@ export const WithCustomRuleStyle: Story = {
 		markers: [
 			{
 				type: 'hover',
-				showLabels: false,
-				rule: {
-					stroke: '#e63946',
-					strokeOpacity: 0.3,
-					strokeWidth: 2,
-					strokeDasharray: '6 3'
-				},
-				dot: {
-					dotFill: '#e63946',
-					dotFillOpacity: 0.2,
-					dotStrokeOpacity: 1,
-					dotRadius: 20
-				}
+				back: [
+					{
+						type: 'rule',
+						axis: 'x',
+						points: 'active',
+						styles: {
+							stroke: '#e63946',
+							strokeOpacity: 0.3,
+							strokeWidth: 2,
+							strokeDasharray: '6 3'
+						}
+					},
+					{
+						type: 'rule',
+						axis: 'y',
+						points: 'active',
+						styles: {
+							stroke: '#e63946',
+							strokeOpacity: 0.3,
+							strokeWidth: 2,
+							strokeDasharray: '6 3'
+						}
+					}
+				],
+				front: [
+					{
+						type: 'dot',
+						styles: {
+							dotFill: '#e63946',
+							dotFillOpacity: 0.2,
+							dotStrokeOpacity: 1,
+							dotRadius: 20
+						}
+					}
+				]
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
 /**
- * `areaX`/`areaY` together - since both of a heatmap's axes are band scales,
- * the two translucent highlight areas cross exactly at the hovered cell,
- * highlighting its full row and column at once. Each defaults to a neutral
- * gray sized to the cell's own width/height plus 2px.
+ * A `band` along each axis in `back` - since both of a heatmap's axes are band
+ * scales, the two translucent bands cross exactly at the hovered cell,
+ * highlighting its full row and column at once. Each defaults to the
+ * configuration's neutral gray `hover.area`, the width of the cell's band.
  */
 export const WithHighlightCross: Story = {
 	args: {
@@ -167,8 +168,12 @@ export const WithHighlightCross: Story = {
 		markers: [
 			{
 				type: 'hover',
-				areaX: true,
-				areaY: true
+				back: [
+					{ type: 'band', axis: 'x' },
+					{ type: 'band', axis: 'y' },
+					{ type: 'rule', axis: 'x', points: 'active' },
+					{ type: 'rule', axis: 'y', points: 'active' }
+				]
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

@@ -3,10 +3,11 @@ import { buildMarks, buildHitAreas, buildBarGeometry } from '$lib/plots/ranking/
 import { NiceTicks } from '$lib/layout/scales/NiceTicks';
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
+import { HoverDefaults } from '$lib/layout/hover/HoverDefaults';
 import type { AxisPlotDefaults } from '$lib/types/phases';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { AxisScale } from '$lib/types/layout/scales';
-import type { BarPlotState, BarPlotCtx } from '$lib/types/plots/ranking/bar/state';
+import type { BarPlotState, BarPlotEnv } from '$lib/types/plots/ranking/bar/state';
 
 /**
  * The domain a bar plot fits to its own bars on its value axis: from zero to
@@ -49,7 +50,7 @@ export function fitValueDomain<TData extends Record<string, unknown>>(
  */
 export function buildBarDefaults<TData extends Record<string, unknown>>(): AxisPlotDefaults<
 	BarPlotState<TData>,
-	BarPlotCtx
+	BarPlotEnv
 > {
 	return {
 		data: {
@@ -62,8 +63,8 @@ export function buildBarDefaults<TData extends Record<string, unknown>>(): AxisP
 		},
 		scales: {
 			zero: ['value'],
-			defaults: (_state, ctx) => ({
-				category: { paddingInner: ctx.cfg.bar.paddingInner, paddingOuter: ctx.cfg.bar.paddingOuter }
+			defaults: (_state, env) => ({
+				category: { paddingInner: env.cfg.bar.paddingInner, paddingOuter: env.cfg.bar.paddingOuter }
 			}),
 			fit: (state) => fitValueDomain(state)
 		},
@@ -96,13 +97,13 @@ export function buildBarDefaults<TData extends Record<string, unknown>>(): AxisP
 						.map(({ series, value }) =>
 							value < 0
 								? labels.edgeBox(
-										labels.format(value, series.name),
+										labels.format(value, undefined, series.name),
 										{ x: 'before', y: 'middle' },
 										{ x: -offset },
 										['left']
 									)
 								: labels.edgeBox(
-										labels.format(value, series.name),
+										labels.format(value, undefined, series.name),
 										{ x: 'after', y: 'middle' },
 										{ x: offset },
 										['right']
@@ -116,13 +117,18 @@ export function buildBarDefaults<TData extends Record<string, unknown>>(): AxisP
 			// Each bar matched by its own band (see `buildHitAreas`); a grouped bar's dot is
 			// drawn in its series' slice of the band.
 			pointMatching: 'contains',
-			decorate: (state, ctx) => {
-				const { sliceOf } = buildBarGeometry(state, ctx.cfg.bar.seriesPadding);
+			decorate: (state, env) => {
+				const { sliceOf } = buildBarGeometry(state, env.cfg.bar.seriesPadding);
 				return (row) => ({
 					areaInset: sliceOf(String((row as Record<string, unknown>)[SERIES_KEY]))
 				});
 			},
-			hitAreas: buildHitAreas
+			hitAreas: buildHitAreas,
+			// The hovered category's band behind its bars - its series' slice of it, when that bar alone is hovered.
+			marker: (state) => ({
+				back: [HoverDefaults.band(state.axes?.isHorizontal ? 'y' : 'x')],
+				front: []
+			})
 		},
 		timeline: { interpolation: { value: 'value', key: ['category', 'grouping'] } }
 	};

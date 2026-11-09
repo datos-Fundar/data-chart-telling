@@ -7,7 +7,7 @@ import type { CurveAwarePlotStylesConfig } from '$lib/types/layout/styles';
 import type { AxisBasedMarkersConfig, DotMarkerConfig } from '$lib/types/markers/common';
 import type {
 	SparklinePlotState,
-	SparklinePlotCtx
+	SparklinePlotEnv
 } from '$lib/types/plots/evolution/sparkline/state';
 
 /**
@@ -16,11 +16,11 @@ import type {
  */
 export function buildMarks<TData extends Record<string, unknown>>(
 	state: SparklinePlotState<TData>,
-	ctx: SparklinePlotCtx
+	env: SparklinePlotEnv
 ): AxisBasedMarkersConfig[] {
 	const { sparkline } = getConfiguration();
 	const groups = state.processedGroups ?? [];
-	const disabledDotsFor = (name: string) => ctx.interaction?.dotsFor(name);
+	const disabledDotsFor = (name: string) => env.interaction?.dotsFor(name);
 	const lines = buildLineMarkers({
 		groupedSeries: groups.map((group) => ({
 			...group,
@@ -33,7 +33,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 			}))
 		})),
 		colorFor: state.colorForSeries!,
-		disabledStrokeFor: (name) => ctx.interaction?.strokeFor(name),
+		disabledStrokeFor: (name) => env.interaction?.strokeFor(name),
 		disabledDotsFor,
 		curve: (state.styles as CurveAwarePlotStylesConfig | undefined)?.curve
 	});

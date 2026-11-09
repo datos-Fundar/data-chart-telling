@@ -8,7 +8,7 @@ import type {
 	TickMarkerConfig
 } from '$lib/types/markers/common';
 import type { BulletStylesConfig } from '$lib/types/layout/styles';
-import type { BulletPlotState, BulletPlotCtx } from '$lib/types/plots/ranking/bullet/state';
+import type { BulletPlotState, BulletPlotEnv } from '$lib/types/plots/ranking/bullet/state';
 
 /** One drawn category: where it sits and what it is measured against. */
 type Measure = { category: unknown; target?: number; bounds: number[] };
@@ -16,9 +16,9 @@ type Measure = { category: unknown; target?: number; bounds: number[] };
 /** Each category's target and range bounds, read off the rows the bars draw. */
 function buildMeasures<TData extends Record<string, unknown>>(
 	state: BulletPlotState<TData>,
-	ctx: BulletPlotCtx
+	env: BulletPlotEnv
 ): Measure[] {
-	const geometry = buildBarGeometry(state, ctx.cfg.bar.seriesPadding);
+	const geometry = buildBarGeometry(state, env.cfg.bar.seriesPadding);
 	return (state.processedData?.data ?? [])
 		.filter((row) => row[GAP_VALUE] === undefined && geometry.spanOf(row) !== undefined)
 		.map((row) => ({
@@ -34,9 +34,9 @@ function buildMeasures<TData extends Record<string, unknown>>(
 /** Every value the axis has to reach beyond the bars. */
 export function buildReach<TData extends Record<string, unknown>>(
 	state: BulletPlotState<TData>,
-	ctx: BulletPlotCtx
+	env: BulletPlotEnv
 ): number[] {
-	return buildMeasures(state, ctx).flatMap(({ target, bounds }) => [
+	return buildMeasures(state, env).flatMap(({ target, bounds }) => [
 		...(target === undefined ? [] : [target]),
 		...bounds
 	]);
@@ -49,9 +49,9 @@ export function buildReach<TData extends Record<string, unknown>>(
  */
 export function buildMarks<TData extends Record<string, unknown>>(
 	state: BulletPlotState<TData>,
-	ctx: BulletPlotCtx
+	env: BulletPlotEnv
 ): AxisBasedMarkersConfig[] {
-	const configured = ctx.cfg.bullet;
+	const configured = env.cfg.bullet;
 	const own = (state.styles ?? {}) as BulletStylesConfig;
 	const rangeColors = own.ranges?.colors ?? configured.rangeColors;
 	const rangeWidth = own.ranges?.width ?? configured.rangeWidth;
@@ -61,8 +61,8 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		length: own.target?.length ?? configured.targetLength
 	};
 	const isHorizontal = state.axes?.isHorizontal ?? false;
-	const baseline = buildBarGeometry(state, ctx.cfg.bar.seriesPadding).baseline;
-	const measures = buildMeasures(state, ctx);
+	const baseline = buildBarGeometry(state, env.cfg.bar.seriesPadding).baseline;
+	const measures = buildMeasures(state, env);
 
 	// Each bound is a band from the baseline, drawn widest first so the narrower ones lie over it.
 	const rows = measures.flatMap(({ category, bounds }) =>
@@ -91,7 +91,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 				];
 
 	// The bars narrowed to a thickness of their own, centered in their band.
-	const bars = buildBarMarks(state, ctx).map((marker) =>
+	const bars = buildBarMarks(state, env).map((marker) =>
 		marker.type === 'bar' && marker.role === 'segment'
 			? ({
 					...marker,

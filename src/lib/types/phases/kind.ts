@@ -4,6 +4,7 @@ import type { TransformsStageOptions, TransformsStageState } from './transforms/
 import type { StatisticsStageOptions, StatisticsStageState } from './statistics/phase';
 import type { ScalesStageOptions } from './scales/phase';
 import type { HoverStageOptions } from './hover/phase';
+import type { ContextStageOptions } from './context/phase';
 import type { StylesStageOptions } from './styles/phase';
 import type { MarkersStageOptions } from './markers/phase';
 import type { AxisChannelName, ChannelName } from '$lib/types/layout/mapping';
@@ -13,15 +14,17 @@ import type { AxisRole } from '$lib/types/phases/data/axes';
  * What one axis-based plot kind adds to the shared pipeline: options for each
  * shared stage - its own marks and value labels among them.
  */
-export type AxisPlotKind<TState extends TransformsStageState & StatisticsStageState, TCtx> = {
-	data?: DataStageOptions<TState, TCtx>;
-	mapping?: MappingStageOptions<TState, TCtx>;
-	transforms?: TransformsStageOptions<TState, TCtx>;
+export type AxisPlotKind<TState extends TransformsStageState & StatisticsStageState, TEnv> = {
+	data?: DataStageOptions<TState, TEnv>;
+	mapping?: MappingStageOptions<TState, TEnv>;
+	transforms?: TransformsStageOptions<TState, TEnv>;
+	/** What the kind works out for each of its rows, for everything that writes about a row to read - see `RowContext`. */
+	context?: ContextStageOptions<TState, TEnv>;
 	statistics?: StatisticsStageOptions<TState>;
-	scales?: ScalesStageOptions<TState, TCtx>;
+	scales?: ScalesStageOptions<TState, TEnv>;
 	styles?: StylesStageOptions<TState>;
-	markers: MarkersStageOptions<TState, TCtx>;
-	hover?: HoverStageOptions<TState, TCtx>;
+	markers: MarkersStageOptions<TState, TEnv>;
+	hover?: HoverStageOptions<TState, TEnv>;
 	/**
 	 * How the slices of a plot (facet panels, timeline steps) share their
 	 * domains. Every axis kind shares them - bands from its axes, zero from its
@@ -47,8 +50,8 @@ export type SharedScalesOptions = {
  */
 export type AxisPlotDefaults<
 	TState extends TransformsStageState & StatisticsStageState,
-	TCtx
-> = AxisPlotKind<TState, TCtx> & {
+	TEnv
+> = AxisPlotKind<TState, TEnv> & {
 	timeline?: {
 		/** Default for `timeline.filterMode`. */
 		filterMode?: 'exact' | 'upTo';

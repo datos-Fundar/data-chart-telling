@@ -41,7 +41,7 @@ Start with the full guide: it lists the mental model, the props every plot share
 - [Chrome](./docs/chrome.md): title, caption, header, footer, order, dividers
 - [Facets](./docs/facets.md): small multiples
 - [Composer](./docs/composer.md): several plots in one figure
-- [Reading plot state](./docs/state.md): `useFigure`, `usePlot`
+- [Reading plot state](./docs/state.md): `useFigure`, `usePlot`, the row context every format reads
 - [Maps](./docs/geo.md): GeoPlot, projections, camera, map markers
 - [Theming](./docs/theming.md): configuration, themes, locale, CSS variables
 
@@ -57,6 +57,7 @@ Start with the full guide: it lists the mental model, the props every plot share
 - [Facets with a synced tooltip](./examples/Facets.svelte)
 - [Bars with value labels](./examples/BarValues.svelte)
 - [Treemap: a tile per row, sized by its value and nested by grouping](./examples/Treemap.svelte)
+- [Treemap whose hover lightens the hovered tile and fades the rest](./examples/TreemapHover.svelte)
 - [Custom tooltip card](./examples/CustomTooltip.svelte)
 - [The smallest plot: rows, fields and a pixel size](./examples/FirstPlot.svelte)
 - [Line per series over a date axis, with end labels](./examples/LineDates.svelte)

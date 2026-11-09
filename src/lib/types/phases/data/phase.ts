@@ -18,7 +18,7 @@ export type SegmentsStageOptions = {
  * which channels the author set, what each axis is, which way the plot runs,
  * whether `color` groups - the stage reads off the data itself.
  */
-export type DataStageOptions<TState, TCtx> = {
+export type DataStageOptions<TState, TEnv> = {
 	/** How many axes the kind lays out as categories: 0 (line), 1 (bar) or 2 (heatmap). Defaults to 0. */
 	discreteAxes?: DiscreteAxesCount;
 	/** How the kind's own mark splits into visual segments. */
@@ -33,6 +33,6 @@ export type DataStageOptions<TState, TCtx> = {
 	 */
 	nested?: boolean;
 	/** The plot's own extra "data" output, once the shared one is in place. */
-	extend?: (state: TState, ctx: TCtx) => TState;
+	extend?: (state: TState, env: TEnv) => TState;
 };
 /* eslint-enable @typescript-eslint/no-explicit-any */

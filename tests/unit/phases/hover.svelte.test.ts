@@ -80,9 +80,9 @@ describe('buildProcessedHoverPoints', () => {
 		]);
 	});
 
-	test('leaves out a series the legend turned off, and rows `include` rejects', () => {
+	test('leaves out a series the legend hides, and rows `include` rejects', () => {
 		const legendInteraction = new LegendState();
-		legendInteraction.turnOff('A', { mode: 'dim' });
+		legendInteraction.turnOff('A', { mode: 'hide' });
 		const off = HoverPhase.buildProcessedHoverPoints<Row>({
 			processed,
 			colorFor,
@@ -97,16 +97,6 @@ describe('buildProcessedHoverPoints', () => {
 			include: (row) => row.raw === 2
 		});
 		expect(included.map((p) => p.series)).toEqual(['A']);
-	});
-
-	test('`row` decides what a hovered point reads as', () => {
-		const [point] = HoverPhase.buildProcessedHoverPoints<Row>({
-			processed,
-			colorFor,
-			label: () => '',
-			row: (row) => ({ ...row, extra: true })
-		});
-		expect(point.row.extra).toBe(true);
 	});
 });
 

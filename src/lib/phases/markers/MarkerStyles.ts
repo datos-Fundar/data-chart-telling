@@ -22,6 +22,9 @@ export class MarkerStyles {
 	/** The style fields that take a dash pattern. */
 	static readonly #DASH_KEYS = new Set(['strokeDasharray', 'dotStrokeDasharray']);
 
+	/** The label colors this class chose for a shape's color, which a restyled shape chooses again. */
+	static readonly #contrasts = new WeakSet<object>();
+
 	/** Fields that hold rows rather than config, which are never walked. */
 	static readonly #ROW_KEYS = new Set(['data', 'features']);
 
@@ -31,6 +34,20 @@ export class MarkerStyles {
 	 */
 	static resolveAll<T>(markers: T[], plot: { cfg?: PlotStylesConfig; rows?: unknown[] } = {}): T[] {
 		return markers.map((marker) => MarkerStyles.#contrasted(MarkerStyles.#walk(marker), plot) as T);
+	}
+
+	/**
+	 * `marker` resolved again after its styles changed (as the hover restyles a shape): a label written in the color
+	 * that read best on the shape's old one reads best on its new one.
+	 */
+	static restyle<T>(marker: T, plot: { cfg?: PlotStylesConfig; rows?: unknown[] } = {}): T {
+		const label = (marker as { label?: { styles?: { fill?: unknown } } }).label;
+		const fill = label?.styles?.fill;
+		const fresh =
+			typeof fill === 'function' && MarkerStyles.#contrasts.has(fill)
+				? { ...marker, label: { ...label, styles: { ...label!.styles, fill: undefined } } }
+				: marker;
+		return MarkerStyles.resolveAll([fresh], plot)[0];
 	}
 
 	/** The marker with its label inside its shape written in the candidate that reads best on each row's color. */
@@ -58,6 +75,7 @@ export class MarkerStyles {
 			const seen = CssColor.composite(color, opacityOf(row), cfg.background);
 			return CssColor.contrastText(seen, candidates);
 		};
+		MarkerStyles.#contrasts.add(fill);
 		return { ...marker, label: { ...label, styles: { ...label.styles, fill } } };
 	}
 

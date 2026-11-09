@@ -1,13 +1,10 @@
 import { buildMarks } from '$lib/plots/distribution/box/markers';
+import { PlotAxes } from '$lib/phases/data/PlotAxes';
+import { HoverDefaults } from '$lib/layout/hover/HoverDefaults';
 import { BoxSummaries } from '$lib/plots/distribution/box/BoxSummaries';
-import { TooltipState } from '$lib/layout/tooltip/TooltipState.svelte';
 import type { AxisPlotDefaults } from '$lib/types/phases';
 import type { AreaStyle } from '$lib/types/plots/styling';
-import type {
-	BoxPlotState,
-	BoxPlotCtx,
-	BoxSummaryRow
-} from '$lib/types/plots/distribution/box/state';
+import type { BoxPlotState, BoxPlotEnv } from '$lib/types/plots/distribution/box/state';
 
 /**
  * BoxPlot on the shared pipeline: one box per category of each series along
@@ -20,7 +17,7 @@ import type {
  */
 export function buildBoxDefaults<TData extends Record<string, unknown>>(): AxisPlotDefaults<
 	BoxPlotState<TData>,
-	BoxPlotCtx
+	BoxPlotEnv
 > {
 	return {
 		data: {
@@ -33,21 +30,19 @@ export function buildBoxDefaults<TData extends Record<string, unknown>>(): AxisP
 		},
 		scales: {
 			bandOrder: 'data',
-			defaults: (_state, ctx) => ({
-				category: { paddingInner: ctx.cfg.box.paddingInner, paddingOuter: ctx.cfg.box.paddingOuter }
+			defaults: (_state, env) => ({
+				category: { paddingInner: env.cfg.box.paddingInner, paddingOuter: env.cfg.box.paddingOuter }
 			})
 		},
+		// Each value's box: its quartiles and whiskers, worked out once for its tooltip and hover to read.
+		context: (state) => BoxSummaries.context(state) as (row: never) => object | undefined,
 		markers: { marks: buildMarks },
 		hover: {
+			// The hovered category's band behind its shape.
+			marker: (state) => HoverDefaults.behindBand(PlotAxes.other(PlotAxes.valueOf(state))),
 			rows: BoxSummaries.of,
 			position: BoxSummaries.position,
-			label: () => ((row: BoxSummaryRow) => String(row.median)) as (row: never) => string,
-			format: (state) => BoxSummaries.format(state) as (row: never) => string,
-			sort: () =>
-				TooltipState.descending((row: BoxSummaryRow) => row.median) as (
-					a: never,
-					b: never
-				) => number
+			format: (state) => BoxSummaries.format(state) as (row: never) => string
 		}
 	};
 }

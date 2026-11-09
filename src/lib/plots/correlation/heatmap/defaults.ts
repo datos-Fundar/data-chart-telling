@@ -1,9 +1,11 @@
 import { ColorRamp } from '$lib/utils/color';
+import { HoverDefaults } from '$lib/layout/hover/HoverDefaults';
 import { OpacityScale } from '$lib/utils/OpacityScale';
 import { ContinuousDomain } from '$lib/utils/ContinuousDomain';
 import { buildMarks } from '$lib/plots/correlation/heatmap/markers';
-import type { AxisPlotDefaults } from '$lib/types/phases';
-import type { HeatmapPlotState, HeatmapPlotCtx } from '$lib/types/plots/correlation/heatmap/state';
+import { RowContext } from '$lib/phases/context/RowContext';
+import type { AxisPlotDefaults, ProcessedRow } from '$lib/types/phases';
+import type { HeatmapPlotState, HeatmapPlotEnv } from '$lib/types/plots/correlation/heatmap/state';
 
 /**
  * HeatmapPlot's own "scales" output, over the band axes the shared phase laid
@@ -12,10 +14,10 @@ import type { HeatmapPlotState, HeatmapPlotCtx } from '$lib/types/plots/correlat
  */
 function extendWithColorScales<TData extends Record<string, unknown>>(
 	state: HeatmapPlotState<TData>,
-	ctx: HeatmapPlotCtx
+	env: HeatmapPlotEnv
 ): HeatmapPlotState<TData> {
 	const { scales, channels } = state;
-	const { range, cfg } = ctx;
+	const { range, cfg } = env;
 	const { color: colorAcc } = channels!;
 	const rows = (state.processedData?.data ?? []) as TData[];
 
@@ -76,7 +78,7 @@ function extendWithColorScales<TData extends Record<string, unknown>>(
  */
 export function buildHeatmapDefaults<TData extends Record<string, unknown>>(): AxisPlotDefaults<
 	HeatmapPlotState<TData>,
-	HeatmapPlotCtx
+	HeatmapPlotEnv
 > {
 	return {
 		data: { discreteAxes: 2, segments: { base: { flat: 'area' } } },
@@ -90,6 +92,14 @@ export function buildHeatmapDefaults<TData extends Record<string, unknown>>(): A
 				}
 			})
 		},
+		// A cell's value is its color's, not a position's.
+		context: (state) => {
+			const color = state.channels!.color.accessor;
+			return ((row: TData) => {
+				const value = Number(color(row as never));
+				return { value: Number.isFinite(value) ? value : undefined };
+			}) as (row: never) => object;
+		},
 		statistics: { inheritGrouping: false },
 		sharedScales: { fromScalesPhase: ['color'] },
 		scales: {
@@ -100,11 +110,16 @@ export function buildHeatmapDefaults<TData extends Record<string, unknown>>(): A
 		styles: { values: { show: true } },
 		markers: { marks: buildMarks },
 		hover: {
-			// A hovered cell reads as its formatted value.
+			// A cell writes its own value: the hover only restyles the cells - the hovered one outlined.
+			marker: (_state, env) => HoverDefaults.shapes(env.cfg),
+			// A hovered cell reads as its value, as its value labels write it.
 			label: (state) => {
-				const format = state.values?.format ?? ((v: number) => `${v}`);
-				const color = state.channels!.color.accessor;
-				return ((row: TData) => format(Number(color(row)), '')) as (row: never) => string;
+				const format = state.values?.format;
+				const number = (v: number) => `${v}`;
+				return ((row: ProcessedRow) => {
+					const context = RowContext.of(row);
+					return format ? format(Number(context.value), number, context) : `${context.value}`;
+				}) as (row: never) => string;
 			},
 			// A cell's color is its value, not a series'.
 			decorate: () => () => ({ series: undefined, color: undefined })

@@ -40,7 +40,7 @@ Each tile is labelled with its name and its **share of the whole**, in percent, 
 3. The value alone, when almost none of the name would show.
 4. Nothing, when not even the value fits.
 
-`styles.values.format(value, group, row, number)` writes the tile's whole text instead (`value` is the share, in percent; `number` writes it as the display fields ask), and `styles.values.show: false` leaves the tiles bare. The label's `fontStyle` sets `fontSize` (the biggest it takes), `fontWeight` and `fill`; `treemap` in the [configuration](../../theming.md) sets the lines between tiles, the label color and the room kept around it.
+`styles.values.format(value, number, context)` writes the tile's whole text instead (`value` is the share, in percent; `number` writes it as the display fields ask; `context` holds the tile's `series`, `name`, `path` and `share`), and `styles.values.show: false` leaves the tiles bare. The label's `fontStyle` sets `fontSize` (the biggest it takes), `fontWeight` and `fill`; `treemap` in the [configuration](../../theming.md) sets the lines between tiles, the label color and the room kept around it.
 
 ## Style
 
@@ -66,4 +66,38 @@ Each tile is labelled with its name and its **share of the whole**, in percent, 
 
 ## Hover and tooltip
 
-Hovering a tile matches it alone - an invisible `rect` over each tile drives the plot's hover - and `tooltip` shows its name and share. `tooltip.format(row, number, context)` writes it by hand: `row` is the tile's row, with the fields of every level and its summed `value`, and `context` what the library works out about it - its `series` (the outermost level) and its `share` of the whole, from 0 to 100. The share is worked out from the values, in whatever unit they are, so a dataset whose `value` is a percentage already reads the same.
+Hovering a tile matches it alone - an invisible `rect` over each tile drives the plot's hover - and `tooltip` shows its name and share. `tooltip.format(row, number, context)` writes it by hand: `row` is the tile's row, with the fields of every level and its summed `value`, and `context` what the library works out about it - its `series` (the outermost level), its `name`, `path`, summed `value` and `share` of the whole, from 0 to 100 (see [Row context](../../state.md#row-context)). The share is worked out from the values, in whatever unit they are, so a dataset whose `value` is a percentage already reads the same.
+
+A `hover` marker draws no crosshair, dot or label over a treemap, since a tile has no axes and writes its own label: it outlines the hovered tile, in the configuration's `hover.active`. The tiles are linked to the hover, so its `active` and `others` restyle them: the hovered tile lightened and outlined, the rest faded, each label still on its tile and written in the color that reads best on its new one. A tile the legend dims stays hoverable and keeps its dimmed fill; one it hides, omits or rescales away is never hovered. See [Tooltip and hover](../../tooltip-and-hover.md#restyling-the-hovered-shapes).
+
+<!-- example: examples/TreemapHover.svelte -->
+
+```svelte
+<script lang="ts">
+	import { TreemapPlot } from '@fundar/data-chart-telling';
+	import { ACTIVITY_BRANCHES } from './datasets';
+</script>
+
+<!--
+	The hover marker restyles the tiles themselves: the hovered one at full strength and outlined, every other
+	faded. Each label is still written on its tile, in the color that reads best on it.
+-->
+<TreemapPlot
+	width={760}
+	height={440}
+	data={ACTIVITY_BRANCHES}
+	value="value"
+	grouping="sector.branch"
+	styles={{ area: { fillOpacity: 0.85 } }}
+	tooltip
+	markers={[
+		{
+			type: 'hover',
+			active: { fillOpacity: 1, stroke: '#111827', strokeWidth: 2 },
+			others: { fillOpacity: 0.35 }
+		}
+	]}
+/>
+```
+
+<!-- /example -->

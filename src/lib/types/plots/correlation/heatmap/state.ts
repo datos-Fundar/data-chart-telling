@@ -1,7 +1,7 @@
 import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
 import type { ResolvedChannel, ResolvedChannels } from '$lib/types/layout/mapping';
 import type { LegendRange } from '$lib/types/layout/legend';
-import type { AxisPlotState, AxisPlotCtx } from '$lib/types/phases';
+import type { AxisPlotState, AxisPlotEnv } from '$lib/types/phases';
 
 /**
  * The active continuous-legend range filter, if any - narrows which cells
@@ -29,6 +29,6 @@ export type HeatmapPlotState<TData extends Record<string, unknown>> = AxisPlotSt
 };
 
 /** The environment every HeatmapPlot phase reads from, alongside the growing state. */
-export type HeatmapPlotCtx = AxisPlotCtx & {
+export type HeatmapPlotEnv = AxisPlotEnv & {
 	range: HeatmapRangeFilter | null | undefined;
 };

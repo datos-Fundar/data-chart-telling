@@ -1,6 +1,6 @@
 import type { Series } from '$lib/types/plots/data/common';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
-import type { AxisPlotState, AxisPlotCtx } from '$lib/types/phases';
+import type { AxisPlotState, AxisPlotEnv } from '$lib/types/phases';
 
 export type PyramidSide = 'left' | 'right';
 
@@ -21,4 +21,4 @@ export type PyramidPlotState<TData extends Record<string, unknown>> = AxisPlotSt
 >;
 
 /** The environment every PyramidPlot phase reads from, alongside the growing state. */
-export type PyramidPlotCtx = AxisPlotCtx;
+export type PyramidPlotEnv = AxisPlotEnv;

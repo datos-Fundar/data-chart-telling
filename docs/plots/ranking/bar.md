@@ -57,3 +57,4 @@ Bars where one axis holds the categories and the other the values. Categories on
 - `scales.x.paddingInner` / `paddingOuter` set the spacing between category bands.
 - `styles.values.show` labels each bar; `styles.values.anchor` places the label (`'outside'`, `'middle'`, `'top'`, `'bottom'`, `'left'`, `'right'`, a corner such as `'top-left'`, or `'tip'` and `'base'`, the ends of the bar away from zero and on it).
 - The tooltip triggers anywhere over a bar's whole band, not just over the visible bar.
+- A `hover` marker draws the hovered category's band behind its bars (its series' slice, when grouped and the bar alone is hovered), and with `active` and `others` restyles the hovered bars and the rest. See [Tooltip and hover](../../tooltip-and-hover.md#in-plot-hover).

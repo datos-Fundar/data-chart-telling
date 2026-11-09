@@ -7,7 +7,7 @@ import { BasicStyles } from '$lib/layout/styles/BasicStyles';
 import { FacetPanels } from '$lib/phases/facet/FacetPanels';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { Accessor, Series } from '$lib/types/plots/data/common';
-import type { AxisPlotState, AxisPlotCtx, DataStageOptions, PhaseStage } from '$lib/types/phases';
+import type { AxisPlotState, AxisPlotEnv, DataStageOptions, PhaseStage } from '$lib/types/phases';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyAxisState = AxisPlotState<any, any, any, any>;
@@ -22,18 +22,18 @@ type AnyAxisState = AxisPlotState<any, any, any, any>;
  * Colors and axes come from every series, before any is omitted or split by
  * facet panel, so they stay put and every panel agrees.
  */
-export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> implements PhaseStage<
+export class DataPhase<TState extends AnyAxisState, TEnv extends AxisPlotEnv> implements PhaseStage<
 	TState,
-	TCtx
+	TEnv
 > {
 	readonly phase = 'data' as const;
-	readonly #options: DataStageOptions<TState, TCtx>;
+	readonly #options: DataStageOptions<TState, TEnv>;
 
-	constructor(options: DataStageOptions<TState, TCtx> = {}) {
+	constructor(options: DataStageOptions<TState, TEnv> = {}) {
 		this.#options = options;
 	}
 
-	run = (state: TState, ctx: TCtx): TState => {
+	run = (state: TState, env: TEnv): TState => {
 		const options = this.#options;
 		const { series, data, segments, scales } = state;
 		const { connect = true, color: segmentColor } = options.segments ?? {};
@@ -50,9 +50,9 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 		const seriesColors = ColorRamp.resolve(
 			scales.color,
 			(options.colorOrder ? options.colorOrder(fullSeries) : fullSeries).map((s) => s.name),
-			ctx.cfg.palette
+			env.cfg.palette
 		);
-		const colorForPath = series ? undefined : DataPhase.#buildPathColors(state, ctx);
+		const colorForPath = series ? undefined : DataPhase.#buildPathColors(state, env);
 		// A plot that splits its series by every level colors each one by its path; a nested one by its outermost.
 		const colorForSeries =
 			colorForPath && !options.nested
@@ -62,7 +62,7 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 			state.panels && state.panelOf && !series
 				? FacetPanels.splitSeries(fullSeries, state.panels, state.panelOf)
 				: fullSeries;
-		const legend = ctx.interaction?.legend;
+		const legend = env.interaction?.legend;
 		const resolvedSeries = legend?.withoutOmitted(panelSeries) ?? panelSeries;
 		const removedSeries = legend?.removed(panelSeries);
 		const baseFor = BasicStyles.of(state.styles, options.segments?.base);
@@ -94,7 +94,7 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 			...(colorForPath ? { colorForPath } : {}),
 			...(gapFillMaps ? { gapFillMaps } : {})
 		} as TState;
-		return options.extend ? options.extend(next, ctx) : next;
+		return options.extend ? options.extend(next, env) : next;
 	};
 
 	/**
@@ -104,7 +104,7 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 	 */
 	static #buildPathColors(
 		state: AnyAxisState,
-		ctx: AxisPlotCtx
+		env: AxisPlotEnv
 	): ((path: readonly string[]) => string) | undefined {
 		const depth = state.scales.color?.depth ?? 1;
 		const rows = state.data ?? [];
@@ -114,7 +114,7 @@ export class DataPhase<TState extends AnyAxisState, TCtx extends AxisPlotCtx> im
 		if (depth <= 1 || levels.length <= 1) return undefined;
 		const paths = rows.map((row) => levels.map((read) => String(read(row))));
 		const outermost = [...new Set(paths.map((path) => path[0]))];
-		const colorOf = ColorRamp.resolve(state.scales.color, outermost, ctx.cfg.palette);
+		const colorOf = ColorRamp.resolve(state.scales.color, outermost, env.cfg.palette);
 		return ColorTones.hierarchy(paths, depth, (value) => colorOf(value));
 	}
 

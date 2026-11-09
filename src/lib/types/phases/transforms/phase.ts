@@ -56,9 +56,9 @@ export type TransformsStageState = {
 };
 
 /** What differs between plots in the shared "transforms" stage. */
-export type TransformsStageOptions<TState extends TransformsStageState, TCtx> = {
+export type TransformsStageOptions<TState extends TransformsStageState, TEnv> = {
 	/** The transforms to run. Defaults to the plot's own `transforms`. */
-	transforms?: (state: TState, ctx: TCtx) => MarkerTransform[];
+	transforms?: (state: TState, env: TEnv) => MarkerTransform[];
 	/**
 	 * Whether a series the legend omits keeps its part of the whole (a treemap's tile): the transforms run over
 	 * its rows too, so every other part keeps its share and its place, and its own rows are dropped after.

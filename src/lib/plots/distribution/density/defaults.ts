@@ -1,10 +1,17 @@
 import { buildMarks } from '$lib/plots/distribution/density/markers';
-import type { AxisPlotDefaults } from '$lib/types/phases';
+import { RowContext } from '$lib/phases/context/RowContext';
+import { TooltipState } from '$lib/layout/tooltip/TooltipState.svelte';
+import { NumberFormat } from '$lib/utils/NumberFormat';
+import { getConfiguration } from '$lib/configuration/config.svelte';
+import type { AxisPlotDefaults, ProcessedRow } from '$lib/types/phases';
 import type { MarkerTransform, DensityXTransform, DensityYTransform } from '$lib/types/transforms';
 import type { AreaStyle } from '$lib/types/plots/styling';
-import type { DensityPlotState, DensityPlotCtx } from '$lib/types/plots/distribution/density/state';
+import type { DensityPlotState, DensityPlotEnv } from '$lib/types/plots/distribution/density/state';
 
 type Density = DensityXTransform | DensityYTransform;
+
+/** A density is a small number: three decimals tell its points apart. */
+const DENSITY_DECIMALS = 3;
 
 /**
  * The plot's own density along its axis merged over the default one, the
@@ -27,7 +34,7 @@ function mergeDensity(own: MarkerTransform[], horizontal: boolean) {
  */
 export function buildDensityDefaults<TData extends Record<string, unknown>>(): AxisPlotDefaults<
 	DensityPlotState<TData>,
-	DensityPlotCtx
+	DensityPlotEnv
 > {
 	return {
 		data: {
@@ -41,6 +48,30 @@ export function buildDensityDefaults<TData extends Record<string, unknown>>(): A
 			transforms: (state) => mergeDensity(state.transforms ?? [], state.axes?.isHorizontal ?? false)
 		},
 		scales: { zero: ['value'] },
-		markers: { marks: buildMarks }
+		markers: { marks: buildMarks },
+		hover: {
+			// A hovered point reads as its estimate, the value its context gives it - a small number, written with
+			// three decimals unless the author asks otherwise.
+			label: (state) => {
+				const number = NumberFormat.of(
+					NumberFormat.displayOf(state.values),
+					getConfiguration(),
+					DENSITY_DECIMALS
+				);
+				return ((row: ProcessedRow) => number(Number(RowContext.of(row).value))) as (
+					row: never
+				) => string;
+			},
+			// Its tooltip writes the estimate the same way.
+			format: (state) =>
+				TooltipState.default(
+					state,
+					NumberFormat.of(
+						NumberFormat.displayOf(state.tooltip),
+						getConfiguration(),
+						DENSITY_DECIMALS
+					)
+				) as (row: never) => string
+		}
 	};
 }

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
+import type { PlotRowContext } from '$lib';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
@@ -158,7 +159,8 @@ export const CustomFormat: Story = {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number, name: string) => `${name} → ${v.toFixed(1)} yr`
+				format: (v: number, _number: unknown, context: PlotRowContext) =>
+					`${context.series} → ${v.toFixed(1)} yr`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -197,7 +199,8 @@ export const TwoSeriesWithLabels: Story = {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number, name: string) => `${name} (${v.toFixed(1)})`
+				format: (v: number, _number: unknown, context: PlotRowContext) =>
+					`${context.series} (${v.toFixed(1)})`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -214,7 +217,8 @@ export const TwoSeriesLabelsMiddle: Story = {
 			values: {
 				show: true,
 				anchor: 'middle',
-				format: (v: number, name: string) => `${name}: ${v.toFixed(1)} yr`
+				format: (v: number, _number: unknown, context: PlotRowContext) =>
+					`${context.series}: ${v.toFixed(1)} yr`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -231,7 +235,8 @@ export const TwoSeriesGroupedLabelsMiddle: Story = {
 			values: {
 				show: true,
 				anchor: 'middle',
-				format: (v: number, name: string) => `${name}\n(${v.toFixed(1)} yr)`
+				format: (v: number, _number: unknown, context: PlotRowContext) =>
+					`${context.series}\n(${v.toFixed(1)} yr)`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -248,7 +253,8 @@ export const TwoSeriesStackedLabelsMiddle: Story = {
 			values: {
 				show: true,
 				anchor: 'middle',
-				format: (v: number, name: string) => `${name}\n(${v.toFixed(1)} yr)`
+				format: (v: number, _number: unknown, context: PlotRowContext) =>
+					`${context.series}\n(${v.toFixed(1)} yr)`
 			}
 		} satisfies AxisBasedStylesConfig,
 		transforms: [{ type: 'stackY' as const }]

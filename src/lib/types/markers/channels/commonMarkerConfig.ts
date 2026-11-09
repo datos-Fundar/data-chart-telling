@@ -32,6 +32,10 @@ export type CommonMarkerConfig = CommonMarkerEvents & {
 	clip?: boolean;
 	/** Names the marker on its plot's automatic legend - see {@link MarkLegend}. `false` keeps a decorative marker out of it, and out of how the plot's series look there. */
 	legend?: MarkLegend | false;
-	/** Makes the marker a hit area of the plot's hover: the pointer entering any of its shapes hovers its `data` rows. */
-	hover?: boolean;
+	/**
+	 * Links the marker to the plot's hover. `'trigger'` makes it a hit area: the pointer entering any of its shapes
+	 * hovers its `data` rows. `'style'` has its shapes take the hover marker's `active` and `others` styles.
+	 * `true` does both.
+	 */
+	hover?: boolean | 'trigger' | 'style';
 };

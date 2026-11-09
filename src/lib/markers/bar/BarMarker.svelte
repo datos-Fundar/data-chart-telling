@@ -9,13 +9,11 @@
 
 	/**
 	 * Renders one `'bar'` marker: `role: 'segment'` (visible bar via
-	 * `<BarX>`/`<BarY>`), `role: 'hitArea'` (invisible hover hit region for
-	 * one segment), or `role: 'highlight'` (visible area highlight).
+	 * `<BarX>`/`<BarY>`) or `role: 'hitArea'` (invisible hover hit region for
+	 * one segment).
 	 */
 	let { marker }: { marker: BarMarkerConfig } = $props();
 	const events = MarkerEvents.use(() => marker);
-	/** The hover band stands for no row, so a style that is a function of one does not apply to it. */
-	const flatStyles = $derived(RowStyle.flat(marker.styles));
 
 	const cfg = $derived(getConfiguration());
 	const data = $derived(marker.data ?? []);
@@ -90,69 +88,28 @@
 		{@const insetRight = (marker.styles?.insetRight ?? 0) * bandwidth}
 		{@const insetTop = (marker.styles?.insetTop ?? 0) * bandwidth}
 		{@const insetBottom = (marker.styles?.insetBottom ?? 0) * bandwidth}
-		{#if marker.role === 'hitArea'}
-			<!-- The band runs the plot's whole value axis, so the pointer needn't be over the bar. -->
-			{@const [rangeMin, rangeMax] = valueExtentFor(marker.isHorizontal)}
-			{#if marker.isHorizontal}
-				<rect
-					class="dct-hit-area"
-					x={rangeMin + insetLeft}
-					y={bandStart + insetBottom}
-					width={Math.max(0, rangeMax - rangeMin - insetLeft - insetRight)}
-					height={Math.max(0, bandwidth - insetTop - insetBottom)}
-					fill="transparent"
-					{...events.forRow(data[0], 0)}
-				/>
-			{:else}
-				<rect
-					class="dct-hit-area"
-					x={bandStart + insetLeft}
-					y={rangeMin + insetBottom}
-					width={Math.max(0, bandwidth - insetLeft - insetRight)}
-					height={Math.max(0, rangeMax - rangeMin - insetTop - insetBottom)}
-					fill="transparent"
-					{...events.forRow(data[0], 0)}
-				/>
-			{/if}
+		<!-- The band runs the plot's whole value axis, so the pointer needn't be over the bar. -->
+		{@const [rangeMin, rangeMax] = valueExtentFor(marker.isHorizontal)}
+		{#if marker.isHorizontal}
+			<rect
+				class="dct-hit-area"
+				x={rangeMin + insetLeft}
+				y={bandStart + insetBottom}
+				width={Math.max(0, rangeMax - rangeMin - insetLeft - insetRight)}
+				height={Math.max(0, bandwidth - insetTop - insetBottom)}
+				fill="transparent"
+				{...events.forRow(data[0], 0)}
+			/>
 		{:else}
-			{@const [valueMin, valueMax] = valueExtentFor(marker.isHorizontal)}
-			{#if marker.isHorizontal}
-				{@const thickness = Math.max(0, bandwidth - insetTop - insetBottom) + 2}
-				{@const center = bandStart + insetBottom + (bandwidth - insetTop - insetBottom) / 2}
-				<rect
-					class="hover-area"
-					x={valueMin}
-					y={center - thickness / 2}
-					width={Math.max(0, valueMax - valueMin)}
-					height={thickness}
-					fill={flatStyles.fill}
-					fill-opacity={flatStyles.fillOpacity}
-					stroke={flatStyles.stroke}
-					stroke-width={flatStyles.strokeWidth}
-					stroke-opacity={flatStyles.strokeOpacity}
-					stroke-dasharray={flatStyles.strokeDasharray}
-					rx={flatStyles.borderRadius}
-					pointer-events="none"
-				/>
-			{:else}
-				{@const thickness = Math.max(0, bandwidth - insetLeft - insetRight) + 2}
-				{@const center = bandStart + insetLeft + (bandwidth - insetLeft - insetRight) / 2}
-				<rect
-					class="hover-area"
-					x={center - thickness / 2}
-					y={valueMin}
-					width={thickness}
-					height={Math.max(0, valueMax - valueMin)}
-					fill={flatStyles.fill}
-					fill-opacity={flatStyles.fillOpacity}
-					stroke={flatStyles.stroke}
-					stroke-width={flatStyles.strokeWidth}
-					stroke-opacity={flatStyles.strokeOpacity}
-					stroke-dasharray={flatStyles.strokeDasharray}
-					ry={flatStyles.borderRadius}
-					pointer-events="none"
-				/>
-			{/if}
+			<rect
+				class="dct-hit-area"
+				x={bandStart + insetLeft}
+				y={rangeMin + insetBottom}
+				width={Math.max(0, bandwidth - insetLeft - insetRight)}
+				height={Math.max(0, rangeMax - rangeMin - insetTop - insetBottom)}
+				fill="transparent"
+				{...events.forRow(data[0], 0)}
+			/>
 		{/if}
 	{/if}
 {/if}

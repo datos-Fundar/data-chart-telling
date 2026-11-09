@@ -2,12 +2,12 @@ import { Box } from '$lib/layout/margins/Box';
 import { PlotMargins } from '$lib/layout/margins/PlotMargins.svelte';
 import { resolveAccessor } from '$lib/utils/accessors';
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
-import { ValueLabels } from '$lib/layout/styles/ValueLabels';
-import type { PlotAxes } from '$lib/phases/data/PlotAxes';
+import { RowContext } from '$lib/phases/context/RowContext';
+import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { AxisChannelName } from '$lib/types/layout/mapping';
 import type { ProcessedChannel, ProcessedData, ProcessedRow } from '$lib/types/phases';
-import type { TooltipAnchorX, TooltipAnchorY } from '$lib/types/layout/tooltip';
 import type { Series } from '$lib/types/plots/data/common';
+import type { TooltipAnchorX, TooltipAnchorY } from '$lib/types/layout/tooltip';
 
 /** A tooltip anchor as the side of the point the tooltip sits on. */
 const SIDES = {
@@ -97,17 +97,17 @@ export class TooltipState {
 	}
 
 	/**
-	 * How a hovered row reads by default, on every plot: its series, when the
-	 * plot groups its rows; then where it sits - `category: value` when one
-	 * axis is a band of categories (the row's own value, as its series reads
-	 * it), else `x: y` as the transforms left them; then the value its color
-	 * shows, when that is a number (a heatmap's cells). With `number`, the values - the one on the value axis
-	 * (the plot's `y` when neither axis holds categories) and the color's - read as it writes them.
+	 * How a hovered row reads by default, on every plot, from its context (see {@link RowContext}): its series,
+	 * when the plot groups its rows; then where it sits - `category: value` when one axis is a band of categories,
+	 * else `x: y` (an axis the transforms spread into a span, a bin's, as `from-to`); then the value its color
+	 * shows, when that is a number (a heatmap's cells). With `number`, the values - the one on the value axis and
+	 * the color's - read as it writes them.
 	 */
 	static default(
 		state: {
 			processedData?: ProcessedData;
-			resolvedSeries?: Series<Record<string, unknown>>[];
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			resolvedSeries?: Series<any>[];
 			channels?: {
 				grouping?: unknown;
 				color?: { accessor: (row: never) => unknown; source?: unknown };
@@ -118,19 +118,25 @@ export class TooltipState {
 	): (row: ProcessedRow) => string {
 		const processed = state.processedData;
 		if (!processed) return () => '';
-		const x = TooltipState.#axisText(processed, 'x');
-		const y = TooltipState.#axisText(processed, 'y');
-		// With no band axis, the value is the y.
-		const valueY = TooltipState.#axisText(processed, 'y', number);
+		const valueAxis = PlotAxes.valueOf(state);
+		const contextOf = RowContext.reader(state);
 		const bandX = state.axes?.bands.includes('x') ?? false;
 		const bandY = state.axes?.bands.includes('y') ?? false;
-		const valueOf = ValueLabels.valueOf(state);
+		const along = (axis: AxisChannelName) => {
+			const span = TooltipState.#spanText(processed, axis, number);
+			const measured = axis === valueAxis && !state.axes?.bands.includes(axis);
+			return (row: ProcessedRow) =>
+				span ? span(row) : TooltipState.value(contextOf(row)[axis], measured ? number : undefined);
+		};
+		const x = along('x');
+		const y = along('y');
+		const valueOf = (row: ProcessedRow) => TooltipState.value(contextOf(row).value, number);
 		const position: (row: ProcessedRow) => string =
 			bandX && !bandY
-				? (row) => `${x(row)}: ${TooltipState.value(valueOf(row), number)}`
+				? (row) => `${x(row)}: ${valueOf(row)}`
 				: bandY && !bandX
-					? (row) => `${y(row)}: ${TooltipState.value(valueOf(row), number)}`
-					: (row) => `${x(row)}: ${valueY(row)}`;
+					? (row) => `${y(row)}: ${valueOf(row)}`
+					: (row) => `${x(row)}: ${y(row)}`;
 		const grouped = state.channels?.grouping !== undefined;
 		const color = state.channels?.color;
 		const colorName = typeof color?.source === 'string' ? color.source : 'color';
@@ -146,30 +152,23 @@ export class TooltipState {
 	}
 
 	/**
-	 * How one axis reads on a processed row: its own channel, else the range
-	 * the transforms gave it - a stack's own share (`2 - 1`), any other span as `1-2`.
+	 * How an axis the transforms spread into a span reads on a processed row - a bin's edges as `from-to` - or
+	 * `undefined` when the axis has a value of its own or is a stack's (whose own value the context gives).
 	 */
-	static #axisText(
+	static #spanText(
 		processed: ProcessedData,
 		axis: AxisChannelName,
 		number?: (value: number) => string
-	): (row: ProcessedRow) => string {
+	): ((row: ProcessedRow) => string) | undefined {
 		const { channels, transforms } = processed;
-		const read = (channel: ProcessedChannel) =>
-			resolveAccessor(channel as never) as (row: ProcessedRow) => unknown;
-		const point = channels[axis];
-		if (point !== undefined) {
-			const value = read(point);
-			return (row) => TooltipState.value(value(row), number);
-		}
 		const low = channels[`${axis}1`];
 		const high = channels[`${axis}2`];
-		if (low === undefined || high === undefined) return () => '';
+		if (channels[axis] !== undefined || low === undefined || high === undefined) return undefined;
+		if (transforms.some((t) => t.type === STACKS[axis])) return undefined;
+		const read = (channel: ProcessedChannel) =>
+			resolveAccessor(channel as never) as (row: ProcessedRow) => unknown;
 		const from = read(low);
 		const to = read(high);
-		if (transforms.some((t) => t.type === STACKS[axis])) {
-			return (row) => TooltipState.value(Number(to(row)) - Number(from(row)), number);
-		}
 		return (row) =>
 			`${TooltipState.value(from(row), number)}-${TooltipState.value(to(row), number)}`;
 	}

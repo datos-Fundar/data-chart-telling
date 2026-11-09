@@ -9,6 +9,7 @@ export type PlotPhase =
 	| 'data'
 	| 'mapping'
 	| 'transforms'
+	| 'context'
 	| 'statistics'
 	| 'sharedScales'
 	| 'scales'
@@ -19,7 +20,7 @@ export type PlotPhase =
 	| 'hover';
 
 /** A resolution step for one {@link PlotPhase} - same state shape in and out. Each shared phase is a class (`DataPhase`, `HoverPhase`...) that implements it. */
-export type PhaseStage<TState, TCtx = unknown> = {
+export type PhaseStage<TState, TEnv = unknown> = {
 	phase: PlotPhase;
-	run: (state: TState, ctx: TCtx) => TState;
+	run: (state: TState, env: TEnv) => TState;
 };

@@ -2,7 +2,7 @@ import { ColorRamp } from '$lib/utils/color';
 import { OpacityScale } from '$lib/utils/OpacityScale';
 import { ContinuousDomain } from '$lib/utils/ContinuousDomain';
 import { GeoSegments } from '$lib/plots/map/geo/GeoSegments';
-import type { GeoPlotState, GeoPlotCtx } from '$lib/types/plots/map/geo/state';
+import type { GeoPlotState, GeoPlotEnv } from '$lib/types/plots/map/geo/state';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
 
 /**
@@ -15,10 +15,10 @@ import type { GeoFeature } from '$lib/types/plots/data/geo';
  */
 export function buildScales<TProps extends Record<string, unknown>>(
 	state: GeoPlotState<TProps>,
-	ctx: GeoPlotCtx<TProps>
+	env: GeoPlotEnv<TProps>
 ): GeoPlotState<TProps> {
 	const { scales, features, color, grouping, opacity, segments } = state;
-	const { range, cfg } = ctx;
+	const { range, cfg } = env;
 
 	const colorValues = color
 		? features!.map((f) => color(f)).filter((v): v is number => v != null)

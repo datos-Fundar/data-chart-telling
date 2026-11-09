@@ -18,7 +18,8 @@ describe('LinePlot - styles.values.format', () => {
 					show: true,
 					decimals: 2,
 					suffix: ' años',
-					format: (value, _series, _row, number) => (value === last ? `~${number!(value)}` : '')
+					format: (value: number, number: (value: number) => string) =>
+						value === last ? `~${number(value)}` : ''
 				}
 			}
 		});

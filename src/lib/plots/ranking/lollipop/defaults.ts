@@ -1,6 +1,6 @@
 import { buildClevelandDefaults } from '$lib/plots/ranking/cleveland/defaults';
 import type { AxisPlotDefaults } from '$lib/types/phases';
-import type { LollipopPlotState, LollipopPlotCtx } from '$lib/types/plots/ranking/lollipop/state';
+import type { LollipopPlotState, LollipopPlotEnv } from '$lib/types/plots/ranking/lollipop/state';
 
 /**
  * LollipopPlot on the shared pipeline: a ClevelandPlot of one value per
@@ -10,7 +10,7 @@ import type { LollipopPlotState, LollipopPlotCtx } from '$lib/types/plots/rankin
  */
 export function buildLollipopDefaults<TData extends Record<string, unknown>>(): AxisPlotDefaults<
 	LollipopPlotState<TData>,
-	LollipopPlotCtx
+	LollipopPlotEnv
 > {
 	return buildClevelandDefaults<TData>({
 		name: 'LollipopPlot',

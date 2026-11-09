@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
+import type { PlotRowContext } from '$lib';
 import SlopePlot from '$lib/plots/evolution/slope/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import { AGE_SHARES } from '$datasets';
@@ -46,7 +47,11 @@ export const Default: Story = {
 export const Formatted: Story = {
 	args: {
 		styles: {
-			values: { show: true, format: (value: number, name: string) => `${name}: ${value}%` }
+			values: {
+				show: true,
+				format: (value: number, _number: unknown, context: PlotRowContext) =>
+					`${context.series}: ${value}%`
+			}
 		} satisfies AxisBasedStylesConfig
 	}
 };

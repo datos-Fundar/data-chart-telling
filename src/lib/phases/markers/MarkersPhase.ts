@@ -1,5 +1,5 @@
 import type {
-	AxisPlotCtx,
+	AxisPlotEnv,
 	AxisPlotState,
 	MarkersStageOptions,
 	PhaseStage
@@ -18,22 +18,22 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 export class MarkersPhase<
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	TState extends AxisPlotState<any, any, any, any>,
-	TCtx extends AxisPlotCtx
-> implements PhaseStage<TState, TCtx> {
+	TEnv extends AxisPlotEnv
+> implements PhaseStage<TState, TEnv> {
 	readonly phase = 'markers' as const;
-	readonly #options: MarkersStageOptions<TState, TCtx>;
+	readonly #options: MarkersStageOptions<TState, TEnv>;
 
-	constructor(options: MarkersStageOptions<TState, TCtx>) {
+	constructor(options: MarkersStageOptions<TState, TEnv>) {
 		this.#options = options;
 	}
 
-	run = (state: TState, ctx: TCtx): TState => {
+	run = (state: TState, env: TEnv): TState => {
 		const options = this.#options;
 		const labels = state.valueLabels;
 		const valueLabels: AxisBasedMarkersConfig[] =
 			labels?.show && options.valueLabels
-				? options.valueLabels(labels, state, ctx).map((marker): AxisBasedMarkersConfig => {
-						const { styles, ...hooks } = labels.hooks(ctx);
+				? options.valueLabels(labels, state, env).map((marker): AxisBasedMarkersConfig => {
+						const { styles, ...hooks } = labels.hooks(env);
 						return { ...hooks, ...marker, styles: { ...styles, ...marker.styles } } as never;
 					})
 				: [];
@@ -42,12 +42,12 @@ export class MarkersPhase<
 			markers: MarkerStyles.resolveAll(
 				MarkerChannels.inheritPosition(
 					MarkerChannels.inheritAll(
-						[...options.marks(state, ctx), ...(state.markers ?? []), ...valueLabels],
+						[...options.marks(state, env), ...(state.markers ?? []), ...valueLabels],
 						state.scales as never
 					),
 					state.processedData
 				),
-				{ cfg: ctx.cfg, rows: state.processedData?.data }
+				{ cfg: env.cfg, rows: state.processedData?.data }
 			)
 		};
 	};

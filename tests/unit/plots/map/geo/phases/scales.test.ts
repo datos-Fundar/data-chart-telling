@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { buildScales } from '$lib/plots/map/geo/phases/scales';
-import type { GeoPlotState, GeoPlotCtx } from '$lib/types/plots/map/geo/state';
+import type { GeoPlotState, GeoPlotEnv } from '$lib/types/plots/map/geo/state';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 
@@ -28,14 +28,14 @@ const FEATURE_C = feature('c', 30);
 const FEATURE_15 = feature('d', 15);
 const FEATURES = [FEATURE_A, feature('b', 20), FEATURE_C];
 
-const CTX: GeoPlotCtx<Props> = {
+const ENV: GeoPlotEnv<Props> = {
 	cfg: { continuous: { min: '#000000', max: '#ffffff' } } as PlotStylesConfig,
 	range: undefined
 };
 
 function build(
 	overrides: Partial<GeoPlotState<Props>> = {},
-	ctxOverrides: Partial<GeoPlotCtx<Props>> = {}
+	envOverrides: Partial<GeoPlotEnv<Props>> = {}
 ) {
 	const state: GeoPlotState<Props> = {
 		rawFeatures: [],
@@ -48,7 +48,7 @@ function build(
 		color: (f) => (f.properties as Props).pop,
 		...overrides
 	};
-	return buildScales(state, { ...CTX, ...ctxOverrides });
+	return buildScales(state, { ...ENV, ...envOverrides });
 }
 
 describe('buildScales - no color accessor', () => {

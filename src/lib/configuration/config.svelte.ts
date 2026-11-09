@@ -184,7 +184,8 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		rule: { stroke: '#e6580d', strokeOpacity: 0.35, strokeWidth: 1.5, strokeDasharray: '4 4' },
 		dot: { dotRadius: 5, dotFill: 'currentColor' },
 		font: { fill: 'currentColor', fontSize: 12, dy: -18 },
-		area: { fill: '#94a3b8', fillOpacity: 0.4 }
+		area: { fill: '#94a3b8', fillOpacity: 0.4 },
+		active: { stroke: '#111827', strokeWidth: 2 }
 	},
 
 	facet: {
@@ -275,7 +276,8 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		labelGap: 4
 	},
 
-	// Beside a vertical delta (taken on x), above a horizontal one (on y).
+	band: { fill: '#94a3b8', fillOpacity: 0.25 },
+
 	delta: {
 		text: {
 			x: { dx: 12, dy: 0, lineAnchor: 'middle', textAnchor: 'start' },

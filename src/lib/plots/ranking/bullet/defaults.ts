@@ -1,7 +1,7 @@
 import { buildBarDefaults, fitValueDomain } from '$lib/plots/ranking/bar/defaults';
 import { buildMarks, buildReach } from '$lib/plots/ranking/bullet/markers';
 import type { AxisPlotDefaults } from '$lib/types/phases';
-import type { BulletPlotState, BulletPlotCtx } from '$lib/types/plots/ranking/bullet/state';
+import type { BulletPlotState, BulletPlotEnv } from '$lib/types/plots/ranking/bullet/state';
 
 /**
  * BulletPlot on the shared pipeline: a BarPlot whose bars are drawn thinner
@@ -10,20 +10,20 @@ import type { BulletPlotState, BulletPlotCtx } from '$lib/types/plots/ranking/bu
  */
 export function buildBulletDefaults<TData extends Record<string, unknown>>(): AxisPlotDefaults<
 	BulletPlotState<TData>,
-	BulletPlotCtx
+	BulletPlotEnv
 > {
 	const bar = buildBarDefaults<TData>();
 	return {
-		...(bar as AxisPlotDefaults<BulletPlotState<TData>, BulletPlotCtx>),
+		...(bar as AxisPlotDefaults<BulletPlotState<TData>, BulletPlotEnv>),
 		scales: {
 			...bar.scales,
-			defaults: (_state, ctx) => ({
+			defaults: (_state, env) => ({
 				category: {
-					paddingInner: ctx.cfg.bullet.paddingInner,
-					paddingOuter: ctx.cfg.bullet.paddingOuter
+					paddingInner: env.cfg.bullet.paddingInner,
+					paddingOuter: env.cfg.bullet.paddingOuter
 				}
 			}),
-			fit: (state, ctx) => fitValueDomain(state, buildReach(state, ctx))
+			fit: (state, env) => fitValueDomain(state, buildReach(state, env))
 		},
 		markers: { ...bar.markers!, marks: buildMarks }
 	};

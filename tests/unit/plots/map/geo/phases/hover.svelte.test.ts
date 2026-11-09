@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
 import { buildHover, isOverInset } from '$lib/plots/map/geo/phases/hover';
-import type { GeoPlotState, GeoPlotCtx, TaggedGeoFeature } from '$lib/types/plots/map/geo/state';
+import type { GeoPlotState, GeoPlotEnv, TaggedGeoFeature } from '$lib/types/plots/map/geo/state';
 
 type Props = { v?: number };
 
@@ -16,7 +16,7 @@ const FEATURES = [
 
 function run(
 	state: Partial<GeoPlotState<Props>> = {},
-	range?: GeoPlotCtx<Props>['range']
+	range?: GeoPlotEnv<Props>['range']
 ): GeoPlotState<Props> {
 	return buildHover(
 		{
@@ -25,7 +25,7 @@ function run(
 			tooltipFormat: (f) => String((f as unknown as TaggedGeoFeature<Props>).__id),
 			...state
 		} as GeoPlotState<Props>,
-		{ cfg: DEFAULT_CONFIG, range } as GeoPlotCtx<Props>
+		{ cfg: DEFAULT_CONFIG, range } as GeoPlotEnv<Props>
 	);
 }
 

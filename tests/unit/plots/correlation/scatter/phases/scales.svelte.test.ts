@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest';
 import { buildScatterDefaults } from '$lib/plots/correlation/scatter/defaults';
 import { TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
 import { stageOf } from '../../../_helpers/stages';
-import type { ScatterPlotState, ScatterPlotCtx } from '$lib/types/plots/correlation/scatter/state';
+import type { ScatterPlotState, ScatterPlotEnv } from '$lib/types/plots/correlation/scatter/state';
 import type { Series } from '$lib/types/plots/data/common';
 import type { ScatterSegmentStyle } from '$lib/types/plots/segments/common';
 import type { VisualGroup } from '$lib/types/plots/segments/config';
@@ -38,10 +38,10 @@ function build(overrides: Partial<ScatterPlotState<Row>> = {}, dotRadiusDefault 
 		groupedSeries: [group(dotRadiusDefault)],
 		...overrides
 	};
-	const ctx: ScatterPlotCtx = {
+	const env: ScatterPlotEnv = {
 		cfg: { margins: THEME_MARGINS, scatter: { dotRadius: dotRadiusDefault } } as PlotStylesConfig
 	};
-	return buildScales(new TransformsPhase<typeof state>().run(state, ctx), ctx).scales;
+	return buildScales(new TransformsPhase<typeof state>().run(state, env), env).scales;
 }
 
 describe('buildScales - no padding needed', () => {

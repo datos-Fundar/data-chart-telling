@@ -7,7 +7,7 @@ import { ClevelandConnector } from '$lib/plots/ranking/cleveland/ClevelandConnec
 import { BasicStyles } from '$lib/layout/styles/BasicStyles';
 import type {
 	ClevelandPlotState,
-	ClevelandPlotCtx,
+	ClevelandPlotEnv,
 	ClevelandOptions,
 	ClevelandEntry,
 	ClevelandRole
@@ -58,9 +58,9 @@ export class ClevelandMarkers {
 	/** The plot's connectors, then its dots, which draw on top of them. */
 	marks = <TData extends Record<string, unknown>>(
 		state: ClevelandPlotState<TData>,
-		ctx: ClevelandPlotCtx
+		env: ClevelandPlotEnv
 	): AxisBasedMarkersConfig[] => {
-		const { cfg, interaction } = ctx;
+		const { cfg, interaction } = env;
 		const style = cfg[this.#options.config];
 		const { isHorizontal } = ClevelandMarkers.#geometry(state);
 		const ranges = ClevelandRanges.of(
@@ -243,6 +243,7 @@ export class ClevelandMarkers {
 					type: 'dot',
 					series: name,
 					data: segment.data,
+					hover: 'style',
 					...(isHorizontal ? { x: value, y: category } : { x: category, y: value }),
 					r,
 					styles: {
@@ -262,7 +263,7 @@ export class ClevelandMarkers {
 			...caps,
 			...arrows,
 			...dots,
-			...this.#connectorLabels(state, ctx, connector, looks, isHorizontal)
+			...this.#connectorLabels(state, env, connector, looks, isHorizontal)
 		];
 	};
 
@@ -318,7 +319,7 @@ export class ClevelandMarkers {
 	/** The label on each connector, when `styles.connector.label` asks for one: written at its middle, beside it or on it. */
 	#connectorLabels<TData extends Record<string, unknown>>(
 		state: ClevelandPlotState<TData>,
-		ctx: ClevelandPlotCtx,
+		env: ClevelandPlotEnv,
 		connector: ClevelandConnector,
 		looks: { range: ConnectorRange; row: Record<string, unknown> }[],
 		isHorizontal: boolean
@@ -333,7 +334,7 @@ export class ClevelandMarkers {
 		const font = label.fontStyle;
 		// Beside a connector: clear of half its thickest, and a few px.
 		const clear =
-			Math.max(...data.map((row) => Number(row.strokeWidth))) / 2 + ctx.cfg.connector.labelGap;
+			Math.max(...data.map((row) => Number(row.strokeWidth))) / 2 + env.cfg.connector.labelGap;
 		const inside = label.anchor === 'middle';
 		const at: Place = inside
 			? { dx: 0, dy: 0, textAnchor: 'middle', lineAnchor: 'middle' }
@@ -349,7 +350,7 @@ export class ClevelandMarkers {
 				styles: {
 					...font,
 					fill: font?.fill ?? 'currentColor',
-					fontSize: font?.fontSize ?? ctx.cfg.connector.labelFontSize,
+					fontSize: font?.fontSize ?? env.cfg.connector.labelFontSize,
 					dx: font?.dx ?? at.dx,
 					dy: font?.dy ?? at.dy,
 					textAnchor:
@@ -369,7 +370,7 @@ export class ClevelandMarkers {
 	valueLabels = <TData extends Record<string, unknown>>(
 		labels: ValueLabels,
 		state: ClevelandPlotState<TData>,
-		ctx: ClevelandPlotCtx
+		env: ClevelandPlotEnv
 	): TextMarkerConfig[] => {
 		if (!state.processedData?.data.length) return [];
 		const { isHorizontal } = ClevelandMarkers.#geometry(state);
@@ -380,7 +381,7 @@ export class ClevelandMarkers {
 			state.processedData,
 			PlotAxes.valueOf(state) as 'x' | 'y'
 		)[PlotAxes.valueOf(state) as 'x' | 'y'];
-		const gap = labels.offset(isHorizontal ? 'x' : 'y', ctx.cfg[this.#options.config].labelGap);
+		const gap = labels.offset(isHorizontal ? 'x' : 'y', env.cfg[this.#options.config].labelGap);
 		const nameOf = (d: ProcessedRow) => String(d[SERIES_KEY]);
 
 		const picked = this.#picked(state);
@@ -422,8 +423,7 @@ export class ClevelandMarkers {
 						type: 'text',
 						data,
 						...(isHorizontal ? { x: value, y: category } : { x: category, y: value }),
-						text: (d: ProcessedRow) =>
-							format(Number(read(d) ?? valueOf(d)), nameOf(d), d as Record<string, unknown>),
+						text: (d: ProcessedRow) => format(Number(read(d) ?? valueOf(d)), d, nameOf(d)),
 						styles: {
 							...font,
 							fill: fillOf(name),
@@ -458,7 +458,7 @@ export class ClevelandMarkers {
 			return [labels.edgeBox('0', { x: 'middle', y: 'before' }, at, ['top'])];
 		}
 		const at = { x: labels.offset('x', gap) };
-		const texts = new Set(top.map(({ dot }) => labels.format(dot.value, dot.series, dot.row)));
+		const texts = new Set(top.map(({ dot }) => labels.format(dot.value, dot.row, dot.series)));
 		return [...texts].map((text) =>
 			labels.edgeBox(text, { x: 'after', y: 'middle' }, at, ['right'])
 		);

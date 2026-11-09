@@ -1,7 +1,7 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { ViolinProfiles } from '$lib/markers/violin/ViolinProfiles';
-import type { ViolinPlotState, ViolinPlotCtx } from '$lib/types/plots/distribution/violin/state';
+import type { ViolinPlotState, ViolinPlotEnv } from '$lib/types/plots/distribution/violin/state';
 import type { ViolinPlotStylesConfig } from '$lib/types/plots/distribution/violin/props';
 import type {
 	AxisBasedMarkersConfig,
@@ -18,11 +18,11 @@ import type {
  */
 export function buildMarks<TData extends Record<string, unknown>>(
 	state: ViolinPlotState<TData>,
-	ctx: ViolinPlotCtx
+	env: ViolinPlotEnv
 ): AxisBasedMarkersConfig[] {
 	const processed = state.processedData;
 	if (!processed) return [];
-	const { cfg } = ctx;
+	const { cfg } = env;
 	const styles = state.styles as ViolinPlotStylesConfig | undefined;
 	const { channels } = processed;
 	const groups = state.processedGroups ?? [];
@@ -50,7 +50,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 
 	const violins = groups.flatMap((group, index) => {
 		const name = group.series.name;
-		const disabled = ctx.interaction?.fillFor(name);
+		const disabled = env.interaction?.fillFor(name);
 		return group.visualSegments.map(
 			(seg): ViolinMarkerConfig => ({
 				type: 'violin',

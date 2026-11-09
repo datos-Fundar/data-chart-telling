@@ -1,3 +1,4 @@
+import type { BoxRowContext } from '$lib/types/plots/distribution/box/props';
 import type { BasePlotProps, PlotCoreProps } from '$lib/types/plots/props';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
@@ -26,7 +27,9 @@ export type ViolinPlotProps<TData extends Record<string, unknown>> = BasePlotPro
 	ViolinPlotStylesConfig,
 	AreaStyle,
 	AxisBasedMarkersConfig,
-	AxisBasedScalesConfig<TData>
+	AxisBasedScalesConfig<TData>,
+	undefined,
+	BoxRowContext
 >;
 
 /** What `ViolinPlot`'s core draws from. */

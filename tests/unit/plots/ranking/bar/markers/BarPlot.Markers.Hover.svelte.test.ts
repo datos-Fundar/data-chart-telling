@@ -77,18 +77,18 @@ describe('BarPlot - markers.hover', () => {
 		expect(svg).toBeTruthy();
 	});
 
-	test('does not crash with ruleX/ruleY explicitly disabled', async () => {
+	test('does not crash with nothing drawn behind', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,
 			series: [FEMALE],
-			markers: [{ type: 'hover', ruleX: false, ruleY: false }] satisfies AxisBasedMarkersConfig[]
+			markers: [{ type: 'hover', back: [] }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
 		expect(svg).toBeTruthy();
 	});
 
-	test('does not crash with custom dot/font/rule style overrides', async () => {
+	test('does not crash with a rule behind and a dot and a label in front', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,
@@ -96,9 +96,13 @@ describe('BarPlot - markers.hover', () => {
 			markers: [
 				{
 					type: 'hover',
-					dot: { dotRadius: 6, dotFill: '#e11d48' },
-					text: { fontSize: 14 },
-					rule: { strokeDasharray: '2 2' }
+					back: [
+						{ type: 'rule', axis: 'x', value: (p) => p.x, styles: { strokeDasharray: '2 2' } }
+					],
+					front: [
+						{ type: 'dot', styles: { dotRadius: 6, dotFill: '#e11d48' } },
+						{ type: 'text', text: (p) => p.label, styles: { fontSize: 14 } }
+					]
 				}
 			] satisfies AxisBasedMarkersConfig[]
 		});
@@ -140,7 +144,7 @@ describe('BarPlot - markers.hover', () => {
 				strategy: 'x',
 				format: (row) => `${(row as { province: string }).province}`
 			},
-			markers: [{ type: 'hover' }] satisfies AxisBasedMarkersConfig[]
+			markers: [{ type: 'hover', front: [{ type: 'dot' }] }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
 		// Per-category hit areas, not the plot's full-box pointer catcher.
@@ -163,10 +167,24 @@ describe('BarPlot - markers.hover', () => {
 	});
 });
 
-describe('BarPlot - markers.hover areaX/areaY', () => {
+describe('BarPlot - the band its hover draws behind the bars', () => {
 	afterEach(() => resetConfiguration());
 
-	test('off by default - no highlight area even once a category is hovered', async () => {
+	test('draws no dot or label, and no band once the author asks for nothing behind', async () => {
+		const { container } = await render(BarPlot, {
+			width: 400,
+			height: 300,
+			series: [FEMALE],
+			markers: [{ type: 'hover', back: [] }] satisfies AxisBasedMarkersConfig[]
+		});
+		const svg = await waitForSvg(container);
+		hoverFirstCategory(svg);
+		await new Promise((resolve) => setTimeout(resolve, 100));
+		expect(countHoverAreas(svg)).toBe(0);
+		expect(countDotMarks(svg)).toBe(0);
+	});
+
+	test('renders one translucent band on a vertical bar chart', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,
@@ -174,33 +192,18 @@ describe('BarPlot - markers.hover areaX/areaY', () => {
 			markers: [{ type: 'hover' }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
-		hoverFirstCategory(svg);
-		await vi.waitFor(() => {
-			expect(countDotMarks(svg)).toBe(1);
-		});
-		expect(countHoverAreas(svg)).toBe(0);
-	});
-
-	test('areaX renders one translucent area on a vertical bar chart', async () => {
-		const { container } = await render(BarPlot, {
-			width: 400,
-			height: 300,
-			series: [FEMALE],
-			markers: [{ type: 'hover', areaX: true }] satisfies AxisBasedMarkersConfig[]
-		});
-		const svg = await waitForSvg(container);
 		expect(countHoverAreas(svg)).toBe(0);
 		hoverFirstCategory(svg);
 		await vi.waitFor(() => {
 			expect(countHoverAreas(svg)).toBe(1);
 		});
-		const area = svg.querySelector('rect.hover-area')!;
+		const area = svg.querySelector('g.band rect')!;
 		// Vertical highlight: thickness is its width, spanning the full plot height.
 		expect(Number(area.getAttribute('width'))).toBeGreaterThan(0);
 		expect(Number(area.getAttribute('height'))).toBeGreaterThan(0);
 	});
 
-	test('areaY renders one translucent area on a horizontal bar chart', async () => {
+	test('renders one translucent band on a horizontal bar chart', async () => {
 		const data = [
 			{ province: 'Buenos Aires', value: 1.38 },
 			{ province: 'Mendoza', value: 2.1 },
@@ -212,58 +215,33 @@ describe('BarPlot - markers.hover areaX/areaY', () => {
 			data,
 			x: 'value',
 			y: 'province',
-			markers: [{ type: 'hover', areaY: true }] satisfies AxisBasedMarkersConfig[]
+			markers: [{ type: 'hover' }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
 		hoverFirstCategory(svg);
 		await vi.waitFor(() => {
 			expect(countHoverAreas(svg)).toBe(1);
 		});
-		const area = svg.querySelector('rect.hover-area')!;
+		const area = svg.querySelector('g.band rect')!;
 		// Horizontal highlight: thickness is its height, spanning the full plot width.
 		expect(Number(area.getAttribute('height'))).toBeGreaterThan(0);
 		expect(Number(area.getAttribute('width'))).toBeGreaterThan(0);
 	});
 
-	// Only the band axis gets a highlight, so `areaX` and `areaY` draw one area here.
-	test('areaY on a vertical bar chart is a no-op - its value axis has no band scale', async () => {
-		const { container } = await render(BarPlot, {
-			width: 400,
-			height: 300,
-			series: [FEMALE],
-			markers: [{ type: 'hover', areaX: true, areaY: true }] satisfies AxisBasedMarkersConfig[]
-		});
-		const svg = await waitForSvg(container);
-		hoverFirstCategory(svg);
-		await vi.waitFor(() => {
-			expect(countHoverAreas(svg)).toBe(1);
-		});
-	});
-
-	test('renders with the neutral gray default fill when no area is given', async () => {
-		const { container } = await render(BarPlot, {
-			width: 400,
-			height: 300,
-			series: [FEMALE],
-			markers: [{ type: 'hover', areaX: true }] satisfies AxisBasedMarkersConfig[]
-		});
-		const svg = await waitForSvg(container);
-		hoverFirstCategory(svg);
-		await vi.waitFor(() => {
-			expect(countHoverAreas(svg)).toBe(1);
-		});
-		const area = svg.querySelector('rect.hover-area')!;
-		expect(area.getAttribute('fill')).toBe('#94a3b8');
-		expect(area.getAttribute('fill-opacity')).toBe('0.4');
-	});
-
-	test('an area override changes the rendered fill', async () => {
+	// Only the band axis gets a band, so one along each axis draws one here.
+	test('a band along y on a vertical bar chart draws nothing - its value axis has no band scale', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,
 			series: [FEMALE],
 			markers: [
-				{ type: 'hover', areaX: true, area: { fill: '#e11d48', fillOpacity: 0.5 } }
+				{
+					type: 'hover',
+					back: [
+						{ type: 'band', axis: 'x', value: (p) => p.x },
+						{ type: 'band', axis: 'y', value: (p) => p.y }
+					]
+				}
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
@@ -271,30 +249,73 @@ describe('BarPlot - markers.hover areaX/areaY', () => {
 		await vi.waitFor(() => {
 			expect(countHoverAreas(svg)).toBe(1);
 		});
-		const area = svg.querySelector('rect.hover-area')!;
-		expect(area.getAttribute('fill')).toBe('#e11d48');
-		expect(area.getAttribute('fill-opacity')).toBe('0.5');
 	});
 
-	test('a theme-level hover.area override applies without a per-marker area', async () => {
-		setConfiguration({ hover: { area: { fill: '#16a34a', fillOpacity: 0.4 } } });
+	test('renders with the neutral gray default fill of the configuration', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,
 			series: [FEMALE],
-			markers: [{ type: 'hover', areaX: true }] satisfies AxisBasedMarkersConfig[]
+			markers: [{ type: 'hover' }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
 		hoverFirstCategory(svg);
 		await vi.waitFor(() => {
 			expect(countHoverAreas(svg)).toBe(1);
 		});
-		const area = svg.querySelector('rect.hover-area')!;
+		const area = svg.querySelector('g.band rect')!;
+		expect(area.getAttribute('fill')).toBe('#94a3b8');
+		expect(area.getAttribute('fill-opacity')).toBe('0.4');
+	});
+
+	test("a band of the author's own replaces the plot's", async () => {
+		const { container } = await render(BarPlot, {
+			width: 400,
+			height: 300,
+			series: [FEMALE],
+			markers: [
+				{
+					type: 'hover',
+					back: [
+						{
+							type: 'band',
+							axis: 'x',
+							value: (p) => p.x,
+							styles: { fill: '#e11d48', fillOpacity: 0.5 }
+						}
+					]
+				}
+			] satisfies AxisBasedMarkersConfig[]
+		});
+		const svg = await waitForSvg(container);
+		hoverFirstCategory(svg);
+		await vi.waitFor(() => {
+			expect(countHoverAreas(svg)).toBe(1);
+		});
+		const area = svg.querySelector('g.band rect')!;
+		expect(area.getAttribute('fill')).toBe('#e11d48');
+		expect(area.getAttribute('fill-opacity')).toBe('0.5');
+	});
+
+	test("the configuration's hover.area styles the plot's band", async () => {
+		setConfiguration({ hover: { area: { fill: '#16a34a', fillOpacity: 0.4 } } });
+		const { container } = await render(BarPlot, {
+			width: 400,
+			height: 300,
+			series: [FEMALE],
+			markers: [{ type: 'hover' }] satisfies AxisBasedMarkersConfig[]
+		});
+		const svg = await waitForSvg(container);
+		hoverFirstCategory(svg);
+		await vi.waitFor(() => {
+			expect(countHoverAreas(svg)).toBe(1);
+		});
+		const area = svg.querySelector('g.band rect')!;
 		expect(area.getAttribute('fill')).toBe('#16a34a');
 		expect(area.getAttribute('fill-opacity')).toBe('0.4');
 	});
 
-	test('does not crash with areaX/areaY on a grouped (multi-series) bar chart', async () => {
+	test('does not crash on a grouped (multi-series) bar chart', async () => {
 		const { container } = await render(BarPlot, {
 			width: 400,
 			height: 300,
@@ -302,7 +323,7 @@ describe('BarPlot - markers.hover areaX/areaY', () => {
 			x: 'province',
 			y: 'value',
 			color: 'sex',
-			markers: [{ type: 'hover', areaX: true }] satisfies AxisBasedMarkersConfig[]
+			markers: [{ type: 'hover' }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
 		hoverFirstCategory(svg);
@@ -311,7 +332,7 @@ describe('BarPlot - markers.hover areaX/areaY', () => {
 		});
 	});
 
-	test('covers the whole group of a grouped bar chart when the hover matches every series of it', async () => {
+	test('covers the whole group of a grouped bar chart when the hover matches every series of it, and a series slice when it matches that one', async () => {
 		const grouped = (strategy: 'x' | 'series') =>
 			render(BarPlot, {
 				width: 400,
@@ -321,18 +342,20 @@ describe('BarPlot - markers.hover areaX/areaY', () => {
 				y: 'value',
 				color: 'sex',
 				tooltip: { strategy },
-				markers: [{ type: 'hover', areaX: true }] satisfies AxisBasedMarkersConfig[]
+				markers: [{ type: 'hover' }] satisfies AxisBasedMarkersConfig[]
 			});
-		const widthOfArea = async (strategy: 'x' | 'series') => {
+		const widthOfArea = async (strategy: 'x' | 'series', bands: number) => {
 			const { container } = await grouped(strategy);
 			const svg = await waitForSvg(container);
 			hoverFirstCategory(svg);
-			await vi.waitFor(() => expect(countHoverAreas(svg)).toBe(1));
-			return Number(svg.querySelector('rect.hover-area')!.getAttribute('width'));
+			await vi.waitFor(() => expect(countHoverAreas(svg)).toBe(bands));
+			return Number(svg.querySelector('g.band rect')!.getAttribute('width'));
 		};
-		// `'x'` matches both series of the category; `'series'` only the hovered one, whose slice it narrows to.
-		const whole = await widthOfArea('x');
-		const own = await widthOfArea('series');
+		const categories = new Set(PROVINCE_VALUES.map((row) => row.province)).size;
+		// `'x'` matches both series of the category: one band, the whole of it. `'series'` matches the hovered
+		// series in every category: a band in each, narrowed to the series' slice.
+		const whole = await widthOfArea('x', 1);
+		const own = await widthOfArea('series', categories);
 		expect(whole).toBeGreaterThan(own * 1.5);
 	});
 });

@@ -14,7 +14,7 @@
 	styles={{
 		values: {
 			show: true,
-			format: (value, seriesName) => `${seriesName}: ${value.toFixed(0)}`,
+			format: (value, _number, context) => `${context.series}: ${value.toFixed(0)}`,
 			fontStyle: { fontSize: 13 }
 		}
 	}}
