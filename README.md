@@ -136,7 +136,8 @@ Start with the concepts; the rest is organised by what you want a plot to do.
 | [Concepts](docs/concepts.md)                                   | Plots and figures, rows and series, channels, the props every plot shares                    |
 | [Plots](docs/plots.md)                                         | Every plot kind: what it draws and what it needs                                             |
 | [Scales](docs/scales.md)                                       | Axes (`x`, `y`) and channel scales (`color`, `grouping`, `opacity`, `symbol`, `r`, `length`) |
-| [Styles and segments](docs/styles-and-segments.md)             | Value labels, frames, gap filling, and styling ranges of the data                            |
+| [Styles and segments](docs/styles-and-segments.md)             | Value labels in brief, frames, gap filling, and styling ranges of the data                   |
+| [Value labels](docs/value-labels.md)                           | A plot's values on its shapes, and a marker's labels: layouts and their options              |
 | [Markers](docs/markers.md)                                     | Extra marks on a plot: annotations, regions, hover highlights, custom components             |
 | [Transforms and statistics](docs/transforms-and-statistics.md) | Stacking, binning, smoothing, regression and the other data transforms                       |
 | [Tooltip and hover](docs/tooltip-and-hover.md)                 | Floating tooltips, in-plot highlights, syncing hover across plots                            |

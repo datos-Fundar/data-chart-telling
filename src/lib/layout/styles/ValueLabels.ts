@@ -148,6 +148,8 @@ export class ValueLabels {
 			fontWeight?: FontStyle['fontWeight'];
 			/** The rows `styles.values.select` picks: a `'point'` label writes only theirs. */
 			labelled?: readonly ProcessedRow[];
+			/** A row's series color, which `color: 'series'` writes a label off its shape in. */
+			seriesColor?: (row: ProcessedRow) => string | undefined;
 		} = {}
 	): TLabel {
 		const { fitMargins, styles: shared, ...events } = this.hooks(env);
@@ -164,7 +166,12 @@ export class ValueLabels {
 			styles: {
 				...shared,
 				...font,
-				fill: font?.fill ?? (onShape ? undefined : defaults.fill),
+				// On its shape, a label unset reads in the color that contrasts with it; off it, in its own.
+				fill: onShape
+					? this.fill
+					: (this.fill ??
+						(this.color === 'series' ? defaults.seriesColor : undefined) ??
+						defaults.fill),
 				fontSize: font?.fontSize ?? defaults.fontSize ?? 12,
 				fontWeight: font?.fontWeight ?? defaults.fontWeight
 			}

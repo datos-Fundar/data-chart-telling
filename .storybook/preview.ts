@@ -397,7 +397,9 @@ const preview: Preview = {
 						'Timeline',
 						['Player', 'Rule'],
 						'Tooltip',
-						['Basics', 'MultiSeries', 'Customization', 'FacetSync']
+						['Basics', 'MultiSeries', 'Customization', 'FacetSync'],
+						'Values',
+						['Layouts', 'Point', 'Path', 'Box', 'Text']
 					],
 					'Configuration',
 					'Composition',

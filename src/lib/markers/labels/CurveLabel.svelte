@@ -2,6 +2,7 @@
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { CurveGeometry } from '$lib/markers/labels/geometry/CurveGeometry';
+	import { Box } from '$lib/layout/margins/Box';
 	import type { PathLabelConfig, PathShape } from '$lib/types/markers/labels/path';
 	import type { BoxScales } from '$lib/types/markers/labels/box';
 
@@ -19,13 +20,14 @@
 	const cfg = $derived(getConfiguration());
 	const id = $props.id();
 
+	const styles = $derived(label.styles ?? {});
 	const curves = $derived(
 		CurveGeometry.build(shape, marker, label, {
 			scales: plot.svelteplot.scales as unknown as BoxScales,
-			gap: cfg.text.label.gap
+			gap: cfg.text.label.gap,
+			measure: (text) => Box.ofText(text, Number(styles.fontSize ?? 11), cfg).width
 		})
 	);
-	const styles = $derived(label.styles ?? {});
 	// Centred on its curve, a label is drawn over a halo of the background so the curve does not cross it.
 	const halo = $derived((label.side ?? '') === 'on' && styles.stroke === undefined);
 	/** A style's value for a curve's row: a function of the row, or the value itself. */

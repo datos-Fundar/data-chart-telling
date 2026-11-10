@@ -69,3 +69,14 @@ export const IsolateOnHover: Story = {
 		styles: { values: { show: true, hoverIsolate: true } } satisfies AxisBasedStylesConfig
 	}
 };
+
+/**
+ * With several series, the labels at both ends fan out into lanes. `layout: 'path'` writes each series' name along
+ * its own line instead, so each line says which it is without a legend or a lane.
+ */
+export const NamesAlongTheLines: Story = {
+	args: {
+		legend: false,
+		styles: { values: { layout: 'path', offset: '50%' } }
+	}
+};

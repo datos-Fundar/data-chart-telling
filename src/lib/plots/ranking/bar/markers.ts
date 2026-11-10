@@ -131,7 +131,8 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		labels && {
 			...labels.label(env, (d) => labels.format(Number(valueRead(d)), d, name), {
 				fill: 'currentColor',
-				labelled: state.labelled
+				labelled: state.labelled,
+				seriesColor: () => colorForSeries!(name)
 			}),
 			bandSlice: slice
 		};

@@ -326,7 +326,21 @@ export const AlongTheLineOnIt: Story = {
 			{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE },
 			{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE }
 		],
-		styles: { values: { layout: 'path', side: 'on', offset: '60%' } }
+		styles: {
+			values: {
+				layout: 'path',
+				side: 'on',
+				offset: '60%',
+				color: 'series',
+				fontStyle: {
+					stroke: 'white',
+					strokeWidth: 2,
+					fontWeight: 'bold',
+					fontSize: 14,
+					paintOrder: 'stroke'
+				}
+			}
+		}
 	}
 };
 

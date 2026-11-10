@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import type { PlotRowContext } from '$lib';
 import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import { AGE_SHARES_BY_YEAR } from '$datasets';
+import { AGE_SHARES_BY_YEAR, HEIGHT_DENSITY } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `styles.values` labels the end of every area, the same way a line plot labels
@@ -95,5 +95,45 @@ export const HoverIsolate: Story = {
 				format: (v: number, _number: unknown, context: PlotRowContext) => `${context.series} ${v}%`
 			}
 		} satisfies AxisBasedStylesConfig
+	}
+};
+
+/**
+ * `layout: 'path'` writes each age group's name along the top edge of its own band instead of at its end - here,
+ * stacked, where the labels at the end of five thin bands would crowd each other. `side: 'below'` keeps it inside
+ * its band, and `offset` near its middle.
+ */
+export const AlongEachBand: Story = {
+	args: {
+		transforms: [{ type: 'stackY' }],
+		styles: {
+			values: { layout: 'path', side: 'below', offset: '50%', fontStyle: { fill: '#ffffff' } }
+		}
+	}
+};
+
+/**
+ * Two areas that overlap from zero, neither stacked on the other: the height of women and of men, as density curves.
+ * `layout: 'path'` writes each one's name along its top edge, over its own curve, so the two read apart without a
+ * legend - `offset: 'max'` puts each at its own curve's peak, which the two reach a few centimeters apart.
+ */
+export const OverEachCurve: Story = {
+	args: {
+		data: HEIGHT_DENSITY,
+		x: 'height',
+		y: 'density',
+		color: 'sex',
+		legend: false,
+		scales: { y: { label: 'Density (%)' } },
+		styles: {
+			area: { fillOpacity: 0.6 },
+			values: {
+				layout: 'path',
+				offset: 'max',
+				format: (_value: number, _number: unknown, { series }: PlotRowContext) =>
+					series === 'female' ? 'Women' : 'Men',
+				fontStyle: { fontSize: 13, fontWeight: 'bold' }
+			}
+		}
 	}
 };

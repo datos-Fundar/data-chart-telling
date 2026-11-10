@@ -7,16 +7,16 @@ type Run = [start: number, end: number];
 
 const clamp = (value: number, lo: number, hi: number) => Math.min(Math.max(value, lo), hi);
 
-/** The spots around a point, in the order they are tried after the label's own: sides, then corners. */
+/** The spots around a point, clockwise from above it. */
 const AROUND: BoxAnchors[] = [
-	{ x: 'after', y: 'middle' },
-	{ x: 'before', y: 'middle' },
 	{ x: 'middle', y: 'before' },
-	{ x: 'middle', y: 'after' },
 	{ x: 'after', y: 'before' },
+	{ x: 'after', y: 'middle' },
 	{ x: 'after', y: 'after' },
-	{ x: 'before', y: 'before' },
-	{ x: 'before', y: 'after' }
+	{ x: 'middle', y: 'after' },
+	{ x: 'before', y: 'after' },
+	{ x: 'before', y: 'middle' },
+	{ x: 'before', y: 'before' }
 ];
 
 /**
@@ -26,7 +26,7 @@ const AROUND: BoxAnchors[] = [
  */
 export class Declutter {
 	/**
-	 * Each label on the first spot around its point, its `preferred` one first,
+	 * Each label on the first spot around its point - its `preferred` one, then on clockwise -
 	 * that overlaps no label placed before it nor any point, inside `bounds`.
 	 * A label with no free spot is left out of the map: it is not drawn.
 	 */
@@ -40,10 +40,10 @@ export class Declutter {
 		clearance?: number;
 	}): Map<K, BoxFlip> {
 		const { items, preferred, gap, bounds, clearance = 3 } = args;
-		const spots = [
-			preferred,
-			...AROUND.filter((spot) => spot.x !== preferred.x || spot.y !== preferred.y)
-		];
+		// Its own spot first, then on clockwise; a label on the point itself tries it, then goes round from above.
+		const first = AROUND.findIndex((spot) => spot.x === preferred.x && spot.y === preferred.y);
+		const ring = [...AROUND.slice(Math.max(first, 0)), ...AROUND.slice(0, Math.max(first, 0))];
+		const spots = first < 0 ? [preferred, ...ring] : ring;
 		const taken = items.map(
 			({ px, py }) => new Box(px - clearance, py - clearance, 2 * clearance, 2 * clearance)
 		);

@@ -81,58 +81,23 @@ export const CustomValueFormat: Story = {
 };
 
 /**
- * Warm color ramp - overrides the default colour scheme to a warm palette
- * (dark blue to light blue) instead of the default viridis-like ramp.
+ * Only the largest count, called out above its cell (`layout: 'point'`, `select: 'max'`) - every cell still reads by
+ * its color.
  */
-export const WarmColorRamp: Story = {
+export const OnlyTheLargest: Story = {
 	args: {
 		data: PENGUIN_COUNTS,
 		x: 'island',
 		y: 'species',
 		color: 'count',
-		scales: {
-			color: { domain: [0, 120], scheme: 'warm' }
-		},
 		styles: {
-			values: { format: (v: number) => `${v} penguins` }
-		} satisfies AxisBasedStylesConfig
-	}
-};
-
-/**
- * Custom color ramp - full control over the color gradient from min to max.
- * Here a red-to-green ramp emphasizes small and large populations.
- */
-export const CustomColorRamp: Story = {
-	args: {
-		data: PENGUIN_COUNTS,
-		x: 'island',
-		y: 'species',
-		color: 'count',
-		scales: {
-			color: { domain: [0, 120], scheme: ['#ff6b6b', '#51cf66'] }
-		},
-		styles: {
-			values: { format: (v: number) => `${v} penguins` }
-		} satisfies AxisBasedStylesConfig
-	}
-};
-
-/**
- * Inverted color ramp - swaps min/max colors so that higher values appear
- * in darker tones, reversing the typical visual weight.
- */
-export const InvertedColorRamp: Story = {
-	args: {
-		data: PENGUIN_COUNTS,
-		x: 'island',
-		y: 'species',
-		color: 'count',
-		scales: {
-			color: { domain: [0, 120], scheme: ['#51cf66', '#ff6b6b'] }
-		},
-		styles: {
-			values: { format: (v: number) => `${v} penguins` }
-		} satisfies AxisBasedStylesConfig
+			values: {
+				layout: 'point',
+				anchor: 'top',
+				side: 'above',
+				select: 'max',
+				format: (v: number) => `${v} penguins`
+			}
+		}
 	}
 };

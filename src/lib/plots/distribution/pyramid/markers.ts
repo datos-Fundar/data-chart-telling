@@ -94,7 +94,11 @@ export function buildMarks<TData extends Record<string, unknown>>(
 								env,
 								(d) =>
 									labels.format(Math.abs(Number(getMagnitude(d as TData))), d, group.series.name),
-								{ fill: 'currentColor', labelled: state.labelled }
+								{
+									fill: 'currentColor',
+									labelled: state.labelled,
+									seriesColor: () => state.colorForSeries!(group.series.name)
+								}
 							)
 						}
 					: {}),

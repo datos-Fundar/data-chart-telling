@@ -82,6 +82,8 @@ export type TransformsStageOptions<TState extends TransformsStageState, TEnv> = 
 		show?: boolean;
 		/** The rows picked when `styles.values.select` is unset. Defaults to every row. */
 		select?: ValueSelect | ValueSelect[];
+		/** What `'min'` and `'max'` compare: the plot's value axis by default, or this (a heatmap's `color`). */
+		measure?: (state: TransformsStageState) => ((row: ProcessedRow) => unknown) | undefined;
 		/** What a selector picks among: each series (the default), or each category. */
 		group?: 'series' | 'category';
 		/** A test for the rows that cannot be labelled (a gap), read off the state once. */

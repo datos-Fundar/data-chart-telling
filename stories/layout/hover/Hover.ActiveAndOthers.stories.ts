@@ -15,7 +15,7 @@ import {
 	PENGUIN_COUNTS,
 	PROVINCE_VALUES
 } from '$datasets';
-import { plotStory } from './plotStory';
+import { plotStory } from '../../common/plotStory';
 
 /**
  * `active` and `others` restyle the shapes themselves while the hover is on: the ones it reaches take

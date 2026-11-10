@@ -174,46 +174,14 @@ A color or an opacity the function returns is drawn as it is, not mapped through
 
 ## A label in each shape
 
-A `rect`, `cell`, `bar` or `waffle` marker takes a `label`: a text written in the middle of each shape, with every option of a `text` marker but `type`, `data`, `x` and `y`, which the shape sets. It never takes the pointer from the shape under it, so `onclick` and the hover go on as they were.
+A marker writes a label on each of its shapes with `label`: in each bar, cell, rect or waffle by default, beside the points of a line, an area or a dot, or along an edge or a line, with every option of a `text` marker besides. A list of labels writes each of them.
 
 ```ts
 { type: 'rect', data: tiles, x1: 'x1', x2: 'x2', y1: 'y1', y2: 'y2',
   label: { text: 'name', styles: { fill: 'white' }, fit: { fallback: 'value' } } }
 ```
 
-`anchor` puts the label against an edge (`'top'`, `'bottom'`, `'left'`, `'right'`) or in a corner (`'top-left'`...) instead of the middle; `gap` is its distance from the edge. A list of labels writes each of them: `label: [{ text: 'value', anchor: 'top' }, { text: 'name', anchor: 'bottom' }]`. A label with a handler of its own (`onpointerenter`...) listens for the pointer; the others leave it to the shape. Its styles take functions of the row, to dim the label of a series, say. A label inside its shape with no `fill` of its own is written in the color that reads best on the shape's own - white on a dark one, near black on a light one - picked per row from the configuration's `text.label.contrast` (`['#ffffff', '#111827']`), or white or black where neither reaches the WCAG AA ratio of 4.5:1. The shape is read as it is seen: a `fillOpacity` under 1 blends it with the plot's `background`. One outside its shape keeps its plot's color.
-
-The label is fitted to its shape unless `fit` is `false`. One too big is written smaller, down to `minFontSize`; at that size it breaks into the lines the shape holds and the last one is cut short with an ellipsis; when fewer than `minLetters` letters would show, `fallback` - a value, a field or a function of the row - is written instead; and when not even that fits, nothing is. `padding` is the room kept free inside each edge. The defaults of `gap`, `padding`, `minFontSize` (8) and `minLetters` (3) are the configuration's `text.label`: `setConfiguration({ text: { label: { gap: 6 } } })`. A `text` marker of your own takes the same `fit` with a box of its own (`x1`, `x2`, `y1`, `y2`), which is rarely what you want.
-
-`layout: 'path'` writes the label along an edge of each shape instead, not fitted to it: `edge` is `'top'`, `'bottom'`, `'left'` or `'right'`, and on a `bar` or `waffle` also `'tip'`, the end its value runs to, or `'base'`, the one at zero - read per row, so a bar below zero has its tip at its bottom. `side` puts it beyond the edge (`'outside'`, the default), against it within the shape (`'inside'`) or centred on it (`'on'`); `offset` is where along the edge, `'start'`, `'middle'` (the default), `'end'` or a percentage from its left or top end; and `gap` its distance from the edge. `fitMargins: true` grows the plot's margins to hold one that would run past them:
-
-```ts
-{ type: 'bar', role: 'segment', data, x: 'name', y1: 0, y2: 'change',
-  label: { layout: 'path', text: 'change', edge: 'tip', fitMargins: true } }
-```
-
-A `line` or `trail` marker writes a `'path'` label along each line it draws instead, one per `grouping`, curving with it - its `text` read from the line's first row, so a field names its group: `side` is `'above'` (the default), `'below'` or `'on'` the line, as the text reads (a line drawn right to left is written along its reverse), and `offset` is where along it from its left end. An `area` writes it along its top edge (`edge: 'top'`, the default, its `y2`) or its bottom one (`'bottom'`, its `y1`), and a `dot` around its rim, over its top - `offset` from its left side, `side` `'outside'`, `'inside'` or `'on'` it. A label `'on'` its curve is drawn over a halo of the plot's background:
-
-```ts
-{ type: 'line', data, x: 'year', y: 'value', grouping: 'country', curve: 'catmull-rom',
-  label: { layout: 'path', text: 'country', offset: '80%' } }
-```
-
-A `line`, `area`, `trail` or `dot` marker writes its `label` beside a point instead (its `layout` is `'point'`): each row at its `x` and `y` (an area's at the top, its `y2`). `select` picks the rows labelled of each `grouping` of the marker - `'first'`, `'last'`, `'min'`, `'max'` or a list of them, or a function of the row - and rows without a place (a gap) are never labelled. `declutter` spreads labels that would overlap apart, and the point labels of every marker of a plot are laid out together, so the ends of several lines fan out as one. `declutter: 'around'` instead puts each label on a free spot around its point - its own side first, then the other sides and the corners - clear of the other labels and points, and leaves out one with no room, as a scatter's labels need:
-
-```ts
-{ type: 'line', data: rows, x: 'year', y: 'value', grouping: 'country',
-  label: { text: 'country', select: 'last', declutter: true, styles: { dx: 6 } } }
-```
-
-A label written on its own point (no `side`, or `side: 'on'`) is read in its shape: where a dot, a bar or a cell drawn after its own covers it, it is left out, so of dots drawn over one another only the top one's label shows.
-
-A `rect`, `cell`, `bar` or `waffle` label takes `layout: 'point'` too: it starts at a point of each shape's box, its `anchor` (an edge's middle, `'top'`..., or a corner, `'top-left'`...; the middle by default), and is written away from it, `gap` beyond it. With `declutter`, its connector starts there:
-
-```ts
-{ type: 'bar', data: rows, x: 'province', y1: 0, y2: 'value',
-  label: { layout: 'point', text: 'value', anchor: 'top', select: 'max', declutter: true } }
-```
+Its layouts and their options are those of a plot's value labels: see [Labels on markers](value-labels.md#labels-on-markers).
 
 ## Events
 

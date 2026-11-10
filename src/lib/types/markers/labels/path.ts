@@ -23,8 +23,11 @@ export type PathLabelConfig<
 	edge?: TEdge;
 	/** Defaults to `'outside'` on a shape, `'above'` on a stroke. */
 	side?: TSide;
-	/** Where along the edge, from its left or top end. Defaults to `'middle'`. */
-	offset?: 'start' | 'middle' | 'end' | `${number}%`;
+	/**
+	 * Where along the edge, from its left or top end. On a line or an area, `'max'` and `'min'` are the point of each
+	 * one with its highest or lowest value - its peak, its trough. Defaults to `'middle'`.
+	 */
+	offset?: 'start' | 'middle' | 'end' | 'max' | 'min' | `${number}%`;
 	/** Defaults to the configuration's `text.label.gap`. */
 	gap?: number;
 };

@@ -45,7 +45,13 @@ export class CurveGeometry {
 		shape: Exclude<PathShape, 'box'>,
 		marker: CurvedMarker,
 		label: PathLabelConfig<string, string>,
-		plot: { scales: BoxScales; gap: number; dotRadius?: number }
+		plot: {
+			scales: BoxScales;
+			gap: number;
+			dotRadius?: number;
+			/** How wide a text is written, in pixels: a label centred near an end of its line is moved in to fit. */
+			measure?: (text: string) => number;
+		}
 	): CurvedLabel[] {
 		const rows = (marker.data ?? []).filter((row) => row !== null && row !== undefined);
 		const { scales } = plot;
@@ -67,14 +73,15 @@ export class CurveGeometry {
 				const [cx, cy] = [at('x', x(row)), at('y', y(row))];
 				const r = DotRadius.of(marker, row, scales, plot.dotRadius ?? 5);
 				if (cx === undefined || cy === undefined) return [];
-				// From its left, clockwise: over the top, the side text reads upright on.
-				const d = `M${cx - r},${cy}A${r},${r} 0 1 1 ${cx + r},${cy}A${r},${r} 0 1 1 ${cx - r},${cy}`;
+				// From its bottom, clockwise: up its left, over its top - the side text reads upright on - and down its
+				// right, so a text centred on the top has half the circle free on either side.
+				const d = `M${cx},${cy + r}A${r},${r} 0 1 1 ${cx},${cy - r}A${r},${r} 0 1 1 ${cx},${cy + r}`;
 				return [
 					{
 						d,
 						text: textOf(row),
 						row,
-						...CurveGeometry.#along(label.offset, 0.5),
+						...CurveGeometry.#along(label.offset, 0.5, 0.25),
 						...CurveGeometry.#across(
 							side === 'outside' ? 'above' : side === 'inside' ? 'below' : 'on',
 							gap
@@ -92,7 +99,10 @@ export class CurveGeometry {
 			const key = marker.grouping === undefined ? undefined : groupOf(row);
 			groups.set(key, [...(groups.get(key) ?? []), row]);
 		}
-		const path = line().curve(maybeCurve(marker.curve, marker.tension ?? 0) as never);
+		// Text along a straight stretch's corners spreads its letters apart: a linear line is read along a smooth one
+		// through the same points, which never overshoots them.
+		const curve = !marker.curve || marker.curve === 'linear' ? 'monotone-x' : marker.curve;
+		const path = line().curve(maybeCurve(curve, marker.tension ?? 0) as never);
 		return [...groups.values()].flatMap((members) => {
 			const points = members.flatMap((row): Point[] => {
 				const [px, py] = [at('x', x(row)), at('y', y(row))];
@@ -103,17 +113,69 @@ export class CurveGeometry {
 			if (points[0][0] > points[points.length - 1][0]) points.reverse();
 			const d = path(points);
 			if (!d) return [];
+			const offset =
+				label.offset === 'max' || label.offset === 'min'
+					? CurveGeometry.#extreme(points, label.offset, marker.isHorizontal)
+					: label.offset;
+			const text = textOf(members[0]);
+			const along = CurveGeometry.#along(offset, 1);
 			return [
 				{
 					d,
-					text: textOf(members[0]),
+					text,
 					row: members[0],
-					...CurveGeometry.#along(label.offset, 1),
+					...along,
+					...CurveGeometry.#inside(along, plot.measure?.(text), CurveGeometry.#length(points)),
 					...CurveGeometry.#across(label.side ?? 'above', gap),
 					fill: colorOf(members[0])
 				}
 			];
 		});
+	}
+
+	/** A centred text moved in along its line just enough to fit whole on it: what falls past an end is not drawn. */
+	static #inside(
+		along: Pick<CurvedLabel, 'startOffset' | 'textAnchor'>,
+		width: number | undefined,
+		length: number
+	): Partial<Pick<CurvedLabel, 'startOffset'>> {
+		if (!width || along.textAnchor !== 'middle' || length <= 0) return {};
+		const half = Math.min(50, (width / 2 / length) * 100);
+		const at = Number.parseFloat(along.startOffset);
+		const fitted = Math.min(Math.max(at, half), 100 - half);
+		return fitted === at ? {} : { startOffset: `${Number(fitted.toFixed(3))}%` };
+	}
+
+	/** The length of the line through `points`, in pixels. */
+	static #length(points: Point[]): number {
+		let total = 0;
+		for (let i = 1; i < points.length; i++) {
+			total += Math.hypot(points[i][0] - points[i - 1][0], points[i][1] - points[i - 1][1]);
+		}
+		return total;
+	}
+
+	/**
+	 * How far along `points` - as a share of their length - the one with the highest (`'max'`) or lowest value is:
+	 * the one highest up the page, or furthest right on a horizontal area.
+	 */
+	static #extreme(points: Point[], which: 'max' | 'min', isHorizontal?: boolean): `${number}%` {
+		const valueOf = ([px, py]: Point) => (isHorizontal ? px : -py);
+		let at = 0;
+		points.forEach((point, i) => {
+			const better =
+				which === 'max'
+					? valueOf(point) > valueOf(points[at])
+					: valueOf(point) < valueOf(points[at]);
+			if (better) at = i;
+		});
+		let total = 0;
+		let upTo = 0;
+		for (let i = 1; i < points.length; i++) {
+			total += Math.hypot(points[i][0] - points[i - 1][0], points[i][1] - points[i - 1][1]);
+			if (i === at) upTo = total;
+		}
+		return `${total > 0 ? (upTo / total) * 100 : 50}%`;
 	}
 
 	/** The channels the curve runs through: a line's own, or an area's top or bottom edge. */
@@ -132,12 +194,16 @@ export class CurveGeometry {
 		return [read(marker.x), read(edge)];
 	}
 
-	/** Where along the curve, as `startOffset` and `text-anchor`; a rim's `extent` is the upper half of its circle. */
+	/**
+	 * Where along the curve, as `startOffset` and `text-anchor`: `offset` runs over the stretch of it that starts at
+	 * `from` and spans `extent` - a rim's upper half, from its left side to its right.
+	 */
 	static #along(
 		offset: PathLabelConfig['offset'] = 'middle',
-		extent: number
+		extent: number,
+		from = 0
 	): Pick<CurvedLabel, 'startOffset' | 'textAnchor'> {
-		const share = (fraction: number) => `${Number((fraction * extent * 100).toFixed(3))}%`;
+		const share = (fraction: number) => `${Number(((from + fraction * extent) * 100).toFixed(3))}%`;
 		if (offset === 'start') return { startOffset: share(0), textAnchor: 'start' };
 		if (offset === 'end') return { startOffset: share(1), textAnchor: 'end' };
 		const percent = offset === 'middle' ? 50 : Number.parseFloat(offset);

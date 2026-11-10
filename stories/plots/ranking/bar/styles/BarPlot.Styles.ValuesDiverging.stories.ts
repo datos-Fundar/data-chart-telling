@@ -3,6 +3,7 @@ import type { BarValueLabel, ValueLayoutOf } from '$lib/types/layout/styles';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
+import { COUNTRIES_OVER_TIME } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 
@@ -34,35 +35,44 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-type ChangeRow = { jurisdiction: string; change: number };
+type ChangeRow = { country: string; change: number };
 
+/**
+ * How many years life expectancy at birth changed from 1987 to 2007, in seven African countries (Gapminder): AIDS
+ * cut it in South Africa and Kenya.
+ */
 const CHANGES: ChangeRow[] = [
-	{ jurisdiction: 'A', change: -0.88 },
-	{ jurisdiction: 'B', change: -0.44 },
-	{ jurisdiction: 'C', change: -0.06 },
-	{ jurisdiction: 'D', change: 0.02 },
-	{ jurisdiction: 'E', change: 0.33 },
-	{ jurisdiction: 'F', change: 1.13 }
-];
+	'Egypt',
+	'Morocco',
+	'Ethiopia',
+	'Ghana',
+	'Nigeria',
+	'Kenya',
+	'South Africa'
+].map((country) => {
+	const at = (year: number) =>
+		COUNTRIES_OVER_TIME.find((row) => row.country === country && row.year === year)!.life;
+	return { country, change: Math.round((at(2007) - at(1987)) * 10) / 10 };
+});
 
 /** Bars that go left of zero (or below it) and bars that go right of it (or above it). */
 const HORIZONTAL = {
 	name: 'change',
 	x: 'change',
-	y: 'jurisdiction',
+	y: 'country',
 	data: CHANGES
 } satisfies Series<ChangeRow>;
 
 const VERTICAL = {
 	name: 'change',
-	x: 'jurisdiction',
+	x: 'country',
 	y: 'change',
 	data: CHANGES
 } satisfies Series<ChangeRow>;
 
 const values = (placement: ValueLayoutOf<BarValueLabel> = {}) =>
 	({
-		values: { ...placement, decimals: 2, signDisplay: 'always' }
+		values: { ...placement, decimals: 1, signDisplay: 'always' }
 	}) satisfies AxisBasedStylesConfig;
 
 // ── Horizontal ────────────────────────────────────────────────────────────────

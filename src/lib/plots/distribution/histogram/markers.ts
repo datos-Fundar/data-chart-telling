@@ -39,7 +39,8 @@ export function buildMarks<TData extends Record<string, unknown>>(
 	const labelFor = (name: string) =>
 		labels?.label(env, (d) => (countOf(d) > 0 ? labels.format(countOf(d), d, name) : ''), {
 			fill: 'currentColor',
-			labelled: state.labelled
+			labelled: state.labelled,
+			seriesColor: () => state.colorForSeries!(name)
 		});
 
 	const rects = (state.processedGroups ?? []).flatMap((group) => {

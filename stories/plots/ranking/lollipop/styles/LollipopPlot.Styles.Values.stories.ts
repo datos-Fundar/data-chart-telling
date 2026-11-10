@@ -54,3 +54,13 @@ export const SidewaysPercent: Story = {
 		} satisfies AxisBasedStylesConfig
 	}
 };
+
+/** Big heads with each value inside (`side: 'on'`), white on the dot: the value is the lollipop. */
+export const InsideTheHeads: Story = {
+	args: {
+		r: 16,
+		styles: {
+			values: { side: 'on', decimals: 0, fontStyle: { fill: '#ffffff', fontWeight: 'bold' } }
+		}
+	}
+};

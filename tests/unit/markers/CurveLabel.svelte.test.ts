@@ -86,6 +86,8 @@ describe('path labels along curves', () => {
 			}
 		]);
 		await expect.poll(() => paths(svg).length).toBe(3);
+		// Its top is the middle of a rim drawn from its bottom, leaving half the circle on either side of the text.
+		expect(paths(svg)[0].getAttribute('startOffset')).toBe('50%');
 		const dot = svg.querySelector('g.dot path')!.getBoundingClientRect();
 		const text = paths(svg)[0].closest('text')!.getBoundingClientRect();
 		expect(text.bottom).toBeLessThanOrEqual(dot.top + 2);

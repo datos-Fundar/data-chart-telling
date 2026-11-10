@@ -11,7 +11,7 @@ import type { NumberDisplay } from '$lib/types/layout/numbers';
  * How labels that would overlap are laid out. `'lanes'` spreads them apart
  * vertically, all reaching out to one shared column, each routed back to its
  * own point by an elbow connector; `'around'` puts each one on a free spot
- * around its point (its own side first, then the others and the corners),
+ * around its point (its own side first, then on clockwise),
  * clear of the other labels and points, and leaves out one with no room.
  */
 export type TextDeclutterMode = 'lanes' | 'around';

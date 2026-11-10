@@ -1,7 +1,7 @@
 import type { Meta } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import { LIFE, REGION_VALUES } from '$datasets';
-import { plotStory } from './plotStory';
+import { plotStory } from '../../common/plotStory';
 
 /**
  * Each hovered point has a `label` - its value - that the markers the hover draws write (a `text` in `front`

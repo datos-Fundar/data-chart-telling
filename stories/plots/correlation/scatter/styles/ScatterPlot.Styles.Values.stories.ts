@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
+import type { PlotRowContext } from '$lib';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import { COUNTRIES_AT_2007 } from '$datasets';
@@ -37,7 +38,7 @@ export const Default: Story = {
 	args: {}
 };
 
-/** Value labels enabled - `styles.values.show: true` labels every point with its raw Y value, positioned to the right of the dot by default. */
+/** Value labels enabled - `styles.values.show: true` labels every point with its raw Y value, above its dot by default, or on the next free spot clockwise around it. */
 export const ShowValues: Story = {
 	args: {
 		styles: {
@@ -99,5 +100,35 @@ export const CenteredOnPoint: Story = {
 				}
 			}
 		} satisfies AxisBasedStylesConfig
+	}
+};
+
+/**
+ * Bubbles sized by population, each country's name written around its rim (`layout: 'path'`) - a label beside a
+ * big bubble would sit far from its center, one inside would not fit.
+ */
+export const AroundTheBubbles: Story = {
+	args: {
+		data: COUNTRIES_AT_2007.filter((row) => row.population > 120),
+		r: 'population',
+		scales: {
+			x: {
+				type: 'log',
+				domain: [1500, 50_000],
+				ticks: [1500, 2000, 3000, 4000, 5000, 10_000, 20_000, 30_000, 40_000, 50_000]
+			},
+			y: { domain: [40, 90] },
+			r: { range: [8, 20] }
+		},
+		styles: {
+			values: {
+				layout: 'path',
+				format: (_value: number, _number: unknown, { row }: PlotRowContext) =>
+					String((row as { country: string }).country)
+			}
+		},
+		legend: {
+			r: { suffix: ' (M)' }
+		}
 	}
 };

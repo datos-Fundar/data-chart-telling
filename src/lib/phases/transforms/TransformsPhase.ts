@@ -168,14 +168,15 @@ export class TransformsPhase<
 		const values = state.values;
 		if (!options || !ValueLabels.shows(values, options.show)) return {};
 		const processed = state.processedData!;
-		const valueAxis = PlotAxes.valueOf(state) as 'x' | 'y';
+		const measure = options.measure?.(state);
+		const valueAxis = measure ? 'y' : (PlotAxes.valueOf(state) as 'x' | 'y');
 		const select = values?.select ?? options.select;
 		const selections = ValueSelection.transforms(select, values?.series, valueAxis);
 		const position = ProcessedPositions.of(processed, valueAxis);
 		const skip = options.skip?.(state);
 		const channels = {
 			x: position.x,
-			y: position.y,
+			y: measure ?? position.y,
 			group:
 				options.group === 'category'
 					? position[PlotAxes.categoryOf(state) as 'x' | 'y']

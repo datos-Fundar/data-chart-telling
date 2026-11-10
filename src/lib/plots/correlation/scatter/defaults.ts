@@ -94,7 +94,7 @@ export function buildScatterDefaults<TData extends Record<string, unknown>>(): A
 		styles: {
 			values: {
 				layout: 'point',
-				layouts: { point: { side: 'after', gap: 8 }, path: { side: 'outside' } }
+				layouts: { point: { side: 'above', gap: 8 }, path: { side: 'outside' } }
 			}
 		},
 		markers: { marks: buildMarks },

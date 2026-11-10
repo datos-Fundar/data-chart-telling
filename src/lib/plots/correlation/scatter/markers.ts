@@ -24,6 +24,7 @@ function buildValueLabels<TData extends Record<string, unknown>>(
 	const valueOf = ValueLabels.valueOf(state);
 	const label = labels.label(env, (d) => format(Number(valueOf(d)), d, nameOf(d)), {
 		fill: 'currentColor',
+		seriesColor: (d) => state.colorForSeries?.(nameOf(d)),
 		fontSize: 11,
 		fontWeight: 500
 	});

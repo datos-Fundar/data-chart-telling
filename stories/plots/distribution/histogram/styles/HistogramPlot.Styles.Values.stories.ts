@@ -100,3 +100,18 @@ export const HoverIsolate: Story = {
 		} satisfies AxisBasedStylesConfig
 	}
 };
+
+/** Only the tallest bin, its count called out above it (`layout: 'point'`, `select: 'max'`): the most common height. */
+export const TallestBin: Story = {
+	args: {
+		styles: {
+			values: {
+				layout: 'point',
+				anchor: 'top',
+				side: 'above',
+				select: 'max',
+				format: (count: number) => `${count} people`
+			}
+		}
+	}
+};
