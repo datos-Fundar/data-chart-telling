@@ -1,14 +1,18 @@
 import type { PlotRowContext } from '$lib/types/layout/context';
 import type { EdgeBox } from '$lib/types/layout/box';
 import type { ValueLabels } from '$lib/layout/styles/ValueLabels';
-import type { ValueAnchor } from '$lib/types/plots/constants';
+import type { LabelLayout } from '$lib/types/markers/labels/common';
 
 /** A plot kind's own defaults for its value labels, under the author's `styles.values`. */
 export type ValueLabelsOptions<TState> = {
 	/** Whether the labels draw when `styles.values.show` is unset. Defaults to `false`. */
 	show?: boolean;
-	/** Where a label sits when `styles.values.anchor` is unset. Defaults to `'outside'`. */
-	anchor?: ValueAnchor;
+	/** The layout the labels take when `styles.values.layout` is unset. Defaults to `'point'`. */
+	layout?: LabelLayout | ((state: TState) => LabelLayout);
+	/** The kind's own options for each layout it takes, under the author's: a bar's `path` at its `tip`, say. */
+	layouts?:
+		| Partial<Record<LabelLayout, Record<string, unknown>>>
+		| ((state: TState) => Partial<Record<LabelLayout, Record<string, unknown>>>);
 	/** A label's text when `styles.values.format` is unset. Defaults to the bare value. `number` writes a value as the plot's `styles.values` display fields (`decimals`, `prefix`, `suffix`, `signDisplay`) ask, and `context` is what the plot knows of the labelled row. */
 	format?: (value: number, number: (value: number) => string, context: PlotRowContext) => string;
 	/**

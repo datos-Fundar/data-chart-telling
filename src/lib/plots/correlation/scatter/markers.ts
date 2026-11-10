@@ -2,46 +2,39 @@ import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 
 import type { ScatterPlotState, ScatterPlotEnv } from '$lib/types/plots/correlation/scatter/state';
 import type { DotMarkerConfig } from '$lib/types/markers/common';
-import type { PointLabelConfig } from '$lib/types/markers/labels/point';
+import type { MarkerLabelConfig } from '$lib/types/markers/labels/common';
 import type { ProcessedRow } from '$lib/types/phases';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 /**
- * ScatterPlot's `styles.values` as `'point'` labels of its dots: each labelled row with its own value, on a free
- * spot around its point (`declutter: 'around'`) - a label with none is left out.
+ * ScatterPlot's `styles.values` as labels of its dots: each labelled row with its own value, by default on a free
+ * spot around its point (`declutter: 'around'`) - a label with none is left out - or around its rim (`'path'`).
  */
 function buildValueLabels<TData extends Record<string, unknown>>(
 	labels: ValueLabels,
 	state: ScatterPlotState<TData>,
 	env: ScatterPlotEnv
-): PointLabelConfig[] {
+): MarkerLabelConfig[] {
 	const rows = new Set(state.labelled ?? []);
 	if (rows.size === 0) return [];
-	const { font, format } = labels;
+	const { format } = labels;
 	const nameOf = (d: ProcessedRow) => String(d[SERIES_KEY]);
 	const valueOf = ValueLabels.valueOf(state);
-	const { styles: shared, ...hooks } = labels.hooks(env);
+	const label = labels.label(env, (d) => format(Number(valueOf(d)), d, nameOf(d)), {
+		fill: 'currentColor',
+		fontSize: 11,
+		fontWeight: 500
+	});
+	if (labels.layout !== 'point') return [label];
 	return [
 		{
-			...hooks,
-			layout: 'point',
+			...label,
 			select: (row: ProcessedRow) => rows.has(row),
-			text: (d: ProcessedRow) => format(Number(valueOf(d)), d, nameOf(d)),
-			styles: {
-				...shared,
-				...font,
-				fill: font?.fill ?? 'currentColor',
-				fontSize: font?.fontSize ?? 11,
-				fontWeight: font?.fontWeight ?? 500,
-				dx: font?.dx ?? 8,
-				dy: font?.dy ?? 0,
-				textAnchor: labels.textAnchor ?? 'start',
-				lineAnchor: font?.lineAnchor ?? 'middle'
-			},
-			declutter: 'around'
-		}
+			// A label on its own dot stays there; one beside it moves around it to a free spot.
+			declutter: labels.side === 'on' ? undefined : 'around'
+		} as MarkerLabelConfig
 	];
 }
 

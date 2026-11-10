@@ -30,7 +30,8 @@ export function buildSlopeDefaults<TData extends Record<string, unknown>>(): Axi
 		},
 		styles: {
 			values: {
-				anchor: 'start',
+				layout: 'point',
+				layouts: { point: { side: 'after' }, path: { side: 'above', offset: 'middle' } },
 				format: (v, number, context) => `${context.series} - ${number(v)}`
 			}
 		},

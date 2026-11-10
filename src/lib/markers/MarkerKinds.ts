@@ -81,7 +81,7 @@ export class MarkerKinds {
 			clip: false,
 			drawsRows: true,
 			legendSymbol: 'dot',
-			labels: { default: 'point', path: 'rim', point: 'row' }
+			labels: { default: 'point', path: 'rim', point: 'dot' }
 		},
 		geo: { clip: false, drawsRows: false },
 		'geo-component': { clip: false, drawsRows: true },

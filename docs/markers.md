@@ -206,6 +206,8 @@ A `line`, `area`, `trail` or `dot` marker writes its `label` beside a point inst
   label: { text: 'country', select: 'last', declutter: true, styles: { dx: 6 } } }
 ```
 
+A label written on its own point (no `side`, or `side: 'on'`) is read in its shape: where a dot, a bar or a cell drawn after its own covers it, it is left out, so of dots drawn over one another only the top one's label shows.
+
 A `rect`, `cell`, `bar` or `waffle` label takes `layout: 'point'` too: it starts at a point of each shape's box, its `anchor` (an edge's middle, `'top'`..., or a corner, `'top-left'`...; the middle by default), and is written away from it, `gap` beyond it. With `declutter`, its connector starts there:
 
 ```ts

@@ -1,7 +1,8 @@
 import { ValueSelection } from '$lib/phases/transforms/ValueSelection';
 import type { TextMarkerConfig } from '$lib/types/markers/basic/text';
 import type { BoxScales } from '$lib/types/markers/labels/box';
-import type { PointGeometryOf, PointLabelConfig } from '$lib/types/markers/labels/point';
+import type { PointGeometryOf, PointLabelConfig, PointSide } from '$lib/types/markers/labels/point';
+import type { LineAnchor, TextAnchor } from '$lib/types/plots/constants';
 import type { ProcessedRow } from '$lib/types/phases';
 
 const read =
@@ -25,7 +26,7 @@ export class PointLayout {
 		plot: { grouping?: unknown; valueAxis?: 'x' | 'y'; gap?: number } = {}
 	): TextMarkerConfig | undefined {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { layout, select, anchor, gap, ...text } = label;
+		const { layout, select, anchor, side, gap, ...text } = label;
 		const [x, y] = [read(point.x), read(point.y)];
 		const placeable = rows.filter((row) => placed(x(row)) && placed(y(row)));
 		const data =
@@ -42,15 +43,56 @@ export class PointLayout {
 		const onBox =
 			point.size && anchor && anchor !== 'middle'
 				? PointLayout.#onBox(text, point.size, anchor, gap ?? plot.gap ?? 4)
-				: {};
+				: side
+					? { styles: { ...PointLayout.sideOf(side, gap), ...PointLayout.#defined(text.styles) } }
+					: {};
+		// A label on its own point is read in its shape: one drawn over it hides it.
+		const { size, round } = point;
+		const onPoint =
+			!(size && anchor && anchor !== 'middle') && (side === undefined || side === 'on');
+		const covers =
+			onPoint && size
+				? (row: unknown, scales: BoxScales) => {
+						const shape = size(row, scales);
+						return shape && { ...shape, round };
+					}
+				: undefined;
 		return {
 			...text,
 			...onBox,
+			...(covers ? { covers } : {}),
 			type: 'text',
 			data,
 			x: point.x,
 			y: point.y
 		} as TextMarkerConfig;
+	}
+
+	static #defined(styles: object | undefined): object {
+		return Object.fromEntries(
+			Object.entries(styles ?? {}).filter(([, value]) => value !== undefined)
+		);
+	}
+
+	/** The offset and anchors that write a label on `side` of its point, `gap` from it. */
+	static sideOf(
+		side: PointSide,
+		gap?: number
+	): { dx: number; dy: number; textAnchor: TextAnchor; lineAnchor: LineAnchor } {
+		const across = gap ?? 6;
+		const along = gap ?? 8;
+		switch (side) {
+			case 'after':
+				return { dx: across, dy: 0, textAnchor: 'start', lineAnchor: 'middle' };
+			case 'before':
+				return { dx: -across, dy: 0, textAnchor: 'end', lineAnchor: 'middle' };
+			case 'above':
+				return { dx: 0, dy: -along, textAnchor: 'middle', lineAnchor: 'bottom' };
+			case 'below':
+				return { dx: 0, dy: along, textAnchor: 'middle', lineAnchor: 'top' };
+			default:
+				return { dx: 0, dy: 0, textAnchor: 'middle', lineAnchor: 'middle' };
+		}
 	}
 
 	/** Starts each label at `anchor` on its box, written away from it. */

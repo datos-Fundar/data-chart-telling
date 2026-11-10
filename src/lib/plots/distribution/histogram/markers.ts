@@ -1,5 +1,4 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
-import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { Transforms } from '$lib/phases/transforms/Transforms';
 import { resolveAccessor } from '$lib/utils/accessors';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
@@ -38,9 +37,9 @@ export function buildMarks<TData extends Record<string, unknown>>(
 	const countOf = (d: ProcessedRow) =>
 		countRead ? Number(countRead(d)) : Number(position[value](d)) - Number(bottomOf(d));
 	const labelFor = (name: string) =>
-		labels?.shapeLabel(env, (d) => (countOf(d) > 0 ? labels.format(countOf(d), d, name) : ''), {
+		labels?.label(env, (d) => (countOf(d) > 0 ? labels.format(countOf(d), d, name) : ''), {
 			fill: 'currentColor',
-			...ValueLabels.boxAnchor(labels.anchor, { isHorizontal: value === 'x' })
+			labelled: state.labelled
 		});
 
 	const rects = (state.processedGroups ?? []).flatMap((group) => {

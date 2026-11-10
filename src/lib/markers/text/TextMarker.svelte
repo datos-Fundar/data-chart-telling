@@ -8,6 +8,7 @@
 	import { RowOffset } from '$lib/markers/utils/RowOffset';
 	import RowOffsetMarks from '$lib/markers/utils/RowOffsetMarks.svelte';
 	import { Declutter } from '$lib/markers/text/Declutter';
+	import { Covering } from '$lib/markers/text/Covering';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { TextFit, type FittedText } from '$lib/markers/text/TextFit';
 	import { NumberFormat } from '$lib/utils/NumberFormat';
@@ -120,6 +121,7 @@
 			!!marker.edgeAware ||
 			!!marker.origin ||
 			events.any ||
+			!!marker.covers ||
 			typeof marker.textAnchor === 'function' ||
 			typeof marker.lineAnchor === 'function'
 	);
@@ -251,7 +253,7 @@
 	const points = $derived.by(() => {
 		const xScale = plot.scales.x?.fn;
 		const yScale = plot.scales.y?.fn;
-		if ((!declutter && !marker.edgeAware) || !xScale || !yScale) return undefined;
+		if ((!declutter && !marker.edgeAware && !marker.covers) || !xScale || !yScale) return undefined;
 		const xOf = channel(x ?? 0);
 		const yOf = channel(y ?? 0);
 		// A band's position is its start; a mark sits at its middle.
@@ -280,6 +282,26 @@
 				})
 			: undefined
 	);
+
+	/** The rows whose label a shape drawn after its own row covers: their labels are left out. */
+	const covered = $derived.by(() => {
+		const covers = marker.covers;
+		if (!covers || !points) return undefined;
+		const shapes = displayData.map((d, i) => {
+			const shape = covers(d, plot.scales);
+			if (!shape) return undefined;
+			const { px, py } = points[i];
+			const { width, height, round } = shape;
+			return { box: new Box(px - width / 2, py - height / 2, width, height), round };
+		});
+		const labels = displayData.map((d, i) =>
+			Box.ofText(textOf(d), fontSize, cfg).beside(
+				{ x: points[i].px + dx, y: points[i].py + dy },
+				{ x: TEXT_SIDES[anchorAt(d)], y: LINE_SIDES[lineAnchorAt(d)] }
+			)
+		);
+		return Covering.hidden(labels, shapes);
+	});
 
 	/** Each row's spot around its point, `null` for a row with none free. */
 	const around = $derived.by(() => {
@@ -392,7 +414,7 @@
 	{:else if (!declutter && !marker.edgeAware) || points}
 		<!-- A decluttered or edge-aware label waits for both scales. -->
 		{#each displayData as d, i (i)}
-			{#if (!fitted || fitted.get(d)) && placements?.[i] !== null}
+			{#if (!fitted || fitted.get(d)) && placements?.[i] !== null && !covered?.has(i)}
 				{@const lane = lanes?.get(i)}
 				{@const placement = placements?.[i]}
 				{@const extraDy = lane?.extraDy ?? 0}

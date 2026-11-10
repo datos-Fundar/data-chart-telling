@@ -20,7 +20,9 @@ import type {
 	TextMarkerConfig,
 	TickMarkerConfig
 } from '$lib/types/markers/common';
-import type { PointLabelConfig } from '$lib/types/markers/labels/point';
+import type { PointLabelConfig, PointSide } from '$lib/types/markers/labels/point';
+import type { MarkerLabelConfig } from '$lib/types/markers/labels/common';
+import { PointLayout } from '$lib/markers/labels/layouts/PointLayout';
 import type { ProcessedRow } from '$lib/types/phases';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { StrokeStyle } from '$lib/types/plots/styling';
@@ -365,12 +367,15 @@ export class ClevelandMarkers {
 		];
 	}
 
-	/** The value labels of the dots `styles.values` picks, placed by where each dot sits in its range. */
+	/**
+	 * The value labels of the dots `styles.values` picks, placed by where each dot sits in its range - or on the
+	 * `side` the author asks of them all, or around each dot's rim (`'path'`).
+	 */
 	#valueLabels<TData extends Record<string, unknown>>(
 		labels: ValueLabels,
 		state: ClevelandPlotState<TData>,
 		env: ClevelandPlotEnv
-	): PointLabelConfig[] {
+	): MarkerLabelConfig[] {
 		if (!state.processedData?.data.length) return [];
 		const { isHorizontal } = ClevelandMarkers.#geometry(state);
 		const { font, format } = labels;
@@ -379,27 +384,36 @@ export class ClevelandMarkers {
 			state.processedData,
 			PlotAxes.valueOf(state) as 'x' | 'y'
 		)[PlotAxes.valueOf(state) as 'x' | 'y'];
-		const gap = labels.offset(isHorizontal ? 'x' : 'y', env.cfg[this.#options.config].labelGap);
+		const gap = labels.offset(env.cfg[this.#options.config].labelGap);
 		const nameOf = (d: ProcessedRow) => String(d[SERIES_KEY]);
 
 		const picked = this.#picked(state);
 		// Along the range past an end, across it between them.
-		const placement: Record<ClevelandRole, Place> = {
-			max: isHorizontal
-				? { dx: gap, dy: 0, textAnchor: 'start', lineAnchor: 'middle' }
-				: { dx: 0, dy: -gap, textAnchor: 'middle', lineAnchor: 'bottom' },
-			min: isHorizontal
-				? { dx: -gap, dy: 0, textAnchor: 'end', lineAnchor: 'middle' }
-				: { dx: 0, dy: gap, textAnchor: 'middle', lineAnchor: 'top' },
-			between: isHorizontal
-				? { dx: 0, dy: -gap, textAnchor: 'middle', lineAnchor: 'bottom' }
-				: { dx: gap, dy: 0, textAnchor: 'start', lineAnchor: 'middle' }
-		};
+		const side = labels.placement.side as PointSide | undefined;
+		const own = side && { ...PointLayout.sideOf(side, gap) };
+		const placement: Record<ClevelandRole, Place> = own
+			? { max: own, min: own, between: own }
+			: {
+					max: isHorizontal
+						? { dx: gap, dy: 0, textAnchor: 'start', lineAnchor: 'middle' }
+						: { dx: 0, dy: -gap, textAnchor: 'middle', lineAnchor: 'bottom' },
+					min: isHorizontal
+						? { dx: -gap, dy: 0, textAnchor: 'end', lineAnchor: 'middle' }
+						: { dx: 0, dy: gap, textAnchor: 'middle', lineAnchor: 'top' },
+					between: isHorizontal
+						? { dx: 0, dy: -gap, textAnchor: 'middle', lineAnchor: 'bottom' }
+						: { dx: gap, dy: 0, textAnchor: 'start', lineAnchor: 'middle' }
+				};
 		const fill =
 			labels.fill ??
 			(labels.color === 'series'
 				? (d: ProcessedRow) => state.colorForSeries!(nameOf(d))
 				: 'currentColor');
+		if (labels.layout === 'path') {
+			const text = (d: ProcessedRow) => format(Number(read(d) ?? valueOf(d)), d, nameOf(d));
+			const rim = labels.label(env, text, { fontSize: 12 });
+			return [{ ...rim, styles: { ...rim.styles, fill: font?.fill ?? fill } } as MarkerLabelConfig];
+		}
 		const { styles: shared, ...hooks } = labels.hooks(env);
 
 		return (['max', 'min', 'between'] as const).flatMap((role): PointLabelConfig[] => {
@@ -421,10 +435,10 @@ export class ClevelandMarkers {
 						...font,
 						fill,
 						fontSize: font?.fontSize ?? 12,
-						dx: font?.dx ?? at.dx,
-						dy: font?.dy ?? at.dy,
-						textAnchor: labels.textAnchor ?? at.textAnchor,
-						lineAnchor: font?.lineAnchor ?? at.lineAnchor
+						dx: at.dx,
+						dy: at.dy,
+						textAnchor: at.textAnchor,
+						lineAnchor: at.lineAnchor
 					}
 				} as PointLabelConfig
 			];
@@ -446,10 +460,10 @@ export class ClevelandMarkers {
 		);
 		if (top.length === 0) return [];
 		if (!state.axes?.isHorizontal) {
-			const at = { y: -labels.offset('y', gap) };
+			const at = { y: -labels.offset(gap) };
 			return [labels.edgeBox('0', { x: 'middle', y: 'before' }, at, ['top'])];
 		}
-		const at = { x: labels.offset('x', gap) };
+		const at = { x: labels.offset(gap) };
 		const texts = new Set(top.map(({ dot }) => labels.format(dot.value, dot.row, dot.series)));
 		return [...texts].map((text) =>
 			labels.edgeBox(text, { x: 'after', y: 'middle' }, at, ['right'])

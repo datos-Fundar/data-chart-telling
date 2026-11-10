@@ -1,3 +1,4 @@
+import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { Transforms } from '$lib/phases/transforms/Transforms';
 import { ValueSelection } from '$lib/phases/transforms/ValueSelection';
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
@@ -165,7 +166,7 @@ export class TransformsPhase<
 	#labelled(state: TState): Pick<TransformsStageState, 'labelled' | 'labelSelects'> {
 		const options = this.#options.labels;
 		const values = state.values;
-		if (!options || !(values?.show ?? options.show)) return {};
+		if (!options || !ValueLabels.shows(values, options.show)) return {};
 		const processed = state.processedData!;
 		const valueAxis = PlotAxes.valueOf(state) as 'x' | 'y';
 		const select = values?.select ?? options.select;

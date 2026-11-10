@@ -1,3 +1,4 @@
+import type { CoveringShape } from '$lib/types/markers/labels/point';
 import type { FontStyle, StrokeStyle, PerRow } from '$lib/types/plots/styling';
 import type { CommonMarkerConfig } from '$lib/types/markers/channels/commonMarkerConfig';
 import type { CommonMarkerConfigWithRowOffset } from '$lib/types/markers/channels/commonMarkerConfigWithRowOffset';
@@ -99,6 +100,12 @@ export type TextMarkerConfig = CommonMarkerConfigWithRowOffset<
 		edgeAware?: boolean;
 		/** The slice of its category band each label sits in (a grouped bar's series); it is drawn off the band's middle, whatever the band's width. */
 		bandSlice?: BandSlice;
+		/**
+		 * The shape each row's point sits in: a label is left out where the shape of a row drawn after its own covers it,
+		 * as a dot drawn over another hides that one's label.
+		 */
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		covers?: (d: any, scales: any) => CoveringShape | undefined;
 		/** How far each row's point sits off its `x`/`y`, in pixels: labels, connectors and lanes start there. */
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		origin?: (d: any, scales: any) => { dx: number; dy: number } | undefined;

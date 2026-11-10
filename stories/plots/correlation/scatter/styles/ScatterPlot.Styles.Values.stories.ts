@@ -85,18 +85,15 @@ export const CustomFontStyle: Story = {
 	}
 };
 
-/** Centered labels - `fontStyle.textAnchor`/`lineAnchor` bypass the default right-of-dot placement to center the text directly on each point instead. */
+/** Centered labels - `side: 'on'` writes each value on its own dot instead of beside it; a label on its point is never moved aside. */
 export const CenteredOnPoint: Story = {
 	args: {
 		r: 12,
 		styles: {
 			values: {
-				show: true,
+				side: 'on',
 				format: (v: number) => v.toFixed(0),
 				fontStyle: {
-					textAnchor: 'middle',
-					lineAnchor: 'middle',
-					dx: 0,
 					fill: '#ffffff',
 					fontSize: 10
 				}

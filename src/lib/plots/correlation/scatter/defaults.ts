@@ -91,6 +91,12 @@ export function buildScatterDefaults<TData extends Record<string, unknown>>(): A
 		},
 		transforms: { groups: 'runs', labels: {} },
 		scales: { fit: fitDomains },
+		styles: {
+			values: {
+				layout: 'point',
+				layouts: { point: { side: 'after', gap: 8 }, path: { side: 'outside' } }
+			}
+		},
 		markers: { marks: buildMarks },
 		hover: {
 			strategy: 'punctual',

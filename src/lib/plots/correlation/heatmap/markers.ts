@@ -27,6 +27,8 @@ const OPACITY_STEPS = 32;
  * `fillOpacity`/`strokeWidth` to be constant per mark instance, unlike
  * `fill`, which stays a per-row accessor.
  */
+type CellLabel = Exclude<CellMarkerConfig['label'], unknown[] | undefined>;
+
 export function buildMarks<TData extends Record<string, unknown>>(
 	state: HeatmapPlotState<TData>,
 	env: HeatmapPlotEnv
@@ -136,9 +138,11 @@ export function buildMarks<TData extends Record<string, unknown>>(
 			inset: 0.5
 		},
 		hover: 'style',
-		// Each cell writes its own value, in the middle of it.
-		label: labels?.shapeLabel(env, (d) => labels.format(Number(getColor(d as TData)), d), {
-			fontWeight: 600
+		// Each cell writes its own value, in the middle of it by default.
+		label: labels?.label<CellLabel>(env, (d) => labels.format(Number(getColor(d as TData)), d), {
+			fill: 'currentColor',
+			fontWeight: 600,
+			labelled: state.labelled
 		})
 	}));
 

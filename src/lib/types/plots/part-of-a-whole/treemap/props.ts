@@ -1,3 +1,5 @@
+import type { WithValues } from '$lib/types/layout/styles';
+import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
 import type { BasePlotProps, PlotCoreProps } from '$lib/types/plots/props';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
@@ -30,7 +32,7 @@ export type TreemapTooltipContext = TreemapRowContext;
 export type TreemapPlotProps<TData extends Record<string, unknown>> = BasePlotProps<
 	NonAxisDataProps<TData, 'value'>,
 	TData,
-	AxisBasedStylesConfig,
+	WithValues<AxisBasedStylesConfig, BoxLabelConfig>,
 	BarSegmentStyle,
 	AxisBasedMarkersConfig,
 	AxisBasedScalesConfig<TData>,
@@ -42,7 +44,7 @@ export type TreemapPlotProps<TData extends Record<string, unknown>> = BasePlotPr
 export type TreemapPlotCoreProps<TData extends Record<string, unknown>> = PlotCoreProps<
 	NonAxisDataProps<TData, 'value'>,
 	TData,
-	AxisBasedStylesConfig,
+	WithValues<AxisBasedStylesConfig, BoxLabelConfig>,
 	BarSegmentStyle,
 	AxisBasedMarkersConfig,
 	AxisBasedScalesConfig<TData>

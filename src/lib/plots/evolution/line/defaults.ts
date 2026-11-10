@@ -28,9 +28,10 @@ export function buildLineDefaults<TData extends Record<string, unknown>>(): Axis
 		transforms: { labels: { select: 'last', skip: ValueLabels.skipGaps } },
 		styles: {
 			values: {
-				anchor: 'start',
+				layout: 'point',
+				layouts: { point: { side: 'after' }, path: { side: 'above', offset: 'end' } },
 				format: (v, number, context) => `${context.series} - ${number(v)}`,
-				reach: (labels, state) => labels.reachAtSeriesEnds(state)
+				reach: (labels, state) => (labels.layout === 'point' ? labels.reachAtSeriesEnds(state) : [])
 			}
 		},
 		markers: { marks: buildMarks },

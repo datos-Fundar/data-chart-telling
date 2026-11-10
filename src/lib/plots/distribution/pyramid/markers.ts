@@ -1,4 +1,3 @@
-import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { resolveAccessor } from '$lib/utils/accessors';
 import { seriesIdOf } from '$lib/utils/grouping';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
@@ -36,6 +35,8 @@ function signFor<TData extends Record<string, unknown>>(
  * `state.markers`. Emits no `role: 'hitArea'` markers - PyramidPlot's hover
  * matches nearest points rather than hit-testing category bands.
  */
+type BarLabel = Exclude<BarMarkerConfig['label'], unknown[] | undefined>;
+
 export function buildMarks<TData extends Record<string, unknown>>(
 	state: PyramidPlotState<TData>,
 	env: PyramidPlotEnv
@@ -46,12 +47,6 @@ export function buildMarks<TData extends Record<string, unknown>>(
 	const valueAxis = PlotAxes.valueOf(state);
 	const isHorizontal = state.axes?.isHorizontal ?? true;
 	const labels = state.valueLabels?.show ? state.valueLabels : undefined;
-	/**
-	 * Where a series' labels sit on its bars, which run out from the shared baseline to its own side: left and right
-	 * of it on a horizontal pyramid, down and up on a vertical one.
-	 */
-	const anchorOf = (side: 'left' | 'right') =>
-		ValueLabels.boxAnchor(labels?.anchor ?? 'outside', { isHorizontal, negative: side === 'left' });
 	/** One bar's own channels: its category, and its span from the baseline to its signed value. */
 	const span = (category: unknown, to: unknown) =>
 		({
@@ -92,14 +87,14 @@ export function buildMarks<TData extends Record<string, unknown>>(
 				data: realData,
 				hover: 'style',
 				...span(processedCategory, signed),
-				// Each bar writes its own magnitude, on its side of the baseline.
+				// Each bar writes its own magnitude; a bar's tip is on its own side of the baseline.
 				...(labels
 					? {
-							label: labels.shapeLabel(
+							label: labels.label<BarLabel>(
 								env,
 								(d) =>
 									labels.format(Math.abs(Number(getMagnitude(d as TData))), d, group.series.name),
-								{ fill: 'currentColor', ...anchorOf(group.series.side) }
+								{ fill: 'currentColor', labelled: state.labelled }
 							)
 						}
 					: {}),

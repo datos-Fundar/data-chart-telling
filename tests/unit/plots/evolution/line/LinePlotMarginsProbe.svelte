@@ -1,7 +1,7 @@
 <script lang="ts">
 	import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 	import type { Series } from '$lib/types/plots/data/common';
-	import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
+	import type { AxisBasedStylesConfig, LineValueLabel, WithValues } from '$lib/types/layout/styles';
 	import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 	import type { MarginConfig } from '$lib/types/plots/props';
 
@@ -22,7 +22,7 @@
 		width: number;
 		height: number;
 		series: Series<Record<string, unknown>>[];
-		styles?: AxisBasedStylesConfig;
+		styles?: WithValues<AxisBasedStylesConfig, LineValueLabel>;
 		scales?: AxisBasedScalesConfig;
 	} = $props();
 

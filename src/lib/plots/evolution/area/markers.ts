@@ -61,6 +61,6 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		})
 	) as unknown as AxisBasedMarkersConfig[];
 
-	const labels = state.valueLabels?.show ? state.valueLabels.atSeriesEnds(state, env) : undefined;
+	const labels = state.valueLabels?.show ? state.valueLabels.forSeries(state, env) : undefined;
 	return ValueLabels.onMarkers(areas, 'area', labels);
 }

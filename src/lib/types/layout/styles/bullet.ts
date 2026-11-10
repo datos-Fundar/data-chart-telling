@@ -1,8 +1,12 @@
+import type { WithValues, BarValueLabel } from '$lib/types/layout/styles/values';
 import type { GapsAwarePlotStylesConfig } from '$lib/types/layout/styles/gaps';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 
 /** `BulletPlot`'s `styles`: a bar plot's, with the look of its ranges and its target. Each field falls back to `bullet` in the configuration. */
-export type BulletStylesConfig = GapsAwarePlotStylesConfig<BarSegmentStyle> & {
+export type BulletStylesConfig = WithValues<
+	GapsAwarePlotStylesConfig<BarSegmentStyle>,
+	BarValueLabel
+> & {
 	/** The bar that shows the value. */
 	bar?: {
 		/** Its thickness across the category band, in px. */

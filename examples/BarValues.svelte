@@ -10,5 +10,5 @@
 	data={REGION_VALUES.filter((row) => row.date === MONTHS.at(-1))}
 	x="region"
 	y="value"
-	styles={{ values: { show: true, anchor: 'outside' } }}
+	styles={{ values: { show: true } }}
 />

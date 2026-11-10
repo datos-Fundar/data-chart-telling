@@ -21,8 +21,9 @@ const ROW_KEYS: Record<string, Read> = {
 const ROW_STYLE_KEYS = ['fill', 'fillOpacity', 'stroke', 'strokeWidth', 'fontWeight', 'fontStyle'];
 
 /** Functions of the row each row calls its own label's: handlers, and where its point sits. */
+const ROW_FUNCTIONS = ['origin', 'covers'];
 const dispatched = (key: string) =>
-	key === 'origin' || (key.startsWith('on') && key !== 'onoverflow');
+	ROW_FUNCTIONS.includes(key) || (key.startsWith('on') && key !== 'onoverflow');
 
 const read = (value: unknown, row: Row, as: Read): unknown => {
 	if (typeof value === 'function') return (value as (row: Row) => unknown)(row);
@@ -82,10 +83,9 @@ export class LabelMerge {
 			if (own.every((fn) => fn === own[0])) continue;
 			const call = (row: Row, args: unknown[]) =>
 				(sourceOf(row)[key] as ((...args: unknown[]) => unknown) | undefined)?.(...args);
-			merged[key] =
-				key === 'origin'
-					? (row: Row, scales: unknown) => call(row, [row, scales])
-					: (event: Event, row: Row, index: number) => call(row, [event, row, index]);
+			merged[key] = ROW_FUNCTIONS.includes(key)
+				? (row: Row, scales: unknown) => call(row, [row, scales])
+				: (event: Event, row: Row, index: number) => call(row, [event, row, index]);
 		}
 		return merged as unknown as TextMarkerConfig;
 	}

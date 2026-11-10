@@ -1,4 +1,5 @@
 import { line } from 'd3-shape';
+import { DotRadius } from '$lib/markers/dot/DotRadius';
 import { maybeCurve } from 'svelteplot/helpers/curves.js';
 import type { BoxScales } from '$lib/types/markers/labels/box';
 import type { CurveName } from '$lib/types/layout/styles/curve';
@@ -64,7 +65,7 @@ export class CurveGeometry {
 			const [x, y] = [read(marker.x), read(marker.y)];
 			return rows.flatMap((row) => {
 				const [cx, cy] = [at('x', x(row)), at('y', y(row))];
-				const r = CurveGeometry.#radius(marker, row, scales, plot.dotRadius ?? 5);
+				const r = DotRadius.of(marker, row, scales, plot.dotRadius ?? 5);
 				if (cx === undefined || cy === undefined) return [];
 				// From its left, clockwise: over the top, the side text reads upright on.
 				const d = `M${cx - r},${cy}A${r},${r} 0 1 1 ${cx + r},${cy}A${r},${r} 0 1 1 ${cx - r},${cy}`;
@@ -177,17 +178,5 @@ export class CurveGeometry {
 			| string
 			| undefined;
 		return () => own;
-	}
-
-	/** A dot's radius in pixels: its `r` channel through the plot's `r` scale, else its own size. */
-	static #radius(marker: CurvedMarker, row: unknown, scales: BoxScales, fallback: number): number {
-		const { r } = marker;
-		if (typeof r === 'number') return r;
-		if (r !== undefined && scales.r) {
-			const value = Number(scales.r.fn(read(r)(row)));
-			if (Number.isFinite(value)) return value;
-		}
-		const own = marker.styles?.dotRadius;
-		return typeof own === 'number' ? own : fallback;
 	}
 }

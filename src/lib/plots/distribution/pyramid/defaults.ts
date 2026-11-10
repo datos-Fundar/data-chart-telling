@@ -59,14 +59,21 @@ export function buildPyramidDefaults<TData extends Record<string, unknown>>(): A
 				value: { tickFormat: (v: unknown) => String(Math.abs(Number(v))) }
 			})
 		},
+		transforms: { labels: {} },
 		styles: {
 			values: {
+				layout: 'path',
+				layouts: {
+					path: { edge: 'tip', side: 'outside' },
+					box: { anchor: 'middle' },
+					point: { anchor: 'top', side: 'above' }
+				},
 				// A label past its bar's end reaches out on its own side, the longest bar's to the edge.
 				reach: (labels, state) => {
-					if (labels.anchor !== 'outside') return [];
+					if (!labels.pastTip) return [];
 					const axis = PlotAxes.valueOf(state);
 					const isHorizontal = state.axes?.isHorizontal ?? true;
-					const offset = labels.offset(axis);
+					const offset = labels.offset();
 					return labels.extremes(state.resolvedSeries ?? [], axis).map(({ series, value }) => {
 						const left = series.side === 'left';
 						const text = labels.format(Math.abs(value), undefined, series.name);

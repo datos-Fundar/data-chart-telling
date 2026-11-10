@@ -1,7 +1,12 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
-import type { ValueAnchor } from '$lib/types/plots/constants';
+import type { BarValueLabel, ValueLayoutOf } from '$lib/types/layout/styles';
+import type { LabelAnchor } from '$lib/types/plots/constants';
+
+type Placement = ValueLayoutOf<BarValueLabel>;
+const box = (anchor: LabelAnchor): Placement => ({ layout: 'box', anchor });
+const inside = (edge: 'tip' | 'base'): Placement => ({ layout: 'path', edge, side: 'inside' });
 import { waitForSvg } from '../../../_helpers/svg';
 
 const DATA = [
@@ -16,17 +21,16 @@ const boxOf = (el: Element): Box => {
 };
 
 /** The bar and the label of the bar below zero and of the one above it, in the page's own pixels. */
-async function layout(horizontal: boolean, anchor: ValueAnchor, fontStyle?: object) {
+async function layout(horizontal: boolean, placement: Placement) {
 	const { container } = await render(BarPlot, {
 		width: 400,
 		height: 300,
 		data: DATA,
 		...(horizontal ? { x: 'value', y: 'cat' } : { x: 'cat', y: 'value' }),
-		styles: { values: { show: true, anchor, ...(fontStyle ? { fontStyle } : {}) } }
+		styles: { values: { show: true, ...placement } }
 	});
 	const svg = await waitForSvg(container);
-	// The bars as the page lays them out by category, whatever order their markers draw them in: a label that follows the
-	// sign of its value is a marker of its own for the bars above zero and the ones below it.
+	// The bars as the page lays them out by category, whatever order their markers draw them in.
 	const bars = Array.from(svg.querySelectorAll('g.bar-x rect, g.bar-y rect')).sort((a, b) =>
 		horizontal
 			? a.getBoundingClientRect().top - b.getBoundingClientRect().top
@@ -55,8 +59,8 @@ describe.each([
 		return (centre(inner, axis) - from) / (to - from);
 	};
 
-	test("'outside' puts each label beyond its bar's tip, the one below zero on the other side", async () => {
-		const { down, up } = await layout(horizontal, 'outside');
+	test("by default each label is beyond its bar's tip, the one below zero on the other side", async () => {
+		const { down, up } = await layout(horizontal, {});
 		if (horizontal) {
 			expect(down.label.right).toBeLessThanOrEqual(down.bar.left + 1);
 			expect(up.label.left).toBeGreaterThanOrEqual(up.bar.right - 1);
@@ -68,8 +72,8 @@ describe.each([
 
 	/** The ends of the bar as the page draws them: its left and right on a horizontal one, its top and bottom on a vertical one. */
 	const [first, last] = (horizontal ? ['left', 'right'] : ['top', 'bottom']) as [
-		ValueAnchor,
-		ValueAnchor
+		LabelAnchor,
+		LabelAnchor
 	];
 
 	test(
@@ -77,13 +81,13 @@ describe.each([
 			first +
 			"' and '" +
 			last +
-			"' put each label inside its bar, at that end, whatever the sign",
+			"' boxes put each label inside its bar, at that end, whatever the sign",
 		async () => {
 			for (const [anchor, inFirstHalf] of [
 				[first, true],
 				[last, false]
 			] as const) {
-				const { down, up } = await layout(horizontal, anchor);
+				const { down, up } = await layout(horizontal, box(anchor));
 				for (const { bar, label } of [down, up]) {
 					expect(at(label, bar) < 0.5).toBe(inFirstHalf);
 					expect(at(label, bar)).toBeGreaterThan(0);
@@ -93,36 +97,28 @@ describe.each([
 		}
 	);
 
-	test("'tip' puts each label at the end of its bar away from zero, and 'base' at the end on zero", async () => {
+	test("a path inside the 'tip' puts each label at the end of its bar away from zero, the 'base' at the end on zero", async () => {
 		// The bar above zero runs to the right (up), the one below it to the left (down).
 		const upIsLast = horizontal;
-		const tip = await layout(horizontal, 'tip');
+		const tip = await layout(horizontal, inside('tip'));
 		expect(at(tip.up.label, tip.up.bar) > 0.5).toBe(upIsLast);
 		expect(at(tip.down.label, tip.down.bar) > 0.5).toBe(!upIsLast);
-		const base = await layout(horizontal, 'base');
+		const base = await layout(horizontal, inside('base'));
 		expect(at(base.up.label, base.up.bar) > 0.5).toBe(!upIsLast);
 		expect(at(base.down.label, base.down.bar) > 0.5).toBe(upIsLast);
 	});
 
-	test("'middle' centres each label on its bar", async () => {
-		const { down, up } = await layout(horizontal, 'middle');
+	test('a box label is in the middle of its bar', async () => {
+		const { down, up } = await layout(horizontal, { layout: 'box' });
 		for (const { bar, label } of [down, up]) {
 			expect(Math.abs(centre(label, axis) - centre(bar, axis))).toBeLessThan(3);
 		}
 	});
 });
 
-describe('BarPlot - values textAnchor', () => {
-	test("the author's own textAnchor stays for the bar below zero too", async () => {
-		const { down, up } = await layout(true, 'outside', { textAnchor: 'middle' });
-		expect(down.el.style.textAnchor).toBe('middle');
-		expect(up.el.style.textAnchor).toBe('middle');
-	});
-});
-
 describe('BarPlot - values in the corner of a bar', () => {
-	test("'top-left' puts each label inside its bar, in its top left corner", async () => {
-		const { down, up } = await layout(false, 'top-left');
+	test("a box label at 'top-left' is inside its bar, in its top left corner", async () => {
+		const { down, up } = await layout(false, box('top-left'));
 		for (const { bar, label } of [down, up]) {
 			expect(label.left).toBeGreaterThanOrEqual(bar.left);
 			expect(label.left - bar.left).toBeLessThan((bar.right - bar.left) / 2);

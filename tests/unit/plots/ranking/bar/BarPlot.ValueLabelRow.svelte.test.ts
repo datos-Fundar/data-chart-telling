@@ -28,7 +28,7 @@ describe('BarPlot - the row a value label is written from', () => {
 			styles: {
 				values: {
 					show: true,
-					anchor: 'middle',
+					layout: 'box',
 					format: (
 						value: number,
 						_number: unknown,
@@ -56,7 +56,7 @@ describe('BarPlot - the row a value label is written from', () => {
 			styles: {
 				values: {
 					show: true,
-					anchor: 'middle',
+					layout: 'box',
 					format: (value: number, _number: unknown, context: PlotRowContext) =>
 						context.row?.bar === 'Q1' && context.row?.group === 'housing' ? `${value} %` : ''
 				}

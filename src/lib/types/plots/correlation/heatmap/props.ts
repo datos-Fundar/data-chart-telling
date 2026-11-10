@@ -1,3 +1,4 @@
+import type { WithValues, CellValueLabel } from '$lib/types/layout/styles';
 import type { BasePlotProps, PlotCoreProps } from '$lib/types/plots/props';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
@@ -9,7 +10,7 @@ import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
 export type HeatmapPlotProps<TData extends Record<string, unknown>> = BasePlotProps<
 	SeriesProps<TData> | DualAxisDataProps<TData>,
 	TData,
-	AxisBasedStylesConfig,
+	WithValues<AxisBasedStylesConfig, CellValueLabel>,
 	CellSegmentStyle,
 	AxisBasedMarkersConfig,
 	AxisBasedScalesConfig<TData>
@@ -19,7 +20,7 @@ export type HeatmapPlotProps<TData extends Record<string, unknown>> = BasePlotPr
 export type HeatmapPlotCoreProps<TData extends Record<string, unknown>> = PlotCoreProps<
 	SeriesProps<TData> | DualAxisDataProps<TData>,
 	TData,
-	AxisBasedStylesConfig,
+	WithValues<AxisBasedStylesConfig, CellValueLabel>,
 	CellSegmentStyle,
 	AxisBasedMarkersConfig,
 	AxisBasedScalesConfig<TData>

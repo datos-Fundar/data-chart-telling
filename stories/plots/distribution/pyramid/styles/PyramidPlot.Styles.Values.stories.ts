@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
-import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
+import type { AxisBasedStylesConfig, BarValueLabel, WithValues } from '$lib/types/layout/styles';
 import { AGE_GROUPS, POPULATION_BY_AGE } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -71,8 +71,9 @@ export const CustomValueFormat: Story = {
 };
 
 /**
- * Value labels anchored inside - `anchor: 'base'` writes each value inside its bar, at the baseline;
- * `'tip'` would write it inside the end, and `'outside'` (the default) beyond it. Useful for dense pyramids.
+ * Value labels inside their bars - `layout: 'path'` along each bar's `base`, `side: 'inside'`, writes each value at
+ * the baseline; `edge: 'tip'` would write it at the bar's end, and `side: 'outside'` there (the default) beyond it.
+ * Useful for dense pyramids.
  */
 export const LabelsInside: Story = {
 	args: {
@@ -83,18 +84,18 @@ export const LabelsInside: Story = {
 		scales: { y: { domain: AGE_GROUPS } },
 		styles: {
 			values: {
-				show: true,
-				anchor: 'base',
+				layout: 'path',
+				edge: 'base',
+				side: 'inside',
 				format: (v: number) => `${v.toFixed(1)}%`,
 				fontStyle: { fill: '#ffffff', fontWeight: 'bold' }
 			}
-		} satisfies AxisBasedStylesConfig
+		} satisfies WithValues<AxisBasedStylesConfig, BarValueLabel>
 	}
 };
 
 /**
- * Labels with custom offset - uses `dy` to nudge labels vertically away from
- * the bars for better readability.
+ * Labels with a custom gap - `gap` sets how far past each bar's tip its label sits.
  */
 export const LabelsWithOffset: Story = {
 	args: {
@@ -110,7 +111,7 @@ export const LabelsWithOffset: Story = {
 			values: {
 				show: true,
 				format: (v: number) => `${v.toFixed(1)}%`,
-				fontStyle: { dy: 8 }
+				gap: 12
 			}
 		} satisfies AxisBasedStylesConfig
 	}

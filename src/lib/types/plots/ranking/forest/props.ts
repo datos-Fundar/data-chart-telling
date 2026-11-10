@@ -1,3 +1,4 @@
+import type { WithValues, DotValueLabel } from '$lib/types/layout/styles';
 import type { BasePlotProps, PlotCoreProps } from '$lib/types/plots/props';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
@@ -23,7 +24,7 @@ export type ForestIntervalProps<TData extends Record<string, unknown>> = {
 export type ForestPlotProps<TData extends Record<string, unknown>> = BasePlotProps<
 	SeriesProps<TData> | DualAxisDataProps<TData>,
 	TData,
-	ConnectorBasedStylesConfig,
+	WithValues<ConnectorBasedStylesConfig, DotValueLabel>,
 	LineSegmentStyle,
 	AxisBasedMarkersConfig,
 	AxisBasedScalesConfig<TData>
@@ -34,7 +35,7 @@ export type ForestPlotProps<TData extends Record<string, unknown>> = BasePlotPro
 export type ForestPlotCoreProps<TData extends Record<string, unknown>> = PlotCoreProps<
 	SeriesProps<TData> | DualAxisDataProps<TData>,
 	TData,
-	ConnectorBasedStylesConfig,
+	WithValues<ConnectorBasedStylesConfig, DotValueLabel>,
 	LineSegmentStyle,
 	AxisBasedMarkersConfig,
 	AxisBasedScalesConfig<TData>

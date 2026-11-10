@@ -71,8 +71,8 @@ export const Default: Story = {
  * Value labels enabled with default settings, `styles.values.show: true`
  * renders the numeric Y value at the **last** data point of each series.
  *
- * The default format is `"${seriesName} - ${value}"` and the default anchor
- * is `'start'`, which places the text to the right of the endpoint.
+ * The default format is `"${seriesName} - ${value}"` and the default `side`
+ * is `'after'`, which places the text to the right of the endpoint.
  */
 export const ShowValues: Story = {
 	args: {
@@ -118,7 +118,7 @@ export const CustomFormat: Story = {
 /**
  * Two series with default end-point labels, each series gets its own label
  * at its last data point, filled with the palette colour for that series.
- * The default `anchor: 'start'` places both labels to the right of their
+ * The default `side: 'after'` places both labels to the right of their
  * respective endpoints.
  */
 export const TwoSeriesWithLabels: Story = {
@@ -148,11 +148,11 @@ export const TwoSeriesWithLabels: Story = {
 };
 
 /**
- * Anchor `'start'` (explicit), text appears to the right of the last data
- * point, aligned with the series line. This is the default when `anchor` is
+ * `side: 'after'` (explicit), text appears to the right of the last data
+ * point, aligned with the series line. This is the default when `side` is
  * omitted.
  */
-export const AnchorStart: Story = {
+export const SideAfter: Story = {
 	args: {
 		series: [
 			{
@@ -165,7 +165,7 @@ export const AnchorStart: Story = {
 		styles: {
 			values: {
 				show: true,
-				anchor: 'start',
+				side: 'after',
 				format: (v: number) => `${v.toFixed(1)} yr`
 			}
 		} satisfies AxisBasedStylesConfig
@@ -173,11 +173,11 @@ export const AnchorStart: Story = {
 };
 
 /**
- * Anchor `'outside'`, the label appears **above** the last data point,
+ * `side: 'above'`, the label appears **above** the last data point,
  * centered on it. Useful when the label would otherwise overlap the line or
  * clip outside the right edge of the plot.
  */
-export const AnchorOutside: Story = {
+export const SideAbove: Story = {
 	args: {
 		series: [
 			{
@@ -190,7 +190,7 @@ export const AnchorOutside: Story = {
 		styles: {
 			values: {
 				show: true,
-				anchor: 'outside',
+				side: 'above',
 				format: (v: number) => `${v.toFixed(1)} yr`
 			}
 		} satisfies AxisBasedStylesConfig
@@ -198,7 +198,7 @@ export const AnchorOutside: Story = {
 };
 
 /**
- * Two series with `anchor: 'outside'` labels, both labels appear above
+ * Two series with `side: 'above'` labels, both labels appear above
  * their respective last points. Because both series share the same last
  * x value (2020), the labels are stacked vertically, separated naturally
  * by the difference in y values (~5 years here).
@@ -222,7 +222,7 @@ export const TwoSeriesLabelsOutside: Story = {
 		styles: {
 			values: {
 				show: true,
-				anchor: 'outside',
+				side: 'above',
 				format: (v: number, _number: unknown, context: PlotRowContext) =>
 					`${context.series}: ${v.toFixed(1)} yr`
 			}
@@ -231,14 +231,10 @@ export const TwoSeriesLabelsOutside: Story = {
 };
 
 /**
- * Custom offsets, `dx` and `dy` fine-tune the label position in pixels,
- * overriding the defaults computed from `anchor`. Useful for nudging a label
- * away from a marker or another series.
- *
- * Here `anchor: 'outside'` is combined with a larger `dy` to push the label
+ * A custom gap - `gap` sets how far from its point the label sits, here
  * further above the endpoint.
  */
-export const CustomOffsets: Story = {
+export const CustomGap: Story = {
 	args: {
 		series: [
 			{
@@ -251,20 +247,20 @@ export const CustomOffsets: Story = {
 		styles: {
 			values: {
 				show: true,
-				anchor: 'outside',
-				format: (v: number) => `${v.toFixed(1)} yr`,
-				fontStyle: { dy: -10 }
+				side: 'above',
+				gap: 18,
+				format: (v: number) => `${v.toFixed(1)} yr`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
 };
 
 /**
- * Anchor `'middle'`, the label is centered directly on the last data point
+ * `side: 'on'`, the label is centered directly on the last data point
  * with no offset. Works best when there are no dots at the endpoint, or
  * combined with `dy` to shift the text slightly.
  */
-export const AnchorMiddle: Story = {
+export const SideOn: Story = {
 	args: {
 		series: [
 			{
@@ -277,19 +273,18 @@ export const AnchorMiddle: Story = {
 		styles: {
 			values: {
 				show: true,
-				anchor: 'middle',
-				format: (v: number) => `${v.toFixed(1)} yr`,
-				fontStyle: { dy: 18 }
+				side: 'on',
+				format: (v: number) => `${v.toFixed(1)} yr`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
 };
 
 /**
- * Anchor `'end'` - text appears to the **left** of the last data point,
- * toward the chart's zero side. Mirror image of the default `'start'`.
+ * `side: 'before'` - text appears to the **left** of the last data point.
+ * Mirror image of the default `'after'`.
  */
-export const AnchorEnd: Story = {
+export const SideBefore: Story = {
 	args: {
 		series: [
 			{
@@ -302,42 +297,36 @@ export const AnchorEnd: Story = {
 		styles: {
 			values: {
 				show: true,
-				anchor: 'end',
-				format: (v: number) => `${v.toFixed(1)} yr`,
-				fontStyle: { dy: -18 }
+				side: 'before',
+				format: (v: number) => `${v.toFixed(1)} yr`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
 };
 
 /**
- * Custom text anchor and line anchor, bypasses the `anchor` shorthand and
- * sets svelteplot's low-level `textAnchor` / `lineAnchor` directly. The label
- * is right-aligned (`textAnchor: 'end'`) and sits above the point
- * (`lineAnchor: 'bottom'`), with a nudge via `dy`.
+ * `layout: 'path'` writes each series' name along its own line instead, curving with it, near its end
+ * (`offset: 'end'`, the line plot's default). `side` puts it `'above'` (the default), `'below'` or `'on'` the line;
+ * `offset` moves it along the line, from its left end.
  */
-export const LowLevelTextPlacement: Story = {
+export const AlongTheLine: Story = {
 	args: {
 		series: [
-			{
-				name: 'female',
-				x: 'year',
-				y: 'value',
-				data: FEMALE_LIFE
-			}
+			{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE },
+			{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE }
 		],
-		styles: {
-			values: {
-				show: true,
-				format: (v: number) => `${v.toFixed(1)} yr`,
-				fontStyle: {
-					textAnchor: 'end',
-					lineAnchor: 'bottom',
-					dy: -10,
-					dx: 0
-				}
-			}
-		} satisfies AxisBasedStylesConfig
+		styles: { values: { layout: 'path' } }
+	}
+};
+
+/** On the line, `side: 'on'` writes the name over a halo of the background, the line passing behind it. */
+export const AlongTheLineOnIt: Story = {
+	args: {
+		series: [
+			{ name: 'female', x: 'year', y: 'value', data: FEMALE_LIFE },
+			{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE }
+		],
+		styles: { values: { layout: 'path', side: 'on', offset: '60%' } }
 	}
 };
 
@@ -597,7 +586,7 @@ export const Peak: Story = {
 			{ name: 'male', x: 'year', y: 'value', data: MALE_LIFE }
 		],
 		styles: {
-			values: { show: true, select: 'max', anchor: 'outside' }
+			values: { select: 'max', side: 'above' }
 		} satisfies AxisBasedStylesConfig
 	}
 };

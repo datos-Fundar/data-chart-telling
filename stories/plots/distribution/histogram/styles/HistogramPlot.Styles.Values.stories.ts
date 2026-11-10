@@ -4,8 +4,8 @@ import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import { HEIGHTS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
-// `styles.values` labels every non-empty bin with its count. `anchor` places
-// the label along its bar, the same way a bar plot's does.
+// `styles.values` labels every non-empty bin with its count. `layout` and its
+// options place the label on its bar, the same way a bar plot's do.
 
 const meta = {
 	title: 'Plots/Distribution/HistogramPlot/Styles/Values',
@@ -32,36 +32,36 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** `values.show: true` labels each bin with its count, just above its bar (`anchor: 'outside'`, the default). */
+/** `values.show: true` labels each bin with its count, just above its bar (the default: `layout: 'path'` beyond its top edge). */
 export const ShowValues: Story = {
 	args: {
 		styles: { values: { show: true } } satisfies AxisBasedStylesConfig
 	}
 };
 
-/** `anchor: 'top'` puts each count just inside the top of its bar, here in white to read against it. */
-export const AnchorTop: Story = {
+/** `layout: 'box'` with `anchor: 'top'` puts each count just inside the top of its bar, here in white to read against it. */
+export const BoxTop: Story = {
 	args: {
 		styles: {
-			values: { show: true, anchor: 'top', fontStyle: { fill: 'white', fontWeight: 'bold' } }
+			values: { layout: 'box', anchor: 'top', fontStyle: { fill: 'white', fontWeight: 'bold' } }
 		} satisfies AxisBasedStylesConfig
 	}
 };
 
-/** `anchor: 'middle'` centres each count on its bar. */
-export const AnchorMiddle: Story = {
+/** `layout: 'box'` centres each count on its bar. */
+export const BoxMiddle: Story = {
 	args: {
 		styles: {
-			values: { show: true, anchor: 'middle', fontStyle: { fill: 'white' } }
+			values: { layout: 'box', fontStyle: { fill: 'white' } }
 		} satisfies AxisBasedStylesConfig
 	}
 };
 
-/** `anchor: 'bottom'` puts each count at the base of its bar. */
-export const AnchorBottom: Story = {
+/** `layout: 'box'` with `anchor: 'bottom'` puts each count at the base of its bar. */
+export const BoxBottom: Story = {
 	args: {
 		styles: {
-			values: { show: true, anchor: 'bottom', fontStyle: { fill: 'white' } }
+			values: { layout: 'box', anchor: 'bottom', fontStyle: { fill: 'white' } }
 		} satisfies AxisBasedStylesConfig
 	}
 };
@@ -81,7 +81,7 @@ export const GroupedStacked: Story = {
 		grouping: 'group',
 		transforms: [{ type: 'stackY' }],
 		styles: {
-			values: { show: true, anchor: 'middle', fontStyle: { fill: 'white', fontSize: 10 } }
+			values: { layout: 'box', fontStyle: { fill: 'white', fontSize: 10 } }
 		} satisfies AxisBasedStylesConfig
 	}
 };
@@ -93,8 +93,7 @@ export const HoverIsolate: Story = {
 		transforms: [{ type: 'stackY' }],
 		styles: {
 			values: {
-				show: true,
-				anchor: 'middle',
+				layout: 'box',
 				hoverIsolate: true,
 				fontStyle: { fill: 'white', fontSize: 10 }
 			}

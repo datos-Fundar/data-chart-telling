@@ -76,7 +76,13 @@ export function buildClevelandDefaults<TData extends Record<string, unknown>>(
 		},
 		// A dot is labelled by what its category's dots say: the first, the highest... of each.
 		transforms: { labels: { group: 'category', skip: ClevelandRanges.skipGaps } },
-		styles: { values: { reach: markers.reach } },
+		styles: {
+			values: {
+				layout: 'point',
+				layouts: { path: { side: 'outside' } },
+				reach: (labels, state) => (labels.layout === 'point' ? markers.reach(labels, state) : [])
+			}
+		},
 		markers: { marks: markers.marks },
 		// A rule along the value axis at the hovered dot, and a dot and a label on each one of its category.
 		hover: { marker: (state) => HoverDefaults.valueRule(PlotAxes.valueOf(state)) }

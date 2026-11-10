@@ -68,15 +68,26 @@ export function buildBarDefaults<TData extends Record<string, unknown>>(): AxisP
 			}),
 			fit: (state) => fitValueDomain(state)
 		},
+		transforms: { labels: {} },
 		styles: {
 			values: {
+				layout: (state) =>
+					ProcessedPositions.span(state.processedData!, PlotAxes.valueOf(state) as 'x' | 'y')
+						.stacked
+						? 'box'
+						: 'path',
+				layouts: {
+					path: { edge: 'tip', side: 'outside' },
+					box: { anchor: 'middle' },
+					point: { anchor: 'top', side: 'above' }
+				},
 				// An `'outside'` label sits past its bar's end, which the tallest bar takes to the edge.
 				reach: (labels, state) => {
-					if (labels.anchor !== 'outside') return [];
+					if (!labels.pastTip) return [];
 					const axis = PlotAxes.valueOf(state) as 'x' | 'y';
 					if (ProcessedPositions.span(state.processedData!, axis).stacked) return [];
 					if (!state.axes?.isHorizontal) {
-						const offset = labels.offset('y');
+						const offset = labels.offset();
 						const boxes = [
 							labels.edgeBox('0', { x: 'middle', y: 'before' }, { y: -offset }, ['top'])
 						];
@@ -91,7 +102,7 @@ export function buildBarDefaults<TData extends Record<string, unknown>>(): AxisP
 						return boxes;
 					}
 					// A bar below zero reaches out to the left, with its label turned that way.
-					const offset = labels.offset('x');
+					const offset = labels.offset();
 					return labels
 						.extremes(state.resolvedSeries ?? [], PlotAxes.valueOf(state), 'both')
 						.map(({ series, value }) =>

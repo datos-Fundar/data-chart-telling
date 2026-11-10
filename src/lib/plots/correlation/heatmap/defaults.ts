@@ -107,7 +107,14 @@ export function buildHeatmapDefaults<TData extends Record<string, unknown>>(): A
 			defaults: () => ({ x: { labelAnchor: 'right' } }),
 			extend: extendWithColorScales
 		},
-		styles: { values: { show: true } },
+		transforms: { labels: { show: true } },
+		styles: {
+			values: {
+				show: true,
+				layout: 'box',
+				layouts: { path: { edge: 'top', side: 'inside' }, point: { anchor: 'top', side: 'above' } }
+			}
+		},
 		markers: { marks: buildMarks },
 		hover: {
 			// A cell writes its own value: the hover only restyles the cells - the hovered one outlined.
