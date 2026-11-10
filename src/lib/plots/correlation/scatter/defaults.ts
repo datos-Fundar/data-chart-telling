@@ -1,6 +1,6 @@
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { HoverDefaults } from '$lib/layout/hover/HoverDefaults';
-import { buildMarks, buildValueLabels } from '$lib/plots/correlation/scatter/markers';
+import { buildMarks } from '$lib/plots/correlation/scatter/markers';
 import { Margins } from '$lib/layout/margins/Margins';
 import { MarkerAxisValues } from '$lib/phases/scales/MarkerAxisValues';
 import type { AxisFit, AxisPlotDefaults } from '$lib/types/phases';
@@ -89,9 +89,9 @@ export function buildScatterDefaults<TData extends Record<string, unknown>>(): A
 				base: { flat: 'dot' }
 			}
 		},
-		transforms: { groups: 'runs' },
+		transforms: { groups: 'runs', labels: {} },
 		scales: { fit: fitDomains },
-		markers: { marks: buildMarks, valueLabels: buildValueLabels },
+		markers: { marks: buildMarks },
 		hover: {
 			strategy: 'punctual',
 			// A crosshair through the hovered point, and its label - the point is a dot already.

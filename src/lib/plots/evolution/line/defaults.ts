@@ -33,10 +33,7 @@ export function buildLineDefaults<TData extends Record<string, unknown>>(): Axis
 				reach: (labels, state) => labels.reachAtSeriesEnds(state)
 			}
 		},
-		markers: {
-			marks: buildMarks,
-			valueLabels: (labels, state) => labels.atSeriesEnds(state)
-		},
+		markers: { marks: buildMarks },
 		timeline: { filterMode: 'upTo', interpolation: { value: 'y', key: ['grouping'] } }
 	};
 }

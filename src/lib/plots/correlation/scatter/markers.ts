@@ -1,37 +1,36 @@
-import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 
 import type { ScatterPlotState, ScatterPlotEnv } from '$lib/types/plots/correlation/scatter/state';
-import type { DotMarkerConfig, TextMarkerConfig } from '$lib/types/markers/common';
+import type { DotMarkerConfig } from '$lib/types/markers/common';
+import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { ProcessedRow } from '$lib/types/phases';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 /**
- * ScatterPlot's `styles.values` as one `'text'` marker over the same
- * processed rows its dots draw, each labelled with its own `y` value. A label
- * sits beside its point and flips to the other side where its text would
- * cross the plot's edge (`edgeAware`).
+ * ScatterPlot's `styles.values` as `'point'` labels of its dots: each labelled row with its own value, on a free
+ * spot around its point (`declutter: 'around'`) - a label with none is left out.
  */
-export function buildValueLabels<TData extends Record<string, unknown>>(
+function buildValueLabels<TData extends Record<string, unknown>>(
 	labels: ValueLabels,
-	state: ScatterPlotState<TData>
-): TextMarkerConfig[] {
-	const { processedData } = state;
-	if (!processedData?.data.length) return [];
+	state: ScatterPlotState<TData>,
+	env: ScatterPlotEnv
+): PointLabelConfig[] {
+	const rows = new Set(state.labelled ?? []);
+	if (rows.size === 0) return [];
 	const { font, format } = labels;
-	const position = ProcessedPositions.of(processedData);
 	const nameOf = (d: ProcessedRow) => String(d[SERIES_KEY]);
 	const valueOf = ValueLabels.valueOf(state);
+	const { styles: shared, ...hooks } = labels.hooks(env);
 	return [
 		{
-			type: 'text',
-			data: processedData.data,
-			x: position.x as TextMarkerConfig['x'],
-			y: position.y as TextMarkerConfig['y'],
+			...hooks,
+			layout: 'point',
+			select: (row: ProcessedRow) => rows.has(row),
 			text: (d: ProcessedRow) => format(Number(valueOf(d)), d, nameOf(d)),
 			styles: {
+				...shared,
 				...font,
 				fill: font?.fill ?? 'currentColor',
 				fontSize: font?.fontSize ?? 11,
@@ -41,7 +40,7 @@ export function buildValueLabels<TData extends Record<string, unknown>>(
 				textAnchor: labels.textAnchor ?? 'start',
 				lineAnchor: font?.lineAnchor ?? 'middle'
 			},
-			edgeAware: true
+			declutter: 'around'
 		}
 	];
 }
@@ -145,5 +144,8 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		}
 	});
 
-	return markers;
+	const labels = state.valueLabels?.show
+		? buildValueLabels(state.valueLabels, state, env)
+		: undefined;
+	return ValueLabels.onMarkers(markers, 'dot', labels);
 }

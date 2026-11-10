@@ -1,11 +1,12 @@
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { buildLineMarkers } from '$lib/plots/evolution/line/markers';
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
-import type { ValueLabels } from '$lib/layout/styles/ValueLabels';
+import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import type { ValueAnchor } from '$lib/types/plots/constants';
 import type { EdgeBox } from '$lib/types/layout/box';
 import type { CurveAwarePlotStylesConfig } from '$lib/types/layout/styles';
-import type { AxisBasedMarkersConfig, TextMarkerConfig } from '$lib/types/markers/common';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
+import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { SlopePlotState, SlopePlotEnv } from '$lib/types/plots/evolution/slope/state';
 
 /** The anchor of the labels at the plot's start: the mirror of the end's, so `'start'` always reads outward. */
@@ -36,13 +37,17 @@ export function buildMarks<TData extends Record<string, unknown>>(
 			}
 		}))
 	}));
-	return buildLineMarkers({
+	const lines = buildLineMarkers({
 		groupedSeries: groups,
 		colorFor: state.colorForSeries!,
 		disabledStrokeFor: (name) => env.interaction?.strokeFor(name),
 		disabledDotsFor: (name) => env.interaction?.dotsFor(name),
 		curve: (state.styles as CurveAwarePlotStylesConfig | undefined)?.curve
 	});
+	const labels = state.valueLabels?.show
+		? buildValueLabels(state.valueLabels, state, env)
+		: undefined;
+	return ValueLabels.onMarkers(lines, 'line', labels);
 }
 
 /** The rows labelled at the plot's first position and at its last, each series' own. */
@@ -68,18 +73,19 @@ function labelledEnds<TData extends Record<string, unknown>>(state: SlopePlotSta
  */
 export function buildValueLabels<TData extends Record<string, unknown>>(
 	labels: ValueLabels,
-	state: SlopePlotState<TData>
-): TextMarkerConfig[] {
+	state: SlopePlotState<TData>,
+	env: SlopePlotEnv
+): PointLabelConfig[] {
 	if (!state.processedData) return [];
 	const { start, end } = labelledEnds(state);
 	return [
-		...labels.atSeriesEnds(state, {
+		...labels.atSeriesEnds(state, env, {
 			rows: start,
 			anchor: startAnchor(labels.anchor),
 			lane: true,
 			flip: false
 		}),
-		...labels.atSeriesEnds(state, { rows: end, lane: true })
+		...labels.atSeriesEnds(state, env, { rows: end, lane: true })
 	];
 }
 

@@ -16,7 +16,7 @@ describe('ScatterPlot - styles.values', () => {
 		expect(countDotMarks(svg)).toBe(COUNTRIES_AT_2007.length);
 	});
 
-	test('values.show: true renders one label per point, showing the raw Y value', async () => {
+	test('values.show: true labels the points with their raw Y value, none overlapping another', async () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
 			height: 300,
@@ -24,9 +24,26 @@ describe('ScatterPlot - styles.values', () => {
 			styles: { values: { show: true } } satisfies AxisBasedStylesConfig
 		});
 		const svg = await waitForSvg(container);
-		expect(countTextLabels(svg)).toBe(COUNTRIES_AT_2007.length);
-		const labels = Array.from(svg.querySelectorAll('g.text text')).map((t) => t.textContent);
-		expect(labels).toEqual(expect.arrayContaining(COUNTRIES_AT_2007.map((d) => String(d.life))));
+		await expect.poll(() => countTextLabels(svg)).toBeGreaterThan(0);
+		const nodes = Array.from(svg.querySelectorAll('g.text text'));
+		const values = new Set(COUNTRIES_AT_2007.map((d) => String(d.life)));
+		expect(nodes.every((t) => values.has(t.textContent ?? ''))).toBe(true);
+		const boxes = nodes.map((t) => t.getBoundingClientRect());
+		const overlap = (a: DOMRect, b: DOMRect) =>
+			a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
+		expect(boxes.some((a, i) => boxes.some((b, j) => i < j && overlap(a, b)))).toBe(false);
+	});
+
+	test('a label with no free spot around its point is left out', async () => {
+		const { container } = await render(ScatterPlot, {
+			width: 400,
+			height: 300,
+			...DATA_PROPS,
+			styles: { values: { show: true } } satisfies AxisBasedStylesConfig
+		});
+		const svg = await waitForSvg(container);
+		await expect.poll(() => countTextLabels(svg)).toBeGreaterThan(0);
+		expect(countTextLabels(svg)).toBeLessThan(COUNTRIES_AT_2007.length);
 	});
 
 	test('a custom format callback overrides the default label text', async () => {
@@ -39,10 +56,10 @@ describe('ScatterPlot - styles.values', () => {
 			} satisfies AxisBasedStylesConfig
 		});
 		const svg = await waitForSvg(container);
-		const labels = Array.from(svg.querySelectorAll('g.text text')).map((t) => t.textContent);
-		expect(labels).toEqual(
-			expect.arrayContaining(COUNTRIES_AT_2007.map((d) => `${d.life.toFixed(1)} yr`))
-		);
+		await expect.poll(() => countTextLabels(svg)).toBeGreaterThan(0);
+		const formatted = new Set(COUNTRIES_AT_2007.map((d) => `${d.life.toFixed(1)} yr`));
+		const labels = Array.from(svg.querySelectorAll('g.text text')).map((t) => t.textContent ?? '');
+		expect(labels.every((label) => formatted.has(label))).toBe(true);
 	});
 
 	test('a label that would cross the right edge flips to the left of its point', async () => {

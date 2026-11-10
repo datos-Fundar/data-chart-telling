@@ -1,3 +1,5 @@
+import type { PointLabelConfig } from '$lib/types/markers/labels/point';
+import type { CommonMarkerConfigWithLabel } from '$lib/types/markers/channels/commonMarkerConfigWithLabel';
 import type { DotStyle, PerRow } from '$lib/types/plots/styling';
 import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/commonMarkerConfigWithColor';
 import type { CommonMarkerConfigWithRadius } from '$lib/types/markers/channels/commonMarkerConfigWithRadius';
@@ -11,5 +13,6 @@ export type DotMarkerConfig = CommonMarkerConfigWithRowOffset<
 		styles?: PerRow<DotStyle>;
 	} & CommonMarkerConfigWithRadius &
 		CommonMarkerConfigWithColor &
-		CommonMarkerConfigWithSymbol
+		CommonMarkerConfigWithSymbol &
+		CommonMarkerConfigWithLabel<PointLabelConfig>
 >;

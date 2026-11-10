@@ -19,6 +19,7 @@ import type { MarginSide } from '$lib/types/plots/props';
 import type { AxisPlotEnv, AxisPlotState, ProcessedData, ProcessedRow } from '$lib/types/phases';
 import type { TextMarkerConfig } from '$lib/types/markers/common';
 import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
+import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 
 /**
  * A plot's value labels: the author's `styles.values` over the plot kind's
@@ -301,36 +302,42 @@ export class ValueLabels {
 	}
 
 	/**
-	 * A series-over-`x` plot's (line, area) labels: one `'text'` marker over
-	 * the processed rows, each visible series' last row with a value
-	 * (`filter` + `selectLast`, per series), at its top (a stacked row's
-	 * `y2`), labelled with its own value and placed by `anchor`. Labels that
-	 * would overlap fan out into a shared column (`declutter`), colored by the
-	 * segment the row falls in. A plot that labels each end of its series apart
-	 * passes the `rows` and `anchor` of one end, and `lane` to route its labels
-	 * out to a lane whether or not they overlap (`flip: false` keeps one on the
-	 * left in the margin instead of flipping it over its points).
+	 * A series-over-`x` plot's (line, area) labels, for its line or area markers: each labelled row (by default its
+	 * series' last) with its own value, beside it as `anchor` asks, colored by the segment it falls in. Labels that
+	 * would overlap fan out into a shared column. A plot that labels each end of its series apart passes the `rows`
+	 * and `anchor` of one end, and `lane` to route them out to a lane whether or not they overlap.
 	 */
 	atSeriesEnds<TData extends Record<string, unknown>>(
 		state: AxisPlotState<TData, object>,
+		env: AxisPlotEnv,
 		end: {
 			rows?: ProcessedRow[];
 			anchor?: ValueAnchor;
 			lane?: boolean | { elbowGap: number };
 			flip?: boolean;
 		} = {}
-	): TextMarkerConfig[] {
-		if (end.rows) return this.#seriesEnds(state, end);
+	): PointLabelConfig[] {
+		if (end.rows) return this.#seriesEnds(state, env, end);
 		// A label on a series' first point would sit on its own line: it goes out to a lane instead.
 		const firsts = ValueLabels.#firstRows(state);
 		const labelled = state.labelled ?? [];
 		return [
-			...this.#seriesEnds(state, { rows: labelled.filter((row) => !firsts.has(row)) }),
-			...this.#seriesEnds(state, {
+			...this.#seriesEnds(state, env, { rows: labelled.filter((row) => !firsts.has(row)) }),
+			...this.#seriesEnds(state, env, {
 				rows: labelled.filter((row) => firsts.has(row)),
 				lane: { elbowGap: ValueLabels.FIRST_LANE_GAP }
 			})
 		];
+	}
+
+	/** `markers` with `labels` on each one of `type`: the shapes of a series carry its labels. */
+	static onMarkers<T extends { type: string }>(
+		markers: T[],
+		type: string,
+		labels: PointLabelConfig[] | undefined
+	): T[] {
+		if (!labels?.length) return markers;
+		return markers.map((marker) => (marker.type === type ? { ...marker, label: labels } : marker));
 	}
 
 	/** How far (px) a lane takes the label of a series' first point from it - clear of the line that leaves it. */
@@ -350,19 +357,18 @@ export class ValueLabels {
 
 	#seriesEnds<TData extends Record<string, unknown>>(
 		state: AxisPlotState<TData, object>,
+		env: AxisPlotEnv,
 		end: {
 			rows?: ProcessedRow[];
 			anchor?: ValueAnchor;
 			lane?: boolean | { elbowGap: number };
 			flip?: boolean;
 		}
-	): TextMarkerConfig[] {
-		const processed = state.processedData;
-		if (!processed) return [];
+	): PointLabelConfig[] {
+		const rows = new Set(end.rows ?? state.labelled ?? []);
+		if (rows.size === 0) return [];
 		const { font, format } = this;
 		const anchor = end.anchor ?? this.anchor;
-		const position = ProcessedPositions.of(processed);
-		const topOf = (d: ProcessedRow) => position.y(d);
 		const nameOf = (d: ProcessedRow) => String(d[SERIES_KEY]);
 		const valueOf = ValueLabels.valueOf(state);
 		const colorOf = (d: ProcessedRow) => {
@@ -376,31 +382,33 @@ export class ValueLabels {
 				state.colorForSeries?.(nameOf(d))
 			);
 		};
-		const marker: TextMarkerConfig = {
-			type: 'text',
-			// The rows the "transforms" phase picked for the labels: by default each series' last.
-			data: end.rows ?? state.labelled ?? [],
-			x: (processed.channels.x ?? position.x) as TextMarkerConfig['x'],
-			y: (processed.channels.y2 ?? processed.channels.y ?? topOf) as TextMarkerConfig['y'],
-			grouping: SERIES_ID_KEY,
-			text: (d: ProcessedRow) => format(Number(valueOf(d)), d, nameOf(d)),
-			styles: {
-				...font,
-				fill: this.fill ?? ((d: ProcessedRow) => colorOf(d) ?? 'currentColor'),
-				fontSize: font?.fontSize ?? 12,
-				dx: font?.dx ?? (anchor === 'start' ? 6 : anchor === 'end' ? -6 : 0),
-				dy: font?.dy ?? (anchor === 'outside' ? -8 : 0),
-				textAnchor: this.textAnchor ?? (anchor === 'start' || anchor === 'end' ? anchor : 'middle'),
-				lineAnchor: font?.lineAnchor ?? (anchor === 'outside' ? 'bottom' : 'middle')
-			},
-			declutter: {
-				connector: this.strokeStyle,
-				aligned: !!end.lane && (anchor === 'start' || anchor === 'end'),
-				elbowGap: typeof end.lane === 'object' ? end.lane.elbowGap : undefined,
-				flip: end.flip
-			}
-		};
-		return marker.data?.length ? [marker] : [];
+		const { styles: shared, ...hooks } = this.hooks(env);
+		return [
+			{
+				...hooks,
+				layout: 'point',
+				select: (row: ProcessedRow) => rows.has(row),
+				grouping: SERIES_ID_KEY,
+				text: (d: ProcessedRow) => format(Number(valueOf(d)), d, nameOf(d)),
+				styles: {
+					...shared,
+					...font,
+					fill: this.fill ?? ((d: ProcessedRow) => colorOf(d) ?? 'currentColor'),
+					fontSize: font?.fontSize ?? 12,
+					dx: font?.dx ?? (anchor === 'start' ? 6 : anchor === 'end' ? -6 : 0),
+					dy: font?.dy ?? (anchor === 'outside' ? -8 : 0),
+					textAnchor:
+						this.textAnchor ?? (anchor === 'start' || anchor === 'end' ? anchor : 'middle'),
+					lineAnchor: font?.lineAnchor ?? (anchor === 'outside' ? 'bottom' : 'middle')
+				},
+				declutter: {
+					connector: this.strokeStyle,
+					aligned: !!end.lane && (anchor === 'start' || anchor === 'end'),
+					elbowGap: typeof end.lane === 'object' ? end.lane.elbowGap : undefined,
+					flip: end.flip
+				}
+			} as PointLabelConfig
+		];
 	}
 
 	/** The rows of a series-over-`x` plot that cannot be labelled: a gap, or a stack with no top. For the "transforms" phase's `labels.skip`. */

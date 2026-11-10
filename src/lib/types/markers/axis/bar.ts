@@ -1,3 +1,5 @@
+import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
+import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { CommonMarkerConfigWithOrientation } from '$lib/types/markers/channels/commonMarkerConfigWithOrientation';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { AreaStyle, PerRow, InsetStyle } from '$lib/types/plots/styling';
@@ -15,4 +17,4 @@ export type BarMarkerConfig = {
 } & CommonMarkerConfigWithOrientation &
 	CommonMarkerConfigWithColor &
 	CommonMarkerConfigWithInterval &
-	CommonMarkerConfigWithLabel;
+	CommonMarkerConfigWithLabel<BoxLabelConfig | PointLabelConfig>;

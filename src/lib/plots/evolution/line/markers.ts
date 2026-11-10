@@ -1,3 +1,4 @@
+import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { resolveGapRuns, resolveGapsForSeries } from '$lib/plots/utils/gaps';
 
@@ -256,5 +257,6 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		disabledDotsFor
 	});
 
-	return [...lineMarkers, ...gapMarkers];
+	const labels = state.valueLabels?.show ? state.valueLabels.atSeriesEnds(state, env) : undefined;
+	return [...ValueLabels.onMarkers(lineMarkers, 'line', labels), ...gapMarkers];
 }

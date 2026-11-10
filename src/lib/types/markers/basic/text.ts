@@ -7,11 +7,18 @@ import type { LabelAnchor, TextAnchor } from '$lib/types/plots/constants';
 import type { NumberDisplay } from '$lib/types/layout/numbers';
 
 /**
- * Spreads labels that would overlap apart vertically, all reaching out to one
- * shared column, each routed back to its own point by an elbow connector.
- * Unset geometry falls back to the configuration's `text.declutter`.
+ * How labels that would overlap are laid out. `'lanes'` spreads them apart
+ * vertically, all reaching out to one shared column, each routed back to its
+ * own point by an elbow connector; `'around'` puts each one on a free spot
+ * around its point (its own side first, then the others and the corners),
+ * clear of the other labels and points, and leaves out one with no room.
  */
+export type TextDeclutterMode = 'lanes' | 'around';
+
+/** {@link TextDeclutterMode}'s options. Unset geometry falls back to the configuration's `text.declutter`. */
 export type TextDeclutterConfig = {
+	/** Defaults to `'lanes'`. */
+	mode?: TextDeclutterMode;
 	/** Shortest lane's distance (px) from the point before a connector bends. */
 	elbowGap?: number;
 	/** Extra distance (px) each further lane sits out from the last. */
@@ -77,8 +84,8 @@ export type TextMarkerConfig = CommonMarkerConfigWithRowOffset<
 		/** Which side of its point the text sits on: a value, or a function of the row. Wins over `styles.textAnchor`. */
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		textAnchor?: TextAnchor | ((d: any) => TextAnchor);
-		/** Spreads overlapping labels apart - see {@link TextDeclutterConfig}. `true` takes every default. */
-		declutter?: boolean | TextDeclutterConfig;
+		/** Lays out overlapping labels - see {@link TextDeclutterConfig}. `true` is `'lanes'` with every default. */
+		declutter?: boolean | TextDeclutterMode | TextDeclutterConfig;
 		/** Writes each label to fit its box - see {@link TextFitConfig}. `true` takes every default. */
 		fit?: boolean | TextFitConfig;
 		/**
@@ -89,6 +96,9 @@ export type TextMarkerConfig = CommonMarkerConfigWithRowOffset<
 		edgeAware?: boolean;
 		/** The slice of its category band each label sits in (a grouped bar's series); it is drawn off the band's middle, whatever the band's width. */
 		bandSlice?: BandSlice;
+		/** How far each row's point sits off its `x`/`y`, in pixels: labels, connectors and lanes start there. */
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		origin?: (d: any, scales: any) => { dx: number; dy: number } | undefined;
 		/** Where, in the plot's frame, a label sits on an axis it sets no position for: `{ type: 'text', x: 5, frameAnchor: 'top' }` is at the frame's top edge. */
 		frameAnchor?: LabelAnchor;
 		/** Grows the plot's margins, on every side the author left open, so the labels fit. */

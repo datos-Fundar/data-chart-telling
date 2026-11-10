@@ -185,6 +185,20 @@ A `rect`, `cell`, `bar` or `waffle` marker takes a `label`: a text written in th
 
 The label is fitted to its shape unless `fit` is `false`. One too big is written smaller, down to `minFontSize`; at that size it breaks into the lines the shape holds and the last one is cut short with an ellipsis; when fewer than `minLetters` letters would show, `fallback` - a value, a field or a function of the row - is written instead; and when not even that fits, nothing is. `padding` is the room kept free inside each edge. The defaults of `gap`, `padding`, `minFontSize` (8) and `minLetters` (3) are the configuration's `text.label`: `setConfiguration({ text: { label: { gap: 6 } } })`. A `text` marker of your own takes the same `fit` with a box of its own (`x1`, `x2`, `y1`, `y2`), which is rarely what you want.
 
+A `line`, `area`, `trail` or `dot` marker writes its `label` beside a point instead (its `layout` is `'point'`): each row at its `x` and `y` (an area's at the top, its `y2`). `select` picks the rows labelled of each `grouping` of the marker - `'first'`, `'last'`, `'min'`, `'max'` or a list of them, or a function of the row - and rows without a place (a gap) are never labelled. `declutter` spreads labels that would overlap apart, and the point labels of every marker of a plot are laid out together, so the ends of several lines fan out as one. `declutter: 'around'` instead puts each label on a free spot around its point - its own side first, then the other sides and the corners - clear of the other labels and points, and leaves out one with no room, as a scatter's labels need:
+
+```ts
+{ type: 'line', data: rows, x: 'year', y: 'value', grouping: 'country',
+  label: { text: 'country', select: 'last', declutter: true, styles: { dx: 6 } } }
+```
+
+A `rect`, `cell`, `bar` or `waffle` label takes `layout: 'point'` too: it starts at a point of each shape's box, its `anchor` (an edge's middle, `'top'`..., or a corner, `'top-left'`...; the middle by default), and is written away from it, `gap` beyond it. With `declutter`, its connector starts there:
+
+```ts
+{ type: 'bar', data: rows, x: 'province', y1: 0, y2: 'value',
+  label: { layout: 'point', text: 'value', anchor: 'top', select: 'max', declutter: true } }
+```
+
 ## Events
 
 Every marker takes handlers for the pointer:

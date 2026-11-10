@@ -16,7 +16,8 @@ export class MarkerKinds {
 			inherits: ['x', 'y', 'grouping', 'color', 'opacity'],
 			clip: true,
 			drawsRows: true,
-			legendSymbol: 'area'
+			legendSymbol: 'area',
+			labels: { default: 'point', point: 'top' }
 		},
 		arrow: { clip: false, drawsRows: true },
 		band: { clip: true, drawsRows: false, legendSymbol: 'rect' },
@@ -26,7 +27,7 @@ export class MarkerKinds {
 			clip: true,
 			drawsRows: true,
 			legendSymbol: 'bar',
-			labels: { default: 'box', box: 'band' }
+			labels: { default: 'box', box: 'band', point: 'box' }
 		},
 		bollinger: {
 			oriented: true,
@@ -48,7 +49,7 @@ export class MarkerKinds {
 			clip: true,
 			drawsRows: true,
 			legendSymbol: 'cell',
-			labels: { default: 'box', box: 'cell' }
+			labels: { default: 'box', box: 'cell', point: 'box' }
 		},
 		component: { clip: false, drawsRows: false },
 		contour: { clip: false, drawsRows: false },
@@ -79,7 +80,8 @@ export class MarkerKinds {
 			inherits: ['x', 'y', 'color', 'opacity', 'symbol', 'r'],
 			clip: false,
 			drawsRows: true,
-			legendSymbol: 'dot'
+			legendSymbol: 'dot',
+			labels: { default: 'point', point: 'row' }
 		},
 		geo: { clip: false, drawsRows: false },
 		'geo-component': { clip: false, drawsRows: true },
@@ -102,7 +104,8 @@ export class MarkerKinds {
 			inherits: ['x', 'y', 'grouping', 'color'],
 			clip: true,
 			drawsRows: true,
-			legendSymbol: 'line'
+			legendSymbol: 'line',
+			labels: { default: 'point', point: 'row' }
 		},
 		link: { clip: false, drawsRows: false },
 		raster: { clip: true, drawsRows: true },
@@ -111,7 +114,7 @@ export class MarkerKinds {
 			clip: true,
 			drawsRows: true,
 			legendSymbol: 'rect',
-			labels: { default: 'box', box: 'edges' }
+			labels: { default: 'box', box: 'edges', point: 'box' }
 		},
 		regression: {
 			oriented: true,
@@ -137,7 +140,8 @@ export class MarkerKinds {
 			inherits: ['x', 'y', 'grouping', 'color', 'opacity', 'r'],
 			clip: true,
 			drawsRows: true,
-			legendSymbol: 'line'
+			legendSymbol: 'line',
+			labels: { default: 'point', point: 'row' }
 		},
 		vector: { inherits: ['length'], clip: false, drawsRows: false },
 		violin: {
@@ -162,7 +166,7 @@ export class MarkerKinds {
 			inherits: ['x', 'y', 'color'],
 			clip: true,
 			drawsRows: true,
-			labels: { default: 'box', box: 'band' }
+			labels: { default: 'box', box: 'band', point: 'box' }
 		}
 	} satisfies Record<Kind, MarkerTraits>;
 

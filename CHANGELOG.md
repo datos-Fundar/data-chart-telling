@@ -6,7 +6,21 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
-- A marker's `label` can be a list of labels, each written over its shapes on its own: `label: [{ text: 'value', anchor: 'top' }, { text: 'name', anchor: 'bottom' }]`. A label takes a `layout`, how it is laid out on its shape; `'box'`, the box each row's shape spans, is the one there is, and the one a `rect`, `cell`, `bar` or `waffle` takes by default.
+- A marker's `label` can be a list of labels, each written over its shapes on its own: `label: [{ text: 'value', anchor: 'top' }, { text: 'name', anchor: 'bottom' }]`. A label takes a `layout`, how it is laid out on its shape; `'box'`, the box each row's shape spans, is the one a `rect`, `cell`, `bar` or `waffle` takes.
+- A `line`, `area`, `trail` or `dot` marker takes a `label` too, written beside a point (`layout: 'point'`): `select` picks the rows labelled of each `grouping` (`'first'`, `'last'`, `'min'`, `'max'`, a list of them or a function of the row), and `declutter` spreads them apart - together with the point labels of every other marker of the plot: `{ type: 'line', grouping: 'country', label: { text: 'country', select: 'last', declutter: true } }`. A `rect`, `cell`, `bar` or `waffle` label takes `layout: 'point'` as well, starting at its `anchor` on each shape's box: an edge's middle or a corner.
+- `declutter: 'around'` on a `text` marker or a point label: each label goes on a free spot around its point - its own side first, then the other sides and the corners - clear of the other labels and points and inside the plot's area; a label with no free spot is left out. `declutter: 'lanes'` (what `true` is) spreads them into lanes, as before; `{ mode: 'around' }` sets it in an options object.
+- A `Plot` of no kind, that draws only its `markers`, with every option a plot takes (`segments`, `styles`, `transforms`, chrome...): `<Plot markers={[{ type: 'density', data, x: 'gdp', y: 'life' }]} />`. Its `data`, `series` and channels are optional; markers without their own take them.
+- Markers take the plot's channels they leave unset, as far as their kind does: `x`/`y` on each axis they set no position for (`x`, `x1` or `x2`...), and `opacity`, `symbol`, `r` and `length`, with the plot's scales for those.
+- An `area`, `bar`, `bollinger`, `box`, `regression`, `tick`, `violin` or `waffle` marker runs the way its own channels do when the plot sets no position: a band (`x1`/`x2`) runs across its axis, two channels as a plot's would, a single one is the measured value. `isHorizontal` sets it, and is optional on a `bar` marker.
+
+### Changed
+
+- **Breaking:** the shared plot shell exported as `Plot` (to build plot kinds of your own) is `AbstractPlot`; `Plot` is the plot of no kind.
+- A `ScatterPlot`'s value labels go around their points (`declutter: 'around'`), leaving out those with no room, instead of overlapping; `styles.values.select` and `series` pick the points labelled.
+
+### Fixed
+
+- A side of a plot's margins that grows to fit its labels keeps the room its axis takes: an x axis' title no longer lands on its tick labels once value labels show.
 
 ## [1.18.0] - 2026-11-09
 

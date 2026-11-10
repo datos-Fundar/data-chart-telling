@@ -1,3 +1,5 @@
+import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
+import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { CommonMarkerConfigWithOrientation } from '$lib/types/markers/channels/commonMarkerConfigWithOrientation';
 import type { AreaStyle, PerRow } from '$lib/types/plots/styling';
 import type { CommonMarkerConfigWithLabel } from '$lib/types/markers/channels/commonMarkerConfigWithLabel';
@@ -16,4 +18,4 @@ export type WaffleMarkerConfig = {
 } & CommonMarkerConfigWithOrientation &
 	CommonMarkerConfigWithColor &
 	CommonMarkerConfigWithInterval &
-	CommonMarkerConfigWithLabel;
+	CommonMarkerConfigWithLabel<BoxLabelConfig | PointLabelConfig>;

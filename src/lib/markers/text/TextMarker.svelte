@@ -92,9 +92,15 @@
 
 	const declutter = $derived.by(() => {
 		if (!marker.declutter) return undefined;
-		const own = marker.declutter === true ? {} : marker.declutter;
+		const own =
+			marker.declutter === true
+				? {}
+				: typeof marker.declutter === 'string'
+					? { mode: marker.declutter }
+					: marker.declutter;
 		const defaults = cfg.text.declutter;
 		return {
+			mode: own.mode ?? 'lanes',
 			elbowGap: own.elbowGap ?? defaults.elbowGap,
 			laneStep: own.laneStep ?? defaults.laneStep,
 			labelGap: own.labelGap ?? defaults.labelGap,
@@ -104,8 +110,14 @@
 		};
 	});
 	const perRow = $derived(
-		!!declutter || !!marker.edgeAware || events.any || typeof marker.textAnchor === 'function'
+		!!declutter ||
+			!!marker.edgeAware ||
+			!!marker.origin ||
+			events.any ||
+			typeof marker.textAnchor === 'function'
 	);
+	/** Where a row's point sits off its `x`/`y`. */
+	const originOf = (d: TData) => marker.origin?.(d, plot.scales) ?? { dx: 0, dy: 0 };
 	const dir = $derived(Math.sign(dx) || 1);
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -239,14 +251,17 @@
 		const middle = (scale: typeof plot.scales.x) =>
 			scale?.type === 'band' ? scale.fn.bandwidth() / 2 : 0;
 		const [dx0, dy0] = [middle(plot.scales.x), middle(plot.scales.y)];
-		return displayData.map((d) => ({
-			px: Number(xScale(xOf(d) as never)) + dx0,
-			py: Number(yScale(yOf(d) as never)) + dy0
-		}));
+		return displayData.map((d) => {
+			const origin = originOf(d);
+			return {
+				px: Number(xScale(xOf(d) as never)) + dx0 + origin.dx,
+				py: Number(yScale(yOf(d) as never)) + dy0 + origin.dy
+			};
+		});
 	});
 
 	const lanes = $derived(
-		declutter && points && bounds
+		declutter?.mode === 'lanes' && points && bounds
 			? Declutter.buildLanes({
 					items: points.map((p, key) => ({ key, ...p })),
 					dx,
@@ -259,8 +274,36 @@
 			: undefined
 	);
 
-	/** Each row's anchor and offset, flipped where its text would cross the content box's edge. */
+	/** Each row's spot around its point, `null` for a row with none free. */
+	const around = $derived.by(() => {
+		if (declutter?.mode !== 'around' || !points) return undefined;
+		const within = bounds ?? Box.size(plot.plotWidth, plot.plotHeight);
+		const spots = Declutter.around({
+			items: points.map((p, key) => ({
+				key,
+				...p,
+				box: Box.ofText(textOf(displayData[key]), fontSize, cfg)
+			})),
+			preferred: { x: TEXT_SIDES[textAnchor], y: LINE_SIDES[lineAnchor] },
+			gap: Math.max(Math.abs(dx), Math.abs(dy)) || declutter.labelGap,
+			bounds: within
+		});
+		return displayData.map((_, i) => {
+			const spot = spots.get(i);
+			return spot
+				? {
+						dx: spot.dx,
+						dy: spot.dy,
+						textAnchor: TEXT_ANCHORS[spot.anchor.x],
+						lineAnchor: LINE_ANCHORS[spot.anchor.y]
+					}
+				: null;
+		});
+	});
+
+	/** Each row's anchor and offset: on its spot around its point, else flipped where its text would cross the content box's edge. */
 	const placements = $derived.by(() => {
+		if (around) return around;
 		if (!marker.edgeAware || !points) return undefined;
 		const within = bounds ?? Box.size(plot.plotWidth, plot.plotHeight);
 		const anchor = { x: TEXT_SIDES[textAnchor], y: LINE_SIDES[lineAnchor] };
@@ -342,12 +385,13 @@
 	{:else if (!declutter && !marker.edgeAware) || points}
 		<!-- A decluttered or edge-aware label waits for both scales. -->
 		{#each displayData as d, i (i)}
-			{#if !fitted || fitted.get(d)}
+			{#if (!fitted || fitted.get(d)) && placements?.[i] !== null}
 				{@const lane = lanes?.get(i)}
 				{@const placement = placements?.[i]}
 				{@const extraDy = lane?.extraDy ?? 0}
 				{@const laneDir = lane?.aligned ? lane.dir : dir}
 				{@const labelDx = lane?.aligned ? laneDir * lane.reach : dx}
+				{@const origin = originOf(d)}
 				{#if declutter && points && (lane?.aligned || extraDy !== 0)}
 					{@const { px, py } = points[i]}
 					{@const laneX = lane?.aligned ? px + laneDir * lane.laneReach : px + labelDx}
@@ -370,16 +414,16 @@
 							{#if placement}
 								{@render label(
 									rows,
-									placement.dx,
-									placement.dy + extraDy,
+									placement.dx + origin.dx,
+									placement.dy + extraDy + origin.dy,
 									placement.textAnchor,
 									placement.lineAnchor
 								)}
 							{:else}
 								{@render label(
 									rows,
-									labelDx,
-									dy + extraDy,
+									labelDx + origin.dx,
+									dy + extraDy + origin.dy,
 									lane?.aligned && laneDir !== dir ? flipAnchor(anchorAt(d)) : anchorAt(d),
 									lineAnchor
 								)}

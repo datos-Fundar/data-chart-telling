@@ -1,3 +1,4 @@
+import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { buildLineMarkers } from '$lib/plots/evolution/line/markers';
 import { resolveAccessor } from '$lib/utils/accessors';
@@ -64,5 +65,6 @@ export function buildMarks<TData extends Record<string, unknown>>(
 			}
 		];
 	});
-	return [...lines, ...dots];
+	const labels = state.valueLabels?.show ? state.valueLabels.atSeriesEnds(state, env) : undefined;
+	return [...ValueLabels.onMarkers(lines, 'line', labels), ...dots];
 }

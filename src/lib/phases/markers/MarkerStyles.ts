@@ -58,7 +58,7 @@ export class MarkerStyles {
 		if (!cfg || !MarkerStyles.#isPlain(marker)) return marker;
 		const unset = (label: MarkerLabelConfig) =>
 			MarkerStyles.#isPlain(label) &&
-			MarkerLabels.isOnShape(label) &&
+			MarkerLabels.isOnShape(marker as { type?: string }, label) &&
 			label.styles?.fill === undefined;
 		if (!MarkerLabels.list(marker).some(unset)) return marker;
 		const colorOf = MarkerStyles.#shapeColor(

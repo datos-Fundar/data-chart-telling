@@ -1,4 +1,6 @@
 import type { CommonMarkerConfigWithOrientation } from '$lib/types/markers/channels/commonMarkerConfigWithOrientation';
+import type { PointLabelConfig } from '$lib/types/markers/labels/point';
+import type { CommonMarkerConfigWithLabel } from '$lib/types/markers/channels/commonMarkerConfigWithLabel';
 import type { AreaStyle } from '$lib/types/plots/styling';
 import type { CommonMarkerConfigWithArea } from '$lib/types/markers/channels/commonMarkerConfigWithArea';
 import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/commonMarkerConfigWithColor';
@@ -14,4 +16,5 @@ export type AreaMarkerConfig = {
 } & CommonMarkerConfigWithOrientation &
 	CommonMarkerConfigWithArea &
 	CommonMarkerConfigWithColor &
-	CommonMarkerConfigWithInterval;
+	CommonMarkerConfigWithInterval &
+	CommonMarkerConfigWithLabel<PointLabelConfig>;

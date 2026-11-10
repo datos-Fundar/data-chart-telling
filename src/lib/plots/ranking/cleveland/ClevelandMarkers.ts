@@ -20,6 +20,7 @@ import type {
 	TextMarkerConfig,
 	TickMarkerConfig
 } from '$lib/types/markers/common';
+import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { ProcessedRow } from '$lib/types/phases';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 import type { StrokeStyle } from '$lib/types/plots/styling';
@@ -41,7 +42,7 @@ const warned = new Set<string>();
  * highest value (from the baseline, for a lollipop) with a dot at each value.
  * A category with one dot gets a stem in that dot's series color, restyled by
  * the segment its dot belongs to; a category with several gets one neutral
- * connector. The "markers" phase takes its `marks`, `valueLabels` and `reach`.
+ * connector. The "markers" phase takes its `marks` and `reach`.
  */
 export class ClevelandMarkers {
 	readonly #options: ClevelandOptions;
@@ -258,11 +259,14 @@ export class ClevelandMarkers {
 				};
 			});
 		}) as DotMarkerConfig[];
+		const labels = state.valueLabels?.show
+			? this.#valueLabels(state.valueLabels, state, env)
+			: undefined;
 		return [
 			...rules,
 			...caps,
 			...arrows,
-			...dots,
+			...ValueLabels.onMarkers(dots, 'dot', labels),
 			...this.#connectorLabels(state, env, connector, looks, isHorizontal)
 		];
 	};
@@ -361,20 +365,14 @@ export class ClevelandMarkers {
 		];
 	}
 
-	/**
-	 * The value labels of the dots `styles.values.of` picks, one `'text'` marker
-	 * per place a dot can hold in its range - past the top end (above, or right
-	 * of it), past the bottom end (below, or left of it) and, for the dots
-	 * between, beside it - and per series, when they take their series' color.
-	 */
-	valueLabels = <TData extends Record<string, unknown>>(
+	/** The value labels of the dots `styles.values` picks, placed by where each dot sits in its range. */
+	#valueLabels<TData extends Record<string, unknown>>(
 		labels: ValueLabels,
 		state: ClevelandPlotState<TData>,
 		env: ClevelandPlotEnv
-	): TextMarkerConfig[] => {
+	): PointLabelConfig[] {
 		if (!state.processedData?.data.length) return [];
 		const { isHorizontal } = ClevelandMarkers.#geometry(state);
-		const { category, value } = ClevelandMarkers.#channels(state);
 		const { font, format } = labels;
 		const read = ValueLabels.valueOf(state);
 		const valueOf = ProcessedPositions.of(
@@ -385,7 +383,7 @@ export class ClevelandMarkers {
 		const nameOf = (d: ProcessedRow) => String(d[SERIES_KEY]);
 
 		const picked = this.#picked(state);
-		// Where a label sits from its dot, by role: along the range (past an end) or across it (between).
+		// Along the range past an end, across it between them.
 		const placement: Record<ClevelandRole, Place> = {
 			max: isHorizontal
 				? { dx: gap, dy: 0, textAnchor: 'start', lineAnchor: 'middle' }
@@ -397,47 +395,41 @@ export class ClevelandMarkers {
 				? { dx: 0, dy: -gap, textAnchor: 'middle', lineAnchor: 'bottom' }
 				: { dx: gap, dy: 0, textAnchor: 'start', lineAnchor: 'middle' }
 		};
-		// What fills the labels of a series: the one fill all share, its own color, or the axis'.
-		const fillOf = (series: string) =>
+		const fill =
 			labels.fill ??
-			(labels.color === 'series' ? state.colorForSeries!(series) : undefined) ??
-			'currentColor';
-		const names =
-			labels.color === 'series' && !labels.fill
-				? (state.resolvedSeries ?? []).map((s) => s.name)
-				: [''];
+			(labels.color === 'series'
+				? (d: ProcessedRow) => state.colorForSeries!(nameOf(d))
+				: 'currentColor');
+		const { styles: shared, ...hooks } = labels.hooks(env);
 
-		return (['max', 'min', 'between'] as const).flatMap((role) =>
-			names.flatMap((name): TextMarkerConfig[] => {
-				const data = picked
-					.filter(
-						({ entry, dot }) =>
-							ClevelandRanges.roleOf(entry, dot.value) === role &&
-							(name === '' || dot.series === name)
-					)
-					.map(({ dot }) => dot.row);
-				if (data.length === 0) return [];
-				const at = placement[role];
-				return [
-					{
-						type: 'text',
-						data,
-						...(isHorizontal ? { x: value, y: category } : { x: category, y: value }),
-						text: (d: ProcessedRow) => format(Number(read(d) ?? valueOf(d)), d, nameOf(d)),
-						styles: {
-							...font,
-							fill: fillOf(name),
-							fontSize: font?.fontSize ?? 12,
-							dx: font?.dx ?? at.dx,
-							dy: font?.dy ?? at.dy,
-							textAnchor: labels.textAnchor ?? at.textAnchor,
-							lineAnchor: font?.lineAnchor ?? at.lineAnchor
-						}
+		return (['max', 'min', 'between'] as const).flatMap((role): PointLabelConfig[] => {
+			const rows = new Set(
+				picked
+					.filter(({ entry, dot }) => ClevelandRanges.roleOf(entry, dot.value) === role)
+					.map(({ dot }) => dot.row)
+			);
+			if (rows.size === 0) return [];
+			const at = placement[role];
+			return [
+				{
+					...hooks,
+					layout: 'point',
+					select: (row: ProcessedRow) => rows.has(row),
+					text: (d: ProcessedRow) => format(Number(read(d) ?? valueOf(d)), d, nameOf(d)),
+					styles: {
+						...shared,
+						...font,
+						fill,
+						fontSize: font?.fontSize ?? 12,
+						dx: font?.dx ?? at.dx,
+						dy: font?.dy ?? at.dy,
+						textAnchor: labels.textAnchor ?? at.textAnchor,
+						lineAnchor: font?.lineAnchor ?? at.lineAnchor
 					}
-				];
-			})
-		);
-	};
+				} as PointLabelConfig
+			];
+		});
+	}
 
 	/**
 	 * Room for the labels past the dots at the end of the value axis, so the
