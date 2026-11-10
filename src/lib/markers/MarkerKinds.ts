@@ -17,7 +17,7 @@ export class MarkerKinds {
 			clip: true,
 			drawsRows: true,
 			legendSymbol: 'area',
-			labels: { default: 'point', point: 'top' }
+			labels: { default: 'point', path: 'area', point: 'top' }
 		},
 		arrow: { clip: false, drawsRows: true },
 		band: { clip: true, drawsRows: false, legendSymbol: 'rect' },
@@ -81,7 +81,7 @@ export class MarkerKinds {
 			clip: false,
 			drawsRows: true,
 			legendSymbol: 'dot',
-			labels: { default: 'point', point: 'row' }
+			labels: { default: 'point', path: 'rim', point: 'row' }
 		},
 		geo: { clip: false, drawsRows: false },
 		'geo-component': { clip: false, drawsRows: true },
@@ -105,7 +105,7 @@ export class MarkerKinds {
 			clip: true,
 			drawsRows: true,
 			legendSymbol: 'line',
-			labels: { default: 'point', point: 'row' }
+			labels: { default: 'point', path: 'stroke', point: 'row' }
 		},
 		link: { clip: false, drawsRows: false },
 		raster: { clip: true, drawsRows: true },
@@ -141,7 +141,7 @@ export class MarkerKinds {
 			clip: true,
 			drawsRows: true,
 			legendSymbol: 'line',
-			labels: { default: 'point', point: 'row' }
+			labels: { default: 'point', path: 'stroke', point: 'row' }
 		},
 		vector: { inherits: ['length'], clip: false, drawsRows: false },
 		violin: {

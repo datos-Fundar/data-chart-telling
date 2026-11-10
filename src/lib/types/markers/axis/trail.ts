@@ -1,3 +1,4 @@
+import type { StrokeLabelConfig } from '$lib/types/markers/labels/path';
 import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { CommonMarkerConfigWithLabel } from '$lib/types/markers/channels/commonMarkerConfigWithLabel';
 import type { AreaStyle } from '$lib/types/plots/styling';
@@ -15,4 +16,4 @@ export type TrailMarkerConfig = {
 	styles?: Pick<AreaStyle, 'fill' | 'fillOpacity'>;
 } & CommonMarkerConfigWithRadius &
 	CommonMarkerConfigWithColor &
-	CommonMarkerConfigWithLabel<PointLabelConfig>;
+	CommonMarkerConfigWithLabel<StrokeLabelConfig | PointLabelConfig>;

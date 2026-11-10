@@ -10,7 +10,7 @@ export type LabelBaseConfig = Omit<
 	'type' | 'data' | 'x' | 'y' | 'frameAnchor' | 'origin'
 >;
 
-export type MarkerLabelConfig = BoxLabelConfig | PathLabelConfig | PointLabelConfig;
+export type MarkerLabelConfig = BoxLabelConfig | PathLabelConfig<string, string> | PointLabelConfig;
 
 export type MarkerLabels<TLabel extends MarkerLabelConfig = MarkerLabelConfig> = TLabel | TLabel[];
 

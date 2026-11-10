@@ -192,6 +192,13 @@ The label is fitted to its shape unless `fit` is `false`. One too big is written
   label: { layout: 'path', text: 'change', edge: 'tip', fitMargins: true } }
 ```
 
+A `line` or `trail` marker writes a `'path'` label along each line it draws instead, one per `grouping`, curving with it - its `text` read from the line's first row, so a field names its group: `side` is `'above'` (the default), `'below'` or `'on'` the line, as the text reads (a line drawn right to left is written along its reverse), and `offset` is where along it from its left end. An `area` writes it along its top edge (`edge: 'top'`, the default, its `y2`) or its bottom one (`'bottom'`, its `y1`), and a `dot` around its rim, over its top - `offset` from its left side, `side` `'outside'`, `'inside'` or `'on'` it. A label `'on'` its curve is drawn over a halo of the plot's background:
+
+```ts
+{ type: 'line', data, x: 'year', y: 'value', grouping: 'country', curve: 'catmull-rom',
+  label: { layout: 'path', text: 'country', offset: '80%' } }
+```
+
 A `line`, `area`, `trail` or `dot` marker writes its `label` beside a point instead (its `layout` is `'point'`): each row at its `x` and `y` (an area's at the top, its `y2`). `select` picks the rows labelled of each `grouping` of the marker - `'first'`, `'last'`, `'min'`, `'max'` or a list of them, or a function of the row - and rows without a place (a gap) are never labelled. `declutter` spreads labels that would overlap apart, and the point labels of every marker of a plot are laid out together, so the ends of several lines fan out as one. `declutter: 'around'` instead puts each label on a free spot around its point - its own side first, then the other sides and the corners - clear of the other labels and points, and leaves out one with no room, as a scatter's labels need:
 
 ```ts

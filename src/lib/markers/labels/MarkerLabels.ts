@@ -14,7 +14,7 @@ import type {
 } from '$lib/types/markers/labels/box';
 import type { LabelLayout, MarkerLabelConfig } from '$lib/types/markers/labels/common';
 import type { PointLabelConfig } from '$lib/types/markers/labels/point';
-import type { PathLabelConfig } from '$lib/types/markers/labels/path';
+import type { PathLabelConfig, PathShape } from '$lib/types/markers/labels/path';
 import type { TextMarkerConfig } from '$lib/types/markers/basic/text';
 
 type Labelled = BoxedMarker & { label?: MarkerLabelConfig | MarkerLabelConfig[] };
@@ -65,6 +65,18 @@ export class MarkerLabels {
 					: PathLayout.build(label as PathLabelConfig, geometry, options);
 			return built ? [built] : [];
 		});
+	}
+
+	/** The `'path'` labels a marker writes along its curves - its lines, an area's edge, each dot's rim - with their shape. */
+	static curves(marker: { type?: string; label?: MarkerLabelConfig | MarkerLabelConfig[] }): {
+		label: PathLabelConfig<string, string>;
+		shape: Exclude<PathShape, 'box'>;
+	}[] {
+		const shape = MarkerKinds.of(marker.type)?.labels?.path;
+		if (!shape || shape === 'box') return [];
+		return MarkerLabels.list(marker)
+			.filter((label) => MarkerLabels.layoutOf(marker, label) === 'path')
+			.map((label) => ({ label: label as PathLabelConfig<string, string>, shape }));
 	}
 
 	/**

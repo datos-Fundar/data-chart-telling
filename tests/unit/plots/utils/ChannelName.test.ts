@@ -23,7 +23,7 @@ describe('MarkerKinds', () => {
 			clip: true,
 			drawsRows: true,
 			legendSymbol: 'area',
-			labels: { default: 'point', point: 'top' }
+			labels: { default: 'point', path: 'area', point: 'top' }
 		});
 		expect(MarkerKinds.inherits('rule', 'x')).toBe(false);
 		expect(MarkerKinds.inheritsScales('dot')).toBe(true);

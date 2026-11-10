@@ -1,3 +1,4 @@
+import type { RimLabelConfig } from '$lib/types/markers/labels/path';
 import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { CommonMarkerConfigWithLabel } from '$lib/types/markers/channels/commonMarkerConfigWithLabel';
 import type { DotStyle, PerRow } from '$lib/types/plots/styling';
@@ -14,5 +15,5 @@ export type DotMarkerConfig = CommonMarkerConfigWithRowOffset<
 	} & CommonMarkerConfigWithRadius &
 		CommonMarkerConfigWithColor &
 		CommonMarkerConfigWithSymbol &
-		CommonMarkerConfigWithLabel<PointLabelConfig>
+		CommonMarkerConfigWithLabel<RimLabelConfig | PointLabelConfig>
 >;
