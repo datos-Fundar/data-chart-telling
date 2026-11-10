@@ -1,3 +1,4 @@
+import type { CommonMarkerConfigWithOrientation } from '$lib/types/markers/channels/commonMarkerConfigWithOrientation';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { AreaStyle, PerRow, InsetStyle } from '$lib/types/plots/styling';
 import type { CommonMarkerConfigWithLabel } from '$lib/types/markers/channels/commonMarkerConfigWithLabel';
@@ -8,10 +9,10 @@ import type { CommonMarkerConfigWithInterval } from '$lib/types/markers/channels
 export type BarMarkerConfig = {
 	type: 'bar';
 	role: 'segment' | 'hitArea';
-	isHorizontal: boolean;
 	thickness?: number;
 	styles?: PerRow<AreaStyle> & InsetStyle;
 	category?: AxisValue;
-} & CommonMarkerConfigWithColor &
+} & CommonMarkerConfigWithOrientation &
+	CommonMarkerConfigWithColor &
 	CommonMarkerConfigWithInterval &
 	CommonMarkerConfigWithLabel;

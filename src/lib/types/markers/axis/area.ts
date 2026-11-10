@@ -1,3 +1,4 @@
+import type { CommonMarkerConfigWithOrientation } from '$lib/types/markers/channels/commonMarkerConfigWithOrientation';
 import type { AreaStyle } from '$lib/types/plots/styling';
 import type { CommonMarkerConfigWithArea } from '$lib/types/markers/channels/commonMarkerConfigWithArea';
 import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/commonMarkerConfigWithColor';
@@ -10,6 +11,7 @@ export type AreaMarkerConfig = {
 	curve?: CurveName;
 	tension?: number;
 	styles?: AreaStyle;
-} & CommonMarkerConfigWithArea &
+} & CommonMarkerConfigWithOrientation &
+	CommonMarkerConfigWithArea &
 	CommonMarkerConfigWithColor &
 	CommonMarkerConfigWithInterval;

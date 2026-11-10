@@ -1,3 +1,4 @@
+import type { CommonMarkerConfigWithOrientation } from '$lib/types/markers/channels/commonMarkerConfigWithOrientation';
 import type { AreaStyle } from '$lib/types/plots/styling';
 import type { DensityKernel } from '$lib/types/transforms/density';
 import type { CommonMarkerConfig } from '$lib/types/markers/channels/commonMarkerConfig';
@@ -20,4 +21,5 @@ export type ViolinMarkerConfig = {
 	/** The share of each band the violin takes, when several series sit side by side: its index among `count`. */
 	slot?: { index: number; count: number };
 	styles?: AreaStyle;
-} & CommonMarkerConfig;
+} & CommonMarkerConfigWithOrientation &
+	CommonMarkerConfig;

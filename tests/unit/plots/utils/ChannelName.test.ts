@@ -18,6 +18,7 @@ describe('ChannelName', () => {
 describe('MarkerKinds', () => {
 	test('a kind declares its clip, rows, legend symbol and inherited channels traits', () => {
 		expect(MarkerKinds.of('area')).toEqual({
+			oriented: true,
 			inherits: ['x', 'y', 'grouping', 'color', 'opacity'],
 			clip: true,
 			drawsRows: true,

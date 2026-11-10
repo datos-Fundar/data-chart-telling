@@ -6,9 +6,8 @@ import { COUNTRIES_AT_2007 } from '$datasets';
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `tick` marker (svelteplot's own `TickX`/`TickY`) - a short line per row
 // along one axis, a strip plot. Orientation is automatic: `TickX` when `x` is
-// the quantitative axis and `y` a band one, `TickY` otherwise. Demoed on an
-// empty host with a band category axis (same convention as `Markers/Box`) so
-// only the marker itself is on screen. `color` resolves through this
+// the quantitative axis and `y` a band one, `TickY` otherwise - the plot's
+// channels decide, else the marker's own. `color` resolves through this
 // package's own `cfg.palette` into `stroke`.
 
 const CONTINENT_DOMAIN = ['Americas', 'Europe', 'Asia', 'Africa'];
@@ -20,8 +19,6 @@ const meta = {
 	args: {
 		width: 940,
 		height: 400,
-		x: 'gdp',
-		y: 'continent',
 		scales: { x: { domain: [0, 50_000] }, y: { type: 'band', domain: CONTINENT_DOMAIN } }
 	},
 	argTypes: {
@@ -50,8 +47,6 @@ export const Horizontal: Story = {
 /** Swapping the axes flips the marker to `TickY`. */
 export const Vertical: Story = {
 	args: {
-		x: 'continent',
-		y: 'gdp',
 		scales: { y: { domain: [0, 50_000] }, x: { type: 'band', domain: CONTINENT_DOMAIN } },
 		markers: [
 			{ type: 'tick', data: COUNTRIES_AT_2007, x: 'continent', y: 'gdp' }

@@ -1,3 +1,4 @@
+import type { CommonMarkerConfigWithOrientation } from '$lib/types/markers/channels/commonMarkerConfigWithOrientation';
 import type { AreaStyle, PerRow } from '$lib/types/plots/styling';
 import type { CommonMarkerConfigWithLabel } from '$lib/types/markers/channels/commonMarkerConfigWithLabel';
 import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/commonMarkerConfigWithColor';
@@ -12,6 +13,7 @@ export type WaffleMarkerConfig = {
 	gap?: number;
 	round?: boolean;
 	styles?: PerRow<AreaStyle>;
-} & CommonMarkerConfigWithColor &
+} & CommonMarkerConfigWithOrientation &
+	CommonMarkerConfigWithColor &
 	CommonMarkerConfigWithInterval &
 	CommonMarkerConfigWithLabel;

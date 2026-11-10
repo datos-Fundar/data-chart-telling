@@ -1,3 +1,4 @@
+import type { CommonMarkerConfigWithOrientation } from '$lib/types/markers/channels/commonMarkerConfigWithOrientation';
 import type { StrokeStyle, PerRow } from '$lib/types/plots/styling';
 import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/commonMarkerConfigWithColor';
 
@@ -7,4 +8,5 @@ export type TickMarkerConfig = {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	tickLength?: number | ((d: any) => number);
 	styles?: PerRow<StrokeStyle>;
-} & CommonMarkerConfigWithColor;
+} & CommonMarkerConfigWithOrientation &
+	CommonMarkerConfigWithColor;

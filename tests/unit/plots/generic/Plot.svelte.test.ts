@@ -49,6 +49,13 @@ describe('Plot', () => {
 		await expect.poll(() => svg.querySelectorAll('g.density path').length).toBeGreaterThan(0);
 	});
 
+	test('an oriented marker runs the way its own channels do when the plot has none', async () => {
+		const svg = await draw({
+			markers: [{ type: 'tick', data: ROWS, x: 'high', y: 'region' }]
+		});
+		await expect.poll(() => svg.querySelectorAll('g.tick-x line').length).toBe(3);
+	});
+
 	test('takes chrome as any plot does', async () => {
 		const { container } = await render(Plot, {
 			width: 400,

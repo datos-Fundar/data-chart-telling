@@ -14,8 +14,7 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 // rectangles. Likewise, an explicit `multiple` that doesn't match the plot's
 // pixels per unit stretches the cells along the value axis instead of
 // shrinking them to fit, so leave it unset and tune `unit` (vertical form
-// only: svelteplot 0.14.2's `WaffleX` ignores `unit`). Demoed on an empty host with a band axis (same convention as
-// `Markers/Box`).
+// only: svelteplot 0.14.2's `WaffleX` ignores `unit`).
 
 const COUNTS = [
 	{ region: 'Americas', count: 120 },
@@ -113,8 +112,6 @@ export const ColoredByRegion: Story = {
 /** Swapping the axes flips the marker to `WaffleX`; `unit` is ignored here by svelteplot 0.14.2, so only the automatic `multiple` keeps the cells square. */
 export const Horizontal: Story = {
 	args: {
-		x: 'count',
-		y: 'region',
 		scales: {
 			y: { type: 'band', domain: COUNTS.map((d) => d.region) },
 			x: { domain: [0, 160] }
@@ -135,8 +132,6 @@ export const Horizontal: Story = {
 /** A stacked histogram: one waffle per year, the rows of each region stacked on top of one another (svelteplot stacks rows that share `x`). */
 export const StackedHistogram: Story = {
 	args: {
-		x: 'year',
-		y: 'count',
 		scales: {
 			x: { type: 'band', domain: YEARS },
 			y: { domain: [0, 160] }
@@ -158,8 +153,6 @@ export const StackedHistogram: Story = {
 export const StackedHorizontal: Story = {
 	args: {
 		height: 560,
-		x: 'count',
-		y: 'year',
 		scales: {
 			y: { type: 'band', domain: YEARS },
 			x: { domain: [0, 160] }
@@ -181,8 +174,6 @@ export const StackedHorizontal: Story = {
 export const ProportionOfTheWhole: Story = {
 	args: {
 		height: 280,
-		x: 'question',
-		y: 'share',
 		scales: {
 			x: { type: 'band', domain: [...new Set(SURVEY.map((d) => d.question))] },
 			y: { domain: [0, 100] }

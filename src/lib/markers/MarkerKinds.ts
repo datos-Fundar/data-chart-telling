@@ -12,6 +12,7 @@ const SCALED: InheritedChannel[] = ['color', 'opacity', 'symbol', 'r', 'length']
 export class MarkerKinds {
 	static readonly traits = {
 		area: {
+			oriented: true,
 			inherits: ['x', 'y', 'grouping', 'color', 'opacity'],
 			clip: true,
 			drawsRows: true,
@@ -20,6 +21,7 @@ export class MarkerKinds {
 		arrow: { clip: false, drawsRows: true },
 		band: { clip: true, drawsRows: false, legendSymbol: 'rect' },
 		bar: {
+			oriented: true,
 			inherits: ['x', 'y', 'color'],
 			clip: true,
 			drawsRows: true,
@@ -27,6 +29,7 @@ export class MarkerKinds {
 			labels: { default: 'box', box: 'band' }
 		},
 		bollinger: {
+			oriented: true,
 			inherits: ['x', 'y'],
 			clip: true,
 			drawsRows: true,
@@ -34,6 +37,7 @@ export class MarkerKinds {
 		},
 		brush: { clip: false, drawsRows: false },
 		box: {
+			oriented: true,
 			inherits: ['x', 'y'],
 			clip: true,
 			drawsRows: true,
@@ -110,6 +114,7 @@ export class MarkerKinds {
 			labels: { default: 'box', box: 'edges' }
 		},
 		regression: {
+			oriented: true,
 			inherits: ['x', 'y'],
 			clip: true,
 			drawsRows: true,
@@ -123,6 +128,7 @@ export class MarkerKinds {
 			drawsRows: true
 		},
 		tick: {
+			oriented: true,
 			inherits: ['color'],
 			clip: true,
 			drawsRows: true
@@ -135,6 +141,7 @@ export class MarkerKinds {
 		},
 		vector: { inherits: ['length'], clip: false, drawsRows: false },
 		violin: {
+			oriented: true,
 			inherits: ['x', 'y'],
 			clip: true,
 			drawsRows: true,
@@ -151,6 +158,7 @@ export class MarkerKinds {
 			drawsRows: true
 		},
 		waffle: {
+			oriented: true,
 			inherits: ['x', 'y', 'color'],
 			clip: true,
 			drawsRows: true,

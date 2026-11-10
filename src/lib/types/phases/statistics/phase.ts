@@ -1,6 +1,6 @@
 import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
 import type { Accessor, Series } from '$lib/types/plots/data/common';
-import type { AxisValue } from '$lib/types/layout/mapping';
+import type { AxisChannelName, AxisValue } from '$lib/types/layout/mapping';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { ProcessedData, TransformsStageState } from '../transforms/phase';
@@ -26,6 +26,7 @@ export type StatisticsStageState = Pick<FacetStageState, 'panels'> & {
 	authorMarkers?: AxisBasedMarkersConfig[];
 	resolvedSeries?: Series<any>[];
 	axes?: PlotAxes;
+	scales?: Partial<Record<AxisChannelName, { type?: string }>>;
 	flat?: any[];
 	colorForSeries?: (name: string) => string;
 	/** Each series' segments, which a `scope: 'segment'` author marker splits by. */

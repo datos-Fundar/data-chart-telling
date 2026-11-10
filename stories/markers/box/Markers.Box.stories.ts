@@ -68,8 +68,6 @@ export const Basic: Story = {
 /** A quantitative `x` with a categorical `y` picks `BoxX` - the same data, laid out horizontally instead. */
 export const Horizontal: Story = {
 	args: {
-		x: 'gdp',
-		y: 'continent',
 		scales: { x: { domain: [0, 50_000] }, y: { type: 'band', domain: CONTINENT_DOMAIN } },
 		markers: [
 			{

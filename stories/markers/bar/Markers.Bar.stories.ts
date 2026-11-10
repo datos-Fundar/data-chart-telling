@@ -5,8 +5,8 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `bar` marker (`role: 'segment'`, svelteplot's own `BarX`/`BarY`) -
 // author-facing `x`/`x1`/`x2`/`y1`/`y2`/`y` build one bar per row of its own
-// `data`. `isHorizontal` swaps which pair is the category vs. the value, same
-// convention `BarPlot` itself uses. Demoed on a `Plot` of no data
+// `data`. Its orientation follows its own channels: `y1`/`y2` make vertical
+// bars, `x1`/`x2` horizontal ones (`isHorizontal` forces either). Demoed on a `Plot` of no data
 // with a categorical axis so the bars have real bands to sit in - see
 // `Plots/*/Markers` for markers used alongside real chart data.
 
@@ -41,14 +41,13 @@ const BARS = [
 	{ category: 'C', value: 4 }
 ];
 
-/** `isHorizontal: false` (vertical bars) - `x` is the category, `y1`/`y2` the value range from a zero baseline. */
+/** Vertical bars - `x` is the category, `y1`/`y2` the value range from a zero baseline. */
 export const Basic: Story = {
 	args: {
 		markers: [
 			{
 				type: 'bar',
 				role: 'segment',
-				isHorizontal: false,
 				data: BARS,
 				x: 'category',
 				y1: 0,
@@ -58,7 +57,7 @@ export const Basic: Story = {
 	}
 };
 
-/** `isHorizontal: true` - `y` is the category, `x1`/`x2` the value range. The plot's own `scales` swap axes to match. */
+/** Horizontal bars - `y` is the category, `x1`/`x2` the value range. The plot's own `scales` swap axes to match. */
 export const Horizontal: Story = {
 	args: {
 		scales: { x: { domain: [0, 10] }, y: { domain: CATEGORY_DOMAIN } },
@@ -66,7 +65,6 @@ export const Horizontal: Story = {
 			{
 				type: 'bar',
 				role: 'segment',
-				isHorizontal: true,
 				data: BARS,
 				y: 'category',
 				x1: 0,
@@ -83,7 +81,6 @@ export const CustomStyle: Story = {
 			{
 				type: 'bar',
 				role: 'segment',
-				isHorizontal: false,
 				data: BARS,
 				x: 'category',
 				y1: 0,
@@ -101,7 +98,6 @@ export const Label: Story = {
 			{
 				type: 'bar',
 				role: 'segment',
-				isHorizontal: false,
 				data: BARS,
 				x: 'category',
 				y1: 0,

@@ -27,6 +27,8 @@ export type MarkerTraits = {
 	legendSymbol?: LegendMark;
 	/** The plot's channels the marker takes in place of those it leaves unset, with the plot's scales for those that have one. */
 	inherits?: InheritedChannel[];
+	/** Whether it runs one way or the other (svelteplot's `*X`/`*Y` pair): the plot's way, else its own channels'. */
+	oriented?: boolean;
 	/** The labels the marker can write over its shapes; none without it. */
 	labels?: MarkerLabelTraits;
 };
