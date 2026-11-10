@@ -1,17 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
-import { FEMALE_LIFE, LIFE } from '$datasets';
-import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+import Plot from '$lib/plots/generic/Plot.svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `rule` marker (svelteplot's own `RuleX`/`RuleY`) - a vertical/horizontal
-// reference line at `value`, or one per row with `data`. Demoed on an empty
-// `LinePlot` canvas so only the marker itself is on screen - see
+// reference line at `value`, or one per row with `data`. Demoed on a `Plot` of
+// no data so only the marker itself is on screen - see
 // `Plots/*/Markers/Rules` for markers used alongside real chart data.
 
 const meta = {
 	title: 'Markers/Rule',
-	component: LinePlot,
+	component: Plot,
 	tags: ['autodocs'],
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -19,42 +18,40 @@ const meta = {
 		data: { control: false },
 		markers: { control: false }
 	}
-} satisfies Meta<typeof LinePlot>;
+} satisfies Meta<typeof Plot>;
 
 export default meta;
 
 // Each story renders its own plot (the same marker works on any plot kind), so the
 // host, its base args and its story type are declared per host below.
-type LinePlotStory = StoryObj<typeof LinePlot>;
-const renderLinePlot: LinePlotStory['render'] = (args) => ({ Component: LinePlot, props: args });
+type PlotStory = StoryObj<typeof Plot>;
+const renderPlot: PlotStory['render'] = (args) => ({ Component: Plot, props: args });
 
-const LINE_PLOT_ARGS = {
+const PLOT_ARGS = {
 	width: 940,
 	height: 460,
-	data: [],
-	x: 'x',
-	y: 'y',
 	scales: { x: { domain: [0, 10] }, y: { domain: [0, 10] } }
-} satisfies LinePlotStory['args'];
-const LINE_PLOT_ARGS_2 = {
+} satisfies PlotStory['args'];
+const PLOT_ARGS_2 = {
 	width: 940,
-	height: 400
-} satisfies LinePlotStory['args'];
+	height: 400,
+	scales: { x: { domain: [1947, 2019] }, y: { domain: [55, 85] } }
+} satisfies PlotStory['args'];
 
 /** `axis: 'x'`, a literal `value` - one vertical line, spanning the full plot by default. */
-export const Basic: LinePlotStory = {
-	render: renderLinePlot,
+export const Basic: PlotStory = {
+	render: renderPlot,
 	args: {
-		...LINE_PLOT_ARGS,
+		...PLOT_ARGS,
 		markers: [{ type: 'rule', axis: 'x', value: 6 }] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
 /** A list as `value` - a line at each, all with the same style, from a single marker. */
-export const ManyValues: LinePlotStory = {
-	render: renderLinePlot,
+export const ManyValues: PlotStory = {
+	render: renderPlot,
 	args: {
-		...LINE_PLOT_ARGS,
+		...PLOT_ARGS,
 		markers: [
 			{
 				type: 'rule',
@@ -67,10 +64,10 @@ export const ManyValues: LinePlotStory = {
 };
 
 /** `data` + a field-key `value` - one horizontal line per row, from a single marker. */
-export const MultipleFromData: LinePlotStory = {
-	render: renderLinePlot,
+export const MultipleFromData: PlotStory = {
+	render: renderPlot,
 	args: {
-		...LINE_PLOT_ARGS,
+		...PLOT_ARGS,
 		markers: [
 			{
 				type: 'rule',
@@ -84,10 +81,10 @@ export const MultipleFromData: LinePlotStory = {
 };
 
 /** `y1`/`y2` bound the line's own extent instead of spanning the full plot; `styles` sets color/dash pattern. */
-export const Bounded: LinePlotStory = {
-	render: renderLinePlot,
+export const Bounded: PlotStory = {
+	render: renderPlot,
 	args: {
-		...LINE_PLOT_ARGS,
+		...PLOT_ARGS,
 		markers: [
 			{
 				type: 'rule',
@@ -106,18 +103,10 @@ export const Bounded: LinePlotStory = {
 /**
  * Vertical rule markers (ruleX) to highlight specific years.
  */
-export const WithRuleXMarkers: LinePlotStory = {
-	render: renderLinePlot,
+export const WithRuleXMarkers: PlotStory = {
+	render: renderPlot,
 	args: {
-		...LINE_PLOT_ARGS_2,
-		series: [
-			{
-				name: 'female',
-				x: 'year',
-				y: 'value',
-				data: FEMALE_LIFE
-			}
-		],
+		...PLOT_ARGS_2,
 		markers: [
 			{
 				type: 'rule',
@@ -144,18 +133,10 @@ export const WithRuleXMarkers: LinePlotStory = {
 /**
  * Horizontal rule markers (ruleY) to highlight threshold values.
  */
-export const WithRuleYMarkers: LinePlotStory = {
-	render: renderLinePlot,
+export const WithRuleYMarkers: PlotStory = {
+	render: renderPlot,
 	args: {
-		...LINE_PLOT_ARGS_2,
-		series: [
-			{
-				name: 'female',
-				x: 'year',
-				y: 'value',
-				data: FEMALE_LIFE
-			}
-		],
+		...PLOT_ARGS_2,
 		markers: [
 			{
 				type: 'rule',
@@ -182,14 +163,10 @@ export const WithRuleYMarkers: LinePlotStory = {
 /**
  * Mixing vertical and horizontal markers on the same chart.
  */
-export const WithMixedMarkers: LinePlotStory = {
-	render: renderLinePlot,
+export const WithMixedMarkers: PlotStory = {
+	render: renderPlot,
 	args: {
-		...LINE_PLOT_ARGS_2,
-		data: LIFE,
-		x: 'year',
-		y: 'value',
-		color: 'sex',
+		...PLOT_ARGS_2,
 		markers: [
 			{
 				type: 'rule',

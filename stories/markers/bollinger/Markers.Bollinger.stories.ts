@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import Plot from '$lib/plots/generic/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { DAILY_TEMPERATURE, BUENOS_AIRES_TEMPERATURE } from '$datasets';
 
@@ -7,13 +7,11 @@ import { DAILY_TEMPERATURE, BUENOS_AIRES_TEMPERATURE } from '$datasets';
 // A `bollinger` marker (svelteplot's own `BollingerX`/`BollingerY`) draws a
 // moving average - a line - and a band `k` standard deviations either side of
 // it - an area - from the rows it is given. Added to a plot, it reads the
-// plot's own rows and takes its `x` and `y` unless it sets its own: the plot
-// draws the raw readings as dots, and the marker adds the average and its band
-// over them. The average runs along `x` when `x` is the ordered axis.
+// plot's own rows and takes its `x` and `y` unless it sets its own. The average runs along `x` when `x` is the ordered axis.
 
 const meta = {
 	title: 'Markers/Bollinger',
-	component: ScatterPlot,
+	component: Plot,
 	tags: ['autodocs'],
 	args: {
 		width: 940,
@@ -21,7 +19,6 @@ const meta = {
 		data: BUENOS_AIRES_TEMPERATURE,
 		x: 'date',
 		y: 'temp',
-		segments: { default: [{ styles: { dotRadius: 2, dotFillOpacity: 0.6, dotStroke: 'none' } }] },
 		scales: {
 			x: { type: 'time', tickFormat: { month: 'short' } },
 			y: { label: 'Temperature (°C)' }
@@ -34,9 +31,9 @@ const meta = {
 		markers: { control: false }
 	},
 	parameters: {
-		docs: { source: { name: 'ScatterPlot' } }
+		docs: { source: { name: 'Plot' } }
 	}
-} satisfies Meta<typeof ScatterPlot>;
+} satisfies Meta<typeof Plot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

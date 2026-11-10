@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import Plot from '$lib/plots/generic/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { COUNTRIES_AT_2007 } from '$datasets';
 
@@ -12,7 +12,7 @@ import { COUNTRIES_AT_2007 } from '$datasets';
 
 const meta = {
 	title: 'Markers/Delaunay',
-	component: ScatterPlot,
+	component: Plot,
 	tags: ['autodocs'],
 	args: {
 		width: 940,
@@ -28,9 +28,9 @@ const meta = {
 		markers: { control: false }
 	},
 	parameters: {
-		docs: { source: { name: 'ScatterPlot' } }
+		docs: { source: { name: 'Plot' } }
 	}
-} satisfies Meta<typeof ScatterPlot>;
+} satisfies Meta<typeof Plot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

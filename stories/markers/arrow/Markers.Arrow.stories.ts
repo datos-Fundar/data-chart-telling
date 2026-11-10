@@ -1,24 +1,21 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+import Plot from '$lib/plots/generic/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // An `arrow` marker (svelteplot's own `Arrow`) - a point-to-point annotation,
 // unlike `vector` (a point plus a length/rotation, geo-only). `x1`/`y1` →
 // `x2`/`y2` already fully describe the direction, so there's no
-// `isHorizontal` to pick between. Demoed on an empty `LinePlot` canvas so
+// `isHorizontal` to pick between. Demoed on a `Plot` of no data so
 // only the marker itself is on screen, same as `Markers/Rect`.
 
 const meta = {
 	title: 'Markers/Arrow',
-	component: LinePlot,
+	component: Plot,
 	tags: ['autodocs'],
 	args: {
 		width: 940,
 		height: 460,
-		data: [],
-		x: 'x',
-		y: 'y',
 		scales: { x: { domain: [0, 10] }, y: { domain: [0, 10] } }
 	},
 	argTypes: {
@@ -28,9 +25,9 @@ const meta = {
 		markers: { control: false }
 	},
 	parameters: {
-		docs: { source: { name: 'LinePlot' } }
+		docs: { source: { name: 'Plot' } }
 	}
-} satisfies Meta<typeof LinePlot>;
+} satisfies Meta<typeof Plot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

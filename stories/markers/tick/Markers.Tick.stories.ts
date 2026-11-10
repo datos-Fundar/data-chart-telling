@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import Plot from '$lib/plots/generic/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { COUNTRIES_AT_2007 } from '$datasets';
 
@@ -15,12 +15,11 @@ const CONTINENT_DOMAIN = ['Americas', 'Europe', 'Asia', 'Africa'];
 
 const meta = {
 	title: 'Markers/Tick',
-	component: ScatterPlot,
+	component: Plot,
 	tags: ['autodocs'],
 	args: {
 		width: 940,
 		height: 400,
-		data: [],
 		x: 'gdp',
 		y: 'continent',
 		scales: { x: { domain: [0, 50_000] }, y: { type: 'band', domain: CONTINENT_DOMAIN } }
@@ -32,9 +31,9 @@ const meta = {
 		markers: { control: false }
 	},
 	parameters: {
-		docs: { source: { name: 'ScatterPlot' } }
+		docs: { source: { name: 'Plot' } }
 	}
-} satisfies Meta<typeof ScatterPlot>;
+} satisfies Meta<typeof Plot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

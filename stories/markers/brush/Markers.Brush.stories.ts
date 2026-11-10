@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import Plot from '$lib/plots/generic/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { COUNTRIES_AT_2007 } from '$datasets';
 
@@ -13,7 +13,7 @@ import { COUNTRIES_AT_2007 } from '$datasets';
 
 const meta = {
 	title: 'Markers/Brush',
-	component: ScatterPlot,
+	component: Plot,
 	tags: ['autodocs'],
 	args: {
 		width: 940,
@@ -21,7 +21,7 @@ const meta = {
 		data: COUNTRIES_AT_2007,
 		x: 'gdp',
 		y: 'life',
-		color: 'continent'
+		scales: { x: { domain: [0, 50_000] }, y: { domain: [45, 85] } }
 	},
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -30,9 +30,9 @@ const meta = {
 		markers: { control: false }
 	},
 	parameters: {
-		docs: { source: { name: 'ScatterPlot' } }
+		docs: { source: { name: 'Plot' } }
 	}
-} satisfies Meta<typeof ScatterPlot>;
+} satisfies Meta<typeof Plot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -48,7 +48,7 @@ export const Basic: Story = {
 export const InitialSelection: Story = {
 	args: {
 		markers: [
-			{ type: 'brush', brush: { enabled: true, x1: 10, x2: 60, y1: 75, y2: 85 } }
+			{ type: 'brush', brush: { enabled: true, x1: 15000, x2: 25000, y1: 55, y2: 75 } }
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };

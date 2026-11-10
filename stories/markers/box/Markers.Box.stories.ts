@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import Plot from '$lib/plots/generic/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { COUNTRIES_AT_2007 } from '$datasets';
 
@@ -22,25 +22,19 @@ import { COUNTRIES_AT_2007 } from '$datasets';
 // plot's do. `tickMedian`/`tickMinMax` both default to *shown* even when left
 // unset (this package's own default - svelteplot itself defaults
 // `tickMinMax` off). `bar.fill` itself defaults to this package's own
-// `cfg.palette[0]` when unset. Hosted on `ScatterPlot` - a more natural fit
-// for country-level data than a line chart, even though the marker itself
-// doesn't depend on the host kind. Demoed on an empty canvas with a
+// `cfg.palette[0]` when unset. Demoed on a `Plot` of no data with a
 // categorical axis so only the marker itself is on screen - same convention
-// as `Markers/Bar` (an empty host avoids drawing an unrelated default series
-// through the marker's own, separately-grouped rows).
+// as `Markers/Bar`.
 
 const CONTINENT_DOMAIN = ['Americas', 'Europe', 'Asia', 'Africa'];
 
 const meta = {
 	title: 'Markers/Box',
-	component: ScatterPlot,
+	component: Plot,
 	tags: ['autodocs'],
 	args: {
 		width: 940,
 		height: 460,
-		data: [],
-		x: 'continent',
-		y: 'gdp',
 		scales: { x: { domain: CONTINENT_DOMAIN }, y: { domain: [0, 50_000] } }
 	},
 	argTypes: {
@@ -50,9 +44,9 @@ const meta = {
 		markers: { control: false }
 	},
 	parameters: {
-		docs: { source: { name: 'ScatterPlot' } }
+		docs: { source: { name: 'Plot' } }
 	}
-} satisfies Meta<typeof ScatterPlot>;
+} satisfies Meta<typeof Plot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

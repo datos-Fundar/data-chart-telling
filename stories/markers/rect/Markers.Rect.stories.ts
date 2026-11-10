@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+import Plot from '$lib/plots/generic/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -7,19 +7,16 @@ import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 // literal `x1`/`x2`/`y1`/`y2` bounds, unlike `bar` (which is built for one
 // mark per data row on a categorical axis). `data: [{}]` is a one-row
 // placeholder - nothing in it is actually read when every bound is a literal
-// number. Demoed on an empty `LinePlot` canvas so only the marker itself is
+// number. Demoed on a `Plot` of no data so only the marker itself is
 // on screen - see `Channels/X1X2Y1Y2` for `x1`/`x2`/`y1`/`y2` on real data.
 
 const meta = {
 	title: 'Markers/Rect',
-	component: LinePlot,
+	component: Plot,
 	tags: ['autodocs'],
 	args: {
 		width: 940,
 		height: 460,
-		data: [],
-		x: 'x',
-		y: 'y',
 		scales: { x: { domain: [0, 10] }, y: { domain: [0, 10] } }
 	},
 	argTypes: {
@@ -29,9 +26,9 @@ const meta = {
 		markers: { control: false }
 	},
 	parameters: {
-		docs: { source: { name: 'LinePlot' } }
+		docs: { source: { name: 'Plot' } }
 	}
-} satisfies Meta<typeof LinePlot>;
+} satisfies Meta<typeof Plot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

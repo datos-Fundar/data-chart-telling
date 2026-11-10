@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import Plot from '$lib/plots/generic/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -24,14 +24,11 @@ const PATHS = [
 
 const meta = {
 	title: 'Markers/Trail',
-	component: ScatterPlot,
+	component: Plot,
 	tags: ['autodocs'],
 	args: {
 		width: 940,
 		height: 460,
-		data: [],
-		x: 'x',
-		y: 'y',
 		scales: { x: { domain: [0, 8] }, y: { domain: [0, 10] } }
 	},
 	argTypes: {
@@ -41,9 +38,9 @@ const meta = {
 		markers: { control: false }
 	},
 	parameters: {
-		docs: { source: { name: 'ScatterPlot' } }
+		docs: { source: { name: 'Plot' } }
 	}
-} satisfies Meta<typeof ScatterPlot>;
+} satisfies Meta<typeof Plot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

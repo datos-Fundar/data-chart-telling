@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+import Plot from '$lib/plots/generic/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { FEMALE_LIFE, MALE_LIFE } from '$datasets';
 
@@ -7,8 +7,8 @@ import { FEMALE_LIFE, MALE_LIFE } from '$datasets';
 // An `area` marker (svelteplot's own `AreaX`/`AreaY`) - a filled area under a
 // curve, or a band between two curves. Orientation is automatic: `AreaX` when
 // `x` is the quantitative axis and `y` a categorical/temporal one (here a
-// time scale), `AreaY` otherwise - the config never names "X" or "Y" itself. Hosted on a `LinePlot` with its own
-// real series, so the underlying line and the area marker share one scale.
+// time scale), `AreaY` otherwise - the config never names "X" or "Y" itself. Drawn with
+// a `line` marker over the same rows, so the line and the area share one scale.
 
 const CONFIDENCE_BAND = FEMALE_LIFE.map((d, i) => ({
 	year: d.year,
@@ -18,7 +18,7 @@ const CONFIDENCE_BAND = FEMALE_LIFE.map((d, i) => ({
 
 const meta = {
 	title: 'Markers/Area',
-	component: LinePlot,
+	component: Plot,
 	tags: ['autodocs'],
 	args: {
 		width: 940,
@@ -35,9 +35,9 @@ const meta = {
 		markers: { control: false }
 	},
 	parameters: {
-		docs: { source: { name: 'LinePlot' } }
+		docs: { source: { name: 'Plot' } }
 	}
-} satisfies Meta<typeof LinePlot>;
+} satisfies Meta<typeof Plot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -62,16 +62,6 @@ export const Band: Story = {
 		data: CONFIDENCE_BAND,
 		y: 'high',
 		scales: { y: { label: '↑ Male-Female Life Expectancy' } },
-		segments: {
-			default: [
-				{
-					areas: [],
-					styles: {
-						stroke: { stroke: 'red' }
-					}
-				}
-			]
-		},
 		markers: [
 			{
 				type: 'area',
@@ -96,7 +86,7 @@ export const Horizontal: Story = {
 				type: 'area',
 				x: 'value',
 				y: 'year',
-				styles: { fill: '#16a34a', fillOpacity: 0.35 }
+				styles: { fillOpacity: 0.35 }
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
