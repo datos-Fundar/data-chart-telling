@@ -77,7 +77,13 @@
 				: (marker.textAnchor ?? styles?.textAnchor)
 		)
 	);
-	const lineAnchor = $derived(styles?.lineAnchor ?? 'middle');
+	const lineAnchor = $derived(
+		(typeof marker.lineAnchor === 'function' ? undefined : marker.lineAnchor) ??
+			styles?.lineAnchor ??
+			'middle'
+	);
+	const lineAnchorAt = (d: TData) =>
+		typeof marker.lineAnchor === 'function' ? marker.lineAnchor(d) : lineAnchor;
 	// A label in a slice of its band sits off the band's middle, at its drawn width.
 	const nudge = $derived(BandNudge.of(plot.scales, marker.bandSlice));
 	// The fixed offset, which `declutter` and `edgeAware` place labels by; a function of the row moves each label after that, through `RowOffsetMarks`.
@@ -114,7 +120,8 @@
 			!!marker.edgeAware ||
 			!!marker.origin ||
 			events.any ||
-			typeof marker.textAnchor === 'function'
+			typeof marker.textAnchor === 'function' ||
+			typeof marker.lineAnchor === 'function'
 	);
 	/** Where a row's point sits off its `x`/`y`. */
 	const originOf = (d: TData) => marker.origin?.(d, plot.scales) ?? { dx: 0, dy: 0 };
@@ -425,7 +432,7 @@
 									labelDx + origin.dx,
 									dy + extraDy + origin.dy,
 									lane?.aligned && laneDir !== dir ? flipAnchor(anchorAt(d)) : anchorAt(d),
-									lineAnchor
+									lineAnchorAt(d)
 								)}
 							{/if}
 						{/snippet}

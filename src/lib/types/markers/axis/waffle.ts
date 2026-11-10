@@ -1,3 +1,4 @@
+import type { PathLabelConfig, PageEdge, ValueEdge } from '$lib/types/markers/labels/path';
 import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
 import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { CommonMarkerConfigWithOrientation } from '$lib/types/markers/channels/commonMarkerConfigWithOrientation';
@@ -18,4 +19,6 @@ export type WaffleMarkerConfig = {
 } & CommonMarkerConfigWithOrientation &
 	CommonMarkerConfigWithColor &
 	CommonMarkerConfigWithInterval &
-	CommonMarkerConfigWithLabel<BoxLabelConfig | PointLabelConfig>;
+	CommonMarkerConfigWithLabel<
+		BoxLabelConfig | PathLabelConfig<PageEdge | ValueEdge> | PointLabelConfig
+	>;

@@ -2,11 +2,10 @@ import type { LabelBaseConfig } from '$lib/types/markers/labels/common';
 import type { TextMarkerConfig } from '$lib/types/markers/basic/text';
 import type { LabelAnchor } from '$lib/types/plots/constants';
 
-/** A label written in the box of each shape, fitted to it unless `fit` is `false` or it is `outside`. */
+/** A label written in the box of each shape, fitted to it unless `fit` is `false`. */
 export type BoxLabelConfig = LabelBaseConfig & {
 	layout?: 'box';
 	anchor?: LabelAnchor;
-	outside?: boolean;
 	/** Defaults to the configuration's `text.label.gap`. */
 	gap?: number;
 };
@@ -34,6 +33,8 @@ export type BoxGeometryOf = {
 	y: unknown;
 	box: BoxChannels | BoxSizer;
 	size?: BoxSizer;
+	/** For a shape that runs along a value: the axis it runs on, and where each row starts (its base) and ends (its tip). */
+	ends?: { axis: 'x' | 'y'; from: (row: unknown) => unknown; to: (row: unknown) => unknown };
 };
 
 export type BoxLabelMarker = { marker: TextMarkerConfig; box: BoxChannels | BoxSizer };

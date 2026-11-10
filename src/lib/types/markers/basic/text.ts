@@ -3,7 +3,7 @@ import type { CommonMarkerConfig } from '$lib/types/markers/channels/commonMarke
 import type { CommonMarkerConfigWithRowOffset } from '$lib/types/markers/channels/commonMarkerConfigWithRowOffset';
 import type { Margins } from '$lib/layout/margins/Margins';
 import type { BandSlice } from '$lib/types/layout/hover';
-import type { LabelAnchor, TextAnchor } from '$lib/types/plots/constants';
+import type { LabelAnchor, LineAnchor, TextAnchor } from '$lib/types/plots/constants';
 import type { NumberDisplay } from '$lib/types/layout/numbers';
 
 /**
@@ -84,6 +84,9 @@ export type TextMarkerConfig = CommonMarkerConfigWithRowOffset<
 		/** Which side of its point the text sits on: a value, or a function of the row. Wins over `styles.textAnchor`. */
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		textAnchor?: TextAnchor | ((d: any) => TextAnchor);
+		/** Which side of its point the text sits on vertically: a value, or a function of the row. Wins over `styles.lineAnchor`. */
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		lineAnchor?: LineAnchor | ((d: any) => LineAnchor);
 		/** Lays out overlapping labels - see {@link TextDeclutterConfig}. `true` is `'lanes'` with every default. */
 		declutter?: boolean | TextDeclutterMode | TextDeclutterConfig;
 		/** Writes each label to fit its box - see {@link TextFitConfig}. `true` takes every default. */

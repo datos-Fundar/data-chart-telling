@@ -15,7 +15,8 @@ const ROW_KEYS: Record<string, Read> = {
 	dx: 'field',
 	dy: 'field',
 	text: 'either',
-	textAnchor: 'literal'
+	textAnchor: 'literal',
+	lineAnchor: 'literal'
 };
 const ROW_STYLE_KEYS = ['fill', 'fillOpacity', 'stroke', 'strokeWidth', 'fontWeight', 'fontStyle'];
 

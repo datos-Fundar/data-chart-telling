@@ -2,6 +2,7 @@ import { MarkerKinds } from '$lib/markers/MarkerKinds';
 import { BoxGeometry } from '$lib/markers/labels/geometry/BoxGeometry';
 import { PointGeometry } from '$lib/markers/labels/geometry/PointGeometry';
 import { BoxLayout } from '$lib/markers/labels/layouts/BoxLayout';
+import { PathLayout } from '$lib/markers/labels/layouts/PathLayout';
 import { PointLayout } from '$lib/markers/labels/layouts/PointLayout';
 import { LabelMerge } from '$lib/markers/labels/LabelMerge';
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
@@ -13,6 +14,7 @@ import type {
 } from '$lib/types/markers/labels/box';
 import type { LabelLayout, MarkerLabelConfig } from '$lib/types/markers/labels/common';
 import type { PointLabelConfig } from '$lib/types/markers/labels/point';
+import type { PathLabelConfig } from '$lib/types/markers/labels/path';
 import type { TextMarkerConfig } from '$lib/types/markers/basic/text';
 
 type Labelled = BoxedMarker & { label?: MarkerLabelConfig | MarkerLabelConfig[] };
@@ -43,25 +45,25 @@ export class MarkerLabels {
 
 	/** Whether it is read on its shape's color. */
 	static isOnShape(marker: { type?: string }, label: MarkerLabelConfig): boolean {
-		return MarkerLabels.layoutOf(marker, label) === 'box' && !(label as BoxLabelConfig).outside;
+		const layout = MarkerLabels.layoutOf(marker, label);
+		return layout === 'box' || (layout === 'path' && (label as PathLabelConfig).side === 'inside');
 	}
 
-	/** The `'box'` labels of a marker, drawn with its shapes. */
+	/** The `'box'` and `'path'` labels of a marker, drawn with its shapes. */
 	static build(marker: Labelled, plot: LabelPlot = {}): BoxLabelMarker[] {
 		const shape = MarkerKinds.of(marker.type)?.labels?.box;
 		if (!shape) return [];
+		const options = { data: marker.data, scales: plot.scales, gap: plot.gap };
 		return MarkerLabels.list(marker).flatMap((label) => {
-			if (MarkerLabels.layoutOf(marker, label) !== 'box') return [];
+			const layout = MarkerLabels.layoutOf(marker, label);
+			if (layout !== 'box' && layout !== 'path') return [];
 			const geometry = BoxGeometry.of(shape, marker, plot);
-			return geometry
-				? [
-						BoxLayout.build(label as BoxLabelConfig, geometry, {
-							data: marker.data,
-							scales: plot.scales,
-							gap: plot.gap
-						})
-					]
-				: [];
+			if (!geometry) return [];
+			const built =
+				layout === 'box'
+					? BoxLayout.build(label as BoxLabelConfig, geometry, options)
+					: PathLayout.build(label as PathLabelConfig, geometry, options);
+			return built ? [built] : [];
 		});
 	}
 

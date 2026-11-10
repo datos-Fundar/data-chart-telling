@@ -16,9 +16,9 @@ export class BoxLayout {
 		plot: { data?: unknown[]; scales?: () => BoxScales | undefined; gap?: number } = {}
 	): BoxLabelMarker {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { anchor, outside, gap, layout, ...text } = label;
+		const { anchor, gap, layout, ...text } = label;
 		const placed = BoxLayout.#anchored(
-			{ anchor, outside, gap: gap ?? plot.gap },
+			{ anchor, gap: gap ?? plot.gap },
 			text,
 			geometry.size,
 			plot.scales
@@ -26,7 +26,7 @@ export class BoxLayout {
 		return {
 			box: geometry.box,
 			marker: {
-				fit: !outside,
+				fit: true,
 				...text,
 				...placed,
 				type: 'text',
@@ -39,24 +39,21 @@ export class BoxLayout {
 
 	/** The offset (per row, as each box has its own size) and text anchors that put a label at `anchor`. */
 	static #anchored(
-		where: { anchor?: LabelAnchor; outside?: boolean; gap?: number },
-		label: Omit<BoxLabelConfig, 'anchor' | 'outside' | 'gap' | 'layout'>,
+		where: { anchor?: LabelAnchor; gap?: number },
+		label: Omit<BoxLabelConfig, 'anchor' | 'gap' | 'layout'>,
 		size: BoxSizer | undefined,
 		scales: (() => BoxScales | undefined) | undefined
 	): Partial<TextMarkerConfig> {
-		const { anchor = 'middle', outside = false } = where;
+		const { anchor = 'middle' } = where;
 		if (anchor === 'middle' || !size) return {};
 		const gap = where.gap ?? 4;
 		const horizontal = anchor.endsWith('left') ? -1 : anchor.endsWith('right') ? 1 : 0;
 		const vertical = anchor.startsWith('top') ? -1 : anchor.startsWith('bottom') ? 1 : 0;
-		// A corner is always inside its shape.
-		const beyond = outside && horizontal * vertical === 0;
-		const away = beyond ? 1 : -1;
 		const move = (axis: 'width' | 'height', side: number, row: unknown) => {
 			// Read at draw time: the scales move as the labels register.
 			const current = scales?.();
 			const box = current ? size(row, current) : undefined;
-			return box ? side * (box[axis] / 2 + away * gap) : 0;
+			return box ? side * (box[axis] / 2 - gap) : 0;
 		};
 		const own = (value: unknown, fallback: unknown) =>
 			Number(typeof value === 'number' ? value : (fallback ?? 0));
@@ -69,10 +66,10 @@ export class BoxLayout {
 				...label.styles,
 				textAnchor:
 					label.styles?.textAnchor ??
-					(horizontal === 0 ? 'middle' : (horizontal === 1) === beyond ? 'start' : 'end'),
+					(horizontal === 0 ? 'middle' : horizontal === 1 ? 'end' : 'start'),
 				lineAnchor:
 					label.styles?.lineAnchor ??
-					(vertical === 0 ? 'middle' : (vertical === 1) === beyond ? 'top' : 'bottom')
+					(vertical === 0 ? 'middle' : vertical === 1 ? 'bottom' : 'top')
 			}
 		} as Partial<TextMarkerConfig>;
 	}

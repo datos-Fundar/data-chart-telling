@@ -13,12 +13,13 @@ import type { ValuesStyle } from '$lib/types/layout/styles';
 import type { ValueLabelsOptions } from '$lib/types/phases/styles/phase';
 import type { Series } from '$lib/types/plots/data/common';
 import type { FontStyle, StrokeStyle } from '$lib/types/plots/styling';
-import type { LabelAnchor, TextAnchor, ValueAnchor } from '$lib/types/plots/constants';
+import type { TextAnchor, ValueAnchor } from '$lib/types/plots/constants';
 import type { BoxAnchors, EdgeBox } from '$lib/types/layout/box';
 import type { MarginSide } from '$lib/types/plots/props';
 import type { AxisPlotEnv, AxisPlotState, ProcessedData, ProcessedRow } from '$lib/types/phases';
 import type { TextMarkerConfig } from '$lib/types/markers/common';
 import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
+import type { PathLabelConfig, ShapePlacement } from '$lib/types/markers/labels/path';
 import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 
 /**
@@ -207,26 +208,21 @@ export class ValueLabels {
 	}
 
 	/**
-	 * Where in a bar a label goes, from the `anchor` of `styles.values`: its `label` anchor, and whether it is beyond
-	 * the bar. `negative` tells a bar that runs to the left (or down) from its base from one that runs right (or up),
-	 * which `'tip'`, `'base'` and `'outside'` follow; the others are the edges of the page. A `stacked` bar's label is
+	 * Where in a bar a label goes, from the `anchor` of `styles.values`: `'outside'` is past the tip of each bar, along
+	 * the sign of its own value. `'tip'` and `'base'` are the bar's ends inside it, which `negative` tells apart for a
+	 * bar that runs left (or down) from its base; the others are the edges of the page. A `stacked` bar's label is
 	 * always in the middle. An anchor the shapes do not read (`'start'`, `'end'`) is taken for `'outside'`, the default.
 	 */
 	static boxAnchor(
 		anchor: ValueAnchor,
 		shape: { isHorizontal: boolean; negative?: boolean; stacked?: boolean }
-	): { anchor: LabelAnchor; outside?: boolean } {
+	): ShapePlacement {
 		if (shape.stacked || anchor === 'middle') return { anchor: 'middle' };
-		// A place in the shape as it is drawn on the page, which no sign moves.
-		if (
-			anchor !== 'outside' &&
-			anchor !== 'start' &&
-			anchor !== 'end' &&
-			anchor !== 'tip' &&
-			anchor !== 'base'
-		) {
-			return { anchor };
+		if (anchor === 'outside' || anchor === 'start' || anchor === 'end') {
+			return { layout: 'path', edge: 'tip', side: 'outside' };
 		}
+		// A place in the shape as it is drawn on the page, which no sign moves.
+		if (anchor !== 'tip' && anchor !== 'base') return { anchor };
 		const [tip, base] = shape.isHorizontal
 			? shape.negative
 				? (['left', 'right'] as const)
@@ -234,51 +230,49 @@ export class ValueLabels {
 			: shape.negative
 				? (['bottom', 'top'] as const)
 				: (['top', 'bottom'] as const);
-		if (anchor === 'base') return { anchor: base };
-		return anchor === 'tip' ? { anchor: tip } : { anchor: tip, outside: true };
+		return { anchor: anchor === 'base' ? base : tip };
 	}
 
 	/** Whether a label at `anchor` goes to one side or the other of a bar with the sign of its value. */
 	static followsSign(anchor: ValueAnchor): boolean {
-		return anchor === 'outside' || anchor === 'tip' || anchor === 'base';
+		return anchor === 'tip' || anchor === 'base';
 	}
 
 	/**
 	 * The `label` the shapes of a plot kind write their value in: this plot's `styles.values` over the `defaults` the kind
 	 * sets, with what every label shares ({@link hooks}) - its dimming and isolating of a series. A label inside its shape
-	 * never reaches out of the plot, so only one `outside` has the margins grow to hold it; and it takes the default
-	 * `fill` only `outside`, for inside it is written in the color that contrasts with its shape.
+	 * never reaches out of the plot, so only one past its edge has the margins grow to hold it; and it takes the default
+	 * `fill` only there, for inside it is written in the color that contrasts with its shape.
 	 */
-	shapeLabel(
+	shapeLabel<TPlace extends ShapePlacement | object = object>(
 		env: AxisPlotEnv,
 		text: (row: ProcessedRow) => string,
 		defaults: {
 			fill?: string;
 			fontSize?: number;
 			fontWeight?: FontStyle['fontWeight'];
-			anchor?: LabelAnchor;
-			outside?: boolean;
 			gap?: number;
-		} = {}
-	): BoxLabelConfig {
+		} & TPlace = {} as TPlace
+	): TPlace extends { layout: 'path' } ? PathLabelConfig : BoxLabelConfig {
 		const { fitMargins, styles: shared, ...events } = this.hooks(env);
 		const { font } = this;
+		const { fill, fontSize, fontWeight, gap, ...placement } = defaults;
+		const beyond = (placement as { side?: string }).side === 'outside';
 		return {
 			...events,
+			...placement,
 			text,
-			anchor: defaults.anchor,
-			outside: defaults.outside,
-			gap: defaults.gap,
-			fitMargins: defaults.outside ? fitMargins : undefined,
+			gap,
+			fitMargins: beyond ? fitMargins : undefined,
 			styles: {
 				...shared,
 				...font,
 				// Inside its shape, a label unset is written in the color that reads best on it.
-				fill: font?.fill ?? (defaults.outside ? defaults.fill : undefined),
-				fontSize: font?.fontSize ?? defaults.fontSize ?? 12,
-				fontWeight: font?.fontWeight ?? defaults.fontWeight
+				fill: font?.fill ?? (beyond ? fill : undefined),
+				fontSize: font?.fontSize ?? fontSize ?? 12,
+				fontWeight: font?.fontWeight ?? fontWeight
 			}
-		} as BoxLabelConfig;
+		} as never;
 	}
 
 	/**

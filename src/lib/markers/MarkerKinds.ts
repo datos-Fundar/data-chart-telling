@@ -27,7 +27,7 @@ export class MarkerKinds {
 			clip: true,
 			drawsRows: true,
 			legendSymbol: 'bar',
-			labels: { default: 'box', box: 'band', point: 'box' }
+			labels: { default: 'box', box: 'band', path: 'box', point: 'box' }
 		},
 		bollinger: {
 			oriented: true,
@@ -49,7 +49,7 @@ export class MarkerKinds {
 			clip: true,
 			drawsRows: true,
 			legendSymbol: 'cell',
-			labels: { default: 'box', box: 'cell', point: 'box' }
+			labels: { default: 'box', box: 'cell', path: 'box', point: 'box' }
 		},
 		component: { clip: false, drawsRows: false },
 		contour: { clip: false, drawsRows: false },
@@ -114,7 +114,7 @@ export class MarkerKinds {
 			clip: true,
 			drawsRows: true,
 			legendSymbol: 'rect',
-			labels: { default: 'box', box: 'edges', point: 'box' }
+			labels: { default: 'box', box: 'edges', path: 'box', point: 'box' }
 		},
 		regression: {
 			oriented: true,
@@ -166,7 +166,7 @@ export class MarkerKinds {
 			inherits: ['x', 'y', 'color'],
 			clip: true,
 			drawsRows: true,
-			labels: { default: 'box', box: 'band', point: 'box' }
+			labels: { default: 'box', box: 'band', path: 'box', point: 'box' }
 		}
 	} satisfies Record<Kind, MarkerTraits>;
 

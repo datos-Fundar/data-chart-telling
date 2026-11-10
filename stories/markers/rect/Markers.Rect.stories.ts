@@ -118,8 +118,8 @@ export const Label: Story = {
 
 /**
  * `anchor` puts the label against an edge (`'top'`, `'bottom'`, `'left'`, `'right'`) or in a corner (`'top-left'`...)
- * instead of the middle, and `outside` puts one anchored to an edge beyond it. `gap` is its distance from the edge.
- * A label outside is not fitted, and `fitMargins` makes room for it where it would run past the plot.
+ * instead of the middle; `gap` is its distance from the edge. `layout: 'path'` writes one along an edge instead, beyond
+ * it by default: it is not fitted, and `fitMargins` makes room for it where it would run past the plot.
  */
 export const LabelAnchor: Story = {
 	args: {
@@ -143,7 +143,7 @@ export const LabelAnchor: Story = {
 				y1: 'y1',
 				y2: 'y2',
 				styles: { fill: 'steelblue', fillOpacity: 0.85 },
-				label: { text: 'outside, above', anchor: 'top', outside: true }
+				label: { layout: 'path', text: 'along its top edge', edge: 'top' }
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

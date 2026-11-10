@@ -120,8 +120,9 @@ export class BoxGeometry {
 				? { width: length, height: thickness }
 				: { width: thickness, height: length };
 		};
+		const ends = { axis: isHorizontal ? 'x' : 'y', from: first, to: last } as const;
 		return isHorizontal
-			? { box, size: box, x: middleOf, y: category }
-			: { box, size: box, x: category, y: middleOf };
+			? { box, size: box, ends, x: middleOf, y: category }
+			: { box, size: box, ends, x: category, y: middleOf };
 	}
 }

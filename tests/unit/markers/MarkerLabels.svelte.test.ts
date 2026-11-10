@@ -30,11 +30,13 @@ describe('MarkerLabels', () => {
 		expect(MarkerLabels.layoutOf({ type: 'rule' }, { text: 'a' })).toBeUndefined();
 	});
 
-	test('a box label is on its shape unless it is set beyond an edge', () => {
-		expect(MarkerLabels.isOnShape({ type: 'cell' }, { text: 'a' })).toBe(true);
+	test('a box label is on its shape, a path label only inside its edge', () => {
+		const cell = { type: 'cell' };
+		expect(MarkerLabels.isOnShape(cell, { text: 'a' })).toBe(true);
+		expect(MarkerLabels.isOnShape(cell, { layout: 'path', text: 'a', edge: 'top' })).toBe(false);
 		expect(
-			MarkerLabels.isOnShape({ type: 'cell' }, { text: 'a', anchor: 'top', outside: true })
-		).toBe(false);
+			MarkerLabels.isOnShape(cell, { layout: 'path', text: 'a', edge: 'top', side: 'inside' })
+		).toBe(true);
 	});
 
 	test('a kind without labels, or a shape that says nowhere, builds no label markers', () => {

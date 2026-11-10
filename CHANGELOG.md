@@ -8,6 +8,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - A marker's `label` can be a list of labels, each written over its shapes on its own: `label: [{ text: 'value', anchor: 'top' }, { text: 'name', anchor: 'bottom' }]`. A label takes a `layout`, how it is laid out on its shape; `'box'`, the box each row's shape spans, is the one a `rect`, `cell`, `bar` or `waffle` takes.
 - A `line`, `area`, `trail` or `dot` marker takes a `label` too, written beside a point (`layout: 'point'`): `select` picks the rows labelled of each `grouping` (`'first'`, `'last'`, `'min'`, `'max'`, a list of them or a function of the row), and `declutter` spreads them apart - together with the point labels of every other marker of the plot: `{ type: 'line', grouping: 'country', label: { text: 'country', select: 'last', declutter: true } }`. A `rect`, `cell`, `bar` or `waffle` label takes `layout: 'point'` as well, starting at its `anchor` on each shape's box: an edge's middle or a corner.
+- A `rect`, `cell`, `bar` or `waffle` label takes `layout: 'path'`: written along an edge of each shape - `edge` (`'top'`, `'bottom'`, `'left'`, `'right'`, and on a `bar` or `waffle` `'tip'`, the end its value runs to, or `'base'`, read per row so a bar below zero has its tip at its bottom), beyond it, inside it or on it (`side: 'outside' | 'inside' | 'on'`), at an `offset` along it (`'start'`, `'middle'`, `'end'` or a percentage) and `gap` from it: `label: { layout: 'path', text: 'value', edge: 'tip' }`. A `text` marker's `lineAnchor` can be a function of the row, as its `textAnchor`.
 - `declutter: 'around'` on a `text` marker or a point label: each label goes on a free spot around its point - its own side first, then the other sides and the corners - clear of the other labels and points and inside the plot's area; a label with no free spot is left out. `declutter: 'lanes'` (what `true` is) spreads them into lanes, as before; `{ mode: 'around' }` sets it in an options object.
 - A `Plot` of no kind, that draws only its `markers`, with every option a plot takes (`segments`, `styles`, `transforms`, chrome...): `<Plot markers={[{ type: 'density', data, x: 'gdp', y: 'life' }]} />`. Its `data`, `series` and channels are optional; markers without their own take them.
 - Markers take the plot's channels they leave unset, as far as their kind does: `x`/`y` on each axis they set no position for (`x`, `x1` or `x2`...), and `opacity`, `symbol`, `r` and `length`, with the plot's scales for those.
@@ -15,6 +16,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- **Breaking:** a shape's `label` loses `outside`: a label beyond an edge is a `'path'` one. `{ anchor: 'top', outside: true }` is `{ layout: 'path', edge: 'top' }`.
 - **Breaking:** the shared plot shell exported as `Plot` (to build plot kinds of your own) is `AbstractPlot`; `Plot` is the plot of no kind.
 - A `ScatterPlot`'s value labels go around their points (`declutter: 'around'`), leaving out those with no room, instead of overlapping; `styles.values.select` and `series` pick the points labelled.
 
