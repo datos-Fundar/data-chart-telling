@@ -16,6 +16,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - **`GeoPlot` hover no longer lays the map out again.** The hovered province is drawn on the plot's projection without joining its scales, so entering or leaving one no longer works out the scales and projection anew - which, with facets and a synced tooltip, was repeated in every panel.
 - **Facet grids no longer crawl through a timeline.** A step used to give `FacetLayout` new entry objects, which its each blocks wrote into their items from inside their own effect, and Svelte then walked every derived the write reached, in each panel. The blocks now iterate the panels' keys, and each cell reads its entry from a derived.
 - **Shared domains on a stacked, faceted timeline.** With a `timeline` that shows each step's own rows (`filterMode: 'exact'`), a shared value axis was fitted to the rows of every step stacked together. It now reaches the largest total any step stacks in any panel. With `'upTo'` a step shows every row up to it, so the last step's stack still sets it.
+- **Docs: horizontal stacked bars use `stackX`.** The bar plot's page, the transforms page and the LLM notes said stacking is always `stackY`, also for horizontal bars. A stack runs along the value axis: `stackY` with values on `y` (vertical bars), `stackX` with values on `x` (horizontal bars); the other makes the category axis numeric and the bars come out empty.
 
 ## [1.19.0] - 2026-11-11
 

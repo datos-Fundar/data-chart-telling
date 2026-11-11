@@ -69,7 +69,7 @@ Per kind: `BarPlot` x = category, y = value (swap for horizontal bars); `Pyramid
 8. Narrow plots with long category or series names: shorten the text in the data, format with `tickFormat` / `values.format`, or give `margins` more room.
 9. In Svelte 5 components, `state` is taken by the `$state` rune: name local variables otherwise.
 10. In a `facet`, every panel draws the plot's `markers` and `segments`. Give one a `facet` (a `by` value, a list of them, or `{ row, col }` in a `rows`/`cols` grid) to draw it only in the panels it names: `markers={[{ type: 'rule', axis: 'y', value: 10, facet: 'GBA' }]}`, `segments={{ Services: [{ facet: 'Cuyo', styles: { stroke: { strokeDasharray: '4 4' } } }] }}`. A plot with no facet leaves out whatever names one.
-10. Stacking is `transforms={[{ type: 'stackY' }]}`, also for horizontal bars (the value channel is the one stacked).
+10. Bars stack along their value axis: `transforms={[{ type: 'stackY' }]}` for vertical bars (values on `y`), `transforms={[{ type: 'stackX' }]}` for horizontal ones (values on `x`, categories on `y`); the wrong one draws no bars.
 
 ## Reading and driving plot state (custom UI)
 
