@@ -2,7 +2,7 @@
 	lang="ts"
 	generics="TRow extends Record<string, unknown>, TScales extends object, TCore extends PlotCoreBase"
 >
-	import type { Component } from 'svelte';
+	import { untrack, type Component } from 'svelte';
 	import Figure from '$lib/layout/figure/Figure.svelte';
 	import TimelineLayout from '$lib/layout/timeline/TimelineLayout.svelte';
 	import FacetLayout from '$lib/layout/facet/FacetLayout.svelte';
@@ -22,6 +22,7 @@
 	import { TimelineTime } from '$lib/layout/timeline/TimelineTime';
 	import { TimelineSteps } from '$lib/layout/timeline/TimelineSteps';
 	import { resolveAccessor } from '$lib/utils/accessors';
+	import { ConfigEquality } from '$lib/utils/ConfigEquality';
 	import { FacetScope } from '$lib/layout/facet/scope';
 	import type { TooltipProp } from '$lib/types/layout/tooltip';
 	import type { MarginConfig, PlotChromeConfig } from '$lib/types/plots/props';
@@ -134,40 +135,82 @@
 		return (r: TRow[], f: FacetConfig<TRow> | undefined, legend: LegendState | null) =>
 			run.runData(core ?? {}, r, f as never, legend, cfg);
 	});
+	// What sets a timeline's steps, as values that change only when they do: a moving `progress` makes a new
+	// `timeline` object, which these do not follow, so the frame is not run again for it.
+	const stepAccessor = $derived(timeline?.accessor);
+	const stepDateFormat = $derived(timeline?.dateFormat);
+	const stepValues = $derived(timeline?.values);
+	const stepMode = $derived(slicing.filterMode);
+
+	// The plot's own props: one array that is the same object while none of them changed. Rows are compared as
+	// the same object, the rest - `segments`, `styles`, `scales` - as they hold, so a parent that builds the
+	// same configuration again does not make the data phases run again.
+	const ROW_PROPS = new Set(['data', 'series']);
+	let propsSeen: unknown[] = [];
+	const propsKey = $derived.by(() => {
+		const now = core
+			? Object.keys(core).flatMap((key) => [key, (core as Record<string, unknown>)[key]])
+			: [];
+		const same =
+			now.length === propsSeen.length &&
+			now.every(
+				(value, i) =>
+					Object.is(value, propsSeen[i]) ||
+					(i % 2 === 1 &&
+						!ROW_PROPS.has(String(now[i - 1])) &&
+						ConfigEquality.same(value, propsSeen[i]))
+			);
+		if (same) return propsSeen;
+		propsSeen = now;
+		return now;
+	});
+
 	/**
 	 * The frame: the run over every row. With a timeline that shows each step's own rows, the domains it
 	 * shares are the widest any step reaches - a step's rows stack, aggregate or bin among themselves, so the
 	 * extent over every row at once would be wider than any step's.
+	 *
+	 * It is run again when what the runs read changes - the plot's props (`segments` among them), the
+	 * configuration, the rows, the facet, what sets the steps - and for nothing else: a moving timeline, or
+	 * a pointer, never makes it run again.
 	 */
-	function runFrame(): DataRunState | undefined {
-		if (!dataRun || !rows) return undefined;
-		const whole = dataRun(rows, facet, null);
-		if (!timeline) return whole;
-		const reader = new TimelineTime(timeline.dateFormat);
-		const get = resolveAccessor<TRow>(timeline.accessor as never) as (row: TRow) => unknown;
-		const named = timeline.values?.map((v) => reader.toTime(v)).filter((t) => t !== undefined);
-		const steps = TimelineSteps.of(named, rows, (row) => reader.toTime(get(row)) ?? NaN);
-		const perStep = steps.values
-			.filter((step) => !Number.isNaN(step))
-			.map((step) => dataRun(rows.filter(slicing.keep({ time: step })), facet, null).sharedScales);
-		const bands = (whole as { axes?: { bands?: string[] } }).axes?.bands ?? [];
-		return { ...whole, sharedScales: SharedStepScales.over(whole.sharedScales, bands, perStep) };
-	}
-	// Kept while its inputs are the same objects: a timeline step re-reads them without changing them. The
-	// timeline counts by what sets its steps, not by its object, which a moving `progress` makes anew.
 	let frame: { inputs: unknown[]; state: DataRunState | undefined } | undefined;
-	const frameState = $derived.by(() => {
+	const frameState = $derived.by((): DataRunState | undefined => {
 		const inputs = [
+			propsKey,
+			cfg,
 			dataRun,
-			facet,
 			rows,
-			timeline?.accessor,
-			timeline?.dateFormat,
-			timeline?.values,
-			slicing.filterMode
+			facet,
+			stepAccessor,
+			stepDateFormat,
+			stepValues,
+			stepMode
 		];
-		if (frame?.inputs.every((input, i) => input === inputs[i])) return frame.state;
-		const state = runFrame();
+		// Svelte may ask again with the same inputs: the answer is the one it has.
+		if (frame?.inputs.every((input, i) => Object.is(input, inputs[i]))) return frame.state;
+		const state = untrack(() => {
+			if (!dataRun || !rows) return undefined;
+			const whole = dataRun(rows, facet, null);
+			if (stepAccessor === undefined) return whole;
+			const reader = new TimelineTime(stepDateFormat);
+			const get = resolveAccessor<TRow>(stepAccessor as never) as (row: TRow) => unknown;
+			const timeOf = (row: TRow) => reader.toTime(get(row));
+			const named = stepValues?.map((v) => reader.toTime(v)).filter((t) => t !== undefined);
+			const steps = TimelineSteps.of(named, rows, (row) => timeOf(row) ?? NaN);
+			const perStep = steps.values
+				.filter((step) => !Number.isNaN(step))
+				.map((step) => {
+					// A row without a step shows in every one.
+					const shown = rows.filter((row) => {
+						const at = timeOf(row);
+						return at === undefined || TimelineSteps.matches(at, step, stepMode);
+					});
+					return dataRun(shown, facet, null).sharedScales;
+				});
+			const bands = (whole as { axes?: { bands?: string[] } }).axes?.bands ?? [];
+			return { ...whole, sharedScales: SharedStepScales.over(whole.sharedScales, bands, perStep) };
+		});
 		frame = { inputs, state };
 		return state;
 	});
