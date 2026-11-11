@@ -1,48 +1,39 @@
-import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 
 import type { ScatterPlotState, ScatterPlotEnv } from '$lib/types/plots/correlation/scatter/state';
-import type { DotMarkerConfig, TextMarkerConfig } from '$lib/types/markers/common';
+import type { DotMarkerConfig } from '$lib/types/markers/common';
+import type { MarkerLabelConfig } from '$lib/types/markers/labels/common';
 import type { ProcessedRow } from '$lib/types/phases';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 /**
- * ScatterPlot's `styles.values` as one `'text'` marker over the same
- * processed rows its dots draw, each labelled with its own `y` value. A label
- * sits beside its point and flips to the other side where its text would
- * cross the plot's edge (`edgeAware`).
+ * ScatterPlot's `styles.values` as labels of its dots: each labelled row with its own value, by default on a free
+ * spot around its point (`declutter: 'around'`) - a label with none is left out - or around its rim (`'path'`).
  */
-export function buildValueLabels<TData extends Record<string, unknown>>(
+function buildValueLabels<TData extends Record<string, unknown>>(
 	labels: ValueLabels,
-	state: ScatterPlotState<TData>
-): TextMarkerConfig[] {
-	const { processedData } = state;
-	if (!processedData?.data.length) return [];
-	const { font, format } = labels;
-	const position = ProcessedPositions.of(processedData);
+	state: ScatterPlotState<TData>,
+	env: ScatterPlotEnv
+): MarkerLabelConfig[] {
+	const rows = new Set(state.labelled ?? []);
+	if (rows.size === 0) return [];
 	const nameOf = (d: ProcessedRow) => String(d[SERIES_KEY]);
-	const valueOf = ValueLabels.valueOf(state);
+	const label = labels.label(env, (d) => labels.text(d), {
+		fill: 'currentColor',
+		seriesColor: (d) => state.colorForSeries?.(nameOf(d)),
+		fontSize: 11,
+		fontWeight: 500
+	});
+	if (labels.layout !== 'point') return [label];
 	return [
 		{
-			type: 'text',
-			data: processedData.data,
-			x: position.x as TextMarkerConfig['x'],
-			y: position.y as TextMarkerConfig['y'],
-			text: (d: ProcessedRow) => format(Number(valueOf(d)), d, nameOf(d)),
-			styles: {
-				...font,
-				fill: font?.fill ?? 'currentColor',
-				fontSize: font?.fontSize ?? 11,
-				fontWeight: font?.fontWeight ?? 500,
-				dx: font?.dx ?? 8,
-				dy: font?.dy ?? 0,
-				textAnchor: labels.textAnchor ?? 'start',
-				lineAnchor: font?.lineAnchor ?? 'middle'
-			},
-			edgeAware: true
-		}
+			...label,
+			select: (row: ProcessedRow) => rows.has(row),
+			// A label on its own dot stays there; one beside it moves around it to a free spot.
+			declutter: labels.side === 'on' ? undefined : 'around'
+		} as MarkerLabelConfig
 	];
 }
 
@@ -145,5 +136,8 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		}
 	});
 
-	return markers;
+	const labels = state.valueLabels?.show
+		? buildValueLabels(state.valueLabels, state, env)
+		: undefined;
+	return ValueLabels.onMarkers(markers, 'dot', labels);
 }

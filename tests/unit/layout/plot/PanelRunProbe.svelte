@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import { merge } from '$lib/utils/merge';
 	import type { Component } from 'svelte';
 	import { Pipeline } from '$lib/phases/Pipeline';
@@ -53,7 +53,7 @@
 </script>
 
 <!-- Without `once`, each cell's core gets its rows and shared scales but no panel state, so it runs every phase. -->
-<Plot
+<AbstractPlot
 	{Core}
 	core={core as never}
 	{defaults}

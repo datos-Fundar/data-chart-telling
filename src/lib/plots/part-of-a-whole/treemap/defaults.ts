@@ -1,3 +1,4 @@
+import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
 import { TREEMAP_ROW } from '$lib/phases/transforms/methods/TreemapTransform';
 import { HoverDefaults } from '$lib/layout/hover/HoverDefaults';
 import { RowContext } from '$lib/phases/context/RowContext';
@@ -115,12 +116,12 @@ function buildMarks<TData extends Record<string, unknown>>(
 
 	/** The label of a series' tiles: the name over the share, fitted - or the share alone where the name does not fit. */
 	const labelOf = (labels: NonNullable<typeof state.valueLabels>) => {
-		const shape = labels.shapeLabel(
+		const shape = labels.label(
 			env,
 			(row) => `${contextOf(row).name}
 ${shareText(row)}`,
 			{ fontSize: look.fontSize }
-		);
+		) as BoxLabelConfig;
 		return {
 			...shape,
 			styles: { lineHeight: look.lineHeight, ...shape.styles },
@@ -197,7 +198,7 @@ export function buildTreemapDefaults<TData extends Record<string, unknown>>(): A
 			}),
 			fit: () => ({ x: { domain: [0, 1], fitted: true }, y: { domain: [0, 1], fitted: true } })
 		},
-		styles: { values: { show: true } },
+		styles: { values: { show: true, layout: 'box' } },
 		markers: { marks: buildMarks },
 		hover: {
 			strategy: 'punctual',

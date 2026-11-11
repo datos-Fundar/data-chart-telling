@@ -13,20 +13,17 @@ export function buildAreaDefaults<TData extends Record<string, unknown>>(): Axis
 		data: {
 			segments: { color: (style: AreaStyle | undefined) => style?.fill, base: { flat: 'area' } }
 		},
-		statistics: { inheritPositions: true },
 		scales: { zero: ['y'] },
 		transforms: { labels: { select: 'last', skip: ValueLabels.skipGaps } },
 		styles: {
 			values: {
-				anchor: 'start',
+				layout: 'point',
+				layouts: { point: { side: 'after' }, path: { edge: 'top', side: 'above', offset: 'end' } },
 				format: (v, number, context) => `${context.series} - ${number(v)}`,
-				reach: (labels, state) => labels.reachAtSeriesEnds(state)
+				reach: (labels, state) => (labels.layout === 'point' ? labels.reachAtSeriesEnds(state) : [])
 			}
 		},
-		markers: {
-			marks: buildMarks,
-			valueLabels: (labels, state) => labels.atSeriesEnds(state)
-		},
+		markers: { marks: buildMarks },
 		timeline: { filterMode: 'upTo', interpolation: { value: 'y', key: ['grouping'] } }
 	};
 }

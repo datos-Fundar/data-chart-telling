@@ -34,7 +34,7 @@ describe('LinePlot value labels set before their point', () => {
 	async function leftMargin(select?: 'last' | 'first') {
 		const { container } = render(LinePlot, {
 			...props,
-			styles: { values: { show: true, anchor: 'end', select } }
+			styles: { values: { show: true, side: 'before', select } }
 		});
 		const svg = await waitForSvg(container);
 		await new Promise((resolve) => setTimeout(resolve, 400));

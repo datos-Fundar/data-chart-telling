@@ -1,4 +1,4 @@
-import { buildMarks, buildValueLabels } from '$lib/plots/evolution/slope/markers';
+import { buildMarks } from '$lib/plots/evolution/slope/markers';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { HoverDefaults } from '$lib/layout/hover/HoverDefaults';
 import { ValueLabels } from '$lib/layout/styles/ValueLabels';
@@ -30,11 +30,12 @@ export function buildSlopeDefaults<TData extends Record<string, unknown>>(): Axi
 		},
 		styles: {
 			values: {
-				anchor: 'start',
+				layout: 'point',
+				layouts: { point: { side: 'after' }, path: { side: 'above', offset: 'middle' } },
 				format: (v, number, context) => `${context.series} - ${number(v)}`
 			}
 		},
-		markers: { marks: buildMarks, valueLabels: buildValueLabels },
+		markers: { marks: buildMarks },
 		// Only two positions: a rule along the value axis at the hovered point says more than one across them.
 		hover: { ...line.hover, marker: (state) => HoverDefaults.valueRule(PlotAxes.valueOf(state)) }
 	};

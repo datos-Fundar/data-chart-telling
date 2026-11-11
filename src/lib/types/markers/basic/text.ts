@@ -1,17 +1,25 @@
+import type { CoveringShape } from '$lib/types/markers/labels/point';
 import type { FontStyle, StrokeStyle, PerRow } from '$lib/types/plots/styling';
 import type { CommonMarkerConfig } from '$lib/types/markers/channels/commonMarkerConfig';
 import type { CommonMarkerConfigWithRowOffset } from '$lib/types/markers/channels/commonMarkerConfigWithRowOffset';
 import type { Margins } from '$lib/layout/margins/Margins';
 import type { BandSlice } from '$lib/types/layout/hover';
-import type { LabelAnchor, TextAnchor } from '$lib/types/plots/constants';
+import type { LabelAnchor, LineAnchor, TextAnchor } from '$lib/types/plots/constants';
 import type { NumberDisplay } from '$lib/types/layout/numbers';
 
 /**
- * Spreads labels that would overlap apart vertically, all reaching out to one
- * shared column, each routed back to its own point by an elbow connector.
- * Unset geometry falls back to the configuration's `text.declutter`.
+ * How labels that would overlap are laid out. `'lanes'` spreads them apart
+ * vertically, all reaching out to one shared column, each routed back to its
+ * own point by an elbow connector; `'around'` puts each one on a free spot
+ * around its point (its own side first, then on clockwise),
+ * clear of the other labels and points, and leaves out one with no room.
  */
+export type TextDeclutterMode = 'lanes' | 'around';
+
+/** {@link TextDeclutterMode}'s options. Unset geometry falls back to the configuration's `text.declutter`. */
 export type TextDeclutterConfig = {
+	/** Defaults to `'lanes'`. */
+	mode?: TextDeclutterMode;
 	/** Shortest lane's distance (px) from the point before a connector bends. */
 	elbowGap?: number;
 	/** Extra distance (px) each further lane sits out from the last. */
@@ -77,8 +85,11 @@ export type TextMarkerConfig = CommonMarkerConfigWithRowOffset<
 		/** Which side of its point the text sits on: a value, or a function of the row. Wins over `styles.textAnchor`. */
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		textAnchor?: TextAnchor | ((d: any) => TextAnchor);
-		/** Spreads overlapping labels apart - see {@link TextDeclutterConfig}. `true` takes every default. */
-		declutter?: boolean | TextDeclutterConfig;
+		/** Which side of its point the text sits on vertically: a value, or a function of the row. Wins over `styles.lineAnchor`. */
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		lineAnchor?: LineAnchor | ((d: any) => LineAnchor);
+		/** Lays out overlapping labels - see {@link TextDeclutterConfig}. `true` is `'lanes'` with every default. */
+		declutter?: boolean | TextDeclutterMode | TextDeclutterConfig;
 		/** Writes each label to fit its box - see {@link TextFitConfig}. `true` takes every default. */
 		fit?: boolean | TextFitConfig;
 		/**
@@ -89,6 +100,15 @@ export type TextMarkerConfig = CommonMarkerConfigWithRowOffset<
 		edgeAware?: boolean;
 		/** The slice of its category band each label sits in (a grouped bar's series); it is drawn off the band's middle, whatever the band's width. */
 		bandSlice?: BandSlice;
+		/**
+		 * The shape each row's point sits in: a label is left out where the shape of a row drawn after its own covers it,
+		 * as a dot drawn over another hides that one's label.
+		 */
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		covers?: (d: any, scales: any) => CoveringShape | undefined;
+		/** How far each row's point sits off its `x`/`y`, in pixels: labels, connectors and lanes start there. */
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		origin?: (d: any, scales: any) => { dx: number; dy: number } | undefined;
 		/** Where, in the plot's frame, a label sits on an axis it sets no position for: `{ type: 'text', x: 5, frameAnchor: 'top' }` is at the frame's top edge. */
 		frameAnchor?: LabelAnchor;
 		/** Grows the plot's margins, on every side the author left open, so the labels fit. */
@@ -98,25 +118,6 @@ export type TextMarkerConfig = CommonMarkerConfigWithRowOffset<
 	} & NumberDisplay &
 		CommonMarkerConfig
 >;
-
-/** A `text` marker as a shape's `label`: all of it but what the shape sets - its `type`, its rows and the label's position. */
-export type TextLabelConfig = Omit<
-	TextMarkerConfig,
-	'type' | 'data' | 'x' | 'y' | 'frameAnchor'
-> & {
-	/**
-	 * Where in its shape the label sits: its `'middle'` (the default), against one of its edges (`'top'`, `'bottom'`,
-	 * `'left'`, `'right'`) or in one of its corners (`'top-left'`...). The label's `dx` and `dy` move it from there.
-	 */
-	anchor?: LabelAnchor;
-	/**
-	 * Puts a label anchored to an edge beyond that edge, outside the shape, instead of inside it. A label out there is not
-	 * fitted to the shape, and with `fitMargins` the plot's margins grow to hold it.
-	 */
-	outside?: boolean;
-	/** Pixels between the label and the edge it is anchored to. Defaults to the configuration's `text.label.gap`, `4`. */
-	gap?: number;
-};
 
 export type { LabelAnchor };
 

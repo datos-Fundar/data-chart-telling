@@ -2,7 +2,7 @@ import { render } from 'vitest-browser-svelte';
 import type { PlotRowContext } from '$lib';
 import { describe, test, expect } from 'vitest';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
-import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
+import type { AxisBasedStylesConfig, BarValueLabel, ValuesStyle } from '$lib/types/layout/styles';
 import { FEMALE_PROVINCE_VALUES, MALE_PROVINCE_VALUES } from '$datasets';
 import { waitForSvg, countTextLabels } from '../../../_helpers/svg';
 
@@ -81,25 +81,24 @@ describe('BarPlot - styles.values', () => {
 		expect(labels).toEqual(expect.arrayContaining([`male (${MALE_PROVINCE_VALUES[0].value})`]));
 	});
 
-	test("anchor changes the label's vertical position on the bar", async () => {
-		async function firstLabelY(anchor: 'outside' | 'middle' | 'start' | 'end') {
+	test('the layout moves the label on its bar: past its tip, in its middle, inside its tip', async () => {
+		async function firstLabelY(values: ValuesStyle<BarValueLabel, 'value'>) {
 			const { container } = await render(BarPlot, {
 				width: 400,
 				height: 300,
 				series: [FEMALE],
-				styles: { values: { show: true, anchor } } satisfies AxisBasedStylesConfig
+				styles: { values: { show: true, ...values } }
 			});
 			const svg = await waitForSvg(container);
-			// A label is moved by the group around it, so where it is on the page is what tells the anchors apart.
 			await new Promise((resolve) => setTimeout(resolve, 100));
-			return String(Math.round(svg.querySelector('g.text text')!.getBoundingClientRect().top));
+			// Each plot renders further down the page: the label is read against its own bar.
+			const bar = svg.querySelector('g.bar-y rect')!.getBoundingClientRect();
+			return Math.round(svg.querySelector('g.text text')!.getBoundingClientRect().top - bar.top);
 		}
-		const outside = await firstLabelY('outside');
-		const middle = await firstLabelY('middle');
-		const start = await firstLabelY('start');
-		expect(outside).toBeTruthy();
-		expect(middle).toBeTruthy();
-		expect(start).toBeTruthy();
-		expect(new Set([outside, middle, start]).size).toBe(3);
+		const past = await firstLabelY({});
+		const middle = await firstLabelY({ layout: 'box' });
+		const inside = await firstLabelY({ layout: 'path', edge: 'tip', side: 'inside' });
+		expect(past).toBeLessThan(inside);
+		expect(inside).toBeLessThan(middle);
 	});
 });

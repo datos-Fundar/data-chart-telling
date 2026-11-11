@@ -174,16 +174,14 @@ A color or an opacity the function returns is drawn as it is, not mapped through
 
 ## A label in each shape
 
-A `rect`, `cell`, `bar` or `waffle` marker takes a `label`: a text written in the middle of each shape, with every option of a `text` marker but `type`, `data`, `x` and `y`, which the shape sets. It never takes the pointer from the shape under it, so `onclick` and the hover go on as they were.
+A marker writes a label on each of its shapes with `label`: in each bar, cell, rect or waffle by default, beside the points of a line, an area or a dot, or along an edge or a line, with every option of a `text` marker besides. A list of labels writes each of them.
 
 ```ts
 { type: 'rect', data: tiles, x1: 'x1', x2: 'x2', y1: 'y1', y2: 'y2',
   label: { text: 'name', styles: { fill: 'white' }, fit: { fallback: 'value' } } }
 ```
 
-`anchor` puts the label against an edge (`'top'`, `'bottom'`, `'left'`, `'right'`) or in a corner (`'top-left'`...) instead of the middle, and `outside` puts one anchored to an edge beyond it; `gap` is its distance from the edge. A label outside is not fitted, and `fitMargins: true` grows the plot's margins to hold it where it would run past them. A label with a handler of its own (`onpointerenter`...) listens for the pointer; the others leave it to the shape. Its styles take functions of the row, to dim the label of a series, say. A label inside its shape with no `fill` of its own is written in the color that reads best on the shape's own - white on a dark one, near black on a light one - picked per row from the configuration's `text.label.contrast` (`['#ffffff', '#111827']`), or white or black where neither reaches the WCAG AA ratio of 4.5:1. The shape is read as it is seen: a `fillOpacity` under 1 blends it with the plot's `background`. One outside keeps its plot's color.
-
-The label is fitted to its shape unless `fit` is `false`. One too big is written smaller, down to `minFontSize`; at that size it breaks into the lines the shape holds and the last one is cut short with an ellipsis; when fewer than `minLetters` letters would show, `fallback` - a value, a field or a function of the row - is written instead; and when not even that fits, nothing is. `padding` is the room kept free inside each edge. The defaults of `gap`, `padding`, `minFontSize` (8) and `minLetters` (3) are the configuration's `text.label`: `setConfiguration({ text: { label: { gap: 6 } } })`. A `text` marker of your own takes the same `fit` with a box of its own (`x1`, `x2`, `y1`, `y2`), which is rarely what you want.
+Its layouts and their options are those of a plot's value labels: see [Labels on markers](value-labels.md#labels-on-markers).
 
 ## Events
 

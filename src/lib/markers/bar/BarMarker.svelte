@@ -19,7 +19,9 @@
 	const data = $derived(marker.data ?? []);
 	const channelFill = $derived(MarkerChannels.buildFill(data, marker.color, marker.scales, cfg));
 
-	const plot = usePlot().svelteplot;
+	const context = usePlot();
+	const plot = context.svelteplot;
+	const isHorizontal = $derived(marker.isHorizontal ?? context.axes?.isHorizontal ?? false);
 	function categoryScaleFor(isHorizontal: boolean) {
 		return isHorizontal ? plot.scales.y : plot.scales.x;
 	}
@@ -36,11 +38,11 @@
 </script>
 
 {#if marker.role === 'segment'}
-	{@const categoryScale = categoryScaleFor(marker.isHorizontal)}
+	{@const categoryScale = categoryScaleFor(isHorizontal)}
 	{@const bandwidth = categoryScale?.type === 'band' ? categoryScale.fn.bandwidth() : 0}
 	{@const centered =
 		marker.thickness != null ? Math.max(0, (bandwidth - marker.thickness) / 2) : undefined}
-	{#if marker.isHorizontal}
+	{#if isHorizontal}
 		<BarX
 			{...events.props}
 			{data}
@@ -80,7 +82,7 @@
 		/>
 	{/if}
 {:else}
-	{@const categoryScale = categoryScaleFor(marker.isHorizontal)}
+	{@const categoryScale = categoryScaleFor(isHorizontal)}
 	{#if categoryScale?.type === 'band'}
 		{@const bandwidth = categoryScale.fn.bandwidth()}
 		{@const bandStart = Number(categoryScale.fn(marker.category as never) ?? 0)}
@@ -89,8 +91,8 @@
 		{@const insetTop = (marker.styles?.insetTop ?? 0) * bandwidth}
 		{@const insetBottom = (marker.styles?.insetBottom ?? 0) * bandwidth}
 		<!-- The band runs the plot's whole value axis, so the pointer needn't be over the bar. -->
-		{@const [rangeMin, rangeMax] = valueExtentFor(marker.isHorizontal)}
-		{#if marker.isHorizontal}
+		{@const [rangeMin, rangeMax] = valueExtentFor(isHorizontal)}
+		{#if isHorizontal}
 			<rect
 				class="dct-hit-area"
 				x={rangeMin + insetLeft}

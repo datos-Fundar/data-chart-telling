@@ -204,8 +204,13 @@ describe('ClevelandPlot markers', () => {
 					y: 'v',
 					color: 'g',
 					styles: { values: { show: true, select: ['min', 'max'], color } }
-				}).texts.map((t) => t.styles?.fill);
-			// `hi` writes the top ends, `lo` the bottom ones: one marker per series and role.
+				}).texts.flatMap((t) =>
+					(t.data ?? []).map((row) => {
+						const fill = t.styles?.fill;
+						return typeof fill === 'function' ? fill(row) : fill;
+					})
+				);
+			// `hi` writes the top ends, `lo` the bottom ones, each in its series' color.
 			expect(new Set(fills('series')).size).toBe(2);
 			expect(fills('crimson').every((fill) => fill === 'crimson')).toBe(true);
 		});

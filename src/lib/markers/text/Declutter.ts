@@ -1,16 +1,73 @@
+import { Box } from '$lib/layout/margins/Box';
 import type { LabelLane } from '$lib/types/markers/basic/text';
+import type { BoxAnchors, BoxFlip } from '$lib/types/layout/box';
 
 /** A maximal stretch of positions pushed against each other, as inclusive indices (a lone position is `[i, i]`). */
 type Run = [start: number, end: number];
 
 const clamp = (value: number, lo: number, hi: number) => Math.min(Math.max(value, lo), hi);
 
+/** The spots around a point, clockwise from above it. */
+const AROUND: BoxAnchors[] = [
+	{ x: 'middle', y: 'before' },
+	{ x: 'after', y: 'before' },
+	{ x: 'after', y: 'middle' },
+	{ x: 'after', y: 'after' },
+	{ x: 'middle', y: 'after' },
+	{ x: 'before', y: 'after' },
+	{ x: 'before', y: 'middle' },
+	{ x: 'before', y: 'before' }
+];
+
 /**
- * Lays out point labels that would overlap: spreads their pixel `y` apart,
- * gives each moved label its own lane for its leader line, and lines every
- * label up on one shared column once any of them clusters.
+ * Lays out point labels that would overlap: either spreads their pixel `y`
+ * apart into lanes ({@link Declutter.buildLanes}), or puts each one on a free
+ * spot around its point ({@link Declutter.around}).
  */
 export class Declutter {
+	/**
+	 * Each label on the first spot around its point - its `preferred` one, then on clockwise -
+	 * that overlaps no label placed before it nor any point, inside `bounds`.
+	 * A label with no free spot is left out of the map: it is not drawn.
+	 */
+	static around<K>(args: {
+		items: { key: K; px: number; py: number; box: Box }[];
+		preferred: BoxAnchors;
+		/** Distance (px) from the point to the label. */
+		gap: number;
+		bounds: Box;
+		/** Room (px) kept clear around every point. */
+		clearance?: number;
+	}): Map<K, BoxFlip> {
+		const { items, preferred, gap, bounds, clearance = 3 } = args;
+		// Its own spot first, then on clockwise; a label on the point itself tries it, then goes round from above.
+		const first = AROUND.findIndex((spot) => spot.x === preferred.x && spot.y === preferred.y);
+		const ring = [...AROUND.slice(Math.max(first, 0)), ...AROUND.slice(0, Math.max(first, 0))];
+		const spots = first < 0 ? [preferred, ...ring] : ring;
+		const taken = items.map(
+			({ px, py }) => new Box(px - clearance, py - clearance, 2 * clearance, 2 * clearance)
+		);
+		const placed: Box[] = [];
+		const out = new Map<K, BoxFlip>();
+		items.forEach(({ key, px, py, box }, index) => {
+			const clashes = (at: Box) =>
+				placed.some((other) => at.intersects(other)) ||
+				taken.some((other, i) => i !== index && at.intersects(other));
+			for (const spot of spots) {
+				const corner = spot.x !== 'middle' && spot.y !== 'middle';
+				const space = corner ? gap * Math.SQRT1_2 : gap;
+				const at = box.beside({ x: px, y: py }, spot, { x: space, y: space });
+				if (!at.inside(bounds) || clashes(at)) continue;
+				placed.push(at);
+				const offset = (side: string) =>
+					side === 'after' ? space : side === 'before' ? -space : 0;
+				out.set(key, { anchor: spot, dx: offset(spot.x), dy: offset(spot.y) });
+				break;
+			}
+		});
+		return out;
+	}
+
 	/**
 	 * Lays out labels keyed by each item's `key`; fewer than two need none. A
 	 * leftward fan with no room before the content box's left edge (the Y

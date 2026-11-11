@@ -71,7 +71,7 @@ describe('HistogramPlot - styles.values', () => {
 			...PLOT,
 			grouping: 'g',
 			transforms: [...BIN, { type: 'stackY' as const }],
-			styles: { values: { show: true, anchor: 'middle' } } satisfies AxisBasedStylesConfig
+			styles: { values: { show: true, layout: 'box' } } satisfies AxisBasedStylesConfig
 		});
 		const svg = await waitForSvg(container);
 		expect(labels(svg).sort()).toEqual(['1', '1', '1', '2']);
@@ -80,7 +80,7 @@ describe('HistogramPlot - styles.values', () => {
 	test('an inside label draws on top of its bar', async () => {
 		const { container } = await render(HistogramPlot, {
 			...PLOT,
-			styles: { values: { show: true, anchor: 'middle' } } satisfies AxisBasedStylesConfig
+			styles: { values: { show: true, layout: 'box' } } satisfies AxisBasedStylesConfig
 		});
 		const svg = await waitForSvg(container);
 		const lastBar = Array.from(svg.querySelectorAll('g.rect rect, rect')).at(-1)!;

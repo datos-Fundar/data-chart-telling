@@ -48,7 +48,7 @@ describe('statistics - marker level (Scatter dot)', () => {
 		expect(countRegressionMarks(svg)).toBe(1);
 	});
 
-	test('a marker with no x/y set is left alone - no derived marker, no crash', async () => {
+	test("a marker with no x/y of its own takes the plot's, and derives from them", async () => {
 		const { container } = render(ScatterPlot, {
 			width: 400,
 			height: 300,
@@ -63,6 +63,6 @@ describe('statistics - marker level (Scatter dot)', () => {
 			] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
-		expect(countRegressionMarks(svg)).toBe(0);
+		await expect.poll(() => countRegressionMarks(svg)).toBe(1);
 	});
 });

@@ -1,6 +1,6 @@
 <script lang="ts" generics="TProps extends Record<string, unknown>">
 	import Core from '$lib/plots/map/geo/Core.svelte';
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import { merge } from '$lib/utils/merge';
 	import { buildGeoDefaults } from '$lib/plots/map/geo/defaults';
 	import { buildGeoSlicing } from '$lib/plots/map/geo/slices';
@@ -87,7 +87,7 @@
 	}
 </script>
 
-<Plot
+<AbstractPlot
 	{Core}
 	core={core as GeoPlotCoreProps<TProps>}
 	defaults={buildGeoDefaults}

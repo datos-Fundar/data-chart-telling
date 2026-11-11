@@ -28,7 +28,7 @@ export function buildSparklineDefaults<TData extends Record<string, unknown>>():
 				format: (value, number) => number(value)
 			}
 		},
-		markers: { marks: buildMarks, valueLabels: line.markers.valueLabels },
+		markers: { marks: buildMarks },
 		// Small and bare: a dot on the hovered point, and nothing else.
 		hover: { ...line.hover, marker: () => ({ back: [], front: [HoverDefaults.dot()] }) }
 	};

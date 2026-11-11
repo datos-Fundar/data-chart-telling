@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import { buildClevelandDefaults } from '$lib/plots/ranking/cleveland/defaults';
 	import type {
 		ClevelandPlotProps,
@@ -28,7 +28,7 @@
 	}: ClevelandPlotProps<TData> = $props();
 </script>
 
-<Plot
+<AbstractPlot
 	core={core as ClevelandPlotCoreProps<TData>}
 	defaults={buildClevelandDefaults}
 	bind:margins

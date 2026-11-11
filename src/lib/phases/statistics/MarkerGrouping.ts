@@ -1,34 +1,4 @@
-/** Marker kinds that split their rows into separate shapes per `grouping`. */
-const GROUPING_KINDS = new Set([
-	'area',
-	'density',
-	'line',
-	'hull',
-	'trail',
-	'delaunayLink',
-	'delaunayMesh',
-	'voronoi',
-	'voronoiMesh'
-]);
-
-/** Marker kinds whose per-row `color` resolves through the plot's own color scale. */
-const COLOR_KINDS = new Set([
-	'area',
-	'bar',
-	'cell',
-	'density',
-	'delaunayLink',
-	'delaunayMesh',
-	'dot',
-	'hull',
-	'line',
-	'rect',
-	'tick',
-	'trail',
-	'voronoi',
-	'voronoiMesh',
-	'waffle'
-]);
+import { MarkerKinds } from '$lib/markers/MarkerKinds';
 
 /** Kinds that draw only a line, so their flat color is `stroke` alone. */
 const LINE_KINDS = new Set(['line', 'regression', 'bollinger', 'delta']);
@@ -107,8 +77,13 @@ export class MarkerGrouping {
 			if (grouping === undefined)
 				return MarkerGrouping.withSeriesColor(m, plot.defaultColor) as TMarker;
 			const updates: Record<string, unknown> = {};
-			if (GROUPING_KINDS.has(m.type) && m.grouping === undefined) updates.grouping = grouping;
-			if (COLOR_KINDS.has(m.type) && m.color === undefined && !MarkerGrouping.#hasFlatColor(m)) {
+			if (MarkerKinds.inherits(m.type, 'grouping') && m.grouping === undefined)
+				updates.grouping = grouping;
+			if (
+				MarkerKinds.inherits(m.type, 'color') &&
+				m.color === undefined &&
+				!MarkerGrouping.#hasFlatColor(m)
+			) {
 				updates.color = plot.color ?? plot.grouping;
 			}
 			return Object.keys(updates).length ? ({ ...m, ...updates } as TMarker) : marker;

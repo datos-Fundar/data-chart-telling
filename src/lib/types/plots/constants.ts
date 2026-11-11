@@ -14,19 +14,6 @@ export type LabelAnchor =
 	| 'bottom-right';
 
 /**
- * Where a value label sits on its mark. Two vocabularies share the type, one per family of plots:
- *
- * - The plots that label a point or the end of a line (`LinePlot`, `AreaPlot`, `SlopePlot`, `ScatterPlot`...) read
- *   the side of the point its text is written on: `'start'` after it (right of a line's last point), `'end'` before
- *   it, `'middle'` on it and `'outside'` beyond it.
- * - The plots that label a shape (`BarPlot`, `BulletPlot`, `PyramidPlot`, `HistogramPlot`) read where in it the
- *   label is. Inside the shape: a {@link LabelAnchor} - its `'middle'`, an edge as it is drawn on the page
- *   (`'top'`, `'left'`...) or a corner (`'top-left'`...) - or, whichever side of zero the value is, the end of the bar
- *   away from zero, `'tip'`, or the one at zero, `'base'`. Beyond the tip, outside the shape: `'outside'`.
- */
-export type ValueAnchor = LabelAnchor | 'outside' | 'start' | 'end' | 'tip' | 'base';
-
-/**
  * Shared by two unrelated renderers: a `dot` mark's own point shape
  * (delegated to svelteplot/d3-shape) and a discrete legend item's own icon
  * (`DiscreteSymbolIcon.svelte`, the same shape fitted to the icon). `'line'` is legend-only - it represents

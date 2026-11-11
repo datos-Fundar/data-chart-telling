@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
-import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
+import type { AxisBasedStylesConfig, LineValueLabel, ValuesStyle } from '$lib/types/layout/styles';
 import { FEMALE_LIFE, MALE_LIFE } from '$datasets';
 import { waitForSvg, countTextLabels } from '../../../_helpers/svg';
 
@@ -56,7 +56,7 @@ describe('LinePlot - styles.values', () => {
 
 	test('measuring label overflow into the margin never triggers a runaway effect loop', async () => {
 		// Regression test: end-point labels overflowing the plot's top margin
-		// (the default `anchor: 'start'` overlaps content above the last data
+		// (the default `side: 'after'` overlaps content above the last data
 		// point) used to grow that margin via `PlotMargins`, which
 		// fed straight back into svelteplot's `<Plot margin>` as a live
 		// post-mount prop change - sending its own auto-margin sizing into a
@@ -279,7 +279,7 @@ describe('LinePlot - styles.values', () => {
 	});
 
 	describe('select, series and color', () => {
-		const labelsOf = async (values: NonNullable<AxisBasedStylesConfig['values']>) => {
+		const labelsOf = async (values: ValuesStyle<LineValueLabel, 'value'>) => {
 			const { container } = await render(LinePlot, {
 				width: 600,
 				height: 300,
@@ -315,7 +315,7 @@ describe('LinePlot - styles.values', () => {
 		});
 
 		test('`color` writes the labels in one color, which `fontStyle.fill` overrides', async () => {
-			const fills = async (values: NonNullable<AxisBasedStylesConfig['values']>) => {
+			const fills = async (values: ValuesStyle<LineValueLabel, 'value'>) => {
 				const { container } = await render(LinePlot, {
 					width: 600,
 					height: 300,

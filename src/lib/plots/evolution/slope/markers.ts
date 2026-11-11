@@ -1,16 +1,17 @@
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { buildLineMarkers } from '$lib/plots/evolution/line/markers';
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
-import type { ValueLabels } from '$lib/layout/styles/ValueLabels';
-import type { ValueAnchor } from '$lib/types/plots/constants';
+import { ValueLabels } from '$lib/layout/styles/ValueLabels';
+import type { PointSide } from '$lib/types/markers/labels/point';
 import type { EdgeBox } from '$lib/types/layout/box';
 import type { CurveAwarePlotStylesConfig } from '$lib/types/layout/styles';
-import type { AxisBasedMarkersConfig, TextMarkerConfig } from '$lib/types/markers/common';
+import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
+import type { MarkerLabelConfig } from '$lib/types/markers/labels/common';
 import type { SlopePlotState, SlopePlotEnv } from '$lib/types/plots/evolution/slope/state';
 
-/** The anchor of the labels at the plot's start: the mirror of the end's, so `'start'` always reads outward. */
-function startAnchor(anchor: ValueAnchor): ValueAnchor {
-	return anchor === 'start' ? 'end' : anchor === 'end' ? 'start' : anchor;
+/** The side of the labels at the plot's start: the mirror of the end's, so `'after'` always reads outward. */
+function startSide(side: PointSide): PointSide {
+	return side === 'after' ? 'before' : side === 'before' ? 'after' : side;
 }
 
 /** The value a position is told apart by: a date by its time. */
@@ -36,13 +37,17 @@ export function buildMarks<TData extends Record<string, unknown>>(
 			}
 		}))
 	}));
-	return buildLineMarkers({
+	const lines = buildLineMarkers({
 		groupedSeries: groups,
 		colorFor: state.colorForSeries!,
 		disabledStrokeFor: (name) => env.interaction?.strokeFor(name),
 		disabledDotsFor: (name) => env.interaction?.dotsFor(name),
 		curve: (state.styles as CurveAwarePlotStylesConfig | undefined)?.curve
 	});
+	const labels = state.valueLabels?.show
+		? buildValueLabels(state.valueLabels, state, env)
+		: undefined;
+	return ValueLabels.onMarkers(lines, 'line', labels);
 }
 
 /** The rows labelled at the plot's first position and at its last, each series' own. */
@@ -68,18 +73,20 @@ function labelledEnds<TData extends Record<string, unknown>>(state: SlopePlotSta
  */
 export function buildValueLabels<TData extends Record<string, unknown>>(
 	labels: ValueLabels,
-	state: SlopePlotState<TData>
-): TextMarkerConfig[] {
+	state: SlopePlotState<TData>,
+	env: SlopePlotEnv
+): MarkerLabelConfig[] {
 	if (!state.processedData) return [];
+	if (labels.layout === 'path') return labels.alongSeries(state, env);
 	const { start, end } = labelledEnds(state);
 	return [
-		...labels.atSeriesEnds(state, {
+		...labels.atSeriesEnds(state, env, {
 			rows: start,
-			anchor: startAnchor(labels.anchor),
+			side: startSide(labels.side),
 			lane: true,
 			flip: false
 		}),
-		...labels.atSeriesEnds(state, { rows: end, lane: true })
+		...labels.atSeriesEnds(state, env, { rows: end, lane: true })
 	];
 }
 
@@ -90,7 +97,7 @@ export function buildReach<TData extends Record<string, unknown>>(
 ): EdgeBox[] {
 	// Labels before the first position reach the left edge, those after the last one the right.
 	const before = labels
-		.reachAtSeriesEnds(state, startAnchor(labels.anchor))
+		.reachAtSeriesEnds(state, startSide(labels.side))
 		.map(({ box, edges }) => ({ box, edges: edges.filter((edge) => edge !== 'right') }));
 	const after = labels
 		.reachAtSeriesEnds(state)

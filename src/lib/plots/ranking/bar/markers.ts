@@ -12,7 +12,6 @@ import type { ProcessedRow } from '$lib/types/phases';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { BandSlice, HoverPoint } from '$lib/types/layout/hover';
 import type { HoverConfig } from '$lib/types/plots/props';
-import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 const GAP_KINDS = ['start', 'middle', 'end'] as const;
@@ -123,23 +122,16 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		(geometry.stacked || channel === undefined ? top : channel) as ValueChannel;
 	const gapValue = valueOf(channels[valueAxis]);
 
-	// What each bar writes in itself: its value, anchored along the bar by `anchor` - past its tip
-	// (`'outside'`), just inside it (`'start'`), at its base (`'end'`) or in the middle. A stacked bar's
-	// label is always in the middle of its segment.
-	const labels = state.valueLabels?.show ? state.valueLabels : undefined;
-	const valueRead = ValueLabels.valueOf(state);
-	const turns = !!labels && !geometry.stacked && ValueLabels.followsSign(labels.anchor);
-	const labelAnchor = (negative: boolean) =>
-		ValueLabels.boxAnchor(labels?.anchor ?? 'outside', {
-			isHorizontal,
-			negative,
-			stacked: geometry.stacked
-		});
-	const labelFor = (name: string, slice: BandSlice | undefined, negative: boolean) =>
+	// What each bar writes about itself: its value, in the layout of `styles.values` - by default past its tip, or
+	// in the middle of a stacked bar's segment.
+	const labels =
+		state.valueLabels?.show && state.valueLabels.writes('value') ? state.valueLabels : undefined;
+	const labelFor = (name: string, slice: BandSlice | undefined) =>
 		labels && {
-			...labels.shapeLabel(env, (d) => labels.format(Number(valueRead(d)), d, name), {
+			...labels.label(env, (d) => labels.text(d), {
 				fill: 'currentColor',
-				...labelAnchor(negative)
+				labelled: state.labelled,
+				seriesColor: () => colorForSeries!(name)
 			}),
 			bandSlice: slice
 		};
@@ -200,17 +192,8 @@ export function buildMarks<TData extends Record<string, unknown>>(
 			};
 			const real = seg.data.filter(isReal);
 			const value = valueOf(group.series[valueAxis]);
-			// A label past the tip turns with the sign of its value, so the bars below zero are a marker of their own.
-			const parts = turns
-				? [false, true].map((negative) => ({
-						negative,
-						rows: real.filter((row) => Number(valueRead(row)) < 0 === negative)
-					}))
-				: [{ negative: false, rows: real }];
-			for (const { negative, rows } of parts) {
-				const marker = makeMarker(rows, slice, value, styles, labelFor(name, slice, negative));
-				if (marker) segmentMarkers.push(marker);
-			}
+			const marker = makeMarker(real, slice, value, styles, labelFor(name, slice) as never);
+			if (marker) segmentMarkers.push(marker);
 		}
 
 		const id = seriesIdOf(group.series);

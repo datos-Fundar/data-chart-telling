@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import { buildBoxDefaults } from '$lib/plots/distribution/box/defaults';
 	import type { BoxPlotProps, BoxPlotCoreProps } from '$lib/types/plots/distribution/box/props';
 
@@ -25,7 +25,7 @@
 	}: BoxPlotProps<TData> = $props();
 </script>
 
-<Plot
+<AbstractPlot
 	core={core as BoxPlotCoreProps<TData>}
 	defaults={buildBoxDefaults}
 	bind:margins

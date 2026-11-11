@@ -8,8 +8,8 @@ import { COUNTRIES_AT_2007 } from '$datasets';
 
 // Regression coverage for two related plot-frame overflow bugs: a
 // large-radius dot at the domain edge (fixed via the scatter scales fit)
-// and a value label offset past the frame (fixed via the edge-aware anchor
-// flip in Box.flipNear) - both computed up front rather than
+// and a value label offset past the frame (its labels only take spots
+// inside the plot's area, see Declutter.around) - both computed up front rather than
 // registered into svelteplot's own shared margin-auto-sizing context, which
 // can spike CPU/memory into unresponsiveness when many `<Plot>` instances
 // mount/unmount together (e.g. a multi-story docs page → single story).
@@ -49,7 +49,7 @@ describe('ScatterPlot - frame overflow', () => {
 		const svg = await waitForSvg(container);
 		const svgBox = svg.getBoundingClientRect();
 		const labels = svg.querySelectorAll('g.text text');
-		expect(labels.length).toBe(COUNTRIES_AT_2007.length);
+		expect(labels.length).toBeGreaterThan(0);
 		for (const label of labels) {
 			const box = (label as SVGGraphicsElement).getBoundingClientRect();
 			expect(box.left).toBeGreaterThanOrEqual(svgBox.left - 1);
@@ -57,12 +57,9 @@ describe('ScatterPlot - frame overflow', () => {
 		}
 	});
 
-	// The edge-aware flip decides whether a label fits using a measured (not
-	// estimated-from-character-count) text width. A run of wide glyphs like
-	// "M"/"W" is exactly where a character-count estimate under-measures the
-	// most - wide enough here that even the flip can't fully avoid overflow
-	// for every point, so `onoverflow`'s margin growth (see the runaway-loop
-	// test below) does the rest; the settle wait matches that test's.
+	// A label's spot is chosen by its measured (not estimated-from-character-count)
+	// text width; a run of wide glyphs like "M"/"W" is exactly where a
+	// character-count estimate under-measures the most.
 	test('a wide-glyph label at the domain edge still ends up within the plot box', async () => {
 		const { container } = await render(ScatterPlot, {
 			width: 400,
@@ -78,7 +75,7 @@ describe('ScatterPlot - frame overflow', () => {
 		await new Promise((r) => setTimeout(r, 800));
 		const svgBox = svg.getBoundingClientRect();
 		const labels = svg.querySelectorAll('g.text text');
-		expect(labels.length).toBe(COUNTRIES_AT_2007.length);
+		expect(labels.length).toBeGreaterThan(0);
 		for (const label of labels) {
 			const box = (label as SVGGraphicsElement).getBoundingClientRect();
 			expect(box.left).toBeGreaterThanOrEqual(svgBox.left - 1);

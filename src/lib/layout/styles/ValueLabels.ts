@@ -9,16 +9,31 @@ import { NumberFormat } from '$lib/utils/NumberFormat';
 import { RowContext } from '$lib/phases/context/RowContext';
 import type { PlotRowContext } from '$lib/types/layout/context';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
-import type { ValuesStyle } from '$lib/types/layout/styles';
+import type { ValuePartOptions, ValuesFontStyle, ValuesStyle } from '$lib/types/layout/styles';
 import type { ValueLabelsOptions } from '$lib/types/phases/styles/phase';
 import type { Series } from '$lib/types/plots/data/common';
 import type { FontStyle, StrokeStyle } from '$lib/types/plots/styling';
-import type { LabelAnchor, TextAnchor, ValueAnchor } from '$lib/types/plots/constants';
 import type { BoxAnchors, EdgeBox } from '$lib/types/layout/box';
 import type { MarginSide } from '$lib/types/plots/props';
 import type { AxisPlotEnv, AxisPlotState, ProcessedData, ProcessedRow } from '$lib/types/phases';
 import type { TextMarkerConfig } from '$lib/types/markers/common';
-import type { TextLabelConfig } from '$lib/types/markers/basic/text';
+import type { LabelLayout, MarkerLabelConfig } from '$lib/types/markers/labels/common';
+import type { PointGeometryOf, PointLabelConfig, PointSide } from '$lib/types/markers/labels/point';
+import type { BoxScales } from '$lib/types/markers/labels/box';
+import { PointLayout } from '$lib/markers/labels/layouts/PointLayout';
+
+/** One part of each row a plot labels, with where its label sits and how it writes it. */
+type ValuePart = {
+	name: string;
+	placement: Record<string, unknown>;
+	format: (value: number, row?: object, series?: string, part?: string) => string;
+};
+
+/** Where a part's value sits on the row a part label copies. */
+const PART_VALUE = Symbol('partValue');
+
+/** The options of `styles.values` that place a label in its layout. */
+const LAYOUT_KEYS = ['anchor', 'edge', 'side', 'offset', 'gap'] as const;
 
 /**
  * A plot's value labels: the author's `styles.values` over the plot kind's
@@ -28,15 +43,24 @@ import type { TextLabelConfig } from '$lib/types/markers/basic/text';
  */
 export class ValueLabels {
 	readonly show: boolean;
-	readonly anchor: ValueAnchor;
+	/** How the labels are laid out on their shapes: the author's `layout`, else the kind's. */
+	readonly layout: LabelLayout;
+	/** The options that place a label in its {@link layout}: the author's over the kind's own for it. */
+	readonly placement: Record<string, unknown>;
+	/** The parts of each row labelled - a simple plot's one `value`, a box's `median`... - each with its own options. */
+	readonly parts: ValuePart[];
+	/** The series whose rows are labelled, when `styles.values.series` names some; every series else. */
+	readonly series: string[] | undefined;
+	/** Whether the author gave the labels a text of their own, beyond the value. */
+	readonly formatted: boolean;
 	/**
 	 * A label's text for `value`: the author's `format`, else the kind's, else the value as the display fields ask.
 	 * `row` is the row it labels, whose context the format reads; `series` names its series where there is no row
-	 * (a label measured ahead of the rows).
+	 * (a label measured ahead of the rows); `part`, which of the row's values it writes.
 	 */
-	readonly format: (value: number, row?: object, series?: string) => string;
+	readonly format: (value: number, row?: object, series?: string, part?: string) => string;
 	readonly hoverIsolate: boolean;
-	readonly font: FontStyle | undefined;
+	readonly font: ValuesFontStyle | undefined;
 	readonly fontSize: number;
 	/** The connectors of labels that had to move apart. */
 	readonly strokeStyle: StrokeStyle | undefined;
@@ -51,19 +75,56 @@ export class ValueLabels {
 	constructor(
 		values: ValuesStyle | undefined,
 		cfg: PlotStylesConfig,
-		options: Omit<ValueLabelsOptions<never>, 'reach'> = {},
+		options: Omit<
+			ValueLabelsOptions<never>,
+			'reach' | 'layout' | 'layouts' | 'parts' | 'formatFor'
+		> & {
+			layout?: LabelLayout;
+			layouts?: Partial<Record<LabelLayout, Record<string, unknown>>>;
+			parts?: { placements: Record<string, Record<string, unknown>>; default: string[] };
+		} = {},
 		reach?: (labels: ValueLabels) => EdgeBox[]
 	) {
-		this.show = values?.show ?? options.show ?? false;
-		this.anchor = values?.anchor ?? options.anchor ?? 'outside';
+		this.layout = values?.layout ?? options.layout ?? 'point';
+		const own = Object.fromEntries(
+			LAYOUT_KEYS.flatMap((key) => {
+				const value = (values as Record<string, unknown> | undefined)?.[key];
+				return value === undefined ? [] : [[key, value]];
+			})
+		);
 		// The value as the display fields ask (else as it is), which a plot kind's own text builds on.
 		const number =
 			NumberFormat.maybe(NumberFormat.displayOf(values), cfg) ?? ((v: number) => `${v}`);
-		const own = values?.format ?? options.format;
-		this.format = own
-			? (v, row, series) => own(v, number, ValueLabels.contextOf(row, series))
-			: (v) => number(v);
+		const writer =
+			(write: ValuesStyle['format']): ValueLabels['format'] =>
+			(v, row, series, part) =>
+				write
+					? write(v, number, { ...ValueLabels.contextOf(row, series), ...(part ? { part } : {}) })
+					: number(v);
+		this.format = writer(values?.format ?? options.format);
+		this.parts = ValueLabels.#parts(values?.parts, options.parts).map(([name, own_]) => {
+			const { format, ...placement } = own_ as ValuePartOptions;
+			return {
+				name,
+				placement: {
+					...options.layouts?.[this.layout],
+					...options.parts?.placements[name],
+					...own,
+					...placement
+				},
+				format: format ? writer(format) : this.format
+			};
+		});
+		this.placement = this.#part('value')?.placement ?? {
+			...options.layouts?.[this.layout],
+			...own
+		};
+		this.formatted =
+			values?.format !== undefined ||
+			!!(values?.parts as Record<string, { format?: unknown }> | undefined)?.value?.format;
+		this.show = ValueLabels.shows(values, options.show) && this.parts.length > 0;
 		this.hoverIsolate = values?.hoverIsolate ?? false;
+		this.series = values?.series === undefined ? undefined : [values.series].flat();
 		this.font = values?.fontStyle;
 		this.fontSize = typeof this.font?.fontSize === 'number' ? this.font.fontSize : 12;
 		this.strokeStyle = values?.strokeStyle;
@@ -73,10 +134,57 @@ export class ValueLabels {
 		this.reach = (this.show && reach?.(this)) || [];
 	}
 
+	/** Whether the part named `name` is labelled: a plot writing its `value` on its own shapes asks first. */
+	writes(name: string): boolean {
+		return this.#part(name) !== undefined;
+	}
+
+	/** The part named `name`, when it is labelled. */
+	#part(name: string): ValuePart | undefined {
+		return this.parts.find((part) => part.name === name);
+	}
+
+	/** The parts labelled, each with its own options: the author's list or record, else the kind's default ones. */
+	static #parts(
+		own: ValuesStyle['parts'],
+		kind: { default: string[] } | undefined
+	): [string, ValuePartOptions][] {
+		if (own === undefined) return (kind?.default ?? ['value']).map((name) => [name, {}]);
+		if (Array.isArray(own)) return own.map((name) => [name, {}]);
+		return Object.entries(own).flatMap(([name, option]): [string, ValuePartOptions][] =>
+			option ? [[name, option === true ? {} : option]] : []
+		);
+	}
+
+	/** Whether the labels draw: `show` as set, else when any other option of them is set, else the kind's default. */
+	static shows(values: ValuesStyle | undefined, fallback = false): boolean {
+		if (values?.show !== undefined) return values.show;
+		const set = Object.entries(values ?? {}).some(
+			([key, value]) => key !== 'show' && value !== undefined
+		);
+		return set || fallback;
+	}
+
 	/** The context a label's `format` reads: its row's, with `series` when the row gives none. */
 	static contextOf(row: object | undefined, series?: string): PlotRowContext {
 		const context = RowContext.of(row);
 		return context.series === undefined && series !== undefined ? { ...context, series } : context;
+	}
+
+	/**
+	 * The value a label writes for `row`, read off its context: its `value`, or one `part` of it on a plot whose rows
+	 * have several. `undefined` when it is not a number.
+	 */
+	static valueIn(row: object | undefined, part = 'value'): number | undefined {
+		const value = (RowContext.of(row) as Record<string, unknown>)[part];
+		return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+	}
+
+	/** A label's text for `row`: its context's `part` (its `value` by default), as that part's format writes it. */
+	text(row: object, part = 'value'): string {
+		const value = ValueLabels.valueIn(row, part);
+		const format = this.#part(part)?.format ?? this.format;
+		return value === undefined ? '' : format(value, row, undefined, part);
 	}
 
 	/** A plot's value labels: `values` over `options`, the kind's own defaults, their reach read off `state`. */
@@ -86,8 +194,73 @@ export class ValueLabels {
 		options: ValueLabelsOptions<TState>,
 		state: TState
 	): ValueLabels {
-		const { reach } = options;
-		return new ValueLabels(values, cfg, options, reach && ((labels) => reach(labels, state)));
+		const { reach, layout, layouts, parts, formatFor } = options;
+		return new ValueLabels(
+			values,
+			cfg,
+			{
+				...options,
+				layout: typeof layout === 'function' ? layout(state) : layout,
+				format: options.format ?? formatFor?.(state),
+				layouts: typeof layouts === 'function' ? layouts(state) : layouts,
+				parts: parts && {
+					...parts,
+					placements:
+						typeof parts.placements === 'function' ? parts.placements(state) : parts.placements
+				}
+			},
+			reach && ((labels) => reach(labels, state))
+		);
+	}
+
+	/** Whether the labels sit past the tip of their shapes, where the plot's margins keep room for them. */
+	get pastTip(): boolean {
+		const { edge = 'tip', side = 'outside' } = this.placement;
+		return this.layout === 'path' && edge === 'tip' && side === 'outside';
+	}
+
+	/**
+	 * The `label` a plot kind's shapes write their value in, in this plot's {@link layout}: `text`, over what every
+	 * label shares ({@link hooks}). Inside its shape a label takes no `fill` of its own, so it is written in the color
+	 * that reads best on the shape; past it, the plot's `fill`.
+	 */
+	label<TLabel extends MarkerLabelConfig = MarkerLabelConfig>(
+		env: AxisPlotEnv,
+		text: (row: ProcessedRow) => string,
+		defaults: {
+			fill?: string;
+			fontSize?: number;
+			fontWeight?: FontStyle['fontWeight'];
+			/** The rows `styles.values.select` picks: a `'point'` label writes only theirs. */
+			labelled?: readonly ProcessedRow[];
+			/** A row's series color, which `color: 'series'` writes a label off its shape in. */
+			seriesColor?: (row: ProcessedRow) => string | undefined;
+		} = {}
+	): TLabel {
+		const { fitMargins, styles: shared, ...events } = this.hooks(env);
+		const { font } = this;
+		const onShape = this.layout === 'box' || this.placement.side === 'inside';
+		const picked = this.layout === 'point' && defaults.labelled && new Set(defaults.labelled);
+		return {
+			...events,
+			...this.placement,
+			...(picked ? { select: (row: ProcessedRow) => picked.has(row) } : {}),
+			layout: this.layout,
+			text,
+			fitMargins: onShape ? undefined : fitMargins,
+			styles: {
+				...shared,
+				...font,
+				// On its shape, a label unset reads in the color that contrasts with it; off it, in its own.
+				fill: onShape
+					? this.fill
+					: (this.fill ??
+						(this.color === 'series' ? defaults.seriesColor : undefined) ??
+						defaults.fill),
+				fontSize: font?.fontSize ?? defaults.fontSize ?? 12,
+				fontWeight: font?.fontWeight ?? defaults.fontWeight
+			}
+		} as TLabel;
 	}
 
 	/** The configuration the labels were built under, for a plot kind's own label defaults. */
@@ -114,9 +287,9 @@ export class ValueLabels {
 		return Box.ofText(text, this.fontSize, this.#cfg);
 	}
 
-	/** The labels' gap (px) from their mark along `axis`: their own `dx`/`dy`, else `fallback`. */
-	offset(axis: 'x' | 'y', fallback = 6): number {
-		const own = axis === 'x' ? this.font?.dx : this.font?.dy;
+	/** The labels' gap (px) from their mark: the layout's `gap`, else `fallback`. */
+	offset(fallback = 6): number {
+		const own = this.placement.gap;
 		return Math.abs(typeof own === 'number' ? own : fallback);
 	}
 
@@ -169,16 +342,6 @@ export class ValueLabels {
 	}
 
 	/**
-	 * The author's own `textAnchor`, if any. `'outside'` is a hover marker's
-	 * per-point anchor; a label's own `anchor` already places it, so here it
-	 * counts as unset.
-	 */
-	get textAnchor(): Exclude<TextAnchor, 'outside'> | undefined {
-		const own = this.font?.textAnchor;
-		return own === 'outside' ? undefined : own;
-	}
-
-	/**
 	 * What every label marker shares: the plot's margins grow to fit it, it
 	 * dims with its row's series, and with `hoverIsolate`, hovering it
 	 * isolates that series. A row without a series gets the margins only.
@@ -206,81 +369,6 @@ export class ValueLabels {
 	}
 
 	/**
-	 * Where in a bar a label goes, from the `anchor` of `styles.values`: its `label` anchor, and whether it is beyond
-	 * the bar. `negative` tells a bar that runs to the left (or down) from its base from one that runs right (or up),
-	 * which `'tip'`, `'base'` and `'outside'` follow; the others are the edges of the page. A `stacked` bar's label is
-	 * always in the middle. An anchor the shapes do not read (`'start'`, `'end'`) is taken for `'outside'`, the default.
-	 */
-	static boxAnchor(
-		anchor: ValueAnchor,
-		shape: { isHorizontal: boolean; negative?: boolean; stacked?: boolean }
-	): { anchor: LabelAnchor; outside?: boolean } {
-		if (shape.stacked || anchor === 'middle') return { anchor: 'middle' };
-		// A place in the shape as it is drawn on the page, which no sign moves.
-		if (
-			anchor !== 'outside' &&
-			anchor !== 'start' &&
-			anchor !== 'end' &&
-			anchor !== 'tip' &&
-			anchor !== 'base'
-		) {
-			return { anchor };
-		}
-		const [tip, base] = shape.isHorizontal
-			? shape.negative
-				? (['left', 'right'] as const)
-				: (['right', 'left'] as const)
-			: shape.negative
-				? (['bottom', 'top'] as const)
-				: (['top', 'bottom'] as const);
-		if (anchor === 'base') return { anchor: base };
-		return anchor === 'tip' ? { anchor: tip } : { anchor: tip, outside: true };
-	}
-
-	/** Whether a label at `anchor` goes to one side or the other of a bar with the sign of its value. */
-	static followsSign(anchor: ValueAnchor): boolean {
-		return anchor === 'outside' || anchor === 'tip' || anchor === 'base';
-	}
-
-	/**
-	 * The `label` the shapes of a plot kind write their value in: this plot's `styles.values` over the `defaults` the kind
-	 * sets, with what every label shares ({@link hooks}) - its dimming and isolating of a series. A label inside its shape
-	 * never reaches out of the plot, so only one `outside` has the margins grow to hold it; and it takes the default
-	 * `fill` only `outside`, for inside it is written in the color that contrasts with its shape.
-	 */
-	shapeLabel(
-		env: AxisPlotEnv,
-		text: (row: ProcessedRow) => string,
-		defaults: {
-			fill?: string;
-			fontSize?: number;
-			fontWeight?: FontStyle['fontWeight'];
-			anchor?: LabelAnchor;
-			outside?: boolean;
-			gap?: number;
-		} = {}
-	): TextLabelConfig {
-		const { fitMargins, styles: shared, ...events } = this.hooks(env);
-		const { font } = this;
-		return {
-			...events,
-			text,
-			anchor: defaults.anchor,
-			outside: defaults.outside,
-			gap: defaults.gap,
-			fitMargins: defaults.outside ? fitMargins : undefined,
-			styles: {
-				...shared,
-				...font,
-				// Inside its shape, a label unset is written in the color that reads best on it.
-				fill: font?.fill ?? (defaults.outside ? defaults.fill : undefined),
-				fontSize: font?.fontSize ?? defaults.fontSize ?? 12,
-				fontWeight: font?.fontWeight ?? defaults.fontWeight
-			}
-		} as TextLabelConfig;
-	}
-
-	/**
 	 * A processed row's own value, read through its series' own value channel
 	 * (`y`, or `x` on a horizontal plot) - what a label shows, even where a
 	 * transform moved the row (a stacked row's top is the running total, not
@@ -301,36 +389,194 @@ export class ValueLabels {
 	}
 
 	/**
-	 * A series-over-`x` plot's (line, area) labels: one `'text'` marker over
-	 * the processed rows, each visible series' last row with a value
-	 * (`filter` + `selectLast`, per series), at its top (a stacked row's
-	 * `y2`), labelled with its own value and placed by `anchor`. Labels that
-	 * would overlap fan out into a shared column (`declutter`), colored by the
-	 * segment the row falls in. A plot that labels each end of its series apart
-	 * passes the `rows` and `anchor` of one end, and `lane` to route its labels
-	 * out to a lane whether or not they overlap (`flip: false` keeps one on the
-	 * left in the margin instead of flipping it over its points).
+	 * A series-over-`x` plot's (line, area) labels, for its line or area markers: each labelled row (by default its
+	 * series' last) with its own value, on the `side` of it its placement asks, colored by the segment it falls in.
+	 * Labels that would overlap fan out into a shared column. A plot that labels each end of its series apart passes
+	 * the `rows` and `side` of one end, and `lane` to route them out to a lane whether or not they overlap.
 	 */
 	atSeriesEnds<TData extends Record<string, unknown>>(
 		state: AxisPlotState<TData, object>,
+		env: AxisPlotEnv,
 		end: {
 			rows?: ProcessedRow[];
-			anchor?: ValueAnchor;
+			side?: PointSide;
 			lane?: boolean | { elbowGap: number };
 			flip?: boolean;
 		} = {}
-	): TextMarkerConfig[] {
-		if (end.rows) return this.#seriesEnds(state, end);
+	): PointLabelConfig[] {
+		if (end.rows) return this.#seriesEnds(state, env, end);
 		// A label on a series' first point would sit on its own line: it goes out to a lane instead.
 		const firsts = ValueLabels.#firstRows(state);
 		const labelled = state.labelled ?? [];
 		return [
-			...this.#seriesEnds(state, { rows: labelled.filter((row) => !firsts.has(row)) }),
-			...this.#seriesEnds(state, {
+			...this.#seriesEnds(state, env, { rows: labelled.filter((row) => !firsts.has(row)) }),
+			...this.#seriesEnds(state, env, {
 				rows: labelled.filter((row) => firsts.has(row)),
 				lane: { elbowGap: ValueLabels.FIRST_LANE_GAP }
 			})
 		];
+	}
+
+	/**
+	 * The labels of a plot whose rows have several values (a box's quartiles, a bullet's target): one `text` marker per
+	 * part labelled, each of `rows` written at that part's value in its context - one label per value, for a part
+	 * holding several (a box's outliers). `at` places a label at a value: its point, and the shape around it its
+	 * `anchor` reads.
+	 */
+	partMarkers(
+		env: AxisPlotEnv,
+		rows: readonly ProcessedRow[],
+		at: (value: symbol) => PointGeometryOf,
+		defaults: {
+			seriesColor?: (row: ProcessedRow) => string | undefined;
+			/** The parts the kind writes on its own shapes, left out here: a bar's `value`. */
+			skip?: string[];
+		} = {}
+	): TextMarkerConfig[] {
+		const { styles: shared, ...hooks } = this.hooks(env);
+		const { font } = this;
+		// `series` labels the rows of those series only.
+		const named = this.series && new Set(this.series);
+		const labelled = named ? rows.filter((row) => named.has(String(row[SERIES_KEY]))) : rows;
+		return this.parts.flatMap((part) => {
+			if (defaults.skip?.includes(part.name)) return [];
+			const placed = labelled.flatMap((row) => {
+				const own = (RowContext.of(row) as Record<string, unknown>)[part.name];
+				return (Array.isArray(own) ? own : [own])
+					.filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
+					.map((value) => ({ ...row, [PART_VALUE]: value }));
+			});
+			const label = {
+				...hooks,
+				...part.placement,
+				layout: 'point',
+				text: (row: ProcessedRow) =>
+					part.format(Number(row[PART_VALUE]), row, undefined, part.name),
+				styles: {
+					...shared,
+					...font,
+					fill:
+						this.fill ??
+						(this.color === 'series' ? defaults.seriesColor : undefined) ??
+						'currentColor',
+					fontSize: font?.fontSize ?? 11
+				}
+			} as PointLabelConfig;
+			const marker =
+				placed.length > 0 &&
+				PointLayout.build(label, at(PART_VALUE), placed, { gap: this.#cfg.text.label.gap });
+			return marker ? [marker] : [];
+		});
+	}
+
+	/**
+	 * Where a part label of a row sits on a plot of categories: at the row's `category` (a field or a function of
+	 * it), level with the part's value, across the category's band - which an `anchor` reads, to write it beside.
+	 */
+	static bandPoint(
+		state: { axes?: PlotAxes },
+		category: unknown,
+		/** How wide the shape is across its band, in pixels, when it does not fill it: a violin's inner box. */
+		across?: number,
+		/** A row's slot of its band, when its series share it side by side. */
+		slot?: (row: ProcessedRow) => { index: number; count: number } | undefined
+	): (value: symbol) => PointGeometryOf {
+		const valueAxis = PlotAxes.valueOf(state);
+		const categoryAxis = PlotAxes.categoryOf(state);
+		return (value) =>
+			({
+				[categoryAxis]: category,
+				[valueAxis]: value,
+				shift:
+					slot &&
+					((row: unknown, scales: BoxScales) => {
+						const own = slot(row as ProcessedRow);
+						const band = Number(scales[categoryAxis]?.fn?.bandwidth?.() ?? 0);
+						if (!own || !band) return undefined;
+						const share = band / own.count;
+						const offset = share * own.index + share / 2 - band / 2;
+						return categoryAxis === 'x' ? { dx: offset, dy: 0 } : { dx: 0, dy: offset };
+					}),
+				size: (_row: unknown, scales: BoxScales) => {
+					const band = across ?? Number(scales[categoryAxis]?.fn?.bandwidth?.() ?? 0);
+					return categoryAxis === 'x' ? { width: band, height: 0 } : { width: 0, height: band };
+				}
+			}) as unknown as PointGeometryOf;
+	}
+
+	/** The placement that writes each of `parts` beside its category's band: to its right, or above sideways bands. */
+	static besideBand(
+		state: { axes?: PlotAxes },
+		parts: string[]
+	): Record<string, Record<string, unknown>> {
+		const beside = { anchor: state.axes?.isHorizontal ? 'top' : 'right' };
+		return Object.fromEntries(parts.map((part) => [part, beside]));
+	}
+
+	/** A series-over-`x` plot's labels in its {@link layout}: at its series' ends, or along its lines. */
+	forSeries<TData extends Record<string, unknown>>(
+		state: AxisPlotState<TData, object>,
+		env: AxisPlotEnv
+	): MarkerLabelConfig[] {
+		return this.layout === 'path' ? this.alongSeries(state, env) : this.atSeriesEnds(state, env);
+	}
+
+	/** The side of its point a `'point'` label is written on: its placement's, else after it. */
+	get side(): PointSide {
+		return (this.placement.side as PointSide | undefined) ?? 'after';
+	}
+
+	/**
+	 * A series-over-`x` plot's `'path'` labels, for its line or area markers: each series' name - or, with a `format`,
+	 * the text it writes for the series' first row - along its line, colored by the series.
+	 */
+	alongSeries<TData extends Record<string, unknown>>(
+		state: AxisPlotState<TData, object>,
+		env: AxisPlotEnv
+	): MarkerLabelConfig[] {
+		const { font } = this;
+		const nameOf = (d: ProcessedRow) => String(d[SERIES_KEY]);
+		const { styles: shared, ...hooks } = this.hooks(env);
+		return [
+			{
+				...hooks,
+				...this.placement,
+				layout: 'path',
+				text: (d: ProcessedRow) => (this.formatted ? this.text(d) : nameOf(d)),
+				styles: {
+					...shared,
+					...font,
+					fill: this.fill ?? ((d: ProcessedRow) => this.#colorOf(state, d) ?? 'currentColor'),
+					fontSize: font?.fontSize ?? 12
+				}
+			} as MarkerLabelConfig
+		];
+	}
+
+	/** A series row's color: the segment it falls in, else its series'. */
+	#colorOf<TData extends Record<string, unknown>>(
+		state: AxisPlotState<TData, object>,
+		d: ProcessedRow
+	): string | undefined {
+		const id = String(d[SERIES_ID_KEY]);
+		const group = state.scopedGroups?.find((g) => (g.id ?? g.name) === id);
+		const segment = group?.segments.find((seg) => seg.match(d as TData));
+		return (
+			segment?.color ??
+			group?.segments[0]?.color ??
+			group?.color ??
+			state.colorForSeries?.(String(d[SERIES_KEY]))
+		);
+	}
+
+	/** `markers` with `labels` on each one of `type`: the shapes of a series carry its labels. */
+	static onMarkers<T extends { type: string }>(
+		markers: T[],
+		type: string,
+		labels: MarkerLabelConfig[] | undefined
+	): T[] {
+		if (!labels?.length) return markers;
+		return markers.map((marker) => (marker.type === type ? { ...marker, label: labels } : marker));
 	}
 
 	/** How far (px) a lane takes the label of a series' first point from it - clear of the line that leaves it. */
@@ -350,57 +596,45 @@ export class ValueLabels {
 
 	#seriesEnds<TData extends Record<string, unknown>>(
 		state: AxisPlotState<TData, object>,
+		env: AxisPlotEnv,
 		end: {
 			rows?: ProcessedRow[];
-			anchor?: ValueAnchor;
+			side?: PointSide;
 			lane?: boolean | { elbowGap: number };
 			flip?: boolean;
 		}
-	): TextMarkerConfig[] {
-		const processed = state.processedData;
-		if (!processed) return [];
-		const { font, format } = this;
-		const anchor = end.anchor ?? this.anchor;
-		const position = ProcessedPositions.of(processed);
-		const topOf = (d: ProcessedRow) => position.y(d);
-		const nameOf = (d: ProcessedRow) => String(d[SERIES_KEY]);
-		const valueOf = ValueLabels.valueOf(state);
-		const colorOf = (d: ProcessedRow) => {
-			const id = String(d[SERIES_ID_KEY]);
-			const group = state.scopedGroups?.find((g) => (g.id ?? g.name) === id);
-			const segment = group?.segments.find((seg) => seg.match(d as TData));
-			return (
-				segment?.color ??
-				group?.segments[0]?.color ??
-				group?.color ??
-				state.colorForSeries?.(nameOf(d))
-			);
-		};
-		const marker: TextMarkerConfig = {
-			type: 'text',
-			// The rows the "transforms" phase picked for the labels: by default each series' last.
-			data: end.rows ?? state.labelled ?? [],
-			x: (processed.channels.x ?? position.x) as TextMarkerConfig['x'],
-			y: (processed.channels.y2 ?? processed.channels.y ?? topOf) as TextMarkerConfig['y'],
-			grouping: SERIES_ID_KEY,
-			text: (d: ProcessedRow) => format(Number(valueOf(d)), d, nameOf(d)),
-			styles: {
-				...font,
-				fill: this.fill ?? ((d: ProcessedRow) => colorOf(d) ?? 'currentColor'),
-				fontSize: font?.fontSize ?? 12,
-				dx: font?.dx ?? (anchor === 'start' ? 6 : anchor === 'end' ? -6 : 0),
-				dy: font?.dy ?? (anchor === 'outside' ? -8 : 0),
-				textAnchor: this.textAnchor ?? (anchor === 'start' || anchor === 'end' ? anchor : 'middle'),
-				lineAnchor: font?.lineAnchor ?? (anchor === 'outside' ? 'bottom' : 'middle')
-			},
-			declutter: {
-				connector: this.strokeStyle,
-				aligned: !!end.lane && (anchor === 'start' || anchor === 'end'),
-				elbowGap: typeof end.lane === 'object' ? end.lane.elbowGap : undefined,
-				flip: end.flip
-			}
-		};
-		return marker.data?.length ? [marker] : [];
+	): PointLabelConfig[] {
+		const rows = new Set(end.rows ?? state.labelled ?? []);
+		if (rows.size === 0) return [];
+		const { font } = this;
+		const side = end.side ?? this.side;
+		const at = PointLayout.sideOf(side, this.placement.gap as number | undefined);
+		const { styles: shared, ...hooks } = this.hooks(env);
+		return [
+			{
+				...hooks,
+				layout: 'point',
+				select: (row: ProcessedRow) => rows.has(row),
+				grouping: SERIES_ID_KEY,
+				text: (d: ProcessedRow) => this.text(d),
+				styles: {
+					...shared,
+					...font,
+					fill: this.fill ?? ((d: ProcessedRow) => this.#colorOf(state, d) ?? 'currentColor'),
+					fontSize: font?.fontSize ?? 12,
+					dx: at.dx,
+					dy: at.dy,
+					textAnchor: at.textAnchor,
+					lineAnchor: at.lineAnchor
+				},
+				declutter: {
+					connector: this.strokeStyle,
+					aligned: !!end.lane && (side === 'after' || side === 'before'),
+					elbowGap: typeof end.lane === 'object' ? end.lane.elbowGap : undefined,
+					flip: end.flip
+				}
+			} as PointLabelConfig
+		];
 	}
 
 	/** The rows of a series-over-`x` plot that cannot be labelled: a gap, or a stack with no top. For the "transforms" phase's `labels.skip`. */
@@ -424,16 +658,12 @@ export class ValueLabels {
 	 */
 	reachAtSeriesEnds<TData extends Record<string, unknown>>(
 		state: AxisPlotState<TData, object>,
-		anchor: ValueAnchor = this.anchor
+		pointSide: PointSide = this.side
 	): EdgeBox[] {
 		const series = state.resolvedSeries ?? [];
-		const { font, format } = this;
-		const dx =
-			typeof font?.dx === 'number' ? font.dx : anchor === 'start' ? 6 : anchor === 'end' ? -6 : 0;
-		const dy = typeof font?.dy === 'number' ? font.dy : anchor === 'outside' ? -8 : 0;
-		const textAnchor =
-			this.textAnchor ?? (anchor === 'start' ? 'start' : anchor === 'end' ? 'end' : 'middle');
-		const lineAnchor = font?.lineAnchor ?? (anchor === 'outside' ? 'bottom' : 'middle');
+		const { format } = this;
+		const written = PointLayout.sideOf(pointSide, this.placement.gap as number | undefined);
+		const { dx, dy, textAnchor, lineAnchor } = written;
 		const side: BoxAnchors = {
 			x: textAnchor === 'start' ? 'after' : textAnchor === 'end' ? 'before' : 'middle',
 			y: lineAnchor === 'top' ? 'after' : lineAnchor === 'bottom' ? 'before' : 'middle'

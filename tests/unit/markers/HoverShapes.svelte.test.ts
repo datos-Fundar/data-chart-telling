@@ -38,26 +38,39 @@ describe('HoverShapes', () => {
 		cfg: getConfiguration()
 	};
 
+	/** What `marker`'s style `name` draws `row` with: its value, or what its function of the row gives. */
+	const styleOn = (styled: { styles?: Record<string, unknown> }, name: string, row: object) => {
+		const style = styled.styles?.[name];
+		return typeof style === 'function' ? style(row, 0) : style;
+	};
+
 	test('leaves a marker as it is without a hover marker that styles shapes', () => {
-		const parts = new HoverShapes([{ type: 'hover' }]).split(marker, rows, reach);
-		expect(parts).toEqual([{ key: '', marker }]);
-		expect(parts[0].marker).toBe(marker);
+		expect(new HoverShapes([{ type: 'hover' }]).styled(marker, rows, reach)).toBe(marker);
 	});
 
 	test('leaves a marker not linked to the hover, or only a trigger of it, as it is', () => {
 		const shapes = new HoverShapes([HOVER]);
 		for (const hover of [undefined, false, 'trigger'] as const) {
 			const own = { ...marker, hover };
-			expect(shapes.split(own, rows, reach)[0].marker).toBe(own);
+			expect(shapes.styled(own, rows, reach)).toBe(own);
 		}
 	});
 
-	test('splits a linked marker by how the hover reaches each row, the hovered last', () => {
-		const parts = new HoverShapes([HOVER]).split(marker, rows, reach);
-		expect(parts.map((p) => p.key)).toEqual(['o', 'a']);
-		expect(parts[1].marker.data).toEqual([{ v: 1 }]);
-		expect(parts[1].marker.styles).toEqual({ fill: 'red', fillOpacity: 1 });
-		expect(parts[0].marker.styles).toEqual({ fill: 'red', fillOpacity: 0.3 });
+	test('keeps a linked marker whole, each style the hover sets read off the row as the hover reaches it', () => {
+		const styled = new HoverShapes([HOVER]).styled(marker, rows, reach);
+		// Its rows as they are: moving the pointer changes no row, only how each is styled.
+		expect(styled.data).toBe(rows);
+		expect(styled.styles.fill).toBe('red');
+		expect(styleOn(styled, 'fillOpacity', rows[0])).toBe(1);
+		expect(styleOn(styled, 'fillOpacity', rows[1])).toBe(0.3);
+	});
+
+	test('a row the hover does not reach keeps its own style, fully opaque where it set none', () => {
+		const styled = new HoverShapes([HOVER]).styled(marker, rows, { ...reach, roleOf: () => null });
+		expect(styleOn(styled, 'fillOpacity', rows[0])).toBe(1);
+		const own = { ...marker, styles: { fill: 'red', fillOpacity: 0.6 } };
+		const ownStyled = new HoverShapes([HOVER]).styled(own, rows, { ...reach, roleOf: () => null });
+		expect(styleOn(ownStyled, 'fillOpacity', rows[1])).toBe(0.6);
 	});
 
 	test("a dot marker's shapes take the styles under its own names", () => {
@@ -65,20 +78,65 @@ describe('HoverShapes', () => {
 		const shapes = new HoverShapes([
 			{ type: 'hover', active: { fill: 'blue', strokeWidth: 2 }, others: { fillOpacity: 0.3 } }
 		]);
-		const [other, active] = shapes.split(dots, rows, reach);
-		expect(active.marker.styles).toEqual({ dotFill: 'blue', dotStrokeWidth: 2 });
-		expect(other.marker.styles).toEqual({ dotFill: 'red', dotFillOpacity: 0.3 });
+		const styled = shapes.styled(dots, rows, reach);
+		const [active, other] = rows;
+		expect(styleOn(styled, 'dotFill', active)).toBe('blue');
+		// The outline is drawn over every shape, by the outline, not the shape.
+		expect(styleOn(styled, 'dotStrokeWidth', active)).toBeUndefined();
+		const outline = shapes.outline(dots, rows, reach) as typeof dots;
+		expect(outline.styles.dotFill).toBe('none');
+		expect(styleOn(outline, 'dotStrokeWidth', active)).toBe(2);
+		expect(styleOn(styled, 'dotFill', other)).toBe('red');
+		expect(styleOn(styled, 'dotFillOpacity', other)).toBe(0.3);
+		expect(styleOn(styled, 'dotFillOpacity', active)).toBe(1);
+	});
+
+	test('outlines the hovered rows only, unfilled, with no label or pointer of their own', () => {
+		const shapes = new HoverShapes([
+			{ type: 'hover', active: { stroke: 'black', strokeWidth: 2 } }
+		]);
+		const own = { ...marker, label: { text: 'v' }, onclick: () => {} };
+		const outline = shapes.outline(own, rows, reach) as unknown as Record<string, unknown> & {
+			data: unknown[];
+			styles: Record<string, unknown>;
+		};
+		expect(outline.data).toEqual([{ v: 1 }]);
+		expect(outline.styles.fill).toBe('none');
+		expect(outline.styles.fillOpacity).toBe(0);
+		expect(styleOn(outline, 'stroke', rows[0])).toBe('black');
+		expect(styleOn(outline, 'strokeWidth', rows[0])).toBe(2);
+		expect(outline.label).toBeUndefined();
+		expect(outline.onclick).toBeUndefined();
+		expect(outline.hover).toBeUndefined();
+	});
+
+	test('no outline without a stroke in active, or with nothing hovered', () => {
+		expect(new HoverShapes([HOVER]).outline(marker, rows, reach)).toBeUndefined();
+		const shapes = new HoverShapes([{ type: 'hover', active: { stroke: 'black' } }]);
+		expect(shapes.outline(marker, rows, { ...reach, roleOf: () => null })).toBeUndefined();
 	});
 
 	test('a dimmed row keeps its fill and opacities, and takes the rest', () => {
 		const shapes = new HoverShapes([
 			{ type: 'hover', active: { fill: 'blue', fillOpacity: 1, strokeWidth: 3 } }
 		]);
-		const parts = shapes.split(marker, rows, { ...reach, dimmed: () => true });
+		const styled = shapes.styled({ ...marker, styles: { fill: 'red', fillOpacity: 0.2 } }, rows, {
+			...reach,
+			dimmed: () => true
+		});
+		const [active, other] = rows;
+		expect(styleOn(styled, 'fill', active)).toBe('red');
+		expect(styleOn(styled, 'fillOpacity', active)).toBe(0.2);
+		expect(
+			styleOn(
+				shapes.outline(marker, rows, { ...reach, dimmed: () => true })!,
+				'strokeWidth',
+				active
+			)
+		).toBe(3);
 		// The row the hover does not style is drawn as it was.
-		expect(parts.map((p) => p.key)).toEqual(['', 'a~']);
-		expect(parts[0].marker.styles).toBe(marker.styles);
-		expect(parts[1].marker.styles).toEqual({ fill: 'red', strokeWidth: 3 });
+		expect(styleOn(styled, 'strokeWidth', other)).toBeUndefined();
+		expect(styleOn(styled, 'fill', other)).toBe('red');
 	});
 });
 
@@ -206,8 +264,13 @@ describe('the hover marker restyles a treemap tile', () => {
 
 	const rects = (svg: SVGElement) =>
 		Array.from(svg.querySelectorAll<SVGRectElement>('rect')).filter((r) => !r.closest('clipPath'));
+	/** The tiles themselves - not the hovered one's outline, drawn over them all. */
 	const tiles = (svg: SVGElement) =>
-		rects(svg).filter((r) => r.style.fill && r.style.fill !== 'transparent');
+		rects(svg).filter(
+			(r) => r.style.fill && r.style.fill !== 'transparent' && !r.closest('.dct-hover-outline')
+		);
+	/** The hovered tile's outline, drawn over every tile. */
+	const outlines = (svg: SVGElement) => rects(svg).filter((r) => !!r.closest('.dct-hover-outline'));
 	const hitAreas = (svg: SVGElement) => rects(svg).filter((r) => r.style.fill === 'transparent');
 	/** The invisible rectangle over the biggest tile, Resto's, and the biggest tile itself. */
 	const biggest = (all: SVGRectElement[]) => all.reduce((a, b) => (area(a) > area(b) ? a : b));
@@ -242,6 +305,39 @@ describe('the hover marker restyles a treemap tile', () => {
 		expect(svg.querySelectorAll('g.text text')).toHaveLength(before);
 	});
 
+	test("the hovered tile's outline is drawn whole, over every tile, and gone on leave", async () => {
+		const { container } = await render(TreemapPlot, {
+			...props,
+			markers: [{ type: 'hover', active: { stroke: 'rgb(255, 0, 0)', strokeWidth: 3 } }]
+		});
+		const svg = await waitForSvg(container);
+		await expect.poll(() => tiles(svg).length).toBe(ROWS.length);
+		const hit = biggest(hitAreas(svg));
+		rest(hit);
+		await expect.poll(() => outlines(svg)).toHaveLength(0);
+
+		hit.dispatchEvent(new PointerEvent('pointerenter'));
+		await expect.poll(() => outlines(svg)).toHaveLength(1);
+		const [outline] = outlines(svg);
+		expect(styleOf(outline).stroke).toBe('rgb(255, 0, 0)');
+		expect(Number(styleOf(outline).fillOpacity)).toBe(0);
+		// The hovered tile's own box, drawn after every tile, so none of its neighbours covers its edges.
+		const tile = biggest(tiles(svg)).getBoundingClientRect();
+		const box = outline.getBoundingClientRect();
+		expect(Math.abs(box.width - tile.width)).toBeLessThan(1);
+		expect(Math.abs(box.height - tile.height)).toBeLessThan(1);
+		for (const other of tiles(svg)) {
+			expect(
+				other.compareDocumentPosition(outline) & Node.DOCUMENT_POSITION_FOLLOWING
+			).toBeTruthy();
+		}
+		// It never takes the pointer from the tile under it.
+		expect(outline.closest('[pointer-events="none"]')).not.toBeNull();
+
+		rest(hit);
+		await expect.poll(() => outlines(svg)).toHaveLength(0);
+	});
+
 	test('lightens the hovered tile and dims the others, over the segments, and back on leave', async () => {
 		const { container } = await render(TreemapPlot, {
 			...props,
@@ -259,7 +355,8 @@ describe('the hover marker restyles a treemap tile', () => {
 			const all = tiles(svg);
 			const hovered = biggest(all);
 			expect(opacityOf(hovered)).toBe(1);
-			expect(styleOf(hovered).stroke).toBe('rgb(0, 0, 0)');
+			// Its outline is drawn over every tile, whole.
+			expect(outlines(svg).map((o) => styleOf(o).stroke)).toEqual(['rgb(0, 0, 0)']);
 			const rest = all.filter((t) => t !== hovered);
 			expect(rest).toHaveLength(ROWS.length - 1);
 			expect(rest.every((t) => opacityOf(t) === 0.3)).toBe(true);
@@ -309,7 +406,7 @@ describe('the hover marker restyles a treemap tile', () => {
 			const hovered = biggest(all);
 			// Resto is in the dimmed sector: it takes the outline, not the full opacity.
 			expect(opacityOf(hovered)).toBe(0.2);
-			expect(styleOf(hovered).strokeWidth).toBe('4px');
+			expect(outlines(svg).map((o) => styleOf(o).strokeWidth)).toEqual(['4px']);
 			// A sector the legend shows dims under the hover.
 			const shown = all.filter((t) => opacityOf(t) === 0.3);
 			expect(shown).toHaveLength(3);

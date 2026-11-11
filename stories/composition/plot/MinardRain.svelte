@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Plot as SveltePlot, Line, Dot, Text, RuleX, RuleY, LinearGradientY } from 'svelteplot';
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import type { ProjectionLike } from '$lib/plots/utils/tiles';
 	import { MINARD_LON_EXTENT, MINARD_TEMPERATURES, type MinardTemperature } from './minard';
 
@@ -13,7 +13,7 @@
 	 * Each reading sits at the same horizontal place as on the map: with the
 	 * map's `projection` it is where the map draws the reading's longitude and
 	 * latitude, and without, the longitude spread across the width. By default it draws
-	 * only the plot, and every other prop goes to `Plot`.
+	 * only the plot, and every other prop goes to `AbstractPlot`.
 	 */
 	let {
 		projection,
@@ -36,7 +36,7 @@
 	const COLDEST = -30;
 </script>
 
-<Plot
+<AbstractPlot
 	width={900}
 	height={260}
 	data={MINARD_TEMPERATURES}
@@ -114,4 +114,4 @@
 			the map where the army was.
 		</span>
 	{/snippet}
-</Plot>
+</AbstractPlot>

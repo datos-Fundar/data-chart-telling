@@ -8,13 +8,14 @@
 	import { RowOffset } from '$lib/markers/utils/RowOffset';
 	import RowOffsetMarks from '$lib/markers/utils/RowOffsetMarks.svelte';
 	import { Declutter } from '$lib/markers/text/Declutter';
+	import { Covering } from '$lib/markers/text/Covering';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { TextFit, type FittedText } from '$lib/markers/text/TextFit';
 	import { NumberFormat } from '$lib/utils/NumberFormat';
 	import { PlotMargins } from '$lib/layout/margins/PlotMargins.svelte';
 	import { Box } from '$lib/layout/margins/Box';
 	import type { TextMarkerConfig } from '$lib/types/markers/common';
-	import type { BoxChannels, BoxSizer } from '$lib/markers/utils/BoxLabel';
+	import type { BoxChannels, BoxSizer } from '$lib/types/markers/labels/box';
 	import type { TextAnchor } from '$lib/types/plots/constants';
 
 	/**
@@ -77,7 +78,13 @@
 				: (marker.textAnchor ?? styles?.textAnchor)
 		)
 	);
-	const lineAnchor = $derived(styles?.lineAnchor ?? 'middle');
+	const lineAnchor = $derived(
+		(typeof marker.lineAnchor === 'function' ? undefined : marker.lineAnchor) ??
+			styles?.lineAnchor ??
+			'middle'
+	);
+	const lineAnchorAt = (d: TData) =>
+		typeof marker.lineAnchor === 'function' ? marker.lineAnchor(d) : lineAnchor;
 	// A label in a slice of its band sits off the band's middle, at its drawn width.
 	const nudge = $derived(BandNudge.of(plot.scales, marker.bandSlice));
 	// The fixed offset, which `declutter` and `edgeAware` place labels by; a function of the row moves each label after that, through `RowOffsetMarks`.
@@ -92,9 +99,15 @@
 
 	const declutter = $derived.by(() => {
 		if (!marker.declutter) return undefined;
-		const own = marker.declutter === true ? {} : marker.declutter;
+		const own =
+			marker.declutter === true
+				? {}
+				: typeof marker.declutter === 'string'
+					? { mode: marker.declutter }
+					: marker.declutter;
 		const defaults = cfg.text.declutter;
 		return {
+			mode: own.mode ?? 'lanes',
 			elbowGap: own.elbowGap ?? defaults.elbowGap,
 			laneStep: own.laneStep ?? defaults.laneStep,
 			labelGap: own.labelGap ?? defaults.labelGap,
@@ -104,8 +117,16 @@
 		};
 	});
 	const perRow = $derived(
-		!!declutter || !!marker.edgeAware || events.any || typeof marker.textAnchor === 'function'
+		!!declutter ||
+			!!marker.edgeAware ||
+			!!marker.origin ||
+			events.any ||
+			!!marker.covers ||
+			typeof marker.textAnchor === 'function' ||
+			typeof marker.lineAnchor === 'function'
 	);
+	/** Where a row's point sits off its `x`/`y`. */
+	const originOf = (d: TData) => marker.origin?.(d, plot.scales) ?? { dx: 0, dy: 0 };
 	const dir = $derived(Math.sign(dx) || 1);
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -232,21 +253,24 @@
 	const points = $derived.by(() => {
 		const xScale = plot.scales.x?.fn;
 		const yScale = plot.scales.y?.fn;
-		if ((!declutter && !marker.edgeAware) || !xScale || !yScale) return undefined;
+		if ((!declutter && !marker.edgeAware && !marker.covers) || !xScale || !yScale) return undefined;
 		const xOf = channel(x ?? 0);
 		const yOf = channel(y ?? 0);
 		// A band's position is its start; a mark sits at its middle.
 		const middle = (scale: typeof plot.scales.x) =>
 			scale?.type === 'band' ? scale.fn.bandwidth() / 2 : 0;
 		const [dx0, dy0] = [middle(plot.scales.x), middle(plot.scales.y)];
-		return displayData.map((d) => ({
-			px: Number(xScale(xOf(d) as never)) + dx0,
-			py: Number(yScale(yOf(d) as never)) + dy0
-		}));
+		return displayData.map((d) => {
+			const origin = originOf(d);
+			return {
+				px: Number(xScale(xOf(d) as never)) + dx0 + origin.dx,
+				py: Number(yScale(yOf(d) as never)) + dy0 + origin.dy
+			};
+		});
 	});
 
 	const lanes = $derived(
-		declutter && points && bounds
+		declutter?.mode === 'lanes' && points && bounds
 			? Declutter.buildLanes({
 					items: points.map((p, key) => ({ key, ...p })),
 					dx,
@@ -259,8 +283,56 @@
 			: undefined
 	);
 
-	/** Each row's anchor and offset, flipped where its text would cross the content box's edge. */
+	/** The rows whose label a shape drawn after its own row covers: their labels are left out. */
+	const covered = $derived.by(() => {
+		const covers = marker.covers;
+		if (!covers || !points) return undefined;
+		const shapes = displayData.map((d, i) => {
+			const shape = covers(d, plot.scales);
+			if (!shape) return undefined;
+			const { px, py } = points[i];
+			const { width, height, round } = shape;
+			return { box: new Box(px - width / 2, py - height / 2, width, height), round };
+		});
+		const labels = displayData.map((d, i) =>
+			Box.ofText(textOf(d), fontSize, cfg).beside(
+				{ x: points[i].px + dx, y: points[i].py + dy },
+				{ x: TEXT_SIDES[anchorAt(d)], y: LINE_SIDES[lineAnchorAt(d)] }
+			)
+		);
+		return Covering.hidden(labels, shapes);
+	});
+
+	/** Each row's spot around its point, `null` for a row with none free. */
+	const around = $derived.by(() => {
+		if (declutter?.mode !== 'around' || !points) return undefined;
+		const within = bounds ?? Box.size(plot.plotWidth, plot.plotHeight);
+		const spots = Declutter.around({
+			items: points.map((p, key) => ({
+				key,
+				...p,
+				box: Box.ofText(textOf(displayData[key]), fontSize, cfg)
+			})),
+			preferred: { x: TEXT_SIDES[textAnchor], y: LINE_SIDES[lineAnchor] },
+			gap: Math.max(Math.abs(dx), Math.abs(dy)) || declutter.labelGap,
+			bounds: within
+		});
+		return displayData.map((_, i) => {
+			const spot = spots.get(i);
+			return spot
+				? {
+						dx: spot.dx,
+						dy: spot.dy,
+						textAnchor: TEXT_ANCHORS[spot.anchor.x],
+						lineAnchor: LINE_ANCHORS[spot.anchor.y]
+					}
+				: null;
+		});
+	});
+
+	/** Each row's anchor and offset: on its spot around its point, else flipped where its text would cross the content box's edge. */
 	const placements = $derived.by(() => {
+		if (around) return around;
 		if (!marker.edgeAware || !points) return undefined;
 		const within = bounds ?? Box.size(plot.plotWidth, plot.plotHeight);
 		const anchor = { x: TEXT_SIDES[textAnchor], y: LINE_SIDES[lineAnchor] };
@@ -342,12 +414,13 @@
 	{:else if (!declutter && !marker.edgeAware) || points}
 		<!-- A decluttered or edge-aware label waits for both scales. -->
 		{#each displayData as d, i (i)}
-			{#if !fitted || fitted.get(d)}
+			{#if (!fitted || fitted.get(d)) && placements?.[i] !== null && !covered?.has(i)}
 				{@const lane = lanes?.get(i)}
 				{@const placement = placements?.[i]}
 				{@const extraDy = lane?.extraDy ?? 0}
 				{@const laneDir = lane?.aligned ? lane.dir : dir}
 				{@const labelDx = lane?.aligned ? laneDir * lane.reach : dx}
+				{@const origin = originOf(d)}
 				{#if declutter && points && (lane?.aligned || extraDy !== 0)}
 					{@const { px, py } = points[i]}
 					{@const laneX = lane?.aligned ? px + laneDir * lane.laneReach : px + labelDx}
@@ -370,18 +443,18 @@
 							{#if placement}
 								{@render label(
 									rows,
-									placement.dx,
-									placement.dy + extraDy,
+									placement.dx + origin.dx,
+									placement.dy + extraDy + origin.dy,
 									placement.textAnchor,
 									placement.lineAnchor
 								)}
 							{:else}
 								{@render label(
 									rows,
-									labelDx,
-									dy + extraDy,
+									labelDx + origin.dx,
+									dy + extraDy + origin.dy,
 									lane?.aligned && laneDir !== dir ? flipAnchor(anchorAt(d)) : anchorAt(d),
-									lineAnchor
+									lineAnchorAt(d)
 								)}
 							{/if}
 						{/snippet}

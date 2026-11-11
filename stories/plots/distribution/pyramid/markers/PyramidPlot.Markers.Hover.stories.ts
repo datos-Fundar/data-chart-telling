@@ -143,7 +143,7 @@ export const WithCustomRuleStyle: Story = {
  * Label anchored outside the dot - two `text` markers in `front`, each kept to
  * one side of zero by `points`: the female (negative x) label sits to the
  * left of its dot, the male (positive x) label to the right - mirroring the
- * value labels' own `anchor: 'outside'` convention.
+ * value labels, which sit past each bar's tip by default.
  */
 export const LabelOutsideDot: Story = {
 	args: {

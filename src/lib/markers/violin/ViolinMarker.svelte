@@ -16,7 +16,7 @@
 
 	const plot = usePlot();
 	const cfg = $derived(getConfiguration());
-	const isHorizontal = $derived(plot.axes?.isHorizontal ?? false);
+	const isHorizontal = $derived(marker.isHorizontal ?? plot.axes?.isHorizontal ?? false);
 	const categoryScale = $derived(
 		isHorizontal ? plot.svelteplot.scales.y : plot.svelteplot.scales.x
 	);

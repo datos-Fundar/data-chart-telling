@@ -1,3 +1,4 @@
+import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { Transforms } from '$lib/phases/transforms/Transforms';
 
 import type { AreaPlotState, AreaPlotEnv } from '$lib/types/plots/evolution/area/state';
@@ -60,5 +61,6 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		})
 	) as unknown as AxisBasedMarkersConfig[];
 
-	return areas;
+	const labels = state.valueLabels?.show ? state.valueLabels.forSeries(state, env) : undefined;
+	return ValueLabels.onMarkers(areas, 'area', labels);
 }

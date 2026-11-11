@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import Plot from '$lib/plots/generic/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { COUNTRIES_AT_2007 } from '$datasets';
 
@@ -28,7 +28,7 @@ const badge = (d: { country: string; continent: string }) =>
 
 const meta = {
 	title: 'Markers/Image',
-	component: ScatterPlot,
+	component: Plot,
 	tags: ['autodocs'],
 	args: {
 		width: 940,
@@ -44,9 +44,9 @@ const meta = {
 		markers: { control: false }
 	},
 	parameters: {
-		docs: { source: { name: 'ScatterPlot' } }
+		docs: { source: { name: 'Plot' } }
 	}
-} satisfies Meta<typeof ScatterPlot>;
+} satisfies Meta<typeof Plot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -75,9 +75,10 @@ export const SizedWithTitle: Story = {
 	}
 };
 
-/** `r` clips each image to a circle and sets its size from the row - here, scaled by svelteplot's own `r` scale from population. */
+/** `r` clips each image to a circle and sets its size from the row - here, scaled by svelteplot's own `r` scale from population, over `scales.r.range`. */
 export const ClippedByRadius: Story = {
 	args: {
+		scales: { r: { range: [4, 18] } },
 		markers: [
 			{
 				type: 'image',

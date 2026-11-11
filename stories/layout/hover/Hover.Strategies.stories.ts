@@ -6,7 +6,7 @@ import { COUNTRIES_AT_2007, LIFE, PROVINCE_VALUES } from '$datasets';
 import StrategySwitchDemo from './StrategySwitchDemo.svelte';
 import StrategySwitchDemoSource from './StrategySwitchDemo.svelte?raw';
 import { demoSource } from '../../common/docsSource';
-import { plotStory } from './plotStory';
+import { plotStory } from '../../common/plotStory';
 
 /**
  * The `strategy` says which points the hover reaches from the one under the pointer: `'x'` every point at its

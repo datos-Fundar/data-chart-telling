@@ -1,12 +1,14 @@
 import { describe, test, expect } from 'vitest';
 import { TransformsPhase } from '$lib/phases/transforms/TransformsPhase';
 import { StylesPhase } from '$lib/phases/styles/StylesPhase';
+import { ContextPhase } from '$lib/phases/context/ContextPhase';
 import { buildHeatmapDefaults } from '$lib/plots/correlation/heatmap/defaults';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
 import type { HeatmapPlotState, HeatmapPlotEnv } from '$lib/types/plots/correlation/heatmap/state';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { CellMarkerConfig } from '$lib/types/markers/common';
 import { stageOf } from '../../../_helpers/stages';
+import { MarkerLabels } from '$lib/markers/labels/MarkerLabels';
 
 /** The kind's "markers" stage: its own marks, the state's markers, then its value labels. */
 const buildMarkers = stageOf(buildHeatmapDefaults<Row>(), 'markers');
@@ -47,9 +49,15 @@ function buildAll(
 	const env = { ...ENV, ...envOverrides };
 	const styles = new StylesPhase<typeof state, HeatmapPlotEnv>(buildHeatmapDefaults<Row>().styles)
 		.run;
+	// Each row's context, which its value label reads its value from.
+	const context = new ContextPhase<typeof state, HeatmapPlotEnv>(
+		buildHeatmapDefaults<Row>().context
+	).run;
 	return (
-		buildMarkers(styles(new TransformsPhase<typeof state>().run(state, env), env), env).markers ??
-		[]
+		buildMarkers(
+			styles(context(new TransformsPhase<typeof state>().run(state, env), env), env),
+			env
+		).markers ?? []
 	);
 }
 
@@ -125,7 +133,7 @@ describe('buildMarkers - fill', () => {
 describe('buildMarkers - value labels', () => {
 	/** The label each cell marker carries. */
 	const labels = (markers: ReturnType<typeof buildAll>) =>
-		markers.flatMap((m) => (m.type === 'cell' && m.label ? [m.label] : []));
+		markers.flatMap((m) => (m.type === 'cell' ? MarkerLabels.list(m) : []));
 	const textOf = (label: { text: unknown }, d: Row) => (label.text as (d: Row) => string)(d);
 
 	test('every cell is labelled with its own value by default, by the cell that draws it', () => {
@@ -135,7 +143,11 @@ describe('buildMarkers - value labels', () => {
 			FLAT.length
 		);
 		const written = markers.flatMap((m) =>
-			m.type === 'cell' && m.label ? (m.data ?? []).map((d) => textOf(m.label!, d as Row)) : []
+			m.type === 'cell'
+				? MarkerLabels.list(m).flatMap((label) =>
+						(m.data ?? []).map((d) => textOf(label, d as Row))
+					)
+				: []
 		);
 		expect(written.sort()).toEqual(['10', '20']);
 	});
@@ -145,7 +157,11 @@ describe('buildMarkers - value labels', () => {
 	});
 
 	test('`values.format` formats each value', () => {
-		const [label] = labels(buildAll({ values: { format: (v) => `${v}%` } }));
-		expect(textOf(label, FLAT[0])).toBe('10%');
+		const markers = buildAll({ values: { format: (v) => `${v}%` } });
+		const cell = markers.find((m) => m.type === 'cell') as CellMarkerConfig;
+		// A label reads its value off the context of the row its cell draws.
+		const [label] = MarkerLabels.list(cell);
+		const first = (cell.data ?? []).find((d) => (d as Row).value === 10) as Row;
+		expect(textOf(label, first)).toBe('10%');
 	});
 });

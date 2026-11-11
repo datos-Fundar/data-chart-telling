@@ -1,6 +1,6 @@
 import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
 import type { Accessor, Series } from '$lib/types/plots/data/common';
-import type { AxisValue } from '$lib/types/layout/mapping';
+import type { AxisChannelName, AxisValue } from '$lib/types/layout/mapping';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { ProcessedData, TransformsStageState } from '../transforms/phase';
@@ -18,10 +18,15 @@ export type StatisticsStageState = Pick<FacetStageState, 'panels'> & {
 	/** The key the "data" phase split the rows into series by, which an author marker inherits. */
 	seriesGrouping?: Accessor<any, unknown>;
 	color?: Accessor<any, unknown>;
+	opacity?: Accessor<any, unknown>;
+	symbol?: Accessor<any, unknown>;
+	r?: number | Accessor<any, number>;
+	length?: number | Accessor<any, number>;
 	statistics?: StatisticConfig[];
 	authorMarkers?: AxisBasedMarkersConfig[];
 	resolvedSeries?: Series<any>[];
 	axes?: PlotAxes;
+	scales?: Partial<Record<AxisChannelName, { type?: string }>>;
 	flat?: any[];
 	colorForSeries?: (name: string) => string;
 	/** Each series' segments, which a `scope: 'segment'` author marker splits by. */
@@ -43,6 +48,4 @@ export type StatisticsStageOptions<TState extends StatisticsStageState> = {
 	 * default; off for a plot whose `color` is a value channel, not a group.
 	 */
 	inheritGrouping?: boolean;
-	/** Whether a line/area/dot author marker with no `x`/`y` takes the plot's own. */
-	inheritPositions?: boolean;
 };

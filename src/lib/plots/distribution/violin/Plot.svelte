@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import { buildViolinDefaults } from '$lib/plots/distribution/violin/defaults';
 	import type {
 		ViolinPlotProps,
@@ -28,7 +28,7 @@
 	}: ViolinPlotProps<TData> = $props();
 </script>
 
-<Plot
+<AbstractPlot
 	core={core as ViolinPlotCoreProps<TData>}
 	defaults={buildViolinDefaults}
 	bind:margins

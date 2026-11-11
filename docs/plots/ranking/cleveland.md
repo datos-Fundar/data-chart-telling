@@ -33,7 +33,7 @@ The general form of the family: per category, one dot for each series that has a
 - The connector spans the lowest and the highest dot of each category, so a series the legend omits leaves the range.
 - The value axis fits the values without reaching for zero; pin `scales.y.domain` to start it at zero.
 - Its defaults come from `cleveland` in the [configuration](../../theming.md): the connector is a neutral gray, 5 px thick.
-- `styles.values` writes each value: past the highest dot and the lowest of its category, and beside those between them. `select` (`'first'`, `'last'`, `'min'`, `'max'`, or a list) labels only those dots of each category, `series` only those series, and `color: 'series'` writes each label in its dot's series color. `format(value, number, context)` also gets the row in `context.row`, so a label can name its category (see [Styles and segments](../../styles-and-segments.md#value-labels)).
+- `styles.values` writes each value: past the highest dot and the lowest of its category, and beside those between them. `select` (`'first'`, `'last'`, `'min'`, `'max'`, or a list) labels only those dots of each category, `series` only those series, and `color: 'series'` writes each label in its dot's series color. `format(value, number, context)` also gets the row in `context.row`, so a label can name its category (see [Value labels](../../value-labels.md)).
 - `segments` restyle the dots of chosen categories, as in [`DumbbellPlot`](dumbbell.md).
 - The tooltip reads one category at a time, listing every series.
 

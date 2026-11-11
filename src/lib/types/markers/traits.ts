@@ -1,4 +1,9 @@
+import type { ChannelName } from '$lib/types/layout/mapping';
 import type { LegendMark } from '$lib/types/layout/legend';
+import type { MarkerLabelTraits } from '$lib/types/markers/labels/common';
+
+/** A plot channel a marker can take from its plot; `x`/`y` are each taken only by a marker setting no position on that axis. */
+export type InheritedChannel = Exclude<ChannelName, 'value'>;
 
 /** What the rest of the system needs to know about a marker kind, declared once per kind in `MarkerKinds`. */
 export type MarkerTraits = {
@@ -20,4 +25,10 @@ export type MarkerTraits = {
 	 * dot, an area, a bar... A marker without one shows as a plain swatch.
 	 */
 	legendSymbol?: LegendMark;
+	/** The plot's channels the marker takes in place of those it leaves unset, with the plot's scales for those that have one. */
+	inherits?: InheritedChannel[];
+	/** Whether it runs one way or the other (svelteplot's `*X`/`*Y` pair): the plot's way, else its own channels'. */
+	oriented?: boolean;
+	/** The labels the marker can write over its shapes; none without it. */
+	labels?: MarkerLabelTraits;
 };

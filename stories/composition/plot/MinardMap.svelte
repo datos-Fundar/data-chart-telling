@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Plot as SveltePlot, Geo, Trail, Text, Dot, Graticule, Frame } from 'svelteplot';
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import { WORLD_TOPOLOGY } from '$datasets/world-countries-topology';
 	import {
 		NAPOLEONS_CITIES,
@@ -19,13 +19,13 @@
 	 * crossed. A replica of svelteplot's own `trail/napoleon` example
 	 * (https://svelteplot.dev/examples/trail/napoleon).
 	 *
-	 * The root is `Plot` - the chrome every plot kind wraps itself in - which
+	 * The root is `AbstractPlot` - the chrome every plot kind wraps itself in - which
 	 * doesn't care what its `cell` snippet draws: here svelteplot's own
 	 * `<Plot>` (imported as `SveltePlot`), hand-assembled with a blur-masked
 	 * `<defs>` glow and its own projection fitting. So a one-off svelteplot
 	 * chart gets the same title, legend and timeline as `LinePlot` or `BarPlot`,
 	 * and sits in a `PlotComposer` like them. By default it draws only the plot, and every other
-	 * prop (title, order, legend, ...) goes to `Plot`;
+	 * prop (title, order, legend, ...) goes to `AbstractPlot`;
 	 * `onProjection` hands over the map's projection, to line other plots up with it.
 	 */
 	let {
@@ -119,7 +119,7 @@
 	const maxSurvivors = Math.max(...NAPOLEONS_ARMY.map((d) => d.size));
 </script>
 
-<Plot
+<AbstractPlot
 	width={900}
 	height={560}
 	data={MINARD_STEPS}
@@ -246,4 +246,4 @@
 			march.
 		</span>
 	{/snippet}
-</Plot>
+</AbstractPlot>

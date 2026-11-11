@@ -1,3 +1,4 @@
+import type { WithValues, CellValueLabel } from '$lib/types/layout/styles';
 import type { KindRowContext } from '$lib/types/layout/context';
 import type { BasePlotProps, PlotCoreProps } from '$lib/types/plots/props';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
@@ -23,7 +24,7 @@ export type HistogramRowContext = KindRowContext<{
 export type HistogramPlotProps<TData extends Record<string, unknown>> = BasePlotProps<
 	SeriesProps<TData> | SingleAxisDataProps<TData>,
 	TData,
-	AxisBasedStylesConfig,
+	WithValues<AxisBasedStylesConfig, CellValueLabel>,
 	AreaStyle,
 	AxisBasedMarkersConfig,
 	AxisBasedScalesConfig<TData>,
@@ -35,7 +36,7 @@ export type HistogramPlotProps<TData extends Record<string, unknown>> = BasePlot
 export type HistogramPlotCoreProps<TData extends Record<string, unknown>> = PlotCoreProps<
 	SeriesProps<TData> | SingleAxisDataProps<TData>,
 	TData,
-	AxisBasedStylesConfig,
+	WithValues<AxisBasedStylesConfig, CellValueLabel>,
 	AreaStyle,
 	AxisBasedMarkersConfig,
 	AxisBasedScalesConfig<TData>

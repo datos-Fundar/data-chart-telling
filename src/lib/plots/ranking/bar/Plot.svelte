@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import { buildBarDefaults } from '$lib/plots/ranking/bar/defaults';
 	import type { BarPlotProps, BarPlotCoreProps } from '$lib/types/plots/ranking/bar/props';
 
@@ -24,7 +24,7 @@
 	}: BarPlotProps<TData> = $props();
 </script>
 
-<Plot
+<AbstractPlot
 	core={core as BarPlotCoreProps<TData>}
 	defaults={buildBarDefaults}
 	bind:margins

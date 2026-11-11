@@ -1,3 +1,6 @@
+import type { WithValues } from '$lib/types/layout/styles';
+import type { PointLabelConfig } from '$lib/types/markers/labels/point';
+import type { BoxValuePart } from '$lib/types/plots/distribution/box/props';
 import type { BoxRowContext } from '$lib/types/plots/distribution/box/props';
 import type { BasePlotProps, PlotCoreProps } from '$lib/types/plots/props';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
@@ -8,7 +11,11 @@ import type { AreaStyle } from '$lib/types/plots/styling';
 import type { DensityKernel } from '$lib/types/transforms/density';
 
 /** `styles` of `ViolinPlot`: how each category's density is estimated and drawn. */
-export type ViolinPlotStylesConfig = AxisBasedStylesConfig & {
+export type ViolinPlotStylesConfig = WithValues<
+	AxisBasedStylesConfig,
+	PointLabelConfig,
+	BoxValuePart
+> & {
 	kernel?: DensityKernel;
 	/** Kernel bandwidth in data units; Silverman's rule picks one per violin when unset. */
 	bandwidth?: number;

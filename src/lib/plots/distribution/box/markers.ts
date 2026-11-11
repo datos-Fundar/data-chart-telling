@@ -1,3 +1,5 @@
+import { BoxSummaries } from '$lib/plots/distribution/box/BoxSummaries';
+import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import type { BoxPlotState, BoxPlotEnv } from '$lib/types/plots/distribution/box/state';
 import type { AxisBasedMarkersConfig, BoxMarkerConfig } from '$lib/types/markers/common';
 
@@ -17,7 +19,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 	const { channels } = state.processedData!;
 	const { cfg } = env;
 
-	return (state.processedGroups ?? []).flatMap((group) => {
+	const boxes = (state.processedGroups ?? []).flatMap((group) => {
 		const name = group.series.name;
 		const disabled = env.interaction?.fillFor(name);
 		return group.visualSegments.map((seg): BoxMarkerConfig => {
@@ -45,4 +47,11 @@ export function buildMarks<TData extends Record<string, unknown>>(
 			};
 		});
 	});
+	// The parts of each box `styles.values` labels: its whiskers' ends and its median by default, beside it.
+	const labels = state.valueLabels?.show
+		? state.valueLabels.partMarkers(env, BoxSummaries.of(state), BoxSummaries.labelPoint(state), {
+				seriesColor: (row) => state.colorForSeries!(String(row[SERIES_KEY]))
+			})
+		: [];
+	return [...boxes, ...(labels as AxisBasedMarkersConfig[])];
 }

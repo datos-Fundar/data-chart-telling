@@ -1,4 +1,5 @@
 import { getContext, setContext } from 'svelte';
+import { get, type Readable } from 'svelte/store';
 import { Margins } from '$lib/layout/margins/Margins';
 import { Box } from '$lib/layout/margins/Box';
 import { CellAlignment } from '$lib/layout/grid/GridAlignment.svelte';
@@ -8,6 +9,12 @@ import type { AxisScale } from '$lib/types/layout/scales';
 import type { AxisChannelName } from '$lib/types/layout/mapping';
 
 const PLOT_MARGINS_KEY = Symbol('dct-plot-margins');
+
+/** svelteplot's own record of the room each of its axes takes, per side. */
+type AutoMarginStores = Record<
+	'autoMarginTop' | 'autoMarginRight' | 'autoMarginBottom' | 'autoMarginLeft',
+	Readable<ReadonlyMap<string, number>>
+>;
 
 /** The side each axis draws its tick labels on. */
 const TICK_SIDES = { x: 'bottom', y: 'left' } as const;
@@ -62,6 +69,18 @@ export class PlotMargins {
 	#settled: Partial<Record<MarginSide, number>> | undefined;
 	/** What svelteplot's own `<Plot>` lays the plot out by, once {@link follow} is handed it. */
 	#plot = $state.raw<{ options: Record<string, unknown> } | undefined>();
+	/** The room svelteplot's axes ask of each side, whether or not it is `'auto'`, once {@link follow} reads it. */
+	#autoMargins = $state.raw<Record<MarginSide, ReadonlyMap<string, number>> | undefined>();
+	readonly #auto = $derived.by((): Partial<Record<MarginSide, number>> => {
+		const maps = this.#autoMargins;
+		if (!maps) return {};
+		return Object.fromEntries(
+			Margins.SIDES.flatMap((side) => {
+				const values = [...maps[side].values()];
+				return values.length ? [[side, Math.max(...values)]] : [];
+			})
+		);
+	});
 
 	constructor(inputs: PlotMarginsInputs) {
 		this.#inputs = inputs;
@@ -164,6 +183,12 @@ export class PlotMargins {
 	 */
 	follow(plot: { options: Record<string, unknown> }): void {
 		this.#plot = plot;
+		const stores = getContext<AutoMarginStores | undefined>('svelteplot/autoMargins');
+		if (stores) {
+			this.#autoMargins = Object.fromEntries(
+				Margins.SIDES.map((side) => [side, get(stores[PlotMargins.#AUTO_STORE[side]])])
+			) as Record<MarginSide, ReadonlyMap<string, number>>;
+		}
 		const cell = this.#cell;
 		if (!cell) return;
 		$effect(() => {
@@ -179,6 +204,13 @@ export class PlotMargins {
 		});
 	}
 
+	static readonly #AUTO_STORE = {
+		top: 'autoMarginTop',
+		right: 'autoMarginRight',
+		bottom: 'autoMarginBottom',
+		left: 'autoMarginLeft'
+	} as const;
+
 	/** The room the `reserve` boxes take past the edges their points can sit on. */
 	readonly #reserved = $derived.by(() =>
 		this.#inputs.reserve().reduce((room, { box, edges }) => {
@@ -193,7 +225,10 @@ export class PlotMargins {
 		const settled = this.#settled;
 		const { width, height } = this.#inputs.size();
 		const growth = this.#measured.max(this.#reserved).min(Margins.half(width, height));
-		const estimate = this.#inputs.estimate();
+		// A side grows from at least the room svelteplot's axes take on it: their ticks and title.
+		const estimate = this.#inputs
+			.estimate()
+			.map((value, side) => Math.max(value, this.#auto[side] ?? 0));
 		const out: Partial<Record<MarginSide, number>> = {};
 		for (const side of Margins.SIDES) {
 			const own = author?.[side];

@@ -1,3 +1,4 @@
+import type { WithValues, DotValueLabel } from '$lib/types/layout/styles';
 import type { BasePlotProps, PlotCoreProps } from '$lib/types/plots/props';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
@@ -19,11 +20,14 @@ export type ForestIntervalProps<TData extends Record<string, unknown>> = {
 	error?: Accessor<TData, number>;
 };
 
+/** The values of a forest's row its value labels can write: its estimate, and its interval's ends. */
+export type ForestValuePart = 'value' | 'lower' | 'upper';
+
 /** `ForestPlot`'s public props. */
 export type ForestPlotProps<TData extends Record<string, unknown>> = BasePlotProps<
 	SeriesProps<TData> | DualAxisDataProps<TData>,
 	TData,
-	ConnectorBasedStylesConfig,
+	WithValues<ConnectorBasedStylesConfig, DotValueLabel, ForestValuePart>,
 	LineSegmentStyle,
 	AxisBasedMarkersConfig,
 	AxisBasedScalesConfig<TData>
@@ -34,7 +38,7 @@ export type ForestPlotProps<TData extends Record<string, unknown>> = BasePlotPro
 export type ForestPlotCoreProps<TData extends Record<string, unknown>> = PlotCoreProps<
 	SeriesProps<TData> | DualAxisDataProps<TData>,
 	TData,
-	ConnectorBasedStylesConfig,
+	WithValues<ConnectorBasedStylesConfig, DotValueLabel, ForestValuePart>,
 	LineSegmentStyle,
 	AxisBasedMarkersConfig,
 	AxisBasedScalesConfig<TData>

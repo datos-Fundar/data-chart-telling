@@ -13,7 +13,7 @@ import {
 	PROVINCE_VALUES
 } from '$datasets';
 import HoverRing from './HoverRing.svelte';
-import { plotStory } from './plotStory';
+import { plotStory } from '../../common/plotStory';
 
 /**
  * `back` and `front` are the markers the hover draws: behind the plot's shapes, and in front of them. They are

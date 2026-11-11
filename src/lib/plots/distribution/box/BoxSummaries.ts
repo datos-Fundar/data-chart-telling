@@ -1,3 +1,4 @@
+import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { quantile } from 'd3-array';
 import { SERIES_ID_KEY, SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
@@ -10,6 +11,7 @@ import type { AxisValue } from '$lib/types/layout/mapping';
 import type { HoverPosition, ProcessedRow } from '$lib/types/phases';
 import type { BoxPlotState, BoxSummaryRow } from '$lib/types/plots/distribution/box/state';
 import type { BoxRowContext, BoxSummary } from '$lib/types/plots/distribution/box/props';
+import type { PointGeometryOf } from '$lib/types/markers/labels/point';
 
 /** The whiskers reach this many interquartile ranges past the box, as svelteplot draws them. */
 const WHISKER_IQR = 1.5;
@@ -134,6 +136,20 @@ export class BoxSummaries {
 			});
 			return summary;
 		});
+	}
+
+	/** Where each part of a box its value labels can write sits: beside the box, at the height of its value. */
+	static partPlacements<TData extends Record<string, unknown>>(
+		state: BoxPlotState<TData>
+	): Record<string, Record<string, unknown>> {
+		return ValueLabels.besideBand(state, ['min', 'p25', 'median', 'p75', 'max', 'outliers']);
+	}
+
+	/** Where a box's part label sits: at its category, level with the part's value, beside its band. */
+	static labelPoint<TData extends Record<string, unknown>>(
+		state: BoxPlotState<TData>
+	): (value: symbol) => PointGeometryOf {
+		return ValueLabels.bandPoint(state, 'category');
 	}
 
 	/** Where a box's summary sits for hover: at its category, level with its median. */

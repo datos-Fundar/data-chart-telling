@@ -1,8 +1,10 @@
 import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
 import { RowStyle } from '$lib/markers/utils/RowStyle';
 import { CssColor } from '$lib/utils/color/CssColor';
+import { MarkerLabels } from '$lib/markers/labels/MarkerLabels';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { LineStyle } from '$lib/types/plots/constants';
+import type { MarkerLabelConfig } from '$lib/types/markers/labels/common';
 
 /**
  * A plot's markers with their styles as svelteplot reads them, before any is drawn: a named line style
@@ -41,23 +43,24 @@ export class MarkerStyles {
 	 * that read best on the shape's old one reads best on its new one.
 	 */
 	static restyle<T>(marker: T, plot: { cfg?: PlotStylesConfig; rows?: unknown[] } = {}): T {
-		const label = (marker as { label?: { styles?: { fill?: unknown } } }).label;
-		const fill = label?.styles?.fill;
-		const fresh =
-			typeof fill === 'function' && MarkerStyles.#contrasts.has(fill)
-				? { ...marker, label: { ...label, styles: { ...label!.styles, fill: undefined } } }
-				: marker;
+		const fresh = MarkerLabels.map(marker, (label) => {
+			const fill = label.styles?.fill;
+			return typeof fill === 'function' && MarkerStyles.#contrasts.has(fill)
+				? { ...label, styles: { ...label.styles, fill: undefined } }
+				: label;
+		});
 		return MarkerStyles.resolveAll([fresh], plot)[0];
 	}
 
-	/** The marker with its label inside its shape written in the candidate that reads best on each row's color. */
+	/** Writes each label on its shape in the color that reads best on it. */
 	static #contrasted(marker: unknown, plot: { cfg?: PlotStylesConfig; rows?: unknown[] }): unknown {
 		const { cfg } = plot;
 		if (!cfg || !MarkerStyles.#isPlain(marker)) return marker;
-		const label = marker.label as { outside?: boolean; styles?: { fill?: unknown } } | undefined;
-		if (!MarkerStyles.#isPlain(label) || label.outside || label.styles?.fill !== undefined) {
-			return marker;
-		}
+		const unset = (label: MarkerLabelConfig) =>
+			MarkerStyles.#isPlain(label) &&
+			MarkerLabels.isOnShape(marker as { type?: string }, label) &&
+			label.styles?.fill === undefined;
+		if (!MarkerLabels.list(marker).some(unset)) return marker;
 		const colorOf = MarkerStyles.#shapeColor(
 			marker,
 			(marker.data as unknown[]) ?? plot.rows ?? [],
@@ -68,7 +71,7 @@ export class MarkerStyles {
 		const opacityOf = MarkerStyles.#opacity(
 			(marker.styles as { fillOpacity?: unknown } | undefined)?.fillOpacity
 		);
-		// What the label is read on: the shape's color, blended with the plot's background as far as it is see-through.
+		// The shape's color as seen: blended with the background by its opacity.
 		const fill = (row: unknown) => {
 			const color = colorOf(row);
 			if (!color) return undefined;
@@ -76,7 +79,9 @@ export class MarkerStyles {
 			return CssColor.contrastText(seen, candidates);
 		};
 		MarkerStyles.#contrasts.add(fill);
-		return { ...marker, label: { ...label, styles: { ...label.styles, fill } } };
+		return MarkerLabels.map(marker, (label) =>
+			unset(label) ? ({ ...label, styles: { ...label.styles, fill } } as MarkerLabelConfig) : label
+		);
 	}
 
 	/** The opacity each row's shape is drawn with: a number, the field of the rows a string names, a function of the row. */

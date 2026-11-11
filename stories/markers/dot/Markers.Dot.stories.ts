@@ -2,20 +2,20 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import { WORLD_COUNTRIES } from '$datasets/world-countries';
-import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+import Plot from '$lib/plots/generic/Plot.svelte';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import { WEATHER_STATIONS } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `dot` marker (svelteplot's own `Dot`) - one point mark per row of its own
-// `data`, independent of any plot series. Demoed on an empty `LinePlot`
-// canvas (no data of its own, just an explicit `scales` domain) so only the
+// `data`, independent of any plot series. Demoed on a `Plot` of no
+// data (no data of its own, just an explicit `scales` domain) so only the
 // marker itself is on screen - see `Plots/*/Markers` for markers used
 // alongside real chart data.
 
 const meta = {
 	title: 'Markers/Dot',
-	component: LinePlot,
+	component: Plot,
 	tags: ['autodocs'],
 	argTypes: {
 		width: { control: { type: 'range', min: 320, max: 940, step: 20 } },
@@ -23,25 +23,22 @@ const meta = {
 		data: { control: false },
 		markers: { control: false }
 	}
-} satisfies Meta<typeof LinePlot>;
+} satisfies Meta<typeof Plot>;
 
 export default meta;
 
 // Each story renders its own plot (the same marker works on any plot kind), so the
 // host, its base args and its story type are declared per host below.
-type LinePlotStory = StoryObj<typeof LinePlot>;
-const renderLinePlot: LinePlotStory['render'] = (args) => ({ Component: LinePlot, props: args });
+type PlotStory = StoryObj<typeof Plot>;
+const renderPlot: PlotStory['render'] = (args) => ({ Component: Plot, props: args });
 type GeoPlotStory = StoryObj<typeof GeoPlot>;
 const renderGeoPlot: GeoPlotStory['render'] = (args) => ({ Component: GeoPlot, props: args });
 
-const LINE_PLOT_ARGS = {
+const PLOT_ARGS = {
 	width: 940,
 	height: 460,
-	data: [],
-	x: 'x',
-	y: 'y',
 	scales: { x: { domain: [0, 10] }, y: { domain: [0, 10] } }
-} satisfies LinePlotStory['args'];
+} satisfies PlotStory['args'];
 const GEO_PLOT_ARGS = {
 	width: 940,
 	height: 500,
@@ -56,10 +53,10 @@ const POINTS = [
 ];
 
 /** `data` drives one dot per row; `x`/`y` are field-key accessors, `r` a fixed radius. */
-export const Basic: LinePlotStory = {
-	render: renderLinePlot,
+export const Basic: PlotStory = {
+	render: renderPlot,
 	args: {
-		...LINE_PLOT_ARGS,
+		...PLOT_ARGS,
 		markers: [
 			{ type: 'dot', data: POINTS, x: 'x', y: 'y', r: 8 }
 		] satisfies AxisBasedMarkersConfig[]
@@ -67,10 +64,10 @@ export const Basic: LinePlotStory = {
 };
 
 /** `symbol` varies the point shape per row, cycling svelteplot's own default shape sequence. */
-export const Symbols: LinePlotStory = {
-	render: renderLinePlot,
+export const Symbols: PlotStory = {
+	render: renderPlot,
 	args: {
-		...LINE_PLOT_ARGS,
+		...PLOT_ARGS,
 		markers: [
 			{
 				type: 'dot',
@@ -90,10 +87,10 @@ export const Symbols: LinePlotStory = {
 };
 
 /** `styles` fixes fill/stroke for every row, overriding the plot's own default color. */
-export const CustomStyle: LinePlotStory = {
-	render: renderLinePlot,
+export const CustomStyle: PlotStory = {
+	render: renderPlot,
 	args: {
-		...LINE_PLOT_ARGS,
+		...PLOT_ARGS,
 		markers: [
 			{
 				type: 'dot',

@@ -40,9 +40,10 @@
 	import ContourMarker from '$lib/markers/contour/ContourMarker.svelte';
 	import ContourClipMarker from '$lib/markers/contour/ContourClipMarker.svelte';
 	import InsetMarker from '$lib/markers/inset/InsetMarker.svelte';
-	import MarkerLabel from '$lib/markers/utils/MarkerLabel.svelte';
+	import MarkerLabel from '$lib/markers/labels/MarkerLabel.svelte';
 	import FrameClip from '$lib/layout/geometry/FrameClip.svelte';
 	import MarkerOffset from '$lib/layout/geometry/MarkerOffset.svelte';
+	import ScaleFreeMarks from '$lib/layout/geometry/ScaleFreeMarks.svelte';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import { PlotMargins } from '$lib/layout/margins/PlotMargins.svelte';
@@ -395,12 +396,11 @@
 {/snippet}
 
 {#snippet renderMarker(marker: MarkerConfig, rows: TData[] | TSeries[])}
-	<!-- In parts the hover styles alike, while it restyles the marker's shapes. -->
-	{#each shapes.split(withHover(marker, rows), rows, reach) as part (part.key)}
-		<MarkerOffset marker={part.marker}>
-			{@render drawMarker(part.marker, rows)}
-		</MarkerOffset>
-	{/each}
+	<!-- One marker over all its rows, each style the hover sets read off the row as it is hovered. -->
+	{@const styled = shapes.styled(withHover(marker, rows), rows, reach)}
+	<MarkerOffset marker={styled}>
+		{@render drawMarker(styled, rows)}
+	</MarkerOffset>
 {/snippet}
 
 {#snippet renderScoped(marker: MarkerConfig, group: ScopedMarkerGroup<TSeries>)}
@@ -423,15 +423,18 @@
 {/snippet}
 
 {#snippet renderHoverLayer(index: number, layer: 'back' | 'front')}
-	{#each hoverLayers.get(index)?.[layer] ?? [] as part (part.key)}
-		<!-- A point in a slice of its band (a grouped bar's series) is drawn in the middle of it. -->
-		{@const nudge = BandNudge.of(svelteplot.scales, part.slice)}
-		<g transform="translate({nudge.dx}, {nudge.dy})">
-			<FrameClip clip={FrameClipping.isClipped(part.marker)}>
-				{@render renderMarker(part.marker as MarkerConfig, data)}
-			</FrameClip>
-		</g>
-	{/each}
+	<!-- Drawn on the plot's scales, never shaping them: a hover that moves never lays the plot out again. -->
+	<ScaleFreeMarks>
+		{#each hoverLayers.get(index)?.[layer] ?? [] as part (part.key)}
+			<!-- A point in a slice of its band (a grouped bar's series) is drawn in the middle of it. -->
+			{@const nudge = BandNudge.of(svelteplot.scales, part.slice)}
+			<g transform="translate({nudge.dx}, {nudge.dy})">
+				<FrameClip clip={FrameClipping.isClipped(part.marker)}>
+					{@render renderMarker(part.marker as MarkerConfig, data)}
+				</FrameClip>
+			</g>
+		{/each}
+	</ScaleFreeMarks>
 {/snippet}
 
 <!-- What the hover draws behind the plot's shapes, before any of them. -->
@@ -459,6 +462,39 @@
 	{/if}
 {/each}
 
+{#snippet renderOutline(marker: MarkerConfig, rows: TData[] | TSeries[])}
+	{@const outline = shapes.outline(marker, rows, reach)}
+	{#if outline}
+		<FrameClip clip={FrameClipping.isClipped(outline)}>
+			<MarkerOffset marker={outline}>
+				{@render drawMarker(outline, rows)}
+			</MarkerOffset>
+		</FrameClip>
+	{/if}
+{/snippet}
+
+<!--
+	The hovered shapes' outline, over every shape: a shape is drawn in its marker's order, so a neighbour drawn after
+	it would cover part of its outline. Drawn on the plot's scales, never shaping them, and never taking the pointer.
+-->
+{#if shapes.outlines}
+	<g class="dct-hover-outline" pointer-events="none">
+		<ScaleFreeMarks>
+			{#each markers as marker, i (markerKey(marker, i))}
+				{@const scope = scopedSeriesOf(marker)}
+				{#if marker.type !== 'hover' && marker.type !== 'component'}
+					{#if scope === undefined}
+						{@render renderOutline(marker, data)}
+					{:else if groupByName.has(scope)}
+						{@const group = groupByName.get(scope)!}
+						{@render renderOutline(MarkerGrouping.withSeriesColor(marker, group.color), group.data)}
+					{/if}
+				{/if}
+			{/each}
+		</ScaleFreeMarks>
+	</g>
+{/if}
+
 <!--
 	The labels the shapes write in themselves, after every marker - the hover's hit areas too, which are the last of them -
 	so a label that listens for the pointer is not covered, and one outside its shape is not clipped with it.
@@ -466,11 +502,10 @@
 {#each markers as marker, i (markerKey(marker, i))}
 	{@const scope = scopedSeriesOf(marker)}
 	{#if 'label' in marker && marker.label && (scope === undefined || groupByName.has(scope))}
-		<!-- Split as the shapes are, so a label reads on its shape's color under the hover. -->
-		{#each shapes.split(marker, data, reach) as part (part.key)}
-			<MarkerOffset marker={part.marker}>
-				<MarkerLabel marker={{ ...part.marker, data: part.marker.data ?? data }} />
-			</MarkerOffset>
-		{/each}
+		<!-- Styled as the shapes are, so a label reads on its shape's color under the hover. -->
+		{@const styled = shapes.styled(marker, data, reach)}
+		<MarkerOffset marker={styled}>
+			<MarkerLabel marker={{ ...styled, data: styled.data ?? data }} />
+		</MarkerOffset>
 	{/if}
 {/each}

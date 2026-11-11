@@ -1,3 +1,4 @@
+import { MarkerKinds } from '$lib/markers/MarkerKinds';
 import { resolveAccessor } from '$lib/utils/accessors';
 import { ColorRamp } from '$lib/utils/color';
 import { OpacityScale } from '$lib/utils/OpacityScale';
@@ -31,13 +32,13 @@ export class MarkerChannels {
 		return { ...plot, color: numeric ? color : plot.color };
 	}
 
-	/** `markers`, each `dot` with no scales of its own carrying the plot's ({@link inheritScales}). */
+	/** `markers`, each of a kind that inherits them with no scales of its own carrying the plot's ({@link inheritScales}). */
 	static inheritAll<TMarker extends { type: string; scales?: ChannelScalesConfig }>(
 		markers: TMarker[],
 		plot: ChannelScalesConfig | undefined
 	): TMarker[] {
 		return markers.map((marker) =>
-			marker.type === 'dot' && !marker.scales
+			MarkerKinds.inheritsScales(marker.type) && !marker.scales
 				? { ...marker, scales: MarkerChannels.inheritScales(undefined, plot) }
 				: marker
 		);

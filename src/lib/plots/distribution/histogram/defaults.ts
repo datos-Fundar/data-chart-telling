@@ -56,6 +56,7 @@ export function buildHistogramDefaults<TData extends Record<string, unknown>>():
 			}
 		},
 		transforms: {
+			labels: {},
 			transforms: (state, env) =>
 				mergeBin(state.transforms ?? [], env.cfg, state.axes?.isHorizontal ?? false)
 		},
@@ -78,20 +79,24 @@ export function buildHistogramDefaults<TData extends Record<string, unknown>>():
 		scales: { zero: ['value'] },
 		styles: {
 			values: {
+				layout: 'path',
+				// A bin's value runs up, or right on a horizontal histogram: its end is that edge.
+				layouts: (state) => {
+					const end = state.axes?.isHorizontal ? 'right' : 'top';
+					return {
+						path: { edge: end, side: 'outside' },
+						box: { anchor: 'middle' },
+						point: { anchor: end, side: state.axes?.isHorizontal ? 'after' : 'above' }
+					};
+				},
 				// An `'outside'` label sits past its bin's end, which the longest bin takes to the edge.
 				reach: (labels, state) => {
-					if (labels.anchor !== 'outside') return [];
+					const end = state.axes?.isHorizontal ? 'right' : 'top';
+					const { edge, side = 'outside' } = labels.placement;
+					if (labels.layout !== 'path' || edge !== end || side !== 'outside') return [];
 					return state.axes?.isHorizontal
-						? [
-								labels.edgeBox('0', { x: 'after', y: 'middle' }, { x: labels.offset('x') }, [
-									'right'
-								])
-							]
-						: [
-								labels.edgeBox('0', { x: 'middle', y: 'before' }, { y: -labels.offset('y') }, [
-									'top'
-								])
-							];
+						? [labels.edgeBox('0', { x: 'after', y: 'middle' }, { x: labels.offset() }, ['right'])]
+						: [labels.edgeBox('0', { x: 'middle', y: 'before' }, { y: -labels.offset() }, ['top'])];
 				}
 			}
 		},

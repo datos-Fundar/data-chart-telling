@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import { buildLollipopDefaults } from '$lib/plots/ranking/lollipop/defaults';
 	import type {
 		LollipopPlotProps,
@@ -28,7 +28,7 @@
 	}: LollipopPlotProps<TData> = $props();
 </script>
 
-<Plot
+<AbstractPlot
 	core={core as LollipopPlotCoreProps<TData>}
 	defaults={buildLollipopDefaults}
 	bind:margins

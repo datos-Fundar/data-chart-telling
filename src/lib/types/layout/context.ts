@@ -16,6 +16,8 @@ export type PlotRowContext<TRow = Record<string, unknown>> = {
 	value?: number;
 	/** The row itself, as the plot drew it: the data's fields, plus whatever its transforms added. */
 	row?: TRow;
+	/** Which of the row's values a label writes, on a plot whose rows have several (`styles.values.parts`). */
+	part?: string;
 };
 
 /** A plot kind's own context of a row: the shared one, with what the kind works out for it. */

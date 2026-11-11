@@ -1,3 +1,4 @@
+import type { CommonMarkerConfigWithOrientation } from '$lib/types/markers/channels/commonMarkerConfigWithOrientation';
 import type { CommonMarkerConfig } from '$lib/types/markers/channels/commonMarkerConfig';
 
 /**
@@ -14,4 +15,5 @@ export type BoxMarkerConfig = {
 	tickMinMax?: boolean | Record<string, unknown>;
 	thickness?: number;
 	slot?: { index: number; count: number };
-} & CommonMarkerConfig;
+} & CommonMarkerConfigWithOrientation &
+	CommonMarkerConfig;

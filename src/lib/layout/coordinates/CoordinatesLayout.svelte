@@ -2,6 +2,7 @@
 	import type { ComponentProps, Snippet } from 'svelte';
 	import { geoCentroid, type GeoPermissibleObjects } from 'd3-geo';
 	import { Plot } from 'svelteplot';
+	import ScaleGateMarks from '$lib/layout/geometry/ScaleGateMarks.svelte';
 	import { resolveProjection } from '$lib/layout/coordinates/resolveProjection';
 	import { resolveCameraTarget } from '$lib/layout/coordinates/resolveCameraTarget';
 	import { createGeoZoom, type GeoZoomTransform } from '$lib/layout/coordinates/zoom.svelte';
@@ -182,7 +183,8 @@
 	</defs>
 	<g clip-path="url(#{clipId})">
 		<ProjectionZoom inner={geoZoom.transform} outer={cameraTransform}>
-			{@render children()}
+			<!-- The plot's scales follow what its marks' rows hold, not every copy a mark makes of them. -->
+			<ScaleGateMarks>{@render children()}</ScaleGateMarks>
 		</ProjectionZoom>
 	</g>
 </Plot>

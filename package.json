@@ -1,6 +1,6 @@
 {
 	"name": "@fundar/data-chart-telling",
-	"version": "1.18.0",
+	"version": "1.19.0",
 	"description": "Declarative charts, maps and small multiples for Svelte, built on svelteplot.",
 	"license": "MIT",
 	"author": "Ezequiel Puerta",
@@ -76,6 +76,7 @@
 		"d3-interpolate": "^3.0.1",
 		"d3-scale-chromatic": "^3.1.0",
 		"d3-selection": "^3.0.0",
+		"d3-shape": "^3.2.0",
 		"d3-zoom": "^3.0.0"
 	},
 	"peerDependencies": {
@@ -105,6 +106,7 @@
 		"@types/d3-interpolate": "^3.0.4",
 		"@types/d3-scale-chromatic": "^3.1.0",
 		"@types/d3-selection": "^3.0.11",
+		"@types/d3-shape": "^3.2.0",
 		"@types/d3-zoom": "^3.0.8",
 		"@types/node": "^22",
 		"@vitest/browser": "^4.1.7",

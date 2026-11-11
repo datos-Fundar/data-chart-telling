@@ -1,3 +1,4 @@
+import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { buildMarks as buildBarMarks, buildBarGeometry } from '$lib/plots/ranking/bar/markers';
 import { GAP_VALUE } from '$lib/phases/transforms/TransformsPhase';
 import { RowNumbers } from '$lib/plots/utils/RowNumbers';
@@ -119,5 +120,17 @@ export function buildMarks<TData extends Record<string, unknown>>(
 						}
 					}
 				];
-	return [...ranges, ...bars, ...ticks];
+	// Its other parts `styles.values` labels - the target, the range bounds - beside the band; the bars write the value.
+	const geometry = buildBarGeometry(state, env.cfg.bar.seriesPadding);
+	const labels = state.valueLabels?.show
+		? state.valueLabels.partMarkers(
+				env,
+				(state.processedData?.data ?? []).filter(
+					(row) => row[GAP_VALUE] === undefined && geometry.spanOf(row) !== undefined
+				),
+				ValueLabels.bandPoint(state, geometry.categoryOf),
+				{ skip: ['value'] }
+			)
+		: [];
+	return [...ranges, ...bars, ...ticks, ...(labels as AxisBasedMarkersConfig[])];
 }

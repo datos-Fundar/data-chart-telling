@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import LineCore from '$lib/layout/plot/Core.svelte';
 	import { Pipeline } from '$lib/phases/Pipeline';
 	import { buildLineDefaults } from '$lib/plots/evolution/line/defaults';
@@ -29,4 +29,4 @@
 	const timeline = $derived<TimelineConfig<Row>>({ accessor: 'year', type: 'rule', progress });
 </script>
 
-<Plot Core={LineCore} {core} {defaults} {facet} {timeline} />
+<AbstractPlot Core={LineCore} {core} {defaults} {facet} {timeline} />

@@ -1,23 +1,20 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+import Plot from '$lib/plots/generic/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `text` marker (svelteplot's own `Text`) - one label per row of its own
-// `data`. Demoed on an empty `LinePlot` canvas so only the marker itself is
+// `data`. Demoed on a `Plot` of no data so only the marker itself is
 // on screen - see `Plots/*/Markers` for markers used alongside real chart
 // data.
 
 const meta = {
 	title: 'Markers/Text',
-	component: LinePlot,
+	component: Plot,
 	tags: ['autodocs'],
 	args: {
 		width: 940,
 		height: 460,
-		data: [],
-		x: 'x',
-		y: 'y',
 		scales: { x: { domain: [0, 10] }, y: { domain: [0, 10] } }
 	},
 	argTypes: {
@@ -27,9 +24,9 @@ const meta = {
 		markers: { control: false }
 	},
 	parameters: {
-		docs: { source: { name: 'LinePlot' } }
+		docs: { source: { name: 'Plot' } }
 	}
-} satisfies Meta<typeof LinePlot>;
+} satisfies Meta<typeof Plot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

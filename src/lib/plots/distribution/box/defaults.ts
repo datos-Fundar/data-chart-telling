@@ -36,6 +36,17 @@ export function buildBoxDefaults<TData extends Record<string, unknown>>(): AxisP
 		},
 		// Each value's box: its quartiles and whiskers, worked out once for its tooltip and hover to read.
 		context: (state) => BoxSummaries.context(state) as (row: never) => object | undefined,
+		styles: {
+			values: {
+				layout: 'point',
+				// A quartile is worked out, not read: at most two decimals, as the tooltip writes it.
+				format: (value, number) => number(Math.round(value * 100) / 100),
+				parts: {
+					placements: BoxSummaries.partPlacements,
+					default: ['min', 'median', 'max']
+				}
+			}
+		},
 		markers: { marks: buildMarks },
 		hover: {
 			// The hovered category's band behind its shape.

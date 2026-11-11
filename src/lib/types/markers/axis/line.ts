@@ -1,3 +1,6 @@
+import type { StrokeLabelConfig } from '$lib/types/markers/labels/path';
+import type { PointLabelConfig } from '$lib/types/markers/labels/point';
+import type { CommonMarkerConfigWithLabel } from '$lib/types/markers/channels/commonMarkerConfigWithLabel';
 import type { StrokeStyle } from '$lib/types/plots/styling';
 import type { CurveName } from '$lib/types/layout/styles/curve';
 import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/commonMarkerConfigWithColor';
@@ -7,4 +10,5 @@ export type LineMarkerConfig = {
 	type: 'line';
 	curve?: CurveName;
 	styles?: StrokeStyle;
-} & CommonMarkerConfigWithColor;
+} & CommonMarkerConfigWithColor &
+	CommonMarkerConfigWithLabel<StrokeLabelConfig | PointLabelConfig>;

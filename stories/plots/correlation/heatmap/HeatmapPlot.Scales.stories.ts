@@ -121,6 +121,63 @@ export const ExplicitColorDomain: Story = {
 	}
 };
 
+/** A named ramp - `scales.color.scheme: 'warm'` colors the counts from a cool purple to a warm yellow. */
+export const NamedColorRamp: Story = {
+	args: {
+		series: [
+			{
+				name: 'penguins',
+				x: 'island',
+				y: 'species',
+				color: 'count',
+				data: PENGUIN_COUNTS
+			} satisfies Series<PenguinSpeciesCount>
+		],
+		scales: {
+			color: { domain: [0, 120], scheme: 'warm' }
+		} satisfies AxisBasedScalesConfig
+	}
+};
+
+/**
+ * A ramp of your own - `scheme: [from, to]` runs the colors from the lowest count to the highest: here red for the
+ * smallest colonies, green for the largest.
+ */
+export const CustomColorRamp: Story = {
+	args: {
+		series: [
+			{
+				name: 'penguins',
+				x: 'island',
+				y: 'species',
+				color: 'count',
+				data: PENGUIN_COUNTS
+			} satisfies Series<PenguinSpeciesCount>
+		],
+		scales: {
+			color: { domain: [0, 120], scheme: ['#ff6b6b', '#51cf66'] }
+		} satisfies AxisBasedScalesConfig
+	}
+};
+
+/** The same ramp the other way round - the order of `scheme` is the order of the values. */
+export const InvertedColorRamp: Story = {
+	args: {
+		series: [
+			{
+				name: 'penguins',
+				x: 'island',
+				y: 'species',
+				color: 'count',
+				data: PENGUIN_COUNTS
+			} satisfies Series<PenguinSpeciesCount>
+		],
+		scales: {
+			color: { domain: [0, 120], scheme: ['#51cf66', '#ff6b6b'] }
+		} satisfies AxisBasedScalesConfig
+	}
+};
+
 /**
  * Reversed Y axis - PENGUIN_SPECIES appear bottom-to-top instead of top-to-bottom.
  * Useful for matching reading direction or presentation conventions.

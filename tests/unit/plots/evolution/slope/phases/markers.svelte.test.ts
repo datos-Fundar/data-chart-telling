@@ -86,8 +86,8 @@ describe('SlopePlot markers', () => {
 		expect(after.data?.map((d) => (d as Row).v)).toEqual([5, 2]);
 	});
 
-	test('anchor `end` swaps the sides, the labels sitting between the dots', () => {
-		const { texts } = run({ ...props, styles: { values: { show: true, anchor: 'end' } } });
+	test('side `before` swaps the sides, the labels sitting between the dots', () => {
+		const { texts } = run({ ...props, styles: { values: { show: true, side: 'before' } } });
 		const byAnchor = Object.fromEntries(
 			texts.map((t) => [t.styles?.textAnchor, (t.data ?? []).map((d) => (d as Row).v)])
 		);

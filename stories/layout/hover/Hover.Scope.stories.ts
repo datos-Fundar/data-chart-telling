@@ -2,7 +2,7 @@ import type { Meta } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import { LIFE, PROVINCE_VALUES, REGION_VALUES } from '$datasets';
-import { plotStory } from './plotStory';
+import { plotStory } from '../../common/plotStory';
 
 /**
  * What a `hover` marker reaches: every hovered point, or with `series` only that series' - drawn in its color -

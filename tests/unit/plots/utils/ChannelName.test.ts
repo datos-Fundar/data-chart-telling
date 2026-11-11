@@ -16,8 +16,18 @@ describe('ChannelName', () => {
 });
 
 describe('MarkerKinds', () => {
-	test('a kind declares its clip, rows and legend symbol traits', () => {
-		expect(MarkerKinds.of('area')).toEqual({ clip: true, drawsRows: true, legendSymbol: 'area' });
+	test('a kind declares its clip, rows, legend symbol, inherited channels and labels traits', () => {
+		expect(MarkerKinds.of('area')).toEqual({
+			oriented: true,
+			inherits: ['x', 'y', 'grouping', 'color', 'opacity'],
+			clip: true,
+			drawsRows: true,
+			legendSymbol: 'area',
+			labels: { default: 'point', path: 'area', point: 'top' }
+		});
+		expect(MarkerKinds.inherits('rule', 'x')).toBe(false);
+		expect(MarkerKinds.inheritsScales('dot')).toBe(true);
+		expect(MarkerKinds.inheritsScales('text')).toBe(false);
 		expect(MarkerKinds.of('dot')?.clip).toBe(false);
 		expect(MarkerKinds.of('nope')).toBeUndefined();
 	});

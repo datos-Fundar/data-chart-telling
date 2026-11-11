@@ -2,7 +2,9 @@ import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import type { PlotRowContext } from '$lib';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
-import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
+import type { AxisBasedStylesConfig, BarValueLabel, WithValues } from '$lib/types/layout/styles';
+
+type BarStyles = WithValues<AxisBasedStylesConfig, BarValueLabel>;
 import { FEMALE_PROVINCE_VALUES, MALE_PROVINCE_VALUES, type ProvinceRow } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -72,79 +74,99 @@ export const Default: Story = {
  * Value labels enabled with default settings - `styles.values.show: true`
  * renders the numeric Y value above (or anchored to) the top of each bar.
  *
- * The default format is `"${seriesName} - ${value}"` and the default anchor
- * is `'outside'`, which places the text above the bar.
+ * The default format is `"${seriesName} - ${value}"` and the default layout
+ * is `'path'` past each bar's tip (`edge: 'tip'`, `side: 'outside'`), which places the text above the bar.
  */
 export const ShowValues: Story = {
 	args: {
 		series: [FEMALE],
 		styles: {
 			values: { show: true }
-		} satisfies AxisBasedStylesConfig
+		} satisfies BarStyles
 	}
 };
 
 /**
- * Anchor `'outside'` (explicit) - text appears above the bar, centered on it.
- * This is the default when `anchor` is omitted for bar charts.
+ * `layout: 'path'` past each bar's tip (explicit) - text appears above the bar, centered on it.
+ * This is a bar plot's default.
  */
-export const AnchorOutside: Story = {
+export const PathPastTheTip: Story = {
 	args: {
 		series: [FEMALE],
 		styles: {
 			values: {
-				show: true,
-				anchor: 'outside',
+				layout: 'path',
+				edge: 'tip',
+				side: 'outside',
 				format: (v: number) => `${v.toFixed(1)} yr`
 			}
-		} satisfies AxisBasedStylesConfig
+		} satisfies BarStyles
 	}
 };
 
-/** Anchor `'top'` - inside each bar, at its top end. */
-export const AnchorTop: Story = {
+/** `layout: 'box'` with `anchor: 'top'` - inside each bar, at its top end, fitted to it. */
+export const BoxTop: Story = {
 	args: {
 		series: [FEMALE],
 		styles: {
 			values: {
-				show: true,
+				layout: 'box',
 				anchor: 'top',
 				format: (v: number) => `${v.toFixed(1)} yr`,
 				fontStyle: { fill: 'white' }
 			}
-		} satisfies AxisBasedStylesConfig
+		} satisfies BarStyles
 	}
 };
 
 /**
- * Anchor `'middle'` - the label is placed in the middle of the bar.
- * Works best for taller bars with good contrast.
+ * `layout: 'box'` - the label is placed in the middle of the bar, in the color that reads best on it.
+ * Works best for taller bars.
  */
-export const AnchorMiddle: Story = {
+export const BoxMiddle: Story = {
 	args: {
 		series: [FEMALE],
 		styles: {
 			values: {
-				show: true,
-				anchor: 'middle',
+				layout: 'box',
 				format: (v: number) => `${v.toFixed(1)} yr`
 			}
-		} satisfies AxisBasedStylesConfig
+		} satisfies BarStyles
 	}
 };
 
-/** Anchor `'bottom'` - inside each bar, at its bottom end, useful for showing baseline values. */
-export const AnchorBottom: Story = {
+/** `layout: 'path'` along each bar's `base`, inside it - at the end on zero, whatever the sign of its value. */
+export const PathInsideTheBase: Story = {
 	args: {
 		series: [FEMALE],
 		styles: {
 			values: {
-				show: true,
-				anchor: 'bottom',
+				layout: 'path',
+				edge: 'base',
+				side: 'inside',
 				format: (v: number) => `${v.toFixed(1)} yr`,
 				fontStyle: { fill: 'white' }
 			}
-		} satisfies AxisBasedStylesConfig
+		} satisfies BarStyles
+	}
+};
+
+/**
+ * `layout: 'point'` - the label starts at a point of each bar, `anchor: 'top'` the middle of its top edge, and is
+ * written on its `side`. With `select`, only some bars are labelled: here the longest.
+ */
+export const PointAtTheTop: Story = {
+	args: {
+		series: [FEMALE],
+		styles: {
+			values: {
+				layout: 'point',
+				anchor: 'top',
+				side: 'above',
+				select: 'max',
+				format: (v: number) => `max: ${v.toFixed(1)} yr`
+			}
+		} satisfies BarStyles
 	}
 };
 
@@ -162,35 +184,29 @@ export const CustomFormat: Story = {
 				format: (v: number, _number: unknown, context: PlotRowContext) =>
 					`${context.series} → ${v.toFixed(1)} yr`
 			}
-		} satisfies AxisBasedStylesConfig
+		} satisfies BarStyles
 	}
 };
 
 /**
- * Custom offsets - `dx` and `dy` fine-tune the label position in pixels,
- * overriding the defaults computed from `anchor`. Useful for nudging a label
- * away from another bar or legend.
- *
- * Here `anchor: 'outside'` is combined with `dy` to push the label further
- * above the bar.
+ * A custom gap - `gap` sets how far past its bar's tip the label sits, here
+ * further above the bar.
  */
-export const CustomOffsets: Story = {
+export const CustomGap: Story = {
 	args: {
 		series: [FEMALE],
 		styles: {
 			values: {
-				show: true,
-				anchor: 'outside',
-				format: (v: number) => `${v.toFixed(1)} yr`,
-				fontStyle: { dy: -12 }
+				gap: 12,
+				format: (v: number) => `${v.toFixed(1)} yr`
 			}
-		} satisfies AxisBasedStylesConfig
+		} satisfies BarStyles
 	}
 };
 
 /**
  * Two series with default labels - each series' bars get their own labels,
- * filled with the palette colour for that series. The default `anchor: 'outside'`
+ * filled with the palette colour for that series. The default label past the tip
  * places both label sets above their respective bars.
  */
 export const TwoSeriesWithLabels: Story = {
@@ -202,12 +218,12 @@ export const TwoSeriesWithLabels: Story = {
 				format: (v: number, _number: unknown, context: PlotRowContext) =>
 					`${context.series} (${v.toFixed(1)})`
 			}
-		} satisfies AxisBasedStylesConfig
+		} satisfies BarStyles
 	}
 };
 
 /**
- * Two series with `anchor: 'middle'` labels - labels appear inside the bars.
+ * Two series with `layout: 'box'` labels - labels appear inside the bars.
  * Works best when bars are tall enough to accommodate text.
  */
 export const TwoSeriesLabelsMiddle: Story = {
@@ -215,17 +231,16 @@ export const TwoSeriesLabelsMiddle: Story = {
 		series: [FEMALE, MALE],
 		styles: {
 			values: {
-				show: true,
-				anchor: 'middle',
+				layout: 'box',
 				format: (v: number, _number: unknown, context: PlotRowContext) =>
 					`${context.series}: ${v.toFixed(1)} yr`
 			}
-		} satisfies AxisBasedStylesConfig
+		} satisfies BarStyles
 	}
 };
 
 /**
- * Grouped series with labels anchored to the middle. The `\n` in the format
+ * Grouped series with labels in the middle of their bars (`layout: 'box'`). The `\n` in the format
  * function creates a multi-line label.
  */
 export const TwoSeriesGroupedLabelsMiddle: Story = {
@@ -233,54 +248,27 @@ export const TwoSeriesGroupedLabelsMiddle: Story = {
 		series: [FEMALE, MALE],
 		styles: {
 			values: {
-				show: true,
-				anchor: 'middle',
+				layout: 'box',
 				format: (v: number, _number: unknown, context: PlotRowContext) =>
 					`${context.series}\n(${v.toFixed(1)} yr)`
 			}
-		} satisfies AxisBasedStylesConfig
+		} satisfies BarStyles
 	}
 };
 
 /**
- * Stacked series with labels anchored to the middle. The labels are centered
- * within each bar's segment of the stack.
+ * Stacked series - their labels are in the middle of each bar's segment of the stack by default
+ * (`layout: 'box'`).
  */
 export const TwoSeriesStackedLabelsMiddle: Story = {
 	args: {
 		series: [FEMALE, MALE],
 		styles: {
 			values: {
-				show: true,
-				anchor: 'middle',
 				format: (v: number, _number: unknown, context: PlotRowContext) =>
 					`${context.series}\n(${v.toFixed(1)} yr)`
 			}
-		} satisfies AxisBasedStylesConfig,
+		} satisfies BarStyles,
 		transforms: [{ type: 'stackY' as const }]
-	}
-};
-
-/**
- * Custom text anchor and line anchor - bypasses the `anchor` shorthand and
- * sets svelteplot's low-level `textAnchor` / `lineAnchor` directly. The label
- * is right-aligned (`textAnchor: 'end'`) and sits above the bar
- * (`lineAnchor: 'bottom'`), with a nudge via `dy`.
- */
-export const LowLevelTextPlacement: Story = {
-	args: {
-		series: [FEMALE],
-		styles: {
-			values: {
-				show: true,
-				format: (v: number) => `${v.toFixed(1)} yr`,
-				fontStyle: {
-					textAnchor: 'end',
-					lineAnchor: 'bottom',
-					dy: -8,
-					dx: 0
-				}
-			}
-		} satisfies AxisBasedStylesConfig
 	}
 };

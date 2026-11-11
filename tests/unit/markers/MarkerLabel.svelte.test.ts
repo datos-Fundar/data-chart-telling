@@ -130,4 +130,88 @@ describe('markers with a label', () => {
 		const fill = () => svg.querySelector<SVGTextElement>('g.text text')?.style.fill;
 		await expect.poll(fill).toBe('rgb(17, 24, 39)');
 	});
+
+	test('a marker writes each label of a list, the ones on its shape contrasting with it', async () => {
+		const svg = await draw(HeatmapPlot as never, {
+			data: [],
+			x: 'col',
+			y: 'row',
+			markers: [
+				{
+					type: 'cell',
+					data: [{ col: 'Mon', row: 'AM', value: 3, name: 'Monday' }],
+					x: 'col',
+					y: 'row',
+					styles: { fill: '#1f2a44' },
+					label: [
+						{ text: 'value', anchor: 'top' },
+						{ text: 'name', anchor: 'bottom', styles: { fill: 'white' } }
+					]
+				}
+			] satisfies AxisBasedMarkersConfig[]
+		});
+		const fillOf = (text: string) =>
+			[...svg.querySelectorAll<SVGTextElement>('g.text text')].find(
+				(t) => t.textContent?.trim() === text
+			)?.style.fill;
+		await expect.poll(() => fillOf('3')).toBe('rgb(255, 255, 255)');
+		await expect.poll(() => fillOf('Monday')).toBe('white');
+	});
+
+	test('the point labels of several markers spread apart together', async () => {
+		const line = (name: string, end: number) => ({
+			type: 'line' as const,
+			data: [
+				{ t: 1, v: 0, name },
+				{ t: 2, v: end, name }
+			],
+			x: 't',
+			y: 'v',
+			label: { text: 'name', select: 'last' as const, declutter: true, styles: { dx: 6 } }
+		});
+		const svg = await draw(LinePlot, {
+			data: [],
+			x: 't',
+			y: 'v',
+			markers: [line('first', 10), line('second', 10.1), line('third', 10.2)]
+		});
+		await expect
+			.poll(() => [...svg.querySelectorAll('text')].map((t) => t.textContent?.trim()))
+			.toEqual(expect.arrayContaining(['first', 'second', 'third']));
+		await expect
+			.poll(() => svg.querySelectorAll('path[fill="none"][d^="M"][d*="V"]').length)
+			.toBe(3);
+	});
+
+	test("a point label on a bar starts at the bar's top", async () => {
+		const svg = await draw(BarPlot as never, {
+			data: [],
+			x: 'category',
+			y: 'value',
+			markers: [
+				{
+					type: 'bar',
+					role: 'segment',
+					isHorizontal: false,
+					data: BARS,
+					x: 'category',
+					y1: 0,
+					y2: 'value',
+					styles: { fill: 'purple' },
+					label: { ...label, layout: 'point', anchor: 'top', gap: 0 }
+				}
+			] satisfies AxisBasedMarkersConfig[]
+		});
+		await expect.poll(() => written(svg).sort()).toEqual(['6', '9']);
+		const texts = [...svg.querySelectorAll<SVGTextElement>('text')].filter(
+			(t) => t.style.fill === 'white'
+		);
+		const tops = [...svg.querySelectorAll('g.bar-y rect')]
+			.map((bar) => bar.getBoundingClientRect().top)
+			.sort((a, b) => a - b);
+		const bottoms = texts.map((t) => t.getBoundingClientRect().bottom).sort((a, b) => a - b);
+		expect(bottoms).toHaveLength(2);
+		// Sitting on the top, its descent aside.
+		bottoms.forEach((bottom, i) => expect(Math.abs(bottom - tops[i])).toBeLessThan(6));
+	});
 });

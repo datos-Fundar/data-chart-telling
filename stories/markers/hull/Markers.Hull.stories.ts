@@ -1,17 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import Plot from '$lib/plots/generic/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `hull` marker (svelteplot's own `Hull`) - the convex hull around a
 // cluster of points. Symmetric in x/y, so there's no `isHorizontal` to pick
-// between (unlike `area`/`box`). Demoed alongside the scatter points it
-// wraps.
+// between (unlike `area`/`box`).
 
 const meta = {
 	title: 'Markers/Hull',
-	component: ScatterPlot,
+	component: Plot,
 	tags: ['autodocs'],
 	args: {
 		width: 940,
@@ -28,9 +27,9 @@ const meta = {
 		markers: { control: false }
 	},
 	parameters: {
-		docs: { source: { name: 'ScatterPlot' } }
+		docs: { source: { name: 'Plot' } }
 	}
-} satisfies Meta<typeof ScatterPlot>;
+} satisfies Meta<typeof Plot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -52,8 +51,7 @@ export const Basic: Story = {
 
 /**
  * The plot's `color: 'continent'` splits the hull per continent: each hull inherits
- * that grouping and takes its continent's palette color for fill and stroke, the
- * same colors the scatter points use. No setting on the marker itself.
+ * that grouping and takes its continent's palette color for fill and stroke. No setting on the marker itself.
  */
 export const GroupedByContinent: Story = {
 	args: {

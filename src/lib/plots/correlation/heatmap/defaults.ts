@@ -107,7 +107,23 @@ export function buildHeatmapDefaults<TData extends Record<string, unknown>>(): A
 			defaults: () => ({ x: { labelAnchor: 'right' } }),
 			extend: extendWithColorScales
 		},
-		styles: { values: { show: true } },
+		transforms: {
+			// A cell's value is its color: `'min'` and `'max'` compare that.
+			labels: {
+				show: true,
+				measure: (state) =>
+					(state as HeatmapPlotState<TData>).channels?.color.accessor as
+						| ((row: ProcessedRow) => unknown)
+						| undefined
+			}
+		},
+		styles: {
+			values: {
+				show: true,
+				layout: 'box',
+				layouts: { path: { edge: 'top', side: 'inside' }, point: { anchor: 'top', side: 'above' } }
+			}
+		},
 		markers: { marks: buildMarks },
 		hover: {
 			// A cell writes its own value: the hover only restyles the cells - the hovered one outlined.

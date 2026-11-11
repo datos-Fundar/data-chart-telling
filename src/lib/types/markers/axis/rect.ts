@@ -1,3 +1,6 @@
+import type { PathLabelConfig, PageEdge } from '$lib/types/markers/labels/path';
+import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
+import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { AreaStyle, PerRow, InsetStyle } from '$lib/types/plots/styling';
 import type { CommonMarkerConfigWithArea } from '$lib/types/markers/channels/commonMarkerConfigWithArea';
 import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/commonMarkerConfigWithColor';
@@ -12,4 +15,4 @@ export type RectMarkerConfig = {
 } & CommonMarkerConfigWithArea &
 	CommonMarkerConfigWithColor &
 	CommonMarkerConfigWithInterval &
-	CommonMarkerConfigWithLabel;
+	CommonMarkerConfigWithLabel<BoxLabelConfig | PathLabelConfig<PageEdge> | PointLabelConfig>;

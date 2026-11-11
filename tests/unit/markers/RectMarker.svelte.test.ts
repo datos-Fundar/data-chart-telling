@@ -137,11 +137,29 @@ describe('RectMarker - where its label sits', () => {
 		expect(right.text.right).toBeGreaterThan(right.shape.right - 12);
 	});
 
-	test('sits beyond the edge it is anchored to with outside', async () => {
-		const above = await placed({ anchor: 'top', outside: true, fit: false });
+	test('a path label sits beyond the edge it names', async () => {
+		const above = await placed({ layout: 'path', edge: 'top' });
 		expect(above.text.bottom).toBeLessThanOrEqual(above.shape.top + 1);
-		const side = await placed({ anchor: 'right', outside: true, fit: false });
+		const side = await placed({ layout: 'path', edge: 'right' });
 		expect(side.text.left).toBeGreaterThanOrEqual(side.shape.right - 1);
+	});
+
+	test('a path label sits inside its edge, or centred on it', async () => {
+		const inside = await placed({ layout: 'path', edge: 'top', side: 'inside' });
+		expect(inside.text.top).toBeGreaterThanOrEqual(inside.shape.top - 1);
+		expect(inside.text.top).toBeLessThan(inside.shape.top + 12);
+		const on = await placed({ layout: 'path', edge: 'top', side: 'on' });
+		expect(Math.abs(on.text.top + on.text.height / 2 - on.shape.top)).toBeLessThan(2);
+	});
+
+	test('a path label goes along its edge by offset', async () => {
+		const start = await placed({ layout: 'path', edge: 'top', offset: 'start' });
+		expect(Math.abs(start.text.left - start.shape.left)).toBeLessThan(2);
+		const end = await placed({ layout: 'path', edge: 'top', offset: 'end' });
+		expect(Math.abs(end.text.right - end.shape.right)).toBeLessThan(2);
+		const quarter = await placed({ layout: 'path', edge: 'top', offset: '25%' });
+		const center = quarter.text.left + quarter.text.width / 2;
+		expect(Math.abs(center - (quarter.shape.left + quarter.shape.width / 4))).toBeLessThan(2);
 	});
 
 	test('takes a gap of its own from the edge', async () => {
@@ -171,7 +189,7 @@ describe('RectMarker - where its label sits', () => {
 
 describe('RectMarker - a label outside its shape', () => {
 	const edge = { x1: 2000, x2: 2019, y1: 60, y2: 80 };
-	const label = { text: 'A long label', styles: { fill: 'white' }, anchor: 'right', outside: true };
+	const label = { text: 'A long label', styles: { fill: 'white' }, layout: 'path', edge: 'right' };
 	const textOf = (svg: SVGElement) =>
 		[...svg.querySelectorAll<SVGTextElement>('text')].find((t) => t.style.fill === 'white')!;
 

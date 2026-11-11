@@ -1,5 +1,5 @@
 <script lang="ts" generics="TRow extends Record<string, unknown>">
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import PlotScopeCore from './PlotScopeCore.svelte';
 	import type { FacetConfig, FacetScoped } from '$lib/types/layout/facet';
 	import type { TimelineConfig } from '$lib/types/layout/timeline';
@@ -19,7 +19,7 @@
 	} = $props();
 </script>
 
-<Plot
+<AbstractPlot
 	Core={PlotScopeCore as never}
 	core={{ width: 600, height: 400, markers, segments } as never}
 	{data}

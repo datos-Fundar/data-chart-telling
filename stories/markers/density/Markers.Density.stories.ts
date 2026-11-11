@@ -1,17 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import Plot from '$lib/plots/generic/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { COUNTRIES_AT_2007 } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `density` marker (svelteplot's own `Density`) - 2D kernel density
 // estimation drawn as filled/stroked contour bands. Symmetric in x/y, so
-// there's no `isHorizontal` to pick between (unlike `area`/`box`). Demoed
-// alongside the scatter points it's estimated from.
+// there's no `isHorizontal` to pick between (unlike `area`/`box`).
 
 const meta = {
 	title: 'Markers/Density',
-	component: ScatterPlot,
+	component: Plot,
 	tags: ['autodocs'],
 	args: {
 		width: 940,
@@ -27,9 +26,9 @@ const meta = {
 		markers: { control: false }
 	},
 	parameters: {
-		docs: { source: { name: 'ScatterPlot' } }
+		docs: { source: { name: 'Plot' } }
 	}
-} satisfies Meta<typeof ScatterPlot>;
+} satisfies Meta<typeof Plot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

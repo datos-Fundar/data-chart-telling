@@ -1,13 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+import Plot from '$lib/plots/generic/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `difference` marker (svelteplot's own `DifferenceY`) - shaded area
 // between two series, colored by which one is on top at each point. No
 // `isHorizontal`: svelteplot ships only `DifferenceY`, so this always
-// compares two `y` series over a shared `x`. Hosted on a `LinePlot` with the
-// same rows as its own series, so the host and the marker share one scale.
+// compares two `y` series over a shared `x`.
 // The demo series cross twice, so both bands (and the switch between them) show.
 
 /** Actual vs. target output per year - actual starts below target, overtakes it, then falls back under. */
@@ -29,7 +28,7 @@ const COMPARISON = [
 
 const meta = {
 	title: 'Markers/Difference',
-	component: LinePlot,
+	component: Plot,
 	tags: ['autodocs'],
 	args: {
 		width: 940,
@@ -46,9 +45,9 @@ const meta = {
 		markers: { control: false }
 	},
 	parameters: {
-		docs: { source: { name: 'LinePlot' } }
+		docs: { source: { name: 'Plot' } }
 	}
-} satisfies Meta<typeof LinePlot>;
+} satisfies Meta<typeof Plot>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

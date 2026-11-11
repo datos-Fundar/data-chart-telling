@@ -1,3 +1,6 @@
+import type { PathLabelConfig, PageEdge } from '$lib/types/markers/labels/path';
+import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
+import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { AreaStyle, PerRow, InsetStyle } from '$lib/types/plots/styling';
 import type { CommonMarkerConfigWithArea } from '$lib/types/markers/channels/commonMarkerConfigWithArea';
 import type { CommonMarkerConfigWithLabel } from '$lib/types/markers/channels/commonMarkerConfigWithLabel';
@@ -9,4 +12,4 @@ export type CellMarkerConfig = {
 	styles?: PerRow<AreaStyle & Pick<InsetStyle, 'inset'>>;
 } & CommonMarkerConfigWithColor &
 	CommonMarkerConfigWithArea &
-	CommonMarkerConfigWithLabel;
+	CommonMarkerConfigWithLabel<BoxLabelConfig | PathLabelConfig<PageEdge> | PointLabelConfig>;

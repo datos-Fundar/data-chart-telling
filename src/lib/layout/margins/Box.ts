@@ -70,6 +70,26 @@ export class Box {
 		return this.overflow(Box.size(0, 0));
 	}
 
+	/** Whether this box and `other` share any area. */
+	intersects(other: Box): boolean {
+		return (
+			this.left < other.right &&
+			other.left < this.right &&
+			this.top < other.bottom &&
+			other.top < this.bottom
+		);
+	}
+
+	/** Whether this box lies wholly inside `bounds`. */
+	inside(bounds: Box): boolean {
+		return (
+			this.left >= bounds.left &&
+			this.right <= bounds.right &&
+			this.top >= bounds.top &&
+			this.bottom <= bounds.bottom
+		);
+	}
+
 	/** This box grown by `px` on every side. */
 	pad(px: number): Box {
 		return new Box(this.x - px, this.y - px, this.width + 2 * px, this.height + 2 * px);

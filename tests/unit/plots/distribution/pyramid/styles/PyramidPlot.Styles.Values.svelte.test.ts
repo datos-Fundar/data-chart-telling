@@ -2,7 +2,7 @@ import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
-import type { ValueAnchor } from '$lib/types/plots/constants';
+import type { BarValueLabel, ValueLayoutOf } from '$lib/types/layout/styles';
 import { AGE_GROUPS, POPULATION_BY_AGE } from '$datasets';
 import { waitForSvg, countTextLabels } from '../../../_helpers/svg';
 
@@ -46,24 +46,24 @@ describe('PyramidPlot - styles.values', () => {
 		expect(labels).toEqual(expect.arrayContaining(DATA_2022.map((d) => `${d.share.toFixed(1)}%`)));
 	});
 
-	test("anchor changes the label's horizontal position relative to the bar", async () => {
-		async function firstLabelTransform(anchor: ValueAnchor) {
+	test("the layout changes the label's horizontal position relative to the bar", async () => {
+		async function firstLabelTransform(placement: ValueLayoutOf<BarValueLabel>) {
 			const { container } = await render(PyramidPlot, {
 				width: 560,
 				height: 520,
 				...DATA_PROPS,
 				scales: { y: { domain: AGE_GROUPS } },
-				styles: { values: { show: true, anchor } } satisfies AxisBasedStylesConfig
+				styles: { values: { show: true, ...placement } }
 			});
 			const svg = await waitForSvg(container);
-			// A label is moved by the group around it, so where it is on the page is what tells the anchors apart.
+			// A label is moved by the group around it, so where it is on the page is what tells the layouts apart.
 			await new Promise((resolve) => setTimeout(resolve, 100));
 			return String(Math.round(svg.querySelector('g.text text')!.getBoundingClientRect().left));
 		}
-		const outside = await firstLabelTransform('outside');
-		const middle = await firstLabelTransform('middle');
-		const tip = await firstLabelTransform('tip');
-		const base = await firstLabelTransform('base');
+		const outside = await firstLabelTransform({});
+		const middle = await firstLabelTransform({ layout: 'box' });
+		const tip = await firstLabelTransform({ layout: 'path', edge: 'tip', side: 'inside' });
+		const base = await firstLabelTransform({ layout: 'path', edge: 'base', side: 'inside' });
 		expect(new Set([outside, middle, tip, base]).size).toBe(4);
 	});
 });

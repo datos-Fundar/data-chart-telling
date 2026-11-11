@@ -23,7 +23,7 @@ Solid arrows are "renders"; the dotted line is "builds".
 flowchart TD
     Kind["<b>Plot.svelte</b><br/>BarPlot, LinePlot, ..."]
     Defaults["<b>defaults.ts</b><br/>phase options, markers, hover, timeline"]
-    Plot["<b>Plot</b><br/>builds the Pipeline, one core per slice"]
+    AbstractPlot["<b>AbstractPlot</b><br/>builds the Pipeline, one core per slice"]
     Figure["<b>Figure</b><br/>box or grid cell, hover store, legend toggles"]
     Chrome["<b>FigureChrome</b><br/>title, legend, caption"]
     Timeline["<b>TimelineLayout</b>"]
@@ -32,9 +32,9 @@ flowchart TD
     Core["<b>Core</b><br/>its panel phases, or every phase"]
     Base["<b>BasePlotLayout</b><br/>svelteplot Plot, axes, markers"]
 
-    Kind -->|core props + defaults| Plot
+    Kind -->|core props + defaults| AbstractPlot
     Kind -.- Defaults
-    Plot --> Figure
+    AbstractPlot --> Figure
     Figure -->|with chrome| Chrome
     Figure -->|with a timeline| Timeline
     Figure -->|without one| Facet
@@ -44,12 +44,12 @@ flowchart TD
     Core --> Base
 
     classDef public stroke-width:3px
-    class Kind,Plot public
+    class Kind,AbstractPlot public
     linkStyle default stroke:#8a8f98,stroke-width:2px
 ```
 
-1. A kind's `Plot.svelte` splits its props into chrome (`title`, `legend`, ...), `timeline`, `facet` and the core props, and renders the shared `Plot` with its `defaults` builder.
-2. `Plot` builds the kind's **`Pipeline`** once and renders a `Figure` whose body is the `TimelineLayout`, wrapping the `FacetLayout`, wrapping one `Core` per slice. Without a timeline or a facet, the one cell is the whole plot. Each facet's cell gets its scales (shared or free, per `facet.scales`) and whether its axes draw (per `facet.axes` and its edges in the grid).
+1. A kind's `Plot.svelte` splits its props into chrome (`title`, `legend`, ...), `timeline`, `facet` and the core props, and renders the shared `AbstractPlot` with its `defaults` builder.
+2. `AbstractPlot` builds the kind's **`Pipeline`** once and renders a `Figure` whose body is the `TimelineLayout`, wrapping the `FacetLayout`, wrapping one `Core` per slice. Without a timeline or a facet, the one cell is the whole plot. Each facet's cell gets its scales (shared or free, per `facet.scales`) and whether its axes draw (per `facet.axes` and its edges in the grid).
 3. `FacetLayout` turns the rows into facets - one per `by` value, flowed into `columns`, or one per `rows` x `cols` combination - and places them on a `Grid`, one `GridCell` each. Every plot reports the margins it settled on; once all have, each column and row pins its widest ones, so the plot areas line up.
 4. `Core` runs the pipeline over its props and hands the result to `BasePlotLayout`, which draws the svelteplot plot, the axes and the markers.
 
@@ -70,7 +70,7 @@ A `Pipeline` is an ordered list of **phase stages**, each a class in `phases/`. 
 | `markers`          | per panel     | Composes the kind's marks, author markers and value labels      |
 | `tooltip`, `hover` | per panel     | Tooltip text, hover points and strategy                         |
 
-The first six are the **data phases** (`Pipeline.DATA_PHASES`). With a facet, `Plot` runs them once over every row (`PanelRun`, reused for a timeline step or a legend that omits a series), and each panel's `Core` runs only the rest. Without a facet, one `Core` runs every phase. Stages declared out of order still run in phase order, with a warning.
+The first six are the **data phases** (`Pipeline.DATA_PHASES`). With a facet, `AbstractPlot` runs them once over every row (`PanelRun`, reused for a timeline step or a legend that omits a series), and each panel's `Core` runs only the rest. Without a facet, one `Core` runs every phase. Stages declared out of order still run in phase order, with a warning.
 
 ## Facets and the composer share one grid
 
@@ -115,7 +115,7 @@ Dependencies between layers go through Svelte context, so a layer never imports 
 | Hover store     | `Figure` (the outermost; nested figures share it)                   | every core's tooltip and hover sync                                   |
 | Legend toggles  | `Figure` (a figure with its own `legend` scopes them)               | legends and every core below                                          |
 | Timeline        | `Figure`                                                            | the plot's timeline layout, the player bar, `useFigure().timeline`    |
-| Shared timeline | `PlotComposer` with a `timeline`                                    | `Plot`, which then draws no control of its own                        |
+| Shared timeline | `PlotComposer` with a `timeline`                                    | `AbstractPlot`, which then draws no control of its own                |
 | Hover scope     | `GridCell` in a composer's grid, and `HoverScope` around each facet | hover sync, to tell panels and facets apart                           |
 | Grid            | `Grid`                                                              | `GridCell` (registers, gets its box and tag), `Figure` (takes a cell) |
 | Cell alignment  | `GridCell`                                                          | `BasePlotLayout` (pinned margins), `MarginReporter`                   |
@@ -126,7 +126,7 @@ The public readers of that state are `useFigure()` and `usePlot()` ([Reading plo
 
 1. Define its props and state types under `types/plots/<kind>/`.
 2. Write `plots/<kind>/defaults.ts`: a builder returning the options of each phase it customises (`data`, `mapping`, `scales`, `styles`, `markers`, `hover`, `timeline`, ...).
-3. Write `plots/<kind>/Plot.svelte`: split chrome, `timeline`, `facet` and core props and render the shared `Plot` with the builder.
+3. Write `plots/<kind>/Plot.svelte`: split chrome, `timeline`, `facet` and core props and render the shared `AbstractPlot` with the builder.
 4. Export it from `src/lib/index.ts`, add stories under `stories/plots/<kind>/`, tests under `tests/unit/plots/<kind>/`, and a page in `docs/plots/` with a row in the [Plots](plots.md) table.
 
 ## Conventions

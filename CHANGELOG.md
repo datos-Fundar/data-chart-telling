@@ -2,6 +2,41 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.19.0] - 2026-11-11
+
+### Added
+
+- **Value labels, laid out three ways.** Every plot's `styles.values`, and every marker's `label`, takes a `layout`:
+  - `'point'` - beside a point: a line's last value, a scatter's dots, a corner of a bar. `side` (`'after'`, `'before'`, `'above'`, `'below'`, `'on'`) and `gap` place it.
+  - `'path'` - along an edge or a stroke: past a bar's tip (its sign followed per bar), along a line or an area's edge, around a dot's rim. `edge`, `side` and `offset` place it, `offset: 'max'` putting it at each curve's peak.
+  - `'box'` - inside each shape, fitted to it: a heatmap's cells, a stacked bar's segments.
+
+  Each plot kind keeps its own default and takes only the layouts its shapes can write, checked by its types: `<LinePlot styles={{ values: { layout: 'path' } }} />` writes each series' name along its line. See the new [Value labels](docs/value-labels.md) page and the _Layout/Values_ stories.
+
+- **Labels that stay readable.** On a scatter, labels move clockwise around their dot to the first free spot, and are left out where there is none (`declutter: 'around'`, also on a marker's label or a `text` marker). A value written on its own dot is hidden where a later dot covers it.
+- **Several values per row.** `styles.values.parts` picks which values a row writes, typed per plot: a box's or violin's `'min'`, `'p25'`, `'median'`, `'p75'`, `'max'` and `'outliers'`, a bullet's `'target'` and `'ranges'`, a forest's `'lower'` and `'upper'` - as a list, or a record with options for each (`parts: { median: true, max: { format } }`). A label's `format` gets the part in `context.part`.
+- **Value labels on `BoxPlot`, `ViolinPlot` and `DensityPlot`.** A box writes its whisker ends and median, a violin its median, a density each curve's name at its peak.
+- **More on value labels:** a marker's `label` can be a list; any option of `styles.values` turns the labels on, without `show: true`; `select` and `series` now also pick the labelled rows of bar, histogram, heatmap and scatter plots.
+- **A generic `Plot`** that draws only its `markers`, with every option a plot takes, for annotations and custom compositions: `<Plot markers={[{ type: 'density', data, x: 'gdp', y: 'life' }]} />`.
+- **Markers inherit from their plot** the position and channels they leave unset (`x`, `y`, `opacity`, `symbol`, `r`, `length`, with their scales), and run horizontally or vertically by their own channels when the plot has none.
+
+### Changed
+
+- **Breaking:** `styles.values.anchor` is replaced by `layout` and its options. On a line plot, `'start'` is now `side: 'after'` (the default), `'end'` is `side: 'before'`, `'outside'` is `side: 'above'`, `'middle'` is `side: 'on'`. On a bar plot, `'outside'` is the default, `'tip'` and `'base'` are `{ layout: 'path', edge: 'tip' | 'base', side: 'inside' }`, and `'middle'` or a page edge is `{ layout: 'box', anchor }`.
+- **Breaking:** `styles.values.fontStyle` only styles the text: `dx`, `dy`, `textAnchor` and `lineAnchor` are gone, the layout places it (`fontStyle: { dy: -12 }` is `gap: 12`).
+- **Breaking:** a shape label's `outside` is gone: `{ anchor: 'top', outside: true }` is `{ layout: 'path', edge: 'top' }`.
+- **Breaking:** the plot shell exported as `Plot` (to build your own plot kinds) is now `AbstractPlot`; `Plot` is the new generic plot.
+- A scatter's value labels sit above their dots by default, and no longer overlap.
+
+### Fixed
+
+- `styles.values.color` now colors the labels of bar, pyramid, histogram and scatter plots.
+- A violin plot colored by its category draws each violin centered in its band, instead of side by side with empty slots.
+- The x axis title no longer lands on the tick labels when value labels grow the plot's margins.
+- A label along a line, near one of its ends, is no longer cut short.
+- **Hovering no longer lays the whole plot out again at every move of the pointer.** svelteplot works a plot's scales out from every mark's rows, and the hover changed them at each move: its dots, rules and values came and went as marks of the plot, the `active` and `others` styles split a marker's rows anew, and a mark copied its rows whenever one of their styles changed. Each move rebuilt every scale from every row, scaled every mark again and measured the margins again, more so the more series, rows and synced panels a plot has. Now the hover's `back` and `front` markers are drawn on the plot's scales without taking part in them, a marker the hover restyles stays whole with each style read off the row as it is hovered, and the plot works its scales out again only when a mark's rows hold something new. A move of the pointer over a fifteen-line plot settles in about a quarter of the time, and over a treemap or a heatmap that restyles its shapes in a tenth to a quarter.
+- The outline the `hover` marker's `active` gives the hovered shapes (its `stroke`, `strokeWidth`, `strokeOpacity` and `strokeDasharray`, the plot's own `hover.active` by default) is drawn whole, over every shape of the plot. It was drawn on the shape itself, in its marker's order, so the tiles of a treemap, the cells of a heatmap with no gap or the bars of a plot drawn after it covered part of it. The outline never takes the pointer from the shape under it.
+
 ## [1.18.0] - 2026-11-09
 
 ### Added

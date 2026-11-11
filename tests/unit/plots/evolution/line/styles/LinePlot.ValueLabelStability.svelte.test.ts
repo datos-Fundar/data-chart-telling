@@ -83,9 +83,9 @@ describe('LinePlot - leftward value labels reserve room up front', () => {
 		const props = {
 			...renderProps,
 			styles: {
-				values: { show: true, anchor: 'end' as const },
+				values: { show: true, side: 'before' as const },
 				frame: true
-			} satisfies AxisBasedStylesConfig,
+			},
 			series: seriesUpTo(2016)
 		};
 		const withLabels = await render(LinePlot, props);

@@ -1,3 +1,4 @@
+import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { Transforms } from '$lib/phases/transforms/Transforms';
 import { ValueSelection } from '$lib/phases/transforms/ValueSelection';
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
@@ -165,16 +166,17 @@ export class TransformsPhase<
 	#labelled(state: TState): Pick<TransformsStageState, 'labelled' | 'labelSelects'> {
 		const options = this.#options.labels;
 		const values = state.values;
-		if (!options || !(values?.show ?? options.show)) return {};
+		if (!options || !ValueLabels.shows(values, options.show)) return {};
 		const processed = state.processedData!;
-		const valueAxis = PlotAxes.valueOf(state) as 'x' | 'y';
+		const measure = options.measure?.(state);
+		const valueAxis = measure ? 'y' : (PlotAxes.valueOf(state) as 'x' | 'y');
 		const select = values?.select ?? options.select;
 		const selections = ValueSelection.transforms(select, values?.series, valueAxis);
 		const position = ProcessedPositions.of(processed, valueAxis);
 		const skip = options.skip?.(state);
 		const channels = {
 			x: position.x,
-			y: position.y,
+			y: measure ?? position.y,
 			group:
 				options.group === 'category'
 					? position[PlotAxes.categoryOf(state) as 'x' | 'y']

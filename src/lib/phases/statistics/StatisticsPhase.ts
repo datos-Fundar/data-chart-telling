@@ -1,12 +1,11 @@
 import { AuthorMarkers } from '$lib/phases/statistics/AuthorMarkers';
 import { Statistics } from '$lib/phases/statistics/Statistics';
+import { MarkerInheritance } from '$lib/phases/statistics/MarkerInheritance';
+import { MarkerOrientation } from '$lib/phases/statistics/MarkerOrientation';
 import { PANEL_KEY, FacetPanels } from '$lib/phases/facet/FacetPanels';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { PhaseStage, StatisticsStageOptions, StatisticsStageState } from '$lib/types/phases';
-
-/** Marker kinds that draw from a channel pair, so they take the plot's `x`/`y` when the author leaves one out. */
-const POSITIONED_KINDS = new Set(['line', 'area', 'dot']);
 
 /**
  * The "statistics" phase every axis-based plot shares: seeds `state.markers`
@@ -55,7 +54,7 @@ export class StatisticsPhase<TState extends StatisticsStageState> implements Pha
 			statistics,
 			authorMarkers = []
 		} = state;
-		const { inheritGrouping = true, inheritPositions = false } = options;
+		const { inheritGrouping = true } = options;
 
 		const defaultColor = options.defaultColor
 			? options.defaultColor(state)
@@ -64,17 +63,18 @@ export class StatisticsPhase<TState extends StatisticsStageState> implements Pha
 		const onProcessed = authorMarkers.map((marker) =>
 			AuthorMarkers.withProcessedRows(marker, state.processedData)
 		);
-		const positioned = inheritPositions
-			? onProcessed.map((marker) => {
-					if (!POSITIONED_KINDS.has(marker.type)) return marker;
-					const own = marker as AxisBasedMarkersConfig & { x?: unknown; y?: unknown };
-					return {
-						...own,
-						x: own.x ?? resolvedSeries[0]?.x ?? state.x,
-						y: own.y ?? resolvedSeries[0]?.y ?? state.y
-					} as AxisBasedMarkersConfig;
-				})
-			: onProcessed;
+		const unpositioned = !state.axes?.x && !state.axes?.y;
+		const positioned = onProcessed.map((marker) => {
+			const inherited = MarkerInheritance.inherit(marker, {
+				x: resolvedSeries[0]?.x ?? state.x,
+				y: resolvedSeries[0]?.y ?? state.y,
+				opacity: state.opacity,
+				symbol: state.symbol,
+				r: state.r,
+				length: state.length
+			});
+			return unpositioned ? MarkerOrientation.orient(inherited, flat, state.scales) : inherited;
+		});
 
 		// A series setting no value of its own (a histogram's) measures its processed rows: its bins.
 		const valueAxis = PlotAxes.valueOf(state);

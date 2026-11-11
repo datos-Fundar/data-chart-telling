@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
-	import Plot from '$lib/layout/plot/Plot.svelte';
+	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import { buildTreemapDefaults } from '$lib/plots/part-of-a-whole/treemap/defaults';
 	import type {
 		TreemapPlotProps,
@@ -30,7 +30,7 @@
 	}: TreemapPlotProps<TData> = $props();
 </script>
 
-<Plot
+<AbstractPlot
 	core={core as TreemapPlotCoreProps<TData>}
 	defaults={buildTreemapDefaults}
 	bind:margins

@@ -19,7 +19,7 @@
 	const events = MarkerEvents.use(() => marker);
 
 	const plot = usePlot();
-	const isHorizontal = $derived(plot.axes?.isHorizontal ?? false);
+	const isHorizontal = $derived(marker.isHorizontal ?? plot.axes?.isHorizontal ?? false);
 	const BoxMark = $derived(isHorizontal ? BoxX : BoxY);
 
 	/**

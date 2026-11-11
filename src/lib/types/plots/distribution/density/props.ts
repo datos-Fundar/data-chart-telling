@@ -1,3 +1,4 @@
+import type { AreaValueLabel, LineValueLabel, WithValues } from '$lib/types/layout/styles';
 import type { BasePlotProps, PlotCoreProps } from '$lib/types/plots/props';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
@@ -6,7 +7,10 @@ import type { CurveAwarePlotStylesConfig } from '$lib/types/layout/styles';
 import type { AreaStyle } from '$lib/types/plots/styling';
 
 /** `styles` of `DensityPlot`: the curve of the estimate, and the mark that draws it. */
-export type DensityPlotStylesConfig = CurveAwarePlotStylesConfig & {
+export type DensityPlotStylesConfig = WithValues<
+	CurveAwarePlotStylesConfig,
+	AreaValueLabel | LineValueLabel
+> & {
 	/** The mark drawing each estimate: a filled `'area'` or a `'line'`. Defaults to `'area'`. */
 	mark?: 'area' | 'line';
 };
