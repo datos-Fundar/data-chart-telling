@@ -81,12 +81,12 @@ export function buildHitAreas<TData extends Record<string, unknown>>(
 			data: [row],
 			category: categoryOf(row as ProcessedRow),
 			hover: hover.active && 'trigger',
-			...(slice
+			styles: (slice
 				? isHorizontal
 					? { insetTop: slice.start, insetBottom: slice.end }
 					: { insetLeft: slice.start, insetRight: slice.end }
-				: {})
-		} as BarMarkerConfig;
+				: undefined) as BarMarkerConfig['styles']
+		} satisfies BarMarkerConfig;
 	});
 }
 

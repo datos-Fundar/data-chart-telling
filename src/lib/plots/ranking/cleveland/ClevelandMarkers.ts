@@ -261,7 +261,7 @@ export class ClevelandMarkers {
 					}
 				};
 			});
-		}) as DotMarkerConfig[];
+		});
 		const values = state.valueLabels?.show ? state.valueLabels : undefined;
 		const labels = values?.writes('value') ? this.#valueLabels(values, state, env) : undefined;
 		// The other parts of a row it labels - an interval's ends - beside them; the dots write the value.
@@ -378,7 +378,7 @@ export class ClevelandMarkers {
 						font?.textAnchor && font.textAnchor !== 'outside' ? font.textAnchor : at.textAnchor,
 					lineAnchor: font?.lineAnchor ?? at.lineAnchor
 				}
-			} as TextMarkerConfig
+			} satisfies TextMarkerConfig
 		];
 	}
 

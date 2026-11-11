@@ -97,7 +97,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 			? ({
 					...marker,
 					thickness: own.bar?.thickness ?? configured.barThickness
-				} as BarMarkerConfig)
+				} satisfies BarMarkerConfig)
 			: marker
 	);
 
