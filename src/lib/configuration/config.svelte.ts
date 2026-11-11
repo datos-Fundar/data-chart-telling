@@ -181,7 +181,7 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 	},
 
 	hover: {
-		rule: { stroke: '#e6580d', strokeOpacity: 0.35, strokeWidth: 1.5, strokeDasharray: '4 4' },
+		rule: { stroke: '#64748b', strokeOpacity: 0.35, strokeWidth: 1.5, strokeDasharray: '4 4' },
 		dot: { dotRadius: 5, dotFill: 'currentColor' },
 		font: { fill: 'currentColor', fontSize: 12, dy: -18 },
 		area: { fill: '#94a3b8', fillOpacity: 0.4 },

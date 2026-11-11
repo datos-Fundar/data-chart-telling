@@ -37,6 +37,9 @@ export class RowContext {
 		return { ...(typeof series === 'string' ? { series } : {}), row } as TContext;
 	}
 
+	/** The key a row's context is kept under: no scale reads it, so a copy of a row with a new context is no new row to them. */
+	static readonly key: symbol = KEY;
+
 	/** Keeps `context` on `row`, for {@link of} to read back. */
 	static tag(row: ProcessedRow, context: PlotRowContext): void {
 		row[KEY] = context;
