@@ -14,6 +14,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - **`BarPlot` hover on grouped series.** Each series' hover zone now covers only its own strip of the category band, so side-by-side bars report the series under the pointer instead of always the last one.
 - **`band` marker on grouped horizontal bars.** A `slice` of a band on `y` is counted from the bottom, as the bars, their hit areas and the hover's dot, text and rule are, so the hover's band lies over the series under the pointer and not the other one.
 - **`GeoPlot` hover no longer lays the map out again.** The hovered province is drawn on the plot's projection without joining its scales, so entering or leaving one no longer works out the scales and projection anew - which, with facets and a synced tooltip, was repeated in every panel.
+- **Facet grids no longer crawl through a timeline.** A step used to give `FacetLayout` new entry objects, which its each blocks wrote into their items from inside their own effect, and Svelte then walked every derived the write reached, in each panel. The blocks now iterate the panels' keys, and each cell reads its entry from a derived.
 
 ## [1.19.0] - 2026-11-11
 

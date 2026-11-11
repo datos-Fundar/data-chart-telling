@@ -139,6 +139,13 @@
 		});
 	});
 
+	// The panels' keys hold still while their data changes, and each cell reads its own entry by key. A timeline step
+	// gives every entry a new object; an each block over the entries would write each into its item from inside its
+	// own effect, and Svelte then walks every derived that state reaches, panel after panel.
+	const entryByKey = $derived(new Map([...wrapEntries, ...matrixEntries].map((e) => [e.key, e])));
+	const wrapKeys = $derived(wrapEntries.map((e) => e.key));
+	const matrixKeys = $derived(matrixEntries.map((e) => e.key));
+
 	// ── wrapped modes ────────────────────────────────────────────────────────
 	const resolvedMode = $derived(wrap ? resolveResponsive(mode, $isMobile) : 'grid');
 
@@ -150,10 +157,10 @@
 	const resolvedPageSize = $derived(Math.max(1, pageSize ?? gridCols * gridRows));
 	let page = $state(0);
 	const totalPages = $derived(Math.max(1, Math.ceil(wrapEntries.length / resolvedPageSize)));
-	const pageEntries = $derived(
+	const pageKeys = $derived(
 		resolvedMode === 'paginated'
-			? wrapEntries.slice(page * resolvedPageSize, page * resolvedPageSize + resolvedPageSize)
-			: wrapEntries
+			? wrapKeys.slice(page * resolvedPageSize, page * resolvedPageSize + resolvedPageSize)
+			: wrapKeys
 	);
 
 	$effect(() => {
@@ -162,7 +169,7 @@
 
 	const showNav = $derived(resolvedMode === 'paginated' && totalPages > 1);
 	// A page sizes its grid off what it shows, not the full entry count.
-	const pageCols = $derived(Math.max(1, Math.min(gridCols, pageEntries.length || 1)));
+	const pageCols = $derived(Math.max(1, Math.min(gridCols, pageKeys.length || 1)));
 	const gridHeight = $derived(
 		navLayout === 'below' && showNav ? Math.max(0, height - NAV_BELOW_H) : height
 	);
@@ -255,28 +262,31 @@
 	</span>
 {/snippet}
 
-{#snippet facetCells(entries: Entry[], columnCount: number)}
-	{#each entries as entry, i (entry.key)}
-		<GridCell
-			row={entry.r ?? Math.floor(i / columnCount)}
-			col={entry.c ?? i % columnCount}
-			label={wrap ? entry.label : undefined}
-			data-row={entry.row}
-			data-col={entry.col}
-		>
-			{#snippet children(box)}
-				{@render cell({
-					facetValue: entry.label,
-					row: entry.row,
-					col: entry.col,
-					data: entry.data,
-					width: box.width,
-					height: box.height,
-					margins: box.margins,
-					edges: box.edges
-				})}
-			{/snippet}
-		</GridCell>
+{#snippet facetCells(keys: string[], columnCount: number)}
+	{#each keys as key, i (key)}
+		{@const entry = entryByKey.get(key)}
+		{#if entry}
+			<GridCell
+				row={entry.r ?? Math.floor(i / columnCount)}
+				col={entry.c ?? i % columnCount}
+				label={wrap ? entry.label : undefined}
+				data-row={entry.row}
+				data-col={entry.col}
+			>
+				{#snippet children(box)}
+					{@render cell({
+						facetValue: entry.label,
+						row: entry.row,
+						col: entry.col,
+						data: entry.data,
+						width: box.width,
+						height: box.height,
+						margins: box.margins,
+						edges: box.edges
+					})}
+				{/snippet}
+			</GridCell>
+		{/if}
 	{/each}
 {/snippet}
 
@@ -291,7 +301,7 @@
 		colLabels={getCol ? colKeys : undefined}
 		rowLabels={getRow ? rowKeys : undefined}
 	>
-		{@render facetCells(matrixEntries, colKeys.length)}
+		{@render facetCells(matrixKeys, colKeys.length)}
 	</Grid>
 {:else if resolvedMode === 'carousel'}
 	<div
@@ -310,19 +320,22 @@
 			style:gap="{gap}px"
 			style:transform="translateX({translate}px)"
 		>
-			{#each wrapEntries as entry (entry.key)}
-				<div class="dct-facet-carousel__cell" style:width="{carouselCellWidth}px">
-					<div class="dct-facet-carousel__title" style:height="{TITLE_H}px">{entry.label}</div>
-					{#if carouselCellWidth > 0 && carouselCellHeight > 0}
-						{@render cell({
-							facetValue: entry.label,
-							data: entry.data,
-							width: carouselCellWidth,
-							height: carouselCellHeight,
-							edges: CAROUSEL_EDGES
-						})}
-					{/if}
-				</div>
+			{#each wrapKeys as key (key)}
+				{@const entry = entryByKey.get(key)}
+				{#if entry}
+					<div class="dct-facet-carousel__cell" style:width="{carouselCellWidth}px">
+						<div class="dct-facet-carousel__title" style:height="{TITLE_H}px">{entry.label}</div>
+						{#if carouselCellWidth > 0 && carouselCellHeight > 0}
+							{@render cell({
+								facetValue: entry.label,
+								data: entry.data,
+								width: carouselCellWidth,
+								height: carouselCellHeight,
+								edges: CAROUSEL_EDGES
+							})}
+						{/if}
+					</div>
+				{/if}
 			{/each}
 		</div>
 		{#if wrapEntries.length > 1}
@@ -333,7 +346,7 @@
 	<div class="dct-facet-paginated" style:width="{width}px" style:height="{height}px">
 		{#key page}
 			<Grid {width} height={gridHeight} {gap} {align} header={TITLE_H} columns={pageCols}>
-				{@render facetCells(pageEntries, pageCols)}
+				{@render facetCells(pageKeys, pageCols)}
 			</Grid>
 		{/key}
 		{#if showNav}
