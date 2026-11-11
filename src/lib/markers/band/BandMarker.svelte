@@ -34,7 +34,8 @@
 	function boxOf(band: Band) {
 		const bandwidth = scale.fn.bandwidth?.() ?? 0;
 		const start = Number(scale.fn(band.category as never));
-		const from = start + band.slice.start * bandwidth;
+		// Horizontal bars count their slices from the bottom of the band, as `BandNudge` and the bars' hit areas do.
+		const from = start + (marker.axis === 'y' ? band.slice.end : band.slice.start) * bandwidth;
 		const size = Math.max(0, bandwidth * (1 - band.slice.start - band.slice.end));
 		const [low, high] = extent;
 		return marker.axis === 'x'

@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Fixed
 
 - **`BarPlot` hover on grouped series.** Each series' hover zone now covers only its own strip of the category band, so side-by-side bars report the series under the pointer instead of always the last one.
+- **`band` marker on grouped horizontal bars.** A `slice` of a band on `y` is counted from the bottom, as the bars, their hit areas and the hover's dot, text and rule are, so the hover's band lies over the series under the pointer and not the other one.
 
 ## [1.19.0] - 2026-11-11
 
