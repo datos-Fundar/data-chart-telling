@@ -216,6 +216,7 @@
 				? FacetPanels.buildPanelState(panels, slicing.panelKey(place) ?? '')
 				: undefined,
 			facet: place,
+			time,
 			keep: slicing.keep({ time, facet: place })
 		})}
 	</HoverScope>
@@ -260,6 +261,7 @@
 			height: h,
 			tooltip: tooltipConfig,
 			scales: slicing.timelineScales<TScales>(sharedScales),
+			time,
 			keep: slicing.keep({ time })
 		})}
 	{/if}

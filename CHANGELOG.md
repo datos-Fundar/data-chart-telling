@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- **`GeoPlot` facets and timeline from one layer of features.** `facet.values` (or a grid's `rowValues` and `colValues`) and `timeline.values` now create their panels and steps though no feature carries the field, so the same features serve every panel with no copy per value. A slice's values are the ones named, in order, then any more found in the features.
+- **The slice reaches the callbacks of a `GeoPlot`.** `color`, `opacity`, `grouping`, `featureId` and `styles.onFeatureClick` get `{ facet?: { value, row?, col? }, time? }` as their last argument (empty without `facet` or `timeline`), and a tooltip's `format` has the same `facet` and `time` in its context: `color={(f, { facet }) => valueFor(f, facet?.value)}`. The color ramp spans every panel and step, each read in its own slice, unless `facet.scales` (or `timeline.scales`, with no facet) is `'free'`: then each slice fits its own, and a `grouping` by panel with a `segments` `scales.color` per panel gives each its own scheme - and the legend leaves out the plot's own ramp when every colored feature has one of its own. New type `GeoSliceContext`. See [Maps](docs/geo.md#facets-and-timeline).
+
 ### Fixed
 
 - **`BarPlot` hover on grouped series.** Each series' hover zone now covers only its own strip of the category band, so side-by-side bars report the series under the pointer instead of always the last one.

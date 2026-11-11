@@ -19,13 +19,13 @@
 
 ## Data
 
-| Prop           | Meaning                                                                                                                                                                                                      |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `data`         | A GeoJSON `FeatureCollection`, an array of `Feature`s, or a TopoJSON `Topology`                                                                                                                              |
-| `object`       | Required for a `Topology`: the key under `topology.objects` to draw. Needs the optional `topojson-client` package                                                                                            |
-| `featureId`    | Accessor for each feature's stable id. Default: `feature.id ?? properties.id ?? properties.name`. It is the key of `segments`, and identifies features in hover and click                                    |
-| `color`        | `(feature) => number \| undefined` - the value of a choropleth. Features without one use `styles.fill` or their `segments`                                                                                   |
-| `excludeParts` | `(part, feature) => boolean`, where `part` is `{ centroid, geometry }` - drops geometry parts from drawing and hover (a distant territory drawn in an inset instead). `segments` still apply to what remains |
+| Prop           | Meaning                                                                                                                                                                                                                |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`         | A GeoJSON `FeatureCollection`, an array of `Feature`s, or a TopoJSON `Topology`                                                                                                                                        |
+| `object`       | Required for a `Topology`: the key under `topology.objects` to draw. Needs the optional `topojson-client` package                                                                                                      |
+| `featureId`    | Accessor for each feature's stable id. Default: `feature.id ?? properties.id ?? properties.name`. It is the key of `segments`, and identifies features in hover and click                                              |
+| `color`        | `(feature, slice) => number \| undefined` - the value of a choropleth. Features without one use `styles.fill` or their `segments`. `slice` is the [facet panel and timeline step](#facets-and-timeline) it is drawn in |
+| `excludeParts` | `(part, feature) => boolean`, where `part` is `{ centroid, geometry }` - drops geometry parts from drawing and hover (a distant territory drawn in an inset instead). `segments` still apply to what remains           |
 
 ## Styles
 
@@ -145,6 +145,34 @@ An `inset` draws part of the map (or other data) in its own small panel, such as
 ```
 
 `location` is one of the 17 anchors (`'top-left'`, `'bottom-right'`, `'middle-left'`, ...); `features` filters by id from the plot's `data` (or give the inset its own `data`); `featurePartsFilter` narrows to geometry parts; `width` and `height` are fractions of the plot; an inset always fits its own content.
+
+## Facets and timeline
+
+`facet` and `timeline` slice the map by a field each feature carries in its `properties` (and each marker's own rows by the same field); what lacks the field is drawn in every slice. To draw one layer of features in every panel, with no field on them, name the panels instead: `facet.values` for `by`, `rowValues` and `colValues` for `rows` and `cols`, or `timeline.values` for the steps. A slice's values are the ones named, in that order, then any more found in the features.
+
+Every callback that reads a feature gets the slice it is drawn in as its last argument - `color`, `opacity`, `grouping`, `featureId` and `styles.onFeatureClick` - and a tooltip's `format` has it in its context:
+
+| Field         | Meaning                                                            |
+| ------------- | ------------------------------------------------------------------ |
+| `facet.value` | The panel: its `by` value, or a grid's `row · col`                 |
+| `facet.row`   | The panel's `rows` value, on a grid                                |
+| `facet.col`   | The panel's `cols` value, on a grid                                |
+| `time`        | The timeline step; the context is empty without `facet`/`timeline` |
+
+```svelte
+<GeoPlot
+	data={provinces}
+	facet={{ by: 'sex', values: ['Women', 'Men'] }}
+	color={(f, { facet }) => valueFor(f.properties.name, facet?.value)}
+	tooltip={{
+		sync: true,
+		format: (f, number, { facet }) => `${f.properties.name} · ${facet?.value}`
+	}}
+	coordinates={{ projection: { type: 'mercator', domain: 'data' } }}
+/>
+```
+
+The color ramp spans every panel and step, each read in its own slice, so colors compare across them; `facet.scales: 'free'` (or `timeline.scales`, with no facet) fits each slice's own instead, for panels that show different variables. To give each panel its own scheme too, return the panel from `grouping` and set `scales.color` in a `segments` entry per panel. With `projection.domain: 'data'`, each panel fits its own features. See also [Facets](facets.md#maps).
 
 ## Tooltip and hover
 

@@ -1,3 +1,4 @@
+import { ROW_CONTEXT_KEY } from '$lib/phases/context/rowContextKey';
 import { SERIES_ID_KEY, SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
@@ -8,8 +9,7 @@ import type { Series } from '$lib/types/plots/data/common';
 import type { AxisChannelName } from '$lib/types/layout/mapping';
 import type { ProcessedData, ProcessedRow } from '$lib/types/phases';
 
-/** Where a row's context is kept on it: under a symbol, which survives the copies svelteplot makes of a row. */
-const KEY = Symbol('dct-row-context');
+const KEY = ROW_CONTEXT_KEY;
 
 /** What the shared context is worked out from. */
 type ContextSource = {

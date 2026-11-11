@@ -1,6 +1,7 @@
 import type { BasePlotProps, PlotCoreProps } from '$lib/types/plots/props';
 import type { GeoScalesConfig, CoordinatesConfig } from '$lib/types/layout/coordinates';
-import type { GeoFeature, GeoDataProps } from '$lib/types/plots/data/geo';
+import type { GeoFeature, GeoDataProps, GeoSliceContext } from '$lib/types/plots/data/geo';
+import type { PlotRowContext } from '$lib/types/layout/context';
 import type { GeoStylesConfig } from '$lib/types/layout/styles';
 import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
@@ -24,13 +25,17 @@ export type GeoPlotProps<TProps extends Record<string, unknown>> = OmitEach<
 		GeoSegmentStyle,
 		GeoMarkersConfig,
 		GeoScalesConfig,
-		CoordinatesConfig
+		CoordinatesConfig,
+		GeoTooltipContext
 	>,
 	'timeline' | 'facet'
 > & {
 	timeline?: TimelineConfig<Record<string, unknown>>;
 	facet?: FacetConfig<Record<string, unknown>>;
 };
+
+/** What a tooltip's `format` knows of a hovered feature: the shared row context, and the slice it was drawn in. */
+export type GeoTooltipContext = PlotRowContext & GeoSliceContext;
 
 /** What `GeoPlot`'s core draws from. */
 export type GeoPlotCoreProps<TProps extends Record<string, unknown>> = PlotCoreProps<
@@ -41,4 +46,7 @@ export type GeoPlotCoreProps<TProps extends Record<string, unknown>> = PlotCoreP
 	GeoMarkersConfig,
 	GeoScalesConfig,
 	CoordinatesConfig
->;
+> & {
+	/** The slice of the `timeline` and `facet` this core draws - what its callbacks read its features in. */
+	sliceContext?: GeoSliceContext;
+};

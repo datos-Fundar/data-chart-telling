@@ -1,5 +1,5 @@
 import type { Accessor } from '$lib/types/plots/data/common';
-import type { GeoFeature } from '$lib/types/plots/data/geo';
+import type { GeoFeature, GeoSliceContext } from '$lib/types/plots/data/geo';
 import type { ColorScaleConfig } from '$lib/types/layout/scales';
 import type { GeoScalesConfig } from '$lib/types/layout/coordinates';
 import type { SegmentsConfig, MarginConfig, HoverConfig } from '$lib/types/plots/props';
@@ -50,6 +50,8 @@ export type GeoPlotState<TProps extends Record<string, unknown>> = {
 	) => boolean;
 	segments: SegmentsConfig<GeoSegmentStyle>;
 	scales: GeoScalesConfig;
+	/** The slice of the `timeline` and `facet` this core draws, kept on each of its features for a tooltip's `format` to read. */
+	slice?: GeoSliceContext;
 	/** The plot's `tooltip`, which the "hover" phase reads. */
 	tooltip?: TooltipProp<TaggedGeoFeature<TProps>>;
 	/** The raw `markers` prop - GeoPlot interleaves it with the base map by draw order, not a plain append. */

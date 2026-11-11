@@ -1,17 +1,19 @@
 import { resolveAccessor } from '$lib/utils/accessors';
 import { GeoGeometry } from '$lib/plots/map/geo/GeoGeometry';
 import { GeoFeatures } from '$lib/plots/map/geo/GeoFeatures.svelte';
+import { ROW_CONTEXT_KEY } from '$lib/phases/context/rowContextKey';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
 import type { GeoPlotState, TaggedGeoFeature } from '$lib/types/plots/map/geo/state';
 
 /**
  * GeoPlot's "data" phase: every feature tagged with its resolved id/centroid,
- * then reduced by `excludeParts`. Reads no env.
+ * then reduced by `excludeParts`. Each carries the slice it is drawn in as its
+ * row context. Reads no env.
  */
 export function buildData<TProps extends Record<string, unknown>>(
 	state: GeoPlotState<TProps>
 ): GeoPlotState<TProps> {
-	const { rawFeatures, featureId, excludeParts } = state;
+	const { rawFeatures, featureId, excludeParts, slice = {} } = state;
 	const getFeatureId = featureId
 		? resolveAccessor<GeoFeature<TProps>>(featureId)
 		: GeoFeatures.defaultId<TProps>;
@@ -30,5 +32,9 @@ export function buildData<TProps extends Record<string, unknown>>(
 				return [{ ...f, geometry, __cx: cx, __cy: cy } as TaggedGeoFeature<TProps>];
 			});
 
+	// Kept as the row's context, which a copy of the feature carries along: a tooltip's `format` reads it back.
+	for (const f of new Set([...allFeatures, ...features])) {
+		(f as unknown as Record<symbol, unknown>)[ROW_CONTEXT_KEY] = slice;
+	}
 	return { ...state, allFeatures, features };
 }

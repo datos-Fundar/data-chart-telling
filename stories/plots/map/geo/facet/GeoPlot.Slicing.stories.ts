@@ -4,8 +4,8 @@ import GeoTimelineDemo from './GeoTimelineDemo.svelte';
 import GeoTimelineDemoSource from './GeoTimelineDemo.svelte?raw';
 import { demoSource } from '../../../../common/docsSource';
 import { WORLD_COUNTRIES } from '$datasets/world-countries';
-import type { GeoFeature } from '$lib/types/plots/data/geo';
-import { gdpPerPerson } from '../channels';
+import type { GeoFeature, GeoSliceContext } from '$lib/types/plots/data/geo';
+import { countryPopulation, gdpPerPerson } from '../channels';
 
 const NORTH = new Set(['Europe', 'North America', 'Asia']);
 
@@ -56,6 +56,60 @@ export const FacetByHemisphere: Story = {
 		scales: { color: { scheme: 'blues' } },
 		coordinates: { projection: { type: 'equal-earth', domain: 'data' } },
 		facet: { by: 'hemisphere', columns: 2 }
+	}
+};
+
+/**
+ * One layer of features for every panel: the countries carry no field to split by, `facet.values` names the
+ * panels, and `color` reads each country in the panel it is drawn in - here a different scenario per panel.
+ * The ramp spans every panel, so colors compare across them.
+ */
+export const FacetValuesOneLayer: Story = {
+	args: {
+		data: WORLD_COUNTRIES.filter((f) => f.properties!.continent !== 'Antarctica') as GeoFeature[],
+		title: 'GDP per person, two scenarios',
+		color: (f: GeoFeature, { facet }: GeoSliceContext) =>
+			(gdpPerPerson(f) ?? 0) * (facet?.value === 'Optimistic' ? 1.5 : 1),
+		scales: { color: { scheme: 'blues' } },
+		coordinates: { projection: { type: 'equal-earth' } },
+		facet: { by: 'scenario', values: ['Baseline', 'Optimistic'], columns: 2 },
+		tooltip: {
+			sync: true,
+			format: (f: GeoFeature, _number: unknown, { facet }: GeoSliceContext) =>
+				`${(f.properties as { name: string }).name} · ${facet?.value}`
+		}
+	}
+};
+
+/**
+ * Two variables on the same countries, each with its own ramp. The countries carry no field to split by: the
+ * panels are named by `facet.values`, and `color` reads a different variable in each. `scales: 'free'` fits
+ * each panel's own domain, and a `grouping` by panel with a `segments` entry per panel gives each its own
+ * scheme - one ramp shared by two units would mean nothing.
+ */
+export const FacetValuesOwnRamps: Story = {
+	args: {
+		data: WORLD_COUNTRIES.filter((f) => f.properties!.continent !== 'Antarctica') as GeoFeature[],
+		title: 'GDP per person and population',
+		color: (f: GeoFeature, { facet }: GeoSliceContext) =>
+			facet?.value === 'Population' ? countryPopulation(f) : gdpPerPerson(f),
+		grouping: (_f: GeoFeature, { facet }: GeoSliceContext) => facet?.value,
+		segments: {
+			'GDP per person': [{ scales: { color: { scheme: 'blues' } } }],
+			Population: [{ scales: { color: { scheme: 'oranges' } } }]
+		},
+		coordinates: { projection: { type: 'equal-earth' } },
+		facet: {
+			by: 'variable',
+			values: ['GDP per person', 'Population'],
+			columns: 2,
+			scales: 'free'
+		},
+		tooltip: {
+			sync: true,
+			format: (f: GeoFeature, _number: unknown, { facet }: GeoSliceContext) =>
+				`${(f.properties as { name: string }).name} · ${facet?.value}`
+		}
 	}
 };
 

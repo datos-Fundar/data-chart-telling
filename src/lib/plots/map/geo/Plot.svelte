@@ -3,7 +3,8 @@
 	import AbstractPlot from '$lib/layout/plot/AbstractPlot.svelte';
 	import { merge } from '$lib/utils/merge';
 	import { buildGeoDefaults } from '$lib/plots/map/geo/defaults';
-	import { buildGeoSlicing } from '$lib/plots/map/geo/slices';
+	import { buildGeoSlicing, GeoSlices } from '$lib/plots/map/geo/slices';
+	import { Slice } from '$lib/layout/plot/Slice';
 	import { GeoFeatures } from '$lib/plots/map/geo/GeoFeatures.svelte';
 	import type { GeoPlotProps, GeoPlotCoreProps } from '$lib/types/plots/map/geo/props';
 	import type { GeoFeature } from '$lib/types/plots/data/geo';
@@ -19,9 +20,11 @@
 	 * Optional chrome (`title`, `subtitle`, `caption`, `header`, `footer`,
 	 * `legend`) frames it. `timeline` and `facet` slice its features and its
 	 * markers' own rows by a field (a feature's from its `properties`); what
-	 * lacks the field draws in every slice, and the color ramp spans every
-	 * slice. With `coordinates.projection.domain: 'data'`, each facet zooms to
-	 * its own features.
+	 * lacks the field draws in every slice, the color ramp spans every
+	 * slice, and the panels may come from `facet.values` alone (or `rowValues`, `colValues`,
+	 * `timeline.values`), one layer of features serving them all. The callbacks that read a
+	 * feature get the slice as their last argument (`GeoSliceContext`). With
+	 * `coordinates.projection.domain: 'data'`, each facet zooms to its own features.
 	 */
 	let {
 		title,
@@ -54,13 +57,29 @@
 		buildGeoSlicing({ rows: [...features, ...markerRows], timeline, facet })
 	);
 
-	/** The color ramp's domain over every feature, so each slice colors on the same scale. */
+	/**
+	 * The color ramp's domain over every feature as each slice reads it - a facet panel, a timeline step, each
+	 * with its own context - so every slice colors on the same scale. Not under `scales: 'free'` (the
+	 * facet's, or the timeline's when there is no facet): each slice then fits its own.
+	 */
 	const sharedColor = $derived.by((): GeoScalesConfig | undefined => {
 		const value = core.color;
 		if (!value) return undefined;
-		const values = (resolved.features as GeoFeature<TProps>[])
-			.map((f) => value(f))
-			.filter((v): v is number => typeof v === 'number' && Number.isFinite(v));
+		if ((facet ? facet.scales : timeline?.scales) === 'free') return undefined;
+		const all = resolved.features as GeoFeature<TProps>[];
+		const whole = new Slice({
+			rows: features,
+			timeline: slicing.timeline,
+			facet: slicing.facet,
+			filterMode: undefined
+		});
+		const reads = slicing.slices.length
+			? slicing.slices.flatMap(({ place, context }) => {
+					const keep = whole.keep(place) as unknown as (f: GeoFeature<TProps>) => boolean;
+					return all.filter(keep).map((f) => value(f, context));
+				})
+			: all.map((f) => value(f, {}));
+		const values = reads.filter((v): v is number => typeof v === 'number' && Number.isFinite(v));
 		return values.length
 			? { color: { domain: [Math.min(...values), Math.max(...values)] } }
 			: undefined;
@@ -69,8 +88,16 @@
 	/** The core's props for one slice: the features and marker rows it keeps. */
 	function sliceProps(slice: PlotCellContext<Row>): GeoPlotCoreProps<TProps> {
 		const tip = slice.tooltip as TooltipConfig<GeoFeature<TProps>> | undefined;
+		const sliceContext = GeoSlices.contextOf(slice);
 		if (!sliced)
-			return { ...core, width: slice.width, height: slice.height, margins, tooltip: tip };
+			return {
+				...core,
+				width: slice.width,
+				height: slice.height,
+				margins,
+				tooltip: tip,
+				sliceContext
+			};
 		return {
 			...core,
 			data: features.filter(slice.keep) as unknown as GeoFeature<TProps>[],
@@ -82,7 +109,8 @@
 			height: slice.height,
 			margins: slice.margins ?? margins,
 			scales: merge(sharedColor, core.scales),
-			tooltip: tip
+			tooltip: tip,
+			sliceContext
 		} as GeoPlotCoreProps<TProps>;
 	}
 </script>
