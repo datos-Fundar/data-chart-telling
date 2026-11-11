@@ -125,15 +125,17 @@ describe('Plot - a series keeps its color in every facet panel', () => {
 });
 
 describe('Plot - data runs with a timeline', () => {
-	test('one run over every row for the frame, then one per step, not one per panel', async () => {
+	test('the frame runs once over every row and once per step, for the domains the steps share; the step shown runs once, not once per panel', async () => {
 		let runs = 0;
 		const onDataRun = () => runs++;
 		const view = await render(TimelineRunProbe, { progress: 0, onDataRun });
 		await settled(view.container, 3);
-		expect(runs).toBe(2);
+		// The frame, the three steps' own, and the step shown.
+		expect(runs).toBe(1 + 3 + 1);
 		await view.rerender({ progress: 1, onDataRun });
 		await settled(view.container, 3);
-		expect(runs).toBe(3);
+		// A moving step runs only the step it lands on: the frame is not redone.
+		expect(runs).toBe(1 + 3 + 2);
 		view.unmount();
 	});
 });

@@ -18,6 +18,10 @@
 	import { merge } from '$lib/utils/merge';
 	import { Pipeline } from '$lib/phases/Pipeline';
 	import { Slice } from '$lib/layout/plot/Slice';
+	import { SharedStepScales } from '$lib/phases/sharedScales/SharedStepScales';
+	import { TimelineTime } from '$lib/layout/timeline/TimelineTime';
+	import { TimelineSteps } from '$lib/layout/timeline/TimelineSteps';
+	import { resolveAccessor } from '$lib/utils/accessors';
 	import { FacetScope } from '$lib/layout/facet/scope';
 	import type { TooltipProp } from '$lib/types/layout/tooltip';
 	import type { MarginConfig, PlotChromeConfig } from '$lib/types/plots/props';
@@ -130,12 +134,40 @@
 		return (r: TRow[], f: FacetConfig<TRow> | undefined, legend: LegendState | null) =>
 			run.runData(core ?? {}, r, f as never, legend, cfg);
 	});
-	// Kept while its inputs are the same objects: a timeline step re-reads them without changing them.
+	/**
+	 * The frame: the run over every row. With a timeline that shows each step's own rows, the domains it
+	 * shares are the widest any step reaches - a step's rows stack, aggregate or bin among themselves, so the
+	 * extent over every row at once would be wider than any step's.
+	 */
+	function runFrame(): DataRunState | undefined {
+		if (!dataRun || !rows) return undefined;
+		const whole = dataRun(rows, facet, null);
+		if (!timeline) return whole;
+		const reader = new TimelineTime(timeline.dateFormat);
+		const get = resolveAccessor<TRow>(timeline.accessor as never) as (row: TRow) => unknown;
+		const named = timeline.values?.map((v) => reader.toTime(v)).filter((t) => t !== undefined);
+		const steps = TimelineSteps.of(named, rows, (row) => reader.toTime(get(row)) ?? NaN);
+		const perStep = steps.values
+			.filter((step) => !Number.isNaN(step))
+			.map((step) => dataRun(rows.filter(slicing.keep({ time: step })), facet, null).sharedScales);
+		const bands = (whole as { axes?: { bands?: string[] } }).axes?.bands ?? [];
+		return { ...whole, sharedScales: SharedStepScales.over(whole.sharedScales, bands, perStep) };
+	}
+	// Kept while its inputs are the same objects: a timeline step re-reads them without changing them. The
+	// timeline counts by what sets its steps, not by its object, which a moving `progress` makes anew.
 	let frame: { inputs: unknown[]; state: DataRunState | undefined } | undefined;
 	const frameState = $derived.by(() => {
-		const inputs = [dataRun, facet, rows];
+		const inputs = [
+			dataRun,
+			facet,
+			rows,
+			timeline?.accessor,
+			timeline?.dateFormat,
+			timeline?.values,
+			slicing.filterMode
+		];
 		if (frame?.inputs.every((input, i) => input === inputs[i])) return frame.state;
-		const state = dataRun && rows ? dataRun(rows, facet, null) : undefined;
+		const state = runFrame();
 		frame = { inputs, state };
 		return state;
 	});
