@@ -153,6 +153,16 @@
 					};
 	});
 
+	// What a range set from code (`LegendState.setRange`) takes from this section.
+	$effect(() => {
+		if (!isInteractive) return;
+		interaction.narrowing = {
+			mode: section.interactive?.mode ?? 'filter',
+			disabledStyle: section.interactive?.disabledStyle ?? { opacity: cfg.legend.disabledOpacity },
+			domain: [section.min, section.max]
+		};
+	});
+
 	// Mirrors an externally-set `interaction.range` into lo/hi.
 	$effect(() => {
 		if (!isInteractive) return;

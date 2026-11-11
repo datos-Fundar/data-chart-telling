@@ -656,3 +656,62 @@ describe('LegendState - decorative markers', () => {
 		expect(dot).toMatchObject({ type: 'series', mark: 'dot' });
 	});
 });
+
+describe('LegendState - narrowing the range from code', () => {
+	const style = {
+		mode: 'rescale' as const,
+		disabledStyle: { opacity: 0.2 },
+		domain: [0, 100] as [number, number]
+	};
+
+	test('sets the range with the mode and look of the interactive section', () => {
+		const legend = new LegendState();
+		legend.narrowing = style;
+		legend.setRange([20, 60]);
+		expect(legend.range).toEqual({
+			min: 20,
+			max: 60,
+			mode: 'rescale',
+			disabledStyle: { opacity: 0.2 }
+		});
+	});
+
+	test('without a section it filters, dimming by the configured opacity', () => {
+		const legend = new LegendState();
+		legend.setRange([20, 60]);
+		expect(legend.range).toMatchObject({ min: 20, max: 60, mode: 'filter' });
+		expect(typeof legend.range?.disabledStyle.opacity).toBe('number');
+	});
+
+	test('a mode given wins over the section', () => {
+		const legend = new LegendState();
+		legend.narrowing = style;
+		legend.setRange([20, 60], 'filter');
+		expect(legend.range?.mode).toBe('filter');
+	});
+
+	test('bounds given the wrong way round still read low to high', () => {
+		const legend = new LegendState();
+		legend.setRange([60, 20]);
+		expect(legend.range).toMatchObject({ min: 20, max: 60 });
+	});
+
+	test('null, or the whole ramp, is no narrowing', () => {
+		const legend = new LegendState();
+		legend.narrowing = style;
+		legend.setRange([20, 60]);
+		legend.setRange(null);
+		expect(legend.range).toBeNull();
+		legend.setRange([20, 60]);
+		legend.setRange([-10, 150]);
+		expect(legend.range).toBeNull();
+	});
+
+	test('bounds that are not numbers leave the range as it was', () => {
+		const legend = new LegendState();
+		legend.setRange([20, 60]);
+		legend.setRange([Number.NaN, 80]);
+		legend.setRange([10, Number.POSITIVE_INFINITY]);
+		expect(legend.range).toMatchObject({ min: 20, max: 60 });
+	});
+});

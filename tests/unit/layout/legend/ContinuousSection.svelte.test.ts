@@ -351,3 +351,38 @@ describe('ContinuousSection - labels that would touch', () => {
 		expect(label.getBoundingClientRect().right).toBeLessThanOrEqual(legend.right + 0.5);
 	});
 });
+
+describe('ContinuousSection - a range set through setRange', () => {
+	test('moves the handles like a drag, with the mode of the section, and null resets them', async () => {
+		const section: ContinuousLegendSection = {
+			type: 'continuous',
+			min: 0,
+			max: 100,
+			width: 200,
+			interactive: { enabled: true, mode: 'rescale' }
+		};
+		let interaction: LegendState | undefined;
+		const { container } = await render(ExternalSyncHarness, {
+			section,
+			onReady: (store) => {
+				interaction = store;
+			}
+		});
+		if (!interaction) throw new Error('interaction store not provided');
+		await valueOf(container, 'Lower bound');
+
+		interaction.setRange([20, 60]);
+		await vi.waitFor(async () => {
+			expect(await valueOf(container, 'Lower bound')).toBe(20);
+			expect(await valueOf(container, 'Upper bound')).toBe(60);
+		});
+		// The section's own mode, learnt from it, not the default `filter`.
+		expect(interaction.range?.mode).toBe('rescale');
+
+		interaction.setRange(null);
+		await vi.waitFor(async () => {
+			expect(await valueOf(container, 'Lower bound')).toBe(0);
+			expect(await valueOf(container, 'Upper bound')).toBe(100);
+		});
+	});
+});

@@ -99,6 +99,14 @@ export class PublicLegend {
 		return this.#state.range;
 	}
 
+	/**
+	 * Narrows the continuous section to `[min, max]` as dragging its handles would, or resets it with `null`:
+	 * its plots filter or rescale to it. `mode` is the section's own unless given.
+	 */
+	setRange(range: [number, number] | null, mode?: LegendRange['mode']): void {
+		this.#state.setRange(range, mode);
+	}
+
 	/** The series that are turned off. */
 	get off(): string[] {
 		return [...this.#state.disabled.keys()];
