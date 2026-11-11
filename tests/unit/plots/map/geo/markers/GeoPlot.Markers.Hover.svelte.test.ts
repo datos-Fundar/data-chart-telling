@@ -1,9 +1,10 @@
 import { render } from 'vitest-browser-svelte';
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, vi } from 'vitest';
 import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
 import type { GeoMarkersConfig } from '$lib/types/markers/geo';
 import type { GeoFeature } from '$lib/types/plots/data/geo';
 import { ARGENTINA_PROVINCES } from '$datasets/argentina-provinces';
+import ScalesProbe from '../../../../layout/hover/ScalesProbe.svelte';
 import { waitForSvg, countGeoPaths } from '../../../_helpers/svg';
 
 const DATA_PROPS = {
@@ -49,5 +50,45 @@ describe('GeoPlot - hover marker (static baseline)', () => {
 		const { container } = render(GeoPlot, { width: 400, height: 300, ...DATA_PROPS, markers: [] });
 		const svg = await waitForSvg(container);
 		expect(svg).toBeTruthy();
+	});
+});
+
+describe('GeoPlot - hover marker draws on the projection it has', () => {
+	test('a province entering and leaving hover adds and removes one path and never works the scales out again', async () => {
+		const seen: unknown[] = [];
+		const onScales = (scales: unknown) => {
+			if (!seen.includes(scales)) seen.push(scales);
+		};
+		const { container } = render(GeoPlot, {
+			width: 400,
+			height: 300,
+			...DATA_PROPS,
+			markers: [
+				{ type: 'geo-hover' },
+				{ type: 'geo-component', component: ScalesProbe, props: { onScales } }
+			] satisfies GeoMarkersConfig[]
+		});
+		const svg = await waitForSvg(container);
+		const total = ARGENTINA_PROVINCES.length;
+		await vi.waitFor(() => expect(countGeoPaths(svg)).toBe(total));
+		await new Promise((resolve) => setTimeout(resolve, 200));
+		const settled = seen.length;
+
+		const target = svg.querySelectorAll('path')[3] as SVGPathElement;
+		const box = target.getBoundingClientRect();
+		const init = {
+			bubbles: true,
+			clientX: box.left + box.width / 2,
+			clientY: box.top + box.height / 2
+		};
+		target.dispatchEvent(new PointerEvent('pointerenter', init));
+		target.dispatchEvent(new PointerEvent('pointermove', init));
+		await vi.waitFor(() => expect(countGeoPaths(svg)).toBe(total + 1));
+
+		svg.dispatchEvent(new PointerEvent('pointerleave'));
+		target.dispatchEvent(new PointerEvent('pointerleave'));
+		await vi.waitFor(() => expect(countGeoPaths(svg)).toBe(total));
+
+		expect(seen.length - settled).toBe(0);
 	});
 });

@@ -4,6 +4,8 @@ import type { Component } from 'svelte';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import TreemapPlot from '$lib/plots/part-of-a-whole/treemap/Plot.svelte';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
+import { ARGENTINA_PROVINCES } from '$datasets/argentina-provinces';
 import { waitForSvg } from '../unit/plots/_helpers/svg';
 
 /**
@@ -35,6 +37,8 @@ const BRANCHES = Array.from({ length: 52 }, (_, i) => ({
 const CELLS = Array.from({ length: 20 }, (_, x) =>
 	Array.from({ length: 12 }, (_, y) => ({ x: `C${x}`, y: `R${y}`, value: (x * 7 + y * 3) % 20 }))
 ).flat();
+
+const PROVINCE = (f: { properties: unknown }) => (f.properties as { nombre: string }).nombre;
 
 const CASES: { name: string; component: Component<never>; props: Record<string, unknown> }[] = [
 	{
@@ -83,6 +87,16 @@ const CASES: { name: string; component: Component<never>; props: Record<string, 
 			color: 'value',
 			tooltip: true,
 			markers: [{ type: 'hover', active: { stroke: 'black' }, others: { fillOpacity: 0.4 } }]
+		}
+	},
+	{
+		name: "a map's provinces, one hovered at a time",
+		component: GeoPlot as Component<never>,
+		props: {
+			data: ARGENTINA_PROVINCES,
+			featureId: PROVINCE,
+			tooltip: { format: PROVINCE },
+			markers: [{ type: 'geo-hover' }]
 		}
 	}
 ];
