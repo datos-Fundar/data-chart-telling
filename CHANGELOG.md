@@ -6,32 +6,34 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
-- A marker's `label` can be a list of labels, each written over its shapes on its own: `label: [{ text: 'value', anchor: 'top' }, { text: 'name', anchor: 'bottom' }]`. A label takes a `layout`, how it is laid out on its shape; `'box'`, the box each row's shape spans, is the one a `rect`, `cell`, `bar` or `waffle` takes.
-- A `line`, `area`, `trail` or `dot` marker takes a `label` too, written beside a point (`layout: 'point'`): `select` picks the rows labelled of each `grouping` (`'first'`, `'last'`, `'min'`, `'max'`, a list of them or a function of the row), and `declutter` spreads them apart - together with the point labels of every other marker of the plot: `{ type: 'line', grouping: 'country', label: { text: 'country', select: 'last', declutter: true } }`. A `rect`, `cell`, `bar` or `waffle` label takes `layout: 'point'` as well, starting at its `anchor` on each shape's box: an edge's middle or a corner.
-- A `rect`, `cell`, `bar` or `waffle` label takes `layout: 'path'`: written along an edge of each shape - `edge` (`'top'`, `'bottom'`, `'left'`, `'right'`, and on a `bar` or `waffle` `'tip'`, the end its value runs to, or `'base'`, read per row so a bar below zero has its tip at its bottom), beyond it, inside it or on it (`side: 'outside' | 'inside' | 'on'`), at an `offset` along it (`'start'`, `'middle'`, `'end'` or a percentage) and `gap` from it: `label: { layout: 'path', text: 'value', edge: 'tip' }`. A `text` marker's `lineAnchor` can be a function of the row, as its `textAnchor`.
-- A `line`, `trail`, `area` or `dot` label takes `layout: 'path'` too, curving with its shape: along each line (one per `grouping`, its text from the line's first row), an area's top or bottom `edge`, or each dot's rim - `side` (`'above' | 'below' | 'on'` on a line or an area, `'outside' | 'inside' | 'on'` on a dot), `offset` along it and `gap` from it: `label: { layout: 'path', text: 'country', offset: '80%' }`.
-- `styles.values` takes a `layout` and its options, as a marker's `label` does, so a plot's value labels can be laid out another way: `styles: { values: { layout: 'path' } }` writes each series' name along its line on a `LinePlot`, around each dot on a `ScatterPlot` or the Cleveland family; `{ layout: 'point', select: 'max' }` labels only the longest bar of a `BarPlot`. Each plot kind takes the layouts its shapes write, with defaults of its own for each, and its `styles.values` type takes only those. A `'point'` label - a marker's or a plot's - takes a `side`: `'after'`, `'before'`, `'above'`, `'below'` or `'on'` its point.
-- A `'point'` label written on its own point - a value on its dot, `side: 'on'` - is left out where a shape drawn after its own covers it, so of dots drawn over one another only the top one's label shows. A `text` marker takes the same with `covers`, the shape each row's point sits in.
-- `offset: 'max' | 'min'` puts a `'path'` label on a line or an area at each one's peak or trough: `styles: { values: { layout: 'path', offset: 'max' } }` names each of two overlapping density curves over its own peak. Along a straight-segmented line, the text follows a smooth curve through its points, its letters no longer spreading apart at the corners. A label centred near an end of its line is moved in to be written whole, where it was cut short.
-- A _Value labels_ docs page, and _Layout/Values_ stories going through the layouts and their options.
-- Setting any option of `styles.values` turns the labels on: `show: true` is only needed alone; `show: false` still turns them off.
-- `declutter: 'around'` on a `text` marker or a point label: each label goes on a free spot around its point - its own side first, then on clockwise - clear of the other labels and points and inside the plot's area; a label with no free spot is left out. `declutter: 'lanes'` (what `true` is) spreads them into lanes, as before; `{ mode: 'around' }` sets it in an options object.
-- A `Plot` of no kind, that draws only its `markers`, with every option a plot takes (`segments`, `styles`, `transforms`, chrome...): `<Plot markers={[{ type: 'density', data, x: 'gdp', y: 'life' }]} />`. Its `data`, `series` and channels are optional; markers without their own take them.
-- Markers take the plot's channels they leave unset, as far as their kind does: `x`/`y` on each axis they set no position for (`x`, `x1` or `x2`...), and `opacity`, `symbol`, `r` and `length`, with the plot's scales for those.
-- An `area`, `bar`, `bollinger`, `box`, `regression`, `tick`, `violin` or `waffle` marker runs the way its own channels do when the plot sets no position: a band (`x1`/`x2`) runs across its axis, two channels as a plot's would, a single one is the measured value. `isHorizontal` sets it, and is optional on a `bar` marker.
+- **Value labels, laid out three ways.** Every plot's `styles.values`, and every marker's `label`, takes a `layout`:
+  - `'point'` - beside a point: a line's last value, a scatter's dots, a corner of a bar. `side` (`'after'`, `'before'`, `'above'`, `'below'`, `'on'`) and `gap` place it.
+  - `'path'` - along an edge or a stroke: past a bar's tip (its sign followed per bar), along a line or an area's edge, around a dot's rim. `edge`, `side` and `offset` place it, `offset: 'max'` putting it at each curve's peak.
+  - `'box'` - inside each shape, fitted to it: a heatmap's cells, a stacked bar's segments.
+
+  Each plot kind keeps its own default and takes only the layouts its shapes can write, checked by its types: `<LinePlot styles={{ values: { layout: 'path' } }} />` writes each series' name along its line. See the new [Value labels](docs/value-labels.md) page and the _Layout/Values_ stories.
+
+- **Labels that stay readable.** On a scatter, labels move clockwise around their dot to the first free spot, and are left out where there is none (`declutter: 'around'`, also on a marker's label or a `text` marker). A value written on its own dot is hidden where a later dot covers it.
+- **Several values per row.** `styles.values.parts` picks which values a row writes, typed per plot: a box's or violin's `'min'`, `'p25'`, `'median'`, `'p75'`, `'max'` and `'outliers'`, a bullet's `'target'` and `'ranges'`, a forest's `'lower'` and `'upper'` - as a list, or a record with options for each (`parts: { median: true, max: { format } }`). A label's `format` gets the part in `context.part`.
+- **Value labels on `BoxPlot`, `ViolinPlot` and `DensityPlot`.** A box writes its whisker ends and median, a violin its median, a density each curve's name at its peak.
+- **More on value labels:** a marker's `label` can be a list; any option of `styles.values` turns the labels on, without `show: true`; `select` and `series` now also pick the labelled rows of bar, histogram, heatmap and scatter plots.
+- **A generic `Plot`** that draws only its `markers`, with every option a plot takes, for annotations and custom compositions: `<Plot markers={[{ type: 'density', data, x: 'gdp', y: 'life' }]} />`.
+- **Markers inherit from their plot** the position and channels they leave unset (`x`, `y`, `opacity`, `symbol`, `r`, `length`, with their scales), and run horizontally or vertically by their own channels when the plot has none.
 
 ### Changed
 
-- **Breaking:** `styles.values.fontStyle` no longer takes `dx`, `dy`, `textAnchor` or `lineAnchor`: the layout places the labels, and `gap` sets how far from their mark. `fontStyle: { textAnchor: 'middle', lineAnchor: 'middle', dx: 0 }` on a scatter is `side: 'on'`; `fontStyle: { dy: -12 }` past a bar's tip is `gap: 12`.
-- **Breaking:** `styles.values.anchor` and the `ValueAnchor` type are gone: a plot's labels take a `layout` and its options instead. On a line, area, slope or sparkline plot, `anchor: 'start'` is `side: 'after'` (the default), `'end'` is `side: 'before'`, `'outside'` is `side: 'above'` and `'middle'` is `side: 'on'`. On a bar, bullet, pyramid or histogram, `'outside'` is the default (`layout: 'path'` past each tip); `'tip'` and `'base'` are `{ layout: 'path', edge: 'tip' | 'base', side: 'inside' }`; `'middle'` and an edge or corner of the page are `{ layout: 'box', anchor }`.
-- **Breaking:** a shape's `label` loses `outside`: a label beyond an edge is a `'path'` one. `{ anchor: 'top', outside: true }` is `{ layout: 'path', edge: 'top' }`.
-- **Breaking:** the shared plot shell exported as `Plot` (to build plot kinds of your own) is `AbstractPlot`; `Plot` is the plot of no kind.
-- A `ScatterPlot`'s value labels go around their points (`declutter: 'around'`), leaving out those with no room, instead of overlapping; `styles.values.select` and `series` pick the points labelled.
+- **Breaking:** `styles.values.anchor` is replaced by `layout` and its options. On a line plot, `'start'` is now `side: 'after'` (the default), `'end'` is `side: 'before'`, `'outside'` is `side: 'above'`, `'middle'` is `side: 'on'`. On a bar plot, `'outside'` is the default, `'tip'` and `'base'` are `{ layout: 'path', edge: 'tip' | 'base', side: 'inside' }`, and `'middle'` or a page edge is `{ layout: 'box', anchor }`.
+- **Breaking:** `styles.values.fontStyle` only styles the text: `dx`, `dy`, `textAnchor` and `lineAnchor` are gone, the layout places it (`fontStyle: { dy: -12 }` is `gap: 12`).
+- **Breaking:** a shape label's `outside` is gone: `{ anchor: 'top', outside: true }` is `{ layout: 'path', edge: 'top' }`.
+- **Breaking:** the plot shell exported as `Plot` (to build your own plot kinds) is now `AbstractPlot`; `Plot` is the new generic plot.
+- A scatter's value labels sit above their dots by default, and no longer overlap.
 
 ### Fixed
 
-- `styles.values.color` reaches the labels of a bar, pyramid, histogram or scatter plot: `'series'` writes each in its series' color, and a CSS color all of them, where they were always in the axis color.
-- A side of a plot's margins that grows to fit its labels keeps the room its axis takes: an x axis' title no longer lands on its tick labels once value labels show.
+- `styles.values.color` now colors the labels of bar, pyramid, histogram and scatter plots.
+- A violin plot colored by its category draws each violin centered in its band, instead of side by side with empty slots.
+- The x axis title no longer lands on the tick labels when value labels grow the plot's margins.
+- A label along a line, near one of its ends, is no longer cut short.
 
 ## [1.18.0] - 2026-11-09
 

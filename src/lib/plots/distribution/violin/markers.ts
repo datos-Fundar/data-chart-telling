@@ -1,3 +1,7 @@
+import { ValueLabels } from '$lib/layout/styles/ValueLabels';
+import { BoxSummaries } from '$lib/plots/distribution/box/BoxSummaries';
+import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
+import type { BoxPlotState } from '$lib/types/plots/distribution/box/state';
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { ViolinProfiles } from '$lib/markers/violin/ViolinProfiles';
@@ -26,6 +30,18 @@ export function buildMarks<TData extends Record<string, unknown>>(
 	const styles = state.styles as ViolinPlotStylesConfig | undefined;
 	const { channels } = processed;
 	const groups = state.processedGroups ?? [];
+	// Series share a band side by side only where they meet in it: one series per category - grouped by the category
+	// itself - fills each band.
+	const categoryOf = ProcessedPositions.of(processed, PlotAxes.valueOf(state))[
+		PlotAxes.categoryOf(state)
+	];
+	const seriesIn = new Map<string, Set<unknown>>();
+	for (const row of processed.data) {
+		const key = String(categoryOf(row));
+		seriesIn.set(key, (seriesIn.get(key) ?? new Set()).add(row[SERIES_KEY]));
+	}
+	const shared = [...seriesIn.values()].some((series) => series.size > 1);
+	const slotOf = (index: number) => (shared ? { index, count: groups.length } : undefined);
 
 	let peak: number | undefined;
 	if (styles?.scale === 'shared') {
@@ -62,7 +78,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 				bandwidth: styles?.bandwidth,
 				trim: styles?.trim,
 				peak,
-				slot: { index, count: groups.length },
+				slot: slotOf(index),
 				styles: {
 					// An outline asked for without a color is the fill's.
 					...(seg.styles.strokeWidth !== undefined
@@ -89,7 +105,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 							x: channels.x as BoxMarkerConfig['x'],
 							y: channels.y as BoxMarkerConfig['y'],
 							thickness: boxWidth,
-							slot: { index, count: groups.length },
+							slot: slotOf(index),
 							bar: { fill: ink, fillOpacity: 1 },
 							rule: { stroke: ink, strokeWidth: 1.5 },
 							dot: { r: 0 },
@@ -98,5 +114,20 @@ export function buildMarks<TData extends Record<string, unknown>>(
 					)
 				);
 
-	return [...violins, ...boxes] as AxisBasedMarkersConfig[];
+	// The parts of each violin's box `styles.values` labels: its median by default, beside it, in its series' slot.
+	const slots = new Map(groups.map((group, index) => [group.series.name, index]));
+	const summaries = state as unknown as BoxPlotState<TData>;
+	const labels = state.valueLabels?.show
+		? state.valueLabels.partMarkers(
+				env,
+				BoxSummaries.of(summaries),
+				// Beside the narrow box inside each violin, the violin itself as wide as its values are dense.
+				ValueLabels.bandPoint(state, 'category', boxWidth ?? 0, (row) => {
+					const index = slots.get(String(row[SERIES_KEY]));
+					return index === undefined ? undefined : slotOf(index);
+				}),
+				{ seriesColor: (row) => state.colorForSeries!(String(row[SERIES_KEY])) }
+			)
+		: [];
+	return [...violins, ...boxes, ...labels] as AxisBasedMarkersConfig[];
 }

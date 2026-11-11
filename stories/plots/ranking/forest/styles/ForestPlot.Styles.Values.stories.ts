@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import ForestPlot from '$lib/plots/ranking/forest/Plot.svelte';
 import type { ConnectorBasedStylesConfig } from '$lib/types/layout/styles';
+import type { ForestValuePart } from '$lib/types/plots/ranking/forest/props';
 import { INFLATION_RANGES } from '$datasets';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
@@ -64,5 +65,13 @@ export const Upright: Story = {
 		x: 'period',
 		y: 'mean',
 		styles: { values: { show: true } } satisfies ConnectorBasedStylesConfig
+	}
+};
+
+/** The interval's ends are parts of their own: `lower` before it, `upper` after it, the estimate over its dot. */
+export const IntervalEnds: Story = {
+	args: {
+		...MEANS,
+		styles: { values: { parts: ['value', 'lower', 'upper'] as ForestValuePart[] } }
 	}
 };

@@ -19,10 +19,8 @@ function buildValueLabels<TData extends Record<string, unknown>>(
 ): MarkerLabelConfig[] {
 	const rows = new Set(state.labelled ?? []);
 	if (rows.size === 0) return [];
-	const { format } = labels;
 	const nameOf = (d: ProcessedRow) => String(d[SERIES_KEY]);
-	const valueOf = ValueLabels.valueOf(state);
-	const label = labels.label(env, (d) => format(Number(valueOf(d)), d, nameOf(d)), {
+	const label = labels.label(env, (d) => labels.text(d), {
 		fill: 'currentColor',
 		seriesColor: (d) => state.colorForSeries?.(nameOf(d)),
 		fontSize: 11,

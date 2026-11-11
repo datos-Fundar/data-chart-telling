@@ -14,7 +14,7 @@ Each plot kind places them its own way: past the tip of each bar, beside the las
 
 ## What a label says
 
-A label writes the value it labels, as `decimals`, `prefix`, `suffix` and `signDisplay` ask, over the configuration's `numbers` (see [Number format](theming.md#number-format)):
+A label writes the value it labels - its row context's `value` - as `decimals`, `prefix`, `suffix` and `signDisplay` ask, over the configuration's `numbers` (see [Number format](theming.md#number-format)):
 
 ```ts
 styles: { values: { decimals: 1, signDisplay: 'always', suffix: ' yrs' } }
@@ -25,6 +25,27 @@ styles: { values: { decimals: 1, signDisplay: 'always', suffix: ' yrs' } }
 ```ts
 format: (value, number, { series, row }) => `${row.country}: ${number(value)}`;
 ```
+
+## Which values of a row
+
+Most plots have one value per row. On a plot whose rows have several, each one is a **part** of the row's context, and `parts` picks the ones written:
+
+| Plot      | Parts                                                        | Default                    |
+| --------- | ------------------------------------------------------------ | -------------------------- |
+| Box       | `'min'`, `'p25'`, `'median'`, `'p75'`, `'max'`, `'outliers'` | `['min', 'median', 'max']` |
+| Violin    | the same                                                     | `['median']`               |
+| Bullet    | `'value'` (its bar), `'target'`, `'ranges'` (each bound)     | `['value']`                |
+| Forest    | `'value'` (its estimate), `'lower'`, `'upper'`               | `['value']`                |
+| Any other | `'value'`                                                    | `['value']`                |
+
+Each part is written beside its shape at its own value: a box's beside the box, an interval's ends past each end. A part holding several values - a box's `'outliers'`, a bullet's `'ranges'` - writes a label for each. `parts` is a list, or a record turning each on (`true`) or giving it options of its own - where it sits, its `format`:
+
+```ts
+styles: { values: { parts: ['median'] } }
+styles: { values: { parts: { median: true, max: { format: (v) => `max ${v}` } }, series: 'virginica' } }
+```
+
+Its type takes only the parts of the plot, and `format`'s `context.part` names the one written. A worked-out part - a quartile - is rounded to two decimals first.
 
 ## Which rows
 
@@ -57,6 +78,8 @@ A plot kind takes the layouts its shapes can write, and its `styles.values` type
 | Heatmap                                        | `'box'`                                                | `'path'`, `'point'`                                   |
 | Treemap                                        | `'box'`                                                |                                                       |
 | Scatter, Cleveland, dumbbell, lollipop, forest | `'point'` beside each dot                              | `'path'`: around each dot's rim                       |
+| Density                                        | `'point'` over each curve's peak, naming it            | `'path'`: each name along its curve, at its peak      |
+| Box, violin                                    | `'point'` beside each box, at each part's value        |                                                       |
 
 ## Beside a point: `'point'`
 

@@ -279,7 +279,7 @@ describe('LinePlot - styles.values', () => {
 	});
 
 	describe('select, series and color', () => {
-		const labelsOf = async (values: ValuesStyle<LineValueLabel>) => {
+		const labelsOf = async (values: ValuesStyle<LineValueLabel, 'value'>) => {
 			const { container } = await render(LinePlot, {
 				width: 600,
 				height: 300,
@@ -315,7 +315,7 @@ describe('LinePlot - styles.values', () => {
 		});
 
 		test('`color` writes the labels in one color, which `fontStyle.fill` overrides', async () => {
-			const fills = async (values: ValuesStyle<LineValueLabel>) => {
+			const fills = async (values: ValuesStyle<LineValueLabel, 'value'>) => {
 				const { container } = await render(LinePlot, {
 					width: 600,
 					height: 300,

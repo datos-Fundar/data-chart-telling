@@ -37,7 +37,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 	const countOf = (d: ProcessedRow) =>
 		countRead ? Number(countRead(d)) : Number(position[value](d)) - Number(bottomOf(d));
 	const labelFor = (name: string) =>
-		labels?.label(env, (d) => (countOf(d) > 0 ? labels.format(countOf(d), d, name) : ''), {
+		labels?.label(env, (d) => (countOf(d) > 0 ? labels.text(d) : ''), {
 			fill: 'currentColor',
 			labelled: state.labelled,
 			seriesColor: () => state.colorForSeries!(name)

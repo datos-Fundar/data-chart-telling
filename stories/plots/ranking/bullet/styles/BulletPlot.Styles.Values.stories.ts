@@ -49,3 +49,11 @@ export const Formatted: Story = {
 		} satisfies AxisBasedStylesConfig
 	}
 };
+
+/**
+ * A bullet's row has more than its value: `parts` writes its target too, beside the band, or the bounds of its
+ * ranges (`'ranges'`, one label for each).
+ */
+export const WithTheTarget: Story = {
+	args: { styles: { values: { parts: ['value', 'target'] } } }
+};

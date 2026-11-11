@@ -82,7 +82,7 @@ describe('BarPlot - styles.values', () => {
 	});
 
 	test('the layout moves the label on its bar: past its tip, in its middle, inside its tip', async () => {
-		async function firstLabelY(values: ValuesStyle<BarValueLabel>) {
+		async function firstLabelY(values: ValuesStyle<BarValueLabel, 'value'>) {
 			const { container } = await render(BarPlot, {
 				width: 400,
 				height: 300,

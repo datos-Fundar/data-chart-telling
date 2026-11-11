@@ -1,3 +1,4 @@
+import type { BoxPlotState } from '$lib/types/plots/distribution/box/state';
 import { buildMarks } from '$lib/plots/distribution/violin/markers';
 import { HoverDefaults } from '$lib/layout/hover/HoverDefaults';
 import { BoxSummaries } from '$lib/plots/distribution/box/BoxSummaries';
@@ -58,6 +59,18 @@ export function buildViolinDefaults<TData extends Record<string, unknown>>(): Ax
 		},
 		// Each value's box: its quartiles and whiskers, worked out once for its tooltip and hover to read.
 		context: (state) => BoxSummaries.context(state) as (row: never) => object | undefined,
+		styles: {
+			values: {
+				layout: 'point',
+				// A quartile is worked out, not read: at most two decimals, as the tooltip writes it.
+				format: (value, number) => number(Math.round(value * 100) / 100),
+				parts: {
+					placements: (state) =>
+						BoxSummaries.partPlacements(state as unknown as BoxPlotState<TData>),
+					default: ['median']
+				}
+			}
+		},
 		markers: { marks: buildMarks },
 		hover: {
 			// The hovered category's band behind its shape.

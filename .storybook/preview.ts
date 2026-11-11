@@ -399,7 +399,7 @@ const preview: Preview = {
 						'Tooltip',
 						['Basics', 'MultiSeries', 'Customization', 'FacetSync'],
 						'Values',
-						['Layouts', 'Point', 'Path', 'Box', 'Text']
+						['Layouts', 'Point', 'Path', 'Box', 'Parts', 'Text']
 					],
 					'Configuration',
 					'Composition',

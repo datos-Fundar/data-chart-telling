@@ -139,7 +139,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		},
 		hover: 'style',
 		// Each cell writes its own value, in the middle of it by default.
-		label: labels?.label<CellLabel>(env, (d) => labels.format(Number(getColor(d as TData)), d), {
+		label: labels?.label<CellLabel>(env, (d) => labels.text(d), {
 			fill: 'currentColor',
 			fontWeight: 600,
 			labelled: state.labelled

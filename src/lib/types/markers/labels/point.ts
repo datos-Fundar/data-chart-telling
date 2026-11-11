@@ -1,7 +1,7 @@
 import type { LabelBaseConfig } from '$lib/types/markers/labels/common';
 import type { ValueSelect } from '$lib/types/layout/styles';
 import type { LabelAnchor } from '$lib/types/plots/constants';
-import type { BoxSizer } from '$lib/types/markers/labels/box';
+import type { BoxScales, BoxSizer } from '$lib/types/markers/labels/box';
 
 /** A label written beside a point of its shape, spread apart from the others with `declutter`. */
 export type PointLabelConfig = LabelBaseConfig & {
@@ -26,7 +26,14 @@ export type PointSide = 'after' | 'before' | 'above' | 'below' | 'on';
 export type PointShape = 'row' | 'top' | 'box' | 'dot';
 
 /** Where a marker's rows are labelled; `size` is the shape around each point, when it has one, `round` a circle in it. */
-export type PointGeometryOf = { x: unknown; y: unknown; size?: BoxSizer; round?: boolean };
+export type PointGeometryOf = {
+	x: unknown;
+	y: unknown;
+	size?: BoxSizer;
+	round?: boolean;
+	/** How far each row's point sits off its `x`/`y`, in pixels: a series' own slot of its category's band. */
+	shift?: (row: unknown, scales: BoxScales) => { dx: number; dy: number } | undefined;
+};
 
 /** The shape a row's point sits in, in pixels around it: a box, or the circle in it. */
 export type CoveringShape = { width: number; height: number; round?: boolean };

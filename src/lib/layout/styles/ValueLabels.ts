@@ -9,7 +9,7 @@ import { NumberFormat } from '$lib/utils/NumberFormat';
 import { RowContext } from '$lib/phases/context/RowContext';
 import type { PlotRowContext } from '$lib/types/layout/context';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
-import type { ValuesFontStyle, ValuesStyle } from '$lib/types/layout/styles';
+import type { ValuePartOptions, ValuesFontStyle, ValuesStyle } from '$lib/types/layout/styles';
 import type { ValueLabelsOptions } from '$lib/types/phases/styles/phase';
 import type { Series } from '$lib/types/plots/data/common';
 import type { FontStyle, StrokeStyle } from '$lib/types/plots/styling';
@@ -18,8 +18,19 @@ import type { MarginSide } from '$lib/types/plots/props';
 import type { AxisPlotEnv, AxisPlotState, ProcessedData, ProcessedRow } from '$lib/types/phases';
 import type { TextMarkerConfig } from '$lib/types/markers/common';
 import type { LabelLayout, MarkerLabelConfig } from '$lib/types/markers/labels/common';
-import type { PointLabelConfig, PointSide } from '$lib/types/markers/labels/point';
+import type { PointGeometryOf, PointLabelConfig, PointSide } from '$lib/types/markers/labels/point';
+import type { BoxScales } from '$lib/types/markers/labels/box';
 import { PointLayout } from '$lib/markers/labels/layouts/PointLayout';
+
+/** One part of each row a plot labels, with where its label sits and how it writes it. */
+type ValuePart = {
+	name: string;
+	placement: Record<string, unknown>;
+	format: (value: number, row?: object, series?: string, part?: string) => string;
+};
+
+/** Where a part's value sits on the row a part label copies. */
+const PART_VALUE = Symbol('partValue');
 
 /** The options of `styles.values` that place a label in its layout. */
 const LAYOUT_KEYS = ['anchor', 'edge', 'side', 'offset', 'gap'] as const;
@@ -36,14 +47,18 @@ export class ValueLabels {
 	readonly layout: LabelLayout;
 	/** The options that place a label in its {@link layout}: the author's over the kind's own for it. */
 	readonly placement: Record<string, unknown>;
+	/** The parts of each row labelled - a simple plot's one `value`, a box's `median`... - each with its own options. */
+	readonly parts: ValuePart[];
+	/** The series whose rows are labelled, when `styles.values.series` names some; every series else. */
+	readonly series: string[] | undefined;
 	/** Whether the author gave the labels a text of their own, beyond the value. */
 	readonly formatted: boolean;
 	/**
 	 * A label's text for `value`: the author's `format`, else the kind's, else the value as the display fields ask.
 	 * `row` is the row it labels, whose context the format reads; `series` names its series where there is no row
-	 * (a label measured ahead of the rows).
+	 * (a label measured ahead of the rows); `part`, which of the row's values it writes.
 	 */
-	readonly format: (value: number, row?: object, series?: string) => string;
+	readonly format: (value: number, row?: object, series?: string, part?: string) => string;
 	readonly hoverIsolate: boolean;
 	readonly font: ValuesFontStyle | undefined;
 	readonly fontSize: number;
@@ -60,13 +75,16 @@ export class ValueLabels {
 	constructor(
 		values: ValuesStyle | undefined,
 		cfg: PlotStylesConfig,
-		options: Omit<ValueLabelsOptions<never>, 'reach' | 'layout' | 'layouts'> & {
+		options: Omit<
+			ValueLabelsOptions<never>,
+			'reach' | 'layout' | 'layouts' | 'parts' | 'formatFor'
+		> & {
 			layout?: LabelLayout;
 			layouts?: Partial<Record<LabelLayout, Record<string, unknown>>>;
+			parts?: { placements: Record<string, Record<string, unknown>>; default: string[] };
 		} = {},
 		reach?: (labels: ValueLabels) => EdgeBox[]
 	) {
-		this.show = ValueLabels.shows(values, options.show);
 		this.layout = values?.layout ?? options.layout ?? 'point';
 		const own = Object.fromEntries(
 			LAYOUT_KEYS.flatMap((key) => {
@@ -74,16 +92,39 @@ export class ValueLabels {
 				return value === undefined ? [] : [[key, value]];
 			})
 		);
-		this.placement = { ...options.layouts?.[this.layout], ...own };
-		this.formatted = values?.format !== undefined;
 		// The value as the display fields ask (else as it is), which a plot kind's own text builds on.
 		const number =
 			NumberFormat.maybe(NumberFormat.displayOf(values), cfg) ?? ((v: number) => `${v}`);
-		const write = values?.format ?? options.format;
-		this.format = write
-			? (v, row, series) => write(v, number, ValueLabels.contextOf(row, series))
-			: (v) => number(v);
+		const writer =
+			(write: ValuesStyle['format']): ValueLabels['format'] =>
+			(v, row, series, part) =>
+				write
+					? write(v, number, { ...ValueLabels.contextOf(row, series), ...(part ? { part } : {}) })
+					: number(v);
+		this.format = writer(values?.format ?? options.format);
+		this.parts = ValueLabels.#parts(values?.parts, options.parts).map(([name, own_]) => {
+			const { format, ...placement } = own_ as ValuePartOptions;
+			return {
+				name,
+				placement: {
+					...options.layouts?.[this.layout],
+					...options.parts?.placements[name],
+					...own,
+					...placement
+				},
+				format: format ? writer(format) : this.format
+			};
+		});
+		this.placement = this.#part('value')?.placement ?? {
+			...options.layouts?.[this.layout],
+			...own
+		};
+		this.formatted =
+			values?.format !== undefined ||
+			!!(values?.parts as Record<string, { format?: unknown }> | undefined)?.value?.format;
+		this.show = ValueLabels.shows(values, options.show) && this.parts.length > 0;
 		this.hoverIsolate = values?.hoverIsolate ?? false;
+		this.series = values?.series === undefined ? undefined : [values.series].flat();
 		this.font = values?.fontStyle;
 		this.fontSize = typeof this.font?.fontSize === 'number' ? this.font.fontSize : 12;
 		this.strokeStyle = values?.strokeStyle;
@@ -91,6 +132,28 @@ export class ValueLabels {
 		this.declutter = cfg.text.declutter;
 		this.#cfg = cfg;
 		this.reach = (this.show && reach?.(this)) || [];
+	}
+
+	/** Whether the part named `name` is labelled: a plot writing its `value` on its own shapes asks first. */
+	writes(name: string): boolean {
+		return this.#part(name) !== undefined;
+	}
+
+	/** The part named `name`, when it is labelled. */
+	#part(name: string): ValuePart | undefined {
+		return this.parts.find((part) => part.name === name);
+	}
+
+	/** The parts labelled, each with its own options: the author's list or record, else the kind's default ones. */
+	static #parts(
+		own: ValuesStyle['parts'],
+		kind: { default: string[] } | undefined
+	): [string, ValuePartOptions][] {
+		if (own === undefined) return (kind?.default ?? ['value']).map((name) => [name, {}]);
+		if (Array.isArray(own)) return own.map((name) => [name, {}]);
+		return Object.entries(own).flatMap(([name, option]): [string, ValuePartOptions][] =>
+			option ? [[name, option === true ? {} : option]] : []
+		);
 	}
 
 	/** Whether the labels draw: `show` as set, else when any other option of them is set, else the kind's default. */
@@ -108,6 +171,22 @@ export class ValueLabels {
 		return context.series === undefined && series !== undefined ? { ...context, series } : context;
 	}
 
+	/**
+	 * The value a label writes for `row`, read off its context: its `value`, or one `part` of it on a plot whose rows
+	 * have several. `undefined` when it is not a number.
+	 */
+	static valueIn(row: object | undefined, part = 'value'): number | undefined {
+		const value = (RowContext.of(row) as Record<string, unknown>)[part];
+		return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+	}
+
+	/** A label's text for `row`: its context's `part` (its `value` by default), as that part's format writes it. */
+	text(row: object, part = 'value'): string {
+		const value = ValueLabels.valueIn(row, part);
+		const format = this.#part(part)?.format ?? this.format;
+		return value === undefined ? '' : format(value, row, undefined, part);
+	}
+
 	/** A plot's value labels: `values` over `options`, the kind's own defaults, their reach read off `state`. */
 	static build<TState>(
 		values: ValuesStyle | undefined,
@@ -115,14 +194,20 @@ export class ValueLabels {
 		options: ValueLabelsOptions<TState>,
 		state: TState
 	): ValueLabels {
-		const { reach, layout, layouts } = options;
+		const { reach, layout, layouts, parts, formatFor } = options;
 		return new ValueLabels(
 			values,
 			cfg,
 			{
 				...options,
 				layout: typeof layout === 'function' ? layout(state) : layout,
-				layouts: typeof layouts === 'function' ? layouts(state) : layouts
+				format: options.format ?? formatFor?.(state),
+				layouts: typeof layouts === 'function' ? layouts(state) : layouts,
+				parts: parts && {
+					...parts,
+					placements:
+						typeof parts.placements === 'function' ? parts.placements(state) : parts.placements
+				}
 			},
 			reach && ((labels) => reach(labels, state))
 		);
@@ -332,6 +417,102 @@ export class ValueLabels {
 		];
 	}
 
+	/**
+	 * The labels of a plot whose rows have several values (a box's quartiles, a bullet's target): one `text` marker per
+	 * part labelled, each of `rows` written at that part's value in its context - one label per value, for a part
+	 * holding several (a box's outliers). `at` places a label at a value: its point, and the shape around it its
+	 * `anchor` reads.
+	 */
+	partMarkers(
+		env: AxisPlotEnv,
+		rows: readonly ProcessedRow[],
+		at: (value: symbol) => PointGeometryOf,
+		defaults: {
+			seriesColor?: (row: ProcessedRow) => string | undefined;
+			/** The parts the kind writes on its own shapes, left out here: a bar's `value`. */
+			skip?: string[];
+		} = {}
+	): TextMarkerConfig[] {
+		const { styles: shared, ...hooks } = this.hooks(env);
+		const { font } = this;
+		// `series` labels the rows of those series only.
+		const named = this.series && new Set(this.series);
+		const labelled = named ? rows.filter((row) => named.has(String(row[SERIES_KEY]))) : rows;
+		return this.parts.flatMap((part) => {
+			if (defaults.skip?.includes(part.name)) return [];
+			const placed = labelled.flatMap((row) => {
+				const own = (RowContext.of(row) as Record<string, unknown>)[part.name];
+				return (Array.isArray(own) ? own : [own])
+					.filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
+					.map((value) => ({ ...row, [PART_VALUE]: value }));
+			});
+			const label = {
+				...hooks,
+				...part.placement,
+				layout: 'point',
+				text: (row: ProcessedRow) =>
+					part.format(Number(row[PART_VALUE]), row, undefined, part.name),
+				styles: {
+					...shared,
+					...font,
+					fill:
+						this.fill ??
+						(this.color === 'series' ? defaults.seriesColor : undefined) ??
+						'currentColor',
+					fontSize: font?.fontSize ?? 11
+				}
+			} as PointLabelConfig;
+			const marker =
+				placed.length > 0 &&
+				PointLayout.build(label, at(PART_VALUE), placed, { gap: this.#cfg.text.label.gap });
+			return marker ? [marker] : [];
+		});
+	}
+
+	/**
+	 * Where a part label of a row sits on a plot of categories: at the row's `category` (a field or a function of
+	 * it), level with the part's value, across the category's band - which an `anchor` reads, to write it beside.
+	 */
+	static bandPoint(
+		state: { axes?: PlotAxes },
+		category: unknown,
+		/** How wide the shape is across its band, in pixels, when it does not fill it: a violin's inner box. */
+		across?: number,
+		/** A row's slot of its band, when its series share it side by side. */
+		slot?: (row: ProcessedRow) => { index: number; count: number } | undefined
+	): (value: symbol) => PointGeometryOf {
+		const valueAxis = PlotAxes.valueOf(state);
+		const categoryAxis = PlotAxes.categoryOf(state);
+		return (value) =>
+			({
+				[categoryAxis]: category,
+				[valueAxis]: value,
+				shift:
+					slot &&
+					((row: unknown, scales: BoxScales) => {
+						const own = slot(row as ProcessedRow);
+						const band = Number(scales[categoryAxis]?.fn?.bandwidth?.() ?? 0);
+						if (!own || !band) return undefined;
+						const share = band / own.count;
+						const offset = share * own.index + share / 2 - band / 2;
+						return categoryAxis === 'x' ? { dx: offset, dy: 0 } : { dx: 0, dy: offset };
+					}),
+				size: (_row: unknown, scales: BoxScales) => {
+					const band = across ?? Number(scales[categoryAxis]?.fn?.bandwidth?.() ?? 0);
+					return categoryAxis === 'x' ? { width: band, height: 0 } : { width: 0, height: band };
+				}
+			}) as unknown as PointGeometryOf;
+	}
+
+	/** The placement that writes each of `parts` beside its category's band: to its right, or above sideways bands. */
+	static besideBand(
+		state: { axes?: PlotAxes },
+		parts: string[]
+	): Record<string, Record<string, unknown>> {
+		const beside = { anchor: state.axes?.isHorizontal ? 'top' : 'right' };
+		return Object.fromEntries(parts.map((part) => [part, beside]));
+	}
+
 	/** A series-over-`x` plot's labels in its {@link layout}: at its series' ends, or along its lines. */
 	forSeries<TData extends Record<string, unknown>>(
 		state: AxisPlotState<TData, object>,
@@ -353,17 +534,15 @@ export class ValueLabels {
 		state: AxisPlotState<TData, object>,
 		env: AxisPlotEnv
 	): MarkerLabelConfig[] {
-		const { font, format } = this;
+		const { font } = this;
 		const nameOf = (d: ProcessedRow) => String(d[SERIES_KEY]);
-		const valueOf = ValueLabels.valueOf(state);
 		const { styles: shared, ...hooks } = this.hooks(env);
 		return [
 			{
 				...hooks,
 				...this.placement,
 				layout: 'path',
-				text: (d: ProcessedRow) =>
-					this.formatted ? format(Number(valueOf(d)), d, nameOf(d)) : nameOf(d),
+				text: (d: ProcessedRow) => (this.formatted ? this.text(d) : nameOf(d)),
 				styles: {
 					...shared,
 					...font,
@@ -427,11 +606,9 @@ export class ValueLabels {
 	): PointLabelConfig[] {
 		const rows = new Set(end.rows ?? state.labelled ?? []);
 		if (rows.size === 0) return [];
-		const { font, format } = this;
+		const { font } = this;
 		const side = end.side ?? this.side;
 		const at = PointLayout.sideOf(side, this.placement.gap as number | undefined);
-		const nameOf = (d: ProcessedRow) => String(d[SERIES_KEY]);
-		const valueOf = ValueLabels.valueOf(state);
 		const { styles: shared, ...hooks } = this.hooks(env);
 		return [
 			{
@@ -439,7 +616,7 @@ export class ValueLabels {
 				layout: 'point',
 				select: (row: ProcessedRow) => rows.has(row),
 				grouping: SERIES_ID_KEY,
-				text: (d: ProcessedRow) => format(Number(valueOf(d)), d, nameOf(d)),
+				text: (d: ProcessedRow) => this.text(d),
 				styles: {
 					...shared,
 					...font,

@@ -1,3 +1,4 @@
+import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { Transforms } from '$lib/phases/transforms/Transforms';
 import type { DensityPlotState, DensityPlotEnv } from '$lib/types/plots/distribution/density/state';
 import type { DensityPlotStylesConfig } from '$lib/types/plots/distribution/density/props';
@@ -18,7 +19,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 	const styles = state.styles as DensityPlotStylesConfig | undefined;
 	const asLine = styles?.mark === 'line';
 
-	return (state.processedGroups ?? []).flatMap((group) => {
+	const marks = (state.processedGroups ?? []).flatMap((group) => {
 		const name = group.series.name;
 		const disabledFill = env.interaction?.fillFor(name);
 		const disabledStroke = env.interaction?.strokeFor(name);
@@ -56,4 +57,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 			);
 		});
 	}) as unknown as AxisBasedMarkersConfig[];
+	// `styles.values` labels each curve: its name at its peak by default, or along it.
+	const labels = state.valueLabels?.show ? state.valueLabels.forSeries(state, env) : undefined;
+	return ValueLabels.onMarkers(marks, asLine ? 'line' : 'area', labels);
 }

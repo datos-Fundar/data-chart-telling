@@ -12,7 +12,6 @@ import type { ProcessedRow } from '$lib/types/phases';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { BandSlice, HoverPoint } from '$lib/types/layout/hover';
 import type { HoverConfig } from '$lib/types/plots/props';
-import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 
 const GAP_KINDS = ['start', 'middle', 'end'] as const;
@@ -125,11 +124,11 @@ export function buildMarks<TData extends Record<string, unknown>>(
 
 	// What each bar writes about itself: its value, in the layout of `styles.values` - by default past its tip, or
 	// in the middle of a stacked bar's segment.
-	const labels = state.valueLabels?.show ? state.valueLabels : undefined;
-	const valueRead = ValueLabels.valueOf(state);
+	const labels =
+		state.valueLabels?.show && state.valueLabels.writes('value') ? state.valueLabels : undefined;
 	const labelFor = (name: string, slice: BandSlice | undefined) =>
 		labels && {
-			...labels.label(env, (d) => labels.format(Number(valueRead(d)), d, name), {
+			...labels.label(env, (d) => labels.text(d), {
 				fill: 'currentColor',
 				labelled: state.labelled,
 				seriesColor: () => colorForSeries!(name)

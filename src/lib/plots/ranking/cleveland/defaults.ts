@@ -1,3 +1,6 @@
+import { ValueLabels } from '$lib/layout/styles/ValueLabels';
+import { RowNumbers, type IntervalAccessors } from '$lib/plots/utils/RowNumbers';
+import type { ProcessedRow } from '$lib/types/phases';
 import { ClevelandMarkers } from '$lib/plots/ranking/cleveland/ClevelandMarkers';
 import { HoverDefaults } from '$lib/layout/hover/HoverDefaults';
 import { ClevelandRanges } from '$lib/plots/ranking/cleveland/ClevelandRanges';
@@ -76,10 +79,37 @@ export function buildClevelandDefaults<TData extends Record<string, unknown>>(
 		},
 		// A dot is labelled by what its category's dots say: the first, the highest... of each.
 		transforms: { labels: { group: 'category', skip: ClevelandRanges.skipGaps } },
+		// An interval's ends, for its tooltip, hover and value labels to read.
+		context: options.interval
+			? (state) => {
+					const valueOf = ValueLabels.valueOf(state);
+					return ((row: ProcessedRow) => {
+						const [lower, upper] = RowNumbers.interval(
+							state as unknown as IntervalAccessors,
+							row,
+							Number(valueOf(row))
+						);
+						return { lower, upper };
+					}) as (row: never) => object;
+				}
+			: undefined,
 		styles: {
 			values: {
 				layout: 'point',
 				layouts: { path: { side: 'outside' } },
+				// An interval's ends sit past it, each on its own side.
+				parts: options.interval
+					? {
+							placements: (state) => {
+								const sideways = state.axes?.isHorizontal;
+								return {
+									lower: { side: sideways ? 'before' : 'below' },
+									upper: { side: sideways ? 'after' : 'above' }
+								};
+							},
+							default: ['value']
+						}
+					: undefined,
 				reach: (labels, state) => (labels.layout === 'point' ? markers.reach(labels, state) : [])
 			}
 		},

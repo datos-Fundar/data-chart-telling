@@ -1,3 +1,4 @@
+import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { buildMarks } from '$lib/plots/distribution/density/markers';
 import { RowContext } from '$lib/phases/context/RowContext';
 import { TooltipState } from '$lib/layout/tooltip/TooltipState.svelte';
@@ -45,7 +46,22 @@ export function buildDensityDefaults<TData extends Record<string, unknown>>(): A
 			}
 		},
 		transforms: {
+			// A curve is labelled at its peak.
+			labels: { select: 'max' },
 			transforms: (state) => mergeDensity(state.transforms ?? [], state.axes?.isHorizontal ?? false)
+		},
+		styles: {
+			values: {
+				layout: 'point',
+				layouts: { point: { side: 'above' }, path: { side: 'above', offset: 'max' } },
+				// The estimate tells a reader little: a label names the curve it is on, or a lone curve's peak position.
+				formatFor: (state) => {
+					const position = PlotAxes.other(PlotAxes.valueOf(state));
+					return (state.resolvedSeries?.length ?? 0) > 1
+						? (value, number, { series }) => series ?? number(value)
+						: (_value, number, context) => number(Number(context[position]));
+				}
+			}
 		},
 		scales: { zero: ['value'] },
 		markers: { marks: buildMarks },

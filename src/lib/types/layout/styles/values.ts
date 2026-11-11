@@ -39,13 +39,34 @@ export type ValueLayoutOf<TLabel> = TLabel extends { layout?: infer TLayout }
 	? Pick<TLabel, Extract<keyof TLabel, LayoutKey>> & { layout?: TLayout }
 	: never;
 
-/** `TStyles` with its `values` taking only the labels of `TLabel`: the layouts a plot kind's shapes write. */
-export type WithValues<TStyles, TLabel extends MarkerLabelConfig> = Omit<TStyles, 'values'> & {
-	values?: ValuesStyle<TLabel>;
+/**
+ * `TStyles` with its `values` taking only the labels of `TLabel` - the layouts a plot kind's shapes write - and, on a
+ * kind whose rows have several values, the `TPart`s it can label.
+ */
+export type WithValues<
+	TStyles,
+	TLabel extends MarkerLabelConfig,
+	TPart extends string = 'value'
+> = Omit<TStyles, 'values'> & {
+	values?: ValuesStyle<TLabel, TPart>;
 };
 
-export type ValuesStyle<TLabel extends MarkerLabelConfig = MarkerLabelConfig> = ValuesOptions &
-	ValueLayoutOf<TLabel>;
+export type ValuesStyle<
+	TLabel extends MarkerLabelConfig = MarkerLabelConfig,
+	TPart extends string = string
+> = ValuesOptions & ValueLayoutOf<TLabel> & { parts?: ValueParts<TPart, TLabel> };
+
+/** What a part's own label sets, over the plot's: where it sits and its text. */
+export type ValuePartOptions<TLabel = MarkerLabelConfig> = Omit<ValueLayoutOf<TLabel>, 'layout'> &
+	Pick<ValuesOptions, 'format'>;
+
+/**
+ * The parts of each row a plot kind with several values per row labels - a box's `median`, a bullet's `target`: a
+ * list of them, or a record turning each on (`true`) or setting its own options.
+ */
+export type ValueParts<TPart extends string, TLabel = MarkerLabelConfig> =
+	| TPart[]
+	| Partial<Record<TPart, boolean | ValuePartOptions<TLabel>>>;
 
 /** A value label's text style, without what places it: the layout's options do that. */
 export type ValuesFontStyle = Omit<FontStyle, 'textAnchor' | 'lineAnchor' | 'dx' | 'dy'>;

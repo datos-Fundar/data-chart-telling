@@ -1,3 +1,4 @@
+import { isGapValue } from '$lib/plots/utils/gaps';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
@@ -261,15 +262,29 @@ export class ClevelandMarkers {
 				};
 			});
 		}) as DotMarkerConfig[];
-		const labels = state.valueLabels?.show
-			? this.#valueLabels(state.valueLabels, state, env)
-			: undefined;
+		const values = state.valueLabels?.show ? state.valueLabels : undefined;
+		const labels = values?.writes('value') ? this.#valueLabels(values, state, env) : undefined;
+		// The other parts of a row it labels - an interval's ends - beside them; the dots write the value.
+		const processed = state.processedData!;
+		const position = ProcessedPositions.of(processed, PlotAxes.valueOf(state) as 'x' | 'y');
+		const parts = values
+			? values.partMarkers(
+					env,
+					processed.data.filter((row) => !isGapValue(position[PlotAxes.valueOf(state)](row))),
+					ValueLabels.bandPoint(state, position[PlotAxes.categoryOf(state)]),
+					{
+						skip: ['value'],
+						seriesColor: (row) => state.colorForSeries!(String(row[SERIES_KEY]))
+					}
+				)
+			: [];
 		return [
 			...rules,
 			...caps,
 			...arrows,
 			...ValueLabels.onMarkers(dots, 'dot', labels),
-			...this.#connectorLabels(state, env, connector, looks, isHorizontal)
+			...this.#connectorLabels(state, env, connector, looks, isHorizontal),
+			...(parts as AxisBasedMarkersConfig[])
 		];
 	};
 

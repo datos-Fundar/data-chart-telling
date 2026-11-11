@@ -1,3 +1,5 @@
+import type { WithValues } from '$lib/types/layout/styles';
+import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { KindRowContext } from '$lib/types/layout/context';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { BasePlotProps, PlotCoreProps } from '$lib/types/plots/props';
@@ -29,11 +31,14 @@ export type BoxSummary = {
  */
 export type BoxRowContext = KindRowContext<BoxSummary>;
 
+/** The values of a box its value labels can write: its quartiles, its whiskers' ends and the values past them. */
+export type BoxValuePart = Exclude<keyof BoxSummary, 'category' | 'count'>;
+
 /** `BoxPlot`'s public props. */
 export type BoxPlotProps<TData extends Record<string, unknown>> = BasePlotProps<
 	SeriesProps<TData> | DualAxisDataProps<TData>,
 	TData,
-	AxisBasedStylesConfig,
+	WithValues<AxisBasedStylesConfig, PointLabelConfig, BoxValuePart>,
 	AreaStyle,
 	AxisBasedMarkersConfig,
 	AxisBasedScalesConfig<TData>,
@@ -45,7 +50,7 @@ export type BoxPlotProps<TData extends Record<string, unknown>> = BasePlotProps<
 export type BoxPlotCoreProps<TData extends Record<string, unknown>> = PlotCoreProps<
 	SeriesProps<TData> | DualAxisDataProps<TData>,
 	TData,
-	AxisBasedStylesConfig,
+	WithValues<AxisBasedStylesConfig, PointLabelConfig, BoxValuePart>,
 	AreaStyle,
 	AxisBasedMarkersConfig,
 	AxisBasedScalesConfig<TData>

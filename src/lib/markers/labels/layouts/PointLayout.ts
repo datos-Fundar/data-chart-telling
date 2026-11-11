@@ -57,9 +57,19 @@ export class PointLayout {
 						return shape && { ...shape, round };
 					}
 				: undefined;
+		// A point shifted off its `x`/`y` (a series' slot of its band) carries its label, and its anchor's offset, along.
+		const anchored = (onBox as { origin?: TextMarkerConfig['origin'] }).origin;
+		const origin =
+			point.shift &&
+			((row: unknown, scales: BoxScales) => {
+				const shift = point.shift!(row, scales) ?? { dx: 0, dy: 0 };
+				const own = anchored?.(row, scales) ?? { dx: 0, dy: 0 };
+				return { dx: shift.dx + own.dx, dy: shift.dy + own.dy };
+			});
 		return {
 			...text,
 			...onBox,
+			...(origin ? { origin } : {}),
 			...(covers ? { covers } : {}),
 			type: 'text',
 			data,
