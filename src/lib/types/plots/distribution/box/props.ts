@@ -1,10 +1,8 @@
+import type { AxesPlotProps, AxesPlotCoreProps } from '$lib/types/plots/families/axes';
 import type { WithValues } from '$lib/types/layout/styles';
 import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { KindRowContext } from '$lib/types/layout/context';
 import type { AxisValue } from '$lib/types/layout/mapping';
-import type { BasePlotProps, PlotCoreProps } from '$lib/types/plots/props';
-import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { SeriesProps, DualAxisDataProps } from '$lib/types/plots/data/common';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import type { AreaStyle } from '$lib/types/plots/styling';
@@ -35,23 +33,18 @@ export type BoxRowContext = KindRowContext<BoxSummary>;
 export type BoxValuePart = Exclude<keyof BoxSummary, 'category' | 'count'>;
 
 /** `BoxPlot`'s public props. */
-export type BoxPlotProps<TData extends Record<string, unknown>> = BasePlotProps<
+export type BoxPlotProps<TData extends Record<string, unknown>> = AxesPlotProps<
 	SeriesProps<TData> | DualAxisDataProps<TData>,
 	TData,
 	WithValues<AxisBasedStylesConfig, PointLabelConfig, BoxValuePart>,
 	AreaStyle,
-	AxisBasedMarkersConfig,
-	AxisBasedScalesConfig<TData>,
-	undefined,
 	BoxRowContext
 >;
 
 /** What `BoxPlot`'s core draws from. */
-export type BoxPlotCoreProps<TData extends Record<string, unknown>> = PlotCoreProps<
+export type BoxPlotCoreProps<TData extends Record<string, unknown>> = AxesPlotCoreProps<
 	SeriesProps<TData> | DualAxisDataProps<TData>,
 	TData,
 	WithValues<AxisBasedStylesConfig, PointLabelConfig, BoxValuePart>,
-	AreaStyle,
-	AxisBasedMarkersConfig,
-	AxisBasedScalesConfig<TData>
+	AreaStyle
 >;

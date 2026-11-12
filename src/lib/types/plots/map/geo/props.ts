@@ -1,52 +1,28 @@
-import type { BasePlotProps, PlotCoreProps } from '$lib/types/plots/props';
-import type { GeoScalesConfig, CoordinatesConfig } from '$lib/types/layout/coordinates';
-import type { GeoFeature, GeoDataProps, GeoSliceContext } from '$lib/types/plots/data/geo';
+import type {
+	ProjectionPlotProps,
+	ProjectionPlotCoreProps
+} from '$lib/types/plots/families/projection';
+import type { GeoDataProps, GeoSliceContext } from '$lib/types/plots/data/geo';
 import type { PlotRowContext } from '$lib/types/layout/context';
 import type { GeoStylesConfig } from '$lib/types/layout/styles';
 import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
-import type { GeoMarkersConfig } from '$lib/types/markers/geo';
-import type { TimelineConfig } from '$lib/types/layout/timeline';
-import type { FacetConfig } from '$lib/types/layout/facet';
 
-/** `Omit` on each member of a union, so the union (and what tells its members apart) survives. */
-type OmitEach<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
-
-/**
- * `GeoPlot`'s public props. Its `timeline` and `facet` slice both the map's
- * features (reading a field key from each feature's `properties`) and every
- * marker's own `data` rows; a feature or row without the field is context,
- * drawn in every slice.
- */
-export type GeoPlotProps<TProps extends Record<string, unknown>> = OmitEach<
-	BasePlotProps<
-		GeoDataProps<TProps>,
-		GeoFeature<TProps>,
-		GeoStylesConfig<TProps>,
-		GeoSegmentStyle,
-		GeoMarkersConfig,
-		GeoScalesConfig,
-		CoordinatesConfig,
-		GeoTooltipContext
-	>,
-	'timeline' | 'facet'
-> & {
-	timeline?: TimelineConfig<Record<string, unknown>>;
-	facet?: FacetConfig<Record<string, unknown>>;
-};
+/** `GeoPlot`'s public props: GeoJSON or TopoJSON in `data`. */
+export type GeoPlotProps<TProps extends Record<string, unknown>> = ProjectionPlotProps<
+	GeoDataProps<TProps>,
+	TProps,
+	GeoStylesConfig<TProps>,
+	GeoSegmentStyle,
+	GeoTooltipContext
+>;
 
 /** What a tooltip's `format` knows of a hovered feature: the shared row context, and the slice it was drawn in. */
 export type GeoTooltipContext = PlotRowContext & GeoSliceContext;
 
 /** What `GeoPlot`'s core draws from. */
-export type GeoPlotCoreProps<TProps extends Record<string, unknown>> = PlotCoreProps<
+export type GeoPlotCoreProps<TProps extends Record<string, unknown>> = ProjectionPlotCoreProps<
 	GeoDataProps<TProps>,
-	GeoFeature<TProps>,
+	TProps,
 	GeoStylesConfig<TProps>,
-	GeoSegmentStyle,
-	GeoMarkersConfig,
-	GeoScalesConfig,
-	CoordinatesConfig
-> & {
-	/** The slice of the `timeline` and `facet` this core draws - what its callbacks read its features in. */
-	sliceContext?: GeoSliceContext;
-};
+	GeoSegmentStyle
+>;

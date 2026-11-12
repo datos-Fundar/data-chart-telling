@@ -1,27 +1,21 @@
+import type { AxesPlotProps, AxesPlotCoreProps } from '$lib/types/plots/families/axes';
 import type { WithValues, DotValueLabel } from '$lib/types/layout/styles';
-import type { BasePlotProps, PlotCoreProps } from '$lib/types/plots/props';
-import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { SeriesProps, DualAxisDataProps } from '$lib/types/plots/data/common';
 import type { ConnectorBasedStylesConfig } from '$lib/types/layout/styles';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 
 /** `ClevelandPlot`'s public props. */
-export type ClevelandPlotProps<TData extends Record<string, unknown>> = BasePlotProps<
+export type ClevelandPlotProps<TData extends Record<string, unknown>> = AxesPlotProps<
 	SeriesProps<TData> | DualAxisDataProps<TData>,
 	TData,
 	WithValues<ConnectorBasedStylesConfig, DotValueLabel>,
-	LineSegmentStyle,
-	AxisBasedMarkersConfig,
-	AxisBasedScalesConfig<TData>
+	LineSegmentStyle
 >;
 
 /** What `ClevelandPlot`'s core draws from. */
-export type ClevelandPlotCoreProps<TData extends Record<string, unknown>> = PlotCoreProps<
+export type ClevelandPlotCoreProps<TData extends Record<string, unknown>> = AxesPlotCoreProps<
 	SeriesProps<TData> | DualAxisDataProps<TData>,
 	TData,
 	WithValues<ConnectorBasedStylesConfig, DotValueLabel>,
-	LineSegmentStyle,
-	AxisBasedMarkersConfig,
-	AxisBasedScalesConfig<TData>
+	LineSegmentStyle
 >;

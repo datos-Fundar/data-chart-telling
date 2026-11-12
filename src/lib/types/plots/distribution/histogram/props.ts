@@ -1,8 +1,6 @@
+import type { AxesPlotProps, AxesPlotCoreProps } from '$lib/types/plots/families/axes';
 import type { WithValues, CellValueLabel } from '$lib/types/layout/styles';
 import type { KindRowContext } from '$lib/types/layout/context';
-import type { BasePlotProps, PlotCoreProps } from '$lib/types/plots/props';
-import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { SeriesProps, SingleAxisDataProps } from '$lib/types/plots/data/common';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import type { AreaStyle } from '$lib/types/plots/styling';
@@ -21,23 +19,18 @@ export type HistogramRowContext = KindRowContext<{
 }>;
 
 /** `HistogramPlot`'s public props. */
-export type HistogramPlotProps<TData extends Record<string, unknown>> = BasePlotProps<
+export type HistogramPlotProps<TData extends Record<string, unknown>> = AxesPlotProps<
 	SeriesProps<TData> | SingleAxisDataProps<TData>,
 	TData,
 	WithValues<AxisBasedStylesConfig, CellValueLabel>,
 	AreaStyle,
-	AxisBasedMarkersConfig,
-	AxisBasedScalesConfig<TData>,
-	undefined,
 	HistogramRowContext
 >;
 
 /** What `HistogramPlot`'s core draws from. */
-export type HistogramPlotCoreProps<TData extends Record<string, unknown>> = PlotCoreProps<
+export type HistogramPlotCoreProps<TData extends Record<string, unknown>> = AxesPlotCoreProps<
 	SeriesProps<TData> | SingleAxisDataProps<TData>,
 	TData,
 	WithValues<AxisBasedStylesConfig, CellValueLabel>,
-	AreaStyle,
-	AxisBasedMarkersConfig,
-	AxisBasedScalesConfig<TData>
+	AreaStyle
 >;

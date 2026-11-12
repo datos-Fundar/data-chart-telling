@@ -1,10 +1,8 @@
+import type { AxesPlotProps, AxesPlotCoreProps } from '$lib/types/plots/families/axes';
 import type { WithValues } from '$lib/types/layout/styles';
 import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { BoxValuePart } from '$lib/types/plots/distribution/box/props';
 import type { BoxRowContext } from '$lib/types/plots/distribution/box/props';
-import type { BasePlotProps, PlotCoreProps } from '$lib/types/plots/props';
-import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { SeriesProps, DualAxisDataProps } from '$lib/types/plots/data/common';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import type { AreaStyle } from '$lib/types/plots/styling';
@@ -28,23 +26,18 @@ export type ViolinPlotStylesConfig = WithValues<
 };
 
 /** `ViolinPlot`'s public props. */
-export type ViolinPlotProps<TData extends Record<string, unknown>> = BasePlotProps<
+export type ViolinPlotProps<TData extends Record<string, unknown>> = AxesPlotProps<
 	SeriesProps<TData> | DualAxisDataProps<TData>,
 	TData,
 	ViolinPlotStylesConfig,
 	AreaStyle,
-	AxisBasedMarkersConfig,
-	AxisBasedScalesConfig<TData>,
-	undefined,
 	BoxRowContext
 >;
 
 /** What `ViolinPlot`'s core draws from. */
-export type ViolinPlotCoreProps<TData extends Record<string, unknown>> = PlotCoreProps<
+export type ViolinPlotCoreProps<TData extends Record<string, unknown>> = AxesPlotCoreProps<
 	SeriesProps<TData> | DualAxisDataProps<TData>,
 	TData,
 	ViolinPlotStylesConfig,
-	AreaStyle,
-	AxisBasedMarkersConfig,
-	AxisBasedScalesConfig<TData>
+	AreaStyle
 >;

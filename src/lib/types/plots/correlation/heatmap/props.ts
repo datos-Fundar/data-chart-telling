@@ -1,27 +1,21 @@
+import type { AxesPlotProps, AxesPlotCoreProps } from '$lib/types/plots/families/axes';
 import type { WithValues, CellValueLabel } from '$lib/types/layout/styles';
-import type { BasePlotProps, PlotCoreProps } from '$lib/types/plots/props';
-import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { SeriesProps, DualAxisDataProps } from '$lib/types/plots/data/common';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import type { CellSegmentStyle } from '$lib/types/plots/segments/common';
 
 /** `HeatmapPlot`'s public props. */
-export type HeatmapPlotProps<TData extends Record<string, unknown>> = BasePlotProps<
+export type HeatmapPlotProps<TData extends Record<string, unknown>> = AxesPlotProps<
 	SeriesProps<TData> | DualAxisDataProps<TData>,
 	TData,
 	WithValues<AxisBasedStylesConfig, CellValueLabel>,
-	CellSegmentStyle,
-	AxisBasedMarkersConfig,
-	AxisBasedScalesConfig<TData>
+	CellSegmentStyle
 >;
 
 /** What `HeatmapPlot`'s core draws from. */
-export type HeatmapPlotCoreProps<TData extends Record<string, unknown>> = PlotCoreProps<
+export type HeatmapPlotCoreProps<TData extends Record<string, unknown>> = AxesPlotCoreProps<
 	SeriesProps<TData> | DualAxisDataProps<TData>,
 	TData,
 	WithValues<AxisBasedStylesConfig, CellValueLabel>,
-	CellSegmentStyle,
-	AxisBasedMarkersConfig,
-	AxisBasedScalesConfig<TData>
+	CellSegmentStyle
 >;

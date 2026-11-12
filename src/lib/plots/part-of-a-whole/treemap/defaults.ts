@@ -1,6 +1,6 @@
 import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
 import { TREEMAP_ROW } from '$lib/phases/transforms/methods/TreemapTransform';
-import { HoverDefaults } from '$lib/layout/hover/HoverDefaults';
+import { buildGraphDefaults } from '$lib/plots/families/graph/defaults';
 import { RowContext } from '$lib/phases/context/RowContext';
 import { NumberFormat } from '$lib/utils/NumberFormat';
 import { Grouping } from '$lib/utils/grouping';
@@ -171,17 +171,15 @@ ${shareText(row)}`,
 }
 
 /**
- * TreemapPlot on the shared pipeline: its rows are the tiles of the `treemap` transform, laid out in a unit square
- * the plot's two continuous axes span (hidden). Its series are the outermost level of its `grouping`, which colors
- * the tiles and fills the legend. The tiles are `rect` markers, labelled by their own `label`. Hovering a tile is
- * hovering its row: an invisible `rect` over each one drives the plot's hover, and its tooltip names the tile and
- * gives its share.
+ * TreemapPlot, a graph kind: its rows are the tiles of the `treemap` transform, laid out in the unit square its two
+ * continuous axes span. Its series are the outermost level of its `grouping`, which colors the tiles and fills the
+ * legend. The tiles are `rect` markers, labelled by their own `label`; its tooltip names the tile and gives its share.
  */
 export function buildTreemapDefaults<TData extends Record<string, unknown>>(): AxisPlotDefaults<
 	TreemapPlotState<TData>,
 	TreemapPlotEnv
 > {
-	return {
+	return buildGraphDefaults<TreemapPlotState<TData>, TreemapPlotEnv>({
 		data: {
 			discreteAxes: 0,
 			nested: true,
@@ -192,31 +190,13 @@ export function buildTreemapDefaults<TData extends Record<string, unknown>>(): A
 		// A tile's name, path, value and share, for its label, its tooltip and its hover.
 		context: () => tileOf as (row: never) => object,
 		scales: {
-			defaults: () => ({
-				x: { axisDisplay: 'none', grid: false },
-				y: { axisDisplay: 'none', grid: false, reverse: true }
-			}),
+			defaults: () => ({ y: { reverse: true } }),
 			fit: () => ({ x: { domain: [0, 1], fitted: true }, y: { domain: [0, 1], fitted: true } })
 		},
 		styles: { values: { show: true, layout: 'box' } },
 		markers: { marks: buildMarks },
 		hover: {
-			strategy: 'punctual',
-			// A tile is hovered through its own hit area, not through whichever point the pointer is nearest.
-			pointMatching: 'contains',
-			// A tile has no axes for a crosshair, and writes its own label: its hover only restyles the tiles.
-			marker: (_state, env) => HoverDefaults.shapes(env.cfg),
-			hitAreas: (state, hover) =>
-				(hover.points as { row: ProcessedRow }[]).map(
-					({ row }) =>
-						({
-							type: 'rect',
-							data: [row],
-							...edgesOf(state),
-							styles: { fill: 'transparent' },
-							hover: hover.active && 'trigger'
-						}) satisfies RectMarkerConfig
-				),
+			shape: (state) => ({ type: 'rect', ...edgesOf(state) }),
 			format: (state) => {
 				const number = NumberFormat.of(
 					shareDisplay(state.values),
@@ -230,5 +210,5 @@ export function buildTreemapDefaults<TData extends Record<string, unknown>>(): A
 			},
 			label: () => ((row: ProcessedRow) => contextOf(row).name) as (row: never) => string
 		}
-	};
+	});
 }

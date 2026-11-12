@@ -1,5 +1,6 @@
 import { describe, test, expect, vi } from 'vitest';
 import { Pipeline } from '$lib/phases/Pipeline';
+import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
 import type { PhaseStage } from '$lib/types/phases';
 import { runStages } from '../plots/_helpers/stages';
 
@@ -60,5 +61,25 @@ describe('Pipeline', () => {
 
 	test('covers every PlotPhase in Pipeline.ORDER exactly once', () => {
 		expect(new Set(Pipeline.ORDER).size).toBe(Pipeline.ORDER.length);
+	});
+});
+
+describe('Pipeline.interpolation', () => {
+	test('a kind that gives its tween as a function of its props gets it back as is', () => {
+		type Link = { id: string; n: number };
+		const value = (link: Link) => link.n;
+		const key = (link: Link) => link.id;
+		const pipeline = new Pipeline<State, Env>([], {
+			timeline: { interpolation: () => ({ value, key }) as never }
+		});
+		const tween = pipeline.interpolation({ data: [{ id: 'a', n: 1 }] }, DEFAULT_CONFIG);
+		expect(tween).toEqual({ value, key });
+	});
+
+	test('a plot without data tweens nothing', () => {
+		const pipeline = new Pipeline<State, Env>([], {
+			timeline: { interpolation: () => ({ value: () => 0 }) }
+		});
+		expect(pipeline.interpolation({}, DEFAULT_CONFIG)).toBeUndefined();
 	});
 });

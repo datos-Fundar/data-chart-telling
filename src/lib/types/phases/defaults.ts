@@ -43,6 +43,12 @@ export type SharedScalesOptions = {
 	fromScalesPhase?: (AxisChannelName | 'color')[];
 };
 
+/** How a timeline tweens a plot's rows: the value it tweens, and what matches a row across steps. */
+type TimelineTween = {
+	value: (row: never) => number;
+	key?: (row: never) => unknown;
+};
+
 /**
  * Everything an axis plot kind contributes, as defaults the shared machinery
  * runs with: the options for each pipeline phase (its hover among them),
@@ -58,8 +64,11 @@ export type AxisPlotDefaults<
 		/**
 		 * The channels a tweened timeline tweens (`value`) and matches rows across
 		 * steps by (`key`) - by name, or by the part an axis plays (`'value'`,
-		 * `'category'`), whichever way the plot runs.
+		 * `'category'`), whichever way the plot runs. A kind whose rows are not read
+		 * through channels gives its accessors from its core props instead.
 		 */
-		interpolation?: { value: ChannelName | AxisRole; key: (ChannelName | AxisRole)[] };
+		interpolation?:
+			| { value: ChannelName | AxisRole; key: (ChannelName | AxisRole)[] }
+			| ((props: object) => TimelineTween | undefined);
 	};
 };

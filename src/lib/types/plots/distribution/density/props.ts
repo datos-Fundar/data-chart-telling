@@ -1,7 +1,5 @@
+import type { AxesPlotProps, AxesPlotCoreProps } from '$lib/types/plots/families/axes';
 import type { AreaValueLabel, LineValueLabel, WithValues } from '$lib/types/layout/styles';
-import type { BasePlotProps, PlotCoreProps } from '$lib/types/plots/props';
-import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import type { SeriesProps, SingleAxisDataProps } from '$lib/types/plots/data/common';
 import type { CurveAwarePlotStylesConfig } from '$lib/types/layout/styles';
 import type { AreaStyle } from '$lib/types/plots/styling';
@@ -16,21 +14,17 @@ export type DensityPlotStylesConfig = WithValues<
 };
 
 /** `DensityPlot`'s public props. */
-export type DensityPlotProps<TData extends Record<string, unknown>> = BasePlotProps<
+export type DensityPlotProps<TData extends Record<string, unknown>> = AxesPlotProps<
 	SeriesProps<TData> | SingleAxisDataProps<TData>,
 	TData,
 	DensityPlotStylesConfig,
-	AreaStyle,
-	AxisBasedMarkersConfig,
-	AxisBasedScalesConfig<TData>
+	AreaStyle
 >;
 
 /** What `DensityPlot`'s core draws from. */
-export type DensityPlotCoreProps<TData extends Record<string, unknown>> = PlotCoreProps<
+export type DensityPlotCoreProps<TData extends Record<string, unknown>> = AxesPlotCoreProps<
 	SeriesProps<TData> | SingleAxisDataProps<TData>,
 	TData,
 	DensityPlotStylesConfig,
-	AreaStyle,
-	AxisBasedMarkersConfig,
-	AxisBasedScalesConfig<TData>
+	AreaStyle
 >;

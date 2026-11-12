@@ -1,8 +1,6 @@
 import type { WithValues } from '$lib/types/layout/styles';
 import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
-import type { BasePlotProps, PlotCoreProps } from '$lib/types/plots/props';
-import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
-import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
+import type { GraphPlotProps, GraphPlotCoreProps } from '$lib/types/plots/families/graph';
 import type { NonAxisDataProps } from '$lib/types/plots/data/common';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import type { KindRowContext } from '$lib/types/layout/context';
@@ -29,23 +27,18 @@ export type TreemapTooltipContext = TreemapRowContext;
  * `TreemapPlot`'s public props: flat rows, a tile each, on no axes. `value` is a tile's area, and `grouping` what
  * the tiles nest by (`'sector.branch'`, outermost first), whose outermost level colors them.
  */
-export type TreemapPlotProps<TData extends Record<string, unknown>> = BasePlotProps<
+export type TreemapPlotProps<TData extends Record<string, unknown>> = GraphPlotProps<
 	NonAxisDataProps<TData, 'value'>,
 	TData,
 	WithValues<AxisBasedStylesConfig, BoxLabelConfig>,
 	BarSegmentStyle,
-	AxisBasedMarkersConfig,
-	AxisBasedScalesConfig<TData>,
-	undefined,
 	TreemapTooltipContext
 >;
 
 /** What `TreemapPlot`'s core draws from. */
-export type TreemapPlotCoreProps<TData extends Record<string, unknown>> = PlotCoreProps<
+export type TreemapPlotCoreProps<TData extends Record<string, unknown>> = GraphPlotCoreProps<
 	NonAxisDataProps<TData, 'value'>,
 	TData,
 	WithValues<AxisBasedStylesConfig, BoxLabelConfig>,
-	BarSegmentStyle,
-	AxisBasedMarkersConfig,
-	AxisBasedScalesConfig<TData>
+	BarSegmentStyle
 >;

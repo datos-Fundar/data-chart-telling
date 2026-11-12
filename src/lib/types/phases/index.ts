@@ -1,6 +1,6 @@
 export type { PlotPhase, PhaseStage } from './stage';
 export type { AxisPlotState, AxisPlotEnv } from './state';
-export type { AxisPlotKind, AxisPlotDefaults, SharedScalesOptions } from './kind';
+export type { AxisPlotKind, AxisPlotDefaults, SharedScalesOptions } from './defaults';
 export type { DataRunState } from './pipeline';
 export type { DataStageOptions } from './data/phase';
 export type { MappingStageOptions } from './mapping/phase';

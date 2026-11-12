@@ -262,6 +262,11 @@ export class Pipeline<TState, TEnv = unknown> {
 	): { value: Accessor<TRow, never>; key?: Accessor<TRow, unknown> } | undefined {
 		const channels = this.#options.timeline?.interpolation;
 		if (!channels || !props.data) return undefined;
+		if (typeof channels === 'function') {
+			return channels(props) as
+				| { value: Accessor<TRow, never>; key?: Accessor<TRow, unknown> }
+				| undefined;
+		}
 		const upToMapping = this.stages.filter((s) => s.phase === 'data' || s.phase === 'mapping');
 		// Without a legend: the channels read the same whatever it turns off.
 		const state = Pipeline.#through(
