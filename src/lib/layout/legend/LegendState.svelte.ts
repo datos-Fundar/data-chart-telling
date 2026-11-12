@@ -8,6 +8,7 @@ import type {
 	ContinuousLegendSection,
 	DiscreteLegendSection,
 	LegendDisabledAction,
+	LegendDisabledStyle,
 	LegendChannel,
 	LegendEntry,
 	LegendExtension,
@@ -37,9 +38,45 @@ export class LegendState {
 	readonly disabled = new SvelteMap<string, LegendDisabledAction>();
 	/** The narrowed range of the first interactive continuous section, or `null`. */
 	range = $state<LegendRange | null>(null);
+	/** How narrowing the range acts, and the span it narrows, as the interactive continuous section sets them - for a range set from code to act the same. */
+	narrowing = $state<{
+		mode: LegendRange['mode'];
+		disabledStyle: LegendDisabledStyle;
+		domain: [number, number];
+	} | null>(null);
 	readonly #sources = new SvelteMap<unknown, LegendEntry[]>();
 	/** What {@link setOff} last turned off, to turn back on what it no longer lists. */
 	#managed = new SvelteMap<string, LegendDisabledAction>();
+
+	/**
+	 * Narrows the range as dragging the interactive section's handles would: `[min, max]` in the ramp's own
+	 * values, or `null` for the whole of it. Its `mode` is the section's (`'filter'` without one), unless given.
+	 * A span that is not a pair of numbers is left alone.
+	 */
+	setRange(bounds: [number, number] | null, mode?: LegendRange['mode']): void {
+		if (bounds === null) {
+			this.range = null;
+			return;
+		}
+		const [a, b] = bounds;
+		if (!Number.isFinite(a) || !Number.isFinite(b)) return;
+		const { narrowing } = this;
+		const min = Math.min(a, b);
+		const max = Math.max(a, b);
+		// What spans the whole ramp is no narrowing: the section resets its handles the same way.
+		if (narrowing && min <= narrowing.domain[0] && max >= narrowing.domain[1]) {
+			this.range = null;
+			return;
+		}
+		this.range = {
+			min,
+			max,
+			mode: mode ?? narrowing?.mode ?? 'filter',
+			disabledStyle: narrowing?.disabledStyle ?? {
+				opacity: getConfiguration().legend.disabledOpacity
+			}
+		};
+	}
 
 	/** The enclosing figure's legend, or `null` outside one. Call during component init. */
 	static current(): LegendState | null {

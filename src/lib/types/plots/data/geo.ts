@@ -1,5 +1,5 @@
 /// <reference types="geojson" />
-import type { Accessor } from '$lib/types/plots/data/common';
+import type { TimeValue } from '$lib/types/layout/timeline';
 
 /**
  * One GeoJSON feature, generically typed over its `properties`. Intersected
@@ -10,6 +10,17 @@ import type { Accessor } from '$lib/types/plots/data/common';
  */
 export type GeoFeature<TProps extends Record<string, unknown> = Record<string, unknown>> =
 	GeoJSON.Feature<GeoJSON.Geometry, TProps> & Record<string, unknown>;
+
+/**
+ * Which slice of a `timeline` and `facet` a feature is being read for: the callbacks of a sliced map get it as
+ * their last argument. Empty on a map without either.
+ */
+export type GeoSliceContext = {
+	/** The facet panel: its label (a grid's `row · col`), and the `rows` and `cols` values it sits at. */
+	facet?: { value: string; row?: string; col?: string };
+	/** The timeline step. */
+	time?: TimeValue;
+};
 
 export type GeoJsonInput<TProps extends Record<string, unknown>> =
 	| GeoJSON.FeatureCollection<GeoJSON.Geometry, TProps>
@@ -51,14 +62,16 @@ export type GeoDataProps<TProps extends Record<string, unknown> = Record<string,
 	 * (e.g. `segments.argentina`) and for hover/click identification. Defaults
 	 * to `feature.id ?? feature.properties?.id ?? feature.properties?.name`.
 	 */
-	featureId?: Accessor<GeoFeature<TProps>, string>;
+	featureId?:
+		| keyof GeoFeature<TProps>
+		| ((feature: GeoFeature<TProps>, slice: GeoSliceContext) => string);
 	/**
 	 * Optional continuous color-value accessor for choropleth coloring - the
 	 * channel driving the ramp (mirrors heatmap's `color`), configured via
 	 * `scales.color`. A feature with no `color` (or when omitted entirely)
 	 * falls back to `styles.fill`/`segments`.
 	 */
-	color?: (feature: GeoFeature<TProps>) => number | undefined;
+	color?: (feature: GeoFeature<TProps>, slice: GeoSliceContext) => number | undefined;
 	/**
 	 * Optional structural grouping key - splits features into named buckets
 	 * for `segments` to address by name (e.g. `segments.global_south`),
@@ -69,9 +82,9 @@ export type GeoDataProps<TProps extends Record<string, unknown> = Record<string,
 	 * ungrouped. A feature whose `grouping` value has no matching `segments`
 	 * key simply falls through to `segments.default`/the plot-level ramp.
 	 */
-	grouping?: (feature: GeoFeature<TProps>) => string | undefined;
+	grouping?: (feature: GeoFeature<TProps>, slice: GeoSliceContext) => string | undefined;
 	/** Continuous or categorical opacity-value accessor - configure the ramp via `scales.opacity`. */
-	opacity?: (feature: GeoFeature<TProps>) => number | undefined;
+	opacity?: (feature: GeoFeature<TProps>, slice: GeoSliceContext) => number | undefined;
 	/**
 	 * Excludes matching parts of a feature's geometry from the map's own
 	 * rendering and hover/click matching - e.g. so a separate `inset` marker

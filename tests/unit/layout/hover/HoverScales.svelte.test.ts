@@ -6,6 +6,8 @@ import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import TreemapPlot from '$lib/plots/part-of-a-whole/treemap/Plot.svelte';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
+import GeoPlot from '$lib/plots/map/geo/Plot.svelte';
+import { ARGENTINA_PROVINCES } from '$datasets/argentina-provinces';
 import ScalesProbe from './ScalesProbe.svelte';
 import { waitForSvg } from '../../plots/_helpers/svg';
 
@@ -44,6 +46,8 @@ const BARS = Array.from({ length: 24 }, (_, i) => ({
 	name: `Item ${i}`,
 	value: ((i * 13) % 30) - 10
 }));
+
+const PROVINCE = (f: { properties: unknown }) => (f.properties as { nombre: string }).nombre;
 
 type Case = { name: string; component: Component<never>; props: Record<string, unknown> };
 
@@ -117,6 +121,16 @@ const CASES: Case[] = [
 			color: 'series',
 			tooltip: true,
 			markers: [{ type: 'hover', active: { fillOpacity: 1 }, others: { fillOpacity: 0.2 } }]
+		}
+	},
+	{
+		name: "a map's hovered province",
+		component: GeoPlot as Component<never>,
+		props: {
+			data: ARGENTINA_PROVINCES,
+			featureId: PROVINCE,
+			tooltip: { format: PROVINCE },
+			markers: [{ type: 'geo-hover' }]
 		}
 	}
 ];

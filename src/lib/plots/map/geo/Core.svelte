@@ -7,6 +7,7 @@
 	import BasePlotLayout from '$lib/layout/base/BasePlotLayout.svelte';
 	import type { GeoPlotCoreProps } from '$lib/types/plots/map/geo/props';
 	import type { CoordinatesConfig } from '$lib/types/layout/coordinates';
+	import type { GeoFeature } from '$lib/types/plots/data/geo';
 	import type { GeoPlotState, GeoPlotEnv } from '$lib/types/plots/map/geo/state';
 
 	/**
@@ -19,10 +20,10 @@
 	let {
 		data,
 		object,
-		featureId,
-		color,
-		grouping,
-		opacity,
+		featureId: featureIdProp,
+		color: colorProp,
+		grouping: groupingProp,
+		opacity: opacityProp,
 		excludeParts,
 		width,
 		height,
@@ -33,10 +34,25 @@
 		coordinates = {},
 		margins = $bindable(),
 		tooltip = undefined,
+		sliceContext = {},
 		pipeline
 	}: Props = $props();
 
 	const cfg = $derived(getConfiguration());
+
+	// The callbacks read a feature in the slice this core draws; the pipeline's phases call them with the feature alone.
+	const color = $derived(colorProp && ((f: GeoFeature<TProps>) => colorProp(f, sliceContext)));
+	const grouping = $derived(
+		groupingProp && ((f: GeoFeature<TProps>) => groupingProp(f, sliceContext))
+	);
+	const opacity = $derived(
+		opacityProp && ((f: GeoFeature<TProps>) => opacityProp(f, sliceContext))
+	);
+	const featureId = $derived(
+		typeof featureIdProp === 'function'
+			? (f: GeoFeature<TProps>) => featureIdProp(f, sliceContext)
+			: featureIdProp
+	);
 
 	// ── Resolve data: GeoJSON is synchronous, TopoJSON is converted async ────
 	const resolved = new GeoFeatures<TProps>(
@@ -83,7 +99,7 @@
 		fillOpacity: styles.fillOpacity,
 		stroke: styles.stroke,
 		strokeWidth: styles.strokeWidth,
-		onFeatureClick: styles.onFeatureClick
+		onFeatureClick: styles.onFeatureClick && ((d, e) => styles.onFeatureClick!(d, e, sliceContext))
 	});
 	// The kind's pipeline, built once by its plot, over the state this core seeds.
 	const plotState = $derived(
@@ -98,6 +114,7 @@
 				segments,
 				scales,
 				authoredMarkers: markers,
+				slice: sliceContext,
 				tooltip,
 				width,
 				height,
@@ -130,7 +147,13 @@
 		markers: markersOut,
 		scales: layoutScales,
 		channels: {
-			color: { source: ChannelName.of(color, 'color') },
+			// Its own ramps draw every colored feature: the plot's has nothing to show.
+			color: {
+				source:
+					plotState.colorRamps && !plotState.colorDomain
+						? undefined
+						: ChannelName.of(color, 'color')
+			},
 			opacity: { source: ChannelName.of(opacity, 'opacity') }
 		},
 		colorDomain: plotState.colorDomain,

@@ -2,6 +2,24 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.20.0] - 2026-11-11
+
+### Added
+
+- **`GeoPlot` facets and timeline from one layer of features.** `facet.values` (or a grid's `rowValues` and `colValues`) and `timeline.values` now create their panels and steps though no feature carries the field, so the same features serve every panel with no copy per value. A slice's values are the ones named, in order, then any more found in the features.
+- **The slice reaches the callbacks of a `GeoPlot`.** `color`, `opacity`, `grouping`, `featureId` and `styles.onFeatureClick` get `{ facet?: { value, row?, col? }, time? }` as their last argument (empty without `facet` or `timeline`), and a tooltip's `format` has the same `facet` and `time` in its context: `color={(f, { facet }) => valueFor(f, facet?.value)}`. The color ramp spans every panel and step, each read in its own slice, unless `facet.scales` (or `timeline.scales`, with no facet) is `'free'`: then each slice fits its own, and a `grouping` by panel with a `segments` `scales.color` per panel gives each its own scheme - and the legend leaves out the plot's own ramp when every colored feature has one of its own. New type `GeoSliceContext`. See [Maps](docs/geo.md#facets-and-timeline).
+- **`useFigure().legend.setRange([min, max] | null, mode?)`.** Narrows an interactive continuous legend from code as dragging its handles does: they move and the plots filter or rescale to the range, in the section's own mode unless one is given. `null`, or a span covering the whole ramp, resets it. For a figure that draws its own mini legends, such as one per map panel, to apply a panel's range to the shared legend. See [Legend](docs/legend.md).
+
+### Fixed
+
+- **`BarPlot` hover on grouped series.** Each series' hover zone now covers only its own strip of the category band, so side-by-side bars report the series under the pointer instead of always the last one.
+- **`band` marker on grouped horizontal bars.** A `slice` of a band on `y` is counted from the bottom, as the bars, their hit areas and the hover's dot, text and rule are, so the hover's band lies over the series under the pointer and not the other one.
+- **`GeoPlot` hover no longer lays the map out again.** The hovered province is drawn on the plot's projection without joining its scales, so entering or leaving one no longer works out the scales and projection anew - which, with facets and a synced tooltip, was repeated in every panel.
+- **Facet grids no longer crawl through a timeline.** A step used to give `FacetLayout` new entry objects, which its each blocks wrote into their items from inside their own effect, and Svelte then walked every derived the write reached, in each panel. The blocks now iterate the panels' keys, and each cell reads its entry from a derived.
+- **Shared domains on a stacked, faceted timeline.** With a `timeline` that shows each step's own rows (`filterMode: 'exact'`), a shared value axis was fitted to the rows of every step stacked together. It now reaches the largest total any step stacks in any panel. With `'upTo'` a step shows every row up to it, so the last step's stack still sets it.
+- **Docs: horizontal stacked bars use `stackX`.** The bar plot's page, the transforms page and the LLM notes said stacking is always `stackY`, also for horizontal bars. A stack runs along the value axis: `stackY` with values on `y` (vertical bars), `stackX` with values on `x` (horizontal bars); the other makes the category axis numeric and the bars come out empty.
+- **A faceted plot repaints when only its `segments` change.** The data phases are run again when a prop of the plot, the configuration, the rows or the facet changes - props that are configuration (`segments`, `styles`, `scales`...) compared as they hold, so building the same ones again changes nothing - where before a change of `segments` alone left every panel as it was unless `data` changed too. Moving a timeline or a pointer still runs nothing again.
+
 ## [1.19.0] - 2026-11-11
 
 ### Added

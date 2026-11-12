@@ -73,13 +73,16 @@ export function buildScales<TProps extends Record<string, unknown>>(
 			}
 		: undefined;
 
-	// Every segment ramp is built up front, so the legend can draw each one.
+	// Every segment ramp is built up front, so the legend can draw each one. The plot's own ramp is left out of
+	// the legend when every colored feature has one of its own: nothing is drawn with it.
+	let usesPlotRamp = false;
 	if (colorScale) {
 		for (const f of features!) {
 			const featureId = (f as GeoFeature<TProps> & { __id?: string }).__id ?? '';
 			const groupingValue = grouping?.(f);
 			const segScales = GeoSegments.scales(segments, featureId, groupingValue);
 			if (segScales?.color) segmentColorScaleFor(groupingValue ?? featureId, segScales);
+			else if (color?.(f) != null) usesPlotRamp = true;
 		}
 	}
 
@@ -102,7 +105,7 @@ export function buildScales<TProps extends Record<string, unknown>>(
 
 	return {
 		...state,
-		colorDomain: valueDomain ?? undefined,
+		colorDomain: (usesPlotRamp || !colorRamps.length ? valueDomain : undefined) ?? undefined,
 		colorRamps: colorRamps.length ? colorRamps : undefined,
 		opacityDomain:
 			opacityDomain && typeof opacityDomain[0] === 'number'

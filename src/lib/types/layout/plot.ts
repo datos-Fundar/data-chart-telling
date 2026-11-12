@@ -36,6 +36,8 @@ export type PlotCellContext<
 	panel?: object;
 	/** Where this slice sits among the facet panels - `undefined` when the plot has no facet. */
 	facet?: NonNullable<SlicePlace['facet']>;
+	/** The timeline step this slice shows - `undefined` when the plot has no timeline. */
+	time?: TimeValue;
 	/** Whether any row - the plot's own or a marker's - belongs in this slice; rows without a slicing field belong in all. */
 	keep: (row: TRow) => boolean;
 };

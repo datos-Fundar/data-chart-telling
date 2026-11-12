@@ -7,7 +7,7 @@ import type {
 	HistogramPlotState,
 	HistogramPlotEnv
 } from '$lib/types/plots/distribution/histogram/state';
-import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
+import type { AxisBasedMarkersConfig, RectMarkerConfig } from '$lib/types/markers/common';
 import type { ProcessedRow } from '$lib/types/phases';
 
 /**
@@ -54,8 +54,8 @@ export function buildMarks<TData extends Record<string, unknown>>(
 					series: group.series.name,
 					data: seg.data,
 					hover: 'style',
-					...(labels ? { label: labelFor(group.series.name) } : {}),
-					...channels,
+					...(labels ? { label: labelFor(group.series.name) as RectMarkerConfig['label'] } : {}),
+					...(channels as Partial<RectMarkerConfig>),
 					...options,
 					styles: {
 						// An outline asked for without a color is the fill's.
@@ -68,11 +68,11 @@ export function buildMarks<TData extends Record<string, unknown>>(
 						// A dimmed series fades its outline with its fill.
 						...(disabled?.fillOpacity !== undefined ? { strokeOpacity: disabled.fillOpacity } : {})
 					}
-				},
+				} satisfies RectMarkerConfig,
 				transforms
 			)
 		);
-	}) as unknown as AxisBasedMarkersConfig[];
+	}) as AxisBasedMarkersConfig[];
 
 	return rects;
 }

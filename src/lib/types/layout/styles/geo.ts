@@ -1,4 +1,4 @@
-import type { GeoFeature } from '$lib/types/plots/data/geo';
+import type { GeoFeature, GeoSliceContext } from '$lib/types/plots/data/geo';
 import type { FrameProp } from '$lib/types/layout/styles/frame';
 import type { BasePlotStylesConfig } from '$lib/types/layout/styles/base';
 
@@ -29,8 +29,8 @@ export type GeoStylesConfig<TProps extends Record<string, unknown> = Record<stri
 		strokeWidth?: number;
 		/** Raster XYZ tile basemap under the vector geometry. Mercator-family projections only. */
 		tileLayer?: GeoTileLayerConfig;
-		/** Fired when a base-map feature is clicked. */
-		onFeatureClick?: (feature: GeoFeature<TProps>, event: Event) => void;
+		/** Fired when a base-map feature is clicked, with the slice it was drawn in. */
+		onFeatureClick?: (feature: GeoFeature<TProps>, event: Event, slice: GeoSliceContext) => void;
 	};
 
 /**

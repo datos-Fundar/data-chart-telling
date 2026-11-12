@@ -86,6 +86,12 @@ A continuous section narrows with `interactive: { enabled: true, mode: 'filter' 
 
 Series can be toggled from code too: `useFigure().legend` has `off`, `isOff(name)`, `toggle`, `turnOff`, `turnOn` (see [Reading plot state](state.md)).
 
+The range of a continuous section can be set from code as well: `useFigure().legend.setRange([min, max])` does what dragging the handles does - they move, and the plots filter or rescale to it, in the mode the section was set up with (a second argument, `'filter'` or `'rescale'`, overrides it). `setRange(null)`, or a span that covers the whole ramp, resets it; `legend.range` reads it back. A mini legend per panel can use it to apply its own panel's range to the figure's legend on a click.
+
+```svelte
+<button onclick={() => figure.legend?.setRange([panelMin, panelMax])}>Use this range</button>
+```
+
 ## Adjusting the automatic legend
 
 An object adjusts the automatic legend while keeping what the plots read:

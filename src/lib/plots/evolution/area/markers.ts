@@ -2,7 +2,7 @@ import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { Transforms } from '$lib/phases/transforms/Transforms';
 
 import type { AreaPlotState, AreaPlotEnv } from '$lib/types/plots/evolution/area/state';
-import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
+import type { AxisBasedMarkersConfig, AreaMarkerConfig } from '$lib/types/markers/common';
 
 /**
  * AreaPlot's "markers" phase: one `area` per visual segment of each series,
@@ -46,7 +46,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 					type: 'area',
 					series: group.series.name,
 					data: seg.data,
-					...channels,
+					...(channels as Partial<AreaMarkerConfig>),
 					...options,
 					styles: {
 						// An outline asked for without a color is the fill's.
@@ -55,11 +55,11 @@ export function buildMarks<TData extends Record<string, unknown>>(
 						fill
 					},
 					...dimByName(group.series.name)
-				},
+				} satisfies AreaMarkerConfig,
 				transforms
 			);
 		})
-	) as unknown as AxisBasedMarkersConfig[];
+	) as AxisBasedMarkersConfig[];
 
 	const labels = state.valueLabels?.show ? state.valueLabels.forSeries(state, env) : undefined;
 	return ValueLabels.onMarkers(areas, 'area', labels);

@@ -72,7 +72,7 @@ Both derive rows from the data before drawing. A **transform** reshapes the rows
 | Filter    | `filter`                                                                                      | Keep rows a test holds for                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | Select    | `select`, `selectFirst`, `selectLast`, `selectMinX`, `selectMaxX`, `selectMinY`, `selectMaxY` | Keep one row per group, such as each series' last point or peak                                                                                                                                                                                                                                                                                                                                                                                                                |
 
-Bar stacking is always `stackY`, also for horizontal bars. A transform on a `HistogramPlot` is merged over the plot's default binning, so `{ type: 'binX', thresholds: 20 }` changes the bins and the rest stays.
+A bar plot stacks along its value axis: `stackY` for vertical bars, `stackX` for horizontal ones. A transform on a `HistogramPlot` is merged over the plot's default binning, so `{ type: 'binX', thresholds: 20 }` changes the bins and the rest stays.
 
 ## Statistics
 

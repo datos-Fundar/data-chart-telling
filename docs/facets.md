@@ -168,3 +168,15 @@ Panels line up: each plot reports the margins it settled on, and once all have, 
 ## Maps
 
 `GeoPlot` takes `facet` and reads the field from each feature's `properties` (and from each marker row); features without the field are drawn in every panel.
+
+The panels need not come from the features. `values` (or a grid's `rowValues` and `colValues`) name them, and they exist even when no feature carries the field: one layer of features serves every panel, with no copy of it per value. Each callback that reads a feature - `color`, `opacity`, `grouping`, `featureId`, `styles.onFeatureClick` - gets the slice it is drawn in as its last argument, `{ facet?: { value, row?, col? }, time? }`, and a tooltip's `format` finds the same `facet` and `time` in its context:
+
+```svelte
+<GeoPlot
+	data={provinces}
+	facet={{ by: 'sex', values: ['Women', 'Men'] }}
+	color={(f, { facet }) => valueFor(f.properties.name, facet?.value)}
+/>
+```
+
+The ramp spans every panel, each read in its own slice. See [Facets and timeline](geo.md#facets-and-timeline) on maps.

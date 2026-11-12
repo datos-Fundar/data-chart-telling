@@ -1,6 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect } from 'vitest';
 import FacetSizeProbe from './FacetSizeProbe.svelte';
+import FacetRowsProbe from './FacetRowsProbe.svelte';
 
 function cellSize(container: Element): { width: number; height: number } {
 	const cell = container.querySelector('[data-testid="cell"]');
@@ -134,4 +135,35 @@ describe('FacetLayout - navLayout', () => {
 
 		expect(container.querySelector('.dct-facet-paginated__nav-below')).toBeFalsy();
 	});
+});
+
+describe('FacetLayout - new rows for the same panels', () => {
+	const rowsOf = (offset: number) =>
+		['A', 'B', 'C'].flatMap((group, g) => [
+			{ group, value: offset + g },
+			{ group, value: offset + g }
+		]);
+	const cells = (container: Element) =>
+		[...container.querySelectorAll<HTMLElement>('[data-testid="cell"]')].map((el) => ({
+			el,
+			group: el.getAttribute('data-group'),
+			sum: Number(el.textContent?.trim())
+		}));
+
+	test.each(['grid', 'paginated', 'carousel'] as const)(
+		'%s: the cells stay and read the new rows',
+		async (mode) => {
+			const { container, rerender } = await render(FacetRowsProbe, { rows: rowsOf(0), mode });
+			await expect.poll(() => cells(container).length).toBeGreaterThan(0);
+			const before = cells(container);
+			expect(before.map((c) => c.group)).toEqual(['A', 'B', 'C']);
+			expect(before.map((c) => c.sum)).toEqual([0, 2, 4]);
+
+			// A timeline step hands the layout new row objects, in the same panels.
+			await rerender({ rows: rowsOf(10) });
+			await expect.poll(() => cells(container).map((c) => c.sum)).toEqual([20, 22, 24]);
+			// The cells are the ones already drawn, not drawn again.
+			expect(cells(container).map((c) => c.el)).toEqual(before.map((c) => c.el));
+		}
+	);
 });

@@ -164,7 +164,7 @@ ${shareText(row)}`,
 					},
 					label: labels && labelOf(labels),
 					hover: 'style'
-				} as RectMarkerConfig;
+				} satisfies RectMarkerConfig;
 			});
 		});
 	});
@@ -215,7 +215,7 @@ export function buildTreemapDefaults<TData extends Record<string, unknown>>(): A
 							...edgesOf(state),
 							styles: { fill: 'transparent' },
 							hover: hover.active && 'trigger'
-						}) as RectMarkerConfig
+						}) satisfies RectMarkerConfig
 				),
 			format: (state) => {
 				const number = NumberFormat.of(

@@ -146,7 +146,13 @@ export type {
 } from './types/markers/common';
 export type { StatisticConfig } from './types/layout/statistics';
 export type * from './types/transforms';
-export type { GeoFeature, GeoJsonInput, GeoDataProps, Topology } from './types/plots/data/geo';
+export type {
+	GeoFeature,
+	GeoJsonInput,
+	GeoDataProps,
+	GeoSliceContext,
+	Topology
+} from './types/plots/data/geo';
 export type {
 	GeoCustomProjection,
 	GeoCustomProjectionFactory,
