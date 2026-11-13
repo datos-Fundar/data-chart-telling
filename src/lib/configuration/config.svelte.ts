@@ -213,6 +213,13 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 		lineHeight: 1.2
 	},
 
+	sankey: {
+		nodes: { width: 12, padding: 12, fill: '#64748b' },
+		links: { fillOpacity: 0.45, curvature: 0.5 },
+		fontSize: 12,
+		labelGap: 6
+	},
+
 	timeline: {
 		axisColor: 'currentColor',
 		activeColor: '#4e79a7',

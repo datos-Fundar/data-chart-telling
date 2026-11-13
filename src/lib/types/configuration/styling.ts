@@ -295,6 +295,28 @@ export type PlotStylesConfig = {
 		lineHeight: number;
 	};
 
+	/** The nodes, links and labels of a `SankeyPlot`. */
+	sankey: {
+		nodes: {
+			/** A node's width, in px. */
+			width: number;
+			/** The room between two nodes of a column, in px. */
+			padding: number;
+			/** A node's fill while the links are the series, so nothing colors it. */
+			fill: string;
+		};
+		links: {
+			/** A link's fill opacity. */
+			fillOpacity: number;
+			/** How far in from each end (0-1) a link's edges bend. */
+			curvature: number;
+		};
+		/** Font size of a node's label, in px. */
+		fontSize: number;
+		/** The room between a node and its label, in px. */
+		labelGap: number;
+	};
+
 	/** Timeline gutter styling. */
 	timeline: {
 		axisColor: string;

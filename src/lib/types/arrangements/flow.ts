@@ -37,17 +37,22 @@ type FlowOptions = {
 	columns?: string[];
 	/** The room between two nodes of a column, in the links' own units. Defaults to a twentieth of the tallest column. */
 	gap?: number;
+	/** The room between two nodes of a column as a share of the arrangement's height; wins over `gap`. */
+	spacing?: number;
 	/** How the nodes of a column are ordered. Defaults to `'auto'`. */
 	order?: FlowOrder;
 	/** How many passes move the nodes toward the links that join them. Defaults to `6`. */
 	iterations?: number;
 };
 
+/** The options an author gives the flow arrangement, under a plot's `styles.arrangement`. */
+export type FlowArrangementOptions = Pick<FlowOptions, 'columns' | 'order'>;
+
 /**
  * The flow arrangement of a sankey, as the plot's transforms phase runs it: the links of a graph in named columns
  * on x, and on y in their own units, so a node's height is the value through it. Produces a row per node (`x`,
  * `y1`/`y2`) and a row per link (`x1`/`x2`, leaving between `y1`/`y2` and arriving between `y3`/`y4`, as a
  * `ribbon` reads them), told apart by `FLOW_ROW.kind` and carrying what the arrangement knows of them (see
- * `FLOW_ROW`).
+ * `FLOW_ROW`). Its `columns` and `height` options come back as the columns in order and the height they span.
  */
 export type FlowArrangement = { type: 'flow' } & FlowChannels & FlowOptions;

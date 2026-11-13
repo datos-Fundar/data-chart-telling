@@ -15,6 +15,8 @@ import type { AxisRole } from '$lib/types/phases/data/axes';
  * shared stage - its own marks and value labels among them.
  */
 export type AxisPlotKind<TState extends TransformsStageState & StatisticsStageState, TEnv> = {
+	/** The kind's own props a run starts from, besides the ones every axis kind takes. */
+	seed?: (props: Record<string, unknown>) => Partial<TState>;
 	data?: DataStageOptions<TState, TEnv>;
 	mapping?: MappingStageOptions<TState, TEnv>;
 	transforms?: TransformsStageOptions<TState, TEnv>;

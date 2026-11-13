@@ -170,7 +170,8 @@ export class Pipeline<TState, TEnv = unknown> {
 				new HoverPhase<TState, TEnv>(kind.hover)
 			],
 			{
-				seed: (props, rows) => Pipeline.#axisSeed(props, rows) as TState,
+				seed: (props, rows) =>
+					({ ...Pipeline.#axisSeed(props, rows), ...kind.seed?.(props) }) as TState,
 				hoverStrategy: kind.hover?.strategy as PipelineOptions<TState>['hoverStrategy'],
 				timeline: kind.timeline
 			}

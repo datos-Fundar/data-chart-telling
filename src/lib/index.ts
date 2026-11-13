@@ -15,6 +15,7 @@ export { default as HistogramPlot } from './plots/distribution/histogram/Plot.sv
 export { default as LinePlot } from './plots/evolution/line/Plot.svelte';
 export { default as LollipopPlot } from './plots/ranking/lollipop/Plot.svelte';
 export { default as PyramidPlot } from './plots/distribution/pyramid/Plot.svelte';
+export { default as SankeyPlot } from './plots/flow/sankey/Plot.svelte';
 export { default as ScatterPlot } from './plots/correlation/scatter/Plot.svelte';
 export { default as SlopePlot } from './plots/evolution/slope/Plot.svelte';
 export { default as SparklinePlot } from './plots/evolution/sparkline/Plot.svelte';
@@ -100,6 +101,15 @@ export type {
 	TreemapTooltipContext
 } from './types/plots/part-of-a-whole/treemap/props';
 export type { TreemapTile, TreemapArrangementOptions } from './types/arrangements/treemap';
+export type {
+	SankeyPlotProps,
+	SankeyDataProps,
+	SankeyRowContext,
+	SankeyTooltipContext
+} from './types/plots/flow/sankey/props';
+export type { FlowOrder, FlowArrangementOptions } from './types/arrangements/flow';
+export type { FlowColor, FlowEnd } from './types/plots/families/graph';
+export type { GraphNodes } from './types/plots/data/graph';
 export type { GenericPlotProps, GenericDataProps } from './types/plots/generic/props';
 export type { Series } from './types/plots/data/common';
 export type {

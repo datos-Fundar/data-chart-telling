@@ -47,6 +47,8 @@ type Link = { row: Row; index: number; source: Node; target: Node; value: number
 const DEFAULT_ITERATIONS = 6;
 /** The gap between nodes, as a share of the tallest column's values, when none is given. */
 const DEFAULT_GAP = 1 / 20;
+/** The most of a column's height its gaps can take. */
+const MAX_GAPS_SHARE = 0.8;
 
 const read = (channel: unknown, fallback: string): ((row: Row) => unknown) => {
 	const own = channel ?? fallback;
@@ -73,23 +75,41 @@ export class FlowArrangement {
 		const graph = FlowArrangement.#graph(data, { source, target, value }, options);
 		const columns = FlowArrangement.#columns(graph.nodes, options.columns as string[] | undefined);
 		const order = (options.order as FlowOrder | undefined) ?? 'auto';
-		const heaviest = Math.max(
-			0,
-			...columns.map((column) => column.reduce((sum, node) => sum + node.value, 0))
-		);
-		const gap = Number.isFinite(Number(options.gap))
-			? Math.max(0, Number(options.gap))
-			: heaviest * DEFAULT_GAP;
-		const height = Math.max(
-			0,
-			...columns.map(
-				(column) => column.reduce((sum, node) => sum + node.value, 0) + gap * (column.length - 1)
-			)
-		);
+		const { gap, height } = FlowArrangement.#extent(columns, options);
 		new FlowPlacement(columns, gap, height, order).run(
 			Number(options.iterations ?? DEFAULT_ITERATIONS)
 		);
-		return { ...rest, ...FlowArrangement.#rows(graph) };
+		return {
+			...rest,
+			...FlowArrangement.#rows(graph),
+			columns: columns.map((column) => column[0].column),
+			height
+		};
+	}
+
+	/**
+	 * The gap between two nodes and the height the columns span: `spacing` is the gap as a share of that height,
+	 * so the tallest column is solved for it; else `gap`, in the links' units.
+	 */
+	static #extent(columns: Node[][], options: Row): { gap: number; height: number } {
+		const sums = columns.map((column) => column.reduce((sum, node) => sum + node.value, 0));
+		const spacing = Number(options.spacing);
+		if (Number.isFinite(spacing) && spacing >= 0) {
+			const most = Math.max(1, ...columns.map((column) => column.length));
+			// The gaps of the fullest column never take more than MAX_GAPS_SHARE of it.
+			const share = Math.min(spacing, MAX_GAPS_SHARE / Math.max(1, most - 1));
+			const height = Math.max(
+				0,
+				...columns.map((column, i) => sums[i] / (1 - share * (column.length - 1)))
+			);
+			return { gap: share * height, height };
+		}
+		const heaviest = Math.max(0, ...sums);
+		const gap = Number.isFinite(Number(options.gap))
+			? Math.max(0, Number(options.gap))
+			: heaviest * DEFAULT_GAP;
+		const height = Math.max(0, ...columns.map((column, i) => sums[i] + gap * (column.length - 1)));
+		return { gap, height };
 	}
 
 	/** The nodes and links of the graph: the nodes listed first, then the ones the links name. */

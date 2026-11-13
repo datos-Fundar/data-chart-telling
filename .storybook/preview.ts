@@ -212,6 +212,21 @@ const preview: Preview = {
 								'*'
 							]
 						],
+						'Flow',
+						[
+							'SankeyPlot',
+							[
+								'Series',
+								'Scales',
+								'Styles',
+								['Basic', '*'],
+								'Segments',
+								'Markers',
+								['*'],
+								'Tooltip',
+								'*'
+							]
+						],
 						'Map',
 						[
 							'GeoPlot',

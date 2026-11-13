@@ -1,3 +1,4 @@
+import type { PlotRowContext } from '$lib/types/layout/context';
 import type { FrameProp } from '$lib/types/layout/styles/frame';
 import type { ValuesStyle } from '$lib/types/layout/styles/values';
 import type { StrokeStyle, DotStyle, AreaStyle } from '$lib/types/plots/styling';
@@ -10,6 +11,11 @@ export type BasePlotStylesConfig = {
 	/** Decorative border around the plot's content box - see {@link FrameStyle}. Available on every plot kind. */
 	frame?: FrameProp;
 };
+
+/** A style as it is for every row, or a function of the row and what the plot knows of it (its `context`). */
+export type StyleValue<T, TRow = Record<string, unknown>, TContext = PlotRowContext> =
+	| T
+	| ((row: TRow, context: TContext) => T);
 
 /** A style as it is for every series, or a function of the series' name - `undefined` leaves that series as it is. */
 export type PerSeries<TStyle> = TStyle | ((series: string) => TStyle | undefined);

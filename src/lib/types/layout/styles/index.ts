@@ -7,3 +7,4 @@ export * from '$lib/types/layout/styles/geo';
 export * from '$lib/types/layout/styles/curve';
 export * from '$lib/types/layout/styles/bullet';
 export * from '$lib/types/layout/styles/arrangement';
+export * from '$lib/types/layout/styles/sankey';

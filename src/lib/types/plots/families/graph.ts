@@ -7,6 +7,16 @@ import type {
 } from '$lib/types/phases';
 import type { AxesPlotProps, AxesPlotCoreProps } from '$lib/types/plots/families/axes';
 import type { TooltipContext } from '$lib/types/layout/tooltip';
+import type { Accessor } from '$lib/types/layout/mapping';
+
+/** One end of a link: the node it leaves, or the node it reaches. */
+export type FlowEnd = 'source' | 'target';
+
+/**
+ * What colors a flow and names its series on the legend: the label of the node at one end of each link (its
+ * nodes are the series), or a value of the link's own (a field key, or a function of the link).
+ */
+export type FlowColor<TLink extends Record<string, unknown>> = FlowEnd | Accessor<TLink, unknown>;
 
 /** The hover of a graph kind: found through each row's own shape, which it restyles. */
 type GraphHoverOptions<TState, TEnv> = Pick<

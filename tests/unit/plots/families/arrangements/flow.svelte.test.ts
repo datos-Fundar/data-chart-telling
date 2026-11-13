@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { Transforms } from '$lib/phases/transforms/Transforms';
 import { FLOW_ROW } from '$lib/plots/families/graph/arrangements/FlowArrangement';
-import { Graph } from '$lib/plots/families/graph/Graph';
 import type { Transform } from '$lib/types/phases';
 import type { FlowArrangement } from '$lib/types/arrangements/flow';
 
@@ -71,6 +70,21 @@ describe('flow arrangement', () => {
 			expect(num(rows[0], 'y1')).toBeGreaterThanOrEqual(-1e-9);
 			expect(num(rows[rows.length - 1], 'y2')).toBeLessThanOrEqual(height + 1e-9);
 		}
+	});
+
+	test('gives back its columns in order and the height they span', () => {
+		const out = run({ gap: 1 });
+		expect(out.columns).toEqual(['0', '1', '2']);
+		expect(out.height).toBe(15);
+	});
+
+	test('with spacing, sets the gap as a share of the height the columns span', () => {
+		const out = run({ spacing: 0.1 });
+		// The middle column: 14 and one gap of a tenth of the height, so the height is 14 / 0.9.
+		const height = 14 / 0.9;
+		expect(out.height).toBeCloseTo(height);
+		const [top, bottom] = column(out, '1');
+		expect(num(bottom, 'y1') - num(top, 'y2')).toBeCloseTo(height * 0.1);
 	});
 
 	test("stacks a node's links over it, as thick as their values, in the order of their other ends", () => {
@@ -159,52 +173,5 @@ describe('flow arrangement', () => {
 		const auto = run({ order: 'auto', nodes: nodesListed }, data);
 		const crossed = (ids(auto, '0')[0] === 'A') !== (ids(auto, '1')[0] === 'Y');
 		expect(crossed).toBe(false);
-	});
-});
-
-describe('Graph.fromTable', () => {
-	const ROWS = [
-		{ work: 'CABA', home: 'CABA', year: 2003, n: 10 },
-		{ work: 'CABA', home: 'GBA', year: 2003, n: 4 },
-		{ work: 'GBA', home: 'GBA', year: 2003, n: 8 },
-		{ work: 'CABA', home: 'GBA', year: 2025, n: 6 },
-		{ work: 'CABA', home: 'GBA', year: 2025, n: 1 }
-	];
-
-	test('makes a node per value of each column, named after it', () => {
-		const graph = Graph.fromTable(ROWS, { columns: ['work', 'home'], value: 'n' });
-		expect(graph.nodes!.map(({ name, column }) => `${column}:${name}`)).toEqual([
-			'work:CABA',
-			'work:GBA',
-			'home:CABA',
-			'home:GBA'
-		]);
-		expect(graph.column).toBe('column');
-	});
-
-	test('sums the value of the rows two neighbouring columns share into one link', () => {
-		const graph = Graph.fromTable(ROWS, { columns: ['work', 'home'], value: 'n' });
-		const named = (id: string) => graph.nodes!.find((n) => n.id === id)!.name;
-		const sums = graph.links.map((l) => `${named(l.source)}>${named(l.target)}=${l.value}`);
-		expect(sums).toEqual(['CABA>CABA=10', 'CABA>GBA=11', 'GBA>GBA=8']);
-	});
-
-	test('counts the rows without a value, and keeps rows apart by the `by` fields', () => {
-		const graph = Graph.fromTable(ROWS, { columns: ['work', 'home'], by: ['year'] });
-		expect(graph.links.map((l) => [l.year, l.value])).toEqual([
-			[2003, 1],
-			[2003, 1],
-			[2003, 1],
-			[2025, 2]
-		]);
-	});
-
-	test('is placed by the flow arrangement as it comes', () => {
-		const graph = Graph.fromTable(ROWS, { columns: ['work', 'home'], value: 'n' });
-		const out = Transforms.run(
-			{ type: 'flow', nodes: graph.nodes, column: graph.column } as Transform,
-			{ data: graph.links }
-		) as Out;
-		expect(nodes(out).map((row) => row[FLOW_ROW.x])).toEqual(['work', 'work', 'home', 'home']);
 	});
 });

@@ -19,6 +19,11 @@ export type SegmentsStageOptions = {
  * whether `color` groups - the stage reads off the data itself.
  */
 export type DataStageOptions<TState, TEnv> = {
+	/**
+	 * Reshapes the kind's rows before its series are built from them - a graph kind's links, from a table - as
+	 * the plot's timeline and facet sliced them.
+	 */
+	prepare?: (state: TState, env: TEnv) => TState;
 	/** How many axes the kind lays out as categories: 0 (line), 1 (bar) or 2 (heatmap). Defaults to 0. */
 	discreteAxes?: DiscreteAxesCount;
 	/** How the kind's own mark splits into visual segments. */

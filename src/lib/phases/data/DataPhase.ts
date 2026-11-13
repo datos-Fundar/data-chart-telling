@@ -34,8 +34,9 @@ export class DataPhase<TState extends AnyAxisState, TEnv extends AxisPlotEnv> im
 		this.#options = options;
 	}
 
-	run = (state: TState, env: TEnv): TState => {
+	run = (given: TState, env: TEnv): TState => {
 		const options = this.#options;
+		const state = options.prepare ? options.prepare(given, env) : given;
 		const { series, data, segments, scales } = state;
 		const { connect = true, color: segmentColor } = options.segments ?? {};
 
