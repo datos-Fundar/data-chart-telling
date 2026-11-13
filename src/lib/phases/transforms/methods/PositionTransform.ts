@@ -52,6 +52,7 @@ export class PositionTransform {
 
 	static readonly shiftY: TransformAdapter = {
 		channelKeys: POSITION_CHANNEL_KEYS,
+		rowwise: 'y',
 		run: (channels, options) => shiftY(channels as never, options.by as never) as Row
 	};
 

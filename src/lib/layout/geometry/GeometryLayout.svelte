@@ -24,6 +24,7 @@
 	import TickMarker from '$lib/markers/tick/TickMarker.svelte';
 	import TrailMarker from '$lib/markers/trail/TrailMarker.svelte';
 	import ViolinMarker from '$lib/markers/violin/ViolinMarker.svelte';
+	import RibbonMarker from '$lib/markers/ribbon/RibbonMarker.svelte';
 	import WaffleMarker from '$lib/markers/waffle/WaffleMarker.svelte';
 	import DotMarker from '$lib/markers/dot/DotMarker.svelte';
 	import TextMarker from '$lib/markers/text/TextMarker.svelte';
@@ -341,6 +342,8 @@
 		<TrailMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'violin'}
 		<ViolinMarker marker={{ ...marker, data: marker.data ?? rows }} />
+	{:else if marker.type === 'ribbon'}
+		<RibbonMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'waffle'}
 		<WaffleMarker marker={{ ...marker, data: marker.data ?? rows }} />
 	{:else if marker.type === 'dot'}

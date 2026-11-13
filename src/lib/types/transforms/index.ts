@@ -27,7 +27,6 @@ import type {
 	GroupZTransform,
 	Group2DTransform
 } from '$lib/types/transforms/group';
-import type { TreemapTransform } from '$lib/types/transforms/treemap';
 
 export type {
 	TransformChannel,
@@ -81,7 +80,6 @@ export type {
 	GroupZTransform,
 	Group2DTransform
 } from '$lib/types/transforms/group';
-export type { TreemapTile, TreemapTransform } from '$lib/types/transforms/treemap';
 
 /**
  * Every svelteplot transform a marker (via `CommonMarkerConfig.transforms`) or
@@ -124,5 +122,4 @@ export type MarkerTransform =
 	| GroupXTransform
 	| GroupYTransform
 	| GroupZTransform
-	| Group2DTransform
-	| TreemapTransform;
+	| Group2DTransform;

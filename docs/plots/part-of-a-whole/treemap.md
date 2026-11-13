@@ -2,7 +2,7 @@
 
 Part of [Plots](../../plots.md).
 
-A part-to-whole made of rectangles: each row is a tile whose **area** is its `value`, and the tiles are nested by `grouping`, so a group's tiles sit together. `value` is the field (or function) giving a tile's size; the last level of `grouping` names it. The plot is the [`treemap` transform](../../transforms-and-statistics.md) drawn as `rect` markers, each with a `label`.
+A part-to-whole made of rectangles: each row is a tile whose **area** is its `value`, and the tiles are nested by `grouping`, so a group's tiles sit together. `value` is the field (or function) giving a tile's size; the last level of `grouping` names it. The plot lays the tiles out with d3-hierarchy's treemap and draws them as `rect` markers, each with a `label`.
 
 <!-- example: examples/Treemap.svelte -->
 
@@ -28,7 +28,7 @@ A part-to-whole made of rectangles: each row is a tile whose **area** is its `va
 
 - A row without a positive `value` has no tile.
 - `grouping` is the **whole path** of a tile, its fields joined by dots, outermost first: `grouping="sector.kind.branch"` nests the tiles by sector, then by kind, and names each one after its branch. A function is a single level. Rows with the same path are one tile, their values added up, so `grouping="sector"` alone makes three big tiles. The outermost level colors the tiles and is what the [legend](../../legend.md) lists; `scales.color` sets the colors, as in any plot. Without `grouping`, `color` groups the tiles, as it groups the series of any plot. `scales.color.depth` colors deeper levels as tones of their sector's color: `2` a tone per kind, `3` per branch (see [Scales](../../scales.md#color)).
-- How a rectangle is split among its tiles is an option of the plot's own `treemap` transform: `transforms={[{ type: 'treemap', tile: 'binary' }]}` sets it over the one the plot builds from `value` and `grouping`. `tile` is `'squarify'` (the default, which keeps them close to squares), `'binary'`, `'slice'`, `'dice'` or `'sliceDice'`.
+- How a rectangle is split among its tiles is `styles.arrangement.tile`: `styles={{ arrangement: { tile: 'binary' } }}`. `tile` is `'squarify'` (the default, which keeps them close to squares), `'binary'`, `'slice'`, `'dice'` or `'sliceDice'`.
 - Tiles have no axes.
 
 ## Labels

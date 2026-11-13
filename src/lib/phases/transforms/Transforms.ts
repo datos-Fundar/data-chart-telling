@@ -1,4 +1,4 @@
-import type { MarkerTransform } from '$lib/types/transforms';
+import type { Transform } from '$lib/types/phases';
 import { StackTransform } from '$lib/phases/transforms/methods/StackTransform';
 import { BinTransform } from '$lib/phases/transforms/methods/BinTransform';
 import { DensityTransform } from '$lib/phases/transforms/methods/DensityTransform';
@@ -7,11 +7,12 @@ import { NormalizeTransform } from '$lib/phases/transforms/methods/NormalizeTran
 import { PositionTransform } from '$lib/phases/transforms/methods/PositionTransform';
 import { OrderTransform } from '$lib/phases/transforms/methods/OrderTransform';
 import { GroupTransform } from '$lib/phases/transforms/methods/GroupTransform';
-import { TreemapTransform } from '$lib/phases/transforms/methods/TreemapTransform';
+import { TreemapArrangement } from '$lib/plots/families/graph/arrangements/TreemapArrangement';
+import { FlowArrangement } from '$lib/plots/families/graph/arrangements/FlowArrangement';
 import type { Row, TransformAdapter } from '$lib/types/phases/transforms/adapter';
 
-/** Each transform type's adapter: its channels, how it runs, and its own fixes. */
-const ADAPTERS: Record<MarkerTransform['type'], TransformAdapter> = {
+/** Each transform type's adapter: its channels, how it runs, and its own fixes. The arrangements are the kinds' own. */
+const ADAPTERS: Record<Transform['type'], TransformAdapter> = {
 	stackX: StackTransform.x,
 	stackY: StackTransform.y,
 	stackMosaicX: StackTransform.mosaicX,
@@ -52,8 +53,15 @@ const ADAPTERS: Record<MarkerTransform['type'], TransformAdapter> = {
 	groupY: GroupTransform.y,
 	groupZ: GroupTransform.z,
 	group: GroupTransform.grid,
-	treemap: TreemapTransform.adapter
+	treemap: TreemapArrangement.adapter,
+	flow: FlowArrangement.adapter
 };
+
+/** A marker's further channels on an axis, each run through a row-by-row transform as the one it pairs with. */
+const FURTHER = { y: { y3: 'y1', y4: 'y2' } } as const;
+
+/** What a row-by-row transform leaves for a marker's further channels, under keys of their own. */
+const FURTHER_KEYS = { y3: Symbol('transform.y3'), y4: Symbol('transform.y4') } as const;
 
 /** Runs a marker's or a plot's transforms through svelteplot, one type's adapter at a time. */
 export class Transforms {
@@ -72,7 +80,7 @@ export class Transforms {
 	 * grouping as `z`). Only the ones the transform reads are used, and the
 	 * transform's own channels win over them.
 	 */
-	static run(transform: MarkerTransform, inherited: Row = {}): Row {
+	static run(transform: Transform, inherited: Row = {}): Row {
 		const adapter = ADAPTERS[transform.type];
 		const { channelKeys, outputKeys } = adapter;
 		const isOption = (key: string) => outputKeys?.[key] === true || channelKeys[key] !== true;
@@ -104,7 +112,7 @@ export class Transforms {
 	 * type's fix to the marker.
 	 */
 	static resolve<T extends object>(marker: T, fallbackData: Row[]): T {
-		const own = marker as T & { transforms?: MarkerTransform[] };
+		const own = marker as T & { transforms?: Transform[] };
 		if (!own.transforms?.length) return marker;
 		let resolved: Row = { ...own };
 		for (const transform of own.transforms) {
@@ -114,7 +122,11 @@ export class Transforms {
 				...Object.fromEntries(Transforms.INHERITED_CHANNELS.map((k) => [k, resolved[k]]))
 			};
 			const { z, fill, stroke, ...out } = Transforms.run(transform, inherited);
-			resolved = { ...resolved, ...out };
+			resolved = {
+				...resolved,
+				...out,
+				...Transforms.#further(transform, resolved, inherited, out)
+			};
 			if (z !== undefined) resolved.grouping = z;
 			const color = fill ?? stroke;
 			if (color != null && resolved.color === undefined) resolved.color = color;
@@ -123,11 +135,46 @@ export class Transforms {
 	}
 
 	/**
+	 * A row-by-row transform over a marker's further channels (`y3`/`y4`): run again over the same rows with each
+	 * one in the place of the channel it pairs with, its values left on the rows the first run made. Nothing when
+	 * the transform is not row by row or the marker has none of them.
+	 */
+	static #further(transform: Transform, marker: Row, inherited: Row, out: Row): Row {
+		const axis = ADAPTERS[transform.type].rowwise;
+		if (!axis) return {};
+		const pairs = Object.entries(FURTHER[axis]).filter(([own]) => marker[own] !== undefined) as [
+			keyof typeof FURTHER_KEYS,
+			string
+		][];
+		const rows = out.data as Row[] | undefined;
+		if (!pairs.length || !rows) return {};
+		const again = Transforms.run(transform, {
+			...inherited,
+			...Object.fromEntries(pairs.map(([own, as]) => [as, marker[own]]))
+		});
+		const other = again.data as Row[];
+		if (other?.length !== rows.length) return {};
+		const read = (channel: unknown, row: Row) =>
+			typeof channel === 'function'
+				? (channel as (r: Row) => unknown)(row)
+				: row[channel as string];
+		return {
+			data: rows.map((row, i) => ({
+				...row,
+				...Object.fromEntries(
+					pairs.map(([own, as]) => [FURTHER_KEYS[own], read(again[as], other[i])])
+				)
+			})),
+			...Object.fromEntries(pairs.map(([own]) => [own, FURTHER_KEYS[own]]))
+		};
+	}
+
+	/**
 	 * Applies each transform type's `finish` fix to a marker drawing rows those
 	 * transforms produced, once per type used - for a marker built from rows that
 	 * were transformed before it existed (a plot's own processed data).
 	 */
-	static finish<T extends object>(marker: T, transforms: MarkerTransform[]): T {
+	static finish<T extends object>(marker: T, transforms: Transform[]): T {
 		let finished = marker as Row;
 		for (const adapter of new Set(transforms.map((t) => ADAPTERS[t.type]))) {
 			if (adapter.finish) finished = adapter.finish(finished);

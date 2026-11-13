@@ -10,7 +10,8 @@ export type {
 	ProcessedChannelName,
 	ProcessedData,
 	TransformsStageState,
-	TransformsStageOptions
+	TransformsStageOptions,
+	Transform
 } from './transforms/phase';
 export type { ContextStageOptions } from './context/phase';
 export type { StatisticsStageState, StatisticsStageOptions } from './statistics/phase';

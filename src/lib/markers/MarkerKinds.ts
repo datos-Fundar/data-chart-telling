@@ -123,6 +123,12 @@ export class MarkerKinds {
 			drawsRows: true,
 			legendSymbol: 'line'
 		},
+		ribbon: {
+			inherits: ['color', 'opacity'],
+			clip: true,
+			drawsRows: true,
+			legendSymbol: 'area'
+		},
 		rule: { clip: true, drawsRows: false, legendSymbol: 'line' },
 		sphere: { clip: false, drawsRows: false },
 		text: {

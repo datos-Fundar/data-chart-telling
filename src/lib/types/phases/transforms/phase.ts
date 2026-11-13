@@ -1,8 +1,12 @@
 import type { Series } from '$lib/types/plots/data/common';
 import type { MarkerTransform } from '$lib/types/transforms';
+import type { ArrangementTransform } from '$lib/types/arrangements';
 import type { PlotAxes } from '$lib/phases/data/PlotAxes';
 import type { VisualGroup } from '$lib/types/plots/segments/config';
 import type { ValuesStyle, ValueSelect } from '$lib/types/layout/styles';
+
+/** What the transforms phase runs: the author's transforms, and a graph kind's arrangement. */
+export type Transform = MarkerTransform | ArrangementTransform;
 
 /** A row the plot-level transforms produced: the source row's fields, plus whatever channels they add (often symbol-keyed). */
 export type ProcessedRow = Record<string | symbol, unknown>;
@@ -26,7 +30,7 @@ export type ProcessedData = {
 	/** The transforms' own mark options (e.g. a bin's insets), for the marks that draw these rows. */
 	options: Record<string, unknown>;
 	/** The transforms the rows went through, so a mark can apply each type's `finish` fix. */
-	transforms: MarkerTransform[];
+	transforms: Transform[];
 };
 
 /** What the shared "transforms" stage reads from and writes to a plot's state. */
@@ -57,8 +61,8 @@ export type TransformsStageState = {
 
 /** What differs between plots in the shared "transforms" stage. */
 export type TransformsStageOptions<TState extends TransformsStageState, TEnv> = {
-	/** The transforms to run. Defaults to the plot's own `transforms`. */
-	transforms?: (state: TState, env: TEnv) => MarkerTransform[];
+	/** The transforms to run, the kind's arrangement among them. Defaults to the plot's own `transforms`. */
+	transforms?: (state: TState, env: TEnv) => Transform[];
 	/**
 	 * Whether a series the legend omits keeps its part of the whole (a treemap's tile): the transforms run over
 	 * its rows too, so every other part keeps its share and its place, and its own rows are dropped after.

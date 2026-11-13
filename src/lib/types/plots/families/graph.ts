@@ -18,7 +18,7 @@ type GraphHoverOptions<TState, TEnv> = Pick<
 };
 
 /**
- * What a graph kind adds to the shared pipeline: positions come from its own layout transform, on axes it
+ * What a graph kind adds to the shared pipeline: positions come from its own arrangement, on axes it
  * hides unless the author shows them.
  */
 export type GraphPlotKind<TState extends TransformsStageState & StatisticsStageState, TEnv> = Omit<

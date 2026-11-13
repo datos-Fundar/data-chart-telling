@@ -9,7 +9,7 @@ const HIDDEN_AXES = {
 } as const;
 
 /**
- * A graph kind on the shared pipeline: its positions are its layout transform's, on hidden cartesian axes, and its
+ * A graph kind on the shared pipeline: its positions are its arrangement's, on hidden cartesian axes, and its
  * hover matches the shape under the pointer, which it restyles without a crosshair.
  */
 export function buildGraphDefaults<

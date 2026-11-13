@@ -40,7 +40,7 @@ type FitChannel = string | symbol | ((d: any) => unknown);
 
 /**
  * What a label is fitted to: the rectangle its row spans, from `x1` to `x2` along the x axis and from `y1` to `y2`
- * along the y - a tile of a `treemap` transform, say. A label too big for it is written smaller, down to
+ * along the y - a treemap's tile, say. A label too big for it is written smaller, down to
  * `minFontSize`; at that size, broken into as many lines as the box holds and cut short with an ellipsis; and
  * when almost none of it would show, as its `fallback`. A label with no room for even that is left out.
  */

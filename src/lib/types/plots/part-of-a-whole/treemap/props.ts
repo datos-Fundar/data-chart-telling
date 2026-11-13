@@ -1,8 +1,8 @@
-import type { WithValues } from '$lib/types/layout/styles';
+import type { ArrangementAwarePlotStylesConfig, WithValues } from '$lib/types/layout/styles';
 import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
+import type { TreemapArrangementOptions } from '$lib/types/arrangements/treemap';
 import type { GraphPlotProps, GraphPlotCoreProps } from '$lib/types/plots/families/graph';
 import type { NonAxisDataProps } from '$lib/types/plots/data/common';
-import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import type { KindRowContext } from '$lib/types/layout/context';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 
@@ -20,6 +20,12 @@ export type TreemapRowContext = KindRowContext<{
 	share: number;
 }>;
 
+/** `TreemapPlot`'s `styles`: its value labels, and how its rectangles split among their tiles. */
+type TreemapStyles = WithValues<
+	ArrangementAwarePlotStylesConfig<TreemapArrangementOptions>,
+	BoxLabelConfig
+>;
+
 /** What a `TreemapPlot`'s `tooltip.format` gets in its third argument - see {@link TreemapRowContext}. */
 export type TreemapTooltipContext = TreemapRowContext;
 
@@ -30,7 +36,7 @@ export type TreemapTooltipContext = TreemapRowContext;
 export type TreemapPlotProps<TData extends Record<string, unknown>> = GraphPlotProps<
 	NonAxisDataProps<TData, 'value'>,
 	TData,
-	WithValues<AxisBasedStylesConfig, BoxLabelConfig>,
+	TreemapStyles,
 	BarSegmentStyle,
 	TreemapTooltipContext
 >;
@@ -39,6 +45,6 @@ export type TreemapPlotProps<TData extends Record<string, unknown>> = GraphPlotP
 export type TreemapPlotCoreProps<TData extends Record<string, unknown>> = GraphPlotCoreProps<
 	NonAxisDataProps<TData, 'value'>,
 	TData,
-	WithValues<AxisBasedStylesConfig, BoxLabelConfig>,
+	TreemapStyles,
 	BarSegmentStyle
 >;

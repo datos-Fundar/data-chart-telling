@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'vitest';
 import { Transforms } from '$lib/phases/transforms/Transforms';
-import { TREEMAP_ROW } from '$lib/phases/transforms/methods/TreemapTransform';
-import type { MarkerTransform } from '$lib/types/transforms';
+import { TREEMAP_ROW } from '$lib/plots/families/graph/arrangements/TreemapArrangement';
+import type { Transform } from '$lib/types/phases';
+import type { TreemapArrangement } from '$lib/types/arrangements/treemap';
 
 type Row = Record<string | symbol, unknown>;
 type Out = { data: Row[]; [key: string]: unknown };
@@ -14,8 +15,8 @@ const ROWS: Row[] = [
 	{ sector: 'B', kind: 'y', branch: 'b2', v: 10 }
 ];
 
-const run = (transform: Omit<Extract<MarkerTransform, { type: 'treemap' }>, 'type'>, data = ROWS) =>
-	Transforms.run({ type: 'treemap', ...transform } as MarkerTransform, { data }) as Out;
+const run = (transform: Omit<TreemapArrangement, 'type'>, data = ROWS) =>
+	Transforms.run({ type: 'treemap', ...transform } as Transform, { data }) as Out;
 
 /** A tile's number off its row, through the channel the transform names (a symbol key). */
 const at = (out: Out, row: Row, channel: string) => Number(row[out[channel] as symbol]);
@@ -23,7 +24,7 @@ const area = (out: Out, row: Row) =>
 	(at(out, row, 'x2') - at(out, row, 'x1')) * (at(out, row, 'y2') - at(out, row, 'y1'));
 const nameOf = (row: Row) => row[TREEMAP_ROW.name];
 
-describe('treemap transform', () => {
+describe('treemap arrangement', () => {
 	test('makes a tile per distinct path of its levels, its area its share of the unit square', () => {
 		const out = run({ value: 'v', levels: ['sector', 'branch'] });
 		expect(out.data).toHaveLength(5);
@@ -130,7 +131,7 @@ describe('treemap transform', () => {
 		const out = Transforms.resolve(
 			{
 				data: ROWS,
-				transforms: [{ type: 'treemap', value: 'v', levels: ['sector'] }] as MarkerTransform[]
+				transforms: [{ type: 'treemap', value: 'v', levels: ['sector'] }] as Transform[]
 			},
 			ROWS
 		) as unknown as Out;
@@ -141,11 +142,7 @@ describe('treemap transform', () => {
 	});
 
 	test('asks for its data and its value', () => {
-		expect(() => Transforms.run({ type: 'treemap' } as MarkerTransform, { data: ROWS })).toThrow(
-			/value/
-		);
-		expect(() => Transforms.run({ type: 'treemap', value: 'v' } as MarkerTransform, {})).toThrow(
-			/data/
-		);
+		expect(() => Transforms.run({ type: 'treemap' } as Transform, { data: ROWS })).toThrow(/value/);
+		expect(() => Transforms.run({ type: 'treemap', value: 'v' } as Transform, {})).toThrow(/data/);
 	});
 });

@@ -147,6 +147,27 @@ export class MarkerChannels {
 		cfg: PlotStylesConfig,
 		steps = 32
 	): OpacityBucket<TData>[] | undefined {
+		const opacityOf = MarkerChannels.buildOpacity(data, opacity, scales, cfg);
+		if (!opacityOf) return undefined;
+		const buckets = new Map<number, TData[]>();
+		for (const d of data) {
+			const quantized = Math.round(opacityOf(d) * steps) / steps;
+			if (!buckets.has(quantized)) buckets.set(quantized, []);
+			buckets.get(quantized)!.push(d);
+		}
+		return [...buckets.entries()].map(([value, rows]) => ({ value, data: rows }));
+	}
+
+	/**
+	 * The opacity of each row through the marker's `opacity` channel and its `scales.opacity`, or `undefined`
+	 * when it has none - for a marker that draws its shapes itself, so svelteplot never rescales it.
+	 */
+	static buildOpacity<TData>(
+		data: TData[],
+		opacity: string | ((d: TData) => unknown) | undefined,
+		scales: ChannelScalesConfig | undefined,
+		cfg: PlotStylesConfig
+	): ((d: TData) => number) | undefined {
 		if (!opacity || !data.length) return undefined;
 		const opacityFn =
 			typeof opacity === 'function'
@@ -161,14 +182,6 @@ export class MarkerChannels {
 			: [...new Set(rawVals.map(String))];
 
 		const scale = OpacityScale.resolve(scales?.opacity, domain, cfg.continuous.opacityRange);
-
-		const buckets = new Map<number, TData[]>();
-		for (const d of data) {
-			const resolved = scale(opacityFn(d));
-			const quantized = Math.round(resolved * steps) / steps;
-			if (!buckets.has(quantized)) buckets.set(quantized, []);
-			buckets.get(quantized)!.push(d);
-		}
-		return [...buckets.entries()].map(([value, rows]) => ({ value, data: rows }));
+		return (d: TData) => scale(opacityFn(d));
 	}
 }

@@ -108,11 +108,11 @@ describe('TreemapPlot', () => {
 		await expect.poll(() => labels(svg).flat().includes('TERCIARIAS')).toBe(true);
 	});
 
-	test('takes the options of its own treemap transform: tile', async () => {
+	test('splits its rectangles as `styles.arrangement.tile` says', async () => {
 		const { container } = await render(TreemapPlot, {
 			...props,
 			grouping: 'sector',
-			transforms: [{ type: 'treemap', tile: 'dice' }]
+			styles: { arrangement: { tile: 'dice' } }
 		});
 		const svg = await waitForSvg(container);
 		await expect.poll(() => tiles(svg).length).toBe(3);

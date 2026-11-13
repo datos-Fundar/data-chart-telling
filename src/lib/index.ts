@@ -96,7 +96,7 @@ export type {
 	TreemapRowContext,
 	TreemapTooltipContext
 } from './types/plots/part-of-a-whole/treemap/props';
-export type { TreemapTile } from './types/transforms/treemap';
+export type { TreemapTile, TreemapArrangementOptions } from './types/arrangements/treemap';
 export type { GenericPlotProps, GenericDataProps } from './types/plots/generic/props';
 export type {
 	Accessor,
@@ -121,6 +121,7 @@ export type {
 	AxisBasedStylesConfig,
 	ConnectorBasedStylesConfig,
 	BulletStylesConfig,
+	ArrangementAwarePlotStylesConfig,
 	GapsAwarePlotStylesConfig,
 	CurveAwarePlotStylesConfig,
 	GeoStylesConfig,

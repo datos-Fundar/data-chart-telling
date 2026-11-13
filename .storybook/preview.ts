@@ -348,7 +348,6 @@ const preview: Preview = {
 						'Shift',
 						'Sort',
 						'Stack',
-						'Treemap',
 						'Window'
 					],
 					'Markers',
@@ -377,6 +376,7 @@ const preview: Preview = {
 						'Link',
 						'Raster',
 						'Rect',
+						'Ribbon',
 						'Rule',
 						'Sphere',
 						'Text',

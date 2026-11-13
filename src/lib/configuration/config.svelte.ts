@@ -278,6 +278,8 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 
 	band: { fill: '#94a3b8', fillOpacity: 0.25 },
 
+	ribbon: { fill: '#94a3b8', fillOpacity: 0.5, curvature: 0.5 },
+
 	delta: {
 		text: {
 			x: { dx: 12, dy: 0, lineAnchor: 'middle', textAnchor: 'start' },

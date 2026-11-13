@@ -75,35 +75,3 @@ export const UsingFunctions: Story = {
 		grouping: (row) => (row.sector === 'Tertiary' ? 'Services' : 'Goods')
 	}
 };
-
-// How a rectangle is split among its tiles is an option of the plot's `treemap` transform: a `treemap` entry in
-// `transforms` sets it, over the one the plot builds from its `value` and `grouping`.
-
-/** `tile: 'squarify'` (the default) keeps tiles close to squares. */
-export const SquarifiedTiling: Story = {
-	args: { ...BASE, transforms: [{ type: 'treemap', tile: 'squarify' }] }
-};
-
-/** `tile: 'slice'` stacks a rectangle's tiles in rows. */
-export const SliceTiling: Story = {
-	args: { ...BASE, transforms: [{ type: 'treemap', tile: 'slice' }] }
-};
-
-/** `tile: 'dice'` sets them side by side. */
-export const DiceTiling: Story = {
-	args: { ...BASE, transforms: [{ type: 'treemap', tile: 'dice' }] }
-};
-
-/** `tile: 'sliceDice'` alternates rows and columns by level. */
-export const SliceDiceTiling: Story = {
-	args: {
-		...BASE,
-		grouping: 'sector.kind.branch',
-		transforms: [{ type: 'treemap', tile: 'sliceDice' }]
-	}
-};
-
-/** `tile: 'binary'` splits each rectangle in two halves of about the same value. */
-export const BinaryTiling: Story = {
-	args: { ...BASE, transforms: [{ type: 'treemap', tile: 'binary' }] }
-};

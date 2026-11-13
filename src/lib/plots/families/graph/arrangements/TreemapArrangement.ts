@@ -8,7 +8,7 @@ import {
 	treemapSquarify
 } from 'd3-hierarchy';
 import { resolveAccessor } from '$lib/utils/accessors';
-import { TREEMAP_CHANNEL_KEYS, type TreemapTile } from '$lib/types/transforms/treemap';
+import { TREEMAP_CHANNEL_KEYS, type TreemapTile } from '$lib/types/arrangements/treemap';
 import type { Row, TransformAdapter } from '$lib/types/phases/transforms/adapter';
 
 const TILES = {
@@ -45,11 +45,11 @@ const read = (channel: unknown): ((row: Row) => unknown) =>
 		? (channel as (row: Row) => unknown)
 		: (row) => row[channel as string];
 
-/** A treemap as a transform: the layout of d3-hierarchy, in the shape every other transform returns. */
-export class TreemapTransform {
+/** The treemap arrangement: d3-hierarchy's, in the shape every transform returns. */
+export class TreemapArrangement {
 	static readonly adapter: TransformAdapter = {
 		channelKeys: TREEMAP_CHANNEL_KEYS,
-		run: (channels, options) => TreemapTransform.layout(channels, options)
+		run: (channels, options) => TreemapArrangement.place(channels, options)
 	};
 
 	/**
@@ -57,7 +57,7 @@ export class TreemapTransform {
 	 * value is not a positive number has no area, so it makes no tile. The layout is `aspect` wide while it is
 	 * computed and scaled back after, so its tiles are shaped after the box they fill.
 	 */
-	static layout(channels: Row, options: Row): Row {
+	static place(channels: Row, options: Row): Row {
 		const { data, value, ...rest } = channels as { data?: Row[]; value?: unknown } & Row;
 		if (!data) throw new Error('treemap: missing data');
 		if (value === undefined) throw new Error('treemap: missing value channel');

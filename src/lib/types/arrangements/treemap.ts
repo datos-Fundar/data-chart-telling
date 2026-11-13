@@ -15,23 +15,28 @@ export const TREEMAP_CHANNEL_KEYS: Record<keyof TreemapChannels, true> = {
 	value: true
 };
 
+/** The options of a treemap's arrangement an author sets, under the plot's `styles.arrangement`. */
+export type TreemapArrangementOptions = {
+	/** How a rectangle is split among its tiles. Defaults to `'squarify'`, which keeps them close to squares. */
+	tile?: TreemapTile;
+};
+
 /** Options the treemap takes, flat next to the channels. */
-type TreemapOptions = {
+type TreemapOptions = TreemapArrangementOptions & {
 	/**
 	 * What the tiles nest by: one reader per level, outermost first. Rows with the same value at every
 	 * level are one tile, whose area is their values' sum, and the last level names it. Without levels,
 	 * every row is part of a single tile.
 	 */
 	levels?: TransformChannel[];
-	/** How a rectangle is split among its tiles. Defaults to `'squarify'`, which keeps them close to squares. */
-	tile?: TreemapTile;
 	/** The width over the height of the box the tiles fill, which squarified tiles aim to be square in. Defaults to `1`. */
 	aspect?: number;
 };
 
 /**
- * `treemap` as a marker transform: a tile per distinct path of `levels`, laid out in the unit square with
- * d3-hierarchy, its area its summed `value`. Produces `x1`/`x2`/`y1`/`y2` for a `rect` marker, and `x`/`y`
- * at each tile's centre; each row also carries its tile's name, path, value and share (see `TREEMAP_ROW`).
+ * The treemap arrangement, as the plot's transforms phase runs it: a tile per distinct path of `levels`, laid out
+ * in the unit square with d3-hierarchy, its area its summed `value`. Produces `x1`/`x2`/`y1`/`y2` for a `rect`
+ * marker, and `x`/`y` at each tile's centre; each row also carries its tile's name, path, value and share (see
+ * `TREEMAP_ROW`).
  */
-export type TreemapTransform = { type: 'treemap' } & TreemapChannels & TreemapOptions;
+export type TreemapArrangement = { type: 'treemap' } & TreemapChannels & TreemapOptions;

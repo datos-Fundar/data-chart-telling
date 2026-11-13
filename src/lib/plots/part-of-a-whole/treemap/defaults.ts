@@ -1,5 +1,5 @@
 import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
-import { TREEMAP_ROW } from '$lib/phases/transforms/methods/TreemapTransform';
+import { TREEMAP_ROW } from '$lib/plots/families/graph/arrangements/TreemapArrangement';
 import { buildGraphDefaults } from '$lib/plots/families/graph/defaults';
 import { RowContext } from '$lib/phases/context/RowContext';
 import { NumberFormat } from '$lib/utils/NumberFormat';
@@ -8,10 +8,12 @@ import { getConfiguration } from '$lib/configuration/config.svelte';
 import type { AxisPlotDefaults, ProcessedRow } from '$lib/types/phases';
 import type { AxisBasedMarkersConfig, RectMarkerConfig } from '$lib/types/markers/common';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
-import type { MarkerTransform } from '$lib/types/transforms';
-import type { TreemapTransform } from '$lib/types/transforms/treemap';
+import type { Transform } from '$lib/types/phases';
+import type { TreemapArrangement } from '$lib/types/arrangements/treemap';
 import type { GroupingAccessor } from '$lib/types/layout/mapping';
 import type { TreemapRowContext } from '$lib/types/plots/part-of-a-whole/treemap/props';
+import type { ArrangementAwarePlotStylesConfig } from '$lib/types/layout/styles';
+import type { TreemapArrangementOptions } from '$lib/types/arrangements/treemap';
 import type {
 	TreemapPlotState,
 	TreemapPlotEnv
@@ -50,25 +52,24 @@ function tileOf(row: ProcessedRow): Omit<TreemapRowContext, 'series' | 'row'> {
 const contextOf = (row: ProcessedRow) => RowContext.of<TreemapRowContext>(row);
 
 /**
- * The plot's tiles: a `treemap` of its `value`, nested by the levels of its `grouping` (its `color` when unset,
- * as every plot groups by it then) and shaped for its box,
- * with the options of the author's own `treemap` transforms over it (`tile`...), and their other transforms
- * after it in order.
+ * The plot's tiles: a `treemap` arrangement of its `value`, nested by the levels of its `grouping` (its `color`
+ * when unset, as every plot groups by it then), shaped for its box and split as `styles.arrangement` says; the
+ * author's own transforms run after it in order.
  */
 function buildTransforms<TData extends Record<string, unknown>>(
 	state: TreemapPlotState<TData>
-): MarkerTransform[] {
-	const own = state.transforms ?? [];
-	const base = {
+): Transform[] {
+	const arrangement = (
+		state.styles as ArrangementAwarePlotStylesConfig<TreemapArrangementOptions> | undefined
+	)?.arrangement;
+	const treemap = {
 		type: 'treemap',
 		value: state.value,
 		levels: Grouping.levels(state.grouping ?? (state.color as GroupingAccessor<TData>), state.data),
-		aspect: state.width && state.height ? state.width / state.height : DEFAULT_ASPECT
-	} as TreemapTransform;
-	const treemap = own
-		.filter((t): t is TreemapTransform => t.type === 'treemap')
-		.reduce<TreemapTransform>((merged, t) => ({ ...merged, ...t }), base);
-	return [treemap, ...own.filter((t) => t.type !== 'treemap')];
+		aspect: state.width && state.height ? state.width / state.height : DEFAULT_ASPECT,
+		...arrangement
+	} as TreemapArrangement;
+	return [treemap, ...(state.transforms ?? [])];
 }
 
 /** The edges of the tiles, as the processed rows carry them. */
@@ -171,7 +172,7 @@ ${shareText(row)}`,
 }
 
 /**
- * TreemapPlot, a graph kind: its rows are the tiles of the `treemap` transform, laid out in the unit square its two
+ * TreemapPlot, a graph kind: its rows are the tiles of its `treemap` arrangement, laid out in the unit square its two
  * continuous axes span. Its series are the outermost level of its `grouping`, which colors the tiles and fills the
  * legend. The tiles are `rect` markers, labelled by their own `label`; its tooltip names the tile and gives its share.
  */

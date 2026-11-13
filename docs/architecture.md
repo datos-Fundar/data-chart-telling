@@ -76,13 +76,13 @@ The first six are the **data phases** (`Pipeline.DATA_PHASES`). With a facet, `A
 
 Folders group the kinds by what they show (`ranking`, `evolution`, `part-of-a-whole`...); a **family** groups them by where their positions come from, which decides their props, their pipeline and the markers they take.
 
-| Family     | Positions come from                                    | Defaults                                       | Props                 | Kinds         |
-| ---------- | ------------------------------------------------------ | ---------------------------------------------- | --------------------- | ------------- |
-| Axes       | The `x` and `y` scales over the rows                   | The shared phases' own, under the kind's       | `AxesPlotProps`       | most of them  |
-| Projection | A projection of GeoJSON features                       | Its own pipeline (`plots/map/geo/defaults.ts`) | `ProjectionPlotProps` | `GeoPlot`     |
-| Graph      | The kind's layout transform (a hierarchy, a flow, ...) | `buildGraphDefaults` (`plots/families/graph/`) | `GraphPlotProps`      | `TreemapPlot` |
+| Family     | Positions come from                               | Defaults                                       | Props                 | Kinds         |
+| ---------- | ------------------------------------------------- | ---------------------------------------------- | --------------------- | ------------- |
+| Axes       | The `x` and `y` scales over the rows              | The shared phases' own, under the kind's       | `AxesPlotProps`       | most of them  |
+| Projection | A projection of GeoJSON features                  | Its own pipeline (`plots/map/geo/defaults.ts`) | `ProjectionPlotProps` | `GeoPlot`     |
+| Graph      | The kind's arrangement (a hierarchy, a flow, ...) | `buildGraphDefaults` (`plots/families/graph/`) | `GraphPlotProps`      | `TreemapPlot` |
 
-The family props live in `types/plots/families/`. An axes kind and a graph kind both run `Pipeline.ofAxisKind` over the defaults they give (`AxisPlotDefaults`, `types/phases/defaults.ts`). A graph kind draws on axes hidden until the author shows them: its layout transform writes each row's place on them, so every axes marker works over it. Its hover finds the row whose shape is under the pointer and restyles it, without a crosshair.
+The family props live in `types/plots/families/`. An axes kind and a graph kind both run `Pipeline.ofAxisKind` over the defaults they give (`AxisPlotDefaults`, `types/phases/defaults.ts`). A graph kind draws on axes hidden until the author shows them: its arrangement writes each row's place on them, so every axes marker works over it. An arrangement (`plots/families/graph/arrangements/`) runs in the transforms phase like a transform, but only the kind adds it: it is not one of the public `transforms`, and its options are the kind's `styles.arrangement`. Its hover finds the row whose shape is under the pointer and restyles it, without a crosshair.
 
 ## Facets and the composer share one grid
 
