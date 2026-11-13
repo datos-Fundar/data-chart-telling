@@ -42,6 +42,7 @@ async function waitForRows(container: Element): Promise<void> {
 			throw new Error('legend not yet measured/rendered');
 		}
 	});
+	await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 }
 
 describe('DiscreteSection - layout: { type: "vertical" } (explicit)', () => {
@@ -275,5 +276,24 @@ describe('DiscreteSection - columns next to other sections', () => {
 	test('a section with its own columns or layout keeps them', async () => {
 		expect(await columnsOf(4, { columns: 1 })).toBe('repeat(1, max-content)');
 		expect(await columnsOf(4, { layout: { type: 'vertical' } })).toBe('repeat(1, max-content)');
+	});
+});
+
+describe('DiscreteSection - horizontal pagination and the resize it causes', () => {
+	test('measuring the rows again never resizes the section within the frame that measured it', async () => {
+		const errors: string[] = [];
+		const onError = (event: ErrorEvent) => errors.push(event.message);
+		window.addEventListener('error', onError);
+		const section: DiscreteLegendSection = {
+			type: 'discrete',
+			items: shortItems(12),
+			layout: { type: 'horizontal' }
+		};
+		const { container } = await render(DiscreteSectionWidthProbe, { section, width: 260 });
+		await waitForRows(container);
+		await expect.poll(() => container.querySelector('.dct-discrete-paginated__btn')).toBeTruthy();
+		await new Promise((resolve) => setTimeout(resolve, 300));
+		window.removeEventListener('error', onError);
+		expect(errors.filter((message) => message.includes('ResizeObserver'))).toEqual([]);
 	});
 });
