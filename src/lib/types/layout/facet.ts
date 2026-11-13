@@ -1,5 +1,5 @@
 import type { Snippet } from 'svelte';
-import type { Accessor } from '$lib/types/plots/data/common';
+import type { Accessor } from '$lib/types/layout/mapping';
 import type { MarginConfig } from '$lib/types/plots/props';
 import type { CellEdges } from '$lib/types/layout/grid';
 

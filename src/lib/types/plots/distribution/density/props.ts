@@ -1,6 +1,6 @@
 import type { AxesPlotProps, AxesPlotCoreProps } from '$lib/types/plots/families/axes';
 import type { AreaValueLabel, LineValueLabel, WithValues } from '$lib/types/layout/styles';
-import type { SeriesProps, SingleAxisDataProps } from '$lib/types/plots/data/common';
+import type { SeriesProps, SingleAxisDataProps } from '$lib/types/plots/data/axes';
 import type { CurveAwarePlotStylesConfig } from '$lib/types/layout/styles';
 import type { AreaStyle } from '$lib/types/plots/styling';
 

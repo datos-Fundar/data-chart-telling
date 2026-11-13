@@ -1,4 +1,4 @@
-import type { Accessor } from '$lib/types/plots/data/common';
+import type { Accessor } from '$lib/types/layout/mapping';
 
 /**
  * A graph as a graph kind's `data`: its links, the nodes when they carry more than an id, and how to read both -

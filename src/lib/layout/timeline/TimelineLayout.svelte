@@ -13,7 +13,7 @@
 		TimelineChildSnippet,
 		TimelineInterpolation
 	} from '$lib/types/layout/timeline';
-	import type { Accessor } from '$lib/types/plots/data/common';
+	import type { Accessor } from '$lib/types/layout/mapping';
 	import type { PlotBoxContext } from '$lib/types/layout/figure';
 
 	/**

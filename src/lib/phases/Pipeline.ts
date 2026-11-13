@@ -27,7 +27,7 @@ import type { PlotStylesConfig } from '$lib/types/configuration/styling';
 import type { FacetConfig } from '$lib/types/layout/facet';
 import type { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import type { HoverStrategy } from '$lib/types/layout/hover';
-import type { Accessor } from '$lib/types/plots/data/common';
+import type { Accessor } from '$lib/types/layout/mapping';
 import type { ChannelName, GroupingAccessor, ResolvedChannel } from '$lib/types/layout/mapping';
 import { PlotInteraction } from '$lib/layout/interaction/PlotInteraction.svelte';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';

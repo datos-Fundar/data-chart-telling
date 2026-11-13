@@ -1,5 +1,5 @@
 import type { CommonMarkerEvents } from '$lib/types/markers/channels/commonMarkerEvents';
-import type { Accessor } from '$lib/types/plots/data/common';
+import type { Accessor } from '$lib/types/layout/mapping';
 
 /**
  * Marching-squares contours from a scalar field (svelteplot's `Contour`).

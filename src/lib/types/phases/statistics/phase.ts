@@ -1,5 +1,6 @@
 import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
-import type { Accessor, Series } from '$lib/types/plots/data/common';
+import type { Accessor } from '$lib/types/layout/mapping';
+import type { Series } from '$lib/types/plots/data/common';
 import type { AxisChannelName, AxisValue } from '$lib/types/layout/mapping';
 import type { StatisticConfig } from '$lib/types/layout/statistics';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';

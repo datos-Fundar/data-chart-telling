@@ -1,6 +1,6 @@
 import type { AxesPlotProps, AxesPlotCoreProps } from '$lib/types/plots/families/axes';
 import type { WithValues, DotValueLabel } from '$lib/types/layout/styles';
-import type { SeriesProps, DualAxisDataProps } from '$lib/types/plots/data/common';
+import type { SeriesProps, DualAxisDataProps } from '$lib/types/plots/data/axes';
 import type { ConnectorBasedStylesConfig } from '$lib/types/layout/styles';
 import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
 

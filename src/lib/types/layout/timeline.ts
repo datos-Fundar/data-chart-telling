@@ -1,6 +1,6 @@
 import type { Snippet } from 'svelte';
 import type { AxisValue } from '$lib/types/layout/mapping';
-import type { Accessor } from '$lib/types/plots/data/common';
+import type { Accessor } from '$lib/types/layout/mapping';
 import type { EasingName, EasingFn } from '$lib/types/misc/easing';
 
 /** A step as the timeline works with it: a number (a date as its timestamp). */

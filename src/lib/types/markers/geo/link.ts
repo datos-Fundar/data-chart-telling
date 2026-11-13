@@ -1,5 +1,5 @@
 import type { CommonMarkerEvents } from '$lib/types/markers/channels/commonMarkerEvents';
-import type { Accessor } from '$lib/types/plots/data/common';
+import type { Accessor } from '$lib/types/layout/mapping';
 import type { StrokeStyle } from '$lib/types/plots/styling';
 
 /** Lines between point pairs: `curve: 'auto'` traces great-circle arcs, `'linear'` joins their projected positions with a straight line. */

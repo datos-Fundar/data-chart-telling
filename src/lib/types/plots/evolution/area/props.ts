@@ -1,6 +1,6 @@
 import type { AxesPlotProps, AxesPlotCoreProps } from '$lib/types/plots/families/axes';
 import type { WithValues, AreaValueLabel } from '$lib/types/layout/styles';
-import type { SeriesProps, DualAxisDataProps } from '$lib/types/plots/data/common';
+import type { SeriesProps, DualAxisDataProps } from '$lib/types/plots/data/axes';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import type { AreaStyle } from '$lib/types/plots/styling';
 

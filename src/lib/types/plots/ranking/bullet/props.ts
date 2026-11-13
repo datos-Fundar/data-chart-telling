@@ -1,6 +1,6 @@
 import type { BulletStylesConfig } from '$lib/types/layout/styles';
 import type { BarPlotProps, BarPlotCoreProps } from '$lib/types/plots/ranking/bar/props';
-import type { Accessor } from '$lib/types/plots/data/common';
+import type { Accessor } from '$lib/types/layout/mapping';
 
 /**
  * What a bullet plot measures each category against: a `target`, and the

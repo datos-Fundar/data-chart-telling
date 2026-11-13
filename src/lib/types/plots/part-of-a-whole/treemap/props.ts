@@ -2,7 +2,7 @@ import type { ArrangementAwarePlotStylesConfig, WithValues } from '$lib/types/la
 import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
 import type { TreemapArrangementOptions } from '$lib/types/arrangements/treemap';
 import type { GraphPlotProps, GraphPlotCoreProps } from '$lib/types/plots/families/graph';
-import type { NonAxisDataProps } from '$lib/types/plots/data/common';
+import type { NonAxisDataProps } from '$lib/types/plots/data/axes';
 import type { KindRowContext } from '$lib/types/layout/context';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 

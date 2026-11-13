@@ -1,6 +1,11 @@
-import type { Accessor } from '$lib/types/plots/data/common';
-
 export type AxisValue = number | string | Date;
+
+/**
+ * A field key or accessor function. Mirrors the shorthand used across plots
+ * so chart-level encodings (`x`, `y`, `color`, facet, timeline) feel
+ * consistent with the plot-level series definitions.
+ */
+export type Accessor<TRow extends Record<string, unknown>, V> = keyof TRow | ((d: TRow) => V);
 
 /**
  * Every channel a plot maps from its rows, and what its accessor yields per
@@ -48,11 +53,17 @@ export type ChannelName = keyof ChannelValue;
 /** The position channels, each bound to the one axis scale every mark shares. */
 export type AxisChannelName = 'x' | 'y';
 
+/** The channels that split a plot's rows into series. */
+export type GroupingChannelName = 'color' | 'grouping';
+
+/** The channels a pre-built `Series` carries itself: its position and what groups it. */
+export type SeriesChannelName = AxisChannelName | GroupingChannelName;
+
 /**
  * The channels each consumer scales on its own - a plot's `scales.color` and
  * a marker's own `scales.color` can disagree on purpose.
  */
-export type IndependentChannelName = 'color' | 'grouping' | 'opacity' | 'symbol';
+export type IndependentChannelName = GroupingChannelName | 'opacity' | 'symbol';
 
 /** The size channels, which also take a literal number as a fixed pixel size that bypasses their scale. */
 export type SizeChannelName = 'r' | 'length';

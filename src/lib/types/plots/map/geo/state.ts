@@ -1,4 +1,4 @@
-import type { Accessor } from '$lib/types/plots/data/common';
+import type { Accessor } from '$lib/types/layout/mapping';
 import type { GeoFeature, GeoSliceContext } from '$lib/types/plots/data/geo';
 import type { ColorScaleConfig } from '$lib/types/layout/scales';
 import type { GeoScalesConfig } from '$lib/types/layout/coordinates';

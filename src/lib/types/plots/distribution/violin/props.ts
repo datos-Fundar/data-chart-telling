@@ -3,7 +3,7 @@ import type { WithValues } from '$lib/types/layout/styles';
 import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { BoxValuePart } from '$lib/types/plots/distribution/box/props';
 import type { BoxRowContext } from '$lib/types/plots/distribution/box/props';
-import type { SeriesProps, DualAxisDataProps } from '$lib/types/plots/data/common';
+import type { SeriesProps, DualAxisDataProps } from '$lib/types/plots/data/axes';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import type { AreaStyle } from '$lib/types/plots/styling';
 import type { DensityKernel } from '$lib/types/transforms/density';

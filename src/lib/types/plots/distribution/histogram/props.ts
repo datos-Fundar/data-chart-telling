@@ -1,7 +1,7 @@
 import type { AxesPlotProps, AxesPlotCoreProps } from '$lib/types/plots/families/axes';
 import type { WithValues, CellValueLabel } from '$lib/types/layout/styles';
 import type { KindRowContext } from '$lib/types/layout/context';
-import type { SeriesProps, SingleAxisDataProps } from '$lib/types/plots/data/common';
+import type { SeriesProps, SingleAxisDataProps } from '$lib/types/plots/data/axes';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import type { AreaStyle } from '$lib/types/plots/styling';
 

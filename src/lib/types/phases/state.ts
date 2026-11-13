@@ -1,4 +1,5 @@
-import type { Accessor, Series } from '$lib/types/plots/data/common';
+import type { Accessor } from '$lib/types/layout/mapping';
+import type { Series } from '$lib/types/plots/data/common';
 import type { AxisBasedScalesConfig } from '$lib/types/layout/scales';
 import type {
 	SegmentsConfig,

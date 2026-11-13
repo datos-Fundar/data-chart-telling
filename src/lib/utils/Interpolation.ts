@@ -1,7 +1,7 @@
 import type { EasingName, EasingFn } from '$lib/types/misc/easing';
 import type { TimeValue, TimelineInterpolation } from '$lib/types/layout/timeline';
 import type { AxisValue } from '$lib/types/layout/mapping';
-import type { Accessor } from '$lib/types/plots/data/common';
+import type { Accessor } from '$lib/types/layout/mapping';
 
 /** Easing curves, and the tweens a timeline draws between its steps. */
 export class Interpolation {

@@ -1,6 +1,6 @@
 import type { AxesPlotProps, AxesPlotCoreProps } from '$lib/types/plots/families/axes';
 import type { WithValues, LineValueLabel } from '$lib/types/layout/styles';
-import type { SeriesProps, DualAxisDataProps } from '$lib/types/plots/data/common';
+import type { SeriesProps, DualAxisDataProps } from '$lib/types/plots/data/axes';
 import type {
 	CurveAwarePlotStylesConfig,
 	GapsAwarePlotStylesConfig

@@ -1,7 +1,7 @@
 import { resolveAccessor } from '$lib/utils/accessors';
 import type { FacetConfig, FacetWrapConfig } from '$lib/types/layout/facet';
 import type { FacetPanel } from '$lib/types/phases/facet/phase';
-import type { Accessor } from '$lib/types/plots/data/common';
+import type { Accessor } from '$lib/types/layout/mapping';
 
 /** Whether a facet config wraps one facet per `by` value, rather than laying out a `rows`/`cols` grid. */
 export function isFacetWrap<TRow extends Record<string, unknown>>(

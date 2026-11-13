@@ -3,7 +3,7 @@ import type { WithValues } from '$lib/types/layout/styles';
 import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { KindRowContext } from '$lib/types/layout/context';
 import type { AxisValue } from '$lib/types/layout/mapping';
-import type { SeriesProps, DualAxisDataProps } from '$lib/types/plots/data/common';
+import type { SeriesProps, DualAxisDataProps } from '$lib/types/plots/data/axes';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import type { AreaStyle } from '$lib/types/plots/styling';
 

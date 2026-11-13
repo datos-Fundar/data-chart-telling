@@ -15,7 +15,7 @@
 		FacetNavSnippet,
 		FacetNavDirection
 	} from '$lib/types/layout/facet';
-	import type { Accessor } from '$lib/types/plots/data/common';
+	import type { Accessor } from '$lib/types/layout/mapping';
 
 	/**
 	 * Small multiples on a `Grid`: splits `data` and gives each group to

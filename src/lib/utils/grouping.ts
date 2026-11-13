@@ -1,6 +1,7 @@
 import { resolveAccessor } from '$lib/utils/accessors';
 import type { AxisValue, GroupingAccessor } from '$lib/types/layout/mapping';
-import type { Series, Accessor } from '$lib/types/plots/data/common';
+import type { Accessor } from '$lib/types/layout/mapping';
+import type { Series } from '$lib/types/plots/data/common';
 
 /**
  * A plot's `grouping`, read into its levels. A dotted name is a field of the rows when they have one by that
