@@ -20,7 +20,6 @@
 	} = $props();
 
 	/** Each row's place among the marker's rows, which its offsets read: `rows` may be only some of them. */
-	// eslint-disable-next-line svelte/prefer-svelte-reactivity
 	const indexes = $derived(new Map((marker.data ?? []).map((row, index) => [row, index])));
 </script>
 

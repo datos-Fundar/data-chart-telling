@@ -42,7 +42,6 @@
 
 	const data = $derived((marker.data ?? []) as TData[]);
 	/** Each row's place among the marker's rows, which its functions of a row read: svelteplot only knows a row's place among the ones a mark of it draws. */
-	// eslint-disable-next-line svelte/prefer-svelte-reactivity
 	const indexes = $derived(new Map(data.map((row, index) => [row, index])));
 	const indexOf = (d: TData) => indexes.get(d);
 
