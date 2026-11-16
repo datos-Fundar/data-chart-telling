@@ -215,7 +215,7 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 
 	sankey: {
 		nodes: { width: 12, padding: 12, fill: '#64748b' },
-		links: { fillOpacity: 0.45, curvature: 0.5 },
+		links: { fillOpacity: 0.45, curvature: 0.5, activeFillOpacity: 0.8 },
 		fontSize: 12,
 		labelGap: 6
 	},

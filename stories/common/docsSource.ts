@@ -18,13 +18,20 @@ function serialize(v: unknown, depth = 0): string {
 	const pad = '  '.repeat(depth);
 	const inner = '  '.repeat(depth + 1);
 
-	// Functions: short arrow functions show their source; multi-line functions
+	// Functions: arrow functions show their source, re-indented to where they sit; other multi-line functions
 	// (e.g. Svelte components) show just the name.
 	if (typeof v === 'function') {
 		const fn = v as (() => void) & { displayName?: string; __name?: string };
-		const src = fn.toString().trim();
-		if (src.includes('\n')) return fn.displayName || fn.__name || fn.name || 'Component';
-		return src;
+		const src = fn.toString().trim().replace(/\t/g, '  ');
+		if (!src.includes('\n')) return src;
+		if (src.startsWith('function') || src.startsWith('class') || !src.includes('=>')) {
+			return fn.displayName || fn.__name || fn.name || 'Component';
+		}
+		const [first, ...rest] = src.split('\n');
+		const indent = Math.min(
+			...rest.filter((line) => line.trim()).map((line) => line.length - line.trimStart().length)
+		);
+		return [first, ...rest.map((line) => (line.trim() ? pad + line.slice(indent) : ''))].join('\n');
 	}
 
 	if (v instanceof RegExp) return String(v);

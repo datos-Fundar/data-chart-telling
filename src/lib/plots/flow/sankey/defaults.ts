@@ -1,6 +1,13 @@
 import { FLOW_ROW } from '$lib/plots/families/graph/arrangements/FlowArrangement';
 import { FlowGraph, GRAPH_NODE } from '$lib/plots/families/graph/FlowGraph';
-import { buildMarks, context, isNode, nodeWidthOf, stylesOf } from '$lib/plots/flow/sankey/markers';
+import {
+	buildMarks,
+	context,
+	isNode,
+	nodeWidthOf,
+	stylesOf,
+	titleRoomOf
+} from '$lib/plots/flow/sankey/markers';
 import { buildGraphDefaults } from '$lib/plots/families/graph/defaults';
 import { SERIES_ID_KEY, SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { Margins } from '$lib/layout/margins/Margins';
@@ -97,6 +104,7 @@ function buildTransforms(state: State, env: SankeyPlotEnv): Transform[] {
 		state.height
 	);
 	const padding = styles.nodes?.padding ?? look.nodes.padding;
+	const room = titleRoomOf(state, env);
 	const omitted =
 		graph.end && state.removedSeries?.mode === 'omit'
 			? new Set(state.removedSeries.series.map((series) => series.name))
@@ -125,7 +133,7 @@ function buildTransforms(state: State, env: SankeyPlotEnv): Transform[] {
 		nodes,
 		id: GRAPH_NODE.id as never,
 		column: graph.column as never,
-		...(box.height > 0 ? { spacing: padding / box.height } : {}),
+		...(box.height > room ? { spacing: padding / (box.height - room) } : {}),
 		...styles.arrangement
 	} as FlowArrangement;
 	return [...kept, flow, ...(state.transforms ?? [])];
@@ -133,7 +141,8 @@ function buildTransforms(state: State, env: SankeyPlotEnv): Transform[] {
 
 /**
  * The columns as a band scale whose bands are the nodes' px width, the first at the left edge and the last at
- * the right, and the values on y from the top down: whatever the author's `scales` leave unset.
+ * the right, and the values on y from the top down, with room above them for the columns' names: whatever the
+ * author's `scales` leave unset.
  */
 function buildFit(state: State, env: SankeyPlotEnv): Partial<Record<'x' | 'y', AxisFit>> {
 	const options = state.processedData?.options ?? {};
@@ -149,6 +158,10 @@ function buildFit(state: State, env: SankeyPlotEnv): Partial<Record<'x' | 'y', A
 		count > 1 && box.width > width
 			? { paddingInner: (box.width - width * count) / (box.width - width), paddingOuter: 0 }
 			: { paddingInner: 0, paddingOuter: width > 0 ? (box.width / width - 1) / 2 : 0 };
+	// The columns' names sit above the values, in as many units as their px take of the rest of the height.
+	const top = Number.isFinite(height) && height > 0 ? height : 1;
+	const room = titleRoomOf(state, env);
+	const headroom = room > 0 && box.height > room ? (room * top) / (box.height - room) : 0;
 	const author = state.scales;
 	const own = <T extends object>(given: object | undefined, fit: T): T =>
 		Object.fromEntries(
@@ -160,7 +173,7 @@ function buildFit(state: State, env: SankeyPlotEnv): Partial<Record<'x' | 'y', A
 			fitted: true
 		} as AxisFit,
 		y: {
-			...own(author.y, { domain: [0, Number.isFinite(height) && height > 0 ? height : 1] }),
+			...own(author.y, { domain: [headroom > 0 ? -headroom : 0, top] }),
 			fitted: true
 		} as AxisFit
 	};
@@ -227,6 +240,29 @@ export function buildSankeyDefaults<TLink extends Record<string, unknown>>(): Ax
 		},
 		markers: { marks: buildMarks },
 		hover: {
+			// A node is found at its top, a link where it leaves, halfway across: no two rows share a place.
+			position: () => ({
+				x: ((row: ProcessedRow) => (isNode(row) ? row[FLOW_ROW.x] : row[FLOW_ROW.x1])) as never,
+				y: ((row: ProcessedRow) =>
+					isNode(row)
+						? Number(row[FLOW_ROW.y1])
+						: (Number(row[FLOW_ROW.y1]) + Number(row[FLOW_ROW.y2])) / 2) as never
+			}),
+			// A hovered node lights up its links.
+			related: () =>
+				((row: ProcessedRow) =>
+					isNode(row)
+						? [
+								...((row[FLOW_ROW.incoming] as ProcessedRow[] | undefined) ?? []),
+								...((row[FLOW_ROW.outgoing] as ProcessedRow[] | undefined) ?? [])
+							]
+						: []) as never,
+			// The hovered shapes stand out, the others stay as they are.
+			marker: (_state, env) => ({
+				back: [],
+				front: [],
+				active: { fillOpacity: env.cfg.sankey.links.activeFillOpacity }
+			}),
 			shape: (_state, row) =>
 				isNode(row)
 					? {

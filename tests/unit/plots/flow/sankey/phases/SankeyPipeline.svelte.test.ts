@@ -18,6 +18,11 @@ type Marker = {
 	text?: (row: Row) => string;
 } & Row;
 type Ran = {
+	hover: {
+		points: { x: unknown; y: unknown; row: ProcessedRow }[];
+		related: (row: ProcessedRow) => ProcessedRow[];
+		tooltip?: { format: (row: ProcessedRow) => string };
+	};
 	processedData: { data: ProcessedRow[]; options: Row };
 	allSeriesNames: string[];
 	markers: Marker[];
@@ -197,12 +202,22 @@ describe('SankeyPlot - its size in px', () => {
 
 	test('the nodes of the fullest column are styles.nodes.padding px apart', () => {
 		const ran = run(GRAPH, { styles: { nodes: { padding: 30 } } });
-		const height = (ran.scales.y.domain as number[])[1];
+		// The y scale spans the values and, above them, the room the columns' names take.
+		const [from, to] = ran.scales.y.domain as number[];
 		const home = nodesOf(ran)
 			.filter((row) => row[FLOW_ROW.x] === 'home')
 			.sort((a, b) => Number(a[FLOW_ROW.y1]) - Number(b[FLOW_ROW.y1]));
 		const gap = Number(home[1][FLOW_ROW.y1]) - Number(home[0][FLOW_ROW.y2]);
-		expect((gap * box().height) / height).toBeCloseTo(30);
+		expect((gap * box().height) / (to - from)).toBeCloseTo(30);
+	});
+
+	test('keeps room above the values for the names of the columns, and none without them', () => {
+		const named = run(GRAPH).scales.y.domain as number[];
+		const unnamed = run({ data: [{ source: 'a', target: 'b', value: 1 }] }).scales.y
+			.domain as number[];
+		const room = DEFAULT_CONFIG.sankey.fontSize * 1.2 + DEFAULT_CONFIG.sankey.labelGap;
+		expect((-named[0] * box().height) / (named[1] - named[0])).toBeCloseTo(room);
+		expect(unnamed[0]).toBe(0);
 	});
 
 	test("the author's scales win over the fitted ones", () => {
@@ -362,5 +377,50 @@ describe('SankeyPlot - where its labels sit', () => {
 	test("'outside' writes the first and last columns' past the edges", () => {
 		const ran = run(GRAPH, { styles: { values: { position: 'outside' } } });
 		expect(new Set(sides(ran))).toEqual(new Set(['home:end', 'work:start']));
+	});
+});
+
+describe('SankeyPlot - its hover', () => {
+	test('every node and link is a point of its own, at a place no other one has', () => {
+		const ran = run(GRAPH, { tooltip: true });
+		const places = ran.hover.points.map(({ x, y }) => JSON.stringify([x, y]));
+		expect(ran.hover.points).toHaveLength(nodesOf(ran).length + linksOf(ran).length);
+		expect(new Set(places).size).toBe(places.length);
+	});
+
+	test('a hovered node lights up its links, and a link nothing else', () => {
+		const ran = run(GRAPH, { tooltip: true });
+		const gba = nodesOf(ran).find(
+			(row) => contextOf(row).name === 'GBA' && row[FLOW_ROW.x] === 'work'
+		)!;
+		expect(new Set(ran.hover.related(gba))).toEqual(
+			new Set(linksOf(ran).filter((row) => contextOf(row).target === 'GBA'))
+		);
+		expect(ran.hover.related(linksOf(ran)[0])).toEqual([]);
+	});
+
+	test("an author's related, given what the plot knows of every row the hover reaches, replaces the plot's own", () => {
+		const seen: number[] = [];
+		const ran = run(GRAPH, {
+			tooltip: true,
+			markers: [
+				{
+					type: 'hover',
+					related: (hovered: SankeyRowContext, all: SankeyRowContext[]) => {
+						seen.push(all.length);
+						return all.filter((other) => other.kind === 'link' && other.row !== hovered.row);
+					}
+				}
+			]
+		});
+		const [node] = nodesOf(ran);
+		expect(new Set(ran.hover.related(node))).toEqual(new Set(linksOf(ran)));
+		expect(seen).toEqual([nodesOf(ran).length + linksOf(ran).length]);
+	});
+
+	test('the tooltip names a node or a link and its value', () => {
+		const ran = run(GRAPH, { tooltip: true });
+		const link = linksOf(ran).find((row) => contextOf(row).name === 'CABA - GBA')!;
+		expect(ran.hover.tooltip!.format(link)).toBe('CABA - GBA: 10');
 	});
 });

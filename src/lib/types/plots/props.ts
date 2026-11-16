@@ -74,6 +74,8 @@ export type HoverConfig<TRow extends Record<string, unknown>> = {
 	pointMatching?: PointMatchingStrategy;
 	/** Forces the crosshair rule(s) a `hover` marker draws off entirely, overriding whatever `strategy` implies. */
 	crosshair?: boolean;
+	/** The rows that light up with a hovered row, besides it; the tooltip reads the hovered rows alone. */
+	related?: (row: TRow) => TRow[];
 	/** The plot kind's own hover under the strategy in force, which an author's `hover` marker is laid over as it is drawn. */
 	look?: (strategy: HoverStrategy) => HoverLook;
 };

@@ -30,6 +30,15 @@ export const context = (row: ProcessedRow) => RowContext.of<SankeyRowContext>(ro
 export const nodeWidthOf = (state: State, env: SankeyPlotEnv) =>
 	stylesOf(state).nodes?.width ?? env.cfg.sankey.nodes.width;
 
+/** The line height of a column's name, as a multiple of its font size. */
+const TITLE_LINE_HEIGHT = 1.2;
+
+/** The room at the top of the plot the columns' names take, in px: none while the columns have no names. */
+export const titleRoomOf = (state: State, env: SankeyPlotEnv) =>
+	state.graph?.column === undefined
+		? 0
+		: env.cfg.sankey.fontSize * TITLE_LINE_HEIGHT + env.cfg.sankey.labelGap;
+
 /**
  * The plot's own marks, links under nodes under labels. While the nodes are the series each node takes its
  * series' color, and each link the color of the node at `styles.links.fill`'s end; while the links are, each link
@@ -77,7 +86,8 @@ export function buildMarks(state: State, env: SankeyPlotEnv): AxisBasedMarkersCo
 			fillOpacity: (row: ProcessedRow) =>
 				dimmed(linkSeries(row))?.fillOpacity ?? linkStyle.fillOpacity ?? look.links.fillOpacity
 		},
-		legend: false
+		legend: false,
+		hover: 'style'
 	};
 
 	/** The nodes split by series while they are the series, so each bar takes one color. */
@@ -167,8 +177,9 @@ function buildLabels(state: State, env: SankeyPlotEnv, nodes: ProcessedRow[]): T
 }
 
 /**
- * The name of each column over it, when the nodes stand in named columns: the first one starts at its left edge
- * and the last one ends at its right, so neither leaves the plot. The plot's top margin grows to fit them.
+ * The name of each column over it, when the nodes stand in named columns, in the room the y scale keeps for them
+ * above its values: the first one starts at its left edge and the last one ends at its right, so neither leaves
+ * the plot.
  */
 function buildTitles(state: State, env: SankeyPlotEnv): TextMarkerConfig[] {
 	const columns = (state.processedData?.options.columns as string[] | undefined) ?? [];
@@ -186,18 +197,18 @@ function buildTitles(state: State, env: SankeyPlotEnv): TextMarkerConfig[] {
 					? 'end'
 					: 'middle';
 	const shift = { start: -half, middle: 0, end: half } as const;
+	const room = Number(state.scales.y?.domain?.[0] ?? 0);
 	return [
 		{
 			type: 'text',
 			data: columns.map((column) => ({ column })),
 			x: 'column',
+			y: () => room / 2,
 			text: 'column',
-			frameAnchor: 'top',
-			lineAnchor: 'bottom',
-			dy: -look.labelGap,
+			lineAnchor: 'middle',
+			dy: -look.labelGap / 2,
 			dx: (row: { column: string }) => shift[sideOf(row.column)],
 			textAnchor: (row: { column: string }) => sideOf(row.column),
-			fitMargins: true,
 			styles: { fontSize: look.fontSize, fontWeight: 'bold' }
 		} as TextMarkerConfig
 	];

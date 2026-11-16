@@ -1,5 +1,6 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, expect, test } from 'vitest';
+import { page, userEvent } from 'vitest/browser';
 import SankeyPlot from '$lib/plots/flow/sankey/Plot.svelte';
 import { PENGUIN_COUNTS_BY_SEX } from '$datasets';
 import { countBarRects, waitForSvg } from '../../_helpers/svg';
@@ -101,5 +102,47 @@ describe('SankeyPlot', () => {
 		const svg = await waitForSvg(container);
 		await expect.poll(() => ribbons(svg).length).toBe(10);
 		expect(new Set(ribbons(svg).map((path) => path.getAttribute('fill'))).size).toBe(2);
+	});
+});
+
+describe('SankeyPlot - hovering', () => {
+	/** The invisible shapes the pointer finds the nodes (rects) and links (paths) by. */
+	const hitAreas = (svg: SVGElement, tag: string) =>
+		Array.from(svg.querySelectorAll<SVGElement>(tag)).filter(
+			(el) => el.style.fill === 'transparent' || el.getAttribute('fill') === 'transparent'
+		);
+
+	test('a link names its ends and its value in the tooltip, and stands out', async () => {
+		const { container } = await render(SankeyPlot, {
+			props: { width: 700, height: 400, ...BY_ISLAND, tooltip: true, markers: [{ type: 'hover' }] }
+		});
+		const svg = await waitForSvg(container);
+		await expect.poll(() => hitAreas(svg, 'path').length).toBe(11);
+		const opacities = () => ribbons(svg).map((path) => Number(path.getAttribute('fill-opacity')));
+		const before = opacities();
+		await userEvent.hover(page.elementLocator(hitAreas(svg, 'path')[0]), { force: true });
+		await expect.poll(() => container.querySelector('.dct-tooltip')?.textContent).toMatch(/ - /);
+		await expect.poll(() => opacities().filter((o, i) => o > before[i]).length).toBe(1);
+	});
+
+	test('a node lights up every link it is an end of', async () => {
+		const { container } = await render(SankeyPlot, {
+			props: { width: 700, height: 400, ...BY_ISLAND, tooltip: true, markers: [{ type: 'hover' }] }
+		});
+		const svg = await waitForSvg(container);
+		// The nodes' own, as wide as a node: not the plot's.
+		const nodes = () =>
+			hitAreas(svg, 'rect').filter((rect) => rect.getBoundingClientRect().width < 20);
+		await expect.poll(() => nodes().length).toBe(8);
+		const opacities = () => ribbons(svg).map((path) => Number(path.getAttribute('fill-opacity')));
+		const before = opacities();
+		// The nodes in the order the arrangement drew them: the species first, Biscoe among the islands.
+		const biscoe = nodes()[3];
+		await userEvent.hover(page.elementLocator(biscoe), { force: true });
+		await expect
+			.poll(() => container.querySelector('.dct-tooltip')?.textContent)
+			.toContain('Biscoe');
+		// Gentoo and Adelie reach it; its females and males leave it.
+		await expect.poll(() => opacities().filter((o, i) => o > before[i]).length).toBe(4);
 	});
 });

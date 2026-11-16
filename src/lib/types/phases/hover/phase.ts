@@ -28,6 +28,8 @@ export type HoverStageOptions<TState, TEnv = unknown> = {
 	sort?: (state: TState) => (a: never, b: never) => number;
 	/** Where a row sits. Defaults to its processed position: a stacked row's top, a bin's centre. */
 	position?: (state: TState) => HoverPosition;
+	/** The rows that light up with a hovered row, besides it (a sankey node's links); the tooltip reads it alone. */
+	related?: (state: TState) => (row: never) => Record<string | symbol, unknown>[];
 	/** The short label drawn next to a hovered row. Defaults to its value. */
 	label?: (state: TState) => (row: never) => string;
 	/** Fields a candidate carries besides its place, label and series color (a grouped bar's `dx`/`dy`). */

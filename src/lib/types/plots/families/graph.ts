@@ -21,7 +21,7 @@ export type FlowColor<TLink extends Record<string, unknown>> = FlowEnd | Accesso
 /** The hover of a graph kind: found through each row's own shape, which it restyles. */
 type GraphHoverOptions<TState, TEnv> = Pick<
 	HoverStageOptions<TState, TEnv>,
-	'format' | 'label' | 'rows'
+	'format' | 'label' | 'rows' | 'position' | 'related' | 'marker'
 > & {
 	/** The marker a row is drawn as, over that row alone and unstyled: what the pointer finds it by. */
 	shape: (state: TState, row: ProcessedRow) => { type: string } & Record<string, unknown>;

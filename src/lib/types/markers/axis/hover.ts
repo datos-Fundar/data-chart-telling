@@ -65,6 +65,12 @@ export type HoverMarkerConfig<TContext extends PlotRowContext = PlotRowContext> 
 	active?: HoverShapeStyle<TContext>;
 	/** How the shapes the hover does not reach look, while it is on. */
 	others?: HoverShapeStyle<TContext>;
+	/**
+	 * The rows that light up with the hovered one: given what the plot knows of the hovered row and of every row
+	 * the hover can reach (each context with its `row`), the contexts of the ones that take `active` with it. The
+	 * tooltip reads the hovered row alone. In place of the plot kind's own (a sankey node lights up its links).
+	 */
+	related?: (hovered: TContext, all: TContext[]) => TContext[];
 	/** The markers drawn behind every other one of the plot, over the hovered points. */
 	back?: HoverLayerMarker[];
 	/** The markers drawn in front of the plot's shapes, over the hovered points. */

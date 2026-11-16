@@ -36,7 +36,7 @@ export function buildGraphDefaults<
 			...rest,
 			strategy: 'punctual',
 			pointMatching: 'contains',
-			marker: (_state, env) => HoverDefaults.shapes(env.cfg),
+			marker: rest.marker ?? ((_state, env) => HoverDefaults.shapes(env.cfg)),
 			hitAreas: (state, config) =>
 				(config.points as { row: ProcessedRow }[]).map(({ row }) => ({
 					...shape(state, row),

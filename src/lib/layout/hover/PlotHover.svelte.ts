@@ -75,11 +75,18 @@ export class PlotHover<T extends Record<string, unknown>> {
 	// The rows the hover can reach, and the matched ones: by identity, and by their place. Built whole
 	// inside this derivation and never changed after it, so they have nothing to react to.
 	readonly #reach = $derived.by(() => {
-		const points = this.#inputs.hover().points;
-		// eslint-disable-next-line svelte/prefer-svelte-reactivity
-		const matched = new Set<HoverPoint<T>>(this.#matched);
+		const { points, related } = this.#inputs.hover();
 		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const byRow = new Map<unknown, HoverPoint<T>>(points.map((p) => [p.row, p]));
+		// The matched points, with those of the rows that light up with them.
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const matched = new Set<HoverPoint<T>>(this.#matched);
+		for (const point of this.#matched) {
+			for (const row of related?.(point.row) ?? []) {
+				const own = byRow.get(row);
+				if (own) matched.add(own);
+			}
+		}
 		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const byPlace = new Map<string, HoverPoint<T>>(
 			points.map((p) => [PlotHover.#keyOf(p.x, p.y, p.series), p])

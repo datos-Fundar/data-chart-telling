@@ -310,6 +310,8 @@ export type PlotStylesConfig = {
 			fillOpacity: number;
 			/** How far in from each end (0-1) a link's edges bend. */
 			curvature: number;
+			/** A link's fill opacity while it, or a node it joins, is hovered. */
+			activeFillOpacity: number;
 		};
 		/** Font size of a node's label, in px. */
 		fontSize: number;

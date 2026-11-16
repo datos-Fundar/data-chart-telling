@@ -5,6 +5,8 @@ import { RowContext } from '$lib/phases/context/RowContext';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { NumberFormat } from '$lib/utils/NumberFormat';
 import { isGapValue } from '$lib/plots/utils/gaps';
+import type { PlotRowContext } from '$lib/types/layout/context';
+import type { HoverMarkerConfig } from '$lib/types/markers/axis/hover';
 import type { AxisValue } from '$lib/types/layout/mapping';
 import type { HoverDisplayPoint, HoverPoint } from '$lib/types/layout/hover';
 import type { TooltipConfig } from '$lib/types/plots/props';
@@ -90,6 +92,14 @@ export class HoverPhase<
 			number: NumberFormat.of(NumberFormat.displayOf(state.tooltip), env.cfg)
 		});
 		const hitAreas = options.hitAreas?.(state, hover as never, env) ?? [];
+		// The author's hover marker says which rows light up with the hovered one, over the kind.
+		const authored = (state.authorMarkers ?? []).find(
+			(marker): marker is HoverMarkerConfig =>
+				marker.type === 'hover' && (marker as HoverMarkerConfig).related !== undefined
+		)?.related;
+		const related = authored
+			? HoverPhase.#authoredRelated(authored, processed.data as Row[])
+			: (options.related?.(state) as ((row: Row) => Row[]) | undefined);
 		const own = options.marker?.(state, env);
 		const look =
 			typeof own === 'function'
@@ -99,12 +109,33 @@ export class HoverPhase<
 					: (strategy: HoverStrategy) => HoverDefaults.of(strategy, hover.crosshair);
 		return {
 			...state,
-			hover: { ...hover, look },
+			hover: {
+				...hover,
+				look,
+				...(related ? { related } : {})
+			},
 			hoverPosition: position,
 			hoverRows: processed.data,
 			...(hitAreas.length > 0 ? { markers: [...(state.markers ?? []), ...hitAreas] } : {})
 		};
 	};
+
+	/**
+	 * An author's `related` over what the plot knows of each row: it gets the hovered row's context and every
+	 * row's, and returns the contexts of the rows that light up, read back as the rows themselves.
+	 */
+	static #authoredRelated(
+		related: NonNullable<HoverMarkerConfig['related']>,
+		rows: Row[]
+	): (row: Row) => Row[] {
+		let contexts: PlotRowContext[] | undefined;
+		return (row) => {
+			contexts ??= rows.map((own) => RowContext.of(own));
+			return (related(RowContext.of(row), contexts) as PlotRowContext[]).map(
+				(context) => context.row as Row
+			);
+		};
+	}
 
 	/**
 	 * Hover candidates for a plot's own processed rows: each visible row at its
