@@ -180,4 +180,36 @@ describe('RibbonMarker - transforms', () => {
 		expect(shifted[3][1]).toBeLessThan(plain[3][1]);
 		expect(shifted[3][1] - plain[3][1]).toBeCloseTo(shifted[0][1] - plain[0][1], 3);
 	});
+
+	test('paints a gradient fill as a linear gradient across each ribbon, or across the plot', async () => {
+		const shape = await draw([
+			ribbon({ styles: { fill: { gradient: ['red', 'blue'] } } } as never)
+		]);
+		const id = paths(shape)[0].getAttribute('fill')!.slice('url(#'.length, -1);
+		const gradient = shape.querySelector(`linearGradient[id="${id}"]`)!;
+		expect(gradient.getAttribute('gradientUnits')).toBe('objectBoundingBox');
+		expect(
+			[...gradient.querySelectorAll('stop')].map((stop) => stop.getAttribute('offset'))
+		).toEqual(['0', '1']);
+
+		const plot = await draw([
+			ribbon({
+				styles: {
+					fill: {
+						gradient: [
+							{ at: 0, color: 'red' },
+							{ at: 5, color: 'blue' }
+						]
+					}
+				}
+			} as never)
+		]);
+		const across = plot.querySelector('linearGradient')!;
+		expect(across.getAttribute('gradientUnits')).toBe('userSpaceOnUse');
+		const offsets = [...across.querySelectorAll('stop')].map((stop) =>
+			Number(stop.getAttribute('offset'))
+		);
+		expect(offsets[0]).toBeCloseTo(0, 2);
+		expect(offsets[1]).toBeCloseTo(0.5, 1);
+	});
 });

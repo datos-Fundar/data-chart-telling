@@ -3,7 +3,7 @@ import type { ArrangementAwarePlotStylesConfig } from '$lib/types/layout/styles/
 import type { FlowArrangementOptions } from '$lib/types/arrangements/flow';
 import type { FlowEnd } from '$lib/types/plots/families/graph';
 import type { StyleValue } from '$lib/types/layout/styles/base';
-import type { AreaStyle } from '$lib/types/plots/styling';
+import type { AreaStyle, Gradient } from '$lib/types/plots/styling';
 import type { SankeyRowContext } from '$lib/types/plots/flow/sankey/props';
 
 /**
@@ -26,8 +26,10 @@ type SankeyLinkStyle = Omit<AreaStyle, 'fill'> & {
 	 * A link's fill: the color of the node at one of its ends (`'source'`, the default, or `'target'`) while the
 	 * nodes are the series, or a color of its own; or a function of what the plot knows of the link that says which, so
 	 * the links of each column can take a different end (`(link) => link.column === 'island' ? 'target' : 'source'`).
+	 * `'gradient'` runs from the color of its source's node to its target's, and a gradient of its own takes its
+	 * series' color where a stop has none.
 	 */
-	fill?: StyleValue<FlowEnd | (string & {}), SankeyRowContext>;
+	fill?: StyleValue<FlowEnd | 'gradient' | Gradient | (string & {}), SankeyRowContext>;
 	/** How far in from each end (0-1) a link's edges bend: `0.5` meets at the middle, `0` is a straight band. */
 	curvature?: number;
 };

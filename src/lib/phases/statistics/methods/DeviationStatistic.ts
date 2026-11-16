@@ -8,6 +8,7 @@ import {
 	STATISTIC_FALLBACK_COLOR,
 	type StatisticSource
 } from '$lib/types/phases/statistics/source';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 /** Scales a median absolute deviation to the standard deviation of a normal distribution. */
 const MAD_SCALE = 1.4826;
@@ -45,7 +46,11 @@ export class DeviationStatistic {
 				type: 'rect',
 				data: [{ lo, hi }],
 				...(axis === 'x' ? { x1: 'lo', x2: 'hi' } : { y1: 'lo', y2: 'hi' }),
-				styles: { fillOpacity: DEFAULT_BAND_OPACITY, ...style, fill: style.fill ?? color }
+				styles: {
+					fillOpacity: DEFAULT_BAND_OPACITY,
+					...style,
+					fill: Gradient.over(style.fill, color)
+				}
 			});
 			if (label) {
 				const own = label === true ? {} : label;
@@ -65,7 +70,7 @@ export class DeviationStatistic {
 				type: 'rule',
 				axis,
 				value: center,
-				styles: { ...style, stroke: style.stroke ?? color }
+				styles: { ...style, stroke: Gradient.over(style.stroke, color) }
 			});
 			if (label) {
 				const own = label === true ? {} : label;

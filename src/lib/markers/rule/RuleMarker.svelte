@@ -4,6 +4,7 @@
 	import { RuleX, RuleY } from 'svelteplot';
 	import type { AxisValue } from '$lib/types/layout/mapping';
 	import { RowStroke } from '$lib/markers/utils/RowStroke';
+	import GradientDefs from '$lib/markers/utils/GradientDefs.svelte';
 	import type { RuleMarkerConfig } from '$lib/types/markers/common';
 
 	/**
@@ -37,12 +38,19 @@
 	 */
 	const position = $derived(data ? value : (d: { v: AxisValue }) => d.v);
 
+	const id = $props.id();
 	/** Each row's stroke: the marker's `styles`, which can be functions of the row. */
 	const row = $derived(
-		RowStroke.of(styles, rows, { stroke: 'currentColor', strokeWidth: 1, strokeOpacity: 1 })
+		RowStroke.of(
+			styles,
+			rows,
+			{ stroke: 'currentColor', strokeWidth: 1, strokeOpacity: 1 },
+			`${id}-stroke`
+		)
 	);
 </script>
 
+<GradientDefs paints={[row.paint]} />
 <RuleMark
 	{...events.props}
 	data={rows}

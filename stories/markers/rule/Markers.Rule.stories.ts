@@ -189,3 +189,34 @@ export const WithMixedMarkers: PlotStory = {
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+// ── Gradient ──────────────────────────────────────────────────────────────────
+
+/**
+ * A rule is a line with no width (or no height), so it has no box of its own for a gradient to stretch over: span
+ * the plot instead (`span: 'plot'`). Here a vertical rule runs from transparent at the top to violet at the bottom.
+ */
+export const Gradient: PlotStory = {
+	render: renderPlot,
+	args: {
+		...PLOT_ARGS,
+		markers: [
+			{
+				type: 'rule',
+				axis: 'x',
+				value: 6,
+				styles: {
+					stroke: {
+						gradient: [
+							{ color: '#7c3aed', opacity: 0 },
+							{ color: '#7c3aed', opacity: 1 }
+						],
+						axis: 'y',
+						span: 'plot'
+					},
+					strokeWidth: 3
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

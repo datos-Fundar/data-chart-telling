@@ -1,4 +1,5 @@
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 import type { ScatterPlotState, ScatterPlotEnv } from '$lib/types/plots/correlation/scatter/state';
 import type { DotMarkerConfig } from '$lib/types/markers/common';
@@ -124,7 +125,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 				scales: channelScales,
 				styles: {
 					dotRadius: disabledDots?.dotRadius ?? dotStyle.dotRadius ?? cfg.scatter.dotRadius,
-					dotFill: disabledDots?.dotFill ?? dotStyle.dotFill ?? defaultColor,
+					dotFill: disabledDots?.dotFill ?? Gradient.over(dotStyle.dotFill, defaultColor),
 					dotSymbol: disabledDots?.dotSymbol ?? dotStyle.dotSymbol,
 					dotStroke: disabledDots?.dotStroke ?? dotStyle.dotStroke,
 					dotStrokeWidth: disabledDots?.dotStrokeWidth ?? dotStyle.dotStrokeWidth,

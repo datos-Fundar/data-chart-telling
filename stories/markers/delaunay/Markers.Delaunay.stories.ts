@@ -76,3 +76,27 @@ export const GroupedByContinent: Story = {
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+// ── Gradient ──────────────────────────────────────────────────────────────────
+
+/** `stroke` takes a gradient across the plot: here the links fade out toward the poorer countries on the left. */
+export const Gradient: Story = {
+	args: {
+		markers: [
+			{
+				type: 'delaunayLink',
+				x: 'gdp',
+				y: 'life',
+				styles: {
+					stroke: {
+						gradient: [
+							{ color: '#2563eb', opacity: 0.1 },
+							{ color: '#2563eb', opacity: 0.8 }
+						],
+						span: 'plot'
+					}
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

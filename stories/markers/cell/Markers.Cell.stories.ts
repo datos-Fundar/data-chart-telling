@@ -95,3 +95,20 @@ export const Label: Story = {
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+// ── Gradient ──────────────────────────────────────────────────────────────────
+
+/** With `span: 'plot'`, one gradient runs across every cell, left to right: each cell shows its own stretch of it. */
+export const Gradient: Story = {
+	args: {
+		markers: [
+			{
+				type: 'cell',
+				data: CELLS,
+				x: 'col',
+				y: 'row',
+				styles: { fill: { gradient: ['#0ea5e9', '#a855f7', '#f97316'], span: 'plot' } }
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

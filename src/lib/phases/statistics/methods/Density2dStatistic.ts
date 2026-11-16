@@ -4,6 +4,7 @@ import {
 	STATISTIC_FALLBACK_COLOR,
 	type StatisticSource
 } from '$lib/types/phases/statistics/source';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 /** 2D kernel density over the source's `x` and `y`, drawn as a `density` marker. */
 export class Density2dStatistic {
@@ -21,7 +22,7 @@ export class Density2dStatistic {
 				thresholds: config.thresholds,
 				styles: {
 					...config.styles,
-					stroke: config.styles?.stroke ?? source.color ?? STATISTIC_FALLBACK_COLOR
+					stroke: Gradient.over(config.styles?.stroke, source.color ?? STATISTIC_FALLBACK_COLOR)
 				}
 			}
 		];

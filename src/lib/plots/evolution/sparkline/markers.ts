@@ -10,6 +10,7 @@ import type {
 	SparklinePlotState,
 	SparklinePlotEnv
 } from '$lib/types/plots/evolution/sparkline/state';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 /**
  * SparklinePlot's "markers" phase: each series' line, thin, and a dot on its
@@ -46,7 +47,8 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		if (last === undefined) return [];
 		// The dot takes the color of the stretch it ends.
 		const color =
-			group.visualSegments.at(-1)?.styles.stroke?.stroke ?? state.colorForSeries!(series.name);
+			Gradient.swatch(group.visualSegments.at(-1)?.styles.stroke?.stroke) ??
+			state.colorForSeries!(series.name);
 		const disabled = disabledDotsFor(series.name);
 		return [
 			{

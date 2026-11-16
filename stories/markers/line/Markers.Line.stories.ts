@@ -76,3 +76,48 @@ export const CustomStyle: Story = {
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+// ── Gradient ──────────────────────────────────────────────────────────────────
+
+/** `stroke` takes a gradient: its colors spread evenly along the line, from its left end to its right one. */
+export const Gradient: Story = {
+	args: {
+		markers: [
+			{
+				type: 'line',
+				data: SEGMENT,
+				x: 'x',
+				y: 'y',
+				styles: { stroke: { gradient: ['#06b6d4', '#d946ef', '#f59e0b'] }, strokeWidth: 4 }
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};
+
+/**
+ * Stops `at` values of the axis place the colors on the plot: two stops at the same value switch color there at
+ * once - here the line is red above 5 and blue below it.
+ */
+export const GradientAtValues: Story = {
+	args: {
+		markers: [
+			{
+				type: 'line',
+				data: SEGMENT,
+				x: 'x',
+				y: 'y',
+				styles: {
+					stroke: {
+						gradient: [
+							{ at: 5, color: '#dc2626' },
+							{ at: 5, color: '#2563eb' }
+						],
+						axis: 'y'
+					},
+					strokeWidth: 4
+				}
+			},
+			{ type: 'rule', axis: 'y', value: 5, styles: { strokeDasharray: '4 4', strokeOpacity: 0.4 } }
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

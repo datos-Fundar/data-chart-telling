@@ -1,6 +1,7 @@
 import { resolveAccessor } from '$lib/utils/accessors';
 import { seriesIdOf } from '$lib/utils/grouping';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { isGapValue, resolveGapAreaStyle } from '$lib/plots/utils/gaps';
@@ -105,10 +106,10 @@ export function buildMarks<TData extends Record<string, unknown>>(
 				styles: {
 					// An outline asked for without a color is the fill's.
 					...(seg.styles.strokeWidth !== undefined
-						? { stroke: disabledFill?.fill ?? seg.styles.fill ?? defaultColor }
+						? { stroke: disabledFill?.fill ?? Gradient.over(seg.styles.fill, defaultColor) }
 						: {}),
 					...seg.styles,
-					fill: disabledFill?.fill ?? seg.styles.fill ?? defaultColor,
+					fill: disabledFill?.fill ?? Gradient.over(seg.styles.fill, defaultColor),
 					fillOpacity: disabledFill?.fillOpacity ?? seg.styles.fillOpacity ?? 1,
 					// A dimmed series fades its outline with its fill.
 					...(disabledFill?.fillOpacity !== undefined

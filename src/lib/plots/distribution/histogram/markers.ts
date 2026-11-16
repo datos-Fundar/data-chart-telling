@@ -2,6 +2,7 @@ import { ProcessedPositions } from '$lib/phases/transforms/ProcessedPositions';
 import { Transforms } from '$lib/phases/transforms/Transforms';
 import { resolveAccessor } from '$lib/utils/accessors';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 import type {
 	HistogramPlotState,
@@ -60,10 +61,10 @@ export function buildMarks<TData extends Record<string, unknown>>(
 					styles: {
 						// An outline asked for without a color is the fill's.
 						...(seg.styles.strokeWidth !== undefined
-							? { stroke: disabled?.fill ?? seg.styles.fill ?? color }
+							? { stroke: disabled?.fill ?? Gradient.over(seg.styles.fill, color) }
 							: {}),
 						...seg.styles,
-						fill: disabled?.fill ?? seg.styles.fill ?? color,
+						fill: disabled?.fill ?? Gradient.over(seg.styles.fill, color),
 						fillOpacity: disabled?.fillOpacity ?? seg.styles.fillOpacity ?? fillOpacity,
 						// A dimmed series fades its outline with its fill.
 						...(disabled?.fillOpacity !== undefined ? { strokeOpacity: disabled.fillOpacity } : {})

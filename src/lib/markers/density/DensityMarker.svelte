@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
+	import { Paint } from '$lib/markers/utils/Paint';
+	import GradientDefs from '$lib/markers/utils/GradientDefs.svelte';
 	import { Density } from 'svelteplot';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
@@ -45,9 +47,19 @@
 			stroke: channelFill?.(rows[0]) as string | undefined
 		}));
 	});
+	const id = $props.id();
+	/** Each group's fill and stroke: a gradient takes its group's color where a stop has none. */
+	const painted = $derived(
+		groups.map((group, i) => ({
+			...group,
+			fill: Paint.single(marker.styles?.fill, group.stroke, `${id}-${i}-fill`),
+			outline: Paint.single(marker.styles?.stroke, group.stroke, `${id}-${i}-stroke`)
+		}))
+	);
 </script>
 
-{#each groups as group, i (i)}
+<GradientDefs paints={painted.flatMap((group) => [group.fill, group.outline])} />
+{#each painted as group, i (i)}
 	<Density
 		{...events.props}
 		data={group.rows}
@@ -57,9 +69,9 @@
 		weight={marker.weight}
 		bandwidth={marker.bandwidth}
 		thresholds={marker.thresholds}
-		fill={marker.styles?.fill}
+		fill={group.fill.value}
 		fillOpacity={marker.styles?.fillOpacity}
-		stroke={marker.styles?.stroke ?? group.stroke}
+		stroke={group.outline.value ?? group.stroke}
 		strokeWidth={marker.styles?.strokeWidth}
 		strokeOpacity={marker.styles?.strokeOpacity}
 	/>

@@ -2,6 +2,7 @@
 	import { SvelteSet } from 'svelte/reactivity';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { Palette } from '$lib/utils/color';
+	import { Gradient } from '$lib/markers/utils/Gradient';
 	import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 	import { DisabledStyle } from '$lib/layout/legend/DisabledStyle';
 	import DiscreteBadgeItem from '$lib/layout/legend/DiscreteBadgeItem.svelte';
@@ -180,8 +181,8 @@
 	{@const omitMode = ['omit', 'rescale'].includes((action ?? disabledAction).mode)}
 	{@const disabledStyle = DisabledStyle.ofItem(action, cfg.legend.disabledOpacity)}
 	{@const color =
-		disabledStyle?.fill ??
-		disabledStyle?.stroke?.stroke ??
+		Gradient.swatch(disabledStyle?.fill) ??
+		Gradient.swatch(disabledStyle?.stroke?.stroke) ??
 		item.color ??
 		Palette.at(i, cfg.palette)}
 	{@const itemOpacity = disabledStyle

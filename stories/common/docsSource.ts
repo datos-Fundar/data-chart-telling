@@ -1,5 +1,5 @@
 function isPrimitive(v: unknown): boolean {
-	return v === null || typeof v !== 'object' || v instanceof RegExp;
+	return v === null || typeof v !== 'object' || v instanceof RegExp || v instanceof Date;
 }
 
 // Arrays longer than this are previewed as their first few items + an
@@ -35,6 +35,14 @@ function serialize(v: unknown, depth = 0): string {
 	}
 
 	if (v instanceof RegExp) return String(v);
+
+	// A date as the code that makes it, in local time: its time only when it has one.
+	if (v instanceof Date) {
+		const parts = [v.getFullYear(), v.getMonth(), v.getDate()];
+		const time = [v.getHours(), v.getMinutes(), v.getSeconds()];
+		const shown = time.some(Boolean) ? [...parts, ...time] : parts;
+		return `new Date(${shown.join(', ')})`;
+	}
 
 	if (typeof v === 'string') return `'${v}'`;
 	if (typeof v === 'number' || typeof v === 'boolean') return String(v);

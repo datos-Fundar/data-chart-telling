@@ -27,6 +27,35 @@ describe('inheritPlotGrouping', () => {
 		expect((dot as { color?: string }).color).toBeUndefined();
 	});
 
+	test('a gradient that leaves a stop’s color to the shape inherits the plot color; one with its own does not', () => {
+		const fade = { gradient: [{ opacity: 1 }, { opacity: 0 }] };
+		const [tinted] = MarkerGrouping.inheritPlotGrouping(
+			[{ type: 'hull', styles: { fill: fade } }],
+			{
+				color: 'region'
+			}
+		);
+		expect((tinted as { color?: string }).color).toBe('region');
+		const [own] = MarkerGrouping.inheritPlotGrouping(
+			[{ type: 'hull', styles: { fill: { gradient: ['red', 'blue'] } } }],
+			{ color: 'region' }
+		);
+		expect((own as { color?: string }).color).toBeUndefined();
+	});
+
+	test('on an ungrouped plot, a gradient that leaves a stop’s color to the shape takes the series color', () => {
+		const [area] = MarkerGrouping.inheritPlotGrouping(
+			[{ type: 'area', styles: { fill: { gradient: [{ opacity: 1 }, { opacity: 0 }] } } }],
+			{ defaultColor: '#4e79a7' }
+		);
+		expect((area as { styles: { fill: unknown } }).styles.fill).toEqual({
+			gradient: [
+				{ opacity: 1, color: '#4e79a7' },
+				{ opacity: 0, color: '#4e79a7' }
+			]
+		});
+	});
+
 	test('an ungrouped marker with no flat color inherits the plot color', () => {
 		const [dot] = MarkerGrouping.inheritPlotGrouping([{ type: 'dot' }], { color: 'region' });
 		expect((dot as { color?: string }).color).toBe('region');

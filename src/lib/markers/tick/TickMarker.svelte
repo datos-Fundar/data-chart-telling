@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { RowStyle } from '$lib/markers/utils/RowStyle';
+	import { Paint } from '$lib/markers/utils/Paint';
+	import GradientDefs from '$lib/markers/utils/GradientDefs.svelte';
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { TickX, TickY } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
@@ -18,9 +20,8 @@
 	const cfg = $derived(getConfiguration());
 	const data = $derived(marker.data ?? []);
 	const channelStroke = $derived(MarkerChannels.buildFill(data, marker.color, marker.scales, cfg));
-	const stroke = $derived(
-		channelStroke ?? RowStyle.of(marker.styles?.stroke, data) ?? 'currentColor'
-	);
+	const id = $props.id();
+	const stroke = $derived(Paint.of(data, marker.styles?.stroke, channelStroke, `${id}-stroke`));
 
 	/**
 	 * A tick across a band axis spans the whole band, whatever `tickLength` says -
@@ -37,6 +38,7 @@
 	const insetProps = $derived((inset === undefined ? {} : { inset }) as Record<string, unknown>);
 </script>
 
+<GradientDefs paints={[stroke]} />
 <TickMark
 	{...events.props}
 	{data}
@@ -44,7 +46,7 @@
 	y={marker.y}
 	tickLength={marker.tickLength}
 	{...insetProps}
-	{stroke}
+	stroke={stroke.prop ?? 'currentColor'}
 	strokeWidth={RowStyle.field(marker.styles?.strokeWidth)}
 	strokeOpacity={RowStyle.opacity(marker.styles?.strokeOpacity)}
 	strokeDasharray={marker.styles?.strokeDasharray}

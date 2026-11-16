@@ -118,7 +118,7 @@ A row whose value is `null`, `undefined` or `NaN` breaks a line. `styles.gaps` b
   `GeoPlot` has styles of its own and uses none of them.
 
 - On the plots with connectors, `styles.stroke` (or a segment's `stroke`) styles the stems and connectors: width, color, opacity, dashes and line caps and joins. What the author sets for a connector wins over it: a segment's `stroke` wins over `styles.connector`, which wins over `styles.stroke`. A function of the series styles only the connector of a lone dot, which has a series; the connector of several dots takes a style as it is.
-- A series keeps the color of the `color` scale unless the style sets its own.
+- A series keeps the color of the `color` scale unless the style sets its own. A color can be a [gradient](markers.md#gradients): one whose stops leave their color unset takes each series' own, so `area: { fill: { gradient: [{ opacity: 0.5 }, { opacity: 0 }], axis: 'y' } }` fades every series out in its color.
 - A segment's own style wins over them, field by field, and what a legend turned off dims over both - so a `legend.off` fades a series without `segments` repeating its opacity.
 
 ## Segments

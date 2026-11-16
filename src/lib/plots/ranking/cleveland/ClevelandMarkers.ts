@@ -30,6 +30,7 @@ import type { StrokeStyle } from '$lib/types/plots/styling';
 import type { BasicStylesConfig, ConnectorRange } from '$lib/types/layout/styles';
 import type { TextAnchor, LineAnchor } from '$lib/types/plots/constants';
 import type { EdgeBox } from '$lib/types/layout/box';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 /** Where a label sits from its dot, and how its text anchors there. */
 type Place = { dx: number; dy: number; textAnchor: TextAnchor; lineAnchor: LineAnchor };
@@ -252,7 +253,7 @@ export class ClevelandMarkers {
 					r,
 					styles: {
 						dotRadius: disabled?.dotRadius ?? dot?.dotRadius ?? style.dotRadius,
-						dotFill: disabled?.dotFill ?? dot?.dotFill ?? stem?.stroke ?? color,
+						dotFill: disabled?.dotFill ?? Gradient.over(dot?.dotFill ?? stem?.stroke, color),
 						dotFillOpacity: disabled?.dotFillOpacity ?? dot?.dotFillOpacity,
 						dotSymbol: disabled?.dotSymbol ?? dot?.dotSymbol,
 						dotStroke: disabled?.dotStroke ?? dot?.dotStroke ?? 'none',

@@ -1,4 +1,5 @@
 <script lang="ts" generics="TData = Record<string, unknown>">
+	import { Gradient } from '$lib/markers/utils/Gradient';
 	import { RowStyle } from '$lib/markers/utils/RowStyle';
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Text } from 'svelteplot';
@@ -467,7 +468,7 @@
 					<path
 						d={`M ${px} ${py} H ${laneX} V ${py + extraDy} H ${px + labelDx}`}
 						fill="none"
-						stroke={connector.stroke}
+						stroke={Gradient.swatch(connector.stroke)}
 						stroke-width={connector.strokeWidth}
 						stroke-opacity={connector.strokeOpacity ?? opacityOf(d) ?? 1}
 						stroke-dasharray={connector.strokeDasharray}

@@ -65,3 +65,19 @@ export const GroupedByContinent: Story = {
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+// ── Gradient ──────────────────────────────────────────────────────────────────
+
+/** A gradient with no colors of its own takes each hull's color: here each one fades out from its top down. */
+export const Gradient: Story = {
+	args: {
+		markers: [
+			{
+				type: 'hull',
+				x: 'gdp',
+				y: 'life',
+				styles: { fill: { gradient: [{ opacity: 0.35 }, { opacity: 0 }], axis: 'y' } }
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

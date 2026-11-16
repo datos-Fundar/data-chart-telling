@@ -3,6 +3,8 @@
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { RowStyle } from '$lib/markers/utils/RowStyle';
+	import { Paint } from '$lib/markers/utils/Paint';
+	import GradientDefs from '$lib/markers/utils/GradientDefs.svelte';
 	import { Bands, type Band } from '$lib/markers/band/Bands';
 	import type { BandMarkerConfig } from '$lib/types/markers/common';
 
@@ -20,6 +22,10 @@
 	const rows = $derived(marker.data ?? []);
 	const styles = $derived({ ...cfg.band, ...marker.styles });
 	const scale = $derived(plot.scales[marker.axis]);
+	const id = $props.id();
+	const bandRows = $derived(bands.map((band) => band.row));
+	const fill = $derived(Paint.of(bandRows, styles.fill, undefined, `${id}-fill`));
+	const stroke = $derived(Paint.of(bandRows, styles.stroke, undefined, `${id}-stroke`));
 	const across = $derived(plot.scales[marker.axis === 'x' ? 'y' : 'x']);
 
 	/** The pixels the other axis spans, lowest first. */
@@ -55,6 +61,7 @@
 
 {#if scale?.type === 'band'}
 	<g class="band" pointer-events={events.any ? undefined : 'none'}>
+		<GradientDefs paints={[fill, stroke]} />
 		{#each bands as band (band.category instanceof Date ? +band.category : band.category)}
 			{@const box = boxOf(band)}
 			{@const radius = numberOf(styles.borderRadius, band.row)}
@@ -62,9 +69,9 @@
 				{...box}
 				rx={radius}
 				ry={radius}
-				fill={colorOf(styles.fill, band.row)}
+				fill={fill.at(band.row)}
 				fill-opacity={numberOf(styles.fillOpacity, band.row)}
-				stroke={colorOf(styles.stroke, band.row)}
+				stroke={stroke.at(band.row)}
 				stroke-width={numberOf(styles.strokeWidth, band.row)}
 				stroke-opacity={numberOf(styles.strokeOpacity, band.row)}
 				stroke-dasharray={colorOf(styles.strokeDasharray, band.row)}

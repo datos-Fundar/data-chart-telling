@@ -1,5 +1,7 @@
 <script lang="ts" generics="TData = Record<string, unknown>">
 	import { RowStyle } from '$lib/markers/utils/RowStyle';
+	import { Paint } from '$lib/markers/utils/Paint';
+	import GradientDefs from '$lib/markers/utils/GradientDefs.svelte';
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { Dot } from 'svelteplot';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
@@ -63,16 +65,19 @@
 	 * `'none'` is handed over as unset, which svelteplot draws as no paint.
 	 */
 	const paint = <T,>(value: T): T | undefined => (value === 'none' ? undefined : value);
-	const fill = $derived(
-		paint(resolvedFill ?? RowStyle.of(styles?.dotFill, displayData) ?? 'currentColor')
-	);
+	const id = $props.id();
+	const fills = $derived(Paint.of(displayData, styles?.dotFill, resolvedFill, `${id}-fill`));
+	const strokes = $derived(Paint.of(displayData, styles?.dotStroke, undefined, `${id}-stroke`));
+	const fill = $derived(paint(fills.prop ?? 'currentColor'));
 	const flatFillOpacity = $derived(RowStyle.opacity(styles?.dotFillOpacity) ?? 1);
 	const symbol = $derived(resolvedSymbolFn ?? styles?.dotSymbol ?? 'circle');
-	const stroke = $derived(paint(RowStyle.of(styles?.dotStroke, displayData) ?? 'currentColor'));
+	const stroke = $derived(paint(strokes.prop ?? 'currentColor'));
 	const strokeWidth = $derived(RowStyle.field(styles?.dotStrokeWidth) ?? 1);
 	const strokeOpacity = $derived(RowStyle.opacity(styles?.dotStrokeOpacity) ?? 1);
 	const strokeDasharray = $derived(styles?.dotStrokeDasharray);
 </script>
+
+<GradientDefs paints={[fills, strokes]} />
 
 {#snippet dots(rows: TData[], fillOpacity: number)}
 	<RowOffsetMarks {marker} {rows}>

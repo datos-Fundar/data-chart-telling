@@ -10,6 +10,7 @@ import type {
 } from '$lib/types/plots/gaps';
 import type { AreaStyle } from '$lib/types/plots/styling';
 import type { AxisChannelName } from '$lib/types/layout/mapping';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 const DEFAULT_KEY = 'default';
 
@@ -223,7 +224,7 @@ export function resolveGapAreaStyle(
 	gapDefaults: AreaStyle
 ): AreaStyle {
 	return {
-		fill: zoneStyle?.fill ?? gapDefaults.fill ?? defaultColor,
+		fill: Gradient.over(zoneStyle?.fill ?? gapDefaults.fill, defaultColor),
 		fillOpacity: zoneStyle?.fillOpacity ?? gapDefaults.fillOpacity ?? 1,
 		stroke: zoneStyle?.stroke ?? gapDefaults.stroke,
 		strokeWidth: zoneStyle?.strokeWidth ?? gapDefaults.strokeWidth,

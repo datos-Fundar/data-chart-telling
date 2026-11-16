@@ -18,6 +18,7 @@ import type {
 	TreemapPlotState,
 	TreemapPlotEnv
 } from '$lib/types/plots/part-of-a-whole/treemap/state';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 /** A share is written with one decimal unless the author or the configuration's `numbers.decimals` says otherwise. */
 const SHARE_DECIMALS = 1;
@@ -158,7 +159,7 @@ ${shareText(row)}`,
 					...edges,
 					styles: {
 						...style,
-						fill: dimmed?.fill ?? style.fill ?? color,
+						fill: dimmed?.fill ?? Gradient.over(style.fill, color),
 						fillOpacity: dimmed?.fillOpacity ?? style.fillOpacity,
 						stroke: style.stroke ?? look.stroke,
 						strokeWidth: style.strokeWidth ?? look.strokeWidth

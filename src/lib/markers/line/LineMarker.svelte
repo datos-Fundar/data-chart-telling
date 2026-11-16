@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
+	import { Paint } from '$lib/markers/utils/Paint';
+	import GradientDefs from '$lib/markers/utils/GradientDefs.svelte';
 	import { Line } from 'svelteplot';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
@@ -16,8 +18,11 @@
 	const cfg = $derived(getConfiguration());
 	const data = $derived(marker.data ?? []);
 	const channelStroke = $derived(MarkerChannels.buildFill(data, marker.color, marker.scales, cfg));
+	const id = $props.id();
+	const stroke = $derived(Paint.of(data, marker.styles?.stroke, channelStroke, `${id}-stroke`));
 </script>
 
+<GradientDefs paints={[stroke]} />
 <Line
 	{...events.props}
 	{data}
@@ -25,7 +30,7 @@
 	y={marker.y}
 	z={marker.grouping}
 	curve={marker.curve ?? cfg.line.curve}
-	stroke={channelStroke ?? marker.styles?.stroke}
+	stroke={stroke.prop}
 	strokeWidth={marker.styles?.strokeWidth}
 	strokeOpacity={marker.styles?.strokeOpacity}
 	strokeDasharray={marker.styles?.strokeDasharray}

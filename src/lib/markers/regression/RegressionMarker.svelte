@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
+	import { Paint } from '$lib/markers/utils/Paint';
+	import GradientDefs from '$lib/markers/utils/GradientDefs.svelte';
 	import { RegressionX, RegressionY } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import type { RegressionMarkerConfig } from '$lib/types/markers/common';
@@ -26,8 +28,11 @@
 	const RegressionMark = $derived(isHorizontal ? RegressionX : RegressionY);
 
 	const data = $derived(marker.data ?? []);
+	const id = $props.id();
+	const stroke = $derived(Paint.single(marker.styles?.stroke, undefined, `${id}-stroke`));
 </script>
 
+<GradientDefs paints={[stroke]} />
 <RegressionMark
 	{...events.props}
 	{data}
@@ -38,7 +43,7 @@
 	base={marker.base}
 	span={marker.span}
 	confidence={marker.confidence}
-	stroke={marker.styles?.stroke ?? 'currentColor'}
+	stroke={stroke.value ?? 'currentColor'}
 	strokeWidth={marker.styles?.strokeWidth}
 	strokeOpacity={marker.styles?.strokeOpacity}
 	strokeDasharray={marker.styles?.strokeDasharray}

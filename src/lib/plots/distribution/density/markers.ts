@@ -3,6 +3,7 @@ import { Transforms } from '$lib/phases/transforms/Transforms';
 import type { DensityPlotState, DensityPlotEnv } from '$lib/types/plots/distribution/density/state';
 import type { DensityPlotStylesConfig } from '$lib/types/plots/distribution/density/props';
 import type { AxisBasedMarkersConfig, AreaMarkerConfig } from '$lib/types/markers/common';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 /**
  * DensityPlot's "markers" phase: one `area` - or `line`, by `styles.mark` - per
@@ -24,10 +25,12 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		const disabledFill = env.interaction?.fillFor(name);
 		const disabledStroke = env.interaction?.strokeFor(name);
 		return group.visualSegments.map((seg) => {
-			const color = seg.styles.fill ?? state.colorForSeries!(name);
+			const color = Gradient.over(seg.styles.fill, state.colorForSeries!(name));
 			const style = asLine
 				? {
-						stroke: disabledStroke?.stroke ?? seg.styles.stroke ?? color,
+						stroke:
+							disabledStroke?.stroke ??
+							Gradient.over(seg.styles.stroke, state.colorForSeries!(name)),
 						strokeWidth:
 							disabledStroke?.strokeWidth ?? seg.styles.strokeWidth ?? cfg.density.strokeWidth,
 						strokeOpacity: disabledStroke?.strokeOpacity ?? seg.styles.strokeOpacity,
@@ -41,7 +44,9 @@ export function buildMarks<TData extends Record<string, unknown>>(
 						...seg.styles,
 						fill: disabledFill?.fill ?? color,
 						fillOpacity:
-							disabledFill?.fillOpacity ?? seg.styles.fillOpacity ?? cfg.density.fillOpacity
+							disabledFill?.fillOpacity ??
+							seg.styles.fillOpacity ??
+							Gradient.defaultOpacity(seg.styles.fill, cfg.density.fillOpacity)
 					};
 			return Transforms.finish(
 				{

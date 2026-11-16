@@ -4,6 +4,7 @@ import {
 	STATISTIC_FALLBACK_COLOR,
 	type StatisticSource
 } from '$lib/types/phases/statistics/source';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 /** A regression curve over the source, drawn as a `regression` marker (svelteplot fits it at render time). */
 export class RegressionStatistic {
@@ -24,7 +25,7 @@ export class RegressionStatistic {
 				confidence: config.confidence,
 				styles: {
 					...config.styles,
-					stroke: config.styles?.stroke ?? source.color ?? STATISTIC_FALLBACK_COLOR
+					stroke: Gradient.over(config.styles?.stroke, source.color ?? STATISTIC_FALLBACK_COLOR)
 				}
 			}
 		];

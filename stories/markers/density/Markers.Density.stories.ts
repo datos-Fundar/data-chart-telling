@@ -64,3 +64,28 @@ export const GroupedByContinent: Story = {
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+// ── Gradient ──────────────────────────────────────────────────────────────────
+
+/**
+ * A gradient with no colors of its own takes each group's: here every continent's density bands fade out toward the
+ * bottom of the plot (`span: 'plot'`), so each band is as strong as it is high.
+ */
+export const Gradient: Story = {
+	args: {
+		color: 'continent',
+		markers: [
+			{
+				type: 'density',
+				x: 'gdp',
+				y: 'life',
+				bandwidth: 24,
+				thresholds: 4,
+				styles: {
+					fill: { gradient: [{ opacity: 0.35 }, { opacity: 0 }], axis: 'y', span: 'plot' },
+					strokeOpacity: 0.6
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

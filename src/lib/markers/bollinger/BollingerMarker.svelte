@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
+	import { Paint } from '$lib/markers/utils/Paint';
+	import GradientDefs from '$lib/markers/utils/GradientDefs.svelte';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { BollingerX, BollingerY } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
@@ -44,10 +46,23 @@
 
 	/** What the plot's palette gives a row's group. */
 	const groupFill = $derived(MarkerChannels.buildFill(data, marker.grouping, marker.scales, cfg));
+	const id = $props.id();
+	/** Each group's line and band: a gradient takes its group's color where a stop has none. */
+	const painted = $derived(
+		groups.map((group, i) => {
+			const color = marker.grouping ? groupFill?.(group.rows[0]) : undefined;
+			return {
+				...group,
+				color,
+				stroke: Paint.single(marker.styles?.stroke, color, `${id}-${i}-stroke`),
+				band: Paint.single(marker.styles?.bandFill, color, `${id}-${i}-band`)
+			};
+		})
+	);
 </script>
 
-{#each groups as group (group.key)}
-	{@const color = marker.grouping ? groupFill?.(group.rows[0]) : undefined}
+<GradientDefs paints={painted.flatMap((group) => [group.stroke, group.band])} />
+{#each painted as group (group.key)}
 	<BollingerMark
 		{...events.props}
 		data={group.rows}
@@ -55,8 +70,8 @@
 		y={marker.y}
 		n={marker.n}
 		k={marker.k}
-		stroke={marker.styles?.stroke ?? color}
+		stroke={group.stroke.value ?? group.color}
 		strokeOpacity={marker.styles?.strokeOpacity}
-		fill={marker.styles?.bandFill ?? color}
+		fill={group.band.value ?? group.color}
 	/>
 {/each}

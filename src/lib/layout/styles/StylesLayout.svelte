@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { Frame } from 'svelteplot';
+	import { Paint } from '$lib/markers/utils/Paint';
+	import GradientDefs from '$lib/markers/utils/GradientDefs.svelte';
 	import TileLayer from '$lib/layout/styles/TileLayer.svelte';
 	import { GeoGeometry } from '$lib/plots/map/geo/GeoGeometry';
 	import type { StylesLayoutConfig } from '$lib/types/layout/styles';
@@ -26,6 +28,9 @@
 
 	const frame = $derived(styles?.frame);
 	const frameStyle = $derived(typeof frame === 'object' ? frame : undefined);
+	const frameId = $props.id();
+	const frameFill = $derived(Paint.single(frameStyle?.fill, undefined, `${frameId}-fill`));
+	const frameStroke = $derived(Paint.single(frameStyle?.stroke, undefined, `${frameId}-stroke`));
 
 	/** Auto-fits `TileLayer` to the tile-layer feature set `GeoPlot` tacks onto `styles.tileLayer.features` - see `StylesLayoutConfig`'s own doc comment. */
 	const dataLonLatBounds = $derived.by((): [number, number, number, number] | null => {
@@ -58,10 +63,11 @@
 	/>
 {/if}
 {#if frame}
+	<GradientDefs paints={[frameFill, frameStroke]} />
 	<Frame
-		fill={frameStyle?.fill}
+		fill={frameFill.value}
 		fillOpacity={frameStyle?.fillOpacity}
-		stroke={frameStyle?.stroke}
+		stroke={frameStroke.value}
 		strokeWidth={frameStyle?.strokeWidth}
 		strokeOpacity={frameStyle?.strokeOpacity}
 		strokeDasharray={frameStyle?.strokeDasharray}

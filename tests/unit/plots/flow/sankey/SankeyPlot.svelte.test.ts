@@ -105,6 +105,45 @@ describe('SankeyPlot', () => {
 	});
 });
 
+describe('SankeyPlot - link gradients', () => {
+	/** The stop colors of the gradient a ribbon is painted with. */
+	const stopsOf = (svg: SVGElement, path: Element) => {
+		const id = path.getAttribute('fill')!.slice('url(#'.length, -1);
+		return [...svg.querySelectorAll(`[id="${id}"] stop`)].map((stop) =>
+			stop.getAttribute('stop-color')
+		);
+	};
+
+	test("'gradient' runs each link from its source node's color to its target's", async () => {
+		const { container } = await render(SankeyPlot, {
+			props: { width: 700, height: 400, ...BY_ISLAND, styles: { links: { fill: 'gradient' } } }
+		});
+		const svg = await waitForSvg(container);
+		await expect.poll(() => ribbons(svg).length).toBe(11);
+		const pairs = new Set(ribbons(svg).map((path) => stopsOf(svg, path).join('>')));
+		// 5 species-island pairs and 6 island-sex pairs, each its own pair of colors.
+		expect(pairs.size).toBe(11);
+		for (const pair of pairs) expect(pair.split('>')).toHaveLength(2);
+	});
+
+	test("a gradient of the author's takes each link's series color where a stop has none", async () => {
+		const { container } = await render(SankeyPlot, {
+			props: {
+				width: 700,
+				height: 400,
+				...BY_ISLAND,
+				styles: { links: { fill: { gradient: [{ opacity: 1 }, { color: 'white' }] } } }
+			}
+		});
+		const svg = await waitForSvg(container);
+		await expect.poll(() => ribbons(svg).length).toBe(11);
+		const firsts = new Set(ribbons(svg).map((path) => stopsOf(svg, path)[0]));
+		// Each link takes its source's color: 3 species and 3 islands.
+		expect(firsts.size).toBe(6);
+		expect(new Set(ribbons(svg).map((path) => stopsOf(svg, path)[1]))).toEqual(new Set(['white']));
+	});
+});
+
 describe('SankeyPlot - node labels', () => {
 	/** Where the label starting with `name` sits across, against the middle of the plot's frame. */
 	const sideOf = (svg: SVGElement, name: string) => {

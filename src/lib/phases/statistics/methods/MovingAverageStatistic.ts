@@ -5,6 +5,7 @@ import {
 	STATISTIC_FALLBACK_COLOR,
 	type StatisticSource
 } from '$lib/types/phases/statistics/source';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 /** Sliding-window reducer (mean/median/sum/...) drawn as a `line` marker. */
 export class MovingAverageStatistic {
@@ -33,7 +34,7 @@ export class MovingAverageStatistic {
 				y: result.y as LineMarkerConfig['y'],
 				styles: {
 					...config.styles,
-					stroke: config.styles?.stroke ?? source.color ?? STATISTIC_FALLBACK_COLOR
+					stroke: Gradient.over(config.styles?.stroke, source.color ?? STATISTIC_FALLBACK_COLOR)
 				}
 			}
 		];

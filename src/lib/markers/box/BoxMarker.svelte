@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { Gradient } from '$lib/markers/utils/Gradient';
+	import type { Paint } from '$lib/types/plots/styling';
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { BoxX, BoxY } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
@@ -72,7 +74,7 @@
 		...placement?.shift,
 		...(typeof marker.bar === 'object' ? marker.bar : {})
 	});
-	const barFill = $derived(bar.fill as string);
+	const barFill = $derived(bar.fill as Paint);
 
 	/** `bar.insetLeft`/`insetRight` averaged into one symmetric value - a tick's own `inset` is a single number/percentage, not independent left/right. */
 	const tickInset = $derived.by(() => {
@@ -89,7 +91,7 @@
 	 * its own `stroke` color (passed in separately: contrasting for
 	 * `tickMedian`, matching for `rule`/`tickMinMax`).
 	 */
-	function lineStyleDefaults(strokeColor: string): Record<string, unknown> {
+	function lineStyleDefaults(strokeColor: Paint): Record<string, unknown> {
 		const out: Record<string, unknown> = { stroke: strokeColor };
 		if (bar.strokeWidth !== undefined) out.strokeWidth = bar.strokeWidth;
 		const strokeOpacity = bar.fillOpacity ?? bar.opacity;
@@ -115,7 +117,7 @@
 		...placement?.shift
 	});
 	const tickMedianDefault = $derived({
-		...lineStyleDefaults(CssColor.contrastText(barFill)),
+		...lineStyleDefaults(CssColor.contrastText(Gradient.swatch(barFill) ?? 'currentColor')),
 		...placement?.shift,
 		...(tickInset !== undefined ? { inset: tickInset } : {})
 	});

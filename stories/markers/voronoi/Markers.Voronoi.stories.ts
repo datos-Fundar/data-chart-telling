@@ -77,3 +77,29 @@ export const Mesh: Story = {
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+// ── Gradient ──────────────────────────────────────────────────────────────────
+
+/** With stops `at` values of the axis, each cell takes the color of where it lies: here by life expectancy. */
+export const Gradient: Story = {
+	args: {
+		markers: [
+			{
+				type: 'voronoi',
+				x: 'gdp',
+				y: 'life',
+				styles: {
+					fill: {
+						gradient: [
+							{ at: 80, color: '#16a34a' },
+							{ at: 40, color: '#dc2626' }
+						],
+						axis: 'y'
+					},
+					fillOpacity: 0.5,
+					stroke: 'white'
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

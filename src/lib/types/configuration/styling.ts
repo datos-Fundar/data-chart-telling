@@ -1,4 +1,4 @@
-import type { StrokeStyle, DotStyle, FontStyle, AreaStyle } from '$lib/types/plots/styling';
+import type { StrokeStyle, DotStyle, FontStyle, AreaStyle, Paint } from '$lib/types/plots/styling';
 import type { LineAnchor, SymbolType, TextAnchor } from '$lib/types/plots/constants';
 import type { PlotChromeEntry } from '$lib/types/plots/props';
 import type { LegendMark } from '$lib/types/layout/legend';
@@ -413,6 +413,14 @@ export type PlotStylesConfig = {
 
 	/** The `ribbon` marker's style, under its own `styles` and `curvature`. */
 	ribbon: AreaStyle & { curvature: number };
+
+	/** The `difference` marker's fills, under its own: where the metric (`y2`) is above the comparison (`y1`), and below. */
+	difference: {
+		positiveFill: Paint;
+		positiveFillOpacity: number;
+		negativeFill: Paint;
+		negativeFillOpacity: number;
+	};
 
 	/** The `delta` marker's label offset and anchor, per axis the delta is taken on. A marker's own `text` wins. */
 	delta: {

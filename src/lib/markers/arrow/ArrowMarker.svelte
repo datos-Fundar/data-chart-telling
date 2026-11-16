@@ -4,6 +4,7 @@
 	import { Arrow } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
 	import { RowStroke } from '$lib/markers/utils/RowStroke';
+	import GradientDefs from '$lib/markers/utils/GradientDefs.svelte';
 	import type { ArrowMarkerConfig } from '$lib/types/markers/common';
 
 	/**
@@ -19,7 +20,10 @@
 	const plot = usePlot().svelteplot;
 	const data = $derived(marker.data ?? []);
 	/** Each row's stroke: the marker's `styles`, which can be functions of the row. */
-	const row = $derived(RowStroke.of(marker.styles, data, { stroke: 'currentColor' }));
+	const id = $props.id();
+	const row = $derived(
+		RowStroke.of(marker.styles, data, { stroke: 'currentColor' }, `${id}-stroke`)
+	);
 
 	type Row = Record<string, unknown>;
 	type Channel = string | number | ((d: never) => unknown) | undefined;
@@ -53,6 +57,7 @@
 	const own = (key: string) => ({ value: (d: Row) => d[key], scale: null }) as never;
 </script>
 
+<GradientDefs paints={[row.paint]} />
 <Arrow
 	{...events.props}
 	data={placed}

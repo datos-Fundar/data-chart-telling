@@ -4,6 +4,7 @@ import {
 	STATISTIC_FALLBACK_COLOR,
 	type StatisticSource
 } from '$lib/types/phases/statistics/source';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 /** Bollinger bands over the source, drawn as a `bollinger` marker (svelteplot computes them at render time). */
 export class BollingerStatistic {
@@ -21,7 +22,7 @@ export class BollingerStatistic {
 				k: config.k,
 				styles: {
 					...config.styles,
-					stroke: config.styles?.stroke ?? source.color ?? STATISTIC_FALLBACK_COLOR
+					stroke: Gradient.over(config.styles?.stroke, source.color ?? STATISTIC_FALLBACK_COLOR)
 				}
 			}
 		];

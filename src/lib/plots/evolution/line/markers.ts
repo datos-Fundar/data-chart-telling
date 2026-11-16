@@ -1,6 +1,7 @@
 import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { getConfiguration } from '$lib/configuration/config.svelte';
 import { resolveGapRuns, resolveGapsForSeries } from '$lib/plots/utils/gaps';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 import type { GapPoint } from '$lib/types/plots/gaps';
 import type { Series } from '$lib/types/plots/data/common';
@@ -55,7 +56,7 @@ export function buildLineMarkers<TData extends Record<string, unknown>>(args: {
 				y,
 				curve: seg.styles.curve ?? curve,
 				styles: {
-					stroke: disabledStroke?.stroke ?? strokeStyle?.stroke ?? defaultColor,
+					stroke: disabledStroke?.stroke ?? Gradient.over(strokeStyle?.stroke, defaultColor),
 					strokeWidth:
 						disabledStroke?.strokeWidth ?? strokeStyle?.strokeWidth ?? cfg.line.strokeWidth,
 					strokeOpacity: disabledStroke?.strokeOpacity ?? strokeStyle?.strokeOpacity ?? 1,
@@ -73,10 +74,13 @@ export function buildLineMarkers<TData extends Record<string, unknown>>(args: {
 				y,
 				styles: {
 					dotRadius: disabledDots?.dotRadius ?? dotStyle.dotRadius ?? cfg.line.dotRadius,
-					dotFill: disabledDots?.dotFill ?? dotStyle.dotFill ?? strokeStyle?.stroke ?? defaultColor,
+					dotFill:
+						disabledDots?.dotFill ??
+						Gradient.over(dotStyle.dotFill ?? strokeStyle?.stroke, defaultColor),
 					dotSymbol: disabledDots?.dotSymbol ?? dotStyle.dotSymbol ?? 'circle',
 					dotStroke:
-						disabledDots?.dotStroke ?? dotStyle.dotStroke ?? strokeStyle?.stroke ?? defaultColor,
+						disabledDots?.dotStroke ??
+						Gradient.over(dotStyle.dotStroke ?? strokeStyle?.stroke, defaultColor),
 					dotStrokeWidth: disabledDots?.dotStrokeWidth ?? dotStyle.dotStrokeWidth ?? 1,
 					dotFillOpacity:
 						disabledDots?.dotFillOpacity ??
@@ -146,7 +150,7 @@ export function buildGapMarkers<TData extends Record<string, unknown>>(args: {
 				x: gx,
 				y: gy,
 				styles: {
-					stroke: disabledStroke?.stroke ?? strokeStyle?.stroke ?? defaultColor,
+					stroke: disabledStroke?.stroke ?? Gradient.over(strokeStyle?.stroke, defaultColor),
 					strokeWidth:
 						disabledStroke?.strokeWidth ??
 						strokeStyle?.strokeWidth ??

@@ -1,4 +1,5 @@
 import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
+import { Gradient } from '$lib/markers/utils/Gradient';
 import { RowStyle } from '$lib/markers/utils/RowStyle';
 import { CssColor } from '$lib/utils/color/CssColor';
 import { MarkerLabels } from '$lib/markers/labels/MarkerLabels';
@@ -105,11 +106,23 @@ export class MarkerStyles {
 		cfg: PlotStylesConfig
 	): ((row: unknown) => string | undefined) | undefined {
 		const fill = (marker.styles as { fill?: unknown } | undefined)?.fill;
-		return (
-			MarkerChannels.buildFill(rows, marker.color as never, marker.scales as never, cfg) ??
-			RowStyle.colorOf(fill, rows) ??
-			(marker.type === 'waffle' ? () => cfg.palette[0] : undefined)
+		const channel = MarkerChannels.buildFill(
+			rows,
+			marker.color as never,
+			marker.scales as never,
+			cfg
 		);
+		// A gradient stands for its swatch, in the channel's color where a stop has none.
+		if (Gradient.is(fill)) return (row) => Gradient.swatch(Gradient.tint(fill, channel?.(row)));
+		const own = RowStyle.colorOf(fill, rows);
+		const color = channel ?? own ?? (marker.type === 'waffle' ? () => cfg.palette[0] : undefined);
+		if (!color || typeof fill !== 'function') return color;
+		return (row) => {
+			const paint: unknown = (fill as (row: unknown) => unknown)(row);
+			return Gradient.is(paint)
+				? Gradient.swatch(Gradient.tint(paint, channel?.(row)))
+				: (channel?.(row) ?? (paint as string | undefined));
+		};
 	}
 
 	/** A dash pattern for `style`: a named line style's, any other as it is; a function of the row gives each row's. */

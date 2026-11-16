@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { RowStyle } from '$lib/markers/utils/RowStyle';
+	import { Paint } from '$lib/markers/utils/Paint';
+	import GradientDefs from '$lib/markers/utils/GradientDefs.svelte';
 	import { Rect } from 'svelteplot';
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
@@ -12,6 +14,9 @@
 	const cfg = $derived(getConfiguration());
 	const data = $derived(marker.data ?? []);
 	const channelFill = $derived(MarkerChannels.buildFill(data, marker.color, marker.scales, cfg));
+	const id = $props.id();
+	const fill = $derived(Paint.of(data, marker.styles?.fill, channelFill, `${id}-fill`));
+	const stroke = $derived(Paint.of(data, marker.styles?.stroke, undefined, `${id}-stroke`));
 	const opacityBuckets = $derived(
 		MarkerChannels.buildOpacityBuckets(data, marker.opacity, marker.scales, cfg)
 	);
@@ -19,6 +24,7 @@
 	const events = MarkerEvents.use(() => marker);
 </script>
 
+<GradientDefs paints={[fill, stroke]} />
 {#if opacityBuckets}
 	{#each opacityBuckets as bucket (bucket.value)}
 		<Rect
@@ -34,9 +40,9 @@
 			insetRight={RowStyle.field(marker.styles?.insetRight)}
 			insetTop={RowStyle.field(marker.styles?.insetTop)}
 			insetBottom={RowStyle.field(marker.styles?.insetBottom)}
-			fill={channelFill ?? RowStyle.of(marker.styles?.fill, data)}
+			fill={fill.prop}
 			fillOpacity={bucket.value}
-			stroke={RowStyle.of(marker.styles?.stroke, data)}
+			stroke={stroke.prop}
 			strokeWidth={RowStyle.field(marker.styles?.strokeWidth)}
 			strokeOpacity={RowStyle.opacity(marker.styles?.strokeOpacity)}
 			strokeDasharray={marker.styles?.strokeDasharray}
@@ -58,9 +64,9 @@
 		insetRight={RowStyle.field(marker.styles?.insetRight)}
 		insetTop={RowStyle.field(marker.styles?.insetTop)}
 		insetBottom={RowStyle.field(marker.styles?.insetBottom)}
-		fill={channelFill ?? RowStyle.of(marker.styles?.fill, data)}
+		fill={fill.prop}
 		fillOpacity={RowStyle.opacity(marker.styles?.fillOpacity) ?? 1}
-		stroke={RowStyle.of(marker.styles?.stroke, data)}
+		stroke={stroke.prop}
 		strokeWidth={RowStyle.field(marker.styles?.strokeWidth)}
 		strokeOpacity={RowStyle.opacity(marker.styles?.strokeOpacity)}
 		strokeDasharray={marker.styles?.strokeDasharray}

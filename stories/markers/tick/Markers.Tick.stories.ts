@@ -69,3 +69,28 @@ export const ColoredByContinent: Story = {
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+// ── Gradient ──────────────────────────────────────────────────────────────────
+
+/** Stops `at` values of the axis color each tick by where it falls: here by GDP, gray for the poorest to green for the richest. */
+export const Gradient: Story = {
+	args: {
+		markers: [
+			{
+				type: 'tick',
+				data: COUNTRIES_AT_2007,
+				x: 'gdp',
+				y: 'continent',
+				styles: {
+					stroke: {
+						gradient: [
+							{ at: 0, color: '#94a3b8' },
+							{ at: 40000, color: '#16a34a' }
+						]
+					},
+					strokeWidth: 2
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

@@ -68,33 +68,34 @@ Many markers also take channel fields (`color`, `fill`, `opacity`, `r`, `symbol`
 
 ## Catalog for axis-based plots
 
-| `type`                                                   | Draws                                                                                                                                                                                               |
-| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `dot`                                                    | A point per row; `r`, `color`, `symbol`, `styles` (`DotStyle`)                                                                                                                                      |
-| `text`                                                   | A label per row; `text` (string or function), `styles` (`FontStyle`), `declutter`, `edgeAware`, `fitMargins`, `fit`                                                                                 |
-| `line`                                                   | A line through the rows                                                                                                                                                                             |
-| `rule`                                                   | A reference line: `axis: 'x' \| 'y'`, `value` (a list draws a line at each, or a function with `data`), `styles` (`StrokeStyle`, and `inset`, `insetTop`, ... to pull it in from its ends)          |
-| `band`                                                   | The band of a category across the whole other axis: `axis: 'x' \| 'y'`, `value` (a list, or a function with `data`), `slice`, `styles` (`AreaStyle`). Only on a band scale                          |
-| `tick`                                                   | A short tick per row along one axis                                                                                                                                                                 |
-| `bar`                                                    | A bar; `rect`, `cell`: rectangles and heatmap cells                                                                                                                                                 |
-| `rect`                                                   | A rectangle from `x1`/`x2`/`y1`/`y2`; `interval` turns `x`/`y` into ranges; `styles` (`AreaStyle`, and `inset`, `insetLeft`, ...); `label`, a text in each (`cell`, `bar` and `waffle` take it too) |
-| `area`                                                   | A filled area under a curve, or between `y1` and `y2`; `curve`                                                                                                                                      |
-| `difference`                                             | The area between two series, colored by which one is on top                                                                                                                                         |
-| `arrow`                                                  | An arrow from `x1,y1` to `x2,y2`; `bend`, `headAngle`, `headLength`, `styles` (`StrokeStyle`, and `inset`, `insetStart`, `insetEnd`)                                                                |
-| `trail`                                                  | A variable-width ribbon along a path, its width set by `r`                                                                                                                                          |
-| `delta`                                                  | The distance between two series (or a series and a fixed value) at a position - or at each of a list of them, `at: [1980, 2000]` - as a line and a label                                            |
-| `hull`                                                   | The convex hull around a cluster of points                                                                                                                                                          |
-| `density`                                                | 2D density contour bands                                                                                                                                                                            |
-| `box`                                                    | A box plot; sub-marks styled through `bar`, `rule`, `dot`, `tickMedian`, `tickMinMax`; `thickness` sets its width in pixels, `slot` its share of a band                                             |
-| `violin`                                                 | A violin per category of its rows: the mirrored density of `y` (or `x`), `kernel`, `bandwidth`, `trim`, `peak`, `slot`; add a narrow `box` over the same rows for the box inside                    |
-| `regression`, `bollinger`                                | A fitted curve, a moving-average band                                                                                                                                                               |
-| `waffle`                                                 | The value as a grid of unit squares; `unit`, `multiple`, `gap`                                                                                                                                      |
-| `voronoi`, `voronoiMesh`, `delaunayLink`, `delaunayMesh` | Voronoi cells and Delaunay triangulation                                                                                                                                                            |
-| `image`                                                  | An image per row; `src`, `width`, `height`                                                                                                                                                          |
-| `raster`                                                 | A field sampled over a rectangle, drawn to a canvas                                                                                                                                                 |
-| `brush`                                                  | A drag-to-select rectangle with `onbrushstart`, `onbrush`, `onbrushend`                                                                                                                             |
-| `hover`                                                  | The in-plot hover highlight (see below)                                                                                                                                                             |
-| `component`                                              | Your own Svelte component (see below)                                                                                                                                                               |
+| `type`                                                   | Draws                                                                                                                                                                                                                                                 |
+| -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dot`                                                    | A point per row; `r`, `color`, `symbol`, `styles` (`DotStyle`)                                                                                                                                                                                        |
+| `text`                                                   | A label per row; `text` (string or function), `styles` (`FontStyle`), `declutter`, `edgeAware`, `fitMargins`, `fit`                                                                                                                                   |
+| `line`                                                   | A line through the rows                                                                                                                                                                                                                               |
+| `rule`                                                   | A reference line: `axis: 'x' \| 'y'`, `value` (a list draws a line at each, or a function with `data`), `styles` (`StrokeStyle`, and `inset`, `insetTop`, ... to pull it in from its ends)                                                            |
+| `band`                                                   | The band of a category across the whole other axis: `axis: 'x' \| 'y'`, `value` (a list, or a function with `data`), `slice`, `styles` (`AreaStyle`). Only on a band scale                                                                            |
+| `tick`                                                   | A short tick per row along one axis                                                                                                                                                                                                                   |
+| `bar`                                                    | A bar; `rect`, `cell`: rectangles and heatmap cells                                                                                                                                                                                                   |
+| `rect`                                                   | A rectangle from `x1`/`x2`/`y1`/`y2`; `interval` turns `x`/`y` into ranges; `styles` (`AreaStyle`, and `inset`, `insetLeft`, ...); `label`, a text in each (`cell`, `bar` and `waffle` take it too)                                                   |
+| `area`                                                   | A filled area under a curve, or between `y1` and `y2`; `curve`                                                                                                                                                                                        |
+| `ribbon`                                                 | A band per row that flows along x from `x1` to `x2`, leaving between `y1` and `y2` and arriving between `y3` and `y4`; `curvature`, `styles` (`AreaStyle`, its `fill` and `stroke` a color or a [gradient](#gradients), and `insetStart`, `insetEnd`) |
+| `difference`                                             | The area between two series, colored by which one is on top                                                                                                                                                                                           |
+| `arrow`                                                  | An arrow from `x1,y1` to `x2,y2`; `bend`, `headAngle`, `headLength`, `styles` (`StrokeStyle`, and `inset`, `insetStart`, `insetEnd`)                                                                                                                  |
+| `trail`                                                  | A variable-width ribbon along a path, its width set by `r`                                                                                                                                                                                            |
+| `delta`                                                  | The distance between two series (or a series and a fixed value) at a position - or at each of a list of them, `at: [1980, 2000]` - as a line and a label                                                                                              |
+| `hull`                                                   | The convex hull around a cluster of points                                                                                                                                                                                                            |
+| `density`                                                | 2D density contour bands                                                                                                                                                                                                                              |
+| `box`                                                    | A box plot; sub-marks styled through `bar`, `rule`, `dot`, `tickMedian`, `tickMinMax`; `thickness` sets its width in pixels, `slot` its share of a band                                                                                               |
+| `violin`                                                 | A violin per category of its rows: the mirrored density of `y` (or `x`), `kernel`, `bandwidth`, `trim`, `peak`, `slot`; add a narrow `box` over the same rows for the box inside                                                                      |
+| `regression`, `bollinger`                                | A fitted curve, a moving-average band                                                                                                                                                                                                                 |
+| `waffle`                                                 | The value as a grid of unit squares; `unit`, `multiple`, `gap`                                                                                                                                                                                        |
+| `voronoi`, `voronoiMesh`, `delaunayLink`, `delaunayMesh` | Voronoi cells and Delaunay triangulation                                                                                                                                                                                                              |
+| `image`                                                  | An image per row; `src`, `width`, `height`                                                                                                                                                                                                            |
+| `raster`                                                 | A field sampled over a rectangle, drawn to a canvas                                                                                                                                                                                                   |
+| `brush`                                                  | A drag-to-select rectangle with `onbrushstart`, `onbrush`, `onbrushend`                                                                                                                                                                               |
+| `hover`                                                  | The in-plot hover highlight (see below)                                                                                                                                                                                                               |
+| `component`                                              | Your own Svelte component (see below)                                                                                                                                                                                                                 |
 
 ## Markers in some facets
 
@@ -178,6 +179,33 @@ Every function of the row a marker takes - a channel (`x`, `y`, `text`...), a fi
 { type: 'text', x: (row, context) => context.start.column, y: (row, context) => context.start.y,
   text: (row, context) => `${Math.round(context.sourceShare)}%` }
 ```
+
+## Gradients
+
+On a marker that paints with one, a `fill` or a `stroke` can be a gradient instead of a color, or a function of the row that returns either:
+
+```ts
+{ type: 'ribbon', ..., styles: { fill: { gradient: ['#2563eb', '#f97316'] } } }
+```
+
+- `gradient`, its stops, in order:
+  - A color.
+  - An object, each field optional:
+    - `color`: without one, the stop takes the shape's own color, its `color` channel's.
+    - `opacity`: 1 by default.
+    - `at`: a value on the gradient's axis, or a share of its span (`'25%'`). Stops without one are spread evenly between their neighbours.
+- `axis`, the direction it runs in:
+  - `'x'` (the default): from the left.
+  - `'y'`: from the top.
+- `span`, what it stretches over:
+  - `'shape'` (the default): each shape on its own.
+  - `'plot'`: the whole plot, so shapes one after another share one gradient. A stop `at` a value always spans the plot.
+
+A gradient wins over the `color` channel, and takes its color where a stop has none: `{ gradient: [{ opacity: 1 }, { opacity: 0 }] }` fades each shape out in its own color. Two stops at the same value switch color there at once. Shapes painted with the same gradient in the same color share one `<linearGradient>`.
+
+A gradient over `'shape'` stretches over each shape's box, so a shape with no height (a flat line, on `axis: 'y'`) or no width has none to stretch over and is not painted: span the plot instead. A shape drawn to a canvas takes no gradient.
+
+Every marker that fills or strokes a shape takes a gradient wherever it takes a color: its `styles` (`fill`, `stroke`, a dot's `dotFill` and `dotStroke`), a `difference`'s `positiveFill` and `negativeFill`, a `bollinger`'s `bandFill`. So do a plot's own `styles` (`styles.area`, `styles.stroke`, `styles.dot`, a segment's style) and its `frame`, where a stop with no color takes each series' own. A `contour`'s `fill`, a channel of its values, and a `text` take colors only. Where a single color is needed instead - a legend's swatch, a label's contrast - a gradient stands for its middle stop.
 
 ## A label in each shape
 

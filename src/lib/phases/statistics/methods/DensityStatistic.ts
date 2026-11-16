@@ -5,6 +5,7 @@ import {
 	STATISTIC_FALLBACK_COLOR,
 	type StatisticSource
 } from '$lib/types/phases/statistics/source';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 /** 1D kernel density over the source's `x` values, drawn as an `area` marker. */
 export class DensityStatistic {
@@ -32,7 +33,7 @@ export class DensityStatistic {
 				y: result.y as AreaMarkerConfig['y'],
 				styles: {
 					...config.styles,
-					fill: config.styles?.fill ?? source.color ?? STATISTIC_FALLBACK_COLOR
+					fill: Gradient.over(config.styles?.fill, source.color ?? STATISTIC_FALLBACK_COLOR)
 				}
 			}
 		];

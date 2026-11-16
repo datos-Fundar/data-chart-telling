@@ -76,3 +76,26 @@ export const ByGroup: Story = {
 		markers: [{ type: 'bollinger', grouping: 'city', n: 30 }] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+// ── Gradient ──────────────────────────────────────────────────────────────────
+
+/** `bandFill` takes a gradient: here the band fades from the top down. */
+export const Gradient: Story = {
+	args: {
+		markers: [
+			{
+				type: 'bollinger',
+				styles: {
+					stroke: '#dc2626',
+					bandFill: {
+						gradient: [
+							{ color: '#dc2626', opacity: 0.8 },
+							{ color: '#dc2626', opacity: 0.01 }
+						],
+						axis: 'y'
+					}
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

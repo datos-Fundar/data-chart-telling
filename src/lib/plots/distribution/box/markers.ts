@@ -2,6 +2,7 @@ import { BoxSummaries } from '$lib/plots/distribution/box/BoxSummaries';
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import type { BoxPlotState, BoxPlotEnv } from '$lib/types/plots/distribution/box/state';
 import type { AxisBasedMarkersConfig, BoxMarkerConfig } from '$lib/types/markers/common';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 /**
  * BoxPlot's "markers" phase: one `box` per visual segment of each series,
@@ -24,7 +25,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		const disabled = env.interaction?.fillFor(name);
 		return group.visualSegments.map((seg): BoxMarkerConfig => {
 			const { stroke, strokeWidth, strokeOpacity, borderRadius } = seg.styles;
-			const fill = disabled?.fill ?? seg.styles.fill ?? state.colorForSeries!(name);
+			const fill = disabled?.fill ?? Gradient.over(seg.styles.fill, state.colorForSeries!(name));
 			// An outline asked for without a color is the fill's.
 			const outline = {
 				stroke: stroke ?? (strokeWidth !== undefined ? fill : undefined),
@@ -42,7 +43,10 @@ export function buildMarks<TData extends Record<string, unknown>>(
 					// The box's own outline, from its segment; unset fields stay svelteplot's.
 					...Object.fromEntries(Object.entries(outline).filter(([, v]) => v !== undefined)),
 					fill,
-					fillOpacity: disabled?.fillOpacity ?? seg.styles.fillOpacity ?? cfg.box.fillOpacity
+					fillOpacity:
+						disabled?.fillOpacity ??
+						seg.styles.fillOpacity ??
+						Gradient.defaultOpacity(seg.styles.fill, cfg.box.fillOpacity)
 				}
 			};
 		});

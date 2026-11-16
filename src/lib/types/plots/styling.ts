@@ -1,4 +1,5 @@
 import type { AnyRowContext, PlotRowContext, RowFunction } from '$lib/types/layout/context';
+import type { AxisValue } from '$lib/types/layout/mapping';
 import type {
 	FontWeight,
 	FontStyleKeyword,
@@ -31,7 +32,7 @@ export type FontStyle = {
 
 /** Stroke styling for any line-ish mark - a line, a rule, a marker's connector. */
 export type StrokeStyle = {
-	stroke?: string;
+	stroke?: Paint;
 	strokeWidth?: number;
 	strokeOpacity?: number;
 	strokeDasharray?: string | LineStyle;
@@ -48,10 +49,10 @@ export type StrokeStyle = {
  */
 export type DotStyle = {
 	dotRadius?: number;
-	dotFill?: string;
+	dotFill?: Paint;
 	dotFillOpacity?: number;
 	dotSymbol?: SymbolType;
-	dotStroke?: string;
+	dotStroke?: Paint;
 	dotStrokeWidth?: number;
 	dotStrokeOpacity?: number;
 	dotStrokeDasharray?: string | LineStyle;
@@ -59,14 +60,43 @@ export type DotStyle = {
 
 /** Styling for a 2D area mark - a bar segment, a heatmap cell, a geo feature highlight. */
 export type AreaStyle = {
-	fill?: string;
+	fill?: Paint;
 	fillOpacity?: number;
-	stroke?: string;
+	stroke?: Paint;
 	strokeWidth?: number;
 	strokeOpacity?: number;
 	strokeDasharray?: string | LineStyle;
 	borderRadius?: number;
 };
+
+/**
+ * One stop of a gradient: a color, or a color and an opacity at a place along it. Without a `color`, the stop
+ * takes the shape's own (its series'); without an `at`, the stops are spread evenly between their neighbours.
+ */
+export type GradientStop =
+	| string
+	| {
+			color?: string;
+			/** Defaults to 1. */
+			opacity?: number;
+			/** A value on the gradient's axis, which spans the plot, or a share of its span. */
+			at?: AxisValue | `${number}%`;
+	  };
+
+/**
+ * A fill or a stroke that changes color along an axis, its stops from the left on `x` and from the top on `y`.
+ * It spans each shape, or the whole plot: a stop `at` a value spans the plot.
+ */
+export type Gradient = {
+	gradient: GradientStop[];
+	/** Defaults to `'x'`. */
+	axis?: 'x' | 'y';
+	/** Defaults to `'shape'`. */
+	span?: 'shape' | 'plot';
+};
+
+/** A color, or a gradient. */
+export type Paint = string | Gradient;
 
 /** How far a shape is pulled in from its edges, in pixels (a bar's, as a fraction of its band): `inset` on all sides, or each side's own. */
 export type InsetStyle = {

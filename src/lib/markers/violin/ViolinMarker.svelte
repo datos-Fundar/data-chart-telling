@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { usePlot } from '$lib/layout/plot/usePlot';
+	import { Paint } from '$lib/markers/utils/Paint';
+	import { Gradient } from '$lib/markers/utils/Gradient';
+	import GradientDefs from '$lib/markers/utils/GradientDefs.svelte';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import { resolveAccessor } from '$lib/utils/accessors';
 	import { ViolinProfiles } from '$lib/markers/violin/ViolinProfiles';
@@ -23,6 +26,9 @@
 	const valueScale = $derived(isHorizontal ? plot.svelteplot.scales.x : plot.svelteplot.scales.y);
 
 	const data = $derived((marker.data ?? []) as ProcessedRow[]);
+	const id = $props.id();
+	const fill = $derived(Paint.single(marker.styles?.fill, undefined, `${id}-fill`));
+	const stroke = $derived(Paint.single(marker.styles?.stroke, undefined, `${id}-stroke`));
 	const profiles = $derived(
 		ViolinProfiles.of(
 			data,
@@ -61,12 +67,14 @@
 </script>
 
 <g class="dct-violin">
+	<GradientDefs paints={[fill, stroke]} />
 	{#each shapes as d, i (i)}
 		<path
 			{d}
-			fill={marker.styles?.fill}
-			fill-opacity={marker.styles?.fillOpacity ?? cfg.violin.fillOpacity}
-			stroke={marker.styles?.stroke}
+			fill={fill.value}
+			fill-opacity={marker.styles?.fillOpacity ??
+				Gradient.defaultOpacity(marker.styles?.fill, cfg.violin.fillOpacity)}
+			stroke={stroke.value}
 			stroke-width={marker.styles?.strokeWidth}
 			stroke-opacity={marker.styles?.strokeOpacity}
 			stroke-dasharray={marker.styles?.strokeDasharray}

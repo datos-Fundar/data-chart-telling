@@ -12,6 +12,7 @@ import type {
 	BoxMarkerConfig,
 	ViolinMarkerConfig
 } from '$lib/types/markers/common';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 /**
  * ViolinPlot's "markers" phase: one `violin` - and a narrow `box` over it - per visual
@@ -82,11 +83,17 @@ export function buildMarks<TData extends Record<string, unknown>>(
 				styles: {
 					// An outline asked for without a color is the fill's.
 					...(seg.styles.strokeWidth !== undefined
-						? { stroke: disabled?.fill ?? seg.styles.fill ?? state.colorForSeries!(name) }
+						? {
+								stroke:
+									disabled?.fill ?? Gradient.over(seg.styles.fill, state.colorForSeries!(name))
+							}
 						: {}),
 					...seg.styles,
-					fill: disabled?.fill ?? seg.styles.fill ?? state.colorForSeries!(name),
-					fillOpacity: disabled?.fillOpacity ?? seg.styles.fillOpacity ?? cfg.violin.fillOpacity
+					fill: disabled?.fill ?? Gradient.over(seg.styles.fill, state.colorForSeries!(name)),
+					fillOpacity:
+						disabled?.fillOpacity ??
+						seg.styles.fillOpacity ??
+						Gradient.defaultOpacity(seg.styles.fill, cfg.violin.fillOpacity)
 				}
 			})
 		);

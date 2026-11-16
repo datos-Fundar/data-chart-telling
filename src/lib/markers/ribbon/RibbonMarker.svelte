@@ -6,17 +6,21 @@
 	import { MarkerChannels } from '$lib/markers/utils/MarkerChannels';
 	import { RibbonPath, type RibbonEnd } from '$lib/markers/ribbon/RibbonPath';
 	import { resolveAccessor } from '$lib/utils/accessors';
+	import { Paint } from '$lib/markers/utils/Paint';
+	import GradientDefs from '$lib/markers/utils/GradientDefs.svelte';
 	import type { RibbonMarkerConfig } from '$lib/types/markers/common';
 
 	/**
 	 * Renders one `'ribbon'` marker: a band per row from `x1` to `x2` on the plot's own scales. On a band axis a
 	 * ribbon leaves from the far edge of its start's band and arrives at the near edge of its end's. Its `color` and
-	 * `opacity` channels win over the fill and fill opacity of its `styles`, as a `rect`'s do.
+	 * `opacity` channels win over the fill and fill opacity of its `styles`, as a `rect`'s do, but for a gradient
+	 * (`Paint`), which takes the channel's color where a stop has none of its own.
 	 */
 	let { marker }: { marker: RibbonMarkerConfig } = $props();
 	const cfg = $derived(getConfiguration());
 	const events = MarkerEvents.use(() => marker);
 	const plot = usePlot().svelteplot;
+	const id = $props.id();
 
 	type Row = Record<string, unknown>;
 	const rows = $derived((marker.data ?? []) as Row[]);
@@ -54,6 +58,9 @@
 			? (style as (r: Row, i: number) => string)(row, index)
 			: RowStyle.colorOf(style, rows)?.(row);
 
+	const fill = $derived(Paint.of(rows, styles.fill, channelFill, `${id}-fill`));
+	const stroke = $derived(Paint.of(rows, styles.stroke, undefined, `${id}-stroke`));
+
 	/** Where `value` sits along x: the far edge of its band at the start, the near edge at the end. */
 	const along = (value: unknown, side: 'start' | 'end') => {
 		const scale = plot.scales.x;
@@ -82,14 +89,15 @@
 </script>
 
 <g class="ribbon">
+	<GradientDefs paints={[fill, stroke]} />
 	{#each rows as row, index (index)}
 		{@const d = pathOf(row, index)}
 		{#if d}
 			<path
 				{d}
-				fill={channelFill?.(row) ?? colorOf(styles.fill, row, index)}
+				fill={fill.at(row, index)}
 				fill-opacity={channelOpacity?.(row) ?? numberOf(styles.fillOpacity, row, index)}
-				stroke={colorOf(styles.stroke, row, index)}
+				stroke={stroke.at(row, index)}
 				stroke-width={numberOf(styles.strokeWidth, row, index)}
 				stroke-opacity={numberOf(styles.strokeOpacity, row, index)}
 				stroke-dasharray={colorOf(styles.strokeDasharray, row, index)}

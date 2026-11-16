@@ -4,6 +4,7 @@ import { GAP_KIND, GAP_VALUE, SERIES_ID_KEY } from '$lib/phases/transforms/Trans
 import { seriesIdOf } from '$lib/utils/grouping';
 import { resolveGapAreaStyle } from '$lib/plots/utils/gaps';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { BarMarkerConfig } from '$lib/types/markers/common';
@@ -178,7 +179,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 		const disabledFill = env.interaction?.fillFor(name);
 
 		for (const seg of group.visualSegments) {
-			const fill = disabledFill?.fill ?? seg.styles.fill ?? defaultColor;
+			const fill = disabledFill?.fill ?? Gradient.over(seg.styles.fill, defaultColor);
 			const styles: BarSegmentStyle = {
 				// An outline asked for without a color is the fill's.
 				...(seg.styles.strokeWidth !== undefined ? { stroke: fill } : {}),

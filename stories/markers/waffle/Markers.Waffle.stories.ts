@@ -219,3 +219,22 @@ export const Label: Story = {
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+// ── Gradient ──────────────────────────────────────────────────────────────────
+
+/** `fill` takes a gradient: here each square runs from a lighter to a darker green, top to bottom. */
+export const Gradient: Story = {
+	args: {
+		markers: [
+			{
+				type: 'waffle',
+				data: COUNTS,
+				x: 'region',
+				y: 'count',
+				multiple: 10,
+				unit: 1,
+				styles: { fill: { gradient: ['#86efac', '#15803d'], axis: 'y' } }
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

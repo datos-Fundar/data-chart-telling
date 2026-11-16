@@ -1,5 +1,8 @@
 <script lang="ts" generics="TData extends Record<string, unknown>">
+	import { Gradient } from '$lib/markers/utils/Gradient';
 	import { Line } from 'svelteplot';
+	import { Paint } from '$lib/markers/utils/Paint';
+	import GradientDefs from '$lib/markers/utils/GradientDefs.svelte';
 	import DotMarker from '$lib/markers/dot/DotMarker.svelte';
 	import TextMarker from '$lib/markers/text/TextMarker.svelte';
 	import { Delta } from '$lib/markers/delta/Delta';
@@ -58,6 +61,9 @@
 		};
 	});
 
+	const lineId = $props.id();
+	const line = $derived(Paint.single(marker.stroke?.stroke, undefined, `${lineId}-stroke`));
+
 	/**
 	 * The dot of one end: in the delta's own `stroke` when it sets one, else in the color of the series the end
 	 * measures - an axis end has none, and takes the dot's default. `dot` wins over both.
@@ -77,11 +83,12 @@
 </script>
 
 {#if coords}
+	<GradientDefs paints={[line]} />
 	<Line
 		data={coords.lineData}
 		x={(p) => p.x}
 		y={(p) => p.y}
-		stroke={marker.stroke?.stroke ?? 'currentColor'}
+		stroke={line.value ?? 'currentColor'}
 		strokeWidth={marker.stroke?.strokeWidth ?? 2}
 		strokeOpacity={marker.stroke?.strokeOpacity ?? 0.8}
 		strokeDasharray={marker.stroke?.strokeDasharray ?? '6 6'}
@@ -107,7 +114,7 @@
 				fontWeight: 'bold',
 				fontSize: 14,
 				textAnchor: label.textAnchor,
-				fill: marker.stroke?.stroke ?? 'currentColor',
+				fill: Gradient.swatch(marker.stroke?.stroke) ?? 'currentColor',
 				...marker.text,
 				dx: marker.text?.dx ?? label.dx,
 				dy: marker.text?.dy ?? label.dy,

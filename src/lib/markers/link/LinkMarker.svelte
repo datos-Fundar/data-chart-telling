@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
+	import { Paint } from '$lib/markers/utils/Paint';
+	import GradientDefs from '$lib/markers/utils/GradientDefs.svelte';
 	import { Geo } from 'svelteplot';
 	import { geoPath } from 'd3-geo';
 	import { resolveAccessor } from '$lib/utils/accessors';
@@ -21,6 +23,8 @@
 	const STEPS = 64;
 
 	const plot = usePlot().svelteplot;
+	const id = $props.id();
+	const stroke = $derived(Paint.single(marker.styles?.stroke, undefined, `${id}-stroke`));
 
 	const getX1 = $derived(resolveAccessor(marker.x1));
 	const getY1 = $derived(resolveAccessor(marker.y1));
@@ -168,11 +172,12 @@
 
 {#if drawn}
 	<g class="link">
+		<GradientDefs paints={[stroke]} />
 		{#each paths as d, index (index)}
 			<path
 				{d}
 				fill="none"
-				stroke={marker.styles?.stroke ?? 'currentColor'}
+				stroke={stroke.value ?? 'currentColor'}
 				stroke-width={marker.styles?.strokeWidth ?? 1}
 				stroke-opacity={marker.styles?.strokeOpacity}
 				stroke-dasharray={marker.styles?.strokeDasharray}
@@ -181,12 +186,13 @@
 		{/each}
 	</g>
 {:else}
+	<GradientDefs paints={[stroke]} />
 	<!-- No `fill` prop: svelteplot treats any string as scale-worthy unless it's a real CSS color, so a literal `'none'` would run through the color scale instead of staying unfilled. Omitting it leaves svelteplot's own unfilled default in place. -->
 	<Geo
 		{...events.props}
 		class="link"
 		data={arcFeatures}
-		stroke={marker.styles?.stroke ?? 'currentColor'}
+		stroke={stroke.value ?? 'currentColor'}
 		strokeWidth={marker.styles?.strokeWidth ?? 1}
 		strokeOpacity={marker.styles?.strokeOpacity}
 		strokeDasharray={marker.styles?.strokeDasharray}

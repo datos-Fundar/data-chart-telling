@@ -1,4 +1,5 @@
 import { buildSeries, Grouping } from '$lib/utils/grouping';
+import { Gradient } from '$lib/markers/utils/Gradient';
 import { ColorRamp, ColorTones } from '$lib/utils/color';
 import { resolveAccessor } from '$lib/utils/accessors';
 import { buildGroupedSeries, buildScopedMarkerGroups } from '$lib/plots/utils/segments';
@@ -74,7 +75,8 @@ export class DataPhase<TState extends AnyAxisState, TEnv extends AxisPlotEnv> im
 			segments,
 			baseFor,
 			colorFor: (s) => colorForSeries(s.name),
-			segmentColorFor: (style, defaultColor) => segmentColor?.(style) ?? defaultColor
+			segmentColorFor: (style, defaultColor) =>
+				Gradient.swatch(segmentColor?.(style)) ?? defaultColor
 		});
 		// A continuous mark bridges its gaps instead (see `buildGapMarkers`).
 		const gapFillMaps = connect

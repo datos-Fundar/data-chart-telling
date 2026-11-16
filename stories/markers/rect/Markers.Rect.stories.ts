@@ -148,3 +148,30 @@ export const LabelAnchor: Story = {
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+// ── Gradient ──────────────────────────────────────────────────────────────────
+
+/** `fill` and `stroke` take a gradient: here a rect whose fill fades out to the right, under a stroke that does not. */
+export const Gradient: Story = {
+	args: {
+		markers: [
+			{
+				type: 'rect',
+				data: [{}],
+				x1: 2,
+				x2: 8,
+				y1: 3,
+				y2: 7,
+				styles: {
+					fill: {
+						gradient: [
+							{ color: '#7c3aed', opacity: 0.7 },
+							{ color: '#7c3aed', opacity: 0 }
+						]
+					},
+					stroke: '#7c3aed'
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

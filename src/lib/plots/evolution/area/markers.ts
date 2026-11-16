@@ -1,5 +1,6 @@
 import { ValueLabels } from '$lib/layout/styles/ValueLabels';
 import { Transforms } from '$lib/phases/transforms/Transforms';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 import type { AreaPlotState, AreaPlotEnv } from '$lib/types/plots/evolution/area/state';
 import type { AxisBasedMarkersConfig, AreaMarkerConfig } from '$lib/types/markers/common';
@@ -40,7 +41,7 @@ export function buildMarks<TData extends Record<string, unknown>>(
 	const areas = (state.processedGroups ?? []).flatMap((group) =>
 		group.visualSegments.map((seg) => {
 			// A stroke the segment sets is not a reason to lose the series' fill, as the marker would take it for the color.
-			const fill = seg.styles.fill ?? state.colorForSeries!(group.series.name);
+			const fill = Gradient.over(seg.styles.fill, state.colorForSeries!(group.series.name));
 			return Transforms.finish(
 				{
 					type: 'area',

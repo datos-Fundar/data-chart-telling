@@ -107,3 +107,51 @@ export const Label: Story = {
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+// ── Gradient ──────────────────────────────────────────────────────────────────
+
+/** `fill` takes a gradient: here each bar runs from violet at its top to cyan at its bottom (`axis: 'y'`). */
+export const Gradient: Story = {
+	args: {
+		markers: [
+			{
+				type: 'bar',
+				role: 'segment',
+				data: BARS,
+				x: 'category',
+				y1: 0,
+				y2: 'value',
+				styles: { fill: { gradient: ['#7c3aed', '#06b6d4'], axis: 'y' } }
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};
+
+/**
+ * Stops `at` values of the axis span the whole plot: every bar shows the same scale, so a taller bar reaches
+ * further into the red.
+ */
+export const GradientAcrossThePlot: Story = {
+	args: {
+		markers: [
+			{
+				type: 'bar',
+				role: 'segment',
+				data: BARS,
+				x: 'category',
+				y1: 0,
+				y2: 'value',
+				styles: {
+					fill: {
+						gradient: [
+							{ at: 10, color: '#b91c1c' },
+							{ at: 5, color: '#f59e0b' },
+							{ at: 0, color: '#fde68a' }
+						],
+						axis: 'y'
+					}
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

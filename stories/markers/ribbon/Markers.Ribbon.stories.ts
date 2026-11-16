@@ -199,3 +199,100 @@ export const BetweenBars: Story = {
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+// ── Gradients ─────────────────────────────────────────────────────────────────
+
+/** A `fill` can be a gradient: its colors spread evenly from each ribbon's left end to its right one. */
+export const Gradient: Story = {
+	args: {
+		markers: [
+			{
+				type: 'ribbon',
+				data: FLOWS,
+				x1: 'from',
+				x2: 'to',
+				y1: 'y1',
+				y2: 'y2',
+				y3: 'y3',
+				y4: 'y4',
+				styles: { fill: { gradient: ['#2563eb', '#f97316'] } }
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};
+
+/**
+ * A stop with no color takes the ribbon's own, its `color` channel's: here each ribbon fades out on its way, in
+ * its own color.
+ */
+export const FadingInItsColor: Story = {
+	args: {
+		markers: [
+			{
+				type: 'ribbon',
+				data: FLOWS,
+				x1: 'from',
+				x2: 'to',
+				y1: 'y1',
+				y2: 'y2',
+				y3: 'y3',
+				y4: 'y4',
+				color: 'flow',
+				styles: { fill: { gradient: [{ opacity: 1 }, { opacity: 0.1 }] } }
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};
+
+/**
+ * `span: 'plot'` measures the gradient across the whole plot, not each ribbon: three ribbons one after another
+ * take one gradient between them. A stop `at` a value of the axis spans the plot too.
+ */
+export const AcrossThePlot: Story = {
+	args: {
+		markers: [
+			{
+				type: 'ribbon',
+				data: [
+					{ from: 0, to: 3.5, y1: 1, y2: 3, y3: 4, y4: 6 },
+					{ from: 3.5, to: 6.5, y1: 4, y2: 6, y3: 2, y4: 4 },
+					{ from: 6.5, to: 10, y1: 2, y2: 4, y3: 6, y4: 8 }
+				],
+				x1: 'from',
+				x2: 'to',
+				y1: 'y1',
+				y2: 'y2',
+				y3: 'y3',
+				y4: 'y4',
+				curvature: 0.5,
+				styles: {
+					fill: { gradient: ['#0ea5e9', '#a855f7', '#f97316'], span: 'plot' }
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};
+
+/** `axis: 'y'` runs the gradient from the top down: here from the ribbon's color to transparent. */
+export const Vertical: Story = {
+	args: {
+		markers: [
+			{
+				type: 'ribbon',
+				data: [{}],
+				x1: 1,
+				x2: 9,
+				y1: 4,
+				y2: 6,
+				y3: 1,
+				y4: 9,
+				styles: {
+					fill: {
+						gradient: [{ color: '#7c3aed' }, { color: '#7c3aed', opacity: 0 }],
+						axis: 'y'
+					}
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

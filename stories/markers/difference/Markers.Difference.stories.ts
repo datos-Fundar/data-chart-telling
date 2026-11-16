@@ -52,33 +52,63 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Actual (`y1`) vs. target (`y2`) - red where actual is above target, blue where it falls below; the two bands meet where the series cross. */
+/**
+ * Actual (`y2`, the metric) against target (`y1`, the comparison) - blue where actual is above target, red where
+ * it falls below; the two bands meet where the series cross.
+ */
 export const Basic: Story = {
 	args: {
 		markers: [
 			{
 				type: 'difference',
 				x: 'year',
-				y1: 'actual',
-				y2: 'target'
+				y1: 'target',
+				y2: 'actual'
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
 
-/** Custom fill colors for the positive/negative bands, instead of svelteplot's blue/red defaults. */
+/** Custom fill colors for the positive/negative bands, instead of the blue/red defaults. */
 export const CustomColors: Story = {
 	args: {
 		markers: [
 			{
 				type: 'difference',
 				x: 'year',
-				y1: 'actual',
-				y2: 'target',
+				y1: 'target',
+				y2: 'actual',
 				positiveFill: '#0ea5e9',
 				negativeFill: '#f97316',
 				positiveFillOpacity: 0.5,
 				negativeFillOpacity: 0.5
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};
+
+// ── Gradient ──────────────────────────────────────────────────────────────────
+
+/**
+ * `positiveFill` and `negativeFill` take gradients: here along y (`axis: 'y'`), each band strongest at its outer
+ * edge and fading toward the other line.
+ */
+export const Gradient: Story = {
+	args: {
+		markers: [
+			{
+				type: 'difference',
+				x: 'year',
+				y1: 'target',
+				y2: 'actual',
+				positiveFill: {
+					gradient: [{ color: '#0ea5e9' }, { color: '#0ea5e9', opacity: 0.15 }],
+					axis: 'y'
+				},
+				negativeFill: {
+					gradient: [{ color: '#f97316', opacity: 0.15 }, { color: '#f97316' }],
+					axis: 'y'
+				}
 			}
 		] satisfies AxisBasedMarkersConfig[]
 	}

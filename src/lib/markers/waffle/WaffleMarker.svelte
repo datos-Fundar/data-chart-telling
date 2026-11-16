@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { RowStyle } from '$lib/markers/utils/RowStyle';
+	import { Paint } from '$lib/markers/utils/Paint';
+	import GradientDefs from '$lib/markers/utils/GradientDefs.svelte';
 	import { MarkerEvents } from '$lib/markers/utils/MarkerEvents';
 	import { WaffleX, WaffleY } from 'svelteplot';
 	import { usePlot } from '$lib/layout/plot/usePlot';
@@ -18,9 +20,12 @@
 	const cfg = $derived(getConfiguration());
 	const data = $derived(marker.data ?? []);
 	const channelFill = $derived(MarkerChannels.buildFill(data, marker.color, marker.scales, cfg));
-	const fill = $derived(channelFill ?? marker.styles?.fill ?? cfg.palette[0]);
+	const id = $props.id();
+	const fill = $derived(Paint.of(data, marker.styles?.fill, channelFill, `${id}-fill`));
+	const stroke = $derived(Paint.of(data, marker.styles?.stroke, undefined, `${id}-stroke`));
 </script>
 
+<GradientDefs paints={[fill, stroke]} />
 <WaffleMark
 	{...events.props}
 	{data}
@@ -32,9 +37,9 @@
 	gap={marker.gap}
 	round={marker.round}
 	borderRadius={RowStyle.field(marker.styles?.borderRadius)}
-	{fill}
+	fill={fill.prop ?? cfg.palette[0]}
 	fillOpacity={RowStyle.opacity(marker.styles?.fillOpacity)}
-	stroke={RowStyle.of(marker.styles?.stroke, data)}
+	stroke={stroke.prop}
 	strokeWidth={RowStyle.field(marker.styles?.strokeWidth)}
 	strokeOpacity={RowStyle.opacity(marker.styles?.strokeOpacity)}
 />

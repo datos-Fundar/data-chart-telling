@@ -287,6 +287,13 @@ export const DEFAULT_CONFIG: PlotStylesConfig = {
 
 	ribbon: { fill: '#94a3b8', fillOpacity: 0.5, curvature: 0.5 },
 
+	difference: {
+		positiveFill: 'blue',
+		positiveFillOpacity: 1,
+		negativeFill: 'red',
+		negativeFillOpacity: 1
+	},
+
 	delta: {
 		text: {
 			x: { dx: 12, dy: 0, lineAnchor: 'middle', textAnchor: 'start' },

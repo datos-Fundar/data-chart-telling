@@ -138,7 +138,15 @@ export type {
 } from './types/plots/segments/common';
 export type { Range, Area, Segment } from './types/plots/segments/config';
 export type { SymbolType } from './types/plots/constants';
-export type { FontStyle, StrokeStyle, DotStyle, AreaStyle } from './types/plots/styling';
+export type {
+	FontStyle,
+	StrokeStyle,
+	DotStyle,
+	AreaStyle,
+	Gradient,
+	GradientStop,
+	Paint
+} from './types/plots/styling';
 export type {
 	AxisBasedMarkersConfig,
 	BrushSelection,

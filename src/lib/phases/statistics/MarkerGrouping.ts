@@ -1,4 +1,5 @@
 import { MarkerKinds } from '$lib/markers/MarkerKinds';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 /** Kinds that draw only a line, so their flat color is `stroke` alone. */
 const LINE_KINDS = new Set(['line', 'regression', 'bollinger', 'delta']);
@@ -6,9 +7,15 @@ const LINE_KINDS = new Set(['line', 'regression', 'bollinger', 'delta']);
 /** Flat color style keys - when a marker sets one, it keeps that color instead of inheriting one. */
 const FLAT_COLOR_KEYS = ['fill', 'stroke', 'dotFill', 'dotStroke'];
 
-/** A style value that paints nothing isn't a color choice, so it doesn't block inheritance. */
+/**
+ * A style value that paints nothing isn't a color choice, so it doesn't block inheritance; nor does a gradient with a
+ * stop that leaves its color to the shape, which takes the inherited one there.
+ */
 const isPaint = (value: unknown) =>
-	value !== undefined && value !== 'none' && value !== 'transparent';
+	value !== undefined &&
+	value !== 'none' &&
+	value !== 'transparent' &&
+	!(Gradient.is(value) && Gradient.isTinted(value));
 
 type MarkerLike = {
 	type: string;
@@ -50,8 +57,9 @@ export class MarkerGrouping {
 						? ['fill']
 						: ['fill', 'stroke'];
 		const styles: Record<string, unknown> = { ...(marker.styles ?? {}) };
-		// A `'none'` the marker sets doesn't block the inherited color, but stays itself.
-		for (const key of keys) styles[key] ??= color;
+		// A `'none'` the marker sets doesn't block the inherited color, but stays itself; a gradient takes it where a
+		// stop has no color of its own.
+		for (const key of keys) styles[key] = Gradient.over(styles[key], color);
 		return { ...marker, styles };
 	}
 

@@ -23,6 +23,9 @@ export type RibbonMarkerConfig<TContext extends PlotRowContext = AnyRowContext> 
 	y4?: Channel<TContext>;
 	/** How far in from each end (0-1) the edges' curves bend: `0.5` meets at the middle, `0` is a straight band. */
 	curvature?: number;
-	/** `insetStart`/`insetEnd` pull each end in by that many pixels along the flow. */
+	/**
+	 * `insetStart`/`insetEnd` pull each end in by that many pixels along the flow. `fill` and `stroke` take a gradient
+	 * as well as a color.
+	 */
 	styles?: PerRow<AreaStyle & DirectedInsetStyle, TContext>;
 } & Omit<CommonMarkerConfigWithColor<TContext> & CommonMarkerConfigWithArea<TContext>, 'x' | 'y'>;

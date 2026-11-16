@@ -12,6 +12,8 @@ import type { SankeyStylesConfig } from '$lib/types/layout/styles/sankey';
 import type { SankeyRowContext } from '$lib/types/plots/flow/sankey/props';
 import type { SankeyPlotState, SankeyPlotEnv } from '$lib/types/plots/flow/sankey/state';
 import type { FlowEnd } from '$lib/types/plots/families/graph';
+import type { Paint } from '$lib/types/plots/styling';
+import { Gradient } from '$lib/markers/utils/Gradient';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type State = SankeyPlotState<any>;
@@ -40,8 +42,9 @@ export const titleRoomOf = (state: State, env: SankeyPlotEnv) =>
 
 /**
  * The plot's own marks: links under nodes, each node with its label, and the columns' names. While the nodes are
- * the series each node takes its series' color, and each link the color of the node at `styles.links.fill`'s end;
- * while the links are, each link takes its own and the nodes a neutral fill. A series the legend dims dims its
+ * the series each node takes its series' color, and each link the color of the node at `styles.links.fill`'s end,
+ * or a gradient from its source's to its target's; while the links are, each link takes its own and the nodes a
+ * neutral fill. A series the legend dims dims its
  * nodes and links.
  */
 export function buildMarks(state: State, env: SankeyPlotEnv): AxisBasedMarkersConfig[] {
@@ -59,14 +62,30 @@ export function buildMarks(state: State, env: SankeyPlotEnv): AxisBasedMarkersCo
 	/** What a link's fill names: an end whose node colors it, or a color of its own. */
 	const fillOf = (row: ProcessedRow) =>
 		typeof linkFill === 'function' ? linkFill(context(row)) : linkFill;
+	/** The end whose node colors a link: its source's for a gradient, which starts in it. */
 	const endOf = (row: ProcessedRow): FlowEnd | undefined => {
 		const fill = fillOf(row);
+		if (fill === 'gradient' || Gradient.is(fill)) return 'source';
 		return fill === 'source' || fill === 'target' ? (fill as FlowEnd) : undefined;
 	};
+	/** The series of a link's node at `end` while the nodes are the series, else the link's own. */
+	const seriesAt = (row: ProcessedRow, end: FlowEnd | undefined) =>
+		graph.end && end ? graph.labelOf(row[FLOW_ROW[end]]) : row[SERIES_KEY];
 	/** The series a link is drawn in: the label of its node at its end while the nodes are the series, else its own. */
-	const linkSeries = (row: ProcessedRow) => {
-		const end = endOf(row);
-		return graph.end && end ? graph.labelOf(row[FLOW_ROW[end]]) : row[SERIES_KEY];
+	const linkSeries = (row: ProcessedRow) => seriesAt(row, endOf(row));
+	/**
+	 * What a link is painted with: its node's color at its end, a gradient between its two nodes' colors (its own
+	 * color while the links are the series), a gradient of the author's with its series' color where a stop has
+	 * none, or a color of its own.
+	 */
+	const paintOf = (row: ProcessedRow): Paint | undefined => {
+		const fill = fillOf(row);
+		if (fill === 'gradient')
+			return graph.end
+				? { gradient: [colorOf(seriesAt(row, 'source')), colorOf(seriesAt(row, 'target'))] }
+				: colorOf(linkSeries(row));
+		if (Gradient.is(fill)) return Gradient.tint(fill, colorOf(linkSeries(row)));
+		return endOf(row) ? colorOf(linkSeries(row)) : (fill as string | undefined);
 	};
 	const ribbon: RibbonMarkerConfig = {
 		type: 'ribbon',
@@ -81,8 +100,7 @@ export function buildMarks(state: State, env: SankeyPlotEnv): AxisBasedMarkersCo
 		...(state.opacity !== undefined ? { opacity: state.opacity as never } : {}),
 		styles: {
 			...linkStyle,
-			fill: (row: ProcessedRow) =>
-				dimmed(linkSeries(row))?.fill ?? (endOf(row) ? colorOf(linkSeries(row)) : fillOf(row)),
+			fill: (row: ProcessedRow) => dimmed(linkSeries(row))?.fill ?? paintOf(row)!,
 			fillOpacity: (row: ProcessedRow) =>
 				dimmed(linkSeries(row))?.fillOpacity ?? linkStyle.fillOpacity ?? look.links.fillOpacity
 		},

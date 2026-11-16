@@ -69,3 +69,41 @@ export const LinksThroughAColumn: Story = {
 export const LinkColor: Story = {
 	args: { styles: { links: { fill: '#94a3b8' } } }
 };
+
+// ── Gradients ─────────────────────────────────────────────────────────────────
+
+/** `fill: 'gradient'`: each link runs from the color of the node it leaves to the color of the node it reaches. */
+export const LinksGradient: Story = {
+	args: { styles: { links: { fill: 'gradient' } } }
+};
+
+/**
+ * A gradient of its own: a stop with no color takes the link's series' color, so each link fades out from the
+ * node it leaves.
+ */
+export const LinksFading: Story = {
+	args: {
+		styles: { links: { fill: { gradient: [{ opacity: 1 }, { opacity: 0.15 }] }, fillOpacity: 0.8 } }
+	}
+};
+
+/**
+ * `span: 'plot'` measures a gradient across the whole plot, so a path through several columns keeps one gradient
+ * from end to end.
+ */
+export const LinksAcrossThePlot: Story = {
+	args: {
+		styles: {
+			links: { fill: { gradient: ['#0ea5e9', '#a855f7', '#f97316'], span: 'plot' } }
+		}
+	}
+};
+
+/** The function can return a gradient too: the links that leave a species run to the island they reach. */
+export const LinksGradientByColumn: Story = {
+	args: {
+		styles: {
+			links: { fill: (link) => (link.column === 'species' ? 'gradient' : 'source') }
+		}
+	}
+};

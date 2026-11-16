@@ -91,3 +91,31 @@ export const Horizontal: Story = {
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+// ── Gradient ──────────────────────────────────────────────────────────────────
+
+/**
+ * `fill` takes a gradient as well as a color: here the area fades from the top down (`axis: 'y'`), from its color to
+ * transparent. A gradient sets its own opacity, so the area's default `fillOpacity` does not dim it further.
+ */
+export const Gradient: Story = {
+	args: {
+		markers: [
+			{
+				type: 'area',
+				x: 'year',
+				y: 'value',
+				styles: {
+					fill: {
+						gradient: [
+							{ color: '#2563eb', opacity: 0.5 },
+							{ color: '#2563eb', opacity: 0 }
+						],
+						axis: 'y'
+					}
+				}
+			},
+			{ type: 'line', x: 'year', y: 'value', styles: { stroke: '#2563eb' } }
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

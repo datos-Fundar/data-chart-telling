@@ -163,3 +163,26 @@ export const ColoredByTemperature: GeoPlotStory = {
 		] satisfies GeoMarkersConfig[]
 	}
 };
+
+// ── Gradient ──────────────────────────────────────────────────────────────────
+
+/** `dotFill` and `dotStroke` take a gradient: here each dot runs from orange at its top to violet at its bottom. */
+export const Gradient: PlotStory = {
+	render: renderPlot,
+	args: {
+		...PLOT_ARGS,
+		markers: [
+			{
+				type: 'dot',
+				data: POINTS,
+				x: 'x',
+				y: 'y',
+				r: 14,
+				styles: {
+					dotFill: { gradient: ['#f97316', '#7c3aed'], axis: 'y' },
+					dotStroke: 'white'
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

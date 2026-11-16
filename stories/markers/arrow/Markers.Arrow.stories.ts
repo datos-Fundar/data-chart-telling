@@ -68,3 +68,30 @@ export const Bent: Story = {
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+// ── Gradient ──────────────────────────────────────────────────────────────────
+
+/** `stroke` takes a gradient: here the arrow runs from transparent at its tail to violet at its head. */
+export const Gradient: Story = {
+	args: {
+		markers: [
+			{
+				type: 'arrow',
+				data: [{}],
+				x1: 2,
+				y1: 2,
+				x2: 8,
+				y2: 7,
+				styles: {
+					stroke: {
+						gradient: [
+							{ color: '#7c3aed', opacity: 0.1 },
+							{ color: '#7c3aed', opacity: 1 }
+						]
+					},
+					strokeWidth: 3
+				}
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

@@ -1,4 +1,4 @@
-import type { StrokeStyle } from '$lib/types/plots/styling';
+import type { Paint, StrokeStyle } from '$lib/types/plots/styling';
 
 /** Band options for `type: 'bollinger'` - mirrors svelteplot's own `BollingerOptions` field-for-field. */
 export type BollingerStatisticOptions = {
@@ -13,5 +13,5 @@ export type BollingerStatisticOptions = {
 	 * (`strokeWidth` and the rest of `StrokeStyle` are accepted but have no
 	 * visible effect on the line, so deliberately not offered here).
 	 */
-	styles?: Pick<StrokeStyle, 'stroke' | 'strokeOpacity'> & { bandFill?: string };
+	styles?: Pick<StrokeStyle, 'stroke' | 'strokeOpacity'> & { bandFill?: Paint };
 };

@@ -79,3 +79,21 @@ export const GroupedAndSmoothed: Story = {
 		] satisfies AxisBasedMarkersConfig[]
 	}
 };
+
+// ── Gradient ──────────────────────────────────────────────────────────────────
+
+/** `fill` takes a gradient: here the trail runs from cyan where it starts to violet where it ends. */
+export const Gradient: Story = {
+	args: {
+		markers: [
+			{
+				type: 'trail',
+				data: PATHS.filter((d) => d.id === 'north'),
+				x: 'x',
+				y: 'y',
+				r: 'w',
+				styles: { fill: { gradient: ['#06b6d4', '#7c3aed'] } }
+			}
+		] satisfies AxisBasedMarkersConfig[]
+	}
+};

@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { Geo } from 'svelteplot';
+	import { Paint } from '$lib/markers/utils/Paint';
+	import GradientDefs from '$lib/markers/utils/GradientDefs.svelte';
 	import ScaleFreeMarks from '$lib/layout/geometry/ScaleFreeMarks.svelte';
 	import { getConfiguration } from '$lib/configuration/config.svelte';
 	import type { GeoHoverMarkerConfig } from '$lib/types/markers/geo';
@@ -13,15 +15,19 @@
 
 	const cfg = $derived(getConfiguration());
 	const style = $derived({ ...cfg.hover.area, ...marker.styles });
+	const id = $props.id();
+	const fill = $derived(Paint.single(style.fill, undefined, `${id}-fill`));
+	const stroke = $derived(Paint.single(style.stroke, undefined, `${id}-stroke`));
 </script>
 
 {#if data.length > 0}
 	<ScaleFreeMarks>
+		<GradientDefs paints={[fill, stroke]} />
 		<Geo
 			data={data.map((p) => p.row)}
-			fill={style.fill}
+			fill={fill.value}
 			fillOpacity={style.fillOpacity}
-			stroke={style.stroke}
+			stroke={stroke.value}
 			strokeWidth={style.strokeWidth}
 			strokeOpacity={style.strokeOpacity}
 			strokeDasharray={style.strokeDasharray}
