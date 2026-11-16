@@ -1,3 +1,4 @@
+import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
 import type { StrokeLabelConfig } from '$lib/types/markers/labels/path';
 import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { CommonMarkerConfigWithLabel } from '$lib/types/markers/channels/commonMarkerConfigWithLabel';
@@ -7,13 +8,13 @@ import type { CommonMarkerConfigWithRadius } from '$lib/types/markers/channels/c
 import type { CurveName } from '$lib/types/layout/styles/curve';
 
 /** A variable-width ribbon following a path (svelteplot's `Trail`), its width set by `r`. */
-export type TrailMarkerConfig = {
+export type TrailMarkerConfig<TContext extends PlotRowContext = AnyRowContext> = {
 	type: 'trail';
 	curve?: CurveName;
 	tension?: number;
 	cap?: 'butt' | 'round';
 	resolution?: number | 'auto';
 	styles?: Pick<AreaStyle, 'fill' | 'fillOpacity'>;
-} & CommonMarkerConfigWithRadius &
-	CommonMarkerConfigWithColor &
-	CommonMarkerConfigWithLabel<StrokeLabelConfig | PointLabelConfig>;
+} & CommonMarkerConfigWithRadius<TContext> &
+	CommonMarkerConfigWithColor<TContext> &
+	CommonMarkerConfigWithLabel<StrokeLabelConfig<TContext> | PointLabelConfig<TContext>>;

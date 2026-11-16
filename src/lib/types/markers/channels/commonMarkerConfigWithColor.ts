@@ -1,7 +1,8 @@
+import type { AnyRowContext, PlotRowContext, RowFunction } from '$lib/types/layout/context';
 import type { CommonMarkerConfig } from './commonMarkerConfig';
 
 /** Common props plus the color ramp channel. */
-export type CommonMarkerConfigWithColor = CommonMarkerConfig & {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	color?: string | ((d: any, context?: any) => unknown);
-};
+export type CommonMarkerConfigWithColor<TContext extends PlotRowContext = AnyRowContext> =
+	CommonMarkerConfig<TContext> & {
+		color?: string | RowFunction<unknown, TContext>;
+	};

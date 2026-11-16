@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import type { PlotRowContext } from '$lib';
 import DensityPlot from '$lib/plots/distribution/density/Plot.svelte';
 import { HEIGHTS } from '$datasets';
 
@@ -53,7 +52,7 @@ export const AlongEachCurve: Story = {
 			area: { fillOpacity: 0.5 },
 			values: {
 				layout: 'path',
-				format: (context: PlotRowContext) => (context.series === 'female' ? 'Women' : 'Men')
+				format: (context) => (context.series === 'female' ? 'Women' : 'Men')
 			}
 		}
 	}

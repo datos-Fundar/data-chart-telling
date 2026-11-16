@@ -1,7 +1,7 @@
-import type { PlotRowContext } from '$lib/types/layout/context';
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import DensityPlot from '$lib/plots/distribution/density/Plot.svelte';
 import { HEIGHTS } from '$datasets';
+import type { ComponentProps } from 'svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Hovering a density plot reads the curve at the pointer: the value along the
@@ -46,9 +46,8 @@ type Story = StoryObj<typeof meta>;
  */
 const TOOLTIP = {
 	sync: false,
-	format: (context: PlotRowContext) =>
-		`${Number(context.x).toFixed(1)}: ${Number(context.value).toFixed(3)}`
-};
+	format: (context) => `${Number(context.x).toFixed(1)}: ${Number(context.value).toFixed(3)}`
+} satisfies ComponentProps<typeof DensityPlot>['tooltip'];
 
 /** A tooltip along the curve: hover to read its density. */
 export const Default: Story = {

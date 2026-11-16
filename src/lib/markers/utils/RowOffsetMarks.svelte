@@ -14,15 +14,19 @@
 		rows,
 		mark
 	}: {
-		marker: { dx?: RowOffsetConfig; dy?: RowOffsetConfig };
+		marker: { dx?: RowOffsetConfig; dy?: RowOffsetConfig; data?: readonly unknown[] };
 		rows: TRow[];
 		mark: Snippet<[TRow[]]>;
 	} = $props();
+
+	/** Each row's place among the marker's rows, which its offsets read: `rows` may be only some of them. */
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity
+	const indexes = $derived(new Map((marker.data ?? []).map((row, index) => [row, index])));
 </script>
 
 {#if RowOffset.isPerRow(marker)}
 	{#each rows as row, index (index)}
-		{@const { dx, dy } = RowOffset.ofRow(marker, row)}
+		{@const { dx, dy } = RowOffset.ofRow(marker, row, indexes.get(row))}
 		<g transform="translate({dx},{dy})">{@render mark([row])}</g>
 	{/each}
 {:else}

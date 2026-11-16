@@ -21,11 +21,11 @@ export class RowOffset {
 		return typeof marker.dx === 'function' || typeof marker.dy === 'function';
 	}
 
-	/** The functional part, for one row. */
-	static ofRow(marker: Offsets, row: unknown): Pixels {
+	/** The functional part, for one row: `index` is its place among the marker's rows. */
+	static ofRow(marker: Offsets, row: unknown, index?: number): Pixels {
 		return {
-			dx: typeof marker.dx === 'function' ? (marker.dx(row) ?? 0) : 0,
-			dy: typeof marker.dy === 'function' ? (marker.dy(row) ?? 0) : 0
+			dx: typeof marker.dx === 'function' ? (marker.dx(row, index) ?? 0) : 0,
+			dy: typeof marker.dy === 'function' ? (marker.dy(row, index) ?? 0) : 0
 		};
 	}
 }

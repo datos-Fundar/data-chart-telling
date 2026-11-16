@@ -1,4 +1,10 @@
-import type { PathLabelConfig, PageEdge, ValueEdge } from '$lib/types/markers/labels/path';
+import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
+import type {
+	PathLabelConfig,
+	PageEdge,
+	ValueEdge,
+	ShapeSide
+} from '$lib/types/markers/labels/path';
 import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
 import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { CommonMarkerConfigWithOrientation } from '$lib/types/markers/channels/commonMarkerConfigWithOrientation';
@@ -9,15 +15,17 @@ import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/co
 import type { CommonMarkerConfigWithInterval } from '$lib/types/markers/channels/commonMarkerConfigWithInterval';
 
 /** A bar mark; `role` tells a visible segment from the hover hit area. */
-export type BarMarkerConfig = {
+export type BarMarkerConfig<TContext extends PlotRowContext = AnyRowContext> = {
 	type: 'bar';
 	role: 'segment' | 'hitArea';
 	thickness?: number;
-	styles?: PerRow<AreaStyle> & InsetStyle;
+	styles?: PerRow<AreaStyle, TContext> & InsetStyle;
 	category?: AxisValue;
 } & CommonMarkerConfigWithOrientation &
-	CommonMarkerConfigWithColor &
-	CommonMarkerConfigWithInterval &
+	CommonMarkerConfigWithColor<TContext> &
+	CommonMarkerConfigWithInterval<TContext> &
 	CommonMarkerConfigWithLabel<
-		BoxLabelConfig | PathLabelConfig<PageEdge | ValueEdge> | PointLabelConfig
+		| BoxLabelConfig<TContext>
+		| PathLabelConfig<PageEdge | ValueEdge, ShapeSide, TContext>
+		| PointLabelConfig<TContext>
 	>;

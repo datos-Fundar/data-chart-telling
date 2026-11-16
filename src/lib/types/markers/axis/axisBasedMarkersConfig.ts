@@ -1,4 +1,4 @@
-import type { PlotRowContext } from '$lib/types/layout/context';
+import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
 import type { BasicMarkersConfig } from '$lib/types/markers/basic/basicMarkersConfig';
 import type { LineMarkerConfig } from './line';
 import type { BarMarkerConfig } from './bar';
@@ -30,35 +30,38 @@ import type { HoverMarkerConfig } from './hover';
 import type { CustomComponentMarkerConfig } from './component';
 import type { DeltaMarkerConfig } from './delta';
 
-/** Every marker kind an axis-based plot can render. */
-export type AxisBasedMarkersConfig<TContext extends PlotRowContext = PlotRowContext> =
-	| BasicMarkersConfig
-	| LineMarkerConfig
-	| BarMarkerConfig
-	| CellMarkerConfig
-	| RectMarkerConfig
-	| RegressionMarkerConfig
-	| BollingerMarkerConfig
-	| AreaMarkerConfig
-	| DensityMarkerConfig
-	| BoxMarkerConfig
-	| HullMarkerConfig
-	| DifferenceMarkerConfig
-	| ArrowMarkerConfig
-	| BrushMarkerConfig
-	| DelaunayLinkMarkerConfig
-	| DelaunayMeshMarkerConfig
-	| VoronoiMarkerConfig
-	| VoronoiMeshMarkerConfig
-	| ImageMarkerConfig
-	| RasterMarkerConfig
-	| TickMarkerConfig
-	| TrailMarkerConfig
-	| WaffleMarkerConfig
-	| ViolinMarkerConfig
-	| RibbonMarkerConfig
-	| RuleMarkerConfig
-	| BandMarkerConfig
+/**
+ * Every marker kind an axis-based plot can render, its functions of a row reading `TContext`: what the plot kind
+ * knows of each row. A plot kind gives its own, so a marker written on it reads it without naming it.
+ */
+export type AxisBasedMarkersConfig<TContext extends PlotRowContext = AnyRowContext> =
+	| BasicMarkersConfig<TContext>
+	| LineMarkerConfig<TContext>
+	| BarMarkerConfig<TContext>
+	| CellMarkerConfig<TContext>
+	| RectMarkerConfig<TContext>
+	| RegressionMarkerConfig<TContext>
+	| BollingerMarkerConfig<TContext>
+	| AreaMarkerConfig<TContext>
+	| DensityMarkerConfig<TContext>
+	| BoxMarkerConfig<TContext>
+	| HullMarkerConfig<TContext>
+	| DifferenceMarkerConfig<TContext>
+	| ArrowMarkerConfig<TContext>
+	| BrushMarkerConfig<TContext>
+	| DelaunayLinkMarkerConfig<TContext>
+	| DelaunayMeshMarkerConfig<TContext>
+	| VoronoiMarkerConfig<TContext>
+	| VoronoiMeshMarkerConfig<TContext>
+	| ImageMarkerConfig<TContext>
+	| RasterMarkerConfig<TContext>
+	| TickMarkerConfig<TContext>
+	| TrailMarkerConfig<TContext>
+	| WaffleMarkerConfig<TContext>
+	| ViolinMarkerConfig<TContext>
+	| RibbonMarkerConfig<TContext>
+	| RuleMarkerConfig<TContext>
+	| BandMarkerConfig<TContext>
 	| HoverMarkerConfig<TContext>
 	| CustomComponentMarkerConfig
 	| DeltaMarkerConfig;

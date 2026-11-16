@@ -1,3 +1,4 @@
+import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
 import type { StrokeStyle } from '$lib/types/plots/styling';
 import type { CommonMarkerConfig } from '$lib/types/markers/channels/commonMarkerConfig';
 
@@ -11,7 +12,7 @@ export type BrushSelection = {
 };
 
 /** An interactive drag-to-select rectangle (svelteplot's `Brush`), drawn in screen space. */
-export type BrushMarkerConfig = {
+export type BrushMarkerConfig<TContext extends PlotRowContext = AnyRowContext> = {
 	type: 'brush';
 	brush?: BrushSelection;
 	limitDimension?: false | 'x' | 'y';
@@ -21,4 +22,4 @@ export type BrushMarkerConfig = {
 	onbrush?: (event: MouseEvent & { brush: BrushSelection }) => void;
 	onbrushend?: (event: MouseEvent & { brush: BrushSelection }) => void;
 	styles?: StrokeStyle;
-} & Pick<CommonMarkerConfig, 'series'>;
+} & Pick<CommonMarkerConfig<TContext>, 'series'>;

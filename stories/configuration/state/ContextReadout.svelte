@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { usePlot } from '$lib/layout/plot/usePlot';
-	import type { HistogramRowContext } from '$lib/types/plots/distribution/histogram/props';
+	import type { RowContextOf } from '$lib';
+	import type HistogramPlot from '$lib/plots/distribution/histogram/Plot.svelte';
 
-	// Mounted as a `component` marker: `usePlot().contextOf` reads what the plot knows of the hovered bin.
+	// Mounted as a `component` marker: `usePlot().contextOf` reads what the plot knows of the hovered bin, which
+	// `RowContextOf` names from the plot it is mounted in.
 	const plot = usePlot();
 
 	const bin = $derived(
-		plot.hover.activePoint && plot.contextOf<HistogramRowContext>(plot.hover.activePoint.row)
+		plot.hover.activePoint &&
+			plot.contextOf<RowContextOf<typeof HistogramPlot>>(plot.hover.activePoint.row)
 	);
 </script>
 

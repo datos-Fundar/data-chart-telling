@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import SankeyPlot from '$lib/plots/flow/sankey/Plot.svelte';
 import { PENGUIN_COUNTS_BY_SEX } from '$datasets';
-import type { SankeyRowContext } from '$lib/types/plots/flow/sankey/props';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `text` marker of the author's draws over a sankey's own rows - its nodes
@@ -54,30 +53,30 @@ export const LinkShares: Story = {
 				transforms: [
 					{
 						type: 'filter',
-						filter: (row, context: SankeyRowContext) => context.start?.column === 'species'
+						filter: (row, context) => context.start?.column === 'species'
 					}
 				],
-				x: (row, context: SankeyRowContext) => context.start!.column,
-				y: (row, context: SankeyRowContext) => context.start!.y,
+				x: (row, context) => context.start!.column,
+				y: (row, context) => context.start!.y,
 				dx: BESIDE_A_NODE,
 				textAnchor: 'start',
 				lineAnchor: 'middle',
-				text: (row, context: SankeyRowContext) => `${Math.round(context.sourceShare!)}%`
+				text: (row, context) => `${Math.round(context.sourceShare!)}%`
 			},
 			{
 				type: 'text',
 				transforms: [
 					{
 						type: 'filter',
-						filter: (row, context: SankeyRowContext) => context.end?.column === 'sex'
+						filter: (row, context) => context.end?.column === 'sex'
 					}
 				],
-				x: (row, context: SankeyRowContext) => context.end!.column,
-				y: (row, context: SankeyRowContext) => context.end!.y,
+				x: (row, context) => context.end!.column,
+				y: (row, context) => context.end!.y,
 				dx: -BESIDE_A_NODE,
 				textAnchor: 'end',
 				lineAnchor: 'middle',
-				text: (row, context: SankeyRowContext) => `${Math.round(context.targetShare!)}%`
+				text: (row, context) => `${Math.round(context.targetShare!)}%`
 			}
 		]
 	}

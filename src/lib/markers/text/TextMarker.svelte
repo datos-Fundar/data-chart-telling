@@ -41,6 +41,30 @@
 	const bounds = $derived(plotMargins?.contentBox);
 
 	const data = $derived((marker.data ?? []) as TData[]);
+	/** Each row's place among the marker's rows, which its functions of a row read: svelteplot only knows a row's place among the ones a mark of it draws. */
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity
+	const indexes = $derived(new Map(data.map((row, index) => [row, index])));
+	const indexOf = (d: TData) => indexes.get(d);
+
+	/** Where a row handed to svelteplot keeps its place among the marker's rows: svelteplot copies each row, and the copy keeps it. */
+	const ROW_INDEX = Symbol('rowIndex');
+	/** `rows` as a mark of them takes them, each carrying its place among the marker's rows. */
+	const indexed = (rows: TData[]) =>
+		rows.map((row) => ({ ...row, [ROW_INDEX]: indexOf(row) }) as TData);
+	/**
+	 * `value` as svelteplot calls it: with a copy of the row, and its place among the rows of one mark - here its place
+	 * among the marker's, which the copy carries. Built once, so svelteplot sees the same function every time.
+	 */
+	function atRow<T>(value: T): T {
+		const own = (fn: (row: TData, index?: number) => unknown) => (d: TData) =>
+			fn(d, (d as Record<symbol, number> | undefined)?.[ROW_INDEX]);
+		if (typeof value === 'function') return own(value as never) as T;
+		const channel = value as { value?: unknown } | undefined;
+		if (channel && typeof channel === 'object' && typeof channel.value === 'function')
+			return { ...channel, value: own(channel.value as never) } as T;
+		return value;
+	}
+
 	const x = $derived(marker.x);
 	const y = $derived(marker.y);
 	const text = $derived(marker.text ?? '');
@@ -57,17 +81,26 @@
 	const fill = $derived.by(() => {
 		const own = styles?.fill;
 		if (typeof own !== 'function') return RowStyle.of(own, displayData) ?? 'currentColor';
-		return { value: (d: TData) => own(d) ?? 'currentColor', scale: null };
+		return {
+			value: (d: TData, index?: number) => own(d, index) ?? 'currentColor',
+			scale: null
+		};
 	});
 	const fillOpacity = $derived.by(() => {
 		const own = styles?.fillOpacity;
 		return typeof own === 'function'
-			? { value: (d: TData) => own(d) ?? 1, scale: null }
+			? { value: (d: TData, index?: number) => own(d, index) ?? 1, scale: null }
 			: RowStyle.opacity(own);
 	});
+	const xAt = $derived(atRow(x));
+	const yAt = $derived(atRow(y));
+	const fillAt = $derived(atRow(fill));
+	const fillOpacityAt = $derived(atRow(fillOpacity));
+	const strokeAt = $derived(atRow(RowStyle.of(styles?.stroke, displayData)));
+	const strokeWidthAt = $derived(atRow(RowStyle.field(styles?.strokeWidth)));
 	const fontSize = $derived(styles?.fontSize ?? 12);
-	const fontWeight = $derived(styles?.fontWeight ?? 'normal');
-	const fontStyleProp = $derived(styles?.fontStyle ?? 'normal');
+	const fontWeight = $derived(atRow(styles?.fontWeight ?? 'normal'));
+	const fontStyleProp = $derived(atRow(styles?.fontStyle ?? 'normal'));
 	// An unresolved `'outside'` falls back to `'start'`.
 	const anchorOf = (anchor: TextAnchor | undefined): Exclude<TextAnchor, 'outside'> =>
 		anchor === 'outside' ? 'start' : (anchor ?? 'middle');
@@ -84,7 +117,7 @@
 			'middle'
 	);
 	const lineAnchorAt = (d: TData) =>
-		typeof marker.lineAnchor === 'function' ? marker.lineAnchor(d) : lineAnchor;
+		typeof marker.lineAnchor === 'function' ? marker.lineAnchor(d, indexOf(d)) : lineAnchor;
 	// A label in a slice of its band sits off the band's middle, at its drawn width.
 	const nudge = $derived(BandNudge.of(plot.scales, marker.bandSlice));
 	// The fixed offset, which `declutter` and `edgeAware` place labels by; a function of the row moves each label after that, through `RowOffsetMarks`.
@@ -94,7 +127,9 @@
 	const dx = $derived(fixedOffset.dx + nudge.dx);
 	const dy = $derived(fixedOffset.dy + nudge.dy);
 	const anchorAt = (d: TData) =>
-		typeof marker.textAnchor === 'function' ? anchorOf(marker.textAnchor(d)) : textAnchor;
+		typeof marker.textAnchor === 'function'
+			? anchorOf(marker.textAnchor(d, indexOf(d)))
+			: textAnchor;
 	const projected = $derived(!!plot.scales.projection);
 
 	const declutter = $derived.by(() => {
@@ -131,7 +166,10 @@
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	function channel(value: unknown): (d: any) => unknown {
-		if (typeof value === 'function') return value as (d: unknown) => unknown;
+		if (typeof value === 'function') {
+			const own = value as (d: unknown, index?: number) => unknown;
+			return (d) => own(d, indexOf(d));
+		}
 		// A field key: a name, or the symbol a transform keyed its output channel by.
 		if (typeof value === 'string' || typeof value === 'symbol') return (d) => d?.[value];
 		return () => value;
@@ -139,7 +177,7 @@
 
 	/** What a row's `text` comes to: a function's result, a field of the row, else the text itself. */
 	function valueOf(d: TData): unknown {
-		if (typeof text === 'function') return text(d);
+		if (typeof text === 'function') return text(d, indexOf(d));
 		if (typeof text === 'string' && typeof d === 'object' && d !== null && text in d) {
 			return (d as Record<string, unknown>)[text];
 		}
@@ -196,7 +234,7 @@
 			// As `text` is: a function's result, a field of the row, else the text itself.
 			const value =
 				typeof fallback === 'function'
-					? fallback(d)
+					? fallback(d, indexOf(d))
 					: typeof fallback === 'string' && typeof d === 'object' && d !== null && fallback in d
 						? (d as Record<string, unknown>)[fallback]
 						: fallback;
@@ -374,19 +412,19 @@
 	<g transform={projected ? `translate(${rowDx},${rowDy})` : undefined}>
 		{#each sizeGroups(rows) as group (group.size)}
 			<Text
-				data={group.rows}
-				x={x ?? (marker.frameAnchor ? undefined : 0)}
-				y={y ?? (marker.frameAnchor ? undefined : 0)}
+				data={indexed(group.rows)}
+				x={xAt ?? (marker.frameAnchor ? undefined : 0)}
+				y={yAt ?? (marker.frameAnchor ? undefined : 0)}
 				frameAnchor={marker.frameAnchor}
 				text={((d: TData, index: number) => {
 					if (group.texts) return group.texts[index];
-					const value = valueOf(d);
+					const value = valueOf(group.rows[index] ?? d);
 					return typeof value === 'number' ? numberText(value) : value;
 				}) as (d: TData) => string}
 				dx={projected ? 0 : rowDx}
 				dy={projected ? 0 : rowDy}
-				fill={fill as never}
-				fillOpacity={fillOpacity as never}
+				fill={fillAt as never}
+				fillOpacity={fillOpacityAt as never}
 				fontSize={group.size}
 				{fontWeight}
 				textAnchor={rowAnchor}
@@ -394,8 +432,8 @@
 				fontStyle={fontStyleProp}
 				lineHeight={styles?.lineHeight}
 				rotate={styles?.rotate}
-				stroke={RowStyle.of(styles?.stroke, rows)}
-				strokeWidth={RowStyle.field(styles?.strokeWidth)}
+				stroke={strokeAt}
+				strokeWidth={strokeWidthAt}
 				paintOrder={styles?.paintOrder}
 				class={styles?.class}
 				textClass={styles?.textClass}

@@ -1,3 +1,4 @@
+import type { AnyRowContext, PlotRowContext, RowFunction } from '$lib/types/layout/context';
 import type { PositionChannels } from '$lib/types/transforms/common';
 
 /**
@@ -7,10 +8,9 @@ import type { PositionChannels } from '$lib/types/transforms/common';
  * marker of the author's, the test gets what the plot knows of each row too
  * (`(row, context) => boolean`).
  */
-export type FilterTransform = {
+export type FilterTransform<TContext extends PlotRowContext = AnyRowContext> = {
 	type: 'filter';
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	filter: string | ((d: any, context?: any) => unknown);
+	filter: string | RowFunction<unknown, TContext>;
 } & PositionChannels;
 
 /** The keys `filter` reads as channels: every position channel, and `filter` itself. */

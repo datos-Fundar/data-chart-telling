@@ -1,9 +1,9 @@
 import type { Meta } from '@storybook/svelte-vite';
-import type { PlotRowContext } from '$lib';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/common';
 import { renderSource } from '../../common/docsSource';
 import { LIFE, GOOGL_AUGUST_2026, AMZN_AUGUST_2026, type StockDay } from '$datasets';
+import type { ComponentProps } from 'svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // `x1`/`x2`/`y1`/`y2`: interval-position channels bound to the plot's shared
@@ -96,10 +96,9 @@ const stockPriceProps = {
 	styles: {
 		values: {
 			show: true,
-			format: (context: PlotRowContext & { value: number }) =>
-				`${context.series} - ${context.value.toFixed(2)} USD`
+			format: (context) => `${context.series} - ${context.value.toFixed(2)} USD`
 		}
-	}
+	} satisfies ComponentProps<typeof LinePlot>['styles']
 };
 
 /**

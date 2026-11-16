@@ -1,6 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { AuthorMarkers } from '$lib/phases/statistics/AuthorMarkers';
 import { SERIES_ID_KEY, SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
+import { RowContext } from '$lib/phases/context/RowContext';
 import type { ProcessedData } from '$lib/types/phases';
 
 const rows = [
@@ -117,5 +118,52 @@ describe('withProcessedRows', () => {
 		expect(AuthorMarkers.withProcessedRows(rule, processed)).toBe(rule);
 		const marker = { type: 'dot' };
 		expect(AuthorMarkers.withProcessedRows(marker, { ...processed, transforms: [] })).toBe(marker);
+	});
+});
+
+describe('withContext', () => {
+	/** A row the plot drew, with what it knows of it. */
+	const row = { x: 1 };
+	RowContext.tag(row as never, { series: 'A', value: 7 });
+	const seen = (fn: unknown) => (fn as (row: unknown, index?: number) => unknown)(row, 2);
+	const contextOf = (context: Record<string, unknown>) =>
+		JSON.stringify(context.row ? { ...context, row: undefined } : context);
+
+	test('gives every function of a row its context, its place among the rows, and what every row shares', () => {
+		const echo = (_: unknown, context: Record<string, unknown>) => contextOf(context);
+		const marker = AuthorMarkers.withContext(
+			{
+				type: 'text',
+				text: echo,
+				src: echo,
+				tickLength: echo,
+				fit: { fallback: echo, x1: 'x' },
+				styles: { fill: echo, fontSize: 12 },
+				label: [{ text: echo, dx: echo, styles: { fill: echo } }, { text: 'fixed' }],
+				transforms: [{ type: 'filter', filter: echo }]
+			},
+			{ time: 2003 }
+		) as unknown as Record<string, unknown> & {
+			fit: Record<string, unknown>;
+			styles: Record<string, unknown>;
+			label: Record<string, unknown>[];
+			transforms: { filter: unknown }[];
+		};
+		const expected = JSON.stringify({ time: 2003, series: 'A', value: 7, index: 2 });
+		for (const fn of [
+			marker.text,
+			marker.src,
+			marker.tickLength,
+			marker.fit.fallback,
+			marker.styles.fill,
+			marker.label[0].text,
+			marker.label[0].dx,
+			(marker.label[0].styles as Record<string, unknown>).fill,
+			marker.transforms[0].filter
+		])
+			expect(seen(fn)).toBe(expected);
+		expect(marker.fit.x1).toBe('x');
+		expect(marker.styles.fontSize).toBe(12);
+		expect(marker.label[1].text).toBe('fixed');
 	});
 });

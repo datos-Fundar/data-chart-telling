@@ -215,3 +215,28 @@ describe('GeoPlot - one layer of features for every facet panel', () => {
 		});
 	});
 });
+
+describe('GeoPlot - what a marker of the author reads of its rows', () => {
+	test('a text gets each of its rows, its place among them, and the facet panel it is drawn in', async () => {
+		const { container } = await render(GeoPlot, {
+			width: 700,
+			height: 400,
+			data: ARGENTINA_PROVINCES,
+			featureId: name,
+			facet: FACET,
+			markers: [
+				{
+					type: 'text',
+					data: [{ lon: -64, lat: -34 }],
+					x: 'lon',
+					y: 'lat',
+					text: (row, context) => `#${context.index} ${context.row?.lon} ${context.facet?.value}`
+				}
+			]
+		});
+		await vi.waitFor(() => {
+			const texts = [...container.querySelectorAll('text')].map((t) => t.textContent);
+			for (const sex of SEXES) expect(texts).toContain(`#0 -64 ${sex}`);
+		});
+	});
+});

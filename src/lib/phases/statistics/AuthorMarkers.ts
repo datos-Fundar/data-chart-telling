@@ -32,10 +32,22 @@ const ROW_PROPS = [
 	'textAnchor',
 	'lineAnchor',
 	'title',
-	'href'
+	'href',
+	'src',
+	'width',
+	'height',
+	'tickLength',
+	'slice',
+	'weight'
 ] as const;
 
-type RowFunction = (row: unknown, context: unknown) => unknown;
+/** The props of a `label` that read its rows, besides its `styles`. */
+const LABEL_PROPS = ['text', 'dx', 'dy', 'textAnchor', 'lineAnchor'] as const;
+
+/** The props of a `text`'s `fit` that read its rows. */
+const FIT_PROPS = ['x1', 'x2', 'y1', 'y2', 'fallback'] as const;
+
+type ContextFunction = (row: unknown, context: unknown) => unknown;
 
 /** Kinds that handle `scope: 'segment'` themselves, at render time. */
 const RENDER_SCOPED_KINDS = new Set(['component', 'hover']);
@@ -74,31 +86,43 @@ export class AuthorMarkers {
 	}
 
 	/**
-	 * `marker` with every function of its rows - its channels, its `styles` and its transforms' `filter` - given what
-	 * the plot knows of each row besides the row itself: `(row, context)`, the row's place among the marker's in
-	 * `context.index`.
+	 * `marker` with every function of its rows - its channels, its `styles`, its `label`, a `text`'s `fit` and its
+	 * transforms' `filter` - given what the plot knows of each row besides the row itself: `(row, context)`, the
+	 * row's place among the marker's in `context.index`, over what `shared` adds to every row's (a map's slice).
 	 */
-	static withContext<T extends object>(marker: T): T {
-		const own = marker as T & {
-			styles?: Record<string, unknown>;
-			transforms?: { filter?: unknown }[];
-		};
+	static withContext<T extends object>(marker: T, shared: object = {}): T {
 		const read = (fn: unknown) =>
 			typeof fn === 'function'
 				? (row: unknown, index?: number) =>
-						(fn as RowFunction)(
-							row,
-							index === undefined ? RowContext.of(row) : RowContext.at(row, index)
-						)
+						(fn as ContextFunction)(row, {
+							...shared,
+							...(index === undefined ? RowContext.of(row) : RowContext.at(row, index))
+						})
 				: fn;
-		const next: Record<string, unknown> = { ...own };
-		for (const key of ROW_PROPS) {
-			if (typeof next[key] === 'function') next[key] = read(next[key]);
-		}
-		if (own.styles) {
-			next.styles = Object.fromEntries(
-				Object.entries(own.styles).map(([key, value]) => [key, read(value)])
-			);
+		/** `own` with `keys` and every field of its `styles` given their context. */
+		const props = (own: Record<string, unknown>, keys: readonly string[]) => {
+			const next: Record<string, unknown> = { ...own };
+			for (const key of keys) if (typeof next[key] === 'function') next[key] = read(next[key]);
+			if (own.styles && typeof own.styles === 'object')
+				next.styles = Object.fromEntries(
+					Object.entries(own.styles).map(([key, value]) => [key, read(value)])
+				);
+			return next;
+		};
+		const own = marker as Record<string, unknown> & {
+			label?: Record<string, unknown> | Record<string, unknown>[];
+			fit?: unknown;
+			transforms?: { filter?: unknown }[];
+		};
+		const next = props(own, ROW_PROPS);
+		if (own.label)
+			next.label = Array.isArray(own.label)
+				? own.label.map((label) => props(label, LABEL_PROPS))
+				: props(own.label, LABEL_PROPS);
+		if (own.fit && typeof own.fit === 'object') {
+			const fit = { ...(own.fit as Record<string, unknown>) };
+			for (const key of FIT_PROPS) if (typeof fit[key] === 'function') fit[key] = read(fit[key]);
+			next.fit = fit;
 		}
 		if (own.transforms) {
 			next.transforms = own.transforms.map((transform) =>

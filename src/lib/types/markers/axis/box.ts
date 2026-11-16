@@ -1,3 +1,4 @@
+import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
 import type { CommonMarkerConfigWithOrientation } from '$lib/types/markers/channels/commonMarkerConfigWithOrientation';
 import type { CommonMarkerConfig } from '$lib/types/markers/channels/commonMarkerConfig';
 
@@ -5,7 +6,7 @@ import type { CommonMarkerConfig } from '$lib/types/markers/channels/commonMarke
  * A box plot (svelteplot's `BoxX`/`BoxY`). Styled per sub-mark through `bar`,
  * `rule`, `dot`, `tickMedian` and `tickMinMax`, each forwarded to svelteplot.
  */
-export type BoxMarkerConfig = {
+export type BoxMarkerConfig<TContext extends PlotRowContext = AnyRowContext> = {
 	type: 'box';
 	sort?: 'min' | 'max' | 'median' | 'p25' | 'p75' | '-min' | '-max' | '-median' | '-p25' | '-p75';
 	bar?: Record<string, unknown>;
@@ -16,4 +17,4 @@ export type BoxMarkerConfig = {
 	thickness?: number;
 	slot?: { index: number; count: number };
 } & CommonMarkerConfigWithOrientation &
-	CommonMarkerConfig;
+	CommonMarkerConfig<TContext>;

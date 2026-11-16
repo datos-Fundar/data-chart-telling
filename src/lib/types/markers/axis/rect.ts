@@ -1,4 +1,5 @@
-import type { PathLabelConfig, PageEdge } from '$lib/types/markers/labels/path';
+import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
+import type { PathLabelConfig, PageEdge, ShapeSide } from '$lib/types/markers/labels/path';
 import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
 import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { AreaStyle, PerRow, InsetStyle } from '$lib/types/plots/styling';
@@ -8,11 +9,15 @@ import type { CommonMarkerConfigWithLabel } from '$lib/types/markers/channels/co
 import type { CommonMarkerConfigWithInterval } from '$lib/types/markers/channels/commonMarkerConfigWithInterval';
 
 /** An arbitrary rectangle (svelteplot's `Rect`); `interval` turns `x`/`y` into ranges. */
-export type RectMarkerConfig = {
+export type RectMarkerConfig<TContext extends PlotRowContext = AnyRowContext> = {
 	type: 'rect';
 	interval?: number | string;
-	styles?: PerRow<AreaStyle & InsetStyle>;
-} & CommonMarkerConfigWithArea &
-	CommonMarkerConfigWithColor &
-	CommonMarkerConfigWithInterval &
-	CommonMarkerConfigWithLabel<BoxLabelConfig | PathLabelConfig<PageEdge> | PointLabelConfig>;
+	styles?: PerRow<AreaStyle & InsetStyle, TContext>;
+} & CommonMarkerConfigWithArea<TContext> &
+	CommonMarkerConfigWithColor<TContext> &
+	CommonMarkerConfigWithInterval<TContext> &
+	CommonMarkerConfigWithLabel<
+		| BoxLabelConfig<TContext>
+		| PathLabelConfig<PageEdge, ShapeSide, TContext>
+		| PointLabelConfig<TContext>
+	>;

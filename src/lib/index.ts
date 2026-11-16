@@ -32,11 +32,10 @@ export { default as Plot } from './plots/generic/Plot.svelte';
 export { default as AbstractPlot } from './layout/plot/AbstractPlot.svelte';
 export { default as BasePlotLayout } from './layout/base/BasePlotLayout.svelte';
 export { usePlot, useFigure } from './layout/plot/usePlot';
-// What a plot knows of each row it draws, which every format reads.
-export type { PlotRowContext, KindRowContext } from './types/layout/context';
+// What a plot knows of each row it draws reaches every callback typed by its kind; `RowContextOf` names it from the plot.
+export type { RowContextOf } from './types/layout/context';
 export type { ContextStageOptions } from './types/phases/context/phase';
-export type { BoxRowContext, BoxSummary } from './types/plots/distribution/box/props';
-export type { HistogramRowContext } from './types/plots/distribution/histogram/props';
+export type { BoxSummary } from './types/plots/distribution/box/props';
 export type {
 	PublicPlotContext,
 	PublicFigureContext,
@@ -94,18 +93,9 @@ export type {
 } from './types/layout/mapping';
 export type { AxisScale, AxisBasedScalesConfig, ChannelScalesConfig } from './types/layout/scales';
 export type { NumberDisplay } from './types/layout/numbers';
-export type {
-	TreemapPlotProps,
-	TreemapRowContext,
-	TreemapTooltipContext
-} from './types/plots/part-of-a-whole/treemap/props';
+export type { TreemapPlotProps } from './types/plots/part-of-a-whole/treemap/props';
 export type { TreemapTile, TreemapArrangementOptions } from './types/arrangements/treemap';
-export type {
-	SankeyPlotProps,
-	SankeyDataProps,
-	SankeyRowContext,
-	SankeyTooltipContext
-} from './types/plots/flow/sankey/props';
+export type { SankeyPlotProps, SankeyDataProps } from './types/plots/flow/sankey/props';
 export type { FlowOrder, FlowArrangementOptions } from './types/arrangements/flow';
 export type { FlowColor, FlowEnd } from './types/plots/families/graph';
 export type { GraphNodes } from './types/plots/data/graph';

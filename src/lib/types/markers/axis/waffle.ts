@@ -1,4 +1,10 @@
-import type { PathLabelConfig, PageEdge, ValueEdge } from '$lib/types/markers/labels/path';
+import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
+import type {
+	PathLabelConfig,
+	PageEdge,
+	ValueEdge,
+	ShapeSide
+} from '$lib/types/markers/labels/path';
 import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
 import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { CommonMarkerConfigWithOrientation } from '$lib/types/markers/channels/commonMarkerConfigWithOrientation';
@@ -8,17 +14,19 @@ import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/co
 import type { CommonMarkerConfigWithInterval } from '$lib/types/markers/channels/commonMarkerConfigWithInterval';
 
 /** A waffle chart bar: the value as a grid of unit squares (svelteplot's `WaffleX`/`WaffleY`). */
-export type WaffleMarkerConfig = {
+export type WaffleMarkerConfig<TContext extends PlotRowContext = AnyRowContext> = {
 	type: 'waffle';
 	/** Quantity per square; svelteplot 0.14.2 drops it on the horizontal form. */
 	unit?: number;
 	multiple?: number;
 	gap?: number;
 	round?: boolean;
-	styles?: PerRow<AreaStyle>;
+	styles?: PerRow<AreaStyle, TContext>;
 } & CommonMarkerConfigWithOrientation &
-	CommonMarkerConfigWithColor &
-	CommonMarkerConfigWithInterval &
+	CommonMarkerConfigWithColor<TContext> &
+	CommonMarkerConfigWithInterval<TContext> &
 	CommonMarkerConfigWithLabel<
-		BoxLabelConfig | PathLabelConfig<PageEdge | ValueEdge> | PointLabelConfig
+		| BoxLabelConfig<TContext>
+		| PathLabelConfig<PageEdge | ValueEdge, ShapeSide, TContext>
+		| PointLabelConfig<TContext>
 	>;

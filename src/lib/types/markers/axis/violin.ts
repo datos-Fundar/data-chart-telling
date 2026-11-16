@@ -1,3 +1,4 @@
+import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
 import type { CommonMarkerConfigWithOrientation } from '$lib/types/markers/channels/commonMarkerConfigWithOrientation';
 import type { AreaStyle } from '$lib/types/plots/styling';
 import type { DensityKernel } from '$lib/types/transforms/density';
@@ -8,7 +9,7 @@ import type { CommonMarkerConfig } from '$lib/types/markers/channels/commonMarke
  * middle of the category's band; a `box` marker over the same rows draws the box inside. `x` and `y` are the
  * category and the value, in either order.
  */
-export type ViolinMarkerConfig = {
+export type ViolinMarkerConfig<TContext extends PlotRowContext = AnyRowContext> = {
 	type: 'violin';
 	/** Kernel shape of the estimate. */
 	kernel?: DensityKernel;
@@ -22,4 +23,4 @@ export type ViolinMarkerConfig = {
 	slot?: { index: number; count: number };
 	styles?: AreaStyle;
 } & CommonMarkerConfigWithOrientation &
-	CommonMarkerConfig;
+	CommonMarkerConfig<TContext>;

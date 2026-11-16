@@ -1,7 +1,7 @@
-import type { HistogramRowContext } from '$lib/types/plots/distribution/histogram/props';
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import HistogramPlot from '$lib/plots/distribution/histogram/Plot.svelte';
 import { HEIGHTS } from '$datasets';
+import type { ComponentProps } from 'svelte';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // Hovering a bar shows the bin it covers: its edges, its count, and its group
@@ -44,12 +44,12 @@ type Story = StoryObj<typeof meta>;
 /** The bin's edges and count, from its context, and its group when the histogram is grouped. */
 const TOOLTIP = {
 	sync: false,
-	format: (context: HistogramRowContext) => {
+	format: (context) => {
 		const range = `${context.from.toFixed(1)} to ${context.to.toFixed(1)}`;
 		const group = context.series === undefined ? '' : ` · ${context.series}`;
 		return `${range}: ${context.count} rows${group}`;
 	}
-};
+} satisfies ComponentProps<typeof HistogramPlot>['tooltip'];
 
 /** A tooltip on each bar: hover a bar to read its count. */
 export const Default: Story = {

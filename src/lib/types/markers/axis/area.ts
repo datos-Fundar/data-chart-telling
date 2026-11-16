@@ -1,3 +1,4 @@
+import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
 import type { AreaEdgeLabelConfig } from '$lib/types/markers/labels/path';
 import type { CommonMarkerConfigWithOrientation } from '$lib/types/markers/channels/commonMarkerConfigWithOrientation';
 import type { PointLabelConfig } from '$lib/types/markers/labels/point';
@@ -9,13 +10,13 @@ import type { CommonMarkerConfigWithInterval } from '$lib/types/markers/channels
 import type { CurveName } from '$lib/types/layout/styles/curve';
 
 /** A filled area under a curve, or a band between two curves (svelteplot's `AreaX`/`AreaY`). */
-export type AreaMarkerConfig = {
+export type AreaMarkerConfig<TContext extends PlotRowContext = AnyRowContext> = {
 	type: 'area';
 	curve?: CurveName;
 	tension?: number;
 	styles?: AreaStyle;
 } & CommonMarkerConfigWithOrientation &
-	CommonMarkerConfigWithArea &
-	CommonMarkerConfigWithColor &
-	CommonMarkerConfigWithInterval &
-	CommonMarkerConfigWithLabel<AreaEdgeLabelConfig | PointLabelConfig>;
+	CommonMarkerConfigWithArea<TContext> &
+	CommonMarkerConfigWithColor<TContext> &
+	CommonMarkerConfigWithInterval<TContext> &
+	CommonMarkerConfigWithLabel<AreaEdgeLabelConfig<TContext> | PointLabelConfig<TContext>>;

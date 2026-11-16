@@ -1,7 +1,8 @@
+import type { AnyRowContext, PlotRowContext, RowFunction } from '$lib/types/layout/context';
 import type { CommonMarkerConfig } from './commonMarkerConfig';
 
 /** Common props plus the categorical shape channel `symbol`. */
-export type CommonMarkerConfigWithSymbol = CommonMarkerConfig & {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	symbol?: string | ((d: any, context?: any) => unknown);
-};
+export type CommonMarkerConfigWithSymbol<TContext extends PlotRowContext = AnyRowContext> =
+	CommonMarkerConfig<TContext> & {
+		symbol?: string | RowFunction<unknown, TContext>;
+	};

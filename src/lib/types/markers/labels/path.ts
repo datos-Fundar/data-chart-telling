@@ -1,3 +1,4 @@
+import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
 import type { LabelAnchor } from '$lib/types/plots/constants';
 import type { LabelBaseConfig } from '$lib/types/markers/labels/common';
 
@@ -16,8 +17,9 @@ export type StrokeSide = 'above' | 'below' | 'on';
 /** A label written along an edge of its shape, read per row: a `'tip'` follows the sign of the row's value. */
 export type PathLabelConfig<
 	TEdge extends string = PageEdge | ValueEdge,
-	TSide extends string = ShapeSide
-> = LabelBaseConfig & {
+	TSide extends string = ShapeSide,
+	TContext extends PlotRowContext = AnyRowContext
+> = LabelBaseConfig<TContext> & {
 	layout: 'path';
 	/** `'tip'` on a shape that runs along a value, else `'top'`. */
 	edge?: TEdge;
@@ -33,13 +35,23 @@ export type PathLabelConfig<
 };
 
 /** A label written along each line a marker draws, curving with it. */
-export type StrokeLabelConfig = Omit<PathLabelConfig<never, StrokeSide>, 'edge'>;
+export type StrokeLabelConfig<TContext extends PlotRowContext = AnyRowContext> = Omit<
+	PathLabelConfig<never, StrokeSide, TContext>,
+	'edge'
+>;
 
 /** A label written along the top (`y2`) or bottom (`y1`) edge of each area, curving with it. */
-export type AreaEdgeLabelConfig = PathLabelConfig<'top' | 'bottom', StrokeSide>;
+export type AreaEdgeLabelConfig<TContext extends PlotRowContext = AnyRowContext> = PathLabelConfig<
+	'top' | 'bottom',
+	StrokeSide,
+	TContext
+>;
 
 /** A label written along the rim of each dot, from its left over its top. */
-export type RimLabelConfig = Omit<PathLabelConfig<never, ShapeSide>, 'edge'>;
+export type RimLabelConfig<TContext extends PlotRowContext = AnyRowContext> = Omit<
+	PathLabelConfig<never, ShapeSide, TContext>,
+	'edge'
+>;
 
 /**
  * Where a kind writes `'path'` labels: `'box'` along the edges of each row's box, `'stroke'` along each line it

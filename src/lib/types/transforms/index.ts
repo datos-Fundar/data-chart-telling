@@ -1,3 +1,4 @@
+import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
 import type {
 	StackXTransform,
 	StackYTransform,
@@ -87,7 +88,7 @@ export type {
  * Each one is a flat object: `type` picks the transform, and the rest are its
  * own channels and options, by svelteplot's own names.
  */
-export type MarkerTransform =
+export type MarkerTransform<TContext extends PlotRowContext = AnyRowContext> =
 	| StackYTransform
 	| StackXTransform
 	| StackMosaicXTransform
@@ -116,7 +117,7 @@ export type MarkerTransform =
 	| SortTransform
 	| ShuffleTransform
 	| ReverseTransform
-	| FilterTransform
+	| FilterTransform<TContext>
 	| SelectTransform
 	| SelectShorthandTransform
 	| GroupXTransform

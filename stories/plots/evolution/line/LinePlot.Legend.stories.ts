@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import type { PlotRowContext } from '$lib';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedStylesConfig, GapsAwarePlotStylesConfig } from '$lib/types/layout/styles';
 import type { GapsConfig } from '$lib/types/plots/gaps';
@@ -62,9 +61,8 @@ function sexLegend(mode: 'dim' | 'hide' | 'omit'): LegendSection[] {
 
 const VALUE_LABELS = {
 	show: true,
-	format: (context: PlotRowContext & { value: number }) =>
-		`${context.series} (${context.value.toFixed(1)})`
-};
+	format: (context) => `${context.series} (${context.value.toFixed(1)})`
+} satisfies AxisBasedStylesConfig['values'];
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 

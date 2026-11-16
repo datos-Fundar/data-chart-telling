@@ -1,15 +1,14 @@
+import type { AnyRowContext, PlotRowContext, RowFunction } from '$lib/types/layout/context';
 import type { CommonMarkerConfigWithInterval } from '$lib/types/markers/channels/commonMarkerConfigWithInterval';
 
 /** A raster image of a field over a rectangle, drawn to a canvas (svelteplot's `Raster`). */
-export type RasterMarkerConfig = {
+export type RasterMarkerConfig<TContext extends PlotRowContext = AnyRowContext> = {
 	type: 'raster';
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	fill?: string | ((d: any, context?: any) => unknown) | ((x: number, y: number) => unknown);
+	fill?: string | RowFunction<unknown, TContext> | ((x: number, y: number) => unknown);
 	fillOpacity?:
 		| number
 		| string
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		| ((d: any, context?: any) => number)
+		| RowFunction<number, TContext>
 		| ((x: number, y: number) => number);
 	width?: number;
 	height?: number;
@@ -22,4 +21,4 @@ export type RasterMarkerConfig = {
 	x2?: number;
 	y1?: number;
 	y2?: number;
-} & CommonMarkerConfigWithInterval;
+} & CommonMarkerConfigWithInterval<TContext>;

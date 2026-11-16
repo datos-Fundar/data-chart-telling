@@ -26,7 +26,7 @@ export type ProjectionPlotProps<
 		GeoFeature<TProps>,
 		TStyles,
 		TSegmentStyle,
-		GeoMarkersConfig,
+		GeoMarkersConfig<TTooltipContext>,
 		GeoScalesConfig,
 		CoordinatesConfig,
 		TTooltipContext

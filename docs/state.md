@@ -76,9 +76,9 @@ A plot works out a context for every row it draws, once, as it reads its data: t
 - the `hover` marker's `format(context, number)`, the functions of its `active` and `others` (`(context) => value`), and its points (`point.context`) in its `back` and `front` markers;
 - a style that takes a function of the row on a plot kind (`(context) => value`, such as a sankey's `styles.links.fill`);
 - the accessors and styles of an author's own markers, as their second argument (`(row, context) => value`, with the row's place among the marker's rows in `context.index`), and the `filter` of their transforms;
-- `usePlot().contextOf(row)` in a `component` marker.
+- `usePlot().contextOf(row)` in a `component` marker. Nothing ties that component to its plot, so `RowContextOf` names the context from the plot it is mounted in: `plot.contextOf<RowContextOf<typeof HistogramPlot>>(row)`.
 
-Every callback about a row gets the same context first, so what one reads (a tile's `share`) every other one reads too. Each is typed with the plot kind's own context, so an editor offers its fields as you write `context.` - a treemap's `share` in a tooltip, a value label or a `hover` marker's `active` alike. An author marker's accessors are the exception: their `context` is untyped unless you name its type (`(row, context: SankeyRowContext) => ...`).
+Every callback about a row gets the same context first, so what one reads (a tile's `share`) every other one reads too. Each is typed with the plot kind's own context, so an editor offers its fields as you write `context.` - a treemap's `share` in a tooltip, a value label or a `hover` marker's `active` alike. An author's own markers are no exception: written on a plot, their accessors, styles, labels and filters get its context typed too, with or without rows of their own - so no context type is ever named. A marker with rows of its own reads what the plot knows of rows it drew, so on it the plot kind's own fields are unset.
 
 What each plot kind adds:
 
@@ -100,8 +100,6 @@ What each plot kind adds:
 	}}
 />
 ```
-
-The types are `PlotRowContext`, and per kind `TreemapRowContext`, `HistogramRowContext` and `BoxRowContext`.
 
 ## When to use them
 

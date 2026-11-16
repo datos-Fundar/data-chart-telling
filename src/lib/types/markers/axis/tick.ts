@@ -1,12 +1,12 @@
+import type { AnyRowContext, PlotRowContext, RowFunction } from '$lib/types/layout/context';
 import type { CommonMarkerConfigWithOrientation } from '$lib/types/markers/channels/commonMarkerConfigWithOrientation';
 import type { StrokeStyle, PerRow } from '$lib/types/plots/styling';
 import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/commonMarkerConfigWithColor';
 
 /** A short tick per row along one axis (svelteplot's `TickX`/`TickY`). */
-export type TickMarkerConfig = {
+export type TickMarkerConfig<TContext extends PlotRowContext = AnyRowContext> = {
 	type: 'tick';
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	tickLength?: number | ((d: any, context?: any) => number);
-	styles?: PerRow<StrokeStyle>;
+	tickLength?: number | RowFunction<number, TContext>;
+	styles?: PerRow<StrokeStyle, TContext>;
 } & CommonMarkerConfigWithOrientation &
-	CommonMarkerConfigWithColor;
+	CommonMarkerConfigWithColor<TContext>;

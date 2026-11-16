@@ -1,21 +1,23 @@
+import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
 import type { LabelBaseConfig } from '$lib/types/markers/labels/common';
 import type { ValueSelect } from '$lib/types/layout/styles';
 import type { LabelAnchor } from '$lib/types/plots/constants';
 import type { BoxScales, BoxSizer } from '$lib/types/markers/labels/box';
 
 /** A label written beside a point of its shape, spread apart from the others with `declutter`. */
-export type PointLabelConfig = LabelBaseConfig & {
-	layout?: 'point';
-	/** The rows labelled, of each `grouping` of the marker. Every row by default. */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	select?: ValueSelect | ValueSelect[] | ((row: any) => boolean);
-	/** On a shape with a box (a bar, a cell): the point of its box the label starts at, `'middle'` by default. */
-	anchor?: LabelAnchor;
-	/** Which side of its point the text is written on, as it reads: after it (to its right), before it, above, below or on it. */
-	side?: PointSide;
-	/** The gap from its point. Defaults to the configuration's `text.label.gap` on a box, else 6px across and 8px up or down. */
-	gap?: number;
-};
+export type PointLabelConfig<TContext extends PlotRowContext = AnyRowContext> =
+	LabelBaseConfig<TContext> & {
+		layout?: 'point';
+		/** The rows labelled, of each `grouping` of the marker. Every row by default. */
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		select?: ValueSelect | ValueSelect[] | ((row: any) => boolean);
+		/** On a shape with a box (a bar, a cell): the point of its box the label starts at, `'middle'` by default. */
+		anchor?: LabelAnchor;
+		/** Which side of its point the text is written on, as it reads: after it (to its right), before it, above, below or on it. */
+		side?: PointSide;
+		/** The gap from its point. Defaults to the configuration's `text.label.gap` on a box, else 6px across and 8px up or down. */
+		gap?: number;
+	};
 
 export type PointSide = 'after' | 'before' | 'above' | 'below' | 'on';
 

@@ -1,3 +1,4 @@
+import type { AnyRowContext, PlotRowContext, RowFunction } from '$lib/types/layout/context';
 import type {
 	FontWeight,
 	FontStyleKeyword,
@@ -84,11 +85,12 @@ export type DirectedInsetStyle = { inset?: number; insetStart?: number; insetEnd
  * A number can also be the name of a field of the rows; so can a color, when the rows have a field
  * of that name.
  */
-export type RowValue<T> =
+export type RowValue<T, TContext extends PlotRowContext = AnyRowContext> =
 	| T
 	| (T extends number ? string : never)
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	| ((row: any, context?: any) => T);
+	| RowFunction<T, TContext>;
 
 /** A style whose every field can be a function of the row ({@link RowValue}). */
-export type PerRow<TStyle> = { [K in keyof TStyle]?: RowValue<NonNullable<TStyle[K]>> };
+export type PerRow<TStyle, TContext extends PlotRowContext = AnyRowContext> = {
+	[K in keyof TStyle]?: RowValue<NonNullable<TStyle[K]>, TContext>;
+};

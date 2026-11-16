@@ -1,3 +1,4 @@
+import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
 import type { RimLabelConfig } from '$lib/types/markers/labels/path';
 import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { CommonMarkerConfigWithLabel } from '$lib/types/markers/channels/commonMarkerConfigWithLabel';
@@ -8,12 +9,14 @@ import type { CommonMarkerConfigWithRowOffset } from '$lib/types/markers/channel
 import type { CommonMarkerConfigWithSymbol } from '$lib/types/markers/channels/commonMarkerConfigWithSymbol';
 
 /** A point mark (svelteplot's `Dot`), usable on any plot kind. */
-export type DotMarkerConfig = CommonMarkerConfigWithRowOffset<
-	{
-		type: 'dot';
-		styles?: PerRow<DotStyle>;
-	} & CommonMarkerConfigWithRadius &
-		CommonMarkerConfigWithColor &
-		CommonMarkerConfigWithSymbol &
-		CommonMarkerConfigWithLabel<RimLabelConfig | PointLabelConfig>
->;
+export type DotMarkerConfig<TContext extends PlotRowContext = AnyRowContext> =
+	CommonMarkerConfigWithRowOffset<
+		{
+			type: 'dot';
+			styles?: PerRow<DotStyle, TContext>;
+		} & CommonMarkerConfigWithRadius<TContext> &
+			CommonMarkerConfigWithColor<TContext> &
+			CommonMarkerConfigWithSymbol<TContext> &
+			CommonMarkerConfigWithLabel<RimLabelConfig<TContext> | PointLabelConfig<TContext>>,
+		TContext
+	>;

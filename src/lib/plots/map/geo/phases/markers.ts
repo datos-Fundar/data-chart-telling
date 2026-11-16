@@ -1,3 +1,4 @@
+import { AuthorMarkers } from '$lib/phases/statistics/AuthorMarkers';
 import { MarkerStyles } from '$lib/phases/markers/MarkerStyles';
 import { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import { GeoSegments } from '$lib/plots/map/geo/GeoSegments';
@@ -100,11 +101,13 @@ export function buildMarkers<TProps extends Record<string, unknown>>(
 		onclick: onFeatureClick ? (e, d) => onFeatureClick(d as TaggedGeoFeature<TProps>, e) : undefined
 	}));
 
-	const behindMarkers = authoredMarkers.filter(isBehindMarker);
-	const frontMarkers = authoredMarkers.filter((m) => !isBehindMarker(m) && m.type !== 'geo-hover');
-	const hoverMarker = authoredMarkers.find(
-		(m): m is GeoHoverMarkerConfig => m.type === 'geo-hover'
+	// A dot or a text of the author reads each of its rows with what the map knows of it: the slice it is drawn in.
+	const authored = authoredMarkers.map((m) =>
+		m.type === 'dot' || m.type === 'text' ? AuthorMarkers.withContext(m, state.slice ?? {}) : m
 	);
+	const behindMarkers = authored.filter(isBehindMarker);
+	const frontMarkers = authored.filter((m) => !isBehindMarker(m) && m.type !== 'geo-hover');
+	const hoverMarker = authored.find((m): m is GeoHoverMarkerConfig => m.type === 'geo-hover');
 
 	const markers: MarkerConfig[] = MarkerStyles.resolveAll(
 		MarkerChannels.inheritAll(

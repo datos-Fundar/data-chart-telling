@@ -1,3 +1,4 @@
+import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
 import type { BasicMarkersConfig } from '$lib/types/markers/basic/basicMarkersConfig';
 import type { GeoGraticuleMarkerConfig } from './graticule';
 import type { GeoSphereMarkerConfig } from './sphere';
@@ -9,8 +10,8 @@ import type { GeoCustomComponentMarkerConfig } from './geoComponent';
 import type { GeoInsetMarkerConfig } from './inset';
 
 /** Every marker a geo plot accepts. */
-export type GeoMarkersConfig =
-	| BasicMarkersConfig
+export type GeoMarkersConfig<TContext extends PlotRowContext = AnyRowContext> =
+	| BasicMarkersConfig<TContext>
 	| GeoGraticuleMarkerConfig
 	| GeoSphereMarkerConfig
 	| GeoVectorMarkerConfig

@@ -1,14 +1,16 @@
+import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
 import type { LabelBaseConfig } from '$lib/types/markers/labels/common';
 import type { TextMarkerConfig } from '$lib/types/markers/basic/text';
 import type { LabelAnchor } from '$lib/types/plots/constants';
 
 /** A label written in the box of each shape, fitted to it unless `fit` is `false`. */
-export type BoxLabelConfig = LabelBaseConfig & {
-	layout?: 'box';
-	anchor?: LabelAnchor;
-	/** Defaults to the configuration's `text.label.gap`. */
-	gap?: number;
-};
+export type BoxLabelConfig<TContext extends PlotRowContext = AnyRowContext> =
+	LabelBaseConfig<TContext> & {
+		layout?: 'box';
+		anchor?: LabelAnchor;
+		/** Defaults to the configuration's `text.label.gap`. */
+		gap?: number;
+	};
 
 export type BoxShape = 'edges' | 'cell' | 'band';
 

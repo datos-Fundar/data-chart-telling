@@ -1,12 +1,13 @@
-import type { PlotRowContext } from '$lib';
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
+import type BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import TooltipSyncDemo, { pyramidData } from './TooltipSyncDemo.svelte';
 import FacetSyncBarBySeriesDemo from './FacetSyncBarBySeriesDemo.svelte';
 import FacetSyncBarUnrelatedOrderDemo, {
 	UNRELATED_SORT_DATA,
 	type GroupValue
 } from './FacetSyncBarUnrelatedOrderDemo.svelte';
+import type { ComponentProps } from 'svelte';
 import { renderSource } from '../../common/docsSource';
 import {
 	ARGENTINA_CHILE_TRENDS,
@@ -133,9 +134,8 @@ export const FacetSyncBarBySeries: StoryObj = {
 					tooltip: {
 						strategy: 'series',
 						sync: true,
-						format: (context: PlotRowContext) =>
-							`${(context.row as AgeRow).sex}: ${(context.row as AgeRow).share}%`
-					},
+						format: (context) => `${(context.row as AgeRow).sex}: ${(context.row as AgeRow).share}%`
+					} satisfies ComponentProps<typeof BarPlot>['tooltip'],
 					markers: [{ type: 'hover' }]
 				})
 			}
@@ -192,9 +192,9 @@ export const FacetSyncBarUnrelatedOrder: StoryObj = {
 					tooltip: {
 						strategy: 'y',
 						sync: true,
-						format: (context: PlotRowContext) =>
+						format: (context) =>
 							`${(context.row as GroupValue).category}: ${(context.row as GroupValue).value}`
-					},
+					} satisfies ComponentProps<typeof BarPlot>['tooltip'],
 					markers: [{ type: 'hover' }]
 				})
 			}

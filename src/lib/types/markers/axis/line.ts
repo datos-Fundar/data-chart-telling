@@ -1,3 +1,4 @@
+import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
 import type { StrokeLabelConfig } from '$lib/types/markers/labels/path';
 import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { CommonMarkerConfigWithLabel } from '$lib/types/markers/channels/commonMarkerConfigWithLabel';
@@ -6,9 +7,9 @@ import type { CurveName } from '$lib/types/layout/styles/curve';
 import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/commonMarkerConfigWithColor';
 
 /** A single line-segment stroke; `color` strokes each `grouping`'s line in its own color. */
-export type LineMarkerConfig = {
+export type LineMarkerConfig<TContext extends PlotRowContext = AnyRowContext> = {
 	type: 'line';
 	curve?: CurveName;
 	styles?: StrokeStyle;
-} & CommonMarkerConfigWithColor &
-	CommonMarkerConfigWithLabel<StrokeLabelConfig | PointLabelConfig>;
+} & CommonMarkerConfigWithColor<TContext> &
+	CommonMarkerConfigWithLabel<StrokeLabelConfig<TContext> | PointLabelConfig<TContext>>;
