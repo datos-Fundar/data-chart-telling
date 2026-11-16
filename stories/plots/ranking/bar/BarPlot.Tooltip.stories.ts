@@ -76,8 +76,8 @@ export const BasicTooltip: Story = {
 		series: [FEMALE],
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { province, value } = row as ProvinceRow;
+			format: (context) => {
+				const { province, value } = context.row as ProvinceRow;
 				return `${province}: ${value} yr`;
 			}
 		}
@@ -94,8 +94,8 @@ export const RichFormat: Story = {
 		series: [FEMALE],
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { province, value } = row as ProvinceRow;
+			format: (context) => {
+				const { province, value } = context.row as ProvinceRow;
 				return `Province: ${province}\nLife expectancy: ${value.toFixed(1)} yr`;
 			}
 		}
@@ -111,8 +111,8 @@ export const ComputedFormat: Story = {
 		series: [FEMALE],
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { province, value } = row as ProvinceRow;
+			format: (context) => {
+				const { province, value } = context.row as ProvinceRow;
 				const delta = (value - 80).toFixed(1);
 				const sign = value >= 80 ? '+' : '';
 				return `${province}: ${value.toFixed(1)} yr (${sign}${delta} vs 80)`;
@@ -131,8 +131,8 @@ export const TwoSeries: Story = {
 		series: [FEMALE, MALE],
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { province, value } = row as ProvinceRow;
+			format: (context) => {
+				const { province, value } = context.row as ProvinceRow;
 				return `${province}: ${value.toFixed(1)} yr`;
 			}
 		}
@@ -152,8 +152,8 @@ export const SeriesFiltered: Story = {
 		tooltip: {
 			sync: false,
 			series: ['female'],
-			format: (row) => {
-				const { province, value } = row as ProvinceRow;
+			format: (context) => {
+				const { province, value } = context.row as ProvinceRow;
 				return `Female - ${province}: ${value.toFixed(1)} yr`;
 			}
 		}
@@ -173,8 +173,8 @@ export const TwoSeriesFromGroupedData: Story = {
 		color: 'sex',
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { sex, province, value } = row as ProvinceRow;
+			format: (context) => {
+				const { sex, province, value } = context.row as ProvinceRow;
 				return `${sex} (${province}): ${value.toFixed(1)} yr`;
 			}
 		}
@@ -194,8 +194,8 @@ export const GroupedDataSeriesFiltered: Story = {
 		tooltip: {
 			sync: false,
 			series: ['female'],
-			format: (row) => {
-				const { sex, province, value } = row as ProvinceRow;
+			format: (context) => {
+				const { sex, province, value } = context.row as ProvinceRow;
 				return `${sex} (${province}): ${value.toFixed(1)} yr`;
 			}
 		}
@@ -230,8 +230,8 @@ export const CustomAnchor: Story = {
 			sync: false,
 			anchorX: 'left',
 			anchorY: 'top',
-			format: (row) => {
-				const { province, value } = row as ProvinceRow;
+			format: (context) => {
+				const { province, value } = context.row as ProvinceRow;
 				return `${province}: ${value.toFixed(1)} yr`;
 			}
 		}
@@ -260,8 +260,8 @@ export const HorizontalStackedTooltip: Story = {
 		} satisfies AxisBasedScalesConfig,
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { year, ageGroup, share } = row as AgeShareRow;
+			format: (context) => {
+				const { year, ageGroup, share } = context.row as AgeShareRow;
 				return `${year} / ${ageGroup}: ${share}`;
 			}
 		},
@@ -287,8 +287,8 @@ export const HorizontalSingleSeriesTooltip: Story = {
 		} satisfies AxisBasedScalesConfig,
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { year, share } = row as AgeShareRow;
+			format: (context) => {
+				const { year, share } = context.row as AgeShareRow;
 				return `${year}: ${share}`;
 			}
 		}

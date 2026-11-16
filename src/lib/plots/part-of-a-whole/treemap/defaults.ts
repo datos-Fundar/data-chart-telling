@@ -111,7 +111,7 @@ function buildMarks<TData extends Record<string, unknown>>(
 	const shareText = (row: ProcessedRow) => {
 		const context = contextOf(row);
 		return state.values?.format
-			? state.values.format(context.share, number, context)
+			? state.values.format(context as typeof context & { value: number }, number)
 			: number(context.share);
 	};
 

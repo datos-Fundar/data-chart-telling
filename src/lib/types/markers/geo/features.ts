@@ -3,7 +3,7 @@ export type GeoFeaturesMarkerConfig = {
 	type: 'geo';
 	data: Record<string, unknown>[];
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	fill: (d: any) => string;
+	fill: (d: any, context?: any) => string;
 	fillOpacity?: number;
 	stroke?: string;
 	strokeWidth?: number;

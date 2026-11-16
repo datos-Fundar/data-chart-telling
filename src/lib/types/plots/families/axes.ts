@@ -15,7 +15,7 @@ export type AxesPlotProps<
 	TRow,
 	TStyles,
 	TSegmentStyle,
-	AxisBasedMarkersConfig,
+	AxisBasedMarkersConfig<TTooltipContext>,
 	AxisBasedScalesConfig<TRow>,
 	undefined,
 	TTooltipContext

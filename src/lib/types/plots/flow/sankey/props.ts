@@ -44,7 +44,7 @@ export type SankeyRowContext = KindRowContext<{
 	outgoing: SankeyRowContext[];
 }>;
 
-/** What a `SankeyPlot`'s `tooltip.format` gets in its third argument - see {@link SankeyRowContext}. */
+/** What a `SankeyPlot`'s `tooltip.format` gets - see {@link SankeyRowContext}. */
 export type SankeyTooltipContext = SankeyRowContext;
 
 /** The channels `SankeyPlot` takes none of: its rows are placed by its graph. */

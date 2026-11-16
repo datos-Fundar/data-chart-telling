@@ -53,7 +53,11 @@ export const Formatted: Story = {
 	args: {
 		...MEANS,
 		styles: {
-			values: { show: true, format: (value: number) => `${value}%`, fontStyle: { fontWeight: 600 } }
+			values: {
+				show: true,
+				format: (context) => `${context.value}%`,
+				fontStyle: { fontWeight: 600 }
+			}
 		} satisfies ConnectorBasedStylesConfig
 	}
 };

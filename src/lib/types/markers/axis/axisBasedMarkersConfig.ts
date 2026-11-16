@@ -1,3 +1,4 @@
+import type { PlotRowContext } from '$lib/types/layout/context';
 import type { BasicMarkersConfig } from '$lib/types/markers/basic/basicMarkersConfig';
 import type { LineMarkerConfig } from './line';
 import type { BarMarkerConfig } from './bar';
@@ -30,7 +31,7 @@ import type { CustomComponentMarkerConfig } from './component';
 import type { DeltaMarkerConfig } from './delta';
 
 /** Every marker kind an axis-based plot can render. */
-export type AxisBasedMarkersConfig =
+export type AxisBasedMarkersConfig<TContext extends PlotRowContext = PlotRowContext> =
 	| BasicMarkersConfig
 	| LineMarkerConfig
 	| BarMarkerConfig
@@ -58,6 +59,6 @@ export type AxisBasedMarkersConfig =
 	| RibbonMarkerConfig
 	| RuleMarkerConfig
 	| BandMarkerConfig
-	| HoverMarkerConfig
+	| HoverMarkerConfig<TContext>
 	| CustomComponentMarkerConfig
 	| DeltaMarkerConfig;

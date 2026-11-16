@@ -30,7 +30,7 @@ describe('ScatterPlot - tooltip', () => {
 			y: 'life',
 			tooltip: {
 				sync: false,
-				format: (row) => `${(row as CountryYearRow).country}`
+				format: (context) => `${(context.row as CountryYearRow).country}`
 			}
 		});
 		await waitForSvg(container);
@@ -47,7 +47,8 @@ describe('ScatterPlot - tooltip', () => {
 			color: 'continent',
 			tooltip: {
 				sync: false,
-				format: (row) => `${(row as CountryYearRow).country}: ${(row as CountryYearRow).life} yr`
+				format: (context) =>
+					`${(context.row as CountryYearRow).country}: ${(context.row as CountryYearRow).life} yr`
 			}
 		});
 		const svg = await waitForSvg(container);
@@ -65,7 +66,7 @@ describe('ScatterPlot - tooltip', () => {
 			tooltip: {
 				sync: false,
 				series: ['Americas'],
-				format: (row) => `${(row as CountryYearRow).country}`
+				format: (context) => `${(context.row as CountryYearRow).country}`
 			}
 		});
 		const svg = await waitForSvg(container);

@@ -44,14 +44,10 @@ type Story = StoryObj<typeof meta>;
 /** The bin's edges and count, from its context, and its group when the histogram is grouped. */
 const TOOLTIP = {
 	sync: false,
-	format: (
-		_row: Record<string, unknown>,
-		_number: unknown,
-		{ from, to, count, series }: HistogramRowContext
-	) => {
-		const range = `${from.toFixed(1)} to ${to.toFixed(1)}`;
-		const group = series === undefined ? '' : ` · ${series}`;
-		return `${range}: ${count} rows${group}`;
+	format: (context: HistogramRowContext) => {
+		const range = `${context.from.toFixed(1)} to ${context.to.toFixed(1)}`;
+		const group = context.series === undefined ? '' : ` · ${context.series}`;
+		return `${range}: ${context.count} rows${group}`;
 	}
 };
 

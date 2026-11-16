@@ -15,7 +15,7 @@ export type TooltipAnchorY = 'top' | 'middle' | 'bottom';
 /** A matched row as a tooltip's `content` gets it: the row itself, plus `seriesColor`, the one the plot draws it in (unset on plots without series). */
 export type TooltipRow<TRow> = TRow & { seriesColor?: string };
 
-/** What a plot knows of a hovered row, the third argument of a tooltip's `format` - see {@link PlotRowContext}. */
+/** What a plot knows of a hovered row, which a tooltip's `format` gets - see {@link PlotRowContext}. */
 export type TooltipContext = PlotRowContext;
 
 /**
@@ -32,11 +32,11 @@ export type TooltipOptions<
 	/** Highlight the hovered point in every synced plot too. Defaults to `false`. */
 	sync?: boolean;
 	/**
-	 * Custom tooltip text for a row (supports `\n`). Defaults per chart kind. `number` writes a value as the display
-	 * fields above ask, and `context` is what the plot knows of the row: its series, `x`, `y`, the value it shows and
-	 * whatever its kind works out (a tile's share, a box's quartiles) - see {@link PlotRowContext}.
+	 * Custom tooltip text for a row (supports `\n`). Defaults per chart kind. `context` is what the plot knows of
+	 * the row: the `row` itself, its series, `x`, `y`, the value it shows and whatever its kind works out (a tile's
+	 * share, a box's quartiles) - see {@link PlotRowContext}. `number` writes a value as the display fields above ask.
 	 */
-	format?: (row: TRow, number: (value: number) => string, context: TContext) => string;
+	format?: (context: TContext & { row: TRow }, number: (value: number) => string) => string;
 	/** Named subset of crossing series to include. Omitted = all matched. */
 	series?: string[];
 	/** Custom tooltip body; replaces `format` when given. Its rows carry a `seriesColor` - see {@link TooltipRow}. */

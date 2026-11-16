@@ -118,7 +118,7 @@ describe('BarPlot - markers.hover', () => {
 			markers: [
 				{
 					type: 'hover',
-					format: (point) => `${point.x}: ${point.y}`
+					format: (context) => `${context.x}: ${context.y}`
 				}
 			] satisfies AxisBasedMarkersConfig[]
 		});
@@ -142,7 +142,7 @@ describe('BarPlot - markers.hover', () => {
 			tooltip: {
 				sync: false,
 				strategy: 'x',
-				format: (row) => `${(row as { province: string }).province}`
+				format: (context) => `${(context.row as { province: string }).province}`
 			},
 			markers: [{ type: 'hover', front: [{ type: 'dot' }] }] satisfies AxisBasedMarkersConfig[]
 		});

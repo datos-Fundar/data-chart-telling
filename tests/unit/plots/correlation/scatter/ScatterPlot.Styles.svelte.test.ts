@@ -52,7 +52,7 @@ describe('ScatterPlot - styles.values', () => {
 			height: 300,
 			...DATA_PROPS,
 			styles: {
-				values: { show: true, format: (v: number) => `${v.toFixed(1)} yr` }
+				values: { show: true, format: (context) => `${context.value.toFixed(1)} yr` }
 			} satisfies AxisBasedStylesConfig
 		});
 		const svg = await waitForSvg(container);
@@ -75,7 +75,7 @@ describe('ScatterPlot - styles.values', () => {
 			y: 'y',
 			margins: { right: 10 },
 			styles: {
-				values: { show: true, format: (v: number) => `value ${v}` }
+				values: { show: true, format: (context) => `value ${context.value}` }
 			} satisfies AxisBasedStylesConfig
 		});
 		const svg = await waitForSvg(container);

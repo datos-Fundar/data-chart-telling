@@ -31,8 +31,8 @@ describe('PyramidPlot - tooltip', () => {
 			...DATA_PROPS,
 			tooltip: {
 				sync: false,
-				format: (row) => {
-					const { ageGroup, sex, share } = row as AgeRow;
+				format: (context) => {
+					const { ageGroup, sex, share } = context.row as AgeRow;
 					return `${sex} - ${ageGroup}: ${share}%`;
 				}
 			}
@@ -49,8 +49,8 @@ describe('PyramidPlot - tooltip', () => {
 			scales: { y: { domain: AGE_GROUPS } },
 			tooltip: {
 				sync: false,
-				format: (row) => {
-					const { ageGroup, sex, share } = row as AgeRow;
+				format: (context) => {
+					const { ageGroup, sex, share } = context.row as AgeRow;
 					return `${sex} - ${ageGroup}: ${share.toFixed(1)}%`;
 				}
 			}
@@ -68,7 +68,7 @@ describe('PyramidPlot - tooltip', () => {
 			tooltip: {
 				sync: false,
 				series: ['Female'],
-				format: (row) => `Female: ${(row as AgeRow).share.toFixed(1)}%`
+				format: (context) => `Female: ${(context.row as AgeRow).share.toFixed(1)}%`
 			}
 		});
 		const svg = await waitForSvg(container);
@@ -96,7 +96,8 @@ describe('PyramidPlot - tooltip', () => {
 			scales: { y: { domain: AGE_GROUPS } },
 			tooltip: {
 				sync: false,
-				format: (row) => `${(row as AgeRow).ageGroup}: ${(row as AgeRow).share}%`
+				format: (context) =>
+					`${(context.row as AgeRow).ageGroup}: ${(context.row as AgeRow).share}%`
 			}
 		});
 		const svg = await waitForSvg(container);
@@ -113,8 +114,8 @@ describe('PyramidPlot - hover matches by row (y), not by bar magnitude (x)', () 
 			scales: { y: { domain: AGE_GROUPS } },
 			tooltip: {
 				sync: false,
-				format: (row) => {
-					const { ageGroup, sex, share } = row as AgeRow;
+				format: (context) => {
+					const { ageGroup, sex, share } = context.row as AgeRow;
 					return `${sex} - ${ageGroup}: ${share}%`;
 				}
 			}

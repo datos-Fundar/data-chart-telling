@@ -49,7 +49,7 @@ export function buildMarks(state: State, env: SankeyPlotEnv): AxisBasedMarkersCo
 	const { fill: linkFill = 'source', curvature, ...linkStyle } = styles.links ?? {};
 	/** What a link's fill names: an end whose node colors it, or a color of its own. */
 	const fillOf = (row: ProcessedRow) =>
-		typeof linkFill === 'function' ? linkFill(row, context(row)) : linkFill;
+		typeof linkFill === 'function' ? linkFill(context(row)) : linkFill;
 	const endOf = (row: ProcessedRow): FlowEnd | undefined => {
 		const fill = fillOf(row);
 		return fill === 'source' || fill === 'target' ? (fill as FlowEnd) : undefined;
@@ -130,7 +130,9 @@ function buildLabels(state: State, env: SankeyPlotEnv, nodes: ProcessedRow[]): T
 	const colorOf = (series: unknown) => state.colorForSeries!(String(series));
 	const text = (row: ProcessedRow) => {
 		const own = context(row);
-		const value = values?.format ? values.format(own.value!, number, own) : number(own.value!);
+		const value = values?.format
+			? values.format(own as typeof own & { value: number }, number)
+			: number(own.value!);
 		return `${own.name} ${value}`;
 	};
 	return [

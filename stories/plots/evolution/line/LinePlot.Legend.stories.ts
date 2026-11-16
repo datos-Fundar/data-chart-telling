@@ -62,8 +62,8 @@ function sexLegend(mode: 'dim' | 'hide' | 'omit'): LegendSection[] {
 
 const VALUE_LABELS = {
 	show: true,
-	format: (v: number, _number: unknown, context: PlotRowContext) =>
-		`${context.series} (${v.toFixed(1)})`
+	format: (context: PlotRowContext & { value: number }) =>
+		`${context.series} (${context.value.toFixed(1)})`
 };
 
 // ── Stories ───────────────────────────────────────────────────────────────────

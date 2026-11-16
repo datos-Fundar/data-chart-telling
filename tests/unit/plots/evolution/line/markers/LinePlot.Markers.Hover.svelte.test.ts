@@ -107,7 +107,7 @@ describe('LinePlot - markers.hover', () => {
 			markers: [
 				{
 					type: 'hover',
-					format: (point) => `${point.x}: ${point.y}`
+					format: (context) => `${context.x}: ${context.y}`
 				}
 			] satisfies AxisBasedMarkersConfig[]
 		});

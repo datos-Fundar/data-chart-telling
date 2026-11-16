@@ -12,7 +12,8 @@ import type { DensityKernel } from '$lib/types/transforms/density';
 export type ViolinPlotStylesConfig = WithValues<
 	AxisBasedStylesConfig,
 	PointLabelConfig,
-	BoxValuePart
+	BoxValuePart,
+	BoxRowContext
 > & {
 	kernel?: DensityKernel;
 	/** Kernel bandwidth in data units; Silverman's rule picks one per violin when unset. */

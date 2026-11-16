@@ -51,7 +51,7 @@ export const Links: Story = {
 export const LinksByColumn: Story = {
 	args: {
 		styles: {
-			links: { fill: (link, context) => (context.column === 'species' ? 'source' : 'target') }
+			links: { fill: (link) => (link.column === 'species' ? 'source' : 'target') }
 		}
 	}
 };
@@ -60,7 +60,7 @@ export const LinksByColumn: Story = {
 export const LinksThroughAColumn: Story = {
 	args: {
 		styles: {
-			links: { fill: (link, context) => (context.column === 'species' ? 'target' : 'source') }
+			links: { fill: (link) => (link.column === 'species' ? 'target' : 'source') }
 		}
 	}
 };

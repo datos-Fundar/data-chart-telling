@@ -55,7 +55,7 @@ export const Sideways: Story = {
 		y: 'ageGroup',
 		scales: { color: SEQUENTIAL_COLORS, x: { domain: [14, 26] } },
 		styles: {
-			values: { show: true, format: (value: number) => `${value} %` }
+			values: { show: true, format: (context) => `${context.value} %` }
 		} satisfies ConnectorBasedStylesConfig
 	}
 };
@@ -81,7 +81,7 @@ export const FirstAndLast: Story = {
 				show: true,
 				select: ['first', 'last'],
 				color: 'series',
-				format: (value: number) => `${value}%`
+				format: (context) => `${context.value}%`
 			}
 		} satisfies ConnectorBasedStylesConfig
 	}

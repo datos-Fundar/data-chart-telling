@@ -12,10 +12,8 @@ export type BasePlotStylesConfig = {
 	frame?: FrameProp;
 };
 
-/** A style as it is for every row, or a function of the row and what the plot knows of it (its `context`). */
-export type StyleValue<T, TRow = Record<string, unknown>, TContext = PlotRowContext> =
-	| T
-	| ((row: TRow, context: TContext) => T);
+/** A style as it is for every row, or a function of what the plot knows of the row (its `context`, with the `row`). */
+export type StyleValue<T, TContext = PlotRowContext> = T | ((context: TContext) => T);
 
 /** A style as it is for every series, or a function of the series' name - `undefined` leaves that series as it is. */
 export type PerSeries<TStyle> = TStyle | ((series: string) => TStyle | undefined);

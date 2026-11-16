@@ -1,5 +1,4 @@
 import { render } from 'vitest-browser-svelte';
-import type { PlotRowContext } from '$lib';
 import { describe, test, expect, afterEach, vi } from 'vitest';
 import PyramidPlot from '$lib/plots/distribution/pyramid/Plot.svelte';
 import { setConfiguration, resetConfiguration } from '$lib/configuration/config.svelte';
@@ -194,8 +193,7 @@ describe('PyramidPlot - gaps (hover-isolate dimming)', () => {
 				values: {
 					show: true,
 					hoverIsolate: true,
-					format: (v: number, _number: unknown, context: PlotRowContext) =>
-						`${context.series}: ${v}`
+					format: (context) => `${context.series}: ${context.value}`
 				},
 				gaps: { default: { middle: {} } } satisfies GapsConfig<BarSegmentStyle>
 			}

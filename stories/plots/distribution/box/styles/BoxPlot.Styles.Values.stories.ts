@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import type { PlotRowContext } from '$lib';
 import BoxPlot from '$lib/plots/distribution/box/Plot.svelte';
 import { IRIS } from '$datasets';
 
@@ -60,11 +59,11 @@ export const OwnFormatPerPart: Story = {
 			area: { fillOpacity: 0.4 },
 			values: {
 				parts: {
-					min: { format: (v: number) => `min ${v}` },
-					median: { format: (v: number) => `median ${v} cm` },
+					min: { format: (context) => `min ${context.value}` },
+					median: { format: (context) => `median ${context.value} cm` },
 					max: true
 				},
-				format: (v: number, _number: unknown, { part }: PlotRowContext) => `${part} ${v}`
+				format: (context) => `${context.part} ${context.value}`
 			}
 		}
 	}

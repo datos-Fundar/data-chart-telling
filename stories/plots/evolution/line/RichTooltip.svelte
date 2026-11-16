@@ -29,8 +29,8 @@
 		]}
 		tooltip={{
 			sync: false,
-			format: (row) => {
-				const { year, value } = row as LifeRow;
+			format: (context) => {
+				const { year, value } = context.row as LifeRow;
 				return `${year}: ${value.toFixed(1)} yr`;
 			},
 			content

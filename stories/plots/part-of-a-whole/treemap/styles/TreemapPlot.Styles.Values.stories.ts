@@ -72,16 +72,16 @@ export const OneDecimal: Story = {
 	}
 };
 
-/** `format(share, number, context)` writes a tile's whole label: `context` names its group and the tile. */
+/** `format(context, number)` writes a tile's whole label: `context` has its group, its name and its share. */
 export const CustomFormat: Story = {
 	args: {
 		...BASE,
 		styles: {
 			values: {
 				show: true,
-				format: (share, number, context) => `${context.series?.slice(0, 3)} ${number(share)}`
+				format: (context, number) => `${context.series?.slice(0, 3)} ${number(context.share)}`
 			}
-		} satisfies AxisBasedStylesConfig
+		}
 	}
 };
 

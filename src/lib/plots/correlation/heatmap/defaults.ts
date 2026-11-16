@@ -134,7 +134,9 @@ export function buildHeatmapDefaults<TData extends Record<string, unknown>>(): A
 				const number = (v: number) => `${v}`;
 				return ((row: ProcessedRow) => {
 					const context = RowContext.of(row);
-					return format ? format(Number(context.value), number, context) : `${context.value}`;
+					return format
+						? format({ ...context, value: Number(context.value) }, number)
+						: `${context.value}`;
 				}) as (row: never) => string;
 			},
 			// A cell's color is its value, not a series'.

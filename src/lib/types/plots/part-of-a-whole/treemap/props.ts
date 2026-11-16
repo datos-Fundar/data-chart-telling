@@ -23,10 +23,12 @@ export type TreemapRowContext = KindRowContext<{
 /** `TreemapPlot`'s `styles`: its value labels, and how its rectangles split among their tiles. */
 type TreemapStyles = WithValues<
 	ArrangementAwarePlotStylesConfig<TreemapArrangementOptions>,
-	BoxLabelConfig
+	BoxLabelConfig,
+	'value',
+	TreemapRowContext
 >;
 
-/** What a `TreemapPlot`'s `tooltip.format` gets in its third argument - see {@link TreemapRowContext}. */
+/** What a `TreemapPlot`'s `tooltip.format` gets - see {@link TreemapRowContext}. */
 export type TreemapTooltipContext = TreemapRowContext;
 
 /**

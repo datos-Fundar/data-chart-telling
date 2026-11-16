@@ -9,7 +9,7 @@ import type { CommonMarkerEvents } from '$lib/types/markers/channels/commonMarke
 export type CommonMarkerConfig = CommonMarkerEvents & {
 	data?: Record<string, unknown>[];
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	grouping?: string | ((d: any) => unknown);
+	grouping?: string | ((d: any, context?: any) => unknown);
 	series?: string;
 	/**
 	 * With `series` set, whether the marker draws once over the whole series
@@ -18,9 +18,9 @@ export type CommonMarkerConfig = CommonMarkerEvents & {
 	 */
 	scope?: 'series' | 'segment';
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	x?: AxisValue | ((d: any) => AxisValue);
+	x?: AxisValue | ((d: any, context?: any) => AxisValue);
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	y?: AxisValue | ((d: any) => AxisValue);
+	y?: AxisValue | ((d: any, context?: any) => AxisValue);
 	scales?: ChannelScalesConfig;
 	statistics?: StatisticConfig[];
 	transforms?: MarkerTransform[];

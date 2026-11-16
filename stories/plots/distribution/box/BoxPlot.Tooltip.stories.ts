@@ -49,9 +49,9 @@ export const CustomFormat: Story = {
 	args: {
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { category, median, p25, p75, count } = row as BoxSummaryRow;
-				return `${category}: ${median} cm (middle half ${p25}-${p75}), ${count} flowers`;
+			format: (context) => {
+				const box = context.row as BoxSummaryRow;
+				return `${box.category}: ${box.median} cm (middle half ${box.p25}-${box.p75}), ${box.count} flowers`;
 			}
 		}
 	}

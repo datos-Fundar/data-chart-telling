@@ -96,8 +96,8 @@ const stockPriceProps = {
 	styles: {
 		values: {
 			show: true,
-			format: (v: number, _number: unknown, context: PlotRowContext) =>
-				`${context.series} - ${v.toFixed(2)} USD`
+			format: (context: PlotRowContext & { value: number }) =>
+				`${context.series} - ${context.value.toFixed(2)} USD`
 		}
 	}
 };

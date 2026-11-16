@@ -2,15 +2,14 @@ import type { Meta } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import { COUNTRIES_OVER_TIME, LIFE, PROVINCE_VALUES } from '$datasets';
-import type { PlotRowContext } from '$lib';
 import { plotStory } from '../../common/plotStory';
 
 /**
  * What a label says and how it looks is the same in every layout. Its text is the value it labels, written as
- * `decimals`, `prefix`, `suffix` and `signDisplay` ask (over the configuration's `numbers`); `format(value, number,
- * context)` writes anything else - `number` writes a value as those fields ask, and `context` is what the plot
- * knows of the labelled row: its `series`, its `row` for the other fields of the data, and what the plot kind works
- * out (a histogram bin's `count`, a treemap tile's `share`...).
+ * `decimals`, `prefix`, `suffix` and `signDisplay` ask (over the configuration's `numbers`); `format(context,
+ * number)` writes anything else - `context` is what the plot knows of the labelled row: the `value` it labels, its
+ * `series`, its `row` for the other fields of the data, and what the plot kind works out (a histogram bin's `count`,
+ * a treemap tile's `share`...), and `number` writes a value as those fields ask.
  *
  * `color: 'series'` writes each label in its series' color; `fontStyle` sets the text's look - its `fill`, `fontSize`,
  * `fontWeight`... - but never where it sits, which is the layout's. `hoverIsolate` dims every other series while the
@@ -56,8 +55,8 @@ export const Format = plotStory(LinePlot, 'LinePlot', {
 	scales: { x: { nice: false } },
 	styles: {
 		values: {
-			format: (v: number, number: (v: number) => string, { series }: PlotRowContext) =>
-				`${series === 'female' ? 'Women' : 'Men'}: ${number(v)} years`,
+			format: (context, number) =>
+				`${context.series === 'female' ? 'Women' : 'Men'}: ${number(context.value)} years`,
 			decimals: 1
 		}
 	}

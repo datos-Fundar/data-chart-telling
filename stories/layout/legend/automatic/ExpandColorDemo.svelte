@@ -16,5 +16,5 @@
 	y="species"
 	color="count"
 	legend={{ color: { title: 'Penguins', width: 260, interactive: { enabled: true } } }}
-	styles={{ values: { format: (v: number) => `${v}` } }}
+	styles={{ values: { format: (context) => `${context.value}` } }}
 />

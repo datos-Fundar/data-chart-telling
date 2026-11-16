@@ -75,8 +75,8 @@ export const FacetValuesOneLayer: Story = {
 		facet: { by: 'scenario', values: ['Baseline', 'Optimistic'], columns: 2 },
 		tooltip: {
 			sync: true,
-			format: (f: GeoFeature, _number: unknown, { facet }: GeoSliceContext) =>
-				`${(f.properties as { name: string }).name} · ${facet?.value}`
+			format: (context) =>
+				`${(context.row.properties as { name: string }).name} · ${context.facet?.value}`
 		}
 	}
 };
@@ -107,8 +107,8 @@ export const FacetValuesOwnRamps: Story = {
 		},
 		tooltip: {
 			sync: true,
-			format: (f: GeoFeature, _number: unknown, { facet }: GeoSliceContext) =>
-				`${(f.properties as { name: string }).name} · ${facet?.value}`
+			format: (context) =>
+				`${(context.row.properties as { name: string }).name} · ${context.facet?.value}`
 		}
 	}
 };

@@ -172,6 +172,13 @@ On the markers that draw a shape for each row - `rect`, `bar`, `cell`, `waffle`,
 
 A color or an opacity the function returns is drawn as it is, not mapped through a scale. Where the function would only read a field, name the field: a number (`strokeWidth`, `fillOpacity`, an inset...) given as a string is the field of the rows, and so is a color when the rows have a field of that name - `fill: 'tint'` reads `row.tint`, but `fill: 'tomato'` is the color unless some row has a `tomato` field. A `text` marker does the same with `fill`, `fillOpacity`, `stroke`, `strokeWidth`, `fontWeight` and `fontStyle`; the other fields place and measure the labels, so they are one value for all. The markers that draw one shape for many rows (`line`, `area`, `density`, `hull`, a mesh) take plain values.
 
+Every function of the row a marker takes - a channel (`x`, `y`, `text`...), a field of `styles`, the `filter` of its transforms - gets what the plot knows of the row as its second argument: `(row, context) => value`. Over the plot's own rows, `context` holds their `series`, `x`, `y`, `value` and whatever the plot kind works out (a treemap tile's `share`, a sankey link's `start` and `end`); over a marker's own `data`, it holds the `row` alone. `context.index` is the row's place among the marker's rows. See [Row context](state.md#row-context).
+
+```ts
+{ type: 'text', x: (row, context) => context.start.column, y: (row, context) => context.start.y,
+  text: (row, context) => `${Math.round(context.sourceShare)}%` }
+```
+
 ## A label in each shape
 
 A marker writes a label on each of its shapes with `label`: in each bar, cell, rect or waffle by default, beside the points of a line, an area or a dot, or along an edge or a line, with every option of a `text` marker besides. A list of labels writes each of them.

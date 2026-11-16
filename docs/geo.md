@@ -11,7 +11,7 @@
 	color={(f) => Number(f.properties?.population)}
 	scales={{ color: { scheme: 'blues' } }}
 	coordinates={{ projection: { type: argentinaBicontinental } }}
-	tooltip={{ format: (f) => String(f.properties?.nombre) }}
+	tooltip={{ format: (context) => String(context.row.properties?.nombre) }}
 />
 ```
 
@@ -138,7 +138,7 @@ An `inset` draws part of the map (or other data) in its own small panel, such as
 			width: 0.25,
 			height: 0.25,
 			margin: 8,
-			tooltip: { format: (f) => String(f.properties.name) }
+			tooltip: { format: (context) => String(context.row.properties.name) }
 		}
 	]}
 />
@@ -166,7 +166,7 @@ Every callback that reads a feature gets the slice it is drawn in as its last ar
 	color={(f, { facet }) => valueFor(f.properties.name, facet?.value)}
 	tooltip={{
 		sync: true,
-		format: (f, number, { facet }) => `${f.properties.name} · ${facet?.value}`
+		format: (context) => `${context.row.properties.name} · ${context.facet?.value}`
 	}}
 	coordinates={{ projection: { type: 'mercator', domain: 'data' } }}
 />
@@ -176,4 +176,4 @@ The color ramp spans every panel and step, each read in its own slice, so colors
 
 ## Tooltip and hover
 
-`tooltip` works as on other plots with the hovered feature as the row (`format: (feature) => string`, or a `content` snippet). Add `{ type: 'geo-hover' }` for an in-map highlight. Hover matches the browser's own SVG hit-testing, so a feature is hovered where it is drawn.
+`tooltip` works as on other plots with the hovered feature as the row (`format: (context) => string`, `context.row` being the feature, or a `content` snippet). Add `{ type: 'geo-hover' }` for an in-map highlight. Hover matches the browser's own SVG hit-testing, so a feature is hovered where it is drawn.

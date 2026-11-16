@@ -129,7 +129,7 @@ const CASES: Case[] = [
 		props: {
 			data: ARGENTINA_PROVINCES,
 			featureId: PROVINCE,
-			tooltip: { format: PROVINCE },
+			tooltip: { format: (context: { row: { properties: unknown } }) => PROVINCE(context.row) },
 			markers: [{ type: 'geo-hover' }]
 		}
 	}

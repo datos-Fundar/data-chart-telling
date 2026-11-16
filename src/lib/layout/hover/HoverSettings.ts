@@ -69,10 +69,9 @@ export class HoverSettings<TRow extends Record<string, unknown>> {
 				...tooltip,
 				format: tooltip.format
 					? (row: TRow) =>
-							(tooltip.format as (row: TRow, number: unknown, context: PlotRowContext) => string)(
-								row,
-								number,
-								RowContext.of(row)
+							(tooltip.format as (context: PlotRowContext, number: unknown) => string)(
+								RowContext.of(row),
+								number
 							)
 					: format,
 				...(sort ? { sort } : {})

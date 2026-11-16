@@ -2,7 +2,6 @@ import { render } from 'vitest-browser-svelte';
 import { describe, expect, test } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import TreemapPlot from '$lib/plots/part-of-a-whole/treemap/Plot.svelte';
-import type { TreemapTooltipContext } from '$lib/types/plots/part-of-a-whole/treemap/props';
 import { waitForSvg } from '../../_helpers/svg';
 
 type Row = { sector: string; branch: string; kind: string; value: number };
@@ -304,8 +303,8 @@ describe('TreemapPlot - hovering a tile', () => {
 		const { container } = await render(TreemapPlot, {
 			...props,
 			tooltip: {
-				format: (row: Record<string, unknown>, _number: unknown, context: TreemapTooltipContext) =>
-					`${context.series} > ${row.branch} = ${row.value} = ${context.share.toFixed(0)}`
+				format: (context) =>
+					`${context.series} > ${context.row.branch} = ${context.row.value} = ${context.share.toFixed(0)}`
 			}
 		});
 		const svg = await waitForSvg(container);

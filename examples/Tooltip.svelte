@@ -14,6 +14,6 @@
 	x="date"
 	y="value"
 	color="region"
-	tooltip={{ strategy: 'x', format: (row) => `${row.region}: ${row.value}` }}
+	tooltip={{ strategy: 'x', format: (context) => `${context.row.region}: ${context.row.value}` }}
 	markers={[{ type: 'hover' }]}
 />

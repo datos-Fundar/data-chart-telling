@@ -56,8 +56,8 @@ export const CustomFormat: Story = {
 		tooltip: {
 			decimals: 0,
 			suffix: ' %',
-			format: (row, number, context) =>
-				`${context.series} › ${row.branch}\n${Number(row.value).toLocaleString()} M - ${number(context.share)} of the whole`
+			format: (context, number) =>
+				`${context.series} › ${context.row.branch}\n${Number(context.row.value).toLocaleString()} M - ${number(context.share)} of the whole`
 		}
 	}
 };
@@ -70,8 +70,7 @@ export const ShareIsComputed: Story = {
 	args: {
 		...BASE,
 		tooltip: {
-			format: (row, _number, context) =>
-				`${row.branch}: ${context.share.toFixed(1)}% of the economy`
+			format: (context) => `${context.row.branch}: ${context.share.toFixed(1)}% of the economy`
 		}
 	}
 };
@@ -84,7 +83,7 @@ export const PrecomputedPercentages: Story = {
 	args: {
 		...BASE,
 		data: PERCENTAGES,
-		tooltip: { format: (row, _number, context) => `${row.branch}: ${context.share.toFixed(1)}%` }
+		tooltip: { format: (context) => `${context.row.branch}: ${context.share.toFixed(1)}%` }
 	}
 };
 
@@ -94,7 +93,7 @@ export const NestedTooltip: Story = {
 		...BASE,
 		grouping: 'sector.kind.branch',
 		tooltip: {
-			format: (row) => `${row.sector} › ${row.kind}\n${row.branch}`
+			format: (context) => `${context.row.sector} › ${context.row.kind}\n${context.row.branch}`
 		}
 	}
 };

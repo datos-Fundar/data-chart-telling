@@ -40,7 +40,8 @@ describe('BarPlot - tooltip', () => {
 			series: [FEMALE],
 			tooltip: {
 				sync: false,
-				format: (row) => `${(row as ProvinceRow).province}: ${(row as ProvinceRow).value} yr`
+				format: (context) =>
+					`${(context.row as ProvinceRow).province}: ${(context.row as ProvinceRow).value} yr`
 			}
 		});
 		await waitForSvg(container);
@@ -54,8 +55,8 @@ describe('BarPlot - tooltip', () => {
 			series: [FEMALE, MALE],
 			tooltip: {
 				sync: false,
-				format: (row) =>
-					`${(row as ProvinceRow).province}: ${(row as ProvinceRow).value.toFixed(1)} yr`
+				format: (context) =>
+					`${(context.row as ProvinceRow).province}: ${(context.row as ProvinceRow).value.toFixed(1)} yr`
 			}
 		});
 		const svg = await waitForSvg(container);
@@ -70,7 +71,7 @@ describe('BarPlot - tooltip', () => {
 			tooltip: {
 				sync: false,
 				series: ['female'],
-				format: (row) => `Female: ${(row as ProvinceRow).value.toFixed(1)} yr`
+				format: (context) => `Female: ${(context.row as ProvinceRow).value.toFixed(1)} yr`
 			}
 		});
 		const svg = await waitForSvg(container);
@@ -87,7 +88,7 @@ describe('BarPlot - tooltip', () => {
 			color: 'sex',
 			tooltip: {
 				sync: false,
-				format: (row) => `${row.sex} (${row.province}): ${row.value} yr`
+				format: (context) => `${context.row.sex} (${context.row.province}): ${context.row.value} yr`
 			}
 		});
 		const svg = await waitForSvg(container);

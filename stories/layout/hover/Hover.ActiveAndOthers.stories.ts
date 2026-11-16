@@ -20,7 +20,7 @@ import { plotStory } from '../../common/plotStory';
 /**
  * `active` and `others` restyle the shapes themselves while the hover is on: the ones it reaches take
  * `active`, every other one `others` - `fill`, `fillOpacity`, `stroke`, `strokeWidth`, `strokeOpacity` and
- * `strokeDasharray`, a value or a function of the row. Nothing is drawn over the shapes, so their labels stay on
+ * `strokeDasharray`, a value or a function of what the plot knows of the row (its context). Nothing is drawn over the shapes, so their labels stay on
  * top, and a label with no color of its own is written in the one that reads best on the shape's new color.
  *
  * A plot's own shapes take them where its kind links them to the hover: a treemap's tiles, a heatmap's cells,
@@ -125,13 +125,16 @@ export const LollipopDots = plotStory(LollipopPlot, 'LollipopPlot', {
 	markers: [{ type: 'hover', active: { fill: '#dc2626' }, others: { fill: '#9ca3af' } }]
 });
 
-/** A style as a function of the row: the big branches fade less than the small ones. */
+/**
+ * A style as a function of what the plot knows of the row: the big branches fade less than the small ones, by
+ * each tile's share of the whole.
+ */
 export const FunctionOfTheRow = plotStory(TreemapPlot, 'TreemapPlot', {
 	...TREEMAP,
 	markers: [
 		{
 			type: 'hover',
-			others: { fillOpacity: (row: { value: number }) => (row.value > 10 ? 0.6 : 0.25) }
+			others: { fillOpacity: (context) => (context.share > 5 ? 0.6 : 0.25) }
 		}
 	]
 });

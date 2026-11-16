@@ -30,7 +30,7 @@ describe.each([['vertical', false] as const, ['horizontal', true] as const])(
 				tooltip: {
 					sync: false,
 					strategy: 'series',
-					format: (row) => `${(row as Row).series}:${(row as Row).value}`
+					format: (context) => `${(context.row as Row).series}:${(context.row as Row).value}`
 				}
 			});
 			const svg = await waitForSvg(container);

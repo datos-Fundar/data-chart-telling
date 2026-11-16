@@ -46,8 +46,8 @@ export const CustomFormat: Story = {
 	args: {
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { ageGroup, year, share } = row as AgeShareRow;
+			format: (context) => {
+				const { ageGroup, year, share } = context.row as AgeShareRow;
 				return `${ageGroup} in ${year}: ${share}%`;
 			}
 		}

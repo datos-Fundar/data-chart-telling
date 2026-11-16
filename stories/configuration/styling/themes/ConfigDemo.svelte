@@ -91,7 +91,7 @@
 					width: 180
 				}
 			]}
-			styles={{ values: { format: (v) => `${v}` } }}
+			styles={{ values: { format: (context) => `${context.value}` } }}
 		/>
 	</div>
 </div>

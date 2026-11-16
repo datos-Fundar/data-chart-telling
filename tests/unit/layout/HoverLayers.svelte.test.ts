@@ -186,7 +186,7 @@ describe('HoverLayers', () => {
 		expect(
 			HoverLayers.labelled(points, { type: 'hover', suffix: '%' }, cfg).map((p) => p.label)
 		).toEqual(['10%', '20%']);
-		const format = (p: { series?: string }) => `${p.series}!`;
+		const format = (context: { series?: string }) => `${context.series}!`;
 		expect(
 			HoverLayers.labelled(points, { type: 'hover', format }, cfg).map((p) => p.label)
 		).toEqual(['f!', 'm!']);

@@ -42,8 +42,8 @@ export const BasicTooltip: Story = {
 	args: {
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { country, gdp, life } = row as CountryYearRow;
+			format: (context) => {
+				const { country, gdp, life } = context.row as CountryYearRow;
 				return `${country}: $${(gdp / 1000).toFixed(1)}k, ${life.toFixed(1)} yr`;
 			}
 		}
@@ -55,8 +55,8 @@ export const RichFormat: Story = {
 	args: {
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { country, gdp, life, population } = row as CountryYearRow;
+			format: (context) => {
+				const { country, gdp, life, population } = context.row as CountryYearRow;
 				return `${country}\nGDP: $${(gdp / 1000).toFixed(1)}k · Life exp.: ${life.toFixed(1)} yr\nPop.: ${population}M`;
 			}
 		}
@@ -70,8 +70,8 @@ export const GroupedByContinent: Story = {
 		color: 'continent',
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { country, continent, life } = row as CountryYearRow;
+			format: (context) => {
+				const { country, continent, life } = context.row as CountryYearRow;
 				return `${country} (${continent}): ${life.toFixed(1)} yr`;
 			}
 		}
@@ -103,8 +103,8 @@ export const CustomAnchor: Story = {
 			sync: false,
 			anchorX: 'left',
 			anchorY: 'top',
-			format: (row) => {
-				const { country, gdp, life } = row as CountryYearRow;
+			format: (context) => {
+				const { country, gdp, life } = context.row as CountryYearRow;
 				return `${country}: $${(gdp / 1000).toFixed(1)}k, ${life.toFixed(1)} yr`;
 			}
 		}

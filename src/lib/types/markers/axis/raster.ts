@@ -4,9 +4,13 @@ import type { CommonMarkerConfigWithInterval } from '$lib/types/markers/channels
 export type RasterMarkerConfig = {
 	type: 'raster';
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	fill?: string | ((d: any) => unknown) | ((x: number, y: number) => unknown);
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	fillOpacity?: number | string | ((d: any) => number) | ((x: number, y: number) => number);
+	fill?: string | ((d: any, context?: any) => unknown) | ((x: number, y: number) => unknown);
+	fillOpacity?:
+		| number
+		| string
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		| ((d: any, context?: any) => number)
+		| ((x: number, y: number) => number);
 	width?: number;
 	height?: number;
 	pixelSize?: number;

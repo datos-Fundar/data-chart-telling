@@ -62,7 +62,7 @@ export const NoValueLabels: Story = {
 };
 
 /**
- * Custom value format - the `format(value)` callback controls how cell values
+ * Custom value format - the `format(context)` callback controls how cell values
  * are displayed. Here each count is shown followed by the unit.
  */
 export const CustomValueFormat: Story = {
@@ -75,7 +75,7 @@ export const CustomValueFormat: Story = {
 			color: { domain: [0, 120] }
 		},
 		styles: {
-			values: { format: (v: number) => `${v} penguins` }
+			values: { format: (context) => `${context.value} penguins` }
 		} satisfies AxisBasedStylesConfig
 	}
 };
@@ -96,7 +96,7 @@ export const OnlyTheLargest: Story = {
 				anchor: 'top',
 				side: 'above',
 				select: 'max',
-				format: (v: number) => `${v} penguins`
+				format: (context) => `${context.value} penguins`
 			}
 		}
 	}

@@ -30,8 +30,8 @@ describe('HeatmapPlot - tooltip', () => {
 			...DATA_PROPS,
 			tooltip: {
 				sync: false,
-				format: (row) => {
-					const { island, species, count } = row as PenguinSpeciesCount;
+				format: (context) => {
+					const { island, species, count } = context.row as PenguinSpeciesCount;
 					return `${island} - ${species}: ${count} penguins`;
 				}
 			}
@@ -47,8 +47,8 @@ describe('HeatmapPlot - tooltip', () => {
 			...DATA_PROPS,
 			tooltip: {
 				sync: false,
-				format: (row) => {
-					const { island, species, count } = row as PenguinSpeciesCount;
+				format: (context) => {
+					const { island, species, count } = context.row as PenguinSpeciesCount;
 					return `${island} - ${species}: ${count} penguins`;
 				}
 			}
@@ -72,8 +72,8 @@ describe('HeatmapPlot - tooltip', () => {
 			],
 			tooltip: {
 				sync: false,
-				format: (row) => {
-					const { island, count } = row as PenguinSpeciesCount;
+				format: (context) => {
+					const { island, count } = context.row as PenguinSpeciesCount;
 					return `${island}: ${count} penguins`;
 				}
 			}

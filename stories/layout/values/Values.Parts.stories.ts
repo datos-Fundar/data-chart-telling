@@ -2,7 +2,6 @@ import type { Meta } from '@storybook/svelte-vite';
 import BoxPlot from '$lib/plots/distribution/box/Plot.svelte';
 import BulletPlot from '$lib/plots/ranking/bullet/Plot.svelte';
 import ForestPlot from '$lib/plots/ranking/forest/Plot.svelte';
-import type { PlotRowContext } from '$lib';
 import { INFLATION_RANGES, IRIS, PROVINCE_LIFE } from '$datasets';
 import { plotStory } from '../../common/plotStory';
 
@@ -51,8 +50,12 @@ export const OwnOptionsPerPart = plotStory(BoxPlot, 'BoxPlot', {
 	styles: {
 		area: { fillOpacity: 0.4 },
 		values: {
-			parts: { min: true, median: { format: (v: number) => `median ${v} cm` }, max: true },
-			format: (v: number, _number: unknown, { part }: PlotRowContext) => `${part} ${v}`
+			parts: {
+				min: true,
+				median: { format: (context) => `median ${context.value} cm` },
+				max: true
+			},
+			format: (context) => `${context.part} ${context.value}`
 		}
 	}
 });

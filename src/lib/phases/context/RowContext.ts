@@ -37,6 +37,14 @@ export class RowContext {
 		return { ...(typeof series === 'string' ? { series } : {}), row } as TContext;
 	}
 
+	/** What the plot knows of `row` ({@link of}), with its place among the rows a marker draws. */
+	static at<TContext extends PlotRowContext = PlotRowContext>(
+		row: unknown,
+		index: number
+	): TContext {
+		return { ...RowContext.of<TContext>(row), index };
+	}
+
 	/** The key a row's context is kept under: no scale reads it, so a copy of a row with a new context is no new row to them. */
 	static readonly key: symbol = KEY;
 

@@ -95,7 +95,7 @@ const CASES: { name: string; component: Component<never>; props: Record<string, 
 		props: {
 			data: ARGENTINA_PROVINCES,
 			featureId: PROVINCE,
-			tooltip: { format: PROVINCE },
+			tooltip: { format: (context: { row: { properties: unknown } }) => PROVINCE(context.row) },
 			markers: [{ type: 'geo-hover' }]
 		}
 	}

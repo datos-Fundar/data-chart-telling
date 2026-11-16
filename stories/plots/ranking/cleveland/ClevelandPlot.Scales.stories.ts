@@ -110,7 +110,7 @@ export const SortedByLastCensus: Story = {
 			values: {
 				show: true,
 				select: 'last',
-				format: (value: number) => `${value}%`
+				format: (context) => `${context.value}%`
 			}
 		} satisfies ConnectorBasedStylesConfig
 	}

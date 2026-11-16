@@ -105,8 +105,7 @@ describe('SankeyPlot - the nodes as the series', () => {
 		const ran = run(GRAPH, {
 			styles: {
 				links: {
-					fill: (_: unknown, link: SankeyRowContext) =>
-						link.source === 'Interior' ? 'target' : '#123456'
+					fill: (link: SankeyRowContext) => (link.source === 'Interior' ? 'target' : '#123456')
 				}
 			}
 		});
@@ -229,7 +228,7 @@ describe('SankeyPlot - its labels', () => {
 		const ran = run(GRAPH, {
 			styles: {
 				values: {
-					format: (_: number, __: unknown, context: SankeyRowContext) =>
+					format: (context: SankeyRowContext) =>
 						`${context.incoming.length}/${context.outgoing.length}`
 				}
 			}

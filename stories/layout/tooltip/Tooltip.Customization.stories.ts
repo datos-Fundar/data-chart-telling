@@ -34,9 +34,9 @@ export const CustomFormat: Story = {
 		color: 'metric' as keyof CountryTrendRow,
 		tooltip: {
 			strategy: 'x',
-			format: (row) => {
-				const r = row as unknown as CountryTrendRow;
-				return `${r.metric} · ${r.year}\nIndex ${r.value}`;
+			format: (context) => {
+				const trend = context.row as unknown as CountryTrendRow;
+				return `${trend.metric} · ${trend.year}\nIndex ${trend.value}`;
 			}
 		},
 		markers: [{ type: 'hover' }]

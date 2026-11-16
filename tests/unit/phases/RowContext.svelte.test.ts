@@ -122,13 +122,13 @@ describe('the row context', () => {
 			y: 'y',
 			color: 'region',
 			tooltip: {
-				format: (_row: Row, _number: unknown, context: { series?: string; value?: number }) =>
+				format: (context: { series?: string; value?: number }) =>
 					`${context.series}=${context.value}`
 			},
 			styles: {
 				values: {
 					show: true,
-					format: (_value: number, _number: unknown, context: { series?: string }) => {
+					format: (context: { series?: string }) => {
 						seen.push(context.series);
 						return '';
 					}

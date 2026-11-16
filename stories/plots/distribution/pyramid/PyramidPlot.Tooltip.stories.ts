@@ -45,8 +45,8 @@ export const BasicTooltip: Story = {
 		scales: { y: { domain: AGE_GROUPS } },
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { ageGroup, sex, share } = row as AgeRow;
+			format: (context) => {
+				const { ageGroup, sex, share } = context.row as AgeRow;
 				return `${sex} - ${ageGroup}: ${share}%`;
 			}
 		}
@@ -66,8 +66,8 @@ export const RichFormat: Story = {
 		scales: { y: { domain: AGE_GROUPS } },
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { ageGroup, sex, share } = row as AgeRow;
+			format: (context) => {
+				const { ageGroup, sex, share } = context.row as AgeRow;
 				return `${sex}\nAge Group: ${ageGroup}\nPopulation: ${share.toFixed(2)}%`;
 			}
 		}
@@ -87,8 +87,8 @@ export const ComputedFormat: Story = {
 		scales: { y: { domain: AGE_GROUPS } },
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { ageGroup, sex, share } = row as AgeRow;
+			format: (context) => {
+				const { ageGroup, sex, share } = context.row as AgeRow;
 				const baselinePct = 3.0;
 				const ratio = (share / baselinePct).toFixed(2);
 				return `${sex} (${ageGroup}): ${share.toFixed(2)}% (${ratio}× baseline)`;
@@ -112,8 +112,8 @@ export const FemaleOnly: Story = {
 		tooltip: {
 			sync: false,
 			series: ['Female'],
-			format: (row) => {
-				const { ageGroup, share } = row as AgeRow;
+			format: (context) => {
+				const { ageGroup, share } = context.row as AgeRow;
 				return `Female - ${ageGroup}: ${share.toFixed(2)}%`;
 			}
 		}
@@ -133,8 +133,8 @@ export const MaleOnly: Story = {
 		tooltip: {
 			sync: false,
 			series: ['Male'],
-			format: (row) => {
-				const { ageGroup, share } = row as AgeRow;
+			format: (context) => {
+				const { ageGroup, share } = context.row as AgeRow;
 				return `Male - ${ageGroup}: ${share.toFixed(2)}%`;
 			}
 		}
@@ -154,8 +154,8 @@ export const BothSidesFormatted: Story = {
 		scales: { y: { domain: AGE_GROUPS } },
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { sex, ageGroup, share } = row as AgeRow;
+			format: (context) => {
+				const { sex, ageGroup, share } = context.row as AgeRow;
 				const sexEmoji = sex === 'Female' ? '♀' : '♂';
 				return `${sexEmoji} ${sex}\n${ageGroup}: ${share.toFixed(2)}%`;
 			}
@@ -176,8 +176,8 @@ export const CohortPercentage: Story = {
 		scales: { y: { domain: AGE_GROUPS } },
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { sex, ageGroup, share } = row as AgeRow;
+			format: (context) => {
+				const { sex, ageGroup, share } = context.row as AgeRow;
 				return `${sex} (${ageGroup})\n${share.toFixed(2)}% of population`;
 			}
 		}
@@ -219,8 +219,8 @@ export const CustomAnchor: Story = {
 			sync: false,
 			anchorX: 'left',
 			anchorY: 'top',
-			format: (row) => {
-				const { ageGroup, sex, share } = row as AgeRow;
+			format: (context) => {
+				const { ageGroup, sex, share } = context.row as AgeRow;
 				return `${sex} - ${ageGroup}: ${share}%`;
 			}
 		}

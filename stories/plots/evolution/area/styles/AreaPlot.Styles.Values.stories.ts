@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import type { PlotRowContext } from '$lib';
 import AreaPlot from '$lib/plots/evolution/area/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import { AGE_SHARES_BY_YEAR, HEIGHT_DENSITY } from '$datasets';
@@ -54,19 +53,19 @@ export const Stacked: Story = {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number, _number: unknown, context: PlotRowContext) => `${context.series} ${v}%`
+				format: (context) => `${context.series} ${context.value}%`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
 };
 
-/** `format(value, seriesName)` returns each label's text. */
+/** `format(context)` returns each label's text, from the labelled row's `value` and `series`. */
 export const CustomFormat: Story = {
 	args: {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number, _number: unknown, context: PlotRowContext) => `${context.series}: ${v}%`
+				format: (context) => `${context.series}: ${context.value}%`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -78,7 +77,7 @@ export const CustomConnector: Story = {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number, _number: unknown, context: PlotRowContext) => `${context.series} ${v}%`,
+				format: (context) => `${context.series} ${context.value}%`,
 				strokeStyle: { stroke: '#7c3aed', strokeWidth: 1, strokeDasharray: '2 2' }
 			}
 		} satisfies AxisBasedStylesConfig
@@ -92,7 +91,7 @@ export const HoverIsolate: Story = {
 			values: {
 				show: true,
 				hoverIsolate: true,
-				format: (v: number, _number: unknown, context: PlotRowContext) => `${context.series} ${v}%`
+				format: (context) => `${context.series} ${context.value}%`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -130,8 +129,7 @@ export const OverEachCurve: Story = {
 			values: {
 				layout: 'path',
 				offset: 'max',
-				format: (_value: number, _number: unknown, { series }: PlotRowContext) =>
-					series === 'female' ? 'Women' : 'Men',
+				format: (context) => (context.series === 'female' ? 'Women' : 'Men'),
 				fontStyle: { fontSize: 13, fontWeight: 'bold' }
 			}
 		}

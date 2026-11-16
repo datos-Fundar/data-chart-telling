@@ -23,7 +23,7 @@ A plot becomes interactive when it is given a `tooltip`, a `{ type: 'hover' }` m
 	x="date"
 	y="value"
 	color="region"
-	tooltip={{ strategy: 'x', format: (row) => `${row.region}: ${row.value}` }}
+	tooltip={{ strategy: 'x', format: (context) => `${context.row.region}: ${context.row.value}` }}
 	markers={[{ type: 'hover' }]}
 />
 ```
@@ -38,12 +38,12 @@ A plot becomes interactive when it is given a `tooltip`, a `{ type: 'hover' }` m
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `strategy`           | How related points are found: `'x'`, `'y'`, `'punctual'` (the exact point) or `'series'` (all points of the hovered series). Defaults per plot kind                                                                                                                                                                                                                |
 | `sync`               | Show the highlight in every synced plot too (default `false`)                                                                                                                                                                                                                                                                                                      |
-| `format`             | `(row) => string` - the tooltip text for the hovered row (`\n` breaks lines). With several rows, they read from the highest value to the lowest (a stacked row by its own value)                                                                                                                                                                                   |
+| `format`             | `(context) => string` - the tooltip text for the hovered row (`\n` breaks lines), from what the plot knows of it (`context.row` is the row). With several rows, they read from the highest value to the lowest (a stacked row by its own value)                                                                                                                    |
 | `content`            | A snippet `{#snippet content({ rows })}` replacing the text with custom markup. It gets the rows as the hover matched them, unsorted, each one your row plus a `seriesColor`: the one the plot draws it in (the series color, from `scales.color` or the palette). It is drawn in a plain card, so the markup brings its own order, background, colors and spacing |
 | `series`             | Only these series appear in the tooltip                                                                                                                                                                                                                                                                                                                            |
 | `anchorX`, `anchorY` | Preferred side of the cursor: `'left' \| 'middle' \| 'right'` (default `'right'`) and `'top' \| 'middle' \| 'bottom'` (default `'bottom'`). It moves to the other side when it would overflow                                                                                                                                                                      |
 
-`decimals`, `prefix`, `suffix` and `signDisplay` ([Number format](theming.md#number-format)) write the value the default text shows - the one on the value axis, the `x` of horizontal bars - and a heatmap's color value. A custom `format` gets a second argument, `number`, that writes a number the same way: `format: (row, number) => `${row.region}: ${number(row.value)}``. Its third, `context`, is what the plot knows of the row: the `series`it is drawn in, its`x`, `y`and`value`, and what its kind works out - a [treemap](plots/part-of-a-whole/treemap.md)'s `share`, a histogram's bin edges, a box's quartiles (see [Row context](state.md#row-context)).
+`decimals`, `prefix`, `suffix` and `signDisplay` ([Number format](theming.md#number-format)) write the value the default text shows - the one on the value axis, the `x` of horizontal bars - and a heatmap's color value. A custom `format` gets `context`, what the plot knows of the row: the `row` itself, the `series` it is drawn in, its `x`, `y` and `value`, and what its kind works out - a [treemap](plots/part-of-a-whole/treemap.md)'s `share`, a histogram's bin edges, a box's quartiles (see [Row context](state.md#row-context)). Its second argument, `number`, writes a number the same way: `format: (context, number) => `${context.row.region}: ${number(context.value)}``.
 
 <!-- example: examples/CustomTooltip.svelte -->
 
@@ -128,7 +128,7 @@ The marker's own fields are laid over the plot's:
 
 - `back` and `front` are lists of markers - any but another `hover`, a `component` too - that replace the plot's when set; `back: []` draws nothing behind.
 - `active` and `others` restyle the shapes (see [Restyling the hovered shapes](#restyling-the-hovered-shapes)), field by field over the plot's.
-- `strategy`, `sync`, `series` and `scope` say what it reaches, as for a tooltip, and the number fields `decimals`, `prefix`, `suffix` and `signDisplay` (or `format(point, number)`) write each point's label.
+- `strategy`, `sync`, `series` and `scope` say what it reaches, as for a tooltip, and the number fields `decimals`, `prefix`, `suffix` and `signDisplay` (or `format(context, number)`, from what the plot knows of the point's row) write each point's label.
 
 ```svelte
 <!-- A band behind the hovered category, and a dot and its value on each bar. -->

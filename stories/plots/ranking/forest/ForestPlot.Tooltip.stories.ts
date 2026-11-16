@@ -48,8 +48,8 @@ export const CustomFormat: Story = {
 	args: {
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { period, mean, min, max } = row as InflationRange;
+			format: (context) => {
+				const { period, mean, min, max } = context.row as InflationRange;
 				return `${period}: ${mean}% (${min} to ${max})`;
 			}
 		}

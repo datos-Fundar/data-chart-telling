@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import type { PlotRowContext } from '$lib';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import type { Series } from '$lib/types/plots/data/common';
 import type { AxisBasedStylesConfig, BarValueLabel, WithValues } from '$lib/types/layout/styles';
@@ -98,7 +97,7 @@ export const PathPastTheTip: Story = {
 				layout: 'path',
 				edge: 'tip',
 				side: 'outside',
-				format: (v: number) => `${v.toFixed(1)} yr`
+				format: (context) => `${context.value.toFixed(1)} yr`
 			}
 		} satisfies BarStyles
 	}
@@ -112,7 +111,7 @@ export const BoxTop: Story = {
 			values: {
 				layout: 'box',
 				anchor: 'top',
-				format: (v: number) => `${v.toFixed(1)} yr`,
+				format: (context) => `${context.value.toFixed(1)} yr`,
 				fontStyle: { fill: 'white' }
 			}
 		} satisfies BarStyles
@@ -129,7 +128,7 @@ export const BoxMiddle: Story = {
 		styles: {
 			values: {
 				layout: 'box',
-				format: (v: number) => `${v.toFixed(1)} yr`
+				format: (context) => `${context.value.toFixed(1)} yr`
 			}
 		} satisfies BarStyles
 	}
@@ -144,7 +143,7 @@ export const PathInsideTheBase: Story = {
 				layout: 'path',
 				edge: 'base',
 				side: 'inside',
-				format: (v: number) => `${v.toFixed(1)} yr`,
+				format: (context) => `${context.value.toFixed(1)} yr`,
 				fontStyle: { fill: 'white' }
 			}
 		} satisfies BarStyles
@@ -164,16 +163,16 @@ export const PointAtTheTop: Story = {
 				anchor: 'top',
 				side: 'above',
 				select: 'max',
-				format: (v: number) => `max: ${v.toFixed(1)} yr`
+				format: (context) => `max: ${context.value.toFixed(1)} yr`
 			}
 		} satisfies BarStyles
 	}
 };
 
 /**
- * Custom format - the `format(value, seriesName)` callback receives the
- * numeric Y value and the series name. Return any string to override the
- * default `"${seriesName} - ${value}"` label.
+ * Custom format - the `format(context)` callback receives what the plot knows
+ * of the labelled row: its `value`, its `series`, its `row`... Return any string
+ * to override the default label.
  */
 export const CustomFormat: Story = {
 	args: {
@@ -181,8 +180,7 @@ export const CustomFormat: Story = {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number, _number: unknown, context: PlotRowContext) =>
-					`${context.series} → ${v.toFixed(1)} yr`
+				format: (context) => `${context.series} → ${context.value.toFixed(1)} yr`
 			}
 		} satisfies BarStyles
 	}
@@ -198,7 +196,7 @@ export const CustomGap: Story = {
 		styles: {
 			values: {
 				gap: 12,
-				format: (v: number) => `${v.toFixed(1)} yr`
+				format: (context) => `${context.value.toFixed(1)} yr`
 			}
 		} satisfies BarStyles
 	}
@@ -215,8 +213,7 @@ export const TwoSeriesWithLabels: Story = {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number, _number: unknown, context: PlotRowContext) =>
-					`${context.series} (${v.toFixed(1)})`
+				format: (context) => `${context.series} (${context.value.toFixed(1)})`
 			}
 		} satisfies BarStyles
 	}
@@ -232,8 +229,7 @@ export const TwoSeriesLabelsMiddle: Story = {
 		styles: {
 			values: {
 				layout: 'box',
-				format: (v: number, _number: unknown, context: PlotRowContext) =>
-					`${context.series}: ${v.toFixed(1)} yr`
+				format: (context) => `${context.series}: ${context.value.toFixed(1)} yr`
 			}
 		} satisfies BarStyles
 	}
@@ -249,8 +245,7 @@ export const TwoSeriesGroupedLabelsMiddle: Story = {
 		styles: {
 			values: {
 				layout: 'box',
-				format: (v: number, _number: unknown, context: PlotRowContext) =>
-					`${context.series}\n(${v.toFixed(1)} yr)`
+				format: (context) => `${context.series}\n(${context.value.toFixed(1)} yr)`
 			}
 		} satisfies BarStyles
 	}
@@ -265,8 +260,7 @@ export const TwoSeriesStackedLabelsMiddle: Story = {
 		series: [FEMALE, MALE],
 		styles: {
 			values: {
-				format: (v: number, _number: unknown, context: PlotRowContext) =>
-					`${context.series}\n(${v.toFixed(1)} yr)`
+				format: (context) => `${context.series}\n(${context.value.toFixed(1)} yr)`
 			}
 		} satisfies BarStyles,
 		transforms: [{ type: 'stackY' as const }]

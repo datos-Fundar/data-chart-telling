@@ -15,13 +15,13 @@ export type BandMarkerConfig = {
 	 * row gives each row's own.
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	value: AxisValue | string | (AxisValue | string)[] | ((d: any) => AxisValue);
+	value: AxisValue | string | (AxisValue | string)[] | ((d: any, context?: any) => AxisValue);
 	/**
 	 * The part of the band it fills, as the fractions of its width left out at its start and its end (a grouped
 	 * bar's series' slice). A function of the row gives each row's own; a band several rows share fills what all of
 	 * them do. Unset, the whole band.
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	slice?: BandSlice | ((d: any) => BandSlice | undefined);
+	slice?: BandSlice | ((d: any, context?: any) => BandSlice | undefined);
 	styles?: PerRow<AreaStyle>;
 } & Omit<CommonMarkerConfig, 'x' | 'y'>;

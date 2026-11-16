@@ -20,10 +20,10 @@ A label writes the value it labels - its row context's `value` - as `decimals`, 
 styles: { values: { decimals: 1, signDisplay: 'always', suffix: ' yrs' } }
 ```
 
-`format(value, number, context)` writes anything else. `number` writes a value as the fields above ask; `context` is what the plot knows of the labelled row (see [Row context](state.md#row-context)): its `series`, its `row` with the other fields of the data, and what the plot kind works out, such as a histogram bin's `count` or a treemap tile's `share`.
+`format(context, number)` writes anything else. `context` is what the plot knows of the labelled row (see [Row context](state.md#row-context)): the `value` the label writes, its `series`, its `row` with the other fields of the data, and what the plot kind works out, such as a histogram bin's `count` or a treemap tile's `share`; `number` writes a value as the fields above ask.
 
 ```ts
-format: (value, number, { series, row }) => `${row.country}: ${number(value)}`;
+format: (context, number) => `${context.row.country}: ${number(context.value)}`;
 ```
 
 ## Which values of a row
@@ -42,7 +42,7 @@ Each part is written beside its shape at its own value: a box's beside the box, 
 
 ```ts
 styles: { values: { parts: ['median'] } }
-styles: { values: { parts: { median: true, max: { format: (v) => `max ${v}` } }, series: 'virginica' } }
+styles: { values: { parts: { median: true, max: { format: (context) => `max ${context.value}` } }, series: 'virginica' } }
 ```
 
 Its type takes only the parts of the plot, and `format`'s `context.part` names the one written. A worked-out part - a quartile - is rounded to two decimals first.

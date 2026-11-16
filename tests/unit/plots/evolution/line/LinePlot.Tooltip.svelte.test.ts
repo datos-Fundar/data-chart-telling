@@ -48,7 +48,7 @@ describe('LinePlot - tooltip', () => {
 			width: 400,
 			height: 300,
 			series: [MALE, FEMALE],
-			tooltip: { strategy: 'x', format: (row) => String((row as LifeRow).value) }
+			tooltip: { strategy: 'x', format: (context) => String((context.row as LifeRow).value) }
 		});
 		await hoverCenterAndReadTooltip(container);
 		const lines = container.querySelector('.dct-tooltip')!.textContent!.trim().split('\n');
@@ -70,7 +70,8 @@ describe('LinePlot - tooltip', () => {
 			series: [FEMALE],
 			tooltip: {
 				sync: false,
-				format: (row) => `${(row as LifeRow).year}: ${(row as LifeRow).value} yr`
+				format: (context) =>
+					`${(context.row as LifeRow).year}: ${(context.row as LifeRow).value} yr`
 			}
 		});
 		await waitForSvg(container);
@@ -84,7 +85,8 @@ describe('LinePlot - tooltip', () => {
 			series: [FEMALE, MALE],
 			tooltip: {
 				sync: false,
-				format: (row) => `${(row as LifeRow).year}: ${(row as LifeRow).value.toFixed(1)} yr`
+				format: (context) =>
+					`${(context.row as LifeRow).year}: ${(context.row as LifeRow).value.toFixed(1)} yr`
 			}
 		});
 		const svg = await waitForSvg(container);
@@ -99,7 +101,7 @@ describe('LinePlot - tooltip', () => {
 			tooltip: {
 				sync: false,
 				series: ['female'],
-				format: (row) => `Female: ${(row as LifeRow).value.toFixed(1)} yr`
+				format: (context) => `Female: ${(context.row as LifeRow).value.toFixed(1)} yr`
 			}
 		});
 		const svg = await waitForSvg(container);
@@ -116,7 +118,7 @@ describe('LinePlot - tooltip', () => {
 			color: 'sex',
 			tooltip: {
 				sync: false,
-				format: (row) => `${row.sex} (${row.year}): ${row.value} yr`
+				format: (context) => `${context.row.sex} (${context.row.year}): ${context.row.value} yr`
 			}
 		});
 		const svg = await waitForSvg(container);
@@ -132,7 +134,8 @@ describe('LinePlot - tooltip anchor placement', () => {
 			series: [FEMALE, MALE],
 			tooltip: {
 				sync: false,
-				format: (row) => `${(row as LifeRow).year}: ${(row as LifeRow).value.toFixed(1)} yr`
+				format: (context) =>
+					`${(context.row as LifeRow).year}: ${(context.row as LifeRow).value.toFixed(1)} yr`
 			}
 		});
 		const { cursorX, cursorY, left, top } = await hoverCenterAndReadTooltip(container);
@@ -148,7 +151,8 @@ describe('LinePlot - tooltip anchor placement', () => {
 			tooltip: {
 				sync: false,
 				anchorX: 'left',
-				format: (row) => `${(row as LifeRow).year}: ${(row as LifeRow).value.toFixed(1)} yr`
+				format: (context) =>
+					`${(context.row as LifeRow).year}: ${(context.row as LifeRow).value.toFixed(1)} yr`
 			}
 		});
 		const { cursorX, left } = await hoverCenterAndReadTooltip(container);
@@ -163,7 +167,8 @@ describe('LinePlot - tooltip anchor placement', () => {
 			tooltip: {
 				sync: false,
 				anchorY: 'top',
-				format: (row) => `${(row as LifeRow).year}: ${(row as LifeRow).value.toFixed(1)} yr`
+				format: (context) =>
+					`${(context.row as LifeRow).year}: ${(context.row as LifeRow).value.toFixed(1)} yr`
 			}
 		});
 		const { cursorY, top } = await hoverCenterAndReadTooltip(container);
@@ -178,7 +183,8 @@ describe('LinePlot - tooltip anchor placement', () => {
 			tooltip: {
 				sync: false,
 				anchorY: 'bottom',
-				format: (row) => `${(row as LifeRow).year}: ${(row as LifeRow).value.toFixed(1)} yr`
+				format: (context) =>
+					`${(context.row as LifeRow).year}: ${(context.row as LifeRow).value.toFixed(1)} yr`
 			}
 		});
 		const { cursorY, top } = await hoverCenterAndReadTooltip(container);

@@ -33,7 +33,6 @@ export { default as AbstractPlot } from './layout/plot/AbstractPlot.svelte';
 export { default as BasePlotLayout } from './layout/base/BasePlotLayout.svelte';
 export { usePlot, useFigure } from './layout/plot/usePlot';
 // What a plot knows of each row it draws, which every format reads.
-export { RowContext } from './phases/context/RowContext';
 export type { PlotRowContext, KindRowContext } from './types/layout/context';
 export type { ContextStageOptions } from './types/phases/context/phase';
 export type { BoxRowContext, BoxSummary } from './types/plots/distribution/box/props';

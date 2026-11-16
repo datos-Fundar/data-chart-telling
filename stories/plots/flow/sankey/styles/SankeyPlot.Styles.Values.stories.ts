@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import SankeyPlot from '$lib/plots/flow/sankey/Plot.svelte';
 import { PENGUIN_COUNTS_BY_SEX } from '$datasets';
-import type { SankeyRowContext } from '$lib/types/plots/flow/sankey/props';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A sankey's node labels: `styles.values` says where they sit and what they
@@ -55,10 +54,8 @@ export const LabelFormat: Story = {
 	args: {
 		styles: {
 			values: {
-				format: (value, number, context) => {
-					const { incoming, outgoing } = context as SankeyRowContext;
-					return `${number(value)} (${incoming.length} in, ${outgoing.length} out)`;
-				}
+				format: (context, number) =>
+					`${number(context.value)} (${context.incoming.length} in, ${context.outgoing.length} out)`
 			}
 		}
 	}
@@ -72,8 +69,7 @@ export const ColumnShares: Story = {
 	args: {
 		styles: {
 			values: {
-				format: (value, number, context) =>
-					`${number(value)} (${Math.round((context as SankeyRowContext).share!)}%)`
+				format: (context, number) => `${number(context.value)} (${Math.round(context.share!)}%)`
 			}
 		}
 	}
@@ -88,15 +84,16 @@ export const LinkShares: Story = {
 	args: {
 		styles: {
 			values: {
-				format: (value, number, context) => {
-					const { column, incoming, outgoing } = context as SankeyRowContext;
+				format: (context, number) => {
 					const parts =
-						column === 'species'
-							? outgoing.map((link) => `${Math.round(link.sourceShare!)}% ${link.target}`)
-							: column === 'island'
-								? incoming.map((link) => `${Math.round(link.targetShare!)}% ${link.source}`)
+						context.column === 'species'
+							? context.outgoing.map((link) => `${Math.round(link.sourceShare!)}% ${link.target}`)
+							: context.column === 'island'
+								? context.incoming.map((link) => `${Math.round(link.targetShare!)}% ${link.source}`)
 								: [];
-					return parts.length ? `${number(value)}: ${parts.join(', ')}` : number(value);
+					return parts.length
+						? `${number(context.value)}: ${parts.join(', ')}`
+						: number(context.value);
 				}
 			}
 		}

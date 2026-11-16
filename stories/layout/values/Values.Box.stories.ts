@@ -2,7 +2,6 @@ import type { Meta } from '@storybook/svelte-vite';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import HeatmapPlot from '$lib/plots/correlation/heatmap/Plot.svelte';
 import { FEMALE_PROVINCE_VALUES, MONTHS, REGION_VALUES } from '$datasets';
-import type { PlotRowContext } from '$lib';
 import { plotStory } from '../../common/plotStory';
 
 /**
@@ -68,8 +67,8 @@ export const FittedToItsBox = plotStory(BarPlot, 'BarPlot', {
 	styles: {
 		values: {
 			layout: 'box',
-			format: (v: number, _number: unknown, { row }: PlotRowContext) =>
-				`${(row as { province: string }).province}: ${v} years`
+			format: (context) =>
+				`${(context.row as { province: string }).province}: ${context.value} years`
 		}
 	}
 });

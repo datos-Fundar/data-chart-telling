@@ -2,10 +2,40 @@ import { MarkerKinds } from '$lib/markers/MarkerKinds';
 import { Transforms } from '$lib/phases/transforms/Transforms';
 import { MarkerGrouping } from '$lib/phases/statistics/MarkerGrouping';
 import { SERIES_ID_KEY, SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
+import { RowContext } from '$lib/phases/context/RowContext';
 import type { ProcessedData } from '$lib/types/phases';
 import type { ScopedMarkerGroup } from '$lib/types/layout/geometry';
 
 type Row = Record<string, unknown>;
+
+/** The props of a marker that read its rows: each a value, or a function of the row. */
+const ROW_PROPS = [
+	'x',
+	'y',
+	'x1',
+	'x2',
+	'y1',
+	'y2',
+	'y3',
+	'y4',
+	'value',
+	'text',
+	'r',
+	'opacity',
+	'color',
+	'symbol',
+	'length',
+	'rotate',
+	'grouping',
+	'dx',
+	'dy',
+	'textAnchor',
+	'lineAnchor',
+	'title',
+	'href'
+] as const;
+
+type RowFunction = (row: unknown, context: unknown) => unknown;
 
 /** Kinds that handle `scope: 'segment'` themselves, at render time. */
 const RENDER_SCOPED_KINDS = new Set(['component', 'hover']);
@@ -41,6 +71,43 @@ export class AuthorMarkers {
 				Transforms.resolve(own, rows)
 			);
 		});
+	}
+
+	/**
+	 * `marker` with every function of its rows - its channels, its `styles` and its transforms' `filter` - given what
+	 * the plot knows of each row besides the row itself: `(row, context)`, the row's place among the marker's in
+	 * `context.index`.
+	 */
+	static withContext<T extends object>(marker: T): T {
+		const own = marker as T & {
+			styles?: Record<string, unknown>;
+			transforms?: { filter?: unknown }[];
+		};
+		const read = (fn: unknown) =>
+			typeof fn === 'function'
+				? (row: unknown, index?: number) =>
+						(fn as RowFunction)(
+							row,
+							index === undefined ? RowContext.of(row) : RowContext.at(row, index)
+						)
+				: fn;
+		const next: Record<string, unknown> = { ...own };
+		for (const key of ROW_PROPS) {
+			if (typeof next[key] === 'function') next[key] = read(next[key]);
+		}
+		if (own.styles) {
+			next.styles = Object.fromEntries(
+				Object.entries(own.styles).map(([key, value]) => [key, read(value)])
+			);
+		}
+		if (own.transforms) {
+			next.transforms = own.transforms.map((transform) =>
+				typeof transform.filter === 'function'
+					? { ...transform, filter: read(transform.filter) }
+					: transform
+			);
+		}
+		return next as T;
 	}
 
 	/**

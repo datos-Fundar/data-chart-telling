@@ -60,8 +60,8 @@ export const BasicTooltip: Story = {
 		],
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { year, value } = row as LifeRow;
+			format: (context) => {
+				const { year, value } = context.row as LifeRow;
 				return `${year}: ${value} yr`;
 			}
 		}
@@ -85,8 +85,8 @@ export const RichFormat: Story = {
 		],
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { year, value } = row as LifeRow;
+			format: (context) => {
+				const { year, value } = context.row as LifeRow;
 				return `Year: ${year}\nLife expectancy: ${value.toFixed(1)} yr`;
 			}
 		}
@@ -109,8 +109,8 @@ export const ComputedFormat: Story = {
 		],
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { year, value } = row as LifeRow;
+			format: (context) => {
+				const { year, value } = context.row as LifeRow;
 				const delta = (value - 80).toFixed(1);
 				const sign = value >= 80 ? '+' : '';
 				return `${year}: ${value.toFixed(1)} yr (${sign}${delta} vs 80)`;
@@ -142,8 +142,8 @@ export const TwoSeries: Story = {
 		],
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { year, value } = row as LifeRow;
+			format: (context) => {
+				const { year, value } = context.row as LifeRow;
 				return `${year}: ${value.toFixed(1)} yr`;
 			}
 		}
@@ -176,8 +176,8 @@ export const SeriesFiltered: Story = {
 		tooltip: {
 			sync: false,
 			series: ['female'],
-			format: (row) => {
-				const { year, value } = row as LifeRow;
+			format: (context) => {
+				const { year, value } = context.row as LifeRow;
 				return `Female: ${value.toFixed(1)} yr (${year})`;
 			}
 		}
@@ -197,8 +197,8 @@ export const TwoSeriesFromGroupedData: Story = {
 		color: 'sex',
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { sex, year, value } = row as LifeRow;
+			format: (context) => {
+				const { sex, year, value } = context.row as LifeRow;
 				return `${sex} (${year}): ${value.toFixed(1)} yr`;
 			}
 		}
@@ -218,8 +218,8 @@ export const GroupedDataSeriesFiltered: Story = {
 		tooltip: {
 			sync: false,
 			series: ['female'],
-			format: (row) => {
-				const { year, value } = row as LifeRow;
+			format: (context) => {
+				const { year, value } = context.row as LifeRow;
 				return `Female (${year}): ${value.toFixed(1)} yr`;
 			}
 		}
@@ -263,8 +263,8 @@ export const CustomAnchor: Story = {
 			sync: false,
 			anchorX: 'left',
 			anchorY: 'top',
-			format: (row) => {
-				const { year, value } = row as LifeRow;
+			format: (context) => {
+				const { year, value } = context.row as LifeRow;
 				return `${year}: ${value.toFixed(1)} yr`;
 			}
 		}

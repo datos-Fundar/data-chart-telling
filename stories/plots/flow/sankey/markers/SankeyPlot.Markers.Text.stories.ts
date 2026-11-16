@@ -1,14 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import SankeyPlot from '$lib/plots/flow/sankey/Plot.svelte';
-import { RowContext } from '$lib/phases/context/RowContext';
 import { PENGUIN_COUNTS_BY_SEX } from '$datasets';
 import type { SankeyRowContext } from '$lib/types/plots/flow/sankey/props';
-import type { ProcessedRow } from '$lib/types/phases';
 
 // ── Meta ──────────────────────────────────────────────────────────────────────
 // A `text` marker of the author's draws over a sankey's own rows - its nodes
-// and its links - and reads what the plot knows of each through `RowContext`:
-// where a link starts and ends, and its share of the nodes it joins.
+// and its links - and each of its accessors gets what the plot knows of a row
+// besides the row itself, `(row, context)`: where a link starts and ends, and
+// its share of the nodes it joins.
 
 const meta = {
 	title: 'Plots/Flow/SankeyPlot/Markers/Text',
@@ -36,9 +35,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** What the plot knows of a row it draws. */
-const contextOf = (row: ProcessedRow) => RowContext.of<SankeyRowContext>(row);
-
 /** How far from a node's middle a label beside it starts: half the node's default width, and a gap. */
 const BESIDE_A_NODE = 10;
 
@@ -56,24 +52,32 @@ export const LinkShares: Story = {
 			{
 				type: 'text',
 				transforms: [
-					{ type: 'filter', filter: (row) => contextOf(row).start?.column === 'species' }
+					{
+						type: 'filter',
+						filter: (row, context: SankeyRowContext) => context.start?.column === 'species'
+					}
 				],
-				x: (row) => contextOf(row).start!.column,
-				y: (row) => contextOf(row).start!.y,
+				x: (row, context: SankeyRowContext) => context.start!.column,
+				y: (row, context: SankeyRowContext) => context.start!.y,
 				dx: BESIDE_A_NODE,
 				textAnchor: 'start',
 				lineAnchor: 'middle',
-				text: (row) => `${Math.round(contextOf(row).sourceShare!)}%`
+				text: (row, context: SankeyRowContext) => `${Math.round(context.sourceShare!)}%`
 			},
 			{
 				type: 'text',
-				transforms: [{ type: 'filter', filter: (row) => contextOf(row).end?.column === 'sex' }],
-				x: (row) => contextOf(row).end!.column,
-				y: (row) => contextOf(row).end!.y,
+				transforms: [
+					{
+						type: 'filter',
+						filter: (row, context: SankeyRowContext) => context.end?.column === 'sex'
+					}
+				],
+				x: (row, context: SankeyRowContext) => context.end!.column,
+				y: (row, context: SankeyRowContext) => context.end!.y,
 				dx: -BESIDE_A_NODE,
 				textAnchor: 'end',
 				lineAnchor: 'middle',
-				text: (row) => `${Math.round(contextOf(row).targetShare!)}%`
+				text: (row, context: SankeyRowContext) => `${Math.round(context.targetShare!)}%`
 			}
 		]
 	}

@@ -6,13 +6,13 @@ export type ImageMarkerConfig = CommonMarkerConfigWithRowOffset<
 	{
 		type: 'image';
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		src: string | ((d: any) => string);
+		src: string | ((d: any, context?: any) => string);
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		width?: number | ((d: any) => number);
+		width?: number | ((d: any, context?: any) => number);
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		height?: number | ((d: any) => number);
+		height?: number | ((d: any, context?: any) => number);
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		title?: string | ((d: any) => string);
+		title?: string | ((d: any, context?: any) => string);
 		preserveAspectRatio?: string;
 		/** A constant opacity; the shared `opacity` channel is a color ramp, not this. */
 		opacity?: number;

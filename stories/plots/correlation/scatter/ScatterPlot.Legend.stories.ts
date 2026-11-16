@@ -63,7 +63,7 @@ export const LegendDisabledDimsLabels: Story = {
 		color: 'continent',
 		legend: continentLegend('dim'),
 		styles: {
-			values: { show: true, format: (v: number) => v.toFixed(0) }
+			values: { show: true, format: (context) => context.value.toFixed(0) }
 		} satisfies AxisBasedStylesConfig
 	}
 };
@@ -91,7 +91,7 @@ export const HoverIsolate: Story = {
 			values: {
 				show: true,
 				hoverIsolate: true,
-				format: (v: number) => v.toFixed(0)
+				format: (context) => context.value.toFixed(0)
 			}
 		} satisfies AxisBasedStylesConfig
 	}

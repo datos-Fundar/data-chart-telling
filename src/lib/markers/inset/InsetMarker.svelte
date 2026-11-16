@@ -4,6 +4,7 @@
 	import { insetBox } from './insetLayout';
 	import { GeoGeometry } from '$lib/plots/map/geo/GeoGeometry';
 	import Tooltip from '$lib/layout/tooltip/Tooltip.svelte';
+	import { RowContext } from '$lib/phases/context/RowContext';
 	import type { GeoInsetMarkerConfig } from '$lib/types/markers/geo';
 	import type { GeoFeature } from '$lib/types/plots/data/geo';
 	import type { TooltipAnchorX, TooltipAnchorY } from '$lib/types/layout/tooltip';
@@ -185,7 +186,7 @@
 						y={hovered?.y ?? 0}
 						bounds={{ width: box.width, height: box.height }}
 						rows={hovered ? [hovered.feature] : []}
-						format={tooltip.format}
+						format={(row) => tooltip.format(RowContext.of(row) as never)}
 						content={tooltip.content}
 						anchorX={tooltip.anchorX ?? tooltipAnchorX}
 						anchorY={tooltip.anchorY ?? tooltipAnchorY}

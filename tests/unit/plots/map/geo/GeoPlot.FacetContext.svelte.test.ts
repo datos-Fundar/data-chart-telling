@@ -151,8 +151,7 @@ describe('GeoPlot - one layer of features for every facet panel', () => {
 			color: (f: GeoFeature, slice: GeoSliceContext) => valueFor(name(f), slice.facet?.value),
 			tooltip: {
 				sync: true,
-				format: (f: GeoFeature, _number: unknown, context: GeoSliceContext) =>
-					`${name(f)} · ${context.facet?.value}`
+				format: (context) => `${name(context.row)} · ${context.facet?.value}`
 			}
 		});
 		await vi.waitFor(() => {

@@ -51,8 +51,8 @@ export const BasicTooltip: Story = {
 		series: SERIES,
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { island, species, count } = row as PenguinSpeciesCount;
+			format: (context) => {
+				const { island, species, count } = context.row as PenguinSpeciesCount;
 				return `${island} - ${species}: ${count} penguins`;
 			}
 		}
@@ -68,8 +68,8 @@ export const RichFormat: Story = {
 		series: SERIES,
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { island, species, count } = row as PenguinSpeciesCount;
+			format: (context) => {
+				const { island, species, count } = context.row as PenguinSpeciesCount;
 				return `Island: ${island}\nSpecies: ${species}\nPenguins: ${count}`;
 			}
 		}
@@ -85,8 +85,8 @@ export const ComputedFormat: Story = {
 		series: SERIES,
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { island, species, count } = row as PenguinSpeciesCount;
+			format: (context) => {
+				const { island, species, count } = context.row as PenguinSpeciesCount;
 				const delta = count - 50;
 				const sign = count >= 50 ? '+' : '';
 				return `${island} - ${species}: ${count} penguins (${sign}${delta} vs 50)`;
@@ -104,8 +104,8 @@ export const RoundedValue: Story = {
 		series: SERIES,
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { island, species, count } = row as PenguinSpeciesCount;
+			format: (context) => {
+				const { island, species, count } = context.row as PenguinSpeciesCount;
 				return `${island} - ${species}\n${count} penguins`;
 			}
 		}
@@ -140,8 +140,8 @@ export const CustomAnchor: Story = {
 			sync: false,
 			anchorX: 'left',
 			anchorY: 'top',
-			format: (row) => {
-				const { island, species, count } = row as PenguinSpeciesCount;
+			format: (context) => {
+				const { island, species, count } = context.row as PenguinSpeciesCount;
 				return `${island} - ${species}: ${count} penguins`;
 			}
 		}

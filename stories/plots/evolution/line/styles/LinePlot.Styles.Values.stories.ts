@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import type { PlotRowContext } from '$lib';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import {
@@ -91,9 +90,9 @@ export const ShowValues: Story = {
 };
 
 /**
- * Custom format, the `format(value, seriesName)` callback receives the
- * numeric Y value and the series name. Return any string to override the
- * default `"${seriesName} - ${value}"` label.
+ * Custom format - the `format(context)` callback receives what the plot knows
+ * of the labelled row: its `value`, its `series`, its `row`... Return any string
+ * to override the default label.
  */
 export const CustomFormat: Story = {
 	args: {
@@ -108,8 +107,7 @@ export const CustomFormat: Story = {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number, _number: unknown, context: PlotRowContext) =>
-					`${context.series} → ${v.toFixed(1)} yr`
+				format: (context) => `${context.series} → ${context.value.toFixed(1)} yr`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -140,8 +138,7 @@ export const TwoSeriesWithLabels: Story = {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number, _number: unknown, context: PlotRowContext) =>
-					`${context.series} (${v.toFixed(1)})`
+				format: (context) => `${context.series} (${context.value.toFixed(1)})`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -166,7 +163,7 @@ export const SideAfter: Story = {
 			values: {
 				show: true,
 				side: 'after',
-				format: (v: number) => `${v.toFixed(1)} yr`
+				format: (context) => `${context.value.toFixed(1)} yr`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -191,7 +188,7 @@ export const SideAbove: Story = {
 			values: {
 				show: true,
 				side: 'above',
-				format: (v: number) => `${v.toFixed(1)} yr`
+				format: (context) => `${context.value.toFixed(1)} yr`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -223,8 +220,7 @@ export const TwoSeriesLabelsOutside: Story = {
 			values: {
 				show: true,
 				side: 'above',
-				format: (v: number, _number: unknown, context: PlotRowContext) =>
-					`${context.series}: ${v.toFixed(1)} yr`
+				format: (context) => `${context.series}: ${context.value.toFixed(1)} yr`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -249,7 +245,7 @@ export const CustomGap: Story = {
 				show: true,
 				side: 'above',
 				gap: 18,
-				format: (v: number) => `${v.toFixed(1)} yr`
+				format: (context) => `${context.value.toFixed(1)} yr`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -274,7 +270,7 @@ export const SideOn: Story = {
 			values: {
 				show: true,
 				side: 'on',
-				format: (v: number) => `${v.toFixed(1)} yr`
+				format: (context) => `${context.value.toFixed(1)} yr`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -298,7 +294,7 @@ export const SideBefore: Story = {
 			values: {
 				show: true,
 				side: 'before',
-				format: (v: number) => `${v.toFixed(1)} yr`
+				format: (context) => `${context.value.toFixed(1)} yr`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -412,8 +408,7 @@ export const DeclutteredLabels: Story = {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number, _number: unknown, context: PlotRowContext) =>
-					`${context.series} (${v.toFixed(1)})`
+				format: (context) => `${context.series} (${context.value.toFixed(1)})`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -435,8 +430,7 @@ export const DeclutteredLabelsCustomStyle: Story = {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number, _number: unknown, context: PlotRowContext) =>
-					`${context.series} (${v.toFixed(1)})`,
+				format: (context) => `${context.series} (${context.value.toFixed(1)})`,
 				fontStyle: {
 					fontWeight: 'bold',
 					stroke: 'white',
@@ -469,8 +463,7 @@ export const DeclutteredLabelsNearMissSeries: Story = {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number, _number: unknown, context: PlotRowContext) =>
-					`${context.series} (${v.toFixed(1)})`
+				format: (context) => `${context.series} (${context.value.toFixed(1)})`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -516,8 +509,7 @@ export const DeclutteredLabelsBoundedByPlot: Story = {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number, _number: unknown, context: PlotRowContext) =>
-					`${context.series} (${v.toFixed(1)})`
+				format: (context) => `${context.series} (${context.value.toFixed(1)})`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -572,8 +564,7 @@ export const IsolatedLabelBoundedByPlot: Story = {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number, _number: unknown, context: PlotRowContext) =>
-					`${context.series} (${v.toFixed(1)})`
+				format: (context) => `${context.series} (${context.value.toFixed(1)})`
 			}
 		} satisfies AxisBasedStylesConfig
 	}

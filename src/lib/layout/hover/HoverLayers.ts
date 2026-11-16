@@ -1,3 +1,4 @@
+import { RowContext } from '$lib/phases/context/RowContext';
 import { NumberFormat } from '$lib/utils/NumberFormat';
 import type { BandSlice, HoverDisplayPoint } from '$lib/types/layout/hover';
 import type { HoverLayerMarker, HoverMarkerConfig } from '$lib/types/markers/common';
@@ -31,7 +32,10 @@ export class HoverLayers {
 		const { format } = marker;
 		if (!format && !numberOf) return [...points];
 		return points.map((point) => {
-			if (format) return { ...point, label: format(point, number) };
+			if (format) {
+				const context = point.context ?? RowContext.of(point.row);
+				return { ...point, label: format({ series: point.series, ...context }, number) };
+			}
 			const value = Number(point.label);
 			const written =
 				point.label !== undefined && point.label !== '' && Number.isFinite(value)

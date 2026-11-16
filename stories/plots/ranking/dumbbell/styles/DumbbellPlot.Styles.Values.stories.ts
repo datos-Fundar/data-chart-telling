@@ -60,7 +60,7 @@ export const Sideways: Story = {
 		y: 'province',
 		scales: { x: { domain: [70, 85] } },
 		styles: {
-			values: { show: true, format: (value: number) => `${value} years` }
+			values: { show: true, format: (context) => `${context.value} years` }
 		} satisfies ConnectorBasedStylesConfig
 	}
 };
@@ -91,7 +91,7 @@ export const LastSeriesLabelled: Story = {
 				show: true,
 				select: 'last',
 				color: 'series',
-				format: (value: number) => `${value}%`,
+				format: (context) => `${context.value}%`,
 				fontStyle: { fontWeight: 600 }
 			}
 		} satisfies ConnectorBasedStylesConfig

@@ -35,8 +35,8 @@
 	tooltip={{
 		strategy: 'y',
 		sync: true,
-		format: (row) => {
-			const { category, value } = row as GroupValue;
+		format: (context) => {
+			const { category, value } = context.row as GroupValue;
 			return `${category}: ${value}`;
 		}
 	}}

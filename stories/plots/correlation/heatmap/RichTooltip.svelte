@@ -50,8 +50,8 @@
 		scales={{ color: { domain: COLOR_DOMAIN } }}
 		tooltip={{
 			sync: false,
-			format: (row) => {
-				const { island, species, count } = row as PenguinSpeciesCount;
+			format: (context) => {
+				const { island, species, count } = context.row as PenguinSpeciesCount;
 				return `${island} - ${species}: ${count} penguins`;
 			},
 			content

@@ -48,8 +48,8 @@ export const CustomFormat: Story = {
 	args: {
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { ageGroup, share } = row as AgeShareRow;
+			format: (context) => {
+				const { ageGroup, share } = context.row as AgeShareRow;
 				return `${ageGroup}: ${share}%`;
 			}
 		}

@@ -1,3 +1,4 @@
+import type { PlotRowContext } from '$lib';
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import TooltipSyncDemo, { pyramidData } from './TooltipSyncDemo.svelte';
@@ -132,7 +133,8 @@ export const FacetSyncBarBySeries: StoryObj = {
 					tooltip: {
 						strategy: 'series',
 						sync: true,
-						format: (row: AgeRow) => `${row.sex}: ${row.share}%`
+						format: (context: PlotRowContext) =>
+							`${(context.row as AgeRow).sex}: ${(context.row as AgeRow).share}%`
 					},
 					markers: [{ type: 'hover' }]
 				})
@@ -155,7 +157,9 @@ export const FacetSyncHeatmap: StoryObj = {
 					y: 'species',
 					color: 'count',
 					scales: { x: { label: 'Island' }, y: { label: 'Species' } },
-					styles: { values: { show: false, format: (v: number) => `${v}` } },
+					styles: {
+						values: { show: false, format: (context: { value: number }) => `${context.value}` }
+					},
 					facet: { by: 'sex', columns: 2 },
 					tooltip: { strategy: 'punctual', sync: true },
 					markers: [{ type: 'hover' }]
@@ -188,7 +192,8 @@ export const FacetSyncBarUnrelatedOrder: StoryObj = {
 					tooltip: {
 						strategy: 'y',
 						sync: true,
-						format: (row: GroupValue) => `${row.category}: ${row.value}`
+						format: (context: PlotRowContext) =>
+							`${(context.row as GroupValue).category}: ${(context.row as GroupValue).value}`
 					},
 					markers: [{ type: 'hover' }]
 				})
@@ -215,7 +220,7 @@ export const FacetSyncPyramid: StoryObj = {
 						color: { scheme: { Female: '#d6336c', Male: '#1971c2' } }
 					},
 					styles: {
-						values: { format: (v: number) => `${v.toFixed(1)}%` }
+						values: { format: (context: { value: number }) => `${context.value.toFixed(1)}%` }
 					},
 					facet: { by: 'year', columns: 2 },
 					tooltip: { strategy: 'y', sync: true },

@@ -65,7 +65,7 @@ export const CustomValueFormat: Story = {
 			y: { domain: AGE_GROUPS }
 		},
 		styles: {
-			values: { show: true, format: (v: number) => `${v.toFixed(1)}%` }
+			values: { show: true, format: (context) => `${context.value.toFixed(1)}%` }
 		} satisfies AxisBasedStylesConfig
 	}
 };
@@ -87,7 +87,7 @@ export const LabelsInside: Story = {
 				layout: 'path',
 				edge: 'base',
 				side: 'inside',
-				format: (v: number) => `${v.toFixed(1)}%`,
+				format: (context) => `${context.value.toFixed(1)}%`,
 				fontStyle: { fill: '#ffffff', fontWeight: 'bold' }
 			}
 		} satisfies WithValues<AxisBasedStylesConfig, BarValueLabel>
@@ -110,7 +110,7 @@ export const LabelsWithOffset: Story = {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number) => `${v.toFixed(1)}%`,
+				format: (context) => `${context.value.toFixed(1)}%`,
 				gap: 12
 			}
 		} satisfies AxisBasedStylesConfig

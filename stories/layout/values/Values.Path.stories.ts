@@ -10,7 +10,6 @@ import {
 	HEIGHT_DENSITY,
 	LIFE
 } from '$datasets';
-import type { PlotRowContext } from '$lib';
 import { plotStory } from '../../common/plotStory';
 
 /**
@@ -124,8 +123,7 @@ export const FormattedAlongALine = plotStory(LinePlot, 'LinePlot', {
 	styles: {
 		values: {
 			layout: 'path',
-			format: (_v: number, _number: unknown, { series }: PlotRowContext) =>
-				series === 'female' ? 'Women' : 'Men'
+			format: (context) => (context.series === 'female' ? 'Women' : 'Men')
 		}
 	},
 	scales: { x: { nice: false } }
@@ -193,8 +191,7 @@ export const AtEachAreasPeak = plotStory(AreaPlot, 'AreaPlot', {
 		values: {
 			layout: 'path',
 			offset: 'max',
-			format: (_value: number, _number: unknown, { series }: PlotRowContext) =>
-				series === 'female' ? 'Women' : 'Men',
+			format: (context) => (context.series === 'female' ? 'Women' : 'Men'),
 			fontStyle: { fontSize: 13, fontWeight: 'bold' }
 		}
 	}
@@ -218,8 +215,7 @@ export const AroundADot = plotStory(ScatterPlot, 'ScatterPlot', {
 	styles: {
 		values: {
 			layout: 'path',
-			format: (_v: number, _number: unknown, { row }: PlotRowContext) =>
-				String((row as { country: string }).country)
+			format: (context) => String((context.row as { country: string }).country)
 		}
 	}
 });

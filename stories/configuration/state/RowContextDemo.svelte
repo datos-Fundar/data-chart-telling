@@ -13,9 +13,14 @@
 	data={HEIGHTS}
 	x="height"
 	tooltip={{
-		format: (_row, number, context: HistogramRowContext) =>
+		format: (context: HistogramRowContext, number) =>
 			`${context.from} to ${context.to} cm: ${number(context.count)} people`
 	}}
-	styles={{ values: { show: true, format: (count, number) => (count > 0 ? number(count) : '') } }}
+	styles={{
+		values: {
+			show: true,
+			format: (context, number) => (context.value > 0 ? number(context.value) : '')
+		}
+	}}
 	markers={[{ type: 'hover' }, { type: 'component', component: ContextReadout }]}
 />

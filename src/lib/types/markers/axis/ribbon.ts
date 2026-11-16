@@ -4,7 +4,7 @@ import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/co
 import type { CommonMarkerConfigWithArea } from '$lib/types/markers/channels/commonMarkerConfigWithArea';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Channel = AxisValue | ((d: any) => AxisValue);
+type Channel = AxisValue | ((d: any, context?: any) => AxisValue);
 
 /**
  * A band per row that flows along x, from `x1` to `x2`: it leaves with its edges at `y1` and `y2` and arrives

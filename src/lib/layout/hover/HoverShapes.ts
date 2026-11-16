@@ -1,3 +1,4 @@
+import { RowContext } from '$lib/phases/context/RowContext';
 import { MarkerStyles } from '$lib/phases/markers/MarkerStyles';
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { RowStyle } from '$lib/markers/utils/RowStyle';
@@ -205,7 +206,10 @@ export class HoverShapes {
 				continue;
 			dimmed ??= HoverShapes.#LEGEND_KEYS.has(field) && reach.dimmed(row);
 			if (dimmed) return undefined;
-			value = typeof own === 'function' ? (own as Read)(row, index) : own;
+			value =
+				typeof own === 'function'
+					? (own as (context: unknown) => unknown)(RowContext.at(row, index))
+					: own;
 		}
 		return value;
 	}

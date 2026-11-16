@@ -39,8 +39,8 @@
 		markers={[{ type: 'hover' }]}
 		tooltip={{
 			sync: false,
-			format: (row) => {
-				const { year, ageGroup, share } = row as AgeShareRow;
+			format: (context) => {
+				const { year, ageGroup, share } = context.row as AgeShareRow;
 				return `${year} / ${ageGroup}: ${share}`;
 			},
 			content

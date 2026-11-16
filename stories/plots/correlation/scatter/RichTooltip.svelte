@@ -41,8 +41,8 @@
 		color="continent"
 		tooltip={{
 			sync: false,
-			format: (row) => {
-				const { country, gdp, life } = row as CountryYearRow;
+			format: (context) => {
+				const { country, gdp, life } = context.row as CountryYearRow;
 				return `${country}: $${(gdp / 1000).toFixed(1)}k, ${life.toFixed(1)} yr`;
 			},
 			content

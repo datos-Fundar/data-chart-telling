@@ -29,13 +29,9 @@ describe('BarPlot - the row a value label is written from', () => {
 				values: {
 					show: true,
 					layout: 'box',
-					format: (
-						value: number,
-						_number: unknown,
-						{ series, row }: { series?: string; row?: Record<string, unknown> }
-					) => {
-						calls.push({ value, series: series!, row });
-						return `${value}`;
+					format: (context: { value: number; series?: string; row?: Record<string, unknown> }) => {
+						calls.push({ value: context.value, series: context.series!, row: context.row });
+						return `${context.value}`;
 					}
 				}
 			}
@@ -57,8 +53,10 @@ describe('BarPlot - the row a value label is written from', () => {
 				values: {
 					show: true,
 					layout: 'box',
-					format: (value: number, _number: unknown, context: PlotRowContext) =>
-						context.row?.bar === 'Q1' && context.row?.group === 'housing' ? `${value} %` : ''
+					format: (context: PlotRowContext & { value: number }) =>
+						context.row?.bar === 'Q1' && context.row?.group === 'housing'
+							? `${context.value} %`
+							: ''
 				}
 			}
 		} as never);

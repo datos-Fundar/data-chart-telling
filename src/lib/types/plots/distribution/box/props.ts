@@ -36,7 +36,7 @@ export type BoxValuePart = Exclude<keyof BoxSummary, 'category' | 'count'>;
 export type BoxPlotProps<TData extends Record<string, unknown>> = AxesPlotProps<
 	SeriesProps<TData> | DualAxisDataProps<TData>,
 	TData,
-	WithValues<AxisBasedStylesConfig, PointLabelConfig, BoxValuePart>,
+	WithValues<AxisBasedStylesConfig, PointLabelConfig, BoxValuePart, BoxRowContext>,
 	AreaStyle,
 	BoxRowContext
 >;
@@ -45,6 +45,6 @@ export type BoxPlotProps<TData extends Record<string, unknown>> = AxesPlotProps<
 export type BoxPlotCoreProps<TData extends Record<string, unknown>> = AxesPlotCoreProps<
 	SeriesProps<TData> | DualAxisDataProps<TData>,
 	TData,
-	WithValues<AxisBasedStylesConfig, PointLabelConfig, BoxValuePart>,
+	WithValues<AxisBasedStylesConfig, PointLabelConfig, BoxValuePart, BoxRowContext>,
 	AreaStyle
 >;

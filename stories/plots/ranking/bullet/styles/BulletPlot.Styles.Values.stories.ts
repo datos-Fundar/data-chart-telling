@@ -45,7 +45,7 @@ export const Default: Story = {
 export const Formatted: Story = {
 	args: {
 		styles: {
-			values: { show: true, format: (value: number) => `${value} years` }
+			values: { show: true, format: (context) => `${context.value} years` }
 		} satisfies AxisBasedStylesConfig
 	}
 };

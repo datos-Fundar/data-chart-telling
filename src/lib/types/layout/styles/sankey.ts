@@ -25,10 +25,10 @@ export type SankeyNodeStyle = AreaStyle & {
 export type SankeyLinkStyle = Omit<AreaStyle, 'fill'> & {
 	/**
 	 * A link's fill: the color of the node at one of its ends (`'source'`, the default, or `'target'`) while the
-	 * nodes are the series, or a color of its own; or a function of the link and its context that says which, so
-	 * the links of each column can take a different end (`(link, context) => context.column === 'island' ? 'target' : 'source'`).
+	 * nodes are the series, or a color of its own; or a function of what the plot knows of the link that says which, so
+	 * the links of each column can take a different end (`(link) => link.column === 'island' ? 'target' : 'source'`).
 	 */
-	fill?: StyleValue<FlowEnd | (string & {}), Record<string, unknown>, SankeyRowContext>;
+	fill?: StyleValue<FlowEnd | (string & {}), SankeyRowContext>;
 	/** How far in from each end (0-1) a link's edges bend: `0.5` meets at the middle, `0` is a straight band. */
 	curvature?: number;
 };
@@ -43,7 +43,9 @@ export type SankeyValuesPosition = 'auto' | 'outside';
 /** `SankeyPlot`'s `styles`: its nodes, its links, its node labels, and how its nodes are arranged. */
 export type SankeyStylesConfig = WithValues<
 	ArrangementAwarePlotStylesConfig<FlowArrangementOptions>,
-	PointLabelConfig
+	PointLabelConfig,
+	'value',
+	SankeyRowContext
 > & {
 	nodes?: SankeyNodeStyle;
 	links?: SankeyLinkStyle;

@@ -48,8 +48,8 @@ export const CustomFormat: Story = {
 	args: {
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { province, female } = row as ProvinceLifeRow;
+			format: (context) => {
+				const { province, female } = context.row as ProvinceLifeRow;
 				return `${province}: ${female} years`;
 			}
 		}

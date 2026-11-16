@@ -52,8 +52,8 @@ export const Custom: Story = {
 	args: {
 		tooltip: {
 			sync: false,
-			format: (row: Record<string, unknown>) =>
-				`${String(row.category)}: median ${Number(row.median).toFixed(1)} (${String(row.count)} flowers)`
+			format: (context) =>
+				`${String(context.row.category)}: median ${Number(context.row.median).toFixed(1)} (${String(context.row.count)} flowers)`
 		}
 	}
 };

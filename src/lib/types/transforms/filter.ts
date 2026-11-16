@@ -1,13 +1,16 @@
-import type { PositionChannels, TransformChannel } from '$lib/types/transforms/common';
+import type { PositionChannels } from '$lib/types/transforms/common';
 
 /**
  * `filter` as a marker transform: keeps only the rows `filter` holds for -
  * a per-row test, or a field key whose value is truthy. Unlike filtering the
- * marker's `data` beforehand, it composes with the transforms around it.
+ * marker's `data` beforehand, it composes with the transforms around it. In a
+ * marker of the author's, the test gets what the plot knows of each row too
+ * (`(row, context) => boolean`).
  */
 export type FilterTransform = {
 	type: 'filter';
-	filter: TransformChannel;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	filter: string | ((d: any, context?: any) => unknown);
 } & PositionChannels;
 
 /** The keys `filter` reads as channels: every position channel, and `filter` itself. */

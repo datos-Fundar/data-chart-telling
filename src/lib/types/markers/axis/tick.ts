@@ -6,7 +6,7 @@ import type { CommonMarkerConfigWithColor } from '$lib/types/markers/channels/co
 export type TickMarkerConfig = {
 	type: 'tick';
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	tickLength?: number | ((d: any) => number);
+	tickLength?: number | ((d: any, context?: any) => number);
 	styles?: PerRow<StrokeStyle>;
 } & CommonMarkerConfigWithOrientation &
 	CommonMarkerConfigWithColor;

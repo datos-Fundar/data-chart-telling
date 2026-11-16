@@ -41,37 +41,45 @@ export type ValueLayoutOf<TLabel> = TLabel extends { layout?: infer TLayout }
 
 /**
  * `TStyles` with its `values` taking only the labels of `TLabel` - the layouts a plot kind's shapes write - and, on a
- * kind whose rows have several values, the `TPart`s it can label.
+ * kind whose rows have several values, the `TPart`s it can label; its `format` reads `TContext`, what the kind
+ * knows of a row.
  */
 export type WithValues<
 	TStyles,
 	TLabel extends MarkerLabelConfig,
-	TPart extends string = 'value'
+	TPart extends string = 'value',
+	TContext extends PlotRowContext = PlotRowContext
 > = Omit<TStyles, 'values'> & {
-	values?: ValuesStyle<TLabel, TPart>;
+	values?: ValuesStyle<TLabel, TPart, TContext>;
 };
 
 export type ValuesStyle<
 	TLabel extends MarkerLabelConfig = MarkerLabelConfig,
-	TPart extends string = string
-> = ValuesOptions & ValueLayoutOf<TLabel> & { parts?: ValueParts<TPart, TLabel> };
+	TPart extends string = string,
+	TContext extends PlotRowContext = PlotRowContext
+> = ValuesOptions<TContext> &
+	ValueLayoutOf<TLabel> & { parts?: ValueParts<TPart, TLabel, TContext> };
 
 /** What a part's own label sets, over the plot's: where it sits and its text. */
-export type ValuePartOptions<TLabel = MarkerLabelConfig> = Omit<ValueLayoutOf<TLabel>, 'layout'> &
-	Pick<ValuesOptions, 'format'>;
+export type ValuePartOptions<
+	TLabel = MarkerLabelConfig,
+	TContext extends PlotRowContext = PlotRowContext
+> = Omit<ValueLayoutOf<TLabel>, 'layout'> & Pick<ValuesOptions<TContext>, 'format'>;
 
 /**
  * The parts of each row a plot kind with several values per row labels - a box's `median`, a bullet's `target`: a
  * list of them, or a record turning each on (`true`) or setting its own options.
  */
-export type ValueParts<TPart extends string, TLabel = MarkerLabelConfig> =
-	| TPart[]
-	| Partial<Record<TPart, boolean | ValuePartOptions<TLabel>>>;
+export type ValueParts<
+	TPart extends string,
+	TLabel = MarkerLabelConfig,
+	TContext extends PlotRowContext = PlotRowContext
+> = TPart[] | Partial<Record<TPart, boolean | ValuePartOptions<TLabel, TContext>>>;
 
 /** A value label's text style, without what places it: the layout's options do that. */
 export type ValuesFontStyle = Omit<FontStyle, 'textAnchor' | 'lineAnchor' | 'dx' | 'dy'>;
 
-type ValuesOptions = NumberDisplay & {
+type ValuesOptions<TContext extends PlotRowContext = PlotRowContext> = NumberDisplay & {
 	/** Whether the labels are drawn. Setting any other option of them turns them on; off by default, except on a heatmap. */
 	show?: boolean;
 	/**
@@ -89,12 +97,13 @@ type ValuesOptions = NumberDisplay & {
 	 */
 	color?: 'series' | (string & {});
 	/**
-	 * A label's text, in place of the value as `decimals`, `prefix`, `suffix` and `signDisplay` write it: from the
-	 * value it shows (a histogram bin's count, a tile's share), `number`, which writes a value as those fields ask,
-	 * and `context`, what the plot knows of the labelled row - its `series`, `x`, `y`, whatever its kind works out
-	 * and, where the label has one, the `row` itself, for the other fields of the data (see {@link PlotRowContext}).
+	 * A label's text, in place of the value as `decimals`, `prefix`, `suffix` and `signDisplay` write it: from
+	 * `context`, what the plot knows of the labelled row - the `value` the label writes (on a plot whose rows have
+	 * several, the one of its `part`), its `series`, `x`, `y`, whatever its kind works out (a tile's `share`, a box's
+	 * `median`) and, where the label has one, the `row` itself (see {@link PlotRowContext}) - and `number`, which
+	 * writes a value as those fields ask.
 	 */
-	format?: (value: number, number: (value: number) => string, context: PlotRowContext) => string;
+	format?: (context: TContext & { value: number }, number: (value: number) => string) => string;
 	/** Hovering a label dims every other series, like toggling them off in the legend. */
 	hoverIsolate?: boolean;
 	/** The text's look; where it sits is the layout's (`side`, `gap`, `offset`...). */

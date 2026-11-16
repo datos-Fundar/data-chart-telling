@@ -1,3 +1,4 @@
+import type { PlotRowContext } from '$lib/types/layout/context';
 import type { Snippet } from 'svelte';
 import type { GeoFeature, GeoJsonInput } from '$lib/types/plots/data/geo';
 import type { GeoSegmentStyle } from '$lib/types/plots/segments/common';
@@ -40,7 +41,8 @@ export type GeoInsetProjectionConfig =
 
 /** An inset's own hover tooltip, matched by nearest projected centroid. */
 export type GeoInsetTooltipConfig = {
-	format: (feature: GeoFeature<Record<string, unknown>>) => string;
+	/** The text for a hovered feature, from what the plot knows of it (`context.row` is the feature). */
+	format: (context: PlotRowContext & { row: GeoFeature<Record<string, unknown>> }) => string;
 	content?: Snippet<[{ rows: GeoFeature<Record<string, unknown>>[] }]>;
 	anchorX?: TooltipAnchorX;
 	anchorY?: TooltipAnchorY;

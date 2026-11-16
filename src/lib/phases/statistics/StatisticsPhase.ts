@@ -61,7 +61,7 @@ export class StatisticsPhase<TState extends StatisticsStageState> implements Pha
 			: resolvedSeries[0] && colorForSeries?.(resolvedSeries[0].name);
 
 		const onProcessed = authorMarkers.map((marker) =>
-			AuthorMarkers.withProcessedRows(marker, state.processedData)
+			AuthorMarkers.withProcessedRows(AuthorMarkers.withContext(marker), state.processedData)
 		);
 		const unpositioned = !state.axes?.x && !state.axes?.y;
 		const positioned = onProcessed.map((marker) => {

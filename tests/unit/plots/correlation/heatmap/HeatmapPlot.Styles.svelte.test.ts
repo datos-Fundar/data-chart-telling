@@ -43,7 +43,7 @@ describe('HeatmapPlot - styles.values', () => {
 			height: 300,
 			...DATA_PROPS,
 			styles: {
-				values: { format: (v: number) => `${v} penguins` }
+				values: { format: (context) => `${context.value} penguins` }
 			} satisfies AxisBasedStylesConfig
 		});
 		const svg = await waitForSvg(container);

@@ -43,7 +43,8 @@ describe('styles.values.parts', () => {
 				values: {
 					parts: {
 						median: {
-							format: (v: number, _n: unknown, { part }: { part?: string }) => `${part} ${v}`
+							format: (context: { part?: string; value: number }) =>
+								`${context.part} ${context.value}`
 						}
 					}
 				}

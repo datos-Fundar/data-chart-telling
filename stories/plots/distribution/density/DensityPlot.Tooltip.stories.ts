@@ -46,7 +46,7 @@ type Story = StoryObj<typeof meta>;
  */
 const TOOLTIP = {
 	sync: false,
-	format: (_row: Record<string, unknown>, _number: unknown, context: PlotRowContext) =>
+	format: (context: PlotRowContext) =>
 		`${Number(context.x).toFixed(1)}: ${Number(context.value).toFixed(3)}`
 };
 

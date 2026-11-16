@@ -71,10 +71,14 @@ Works inside a plot - in a [`component` marker](markers.md#custom-components), w
 
 A plot works out a context for every row it draws, once, as it reads its data: the `series` the row is drawn in, its `x` and `y` (its own values, not a stack's running total, or where the plot's transforms put it), the `value` it shows on the value axis, the `row` itself, and whatever the plot kind works out for it. Everything that writes about a row reads the same context, so a value the plot computes - a tile's share, a density's estimate, a bin's count - is there to read without working it out again:
 
-- `tooltip.format(row, number, context)`;
-- `styles.values.format(value, number, context)`;
-- the `hover` marker's points (`point.context`), in its `format` and in its `back` and `front` markers;
-- `usePlot().contextOf(row)` in a `component` marker, and `RowContext.of(row)` anywhere, from a row the plot drew or a copy of it (the one a mark's accessor gets).
+- `tooltip.format(context, number)`;
+- `styles.values.format(context, number)`, where `value` is the one the label writes (a part's, on a plot whose rows have several);
+- the `hover` marker's `format(context, number)`, the functions of its `active` and `others` (`(context) => value`), and its points (`point.context`) in its `back` and `front` markers;
+- a style that takes a function of the row on a plot kind (`(context) => value`, such as a sankey's `styles.links.fill`);
+- the accessors and styles of an author's own markers, as their second argument (`(row, context) => value`, with the row's place among the marker's rows in `context.index`), and the `filter` of their transforms;
+- `usePlot().contextOf(row)` in a `component` marker.
+
+Every callback about a row gets the same context first, so what one reads (a tile's `share`) every other one reads too. Each is typed with the plot kind's own context, so an editor offers its fields as you write `context.` - a treemap's `share` in a tooltip, a value label or a `hover` marker's `active` alike. An author marker's accessors are the exception: their `context` is untyped unless you name its type (`(row, context: SankeyRowContext) => ...`).
 
 What each plot kind adds:
 
@@ -92,7 +96,7 @@ What each plot kind adds:
 	data={ages}
 	x="age"
 	tooltip={{
-		format: (_row, number, context) => `${context.from}-${context.to}: ${number(context.count)}`
+		format: (context, number) => `${context.from}-${context.to}: ${number(context.count)}`
 	}}
 />
 ```

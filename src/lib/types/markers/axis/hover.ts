@@ -1,23 +1,23 @@
 import type { AxisBasedMarkersConfig } from '$lib/types/markers/axis/axisBasedMarkersConfig';
 import type { HoverDisplayPoint, HoverStrategy } from '$lib/types/layout/hover';
+import type { PlotRowContext } from '$lib/types/layout/context';
 import type { NumberDisplay } from '$lib/types/layout/numbers';
 import type { LineStyle } from '$lib/types/plots/constants';
 
-/** A style value: the same for every shape, or a function of the row a shape draws. */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ShapeStyleValue<T> = T | ((row: any) => T);
+/** A style value: the same for every shape, or a function of what the plot knows of the row a shape draws. */
+type ShapeStyleValue<T, TContext> = T | ((context: TContext) => T);
 
 /**
  * How the shapes of a marker linked to the hover (`hover: true` or `'style'`) look while the hover is on: the
  * hovered ones under `active`, the rest under `others`. Each value replaces the shape's own, and may be a
- * function of its row.
+ * function of what the plot knows of its row (`TContext`).
  */
-export type HoverShapeStyle = {
-	fill?: ShapeStyleValue<string>;
-	fillOpacity?: ShapeStyleValue<number>;
-	stroke?: ShapeStyleValue<string>;
-	strokeWidth?: ShapeStyleValue<number>;
-	strokeOpacity?: ShapeStyleValue<number>;
+export type HoverShapeStyle<TContext extends PlotRowContext = PlotRowContext> = {
+	fill?: ShapeStyleValue<string, TContext>;
+	fillOpacity?: ShapeStyleValue<number, TContext>;
+	stroke?: ShapeStyleValue<string, TContext>;
+	strokeWidth?: ShapeStyleValue<number, TContext>;
+	strokeOpacity?: ShapeStyleValue<number, TContext>;
 	strokeDasharray?: string | LineStyle;
 };
 
@@ -55,22 +55,25 @@ export type HoverLayerMarker = InHover<Exclude<AxisBasedMarkersConfig, { type: '
  * The points' label is the hovered value as `decimals`, `prefix`, `suffix` and `signDisplay` write it - as the
  * plot writes it while none of them (nor `numbers.decimals`) is set - unless `format` writes it.
  */
-export type HoverMarkerConfig = NumberDisplay & {
+export type HoverMarkerConfig<TContext extends PlotRowContext = PlotRowContext> = NumberDisplay & {
 	type: 'hover';
 	series?: string;
 	scope?: 'series' | 'segment';
 	strategy?: HoverStrategy;
 	sync?: boolean;
 	/** How the hovered shapes of every marker linked to the hover look - the plot's own tiles, bars and cells among them. */
-	active?: HoverShapeStyle;
+	active?: HoverShapeStyle<TContext>;
 	/** How the shapes the hover does not reach look, while it is on. */
-	others?: HoverShapeStyle;
+	others?: HoverShapeStyle<TContext>;
 	/** The markers drawn behind every other one of the plot, over the hovered points. */
 	back?: HoverLayerMarker[];
 	/** The markers drawn in front of the plot's shapes, over the hovered points. */
 	front?: HoverLayerMarker[];
-	/** A point's label, in place of its value. `number` writes a value as the display fields above ask. */
-	format?: (point: HoverDisplayPoint, number: (value: number) => string) => string;
+	/**
+	 * A point's label, in place of its value: from what the plot knows of its row (its `context`, with the `row`
+	 * itself). `number` writes a value as the display fields above ask.
+	 */
+	format?: (context: TContext, number: (value: number) => string) => string;
 };
 
 /** What a plot kind's own hover is made of, which an author's `hover` marker is laid over. */

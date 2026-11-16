@@ -42,7 +42,7 @@ export const Default: Story = {};
 export const Formatted: Story = {
 	args: {
 		styles: {
-			values: { format: (value: number) => `${value}%` }
+			values: { format: (context) => `${context.value}%` }
 		} satisfies AxisBasedStylesConfig
 	}
 };

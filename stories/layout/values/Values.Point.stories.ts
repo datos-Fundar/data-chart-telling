@@ -3,7 +3,6 @@ import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import { COUNTRIES_AT_2007, FEMALE_LIFE, FEMALE_PROVINCE_VALUES, PRICES } from '$datasets';
-import type { PlotRowContext } from '$lib';
 import { plotStory } from '../../common/plotStory';
 
 /**
@@ -31,7 +30,7 @@ export default meta;
 const SIZE = { width: 720, height: 360 };
 /** Female life expectancy at birth in Argentina, 1947-2019. */
 const LIFE_LINE = { ...SIZE, data: FEMALE_LIFE, x: 'year', y: 'value', margins: { right: 60 } };
-const years = (v: number) => `${v} years`;
+const years = (context: { value: number }) => `${context.value} years`;
 
 // ── Side and gap ──────────────────────────────────────────────────────────────
 
@@ -128,8 +127,7 @@ export const AroundTheDots = plotStory(ScatterPlot, 'ScatterPlot', {
 	scales: { x: { type: 'log' } },
 	styles: {
 		values: {
-			format: (_value: number, _number: unknown, { row }: PlotRowContext) =>
-				String((row as { country: string }).country)
+			format: (context) => String((context.row as { country: string }).country)
 		}
 	}
 });
@@ -167,7 +165,7 @@ export const AtAPointOfABar = plotStory(BarPlot, 'BarPlot', {
 			anchor: 'top',
 			side: 'above',
 			select: 'max',
-			format: (v: number) => `longest: ${v} years`
+			format: (context) => `longest: ${context.value} years`
 		}
 	}
 });

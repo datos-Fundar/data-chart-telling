@@ -42,7 +42,7 @@ describe('LinePlot - styles.values', () => {
 			styles: {
 				values: {
 					show: true,
-					format: (v, _number, context) => `${context.series} → ${v.toFixed(1)} yr`
+					format: (context) => `${context.series} → ${context.value.toFixed(1)} yr`
 				}
 			} satisfies AxisBasedStylesConfig,
 			margins: { right: 120 }
@@ -237,7 +237,7 @@ describe('LinePlot - styles.values', () => {
 			height: 300,
 			series: [FEMALE, MALE],
 			styles: {
-				values: { show: true, format: (v, _number, context) => `${context.series} (${v})` }
+				values: { show: true, format: (context) => `${context.series} (${context.value})` }
 			} satisfies AxisBasedStylesConfig,
 			margins: { right: 80 }
 		});
@@ -284,7 +284,7 @@ describe('LinePlot - styles.values', () => {
 				width: 600,
 				height: 300,
 				series: [FEMALE, MALE],
-				styles: { values: { show: true, format: (v: number) => String(v), ...values } },
+				styles: { values: { show: true, format: (context) => String(context.value), ...values } },
 				margins: { right: 80, left: 80 }
 			});
 			const svg = await waitForSvg(container);

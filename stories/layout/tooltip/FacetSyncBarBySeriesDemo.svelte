@@ -49,8 +49,8 @@
 			tooltip={{
 				strategy: 'series',
 				sync: true,
-				format: (row) => {
-					const { sex, share } = row as AgeRow;
+				format: (context) => {
+					const { sex, share } = context.row as AgeRow;
 					return `${sex}: ${share}%`;
 				}
 			}}

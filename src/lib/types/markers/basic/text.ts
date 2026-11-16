@@ -36,7 +36,7 @@ export type TextDeclutterConfig = {
 
 /** Where a row's `x1`, `x2`, `y1` and `y2` are: a field of the rows, the symbol a transform keyed it by, or a function of the row. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type FitChannel = string | symbol | ((d: any) => unknown);
+type FitChannel = string | symbol | ((d: any, context?: any) => unknown);
 
 /**
  * What a label is fitted to: the rectangle its row spans, from `x1` to `x2` along the x axis and from `y1` to `y2`
@@ -58,7 +58,7 @@ export type TextFitConfig = {
 	minLetters?: number;
 	/** What to write when the text does not fit, cut short or not - a value alone, say; a number is written as the marker's `decimals` and the rest ask. */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	fallback?: string | number | ((d: any) => string | number);
+	fallback?: string | number | ((d: any, context?: any) => string | number);
 };
 
 /** The text styles that can be a function of the row. */
@@ -76,7 +76,7 @@ export type TextMarkerConfig = CommonMarkerConfigWithRowOffset<
 		 * `decimals`, `prefix`, `suffix` and `signDisplay`, over the configuration's `numbers`.
 		 */
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		text: string | number | ((d: any) => string | number);
+		text: string | number | ((d: any, context?: any) => string | number);
 		/**
 		 * How the labels are drawn. `fill`, `fillOpacity`, `stroke`, `strokeWidth`, `fontWeight` and `fontStyle` can each be a function of the row;
 		 * the rest place and measure the labels, so they are the same for all of them.
@@ -84,10 +84,10 @@ export type TextMarkerConfig = CommonMarkerConfigWithRowOffset<
 		styles?: PerRow<TextRowStyle> & Omit<FontStyle, TextRowStyleKey>;
 		/** Which side of its point the text sits on: a value, or a function of the row. Wins over `styles.textAnchor`. */
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		textAnchor?: TextAnchor | ((d: any) => TextAnchor);
+		textAnchor?: TextAnchor | ((d: any, context?: any) => TextAnchor);
 		/** Which side of its point the text sits on vertically: a value, or a function of the row. Wins over `styles.lineAnchor`. */
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		lineAnchor?: LineAnchor | ((d: any) => LineAnchor);
+		lineAnchor?: LineAnchor | ((d: any, context?: any) => LineAnchor);
 		/** Lays out overlapping labels - see {@link TextDeclutterConfig}. `true` is `'lanes'` with every default. */
 		declutter?: boolean | TextDeclutterMode | TextDeclutterConfig;
 		/** Writes each label to fit its box - see {@link TextFitConfig}. `true` takes every default. */

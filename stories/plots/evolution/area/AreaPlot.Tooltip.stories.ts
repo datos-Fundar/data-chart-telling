@@ -39,8 +39,8 @@ export const BasicTooltip: Story = {
 	args: {
 		tooltip: {
 			sync: false,
-			format: (row) => {
-				const { height, density } = row as HeightDensity;
+			format: (context) => {
+				const { height, density } = context.row as HeightDensity;
 				return `${height} cm - ${density.toFixed(2)}%`;
 			}
 		}

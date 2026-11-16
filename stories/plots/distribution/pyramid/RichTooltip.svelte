@@ -31,8 +31,8 @@
 		scales={{ y: { domain: AGE_GROUPS } }}
 		tooltip={{
 			sync: false,
-			format: (row) => {
-				const { sex, ageGroup, share } = row as AgeRow;
+			format: (context) => {
+				const { sex, ageGroup, share } = context.row as AgeRow;
 				return `${sex} - ${ageGroup}: ${share.toFixed(1)}%`;
 			},
 			content

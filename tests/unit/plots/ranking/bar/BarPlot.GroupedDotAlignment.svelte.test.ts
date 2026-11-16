@@ -22,7 +22,7 @@ describe.each([['vertical', false] as const, ['horizontal', true] as const])(
 				tooltip: {
 					sync: false,
 					strategy: 'series',
-					format: (row: unknown) => (row as { series: string }).series
+					format: (context) => String(context.series)
 				},
 				// A bar plot's own hover draws no dot: one of the author's, in front.
 				markers: [{ type: 'hover', front: [{ type: 'dot' }] }]

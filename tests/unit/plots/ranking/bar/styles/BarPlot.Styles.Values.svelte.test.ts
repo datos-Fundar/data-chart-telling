@@ -1,5 +1,4 @@
 import { render } from 'vitest-browser-svelte';
-import type { PlotRowContext } from '$lib';
 import { describe, test, expect } from 'vitest';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import type { AxisBasedStylesConfig, BarValueLabel, ValuesStyle } from '$lib/types/layout/styles';
@@ -49,8 +48,7 @@ describe('BarPlot - styles.values', () => {
 			styles: {
 				values: {
 					show: true,
-					format: (v: number, _number: unknown, context: PlotRowContext) =>
-						`${context.series}: ${v.toFixed(1)} yr`
+					format: (context) => `${context.series}: ${context.value.toFixed(1)} yr`
 				}
 			} satisfies AxisBasedStylesConfig
 		});
@@ -69,8 +67,7 @@ describe('BarPlot - styles.values', () => {
 			styles: {
 				values: {
 					show: true,
-					format: (v: number, _number: unknown, context: PlotRowContext) =>
-						`${context.series} (${v})`
+					format: (context) => `${context.series} (${context.value})`
 				}
 			} satisfies AxisBasedStylesConfig
 		});

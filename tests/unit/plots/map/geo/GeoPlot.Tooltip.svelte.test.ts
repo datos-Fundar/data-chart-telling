@@ -53,7 +53,7 @@ describe('GeoPlot - tooltip', () => {
 			...DATA_PROPS,
 			tooltip: {
 				sync: false,
-				format: (f) => (f.properties as { nombre: string }).nombre
+				format: (context) => (context.row.properties as { nombre: string }).nombre
 			}
 		});
 		await waitForSvg(container);
@@ -67,8 +67,11 @@ describe('GeoPlot - tooltip', () => {
 			...DATA_PROPS,
 			tooltip: {
 				sync: false,
-				format: (f) => {
-					const { nombre, population } = f.properties as { nombre: string; population: number };
+				format: (context) => {
+					const { nombre, population } = context.row.properties as {
+						nombre: string;
+						population: number;
+					};
 					return `${nombre}: ${population}`;
 				}
 			}
@@ -84,7 +87,7 @@ describe('GeoPlot - tooltip', () => {
 			...DATA_PROPS,
 			tooltip: {
 				sync: false,
-				format: (f) => (f.properties as { nombre: string }).nombre
+				format: (context) => (context.row.properties as { nombre: string }).nombre
 				// A tooltip's `content` snippet can't be constructed inline from a
 				// plain .ts test file (it needs Svelte's snippet compilation) - the
 				// custom-content path is instead covered visually via
@@ -108,7 +111,7 @@ describe('GeoPlot - inset tooltip anchor inheritance', () => {
 				sync: false,
 				anchorX: 'left',
 				anchorY: 'top',
-				format: (f) => (f.properties as { nombre: string }).nombre
+				format: (context) => (context.row.properties as { nombre: string }).nombre
 			},
 			markers: [
 				{
@@ -119,7 +122,7 @@ describe('GeoPlot - inset tooltip anchor inheritance', () => {
 					height: 0.6,
 					tooltip: {
 						// No anchorX/anchorY here - should inherit the top-level's 'left'/'top'.
-						format: (f) => (f.properties as { nombre: string }).nombre
+						format: (context) => (context.row.properties as { nombre: string }).nombre
 					}
 				}
 			] satisfies GeoMarkersConfig[]
@@ -138,7 +141,7 @@ describe('GeoPlot - inset tooltip anchor inheritance', () => {
 				sync: false,
 				anchorX: 'left',
 				anchorY: 'top',
-				format: (f) => (f.properties as { nombre: string }).nombre
+				format: (context) => (context.row.properties as { nombre: string }).nombre
 			},
 			markers: [
 				{
@@ -150,7 +153,7 @@ describe('GeoPlot - inset tooltip anchor inheritance', () => {
 					tooltip: {
 						anchorX: 'right',
 						anchorY: 'bottom',
-						format: (f) => (f.properties as { nombre: string }).nombre
+						format: (context) => (context.row.properties as { nombre: string }).nombre
 					}
 				}
 			] satisfies GeoMarkersConfig[]
@@ -167,7 +170,7 @@ describe('GeoPlot - inset tooltip anchor inheritance', () => {
 			...DATA_PROPS,
 			tooltip: {
 				sync: false,
-				format: (f) => (f.properties as { nombre: string }).nombre
+				format: (context) => (context.row.properties as { nombre: string }).nombre
 			},
 			markers: [
 				{
@@ -177,7 +180,7 @@ describe('GeoPlot - inset tooltip anchor inheritance', () => {
 					width: 0.6,
 					height: 0.6,
 					tooltip: {
-						format: (f) => (f.properties as { nombre: string }).nombre
+						format: (context) => (context.row.properties as { nombre: string }).nombre
 					}
 				}
 			] satisfies GeoMarkersConfig[]

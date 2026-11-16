@@ -22,7 +22,7 @@ export type HistogramRowContext = KindRowContext<{
 export type HistogramPlotProps<TData extends Record<string, unknown>> = AxesPlotProps<
 	SeriesProps<TData> | SingleAxisDataProps<TData>,
 	TData,
-	WithValues<AxisBasedStylesConfig, CellValueLabel>,
+	WithValues<AxisBasedStylesConfig, CellValueLabel, 'value', HistogramRowContext>,
 	AreaStyle,
 	HistogramRowContext
 >;
@@ -31,6 +31,6 @@ export type HistogramPlotProps<TData extends Record<string, unknown>> = AxesPlot
 export type HistogramPlotCoreProps<TData extends Record<string, unknown>> = AxesPlotCoreProps<
 	SeriesProps<TData> | SingleAxisDataProps<TData>,
 	TData,
-	WithValues<AxisBasedStylesConfig, CellValueLabel>,
+	WithValues<AxisBasedStylesConfig, CellValueLabel, 'value', HistogramRowContext>,
 	AreaStyle
 >;

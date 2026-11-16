@@ -84,8 +84,11 @@ export type DirectedInsetStyle = { inset?: number; insetStart?: number; insetEnd
  * A number can also be the name of a field of the rows; so can a color, when the rows have a field
  * of that name.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type RowValue<T> = T | (T extends number ? string : never) | ((row: any) => T);
+export type RowValue<T> =
+	| T
+	| (T extends number ? string : never)
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	| ((row: any, context?: any) => T);
 
 /** A style whose every field can be a function of the row ({@link RowValue}). */
 export type PerRow<TStyle> = { [K in keyof TStyle]?: RowValue<NonNullable<TStyle[K]>> };

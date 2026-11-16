@@ -53,8 +53,7 @@ export const AlongEachCurve: Story = {
 			area: { fillOpacity: 0.5 },
 			values: {
 				layout: 'path',
-				format: (_v: number, _number: unknown, { series }: PlotRowContext) =>
-					series === 'female' ? 'Women' : 'Men'
+				format: (context: PlotRowContext) => (context.series === 'female' ? 'Women' : 'Men')
 			}
 		}
 	}

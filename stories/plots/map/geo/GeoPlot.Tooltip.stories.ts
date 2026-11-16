@@ -45,7 +45,7 @@ export const BasicTooltip: Story = {
 	args: {
 		tooltip: {
 			sync: false,
-			format: (f) => (f.properties as ArgentinaProvinceProps).nombre
+			format: (context) => (context.row.properties as ArgentinaProvinceProps).nombre
 		}
 	}
 };
@@ -58,8 +58,8 @@ export const RichFormat: Story = {
 	args: {
 		tooltip: {
 			sync: false,
-			format: (f) => {
-				const { nombre, population } = f.properties as ArgentinaProvinceProps;
+			format: (context) => {
+				const { nombre, population } = context.row.properties as ArgentinaProvinceProps;
 				return `${nombre}\nPopulation: ${population.toLocaleString()}`;
 			}
 		}
@@ -71,8 +71,8 @@ export const ComputedFormat: Story = {
 	args: {
 		tooltip: {
 			sync: false,
-			format: (f) => {
-				const { nombre, population } = f.properties as ArgentinaProvinceProps;
+			format: (context) => {
+				const { nombre, population } = context.row.properties as ArgentinaProvinceProps;
 				const total = ARGENTINA_PROVINCES.reduce(
 					(sum, p) => sum + (p.properties as ArgentinaProvinceProps).population,
 					0
@@ -110,7 +110,7 @@ export const CustomAnchor: Story = {
 			sync: false,
 			anchorX: 'left',
 			anchorY: 'top',
-			format: (f) => (f.properties as ArgentinaProvinceProps).nombre
+			format: (context) => (context.row.properties as ArgentinaProvinceProps).nombre
 		}
 	}
 };
@@ -143,7 +143,7 @@ export const TooltipOnInsets: Story = {
 		excludeParts: isAntarcticPart,
 		tooltip: {
 			sync: false,
-			format: (f) => (f.properties as ArgentinaProvinceProps).nombre
+			format: (context) => (context.row.properties as ArgentinaProvinceProps).nombre
 		},
 		markers: [
 			{
@@ -152,9 +152,9 @@ export const TooltipOnInsets: Story = {
 				data: CABA_COMUNAS,
 				styles: { stroke: '#dc2626', strokeWidth: 1 },
 				tooltip: {
-					format: (f) => {
-						const { comuna, barrios } = f.properties as CabaComunaProps;
-						return `Comuna ${comuna}\n${barrios}`;
+					format: (context) => {
+						const comuna = context.row.properties as CabaComunaProps;
+						return `Comuna ${comuna.comuna}\n${comuna.barrios}`;
 					}
 				}
 			},
@@ -194,7 +194,7 @@ export const TooltipOnInsetsWithAnchorInheritance: Story = {
 			sync: false,
 			anchorX: 'left',
 			anchorY: 'top',
-			format: (f) => (f.properties as ArgentinaProvinceProps).nombre
+			format: (context) => (context.row.properties as ArgentinaProvinceProps).nombre
 		},
 		markers: [
 			{
@@ -204,9 +204,9 @@ export const TooltipOnInsetsWithAnchorInheritance: Story = {
 				styles: { stroke: '#dc2626', strokeWidth: 1 },
 				tooltip: {
 					// No anchorX/anchorY here - inherits the top-level's 'left'/'top'.
-					format: (f) => {
-						const { comuna, barrios } = f.properties as CabaComunaProps;
-						return `Comuna ${comuna}\n${barrios}`;
+					format: (context) => {
+						const comuna = context.row.properties as CabaComunaProps;
+						return `Comuna ${comuna.comuna}\n${comuna.barrios}`;
 					}
 				}
 			},

@@ -14,6 +14,6 @@ export type RuleMarkerConfig = {
 	 * a field key or a function of the row gives each row's own.
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	value: AxisValue | string | (AxisValue | string)[] | ((d: any) => AxisValue);
+	value: AxisValue | string | (AxisValue | string)[] | ((d: any, context?: any) => AxisValue);
 	styles?: PerRow<StrokeStyle & InsetStyle>;
 } & CommonMarkerConfigWithInterval;

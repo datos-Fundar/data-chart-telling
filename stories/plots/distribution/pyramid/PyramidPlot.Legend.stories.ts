@@ -63,7 +63,7 @@ export const LegendDisabledDimsLabels: Story = {
 			y: { domain: AGE_GROUPS }
 		},
 		styles: {
-			values: { show: true, format: (v: number) => `${v.toFixed(1)}%` }
+			values: { show: true, format: (context) => `${context.value.toFixed(1)}%` }
 		} satisfies AxisBasedStylesConfig
 	}
 };
@@ -85,7 +85,11 @@ export const HoverIsolate: Story = {
 			y: { domain: AGE_GROUPS }
 		},
 		styles: {
-			values: { show: true, hoverIsolate: true, format: (v: number) => `${v.toFixed(1)}%` }
+			values: {
+				show: true,
+				hoverIsolate: true,
+				format: (context) => `${context.value.toFixed(1)}%`
+			}
 		} satisfies AxisBasedStylesConfig
 	}
 };

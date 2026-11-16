@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/svelte-vite';
-import type { PlotRowContext } from '$lib';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
 import type { AxisBasedStylesConfig } from '$lib/types/layout/styles';
 import { COUNTRIES_AT_2007 } from '$datasets';
@@ -47,13 +46,13 @@ export const ShowValues: Story = {
 	}
 };
 
-/** Custom format - `format(value, seriesName)` receives the Y value (and the series name, empty here since labels aren't grouped) and returns any string. */
+/** Custom format - `format(context)` receives what the plot knows of the labelled dot (its `value`, the Y value, and its `series`) and returns any string. */
 export const CustomFormat: Story = {
 	args: {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number) => `${v.toFixed(1)} yr`
+				format: (context) => `${context.value.toFixed(1)} yr`
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -67,7 +66,7 @@ export const GroupedWithLabels: Story = {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number) => v.toFixed(0)
+				format: (context) => context.value.toFixed(0)
 			}
 		} satisfies AxisBasedStylesConfig
 	}
@@ -79,7 +78,7 @@ export const CustomFontStyle: Story = {
 		styles: {
 			values: {
 				show: true,
-				format: (v: number) => `${v.toFixed(1)} yr`,
+				format: (context) => `${context.value.toFixed(1)} yr`,
 				fontStyle: { fill: '#7f1d1d', fontWeight: 'bold', fontSize: 13 }
 			}
 		} satisfies AxisBasedStylesConfig
@@ -93,7 +92,7 @@ export const CenteredOnPoint: Story = {
 		styles: {
 			values: {
 				side: 'on',
-				format: (v: number) => v.toFixed(0),
+				format: (context) => context.value.toFixed(0),
 				fontStyle: {
 					fill: '#ffffff',
 					fontSize: 10
@@ -123,8 +122,7 @@ export const AroundTheBubbles: Story = {
 		styles: {
 			values: {
 				layout: 'path',
-				format: (_value: number, _number: unknown, { row }: PlotRowContext) =>
-					String((row as { country: string }).country)
+				format: (context) => String((context.row as { country: string }).country)
 			}
 		},
 		legend: {

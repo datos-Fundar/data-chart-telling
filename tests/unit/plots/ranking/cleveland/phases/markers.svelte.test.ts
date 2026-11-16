@@ -183,8 +183,8 @@ describe('ClevelandPlot markers', () => {
 					values: {
 						show: true,
 						select: 'last',
-						format: (v: number, _number: unknown, context: PlotRowContext) =>
-							`${(context.row as Row | undefined)?.c}/${context.series}: ${v}`
+						format: (context: PlotRowContext & { value: number }) =>
+							`${(context.row as Row | undefined)?.c}/${context.series}: ${context.value}`
 					}
 				}
 			});

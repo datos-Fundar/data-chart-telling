@@ -38,7 +38,7 @@ describe('PyramidPlot - styles.values', () => {
 			height: 520,
 			...DATA_PROPS,
 			styles: {
-				values: { show: true, format: (v: number) => `${v.toFixed(1)}%` }
+				values: { show: true, format: (context) => `${context.value.toFixed(1)}%` }
 			} satisfies AxisBasedStylesConfig
 		});
 		const svg = await waitForSvg(container);

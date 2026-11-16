@@ -58,7 +58,7 @@
 			y={'species' as keyof PenguinCount}
 			color={'count' as keyof PenguinCount}
 			scales={{ x: { label: 'Island' }, y: { label: 'Species' } }}
-			styles={{ values: { show: false, format: (v) => `${v}` } }}
+			styles={{ values: { show: false, format: (context) => `${context.value}` } }}
 			facet={{ by: 'sex' as keyof PenguinCount, columns: 2 }}
 			tooltip={{ strategy, sync }}
 			markers={[{ type: 'hover' }]}
@@ -91,7 +91,7 @@
 				color: { scheme: { Female: '#d6336c', Male: '#1971c2' } }
 			}}
 			styles={{
-				values: { format: (v) => `${v.toFixed(1)}%` }
+				values: { format: (context) => `${context.value.toFixed(1)}%` }
 			}}
 			facet={{ by: 'year' as keyof AgeRow, columns: 2 }}
 			tooltip={{ strategy, sync }}

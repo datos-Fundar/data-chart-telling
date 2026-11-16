@@ -1,5 +1,5 @@
 /** A pixel offset: one for the whole marker, or one per row. */
-export type RowOffset = number | ((d: any) => number); // eslint-disable-line @typescript-eslint/no-explicit-any
+export type RowOffset = number | ((d: any, context?: any) => number); // eslint-disable-line @typescript-eslint/no-explicit-any
 
 /**
  * `TConfig` with `dx` and `dy` that may also be a function of the row, for a

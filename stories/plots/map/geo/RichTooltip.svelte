@@ -48,7 +48,8 @@
 		coordinates={{ projection: { type: argentinaBicontinental } }}
 		tooltip={{
 			sync: false,
-			format: (f) => `${f.properties!.nombre}: ${f.properties!.population.toLocaleString()}`,
+			format: (context) =>
+				`${context.row.properties!.nombre}: ${context.row.properties!.population.toLocaleString()}`,
 			content
 		}}
 	/>

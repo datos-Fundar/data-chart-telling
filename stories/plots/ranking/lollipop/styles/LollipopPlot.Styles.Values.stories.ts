@@ -50,7 +50,7 @@ export const SidewaysPercent: Story = {
 		y: 'province',
 		scales: { x: { domain: [70, 85] } },
 		styles: {
-			values: { show: true, format: (value: number) => `${value} years` }
+			values: { show: true, format: (context) => `${context.value} years` }
 		} satisfies AxisBasedStylesConfig
 	}
 };

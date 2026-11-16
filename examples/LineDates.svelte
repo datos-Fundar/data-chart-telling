@@ -11,5 +11,5 @@
 	x="date"
 	y="index"
 	color="commodity"
-	styles={{ values: { show: true, format: (v, _number, context) => `${context.series}: ${v}` } }}
+	styles={{ values: { show: true, format: (context) => `${context.series}: ${context.value}` } }}
 />

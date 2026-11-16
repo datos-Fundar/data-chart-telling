@@ -2,13 +2,14 @@ import type { Meta } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import { LIFE, REGION_VALUES } from '$datasets';
 import { plotStory } from '../../common/plotStory';
+import type { PlotRowContext } from '$lib';
 
 /**
  * Each hovered point has a `label` - its value - that the markers the hover draws write (a `text` in `front`
  * does, unless told otherwise). The `hover` marker's number fields write it: `decimals`, `prefix`, `suffix` and
- * `signDisplay`, over the configuration's `numbers`. `format(point, number)` writes the whole label instead:
- * `point` is the hovered point (its `x`, `y`, `series`, `row`...) and `number` writes a value as the number
- * fields ask.
+ * `signDisplay`, over the configuration's `numbers`. `format(context, number)` writes the whole label instead:
+ * `context` is what the plot knows of the hovered row (its `x`, `y`, `value`, `series`, `row`...) and `number`
+ * writes a value as the number fields ask.
  */
 const meta = {
 	title: 'Layout/Hover/Numbers',
@@ -61,15 +62,18 @@ export const SignDisplay = plotStory(LinePlot, 'LinePlot', {
 	markers: [{ type: 'hover', decimals: 1, suffix: '%', signDisplay: 'always' }]
 });
 
-/** `format(point, number)`: the whole label - here the series' name before the value, written by `number`. */
+/**
+ * `format(context, number)`: the whole label, from what the plot knows of the hovered row - here its series' name
+ * before its value, written by `number`.
+ */
 export const Format = plotStory(LinePlot, 'LinePlot', {
 	...LINES,
 	markers: [
 		{
 			type: 'hover',
 			decimals: 1,
-			format: (point: { series?: string; y: unknown }, number: (value: number) => string) =>
-				`${point.series}: ${number(Number(point.y))}`
+			format: (context: PlotRowContext, number: (value: number) => string) =>
+				`${context.series}: ${number(Number(context.value))}`
 		}
 	]
 });

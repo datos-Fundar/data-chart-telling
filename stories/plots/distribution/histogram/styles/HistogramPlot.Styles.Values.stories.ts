@@ -70,7 +70,7 @@ export const BoxBottom: Story = {
 export const CustomFormat: Story = {
 	args: {
 		styles: {
-			values: { show: true, format: (count: number) => `n=${count}` }
+			values: { show: true, format: (context) => `n=${context.value}` }
 		} satisfies AxisBasedStylesConfig
 	}
 };
@@ -110,7 +110,7 @@ export const TallestBin: Story = {
 				anchor: 'top',
 				side: 'above',
 				select: 'max',
-				format: (count: number) => `${count} people`
+				format: (context: { value: number }) => `${context.value} people`
 			}
 		}
 	}

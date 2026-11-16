@@ -18,6 +18,8 @@ export type PlotRowContext<TRow = Record<string, unknown>> = {
 	row?: TRow;
 	/** Which of the row's values a label writes, on a plot whose rows have several (`styles.values.parts`). */
 	part?: string;
+	/** The row's place among the rows a marker draws, in that marker's own accessors and styles. */
+	index?: number;
 };
 
 /** A plot kind's own context of a row: the shared one, with what the kind works out for it. */

@@ -95,13 +95,20 @@ export class ValueLabels {
 		// The value as the display fields ask (else as it is), which a plot kind's own text builds on.
 		const number =
 			NumberFormat.maybe(NumberFormat.displayOf(values), cfg) ?? ((v: number) => `${v}`);
+		const contextOf = (row: object | undefined, series?: string, part?: string) => ({
+			...ValueLabels.contextOf(row, series),
+			...(part ? { part } : {})
+		});
+		// The author's format writes from the row's context; a kind's own default, from the value it labels.
 		const writer =
 			(write: ValuesStyle['format']): ValueLabels['format'] =>
 			(v, row, series, part) =>
 				write
-					? write(v, number, { ...ValueLabels.contextOf(row, series), ...(part ? { part } : {}) })
-					: number(v);
-		this.format = writer(values?.format ?? options.format);
+					? write({ ...contextOf(row, series, part), value: v }, number)
+					: options.format
+						? options.format(v, number, contextOf(row, series, part))
+						: number(v);
+		this.format = writer(values?.format);
 		this.parts = ValueLabels.#parts(values?.parts, options.parts).map(([name, own_]) => {
 			const { format, ...placement } = own_ as ValuePartOptions;
 			return {

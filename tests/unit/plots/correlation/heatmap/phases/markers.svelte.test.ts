@@ -157,7 +157,7 @@ describe('buildMarkers - value labels', () => {
 	});
 
 	test('`values.format` formats each value', () => {
-		const markers = buildAll({ values: { format: (v) => `${v}%` } });
+		const markers = buildAll({ values: { format: (context) => `${context.value}%` } });
 		const cell = markers.find((m) => m.type === 'cell') as CellMarkerConfig;
 		// A label reads its value off the context of the row its cell draws.
 		const [label] = MarkerLabels.list(cell);

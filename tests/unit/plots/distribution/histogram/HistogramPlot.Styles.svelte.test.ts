@@ -59,7 +59,7 @@ describe('HistogramPlot - styles.values', () => {
 		const { container } = await render(HistogramPlot, {
 			...PLOT,
 			styles: {
-				values: { show: true, format: (count: number) => `n=${count}` }
+				values: { show: true, format: (context) => `n=${context.value}` }
 			} satisfies AxisBasedStylesConfig
 		});
 		const svg = await waitForSvg(container);

@@ -28,8 +28,8 @@
 		]}
 		tooltip={{
 			sync: false,
-			format: (row) => {
-				const { province, value } = row as ProvinceRow;
+			format: (context) => {
+				const { province, value } = context.row as ProvinceRow;
 				return `${province}: ${value.toFixed(1)} yr`;
 			},
 			content
