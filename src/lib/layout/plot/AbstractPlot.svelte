@@ -242,11 +242,22 @@
 			markers?: object[];
 			segments?: Record<string, object[]>;
 		};
+		const sharedAxes = sharedAxesOf(ctx.scales);
 		return {
 			...props,
+			...(sharedAxes.length ? { sharedAxes } : {}),
 			...(markers ? { markers: FacetScope.scope(markers, ctx.facet) } : {}),
 			...(segments ? { segments: FacetScope.scopeSegments(segments, ctx.facet) } : {})
 		};
+	}
+
+	/** The axes whose domain comes from the shared scales and which the author did not pin. */
+	function sharedAxesOf(shared: TScales | undefined): ('x' | 'y')[] {
+		const domainOf = (scales: unknown, axis: 'x' | 'y') =>
+			(scales as Record<string, { domain?: unknown } | undefined> | undefined)?.[axis]?.domain;
+		return (['x', 'y'] as const).filter(
+			(axis) => domainOf(shared, axis) != null && domainOf(core?.scales, axis) == null
+		);
 	}
 
 	function buildSliceProps(ctx: PlotCellContext<TRow, TScales>) {

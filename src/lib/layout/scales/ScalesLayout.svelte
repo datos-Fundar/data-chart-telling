@@ -41,10 +41,11 @@
 		/** The labels a category axis writes, when it leaves some out for want of room. */
 		tickValues?: Partial<Record<'x' | 'y', string[]>>;
 		/** The plot's state: its fitted axes and the y channel's field, which titles a vertical y axis with no rows. */
-		state: Pick<PlotLayoutState, 'fittedAxes' | 'channels'>;
+		state: Pick<PlotLayoutState, 'fittedAxes' | 'sharedAxes' | 'channels'>;
 	} = $props();
 
 	const fittedAxes = $derived(plotState.fittedAxes);
+	const sharedAxes = $derived(plotState.sharedAxes);
 	const yField = $derived.by(() => {
 		const source = plotState.channels?.y?.source;
 		return typeof source === 'string' ? source : undefined;
@@ -152,17 +153,20 @@
 		span: number,
 		min: number
 	) {
+		const shared = sharedAxes?.includes(axis) ?? false;
 		if (
 			scale?.ticks != null ||
 			scale?.tickSpacing != null ||
 			scale?.interval != null ||
-			(scale?.domain != null && !fittedAxes?.includes(axis))
+			(scale?.domain != null && !fittedAxes?.includes(axis) && !shared)
 		)
 			return undefined;
 		if (type != null && isDiscreteType(type)) return undefined;
 		if (oppositeType != null && isDiscreteType(oppositeType)) return undefined;
 		if (scale?.type != null && scale.type !== 'linear' && scale.type !== 'auto') return undefined;
-		const present = values.filter((v) => v != null);
+		// A shared domain is the same on every frame and panel, so the edges are its ends, not this slice's rows.
+		const source = shared ? (scale?.domain ?? values) : values;
+		const present = source.filter((v) => v != null);
 		if (!present.every((v) => typeof v === 'number')) return undefined;
 		return EdgeTicks.build({
 			axis,

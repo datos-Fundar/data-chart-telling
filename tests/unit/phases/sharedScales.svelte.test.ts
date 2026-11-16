@@ -121,9 +121,12 @@ function frameOf(facet: FacetConfig<Row> | undefined) {
 }
 
 /** The step's domains for `facet`'s frame, looked up the way a plot's shell looks up a cell's. */
-function sharedScalesOf(facet: FacetConfig<Row> | undefined) {
+function sharedScalesOf(
+	facet: FacetConfig<Row> | undefined,
+	scales?: Record<string, { nice?: boolean | { tolerance: number } }>
+) {
 	const step = new SharedScalesPhase(buildLineDefaults<Row>().sharedScales).run;
-	const { sharedScales } = step({ ...frameOf(facet), facet } as never, {}) as {
+	const { sharedScales } = step({ ...frameOf(facet), facet, scales } as never, {}) as {
 		sharedScales: Record<string, { x?: { domain: unknown[] }; y?: { domain: unknown[] } }>;
 	};
 	return (place: { facetValue?: string; row?: string; col?: string } = {}) =>
@@ -168,5 +171,24 @@ describe('SharedScalesPhase', () => {
 			sharedScales: Record<string, { x?: { domain: unknown[] } }>;
 		};
 		expect(sharedScales[''].x?.domain).toEqual([0, 30]);
+	});
+
+	test('`nice: false` on x shares the raw extent, without a facet (a timeline)', () => {
+		const scales = sharedScalesOf(undefined, { x: { nice: false } })();
+		expect(scales?.x?.domain).toEqual([1, 30]);
+		expect(scales?.y?.domain).toEqual([0, 60]);
+	});
+
+	test('`nice: false` on x shares the raw extent across facets', () => {
+		const scales = sharedScalesOf({ by: 'g' }, { x: { nice: false } });
+		expect(scales({ facetValue: 'A' })?.x?.domain).toEqual([1, 30]);
+		expect(scales({ facetValue: 'B' })?.x?.domain).toEqual([1, 30]);
+	});
+
+	test('`nice: true` or a tolerance keeps the rounded domain', () => {
+		expect(sharedScalesOf(undefined, { x: { nice: true } })()?.x?.domain).toEqual([0, 30]);
+		expect(sharedScalesOf(undefined, { x: { nice: { tolerance: 0.1 } } })()?.x?.domain).toEqual([
+			0, 30
+		]);
 	});
 });

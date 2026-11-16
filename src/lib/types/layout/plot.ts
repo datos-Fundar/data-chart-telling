@@ -72,6 +72,8 @@ export type PlotLayoutState = {
 	scales?: object;
 	/** The axes whose domain the plot kind fit itself rather than the author pinned. */
 	fittedAxes?: string[];
+	/** The axes whose domain a slice took from the shared scales (a timeline's or a facet's), not from the author. */
+	sharedAxes?: string[];
 	/** What the plot's position channels are and which way it runs, for what draws inside it. */
 	axes?: PlotAxes;
 	/** The plot's channels as given, whose field titles an axis with no rows. */
