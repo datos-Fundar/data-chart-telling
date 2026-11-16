@@ -61,6 +61,7 @@ export type AxisPipelineProps<TData extends Record<string, unknown>> = {
 	markers?: unknown[];
 	statistics?: unknown[];
 	transforms?: unknown[];
+	sharedAxes?: string[];
 };
 
 /** The pipeline state fields `Plot` reads. */
@@ -345,7 +346,8 @@ export class Pipeline<TState, TEnv = unknown> {
 			tooltip: props.tooltip,
 			authorMarkers: props.markers ?? [],
 			statistics: props.statistics ?? [],
-			transforms: props.transforms ?? []
+			transforms: props.transforms ?? [],
+			sharedAxes: props.sharedAxes
 		};
 	}
 }
