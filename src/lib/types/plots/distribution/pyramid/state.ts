@@ -2,7 +2,7 @@ import type { Series } from '$lib/types/plots/data/common';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 import type { AxisPlotState, AxisPlotEnv } from '$lib/types/phases';
 
-export type PyramidSide = 'left' | 'right';
+type PyramidSide = 'left' | 'right';
 
 /** A resolved series tagged with which side of the shared zero baseline it renders on. */
 export type PyramidSeries<TData extends Record<string, unknown>> = Series<TData> & {

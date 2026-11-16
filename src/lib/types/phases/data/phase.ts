@@ -4,7 +4,7 @@ import type { BasicStylesShape } from '$lib/types/layout/styles';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /** How a plot kind's own mark splits into visual segments. */
-export type SegmentsStageOptions = {
+type SegmentsStageOptions = {
 	/** The color a segment's own style sets, if any, for the markers scoped to its series. */
 	color?: (style: any) => string | undefined;
 	/** Whether adjacent visual segments share their boundary row - a continuous mark (line, area) does. Defaults to `true`. */

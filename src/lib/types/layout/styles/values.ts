@@ -70,7 +70,7 @@ export type ValuePartOptions<
  * The parts of each row a plot kind with several values per row labels - a box's `median`, a bullet's `target`: a
  * list of them, or a record turning each on (`true`) or setting its own options.
  */
-export type ValueParts<
+type ValueParts<
 	TPart extends string,
 	TLabel = MarkerLabelConfig,
 	TContext extends PlotRowContext = PlotRowContext

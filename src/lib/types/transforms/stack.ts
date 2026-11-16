@@ -5,7 +5,7 @@ import {
 } from '$lib/types/transforms/common';
 
 /** Channels both stack transforms read, by svelteplot's own names. */
-export type StackChannels = PositionChannels;
+type StackChannels = PositionChannels;
 
 /** The keys of {@link StackChannels}, at runtime. */
 export const STACK_CHANNEL_KEYS = POSITION_CHANNEL_KEYS;

@@ -7,7 +7,7 @@ import type { AreaStyle } from '$lib/types/plots/styling';
  * enables it and overrides its look field-by-field. Insets pull the frame
  * in from the content box's own edges, in pixels.
  */
-export type FrameStyle = AreaStyle & {
+type FrameStyle = AreaStyle & {
 	inset?: number;
 	insetTop?: number;
 	insetRight?: number;

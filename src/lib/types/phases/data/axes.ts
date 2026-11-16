@@ -4,7 +4,7 @@ import type { AxisChannelName } from '$lib/types/layout/mapping';
 export type AxisKind = 'discrete' | 'temporal' | 'continuous';
 
 /** Where an axis' kind came from: the author's `scales.*.type`, its values, or the plot kind needing a discrete axis. */
-export type AxisOrigin = 'explicit' | 'inferred' | 'promoted';
+type AxisOrigin = 'explicit' | 'inferred' | 'promoted';
 
 /** One active position channel, as the "data" phase reads it. */
 export type InferredAxis = { kind: AxisKind; origin: AxisOrigin };

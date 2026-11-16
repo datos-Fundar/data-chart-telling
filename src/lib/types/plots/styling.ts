@@ -85,7 +85,7 @@ export type DirectedInsetStyle = { inset?: number; insetStart?: number; insetEnd
  * A number can also be the name of a field of the rows; so can a color, when the rows have a field
  * of that name.
  */
-export type RowValue<T, TContext extends PlotRowContext = AnyRowContext> =
+type RowValue<T, TContext extends PlotRowContext = AnyRowContext> =
 	| T
 	| (T extends number ? string : never)
 	| RowFunction<T, TContext>;

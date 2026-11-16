@@ -5,19 +5,11 @@ import type { DensityStatisticOptions, Density2DStatisticOptions } from './densi
 import type { BoxStatisticOptions } from './box';
 import type { DeviationStatisticOptions } from './deviation';
 
-export type {
-	DeviationBandLabel,
-	DeviationEstimator,
-	DeviationLabel,
-	DeviationSpread,
-	DeviationStatisticOptions
-} from './deviation';
-export type { RegressionType, RegressionStatisticOptions } from './regression';
+export type { DeviationStatisticOptions } from './deviation';
+export type { RegressionStatisticOptions } from './regression';
 export type { BollingerStatisticOptions } from './bollinger';
-export type { StatisticReducer, MovingAverageStatisticOptions } from './movingAverage';
-export type { DensityKernel, DensityStatisticOptions, Density2DStatisticOptions } from './density';
-export type { BoxStatisticOptions } from './box';
-
+export type { MovingAverageStatisticOptions } from './movingAverage';
+export type { DensityStatisticOptions } from './density';
 /**
  * Which series a plot-level statistic runs over. Omitted: one derived
  * statistic per series, so a plot grouped by `color`/`grouping` gets its
@@ -25,7 +17,7 @@ export type { BoxStatisticOptions } from './box';
  * true`: one statistic over every series combined. Ignored on a marker's own
  * `.statistics` - a marker has exactly one source, its own `data`.
  */
-export type StatisticScope = { series?: string[]; pooled?: boolean };
+type StatisticScope = { series?: string[]; pooled?: boolean };
 
 /**
  * A statistic to compute and draw as one or more derived markers - the same

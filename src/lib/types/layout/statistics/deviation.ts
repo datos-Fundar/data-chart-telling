@@ -1,13 +1,13 @@
 import type { AreaStyle, FontStyle, StrokeStyle } from '$lib/types/plots/styling';
 
 /** The value a `deviation` statistic centers on. */
-export type DeviationEstimator = 'mean' | 'median' | 'midrange';
+type DeviationEstimator = 'mean' | 'median' | 'midrange';
 
 /** How far the band reaches from the estimator, before `k` scales it. */
-export type DeviationSpread = 'stdev' | 'mad';
+type DeviationSpread = 'stdev' | 'mad';
 
 /** A label written against the plot's edge, beside the line it names. */
-export type DeviationLabel = {
+type DeviationLabel = {
 	/** The text. Defaults to the estimator's name for the rule (`'MEAN'`) and the spread's for the band (`'STDEV'`). */
 	text?: string;
 	/** `dx`/`dy` here add to the default gap between the label and its line. */
@@ -15,7 +15,7 @@ export type DeviationLabel = {
 };
 
 /** A band label's place: which edge it names and which side of that edge it sits on. */
-export type DeviationBandLabel = DeviationLabel & {
+type DeviationBandLabel = DeviationLabel & {
 	/** The edge it names. Defaults to `'upper'`. */
 	edge?: 'lower' | 'upper';
 	/** Whether it sits inside the band or outside it. Defaults to `'inside'`. */

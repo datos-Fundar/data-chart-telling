@@ -11,7 +11,7 @@ import type { KindRowContext } from '$lib/types/layout/context';
 import type { BarSegmentStyle } from '$lib/types/plots/segments/common';
 
 /** One end of a link: a column on x and a value on y, as a marker's `x` and `y` read them. */
-export type SankeyLinkEnd = { column: string; y: number };
+type SankeyLinkEnd = { column: string; y: number };
 
 /**
  * What a `SankeyPlot` knows of a node or a link, which its tooltip's and value labels' `format`, its hover and
@@ -45,7 +45,7 @@ export type SankeyRowContext = KindRowContext<{
 }>;
 
 /** What a `SankeyPlot`'s `tooltip.format` gets - see {@link SankeyRowContext}. */
-export type SankeyTooltipContext = SankeyRowContext;
+type SankeyTooltipContext = SankeyRowContext;
 
 /** The channels `SankeyPlot` takes none of: its rows are placed by its graph. */
 type NoChannels<TRow extends Record<string, unknown>> = {
@@ -60,7 +60,7 @@ type NoChannels<TRow extends Record<string, unknown>> = {
  * `nodes` gives the ones that carry more than an id. `color` is what the legend lists: the nodes' labels
  * (`'source'`, the default, or `'target'`) or a value of the links'; `opacity` fades the links by one of theirs.
  */
-export type SankeyLinksDataProps<
+type SankeyLinksDataProps<
 	TLink extends Record<string, unknown>,
 	TNode extends Record<string, unknown>
 > = {
@@ -83,7 +83,7 @@ export type SankeyLinksDataProps<
  * `color`, `opacity`, `grouping` and its facet's - and keep it, so those read the links as they would the rows.
  * `grouping` keeps them apart without coloring them.
  */
-export type SankeyTableDataProps<TRow extends Record<string, unknown>> = {
+type SankeyTableDataProps<TRow extends Record<string, unknown>> = {
 	data: TRow[];
 	series?: never;
 	columns: (keyof TRow & string)[];

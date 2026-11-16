@@ -11,7 +11,7 @@ export function isFacetWrap<TRow extends Record<string, unknown>>(
 }
 
 /** One `rows` × `cols` grid cell's rows. */
-export type FacetGridGroup<TRow> = { rows: TRow[]; row?: string; col?: string };
+type FacetGridGroup<TRow> = { rows: TRow[]; row?: string; col?: string };
 
 /** The key a `rows`/`cols` grid files a cell under. */
 export function facetGridKey(row: string | undefined, col: string | undefined): string {

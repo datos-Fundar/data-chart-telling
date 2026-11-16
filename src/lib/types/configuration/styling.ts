@@ -21,7 +21,7 @@ export type TextStyle = {
 };
 
 /** What the plots that join dots along a category (lollipop, dumbbell, Cleveland) read from their own configuration block. */
-export type DotRangeStyling = {
+type DotRangeStyling = {
 	/** Radius of every dot that sets none of its own, in px. */
 	dotRadius: number;
 	/** Whether every connector draws a cap - a short tick across it - at each end, unless `styles.connector.caps` says otherwise. */

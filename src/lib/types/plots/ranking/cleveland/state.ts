@@ -11,7 +11,7 @@ export type ClevelandPlotState<TData extends Record<string, unknown>> = AxisPlot
 export type ClevelandPlotEnv = AxisPlotEnv;
 
 /** The configuration blocks the Cleveland-style plots draw their defaults from: one per plot. */
-export type ClevelandConfigKey = 'lollipop' | 'dumbbell' | 'cleveland' | 'forest';
+type ClevelandConfigKey = 'lollipop' | 'dumbbell' | 'cleveland' | 'forest';
 
 /** One category's dots along the value axis: the row each one draws, and the range they span. */
 export type ClevelandEntry = {

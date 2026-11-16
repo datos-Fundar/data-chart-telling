@@ -13,13 +13,13 @@ export type FacetNavLayout = 'overlay' | 'below';
  * `'free-x'`/`'free-y'` for one axis. In a `rows`/`cols` grid a free x is
  * shared down each column and a free y along each row.
  */
-export type FacetScales = 'shared' | 'free' | 'free-x' | 'free-y';
+type FacetScales = 'shared' | 'free' | 'free-x' | 'free-y';
 
 /**
  * Which facets draw their axes: `'all'` (default), or `'outer'` for only the
  * left column's y and the bottom row's x, with panels resized to equal boxes.
  */
-export type FacetAxes = 'all' | 'outer';
+type FacetAxes = 'all' | 'outer';
 
 /** Where a facet sits in its grid - whether each of its sides is on the grid's outer edge. */
 export type FacetEdges = CellEdges;
@@ -99,7 +99,7 @@ export type FacetWrapConfig<TRow extends Record<string, unknown>> = FacetCommonC
 };
 
 /** One facet per `rows` × `cols` combination, with each value labelled; combinations without rows stay empty. */
-export type FacetGridConfig<TRow extends Record<string, unknown>> = FacetCommonConfig & {
+type FacetGridConfig<TRow extends Record<string, unknown>> = FacetCommonConfig & {
 	by?: never;
 	rows?: Accessor<TRow, unknown>;
 	cols?: Accessor<TRow, unknown>;

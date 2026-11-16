@@ -15,13 +15,13 @@ import type { MarkerTransform } from '$lib/types/transforms';
 
 /** The `styles` prop accepted by every plot kind - its own
  * styles shape ({@link AxisBasedStylesConfig}, `GeoStylesConfig`, …). */
-export type StylesConfig<TStyles extends object> = TStyles;
+type StylesConfig<TStyles extends object> = TStyles;
 
 /**
  * The `markers` prop accepted by every plot kind - a list of that kind's own marker union, each of
  * which can be limited to some facet panels with `facet`.
  */
-export type MarkersConfig<TMarker> = (TMarker & FacetScoped)[];
+type MarkersConfig<TMarker> = (TMarker & FacetScoped)[];
 
 /**
  * The `segments` prop - series name (or `'default'`) to its {@link Segment}s.
@@ -107,7 +107,7 @@ export type PlotChromeItem =
  * others take as much as they need; a row without a `plot` shares its width
  * among its blocks, none of them stretching.
  */
-export type PlotChromeRow<TItem extends string = Exclude<PlotChromeItem, 'divider'>> =
+type PlotChromeRow<TItem extends string = Exclude<PlotChromeItem, 'divider'>> =
 	| `(${TItem}, ${TItem})`
 	| `(${TItem}, ${TItem}, ${TItem})`;
 

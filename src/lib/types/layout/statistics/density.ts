@@ -1,8 +1,6 @@
 import type { AreaStyle } from '$lib/types/plots/styling';
 import type { DensityKernel } from '$lib/types/transforms/density';
 
-export type { DensityKernel } from '$lib/types/transforms/density';
-
 /**
  * Options for `type: 'density'` - a 1D kernel density estimate over the
  * `x` values, drawn as a filled area. Runs the `densityX` transform (same

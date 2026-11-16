@@ -11,7 +11,7 @@ import type { SankeyRowContext } from '$lib/types/plots/flow/sankey/props';
  * The nodes of a sankey: an area's style, its `fill` over its series' color, and its size. `width` and `padding`
  * fall back to `sankey.nodes` in the configuration.
  */
-export type SankeyNodeStyle = AreaStyle & {
+type SankeyNodeStyle = AreaStyle & {
 	/** A node's width, in px. */
 	width?: number;
 	/** The room between two nodes of a column, in px. */
@@ -22,7 +22,7 @@ export type SankeyNodeStyle = AreaStyle & {
  * The links of a sankey: an area's style, with a `fill` of their own and how they bend.
  * `fillOpacity` and `curvature` fall back to `sankey.links` in the configuration.
  */
-export type SankeyLinkStyle = Omit<AreaStyle, 'fill'> & {
+type SankeyLinkStyle = Omit<AreaStyle, 'fill'> & {
 	/**
 	 * A link's fill: the color of the node at one of its ends (`'source'`, the default, or `'target'`) while the
 	 * nodes are the series, or a color of its own; or a function of what the plot knows of the link that says which, so
@@ -38,7 +38,7 @@ export type SankeyLinkStyle = Omit<AreaStyle, 'fill'> & {
  * last, left of the last); `'outside'` past the plot's edges for the first and last columns, so the room between
  * the columns is left to the links.
  */
-export type SankeyValuesPosition = 'auto' | 'outside';
+type SankeyValuesPosition = 'auto' | 'outside';
 
 /** `SankeyPlot`'s `styles`: its nodes, its links, its node labels, and how its nodes are arranged. */
 export type SankeyStylesConfig = WithValues<

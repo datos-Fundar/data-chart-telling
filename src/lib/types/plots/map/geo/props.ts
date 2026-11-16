@@ -17,7 +17,7 @@ export type GeoPlotProps<TProps extends Record<string, unknown>> = ProjectionPlo
 >;
 
 /** What a tooltip's `format` knows of a hovered feature: the shared row context, and the slice it was drawn in. */
-export type GeoTooltipContext = PlotRowContext & GeoSliceContext;
+type GeoTooltipContext = PlotRowContext & GeoSliceContext;
 
 /** What `GeoPlot`'s core draws from. */
 export type GeoPlotCoreProps<TProps extends Record<string, unknown>> = ProjectionPlotCoreProps<

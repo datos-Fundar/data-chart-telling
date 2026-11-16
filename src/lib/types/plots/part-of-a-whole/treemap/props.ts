@@ -29,7 +29,7 @@ type TreemapStyles = WithValues<
 >;
 
 /** What a `TreemapPlot`'s `tooltip.format` gets - see {@link TreemapRowContext}. */
-export type TreemapTooltipContext = TreemapRowContext;
+type TreemapTooltipContext = TreemapRowContext;
 
 /**
  * `TreemapPlot`'s public props: flat rows, a tile each, on no axes. `value` is a tile's area, and `grouping` what

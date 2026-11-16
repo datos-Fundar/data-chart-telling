@@ -4,7 +4,7 @@ import type { StrokeStyle } from '$lib/types/plots/styling';
  * Regression model svelteplot's own `RegressionX`/`RegressionY` marks support
  * - same names, so nothing new to learn if you already know svelteplot.
  */
-export type RegressionType = 'linear' | 'quad' | 'poly' | 'exp' | 'log' | 'pow' | 'loess';
+type RegressionType = 'linear' | 'quad' | 'poly' | 'exp' | 'log' | 'pow' | 'loess';
 
 /** Fit options for `type: 'regression'` - mirrors svelteplot's own `RegressionOptions` field-for-field. */
 export type RegressionStatisticOptions = {

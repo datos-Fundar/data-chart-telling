@@ -13,11 +13,9 @@ export type {
 	TransformsStageOptions,
 	Transform
 } from './transforms/phase';
-export type { ContextStageOptions } from './context/phase';
 export type { StatisticsStageState, StatisticsStageOptions } from './statistics/phase';
 export type { SharedAxisValues } from './sharedScales/phase';
 export type { AxisFit, ScalesStageOptions } from './scales/phase';
-export type { StylesStageOptions, ValueLabelsOptions } from './styles/phase';
 export type { MarkersStageOptions } from './markers/phase';
 export type { FacetPanel, FacetStageState } from './facet/phase';
 export type { HoverStageOptions, HoverPosition } from './hover/phase';

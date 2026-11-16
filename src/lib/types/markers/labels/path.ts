@@ -1,5 +1,4 @@
 import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
-import type { LabelAnchor } from '$lib/types/plots/constants';
 import type { LabelBaseConfig } from '$lib/types/markers/labels/common';
 
 /** An edge of a shape as it is drawn on the page. */
@@ -12,7 +11,7 @@ export type ValueEdge = 'tip' | 'base';
 export type ShapeSide = 'outside' | 'inside' | 'on';
 
 /** Where a label sits off an open stroke, as its text reads: above it, below it, or centred on it. */
-export type StrokeSide = 'above' | 'below' | 'on';
+type StrokeSide = 'above' | 'below' | 'on';
 
 /** A label written along an edge of its shape, read per row: a `'tip'` follows the sign of the row's value. */
 export type PathLabelConfig<
@@ -58,11 +57,6 @@ export type RimLabelConfig<TContext extends PlotRowContext = AnyRowContext> = Om
  * draws, `'area'` along the top or bottom edge of each area, `'rim'` around each dot.
  */
 export type PathShape = 'box' | 'stroke' | 'area' | 'rim';
-
-/** Where a plot's value label goes on its shape: in its box at an `anchor`, or along one of its edges. */
-export type ShapePlacement =
-	| { anchor: LabelAnchor }
-	| Required<Pick<PathLabelConfig, 'layout' | 'edge' | 'side'>>;
 
 /** One label along a curve, in pixels: the path its text follows and where on it the text sits. */
 export type CurvedLabel = {

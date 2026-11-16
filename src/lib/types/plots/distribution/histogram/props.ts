@@ -9,7 +9,7 @@ import type { AreaStyle } from '$lib/types/plots/styling';
  * What a `HistogramPlot` knows of a bin, which its tooltip's and value labels' `format`, its hover and
  * `usePlot().contextOf` read: its `count` (also its `value`) and the edges it spans.
  */
-export type HistogramRowContext = KindRowContext<{
+type HistogramRowContext = KindRowContext<{
 	/** How many values fall in the bin. */
 	count: number;
 	/** The bin's lower edge. */

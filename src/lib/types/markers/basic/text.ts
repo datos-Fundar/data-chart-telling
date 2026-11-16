@@ -15,10 +15,10 @@ import type { NumberDisplay } from '$lib/types/layout/numbers';
  * around its point (its own side first, then on clockwise),
  * clear of the other labels and points, and leaves out one with no room.
  */
-export type TextDeclutterMode = 'lanes' | 'around';
+type TextDeclutterMode = 'lanes' | 'around';
 
 /** {@link TextDeclutterMode}'s options. Unset geometry falls back to the configuration's `text.declutter`. */
-export type TextDeclutterConfig = {
+type TextDeclutterConfig = {
 	/** Defaults to `'lanes'`. */
 	mode?: TextDeclutterMode;
 	/** Shortest lane's distance (px) from the point before a connector bends. */
@@ -44,7 +44,7 @@ type FitChannel<TContext extends PlotRowContext> = string | symbol | RowFunction
  * `minFontSize`; at that size, broken into as many lines as the box holds and cut short with an ellipsis; and
  * when almost none of it would show, as its `fallback`. A label with no room for even that is left out.
  */
-export type TextFitConfig<TContext extends PlotRowContext = AnyRowContext> = {
+type TextFitConfig<TContext extends PlotRowContext = AnyRowContext> = {
 	/** The edges of a box of your own. A marker that draws a shape for each label gives its own, and these are left out. */
 	x1?: FitChannel<TContext>;
 	x2?: FitChannel<TContext>;
@@ -116,8 +116,6 @@ export type TextMarkerConfig<TContext extends PlotRowContext = AnyRowContext> =
 			CommonMarkerConfig<TContext>,
 		TContext
 	>;
-
-export type { LabelAnchor };
 
 /** Where one decluttered label goes - see `Declutter.buildLanes`. */
 export type LabelLane = {

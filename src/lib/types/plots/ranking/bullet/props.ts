@@ -7,7 +7,7 @@ import type { Accessor } from '$lib/types/layout/mapping';
  * `ranges` that grade the value. Each is a field of the row, a function of
  * it, or a number the same for every category.
  */
-export type BulletReferenceProps<TData extends Record<string, unknown>> = {
+type BulletReferenceProps<TData extends Record<string, unknown>> = {
 	/** Where the value should get to: a tick across the category's band at this value. */
 	target?: Accessor<TData, number> | number;
 	/** The upper bounds of the bands that grade the value, in any order: each runs from the baseline to its bound, the smallest band darkest. */

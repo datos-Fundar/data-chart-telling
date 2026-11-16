@@ -26,7 +26,7 @@ export type GeoStyleGroup<TProps extends Record<string, unknown>> = {
 };
 
 /** The active continuous-legend range filter, if any - mirrors HeatmapPlot's own. */
-export type GeoRangeFilter = {
+type GeoRangeFilter = {
 	min: number;
 	max: number;
 	mode: 'rescale' | 'filter';

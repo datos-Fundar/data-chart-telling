@@ -10,7 +10,7 @@ import type { LineSegmentStyle } from '$lib/types/plots/segments/common';
  * it): its `lower` and `upper` ends, or an `error` that reaches that far either
  * side of it. A point with none of them draws as a dot alone.
  */
-export type ForestIntervalProps<TData extends Record<string, unknown>> = {
+type ForestIntervalProps<TData extends Record<string, unknown>> = {
 	/** The lower end of each row's interval. */
 	lower?: Accessor<TData, number>;
 	/** The upper end of each row's interval. */

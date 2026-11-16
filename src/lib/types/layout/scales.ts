@@ -31,7 +31,7 @@ export type ColorScaleConfig = {
 };
 
 /** How groups sharing the same `grouping`/`color` value are ordered: `reverse` flips which sorts first (e.g. PyramidPlot's left/right sides). */
-export type GroupingScaleConfig = {
+type GroupingScaleConfig = {
 	reverse?: boolean;
 };
 
@@ -54,7 +54,7 @@ export type SymbolScaleConfig = {
 };
 
 /** Each independent channel's scale config, on a plot's `scales` and a marker's own. */
-export type ChannelScaleConfig = {
+type ChannelScaleConfig = {
 	color: ColorScaleConfig;
 	grouping: GroupingScaleConfig;
 	opacity: OpacityScaleConfig;
@@ -92,19 +92,19 @@ export type LengthScaleConfig = {
 
 /** Scale types that lay out distinct categories - an axis paired with one plays the "index" role, so the other is the plain magnitude/value axis. */
 export const DISCRETE_SCALE_TYPES = ['band', 'categorical', 'point', 'ordinal'] as const;
-export type DiscreteScaleType = (typeof DISCRETE_SCALE_TYPES)[number];
+type DiscreteScaleType = (typeof DISCRETE_SCALE_TYPES)[number];
 
 /** Scale types that lay out a continuous time axis. */
 export const TEMPORAL_SCALE_TYPES = ['time', 'utc'] as const;
-export type TemporalScaleType = (typeof TEMPORAL_SCALE_TYPES)[number];
+type TemporalScaleType = (typeof TEMPORAL_SCALE_TYPES)[number];
 
 /** Scale types that map a numeric domain continuously onto the range, differing only in the transform applied (identity, power, log, ...). */
 export const CONTINUOUS_SCALE_TYPES = ['linear', 'pow', 'sqrt', 'log', 'symlog'] as const;
-export type ContinuousScaleType = (typeof CONTINUOUS_SCALE_TYPES)[number];
+type ContinuousScaleType = (typeof CONTINUOUS_SCALE_TYPES)[number];
 
 /** Scale types that interpolate continuously along a single ramp (one end to the other, or around a cycle). */
 export const SEQUENTIAL_SCALE_TYPES = ['sequential', 'cyclical', 'quantile-cont'] as const;
-export type SequentialScaleType = (typeof SEQUENTIAL_SCALE_TYPES)[number];
+type SequentialScaleType = (typeof SEQUENTIAL_SCALE_TYPES)[number];
 
 /** Scale types that interpolate continuously along a ramp with a neutral midpoint, diverging to either side of it. */
 export const DIVERGING_SCALE_TYPES = [
@@ -114,11 +114,11 @@ export const DIVERGING_SCALE_TYPES = [
 	'diverging-sqrt',
 	'diverging-symlog'
 ] as const;
-export type DivergingScaleType = (typeof DIVERGING_SCALE_TYPES)[number];
+type DivergingScaleType = (typeof DIVERGING_SCALE_TYPES)[number];
 
 /** Scale types that bucket a numeric domain into a fixed set of output values instead of interpolating. */
 export const BINNED_SCALE_TYPES = ['threshold', 'quantile', 'quantize'] as const;
-export type BinnedScaleType = (typeof BINNED_SCALE_TYPES)[number];
+type BinnedScaleType = (typeof BINNED_SCALE_TYPES)[number];
 
 /**
  * What an axis does when the tick at the data's first or last value would
@@ -139,7 +139,7 @@ export type NiceOption = boolean | { tolerance?: number };
 export type EdgeTicksOptions = { enabled: boolean; collision: EdgeTickCollision };
 
 /** A scale's `edgeTicks`: `true` or `false`, or an object that turns them on with its own `collision`. */
-export type EdgeTicksOption = boolean | Partial<Omit<EdgeTicksOptions, 'enabled'>>;
+type EdgeTicksOption = boolean | Partial<Omit<EdgeTicksOptions, 'enabled'>>;
 
 /**
  * A category axis ordered by what each category holds: `'value'` by its value
@@ -219,7 +219,7 @@ export type AxisScale<TData = Record<string, unknown>> = NumberDisplay & {
 };
 
 /** Each {@link AxisChannelName}'s own scale-config shape - both use {@link AxisScale}. */
-export type AxisChannelScaleConfig<TData = Record<string, unknown>> = {
+type AxisChannelScaleConfig<TData = Record<string, unknown>> = {
 	[K in AxisChannelName]?: AxisScale<TData>;
 };
 

@@ -8,8 +8,6 @@ import type {
 	SymbolScaleConfig
 } from '$lib/types/layout/scales';
 
-export type LegendSectionType = 'discrete' | 'continuous' | 'size' | 'symbol';
-
 /**
  * Style for whatever a legend has turned off: a toggled-off series, or a row
  * outside a continuous range. `opacity` is the fallback for every
@@ -74,8 +72,8 @@ export type LegendNavContext = {
 /** Custom prev/next button renderer for a paginated horizontal section. Falls back to a small default arrow button. */
 export type LegendNavSnippet = Snippet<[LegendNavContext]>;
 
-export type LegendHandleWhich = 'lo' | 'hi';
-export type LegendHandleContext = {
+type LegendHandleWhich = 'lo' | 'hi';
+type LegendHandleContext = {
 	which: LegendHandleWhich;
 	/** The handle's current data value. */
 	value: number;
@@ -85,13 +83,13 @@ export type LegendHandleContext = {
 	ondoubleclick: () => void;
 };
 /** Custom drag-handle renderer for an interactive continuous section. */
-export type LegendHandleSnippet = Snippet<[LegendHandleContext]>;
+type LegendHandleSnippet = Snippet<[LegendHandleContext]>;
 
 /** Item look of an interactive discrete section: `'badge'` (default) pills with an eye toggle, or `'basic'` swatches. */
-export type LegendInteractiveStyle = 'badge' | 'basic';
+type LegendInteractiveStyle = 'badge' | 'basic';
 
 /** Click-to-toggle configuration for a discrete section: whether it's on, how toggled items look, and the style applied to a toggled-off one. */
-export type DiscreteInteractiveConfig = {
+type DiscreteInteractiveConfig = {
 	/** Turns click-to-toggle on for every item in the section. */
 	enabled?: boolean;
 	/** Item look while `enabled`. Defaults to `'badge'`. */
@@ -132,7 +130,7 @@ export type DiscreteLegendSection = {
 };
 
 /** Drag-to-narrow configuration for a continuous section: whether it's on, how the range behaves, and its look. */
-export type ContinuousInteractiveConfig = {
+type ContinuousInteractiveConfig = {
 	/** Turns drag-to-narrow on, adding lo/hi handles at the edges of the excluded range. */
 	enabled?: boolean;
 	/** `'rescale'` refits the color ramp to the narrowed range; `'filter'` (default) keeps it and hides what's outside. */
@@ -313,7 +311,7 @@ export type LegendChannel = 'series' | 'color' | 'opacity' | 'r' | 'symbol';
  * only the sections titled so - by the field or function name, or as the
  * legend shows it - and one without adjusts all of that channel's.
  */
-export type LegendOverride<TSection extends { type: string }, TComputed extends string> =
+type LegendOverride<TSection extends { type: string }, TComputed extends string> =
 	| (Omit<TSection, 'type' | TComputed> & { match?: string })
 	| (Omit<TSection, 'type' | TComputed> & { match?: string })[];
 
@@ -323,7 +321,7 @@ export type LegendOverride<TSection extends { type: string }, TComputed extends 
  * takes what both sections share, plus each one's own - what a section lacks
  * is ignored. `interactive` takes either section's options.
  */
-export type ColorOverride = Omit<
+type ColorOverride = Omit<
 	ContinuousLegendSection,
 	'type' | 'min' | 'max' | 'colorMin' | 'colorMax' | 'scheme' | 'pivot' | 'opacity' | 'interactive'
 > &

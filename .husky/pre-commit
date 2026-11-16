@@ -1,3 +1,5 @@
-# Checks on every commit: formatting and eslint over the whole project, then the type check.
+# Checks on every commit: formatting and eslint over the whole project, the type check, then no type exported that
+# nothing imports - all the CI checks short of the build and the tests.
 pnpm lint
 pnpm check
+pnpm check:unused-types

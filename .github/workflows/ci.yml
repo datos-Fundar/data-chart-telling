@@ -26,6 +26,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm check
+      - run: pnpm check:unused-types
       - run: pnpm prepack
 
   test:

@@ -7,7 +7,7 @@ import type { AxisPlotState, AxisPlotEnv } from '$lib/types/phases';
  * The active continuous-legend range filter, if any - narrows which cells
  * render at full opacity, and in `'rescale'` mode, the color domain itself.
  */
-export type HeatmapRangeFilter = LegendRange;
+type HeatmapRangeFilter = LegendRange;
 
 /**
  * HeatmapPlot's pipeline state: the shared axis-based state, where `color` is

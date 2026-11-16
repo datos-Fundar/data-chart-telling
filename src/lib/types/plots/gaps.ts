@@ -12,7 +12,7 @@ export type GapZoneConfig<TStyle> = {
  * (required to fill it), reaching `y` there (default: the nearest real
  * value). On bar plots only `x`'s presence matters.
  */
-export type OpenGapZoneConfig<TStyle> = GapZoneConfig<TStyle> & {
+type OpenGapZoneConfig<TStyle> = GapZoneConfig<TStyle> & {
 	x: AxisValue;
 	y?: AxisValue;
 };

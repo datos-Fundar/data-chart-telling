@@ -40,7 +40,7 @@ export type GeoInsetProjectionConfig =
 	  };
 
 /** An inset's own hover tooltip, matched by nearest projected centroid. */
-export type GeoInsetTooltipConfig = {
+type GeoInsetTooltipConfig = {
 	/** The text for a hovered feature, from what the plot knows of it (`context.row` is the feature). */
 	format: (context: PlotRowContext & { row: GeoFeature<Record<string, unknown>> }) => string;
 	content?: Snippet<[{ rows: GeoFeature<Record<string, unknown>>[] }]>;

@@ -1,5 +1,5 @@
 /** One resolved segment for scoped-marker rendering - see {@link ScopedMarkerGroup}. */
-export type ScopedMarkerSegment<TData> = {
+type ScopedMarkerSegment<TData> = {
 	match: (row: TData) => boolean;
 	color: string;
 };

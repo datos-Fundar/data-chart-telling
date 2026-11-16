@@ -13,7 +13,7 @@ export type TimeInput = TimeValue | Date | string;
 export type TimelineStep = number | Date;
 export type Orientation = 'horizontal' | 'vertical';
 
-export type TimelineChildContext<TRow extends Record<string, unknown>> = {
+type TimelineChildContext<TRow extends Record<string, unknown>> = {
 	selectedValue: TimeValue;
 	data: TRow[];
 	width: number;
