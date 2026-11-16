@@ -32,6 +32,8 @@
 		"test:coverage": "node scripts/coverage.mjs",
 		"test:perf": "vitest run --project=perf --reporter=verbose",
 		"test:stories": "vitest run --project=storybook",
+		"test:visual": "node scripts/visual.mjs",
+		"test:visual:update": "node scripts/visual.mjs --update",
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build",
 		"docs:images": "node scripts/docs-images.mjs",

@@ -120,6 +120,8 @@ export const InvertedColorRamp: Story = {
  * because this file's meta sets one).
  */
 export const TileLayerBasemap: Story = {
+	// Its tiles come over the network, so no screenshot of it holds still: `pnpm test:visual` leaves it out.
+	tags: ['no-visual'],
 	args: {
 		coordinates: { projection: { type: 'mercator', domain: 'data' } },
 		excludeParts: isAntarcticPart,
@@ -147,6 +149,8 @@ const IGN_ATTRIBUTION = '© Instituto Geográfico Nacional (IGN)';
 
 /** IGN's default "Argenmap" basemap - the standard full-color street map. */
 export const TileLayerIgnArgenmap: Story = {
+	// Its tiles come over the network, so no screenshot of it holds still: `pnpm test:visual` leaves it out.
+	tags: ['no-visual'],
 	args: {
 		coordinates: { projection: { type: 'mercator', domain: 'data' } },
 		excludeParts: isAntarcticPart,
@@ -165,6 +169,8 @@ export const TileLayerIgnArgenmap: Story = {
 
 /** IGN's "Argenmap gris" basemap - a muted grayscale variant, useful under a strong choropleth. */
 export const TileLayerIgnArgenmapGris: Story = {
+	// Its tiles come over the network, so no screenshot of it holds still: `pnpm test:visual` leaves it out.
+	tags: ['no-visual'],
 	args: {
 		coordinates: { projection: { type: 'mercator', domain: 'data' } },
 		excludeParts: isAntarcticPart,
@@ -183,6 +189,8 @@ export const TileLayerIgnArgenmapGris: Story = {
 
 /** IGN's "Argenmap topográfico" basemap - shows terrain/elevation shading and contour detail. */
 export const TileLayerIgnArgenmapTopografico: Story = {
+	// Its tiles come over the network, so no screenshot of it holds still: `pnpm test:visual` leaves it out.
+	tags: ['no-visual'],
 	args: {
 		coordinates: { projection: { type: 'mercator', domain: 'data' } },
 		excludeParts: isAntarcticPart,
@@ -201,6 +209,8 @@ export const TileLayerIgnArgenmapTopografico: Story = {
 
 /** IGN's "Argenmap oscuro" basemap - a dark-themed variant, pairs well with a light-colored choropleth ramp. */
 export const TileLayerIgnArgenmapOscuro: Story = {
+	// Its tiles come over the network, so no screenshot of it holds still: `pnpm test:visual` leaves it out.
+	tags: ['no-visual'],
 	args: {
 		coordinates: { projection: { type: 'mercator', domain: 'data' } },
 		excludeParts: isAntarcticPart,
@@ -219,6 +229,8 @@ export const TileLayerIgnArgenmapOscuro: Story = {
 
 /** IGN's "Argenmap híbrido" basemap - satellite imagery with street/label overlays. */
 export const TileLayerIgnArgenmapHibrido: Story = {
+	// Its tiles come over the network, so no screenshot of it holds still: `pnpm test:visual` leaves it out.
+	tags: ['no-visual'],
 	args: {
 		coordinates: { projection: { type: 'mercator', domain: 'data' } },
 		excludeParts: isAntarcticPart,

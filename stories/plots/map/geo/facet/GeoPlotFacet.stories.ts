@@ -17,7 +17,8 @@ import { demoSource } from '../../../../common/docsSource';
 const meta = {
 	title: 'Plots/Map/GeoPlot/Facet',
 	component: GeoPlotFacetDemo,
-	tags: ['autodocs'],
+	// Its tiles come over the network, so no screenshot of it holds still: `pnpm test:visual` leaves it out.
+	tags: ['autodocs', 'no-visual'],
 	args: { width: 900, height: 600 },
 	argTypes: {
 		width: { control: { type: 'range', min: 400, max: 1200, step: 20 } },

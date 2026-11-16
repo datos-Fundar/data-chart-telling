@@ -31,3 +31,6 @@ storybook-static
 # Coverage
 coverage
 .vitest-reports
+
+# Visual regression screenshots, taken on this machine only (pnpm test:visual)
+.visual

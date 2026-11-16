@@ -20,10 +20,8 @@ const coverageRun = process.argv.includes('--coverage');
 
 const storybookProject: TestProjectConfiguration = {
 	extends: true,
-	plugins: [
-		svelte({ preprocess: vitePreprocess() }),
-		storybookTest({ configDir: path.join(dirname, '.storybook') })
-	],
+	// The Svelte plugin comes with the Storybook config (`viteFinal`): a second one compiles Svelte's output again.
+	plugins: [storybookTest({ configDir: path.join(dirname, '.storybook') })],
 	test: {
 		name: 'storybook',
 		browser: {
@@ -31,6 +29,49 @@ const storybookProject: TestProjectConfiguration = {
 			headless: true,
 			provider: playwright({}),
 			instances: [{ browser: 'chromium' }]
+		}
+	}
+};
+
+/**
+ * The stories again, each compared with a screenshot of it taken on this machine: `pnpm test:visual`. The screenshots
+ * live in `.visual/`, which is neither committed nor published, and no other run includes this project.
+ */
+const visualProject: TestProjectConfiguration = {
+	extends: true,
+	// A story tagged `no-visual` (one drawn from the network) has no screenshot to hold still.
+	plugins: [
+		storybookTest({
+			configDir: path.join(dirname, '.storybook'),
+			tags: { exclude: ['no-visual'] }
+		})
+	],
+	test: {
+		name: 'visual',
+		// One browser at a time: many open at once lose their connection, as in the browser project.
+		maxWorkers: 1,
+		// What a failed story leaves behind stays beside its screenshots, out of the repo.
+		attachmentsDir: '.visual/attachments',
+		setupFiles: [path.join(dirname, '.storybook/vitest.visual.ts')],
+		browser: {
+			enabled: true,
+			headless: true,
+			provider: playwright({}),
+			instances: [{ browser: 'chromium', viewport: { width: 1280, height: 900 } }],
+			expect: {
+				toMatchScreenshot: {
+					resolveScreenshotPath: ({ arg, ext, testFileDirectory, testFileName }) =>
+						path.join(
+							dirname,
+							'.visual/reference',
+							testFileDirectory,
+							testFileName,
+							`${arg}${ext}`
+						),
+					resolveDiffPath: ({ arg, ext, testFileDirectory, testFileName }) =>
+						path.join(dirname, '.visual/diff', testFileDirectory, testFileName, `${arg}${ext}`)
+				}
+			}
 		}
 	}
 };
@@ -98,7 +139,7 @@ export default defineConfig({
 			// ── Storybook stories as Vitest tests ────────────────────────────────────
 			// Run separately with: pnpm vitest --project=storybook
 			// (requires the Storybook dev server to boot internally via storybookTest)
-			...(coverageRun ? [] : [storybookProject])
+			...(coverageRun ? [] : [storybookProject, visualProject])
 		]
 	}
 });
