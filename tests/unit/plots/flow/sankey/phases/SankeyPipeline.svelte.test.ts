@@ -69,6 +69,8 @@ const barsOf = (ran: Ran) =>
 	ran.markers.filter((m) => m.type === 'bar' && m.styles?.fill !== 'transparent');
 const fillOf = (marker: Marker, row: ProcessedRow) =>
 	(marker.styles!.fill as (row: ProcessedRow) => string)(row);
+/** The text of the label a node's bar writes. */
+const textOf = (ran: Ran) => (barsOf(ran)[0].label as { text: (row: Row) => string }).text;
 const box = () => Margins.resolve(DEFAULT_CONFIG.margins).contentBox(WIDTH, HEIGHT);
 
 describe('SankeyPlot - the nodes as the series', () => {
@@ -229,8 +231,8 @@ describe('SankeyPlot - its size in px', () => {
 describe('SankeyPlot - its labels', () => {
 	test('a node is labelled with its name and the value through it', () => {
 		const ran = run(GRAPH);
-		const [labels] = ran.markers.filter((m) => m.type === 'text');
-		expect(nodesOf(ran).map((row) => labels.text!(row))).toEqual([
+		const text = textOf(ran);
+		expect(nodesOf(ran).map((row) => text(row))).toEqual([
 			'CABA 60',
 			'GBA 90',
 			'Interior 5',
@@ -248,8 +250,8 @@ describe('SankeyPlot - its labels', () => {
 				}
 			}
 		});
-		const [labels] = ran.markers.filter((m) => m.type === 'text');
-		expect(nodesOf(ran).map((row) => labels.text!(row))).toEqual([
+		const text = textOf(ran);
+		expect(nodesOf(ran).map((row) => text(row))).toEqual([
 			'CABA 0/2',
 			'GBA 0/2',
 			'Interior 0/1',
@@ -274,9 +276,9 @@ describe('SankeyPlot - its labels', () => {
 
 	test('names the columns only when the nodes stand in named ones', () => {
 		const titles = (ran: Ran) => ran.markers.filter((m) => m.type === 'text').length;
-		expect(titles(run(GRAPH))).toBe(2);
+		expect(titles(run(GRAPH))).toBe(1);
 		const unnamed = { data: [{ source: 'a', target: 'b', value: 1 }] };
-		expect(titles(run(unnamed))).toBe(1);
+		expect(titles(run(unnamed))).toBe(0);
 	});
 });
 
@@ -363,20 +365,34 @@ describe('SankeyPlot - where a link starts and ends', () => {
 });
 
 describe('SankeyPlot - where its labels sit', () => {
-	const sides = (ran: Ran) => {
-		const [labels] = ran.markers.filter((m) => m.type === 'text') as (Marker & {
-			textAnchor: (row: ProcessedRow) => string;
-		})[];
-		return nodesOf(ran).map((row) => `${row[FLOW_ROW.x]}:${labels.textAnchor(row)}`);
-	};
+	/** The label of every node bar. */
+	const labelsOf = (ran: Ran) =>
+		(barsOf(ran) as (Marker & { label?: Record<string, unknown> })[]).map((bar) => bar.label);
 
-	test("'auto' writes every column's toward the middle", () => {
-		expect(new Set(sides(run(GRAPH)))).toEqual(new Set(['home:start', 'work:end']));
+	test("each node's bar writes it, along the edge that faces the plot's middle", () => {
+		const labels = labelsOf(run(GRAPH));
+		expect(labels.length).toBeGreaterThan(0);
+		for (const label of labels)
+			expect(label).toMatchObject({ layout: 'path', edge: 'inner', side: 'outside' });
 	});
 
-	test("'outside' writes the first and last columns' past the edges", () => {
-		const ran = run(GRAPH, { styles: { values: { position: 'outside' } } });
-		expect(new Set(sides(ran))).toEqual(new Set(['home:end', 'work:start']));
+	test("takes a bar's layouts: in its box, with the name over the value", () => {
+		const ran = run(GRAPH, { styles: { values: { layout: 'box' } } });
+		const [label] = labelsOf(ran);
+		expect(label).toMatchObject({ layout: 'box', anchor: 'middle' });
+		const [node] = nodesOf(ran);
+		expect((label!.text as (row: ProcessedRow) => string)(node)).toContain('\n');
+	});
+
+	test("'outer' writes them along the edge that faces away", () => {
+		const [label] = labelsOf(run(GRAPH, { styles: { values: { edge: 'outer' } } }));
+		expect(label).toMatchObject({ layout: 'path', edge: 'outer' });
+	});
+
+	test('show: false leaves the nodes unlabelled', () => {
+		expect(labelsOf(run(GRAPH, { styles: { values: { show: false } } }))).not.toContain(
+			expect.anything()
+		);
 	});
 });
 

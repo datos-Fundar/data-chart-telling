@@ -1,7 +1,6 @@
 import { FLOW_ROW } from '$lib/plots/families/graph/arrangements/FlowArrangement';
 import { SERIES_KEY } from '$lib/phases/transforms/TransformsPhase';
 import { RowContext } from '$lib/phases/context/RowContext';
-import { NumberFormat } from '$lib/utils/NumberFormat';
 import type { ProcessedRow } from '$lib/types/phases';
 import type {
 	AxisBasedMarkersConfig,
@@ -40,9 +39,10 @@ export const titleRoomOf = (state: State, env: SankeyPlotEnv) =>
 		: env.cfg.sankey.fontSize * TITLE_LINE_HEIGHT + env.cfg.sankey.labelGap;
 
 /**
- * The plot's own marks, links under nodes under labels. While the nodes are the series each node takes its
- * series' color, and each link the color of the node at `styles.links.fill`'s end; while the links are, each link
- * takes its own and the nodes a neutral fill. A series the legend dims dims its nodes and links.
+ * The plot's own marks: links under nodes, each node with its label, and the columns' names. While the nodes are
+ * the series each node takes its series' color, and each link the color of the node at `styles.links.fill`'s end;
+ * while the links are, each link takes its own and the nodes a neutral fill. A series the legend dims dims its
+ * nodes and links.
  */
 export function buildMarks(state: State, env: SankeyPlotEnv): AxisBasedMarkersConfig[] {
 	const rows = state.processedData?.data ?? [];
@@ -99,6 +99,7 @@ export function buildMarks(state: State, env: SankeyPlotEnv): AxisBasedMarkersCo
 	}
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const { width, padding, ...nodeStyle } = styles.nodes ?? {};
+	const label = labelOf(state, env);
 	const bars = [...groups].map(([series, data]): BarMarkerConfig => {
 		const dim = graph.end ? dimmed(series) : undefined;
 		return {
@@ -112,68 +113,29 @@ export function buildMarks(state: State, env: SankeyPlotEnv): AxisBasedMarkersCo
 				...nodeStyle,
 				fill: dim?.fill ?? nodeStyle.fill ?? (graph.end ? colorOf(series) : look.nodes.fill),
 				fillOpacity: dim?.fillOpacity ?? nodeStyle.fillOpacity ?? 1
-			}
+			},
+			...(label ? { label } : {})
 		};
 	});
 
-	return [ribbon, ...bars, ...buildLabels(state, env, nodes), ...buildTitles(state, env)];
+	return [ribbon, ...bars, ...buildTitles(state, env)];
 }
 
 /**
- * A label beside each node: its name and the value through it. With `position: 'auto'` it sits on the side away
- * from the plot's edge - right of every column but the last, left of the last one; with `'outside'` the first
- * column's sit left of it and the last one's right, past the plot's edges, which grow to fit them.
+ * A node's label, its bar's: its name and the value through it, side by side - over each other in its box.
+ * While the nodes are the series, `color: 'series'` writes each in its node's color.
  */
-function buildLabels(state: State, env: SankeyPlotEnv, nodes: ProcessedRow[]): TextMarkerConfig[] {
-	const values = state.values;
-	if (values?.show === false || !nodes.length) return [];
-	const look = env.cfg.sankey;
-	const columns = (state.processedData?.options.columns as string[] | undefined) ?? [];
-	const [first, last] = [columns[0], columns.at(-1)];
-	const reach = nodeWidthOf(state, env) / 2 + look.labelGap;
-	const outside = (stylesOf(state).values?.position ?? 'auto') === 'outside';
-	/** Whether a node's label sits left of it: the last column's, or with `'outside'` the first column's. */
-	const isLeft = (row: ProcessedRow) =>
-		columns.length > 1 && row[FLOW_ROW.x] === (outside ? first : last);
-	const number = NumberFormat.of(NumberFormat.displayOf(values), env.cfg);
+function labelOf(state: State, env: SankeyPlotEnv): BarMarkerConfig['label'] {
+	const labels = state.valueLabels?.show ? state.valueLabels : undefined;
+	if (!labels) return undefined;
+	const between = labels.layout === 'box' ? '\n' : ' ';
 	const graph = state.graph;
-	const colorOf = (series: unknown) => state.colorForSeries!(String(series));
-	const text = (row: ProcessedRow) => {
-		const own = context(row);
-		const value = values?.format
-			? values.format(own as typeof own & { value: number }, number)
-			: number(own.value!);
-		return `${own.name} ${value}`;
-	};
-	return [
-		{
-			type: 'text',
-			data: nodes,
-			x: FLOW_ROW.x as never,
-			y: FLOW_ROW.y as never,
-			text,
-			dx: (row: ProcessedRow) => (isLeft(row) ? -reach : reach),
-			textAnchor: (row: ProcessedRow) => (isLeft(row) ? 'end' : 'start'),
-			lineAnchor: 'middle',
-			...(outside ? { fitMargins: true } : {}),
-			styles: {
-				fontSize: look.fontSize,
-				...(values?.color === 'series' && graph?.end
-					? { fill: (row: ProcessedRow) => colorOf(row[SERIES_KEY]) }
-					: values?.color
-						? { fill: values.color }
-						: {}),
-				// A node the legend hides takes its label with it.
-				...(graph?.end
-					? {
-							fillOpacity: (row: ProcessedRow) =>
-								env.interaction?.fillFor(String(row[SERIES_KEY]))?.fillOpacity === 0 ? 0 : undefined
-						}
-					: {}),
-				...values?.fontStyle
-			}
-		} as TextMarkerConfig
-	];
+	return labels.label(env, (row) => `${context(row).name}${between}${labels.text(row)}`, {
+		fontSize: env.cfg.sankey.fontSize,
+		...(graph?.end
+			? { seriesColor: (row: ProcessedRow) => state.colorForSeries!(String(row[SERIES_KEY])) }
+			: {})
+	});
 }
 
 /**

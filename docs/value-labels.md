@@ -102,12 +102,42 @@ Labels that would overlap move apart:
 
 The path depends on the shape:
 
-- On a bar or a cell, an edge of its box, which `edge` names: `'top'`, `'bottom'`, `'left'` or `'right'` as the page draws them, and on a bar `'tip'`, the end its value runs to, or `'base'`, the one at zero. The tip is read per row, so a bar below zero has its tip at its bottom, and a label past it goes under it.
-- On a line, the line itself, curving with it: one label per series, its series' name unless `format` writes another.
-- On an area, its top edge, or its bottom one with `edge: 'bottom'`; on a stack, each band's own.
-- On a dot, its rim, over its top.
+- On a bar or a cell, an edge of its box, which `edge` names:
+  - `'top'`
+  - `'bottom'`
+  - `'left'`
+  - `'right'`
+  - `'inner'`: the left or right edge that faces the plot's middle, the right one on the left half and at the middle.
+  - `'outer'`: the other one of those two.
+  - `'tip'`, on a bar: the end its value runs to, read per row, so a bar below zero has its tip at its bottom, and a label past it goes under it.
+  - `'base'`, on a bar: the end at zero.
+- On an area, the edge `edge` names; on a stack, each band's own:
+  - `'top'` (the default)
+  - `'bottom'`
+- On a line, the line itself, curving with it: one label per series, its series' name unless `format` writes another. It takes no `edge`.
+- On a dot, its rim, over its top. It takes no `edge`.
 
-`side` is which side of the path the text sits on: on a shape `'outside'` (the default), `'inside'` or `'on'` its edge; on a line or an area `'above'` (the default), `'below'` or `'on'` it, where the text is drawn over a halo of the background. `offset` is where along the path, from its left or top end: `'start'`, `'middle'`, `'end'` or a percentage of its length; on a line or an area, `'max'` and `'min'` put each label at its own peak or trough. A label centred near an end of its line is moved in just enough to be written whole. `gap` is how far from it.
+Where on the path the label sits:
+
+- `side`, which side of the path:
+  - On a shape:
+    - `'outside'` (the default): beyond its edge.
+    - `'inside'`: against its edge, within the shape.
+    - `'on'`: centred on its edge.
+  - On a line or an area:
+    - `'above'` (the default)
+    - `'below'`
+    - `'on'`: over the line, on a halo of the background.
+- `offset`, how far along the path, from its left or top end:
+  - `'start'`
+  - `'middle'`
+  - `'end'`
+  - A percentage of its length, such as `'25%'`.
+  - `'max'`, on a line or an area: at its own peak.
+  - `'min'`, on a line or an area: at its own trough.
+- `gap`: how far from the path, in px.
+
+A label centred near an end of its line is moved in just enough to be written whole.
 
 ```ts
 styles: { values: { layout: 'path', edge: 'tip', side: 'inside' } } // inside each bar's end
@@ -120,7 +150,7 @@ A label along a path is written whole, not fitted to its shape. Along a straight
 
 The label is written in the middle of its shape's box. `anchor` puts it against an edge (`'top'`, `'bottom'`, `'left'`, `'right'`) or in a corner (`'top-left'`...), `gap` from it.
 
-A label in a box is fitted to it: one too wide is written smaller, down to `minFontSize`; at that size it breaks into the lines the box holds and the last one is cut short with an ellipsis; and when not even that fits, it is left out. `padding` is the room kept free inside each edge. The defaults of `gap`, `padding`, `minFontSize` (8) and `minLetters` (3) are the configuration's `text.label`: `setConfiguration({ text: { label: { gap: 6 } } })`.
+A label in a box is fitted to it: one too wide is written smaller, down to `minFontSize`; at that size it breaks into the lines the box holds and the last one is cut short with an ellipsis; and when not even that fits, it is left out. A label turned a quarter (`fontStyle.rotate: -90`) runs along the box's height. `padding` is the room kept free inside each edge. The defaults of `gap`, `padding`, `minFontSize` (8) and `minLetters` (3) are the configuration's `text.label`: `setConfiguration({ text: { label: { gap: 6 } } })`.
 
 ## How labels look
 
@@ -140,13 +170,13 @@ A marker writes the same labels on its shapes with `label`, which takes a layout
 
 `text` is a field of the row, a function of it, or a literal. A list of labels writes each of them: `label: [{ text: 'value', anchor: 'top' }, { text: 'name', anchor: 'bottom' }]`. Each marker kind takes the layouts its shapes can write, `'box'` by default on shapes with a box and `'point'` on the others:
 
-| Marker          | `'box'` | `'path'`                            | `'point'`                     |
-| --------------- | ------- | ----------------------------------- | ----------------------------- |
-| `bar`, `waffle` | default | its edges, `'tip'` and `'base'` too | a point of its box (`anchor`) |
-| `rect`, `cell`  | default | its edges                           | a point of its box (`anchor`) |
-| `line`, `trail` |         | the line                            | default: each row's point     |
-| `area`          |         | its top or bottom edge              | default: each row's top       |
-| `dot`           |         | its rim                             | default: its center           |
+| Marker          | `'box'` | `'path'`                                                  | `'point'`                     |
+| --------------- | ------- | --------------------------------------------------------- | ----------------------------- |
+| `bar`, `waffle` | default | its edges, `'tip'`, `'base'`, `'inner'` and `'outer'` too | a point of its box (`anchor`) |
+| `rect`, `cell`  | default | its edges, `'inner'` and `'outer'` too                    | a point of its box (`anchor`) |
+| `line`, `trail` |         | the line                                                  | default: each row's point     |
+| `area`          |         | its top or bottom edge                                    | default: each row's top       |
+| `dot`           |         | its rim                                                   | default: its center           |
 
 On a marker:
 

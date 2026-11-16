@@ -16,17 +16,42 @@ import { plotStory } from '../../common/plotStory';
  * `layout: 'path'` writes each label along an edge or a stroke of its shape - the default of the plots of bars,
  * past each bar's tip. The path depends on the shape:
  *
- * - on a bar or a cell, an edge of its box: `edge` names it - `'top'`, `'bottom'`, `'left'`, `'right'` as the page
- *   draws them, and on a bar `'tip'`, the end its value runs to, or `'base'`, the one at zero;
- * - on a line, the line itself, one label per series, its series' name by default;
- * - on an area, its top edge, or its bottom one with `edge: 'bottom'`;
- * - on a dot, its rim.
+ * - On a bar or a cell, an edge of its box, which `edge` names:
+ *   - `'top'`
+ *   - `'bottom'`
+ *   - `'left'`
+ *   - `'right'`
+ *   - `'inner'`: the left or right edge that faces the plot's middle.
+ *   - `'outer'`: the other one of those two.
+ *   - `'tip'`, on a bar: the end its value runs to.
+ *   - `'base'`, on a bar: the end at zero.
+ * - On an area, the edge `edge` names:
+ *   - `'top'` (the default)
+ *   - `'bottom'`
+ * - On a line, the line itself: one label per series, its series' name by default. It takes no `edge`.
+ * - On a dot, its rim. It takes no `edge`.
  *
- * `side` says which side of the path the text sits on: on a shape `'outside'` (the default), `'inside'` or `'on'`
- * its edge; on a line or an area `'above'` (the default), `'below'` or `'on'` it. `offset` is where along the path,
- * from its left or top end - `'start'`, `'middle'`, `'end'` or a percentage of its length; on a line or an area,
- * `'max'` and `'min'` put each label at its own peak or trough - and `gap` how far from it. A label along a path is
- * not fitted to its shape: it is written whole.
+ * Where on the path the label sits:
+ *
+ * - `side`, which side of the path:
+ *   - On a shape:
+ *     - `'outside'` (the default): beyond its edge.
+ *     - `'inside'`: against its edge, within the shape.
+ *     - `'on'`: centred on its edge.
+ *   - On a line or an area:
+ *     - `'above'` (the default)
+ *     - `'below'`
+ *     - `'on'`: over the line, on a halo of the background.
+ * - `offset`, how far along the path, from its left or top end:
+ *   - `'start'`
+ *   - `'middle'`
+ *   - `'end'`
+ *   - A percentage of its length, such as `'25%'`.
+ *   - `'max'`, on a line or an area: at its own peak.
+ *   - `'min'`, on a line or an area: at its own trough.
+ * - `gap`: how far from the path, in px.
+ *
+ * A label along a path is not fitted to its shape: it is written whole.
  */
 const meta = {
 	title: 'Layout/Values/Path',
@@ -85,6 +110,21 @@ export const AtTheBase = plotStory(BarPlot, 'BarPlot', {
 export const AlongAPageEdge = plotStory(BarPlot, 'BarPlot', {
 	...CHANGES,
 	styles: { values: { ...SIGNED, layout: 'path', edge: 'top' } }
+});
+
+/**
+ * `edge: 'inner'`: the left or right edge that faces the plot's middle - the right one on the left half and at the
+ * middle, the left one on the right half. Here inside it: each label sits against the side of its bar toward the center.
+ */
+export const AlongTheInnerEdge = plotStory(BarPlot, 'BarPlot', {
+	...CHANGES,
+	styles: { values: { ...SIGNED, layout: 'path', edge: 'inner', side: 'inside' } }
+});
+
+/** `edge: 'outer'`: the other one, facing away from the middle: each label sits against the side of its bar toward the plot's edge. */
+export const AlongTheOuterEdge = plotStory(BarPlot, 'BarPlot', {
+	...CHANGES,
+	styles: { values: { ...SIGNED, layout: 'path', edge: 'outer', side: 'inside' } }
 });
 
 // ── Along a line ──────────────────────────────────────────────────────────────

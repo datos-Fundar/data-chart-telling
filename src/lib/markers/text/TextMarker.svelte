@@ -229,6 +229,8 @@
 		const padding = fit.padding ?? cfg.text.label.padding;
 		const measure = (text: string, size: number) => Box.ofText(text, size, cfg).width;
 		const fallback = fit.fallback;
+		// A label turned a quarter runs along its box's height, its lines stacked across its width.
+		const turned = typeof styles?.rotate === 'number' && Math.abs(styles.rotate) % 180 === 90;
 		const fallbackOf = (d: TData) => {
 			// As `text` is: a function's result, a field of the row, else the text itself.
 			const value =
@@ -250,8 +252,8 @@
 					? TextFit.fit({
 							text: textOf(d),
 							fallback: fallback === undefined ? undefined : fallbackOf(d),
-							width: size.width - 2 * padding,
-							height: size.height - 2 * padding,
+							width: (turned ? size.height : size.width) - 2 * padding,
+							height: (turned ? size.width : size.height) - 2 * padding,
 							fontSize,
 							minFontSize: fit.minFontSize ?? cfg.text.label.minFontSize,
 							lineHeight: styles?.lineHeight ?? 1.2,

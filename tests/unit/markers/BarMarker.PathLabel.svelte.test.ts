@@ -58,3 +58,16 @@ describe('a bar marker - path labels', () => {
 		expect(Math.abs(downText.top - down.top)).toBeLessThan(8);
 	});
 });
+
+describe('a bar marker - path labels on the side facing the middle', () => {
+	test("'inner' is the side facing the plot's middle across, 'outer' the other one", async () => {
+		const inner = await draw({ edge: 'inner' });
+		// 'up' stands on the left half, 'down' on the right one.
+		expect(inner.upText.left).toBeGreaterThanOrEqual(inner.up.right - 1);
+		expect(inner.downText.right).toBeLessThanOrEqual(inner.down.left + 1);
+
+		const outer = await draw({ edge: 'outer' });
+		expect(outer.upText.right).toBeLessThanOrEqual(outer.up.left + 1);
+		expect(outer.downText.left).toBeGreaterThanOrEqual(outer.down.right - 1);
+	});
+});

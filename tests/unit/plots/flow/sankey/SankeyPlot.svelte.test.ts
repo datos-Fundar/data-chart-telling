@@ -105,6 +105,42 @@ describe('SankeyPlot', () => {
 	});
 });
 
+describe('SankeyPlot - node labels', () => {
+	/** Where the label starting with `name` sits across, against the middle of the plot's frame. */
+	const sideOf = (svg: SVGElement, name: string) => {
+		const text = Array.from(svg.querySelectorAll('text')).find((el) =>
+			el.textContent?.startsWith(`${name} `)
+		)!;
+		const label = text.getBoundingClientRect();
+		const frame = svg.getBoundingClientRect();
+		return label.left + label.width / 2 < frame.left + frame.width / 2 ? 'left' : 'right';
+	};
+	const columnOf = (svg: SVGElement, name: string) => {
+		const text = Array.from(svg.querySelectorAll('text')).find((el) =>
+			el.textContent?.startsWith(`${name} `)
+		)!;
+		return text.getAttribute('text-anchor') ?? getComputedStyle(text).textAnchor;
+	};
+
+	test("sit toward the plot's middle by default, and away from it with 'outer'", async () => {
+		const inner = await render(SankeyPlot, { props: { width: 700, height: 400, ...BY_ISLAND } });
+		const svg = await waitForSvg(inner.container);
+		await expect.poll(() => inner.container.textContent).toContain('Torgersen 47');
+		expect(columnOf(svg, 'Adelie')).toBe('start');
+		expect(columnOf(svg, 'Female')).toBe('end');
+		expect(sideOf(svg, 'Adelie')).toBe('left');
+		inner.unmount();
+
+		const outer = await render(SankeyPlot, {
+			props: { width: 700, height: 400, ...BY_ISLAND, styles: { values: { edge: 'outer' } } }
+		});
+		const outerSvg = await waitForSvg(outer.container);
+		await expect.poll(() => outer.container.textContent).toContain('Torgersen 47');
+		await expect.poll(() => columnOf(outerSvg, 'Adelie')).toBe('end');
+		expect(columnOf(outerSvg, 'Female')).toBe('start');
+	});
+});
+
 describe('SankeyPlot - hovering', () => {
 	/** The invisible shapes the pointer finds the nodes (rects) and links (paths) by. */
 	const hitAreas = (svg: SVGElement, tag: string) =>

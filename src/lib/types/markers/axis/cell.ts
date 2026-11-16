@@ -1,5 +1,10 @@
 import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
-import type { PathLabelConfig, PageEdge, ShapeSide } from '$lib/types/markers/labels/path';
+import type {
+	PathLabelConfig,
+	PageEdge,
+	PlotEdge,
+	ShapeSide
+} from '$lib/types/markers/labels/path';
 import type { BoxLabelConfig } from '$lib/types/markers/labels/box';
 import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { AreaStyle, PerRow, InsetStyle } from '$lib/types/plots/styling';
@@ -15,6 +20,6 @@ export type CellMarkerConfig<TContext extends PlotRowContext = AnyRowContext> = 
 	CommonMarkerConfigWithArea<TContext> &
 	CommonMarkerConfigWithLabel<
 		| BoxLabelConfig<TContext>
-		| PathLabelConfig<PageEdge, ShapeSide, TContext>
+		| PathLabelConfig<PageEdge | PlotEdge, ShapeSide, TContext>
 		| PointLabelConfig<TContext>
 	>;

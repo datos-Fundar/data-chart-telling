@@ -35,15 +35,66 @@ type Story = StoryObj<typeof meta>;
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
-/** By default each node is labelled with its name and the value through it, beside it toward the plot's middle. */
+/**
+ * By default each node is labelled with its name and the value through it, beside it toward the plot's middle:
+ * `layout: 'path'` along its `'inner'` edge, `side: 'outside'`.
+ */
 export const Basic: Story = {};
 
 /**
- * `position: 'outside'` writes the first and last columns' labels past the plot's edges, which grow to fit them,
- * so the room beside those nodes is left to the links.
+ * A node's label is its bar's, so it takes a bar's layouts. `edge: 'outer'` writes it on the side facing away
+ * from the plot's middle: the first and last columns' sit past the plot's edges, which grow to fit them, and
+ * leave the room beside those nodes to the links.
  */
-export const Outside: Story = {
-	args: { styles: { values: { position: 'outside' } } }
+export const Outer: Story = {
+	args: { styles: { values: { layout: 'path', edge: 'outer' } } }
+};
+
+/** `layout: 'box'` writes each label in its node, its name over its value: here the nodes are wide enough. */
+export const InsideWideNodes: Story = {
+	args: {
+		styles: {
+			nodes: { width: 90 },
+			values: { layout: 'box' }
+		}
+	}
+};
+
+/** `side: 'inside'` writes it in its node, against the edge facing the plot's middle. */
+export const AgainstTheInnerEdge: Story = {
+	args: {
+		styles: {
+			nodes: { width: 80 },
+			values: { layout: 'path', edge: 'inner', side: 'inside' }
+		}
+	}
+};
+
+/** A `fontStyle.rotate` of `-90` writes it up the middle of its node, along it. */
+export const Vertical: Story = {
+	args: {
+		styles: {
+			nodes: { width: 40 },
+			values: { layout: 'box', fontStyle: { rotate: -90 } }
+		}
+	}
+};
+
+/**
+ * `color: 'series'` writes each label in its node's color: past the plot's edges here, off the links. The middle
+ * column's still cross the links: a white stroke painted under the text (`paintOrder: 'stroke'`) keeps them apart.
+ */
+export const SeriesColor: Story = {
+	args: {
+		styles: {
+			values: {
+				layout: 'path',
+				edge: 'outer',
+				color: 'series',
+				fontStyle: { fontWeight: 600, stroke: 'white', strokeWidth: 3, paintOrder: 'stroke' }
+			}
+		}
+	}
 };
 
 /**

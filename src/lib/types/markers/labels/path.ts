@@ -4,6 +4,9 @@ import type { LabelBaseConfig } from '$lib/types/markers/labels/common';
 /** An edge of a shape as it is drawn on the page. */
 export type PageEdge = 'top' | 'bottom' | 'left' | 'right';
 
+/** A side of a shape as the plot's middle sees it: the one facing it across, 'inner', or the one facing away, 'outer'. */
+export type PlotEdge = 'inner' | 'outer';
+
 /** An edge of a shape that runs along a value: the end away from zero, `'tip'`, or the one at zero, `'base'`. */
 export type ValueEdge = 'tip' | 'base';
 
@@ -15,7 +18,7 @@ type StrokeSide = 'above' | 'below' | 'on';
 
 /** A label written along an edge of its shape, read per row: a `'tip'` follows the sign of the row's value. */
 export type PathLabelConfig<
-	TEdge extends string = PageEdge | ValueEdge,
+	TEdge extends string = PageEdge | PlotEdge | ValueEdge,
 	TSide extends string = ShapeSide,
 	TContext extends PlotRowContext = AnyRowContext
 > = LabelBaseConfig<TContext> & {

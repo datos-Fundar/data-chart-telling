@@ -5,6 +5,7 @@ import type {
 	AreaEdgeLabelConfig,
 	PageEdge,
 	PathLabelConfig,
+	PlotEdge,
 	RimLabelConfig,
 	StrokeLabelConfig,
 	ValueEdge
@@ -115,11 +116,14 @@ type ValuesOptions<TContext extends PlotRowContext = PlotRowContext> = NumberDis
 /** The labels a plot of bars writes on them: in each, along an edge (its `tip` too) or beside a point of it. */
 export type BarValueLabel =
 	| BoxLabelConfig
-	| PathLabelConfig<PageEdge | ValueEdge>
+	| PathLabelConfig<PageEdge | PlotEdge | ValueEdge>
 	| PointLabelConfig;
 
 /** The labels a plot of boxes with no value direction (a heatmap's cells, a histogram's bins) writes on them. */
-export type CellValueLabel = BoxLabelConfig | PathLabelConfig<PageEdge> | PointLabelConfig;
+export type CellValueLabel =
+	| BoxLabelConfig
+	| PathLabelConfig<PageEdge | PlotEdge>
+	| PointLabelConfig;
 
 /** The labels a plot of lines writes: beside its points, or along its lines. */
 export type LineValueLabel = PointLabelConfig | StrokeLabelConfig;

@@ -2,6 +2,7 @@ import type { AnyRowContext, PlotRowContext } from '$lib/types/layout/context';
 import type {
 	PathLabelConfig,
 	PageEdge,
+	PlotEdge,
 	ValueEdge,
 	ShapeSide
 } from '$lib/types/markers/labels/path';
@@ -26,6 +27,6 @@ export type BarMarkerConfig<TContext extends PlotRowContext = AnyRowContext> = {
 	CommonMarkerConfigWithInterval<TContext> &
 	CommonMarkerConfigWithLabel<
 		| BoxLabelConfig<TContext>
-		| PathLabelConfig<PageEdge | ValueEdge, ShapeSide, TContext>
+		| PathLabelConfig<PageEdge | PlotEdge | ValueEdge, ShapeSide, TContext>
 		| PointLabelConfig<TContext>
 	>;

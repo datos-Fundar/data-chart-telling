@@ -40,13 +40,13 @@ const BESIDE_A_NODE = 10;
 // ── Stories ───────────────────────────────────────────────────────────────────
 
 /**
- * `styles.values.position: 'outside'` writes the species' and the sexes' labels past the plot's edges, so the
+ * `styles.values.edge: 'outer'` writes the species' and the sexes' labels past the plot's edges, so the
  * room beside those nodes is left to the links. Two `text` markers write there each link's share: of its species
  * where it leaves one - a third of the Adelies live on Torgersen - and of its sex where it reaches one.
  */
 export const LinkShares: Story = {
 	args: {
-		styles: { values: { position: 'outside' } },
+		styles: { values: { edge: 'outer' } },
 		markers: [
 			{
 				type: 'text',

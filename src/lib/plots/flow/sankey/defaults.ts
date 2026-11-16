@@ -238,6 +238,22 @@ export function buildSankeyDefaults<TLink extends Record<string, unknown>>(): Ax
 			defaults: () => ({ y: { reverse: true } }),
 			fit: buildFit
 		},
+		// Each node is labelled beside it, toward the plot's middle, with its value as the display fields write it.
+		styles: {
+			values: {
+				show: true,
+				layout: 'path',
+				layouts: {
+					path: { edge: 'inner', side: 'outside' },
+					box: { anchor: 'middle' },
+					point: { anchor: 'middle', side: 'on' }
+				},
+				formatFor: (state) => {
+					const number = NumberFormat.of(NumberFormat.displayOf(state.values), getConfiguration());
+					return (value) => number(value);
+				}
+			}
+		},
 		markers: { marks: buildMarks },
 		hover: {
 			// A node is found at its top, a link where it leaves, halfway across: no two rows share a place.

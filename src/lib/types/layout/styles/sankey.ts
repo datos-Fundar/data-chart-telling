@@ -1,6 +1,5 @@
-import type { WithValues } from '$lib/types/layout/styles/values';
+import type { BarValueLabel, WithValues } from '$lib/types/layout/styles/values';
 import type { ArrangementAwarePlotStylesConfig } from '$lib/types/layout/styles/arrangement';
-import type { PointLabelConfig } from '$lib/types/markers/labels/point';
 import type { FlowArrangementOptions } from '$lib/types/arrangements/flow';
 import type { FlowEnd } from '$lib/types/plots/families/graph';
 import type { StyleValue } from '$lib/types/layout/styles/base';
@@ -34,20 +33,15 @@ type SankeyLinkStyle = Omit<AreaStyle, 'fill'> & {
 };
 
 /**
- * Where a node's label sits: `'auto'` beside it, toward the middle of the plot (right of every column but the
- * last, left of the last); `'outside'` past the plot's edges for the first and last columns, so the room between
- * the columns is left to the links.
+ * `SankeyPlot`'s `styles`: its nodes, its links, its node labels, and how its nodes are arranged. A node's label
+ * is its bar's, in any of a bar's layouts: by default along its `'inner'` edge, the one facing the plot's middle.
  */
-type SankeyValuesPosition = 'auto' | 'outside';
-
-/** `SankeyPlot`'s `styles`: its nodes, its links, its node labels, and how its nodes are arranged. */
 export type SankeyStylesConfig = WithValues<
 	ArrangementAwarePlotStylesConfig<FlowArrangementOptions>,
-	PointLabelConfig,
+	BarValueLabel,
 	'value',
 	SankeyRowContext
 > & {
 	nodes?: SankeyNodeStyle;
 	links?: SankeyLinkStyle;
-	values?: { position?: SankeyValuesPosition };
 };

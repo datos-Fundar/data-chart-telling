@@ -42,7 +42,7 @@ export class PathLayout {
 		const placed = (row: unknown): Placement => {
 			const scales = plot.scales?.();
 			const box = scales ? size(row, scales) : undefined;
-			const page = PathLayout.#pageEdge(edge ?? (ends ? 'tip' : 'top'), ends, row, scales);
+			const page = PathLayout.#pageEdge(edge ?? (ends ? 'tip' : 'top'), geometry, row, scales);
 			const [h, v] = NORMALS[page];
 			const [width, height] = [box?.width ?? 0, box?.height ?? 0];
 			const across = (extent: number) => extent / 2 + space;
@@ -91,13 +91,20 @@ export class PathLayout {
 		return Number.isFinite(percent) ? Math.min(Math.max(percent / 100, 0), 1) : 0.5;
 	}
 
-	/** The page edge a row's `edge` is: its tip is the end of the shape its value runs to. */
+	/**
+	 * The page edge a row's `edge` is: its tip is the end of the shape its value runs to; its inner side the one
+	 * that faces the plot's middle across, its outer side the other one.
+	 */
 	static #pageEdge(
 		edge: string,
-		ends: BoxGeometryOf['ends'],
+		{ ends, x }: BoxGeometryOf,
 		row: unknown,
 		scales: BoxScales | undefined
 	): PageEdge {
+		if (edge === 'inner' || edge === 'outer') {
+			const inner = PathLayout.#inner(x, row, scales?.x);
+			return edge === 'inner' ? inner : OPPOSITE[inner];
+		}
 		if (edge !== 'tip' && edge !== 'base') return edge as PageEdge;
 		const scale = ends && scales?.[ends.axis];
 		const [from, to] = scale
@@ -107,5 +114,20 @@ export class PathLayout {
 		const tip: PageEdge =
 			ends?.axis === 'x' ? (to >= from ? 'right' : 'left') : to <= from ? 'top' : 'bottom';
 		return edge === 'tip' ? tip : OPPOSITE[tip];
+	}
+
+	/** The side of a row's shape that faces the plot's middle across: its right while it stands on the left half or at the middle. */
+	static #inner(x: unknown, row: unknown, scale: BoxScales[string]): PageEdge {
+		if (!scale) return 'right';
+		const value =
+			typeof x === 'function'
+				? (x as (row: unknown) => unknown)(row)
+				: typeof x === 'string' || typeof x === 'symbol'
+					? (row as Record<string | symbol, unknown>)?.[x]
+					: x;
+		const band = scale.type === 'band' ? Number(scale.fn.bandwidth()) : 0;
+		const at = Number(scale.fn(value)) + band / 2;
+		const [from, to] = (scale.fn.range?.() ?? [at, at]).map(Number);
+		return at <= (from + to) / 2 + 0.5 ? 'right' : 'left';
 	}
 }
