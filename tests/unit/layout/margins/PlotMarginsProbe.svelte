@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { setContext } from 'svelte';
+	import type { Readable } from 'svelte/store';
 	import { Margins } from '$lib/layout/margins/Margins';
 	import { PlotMargins } from '$lib/layout/margins/PlotMargins.svelte';
 	import type { MarginConfig } from '$lib/types/plots/props';
@@ -12,6 +14,8 @@
 	 * a label's DOM measurement does - outside the reactive graph. `plot`, if
 	 * given, is followed as svelteplot's plot, and `label` a rectangle (in
 	 * px of the box) watched for overflow the way a value label is.
+	 * `autoMargins`, if given, stands for svelteplot's record of the room its
+	 * axes ask of each side (with `plot`, which it is read through).
 	 */
 	let {
 		width,
@@ -20,6 +24,7 @@
 		reserve = [],
 		plot,
 		label,
+		autoMargins,
 		onReady,
 		onSettle
 	}: {
@@ -29,6 +34,10 @@
 		reserve?: EdgeBox[];
 		plot?: { options: Record<string, unknown> };
 		label?: { x: number; y: number; width: number; height: number };
+		autoMargins?: Record<
+			'autoMarginTop' | 'autoMarginRight' | 'autoMarginBottom' | 'autoMarginLeft',
+			Readable<ReadonlyMap<string, number>>
+		>;
 		onReady: (margins: PlotMargins) => void;
 		onSettle?: (margins: MarginConfig) => void;
 	} = $props();
@@ -46,6 +55,8 @@
 	});
 
 	let labelEl = $state<SVGGraphicsElement>();
+	// svelte-ignore state_referenced_locally
+	if (autoMargins) setContext('svelteplot/autoMargins', autoMargins);
 	// svelte-ignore state_referenced_locally
 	if (plot) margins.follow(plot);
 	margins.watch(() => labelEl, { grow: () => true });
