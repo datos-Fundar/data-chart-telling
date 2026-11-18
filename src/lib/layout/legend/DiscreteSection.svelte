@@ -97,14 +97,20 @@
 	// than indexing stale `rows` into the new list.
 	const currentKey = $derived(section.items.map((item) => item.name).join(' '));
 
+	// The width the rows were last measured at. A new width is the container's resize, reported by a resize
+	// observer: the rows it brings decide whether the nav buttons show, which resizes the section again, so they
+	// apply on the next frame - a resize within the frame that reported one is a loop to the browser. Anything else
+	// (the first measure, new items) applies at once, before the section is painted unpaged.
+	let measuredWidth: number | undefined;
 	$effect(() => {
 		if (!isHorizontal || !measurerEl) {
 			rows = [];
 			measuredKey = '';
+			measuredWidth = undefined;
 			return;
 		}
 		void section.items;
-		void containerWidth;
+		const width = containerWidth;
 		const key = currentKey;
 		const children = Array.from(measurerEl.children) as HTMLElement[];
 		const grouped: number[][] = [];
@@ -118,8 +124,18 @@
 				grouped[grouped.length - 1].push(i);
 			}
 		}
-		rows = grouped;
-		measuredKey = key;
+		const apply = () => {
+			rows = grouped;
+			measuredKey = key;
+		};
+		const resized = measuredWidth !== undefined && width !== measuredWidth;
+		measuredWidth = width;
+		if (!resized) {
+			apply();
+			return;
+		}
+		const frame = requestAnimationFrame(apply);
+		return () => cancelAnimationFrame(frame);
 	});
 
 	// Whether `rows` was measured against the current item list - before it

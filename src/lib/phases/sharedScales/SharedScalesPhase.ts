@@ -103,11 +103,7 @@ export class SharedScalesPhase<TState extends SharedScalesState, TEnv> implement
 			const values = members
 				? members.map((panel) => SharedScalesPhase.buildPanelAxisValues(state, panel, layout))
 				: [SharedScalesPhase.buildPanelAxisValues(state, undefined, layout)];
-			return SharedScalesPhase.buildSharedAxisScale(
-				values,
-				channel,
-				NiceTicks.toleranceOf(state.scales?.[channel]?.nice)
-			);
+			return SharedScalesPhase.buildSharedAxisScale(values, channel, state.scales?.[channel]?.nice);
 		};
 
 		const cache = new Map<string, SharedScale>();
@@ -146,12 +142,12 @@ export class SharedScalesPhase<TState extends SharedScalesState, TEnv> implement
 	 * otherwise, or `undefined`. A numeric extent is niced here, once, so every
 	 * slice gets the exact same domain - svelteplot's own `nice` rounds by a tick
 	 * count derived from each panel's height, which over-rounds short panels and
-	 * can disagree between panels of different heights.
+	 * can disagree between panels of different heights. `nice: false` keeps the raw extent.
 	 */
 	static buildSharedAxisScale(
 		slices: SharedAxisValues[],
 		axis: AxisChannelName,
-		niceTolerance?: number
+		nice?: NiceOption
 	): SharedScale {
 		const values = slices
 			.flatMap((slice) => slice[axis])
@@ -169,7 +165,8 @@ export class SharedScalesPhase<TState extends SharedScalesState, TEnv> implement
 				: (values as number[]);
 			const lo = Math.min(...numbers);
 			const hi = Math.max(...numbers);
-			return { domain: NiceTicks.domain(lo, hi, 10, niceTolerance), nice: false };
+			if (nice === false) return { domain: [lo, hi], nice: false };
+			return { domain: NiceTicks.domain(lo, hi, 10, NiceTicks.toleranceOf(nice)), nice: false };
 		}
 		if (values.every((v) => v instanceof Date)) {
 			const times = (values as Date[]).map((d) => +d);

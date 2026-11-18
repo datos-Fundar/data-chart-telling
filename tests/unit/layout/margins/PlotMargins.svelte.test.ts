@@ -1,5 +1,7 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, test, expect, vi } from 'vitest';
+import { writable } from 'svelte/store';
+import { SvelteMap } from 'svelte/reactivity';
 import PlotMarginsProbe from './PlotMarginsProbe.svelte';
 import { Margins } from '$lib/layout/margins/Margins';
 import { Box } from '$lib/layout/margins/Box';
@@ -154,5 +156,96 @@ describe('PlotMargins - rotated tick labels', () => {
 			onReady: () => {}
 		});
 		expect(probe(container).getAttribute('data-bottom')).toBe('auto');
+	});
+});
+
+describe("PlotMargins - svelteplot's measured room flipping by a pixel", () => {
+	// svelteplot rounds a tick label's box up, so a label on the edge of a whole pixel reads one
+	// pixel taller or shorter depending on where it is drawn: the room it asks of its side then
+	// flips with every layout, for ever, unless it is held.
+	const bottom = (container: Element) => probe(container).getAttribute('data-bottom');
+	const tick = () => new Promise((r) => setTimeout(r, 0));
+
+	async function setup() {
+		const room = new SvelteMap<string, number>();
+		const empty = writable(new SvelteMap<string, number>());
+		const autoMargins = {
+			autoMarginTop: empty,
+			autoMarginRight: empty,
+			autoMarginBottom: writable(room),
+			autoMarginLeft: empty
+		};
+		const plot = { options: { marginTop: 5, marginRight: 5, marginBottom: 5, marginLeft: 5 } };
+		const { container } = await render(PlotMarginsProbe, {
+			width: 1000,
+			plot,
+			autoMargins,
+			onReady: () => {}
+		});
+		const measure = async (value: number) => {
+			room.set('x-axis', value);
+			await tick();
+		};
+		return { container, measure };
+	}
+
+	test("a side whose measured room holds still is left 'auto'", async () => {
+		const { container, measure } = await setup();
+		await measure(29);
+		await measure(29);
+		expect(bottom(container)).toBeNull();
+	});
+
+	test('a side that is measured one way, then another, once is not held yet', async () => {
+		const { container, measure } = await setup();
+		await measure(29);
+		await measure(30);
+		expect(bottom(container)).toBeNull();
+	});
+
+	test('a side that keeps flipping by a pixel is held at the higher reading', async () => {
+		const { container, measure } = await setup();
+		for (const value of [29, 30, 29, 30, 29]) await measure(value);
+		expect(bottom(container)).toBe('30');
+		// Whichever reading it lands on next, it stays put.
+		await measure(30);
+		await measure(29);
+		expect(bottom(container)).toBe('30');
+	});
+
+	test('a side that really moves is never held', async () => {
+		const { container, measure } = await setup();
+		for (const value of [29, 40, 29, 40, 29]) await measure(value);
+		expect(bottom(container)).toBeNull();
+	});
+
+	test('a held side is let go once its room moves further than a pixel', async () => {
+		const { container, measure } = await setup();
+		for (const value of [29, 30, 29, 30]) await measure(value);
+		expect(bottom(container)).toBe('30');
+		await measure(45);
+		expect(bottom(container)).toBeNull();
+	});
+
+	test('a side the author set is never touched', async () => {
+		const room = new SvelteMap<string, number>();
+		const empty = writable(new SvelteMap<string, number>());
+		const { container } = await render(PlotMarginsProbe, {
+			width: 1000,
+			author: { bottom: 50 },
+			plot: { options: { marginTop: 5, marginRight: 5, marginBottom: 50, marginLeft: 5 } },
+			autoMargins: {
+				autoMarginTop: empty,
+				autoMarginRight: empty,
+				autoMarginBottom: writable(room),
+				autoMarginLeft: empty
+			},
+			onReady: () => {}
+		});
+		for (const value of [29, 30, 29, 30]) {
+			room.set('x-axis', value);
+			await tick();
+		}
+		expect(bottom(container)).toBe('50');
 	});
 });

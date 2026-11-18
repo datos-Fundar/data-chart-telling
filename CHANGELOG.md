@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.20.1] - 2026-11-18
+
+### Fixed
+
+- **A timeline or facet that shares `x` honours `nice: false`.** A shared axis niced its domain whatever `scales.x.nice` said, so the ends of the data were rounded out; `nice: false` now keeps the raw extent, the same on every step and panel.
+- **A shared axis draws its edge ticks.** The edge ticks of a numeric axis whose domain came from the shared scales were left out, since the axis took that domain for one the author pinned. They are now drawn at the ends of the shared domain, not of each slice's rows.
+- **A horizontal legend no longer resizes within the frame that reported a resize.** Its rows are measured on the next frame when the container's width changes, so paging the legend (its nav buttons showing or hiding) no longer makes the browser report a "ResizeObserver loop" error.
+- **A plot whose tick labels sit on the edge of a whole pixel no longer lays itself out for ever.** svelteplot sizes an `'auto'` margin by the rounded-up height (or width) of its tick labels, and a label measures a hair taller or shorter depending on where it is drawn, which the margin itself moves: the margin then flipped by a pixel on every pass and the page froze in an endless effect loop (seen with a `zero: true` y axis on small faceted panels). An `'auto'` side whose measured room flips back and forth within a pixel is now held at its higher reading, and let go once it moves further than that; a side the author set is never touched.
+
 ## [1.20.0] - 2026-11-11
 
 ### Added

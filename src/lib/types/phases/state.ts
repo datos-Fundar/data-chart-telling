@@ -44,6 +44,8 @@ export type AxisPlotState<
 	scales: AxisBasedScalesConfig<TData>;
 	/** The axes whose domain the "scales" phase left to the kind's own fit, not the author's `domain`. */
 	fittedAxes?: AxisChannelName[];
+	/** The axes whose domain a slice took from the shared scales, not from the author. */
+	sharedAxes?: AxisChannelName[];
 	statistics?: StatisticConfig[];
 	transforms?: MarkerTransform[];
 	authorMarkers?: AxisBasedMarkersConfig[];

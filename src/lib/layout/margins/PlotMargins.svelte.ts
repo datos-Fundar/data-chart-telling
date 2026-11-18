@@ -82,6 +82,51 @@ export class PlotMargins {
 		);
 	});
 
+	/**
+	 * How far (px) an axis' measured room may differ between two readings and still be the same
+	 * room, measured twice: svelteplot rounds a tick label's box up, so a label that sits a hair
+	 * past a whole pixel reads one pixel taller or shorter depending on where it is drawn.
+	 */
+	static readonly #AUTO_JITTER = 1;
+
+	/** Per side: what the room svelteplot's axes ask of it last read as, and the highest of the readings it flipped between. */
+	readonly #flips: Partial<Record<MarginSide, { last: number; high: number; count: number }>> = {};
+
+	/**
+	 * An `'auto'` side whose measured room keeps flipping by a pixel, held at its higher reading.
+	 * svelteplot lays an axis out by the room it measured, and the label it measured moves with
+	 * that layout: a label on the edge of a whole pixel then flips the room for ever, and with it
+	 * the plot's effects. A side that read as two values within {@link AUTO_JITTER} of each other
+	 * back and forth is pinned, and let go again once it moves further than that.
+	 */
+	readonly #steady = $derived.by((): Partial<Record<MarginSide, number>> => {
+		const out: Partial<Record<MarginSide, number>> = {};
+		for (const side of Margins.SIDES) {
+			const value = this.#auto[side];
+			if (value === undefined) {
+				delete this.#flips[side];
+				continue;
+			}
+			const seen = this.#flips[side];
+			if (!seen) {
+				this.#flips[side] = { last: value, high: value, count: 0 };
+				continue;
+			}
+			if (value !== seen.last) {
+				if (Math.abs(value - seen.last) <= PlotMargins.#AUTO_JITTER) {
+					seen.count += 1;
+					seen.high = Math.max(seen.high, value);
+				} else {
+					seen.count = 0;
+					seen.high = value;
+				}
+				seen.last = value;
+			}
+			if (seen.count >= 2) out[side] = seen.high;
+		}
+		return out;
+	});
+
 	constructor(inputs: PlotMarginsInputs) {
 		this.#inputs = inputs;
 		setContext(PLOT_MARGINS_KEY, this);
@@ -228,7 +273,7 @@ export class PlotMargins {
 		// A side grows from at least the room svelteplot's axes take on it: their ticks and title.
 		const estimate = this.#inputs
 			.estimate()
-			.map((value, side) => Math.max(value, this.#auto[side] ?? 0));
+			.map((value, side) => Math.max(value, this.#auto[side] ?? 0, this.#steady[side] ?? 0));
 		const out: Partial<Record<MarginSide, number>> = {};
 		for (const side of Margins.SIDES) {
 			const own = author?.[side];
@@ -322,6 +367,10 @@ export class PlotMargins {
 		for (const [side, room] of Object.entries(this.#tickRoom) as [MarginSide, number][]) {
 			const own = out[side];
 			if (typeof own === 'number') out[side] = Math.max(0, own + room);
+		}
+		// An `'auto'` side that keeps flipping by a pixel is held, so the plot settles.
+		for (const [side, room] of Object.entries(this.#steady) as [MarginSide, number][]) {
+			if (typeof out[side] !== 'number') out[side] = room;
 		}
 		return out;
 	});

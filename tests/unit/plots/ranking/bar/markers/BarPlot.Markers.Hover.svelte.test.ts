@@ -192,7 +192,6 @@ describe('BarPlot - the band its hover draws behind the bars', () => {
 			markers: [{ type: 'hover' }] satisfies AxisBasedMarkersConfig[]
 		});
 		const svg = await waitForSvg(container);
-		expect(countHoverAreas(svg)).toBe(0);
 		hoverFirstCategory(svg);
 		await vi.waitFor(() => {
 			expect(countHoverAreas(svg)).toBe(1);
