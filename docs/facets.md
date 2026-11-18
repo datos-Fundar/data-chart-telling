@@ -157,6 +157,25 @@ A marker or a segment that names a facet is not drawn by a plot that has none. I
 
 Panels line up: each plot reports the margins it settled on, and once all have, every column and row pins its widest ones, so the plot areas align whatever their tick labels need.
 
+## Changing the panels while a plot shows
+
+A grid is meant to be changed: `facet.columns`, `rows`, `values`, `rowValues` and `colValues` are read again whenever they change. Change them from where the user acts (an event handler), or derive them from what the user picked:
+
+```svelte
+<script lang="ts">
+	let cols = $state(3);
+	let rows = $state(2);
+	let chosen = $state(['Laptops', 'Phones', 'Tablets', 'Monitors']);
+
+	// The panels follow the grid: derived, not written by an effect.
+	const values = $derived(chosen.slice(0, rows * cols));
+</script>
+
+<BarPlot {data} x="value" y="region" facet={{ by: 'product', columns: cols, values }} />
+```
+
+Do not write state a plot reads from inside an `$effect` (`$effect(() => { values = all.slice(0, rows * cols); })`). Svelte then walks every path of the deriveds that state reaches, with no record of the ones it has been through, and a plot's graph has so many paths that the tab freezes for minutes on a faceted plot with a few panels. The same write made from a handler, or `$derived` in its place, settles in about a tenth of a second. `pnpm test:perf` times the handler's way.
+
 ## Hover and tooltips
 
 `tooltip={{ sync: true }}` shows the hovered point in every panel, a feature for comparing the same x across panels. See [Tooltip and hover](tooltip-and-hover.md).
