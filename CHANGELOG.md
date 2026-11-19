@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.20.3] - 2026-11-19
+
+### Fixed
+
+- **A facet panel that replaces a removed one draws its plot.** When a panel left and another entered in the same update (a `facet.values` of `[A, B, C]` becoming `[B, C, D]`), the grid lost the new cell: its title showed, but the cell was never placed and stayed empty. A grid now keeps its cells so that removing one never drops one added at the same time.
+
 ## [1.20.2] - 2026-11-19
 
 ### Fixed
