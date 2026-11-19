@@ -184,6 +184,8 @@ Do not write state a plot reads from inside an `$effect` (`$effect(() => { value
 
 `facet` and [`timeline`](timeline.md) combine: each step shows its rows split into panels.
 
+The timeline's `scales` still applies to the axes a wrapped facet leaves free: with `facet.scales: 'free-y'` and the timeline's default `'shared'`, each panel keeps its own y extent across every step, so its axis holds still while scrubbing. `timeline.scales: 'free-y'` lets each panel refit to the step instead. Axes the facet shares stay shared by every panel and step.
+
 ## Maps
 
 `GeoPlot` takes `facet` and reads the field from each feature's `properties` (and from each marker row); features without the field are drawn in every panel.

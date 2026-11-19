@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.20.2] - 2026-11-19
+
+### Fixed
+
+- **A timeline's `scales` applies to the free axes of a wrapped facet.** With `facet.scales: 'free'` or `'free-x'`/`'free-y'` the free axis refit to each step whatever `timeline.scales` said, so its axis moved while scrubbing. It now holds each panel at its own extent over every step, and refits to the step only when the timeline frees that axis too.
+- **Removing a facet panel no longer breaks the grid.** A panel's cell read its entry in the `{@const}` once that panel was gone, so the grid threw `Cannot read properties of undefined (reading 'r')` (or `'label'`) on the next pointer move, and the panels left stopped drawing. The cell now reads it safely, and a grid ignores a cell whose request can't be read.
+
 ## [1.20.1] - 2026-11-18
 
 ### Fixed
