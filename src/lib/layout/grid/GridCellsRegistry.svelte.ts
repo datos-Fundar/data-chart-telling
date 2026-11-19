@@ -30,7 +30,11 @@ export class GridCellsRegistry {
 	/** The margins the cells' plots settled on, which an aligned grid lines up. */
 	readonly alignment = new GridAlignment();
 	readonly #inputs: GridCellsRegistryInputs;
-	#cells = $state<{ id: string; request: () => GridCellRequest }[]>([]);
+	// Not reactive itself: an add and a remove each rewrite `#cells` from what they read, and a remove that ran in
+	// the same flush as an add read it without the add, writing it back and dropping the new cell.
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity -- read through `#version`, not reactive itself
+	#cells = new Map<string, () => GridCellRequest>();
+	#version = $state(0);
 	#next = 0;
 
 	constructor(inputs: GridCellsRegistryInputs) {
@@ -54,9 +58,10 @@ export class GridCellsRegistry {
 
 	/** Every registered cell's request, with its id, in registration order. A cell whose request can't be read is left out. */
 	get requests(): (GridCellRequest & { id: string })[] {
-		return this.#cells.flatMap((cell) => {
+		void this.#version;
+		return [...this.#cells].flatMap(([id, request]) => {
 			try {
-				return [{ id: cell.id, ...cell.request() }];
+				return [{ id, ...request() }];
 			} catch {
 				return [];
 			}
@@ -66,12 +71,14 @@ export class GridCellsRegistry {
 	/** Registers a cell (its request read reactively), returning its id. */
 	register(request: () => GridCellRequest): string {
 		const id = `cell-${this.#next++}`;
-		this.#cells.push({ id, request });
+		this.#cells.set(id, request);
+		this.#version++;
 		return id;
 	}
 
 	unregister(id: string): void {
-		this.#cells = this.#cells.filter((cell) => cell.id !== id);
+		this.#cells.delete(id);
+		this.#version++;
 	}
 
 	/** The cell's layout, or `undefined` before the grid placed it. */
