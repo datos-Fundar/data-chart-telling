@@ -29,6 +29,7 @@
 	import type { PlotCellContext, PlotCellSnippet, PlotCoreBase } from '$lib/types/layout/plot';
 	import type { FacetCellContext, FacetConfig } from '$lib/types/layout/facet';
 	import type { TimelineConfig, TimeValue } from '$lib/types/layout/timeline';
+	import type { AxisChannelName } from '$lib/types/layout/mapping';
 	import type { LegendState } from '$lib/layout/legend/LegendState.svelte';
 	import type { AxisPlotDefaults, DataRunState, FacetStageState } from '$lib/types/phases';
 
@@ -132,8 +133,12 @@
 	const dataRun = $derived.by(() => {
 		const run = pipeline;
 		if (!sliced || !run?.facets) return undefined;
-		return (r: TRow[], f: FacetConfig<TRow> | undefined, legend: LegendState | null) =>
-			run.runData(core ?? {}, r, f as never, legend, cfg);
+		return (
+			r: TRow[],
+			f: FacetConfig<TRow> | undefined,
+			legend: LegendState | null,
+			holdFree?: AxisChannelName[]
+		) => run.runData(core ?? {}, r, f as never, legend, cfg, holdFree);
 	});
 	// What sets a timeline's steps, as values that change only when they do: a moving `progress` makes a new
 	// `timeline` object, which these do not follow, so the frame is not run again for it.
@@ -141,6 +146,8 @@
 	const stepDateFormat = $derived(timeline?.dateFormat);
 	const stepValues = $derived(timeline?.values);
 	const stepMode = $derived(slicing.filterMode);
+	// The free axes of a wrapped facet that the timeline holds still, as a string so a moving timeline invalidates nothing.
+	const heldAxes = $derived(slicing.heldFreeAxes().join());
 
 	// The plot's own props: one array that is the same object while none of them changed. Rows are compared as
 	// the same object, the rest - `segments`, `styles`, `scales` - as they hold, so a parent that builds the
@@ -185,13 +192,15 @@
 			stepAccessor,
 			stepDateFormat,
 			stepValues,
-			stepMode
+			stepMode,
+			heldAxes
 		];
 		// Svelte may ask again with the same inputs: the answer is the one it has.
 		if (frame?.inputs.every((input, i) => Object.is(input, inputs[i]))) return frame.state;
 		const state = untrack(() => {
 			if (!dataRun || !rows) return undefined;
-			const whole = dataRun(rows, facet, null);
+			const held = (heldAxes ? heldAxes.split(',') : []) as AxisChannelName[];
+			const whole = dataRun(rows, facet, null, held);
 			if (stepAccessor === undefined) return whole;
 			const reader = new TimelineTime(stepDateFormat);
 			const get = resolveAccessor<TRow>(stepAccessor as never) as (row: TRow) => unknown;
@@ -206,7 +215,7 @@
 						const at = timeOf(row);
 						return at === undefined || TimelineSteps.matches(at, step, stepMode);
 					});
-					return dataRun(shown, facet, null).sharedScales;
+					return dataRun(shown, facet, null, held).sharedScales;
 				});
 			const bands = (whole as { axes?: { bands?: string[] } }).axes?.bands ?? [];
 			return { ...whole, sharedScales: SharedStepScales.over(whole.sharedScales, bands, perStep) };

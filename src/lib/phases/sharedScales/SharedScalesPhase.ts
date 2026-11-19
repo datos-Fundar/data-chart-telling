@@ -36,6 +36,7 @@ type SharedScalesState = FacetStageState & {
 	markers?: object[];
 	scales?: Partial<Record<AxisChannelName, { nice?: NiceOption; sort?: unknown }>>;
 	sharedScales?: Record<string, AxisBasedScalesConfig<never>>;
+	holdFree?: AxisChannelName[];
 };
 
 /**
@@ -107,16 +108,18 @@ export class SharedScalesPhase<TState extends SharedScalesState, TEnv> implement
 		};
 
 		const cache = new Map<string, SharedScale>();
-		const scalesOf = (place: { row?: string; col?: string } | undefined) => {
+		const scalesOf = (place: { key?: string; row?: string; col?: string } | undefined) => {
 			const out: Record<string, SharedScale> = {};
 			for (const channel of channels) {
-				const line = SharedScalesPhase.#sharingLine(facet, channel);
+				const line = SharedScalesPhase.#sharingLine(facet, channel, state.holdFree);
 				if (!line) continue;
-				const key = line === 'all' ? '' : (place?.[line] ?? '');
+				const key = line === 'all' ? '' : (place?.[line === 'panel' ? 'key' : line] ?? '');
 				const cacheKey = `${channel}\u0000${key}`;
 				if (!cache.has(cacheKey)) {
 					const members = panels.length
-						? panels.filter((p) => line === 'all' || p[line] === key).map((p) => p.key)
+						? panels
+								.filter((p) => line === 'all' || p[line === 'panel' ? 'key' : line] === key)
+								.map((p) => p.key)
 						: undefined;
 					// Every panel sharing a phase-derived domain is the whole run, as it was built.
 					const whole = line === 'all' && fromPhase.has(channel);
@@ -212,12 +215,13 @@ export class SharedScalesPhase<TState extends SharedScalesState, TEnv> implement
 	 */
 	static #sharingLine(
 		facet: FacetConfig<Record<string, unknown>> | undefined,
-		channel: SharedChannel
-	): 'all' | 'row' | 'col' | null {
+		channel: SharedChannel,
+		holdFree?: AxisChannelName[]
+	): 'all' | 'row' | 'col' | 'panel' | null {
 		if (!facet || channel === 'color') return 'all';
 		const mode = facet.scales ?? 'shared';
 		if (mode !== 'free' && mode !== `free-${channel}`) return 'all';
-		if (isFacetWrap(facet)) return null;
+		if (isFacetWrap(facet)) return holdFree?.includes(channel) ? 'panel' : null;
 		return channel === 'x' ? 'col' : 'row';
 	}
 }

@@ -4,6 +4,7 @@ import { TimelineSteps } from '$lib/layout/timeline/TimelineSteps';
 import { TimelineTime } from '$lib/layout/timeline/TimelineTime';
 import { buildFacetAxesDisplay } from '$lib/layout/facet/axes';
 import { buildFacetPlaceKey, isFacetWrap } from '$lib/layout/facet/config';
+import type { AxisChannelName } from '$lib/types/layout/mapping';
 import type { FacetCellContext, FacetConfig } from '$lib/types/layout/facet';
 import type { TimelineConfig } from '$lib/types/layout/timeline';
 import type { SlicePlace } from '$lib/types/layout/plot';
@@ -108,6 +109,21 @@ export class Slice<TRow extends Record<string, unknown>> {
 		const key = this.panelKey(place);
 		if (key === undefined) return undefined;
 		return merge(shared?.[key] as TScales | undefined, this.#axes?.(place) as TScales | undefined);
+	}
+
+	/**
+	 * The free axes of a wrapped facet that a timeline holds still: each panel
+	 * keeps its own extent over every step, unless the timeline frees that axis too.
+	 */
+	heldFreeAxes(): AxisChannelName[] {
+		const { timeline, facet } = this;
+		if (!timeline || !facet || !isFacetWrap(facet)) return [];
+		const mode = timeline.scales;
+		if (mode === 'free') return [];
+		const free = facet.scales;
+		return (['x', 'y'] as const).filter(
+			(axis) => (free === 'free' || free === `free-${axis}`) && mode !== `free-${axis}`
+		);
 	}
 
 	/**

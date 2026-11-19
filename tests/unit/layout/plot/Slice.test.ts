@@ -106,3 +106,33 @@ describe('Slice', () => {
 		expect(shared[''].x).toBeDefined();
 	});
 });
+
+describe('Slice.heldFreeAxes', () => {
+	const held = (
+		facet: SliceInputs<Row>['facet'],
+		timeline: SliceInputs<Row>['timeline'] | null = { accessor: 'year' }
+	) =>
+		new Slice<Row>({
+			rows: [],
+			timeline: timeline ?? undefined,
+			facet,
+			filterMode: undefined
+		}).heldFreeAxes();
+
+	test('a wrapped facet free on y keeps y still across a timeline by default', () => {
+		expect(held({ by: 'region', scales: 'free-y' })).toEqual(['y']);
+		expect(held({ by: 'region', scales: 'free' })).toEqual(['x', 'y']);
+	});
+
+	test('holds nothing on the axes the timeline frees', () => {
+		const facet = { by: 'region', scales: 'free' } as const;
+		expect(held(facet, { accessor: 'year', scales: 'free-y' })).toEqual(['x']);
+		expect(held(facet, { accessor: 'year', scales: 'free' })).toEqual([]);
+	});
+
+	test('holds nothing without a timeline, with shared facet scales, or on a grid', () => {
+		expect(held({ by: 'region', scales: 'free-y' }, null)).toEqual([]);
+		expect(held({ by: 'region' })).toEqual([]);
+		expect(held({ rows: 'region', cols: 'sector', scales: 'free' })).toEqual([]);
+	});
+});

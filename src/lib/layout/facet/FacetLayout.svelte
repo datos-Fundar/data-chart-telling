@@ -265,20 +265,21 @@
 {#snippet facetCells(keys: string[], columnCount: number)}
 	{#each keys as key, i (key)}
 		{@const entry = entryByKey.get(key)}
+		<!-- The grid reads a cell's props before this block drops it, once its panel is gone: `entry` is `undefined` for that read. -->
 		{#if entry}
 			<GridCell
-				row={entry.r ?? Math.floor(i / columnCount)}
-				col={entry.c ?? i % columnCount}
-				label={wrap ? entry.label : undefined}
-				data-row={entry.row}
-				data-col={entry.col}
+				row={entry?.r ?? Math.floor(i / columnCount)}
+				col={entry?.c ?? i % columnCount}
+				label={wrap ? entry?.label : undefined}
+				data-row={entry?.row}
+				data-col={entry?.col}
 			>
 				{#snippet children(box)}
 					{@render cell({
-						facetValue: entry.label,
-						row: entry.row,
-						col: entry.col,
-						data: entry.data,
+						facetValue: entry?.label ?? '',
+						row: entry?.row,
+						col: entry?.col,
+						data: entry?.data ?? [],
 						width: box.width,
 						height: box.height,
 						margins: box.margins,

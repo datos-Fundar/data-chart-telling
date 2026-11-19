@@ -28,7 +28,12 @@ import type { FacetConfig } from '$lib/types/layout/facet';
 import type { LegendState } from '$lib/layout/legend/LegendState.svelte';
 import type { HoverStrategy } from '$lib/types/layout/hover';
 import type { Accessor } from '$lib/types/plots/data/common';
-import type { ChannelName, GroupingAccessor, ResolvedChannel } from '$lib/types/layout/mapping';
+import type {
+	AxisChannelName,
+	ChannelName,
+	GroupingAccessor,
+	ResolvedChannel
+} from '$lib/types/layout/mapping';
 import { PlotInteraction } from '$lib/layout/interaction/PlotInteraction.svelte';
 import { DEFAULT_CONFIG } from '$lib/configuration/config.svelte';
 import type { PlotAxes } from '$lib/phases/data/PlotAxes';
@@ -216,16 +221,19 @@ export class Pipeline<TState, TEnv = unknown> {
 	 * The data phases over `rows`, seeded from a core's `props`, with the
 	 * plot's `facet`: one run that every facet panel then reads its part of,
 	 * including the domains its slices share (its "sharedScales" phase).
+	 * `holdFree` names the free axes of a wrapped facet that each panel keeps
+	 * to its own extent over every row, as a timeline holding them still does.
 	 */
 	runData(
 		props: object,
 		rows: unknown[],
 		facet: FacetConfig<never> | undefined,
 		legendInteraction: LegendState | null,
-		cfg: PlotStylesConfig
+		cfg: PlotStylesConfig,
+		holdFree?: AxisChannelName[]
 	): DataRunState {
 		this.#data ??= this.stages.filter((stage) => Pipeline.DATA_PHASES.includes(stage.phase));
-		const seed = { ...this.#seed(props, rows), facet } as TState;
+		const seed = { ...this.#seed(props, rows), facet, holdFree } as TState;
 		return Pipeline.#through(
 			this.#data,
 			seed,

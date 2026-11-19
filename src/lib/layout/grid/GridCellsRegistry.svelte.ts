@@ -52,9 +52,15 @@ export class GridCellsRegistry {
 		setContext(GRID_KEY, this);
 	}
 
-	/** Every registered cell's request, with its id, in registration order. */
+	/** Every registered cell's request, with its id, in registration order. A cell whose request can't be read is left out. */
 	get requests(): (GridCellRequest & { id: string })[] {
-		return this.#cells.map((cell) => ({ id: cell.id, ...cell.request() }));
+		return this.#cells.flatMap((cell) => {
+			try {
+				return [{ id: cell.id, ...cell.request() }];
+			} catch {
+				return [];
+			}
+		});
 	}
 
 	/** Registers a cell (its request read reactively), returning its id. */
