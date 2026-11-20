@@ -16,6 +16,7 @@
 	import { TickLabels } from '$lib/layout/scales/TickLabels';
 	import { TickLines } from '$lib/layout/scales/TickLines';
 	import { TickNumbers } from '$lib/layout/scales/TickNumbers';
+	import { TickText } from '$lib/layout/scales/TickText';
 	import ScalesLayout from '$lib/layout/scales/ScalesLayout.svelte';
 	import GeometryLayout from '$lib/layout/geometry/GeometryLayout.svelte';
 	import CoordinatesLayout from '$lib/layout/coordinates/CoordinatesLayout.svelte';
@@ -145,19 +146,22 @@
 	 * width and height less the margins an `'auto'` side is estimated at, so it holds
 	 * whatever the margins settle on.
 	 */
+	/** Whether an axis is one of categories: a kind's band axis, or text laid out as points. */
+	const isCategoryAxis = (axis: 'x' | 'y') =>
+		!!(state.axes?.bands.includes(axis) || state.axes?.isDiscrete(axis));
+	/** An axis' categories: its domain, else what the data holds. */
+	const categoriesOf = (axis: 'x' | 'y') => {
+		const given = scales?.[axis]?.domain;
+		if (given) return given.map(String);
+		const get = axis === 'x' ? getX : getY;
+		return [...new Set(data.map((row) => String(get(row))))].sort();
+	};
 	const tickLayout = $derived.by(() => {
 		// A kind's band axes, and any axis of text categories a line or scatter lays out as points.
-		const bands = (['x', 'y'] as const).filter(
-			(axis) => state.axes?.bands.includes(axis) || state.axes?.isDiscrete(axis)
-		);
+		const bands = (['x', 'y'] as const).filter(isCategoryAxis);
 		if (!cfg.axis.autoRotate || bands.length === 0) return undefined;
 		const estimate = marginEstimate;
-		const categories = (axis: 'x' | 'y') => {
-			const given = scales?.[axis]?.domain;
-			if (given) return given.map(String);
-			const get = axis === 'x' ? getX : getY;
-			return [...new Set(data.map((row) => String(get(row))))].sort();
-		};
+		const categories = categoriesOf;
 		const out: {
 			x?: ReturnType<typeof TickLabels.layout>;
 			y?: { every: number; values: string[] };
@@ -198,10 +202,30 @@
 	const layoutScales = $derived.by(() => {
 		if (scales === undefined) return scales;
 		const rotate = tickLayout?.x?.rotate;
-		const written = (scale: AxisScale<TData> | undefined) =>
-			withLines(TickNumbers.apply(scale as AxisScale<never> | undefined, cfg) as typeof scale);
-		const x = written(rotate ? { ...scales.x, tickRotate: rotate } : scales.x);
-		return { ...scales, ...(x ? { x } : {}), ...(scales.y ? { y: written(scales.y) } : {}) };
+		const written = (scale: AxisScale<TData> | undefined, axis: 'x' | 'y') =>
+			withLines(
+				TickText.apply(
+					TickNumbers.apply(scale as AxisScale<never> | undefined, cfg),
+					cfg,
+					isCategoryAxis(axis)
+				) as typeof scale
+			);
+		const x = written(rotate ? { ...scales.x, tickRotate: rotate } : scales.x, 'x');
+		return { ...scales, ...(x ? { x } : {}), ...(scales.y ? { y: written(scales.y, 'y') } : {}) };
+	});
+	/**
+	 * The room the y axis keeps on its side for its widest label (the scale's `maxWidth`), over all of its
+	 * categories and not the ones drawn - so the plot does not change width as other labels show.
+	 */
+	const tickFloor = $derived.by(() => {
+		const scale = scales?.y;
+		if (scale?.maxWidth === undefined || !isCategoryAxis('y')) return {};
+		const format = layoutScales?.y?.tickFormat;
+		const labels = categoriesOf('y').map((name, index, all) =>
+			typeof format === 'function' ? String(format(name, index, all)) : name
+		);
+		const room = TickText.room(scale as AxisScale<never>, labels, cfg);
+		return room === undefined ? {} : { left: room };
 	});
 	/** The category labels a crowded axis still writes: one in every few. */
 	const tickValues = $derived.by(() => {
@@ -228,6 +252,7 @@
 		scales: () => layoutScales,
 		tickFontSize: () => cfg.axis.fontSize,
 		tickWidth: () => ({ x: tickLayout?.x?.width }),
+		tickFloor: () => tickFloor,
 		settle: (settled) => (margins = settled)
 	});
 	const numericMargins = $derived(plotMargins.numeric);

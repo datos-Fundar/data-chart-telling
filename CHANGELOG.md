@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- **`maxWidth` on a scale.** The labels of a category axis (or of one with a `tickFormat`) are cut to that many px, and a `y` axis keeps its margin for the widest of them, so the plot does not change width as other labels show.
+
 ## [1.20.4] - 2026-11-20
 
 ### Added
