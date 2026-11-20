@@ -15,13 +15,15 @@
 		color,
 		disabled,
 		showIcon = true,
-		omitMode = false
+		omitMode = false,
+		labelMaxWidth
 	}: {
 		item: LegendItem;
 		color: string;
 		disabled: boolean;
 		showIcon?: boolean;
 		omitMode?: boolean;
+		labelMaxWidth?: number;
 	} = $props();
 	const cfg = $derived(getConfiguration());
 	const textColor = $derived(CssColor.contrastText(color));
@@ -31,7 +33,11 @@
 	{#if showIcon}
 		<DiscreteSymbolIcon {item} color={textColor} />
 	{/if}
-	<span class="dct-discrete__label">{item.label || LegendText.of(item.name, cfg)}</span>
+	<span
+		class="dct-discrete__label"
+		style:max-width={labelMaxWidth === undefined ? undefined : `${labelMaxWidth}px`}
+		>{item.label || LegendText.of(item.name, cfg)}</span
+	>
 	<svg class="dct-discrete__eye" viewBox="0 0 24 24" aria-hidden="true">
 		{#if omitMode}
 			{#if disabled}

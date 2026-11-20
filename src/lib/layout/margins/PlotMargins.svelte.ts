@@ -43,6 +43,8 @@ export type PlotMarginsInputs = {
 	tickFontSize: () => number;
 	/** How wide the widest tick label of an axis is, where the plot measured it: a rotated axis takes room for that, not for a guessed width. */
 	tickWidth?: () => Partial<Record<AxisChannelName, number | undefined>>;
+	/** The room an axis' tick labels keep on a side whatever is drawn (a scale's `maxWidth`): its margin never goes below it. */
+	tickFloor?: () => Partial<Record<MarginSide, number>>;
 	/** Receives the margins the labels settled on - the plot's bindable `margins`. */
 	settle?: (margins: MarginConfig) => void;
 };
@@ -281,7 +283,9 @@ export class PlotMargins {
 			const held = typeof own === 'number' && settled?.[side] === own ? own : undefined;
 			if (own !== undefined && held === undefined) continue;
 			const grown = growth[side] > 0 ? estimate[side] + growth[side] : undefined;
-			if (held !== undefined || grown !== undefined) out[side] = Math.max(held ?? 0, grown ?? 0);
+			const floor = this.#inputs.tickFloor?.()[side];
+			if (held !== undefined || grown !== undefined || floor !== undefined)
+				out[side] = Math.max(held ?? 0, grown ?? 0, floor ?? 0);
 		}
 		for (const [a, b, extent] of [
 			['left', 'right', width],

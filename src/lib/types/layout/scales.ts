@@ -1,5 +1,6 @@
 import type { SymbolType } from '$lib/types/plots/constants';
 import type { NumberDisplay } from '$lib/types/layout/numbers';
+import type { TextDisplay } from '$lib/types/layout/texts';
 import type { AxisChannelName, IndependentChannelName } from '$lib/types/layout/mapping';
 
 // ── Per-consumer channels: each consumer resolves its own ramp ───────────────
@@ -160,63 +161,66 @@ export type CategorySort = {
 /**
  * Scale overrides for one plot axis - svelteplot's `ScaleOptions` and
  * `XScaleOptions`, plus this package's own fields. `decimals`, `prefix`, `suffix` and `signDisplay` write the
- * ticks of a numeric axis ({@link NumberDisplay}); they are ignored when `tickFormat` or `percent` is set. Without `decimals`
+ * ticks of a numeric axis ({@link NumberDisplay}); they are ignored when `tickFormat` or `percent` is set. `maxWidth`
+ * and `replace` ({@link TextDisplay}) write the labels of a category axis, or of one with a `tickFormat`: swaps first, then cut
+ * to that many px - and a y axis then keeps its margin for the widest of them, whichever are drawn. Without `decimals`
  * the ticks keep their automatic format, abbreviated when they span orders of magnitude. `TData` is the row type
  * {@link AxisScale.sort} compares.
  */
-export type AxisScale<TData = Record<string, unknown>> = NumberDisplay & {
-	type?:
-		| 'auto'
-		| ContinuousScaleType
-		| TemporalScaleType
-		| DiscreteScaleType
-		| SequentialScaleType
-		| DivergingScaleType
-		| BinnedScaleType;
-	domain?: (number | string | boolean | Date | null)[];
-	range?: (number | string | boolean | Date | null)[];
-	reverse?: boolean;
-	label?: string | false;
-	labelAnchor?: 'auto' | 'left' | 'center' | 'right' | 'bottom' | 'middle' | 'top';
-	labelOrientation?: 'horizontal' | 'vertical';
-	labelPosition?: 'top' | 'middle';
-	titleFontSize?: number;
-	interval?: string | number;
-	clamp?: boolean;
-	nice?: NiceOption;
-	edgeTicks?: EdgeTicksOption;
-	zero?: boolean;
-	round?: boolean;
-	percent?: boolean;
-	align?: number;
-	base?: number;
-	constant?: number;
-	/** The order of a category axis: a comparator of two rows (each category's first), or a {@link CategorySort} by what the categories hold. Ignored when `domain` is set. */
-	sort?: ((a: TData, b: TData) => number) | CategorySort;
-	grid?:
-		| boolean
-		| { stroke?: string; strokeWidth?: number; strokeOpacity?: number; strokeDasharray?: string };
-	/** Whether the axis' ticks and title draw: `'hidden'` keeps their space (so aligned panels stay aligned), `'none'` gives it back. Defaults to `'visible'`. */
-	axisDisplay?: 'visible' | 'hidden' | 'none';
-	padding?: number;
-	paddingInner?: number;
-	paddingOuter?: number;
-	insetLeft?: number;
-	insetRight?: number;
-	insetTop?: number;
-	insetBottom?: number;
-	ticks?: (number | string | boolean | Date | null)[];
-	tickSpacing?: number;
-	tickSize?: number;
-	tickPadding?: number;
-	tickRotate?: number;
-	lines?: number;
-	tickFormat?:
-		| false
-		| Intl.NumberFormatOptions
-		| Intl.DateTimeFormatOptions
-		| ((d: unknown, index: number, ticks: unknown[]) => string | string[]);
-};
+export type AxisScale<TData = Record<string, unknown>> = NumberDisplay &
+	TextDisplay & {
+		type?:
+			| 'auto'
+			| ContinuousScaleType
+			| TemporalScaleType
+			| DiscreteScaleType
+			| SequentialScaleType
+			| DivergingScaleType
+			| BinnedScaleType;
+		domain?: (number | string | boolean | Date | null)[];
+		range?: (number | string | boolean | Date | null)[];
+		reverse?: boolean;
+		label?: string | false;
+		labelAnchor?: 'auto' | 'left' | 'center' | 'right' | 'bottom' | 'middle' | 'top';
+		labelOrientation?: 'horizontal' | 'vertical';
+		labelPosition?: 'top' | 'middle';
+		titleFontSize?: number;
+		interval?: string | number;
+		clamp?: boolean;
+		nice?: NiceOption;
+		edgeTicks?: EdgeTicksOption;
+		zero?: boolean;
+		round?: boolean;
+		percent?: boolean;
+		align?: number;
+		base?: number;
+		constant?: number;
+		/** The order of a category axis: a comparator of two rows (each category's first), or a {@link CategorySort} by what the categories hold. Ignored when `domain` is set. */
+		sort?: ((a: TData, b: TData) => number) | CategorySort;
+		grid?:
+			| boolean
+			| { stroke?: string; strokeWidth?: number; strokeOpacity?: number; strokeDasharray?: string };
+		/** Whether the axis' ticks and title draw: `'hidden'` keeps their space (so aligned panels stay aligned), `'none'` gives it back. Defaults to `'visible'`. */
+		axisDisplay?: 'visible' | 'hidden' | 'none';
+		padding?: number;
+		paddingInner?: number;
+		paddingOuter?: number;
+		insetLeft?: number;
+		insetRight?: number;
+		insetTop?: number;
+		insetBottom?: number;
+		ticks?: (number | string | boolean | Date | null)[];
+		tickSpacing?: number;
+		tickSize?: number;
+		tickPadding?: number;
+		tickRotate?: number;
+		lines?: number;
+		tickFormat?:
+			| false
+			| Intl.NumberFormatOptions
+			| Intl.DateTimeFormatOptions
+			| ((d: unknown, index: number, ticks: unknown[]) => string | string[]);
+	};
 
 /** Each {@link AxisChannelName}'s own scale-config shape - both use {@link AxisScale}. */
 export type AxisChannelScaleConfig<TData = Record<string, unknown>> = {

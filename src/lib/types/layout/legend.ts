@@ -2,6 +2,7 @@ import type { Snippet } from 'svelte';
 import type { SymbolType, LineStyle } from '$lib/types/plots/constants';
 import type { StrokeStyle, DotStyle } from '$lib/types/plots/styling';
 import type { NumberDisplay } from '$lib/types/layout/numbers';
+import type { TextDisplay } from '$lib/types/layout/texts';
 import type {
 	ColorScaleConfig,
 	OpacityScaleConfig,
@@ -102,28 +103,17 @@ export type DiscreteInteractiveConfig = {
 	showIcon?: boolean;
 };
 
-/**
- * How a discrete section rewrites the label of each of its items, to add a unit or shorten a word without
- * writing the items again. `replace` goes first, then `prefix` and `suffix` go around the result.
- */
-export type LegendLabels = {
-	prefix?: string;
-	suffix?: string;
-	/**
-	 * What to swap in every label, in order: a text for the text that replaces it (every match), or a list of
-	 * `[pattern, replacement]` pairs where the pattern may be a regular expression - `{ Quintile: 'Q' }`,
-	 * `[[/^Quartile /, 'Q: ']]`.
-	 */
-	replace?: Record<string, string> | [string | RegExp, string][];
-};
-
 export type DiscreteLegendSection = {
 	type: 'discrete';
 	enabled?: boolean;
 	title?: string;
 	items: LegendItem[];
-	/** Rewrites the label of each item - see {@link LegendLabels}. */
-	labels?: LegendLabels;
+	/**
+	 * Rewrites the label of each item, to add a unit, shorten a word or cap its width without writing the items again:
+	 * `replace` goes first, then `prefix` and `suffix` go around the result, and `maxWidth` cuts what is written - see
+	 * {@link TextDisplay}.
+	 */
+	labels?: TextDisplay;
 	columns?: number;
 	/** Item flow direction. Defaults to horizontal for a lone section, vertical once there's more than one. */
 	layout?: LegendItemsLayout;

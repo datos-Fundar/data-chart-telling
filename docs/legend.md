@@ -129,12 +129,13 @@ legend={{ removeItems: ['2017/18'] }}
 
 ### Rewriting the labels
 
-`labels` on a discrete section rewrites the label of every item without writing the items again - to add a unit or shorten a word. Each is optional; `replace` goes first, then `prefix` and `suffix` go around the result. An item is rewritten from the text it would show: its `label`, else its name as the legend writes it.
+`labels` on a discrete section rewrites the label of every item without writing the items again - to add a unit, shorten a word or cap its width. Each is optional; `replace` goes first, then `prefix` and `suffix` go around the result, and `maxWidth` (px) cuts a label wider than that short, with an ellipsis. An item is rewritten from the text it would show: its `label`, else its name as the legend writes it.
 
 ```ts
 legend={{ series: { labels: { suffix: ' years' } } }}                       // 25-29 → 25-29 years
 legend={{ series: { labels: { replace: { Quintile: 'Q' }, suffix: '%' } } }} // Quintile 1 → Q 1%
 legend={{ series: { labels: { replace: [[/^Quartile /, 'Q: ']] } } }}        // Quartile 3 → Q: 3 (a pattern, in order)
+legend={{ series: { labels: { maxWidth: 90 } } }}                            // Tierra del Fuego, Antártida… → Tierra del Fue…
 ```
 
 `replace` is a record of text → replacement (every match; a text with spaces or dashes is a quoted key, `{ 'Quintile ': 'Q: ' }`), or a list of `[pattern, replacement]` pairs where the pattern may be a regular expression. The names are left as they are, so `off` and the toggles still go by them. An explicit section takes `labels` too.

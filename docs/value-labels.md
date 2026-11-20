@@ -20,7 +20,7 @@ A label writes the value it labels - its row context's `value` - as `decimals`, 
 styles: { values: { decimals: 1, signDisplay: 'always', suffix: ' yrs' } }
 ```
 
-`maxWidth` cuts a label wider than that many px short with an ellipsis - a series' name at the end of a line, say - and the plot's margin keeps room for no more than it.
+`maxWidth` cuts a label wider than that many px short with an ellipsis - a series' name at the end of a line, say - and the plot's margin keeps room for no more than it. `replace` swaps text in what a label says, before it is cut - a list of `[pattern, replacement]` pairs, or a record of text to its replacement, as in a [legend's labels](legend.md#rewriting-the-labels): `replace: { 'Ciudad Autónoma de Buenos Aires': 'CABA' }`.
 
 `format(value, number, context)` writes anything else. `number` writes a value as the fields above ask; `context` is what the plot knows of the labelled row (see [Row context](state.md#row-context)): its `series`, its `row` with the other fields of the data, and what the plot kind works out, such as a histogram bin's `count` or a treemap tile's `share`.
 
