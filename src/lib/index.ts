@@ -91,6 +91,7 @@ export type {
 } from './types/layout/mapping';
 export type { AxisScale, AxisBasedScalesConfig, ChannelScalesConfig } from './types/layout/scales';
 export type { NumberDisplay } from './types/layout/numbers';
+export type { TextDisplay } from './types/layout/texts';
 export type {
 	TreemapPlotProps,
 	TreemapRowContext,

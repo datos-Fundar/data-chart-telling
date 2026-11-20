@@ -6,6 +6,7 @@ import { seriesIdOf } from '$lib/utils/grouping';
 import { isGapValue } from '$lib/plots/utils/gaps';
 import { PlotAxes } from '$lib/phases/data/PlotAxes';
 import { NumberFormat } from '$lib/utils/NumberFormat';
+import { TextFormat } from '$lib/utils/TextFormat';
 import { RowContext } from '$lib/phases/context/RowContext';
 import type { PlotRowContext } from '$lib/types/layout/context';
 import type { PlotStylesConfig } from '$lib/types/configuration/styling';
@@ -95,12 +96,20 @@ export class ValueLabels {
 		// The value as the display fields ask (else as it is), which a plot kind's own text builds on.
 		const number =
 			NumberFormat.maybe(NumberFormat.displayOf(values), cfg) ?? ((v: number) => `${v}`);
+		// Then cut to `maxWidth`, measured at the labels' own size.
+		const size = typeof values?.fontStyle?.fontSize === 'number' ? values.fontStyle.fontSize : 12;
+		const fit = TextFormat.of(
+			TextFormat.displayOf(values),
+			(text) => Box.ofText(text, size, cfg).width
+		);
 		const writer =
 			(write: ValuesStyle['format']): ValueLabels['format'] =>
 			(v, row, series, part) =>
-				write
-					? write(v, number, { ...ValueLabels.contextOf(row, series), ...(part ? { part } : {}) })
-					: number(v);
+				fit(
+					write
+						? write(v, number, { ...ValueLabels.contextOf(row, series), ...(part ? { part } : {}) })
+						: number(v)
+				);
 		this.format = writer(values?.format ?? options.format);
 		this.parts = ValueLabels.#parts(values?.parts, options.parts).map(([name, own_]) => {
 			const { format, ...placement } = own_ as ValuePartOptions;

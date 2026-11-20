@@ -11,6 +11,7 @@ import type {
 } from '$lib/types/markers/labels/path';
 import type { FontStyle, StrokeStyle } from '$lib/types/plots/styling';
 import type { NumberDisplay } from '$lib/types/layout/numbers';
+import type { TextDisplay } from '$lib/types/layout/texts';
 import type { PlotRowContext } from '$lib/types/layout/context';
 
 /**
@@ -71,37 +72,38 @@ export type ValueParts<TPart extends string, TLabel = MarkerLabelConfig> =
 /** A value label's text style, without what places it: the layout's options do that. */
 export type ValuesFontStyle = Omit<FontStyle, 'textAnchor' | 'lineAnchor' | 'dx' | 'dy'>;
 
-type ValuesOptions = NumberDisplay & {
-	/** Whether the labels are drawn. Setting any other option of them turns them on; off by default, except on a heatmap. */
-	show?: boolean;
-	/**
-	 * Which rows of each group are labelled: one selector, or a list of them (a
-	 * row picked by any is labelled) - see {@link ValueSelect}. Each plot has its
-	 * own default: a line or an area labels its series' last point, the plots
-	 * that join dots label them all.
-	 */
-	select?: ValueSelect | ValueSelect[];
-	/** Labels only the rows of these series, by name. Defaults to every series. */
-	series?: string | string[];
-	/**
-	 * The labels' color: `'series'` writes each in its series' color, any other
-	 * CSS color writes them all in it. `fontStyle.fill` wins when it is set.
-	 */
-	color?: 'series' | (string & {});
-	/**
-	 * A label's text, in place of the value as `decimals`, `prefix`, `suffix` and `signDisplay` write it: from the
-	 * value it shows (a histogram bin's count, a tile's share), `number`, which writes a value as those fields ask,
-	 * and `context`, what the plot knows of the labelled row - its `series`, `x`, `y`, whatever its kind works out
-	 * and, where the label has one, the `row` itself, for the other fields of the data (see {@link PlotRowContext}).
-	 */
-	format?: (value: number, number: (value: number) => string, context: PlotRowContext) => string;
-	/** Hovering a label dims every other series, like toggling them off in the legend. */
-	hoverIsolate?: boolean;
-	/** The text's look; where it sits is the layout's (`side`, `gap`, `offset`...). */
-	fontStyle?: ValuesFontStyle;
-	/** The connectors a line or area plot routes back from labels that had to move apart. */
-	strokeStyle?: StrokeStyle;
-};
+type ValuesOptions = NumberDisplay &
+	TextDisplay & {
+		/** Whether the labels are drawn. Setting any other option of them turns them on; off by default, except on a heatmap. */
+		show?: boolean;
+		/**
+		 * Which rows of each group are labelled: one selector, or a list of them (a
+		 * row picked by any is labelled) - see {@link ValueSelect}. Each plot has its
+		 * own default: a line or an area labels its series' last point, the plots
+		 * that join dots label them all.
+		 */
+		select?: ValueSelect | ValueSelect[];
+		/** Labels only the rows of these series, by name. Defaults to every series. */
+		series?: string | string[];
+		/**
+		 * The labels' color: `'series'` writes each in its series' color, any other
+		 * CSS color writes them all in it. `fontStyle.fill` wins when it is set.
+		 */
+		color?: 'series' | (string & {});
+		/**
+		 * A label's text, in place of the value as `decimals`, `prefix`, `suffix` and `signDisplay` write it: from the
+		 * value it shows (a histogram bin's count, a tile's share), `number`, which writes a value as those fields ask,
+		 * and `context`, what the plot knows of the labelled row - its `series`, `x`, `y`, whatever its kind works out
+		 * and, where the label has one, the `row` itself, for the other fields of the data (see {@link PlotRowContext}).
+		 */
+		format?: (value: number, number: (value: number) => string, context: PlotRowContext) => string;
+		/** Hovering a label dims every other series, like toggling them off in the legend. */
+		hoverIsolate?: boolean;
+		/** The text's look; where it sits is the layout's (`side`, `gap`, `offset`...). */
+		fontStyle?: ValuesFontStyle;
+		/** The connectors a line or area plot routes back from labels that had to move apart. */
+		strokeStyle?: StrokeStyle;
+	};
 
 /** The labels a plot of bars writes on them: in each, along an edge (its `tip` too) or beside a point of it. */
 export type BarValueLabel =
