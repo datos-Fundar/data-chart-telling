@@ -6,7 +6,15 @@ import type { CellEdges } from '$lib/types/layout/grid';
 export type Responsive<T> = T | { desktop: T; mobile: T };
 export type FacetColumns = Responsive<number>;
 export type FacetMode = 'grid' | 'carousel' | 'paginated';
-export type FacetNavLayout = 'overlay' | 'below';
+export type FacetNavLayout = 'overlay' | 'below' | 'above';
+/** Where over the facets an `'overlay'` badge sits: a corner, or the middle of the top or bottom edge. */
+export type FacetIndicatorPosition =
+	| 'top-left'
+	| 'top-middle'
+	| 'top-right'
+	| 'bottom-left'
+	| 'bottom-middle'
+	| 'bottom-right';
 
 /**
  * Which position scales facets share: `'shared'` (default), `'free'`, or
@@ -64,7 +72,12 @@ export type FacetScoped = {
 	facet?: FacetTarget;
 };
 
-export type FacetIndicatorContext = { current: number; total: number };
+export type FacetIndicatorContext = {
+	current: number;
+	total: number;
+	/** The labels of the panels now shown: the page's in `paginated` mode, the visible ones in a `carousel`. */
+	values: string[];
+};
 export type FacetIndicatorSnippet = Snippet<[FacetIndicatorContext]>;
 
 export type FacetNavDirection = 'prev' | 'next';
@@ -93,8 +106,10 @@ export type FacetWrapConfig<TRow extends Record<string, unknown>> = FacetCommonC
 	visible?: number;
 	pageSize?: number;
 	navLayout?: FacetNavLayout;
+	indicatorAt?: FacetIndicatorPosition;
 	titles?: boolean;
-	formatIndicator?: (current: number, total: number) => string;
+	/** The text of the position badge. `values` are the labels of the panels now shown, to name them in it. */
+	formatIndicator?: (current: number, total: number, values: string[]) => string;
 	indicator?: FacetIndicatorSnippet;
 	navButton?: FacetNavSnippet;
 };

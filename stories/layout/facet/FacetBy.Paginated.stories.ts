@@ -50,6 +50,62 @@ export const NavBelow: Story = {
 	}
 };
 
+/** `navLayout: 'above'` - the buttons and the page indicator sit in a row over the chart. */
+export const NavAbove: Story = {
+	args: {
+		facet: { by: 'country', columns: 3, mode: 'paginated', pageSize: 1, navLayout: 'above' }
+	}
+};
+
+/** `navLayout: 'overlay'` with `indicatorAt: 'top-right'` - the badge moves to another corner of the chart. */
+export const BadgeTopRight: Story = {
+	args: {
+		facet: {
+			by: 'country',
+			columns: 2,
+			mode: 'paginated',
+			pageSize: 4,
+			navLayout: 'overlay',
+			indicatorAt: 'top-right'
+		}
+	}
+};
+
+/**
+ * `formatIndicator` gets the labels of the panels now shown, so the badge can name the facet:
+ * `‹ Argentina - 1/9 ›`. With `titles: false` the panels draw no title of their own.
+ */
+export const FacetNameInBadge: Story = {
+	args: {
+		facet: {
+			by: 'country',
+			columns: 3,
+			mode: 'paginated',
+			pageSize: 1,
+			navLayout: 'below',
+			titles: false,
+			formatIndicator: (current, total, values) => `${values[0]} - ${current}/${total}`
+		}
+	}
+};
+
+/**
+ * With several panels per page (a 2×2 grid here) `values` lists all of them, in order:
+ * the badge names the whole page.
+ */
+export const FacetNamesInBadge: Story = {
+	args: {
+		facet: {
+			by: 'country',
+			columns: 2,
+			mode: 'paginated',
+			pageSize: 4,
+			navLayout: 'below',
+			formatIndicator: (current, total, values) => `${values.join(' · ')} - ${current}/${total}`
+		}
+	}
+};
+
 /** Fully custom `navButton` snippet replacing the default prev/next buttons. */
 export const CustomButtons: Story = {
 	args: {

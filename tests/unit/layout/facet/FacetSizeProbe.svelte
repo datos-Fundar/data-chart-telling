@@ -4,6 +4,7 @@
 		FacetColumns,
 		FacetMode,
 		FacetNavLayout,
+		FacetIndicatorPosition,
 		Responsive
 	} from '$lib/types/layout/facet';
 
@@ -15,7 +16,10 @@
 		mode = 'grid',
 		pageSize,
 		navLayout = 'overlay',
+		indicatorAt,
 		titles = true,
+		visible,
+		formatIndicator,
 		width = 600,
 		height = 400
 	}: {
@@ -24,7 +28,10 @@
 		mode?: Responsive<FacetMode>;
 		pageSize?: number;
 		navLayout?: FacetNavLayout;
+		indicatorAt?: FacetIndicatorPosition;
 		titles?: boolean;
+		visible?: number;
+		formatIndicator?: (current: number, total: number, values: string[]) => string;
 		width?: number;
 		height?: number;
 	} = $props();
@@ -35,7 +42,20 @@
 	);
 </script>
 
-<FacetLayout {data} by="group" {columns} {mode} {pageSize} {navLayout} {titles} {width} {height}>
+<FacetLayout
+	{data}
+	by="group"
+	{columns}
+	{mode}
+	{pageSize}
+	{navLayout}
+	{indicatorAt}
+	{titles}
+	{visible}
+	{formatIndicator}
+	{width}
+	{height}
+>
 	{#snippet cell({ facetValue, width: w, height: h })}
 		<div data-testid="cell" data-facet={facetValue} data-width={w} data-height={h}></div>
 	{/snippet}

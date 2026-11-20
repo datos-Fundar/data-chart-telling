@@ -63,7 +63,7 @@ describe('a plot with a player timeline', () => {
 		const { container } = render(LinePlot, { ...props, order: chrome } as never);
 		await expect.poll(() => container.querySelector('.dct-player')).not.toBeNull();
 		const blocks = [...container.querySelector('.dct-figure-chrome')!.children].map((el) =>
-			el.className.includes('timeline') ? 'timeline' : el.className.includes('body') ? 'plot' : ''
+			el.className.includes('timeline') ? 'timeline' : el.className.includes('plot') ? 'plot' : ''
 		);
 		return blocks.filter(Boolean);
 	}

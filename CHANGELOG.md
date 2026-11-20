@@ -6,6 +6,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- **A facet's badge can name the panels shown.** `formatIndicator` and the `indicator` snippet get their labels as `values`.
+- **`navLayout: 'above'`, and `'below'` for carousels.** The navigation (paginated) or badge (carousel) gets a row above or under the panels instead of overlaying them.
+- **`facet.indicatorAt`.** Where an overlaid badge sits: a corner or the middle of the top or bottom edge (`'bottom-right'` by default).
 - **`facet.titles`.** `titles: false` leaves each panel of a `by` facet untitled and takes back the row the title reserved above it (24px), in grid, paginated and carousel modes. It defaults to `true`.
 
 ### Changed
