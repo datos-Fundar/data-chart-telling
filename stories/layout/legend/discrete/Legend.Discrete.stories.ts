@@ -20,6 +20,33 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/**
+ * `labels.maxWidth` caps the width of every label: a longer one is cut short with an ellipsis, and the rows are laid
+ * out with the labels as they are written.
+ */
+export const LabelsMaxWidth: Story = {
+	args: {
+		sections: [
+			{
+				type: 'discrete',
+				title: 'Province',
+				labels: { maxWidth: 90 },
+				interactive: { enabled: true, legendStyle: 'badge', showIcon: false },
+				items: [
+					{ name: 'a', label: 'Santiago del Estero', color: '#054578' },
+					{
+						name: 'b',
+						label: 'Tierra del Fuego, Antártida e Islas del Atlántico Sur',
+						color: '#00a6e0'
+					},
+					{ name: 'c', label: 'Ciudad Autónoma de Buenos Aires', color: '#e6580d' },
+					{ name: 'd', label: 'Jujuy', color: '#16a34a' }
+				]
+			}
+		] satisfies LegendSection[]
+	}
+};
+
 /** One discrete section: a swatch + label per category. Defaults to `layout: { type: 'horizontal' }`, the only-section default. */
 export const SingleDiscrete: Story = {
 	args: {

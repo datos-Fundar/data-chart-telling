@@ -74,6 +74,28 @@ describe('styles.values - maxWidth', () => {
 	});
 });
 
+describe('styles.values - replace', () => {
+	test('swaps text in what a label says, before it is cut', async () => {
+		const { container } = await render(LinePlot, {
+			width: 500,
+			height: 300,
+			series: SERIES,
+			styles: {
+				values: {
+					format: (_v, _n, { series }) => String(series),
+					replace: { female: 'F' }
+				}
+			}
+		});
+		const svg = await waitForSvg(container);
+		await expect.poll(() => countTextLabels(svg)).toBe(2);
+		const texts = [...svg.querySelectorAll('g.text text')].map((el) => el.textContent);
+		expect(texts).toContain('F');
+		expect(texts).toContain('male');
+		expect(texts).not.toContain('female');
+	});
+});
+
 describe('styles.values - layout', () => {
 	test("a line plot's `'path'` labels write each series' name along its line", async () => {
 		const { container } = await render(LinePlot, {

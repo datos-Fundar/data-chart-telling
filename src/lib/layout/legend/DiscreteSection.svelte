@@ -202,9 +202,16 @@
 			: {}}
 	>
 		{#if useBadge}
-			<DiscreteBadgeItem {item} {color} disabled={isDisabled} {showIcon} {omitMode} />
+			<DiscreteBadgeItem
+				{item}
+				{color}
+				disabled={isDisabled}
+				{showIcon}
+				{omitMode}
+				labelMaxWidth={section.labels?.maxWidth}
+			/>
 		{:else}
-			<DiscreteSwatchItem {item} {color} />
+			<DiscreteSwatchItem {item} {color} labelMaxWidth={section.labels?.maxWidth} />
 		{/if}
 	</div>
 {/snippet}

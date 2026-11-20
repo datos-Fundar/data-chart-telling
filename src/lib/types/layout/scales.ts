@@ -162,8 +162,8 @@ export type CategorySort = {
  * Scale overrides for one plot axis - svelteplot's `ScaleOptions` and
  * `XScaleOptions`, plus this package's own fields. `decimals`, `prefix`, `suffix` and `signDisplay` write the
  * ticks of a numeric axis ({@link NumberDisplay}); they are ignored when `tickFormat` or `percent` is set. `maxWidth`
- * ({@link TextDisplay}) cuts the labels of a category axis, or of one with a `tickFormat`, to that many px - and a y axis then
- * keeps its margin for the widest of them, whichever are drawn. Without `decimals`
+ * and `replace` ({@link TextDisplay}) write the labels of a category axis, or of one with a `tickFormat`: swaps first, then cut
+ * to that many px - and a y axis then keeps its margin for the widest of them, whichever are drawn. Without `decimals`
  * the ticks keep their automatic format, abbreviated when they span orders of magnitude. `TData` is the row type
  * {@link AxisScale.sort} compares.
  */

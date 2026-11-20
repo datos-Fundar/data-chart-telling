@@ -5,16 +5,36 @@ import type { TextDisplay } from '$lib/types/layout/texts';
 export class TextFormat {
 	/** Whether `display` asks for anything: when not, a text is left as it is. */
 	static isSet(display: TextDisplay | undefined): boolean {
-		return display?.maxWidth !== undefined;
+		return (
+			display?.maxWidth !== undefined ||
+			!!display?.prefix ||
+			!!display?.suffix ||
+			TextFormat.#swaps(display).length > 0
+		);
 	}
 
-	/** A writer of texts as `display` asks; `measure` is how wide a text writes, in px. */
+	/** `display`'s swaps as a list of pairs, in order. */
+	static #swaps(display: TextDisplay | undefined): [string | RegExp, string][] {
+		return Array.isArray(display?.replace)
+			? display.replace
+			: Object.entries(display?.replace ?? {});
+	}
+
+	/**
+	 * A writer of texts as `display` asks - its swaps, then its prefix and suffix, then the cut to its `maxWidth`;
+	 * `measure` is how wide a text writes, in px.
+	 */
 	static of(
 		display: TextDisplay | undefined,
 		measure: (text: string) => number
 	): (text: string) => string {
 		const width = display?.maxWidth;
-		return width === undefined ? (text) => text : (text) => TextFit.cut(text, width, measure);
+		const rewrites =
+			!!display?.prefix || !!display?.suffix || TextFormat.#swaps(display).length > 0;
+		return (text) => {
+			const written = rewrites && display ? TextFormat.rewrite(text, display) : text;
+			return width === undefined ? written : TextFit.cut(written, width, measure);
+		};
 	}
 
 	/** {@link TextFormat.of}, or `undefined` while nothing asks for it ({@link TextFormat.isSet}). */
@@ -25,9 +45,26 @@ export class TextFormat {
 		return TextFormat.isSet(display) ? TextFormat.of(display, measure) : undefined;
 	}
 
-	/** The fields of `source` that are a {@link TextDisplay}'s, for a config that carries them beside its own. */
+	/** `text` after `display`'s swaps, in order (each replaces every match), with its prefix and suffix around it. */
+	static rewrite(text: string, display: TextDisplay): string {
+		let result = text;
+		for (const [pattern, replacement] of TextFormat.#swaps(display))
+			result =
+				typeof pattern === 'string'
+					? result.replaceAll(pattern, () => replacement)
+					: result.replace(
+							pattern.global ? pattern : new RegExp(pattern.source, `${pattern.flags}g`),
+							replacement
+						);
+		return `${display.prefix ?? ''}${result}${display.suffix ?? ''}`;
+	}
+
+	/**
+	 * The fields of `source` that are a {@link TextDisplay}'s, for a config that carries them beside its own: its
+	 * swaps and its `maxWidth`. Not its `prefix` and `suffix`, which a place that writes numbers keeps around them.
+	 */
 	static displayOf(source: TextDisplay | boolean | undefined): TextDisplay {
 		const own = typeof source === 'object' ? source : undefined;
-		return { maxWidth: own?.maxWidth };
+		return { replace: own?.replace, maxWidth: own?.maxWidth };
 	}
 }

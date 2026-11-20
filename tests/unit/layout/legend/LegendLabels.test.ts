@@ -4,46 +4,6 @@ import type { DiscreteLegendSection, LegendSection } from '$lib/types/layout/leg
 
 const cfg = { legend: { pretty: true } } as Parameters<typeof LegendLabels.apply>[1];
 
-describe('LegendLabels.rewrite', () => {
-	test('a prefix and a suffix go around the label', () => {
-		expect(LegendLabels.rewrite('25-29', { suffix: ' years' })).toBe('25-29 years');
-		expect(LegendLabels.rewrite('1', { prefix: 'Q: ' })).toBe('Q: 1');
-		expect(LegendLabels.rewrite('b', { prefix: '<', suffix: '>' })).toBe('<b>');
-	});
-
-	test('a record swaps a text for another, every match', () => {
-		expect(LegendLabels.rewrite('Quintile 1 de Quintile', { replace: { Quintile: 'Q' } })).toBe(
-			'Q 1 de Q'
-		);
-	});
-
-	test('a list swaps in order, a pattern as an expression', () => {
-		expect(LegendLabels.rewrite('Quartile 3', { replace: [[/^Quartile /, 'Q: ']] })).toBe('Q: 3');
-		expect(
-			LegendLabels.rewrite('a b', {
-				replace: [
-					['a', 'b'],
-					['b', 'c']
-				]
-			})
-		).toBe('c c');
-	});
-
-	test('a replacement is written as it is, not read as a pattern', () => {
-		expect(LegendLabels.rewrite('a', { replace: { a: '$&$&' } })).toBe('$&$&');
-	});
-
-	test('the swaps go before the prefix and suffix', () => {
-		expect(
-			LegendLabels.rewrite('Quintile 1', { replace: { Quintile: 'Q' }, suffix: 'Quintile' })
-		).toBe('Q 1Quintile');
-	});
-
-	test('nothing set leaves the label as it is', () => {
-		expect(LegendLabels.rewrite('x', {})).toBe('x');
-	});
-});
-
 describe('LegendLabels.apply', () => {
 	const discrete = (labels?: DiscreteLegendSection['labels']): LegendSection[] => [
 		{

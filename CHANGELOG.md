@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- **`replace` on a scale and on value labels.** The swaps a legend's `labels` takes, now also in the labels of a category axis and in `styles.values`: they go before the cut to `maxWidth`.
+- **`maxWidth` on a discrete legend's `labels`.** A label wider than that many px is cut short with an ellipsis, and the rows are laid out with the cut ones.
 - **`maxWidth` on a scale.** The labels of a category axis (or of one with a `tickFormat`) are cut to that many px, and a `y` axis keeps its margin for the widest of them, so the plot does not change width as other labels show.
 
 ## [1.20.4] - 2026-11-20

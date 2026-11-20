@@ -67,6 +67,22 @@ export const MaxWidth: Story = {
 	args: { scales: { x: { nice: false }, y: { maxWidth: 120 } } }
 };
 
+/** `scales.y.replace` swaps text in the labels before they are cut: the two longest names are swapped for short ones, so none needs cutting. */
+export const Replace: Story = {
+	args: {
+		scales: {
+			x: { nice: false },
+			y: {
+				maxWidth: 120,
+				replace: {
+					'Ciudad Autónoma de Buenos Aires': 'CABA',
+					'Tierra del Fuego, Antártida e Islas del Atlántico Sur': 'Tierra del Fuego'
+				}
+			}
+		}
+	}
+};
+
 /**
  * The same on a short plot, where the axis writes only some of the categories: the margin is the same as above, and
  * does not follow the labels that are drawn.
