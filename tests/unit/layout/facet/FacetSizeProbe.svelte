@@ -15,6 +15,7 @@
 		mode = 'grid',
 		pageSize,
 		navLayout = 'overlay',
+		titles = true,
 		width = 600,
 		height = 400
 	}: {
@@ -23,6 +24,7 @@
 		mode?: Responsive<FacetMode>;
 		pageSize?: number;
 		navLayout?: FacetNavLayout;
+		titles?: boolean;
 		width?: number;
 		height?: number;
 	} = $props();
@@ -33,7 +35,7 @@
 	);
 </script>
 
-<FacetLayout {data} by="group" {columns} {mode} {pageSize} {navLayout} {width} {height}>
+<FacetLayout {data} by="group" {columns} {mode} {pageSize} {navLayout} {titles} {width} {height}>
 	{#snippet cell({ facetValue, width: w, height: h })}
 		<div data-testid="cell" data-facet={facetValue} data-width={w} data-height={h}></div>
 	{/snippet}

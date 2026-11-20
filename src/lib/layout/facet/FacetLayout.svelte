@@ -40,6 +40,7 @@
 		visible = 1,
 		pageSize,
 		navLayout = 'overlay',
+		titles = true,
 		formatIndicator,
 		indicator,
 		navButton,
@@ -64,6 +65,7 @@
 		visible?: number;
 		pageSize?: number;
 		navLayout?: FacetNavLayout;
+		titles?: boolean;
 		formatIndicator?: (current: number, total: number) => string;
 		indicator?: FacetIndicatorSnippet;
 		navButton?: FacetNavSnippet;
@@ -97,6 +99,8 @@
 	}
 
 	const wrap = $derived(by !== undefined);
+	// Height of the title row above each `by` panel: none when untitled.
+	const titleHeight = $derived(titles ? TITLE_H : 0);
 
 	// ── wrapped (`by`) ───────────────────────────────────────────────────────
 	// The panels, in the order a plot's "facet" phase lays them out.
@@ -181,7 +185,7 @@
 	const carouselCellWidth = $derived(
 		Math.max(0, Math.floor((width - (visibleCount - 1) * gap) / visibleCount))
 	);
-	const carouselCellHeight = $derived(Math.max(0, height - TITLE_H));
+	const carouselCellHeight = $derived(Math.max(0, height - titleHeight));
 	const maxIndex = $derived(Math.max(0, wrapEntries.length - visibleCount));
 	const stepWidth = $derived(carouselCellWidth + gap);
 
@@ -270,7 +274,7 @@
 			<GridCell
 				row={entry?.r ?? Math.floor(i / columnCount)}
 				col={entry?.c ?? i % columnCount}
-				label={wrap ? entry?.label : undefined}
+				label={wrap && titles ? entry?.label : undefined}
 				data-row={entry?.row}
 				data-col={entry?.col}
 			>
@@ -325,7 +329,9 @@
 				{@const entry = entryByKey.get(key)}
 				{#if entry}
 					<div class="dct-facet-carousel__cell" style:width="{carouselCellWidth}px">
-						<div class="dct-facet-carousel__title" style:height="{TITLE_H}px">{entry.label}</div>
+						{#if titles}
+							<div class="dct-facet-carousel__title" style:height="{TITLE_H}px">{entry.label}</div>
+						{/if}
 						{#if carouselCellWidth > 0 && carouselCellHeight > 0}
 							{@render cell({
 								facetValue: entry.label,
@@ -346,7 +352,7 @@
 {:else}
 	<div class="dct-facet-paginated" style:width="{width}px" style:height="{height}px">
 		{#key page}
-			<Grid {width} height={gridHeight} {gap} {align} header={TITLE_H} columns={pageCols}>
+			<Grid {width} height={gridHeight} {gap} {align} header={titleHeight} columns={pageCols}>
 				{@render facetCells(pageKeys, pageCols)}
 			</Grid>
 		{/key}

@@ -167,3 +167,44 @@ describe('FacetLayout - new rows for the same panels', () => {
 		}
 	);
 });
+
+describe('FacetLayout - titles', () => {
+	test('each panel is titled by default', async () => {
+		const { container } = await render(FacetSizeProbe, {
+			groupCount: 3,
+			columns: 1,
+			mode: 'paginated',
+			pageSize: 1,
+			width: 600,
+			height: 400
+		});
+		expect(container.querySelector('.dct-grid-cell__label')?.textContent).toBe('A');
+	});
+
+	test('`titles: false` draws no title and gives its row to the panel, in grid and carousel modes', async () => {
+		for (const mode of ['paginated', 'carousel'] as const) {
+			const titled = await render(FacetSizeProbe, {
+				groupCount: 3,
+				columns: 1,
+				mode,
+				pageSize: 1,
+				width: 600,
+				height: 400
+			});
+			const untitled = await render(FacetSizeProbe, {
+				groupCount: 3,
+				columns: 1,
+				mode,
+				pageSize: 1,
+				titles: false,
+				width: 600,
+				height: 400
+			});
+			expect(untitled.container.querySelector('.dct-grid-cell__label')).toBeFalsy();
+			expect(untitled.container.querySelector('.dct-facet-carousel__title')).toBeFalsy();
+			expect(cellSize(untitled.container).height).toBeGreaterThan(
+				cellSize(titled.container).height
+			);
+		}
+	});
+});

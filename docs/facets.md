@@ -41,6 +41,7 @@ The data phases (grouping, transforms, statistics, shared scales) run once for a
 | `visible`                | Carousel: how many panels show at once                                                                                                          |
 | `pageSize`               | Paginated: panels per page                                                                                                                      |
 | `navLayout`              | `'overlay'` or `'below'` the navigation buttons                                                                                                 |
+| `titles`                 | `false` draws no title above each panel, and reserves no room for it. Default `true`                                                            |
 | `formatIndicator`        | `(current, total) => string` for the position badge                                                                                             |
 | `indicator`, `navButton` | Snippets replacing the badge and the buttons                                                                                                    |
 | `gap`                    | Pixels between panels                                                                                                                           |

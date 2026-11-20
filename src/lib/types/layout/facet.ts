@@ -93,6 +93,7 @@ export type FacetWrapConfig<TRow extends Record<string, unknown>> = FacetCommonC
 	visible?: number;
 	pageSize?: number;
 	navLayout?: FacetNavLayout;
+	titles?: boolean;
 	formatIndicator?: (current: number, total: number) => string;
 	indicator?: FacetIndicatorSnippet;
 	navButton?: FacetNavSnippet;
