@@ -11,7 +11,12 @@
 	const cfg = $derived(getConfiguration());
 	const gradientId = `dct-grad-${Math.random().toString(36).slice(2)}`;
 	const checkerId = `dct-checker-${Math.random().toString(36).slice(2)}`;
-	const barWidth = $derived(section.width ?? 170);
+	// With `width: 'fill'` the bar takes the width its section is given, as measured.
+	let filledWidth = $state(0);
+	const fills = $derived(section.width === 'fill');
+	const barWidth = $derived(
+		section.width === 'fill' ? filledWidth : typeof section.width === 'number' ? section.width : 170
+	);
 
 	const fmt = $derived(AxisNumberFormat.legend(section, [section.min, section.max], cfg));
 	const isInteractive = $derived(section.interactive?.enabled ?? false);
@@ -267,7 +272,11 @@
 	);
 </script>
 
-<div class="dct-continuous" style:width="{barWidth}px">
+<div
+	class="dct-continuous"
+	style:width={fills ? '100%' : `${barWidth}px`}
+	bind:clientWidth={filledWidth}
+>
 	<svg width={barWidth} height={svgHeight} style="overflow: visible">
 		<defs>
 			<linearGradient id={gradientId} x1="0" x2="1" y1="0" y2="0">

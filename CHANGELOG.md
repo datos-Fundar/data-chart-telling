@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- **`width: 'fill'` on a continuous legend.** The bar takes all the width the legend has, and follows it as it resizes, so a plot does not have to measure its container to size it.
 - **`maxWidth` on value labels.** A label wider than that many px is cut short with an ellipsis, and the plot's margin keeps room for no more than it.
 - **A facet's badge can name the panels shown.** `formatIndicator` and the `indicator` snippet get their labels as `values`.
 - **`navLayout: 'above'`, and `'below'` for carousels.** The navigation (paginated) or badge (carousel) gets a row above or under the panels instead of overlaying them.
