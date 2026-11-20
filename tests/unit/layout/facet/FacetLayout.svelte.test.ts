@@ -1,5 +1,5 @@
 import { render } from 'vitest-browser-svelte';
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, vi } from 'vitest';
 import FacetSizeProbe from './FacetSizeProbe.svelte';
 import FacetRowsProbe from './FacetRowsProbe.svelte';
 
@@ -166,4 +166,216 @@ describe('FacetLayout - new rows for the same panels', () => {
 			expect(cells(container).map((c) => c.el)).toEqual(before.map((c) => c.el));
 		}
 	);
+});
+
+describe('FacetLayout - titles', () => {
+	test('each panel is titled by default', async () => {
+		const { container } = await render(FacetSizeProbe, {
+			groupCount: 3,
+			columns: 1,
+			mode: 'paginated',
+			pageSize: 1,
+			width: 600,
+			height: 400
+		});
+		expect(container.querySelector('.dct-grid-cell__label')?.textContent).toBe('A');
+	});
+
+	test('`titles: false` draws no title and gives its row to the panel, in grid and carousel modes', async () => {
+		for (const mode of ['paginated', 'carousel'] as const) {
+			const titled = await render(FacetSizeProbe, {
+				groupCount: 3,
+				columns: 1,
+				mode,
+				pageSize: 1,
+				width: 600,
+				height: 400
+			});
+			const untitled = await render(FacetSizeProbe, {
+				groupCount: 3,
+				columns: 1,
+				mode,
+				pageSize: 1,
+				titles: false,
+				width: 600,
+				height: 400
+			});
+			expect(untitled.container.querySelector('.dct-grid-cell__label')).toBeFalsy();
+			expect(untitled.container.querySelector('.dct-facet-carousel__title')).toBeFalsy();
+			expect(cellSize(untitled.container).height).toBeGreaterThan(
+				cellSize(titled.container).height
+			);
+		}
+	});
+});
+
+describe('FacetLayout - the below navigation row sizes itself', () => {
+	const props = {
+		groupCount: 4,
+		columns: 1,
+		mode: 'paginated',
+		pageSize: 1,
+		navLayout: 'below',
+		width: 600,
+		height: 400
+	} as const;
+	const navOf = (container: Element) =>
+		container.querySelector('.dct-facet-paginated__nav-below')!.getBoundingClientRect();
+
+	test('with the default buttons it is 44px tall', async () => {
+		const { container } = await render(FacetSizeProbe, props);
+		expect(navOf(container).height).toBe(44);
+	});
+
+	test('smaller buttons shrink the row, and the panel takes what it frees', async () => {
+		const full = await render(FacetSizeProbe, props);
+		const small = await render(FacetSizeProbe, props);
+		small.container.style.setProperty('--dct-facet-nav-btn-size', '1.5rem');
+		await vi.waitFor(() => expect(navOf(small.container).height).toBe(36));
+		await vi.waitFor(() =>
+			expect(cellSize(small.container).height - cellSize(full.container).height).toBe(8)
+		);
+	});
+});
+
+describe('FacetLayout - formatIndicator names the panels shown', () => {
+	const formatIndicator = (current: number, total: number, values: string[]) =>
+		`${values.join('+')} - ${current}/${total}`;
+
+	test('a paginated page names the panels on it', async () => {
+		const { container } = await render(FacetSizeProbe, {
+			groupCount: 4,
+			columns: 1,
+			mode: 'paginated',
+			pageSize: 1,
+			navLayout: 'below',
+			formatIndicator,
+			width: 600,
+			height: 400
+		});
+		const badge = () => container.querySelector('.dct-facet-indicator')?.textContent;
+		expect(badge()).toBe('A - 1/4');
+		(container.querySelectorAll('.dct-facet-paginated__btn')[1] as HTMLElement).click();
+		await vi.waitFor(() => expect(badge()).toBe('B - 2/4'));
+	});
+
+	test('a carousel names the panels visible', async () => {
+		const { container } = await render(FacetSizeProbe, {
+			groupCount: 4,
+			columns: 3,
+			mode: 'carousel',
+			visible: 2,
+			formatIndicator,
+			width: 600,
+			height: 400
+		});
+		expect(container.querySelector('.dct-facet-indicator')?.textContent).toBe('A+B - 1/4');
+	});
+});
+
+describe('FacetLayout - carousel navLayout', () => {
+	const props = {
+		groupCount: 4,
+		columns: 3,
+		mode: 'carousel',
+		visible: 2,
+		width: 600,
+		height: 400
+	} as const;
+
+	test("'below' puts the badge under the panels instead of over them", async () => {
+		const overlay = await render(FacetSizeProbe, props);
+		const below = await render(FacetSizeProbe, { ...props, navLayout: 'below' });
+		const badge = below.container.querySelector('.dct-facet-indicator')!.getBoundingClientRect();
+		const cell = below.container.querySelector('[data-testid="cell"]')!.getBoundingClientRect();
+		expect(badge.top).toBeGreaterThanOrEqual(cell.bottom);
+		expect(cellSize(below.container).height).toBeLessThan(cellSize(overlay.container).height);
+	});
+});
+
+describe('FacetLayout - navLayout above', () => {
+	test('a paginated nav row sits over the panels and takes its room', async () => {
+		const { container } = await render(FacetSizeProbe, {
+			groupCount: 4,
+			columns: 1,
+			mode: 'paginated',
+			pageSize: 1,
+			navLayout: 'above',
+			width: 600,
+			height: 400
+		});
+		const nav = container.querySelector('.dct-facet-paginated__nav-row')!.getBoundingClientRect();
+		const cell = container.querySelector('[data-testid="cell"]')!.getBoundingClientRect();
+		expect(nav.bottom).toBeLessThanOrEqual(cell.top);
+		expect(nav.height + cellSize(container).height).toBeLessThanOrEqual(400);
+	});
+
+	test('a carousel badge row sits over the panels', async () => {
+		const { container } = await render(FacetSizeProbe, {
+			groupCount: 4,
+			columns: 3,
+			mode: 'carousel',
+			visible: 2,
+			navLayout: 'above',
+			width: 600,
+			height: 400
+		});
+		const badge = container.querySelector('.dct-facet-indicator')!.getBoundingClientRect();
+		const cell = container.querySelector('[data-testid="cell"]')!.getBoundingClientRect();
+		expect(badge.bottom).toBeLessThanOrEqual(cell.top);
+	});
+});
+
+describe('FacetLayout - indicatorAt', () => {
+	const props = {
+		groupCount: 4,
+		columns: 3,
+		mode: 'carousel',
+		visible: 1,
+		width: 600,
+		height: 400
+	} as const;
+	type At =
+		| 'top-left'
+		| 'top-middle'
+		| 'top-right'
+		| 'bottom-left'
+		| 'bottom-middle'
+		| 'bottom-right';
+	const place = async (indicatorAt?: At) => {
+		const { container } = await render(FacetSizeProbe, { ...props, indicatorAt });
+		const box = container.querySelector('.dct-facet-carousel')!.getBoundingClientRect();
+		const badge = container.querySelector('.dct-facet-indicator')!.getBoundingClientRect();
+		return {
+			top: badge.top - box.top,
+			bottom: box.bottom - badge.bottom,
+			left: badge.left - box.left,
+			right: box.right - badge.right
+		};
+	};
+
+	test('sits bottom-right by default', async () => {
+		const o = await place();
+		expect(o.bottom).toBe(8);
+		expect(o.right).toBe(8);
+	});
+
+	test.each([
+		['top-left', 'top', 'left'],
+		['top-right', 'top', 'right'],
+		['bottom-left', 'bottom', 'left']
+	] as const)('%s puts the badge in that corner', async (at, vertical, horizontal) => {
+		const o = await place(at);
+		expect(o[vertical]).toBe(8);
+		expect(o[horizontal]).toBe(8);
+	});
+
+	test.each([
+		['top-middle', 'top'],
+		['bottom-middle', 'bottom']
+	] as const)('%s centres the badge along that edge', async (at, edge) => {
+		const o = await place(at);
+		expect(o[edge]).toBe(8);
+		expect(Math.abs(o.left - o.right)).toBeLessThanOrEqual(1);
+	});
 });

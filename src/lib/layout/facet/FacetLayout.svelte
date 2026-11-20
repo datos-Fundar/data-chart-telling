@@ -9,6 +9,7 @@
 		FacetColumns,
 		FacetMode,
 		FacetNavLayout,
+		FacetIndicatorPosition,
 		Responsive,
 		FacetCellSnippet,
 		FacetIndicatorSnippet,
@@ -40,6 +41,8 @@
 		visible = 1,
 		pageSize,
 		navLayout = 'overlay',
+		indicatorAt = 'bottom-right',
+		titles = true,
 		formatIndicator,
 		indicator,
 		navButton,
@@ -64,7 +67,9 @@
 		visible?: number;
 		pageSize?: number;
 		navLayout?: FacetNavLayout;
-		formatIndicator?: (current: number, total: number) => string;
+		indicatorAt?: FacetIndicatorPosition;
+		titles?: boolean;
+		formatIndicator?: (current: number, total: number, values: string[]) => string;
 		indicator?: FacetIndicatorSnippet;
 		navButton?: FacetNavSnippet;
 		width: number;
@@ -85,7 +90,7 @@
 	};
 
 	const TITLE_H = 24;
-	const NAV_BELOW_H = 44;
+	const NAV_BELOW_DEFAULT_H = 44;
 
 	function resolveResponsive<T>(value: Responsive<T>, mobile: boolean): T {
 		if (typeof value === 'object' && value !== null && 'desktop' in value) {
@@ -97,6 +102,11 @@
 	}
 
 	const wrap = $derived(by !== undefined);
+	// Height of the title row above each `by` panel: none when untitled.
+	// The `'below'` navigation row takes the height its buttons and badge need; until it is measured, the default one.
+	let navRowHeight = $state(0);
+	const navHeight = $derived(navRowHeight || NAV_BELOW_DEFAULT_H);
+	const titleHeight = $derived(titles ? TITLE_H : 0);
 
 	// ── wrapped (`by`) ───────────────────────────────────────────────────────
 	// The panels, in the order a plot's "facet" phase lays them out.
@@ -144,6 +154,9 @@
 	// own effect, and Svelte then walks every derived that state reaches, panel after panel.
 	const entryByKey = $derived(new Map([...wrapEntries, ...matrixEntries].map((e) => [e.key, e])));
 	const wrapKeys = $derived(wrapEntries.map((e) => e.key));
+	// The labels of some panels, by their keys.
+	const labelsOf = (keys: string[]): string[] =>
+		keys.flatMap((key) => entryByKey.get(key)?.label ?? []);
 	const matrixKeys = $derived(matrixEntries.map((e) => e.key));
 
 	// ── wrapped modes ────────────────────────────────────────────────────────
@@ -171,7 +184,7 @@
 	// A page sizes its grid off what it shows, not the full entry count.
 	const pageCols = $derived(Math.max(1, Math.min(gridCols, pageKeys.length || 1)));
 	const gridHeight = $derived(
-		navLayout === 'below' && showNav ? Math.max(0, height - NAV_BELOW_H) : height
+		navLayout !== 'overlay' && showNav ? Math.max(0, height - navHeight) : height
 	);
 
 	// ── carousel ─────────────────────────────────────────────────────────────
@@ -181,7 +194,11 @@
 	const carouselCellWidth = $derived(
 		Math.max(0, Math.floor((width - (visibleCount - 1) * gap) / visibleCount))
 	);
-	const carouselCellHeight = $derived(Math.max(0, height - TITLE_H));
+	// With `navLayout: 'below'` or `'above'` the badge gets a row of its own beside the panels instead of overlaying them.
+	const carouselNavRow = $derived(navLayout !== 'overlay' && wrapEntries.length > 1);
+	const carouselCellHeight = $derived(
+		Math.max(0, height - titleHeight - (carouselNavRow ? navHeight : 0))
+	);
 	const maxIndex = $derived(Math.max(0, wrapEntries.length - visibleCount));
 	const stepWidth = $derived(carouselCellWidth + gap);
 
@@ -224,17 +241,47 @@
 	}
 </script>
 
-{#snippet indicatorContent(current: number, total: number)}
+{#snippet indicatorContent(current: number, total: number, values: string[])}
 	{#if indicator}
-		{@render indicator({ current, total })}
+		{@render indicator({ current, total, values })}
 	{:else}
-		<FacetIndicator {current} {total} format={formatIndicator} />
+		<FacetIndicator {current} {total} {values} format={formatIndicator} />
 	{/if}
 {/snippet}
 
-{#snippet indicatorSlot(current: number, total: number)}
-	<div class="dct-facet-indicator-slot">
-		{@render indicatorContent(current, total)}
+{#snippet indicatorSlot(current: number, total: number, values: string[])}
+	<div
+		class="dct-facet-indicator-slot"
+		class:dct-facet-indicator-slot--top={indicatorAt.startsWith('top')}
+		class:dct-facet-indicator-slot--left={indicatorAt.endsWith('left')}
+		class:dct-facet-indicator-slot--middle={indicatorAt.endsWith('middle')}
+	>
+		{@render indicatorContent(current, total, values)}
+	</div>
+{/snippet}
+
+{#snippet navRow()}
+	<div
+		class="dct-facet-paginated__nav-row"
+		class:dct-facet-paginated__nav-below={navLayout === 'below'}
+		class:dct-facet-paginated__nav-above={navLayout === 'above'}
+		bind:clientHeight={navRowHeight}
+	>
+		{@render navButtons(
+			'prev',
+			page === 0,
+			() => (page = Math.max(0, page - 1)),
+			'Previous page',
+			'‹'
+		)}
+		{@render indicatorContent(page + 1, totalPages, labelsOf(pageKeys))}
+		{@render navButtons(
+			'next',
+			page >= totalPages - 1,
+			() => (page = Math.min(totalPages - 1, page + 1)),
+			'Next page',
+			'›'
+		)}
 	</div>
 {/snippet}
 
@@ -270,7 +317,7 @@
 			<GridCell
 				row={entry?.r ?? Math.floor(i / columnCount)}
 				col={entry?.c ?? i % columnCount}
-				label={wrap ? entry?.label : undefined}
+				label={wrap && titles ? entry?.label : undefined}
 				data-row={entry?.row}
 				data-col={entry?.col}
 			>
@@ -319,13 +366,16 @@
 			class="dct-facet-carousel__track"
 			class:dct-facet-carousel__track--dragging={dragging}
 			style:gap="{gap}px"
+			style:padding-top="{carouselNavRow && navLayout === 'above' ? navHeight : 0}px"
 			style:transform="translateX({translate}px)"
 		>
 			{#each wrapKeys as key (key)}
 				{@const entry = entryByKey.get(key)}
 				{#if entry}
 					<div class="dct-facet-carousel__cell" style:width="{carouselCellWidth}px">
-						<div class="dct-facet-carousel__title" style:height="{TITLE_H}px">{entry.label}</div>
+						{#if titles}
+							<div class="dct-facet-carousel__title" style:height="{TITLE_H}px">{entry.label}</div>
+						{/if}
 						{#if carouselCellWidth > 0 && carouselCellHeight > 0}
 							{@render cell({
 								facetValue: entry.label,
@@ -340,36 +390,41 @@
 			{/each}
 		</div>
 		{#if wrapEntries.length > 1}
-			{@render indicatorSlot(activeIndex + 1, wrapEntries.length)}
+			{#if carouselNavRow}
+				<div
+					class="dct-facet-carousel__nav"
+					class:dct-facet-carousel__nav--above={navLayout === 'above'}
+					bind:clientHeight={navRowHeight}
+				>
+					{@render indicatorContent(
+						activeIndex + 1,
+						wrapEntries.length,
+						labelsOf(wrapKeys.slice(activeIndex, activeIndex + visibleCount))
+					)}
+				</div>
+			{:else}
+				{@render indicatorSlot(
+					activeIndex + 1,
+					wrapEntries.length,
+					labelsOf(wrapKeys.slice(activeIndex, activeIndex + visibleCount))
+				)}
+			{/if}
 		{/if}
 	</div>
 {:else}
 	<div class="dct-facet-paginated" style:width="{width}px" style:height="{height}px">
+		{#if showNav && navLayout === 'above'}
+			{@render navRow()}
+		{/if}
 		{#key page}
-			<Grid {width} height={gridHeight} {gap} {align} header={TITLE_H} columns={pageCols}>
+			<Grid {width} height={gridHeight} {gap} {align} header={titleHeight} columns={pageCols}>
 				{@render facetCells(pageKeys, pageCols)}
 			</Grid>
 		{/key}
 		{#if showNav}
 			{#if navLayout === 'below'}
-				<div class="dct-facet-paginated__nav-below" style:height="{NAV_BELOW_H}px">
-					{@render navButtons(
-						'prev',
-						page === 0,
-						() => (page = Math.max(0, page - 1)),
-						'Previous page',
-						'‹'
-					)}
-					{@render indicatorContent(page + 1, totalPages)}
-					{@render navButtons(
-						'next',
-						page >= totalPages - 1,
-						() => (page = Math.min(totalPages - 1, page + 1)),
-						'Next page',
-						'›'
-					)}
-				</div>
-			{:else}
+				{@render navRow()}
+			{:else if navLayout === 'overlay'}
 				<div class="dct-facet-paginated__nav">
 					{@render navButtons(
 						'prev',
@@ -386,7 +441,7 @@
 						'›'
 					)}
 				</div>
-				{@render indicatorSlot(page + 1, totalPages)}
+				{@render indicatorSlot(page + 1, totalPages, labelsOf(pageKeys))}
 			{/if}
 		{/if}
 	</div>
@@ -411,12 +466,14 @@
 	.dct-facet-nav-slot {
 		pointer-events: auto;
 	}
-	.dct-facet-paginated__nav-below {
+	.dct-facet-paginated__nav-row {
 		flex: 0 0 auto;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		gap: var(--dct-facet-nav-below-gap, 0.75rem);
+		padding: var(--dct-facet-nav-below-pad, 6px 0);
+		box-sizing: border-box;
 	}
 	.dct-facet-paginated__btn {
 		border: none;
@@ -434,10 +491,40 @@
 		cursor: default;
 	}
 
+	.dct-facet-carousel__nav {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: var(--dct-facet-nav-below-pad, 6px 0);
+		box-sizing: border-box;
+	}
+
+	.dct-facet-carousel__nav--above {
+		top: 0;
+		bottom: auto;
+	}
+
 	.dct-facet-indicator-slot {
 		position: absolute;
 		right: 0.5rem;
 		bottom: 0.5rem;
+	}
+	.dct-facet-indicator-slot--top {
+		top: 0.5rem;
+		bottom: auto;
+	}
+	.dct-facet-indicator-slot--left {
+		left: 0.5rem;
+		right: auto;
+	}
+	.dct-facet-indicator-slot--middle {
+		left: 50%;
+		right: auto;
+		transform: translateX(-50%);
 	}
 
 	.dct-facet-carousel {
@@ -446,6 +533,7 @@
 		touch-action: pan-y;
 	}
 	.dct-facet-carousel__track {
+		box-sizing: border-box;
 		display: flex;
 		height: 100%;
 		transition: transform 0.25s ease;

@@ -27,7 +27,10 @@
 
 <div class="dct-legend">
 	{#each sections as section, i (keys[i])}
-		<div class="dct-legend__section">
+		<div
+			class="dct-legend__section"
+			class:dct-legend__section--fill={section.type === 'continuous' && section.width === 'fill'}
+		>
 			{#if section.title}
 				<div class="dct-legend__title">{section.title}</div>
 			{/if}
@@ -58,6 +61,10 @@
 		flex-direction: column;
 		gap: 0.5rem;
 		min-width: 0;
+	}
+	/* A bar that fills takes a line of its own, the whole width of it. */
+	.dct-legend__section--fill {
+		flex: 1 1 100%;
 	}
 	.dct-legend__title {
 		font-size: var(--dct-legend-title-size, 0.875rem);

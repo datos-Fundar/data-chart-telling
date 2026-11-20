@@ -2,6 +2,25 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.20.4] - 2026-11-20
+
+### Added
+
+- **`width: 'fill'` on a continuous legend.** The bar takes all the width the legend has, and follows it as it resizes, so a plot does not have to measure its container to size it.
+- **`maxWidth` on value labels.** A label wider than that many px is cut short with an ellipsis, and the plot's margin keeps room for no more than it.
+- **A facet's badge can name the panels shown.** `formatIndicator` and the `indicator` snippet get their labels as `values`.
+- **`navLayout: 'above'`, and `'below'` for carousels.** The navigation (paginated) or badge (carousel) gets a row above or under the panels instead of overlaying them.
+- **`facet.indicatorAt`.** Where an overlaid badge sits: a corner or the middle of the top or bottom edge (`'bottom-right'` by default).
+- **`facet.titles`.** `titles: false` leaves each panel of a `by` facet untitled and takes back the row the title reserved above it (24px), in grid, paginated and carousel modes. It defaults to `true`.
+
+### Changed
+
+- **Every block of a figure's chrome has a CSS class named after it.** The plot's area was `.dct-figure-chrome__body` and a `footer` shared `.dct-figure-chrome__caption` with the `caption` text; they are now `.dct-figure-chrome__plot` and `.dct-figure-chrome__footer` (`caption` keeps `.dct-figure-chrome__caption`), so `header`, `legend`, `timeline`, `plot`, `footer`, `caption`, `title`, `subtitle` and `divider` each match their `order` entry. A stylesheet that targets `__body`, or `__caption` for a footer, has to use the new names.
+
+### Fixed
+
+- **A paginated facet's navigation row sizes itself to its buttons.** It reserved a fixed 44px even when the buttons were smaller.
+
 ## [1.20.3] - 2026-11-19
 
 ### Fixed

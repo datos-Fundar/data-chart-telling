@@ -45,6 +45,35 @@ describe('styles.values - show', () => {
 	});
 });
 
+describe('styles.values - maxWidth', () => {
+	const LONG = SERIES.map((s) => ({ ...s, name: `${s.name} with a very long name` }));
+	const labels = async (maxWidth?: number) => {
+		const { container } = await render(LinePlot, {
+			width: 500,
+			height: 300,
+			series: LONG,
+			styles: { values: { format: (_v, _n, { series }) => String(series), maxWidth } }
+		});
+		const svg = await waitForSvg(container);
+		await expect.poll(() => countTextLabels(svg)).toBe(2);
+		return [...svg.querySelectorAll('g.text text')].map((el) => el.textContent ?? '');
+	};
+
+	test('cuts the labels that are wider with an ellipsis', async () => {
+		const cut = await labels(60);
+		expect(cut).toHaveLength(2);
+		for (const text of cut) {
+			expect(text.endsWith('…')).toBe(true);
+			expect(text.length).toBeLessThan('female with a very long name'.length);
+		}
+	});
+
+	test('leaves them whole without it', async () => {
+		const whole = await labels();
+		expect(whole.every((text) => !text.includes('…'))).toBe(true);
+	});
+});
+
 describe('styles.values - layout', () => {
 	test("a line plot's `'path'` labels write each series' name along its line", async () => {
 		const { container } = await render(LinePlot, {

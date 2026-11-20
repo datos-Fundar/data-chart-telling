@@ -7,14 +7,16 @@
 	let {
 		current,
 		total,
+		values = [],
 		format
 	}: {
 		current: number;
 		total: number;
-		format?: (current: number, total: number) => string;
+		values?: string[];
+		format?: (current: number, total: number, values: string[]) => string;
 	} = $props();
 
-	const text = $derived(format ? format(current, total) : `${current} / ${total}`);
+	const text = $derived(format ? format(current, total, values) : `${current} / ${total}`);
 </script>
 
 <div class="dct-facet-indicator">{text}</div>

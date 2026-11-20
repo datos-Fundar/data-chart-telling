@@ -34,6 +34,25 @@ export const SingleContinuous: Story = {
 	}
 };
 
+/** `width: 'fill'` - the bar takes all the width the legend has, and follows it as it resizes. */
+export const FillsTheWidth: Story = {
+	args: {
+		sections: [
+			{
+				type: 'continuous',
+				title: 'Percentage',
+				min: 0,
+				max: 0.2,
+				colorMin: '#e0e7ff',
+				colorMax: '#4f46e5',
+				ticks: [0.05, 0.1, 0.15],
+				format: (v) => `${(v * 100).toFixed(0)}%`,
+				width: 'fill'
+			}
+		] satisfies LegendSection[]
+	}
+};
+
 const pct = (v: number) => `${v.toFixed(0)}%`;
 
 /**

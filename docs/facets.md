@@ -32,20 +32,22 @@ The data phases (grouping, transforms, statistics, shared scales) run once for a
 
 `{ by }` makes one panel per distinct value of the `by` field.
 
-| Option                   | Meaning                                                                                                                                         |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `by`                     | Field (or function) to split by                                                                                                                 |
-| `values`                 | The facet values to show, in order. Default: every value, in data order                                                                         |
-| `columns`                | Panels per row: a number, or `{ desktop, mobile }`                                                                                              |
-| `mode`                   | `'grid'` (all at once, default), `'carousel'` (a few at a time with prev/next) or `'paginated'` (pages). Also `{ desktop, mobile }`             |
-| `visible`                | Carousel: how many panels show at once                                                                                                          |
-| `pageSize`               | Paginated: panels per page                                                                                                                      |
-| `navLayout`              | `'overlay'` or `'below'` the navigation buttons                                                                                                 |
-| `formatIndicator`        | `(current, total) => string` for the position badge                                                                                             |
-| `indicator`, `navButton` | Snippets replacing the badge and the buttons                                                                                                    |
-| `gap`                    | Pixels between panels                                                                                                                           |
-| `scales`                 | `'shared'` (default), `'free'`, `'free-x'`, `'free-y'`                                                                                          |
-| `axes`                   | `'all'` (default) draws every panel's axes; `'outer'` draws only the left column's y and the bottom row's x, with panels resized to equal boxes |
+| Option                   | Meaning                                                                                                                                                                       |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `by`                     | Field (or function) to split by                                                                                                                                               |
+| `values`                 | The facet values to show, in order. Default: every value, in data order                                                                                                       |
+| `columns`                | Panels per row: a number, or `{ desktop, mobile }`                                                                                                                            |
+| `mode`                   | `'grid'` (all at once, default), `'carousel'` (a few at a time with prev/next) or `'paginated'` (pages). Also `{ desktop, mobile }`                                           |
+| `visible`                | Carousel: how many panels show at once                                                                                                                                        |
+| `pageSize`               | Paginated: panels per page                                                                                                                                                    |
+| `navLayout`              | `'overlay'` over the panels (default), or a row `'below'` or `'above'` them: the navigation buttons (paginated) or the badge (carousel)                                       |
+| `indicatorAt`            | With the default `'overlay'` `navLayout`, where the badge sits: `'top-left'`, `'top-middle'`, `'top-right'`, `'bottom-left'`, `'bottom-middle'` or `'bottom-right'` (default) |
+| `titles`                 | `false` draws no title above each panel, and reserves no room for it. Default `true`                                                                                          |
+| `formatIndicator`        | `(current, total, values) => string` for the position badge; `values` are the labels of the panels shown, to name them in it                                                  |
+| `indicator`, `navButton` | Snippets replacing the badge and the buttons                                                                                                                                  |
+| `gap`                    | Pixels between panels                                                                                                                                                         |
+| `scales`                 | `'shared'` (default), `'free'`, `'free-x'`, `'free-y'`                                                                                                                        |
+| `axes`                   | `'all'` (default) draws every panel's axes; `'outer'` draws only the left column's y and the bottom row's x, with panels resized to equal boxes                               |
 
 <!-- example: examples/FacetsCarousel.svelte -->
 

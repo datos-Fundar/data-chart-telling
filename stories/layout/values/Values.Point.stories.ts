@@ -2,7 +2,13 @@ import type { Meta } from '@storybook/svelte-vite';
 import LinePlot from '$lib/plots/evolution/line/Plot.svelte';
 import BarPlot from '$lib/plots/ranking/bar/Plot.svelte';
 import ScatterPlot from '$lib/plots/correlation/scatter/Plot.svelte';
-import { COUNTRIES_AT_2007, FEMALE_LIFE, FEMALE_PROVINCE_VALUES, PRICES } from '$datasets';
+import {
+	COUNTRIES_AT_2007,
+	FEMALE_LIFE,
+	MALE_LIFE,
+	FEMALE_PROVINCE_VALUES,
+	PRICES
+} from '$datasets';
 import type { PlotRowContext } from '$lib';
 import { plotStory } from '../../common/plotStory';
 
@@ -94,6 +100,26 @@ export const OnlySomeSeries = plotStory(LinePlot, 'LinePlot', {
 				stroke: 'white',
 				fontWeight: 'bold'
 			}
+		}
+	}
+});
+
+// ── Long labels ───────────────────────────────────────────────────────────────
+
+/**
+ * `maxWidth` cuts a label wider than that many px short with an ellipsis, and the plot's margin keeps room for no
+ * more than it - here each series' name, at the end of its line.
+ */
+export const MaxWidth = plotStory(LinePlot, 'LinePlot', {
+	...SIZE,
+	series: [
+		{ name: 'Female life expectancy at birth', x: 'year', y: 'value', data: FEMALE_LIFE },
+		{ name: 'Male life expectancy at birth', x: 'year', y: 'value', data: MALE_LIFE }
+	],
+	styles: {
+		values: {
+			format: (_value: number, _number: unknown, { series }: PlotRowContext) => String(series),
+			maxWidth: 90
 		}
 	}
 });

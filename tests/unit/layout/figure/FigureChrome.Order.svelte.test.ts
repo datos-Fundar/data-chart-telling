@@ -28,11 +28,14 @@ async function blocks(props: Record<string, unknown>): Promise<string[]> {
 
 function named(el: Element): string {
 	{
-		if (el.classList.contains('dct-figure-chrome__body')) return 'plot';
+		if (el.classList.contains('dct-figure-chrome__plot')) return 'plot';
 		if (el.classList.contains('dct-figure-chrome__divider')) return 'divider';
 		if (el.classList.contains('dct-figure-chrome__legend')) return 'legend';
 		if (el.classList.contains('dct-figure-chrome__timeline')) return 'timeline';
-		if (el.classList.contains('dct-figure-chrome__caption'))
+		if (
+			el.classList.contains('dct-figure-chrome__caption') ||
+			el.classList.contains('dct-figure-chrome__footer')
+		)
 			return `caption:${el.textContent?.trim()}`;
 		const parts = [...el.children].map((c) =>
 			c.classList.contains('dct-figure-chrome__title') ? 'title' : 'subtitle'
@@ -188,7 +191,7 @@ describe('FigureChrome - a rule timeline', () => {
 		return {
 			rule: rect('.dct-timeline-rule'),
 			svg: rect('.dct-timeline-rule svg'),
-			body: rect('.dct-figure-chrome__body')
+			body: rect('.dct-figure-chrome__plot')
 		};
 	}
 

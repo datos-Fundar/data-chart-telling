@@ -165,7 +165,8 @@ export type ContinuousLegendSection = NumberDisplay & {
 	/** Draws the bar in one color (`colorMin`, `legend.continuous.opacity.color` by default) fading across this opacity range over a checkerboard, instead of a color ramp. */
 	opacity?: [number, number];
 	ticks?: number[];
-	width?: number;
+	/** The bar's width in px (170 by default), or `'fill'` for all the width the legend has - it follows the container as it resizes. */
+	width?: number | 'fill';
 	/** A value's text, in place of the value. A number it returns (`v * 100` for a share kept as a ratio) is written as the display fields above ask; a string is shown as it is. `number` writes a value that way by hand. */
 	format?: (v: number, number: (v: number) => string) => string | number;
 	interactive?: ContinuousInteractiveConfig;
