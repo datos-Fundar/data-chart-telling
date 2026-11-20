@@ -169,8 +169,8 @@
 		return out;
 	});
 
-	let bodyWidth = $state(0);
-	let bodyHeight = $state(0);
+	let plotWidth = $state(0);
+	let plotHeight = $state(0);
 </script>
 
 {#snippet cell(block: Cell)}
@@ -192,16 +192,16 @@
 		<div class="dct-figure-chrome__timeline">{@render timeline?.()}</div>
 	{:else if block.type === 'plot'}
 		<div
-			class="dct-figure-chrome__body"
-			bind:clientWidth={bodyWidth}
-			bind:clientHeight={bodyHeight}
+			class="dct-figure-chrome__plot"
+			bind:clientWidth={plotWidth}
+			bind:clientHeight={plotHeight}
 		>
-			{#if bodyWidth > 0 && bodyHeight > 0}
-				{@render plot({ width: bodyWidth, height: bodyHeight })}
+			{#if plotWidth > 0 && plotHeight > 0}
+				{@render plot({ width: plotWidth, height: plotHeight })}
 			{/if}
 		</div>
 	{:else if block.type === 'footer'}
-		<div class="dct-figure-chrome__caption">{@render footer?.()}</div>
+		<div class="dct-figure-chrome__footer">{@render footer?.()}</div>
 	{:else}
 		<div class="dct-figure-chrome__caption">
 			<span>{caption}</span>
@@ -302,7 +302,7 @@
 		flex: 0 1 auto;
 		min-width: 0;
 	}
-	.dct-figure-chrome__row > .dct-figure-chrome__body {
+	.dct-figure-chrome__row > .dct-figure-chrome__plot {
 		flex: 1 1 0;
 	}
 	/* Beside the plot, the timeline keeps the configuration's own gap and lines up with it. */
@@ -313,13 +313,14 @@
 		padding: 0;
 	}
 
-	.dct-figure-chrome__body {
+	.dct-figure-chrome__plot {
 		flex: 1 1 auto;
 		min-height: 0;
 		min-width: 0;
 	}
 
-	.dct-figure-chrome__caption {
+	.dct-figure-chrome__caption,
+	.dct-figure-chrome__footer {
 		flex: 0 0 auto;
 		padding: var(--dct-caption-pad, 0.5rem 0);
 		font-family: var(--dct-caption-font, inherit);
