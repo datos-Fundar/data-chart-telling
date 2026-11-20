@@ -87,7 +87,7 @@
 	};
 
 	const TITLE_H = 24;
-	const NAV_BELOW_H = 44;
+	const NAV_BELOW_DEFAULT_H = 44;
 
 	function resolveResponsive<T>(value: Responsive<T>, mobile: boolean): T {
 		if (typeof value === 'object' && value !== null && 'desktop' in value) {
@@ -100,6 +100,9 @@
 
 	const wrap = $derived(by !== undefined);
 	// Height of the title row above each `by` panel: none when untitled.
+	// The `'below'` navigation row takes the height its buttons and badge need; until it is measured, the default one.
+	let navRowHeight = $state(0);
+	const navHeight = $derived(navRowHeight || NAV_BELOW_DEFAULT_H);
 	const titleHeight = $derived(titles ? TITLE_H : 0);
 
 	// ── wrapped (`by`) ───────────────────────────────────────────────────────
@@ -175,7 +178,7 @@
 	// A page sizes its grid off what it shows, not the full entry count.
 	const pageCols = $derived(Math.max(1, Math.min(gridCols, pageKeys.length || 1)));
 	const gridHeight = $derived(
-		navLayout === 'below' && showNav ? Math.max(0, height - NAV_BELOW_H) : height
+		navLayout === 'below' && showNav ? Math.max(0, height - navHeight) : height
 	);
 
 	// ── carousel ─────────────────────────────────────────────────────────────
@@ -358,7 +361,7 @@
 		{/key}
 		{#if showNav}
 			{#if navLayout === 'below'}
-				<div class="dct-facet-paginated__nav-below" style:height="{NAV_BELOW_H}px">
+				<div class="dct-facet-paginated__nav-below" bind:clientHeight={navRowHeight}>
 					{@render navButtons(
 						'prev',
 						page === 0,
@@ -423,6 +426,8 @@
 		align-items: center;
 		justify-content: center;
 		gap: var(--dct-facet-nav-below-gap, 0.75rem);
+		padding: var(--dct-facet-nav-below-pad, 6px 0);
+		box-sizing: border-box;
 	}
 	.dct-facet-paginated__btn {
 		border: none;

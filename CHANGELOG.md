@@ -12,6 +12,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - **Every block of a figure's chrome has a CSS class named after it.** The plot's area was `.dct-figure-chrome__body` and a `footer` shared `.dct-figure-chrome__caption` with the `caption` text; they are now `.dct-figure-chrome__plot` and `.dct-figure-chrome__footer` (`caption` keeps `.dct-figure-chrome__caption`), so `header`, `legend`, `timeline`, `plot`, `footer`, `caption`, `title`, `subtitle` and `divider` each match their `order` entry. A stylesheet that targets `__body`, or `__caption` for a footer, has to use the new names.
 
+### Fixed
+
+- **A paginated facet's navigation row sizes itself to its buttons.** It reserved a fixed 44px even when the buttons were smaller.
+
 ## [1.20.3] - 2026-11-19
 
 ### Fixed

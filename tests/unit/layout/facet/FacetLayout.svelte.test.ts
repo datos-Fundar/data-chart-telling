@@ -1,5 +1,5 @@
 import { render } from 'vitest-browser-svelte';
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, vi } from 'vitest';
 import FacetSizeProbe from './FacetSizeProbe.svelte';
 import FacetRowsProbe from './FacetRowsProbe.svelte';
 
@@ -206,5 +206,34 @@ describe('FacetLayout - titles', () => {
 				cellSize(titled.container).height
 			);
 		}
+	});
+});
+
+describe('FacetLayout - the below navigation row sizes itself', () => {
+	const props = {
+		groupCount: 4,
+		columns: 1,
+		mode: 'paginated',
+		pageSize: 1,
+		navLayout: 'below',
+		width: 600,
+		height: 400
+	} as const;
+	const navOf = (container: Element) =>
+		container.querySelector('.dct-facet-paginated__nav-below')!.getBoundingClientRect();
+
+	test('with the default buttons it is 44px tall', async () => {
+		const { container } = await render(FacetSizeProbe, props);
+		expect(navOf(container).height).toBe(44);
+	});
+
+	test('smaller buttons shrink the row, and the panel takes what it frees', async () => {
+		const full = await render(FacetSizeProbe, props);
+		const small = await render(FacetSizeProbe, props);
+		small.container.style.setProperty('--dct-facet-nav-btn-size', '1.5rem');
+		await vi.waitFor(() => expect(navOf(small.container).height).toBe(36));
+		await vi.waitFor(() =>
+			expect(cellSize(small.container).height - cellSize(full.container).height).toBe(8)
+		);
 	});
 });
